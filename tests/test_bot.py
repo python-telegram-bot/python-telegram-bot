@@ -87,6 +87,9 @@ class TestBot(object):
         assert get_me_bot.first_name == bot.first_name
         assert get_me_bot.last_name == bot.last_name
         assert get_me_bot.name == bot.name
+        assert get_me_bot.can_join_groups == bot.can_join_groups
+        assert get_me_bot.can_read_all_group_messages == bot.can_read_all_group_messages
+        assert get_me_bot.supports_inline_queries == bot.supports_inline_queries
         assert 'https://t.me/{}'.format(get_me_bot.username) == bot.link
 
     @flaky(3, 1)
@@ -175,14 +178,17 @@ class TestBot(object):
         question = 'Is this a test?'
         answers = ['Yes', 'No', 'Maybe']
         message = bot.send_poll(chat_id=super_group_id, question=question, options=answers,
-                                timeout=60)
+                                is_anonymous=False, allows_multiple_answers=True, timeout=60)
 
         assert message.poll
         assert message.poll.question == question
         assert message.poll.options[0].text == answers[0]
         assert message.poll.options[1].text == answers[1]
         assert message.poll.options[2].text == answers[2]
+        assert not message.poll.is_anonymous
+        assert message.poll.allows_multiple_answers
         assert not message.poll.is_closed
+        assert message.poll.type == Poll.REGULAR
 
         poll = bot.stop_poll(chat_id=super_group_id, message_id=message.message_id, timeout=60)
         assert isinstance(poll, Poll)
@@ -194,6 +200,13 @@ class TestBot(object):
         assert poll.options[2].text == answers[2]
         assert poll.options[2].voter_count == 0
         assert poll.question == question
+        assert poll.total_voter_count == 0
+
+        message_quiz = bot.send_poll(chat_id=super_group_id, question=question, options=answers,
+                                     type=Poll.QUIZ, correct_option_id=2, is_closed=True)
+        assert message_quiz.poll.correct_option_id == 2
+        assert message_quiz.poll.type == Poll.QUIZ
+        assert message_quiz.poll.is_closed
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

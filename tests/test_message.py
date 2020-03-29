@@ -90,7 +90,9 @@ def message(bot):
                     {'passport_data': PassportData.de_json(RAW_PASSPORT_DATA, None)},
                     {'poll': Poll(id='abc', question='What is this?',
                                   options=[PollOption(text='a', voter_count=1),
-                                           PollOption(text='b', voter_count=2)], is_closed=False)},
+                                           PollOption(text='b', voter_count=2)], is_closed=False,
+                                  total_voter_count=0, is_anonymous=False, type=Poll.REGULAR,
+                                  allows_multiple_answers=True)},
                     {'text': 'a text message', 'reply_markup': {'inline_keyboard': [[{
                         'text': 'start', 'url': 'http://google.com'}, {
                         'text': 'next', 'callback_data': 'abcd'}],
@@ -126,7 +128,7 @@ class TestMessage(object):
                       'url': 'http://github.com/ab_'},
                      {'length': 12, 'offset': 38, 'type': 'text_mention',
                       'user': User(123456789, 'mentioned user', False)},
-                     {'length': 3, 'offset': 55, 'type': 'pre'},
+                     {'length': 3, 'offset': 55, 'type': 'pre', 'language': 'python'},
                      {'length': 21, 'offset': 60, 'type': 'url'}]
     test_text = 'Test for <bold, ita_lic, code, links, text-mention and pre. http://google.com/ab_'
     test_entities_v2 = [{'length': 4, 'offset': 0, 'type': 'underline'},
@@ -141,9 +143,10 @@ class TestMessage(object):
                         {'length': 17, 'offset': 64, 'type': 'url'},
                         {'length': 36, 'offset': 86, 'type': 'italic'},
                         {'length': 24, 'offset': 91, 'type': 'bold'},
-                        {'length': 4, 'offset': 101, 'type': 'strikethrough'}]
+                        {'length': 4, 'offset': 101, 'type': 'strikethrough'},
+                        {'length': 10, 'offset': 124, 'type': 'pre', 'language': 'python'}]
     test_text_v2 = ('Test for <bold, ita_lic, \`code, links, text-mention and `\pre. '
-                    'http://google.com and bold nested in strk nested in italic.')
+                    'http://google.com and bold nested in strk nested in italic. Python pre.')
     test_message = Message(message_id=1,
                            from_user=None,
                            date=None,
@@ -213,7 +216,8 @@ class TestMessage(object):
                             ' <a href="http://github.com/abc\)def">links</a>, '
                             '<a href="tg://user?id=123456789">text-mention</a> and '
                             '<pre>`\pre</pre>. http://google.com '
-                            'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>.')
+                            'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>. '
+                            '<pre><code class="python">Python pre</code></pre>.')
         text_html = self.test_message_v2.text_html
         assert text_html == test_html_string
 
@@ -227,13 +231,14 @@ class TestMessage(object):
                             ' <a href="http://github.com/abc\)def">links</a>, '
                             '<a href="tg://user?id=123456789">text-mention</a> and '
                             '<pre>`\pre</pre>. <a href="http://google.com">http://google.com</a> '
-                            'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>.')
+                            'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>. '
+                            '<pre><code class="python">Python pre</code></pre>.')
         text_html = self.test_message_v2.text_html_urled
         assert text_html == test_html_string
 
     def test_text_markdown_simple(self):
         test_md_string = ('Test for <*bold*, _ita_\__lic_, `code`, [links](http://github.com/ab_),'
-                          ' [text-mention](tg://user?id=123456789) and ```\npre```. '
+                          ' [text-mention](tg://user?id=123456789) and ```python\npre```. '
                           'http://google.com/ab\_')
         text_markdown = self.test_message.text_markdown
         assert text_markdown == test_md_string
@@ -242,7 +247,8 @@ class TestMessage(object):
         test_md_string = (r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
                           '[links](http://github.com/abc\\\\\)def), '
                           '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```\. '
-                          'http://google\.com and _bold *nested in ~strk~ nested in* italic_\.')
+                          'http://google\.com and _bold *nested in ~strk~ nested in* italic_\. '
+                          '```python\nPython pre```\.')
         text_markdown = self.test_message_v2.text_markdown_v2
         assert text_markdown == test_md_string
 
@@ -271,7 +277,7 @@ class TestMessage(object):
 
     def test_text_markdown_urled(self):
         test_md_string = ('Test for <*bold*, _ita_\__lic_, `code`, [links](http://github.com/ab_),'
-                          ' [text-mention](tg://user?id=123456789) and ```\npre```. '
+                          ' [text-mention](tg://user?id=123456789) and ```python\npre```. '
                           '[http://google.com/ab_](http://google.com/ab_)')
         text_markdown = self.test_message.text_markdown_urled
         assert text_markdown == test_md_string
@@ -281,7 +287,7 @@ class TestMessage(object):
                           '[links](http://github.com/abc\\\\\)def), '
                           '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```\. '
                           '[http://google\.com](http://google.com) and _bold *nested in ~strk~ '
-                          'nested in* italic_\.')
+                          'nested in* italic_\. ```python\nPython pre```\.')
         text_markdown = self.test_message_v2.text_markdown_v2_urled
         assert text_markdown == test_md_string
 
@@ -306,7 +312,8 @@ class TestMessage(object):
                             ' <a href="http://github.com/abc\)def">links</a>, '
                             '<a href="tg://user?id=123456789">text-mention</a> and '
                             '<pre>`\pre</pre>. http://google.com '
-                            'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>.')
+                            'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>. '
+                            '<pre><code class="python">Python pre</code></pre>.')
         caption_html = self.test_message_v2.caption_html
         assert caption_html == test_html_string
 
@@ -320,13 +327,14 @@ class TestMessage(object):
                             ' <a href="http://github.com/abc\)def">links</a>, '
                             '<a href="tg://user?id=123456789">text-mention</a> and '
                             '<pre>`\pre</pre>. <a href="http://google.com">http://google.com</a> '
-                            'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>.')
+                            'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>. '
+                            '<pre><code class="python">Python pre</code></pre>.')
         caption_html = self.test_message_v2.caption_html_urled
         assert caption_html == test_html_string
 
     def test_caption_markdown_simple(self):
         test_md_string = ('Test for <*bold*, _ita_\__lic_, `code`, [links](http://github.com/ab_),'
-                          ' [text-mention](tg://user?id=123456789) and ```\npre```. '
+                          ' [text-mention](tg://user?id=123456789) and ```python\npre```. '
                           'http://google.com/ab\_')
         caption_markdown = self.test_message.caption_markdown
         assert caption_markdown == test_md_string
@@ -335,7 +343,8 @@ class TestMessage(object):
         test_md_string = (r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
                           '[links](http://github.com/abc\\\\\\)def), '
                           '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```\. '
-                          'http://google\.com and _bold *nested in ~strk~ nested in* italic_\.')
+                          'http://google\.com and _bold *nested in ~strk~ nested in* italic_\. '
+                          '```python\nPython pre```\.')
         caption_markdown = self.test_message_v2.caption_markdown_v2
         assert caption_markdown == test_md_string
 
@@ -347,7 +356,7 @@ class TestMessage(object):
 
     def test_caption_markdown_urled(self):
         test_md_string = ('Test for <*bold*, _ita_\__lic_, `code`, [links](http://github.com/ab_),'
-                          ' [text-mention](tg://user?id=123456789) and ```\npre```. '
+                          ' [text-mention](tg://user?id=123456789) and ```python\npre```. '
                           '[http://google.com/ab_](http://google.com/ab_)')
         caption_markdown = self.test_message.caption_markdown_urled
         assert caption_markdown == test_md_string
@@ -357,7 +366,7 @@ class TestMessage(object):
                           '[links](http://github.com/abc\\\\\\)def), '
                           '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```\. '
                           '[http://google\.com](http://google.com) and _bold *nested in ~strk~ '
-                          'nested in* italic_\.')
+                          'nested in* italic_\. ```python\nPython pre```\.')
         caption_markdown = self.test_message_v2.caption_markdown_v2_urled
         assert caption_markdown == test_md_string
 
@@ -444,7 +453,7 @@ class TestMessage(object):
 
     def test_reply_markdown(self, monkeypatch, message):
         test_md_string = ('Test for <*bold*, _ita_\__lic_, `code`, [links](http://github.com/ab_),'
-                          ' [text-mention](tg://user?id=123456789) and ```\npre```. '
+                          ' [text-mention](tg://user?id=123456789) and ```python\npre```. '
                           'http://google.com/ab\_')
 
         def test(*args, **kwargs):
@@ -471,7 +480,8 @@ class TestMessage(object):
         test_md_string = (r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
                           '[links](http://github.com/abc\\\\\)def), '
                           '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```\. '
-                          'http://google\.com and _bold *nested in ~strk~ nested in* italic_\.')
+                          'http://google\.com and _bold *nested in ~strk~ nested in* italic_\. '
+                          '```python\nPython pre```\.')
 
         def test(*args, **kwargs):
             cid = args[0] == message.chat_id
@@ -498,7 +508,8 @@ class TestMessage(object):
                             ' <a href="http://github.com/abc\)def">links</a>, '
                             '<a href="tg://user?id=123456789">text-mention</a> and '
                             '<pre>`\pre</pre>. http://google.com '
-                            'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>.')
+                            'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>. '
+                            '<pre><code class="python">Python pre</code></pre>.')
 
         def test(*args, **kwargs):
             cid = args[0] == message.chat_id

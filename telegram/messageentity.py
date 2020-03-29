@@ -32,6 +32,8 @@ class MessageEntity(TelegramObject):
         length (:obj:`int`): Length of the entity in UTF-16 code units.
         url (:obj:`str`): Optional. Url that will be opened after user taps on the text.
         user (:class:`telegram.User`): Optional. The mentioned user.
+        language (:obj:`str`): Optional. Programming language of the entity
+            text
 
     Args:
         type (:obj:`str`): Type of the entity. Can be mention (@username), hashtag, bot_command,
@@ -40,13 +42,16 @@ class MessageEntity(TelegramObject):
             without usernames).
         offset (:obj:`int`): Offset in UTF-16 code units to the start of the entity.
         length (:obj:`int`): Length of the entity in UTF-16 code units.
-        url (:obj:`str`, optional): For "text_link" only, url that will be opened after usertaps on
-            the text.
-        user (:class:`telegram.User`, optional): For "text_mention" only, the mentioned user.
+        url (:obj:`str`, optional): For :attr:`TEXT_LINK` only, url that will be opened after
+            usertaps on the text.
+        user (:class:`telegram.User`, optional): For :attr:`TEXT_MENTION` only, the mentioned
+             user.
+        language (:obj:`str`, optional): For :attr:`PRE` only, the programming language of
+            the entity text
 
     """
 
-    def __init__(self, type, offset, length, url=None, user=None, **kwargs):
+    def __init__(self, type, offset, length, url=None, user=None, language=None, **kwargs):
         # Required
         self.type = type
         self.offset = offset
@@ -54,6 +59,7 @@ class MessageEntity(TelegramObject):
         # Optionals
         self.url = url
         self.user = user
+        self.language = language
 
         self._id_attrs = (self.type, self.offset, self.length)
 
