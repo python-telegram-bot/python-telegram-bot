@@ -53,7 +53,7 @@ class TestUserProfilePhotos(object):
         a = UserProfilePhotos(2, self.photos)
         b = UserProfilePhotos(2, self.photos)
         c = UserProfilePhotos(1, [self.photos[0]])
-        d = PhotoSize('file_id1', 512, 512)
+        d = PhotoSize('file_id1', 'unique_id', 512, 512)
 
         assert a == b
         assert hash(a) == hash(b)
