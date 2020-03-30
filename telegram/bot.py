@@ -3809,6 +3809,9 @@ class Bot(TelegramObject):
 
         result = self._request.post(url, data, timeout=timeout)
 
+        if result:
+            self._commands = commands
+
         return result
 
     def to_dict(self):
