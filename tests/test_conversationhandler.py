@@ -179,7 +179,7 @@ class TestConversationHandler(object):
         return self._set_state(update, self.STOPPING)
 
     # Tests
-    @pytest.mark.parametrize('attr', ['entry_points', 'states', 'fallbacks', 'per_chat',
+    @pytest.mark.parametrize('attr', ['entry_points', 'states', 'fallbacks', 'per_chat', 'name',
                              'per_user', 'allow_reentry', 'conversation_timeout', 'map_to_parent'],
                              indirect=False)
     def test_immutable(self, attr):
