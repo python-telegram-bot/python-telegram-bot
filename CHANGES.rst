@@ -2,6 +2,26 @@
 Changelog
 =========
 
+Version 12.5.1
+==============
+*Released 2020-03-30*
+
+**Minor changes, doc fixes or bug fixes:**
+
+- Add missing docs for `PollHandler` and `PollAnswerHandler` (`#1853`_)
+- Fix wording in `Filters` docs (`#1855`_)
+- Reorder tests to make them more stable (`#1835`_)
+- Make `ConversationHandler` attributes immutable (`#1756`_)
+- Make `PrefixHandler` attributes `command` and `prefix` editable (`#1636`_)
+- Fix UTC as default `tzinfo` for `Job` (`#1696`_)
+
+.. _`#1853`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1853
+.. _`#1855`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1855
+.. _`#1835`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1835
+.. _`#1756`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1756
+.. _`#1636`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1636
+.. _`#1696`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1696
+
 Version 12.5
 ============
 *Released 2020-03-29*
