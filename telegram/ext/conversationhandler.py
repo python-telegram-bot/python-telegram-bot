@@ -165,23 +165,23 @@ class ConversationHandler(Handler):
                  persistent=False,
                  map_to_parent=None):
 
-        self.entry_points = entry_points
-        self.states = states
-        self.fallbacks = fallbacks
+        self._entry_points = entry_points
+        self._states = states
+        self._fallbacks = fallbacks
 
-        self.allow_reentry = allow_reentry
-        self.per_user = per_user
-        self.per_chat = per_chat
-        self.per_message = per_message
-        self.conversation_timeout = conversation_timeout
-        self.name = name
+        self._allow_reentry = allow_reentry
+        self._per_user = per_user
+        self._per_chat = per_chat
+        self._per_message = per_message
+        self._conversation_timeout = conversation_timeout
+        self._name = name
         if persistent and not self.name:
             raise ValueError("Conversations can't be persistent when handler is unnamed.")
         self.persistent = persistent
         self._persistence = None
         """:obj:`telegram.ext.BasePersistance`: The persistence used to store conversations.
         Set by dispatcher"""
-        self.map_to_parent = map_to_parent
+        self._map_to_parent = map_to_parent
 
         self.timeout_jobs = dict()
         self._timeout_jobs_lock = Lock()
@@ -224,6 +224,87 @@ class ConversationHandler(Handler):
                     warnings.warn("If 'per_chat=True', 'InlineQueryHandler' can not be used, "
                                   "since inline queries have no chat context.")
                     break
+
+    @property
+    def entry_points(self):
+        return self._entry_points
+
+    @entry_points.setter
+    def entry_points(self, value):
+        raise ValueError('You can not assign a new value to entry_points after initialization.')
+
+    @property
+    def states(self):
+        return self._states
+
+    @states.setter
+    def states(self, value):
+        raise ValueError('You can not assign a new value to states after initialization.')
+
+    @property
+    def fallbacks(self):
+        return self._fallbacks
+
+    @fallbacks.setter
+    def fallbacks(self, value):
+        raise ValueError('You can not assign a new value to fallbacks after initialization.')
+
+    @property
+    def allow_reentry(self):
+        return self._allow_reentry
+
+    @allow_reentry.setter
+    def allow_reentry(self, value):
+        raise ValueError('You can not assign a new value to allow_reentry after initialization.')
+
+    @property
+    def per_user(self):
+        return self._per_user
+
+    @per_user.setter
+    def per_user(self, value):
+        raise ValueError('You can not assign a new value to per_user after initialization.')
+
+    @property
+    def per_chat(self):
+        return self._per_chat
+
+    @per_chat.setter
+    def per_chat(self, value):
+        raise ValueError('You can not assign a new value to per_chat after initialization.')
+
+    @property
+    def per_message(self):
+        return self._per_message
+
+    @per_message.setter
+    def per_message(self, value):
+        raise ValueError('You can not assign a new value to per_message after initialization.')
+
+    @property
+    def conversation_timeout(self):
+        return self._conversation_timeout
+
+    @conversation_timeout.setter
+    def conversation_timeout(self, value):
+        raise ValueError('You can not assign a new value to conversation_timeout after '
+                         'initialization.')
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        raise ValueError('You can not assign a new value to name after initialization.')
+
+    @property
+    def map_to_parent(self):
+        return self._map_to_parent
+
+    @map_to_parent.setter
+    def map_to_parent(self, value):
+        raise ValueError('You can not assign a new value to map_to_parent after initialization.')
 
     @property
     def persistence(self):

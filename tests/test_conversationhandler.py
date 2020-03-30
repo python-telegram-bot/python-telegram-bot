@@ -179,6 +179,38 @@ class TestConversationHandler(object):
         return self._set_state(update, self.STOPPING)
 
     # Tests
+    @pytest.mark.parametrize('attr', ['entry_points', 'states', 'fallbacks', 'per_chat', 'name',
+                             'per_user', 'allow_reentry', 'conversation_timeout', 'map_to_parent'],
+                             indirect=False)
+    def test_immutable(self, attr):
+        ch = ConversationHandler('entry_points', {'states': ['states']}, 'fallbacks',
+                                 per_chat='per_chat',
+                                 per_user='per_user', per_message=False,
+                                 allow_reentry='allow_reentry',
+                                 conversation_timeout='conversation_timeout',
+                                 name='name', map_to_parent='map_to_parent')
+
+        value = getattr(ch, attr)
+        if isinstance(value, list):
+            assert value[0] == attr
+        elif isinstance(value, dict):
+            assert list(value.keys())[0] == attr
+        else:
+            assert getattr(ch, attr) == attr
+        with pytest.raises(ValueError, match='You can not assign a new value to {}'.format(attr)):
+            setattr(ch, attr, True)
+
+    def test_immutable_per_message(self):
+        ch = ConversationHandler('entry_points', {'states': ['states']}, 'fallbacks',
+                                 per_chat='per_chat',
+                                 per_user='per_user', per_message=False,
+                                 allow_reentry='allow_reentry',
+                                 conversation_timeout='conversation_timeout',
+                                 name='name', map_to_parent='map_to_parent')
+        assert ch.per_message is False
+        with pytest.raises(ValueError, match='You can not assign a new value to per_message'):
+            ch.per_message = True
+
     def test_per_all_false(self):
         with pytest.raises(ValueError, match="can't all be 'False'"):
             ConversationHandler(self.entry_points, self.states, self.fallbacks,
