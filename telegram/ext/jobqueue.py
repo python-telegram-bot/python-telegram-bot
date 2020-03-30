@@ -285,7 +285,7 @@ class JobQueue(object):
             if job.enabled:
                 try:
                     current_week_day = datetime.datetime.now(job.tzinfo).date().weekday()
-                    if any(day == current_week_day for day in job.days):
+                    if current_week_day in job.days:
                         self.logger.debug('Running job %s', job.name)
                         job.run(self._dispatcher)
 
@@ -400,7 +400,7 @@ class Job(object):
                  days=Days.EVERY_DAY,
                  name=None,
                  job_queue=None,
-                 tzinfo=_UTC):
+                 tzinfo=None):
 
         self.callback = callback
         self.context = context
@@ -413,7 +413,7 @@ class Job(object):
 
         self._days = None
         self.days = days
-        self.tzinfo = tzinfo
+        self.tzinfo = tzinfo or _UTC
 
         self._job_queue = weakref.proxy(job_queue) if job_queue is not None else None
 
