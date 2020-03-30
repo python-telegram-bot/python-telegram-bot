@@ -382,6 +382,8 @@ class TestPrefixHandler(BaseTest):
         handler = self.make_default_handler()
         handler.prefix = ['?', '§']
         assert handler._commands == list(combinations(['?', '§'], self.COMMANDS))
+        handler.prefix = '+'
+        assert handler._commands == list(combinations(['+'], self.COMMANDS))
 
     def test_edit_command(self):
         handler = self.make_default_handler()
