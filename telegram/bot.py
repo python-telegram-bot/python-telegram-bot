@@ -3320,8 +3320,8 @@ class Bot(TelegramObject):
 
     @log
     def create_new_sticker_set(self, user_id, name, title, emojis, png_sticker=None,
-                               contains_masks=None, mask_position=None, tgs_sticker=None,
-                               timeout=20, **kwargs):
+                               contains_masks=None, mask_position=None, timeout=20,
+                               tgs_sticker=None, **kwargs):
         """Use this method to create new sticker set owned by a user.
 
         The bot will be able to edit the created sticker set.
@@ -3395,7 +3395,7 @@ class Bot(TelegramObject):
 
     @log
     def add_sticker_to_set(self, user_id, name, emojis, png_sticker=None, mask_position=None,
-                           tgs_sticker=None, timeout=20, **kwargs):
+                           timeout=20, tgs_sticker=None, **kwargs):
         """Use this method to add a new sticker to a set created by the bot. You must use exactly
         one of the fields png_sticker or tgs_sticker. Animated stickers can be added to animated
         sticker sets and only to them. Animated sticker sets can have up to 50 stickers. Static
@@ -3542,7 +3542,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/setStickerSetThumb'.format(self.base_url)
+        url = '{}/setStickerSetThumb'.format(self.base_url)
 
         if InputFile.is_file(thumb):
             thumb = InputFile(thumb)
