@@ -210,18 +210,6 @@ class TestBot(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_game(self, bot, chat_id):
-        game_short_name = 'test_game'
-        message = bot.send_game(chat_id, game_short_name)
-
-        assert message.game
-        assert message.game.description == ('A no-op test game, for python-telegram-bot '
-                                            'bot framework testing.')
-        assert message.game.animation.file_id != ''
-        assert message.game.photo[0].file_size == 851
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_chat_action(self, bot, chat_id):
         assert bot.send_chat_action(chat_id, ChatAction.TYPING)
 
@@ -598,6 +586,18 @@ class TestBot(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    def test_send_game(self, bot, chat_id):
+        game_short_name = 'test_game'
+        message = bot.send_game(chat_id, game_short_name)
+
+        assert message.game
+        assert message.game.description == ('A no-op test game, for python-telegram-bot '
+                                            'bot framework testing.')
+        assert message.game.animation.file_id != ''
+        assert message.game.photo[0].file_size == 851
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     def test_set_game_score_1(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
         game_short_name = 'test_game'
@@ -797,14 +797,14 @@ class TestBot(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_delete_chat_photo(self, bot, channel_id):
-        assert bot.delete_chat_photo(channel_id)
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_set_chat_photo(self, bot, channel_id):
         with open('tests/data/telegram_test_channel.jpg', 'rb') as f:
             assert bot.set_chat_photo(channel_id, f)
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_delete_chat_photo(self, bot, channel_id):
+        assert bot.delete_chat_photo(channel_id)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
