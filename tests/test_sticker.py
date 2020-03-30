@@ -282,7 +282,7 @@ class TestStickerSet(object):
             file = bot.upload_sticker_file(95205500, f)
         assert file
         assert bot.add_sticker_to_set(chat_id, 'test_by_{0}'.format(bot.username),
-                                      file.file_id, '😄')
+                                      png_sticker=file.file_id, emojis='😄')
 
     def test_sticker_set_to_dict(self, sticker_set):
         sticker_set_dict = sticker_set.to_dict()
