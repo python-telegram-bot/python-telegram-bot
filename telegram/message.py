@@ -23,7 +23,7 @@ from html import escape
 
 from telegram import (Animation, Audio, Contact, Document, Chat, Location, PhotoSize, Sticker,
                       TelegramObject, User, Video, Voice, Venue, MessageEntity, Game, Invoice,
-                      SuccessfulPayment, VideoNote, PassportData, Poll, InlineKeyboardMarkup)
+                      SuccessfulPayment, VideoNote, PassportData, Poll, InlineKeyboardMarkup, Dice)
 from telegram import ParseMode
 from telegram.utils.helpers import escape_markdown, to_timestamp, from_timestamp
 
@@ -408,6 +408,7 @@ class Message(TelegramObject):
         data['successful_payment'] = SuccessfulPayment.de_json(data.get('successful_payment'), bot)
         data['passport_data'] = PassportData.de_json(data.get('passport_data'), bot)
         data['poll'] = Poll.de_json(data.get('poll'), bot)
+        data['dice'] = Dice.de_json(data.get('dice'), bot)
         data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
 
         return cls(bot=bot, **data)

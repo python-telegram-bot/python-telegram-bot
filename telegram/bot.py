@@ -355,6 +355,8 @@ class Bot(TelegramObject):
         limitations:
 
             - A message can only be deleted if it was sent less than 48 hours ago.
+            - A dice message in a private chat can only be deleted if it was sent more than 24
+              hours ago.
             - Bots can delete outgoing messages in private chats, groups, and supergroups.
             - Bots can delete incoming messages in private chats.
             - Bots granted can_post_messages permissions can delete outgoing messages in channels.
@@ -3380,9 +3382,14 @@ class Bot(TelegramObject):
         if InputFile.is_file(tgs_sticker):
             tgs_sticker = InputFile(tgs_sticker)
 
-        data = {'user_id': user_id, 'name': name, 'title': title, 'png_sticker': png_sticker,
-                'tgs_sticker': tgs_sticker, 'emojis': emojis}
+        data = {'user_id': user_id, 'name': name, 'title': title, 'emojis': emojis}
 
+        print(data)
+
+        if png_sticker is not None:
+            data['png_sticker'] = png_sticker
+        if tgs_sticker is not None:
+            data['tgs_sticker'] = tgs_sticker
         if contains_masks is not None:
             data['contains_masks'] = contains_masks
         if mask_position is not None:

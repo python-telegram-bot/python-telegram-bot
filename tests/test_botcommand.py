@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=R0903
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2020
@@ -17,27 +16,31 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a Telegram Dice."""
-from telegram import TelegramObject
+
+import pytest
+
+from telegram import BotCommand
 
 
-class Dice(TelegramObject):
-    """
-    This object represents a dice with random value from 1 to 6. (Yes, Telegram is aware of the
-    proper singular of die. They don't like it.)
+@pytest.fixture(scope="class")
+def bot_command():
+    return BotCommand(command='start', description='A command')
 
-    Attributes:
-        value (:obj:`int`): Value of the dice, 1-6.
 
-    Args:
-        value (:obj:`int`): Value of the dice, 1-6.
-    """
-    def __init__(self, value, **kwargs):
-        self.value = value
+class TestBotCommand(object):
+    command = 'start'
+    description = 'A command'
 
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
+    def test_de_json(self, bot):
+        json_dict = {'command': self.command, 'description': self.description}
+        bot_command = BotCommand.de_json(json_dict, bot)
 
-        return cls(**data)
+        assert bot_command.command == self.command
+        assert bot_command.description == self.description
+
+    def test_to_dict(self, bot_command):
+        bot_command_dict = bot_command.to_dict()
+
+        assert isinstance(bot_command_dict, dict)
+        assert bot_command_dict['command'] == bot_command.command
+        assert bot_command_dict['description'] == bot_command.description
