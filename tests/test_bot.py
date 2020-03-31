@@ -932,3 +932,22 @@ class TestBot(object):
             assert bc[0].description == 'descr1'
             assert bc[1].command == 'cmd2'
             assert bc[1].description == 'descr2'
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_set_and_get_my_commands_strings(self, bot):
+        commands = [
+            ['cmd1', 'descr1'],
+            ['cmd2', 'descr2'],
+        ]
+        bot.set_my_commands([])
+        assert bot.get_my_commands() == []
+        assert bot.commands == []
+        assert bot.set_my_commands(commands)
+
+        for bc in [bot.get_my_commands(), bot.commands]:
+            assert len(bc) == 2
+            assert bc[0].command == 'cmd1'
+            assert bc[0].description == 'descr1'
+            assert bc[1].command == 'cmd2'
+            assert bc[1].description == 'descr2'

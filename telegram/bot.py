@@ -3384,8 +3384,6 @@ class Bot(TelegramObject):
 
         data = {'user_id': user_id, 'name': name, 'title': title, 'emojis': emojis}
 
-        print(data)
-
         if png_sticker is not None:
             data['png_sticker'] = png_sticker
         if tgs_sticker is not None:
@@ -3453,9 +3451,12 @@ class Bot(TelegramObject):
         if InputFile.is_file(tgs_sticker):
             tgs_sticker = InputFile(tgs_sticker)
 
-        data = {'user_id': user_id, 'name': name, 'png_sticker': png_sticker,
-                'tgs_sticker': tgs_sticker, 'emojis': emojis}
+        data = {'user_id': user_id, 'name': name, 'emojis': emojis}
 
+        if png_sticker is not None:
+            data['png_sticker'] = png_sticker
+        if tgs_sticker is not None:
+            data['tgs_sticker'] = tgs_sticker
         if mask_position is not None:
             data['mask_position'] = mask_position
         data.update(kwargs)
@@ -3795,8 +3796,9 @@ class Bot(TelegramObject):
         Use this method to change the list of the bot's commands.
 
         Args:
-            commands (List[:class:`BotCommand`]): A JSON-serialized list of bot commands to be set
-                as the list of the bot's commands. At most 100 commands can be specified.
+            commands (List[:class:`BotCommand` | (:obj:`str`, :obj:`str`)]): A JSON-serialized list
+                of bot commands to be set as the list of the bot's commands. At most 100 commands
+                can be specified.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -3811,7 +3813,9 @@ class Bot(TelegramObject):
         """
         url = '{0}/setMyCommands'.format(self.base_url)
 
-        data = {'commands': [c.to_dict() for c in commands]}
+        cmds = [c if isinstance(c, BotCommand) else BotCommand(c[0], c[1]) for c in commands]
+
+        data = {'commands': [c.to_dict() for c in cmds]}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
