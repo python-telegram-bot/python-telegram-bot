@@ -272,6 +272,13 @@ def animated_sticker_set(bot):
     return ss
 
 
+@pytest.fixture(scope='function')
+def sticker_set_thumb_file():
+    f = open('tests/data/sticker_set_thumb.png', 'rb')
+    yield f
+    f.close()
+
+
 class TestStickerSet(object):
     title = 'Test stickers'
     is_animated = True
@@ -300,12 +307,16 @@ class TestStickerSet(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_bot_methods_1_png(self, bot, chat_id):
+    def test_bot_methods_1_png(self, bot, chat_id, sticker_file):
         with open('tests/data/telegram_sticker.png', 'rb') as f:
             file = bot.upload_sticker_file(95205500, f)
         assert file
         assert bot.add_sticker_to_set(chat_id, 'test_by_{}'.format(bot.username),
                                       png_sticker=file.file_id, emojis='😄')
+        # Also test with file input and mask
+        assert bot.add_sticker_to_set(chat_id, 'test_by_{}'.format(bot.username),
+                                      png_sticker=sticker_file, emojis='😄',
+                                      mask_position=MaskPosition(MaskPosition.EYES, -1, 1, 2))
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -339,14 +350,32 @@ class TestStickerSet(object):
 
     @flaky(10, 1)
     @pytest.mark.timeout(10)
-    def test_bot_methods_3_png(self, bot, sticker_set):
+    def test_bot_methods_3_png(self, bot, chat_id, sticker_set_thumb_file):
+        sleep(1)
+        assert bot.set_sticker_set_thumb('test_by_{}'.format(bot.username), chat_id,
+                                         sticker_set_thumb_file)
+
+    @flaky(10, 1)
+    @pytest.mark.timeout(10)
+    def test_bot_methods_3_tgs(self, bot, chat_id, animated_sticker_file, animated_sticker_set):
+        sleep(1)
+        assert bot.set_sticker_set_thumb('animated_test_by_{}'.format(bot.username), chat_id,
+                                         animated_sticker_file)
+        file_id = animated_sticker_set.stickers[-1].file_id
+        # also test with file input and mask
+        assert bot.set_sticker_set_thumb('animated_test_by_{}'.format(bot.username), chat_id,
+                                         file_id)
+
+    @flaky(10, 1)
+    @pytest.mark.timeout(10)
+    def test_bot_methods_4_png(self, bot, sticker_set):
         sleep(1)
         file_id = sticker_set.stickers[-1].file_id
         assert bot.delete_sticker_from_set(file_id)
 
     @flaky(10, 1)
     @pytest.mark.timeout(10)
-    def test_bot_methods_3_tgs(self, bot, animated_sticker_set):
+    def test_bot_methods_4_tgs(self, bot, animated_sticker_set):
         sleep(1)
         file_id = animated_sticker_set.stickers[-1].file_id
         assert bot.delete_sticker_from_set(file_id)

@@ -35,6 +35,7 @@ class TestDice(object):
         dice = Dice.de_json(json_dict, bot)
 
         assert dice.value == self.value
+        assert Dice.de_json(None, bot) is None
 
     def test_to_dict(self, dice):
         dice_dict = dice.to_dict()

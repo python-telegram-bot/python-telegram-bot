@@ -38,6 +38,8 @@ class TestBotCommand(object):
         assert bot_command.command == self.command
         assert bot_command.description == self.description
 
+        assert BotCommand.de_json(None, bot) is None
+
     def test_to_dict(self, bot_command):
         bot_command_dict = bot_command.to_dict()
 

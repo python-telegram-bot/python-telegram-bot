@@ -37,7 +37,7 @@ from cryptography.hazmat.primitives import serialization
 from future.utils import string_types
 
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
-                      ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore, StickerSet,
+                      TelegramObject, WebhookInfo, GameHighScore, StickerSet,
                       PhotoSize, Audio, Document, Sticker, Video, Animation, Voice, VideoNote,
                       Location, Venue, Contact, InputFile, Poll, BotCommand)
 from telegram.error import InvalidToken, TelegramError
@@ -162,10 +162,7 @@ class Bot(TelegramObject):
             data['disable_notification'] = disable_notification
 
         if reply_markup is not None:
-            if isinstance(reply_markup, ReplyMarkup):
-                data['reply_markup'] = reply_markup.to_json()
-            else:
-                data['reply_markup'] = reply_markup
+            data['reply_markup'] = reply_markup
 
         if data.get('media') and (data['media'].parse_mode == DEFAULT_NONE):
             if self.defaults:
@@ -3712,10 +3709,7 @@ class Bot(TelegramObject):
         }
 
         if reply_markup:
-            if isinstance(reply_markup, ReplyMarkup):
-                data['reply_markup'] = reply_markup.to_json()
-            else:
-                data['reply_markup'] = reply_markup
+            data['reply_markup'] = reply_markup
 
         result = self._request.post(url, data, timeout=timeout)
 
@@ -3820,8 +3814,9 @@ class Bot(TelegramObject):
 
         result = self._request.post(url, data, timeout=timeout)
 
-        if result:
-            self._commands = commands
+        # Set commands. No need to check for outcome.
+        # If request failed, we won't come this far
+        self._commands = commands
 
         return result
 
