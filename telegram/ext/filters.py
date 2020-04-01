@@ -957,6 +957,95 @@ officedocument.wordprocessingml.document")``-
     poll = _Poll()
     """Messages that contain a :class:`telegram.Poll`."""
 
+    class _Dice(BaseFilter):
+        name = 'Filters.dice'
+
+        class _DiceIterable(BaseFilter):
+
+            def __init__(self, iterable):
+                if isinstance(iterable, int):
+                    self.iterable = [iterable]
+                else:
+                    self.iterable = iterable
+                self.name = 'Filters.dice({})'.format(iterable)
+
+            def filter(self, message):
+                if message.dice:
+                    return message.dice.value in self.iterable
+                return False
+
+        class _DiceText(BaseFilter):
+
+            class _DiceTextIterable(BaseFilter):
+
+                def __init__(self, iterable):
+                    if isinstance(iterable, int):
+                        self.iterable = [iterable]
+                    else:
+                        self.iterable = iterable
+                    self.name = 'Filters.dice.text({})'.format(iterable)
+
+                def filter(self, message):
+                    if message.dice:
+                        if message.dice.value in self.iterable:
+                            if not message.text:
+                                message.text = '🎲'
+                            return True
+                    return False
+
+            def filter(self, message):
+                if message.dice:
+                    if not message.text:
+                        message.text = '🎲'
+                    return True
+                return False
+
+            def __call__(self, update):
+                if isinstance(update, Update):
+                    return self.filter(update.effective_message)
+                else:
+                    return self._DiceTextIterable(update)
+
+        text = _DiceText()
+
+        def __call__(self, update):
+            if isinstance(update, Update):
+                return self.filter(update.effective_message)
+            else:
+                return self._DiceIterable(update)
+
+        def filter(self, message):
+            return bool(message.dice)
+
+    dice = _Dice()
+    """Dice Messages. If a string or an iterable of strings is passed, it filters messages to only
+    allow those whose dice is appearing in the given iterable.
+
+    Examples:
+        To allow any dice message, simply use
+        ``MessageHandler(Filters.dice, callback_method)``.
+        To allow only dice with value 6, use
+        ``MessageHandler(Filters.dice(6), callback_method)``.
+        To allow only dice with value 5 `or` 6, use
+        ``MessageHandler(Filters.dice([5, 6]), callback_method)``.
+
+    Args:
+        update (:obj:`int` | Iterable[:obj:`int`], optional): Which values to allow. If not
+            specified, will allow any dice message.
+
+    Attributes:
+        text: Filters for dice messages, but allows to treat them as text messages, i.e. if the
+            dice messages text is empty, it will be set to the dice emoji ``🎲``. Like
+            :attr:`Filters.dice`, this accepts a string/an iterable of strings to filter for dice
+            values.
+
+            Note:
+                When performing actions with that message, that rely only on the messages ID, that
+                text will `not` be set. For example, when forwarding a message received via
+                :attr:`Filters.dice.text`, the forwarded message will not contain the emoji as
+                text.
+    """
+
     class language(BaseFilter):
         """Filters messages to only allow those which are from users with a certain language code.
 
