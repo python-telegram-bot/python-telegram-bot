@@ -37,7 +37,7 @@ from cryptography.hazmat.primitives import serialization
 from future.utils import string_types
 
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
-                      TelegramObject, WebhookInfo, GameHighScore, StickerSet,
+                      ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore, StickerSet,
                       PhotoSize, Audio, Document, Sticker, Video, Animation, Voice, VideoNote,
                       Location, Venue, Contact, InputFile, Poll, BotCommand)
 from telegram.error import InvalidToken, TelegramError
@@ -162,7 +162,10 @@ class Bot(TelegramObject):
             data['disable_notification'] = disable_notification
 
         if reply_markup is not None:
-            data['reply_markup'] = reply_markup
+            if isinstance(reply_markup, ReplyMarkup):
+                data['reply_markup'] = reply_markup.to_dict()
+            else:
+                data['reply_markup'] = reply_markup
 
         if data.get('media') and (data['media'].parse_mode == DEFAULT_NONE):
             if self.defaults:
@@ -3388,7 +3391,7 @@ class Bot(TelegramObject):
         if contains_masks is not None:
             data['contains_masks'] = contains_masks
         if mask_position is not None:
-            data['mask_position'] = mask_position
+            data['mask_position'] = mask_position.to_json()
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -3455,7 +3458,7 @@ class Bot(TelegramObject):
         if tgs_sticker is not None:
             data['tgs_sticker'] = tgs_sticker
         if mask_position is not None:
-            data['mask_position'] = mask_position
+            data['mask_position'] = mask_position.to_json()
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -3709,7 +3712,10 @@ class Bot(TelegramObject):
         }
 
         if reply_markup:
-            data['reply_markup'] = reply_markup
+            if isinstance(reply_markup, ReplyMarkup):
+                data['reply_markup'] = reply_markup.to_dict()
+            else:
+                data['reply_markup'] = reply_markup
 
         result = self._request.post(url, data, timeout=timeout)
 

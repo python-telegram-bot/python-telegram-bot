@@ -53,7 +53,7 @@ except ImportError:  # pragma: no cover
         raise
 
 
-from telegram import (InputFile, TelegramError, InputMedia, MaskPosition, ReplyMarkup)
+from telegram import (InputFile, TelegramError, InputMedia)
 from telegram.error import (Unauthorized, NetworkError, TimedOut, BadRequest, ChatMigrated,
                             RetryAfter, InvalidToken, Conflict)
 
@@ -307,8 +307,6 @@ class Request(object):
             elif isinstance(val, (float, int)):
                 # Urllib3 doesn't like floats it seems
                 data[key] = str(val)
-            elif isinstance(val, MaskPosition) or isinstance(val, ReplyMarkup):
-                data[key] = val.to_json()
             elif key == 'media':
                 # One media or multiple
                 if isinstance(val, InputMedia):
