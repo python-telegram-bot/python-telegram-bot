@@ -624,11 +624,14 @@ class TestFilters(object):
 
     def test_filters_dice(self, update):
         update.message.dice = Dice(4)
-        assert (Filters.dice)(update)
+        assert Filters.dice(update)
         update.message.dice = None
-        assert not (Filters.dice)(update)
+        assert not Filters.dice(update)
 
     def test_filters_dice_iterable(self, update):
+        update.message.dice = None
+        assert not Filters.dice(5)(update)
+
         update.message.dice = Dice(5)
         assert Filters.dice(5)(update)
         assert Filters.dice({5, 6})(update)
@@ -639,21 +642,23 @@ class TestFilters(object):
         update.message.dice = Dice(4)
 
         update.message.text = None
-        assert (Filters.dice.text)(update)
+        assert Filters.dice.text(update)
         assert update.message.text == '🎲'
 
         update.message.text = 'test'
-        assert (Filters.dice.text)(update)
+        assert Filters.dice.text(update)
         assert update.message.text == 'test'
 
         update.message.dice = None
-        assert not (Filters.dice.text)(update)
+        assert not Filters.dice.text(update)
         assert update.message.text == 'test'
 
     def test_filters_dice_text_iterable(self, update):
         update.message.dice = Dice(5)
 
         update.message.text = None
+        assert not Filters.dice.text(4)(update)
+        assert update.message.text is None
         assert Filters.dice.text(5)(update)
         assert update.message.text == '🎲'
         update.message.text = None
@@ -661,7 +666,8 @@ class TestFilters(object):
         assert update.message.text == '🎲'
 
         update.message.text = 'test'
-        update.message.dice = Dice(5)
+        assert not Filters.dice.text(4)(update)
+        assert update.message.text == 'test'
         assert Filters.dice.text(5)(update)
         assert update.message.text == 'test'
         assert Filters.dice.text({5, 6})(update)
