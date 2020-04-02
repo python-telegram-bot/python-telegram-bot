@@ -272,6 +272,10 @@ class Filters(object):
             ...
             MessageHandler(Filters.text(buttons), callback_method)
 
+    Note:
+        Dice messages don't have text. If you want to treat them as text messages anyway, use
+        ``Filters.text | Filters.dice``.
+
     Args:
         update (Iterable[:obj:`str`], optional): Which messages to allow. Only exact matches
             are allowed. If not specified, will allow any text message.
@@ -427,7 +431,7 @@ class Filters(object):
                     send media with wrong types that don't fit to this handler.
 
             Example:
-                Filters.documents.category('audio/') returnes `True` for all types
+                Filters.documents.category('audio/') returns `True` for all types
                 of audio sent as file, for example 'audio/mpeg' or 'audio/x-wav'
             """
 
@@ -960,66 +964,27 @@ officedocument.wordprocessingml.document")``-
     class _Dice(BaseFilter):
         name = 'Filters.dice'
 
-        class _DiceIterable(BaseFilter):
+        class _DiceValues(BaseFilter):
 
-            def __init__(self, iterable):
-                if isinstance(iterable, int):
-                    self.iterable = [iterable]
-                else:
-                    self.iterable = iterable
-                self.name = 'Filters.dice({})'.format(iterable)
+            def __init__(self, values):
+                self.values = [values] if isinstance(values, int) else values
+                self.name = 'Filters.dice({})'.format(values)
 
             def filter(self, message):
-                if message.dice:
-                    return message.dice.value in self.iterable
-                return False
-
-        class _DiceText(BaseFilter):
-
-            class _DiceTextIterable(BaseFilter):
-
-                def __init__(self, iterable):
-                    if isinstance(iterable, int):
-                        self.iterable = [iterable]
-                    else:
-                        self.iterable = iterable
-                    self.name = 'Filters.dice.text({})'.format(iterable)
-
-                def filter(self, message):
-                    if message.dice:
-                        if message.dice.value in self.iterable:
-                            if not message.text:
-                                message.text = '🎲'
-                            return True
-                    return False
-
-            def filter(self, message):
-                if message.dice:
-                    if not message.text:
-                        message.text = '🎲'
-                    return True
-                return False
-
-            def __call__(self, update):
-                if isinstance(update, Update):
-                    return self.filter(update.effective_message)
-                else:
-                    return self._DiceTextIterable(update)
-
-        text = _DiceText()
+                return bool(message.dice and message.dice.value in self.values)
 
         def __call__(self, update):
             if isinstance(update, Update):
                 return self.filter(update.effective_message)
             else:
-                return self._DiceIterable(update)
+                return self._DiceValues(update)
 
         def filter(self, message):
             return bool(message.dice)
 
     dice = _Dice()
-    """Dice Messages. If a string or an iterable of strings is passed, it filters messages to only
-    allow those whose dice is appearing in the given iterable.
+    """Dice Messages. If an integer or a list of integers is passed, it filters messages to only
+    allow those whose dice value is appearing in the given list.
 
     Examples:
         To allow any dice message, simply use
@@ -1030,20 +995,12 @@ officedocument.wordprocessingml.document")``-
         ``MessageHandler(Filters.dice([5, 6]), callback_method)``.
 
     Args:
-        update (:obj:`int` | Iterable[:obj:`int`], optional): Which values to allow. If not
+        update (:obj:`int` | List[:obj:`int`], optional): Which values to allow. If not
             specified, will allow any dice message.
 
-    Attributes:
-        text: Filters for dice messages, but allows to treat them as text messages, i.e. if the
-            dice messages text is empty, it will be set to the dice emoji ``🎲``. Like
-            :attr:`Filters.dice`, this accepts a string/an iterable of strings to filter for dice
-            values.
-
-            Note:
-                When performing actions with that message, that rely only on the messages ID, that
-                text will `not` be set. For example, when forwarding a message received via
-                :attr:`Filters.dice.text`, the forwarded message will not contain the emoji as
-                text.
+        Note:
+            Dice messages don't have text. If you want to treat them as text messages anyway, use
+            ``Filters.text | Filters.dice``.
     """
 
     class language(BaseFilter):
