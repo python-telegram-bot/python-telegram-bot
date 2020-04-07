@@ -37,7 +37,8 @@ class InlineQueryResultGif(InlineQueryResult):
         gif_duration (:obj:`int`): Optional. Duration of the GIF.
         thumb_url (:obj:`str`): URL of the static thumbnail for the result (jpeg or gif).
         title (:obj:`str`): Optional. Title for the result.
-        caption (:obj:`str`): Optional. Caption of the GIF file to be sent, 0-1024 characters after entities parsing.
+        caption (:obj:`str`): Optional. Caption of the GIF file to be sent, 0-1024 characters
+            after entities parsing.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
@@ -54,7 +55,8 @@ class InlineQueryResultGif(InlineQueryResult):
         gif_duration (:obj:`int`, optional): Duration of the GIF
         thumb_url (:obj:`str`): URL of the static thumbnail for the result (jpeg or gif).
         title (:obj:`str`, optional): Title for the result.
-        caption (:obj:`str`, optional): Caption of the GIF file to be sent, 0-1024 characters after entities parsing.
+        caption (:obj:`str`, optional): Caption of the GIF file to be sent, 0-1024 characters
+            after entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.

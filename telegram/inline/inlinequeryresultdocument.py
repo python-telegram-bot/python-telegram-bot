@@ -33,7 +33,8 @@ class InlineQueryResultDocument(InlineQueryResult):
         type (:obj:`str`): 'document'.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         title (:obj:`str`): Title for the result.
-        caption (:obj:`str`): Optional. Caption of the document to be sent, 0-1024 characters after entities parsing.
+        caption (:obj:`str`): Optional. Caption of the document to be sent, 0-1024 characters
+            after entities parsing.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
@@ -52,7 +53,8 @@ class InlineQueryResultDocument(InlineQueryResult):
     Args:
         id (:obj:`str` | :obj:`int`): Unique identifier for this result, 1-64 bytes.
         title (:obj:`str`): Title for the result.
-        caption (:obj:`str`, optional): Caption of the document to be sent, 0-1024 characters after entities parsing.
+        caption (:obj:`str`, optional): Caption of the document to be sent, 0-1024 characters
+            after entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
