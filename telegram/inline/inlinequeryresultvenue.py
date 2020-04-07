@@ -47,7 +47,7 @@ class InlineQueryResultVenue(InlineQueryResult):
         thumb_height (:obj:`int`): Optional. Thumbnail height.
 
     Args:
-        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
+        id (:obj:`str` | :obj:`int`): Unique identifier for this result, 1-64 Bytes.
         latitude (:obj:`float`): Latitude of the venue location in degrees.
         longitude (:obj:`float`): Longitude of the venue location in degrees.
         title (:obj:`str`): Title of the venue.
