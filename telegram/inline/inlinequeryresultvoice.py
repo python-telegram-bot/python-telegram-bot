@@ -45,7 +45,7 @@ class InlineQueryResultVoice(InlineQueryResult):
             message to be sent instead of the voice recording.
 
     Args:
-        id (:obj:`str` | :obj:`int`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         voice_url (:obj:`str`): A valid URL for the voice recording.
         title (:obj:`str`): Recording title.
         caption (:obj:`str`, optional): Caption, 0-1024 characters after entities parsing.

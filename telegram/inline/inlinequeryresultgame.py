@@ -32,7 +32,7 @@ class InlineQueryResultGame(InlineQueryResult):
             to the message.
 
     Args:
-        id (:obj:`str` | :obj:`int`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         game_short_name (:obj:`str`): Short name of the game.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.

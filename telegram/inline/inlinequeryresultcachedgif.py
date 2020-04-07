@@ -45,7 +45,7 @@ class InlineQueryResultCachedGif(InlineQueryResult):
             message to be sent instead of the gif.
 
     Args:
-        id (:obj:`str` | :obj:`int`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         gif_file_id (:obj:`str`): A valid file identifier for the GIF file.
         title (:obj:`str`, optional): Title for the result.caption (:obj:`str`, optional):
         caption (:obj:`str`, optional): Caption of the GIF file to be sent, 0-1024 characters

@@ -46,7 +46,7 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
             message to be sent instead of the video.
 
     Args:
-        id (:obj:`str` | :obj:`int`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         video_file_id (:obj:`str`): A valid file identifier for the video file.
         title (:obj:`str`): Title for the result.
         description (:obj:`str`, optional): Short description of the result.

@@ -44,7 +44,7 @@ class InlineQueryResultLocation(InlineQueryResult):
         thumb_height (:obj:`int`): Optional. Thumbnail height.
 
     Args:
-        id (:obj:`str` | :obj:`int`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         latitude (:obj:`float`): Location latitude in degrees.
         longitude (:obj:`float`): Location longitude in degrees.
         title (:obj:`str`): Location title.

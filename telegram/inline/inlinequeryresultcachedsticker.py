@@ -37,7 +37,7 @@ class InlineQueryResultCachedSticker(InlineQueryResult):
             message to be sent instead of the sticker.
 
     Args:
-        id (:obj:`str` | :obj:`int`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         sticker_file_id (:obj:`str`): A valid file identifier of the sticker.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.

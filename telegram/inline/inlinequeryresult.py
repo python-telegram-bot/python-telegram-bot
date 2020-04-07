@@ -30,7 +30,7 @@ class InlineQueryResult(TelegramObject):
 
     Args:
         type (:obj:`str`): Type of the result.
-        id (:obj:`str` | :obj:`int`): Unique identifier for this result, 1-64 Bytes.
+        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """

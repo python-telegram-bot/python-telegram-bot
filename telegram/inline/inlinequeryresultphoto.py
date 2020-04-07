@@ -49,7 +49,7 @@ class InlineQueryResultPhoto(InlineQueryResult):
             message to be sent instead of the photo.
 
     Args:
-        id (:obj:`str` | :obj:`int`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         photo_url (:obj:`str`): A valid URL of the photo. Photo must be in jpeg format. Photo size
             must not exceed 5MB.
         thumb_url (:obj:`str`): URL of the thumbnail for the photo.

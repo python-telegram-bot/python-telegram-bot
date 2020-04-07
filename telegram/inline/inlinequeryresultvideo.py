@@ -57,7 +57,7 @@ class InlineQueryResultVideo(InlineQueryResult):
             (e.g., a YouTube video).
 
     Args:
-        id (:obj:`str` | :obj:`int`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         video_url (:obj:`str`): A valid URL for the embedded video player or video file.
         mime_type (:obj:`str`): Mime type of the content of video url, "text/html" or "video/mp4".
         thumb_url (:obj:`str`): URL of the thumbnail (jpeg only) for the video.

@@ -42,7 +42,7 @@ class InlineQueryResultCachedAudio(InlineQueryResult):
             message to be sent instead of the audio.
 
     Args:
-        id (:obj:`str` | :obj:`int`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         audio_file_id (:obj:`str`): A valid file identifier for the audio file.
         caption (:obj:`str`, optional): Caption, 0-1024 characters after entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show

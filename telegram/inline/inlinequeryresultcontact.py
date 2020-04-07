@@ -44,7 +44,7 @@ class InlineQueryResultContact(InlineQueryResult):
         thumb_height (:obj:`int`): Optional. Thumbnail height.
 
     Args:
-        id (:obj:`str` | :obj:`int`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         phone_number (:obj:`str`): Contact's phone number.
         first_name (:obj:`str`): Contact's first name.
         last_name (:obj:`str`, optional): Contact's last name.

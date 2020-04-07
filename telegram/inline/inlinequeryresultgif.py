@@ -48,7 +48,7 @@ class InlineQueryResultGif(InlineQueryResult):
             message to be sent instead of the GIF animation.
 
     Args:
-        id (:obj:`str` | :obj:`int`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         gif_url (:obj:`str`): A valid URL for the GIF file. File size must not exceed 1MB.
         gif_width (:obj:`int`, optional): Width of the GIF.
         gif_height (:obj:`int`, optional): Height of the GIF.

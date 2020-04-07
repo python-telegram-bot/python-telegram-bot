@@ -49,7 +49,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
             message to be sent instead of the video animation.
 
     Args:
-        id (:obj:`str` | :obj:`int`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         mpeg4_url (:obj:`str`): A valid URL for the MP4 file. File size must not exceed 1MB.
         mpeg4_width (:obj:`int`, optional): Video width.
         mpeg4_height (:obj:`int`, optional): Video height.

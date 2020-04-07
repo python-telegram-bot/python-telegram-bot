@@ -45,7 +45,7 @@ class InlineQueryResultAudio(InlineQueryResult):
             message to be sent instead of the audio.
 
     Args:
-        id (:obj:`str` | :obj:`int`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         audio_url (:obj:`str`): A valid URL for the audio file.
         title (:obj:`str`): Title.
         performer (:obj:`str`, optional): Performer.

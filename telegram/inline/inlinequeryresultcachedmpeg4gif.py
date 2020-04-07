@@ -45,7 +45,7 @@ class InlineQueryResultCachedMpeg4Gif(InlineQueryResult):
             message to be sent instead of the MPEG-4 file.
 
     Args:
-        id (:obj:`str` | :obj:`int`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         mpeg4_file_id (:obj:`str`): A valid file identifier for the MP4 file.
         title (:obj:`str`, optional): Title for the result.
         caption (:obj:`str`, optional): Caption of the MPEG-4 file to be sent, 0-1024 characters

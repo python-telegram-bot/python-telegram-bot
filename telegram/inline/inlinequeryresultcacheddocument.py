@@ -45,7 +45,7 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
             message to be sent instead of the file.
 
     Args:
-        id (:obj:`str` | :obj:`int`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         title (:obj:`str`): Title for the result.
         document_file_id (:obj:`str`): A valid file identifier for the file.
         description (:obj:`str`, optional): Short description of the result.

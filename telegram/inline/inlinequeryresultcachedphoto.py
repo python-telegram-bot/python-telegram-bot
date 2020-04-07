@@ -46,7 +46,7 @@ class InlineQueryResultCachedPhoto(InlineQueryResult):
             message to be sent instead of the photo.
 
     Args:
-        id (:obj:`str` | :obj:`int`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         photo_file_id (:obj:`str`): A valid file identifier of the photo.
         title (:obj:`str`, optional): Title for the result.
         description (:obj:`str`, optional): Short description of the result.

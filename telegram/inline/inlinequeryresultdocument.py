@@ -51,7 +51,7 @@ class InlineQueryResultDocument(InlineQueryResult):
         thumb_height (:obj:`int`): Optional. Thumbnail height.
 
     Args:
-        id (:obj:`str` | :obj:`int`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         title (:obj:`str`): Title for the result.
         caption (:obj:`str`, optional): Caption of the document to be sent, 0-1024 characters
             after entities parsing.
