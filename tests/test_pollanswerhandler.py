@@ -98,6 +98,14 @@ class TestPollAnswerHandler(object):
         dp.process_update(poll_answer)
         assert self.test_flag
 
+    def test_with_role(self, poll_answer, role):
+        handler = PollAnswerHandler(self.callback_basic, roles=role)
+        print(role.chat_ids)
+        assert not handler.check_update(poll_answer)
+
+        role.chat_ids = 2
+        assert handler.check_update(poll_answer)
+
     def test_pass_user_or_chat_data(self, dp, poll_answer):
         handler = PollAnswerHandler(self.callback_data_1, pass_user_data=True)
         dp.add_handler(handler)
