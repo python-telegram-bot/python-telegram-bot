@@ -94,7 +94,7 @@ class PicklePersistence(BasePersistence):
                 self.chat_data = defaultdict(dict, data['chat_data'])
                 # For backwards compatibility with files not containing bot data
                 self.bot_data = data.get('bot_data', {})
-                self.roles = all.get('roles', Roles(None))
+                self.roles = data.get('roles', Roles(None))
                 if self.roles:
                     self.roles = Roles.decode_from_json(self.roles, None)
                 self.conversations = data['conversations']

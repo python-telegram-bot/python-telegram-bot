@@ -149,13 +149,13 @@ class Role(Filters.user):
     def chat_ids(self, chat_id):
         self.user_ids = chat_id
 
-    def _filter_children(self, user, chat):
+    def filter_children(self, user, chat):
         # filters only downward
         if user and user.id in self.chat_ids:
             return True
         if chat and chat.id in self.chat_ids:
             return True
-        if any([child._filter_children(user, chat) for child in self.child_roles]):
+        if any([child.filter_children(user, chat) for child in self.child_roles]):
             return True
 
     def filter(self, update):
@@ -169,7 +169,7 @@ class Role(Filters.user):
             if self._inverted:
                 # If this is an inverted role (i.e. ~role) and we arrived here, the user is
                 # either ...
-                if self._filter_children(user, chat):
+                if self.filter_children(user, chat):
                     # ... in a child role of this. In this case, and must be excluded. Since the
                     # output of this will be negated, return True
                     return True
@@ -336,8 +336,8 @@ class ChatAdminsRole(Role):
     """
     def __init__(self, bot, timeout=1800):
         super(ChatAdminsRole, self).__init__(name='chat_admins')
-        self._bot = bot
-        self._cache = {}
+        self.bot = bot
+        self.cache = {}
         self.timeout = timeout
 
     def filter(self, update):
@@ -348,17 +348,17 @@ class ChatAdminsRole(Role):
             if user.id == chat.id:
                 return True
             # Check for cached info first
-            if (self._cache.get(chat.id, None)
-                    and (time.time() - self._cache[chat.id][0]) < self.timeout):
-                return user.id in self._cache[chat.id][1]
-            admins = [m.user.id for m in self._bot.get_chat_administrators(chat.id)]
-            self._cache[chat.id] = (time.time(), admins)
+            if (self.cache.get(chat.id, None)
+                    and (time.time() - self.cache[chat.id][0]) < self.timeout):
+                return user.id in self.cache[chat.id][1]
+            admins = [m.user.id for m in self.bot.get_chat_administrators(chat.id)]
+            self.cache[chat.id] = (time.time(), admins)
             return user.id in admins
 
     def __deepcopy__(self, memo):
         new_role = super(ChatAdminsRole, self).__deepcopy__(memo)
-        new_role._bot = self._bot
-        new_role._cache = self._cache
+        new_role.bot = self.bot
+        new_role.cache = self.cache
         new_role.timeout = self.timeout
         return new_role
 
@@ -379,8 +379,8 @@ class ChatCreatorRole(Role):
     """
     def __init__(self, bot):
         super(ChatCreatorRole, self).__init__(name='chat_creator')
-        self._bot = bot
-        self._cache = {}
+        self.bot = bot
+        self.cache = {}
 
     def filter(self, update):
         user = update.effective_user
@@ -390,12 +390,12 @@ class ChatCreatorRole(Role):
             if user.id == chat.id:
                 return True
             # Check for cached info first
-            if self._cache.get(chat.id, None):
-                return user.id == self._cache[chat.id]
+            if self.cache.get(chat.id, None):
+                return user.id == self.cache[chat.id]
             try:
-                member = self._bot.get_chat_member(chat.id, user.id)
+                member = self.bot.get_chat_member(chat.id, user.id)
                 if member.status == ChatMember.CREATOR:
-                    self._cache[chat.id] = user.id
+                    self.cache[chat.id] = user.id
                     return True
                 return False
             except TelegramError:
@@ -404,8 +404,8 @@ class ChatCreatorRole(Role):
 
     def __deepcopy__(self, memo):
         new_role = super(ChatCreatorRole, self).__deepcopy__(memo)
-        new_role._bot = self._bot
-        new_role._cache = self._cache
+        new_role.bot = self.bot
+        new_role.cache = self.cache
         return new_role
 
 
@@ -440,10 +440,10 @@ class Roles(dict):
 
     def __init__(self, bot):
         super(Roles, self).__init__()
-        self._bot = bot
+        self.bot = bot
         self.ADMINS = Role(name='admins')
-        self.CHAT_ADMINS = ChatAdminsRole(bot=self._bot)
-        self.CHAT_CREATOR = ChatCreatorRole(bot=self._bot)
+        self.CHAT_ADMINS = ChatAdminsRole(bot=self.bot)
+        self.CHAT_CREATOR = ChatCreatorRole(bot=self.bot)
 
     def set_bot(self, bot):
         """If for some reason you can't pass the bot on initialization, you can set it with this
@@ -456,9 +456,9 @@ class Roles(dict):
         Raises:
             ValueError
         """
-        if isinstance(self._bot, Bot):
+        if isinstance(self.bot, Bot):
             raise ValueError('Bot is already set for this Roles instance')
-        self._bot = bot
+        self.bot = bot
 
     def __delitem__(self, key):
         """"""  # Remove method from docs
@@ -468,7 +468,7 @@ class Roles(dict):
         """"""  # Remove method from docs
         raise ValueError('Roles are immutable!')
 
-    def _setitem(self, key, value):
+    def setitem(self, key, value):
         super(Roles, self).__setitem__(key, value)
 
     def setdefault(self, key, value=None):
@@ -537,7 +537,7 @@ class Roles(dict):
             raise ValueError('Role name is already taken.')
         role = Role(chat_ids=chat_ids, parent_roles=parent_roles,
                     child_roles=child_roles, name=name)
-        self._setitem(name, role)
+        self.setitem(name, role)
         role.add_parent_role(self.ADMINS)
 
     def remove_role(self, name):
@@ -566,7 +566,7 @@ class Roles(dict):
         return not self == other
 
     def __deepcopy__(self, memo):
-        new_roles = Roles(self._bot)
+        new_roles = Roles(self.bot)
         new_roles.CHAT_ADMINS.timeout = self.CHAT_ADMINS.timeout
         memo[id(self)] = new_roles
         for chat_id in self.ADMINS.chat_ids:
@@ -642,5 +642,5 @@ class Roles(dict):
         roles.CHAT_ADMINS.timeout = tmp['admins_timeout']
         for id_ in tmp['roles']:
             role = _decode_role_from_json(id_, memo)
-            roles._setitem(role.name, role)
+            roles.setitem(role.name, role)
         return roles

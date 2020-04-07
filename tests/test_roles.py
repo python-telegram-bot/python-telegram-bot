@@ -328,10 +328,10 @@ class TestChatAdminsRole(object):
     def test_creation(self, bot):
         admins = ChatAdminsRole(bot, timeout=7)
         assert admins.timeout == 7
-        assert admins._bot is bot
+        assert admins.bot is bot
 
     def test_deepcopy(self, chat_admins_role):
-        chat_admins_role._cache.update({1: 2, 3: 4})
+        chat_admins_role.cache.update({1: 2, 3: 4})
         cadmins = deepcopy(chat_admins_role)
 
         assert chat_admins_role is not cadmins
@@ -341,8 +341,8 @@ class TestChatAdminsRole(object):
         assert chat_admins_role.parent_roles is not cadmins.parent_roles
         assert chat_admins_role.child_roles is not cadmins.child_roles
 
-        assert chat_admins_role._bot is cadmins._bot
-        assert chat_admins_role._cache == cadmins._cache
+        assert chat_admins_role.bot is cadmins.bot
+        assert chat_admins_role.cache == cadmins.cache
         assert chat_admins_role.timeout == cadmins.timeout
 
     def test_simple(self, chat_admins_role, update, monkeypatch):
@@ -350,7 +350,7 @@ class TestChatAdminsRole(object):
             return [ChatMember(User(0, 'TestUser0', False), 'administrator'),
                     ChatMember(User(1, 'TestUser1', False), 'creator')]
 
-        monkeypatch.setattr(chat_admins_role._bot, 'get_chat_administrators', admins)
+        monkeypatch.setattr(chat_admins_role.bot, 'get_chat_administrators', admins)
         handler = MessageHandler(None, None, roles=chat_admins_role)
 
         update.message.from_user.id = 2
@@ -386,19 +386,19 @@ class TestChatAdminsRole(object):
             return [ChatMember(User(0, 'TestUser0', False), 'administrator'),
                     ChatMember(User(1, 'TestUser1', False), 'creator')]
 
-        monkeypatch.setattr(chat_admins_role._bot, 'get_chat_administrators', admins)
+        monkeypatch.setattr(chat_admins_role.bot, 'get_chat_administrators', admins)
         handler = MessageHandler(None, None, roles=chat_admins_role)
 
         update.message.from_user.id = 2
         assert not handler.check_update(update)
-        assert isinstance(chat_admins_role._cache[0], tuple)
-        assert pytest.approx(chat_admins_role._cache[0][0]) == time.time()
-        assert chat_admins_role._cache[0][1] == [0, 1]
+        assert isinstance(chat_admins_role.cache[0], tuple)
+        assert pytest.approx(chat_admins_role.cache[0][0]) == time.time()
+        assert chat_admins_role.cache[0][1] == [0, 1]
 
         def admins(*args, **kwargs):
             raise ValueError('This method should not be called!')
 
-        monkeypatch.setattr(chat_admins_role._bot, 'get_chat_administrators', admins)
+        monkeypatch.setattr(chat_admins_role.bot, 'get_chat_administrators', admins)
 
         update.message.from_user.id = 1
         assert handler.check_update(update)
@@ -408,22 +408,22 @@ class TestChatAdminsRole(object):
         def admins(*args, **kwargs):
             return [ChatMember(User(2, 'TestUser0', False), 'administrator')]
 
-        monkeypatch.setattr(chat_admins_role._bot, 'get_chat_administrators', admins)
+        monkeypatch.setattr(chat_admins_role.bot, 'get_chat_administrators', admins)
 
         update.message.from_user.id = 2
         assert handler.check_update(update)
-        assert isinstance(chat_admins_role._cache[0], tuple)
-        assert pytest.approx(chat_admins_role._cache[0][0]) == time.time()
-        assert chat_admins_role._cache[0][1] == [2]
+        assert isinstance(chat_admins_role.cache[0], tuple)
+        assert pytest.approx(chat_admins_role.cache[0][0]) == time.time()
+        assert chat_admins_role.cache[0][1] == [2]
 
 
 class TestChatCreatorRole(object):
     def test_creation(self, bot):
         creator = ChatCreatorRole(bot)
-        assert creator._bot is bot
+        assert creator.bot is bot
 
     def test_deepcopy(self, chat_creator_role):
-        chat_creator_role._cache.update({1: 2, 3: 4})
+        chat_creator_role.cache.update({1: 2, 3: 4})
         ccreator = deepcopy(chat_creator_role)
 
         assert chat_creator_role is not ccreator
@@ -433,8 +433,8 @@ class TestChatCreatorRole(object):
         assert chat_creator_role.parent_roles is not ccreator.parent_roles
         assert chat_creator_role.child_roles is not ccreator.child_roles
 
-        assert chat_creator_role._bot is ccreator._bot
-        assert chat_creator_role._cache == ccreator._cache
+        assert chat_creator_role.bot is ccreator.bot
+        assert chat_creator_role.cache == ccreator.cache
 
     def test_simple(self, chat_creator_role, monkeypatch, update):
         def member(*args, **kwargs):
@@ -444,7 +444,7 @@ class TestChatCreatorRole(object):
                 return ChatMember(User(1, 'TestUser1', False), 'creator')
             raise TelegramError('User is not a member')
 
-        monkeypatch.setattr(chat_creator_role._bot, 'get_chat_member', member)
+        monkeypatch.setattr(chat_creator_role.bot, 'get_chat_member', member)
         handler = MessageHandler(None, None, roles=chat_creator_role)
 
         update.message.from_user.id = 0
@@ -486,17 +486,17 @@ class TestChatCreatorRole(object):
                 return ChatMember(User(1, 'TestUser1', False), 'creator')
             raise TelegramError('User is not a member')
 
-        monkeypatch.setattr(chat_creator_role._bot, 'get_chat_member', member)
+        monkeypatch.setattr(chat_creator_role.bot, 'get_chat_member', member)
         handler = MessageHandler(None, None, roles=chat_creator_role)
 
         update.message.from_user.id = 1
         assert handler.check_update(update)
-        assert chat_creator_role._cache == {0: 1}
+        assert chat_creator_role.cache == {0: 1}
 
         def member(*args, **kwargs):
             raise ValueError('This method should not be called!')
 
-        monkeypatch.setattr(chat_creator_role._bot, 'get_chat_member', member)
+        monkeypatch.setattr(chat_creator_role.bot, 'get_chat_member', member)
 
         update.message.from_user.id = 1
         assert handler.check_update(update)
@@ -511,18 +511,18 @@ class TestRoles(object):
         assert isinstance(roles, dict)
         assert isinstance(roles.ADMINS, Role)
         assert isinstance(roles.CHAT_ADMINS, Role)
-        assert roles.CHAT_ADMINS._bot is bot
+        assert roles.CHAT_ADMINS.bot is bot
         assert isinstance(roles.CHAT_CREATOR, Role)
-        assert roles.CHAT_CREATOR._bot is bot
-        assert roles._bot is bot
+        assert roles.CHAT_CREATOR.bot is bot
+        assert roles.bot is bot
 
     def test_set_bot(self, bot):
         roles = Roles(1)
-        assert roles._bot == 1
+        assert roles.bot == 1
         roles.set_bot(2)
-        assert roles._bot == 2
+        assert roles.bot == 2
         roles.set_bot(bot)
-        assert roles._bot is bot
+        assert roles.bot is bot
         with pytest.raises(ValueError, match='already set'):
             roles.set_bot(bot)
 
@@ -685,7 +685,7 @@ class TestRoles(object):
 
         rroles = Roles.decode_from_json(json_str, bot)
         assert rroles == roles
-        assert rroles._bot is bot
+        assert rroles.bot is bot
         for name in rroles:
             assert rroles[name] <= rroles.ADMINS
         assert rroles.ADMINS.chat_ids == set([9, 10])

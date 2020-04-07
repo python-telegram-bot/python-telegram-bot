@@ -964,7 +964,6 @@ class TestPickelPersistence(object):
         assert pickle_persistence_2.get_roles()['Working5!'].chat_ids == set([4, 5])
 
     def test_flush_on_stop_only_bot(self, bot, update, pickle_persistence_only_bot):
-        os.remove('pickletest_roles')
         u = Updater(bot=bot, persistence=pickle_persistence_only_bot)
         dp = u.dispatcher
         u.running = True
