@@ -29,6 +29,10 @@ class InlineQueryResultVideo(InlineQueryResult):
     :attr:`input_message_content` to send a message with the specified content instead of
     the video.
 
+    Note:
+        If an InlineQueryResultVideo message contains an embedded video (e.g., YouTube), you must
+        replace its content using :attr:`input_message_content`.
+
     Attributes:
         type (:obj:`str`): 'video'.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
@@ -36,7 +40,8 @@ class InlineQueryResultVideo(InlineQueryResult):
         mime_type (:obj:`str`): Mime type of the content of video url, "text/html" or "video/mp4".
         thumb_url (:obj:`str`): URL of the thumbnail (jpeg only) for the video.
         title (:obj:`str`): Title for the result.
-        caption (:obj:`str`): Optional. Caption, 0-1024 characters
+        caption (:obj:`str`): Optional. Caption of the video to be sent, 0-1024 characters after
+            entities parsing.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
@@ -47,7 +52,9 @@ class InlineQueryResultVideo(InlineQueryResult):
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-            message to be sent instead of the video.
+            message to be sent instead of the video. This field is required if
+            InlineQueryResultVideo is used to send an HTML-page as a result
+            (e.g., a YouTube video).
 
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
@@ -66,7 +73,9 @@ class InlineQueryResultVideo(InlineQueryResult):
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
-            message to be sent instead of the video.
+            message to be sent instead of the video. This field is required if
+            InlineQueryResultVideo is used to send an HTML-page as a result
+            (e.g., a YouTube video).
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
