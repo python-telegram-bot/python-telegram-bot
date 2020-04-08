@@ -87,6 +87,9 @@ class TestBot(object):
         assert get_me_bot.first_name == bot.first_name
         assert get_me_bot.last_name == bot.last_name
         assert get_me_bot.name == bot.name
+        assert get_me_bot.can_join_groups == bot.can_join_groups
+        assert get_me_bot.can_read_all_group_messages == bot.can_read_all_group_messages
+        assert get_me_bot.supports_inline_queries == bot.supports_inline_queries
         assert 'https://t.me/{}'.format(get_me_bot.username) == bot.link
 
     @flaky(3, 1)
@@ -175,14 +178,17 @@ class TestBot(object):
         question = 'Is this a test?'
         answers = ['Yes', 'No', 'Maybe']
         message = bot.send_poll(chat_id=super_group_id, question=question, options=answers,
-                                timeout=60)
+                                is_anonymous=False, allows_multiple_answers=True, timeout=60)
 
         assert message.poll
         assert message.poll.question == question
         assert message.poll.options[0].text == answers[0]
         assert message.poll.options[1].text == answers[1]
         assert message.poll.options[2].text == answers[2]
+        assert not message.poll.is_anonymous
+        assert message.poll.allows_multiple_answers
         assert not message.poll.is_closed
+        assert message.poll.type == Poll.REGULAR
 
         poll = bot.stop_poll(chat_id=super_group_id, message_id=message.message_id, timeout=60)
         assert isinstance(poll, Poll)
@@ -194,18 +200,13 @@ class TestBot(object):
         assert poll.options[2].text == answers[2]
         assert poll.options[2].voter_count == 0
         assert poll.question == question
+        assert poll.total_voter_count == 0
 
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_send_game(self, bot, chat_id):
-        game_short_name = 'test_game'
-        message = bot.send_game(chat_id, game_short_name)
-
-        assert message.game
-        assert message.game.description == ('A no-op test game, for python-telegram-bot '
-                                            'bot framework testing.')
-        assert message.game.animation.file_id != ''
-        assert message.game.photo[0].file_size == 851
+        message_quiz = bot.send_poll(chat_id=super_group_id, question=question, options=answers,
+                                     type=Poll.QUIZ, correct_option_id=2, is_closed=True)
+        assert message_quiz.poll.correct_option_id == 2
+        assert message_quiz.poll.type == Poll.QUIZ
+        assert message_quiz.poll.is_closed
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -348,6 +349,16 @@ class TestBot(object):
         monkeypatch.setattr('telegram.utils.request.Request.post', test)
 
         assert bot.set_chat_permissions(2, chat_permissions)
+
+    def test_set_chat_administrator_custom_title(self, monkeypatch, bot):
+        def test(_, url, data, *args, **kwargs):
+            chat_id = data['chat_id'] == 2
+            user_id = data['user_id'] == 32
+            custom_title = data['custom_title'] == 'custom_title'
+            return chat_id and user_id and custom_title
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        assert bot.set_chat_administrator_custom_title(2, 32, 'custom_title')
 
     # TODO: Needs improvement. Need an incoming callbackquery to test
     def test_answer_callback_query(self, monkeypatch, bot):
@@ -575,6 +586,18 @@ class TestBot(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    def test_send_game(self, bot, chat_id):
+        game_short_name = 'test_game'
+        message = bot.send_game(chat_id, game_short_name)
+
+        assert message.game
+        assert message.game.description == ('A no-op test game, for python-telegram-bot '
+                                            'bot framework testing.')
+        assert message.game.animation.file_id != ''
+        assert message.game.photo[0].file_size == 851
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     def test_set_game_score_1(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
         game_short_name = 'test_game'
@@ -774,14 +797,14 @@ class TestBot(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_delete_chat_photo(self, bot, channel_id):
-        assert bot.delete_chat_photo(channel_id)
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_set_chat_photo(self, bot, channel_id):
         with open('tests/data/telegram_test_channel.jpg', 'rb') as f:
             assert bot.set_chat_photo(channel_id, f)
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_delete_chat_photo(self, bot, channel_id):
+        assert bot.delete_chat_photo(channel_id)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

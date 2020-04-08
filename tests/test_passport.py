@@ -53,26 +53,35 @@ RAW_PASSPORT_DATA = {'credentials': {'hash': 'qB4hz2LMcXYhglwz6EvXMMyI3PURisWLXl
                              'type': 'personal_details'
                          }, {
                              'reverse_side': {'file_date': 1534074942,
-                                              'file_id': 'DgADBAADNQQAAtoagFPf4wwmFZdmyQI'},
+                                              'file_id': 'DgADBAADNQQAAtoagFPf4wwmFZdmyQI',
+                                              'file_unique_id': 'adc3145fd2e84d95b64d68eaa22aa33e'},
                              'translation': [{'file_size': 28640, 'file_date': 1535630933,
-                                              'file_id': 'DgADBAADswMAAisqQVAmooP-kVgLgAI'},
+                                              'file_id': 'DgADBAADswMAAisqQVAmooP-kVgLgAI',
+                                              'file_unique_id': '52a90d53d6064bb58feb582acdc3a324'},
                                              {'file_size': 28672, 'file_date': 1535630933,
-                                              'file_id': 'DgADBAAD1QMAAnrpQFBMZsT3HysjwwI'}],
+                                              'file_id': 'DgADBAAD1QMAAnrpQFBMZsT3HysjwwI',
+                                              'file_unique_id': '7285f864d168441ba1f7d02146250432'}],
                              'front_side': {'file_size': 28624, 'file_date': 1534074942,
-                                            'file_id': 'DgADBAADxwMAApnQgVPK2-ckL2eXVAI'},
+                                            'file_id': 'DgADBAADxwMAApnQgVPK2-ckL2eXVAI',
+                                            'file_unique_id': 'd9d52a700cbb4a189a80104aa5978133'},
                              'type': 'driver_license',
                              'selfie': {'file_size': 28592, 'file_date': 1534074942,
-                                        'file_id': 'DgADBAADEQQAAkopgFNr6oi-wISRtAI'},
+                                        'file_id': 'DgADBAADEQQAAkopgFNr6oi-wISRtAI',
+                                        'file_unique_id': 'd4e390cca57b4da5a65322b304762a12'},
                              'data': 'eJUOFuY53QKmGqmBgVWlLBAQCUQJ79n405SX6M5aGFIIodOPQqnLYvMNqTwTrXGDlW+mVLZcbu+y8luLVO8WsJB/0SB7q5WaXn/IMt1G9lz5G/KMLIZG/x9zlnimsaQLg7u8srG6L4KZzv+xkbbHjZdETrxU8j0N/DoS4HvLMRSJAgeFUrY6v2YW9vSRg+fSxIqQy1jR2VKpzAT8OhOz7A=='
                          }, {
                              'translation': [{'file_size': 28480, 'file_date': 1535630939,
-                                              'file_id': 'DgADBAADyQUAAqyqQVC_eoX_KwNjJwI'},
+                                              'file_id': 'DgADBAADyQUAAqyqQVC_eoX_KwNjJwI',
+                                              'file_unique_id': '38b2877b443542cbaf520c6e36a33ac4'},
                                              {'file_size': 28528, 'file_date': 1535630939,
-                                              'file_id': 'DgADBAADsQQAAubTQVDRO_FN3lOwWwI'}],
+                                              'file_id': 'DgADBAADsQQAAubTQVDRO_FN3lOwWwI',
+                                              'file_unique_id': 'f008ca48c44b4a47895ddbcd2f76741e'}],
                              'files': [{'file_size': 28640, 'file_date': 1534074988,
-                                        'file_id': 'DgADBAADLAMAAhwfgVMyfGa5Nr0LvAI'},
+                                        'file_id': 'DgADBAADLAMAAhwfgVMyfGa5Nr0LvAI',
+                                        'file_unique_id': 'b170748794834644baaa3ec57ee4ce7a'},
                                        {'file_size': 28480, 'file_date': 1534074988,
-                                        'file_id': 'DgADBAADaQQAAsFxgVNVfLZuT-_3ZQI'}],
+                                        'file_id': 'DgADBAADaQQAAsFxgVNVfLZuT-_3ZQI',
+                                        'file_unique_id': '19a12ae34dca424b85e0308f706cee75'}],
                              'type': 'utility_bill'
                          }, {
                              'data': 'j9SksVkSj128DBtZA+3aNjSFNirzv+R97guZaMgae4Gi0oDVNAF7twPR7j9VSmPedfJrEwL3O889Ei+a5F1xyLLyEI/qEBljvL70GFIhYGitS0JmNabHPHSZrjOl8b4s/0Z0Px2GpLO5siusTLQonimdUvu4UPjKquYISmlKEKhtmGATy+h+JDjNCYuOkhakeNw0Rk0BHgj0C3fCb7WZNQSyVb+2GTu6caR6eXf/AFwFp0TV3sRz3h0WIVPW8bna',
@@ -138,14 +147,23 @@ def passport_data(bot):
 
 class TestPassport(object):
     driver_license_selfie_file_id = 'DgADBAADEQQAAkopgFNr6oi-wISRtAI'
+    driver_license_selfie_file_unique_id = 'd4e390cca57b4da5a65322b304762a12'
     driver_license_front_side_file_id = 'DgADBAADxwMAApnQgVPK2-ckL2eXVAI'
+    driver_license_front_side_file_unique_id = 'd9d52a700cbb4a189a80104aa5978133'
     driver_license_reverse_side_file_id = 'DgADBAADNQQAAtoagFPf4wwmFZdmyQI'
+    driver_license_reverse_side_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
     driver_license_translation_1_file_id = 'DgADBAADswMAAisqQVAmooP-kVgLgAI'
+    driver_license_translation_1_file_unique_id = '52a90d53d6064bb58feb582acdc3a324'
     driver_license_translation_2_file_id = 'DgADBAAD1QMAAnrpQFBMZsT3HysjwwI'
+    driver_license_translation_2_file_unique_id = '7285f864d168441ba1f7d02146250432'
     utility_bill_1_file_id = 'DgADBAADLAMAAhwfgVMyfGa5Nr0LvAI'
+    utility_bill_1_file_unique_id = 'b170748794834644baaa3ec57ee4ce7a'
     utility_bill_2_file_id = 'DgADBAADaQQAAsFxgVNVfLZuT-_3ZQI'
+    utility_bill_2_file_unique_id = '19a12ae34dca424b85e0308f706cee75'
     utility_bill_translation_1_file_id = 'DgADBAADyQUAAqyqQVC_eoX_KwNjJwI'
+    utility_bill_translation_1_file_unique_id = '38b2877b443542cbaf520c6e36a33ac4'
     utility_bill_translation_2_file_id = 'DgADBAADsQQAAubTQVDRO_FN3lOwWwI'
+    utility_bill_translation_2_file_unique_id = 'f008ca48c44b4a47895ddbcd2f76741e'
     driver_license_selfie_credentials_file_hash = 'Cila/qLXSBH7DpZFbb5bRZIRxeFW2uv/ulL0u0JNsYI='
     driver_license_selfie_credentials_secret = 'tivdId6RNYNsvXYPppdzrbxOBuBOr9wXRPDcCvnXU7E='
 
@@ -162,24 +180,40 @@ class TestPassport(object):
         assert driver_license.data == RAW_PASSPORT_DATA['data'][1]['data']
         assert isinstance(driver_license.selfie, PassportFile)
         assert driver_license.selfie.file_id == self.driver_license_selfie_file_id
+        assert driver_license.selfie.file_unique_id == self.driver_license_selfie_file_unique_id
+
         assert isinstance(driver_license.front_side, PassportFile)
         assert driver_license.front_side.file_id == self.driver_license_front_side_file_id
+        assert driver_license.front_side.file_unique_id == self.driver_license_front_side_file_unique_id
+
         assert isinstance(driver_license.reverse_side, PassportFile)
         assert driver_license.reverse_side.file_id == self.driver_license_reverse_side_file_id
+        assert driver_license.reverse_side.file_unique_id == self.driver_license_reverse_side_file_unique_id
+
         assert isinstance(driver_license.translation[0], PassportFile)
         assert driver_license.translation[0].file_id == self.driver_license_translation_1_file_id
+        assert driver_license.translation[0].file_unique_id == self.driver_license_translation_1_file_unique_id
+
         assert isinstance(driver_license.translation[1], PassportFile)
         assert driver_license.translation[1].file_id == self.driver_license_translation_2_file_id
+        assert driver_license.translation[1].file_unique_id == self.driver_license_translation_2_file_unique_id
 
         assert utility_bill.type == 'utility_bill'
         assert isinstance(utility_bill.files[0], PassportFile)
         assert utility_bill.files[0].file_id == self.utility_bill_1_file_id
+        assert utility_bill.files[0].file_unique_id == self.utility_bill_1_file_unique_id
+
         assert isinstance(utility_bill.files[1], PassportFile)
         assert utility_bill.files[1].file_id == self.utility_bill_2_file_id
+        assert utility_bill.files[1].file_unique_id == self.utility_bill_2_file_unique_id
+
         assert isinstance(utility_bill.translation[0], PassportFile)
         assert utility_bill.translation[0].file_id == self.utility_bill_translation_1_file_id
+        assert utility_bill.translation[0].file_unique_id == self.utility_bill_translation_1_file_unique_id
+
         assert isinstance(utility_bill.translation[1], PassportFile)
         assert utility_bill.translation[1].file_id == self.utility_bill_translation_2_file_id
+        assert utility_bill.translation[1].file_unique_id == self.utility_bill_translation_2_file_unique_id
 
         assert address.type == 'address'
         assert address.data == RAW_PASSPORT_DATA['data'][3]['data']
@@ -208,10 +242,15 @@ class TestPassport(object):
                                                  'document_no': 'DOCUMENT_NO'}
         assert isinstance(driver_license.selfie, PassportFile)
         assert driver_license.selfie.file_id == self.driver_license_selfie_file_id
+        assert driver_license.selfie.file_unique_id == self.driver_license_selfie_file_unique_id
+
         assert isinstance(driver_license.front_side, PassportFile)
         assert driver_license.front_side.file_id == self.driver_license_front_side_file_id
+        assert driver_license.front_side.file_unique_id == self.driver_license_front_side_file_unique_id
+
         assert isinstance(driver_license.reverse_side, PassportFile)
         assert driver_license.reverse_side.file_id == self.driver_license_reverse_side_file_id
+        assert driver_license.reverse_side.file_unique_id == self.driver_license_reverse_side_file_unique_id
 
         assert address.type == 'address'
         assert address.data.to_dict() == {'city': 'CITY', 'street_line2': 'STREET_LINE2',
@@ -221,8 +260,11 @@ class TestPassport(object):
         assert utility_bill.type == 'utility_bill'
         assert isinstance(utility_bill.files[0], PassportFile)
         assert utility_bill.files[0].file_id == self.utility_bill_1_file_id
+        assert utility_bill.files[0].file_unique_id == self.utility_bill_1_file_unique_id
+
         assert isinstance(utility_bill.files[1], PassportFile)
         assert utility_bill.files[1].file_id == self.utility_bill_2_file_id
+        assert utility_bill.files[1].file_unique_id == self.utility_bill_2_file_unique_id
 
         assert email.type == 'email'
         assert email.email == 'fb3e3i47zt@dispostable.com'
@@ -295,12 +337,14 @@ class TestPassport(object):
         # TODO: Actually download a passport file in a test
         selfie = passport_data.decrypted_data[1].selfie
 
+        # NOTE: file_unique_id is not used in the get_file method, so it is passed directly
         def get_file(*args, **kwargs):
-            return File(args[0])
+            return File(args[0], selfie.file_unique_id)
 
         monkeypatch.setattr(passport_data.bot, 'get_file', get_file)
         file = selfie.get_file()
         assert file.file_id == selfie.file_id
+        assert file.file_unique_id == selfie.file_unique_id
         assert file._credentials.file_hash == self.driver_license_selfie_credentials_file_hash
         assert file._credentials.secret == self.driver_license_selfie_credentials_secret
 

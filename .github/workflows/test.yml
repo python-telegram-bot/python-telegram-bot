@@ -90,7 +90,6 @@ jobs:
         run: |
           pytest -v tests/test_official.py
           exit $?
-        continue-on-error: True
         env:
           TEST_OFFICIAL: "true"
         shell: bash --noprofile --norc {0}

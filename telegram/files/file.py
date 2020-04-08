@@ -38,11 +38,17 @@ class File(TelegramObject):
 
     Attributes:
         file_id (:obj:`str`): Unique identifier for this file.
+        file_unique_id (:obj:`str`): Unique identifier for this file, which
+            is supposed to be the same over time and for different bots.
+            Can't be used to download or reuse the file.
         file_size (:obj:`str`): Optional. File size.
         file_path (:obj:`str`): Optional. File path. Use :attr:`download` to get the file.
 
     Args:
-        file_id (:obj:`str`): Unique identifier for this file.
+        file_id (:obj:`str`): Identifier for this file, which can be used to download
+            or reuse the file.
+        file_unique_id (:obj:`str`): Unique and the same over time and
+            for different bots file identifier.
         file_size (:obj:`int`, optional): Optional. File size, if known.
         file_path (:obj:`str`, optional): File path. Use :attr:`download` to get the file.
         bot (:obj:`telegram.Bot`, optional): Bot to use with shortcut method.
@@ -54,18 +60,23 @@ class File(TelegramObject):
 
     """
 
-    def __init__(self, file_id, bot=None, file_size=None, file_path=None, **kwargs):
+    def __init__(self,
+                 file_id,
+                 file_unique_id,
+                 bot=None,
+                 file_size=None,
+                 file_path=None,
+                 **kwargs):
         # Required
         self.file_id = str(file_id)
-
+        self.file_unique_id = str(file_unique_id)
         # Optionals
         self.file_size = file_size
         self.file_path = file_path
-
         self.bot = bot
         self._credentials = None
 
-        self._id_attrs = (self.file_id,)
+        self._id_attrs = (self.file_unique_id,)
 
     @classmethod
     def de_json(cls, data, bot):
