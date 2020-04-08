@@ -47,16 +47,22 @@ class TestVideoNote(object):
     thumb_file_size = 11547
 
     caption = u'VideoNoteTest - Caption'
+    videonote_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
+    videonote_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
 
     def test_creation(self, video_note):
         # Make sure file has been uploaded.
         assert isinstance(video_note, VideoNote)
         assert isinstance(video_note.file_id, str)
+        assert isinstance(video_note.file_unique_id, str)
         assert video_note.file_id != ''
+        assert video_note.file_unique_id != ''
 
         assert isinstance(video_note.thumb, PhotoSize)
         assert isinstance(video_note.thumb.file_id, str)
+        assert isinstance(video_note.thumb.file_unique_id, str)
         assert video_note.thumb.file_id != ''
+        assert video_note.thumb.file_unique_id != ''
 
     def test_expected_values(self, video_note):
         assert video_note.length == self.length
@@ -72,7 +78,9 @@ class TestVideoNote(object):
 
         assert isinstance(message.video_note, VideoNote)
         assert isinstance(message.video_note.file_id, str)
+        assert isinstance(message.video_note.file_unique_id, str)
         assert message.video_note.file_id != ''
+        assert message.video_note.file_unique_id != ''
         assert message.video_note.length == video_note.length
         assert message.video_note.duration == video_note.duration
         assert message.video_note.file_size == video_note.file_size
@@ -88,6 +96,7 @@ class TestVideoNote(object):
 
         assert new_file.file_size == self.file_size
         assert new_file.file_id == video_note.file_id
+        assert new_file.file_unique_id == video_note.file_unique_id
         assert new_file.file_path.startswith('https://')
 
         new_file.download('telegram2.mp4')
@@ -96,7 +105,6 @@ class TestVideoNote(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    @pytest.mark.skip(reason='Doesnt work without API 4.5')
     def test_resend(self, bot, chat_id, video_note):
         message = bot.send_video_note(chat_id, video_note.file_id)
 
@@ -112,14 +120,16 @@ class TestVideoNote(object):
 
     def test_de_json(self, bot):
         json_dict = {
-            'file_id': 'not a file id',
+            'file_id': self.videonote_file_id,
+            'file_unique_id': self.videonote_file_unique_id,
             'length': self.length,
             'duration': self.duration,
             'file_size': self.file_size
         }
         json_video_note = VideoNote.de_json(json_dict, bot)
 
-        assert json_video_note.file_id == 'not a file id'
+        assert json_video_note.file_id == self.videonote_file_id
+        assert json_video_note.file_unique_id == self.videonote_file_unique_id
         assert json_video_note.length == self.length
         assert json_video_note.duration == self.duration
         assert json_video_note.file_size == self.file_size
@@ -129,6 +139,7 @@ class TestVideoNote(object):
 
         assert isinstance(video_note_dict, dict)
         assert video_note_dict['file_id'] == video_note.file_id
+        assert video_note_dict['file_unique_id'] == video_note.file_unique_id
         assert video_note_dict['length'] == video_note.length
         assert video_note_dict['duration'] == video_note.duration
         assert video_note_dict['file_size'] == video_note.file_size
@@ -157,11 +168,11 @@ class TestVideoNote(object):
         assert video_note.get_file()
 
     def test_equality(self, video_note):
-        a = VideoNote(video_note.file_id, self.length, self.duration)
-        b = VideoNote(video_note.file_id, self.length, self.duration)
-        c = VideoNote(video_note.file_id, 0, 0)
-        d = VideoNote('', self.length, self.duration)
-        e = Voice(video_note.file_id, self.duration)
+        a = VideoNote(video_note.file_id, video_note.file_unique_id, self.length, self.duration)
+        b = VideoNote('', video_note.file_unique_id, self.length, self.duration)
+        c = VideoNote(video_note.file_id, video_note.file_unique_id, 0, 0)
+        d = VideoNote('', '', self.length, self.duration)
+        e = Voice(video_note.file_id, video_note.file_unique_id, self.duration)
 
         assert a == b
         assert hash(a) == hash(b)

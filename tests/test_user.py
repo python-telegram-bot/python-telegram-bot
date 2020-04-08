@@ -19,56 +19,71 @@
 import pytest
 
 from telegram import User, Update
+from telegram.utils.helpers import escape_markdown
 
 
 @pytest.fixture(scope='function')
 def json_dict():
     return {
-        'id': TestUser.id,
+        'id': TestUser.id_,
         'is_bot': TestUser.is_bot,
         'first_name': TestUser.first_name,
         'last_name': TestUser.last_name,
         'username': TestUser.username,
-        'language_code': TestUser.language_code
+        'language_code': TestUser.language_code,
+        'can_join_groups': TestUser.can_join_groups,
+        'can_read_all_group_messages': TestUser.can_read_all_group_messages,
+        'supports_inline_queries': TestUser.supports_inline_queries
     }
 
 
 @pytest.fixture(scope='function')
 def user(bot):
-    return User(id=TestUser.id, first_name=TestUser.first_name, is_bot=TestUser.is_bot,
+    return User(id=TestUser.id_, first_name=TestUser.first_name, is_bot=TestUser.is_bot,
                 last_name=TestUser.last_name, username=TestUser.username,
-                language_code=TestUser.language_code, bot=bot)
+                language_code=TestUser.language_code, can_join_groups=TestUser.can_join_groups,
+                can_read_all_group_messages=TestUser.can_read_all_group_messages,
+                supports_inline_queries=TestUser.supports_inline_queries, bot=bot)
 
 
 class TestUser(object):
-    id = 1
+    id_ = 1
     is_bot = True
     first_name = u'first\u2022name'
     last_name = u'last\u2022name'
     username = 'username'
     language_code = 'en_us'
+    can_join_groups = True
+    can_read_all_group_messages = True
+    supports_inline_queries = False
 
     def test_de_json(self, json_dict, bot):
         user = User.de_json(json_dict, bot)
 
-        assert user.id == self.id
+        assert user.id == self.id_
         assert user.is_bot == self.is_bot
         assert user.first_name == self.first_name
         assert user.last_name == self.last_name
         assert user.username == self.username
         assert user.language_code == self.language_code
+        assert user.can_join_groups == self.can_join_groups
+        assert user.can_read_all_group_messages == self.can_read_all_group_messages
+        assert user.supports_inline_queries == self.supports_inline_queries
 
     def test_de_json_without_username(self, json_dict, bot):
         del json_dict['username']
 
         user = User.de_json(json_dict, bot)
 
-        assert user.id == self.id
+        assert user.id == self.id_
         assert user.is_bot == self.is_bot
         assert user.first_name == self.first_name
         assert user.last_name == self.last_name
         assert user.username is None
         assert user.language_code == self.language_code
+        assert user.can_join_groups == self.can_join_groups
+        assert user.can_read_all_group_messages == self.can_read_all_group_messages
+        assert user.supports_inline_queries == self.supports_inline_queries
 
     def test_de_json_without_username_and_last_name(self, json_dict, bot):
         del json_dict['username']
@@ -76,12 +91,15 @@ class TestUser(object):
 
         user = User.de_json(json_dict, bot)
 
-        assert user.id == self.id
+        assert user.id == self.id_
         assert user.is_bot == self.is_bot
         assert user.first_name == self.first_name
         assert user.last_name is None
         assert user.username is None
         assert user.language_code == self.language_code
+        assert user.can_join_groups == self.can_join_groups
+        assert user.can_read_all_group_messages == self.can_read_all_group_messages
+        assert user.supports_inline_queries == self.supports_inline_queries
 
     def test_name(self, user):
         assert user.name == '@username'
@@ -188,12 +206,24 @@ class TestUser(object):
                                                                            user.id)
         assert user.mention_markdown(user.username) == expected.format(user.username, user.id)
 
+    def test_mention_markdown_v2(self, user):
+        user.first_name = 'first{name'
+        user.last_name = 'last_name'
+
+        expected = u'[{}](tg://user?id={})'
+
+        assert user.mention_markdown_v2() == expected.format(escape_markdown(user.full_name,
+                                                                             version=2), user.id)
+        assert user.mention_markdown_v2('the{name>\u2022') == expected.format('the\{name\>\u2022',
+                                                                              user.id)
+        assert user.mention_markdown_v2(user.username) == expected.format(user.username, user.id)
+
     def test_equality(self):
-        a = User(self.id, self.first_name, self.is_bot, self.last_name)
-        b = User(self.id, self.first_name, self.is_bot, self.last_name)
-        c = User(self.id, self.first_name, self.is_bot)
+        a = User(self.id_, self.first_name, self.is_bot, self.last_name)
+        b = User(self.id_, self.first_name, self.is_bot, self.last_name)
+        c = User(self.id_, self.first_name, self.is_bot)
         d = User(0, self.first_name, self.is_bot, self.last_name)
-        e = Update(self.id)
+        e = Update(self.id_)
 
         assert a == b
         assert hash(a) == hash(b)

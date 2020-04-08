@@ -24,20 +24,20 @@ from telegram import PassportElementErrorUnspecified, PassportElementErrorDataFi
 
 @pytest.fixture(scope='class')
 def passport_element_error_unspecified():
-    return PassportElementErrorUnspecified(TestPassportElementErrorUnspecified.type,
+    return PassportElementErrorUnspecified(TestPassportElementErrorUnspecified.type_,
                                            TestPassportElementErrorUnspecified.element_hash,
                                            TestPassportElementErrorUnspecified.message)
 
 
 class TestPassportElementErrorUnspecified(object):
     source = 'unspecified'
-    type = 'test_type'
+    type_ = 'test_type'
     element_hash = 'element_hash'
     message = 'Error message'
 
     def test_expected_values(self, passport_element_error_unspecified):
         assert passport_element_error_unspecified.source == self.source
-        assert passport_element_error_unspecified.type == self.type
+        assert passport_element_error_unspecified.type == self.type_
         assert passport_element_error_unspecified.element_hash == self.element_hash
         assert passport_element_error_unspecified.message == self.message
 
@@ -55,12 +55,12 @@ class TestPassportElementErrorUnspecified(object):
                 == passport_element_error_unspecified.message)
 
     def test_equality(self):
-        a = PassportElementErrorUnspecified(self.type, self.element_hash, self.message)
-        b = PassportElementErrorUnspecified(self.type, self.element_hash, self.message)
-        c = PassportElementErrorUnspecified(self.type, '', '')
+        a = PassportElementErrorUnspecified(self.type_, self.element_hash, self.message)
+        b = PassportElementErrorUnspecified(self.type_, self.element_hash, self.message)
+        c = PassportElementErrorUnspecified(self.type_, '', '')
         d = PassportElementErrorUnspecified('', self.element_hash, '')
         e = PassportElementErrorUnspecified('', '', self.message)
-        f = PassportElementErrorDataField(self.type, '', '', self.message)
+        f = PassportElementErrorDataField(self.type_, '', '', self.message)
 
         assert a == b
         assert hash(a) == hash(b)

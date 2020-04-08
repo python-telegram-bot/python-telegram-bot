@@ -24,7 +24,7 @@ from telegram import PassportElementErrorDataField, PassportElementErrorSelfie
 
 @pytest.fixture(scope='class')
 def passport_element_error_data_field():
-    return PassportElementErrorDataField(TestPassportElementErrorDataField.type,
+    return PassportElementErrorDataField(TestPassportElementErrorDataField.type_,
                                          TestPassportElementErrorDataField.field_name,
                                          TestPassportElementErrorDataField.data_hash,
                                          TestPassportElementErrorDataField.message)
@@ -32,14 +32,14 @@ def passport_element_error_data_field():
 
 class TestPassportElementErrorDataField(object):
     source = 'data'
-    type = 'test_type'
+    type_ = 'test_type'
     field_name = 'test_field'
     data_hash = 'data_hash'
     message = 'Error message'
 
     def test_expected_values(self, passport_element_error_data_field):
         assert passport_element_error_data_field.source == self.source
-        assert passport_element_error_data_field.type == self.type
+        assert passport_element_error_data_field.type == self.type_
         assert passport_element_error_data_field.field_name == self.field_name
         assert passport_element_error_data_field.data_hash == self.data_hash
         assert passport_element_error_data_field.message == self.message
@@ -60,13 +60,15 @@ class TestPassportElementErrorDataField(object):
                 == passport_element_error_data_field.message)
 
     def test_equality(self):
-        a = PassportElementErrorDataField(self.type, self.field_name, self.data_hash, self.message)
-        b = PassportElementErrorDataField(self.type, self.field_name, self.data_hash, self.message)
-        c = PassportElementErrorDataField(self.type, '', '', '')
+        a = PassportElementErrorDataField(self.type_, self.field_name, self.data_hash,
+                                          self.message)
+        b = PassportElementErrorDataField(self.type_, self.field_name, self.data_hash,
+                                          self.message)
+        c = PassportElementErrorDataField(self.type_, '', '', '')
         d = PassportElementErrorDataField('', self.field_name, '', '')
         e = PassportElementErrorDataField('', '', self.data_hash, '')
         f = PassportElementErrorDataField('', '', '', self.message)
-        g = PassportElementErrorSelfie(self.type, '', self.message)
+        g = PassportElementErrorSelfie(self.type_, '', self.message)
 
         assert a == b
         assert hash(a) == hash(b)

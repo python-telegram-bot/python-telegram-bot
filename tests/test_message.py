@@ -28,7 +28,7 @@ from tests.test_passport import RAW_PASSPORT_DATA
 
 @pytest.fixture(scope='class')
 def message(bot):
-    return Message(TestMessage.id, TestMessage.from_user, TestMessage.date, TestMessage.chat,
+    return Message(TestMessage.id_, TestMessage.from_user, TestMessage.date, TestMessage.chat,
                    bot=bot)
 
 
@@ -47,21 +47,21 @@ def message(bot):
                     {'caption': 'A message caption',
                      'caption_entities': [MessageEntity('bold', 1, 1),
                                           MessageEntity('text_link', 4, 3)]},
-                    {'audio': Audio('audio_id', 12),
+                    {'audio': Audio('audio_id', 'unique_id', 12),
                      'caption': 'audio_file'},
-                    {'document': Document('document_id'),
+                    {'document': Document('document_id', 'unique_id'),
                      'caption': 'document_file'},
-                    {'animation': Animation('animation_id', 30, 30, 1),
+                    {'animation': Animation('animation_id', 'unique_id', 30, 30, 1),
                      'caption': 'animation_file'},
                     {'game': Game('my_game', 'just my game',
-                                  [PhotoSize('game_photo_id', 30, 30), ])},
-                    {'photo': [PhotoSize('photo_id', 50, 50)],
+                                  [PhotoSize('game_photo_id', 'unique_id', 30, 30), ])},
+                    {'photo': [PhotoSize('photo_id', 'unique_id', 50, 50)],
                      'caption': 'photo_file'},
-                    {'sticker': Sticker('sticker_id', 50, 50, True)},
-                    {'video': Video('video_id', 12, 12, 12),
+                    {'sticker': Sticker('sticker_id', 'unique_id', 50, 50, True)},
+                    {'video': Video('video_id', 'unique_id', 12, 12, 12),
                      'caption': 'video_file'},
-                    {'voice': Voice('voice_id', 5)},
-                    {'video_note': VideoNote('video_note_id', 20, 12)},
+                    {'voice': Voice('voice_id', 'unique_id', 5)},
+                    {'video_note': VideoNote('video_note_id', 'unique_id', 20, 12)},
                     {'new_chat_members': [User(55, 'new_user', False)]},
                     {'contact': Contact('phone_numner', 'contact_name')},
                     {'location': Location(-23.691288, 46.788279)},
@@ -69,7 +69,7 @@ def message(bot):
                                     'some place', 'right here')},
                     {'left_chat_member': User(33, 'kicked', False)},
                     {'new_chat_title': 'new title'},
-                    {'new_chat_photo': [PhotoSize('photo_id', 50, 50)]},
+                    {'new_chat_photo': [PhotoSize('photo_id', 'unique_id', 50, 50)]},
                     {'delete_chat_photo': True},
                     {'group_chat_created': True},
                     {'supergroup_chat_created': True},
@@ -84,13 +84,15 @@ def message(bot):
                     {'connected_website': 'http://example.com/'},
                     {'forward_signature': 'some_forward_sign'},
                     {'author_signature': 'some_author_sign'},
-                    {'photo': [PhotoSize('photo_id', 50, 50)],
+                    {'photo': [PhotoSize('photo_id', 'unique_id', 50, 50)],
                      'caption': 'photo_file',
                      'media_group_id': 1234443322222},
                     {'passport_data': PassportData.de_json(RAW_PASSPORT_DATA, None)},
                     {'poll': Poll(id='abc', question='What is this?',
                                   options=[PollOption(text='a', voter_count=1),
-                                           PollOption(text='b', voter_count=2)], is_closed=False)},
+                                           PollOption(text='b', voter_count=2)], is_closed=False,
+                                  total_voter_count=0, is_anonymous=False, type=Poll.REGULAR,
+                                  allows_multiple_answers=True)},
                     {'text': 'a text message', 'reply_markup': {'inline_keyboard': [[{
                         'text': 'start', 'url': 'http://google.com'}, {
                         'text': 'next', 'callback_data': 'abcd'}],
@@ -107,26 +109,44 @@ def message(bot):
                      'photo_from_media_group', 'passport_data', 'poll', 'reply_markup',
                      'default_quote'])
 def message_params(bot, request):
-    return Message(message_id=TestMessage.id,
+    return Message(message_id=TestMessage.id_,
                    from_user=TestMessage.from_user,
                    date=TestMessage.date,
                    chat=TestMessage.chat, bot=bot, **request.param)
 
 
 class TestMessage(object):
-    id = 1
+    id_ = 1
     from_user = User(2, 'testuser', False)
     date = datetime.utcnow()
     chat = Chat(3, 'private')
     test_entities = [{'length': 4, 'offset': 10, 'type': 'bold'},
-                     {'length': 7, 'offset': 16, 'type': 'italic'},
+                     {'length': 3, 'offset': 16, 'type': 'italic'},
+                     {'length': 3, 'offset': 20, 'type': 'italic'},
                      {'length': 4, 'offset': 25, 'type': 'code'},
-                     {'length': 5, 'offset': 31, 'type': 'text_link', 'url': 'http://github.com/'},
+                     {'length': 5, 'offset': 31, 'type': 'text_link',
+                      'url': 'http://github.com/ab_'},
                      {'length': 12, 'offset': 38, 'type': 'text_mention',
                       'user': User(123456789, 'mentioned user', False)},
-                     {'length': 3, 'offset': 55, 'type': 'pre'},
-                     {'length': 17, 'offset': 60, 'type': 'url'}]
-    test_text = 'Test for <bold, ita_lic, code, links, text-mention and pre. http://google.com'
+                     {'length': 3, 'offset': 55, 'type': 'pre', 'language': 'python'},
+                     {'length': 21, 'offset': 60, 'type': 'url'}]
+    test_text = 'Test for <bold, ita_lic, code, links, text-mention and pre. http://google.com/ab_'
+    test_entities_v2 = [{'length': 4, 'offset': 0, 'type': 'underline'},
+                        {'length': 4, 'offset': 10, 'type': 'bold'},
+                        {'length': 7, 'offset': 16, 'type': 'italic'},
+                        {'length': 6, 'offset': 25, 'type': 'code'},
+                        {'length': 5, 'offset': 33, 'type': 'text_link',
+                            'url': 'http://github.com/abc\)def'},
+                        {'length': 12, 'offset': 40, 'type': 'text_mention',
+                            'user': User(123456789, 'mentioned user', False)},
+                        {'length': 5, 'offset': 57, 'type': 'pre'},
+                        {'length': 17, 'offset': 64, 'type': 'url'},
+                        {'length': 36, 'offset': 86, 'type': 'italic'},
+                        {'length': 24, 'offset': 91, 'type': 'bold'},
+                        {'length': 4, 'offset': 101, 'type': 'strikethrough'},
+                        {'length': 10, 'offset': 124, 'type': 'pre', 'language': 'python'}]
+    test_text_v2 = ('Test for <bold, ita_lic, \`code, links, text-mention and `\pre. '
+                    'http://google.com and bold nested in strk nested in italic. Python pre.')
     test_message = Message(message_id=1,
                            from_user=None,
                            date=None,
@@ -135,6 +155,16 @@ class TestMessage(object):
                            entities=[MessageEntity(**e) for e in test_entities],
                            caption=test_text,
                            caption_entities=[MessageEntity(**e) for e in test_entities])
+    test_message_v2 = Message(message_id=1,
+                              from_user=None,
+                              date=None,
+                              chat=None,
+                              text=test_text_v2,
+                              entities=[MessageEntity(**e) for e in test_entities_v2],
+                              caption=test_text_v2,
+                              caption_entities=[
+                                  MessageEntity(**e) for e in test_entities_v2
+                              ])
 
     def test_all_posibilities_de_json_and_to_dict(self, bot, message_params):
         new = Message.de_json(message_params.to_dict(), bot)
@@ -182,11 +212,13 @@ class TestMessage(object):
         assert message.parse_caption_entities() == {entity: 'http://google.com', entity_2: 'h'}
 
     def test_text_html_simple(self):
-        test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
-                            '<a href="http://github.com/">links</a>, '
+        test_html_string = ('<u>Test</u> for &lt;<b>bold</b>, <i>ita_lic</i>, <code>\`code</code>,'
+                            ' <a href="http://github.com/abc\)def">links</a>, '
                             '<a href="tg://user?id=123456789">text-mention</a> and '
-                            '<pre>pre</pre>. http://google.com')
-        text_html = self.test_message.text_html
+                            '<pre>`\pre</pre>. http://google.com '
+                            'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>. '
+                            '<pre><code class="python">Python pre</code></pre>.')
+        text_html = self.test_message_v2.text_html
         assert text_html == test_html_string
 
     def test_text_html_empty(self, message):
@@ -195,30 +227,68 @@ class TestMessage(object):
         assert message.text_html is None
 
     def test_text_html_urled(self):
-        test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
-                            '<a href="http://github.com/">links</a>, '
+        test_html_string = ('<u>Test</u> for &lt;<b>bold</b>, <i>ita_lic</i>, <code>\`code</code>,'
+                            ' <a href="http://github.com/abc\)def">links</a>, '
                             '<a href="tg://user?id=123456789">text-mention</a> and '
-                            '<pre>pre</pre>. <a href="http://google.com">http://google.com</a>')
-        text_html = self.test_message.text_html_urled
+                            '<pre>`\pre</pre>. <a href="http://google.com">http://google.com</a> '
+                            'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>. '
+                            '<pre><code class="python">Python pre</code></pre>.')
+        text_html = self.test_message_v2.text_html_urled
         assert text_html == test_html_string
 
     def test_text_markdown_simple(self):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
-                          '[text-mention](tg://user?id=123456789) and ```pre```. '
-                          'http://google.com')
+        test_md_string = ('Test for <*bold*, _ita_\__lic_, `code`, [links](http://github.com/ab_),'
+                          ' [text-mention](tg://user?id=123456789) and ```python\npre```. '
+                          'http://google.com/ab\_')
         text_markdown = self.test_message.text_markdown
         assert text_markdown == test_md_string
+
+    def test_text_markdown_v2_simple(self):
+        test_md_string = (r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
+                          '[links](http://github.com/abc\\\\\)def), '
+                          '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```\. '
+                          'http://google\.com and _bold *nested in ~strk~ nested in* italic_\. '
+                          '```python\nPython pre```\.')
+        text_markdown = self.test_message_v2.text_markdown_v2
+        assert text_markdown == test_md_string
+
+    def test_text_markdown_new_in_v2(self, message):
+        message.text = 'test'
+        message.entities = [MessageEntity(MessageEntity.BOLD, offset=0, length=4),
+                            MessageEntity(MessageEntity.ITALIC, offset=0, length=4)]
+        with pytest.raises(ValueError):
+            assert message.text_markdown
+
+        message.entities = [MessageEntity(MessageEntity.UNDERLINE, offset=0, length=4)]
+        with pytest.raises(ValueError):
+            message.text_markdown
+
+        message.entities = [MessageEntity(MessageEntity.STRIKETHROUGH, offset=0, length=4)]
+        with pytest.raises(ValueError):
+            message.text_markdown
+
+        message.entities = []
 
     def test_text_markdown_empty(self, message):
         message.text = None
         message.caption = "test"
         assert message.text_markdown is None
+        assert message.text_markdown_v2 is None
 
     def test_text_markdown_urled(self):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
-                          '[text-mention](tg://user?id=123456789) and ```pre```. '
-                          '[http://google.com](http://google.com)')
+        test_md_string = ('Test for <*bold*, _ita_\__lic_, `code`, [links](http://github.com/ab_),'
+                          ' [text-mention](tg://user?id=123456789) and ```python\npre```. '
+                          '[http://google.com/ab_](http://google.com/ab_)')
         text_markdown = self.test_message.text_markdown_urled
+        assert text_markdown == test_md_string
+
+    def test_text_markdown_v2_urled(self):
+        test_md_string = (r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
+                          '[links](http://github.com/abc\\\\\)def), '
+                          '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```\. '
+                          '[http://google\.com](http://google.com) and _bold *nested in ~strk~ '
+                          'nested in* italic_\. ```python\nPython pre```\.')
+        text_markdown = self.test_message_v2.text_markdown_v2_urled
         assert text_markdown == test_md_string
 
     def test_text_html_emoji(self):
@@ -238,11 +308,13 @@ class TestMessage(object):
         assert expected == message.text_markdown
 
     def test_caption_html_simple(self):
-        test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
-                            '<a href="http://github.com/">links</a>, '
+        test_html_string = ('<u>Test</u> for &lt;<b>bold</b>, <i>ita_lic</i>, <code>\`code</code>,'
+                            ' <a href="http://github.com/abc\)def">links</a>, '
                             '<a href="tg://user?id=123456789">text-mention</a> and '
-                            '<pre>pre</pre>. http://google.com')
-        caption_html = self.test_message.caption_html
+                            '<pre>`\pre</pre>. http://google.com '
+                            'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>. '
+                            '<pre><code class="python">Python pre</code></pre>.')
+        caption_html = self.test_message_v2.caption_html
         assert caption_html == test_html_string
 
     def test_caption_html_empty(self, message):
@@ -251,30 +323,51 @@ class TestMessage(object):
         assert message.caption_html is None
 
     def test_caption_html_urled(self):
-        test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
-                            '<a href="http://github.com/">links</a>, '
+        test_html_string = ('<u>Test</u> for &lt;<b>bold</b>, <i>ita_lic</i>, <code>\`code</code>,'
+                            ' <a href="http://github.com/abc\)def">links</a>, '
                             '<a href="tg://user?id=123456789">text-mention</a> and '
-                            '<pre>pre</pre>. <a href="http://google.com">http://google.com</a>')
-        caption_html = self.test_message.caption_html_urled
+                            '<pre>`\pre</pre>. <a href="http://google.com">http://google.com</a> '
+                            'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>. '
+                            '<pre><code class="python">Python pre</code></pre>.')
+        caption_html = self.test_message_v2.caption_html_urled
         assert caption_html == test_html_string
 
     def test_caption_markdown_simple(self):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
-                          '[text-mention](tg://user?id=123456789) and ```pre```. '
-                          'http://google.com')
+        test_md_string = ('Test for <*bold*, _ita_\__lic_, `code`, [links](http://github.com/ab_),'
+                          ' [text-mention](tg://user?id=123456789) and ```python\npre```. '
+                          'http://google.com/ab\_')
         caption_markdown = self.test_message.caption_markdown
+        assert caption_markdown == test_md_string
+
+    def test_caption_markdown_v2_simple(self):
+        test_md_string = (r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
+                          '[links](http://github.com/abc\\\\\\)def), '
+                          '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```\. '
+                          'http://google\.com and _bold *nested in ~strk~ nested in* italic_\. '
+                          '```python\nPython pre```\.')
+        caption_markdown = self.test_message_v2.caption_markdown_v2
         assert caption_markdown == test_md_string
 
     def test_caption_markdown_empty(self, message):
         message.text = "test"
         message.caption = None
         assert message.caption_markdown is None
+        assert message.caption_markdown_v2 is None
 
     def test_caption_markdown_urled(self):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
-                          '[text-mention](tg://user?id=123456789) and ```pre```. '
-                          '[http://google.com](http://google.com)')
+        test_md_string = ('Test for <*bold*, _ita_\__lic_, `code`, [links](http://github.com/ab_),'
+                          ' [text-mention](tg://user?id=123456789) and ```python\npre```. '
+                          '[http://google.com/ab_](http://google.com/ab_)')
         caption_markdown = self.test_message.caption_markdown_urled
+        assert caption_markdown == test_md_string
+
+    def test_caption_markdown_v2_urled(self):
+        test_md_string = (r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
+                          '[links](http://github.com/abc\\\\\\)def), '
+                          '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```\. '
+                          '[http://google\.com](http://google.com) and _bold *nested in ~strk~ '
+                          'nested in* italic_\. ```python\nPython pre```\.')
+        caption_markdown = self.test_message_v2.caption_markdown_v2_urled
         assert caption_markdown == test_md_string
 
     def test_caption_html_emoji(self):
@@ -345,13 +438,13 @@ class TestMessage(object):
 
     def test_reply_text(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             text = args[1] == 'test'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and text and reply
+            return id_ and text and reply
 
         monkeypatch.setattr(message.bot, 'send_message', test)
         assert message.reply_text('test')
@@ -359,9 +452,9 @@ class TestMessage(object):
         assert message.reply_text('test', reply_to_message_id=message.message_id, quote=True)
 
     def test_reply_markdown(self, monkeypatch, message):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
-                          '[text-mention](tg://user?id=123456789) and ```pre```. '
-                          'http://google.com')
+        test_md_string = ('Test for <*bold*, _ita_\__lic_, `code`, [links](http://github.com/ab_),'
+                          ' [text-mention](tg://user?id=123456789) and ```python\npre```. '
+                          'http://google.com/ab\_')
 
         def test(*args, **kwargs):
             cid = args[0] == message.chat_id
@@ -383,11 +476,40 @@ class TestMessage(object):
                                       reply_to_message_id=message.message_id,
                                       quote=True)
 
+    def test_reply_markdown_v2(self, monkeypatch, message):
+        test_md_string = (r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
+                          '[links](http://github.com/abc\\\\\)def), '
+                          '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```\. '
+                          'http://google\.com and _bold *nested in ~strk~ nested in* italic_\. '
+                          '```python\nPython pre```\.')
+
+        def test(*args, **kwargs):
+            cid = args[0] == message.chat_id
+            markdown_text = args[1] == test_md_string
+            markdown_enabled = kwargs['parse_mode'] == ParseMode.MARKDOWN_V2
+            if kwargs.get('reply_to_message_id'):
+                reply = kwargs['reply_to_message_id'] == message.message_id
+            else:
+                reply = True
+            return all([cid, markdown_text, reply, markdown_enabled])
+
+        text_markdown = self.test_message_v2.text_markdown_v2
+        assert text_markdown == test_md_string
+
+        monkeypatch.setattr(message.bot, 'send_message', test)
+        assert message.reply_markdown_v2(self.test_message_v2.text_markdown_v2)
+        assert message.reply_markdown_v2(self.test_message_v2.text_markdown_v2, quote=True)
+        assert message.reply_markdown_v2(self.test_message_v2.text_markdown_v2,
+                                         reply_to_message_id=message.message_id,
+                                         quote=True)
+
     def test_reply_html(self, monkeypatch, message):
-        test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
-                            '<a href="http://github.com/">links</a>, '
+        test_html_string = ('<u>Test</u> for &lt;<b>bold</b>, <i>ita_lic</i>, <code>\`code</code>,'
+                            ' <a href="http://github.com/abc\)def">links</a>, '
                             '<a href="tg://user?id=123456789">text-mention</a> and '
-                            '<pre>pre</pre>. http://google.com')
+                            '<pre>`\pre</pre>. http://google.com '
+                            'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>. '
+                            '<pre><code class="python">Python pre</code></pre>.')
 
         def test(*args, **kwargs):
             cid = args[0] == message.chat_id
@@ -399,25 +521,25 @@ class TestMessage(object):
                 reply = True
             return all([cid, html_text, reply, html_enabled])
 
-        text_html = self.test_message.text_html
+        text_html = self.test_message_v2.text_html
         assert text_html == test_html_string
 
         monkeypatch.setattr(message.bot, 'send_message', test)
-        assert message.reply_html(self.test_message.text_html)
-        assert message.reply_html(self.test_message.text_html, quote=True)
-        assert message.reply_html(self.test_message.text_html,
+        assert message.reply_html(self.test_message_v2.text_html)
+        assert message.reply_html(self.test_message_v2.text_html, quote=True)
+        assert message.reply_html(self.test_message_v2.text_html,
                                   reply_to_message_id=message.message_id,
                                   quote=True)
 
     def test_reply_media_group(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             media = kwargs['media'] == 'reply_media_group'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and media and reply
+            return id_ and media and reply
 
         monkeypatch.setattr(message.bot, 'send_media_group', test)
         assert message.reply_media_group(media='reply_media_group')
@@ -425,13 +547,13 @@ class TestMessage(object):
 
     def test_reply_photo(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             photo = kwargs['photo'] == 'test_photo'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and photo and reply
+            return id_ and photo and reply
 
         monkeypatch.setattr(message.bot, 'send_photo', test)
         assert message.reply_photo(photo='test_photo')
@@ -439,13 +561,13 @@ class TestMessage(object):
 
     def test_reply_audio(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             audio = kwargs['audio'] == 'test_audio'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and audio and reply
+            return id_ and audio and reply
 
         monkeypatch.setattr(message.bot, 'send_audio', test)
         assert message.reply_audio(audio='test_audio')
@@ -453,13 +575,13 @@ class TestMessage(object):
 
     def test_reply_document(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             document = kwargs['document'] == 'test_document'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and document and reply
+            return id_ and document and reply
 
         monkeypatch.setattr(message.bot, 'send_document', test)
         assert message.reply_document(document='test_document')
@@ -467,13 +589,13 @@ class TestMessage(object):
 
     def test_reply_animation(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             animation = kwargs['animation'] == 'test_animation'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and animation and reply
+            return id_ and animation and reply
 
         monkeypatch.setattr(message.bot, 'send_animation', test)
         assert message.reply_animation(animation='test_animation')
@@ -481,13 +603,13 @@ class TestMessage(object):
 
     def test_reply_sticker(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             sticker = kwargs['sticker'] == 'test_sticker'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and sticker and reply
+            return id_ and sticker and reply
 
         monkeypatch.setattr(message.bot, 'send_sticker', test)
         assert message.reply_sticker(sticker='test_sticker')
@@ -495,13 +617,13 @@ class TestMessage(object):
 
     def test_reply_video(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             video = kwargs['video'] == 'test_video'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and video and reply
+            return id_ and video and reply
 
         monkeypatch.setattr(message.bot, 'send_video', test)
         assert message.reply_video(video='test_video')
@@ -509,13 +631,13 @@ class TestMessage(object):
 
     def test_reply_video_note(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             video_note = kwargs['video_note'] == 'test_video_note'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and video_note and reply
+            return id_ and video_note and reply
 
         monkeypatch.setattr(message.bot, 'send_video_note', test)
         assert message.reply_video_note(video_note='test_video_note')
@@ -523,13 +645,13 @@ class TestMessage(object):
 
     def test_reply_voice(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             voice = kwargs['voice'] == 'test_voice'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and voice and reply
+            return id_ and voice and reply
 
         monkeypatch.setattr(message.bot, 'send_voice', test)
         assert message.reply_voice(voice='test_voice')
@@ -537,13 +659,13 @@ class TestMessage(object):
 
     def test_reply_location(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             location = kwargs['location'] == 'test_location'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and location and reply
+            return id_ and location and reply
 
         monkeypatch.setattr(message.bot, 'send_location', test)
         assert message.reply_location(location='test_location')
@@ -551,13 +673,13 @@ class TestMessage(object):
 
     def test_reply_venue(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             venue = kwargs['venue'] == 'test_venue'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and venue and reply
+            return id_ and venue and reply
 
         monkeypatch.setattr(message.bot, 'send_venue', test)
         assert message.reply_venue(venue='test_venue')
@@ -565,13 +687,13 @@ class TestMessage(object):
 
     def test_reply_contact(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             contact = kwargs['contact'] == 'test_contact'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and contact and reply
+            return id_ and contact and reply
 
         monkeypatch.setattr(message.bot, 'send_contact', test)
         assert message.reply_contact(contact='test_contact')
@@ -579,13 +701,13 @@ class TestMessage(object):
 
     def test_reply_poll(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             contact = kwargs['contact'] == 'test_poll'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and contact and reply
+            return id_ and contact and reply
 
         monkeypatch.setattr(message.bot, 'send_poll', test)
         assert message.reply_poll(contact='test_poll')
@@ -678,12 +800,12 @@ class TestMessage(object):
         assert 'reply_to_message_id' in kwargs
 
     def test_equality(self):
-        id = 1
-        a = Message(id, self.from_user, self.date, self.chat)
-        b = Message(id, self.from_user, self.date, self.chat)
-        c = Message(id, User(0, '', False), self.date, self.chat)
+        id_ = 1
+        a = Message(id_, self.from_user, self.date, self.chat)
+        b = Message(id_, self.from_user, self.date, self.chat)
+        c = Message(id_, User(0, '', False), self.date, self.chat)
         d = Message(0, self.from_user, self.date, self.chat)
-        e = Update(id)
+        e = Update(id_)
 
         assert a == b
         assert hash(a) == hash(b)

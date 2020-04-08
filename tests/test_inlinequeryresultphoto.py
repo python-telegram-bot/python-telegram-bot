@@ -26,7 +26,7 @@ from telegram import (InputTextMessageContent, InlineKeyboardButton, InlineKeybo
 @pytest.fixture(scope='class')
 def inline_query_result_photo():
     return InlineQueryResultPhoto(
-        TestInlineQueryResultPhoto.id,
+        TestInlineQueryResultPhoto.id_,
         TestInlineQueryResultPhoto.photo_url,
         TestInlineQueryResultPhoto.thumb_url,
         photo_width=TestInlineQueryResultPhoto.photo_width,
@@ -40,8 +40,8 @@ def inline_query_result_photo():
 
 
 class TestInlineQueryResultPhoto(object):
-    id = 'id'
-    type = 'photo'
+    id_ = 'id'
+    type_ = 'photo'
     photo_url = 'photo url'
     photo_width = 10
     photo_height = 15
@@ -54,8 +54,8 @@ class TestInlineQueryResultPhoto(object):
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
     def test_expected_values(self, inline_query_result_photo):
-        assert inline_query_result_photo.type == self.type
-        assert inline_query_result_photo.id == self.id
+        assert inline_query_result_photo.type == self.type_
+        assert inline_query_result_photo.id == self.id_
         assert inline_query_result_photo.photo_url == self.photo_url
         assert inline_query_result_photo.photo_width == self.photo_width
         assert inline_query_result_photo.photo_height == self.photo_height
@@ -91,11 +91,11 @@ class TestInlineQueryResultPhoto(object):
                 == inline_query_result_photo.reply_markup.to_dict())
 
     def test_equality(self):
-        a = InlineQueryResultPhoto(self.id, self.photo_url, self.thumb_url)
-        b = InlineQueryResultPhoto(self.id, self.photo_url, self.thumb_url)
-        c = InlineQueryResultPhoto(self.id, '', self.thumb_url)
+        a = InlineQueryResultPhoto(self.id_, self.photo_url, self.thumb_url)
+        b = InlineQueryResultPhoto(self.id_, self.photo_url, self.thumb_url)
+        c = InlineQueryResultPhoto(self.id_, '', self.thumb_url)
         d = InlineQueryResultPhoto('', self.photo_url, self.thumb_url)
-        e = InlineQueryResultVoice(self.id, '', '')
+        e = InlineQueryResultVoice(self.id_, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

@@ -34,11 +34,6 @@ from telegram.ext import Dispatcher, JobQueue, Updater, BaseFilter, Defaults
 from telegram.utils.helpers import _UtcOffsetTimezone
 from tests.bots import get_bot
 
-TRAVIS = os.getenv('TRAVIS', False)
-
-if TRAVIS:
-    pytest_plugins = ['tests.travis_fold']
-
 GITHUB_ACTION = os.getenv('GITHUB_ACTION', False)
 
 if GITHUB_ACTION:

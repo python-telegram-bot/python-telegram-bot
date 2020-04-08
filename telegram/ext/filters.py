@@ -23,7 +23,7 @@ import re
 from future.utils import string_types
 from threading import Lock
 
-from telegram import Chat, Update
+from telegram import Chat, Update, MessageEntity
 
 __all__ = ['Filters', 'BaseFilter', 'InvertedFilter', 'MergedFilter']
 
@@ -51,7 +51,7 @@ class BaseFilter(object):
         >>> Filters.text & (~ Filters.forwarded)
 
     Note:
-        Filters use the same short circuiting logic that pythons `and`, `or` and `not`.
+        Filters use the same short circuiting logic as python's `and`, `or` and `not`.
         This means that for example:
 
             >>> Filters.regex(r'(a?x)') | Filters.regex(r'(b?x)')
@@ -250,10 +250,7 @@ class Filters(object):
 
         def __call__(self, update):
             if isinstance(update, Update):
-                if self.update_filter:
-                    return self.filter(update)
-                else:
-                    return self.filter(update.effective_message)
+                return self.filter(update.effective_message)
             else:
                 return self._TextIterable(update)
 
@@ -297,10 +294,7 @@ class Filters(object):
 
         def __call__(self, update):
             if isinstance(update, Update):
-                if self.update_filter:
-                    return self.filter(update)
-                else:
-                    return self.filter(update.effective_message)
+                return self.filter(update.effective_message)
             else:
                 return self._CaptionIterable(update)
 
@@ -322,11 +316,41 @@ class Filters(object):
     class _Command(BaseFilter):
         name = 'Filters.command'
 
+        class _CommandOnlyStart(BaseFilter):
+
+            def __init__(self, only_start):
+                self.only_start = only_start
+                self.name = 'Filters.command({})'.format(only_start)
+
+            def filter(self, message):
+                return (message.entities
+                        and any([e.type == MessageEntity.BOT_COMMAND for e in message.entities]))
+
+        def __call__(self, update):
+            if isinstance(update, Update):
+                return self.filter(update.effective_message)
+            else:
+                return self._CommandOnlyStart(update)
+
         def filter(self, message):
-            return bool(message.text and message.text.startswith('/'))
+            return (message.entities and message.entities[0].type == MessageEntity.BOT_COMMAND
+                    and message.entities[0].offset == 0)
 
     command = _Command()
-    """Messages starting with ``/``."""
+    """
+    Messages with a :attr:`telegram.MessageEntity.BOT_COMMAND`. By default only allows
+    messages `starting` with a bot command. Pass ``False`` to also allow messages that contain a
+    bot command `anywhere` in the text.
+
+    Examples::
+
+        MessageHandler(Filters.command, command_at_start_callback)
+        MessageHandler(Filters.command(False), command_anywhere_callback)
+
+    Args:
+        update (:obj:`bool`, optional): Whether to only allow messages that `start` with a bot
+            command. Defaults to ``True``.
+    """
 
     class regex(BaseFilter):
         """
@@ -345,7 +369,7 @@ class Filters(object):
             if you need to specify flags on your pattern.
 
         Note:
-            Filters use the same short circuiting logic that pythons `and`, `or` and `not`.
+            Filters use the same short circuiting logic as python's `and`, `or` and `not`.
             This means that for example:
 
                 >>> Filters.regex(r'(a?x)') | Filters.regex(r'(b?x)')

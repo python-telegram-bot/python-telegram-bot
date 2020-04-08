@@ -24,7 +24,7 @@ from telegram import Update, User, PreCheckoutQuery, OrderInfo
 
 @pytest.fixture(scope='class')
 def pre_checkout_query(bot):
-    return PreCheckoutQuery(TestPreCheckoutQuery.id,
+    return PreCheckoutQuery(TestPreCheckoutQuery.id_,
                             TestPreCheckoutQuery.from_user,
                             TestPreCheckoutQuery.currency,
                             TestPreCheckoutQuery.total_amount,
@@ -35,7 +35,7 @@ def pre_checkout_query(bot):
 
 
 class TestPreCheckoutQuery(object):
-    id = 5
+    id_ = 5
     invoice_payload = 'invoice_payload'
     shipping_option_id = 'shipping_option_id'
     currency = 'EUR'
@@ -45,7 +45,7 @@ class TestPreCheckoutQuery(object):
 
     def test_de_json(self, bot):
         json_dict = {
-            'id': self.id,
+            'id': self.id_,
             'invoice_payload': self.invoice_payload,
             'shipping_option_id': self.shipping_option_id,
             'currency': self.currency,
@@ -56,7 +56,7 @@ class TestPreCheckoutQuery(object):
         pre_checkout_query = PreCheckoutQuery.de_json(json_dict, bot)
 
         assert pre_checkout_query.bot is bot
-        assert pre_checkout_query.id == self.id
+        assert pre_checkout_query.id == self.id_
         assert pre_checkout_query.invoice_payload == self.invoice_payload
         assert pre_checkout_query.shipping_option_id == self.shipping_option_id
         assert pre_checkout_query.currency == self.currency
@@ -83,14 +83,14 @@ class TestPreCheckoutQuery(object):
         assert pre_checkout_query.answer()
 
     def test_equality(self):
-        a = PreCheckoutQuery(self.id, self.from_user, self.currency, self.total_amount,
+        a = PreCheckoutQuery(self.id_, self.from_user, self.currency, self.total_amount,
                              self.invoice_payload)
-        b = PreCheckoutQuery(self.id, self.from_user, self.currency, self.total_amount,
+        b = PreCheckoutQuery(self.id_, self.from_user, self.currency, self.total_amount,
                              self.invoice_payload)
-        c = PreCheckoutQuery(self.id, None, '', 0, '')
+        c = PreCheckoutQuery(self.id_, None, '', 0, '')
         d = PreCheckoutQuery(0, self.from_user, self.currency, self.total_amount,
                              self.invoice_payload)
-        e = Update(self.id)
+        e = Update(self.id_)
 
         assert a == b
         assert hash(a) == hash(b)
