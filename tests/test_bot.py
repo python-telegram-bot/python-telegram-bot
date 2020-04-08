@@ -176,7 +176,13 @@ class TestBot(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_and_stop_poll(self, bot, super_group_id):
+    @pytest.mark.parametrize('reply_markup', [
+        (InlineKeyboardMarkup.from_button(
+            InlineKeyboardButton(text='text', callback_data='data'))),
+        (InlineKeyboardMarkup.from_button(
+            InlineKeyboardButton(text='text', callback_data='data')).to_dict())
+    ])
+    def test_send_and_stop_poll(self, bot, super_group_id, reply_markup):
         question = 'Is this a test?'
         answers = ['Yes', 'No', 'Maybe']
         message = bot.send_poll(chat_id=super_group_id, question=question, options=answers,
@@ -192,7 +198,10 @@ class TestBot(object):
         assert not message.poll.is_closed
         assert message.poll.type == Poll.REGULAR
 
-        poll = bot.stop_poll(chat_id=super_group_id, message_id=message.message_id, timeout=60)
+        # Since only the poll and not the complete message is returned, we can't check that the
+        # reply_markup is correct. So we just test that sending doesn't give an error.
+        poll = bot.stop_poll(chat_id=super_group_id, message_id=message.message_id,
+                             reply_markup=reply_markup, timeout=60)
         assert isinstance(poll, Poll)
         assert poll.is_closed
         assert poll.options[0].text == answers[0]
