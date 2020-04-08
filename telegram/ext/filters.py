@@ -856,9 +856,9 @@ officedocument.wordprocessingml.document")``-
             usernames(set(:obj:`str`), optional): Which username(s) (without leading '@') to allow
                 through.
         Args:
-            user_id(:obj:`int` | iterable(:obj:`int`), optional): Which user ID(s) to allow
+            user_id(:obj:`int` | List[:obj:`int`], optional): Which user ID(s) to allow
                 through.
-            username(:obj:`str` | iterable(:obj:`str`), optional): Which username(s) to allow
+            username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow
                 through. If username starts with '@' symbol, it will be ignored.
 
         Raises:
