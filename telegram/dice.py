@@ -24,7 +24,7 @@ from telegram import TelegramObject
 class Dice(TelegramObject):
     """
     This object represents a dice with random value from 1 to 6. (Yes, Telegram is aware of the
-    proper singular of die. They don't like it.)
+    proper singular of dice, namely "die". They don't like it.)
 
     Attributes:
         value (:obj:`int`): Value of the dice, 1-6.
