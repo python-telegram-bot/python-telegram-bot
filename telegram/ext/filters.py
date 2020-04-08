@@ -273,8 +273,8 @@ class Filters(object):
             MessageHandler(Filters.text(buttons), callback_method)
 
     Args:
-        update (Strings[:obj:`str`], optional): Which messages to allow. Only exact matches
-            are allowed. If not specified, will allow any text message.
+        update (List[:obj:`str`] | Tuple[:obj:`str`], optional): Which messages to allow. Only
+            exact matches are allowed. If not specified, will allow any text message.
     """
 
     class _Caption(BaseFilter):
@@ -308,8 +308,8 @@ class Filters(object):
         ``MessageHandler(Filters.caption, callback_method)``
 
     Args:
-        update (Strings[:obj:`str`], optional): Which captions to allow. Only exact matches
-            are allowed. If not specified, will allow any message with a caption.
+        update (List[:obj:`str`] | Tuple[:obj:`str`], optional): Which captions to allow. Only
+            exact matches are allowed. If not specified, will allow any message with a caption.
     """
 
     class _Command(BaseFilter):

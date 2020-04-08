@@ -566,13 +566,13 @@ class Updater(object):
             import os
             os._exit(1)
 
-    def idle(self, stop_signals=[SIGINT, SIGTERM, SIGABRT]):
+    def idle(self, stop_signals=(SIGINT, SIGTERM, SIGABRT)):
         """Blocks until one of the signals are received and stops the updater.
 
         Args:
-            stop_signals (:obj:`list`): List containing signals from the signal module that
-                should be subscribed to. Updater.stop() will be called on receiving one of those
-                signals. Defaults to (``SIGINT``, ``SIGTERM``, ``SIGABRT``).
+            stop_signals (:obj:`list` | :obj:`tuple`): List containing signals from the signal
+                module that should be subscribed to. Updater.stop() will be called on receiving one
+                of those signals. Defaults to (``SIGINT``, ``SIGTERM``, ``SIGABRT``).
 
         """
         for sig in stop_signals:
