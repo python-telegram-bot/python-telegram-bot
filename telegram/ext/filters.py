@@ -236,35 +236,35 @@ class Filters(object):
     class _Text(BaseFilter):
         name = 'Filters.text'
 
-        class _TextIterable(BaseFilter):
+        class _TextStrings(BaseFilter):
 
-            def __init__(self, iterable):
-                self.iterable = iterable
-                self.name = 'Filters.text({})'.format(iterable)
+            def __init__(self, strings):
+                self.strings = strings
+                self.name = 'Filters.text({})'.format(strings)
 
             def filter(self, message):
                 if message.text:
-                    return message.text in self.iterable
+                    return message.text in self.strings
                 return False
 
         def __call__(self, update):
             if isinstance(update, Update):
                 return self.filter(update.effective_message)
             else:
-                return self._TextIterable(update)
+                return self._TextStrings(update)
 
         def filter(self, message):
             return bool(message.text)
 
     text = _Text()
-    """Text Messages. If an iterable of strings is passed, it filters messages to only allow those
-    whose text is appearing in the given iterable.
+    """Text Messages. If a list of strings is passed, it filters messages to only allow those
+    whose text is appearing in the given list.
 
     Examples:
         To allow any text message, simply use
         ``MessageHandler(Filters.text, callback_method)``.
 
-        A simple usecase for passing an iterable is to allow only messages that were send by a
+        A simple usecase for passing a list is to allow only messages that were send by a
         custom :class:`telegram.ReplyKeyboardMarkup`::
 
             buttons = ['Start', 'Settings', 'Back']
@@ -273,43 +273,43 @@ class Filters(object):
             MessageHandler(Filters.text(buttons), callback_method)
 
     Args:
-        update (Iterable[:obj:`str`], optional): Which messages to allow. Only exact matches
-            are allowed. If not specified, will allow any text message.
+        update (List[:obj:`str`] | Tuple[:obj:`str`], optional): Which messages to allow. Only
+            exact matches are allowed. If not specified, will allow any text message.
     """
 
     class _Caption(BaseFilter):
         name = 'Filters.caption'
 
-        class _CaptionIterable(BaseFilter):
+        class _CaptionStrings(BaseFilter):
 
-            def __init__(self, iterable):
-                self.iterable = iterable
-                self.name = 'Filters.caption({})'.format(iterable)
+            def __init__(self, strings):
+                self.strings = strings
+                self.name = 'Filters.caption({})'.format(strings)
 
             def filter(self, message):
                 if message.caption:
-                    return message.caption in self.iterable
+                    return message.caption in self.strings
                 return False
 
         def __call__(self, update):
             if isinstance(update, Update):
                 return self.filter(update.effective_message)
             else:
-                return self._CaptionIterable(update)
+                return self._CaptionStrings(update)
 
         def filter(self, message):
             return bool(message.caption)
 
     caption = _Caption()
-    """Messages with a caption. If an iterable of strings is passed, it filters messages to only
-    allow those whose caption is appearing in the given iterable.
+    """Messages with a caption. If a list of strings is passed, it filters messages to only
+    allow those whose caption is appearing in the given list.
 
     Examples:
         ``MessageHandler(Filters.caption, callback_method)``
 
     Args:
-        update (Iterable[:obj:`str`], optional): Which captions to allow. Only exact matches
-            are allowed. If not specified, will allow any message with a caption.
+        update (List[:obj:`str`] | Tuple[:obj:`str`], optional): Which captions to allow. Only
+            exact matches are allowed. If not specified, will allow any message with a caption.
     """
 
     class _Command(BaseFilter):
