@@ -273,7 +273,7 @@ class Filters(object):
             MessageHandler(Filters.text(buttons), callback_method)
 
     Note:
-        Dice messages don't have text. If you want to either text or dice messages, use
+        Dice messages don't have text. If you want to filter either text or dice messages, use
         ``Filters.text | Filters.dice``.
 
     Args:
@@ -999,7 +999,7 @@ officedocument.wordprocessingml.document")``-
             specified, will allow any dice message.
 
         Note:
-            Dice messages don't have text. If you want to either text or dice messages, use
+            Dice messages don't have text. If you want to filter either text or dice messages, use
             ``Filters.text | Filters.dice``.
     """
 
