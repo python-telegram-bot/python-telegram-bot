@@ -177,10 +177,10 @@ class TestBot(object):
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     @pytest.mark.parametrize('reply_markup', [
-        (InlineKeyboardMarkup.from_button(
-            InlineKeyboardButton(text='text', callback_data='data'))),
-        (InlineKeyboardMarkup.from_button(
-            InlineKeyboardButton(text='text', callback_data='data')).to_dict())
+        None,
+        InlineKeyboardMarkup.from_button(InlineKeyboardButton(text='text', callback_data='data')),
+        InlineKeyboardMarkup.from_button(
+            InlineKeyboardButton(text='text', callback_data='data')).to_dict()
     ])
     def test_send_and_stop_poll(self, bot, super_group_id, reply_markup):
         question = 'Is this a test?'
