@@ -428,7 +428,7 @@ class Dispatcher(object):
         """Update :attr:`user_data`, :attr:`chat_data` and :attr:`bot_data` in :attr:`persistence`.
 
         Args:
-        update (:class:`telegram.Update`, optional): The update to process. If passed, only the
+            update (:class:`telegram.Update`, optional): The update to process. If passed, only the
             corresponding ``user_data`` and ``chat_data`` will be updated.
         """
         if self.persistence:
