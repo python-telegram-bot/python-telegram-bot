@@ -47,7 +47,7 @@ class TestFilters(object):
         update.message.text = '/test'
         assert (Filters.text)(update)
 
-    def test_filters_text_iterable(self, update):
+    def test_filters_text_strings(self, update):
         update.message.text = '/test'
         assert Filters.text({'/test', 'test1'})(update)
         assert not Filters.text(['test1', 'test2'])(update)
@@ -58,7 +58,7 @@ class TestFilters(object):
         update.message.caption = None
         assert not (Filters.caption)(update)
 
-    def test_filters_caption_iterable(self, update):
+    def test_filters_caption_strings(self, update):
         update.message.caption = 'test'
         assert Filters.caption({'test', 'test1'})(update)
         assert not Filters.caption(['test1', 'test2'])(update)

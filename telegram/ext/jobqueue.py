@@ -290,6 +290,7 @@ class JobQueue(object):
                     if current_week_day in job.days:
                         self.logger.debug('Running job %s', job.name)
                         job.run(self._dispatcher)
+                        self._dispatcher.update_persistence()
 
                 except Exception:
                     self.logger.exception('An uncaught error was raised while executing job %s',

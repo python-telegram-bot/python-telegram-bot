@@ -546,6 +546,43 @@ class TestConversationHandler(object):
         dp.job_queue.tick()
         assert handler.conversations.get((self.group.id, user1.id)) is None
 
+    def test_conversation_handler_timeout_update_and_context(self, cdp, bot, user1):
+        context = None
+
+        def start_callback(u, c):
+            nonlocal context, self
+            context = c
+            return self.start(u, c)
+
+        states = self.states
+        timeout_handler = CommandHandler('start', None)
+        states.update({ConversationHandler.TIMEOUT: [timeout_handler]})
+        handler = ConversationHandler(entry_points=[CommandHandler('start', start_callback)],
+                                      states=states, fallbacks=self.fallbacks,
+                                      conversation_timeout=0.5)
+        cdp.add_handler(handler)
+
+        # Start state machine, then reach timeout
+        message = Message(0, user1, None, self.group, text='/start',
+                          entities=[MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0,
+                                                  length=len('/start'))],
+                          bot=bot)
+        update = Update(update_id=0, message=message)
+
+        def timeout_callback(u, c):
+            nonlocal update, context, self
+            self.is_timeout = True
+            assert u is update
+            assert c is context
+
+        timeout_handler.callback = timeout_callback
+
+        cdp.process_update(update)
+        sleep(0.5)
+        cdp.job_queue.tick()
+        assert handler.conversations.get((self.group.id, user1.id)) is None
+        assert self.is_timeout
+
     def test_conversation_timeout_keeps_extending(self, dp, bot, user1):
         handler = ConversationHandler(entry_points=self.entry_points, states=self.states,
                                       fallbacks=self.fallbacks, conversation_timeout=0.5)

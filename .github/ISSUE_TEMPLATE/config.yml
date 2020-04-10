@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Telegram Group
+    url: https://telegram.me/pythontelegrambotgroup
+    about: Questions asked on the group usually get answered faster.
+  - name: IRC Channel
+    url: https://webchat.freenode.net/?channels=##python-telegram-bot
+    about: In case you are unable to join our group due to Telegram restrictions, you can use our IRC channel
