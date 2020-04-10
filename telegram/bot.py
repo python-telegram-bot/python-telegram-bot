@@ -503,9 +503,10 @@ class Bot(TelegramObject):
                    **kwargs):
         """
         Use this method to send audio files, if you want Telegram clients to display them in the
-        music player. Your audio must be in the .mp3 or .m4a format. On success, the sent Message
-        is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be
-        changed in the future.
+        music player. Your audio must be in the .mp3 or .m4a format.
+
+        Bots can currently send audio files of up to 50 MB in size, this limit may be changed in
+        the future.
 
         For sending voice messages, use the sendVoice method instead.
 
@@ -592,7 +593,8 @@ class Bot(TelegramObject):
                       thumb=None,
                       **kwargs):
         """
-        Use this method to send general files. On success, the sent Message is returned.
+        Use this method to send general files.
+
         Bots can currently send files of any type of up to 50 MB in size, this limit may be
         changed in the future.
 
@@ -669,7 +671,6 @@ class Bot(TelegramObject):
                      **kwargs):
         """
         Use this method to send static .WEBP or animated .TGS stickers.
-        On success, the sent Message is returned.
 
         Note:
             The sticker argument can be either a file_id, an URL or a file from disk
@@ -731,7 +732,8 @@ class Bot(TelegramObject):
                    **kwargs):
         """
         Use this method to send video files, Telegram clients support mp4 videos
-        (other formats may be sent as Document). On success, the sent Message is returned.
+        (other formats may be sent as Document).
+
         Bots can currently send video files of up to 50 MB in size, this limit may be changed in
         the future.
 
@@ -822,7 +824,7 @@ class Bot(TelegramObject):
                         **kwargs):
         """
         As of v.4.0, Telegram clients support rounded square mp4 videos of up to 1 minute long.
-        Use this method to send video messages. On success, the sent Message is returned.
+        Use this method to send video messages.
 
         Note:
             The video_note argument can be either a file_id or a file from disk
@@ -899,8 +901,8 @@ class Bot(TelegramObject):
                        **kwargs):
         """
         Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound).
-        On success, the sent Message is returned. Bots can currently send animation files of
-        up to 50 MB in size, this limit may be changed in the future.
+        Bots can currently send animation files of up to 50 MB in size, this limit may be changed
+        in the future.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -1196,8 +1198,8 @@ class Bot(TelegramObject):
                 the connection pool).
 
         Returns:
-             :class:`telegram.Message`: On success the edited message.
-             :obj:`bool`: ``True`` is returned on failure.
+            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            edited Message is returned, otherwise ``True`` is returned.
         """
 
         url = '{0}/editMessageLiveLocation'.format(self.base_url)
@@ -1250,8 +1252,8 @@ class Bot(TelegramObject):
                 the connection pool).
 
         Returns:
-            :class:`telegram.Message`: On success the edited message.
-            `:obj:`bool`: ``True`` is returned on failure.
+            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            edited Message is returned, otherwise ``True`` is returned.
         """
 
         url = '{0}/stopMessageLiveLocation'.format(self.base_url)
@@ -1469,8 +1471,8 @@ class Bot(TelegramObject):
         """
         Use this method when you need to tell the user that something is happening on the bot's
         side. The status is set for 5 seconds or less (when a message arrives from your bot,
-        Telegram clients clear its typing status). We only recommend using this method when a
-        response from the bot will take a noticeable amount of time to arrive.
+        Telegram clients clear its typing status). Telegram only recommends using this method when
+        a response from the bot will take a noticeable amount of time to arrive.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -1484,7 +1486,7 @@ class Bot(TelegramObject):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            :obj:`bool`: ``True`` on success.
+            :obj:`bool`:  On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -1548,7 +1550,7 @@ class Bot(TelegramObject):
             where they wanted to use the bot's inline capabilities.
 
         Returns:
-            :obj:`bool` On success, ``True`` is returned.
+            :obj:`bool`: On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2031,7 +2033,7 @@ class Bot(TelegramObject):
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            editedMessage is returned, otherwise ``True`` is returned.
+            edited Message is returned, otherwise ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2141,13 +2143,13 @@ class Bot(TelegramObject):
                     **kwargs):
         """
         Use this method to specify a url and receive incoming updates via an outgoing webhook.
-        Whenever there is an update for the bot, we will send an HTTPS POST request to the
+        Whenever there is an update for the bot, Telegram will send an HTTPS POST request to the
         specified url, containing a JSON-serialized Update. In case of an unsuccessful request,
-        we will give up after a reasonable amount of attempts.
+        Telegram will give up after a reasonable amount of attempts.
 
-        If you'd like to make sure that the Webhook request comes from Telegram, we recommend
-        using a secret path in the URL, e.g. https://www.example.com/<token>. Since nobody else
-        knows your bot's token, you can be pretty sure it's us.
+        If you'd like to make sure that the Webhook request comes from Telegram, Telegram
+        recommends using a secret path in the URL, e.g. https://www.example.com/<token>. Since
+        nobody else knows your bot's token, you can be pretty sure it's us.
 
         Note:
             The certificate argument should be a file from disk ``open(filename, 'rb')``.
@@ -2317,10 +2319,7 @@ class Bot(TelegramObject):
     @log
     def get_chat_administrators(self, chat_id, timeout=None, **kwargs):
         """
-        Use this method to get a list of administrators in a chat. On success, returns an Array of
-        ChatMember objects that contains information about all chat administrators except other
-        bots. If the chat is a group or a supergroup and no administrators were appointed,
-        only the creator will be returned.
+        Use this method to get a list of administrators in a chat.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -2331,7 +2330,10 @@ class Bot(TelegramObject):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            List[:class:`telegram.ChatMember`]
+            List[:class:`telegram.ChatMember`]: On success, returns a list of ``ChatMember``
+            objects that contains information about all chat administrators except
+            other bots. If the chat is a group or a supergroup and no administrators were
+            appointed, only the creator will be returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2359,7 +2361,7 @@ class Bot(TelegramObject):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            int: Number of members in the chat.
+            :obj:`int`: Number of members in the chat.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2422,7 +2424,7 @@ class Bot(TelegramObject):
 
 
         Returns:
-            :obj:`bool`: True on success.
+            :obj:`bool`: On success, ``True`` is returned.
         """
 
         url = '{0}/setChatStickerSet'.format(self.base_url)
@@ -2449,7 +2451,7 @@ class Bot(TelegramObject):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-             :obj:`bool`: True on success.
+             :obj:`bool`: On success, ``True`` is returned.
         """
 
         url = '{0}/deleteChatStickerSet'.format(self.base_url)
@@ -2495,10 +2497,7 @@ class Bot(TelegramObject):
                        timeout=None,
                        **kwargs):
         """
-        Use this method to set the score of the specified user in a game. On success, if the
-        message was sent by the bot, returns the edited Message, otherwise returns True. Returns
-        an error, if the new score is not greater than the user's current score in the chat and
-        force is False.
+        Use this method to set the score of the specified user in a game.
 
         Args:
             user_id (:obj:`int`): User identifier.
@@ -2751,7 +2750,7 @@ class Bot(TelegramObject):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            :obj:`bool`; On success, True is returned.
+            :obj:`bool`: On success, True is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2864,7 +2863,7 @@ class Bot(TelegramObject):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments
 
         Returns:
-            :obj:`bool`: Returns True on success.
+            :obj:`bool`: On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2922,7 +2921,7 @@ class Bot(TelegramObject):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments
 
         Returns:
-            :obj:`bool`: Returns True on success.
+            :obj:`bool`: On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2959,7 +2958,7 @@ class Bot(TelegramObject):
         """
         Use this method to set default chat permissions for all members. The bot must be an
         administrator in the group or a supergroup for this to work and must have the
-        :attr:`can_restrict_members` admin rights. Returns True on success.
+        :attr:`can_restrict_members` admin rights.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username of
@@ -2971,7 +2970,7 @@ class Bot(TelegramObject):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments
 
         Returns:
-            :obj:`bool`: Returns True on success.
+            :obj:`bool`: On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2995,7 +2994,7 @@ class Bot(TelegramObject):
                                             **kwargs):
         """
         Use this method to set a custom title for administrators promoted by the bot in a
-        supergroup. The bot must be an administrator for this to work. Returns True on success.
+        supergroup. The bot must be an administrator for this to work.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username of
@@ -3009,7 +3008,7 @@ class Bot(TelegramObject):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments
 
         Returns:
-            :obj:`bool`: Returns True on success.
+            :obj:`bool`: On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -3072,7 +3071,7 @@ class Bot(TelegramObject):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments
 
         Returns:
-            :obj:`bool`: Returns True on success.
+            :obj:`bool`: On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -3106,7 +3105,7 @@ class Bot(TelegramObject):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments
 
         Returns:
-            :obj:`bool`: Returns ``True`` on success.
+            :obj:`bool`: On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -3138,7 +3137,7 @@ class Bot(TelegramObject):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments
 
         Returns:
-            :obj:`bool`: Returns ``True`` on success.
+            :obj:`bool`: On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -3170,7 +3169,7 @@ class Bot(TelegramObject):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments
 
         Returns:
-            :obj:`bool`: Returns ``True`` on success.
+            :obj:`bool`: On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -3207,7 +3206,7 @@ class Bot(TelegramObject):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments
 
         Returns:
-            :obj:`bool`: Returns ``True`` on success.
+            :obj:`bool`: On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -3230,7 +3229,7 @@ class Bot(TelegramObject):
         """
         Use this method to unpin a message in a group, a supergroup, or a channel.
         The bot must be an administrator in the chat for this to work and must have the
-        ‘can_pin_messages’ admin right in the supergroup or ‘can_edit_messages’ admin right
+        ``can_pin_messages`` admin right in the supergroup or ``can_edit_messages`` admin right
         in the channel.
 
         Args:
@@ -3242,7 +3241,7 @@ class Bot(TelegramObject):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments
 
         Returns:
-            :obj:`bool`: Returns ``True`` on success.
+            :obj:`bool`: On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -3497,8 +3496,7 @@ class Bot(TelegramObject):
         """
         Informs a user that some of the Telegram Passport elements they provided contains errors.
         The user will not be able to re-submit their Passport to you until the errors are fixed
-        (the contents of the field for which you returned the error must change). Returns True
-        on success.
+        (the contents of the field for which you returned the error must change).
 
         Use this if the data submitted by the user doesn't satisfy the standards your service
         requires for any reason. For example, if a birthday date seems invalid, a submitted
@@ -3619,7 +3617,7 @@ class Bot(TelegramObject):
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
             message_id (:obj:`int`): Identifier of the original message with the poll.
-            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): AA JSON-serialized
+            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
                 object for a new message inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
@@ -3627,8 +3625,8 @@ class Bot(TelegramObject):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            :class:`telegram.Poll`: On success, the stopped Poll with the
-                final results is returned.
+            :class:`telegram.Poll`: On success, the stopped Poll with the final results is
+            returned.
 
         Raises:
             :class:`telegram.TelegramError`
