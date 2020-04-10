@@ -323,53 +323,6 @@ class Dispatcher(object):
 
         """
 
-        def persist_update(update):
-            """Persist a single update.
-
-            Args:
-            update (:class:`telegram.Update`):
-                The update to process.
-
-            """
-            if self.persistence and isinstance(update, Update):
-                if self.persistence.store_bot_data:
-                    try:
-                        self.persistence.update_bot_data(self.bot_data)
-                    except Exception as e:
-                        try:
-                            self.dispatch_error(update, e)
-                        except Exception:
-                            message = 'Saving bot data raised an error and an ' \
-                                      'uncaught error was raised while handling ' \
-                                      'the error with an error_handler'
-                            self.logger.exception(message)
-                if self.persistence.store_chat_data and update.effective_chat:
-                    chat_id = update.effective_chat.id
-                    try:
-                        self.persistence.update_chat_data(chat_id,
-                                                          self.chat_data[chat_id])
-                    except Exception as e:
-                        try:
-                            self.dispatch_error(update, e)
-                        except Exception:
-                            message = 'Saving chat data raised an error and an ' \
-                                      'uncaught error was raised while handling ' \
-                                      'the error with an error_handler'
-                            self.logger.exception(message)
-                if self.persistence.store_user_data and update.effective_user:
-                    user_id = update.effective_user.id
-                    try:
-                        self.persistence.update_user_data(user_id,
-                                                          self.user_data[user_id])
-                    except Exception as e:
-                        try:
-                            self.dispatch_error(update, e)
-                        except Exception:
-                            message = 'Saving user data raised an error and an ' \
-                                      'uncaught error was raised while handling ' \
-                                      'the error with an error_handler'
-                            self.logger.exception(message)
-
         # An error happened while polling
         if isinstance(update, TelegramError):
             try:
@@ -388,13 +341,13 @@ class Dispatcher(object):
                         if not context and self.use_context:
                             context = CallbackContext.from_update(update, self)
                         handler.handle_update(update, self, check, context)
-                        persist_update(update)
+                        self.update_persistence(update=update)
                         break
 
             # Stop processing with any other handler.
             except DispatcherHandlerStop:
                 self.logger.debug('Stopping further handlers due to DispatcherHandlerStop')
-                persist_update(update)
+                self.update_persistence(update=update)
                 break
 
             # Dispatch any error.
@@ -471,18 +424,62 @@ class Dispatcher(object):
                 del self.handlers[group]
                 self.groups.remove(group)
 
-    def update_persistence(self):
+    def update_persistence(self, update=None):
         """Update :attr:`user_data`, :attr:`chat_data` and :attr:`bot_data` in :attr:`persistence`.
+
+        Args:
+        update (:class:`telegram.Update`, optional): The update to process. If passed, only the
+            corresponding ``user_data`` and ``chat_data`` will be updated.
         """
         if self.persistence:
+            chat_ids = self.chat_data.keys()
+            user_ids = self.user_data.keys()
+
+            if isinstance(update, Update):
+                if update.effective_chat:
+                    chat_ids = [update.effective_chat.id]
+                else:
+                    chat_ids = []
+                if update.effective_user:
+                    user_ids = [update.effective_user.id]
+                else:
+                    user_ids = []
+
             if self.persistence.store_bot_data:
-                self.persistence.update_bot_data(self.bot_data)
+                try:
+                    self.persistence.update_bot_data(self.bot_data)
+                except Exception as e:
+                    try:
+                        self.dispatch_error(update, e)
+                    except Exception:
+                        message = 'Saving bot data raised an error and an ' \
+                                  'uncaught error was raised while handling ' \
+                                  'the error with an error_handler'
+                        self.logger.exception(message)
             if self.persistence.store_chat_data:
-                for chat_id in self.chat_data:
-                    self.persistence.update_chat_data(chat_id, self.chat_data[chat_id])
+                for chat_id in chat_ids:
+                    try:
+                        self.persistence.update_chat_data(chat_id, self.chat_data[chat_id])
+                    except Exception as e:
+                        try:
+                            self.dispatch_error(update, e)
+                        except Exception:
+                            message = 'Saving chat data raised an error and an ' \
+                                      'uncaught error was raised while handling ' \
+                                      'the error with an error_handler'
+                            self.logger.exception(message)
             if self.persistence.store_user_data:
-                for user_id in self.user_data:
-                    self.persistence.update_user_data(user_id, self.user_data[user_id])
+                for user_id in user_ids:
+                    try:
+                        self.persistence.update_user_data(user_id, self.user_data[user_id])
+                    except Exception as e:
+                        try:
+                            self.dispatch_error(update, e)
+                        except Exception:
+                            message = 'Saving user data raised an error and an ' \
+                                      'uncaught error was raised while handling ' \
+                                      'the error with an error_handler'
+                            self.logger.exception(message)
 
     def add_error_handler(self, callback):
         """Registers an error handler in the Dispatcher. This handler will receive every error
