@@ -2,6 +2,35 @@
 Changelog
 =========
 
+Version 12.6
+============
+*Released 2020-04-10*
+
+**Major Changes:**
+
+- Bot API 4.7 support. **Note:** In ``Bot.create_new_sticker_set`` and ``Bot.add_sticker_to_set``, the order of the parameters had be changed, as the ``png_sticker`` parameter is now optional. (`#1858`_)
+
+**Minor changes, CI improvements or bug fixes:**
+
+- Add tests for ``swtich_inline_query(_current_chat)`` with empty string (`#1635`_)
+- Doc fixes (`#1854`_, `#1874`_, `#1884`_)
+- Update issue templates (`#1880`_)
+- Favor concrete types over "Iterable" (`#1882`_)
+- Pass last valid ``CallbackContext`` to ``TIMEOUT`` handlers of ``ConversationHandler`` (`#1826`_)
+- Tweak handling of persistence and update persistence after job calls (`#1827`_)
+- Use checkout@v2 for GitHub actions (`#1887`_)
+
+.. _`#1858`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1858
+.. _`#1635`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1635
+.. _`#1854`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1854
+.. _`#1874`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1874
+.. _`#1884`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1884
+.. _`#1880`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1880
+.. _`#1882`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1882
+.. _`#1826`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1826
+.. _`#1827`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1827
+.. _`#1887`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1887
+
 Version 12.5.1
 ==============
 *Released 2020-03-30*
