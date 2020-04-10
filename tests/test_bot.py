@@ -26,7 +26,7 @@ from future.utils import string_types
 
 from telegram import (Bot, Update, ChatAction, TelegramError, User, InlineKeyboardMarkup,
                       InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent,
-                      ShippingOption, LabeledPrice, ChatPermissions, Poll,
+                      ShippingOption, LabeledPrice, ChatPermissions, Poll, BotCommand,
                       InlineQueryResultDocument)
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
 from telegram.utils.helpers import from_timestamp, escape_markdown
@@ -80,6 +80,7 @@ class TestBot(object):
     @pytest.mark.timeout(10)
     def test_get_me_and_properties(self, bot):
         get_me_bot = bot.get_me()
+        commands = bot.get_my_commands()
 
         assert isinstance(get_me_bot, User)
         assert get_me_bot.id == bot.id
@@ -91,6 +92,7 @@ class TestBot(object):
         assert get_me_bot.can_read_all_group_messages == bot.can_read_all_group_messages
         assert get_me_bot.supports_inline_queries == bot.supports_inline_queries
         assert 'https://t.me/{}'.format(get_me_bot.username) == bot.link
+        assert commands == bot.commands
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -174,7 +176,13 @@ class TestBot(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_and_stop_poll(self, bot, super_group_id):
+    @pytest.mark.parametrize('reply_markup', [
+        None,
+        InlineKeyboardMarkup.from_button(InlineKeyboardButton(text='text', callback_data='data')),
+        InlineKeyboardMarkup.from_button(
+            InlineKeyboardButton(text='text', callback_data='data')).to_dict()
+    ])
+    def test_send_and_stop_poll(self, bot, super_group_id, reply_markup):
         question = 'Is this a test?'
         answers = ['Yes', 'No', 'Maybe']
         message = bot.send_poll(chat_id=super_group_id, question=question, options=answers,
@@ -190,7 +198,10 @@ class TestBot(object):
         assert not message.poll.is_closed
         assert message.poll.type == Poll.REGULAR
 
-        poll = bot.stop_poll(chat_id=super_group_id, message_id=message.message_id, timeout=60)
+        # Since only the poll and not the complete message is returned, we can't check that the
+        # reply_markup is correct. So we just test that sending doesn't give an error.
+        poll = bot.stop_poll(chat_id=super_group_id, message_id=message.message_id,
+                             reply_markup=reply_markup, timeout=60)
         assert isinstance(poll, Poll)
         assert poll.is_closed
         assert poll.options[0].text == answers[0]
@@ -207,6 +218,13 @@ class TestBot(object):
         assert message_quiz.poll.correct_option_id == 2
         assert message_quiz.poll.type == Poll.QUIZ
         assert message_quiz.poll.is_closed
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_dice(self, bot, chat_id):
+        message = bot.send_dice(chat_id)
+
+        assert message.dice
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -904,3 +922,41 @@ class TestBot(object):
     def test_send_message_default_quote(self, default_bot, chat_id):
         message = default_bot.send_message(chat_id, 'test')
         assert message.default_quote is True
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_set_and_get_my_commands(self, bot):
+        commands = [
+            BotCommand('cmd1', 'descr1'),
+            BotCommand('cmd2', 'descr2'),
+        ]
+        bot.set_my_commands([])
+        assert bot.get_my_commands() == []
+        assert bot.commands == []
+        assert bot.set_my_commands(commands)
+
+        for bc in [bot.get_my_commands(), bot.commands]:
+            assert len(bc) == 2
+            assert bc[0].command == 'cmd1'
+            assert bc[0].description == 'descr1'
+            assert bc[1].command == 'cmd2'
+            assert bc[1].description == 'descr2'
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_set_and_get_my_commands_strings(self, bot):
+        commands = [
+            ['cmd1', 'descr1'],
+            ['cmd2', 'descr2'],
+        ]
+        bot.set_my_commands([])
+        assert bot.get_my_commands() == []
+        assert bot.commands == []
+        assert bot.set_my_commands(commands)
+
+        for bc in [bot.get_my_commands(), bot.commands]:
+            assert len(bc) == 2
+            assert bc[0].command == 'cmd1'
+            assert bc[0].description == 'descr1'
+            assert bc[1].command == 'cmd2'
+            assert bc[1].description == 'descr2'

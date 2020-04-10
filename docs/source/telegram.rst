@@ -9,6 +9,7 @@ telegram package
     telegram.animation
     telegram.audio
     telegram.bot
+    telegram.botcommand
     telegram.callbackquery
     telegram.chat
     telegram.chataction
@@ -17,6 +18,7 @@ telegram package
     telegram.chatphoto
     telegram.constants
     telegram.contact
+    telegram.dice
     telegram.document
     telegram.error
     telegram.file

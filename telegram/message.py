@@ -23,7 +23,7 @@ from html import escape
 
 from telegram import (Animation, Audio, Contact, Document, Chat, Location, PhotoSize, Sticker,
                       TelegramObject, User, Video, Voice, Venue, MessageEntity, Game, Invoice,
-                      SuccessfulPayment, VideoNote, PassportData, Poll, InlineKeyboardMarkup)
+                      SuccessfulPayment, VideoNote, PassportData, Poll, InlineKeyboardMarkup, Dice)
 from telegram import ParseMode
 from telegram.utils.helpers import escape_markdown, to_timestamp, from_timestamp
 
@@ -106,6 +106,7 @@ class Message(TelegramObject):
         passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data.
         poll (:class:`telegram.Poll`): Optional. Message is a native poll,
             information about the poll.
+        dice (:class:`telegram.Dice`): Optional. Message is a dice.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
@@ -199,7 +200,7 @@ class Message(TelegramObject):
             smaller than 52 bits, so a signed 64 bit integer or double-precision float type are
             safe for storing this identifier.
         pinned_message (:class:`telegram.message`, optional): Specified message was pinned. Note
-            that the Message object in this field will not contain further attr:`reply_to_message`
+            that the Message object in this field will not contain further :attr:`reply_to_message`
             fields even if it is itself a reply.
         invoice (:class:`telegram.Invoice`, optional): Message is an invoice for a payment,
             information about the invoice.
@@ -214,6 +215,7 @@ class Message(TelegramObject):
         passport_data (:class:`telegram.PassportData`, optional): Telegram Passport data.
         poll (:class:`telegram.Poll`, optional): Message is a native poll,
             information about the poll.
+        dice (:class:`telegram.Dice`, optional): Message is a dice with random value from 1 to 6.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. login_url buttons are represented as ordinary url buttons.
         default_quote (:obj:`bool`, optional): Default setting for the `quote` parameter of the
@@ -229,7 +231,7 @@ class Message(TelegramObject):
     MESSAGE_TYPES = ['text', 'new_chat_members', 'left_chat_member', 'new_chat_title',
                      'new_chat_photo', 'delete_chat_photo', 'group_chat_created',
                      'supergroup_chat_created', 'channel_chat_created', 'migrate_to_chat_id',
-                     'migrate_from_chat_id', 'pinned_message',
+                     'migrate_from_chat_id', 'pinned_message', 'poll', 'dice',
                      'passport_data'] + ATTACHMENT_TYPES
 
     def __init__(self,
@@ -282,6 +284,7 @@ class Message(TelegramObject):
                  reply_markup=None,
                  bot=None,
                  default_quote=None,
+                 dice=None,
                  **kwargs):
         # Required
         self.message_id = int(message_id)
@@ -331,6 +334,7 @@ class Message(TelegramObject):
         self.animation = animation
         self.passport_data = passport_data
         self.poll = poll
+        self.dice = dice
         self.reply_markup = reply_markup
         self.bot = bot
         self.default_quote = default_quote
@@ -404,6 +408,7 @@ class Message(TelegramObject):
         data['successful_payment'] = SuccessfulPayment.de_json(data.get('successful_payment'), bot)
         data['passport_data'] = PassportData.de_json(data.get('passport_data'), bot)
         data['poll'] = Poll.de_json(data.get('poll'), bot)
+        data['dice'] = Dice.de_json(data.get('dice'), bot)
         data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
 
         return cls(bot=bot, **data)
@@ -807,6 +812,23 @@ class Message(TelegramObject):
         """
         self._quote(kwargs)
         return self.bot.send_poll(self.chat_id, *args, **kwargs)
+
+    def reply_dice(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_dice(update.message.chat_id, *args, **kwargs)
+
+        Keyword Args:
+            quote (:obj:`bool`, optional): If set to ``True``, the dice is sent as an actual reply
+                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        self._quote(kwargs)
+        return self.bot.send_dice(self.chat_id, *args, **kwargs)
 
     def forward(self, chat_id, *args, **kwargs):
         """Shortcut for::

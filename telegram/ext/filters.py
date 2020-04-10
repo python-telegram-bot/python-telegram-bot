@@ -272,6 +272,10 @@ class Filters(object):
             ...
             MessageHandler(Filters.text(buttons), callback_method)
 
+    Note:
+        Dice messages don't have text. If you want to filter either text or dice messages, use
+        ``Filters.text | Filters.dice``.
+
     Args:
         update (List[:obj:`str`] | Tuple[:obj:`str`], optional): Which messages to allow. Only
             exact matches are allowed. If not specified, will allow any text message.
@@ -427,7 +431,7 @@ class Filters(object):
                     send media with wrong types that don't fit to this handler.
 
             Example:
-                Filters.documents.category('audio/') returnes `True` for all types
+                Filters.documents.category('audio/') returns `True` for all types
                 of audio sent as file, for example 'audio/mpeg' or 'audio/x-wav'
             """
 
@@ -956,6 +960,48 @@ officedocument.wordprocessingml.document")``-
 
     poll = _Poll()
     """Messages that contain a :class:`telegram.Poll`."""
+
+    class _Dice(BaseFilter):
+        name = 'Filters.dice'
+
+        class _DiceValues(BaseFilter):
+
+            def __init__(self, values):
+                self.values = [values] if isinstance(values, int) else values
+                self.name = 'Filters.dice({})'.format(values)
+
+            def filter(self, message):
+                return bool(message.dice and message.dice.value in self.values)
+
+        def __call__(self, update):
+            if isinstance(update, Update):
+                return self.filter(update.effective_message)
+            else:
+                return self._DiceValues(update)
+
+        def filter(self, message):
+            return bool(message.dice)
+
+    dice = _Dice()
+    """Dice Messages. If an integer or a list of integers is passed, it filters messages to only
+    allow those whose dice value is appearing in the given list.
+
+    Examples:
+        To allow any dice message, simply use
+        ``MessageHandler(Filters.dice, callback_method)``.
+        To allow only dice with value 6, use
+        ``MessageHandler(Filters.dice(6), callback_method)``.
+        To allow only dice with value 5 `or` 6, use
+        ``MessageHandler(Filters.dice([5, 6]), callback_method)``.
+
+    Args:
+        update (:obj:`int` | List[:obj:`int`], optional): Which values to allow. If not
+            specified, will allow any dice message.
+
+        Note:
+            Dice messages don't have text. If you want to filter either text or dice messages, use
+            ``Filters.text | Filters.dice``.
+    """
 
     class language(BaseFilter):
         """Filters messages to only allow those which are from users with a certain language code.

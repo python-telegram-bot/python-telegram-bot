@@ -39,7 +39,7 @@ from future.utils import string_types
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
                       ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore, StickerSet,
                       PhotoSize, Audio, Document, Sticker, Video, Animation, Voice, VideoNote,
-                      Location, Venue, Contact, InputFile, Poll)
+                      Location, Venue, Contact, InputFile, Poll, BotCommand)
 from telegram.error import InvalidToken, TelegramError
 from telegram.utils.helpers import to_timestamp, DEFAULT_NONE
 from telegram.utils.request import Request
@@ -52,6 +52,9 @@ def info(func):
     def decorator(self, *args, **kwargs):
         if not self.bot:
             self.get_me()
+
+        if self._commands is None:
+            self.get_my_commands()
 
         result = func(self, *args, **kwargs)
         return result
@@ -141,6 +144,7 @@ class Bot(TelegramObject):
         self.base_url = str(base_url) + str(self.token)
         self.base_file_url = str(base_file_url) + str(self.token)
         self.bot = None
+        self._commands = None
         self._request = request or Request()
         self.logger = logging.getLogger(__name__)
 
@@ -159,7 +163,7 @@ class Bot(TelegramObject):
 
         if reply_markup is not None:
             if isinstance(reply_markup, ReplyMarkup):
-                data['reply_markup'] = reply_markup.to_json()
+                data['reply_markup'] = reply_markup.to_dict()
             else:
                 data['reply_markup'] = reply_markup
 
@@ -250,6 +254,13 @@ class Bot(TelegramObject):
         """:obj:`str`: Bot's supports_inline_queries attribute."""
 
         return self.bot.supports_inline_queries
+
+    @property
+    @info
+    def commands(self):
+        """List[:class:`BotCommand`]: Bot's commands."""
+
+        return self._commands
 
     @property
     def name(self):
@@ -344,6 +355,8 @@ class Bot(TelegramObject):
         limitations:
 
             - A message can only be deleted if it was sent less than 48 hours ago.
+            - A dice message in a private chat can only be deleted if it was sent more than 24
+              hours ago.
             - Bots can delete outgoing messages in private chats, groups, and supergroups.
             - Bots can delete incoming messages in private chats.
             - Bots granted can_post_messages permissions can delete outgoing messages in channels.
@@ -3308,15 +3321,23 @@ class Bot(TelegramObject):
         return File.de_json(result, self)
 
     @log
-    def create_new_sticker_set(self, user_id, name, title, png_sticker, emojis,
-                               contains_masks=None, mask_position=None, timeout=20, **kwargs):
+    def create_new_sticker_set(self, user_id, name, title, emojis, png_sticker=None,
+                               contains_masks=None, mask_position=None, timeout=20,
+                               tgs_sticker=None, **kwargs):
         """Use this method to create new sticker set owned by a user.
 
         The bot will be able to edit the created sticker set.
 
+        You must use exactly one of the fields :attr:`png_sticker` or :attr:`tgs_sticker`.
+
+        Warning:
+            As of API 4.7 ``png_sticker`` is an optional argument and therefore the order of the
+            arguments had to be changed. Use keyword arguments to make sure that the arguments are
+            passed correctly.
+
         Note:
-            The png_sticker argument can be either a file_id, an URL or a file from disk
-            ``open(filename, 'rb')``
+            The png_sticker and tgs_sticker argument can be either a file_id, an URL or a file from
+            disk ``open(filename, 'rb')``
 
         Args:
             user_id (:obj:`int`): User identifier of created sticker set owner.
@@ -3326,12 +3347,16 @@ class Bot(TelegramObject):
                 must end in "_by_<bot username>". <bot_username> is case insensitive.
                 1-64 characters.
             title (:obj:`str`): Sticker set title, 1-64 characters.
-            png_sticker (:obj:`str` | `filelike object`): Png image with the sticker, must be up
-                to 512 kilobytes in size, dimensions must not exceed 512px,
+            png_sticker (:obj:`str` | `filelike object`, optional): Png image with the sticker,
+                must be up to 512 kilobytes in size, dimensions must not exceed 512px,
                 and either width or height must be exactly 512px. Pass a file_id as a String to
                 send a file that already exists on the Telegram servers, pass an HTTP URL as a
                 String for Telegram to get a file from the Internet, or upload a new one
                 using multipart/form-data.
+            tgs_sticker (:obj:`str` | `filelike object`, optional): TGS animation with the sticker,
+                uploaded using multipart/form-data. See
+                https://core.telegram.org/animated_stickers#technical-requirements for technical
+                requirements
             emojis (:obj:`str`): One or more emoji corresponding to the sticker.
             contains_masks (:obj:`bool`, optional): Pass True, if a set of mask stickers should be
                 created.
@@ -3354,13 +3379,19 @@ class Bot(TelegramObject):
         if InputFile.is_file(png_sticker):
             png_sticker = InputFile(png_sticker)
 
-        data = {'user_id': user_id, 'name': name, 'title': title, 'png_sticker': png_sticker,
-                'emojis': emojis}
+        if InputFile.is_file(tgs_sticker):
+            tgs_sticker = InputFile(tgs_sticker)
 
+        data = {'user_id': user_id, 'name': name, 'title': title, 'emojis': emojis}
+
+        if png_sticker is not None:
+            data['png_sticker'] = png_sticker
+        if tgs_sticker is not None:
+            data['tgs_sticker'] = tgs_sticker
         if contains_masks is not None:
             data['contains_masks'] = contains_masks
         if mask_position is not None:
-            data['mask_position'] = mask_position
+            data['mask_position'] = mask_position.to_json()
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -3368,23 +3399,35 @@ class Bot(TelegramObject):
         return result
 
     @log
-    def add_sticker_to_set(self, user_id, name, png_sticker, emojis, mask_position=None,
-                           timeout=20, **kwargs):
-        """Use this method to add a new sticker to a set created by the bot.
+    def add_sticker_to_set(self, user_id, name, emojis, png_sticker=None, mask_position=None,
+                           timeout=20, tgs_sticker=None, **kwargs):
+        """Use this method to add a new sticker to a set created by the bot. You must use exactly
+        one of the fields png_sticker or tgs_sticker. Animated stickers can be added to animated
+        sticker sets and only to them. Animated sticker sets can have up to 50 stickers. Static
+        sticker sets can have up to 120 stickers.
+
+        Warning:
+            As of API 4.7 ``png_sticker`` is an optional argument and therefore the order of the
+            arguments had to be changed. Use keyword arguments to make sure that the arguments are
+            passed correctly.
 
         Note:
-            The png_sticker argument can be either a file_id, an URL or a file from disk
-            ``open(filename, 'rb')``
+            The png_sticker and tgs_sticker argument can be either a file_id, an URL or a file from
+            disk ``open(filename, 'rb')``
 
         Args:
             user_id (:obj:`int`): User identifier of created sticker set owner.
             name (:obj:`str`): Sticker set name.
-            png_sticker (:obj:`str` | `filelike object`): Png image with the sticker, must be up
-                to 512 kilobytes in size, dimensions must not exceed 512px,
+            png_sticker (:obj:`str` | `filelike object`, optional): Png image with the sticker,
+                must be up to 512 kilobytes in size, dimensions must not exceed 512px,
                 and either width or height must be exactly 512px. Pass a file_id as a String to
                 send a file that already exists on the Telegram servers, pass an HTTP URL as a
                 String for Telegram to get a file from the Internet, or upload a new one
                 using multipart/form-data.
+            tgs_sticker (:obj:`str` | `filelike object`, optional): TGS animation with the sticker,
+                uploaded using multipart/form-data. See
+                https://core.telegram.org/animated_stickers#technical-requirements for technical
+                requirements
             emojis (:obj:`str`): One or more emoji corresponding to the sticker.
             mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
                 should beplaced on faces.
@@ -3405,10 +3448,17 @@ class Bot(TelegramObject):
         if InputFile.is_file(png_sticker):
             png_sticker = InputFile(png_sticker)
 
-        data = {'user_id': user_id, 'name': name, 'png_sticker': png_sticker, 'emojis': emojis}
+        if InputFile.is_file(tgs_sticker):
+            tgs_sticker = InputFile(tgs_sticker)
 
+        data = {'user_id': user_id, 'name': name, 'emojis': emojis}
+
+        if png_sticker is not None:
+            data['png_sticker'] = png_sticker
+        if tgs_sticker is not None:
+            data['tgs_sticker'] = tgs_sticker
         if mask_position is not None:
-            data['mask_position'] = mask_position
+            data['mask_position'] = mask_position.to_json()
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -3464,6 +3514,48 @@ class Bot(TelegramObject):
         url = '{0}/deleteStickerFromSet'.format(self.base_url)
 
         data = {'sticker': sticker}
+        data.update(kwargs)
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
+    @log
+    def set_sticker_set_thumb(self, name, user_id, thumb=None, timeout=None, **kwargs):
+        """Use this method to set the thumbnail of a sticker set. Animated thumbnails can be set
+        for animated sticker sets only.
+
+        Note:
+            The thumb can be either a file_id, an URL or a file from disk ``open(filename, 'rb')``
+
+        Args:
+            name (:obj:`str`): Sticker set name
+            user_id (:obj:`int`): User identifier of created sticker set owner.
+            thumb (:obj:`str` | `filelike object`, optional): A PNG image with the thumbnail, must
+            be up to 128 kilobytes in size and have width and height exactly 100px, or a TGS
+            animation with the thumbnail up to 32 kilobytes in size; see
+            https://core.telegram.org/animated_stickers#technical-requirements for animated sticker
+            technical requirements. Pass a file_id as a String to send a file that already exists
+            on the Telegram servers, pass an HTTP URL as a String for Telegram to get a file from
+            the Internet, or upload a new one using multipart/form-data.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during
+                creation of the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :obj:`bool`: On success, ``True`` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{}/setStickerSetThumb'.format(self.base_url)
+
+        if InputFile.is_file(thumb):
+            thumb = InputFile(thumb)
+
+        data = {'name': name, 'user_id': user_id, 'thumb': thumb}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -3621,13 +3713,118 @@ class Bot(TelegramObject):
 
         if reply_markup:
             if isinstance(reply_markup, ReplyMarkup):
-                data['reply_markup'] = reply_markup.to_json()
+                data['reply_markup'] = reply_markup.to_dict()
             else:
                 data['reply_markup'] = reply_markup
 
         result = self._request.post(url, data, timeout=timeout)
 
         return Poll.de_json(result, self)
+
+    @log
+    def send_dice(self,
+                  chat_id,
+                  disable_notification=None,
+                  reply_to_message_id=None,
+                  reply_markup=None,
+                  timeout=None,
+                  **kwargs):
+        """
+        Use this method to send a dice, which will have a random value from 1 to 6. On success, the
+        sent Message is returned.
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target private chat.
+            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
+                receive a notification with no sound.
+            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
+                original message.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+                to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :class:`telegram.Message`: On success, the sent Message is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/sendDice'.format(self.base_url)
+
+        data = {
+            'chat_id': chat_id,
+        }
+
+        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+                             reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
+                             **kwargs)
+
+    @log
+    def get_my_commands(self, timeout=None, **kwargs):
+        """
+        Use this method to get the current list of the bot's commands.
+
+        Args:
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            List[:class:`telegram.BotCommand]`: On success, the commands set for the bot
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/getMyCommands'.format(self.base_url)
+
+        result = self._request.get(url, timeout=timeout)
+
+        self._commands = [BotCommand.de_json(c, self) for c in result]
+
+        return self._commands
+
+    @log
+    def set_my_commands(self, commands, timeout=None, **kwargs):
+        """
+        Use this method to change the list of the bot's commands.
+
+        Args:
+            commands (List[:class:`BotCommand` | (:obj:`str`, :obj:`str`)]): A JSON-serialized list
+                of bot commands to be set as the list of the bot's commands. At most 100 commands
+                can be specified.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :obj:`True`: On success
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/setMyCommands'.format(self.base_url)
+
+        cmds = [c if isinstance(c, BotCommand) else BotCommand(c[0], c[1]) for c in commands]
+
+        data = {'commands': [c.to_dict() for c in cmds]}
+        data.update(kwargs)
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        # Set commands. No need to check for outcome.
+        # If request failed, we won't come this far
+        self._commands = commands
+
+        return result
 
     def to_dict(self):
         data = {'id': self.id, 'username': self.username, 'first_name': self.first_name}
@@ -3768,9 +3965,17 @@ class Bot(TelegramObject):
     """Alias for :attr:`set_sticker_position_in_set`"""
     deleteStickerFromSet = delete_sticker_from_set
     """Alias for :attr:`delete_sticker_from_set`"""
+    setStickerSetThumb = set_sticker_set_thumb
+    """Alias for :attr:`set_sticker_set_thumb`"""
     setPassportDataErrors = set_passport_data_errors
     """Alias for :attr:`set_passport_data_errors`"""
     sendPoll = send_poll
     """Alias for :attr:`send_poll`"""
     stopPoll = stop_poll
     """Alias for :attr:`stop_poll`"""
+    sendDice = send_dice
+    """Alias for :attr:`send_dice`"""
+    getMyCommands = get_my_commands
+    """Alias for :attr:`get_my_commands`"""
+    setMyCommands = set_my_commands
+    """Alias for :attr:`set_my_commands`"""
