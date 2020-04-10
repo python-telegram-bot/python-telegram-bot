@@ -106,7 +106,7 @@ class Message(TelegramObject):
         passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data.
         poll (:class:`telegram.Poll`): Optional. Message is a native poll,
             information about the poll.
-        dice (:class:`telegram.Dice`): Optional. Message is a dice with random value from 1 to 6.
+        dice (:class:`telegram.Dice`): Optional. Message is a dice.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
@@ -819,7 +819,7 @@ class Message(TelegramObject):
             bot.send_dice(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the poll is sent as an actual reply
+            quote (:obj:`bool`, optional): If set to ``True``, the dice is sent as an actual reply
                 to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
                 will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
 

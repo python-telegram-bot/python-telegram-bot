@@ -26,9 +26,8 @@ class BotCommand(TelegramObject):
     This object represents a bot command.
 
     Attributes:
-        command (:obj:`str`): Text of the command, 1-32 characters. Can contain only lowercase
-            English letters, digits and underscores.
-        description (:obj:`str`): Description of the command, 3-256 characters.
+        command (:obj:`str`): Text of the command.
+        description (:obj:`str`): Description of the command.
 
     Args:
         command (:obj:`str`): Text of the command, 1-32 characters. Can contain only lowercase

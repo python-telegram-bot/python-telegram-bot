@@ -3330,14 +3330,14 @@ class Bot(TelegramObject):
 
         You must use exactly one of the fields :attr:`png_sticker` or :attr:`tgs_sticker`.
 
-        Note:
-            The png_sticker and tgs_sticker argument can be either a file_id, an URL or a file from
-            disk ``open(filename, 'rb')``
-
         Warning:
             As of API 4.7 ``png_sticker`` is an optional argument and therefore the order of the
             arguments had to be changed. Use keyword arguments to make sure that the arguments are
             passed correctly.
+
+        Note:
+            The png_sticker and tgs_sticker argument can be either a file_id, an URL or a file from
+            disk ``open(filename, 'rb')``
 
         Args:
             user_id (:obj:`int`): User identifier of created sticker set owner.
@@ -3406,14 +3406,14 @@ class Bot(TelegramObject):
         sticker sets and only to them. Animated sticker sets can have up to 50 stickers. Static
         sticker sets can have up to 120 stickers.
 
-        Note:
-            The png_sticker and tgs_sticker argument can be either a file_id, an URL or a file from
-            disk ``open(filename, 'rb')``
-
         Warning:
             As of API 4.7 ``png_sticker`` is an optional argument and therefore the order of the
             arguments had to be changed. Use keyword arguments to make sure that the arguments are
             passed correctly.
+
+        Note:
+            The png_sticker and tgs_sticker argument can be either a file_id, an URL or a file from
+            disk ``open(filename, 'rb')``
 
         Args:
             user_id (:obj:`int`): User identifier of created sticker set owner.

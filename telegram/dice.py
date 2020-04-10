@@ -27,7 +27,7 @@ class Dice(TelegramObject):
     "die". However, PTB mimics the Telegram API, which uses the term "dice".)
 
     Attributes:
-        value (:obj:`int`): Value of the dice, 1-6.
+        value (:obj:`int`): Value of the dice.
 
     Args:
         value (:obj:`int`): Value of the dice, 1-6.
