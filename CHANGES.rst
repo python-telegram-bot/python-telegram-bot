@@ -2,6 +2,16 @@
 Changelog
 =========
 
+Version 12.6.1
+==============
+*Released 2020-04-11*
+
+**Bug fixes:**
+
+- Fix serialization of ``reply_markup`` in media messages (`#1889`_)
+
+.. _`#1889`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1889
+
 Version 12.6
 ============
 *Released 2020-04-10*
