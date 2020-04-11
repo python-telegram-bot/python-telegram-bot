@@ -327,3 +327,14 @@ class TestJobQueue:
         sleep(0.03)
 
         assert self.result == 0
+
+    def test_job_default_tzinfo(self, job_queue):
+        """Test that default tzinfo is always set to UTC"""
+        job_1 = job_queue.run_once(self.job_run_once, 0.01)
+        job_2 = job_queue.run_repeating(self.job_run_once, 10)
+        job_3 = job_queue.run_daily(self.job_run_once, time=dtm.time(hour=15))
+
+        jobs = [job_1, job_2, job_3]
+
+        for job in jobs:
+            assert job.tzinfo == dtm.timezone.utc

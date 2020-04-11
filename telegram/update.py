@@ -20,6 +20,7 @@
 
 from telegram import (Message, TelegramObject, InlineQuery, ChosenInlineResult,
                       CallbackQuery, ShippingQuery, PreCheckoutQuery, Poll)
+from telegram.poll import PollAnswer
 
 
 class Update(TelegramObject):
@@ -42,7 +43,10 @@ class Update(TelegramObject):
         pre_checkout_query (:class:`telegram.PreCheckoutQuery`): Optional. New incoming
             pre-checkout query.
         poll (:class:`telegram.Poll`): Optional. New poll state. Bots receive only updates
-            about polls, which are sent or stopped by the bot
+            about stopped polls and polls, which are sent by the bot
+        poll_answer (:class:`telegram.PollAnswer`): Optional. A user changed their answer
+            in a non-anonymous poll. Bots receive new votes only in polls that were sent
+            by the bot itself.
 
     Args:
         update_id (:obj:`int`): The update's unique identifier. Update identifiers start from a
@@ -67,6 +71,9 @@ class Update(TelegramObject):
             pre-checkout query. Contains full information about checkout
         poll (:class:`telegram.Poll`, optional): New poll state. Bots receive only updates
             about polls, which are sent or stopped by the bot
+        poll_answer (:class:`telegram.PollAnswer`, optional): A user changed their answer
+            in a non-anonymous poll. Bots receive new votes only in polls that were sent
+            by the bot itself.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
@@ -83,6 +90,7 @@ class Update(TelegramObject):
                  shipping_query=None,
                  pre_checkout_query=None,
                  poll=None,
+                 poll_answer=None,
                  **kwargs):
         # Required
         self.update_id = int(update_id)
@@ -97,6 +105,7 @@ class Update(TelegramObject):
         self.channel_post = channel_post
         self.edited_channel_post = edited_channel_post
         self.poll = poll
+        self.poll_answer = poll_answer
 
         self._effective_user = None
         self._effective_chat = None
@@ -137,6 +146,9 @@ class Update(TelegramObject):
         elif self.pre_checkout_query:
             user = self.pre_checkout_query.from_user
 
+        elif self.poll_answer:
+            user = self.poll_answer.user
+
         self._effective_user = user
         return user
 
@@ -146,7 +158,8 @@ class Update(TelegramObject):
         :class:`telegram.Chat`: The chat that this update was sent in, no matter what kind of
             update this is. Will be ``None`` for :attr:`inline_query`,
             :attr:`chosen_inline_result`, :attr:`callback_query` from inline messages,
-            :attr:`shipping_query`, :attr:`pre_checkout_query` and :attr:`poll`.
+            :attr:`shipping_query`, :attr:`pre_checkout_query`, :attr:`poll` and
+            :attr:`poll_answer`.
 
         """
         if self._effective_chat:
@@ -178,7 +191,8 @@ class Update(TelegramObject):
         :class:`telegram.Message`: The message included in this update, no matter what kind of
             update this is. Will be ``None`` for :attr:`inline_query`,
             :attr:`chosen_inline_result`, :attr:`callback_query` from inline messages,
-            :attr:`shipping_query`, :attr:`pre_checkout_query` and :attr:`poll`.
+            :attr:`shipping_query`, :attr:`pre_checkout_query`, :attr:`poll` and
+            :attr:`poll_answer`.
 
         """
         if self._effective_message:
@@ -237,5 +251,6 @@ class Update(TelegramObject):
             edited_channel_post['default_quote'] = data.get('default_quote')
         data['edited_channel_post'] = Message.de_json(edited_channel_post, bot)
         data['poll'] = Poll.de_json(data.get('poll'), bot)
+        data['poll_answer'] = PollAnswer.de_json(data.get('poll_answer'), bot)
 
         return cls(**data)

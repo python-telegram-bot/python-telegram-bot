@@ -33,7 +33,8 @@ class InlineQueryResultDocument(InlineQueryResult):
         type (:obj:`str`): 'document'.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         title (:obj:`str`): Title for the result.
-        caption (:obj:`str`): Optional. Caption, 0-1024 characters
+        caption (:obj:`str`): Optional. Caption of the document to be sent, 0-1024 characters
+            after entities parsing.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
@@ -52,7 +53,8 @@ class InlineQueryResultDocument(InlineQueryResult):
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         title (:obj:`str`): Title for the result.
-        caption (:obj:`str`, optional): Caption, 0-1024 characters
+        caption (:obj:`str`, optional): Caption of the document to be sent, 0-1024 characters
+            after entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
@@ -60,9 +62,9 @@ class InlineQueryResultDocument(InlineQueryResult):
         mime_type (:obj:`str`): Mime type of the content of the file, either "application/pdf"
             or "application/zip".
         description (:obj:`str`, optional): Short description of the result.
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
-        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
+        input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the file.
         thumb_url (:obj:`str`, optional): URL of the thumbnail (jpeg only) for the file.
         thumb_width (:obj:`int`, optional): Thumbnail width.

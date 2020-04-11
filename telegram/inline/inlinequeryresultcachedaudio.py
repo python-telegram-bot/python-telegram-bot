@@ -26,13 +26,13 @@ class InlineQueryResultCachedAudio(InlineQueryResult):
     """
     Represents a link to an mp3 audio file stored on the Telegram servers. By default, this audio
     file will be sent by the user. Alternatively, you can use :attr:`input_message_content` to
-    send amessage with the specified content instead of the audio.
+    send a message with the specified content instead of the audio.
 
     Attributes:
         type (:obj:`str`): 'audio'.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         audio_file_id (:obj:`str`): A valid file identifier for the audio file.
-        caption (:obj:`str`): Optional. Caption, 0-1024 characters
+        caption (:obj:`str`): Optional. Caption, 0-1024 characters after entities parsing.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
@@ -44,7 +44,7 @@ class InlineQueryResultCachedAudio(InlineQueryResult):
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         audio_file_id (:obj:`str`): A valid file identifier for the audio file.
-        caption (:obj:`str`, optional): Caption, 0-1024 characters
+        caption (:obj:`str`, optional): Caption, 0-1024 characters after entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.

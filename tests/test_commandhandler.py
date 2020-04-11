@@ -379,6 +379,29 @@ class TestPrefixHandler(BaseTest):
         assert not is_match(handler, make_message_update('/test'))
         assert not mock_filter.tested
 
+    def test_edit_prefix(self):
+        handler = self.make_default_handler()
+        handler.prefix = ['?', '§']
+        assert handler._commands == list(combinations(['?', '§'], self.COMMANDS))
+        handler.prefix = '+'
+        assert handler._commands == list(combinations(['+'], self.COMMANDS))
+
+    def test_edit_command(self):
+        handler = self.make_default_handler()
+        handler.command = 'foo'
+        assert handler._commands == list(combinations(self.PREFIXES, ['foo']))
+
+    def test_basic_after_editing(self, dp, prefix, command):
+        """Test the basic expected response from a prefix handler"""
+        handler = self.make_default_handler()
+        dp.add_handler(handler)
+        text = prefix + command
+
+        assert self.response(dp, make_message_update(text))
+        handler.command = 'foo'
+        text = prefix + 'foo'
+        assert self.response(dp, make_message_update(text))
+
     def test_context(self, cdp, prefix_message_update):
         handler = self.make_default_handler(self.callback_context)
         cdp.add_handler(handler)

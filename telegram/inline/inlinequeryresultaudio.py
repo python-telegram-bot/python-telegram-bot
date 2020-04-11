@@ -33,9 +33,9 @@ class InlineQueryResultAudio(InlineQueryResult):
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         audio_url (:obj:`str`): A valid URL for the audio file.
         title (:obj:`str`): Title.
-        performer (:obj:`str`): Optional. Caption, 0-200 characters.
-        audio_duration (:obj:`str`): Optional. Performer.
-        caption (:obj:`str`): Optional. Audio duration in seconds.
+        performer (:obj:`str`): Optional. Performer.
+        audio_duration (:obj:`str`): Optional. Audio duration in seconds.
+        caption (:obj:`str`): Optional. Caption, 0-1024 characters after entities parsing.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
@@ -48,9 +48,9 @@ class InlineQueryResultAudio(InlineQueryResult):
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         audio_url (:obj:`str`): A valid URL for the audio file.
         title (:obj:`str`): Title.
-        performer (:obj:`str`, optional): Caption, 0-200 characters.
-        audio_duration (:obj:`str`, optional): Performer.
-        caption (:obj:`str`, optional): Audio duration in seconds.
+        performer (:obj:`str`, optional): Performer.
+        audio_duration (:obj:`str`, optional): Audio duration in seconds.
+        caption (:obj:`str`, optional): Caption, 0-1024 characters after entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.

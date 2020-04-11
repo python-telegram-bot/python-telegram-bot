@@ -38,14 +38,15 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         mpeg4_duration (:obj:`int`): Optional. Video duration.
         thumb_url (:obj:`str`): URL of the static thumbnail (jpeg or gif) for the result.
         title (:obj:`str`): Optional. Title for the result.
-        caption (:obj:`str`): Optional. Caption, 0-1024 characters
+        caption (:obj:`str`): Optional. Caption of the MPEG-4 file to be sent, 0-1024 characters
+            after entities parsing.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-            message to be sent instead of the MPEG-4 file.
+            message to be sent instead of the video animation.
 
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
@@ -55,14 +56,15 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         mpeg4_duration (:obj:`int`, optional): Video duration.
         thumb_url (:obj:`str`): URL of the static thumbnail (jpeg or gif) for the result.
         title (:obj:`str`, optional): Title for the result.
-        caption (:obj:`str`, optional): Caption, 0-1024 characters
+        caption (:obj:`str`, optional): Caption of the MPEG-4 file to be sent, 0-1024 characters
+            after entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
-            message to be sent instead of the MPEG-4 file.
+            message to be sent instead of the video animation.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
