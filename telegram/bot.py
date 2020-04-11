@@ -163,7 +163,9 @@ class Bot(TelegramObject):
 
         if reply_markup is not None:
             if isinstance(reply_markup, ReplyMarkup):
-                data['reply_markup'] = reply_markup.to_dict()
+                # We need to_json() instead of to_dict() here, because reply_markups may be
+                # attached to media messages, which aren't json dumped by utils.request
+                data['reply_markup'] = reply_markup.to_json()
             else:
                 data['reply_markup'] = reply_markup
 
@@ -3404,6 +3406,8 @@ class Bot(TelegramObject):
         if contains_masks is not None:
             data['contains_masks'] = contains_masks
         if mask_position is not None:
+            # We need to_json() instead of to_dict() here, because we're sending a media
+            # message here, which isn't json dumped by utils.request
             data['mask_position'] = mask_position.to_json()
         data.update(kwargs)
 
@@ -3472,6 +3476,8 @@ class Bot(TelegramObject):
         if tgs_sticker is not None:
             data['tgs_sticker'] = tgs_sticker
         if mask_position is not None:
+            # We need to_json() instead of to_dict() here, because we're sending a media
+            # message here, which isn't json dumped by utils.request
             data['mask_position'] = mask_position.to_json()
         data.update(kwargs)
 
@@ -3726,7 +3732,9 @@ class Bot(TelegramObject):
 
         if reply_markup:
             if isinstance(reply_markup, ReplyMarkup):
-                data['reply_markup'] = reply_markup.to_dict()
+                # We need to_json() instead of to_dict() here, because reply_markups may be
+                # attached to media messages, which aren't json dumped by utils.request
+                data['reply_markup'] = reply_markup.to_json()
             else:
                 data['reply_markup'] = reply_markup
 
