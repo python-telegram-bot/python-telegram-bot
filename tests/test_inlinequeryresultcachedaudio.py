@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,7 @@ from telegram import (InputTextMessageContent, InlineQueryResultCachedAudio, Inl
 @pytest.fixture(scope='class')
 def inline_query_result_cached_audio():
     return InlineQueryResultCachedAudio(
-        TestInlineQueryResultCachedAudio.id,
+        TestInlineQueryResultCachedAudio.id_,
         TestInlineQueryResultCachedAudio.audio_file_id,
         caption=TestInlineQueryResultCachedAudio.caption,
         parse_mode=TestInlineQueryResultCachedAudio.parse_mode,
@@ -35,8 +35,8 @@ def inline_query_result_cached_audio():
 
 
 class TestInlineQueryResultCachedAudio(object):
-    id = 'id'
-    type = 'audio'
+    id_ = 'id'
+    type_ = 'audio'
     audio_file_id = 'audio file id'
     caption = 'caption'
     parse_mode = 'HTML'
@@ -44,40 +44,40 @@ class TestInlineQueryResultCachedAudio(object):
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
     def test_expected_values(self, inline_query_result_cached_audio):
-        assert inline_query_result_cached_audio.type == self.type
-        assert inline_query_result_cached_audio.id == self.id
+        assert inline_query_result_cached_audio.type == self.type_
+        assert inline_query_result_cached_audio.id == self.id_
         assert inline_query_result_cached_audio.audio_file_id == self.audio_file_id
         assert inline_query_result_cached_audio.caption == self.caption
         assert inline_query_result_cached_audio.parse_mode == self.parse_mode
-        assert (inline_query_result_cached_audio.input_message_content.to_dict() ==
-                self.input_message_content.to_dict())
-        assert (inline_query_result_cached_audio.reply_markup.to_dict() ==
-                self.reply_markup.to_dict())
+        assert (inline_query_result_cached_audio.input_message_content.to_dict()
+                == self.input_message_content.to_dict())
+        assert (inline_query_result_cached_audio.reply_markup.to_dict()
+                == self.reply_markup.to_dict())
 
     def test_to_dict(self, inline_query_result_cached_audio):
         inline_query_result_cached_audio_dict = inline_query_result_cached_audio.to_dict()
 
         assert isinstance(inline_query_result_cached_audio_dict, dict)
-        assert (inline_query_result_cached_audio_dict['type'] ==
-                inline_query_result_cached_audio.type)
+        assert (inline_query_result_cached_audio_dict['type']
+                == inline_query_result_cached_audio.type)
         assert inline_query_result_cached_audio_dict['id'] == inline_query_result_cached_audio.id
-        assert (inline_query_result_cached_audio_dict['audio_file_id'] ==
-                inline_query_result_cached_audio.audio_file_id)
-        assert (inline_query_result_cached_audio_dict['caption'] ==
-                inline_query_result_cached_audio.caption)
-        assert (inline_query_result_cached_audio_dict['parse_mode'] ==
-                inline_query_result_cached_audio.parse_mode)
-        assert (inline_query_result_cached_audio_dict['input_message_content'] ==
-                inline_query_result_cached_audio.input_message_content.to_dict())
-        assert (inline_query_result_cached_audio_dict['reply_markup'] ==
-                inline_query_result_cached_audio.reply_markup.to_dict())
+        assert (inline_query_result_cached_audio_dict['audio_file_id']
+                == inline_query_result_cached_audio.audio_file_id)
+        assert (inline_query_result_cached_audio_dict['caption']
+                == inline_query_result_cached_audio.caption)
+        assert (inline_query_result_cached_audio_dict['parse_mode']
+                == inline_query_result_cached_audio.parse_mode)
+        assert (inline_query_result_cached_audio_dict['input_message_content']
+                == inline_query_result_cached_audio.input_message_content.to_dict())
+        assert (inline_query_result_cached_audio_dict['reply_markup']
+                == inline_query_result_cached_audio.reply_markup.to_dict())
 
     def test_equality(self):
-        a = InlineQueryResultCachedAudio(self.id, self.audio_file_id)
-        b = InlineQueryResultCachedAudio(self.id, self.audio_file_id)
-        c = InlineQueryResultCachedAudio(self.id, '')
+        a = InlineQueryResultCachedAudio(self.id_, self.audio_file_id)
+        b = InlineQueryResultCachedAudio(self.id_, self.audio_file_id)
+        c = InlineQueryResultCachedAudio(self.id_, '')
         d = InlineQueryResultCachedAudio('', self.audio_file_id)
-        e = InlineQueryResultCachedVoice(self.id, '', '')
+        e = InlineQueryResultCachedVoice(self.id_, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

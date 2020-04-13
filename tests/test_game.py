@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -35,11 +35,11 @@ def game():
 class TestGame(object):
     title = 'Python-telegram-bot Test Game'
     description = 'description'
-    photo = [PhotoSize('Blah', 640, 360, file_size=0)]
+    photo = [PhotoSize('Blah', 'ElseBlah', 640, 360, file_size=0)]
     text = (b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
             b'\\u200d\\U0001f467\\U0001f431http://google.com').decode('unicode-escape')
     text_entities = [MessageEntity(13, 17, MessageEntity.URL)]
-    animation = Animation('blah')
+    animation = Animation('blah', 'unique_id', 320, 180, 1)
 
     def test_de_json_required(self, bot):
         json_dict = {

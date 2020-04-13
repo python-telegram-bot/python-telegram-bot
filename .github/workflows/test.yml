@@ -1,0 +1,119 @@
+name: GitHub Actions
+on:
+  pull_request:
+    branches:
+      - master
+  schedule:
+    - cron: 7 3 * * *
+  push:
+    branches: 
+      - master
+
+jobs:
+  pytest:
+    name: pytest
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        python-version: [3.5, 3.6, 3.7, 3.8]
+        os: [ubuntu-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            python-version: 3.7
+            test-build: True
+          - os: windows-latest
+            python-version: 3.7
+            test-build: True
+      fail-fast: False
+    steps:
+      - uses: actions/checkout@v2
+      - name: Initialize vendored libs
+        run:
+          git submodule update --init --recursive
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -W ignore -m pip install --upgrade pip
+          python -W ignore -m pip install -U codecov pytest-cov
+          python -W ignore -m pip install -r requirements.txt
+          python -W ignore -m pip install -r requirements-dev.txt
+
+      - name: Test with pytest
+        run: |
+          pytest -v -m nocoverage
+          nocov_exit=$?
+          pytest -v -m "not nocoverage" --cov
+          cov_exit=$?
+          global_exit=$(( nocov_exit > cov_exit ? nocov_exit : cov_exit ))
+          exit ${global_exit}
+        env:
+          JOB_INDEX: ${{ strategy.job-index }}
+          BOTS: W3sidG9rZW4iOiAiNjk2MTg4NzMyOkFBR1Z3RUtmSEhsTmpzY3hFRE5LQXdraEdzdFpfa28xbUMwIiwgInBheW1lbnRfcHJvdmlkZXJfdG9rZW4iOiAiMjg0Njg1MDYzOlRFU1Q6WldGaU1UUmxNbVF5TnpNeSIsICJib3RfbmFtZSI6ICJQVEIgdGVzdHMgb24gVHJhdmlzIHVzaW5nIENQeXRob24gMi43IiwgImJvdF91c2VybmFtZSI6ICJAcHRiX3RyYXZpc19jcHl0aG9uXzI3X2JvdCJ9LCB7InRva2VuIjogIjY3MTQ2ODg4NjpBQUdQR2ZjaVJJQlVORmU4MjR1SVZkcTdKZTNfWW5BVE5HdyIsICJwYXltZW50X3Byb3ZpZGVyX3Rva2VuIjogIjI4NDY4NTA2MzpURVNUOlpHWXdPVGxrTXpNeE4yWTIiLCAiYm90X25hbWUiOiAiUFRCIHRlc3RzIG9uIFRyYXZpcyB1c2luZyBDUHl0aG9uIDMuNCIsICJib3RfdXNlcm5hbWUiOiAiQHB0Yl90cmF2aXNfY3B5dGhvbl8zNF9ib3QifSwgeyJ0b2tlbiI6ICI2MjkzMjY1Mzg6QUFGUnJaSnJCN29CM211ekdzR0pYVXZHRTVDUXpNNUNVNG8iLCAicGF5bWVudF9wcm92aWRlcl90b2tlbiI6ICIyODQ2ODUwNjM6VEVTVDpNbU01WVdKaFl6a3hNMlUxIiwgImJvdF9uYW1lIjogIlBUQiB0ZXN0cyBvbiBUcmF2aXMgdXNpbmcgQ1B5dGhvbiAzLjUiLCAiYm90X3VzZXJuYW1lIjogIkBwdGJfdHJhdmlzX2NweXRob25fMzVfYm90In0sIHsidG9rZW4iOiAiNjQwMjA4OTQzOkFBRmhCalFwOXFtM1JUeFN6VXBZekJRakNsZS1Kano1aGNrIiwgInBheW1lbnRfcHJvdmlkZXJfdG9rZW4iOiAiMjg0Njg1MDYzOlRFU1Q6WXpoa1pUZzFOamMxWXpWbCIsICJib3RfbmFtZSI6ICJQVEIgdGVzdHMgb24gVHJhdmlzIHVzaW5nIENQeXRob24gMy42IiwgImJvdF91c2VybmFtZSI6ICJAcHRiX3RyYXZpc19jcHl0aG9uXzM2X2JvdCJ9LCB7InRva2VuIjogIjY5NTEwNDA4ODpBQUhmenlsSU9qU0lJUy1lT25JMjB5MkUyMEhvZEhzZnotMCIsICJwYXltZW50X3Byb3ZpZGVyX3Rva2VuIjogIjI4NDY4NTA2MzpURVNUOk9HUTFNRGd3WmpJd1pqRmwiLCAiYm90X25hbWUiOiAiUFRCIHRlc3RzIG9uIFRyYXZpcyB1c2luZyBDUHl0aG9uIDMuNyIsICJib3RfdXNlcm5hbWUiOiAiQHB0Yl90cmF2aXNfY3B5dGhvbl8zN19ib3QifSwgeyJ0b2tlbiI6ICI2OTE0MjM1NTQ6QUFGOFdrakNaYm5IcVBfaTZHaFRZaXJGRWxackdhWU9oWDAiLCAicGF5bWVudF9wcm92aWRlcl90b2tlbiI6ICIyODQ2ODUwNjM6VEVTVDpZamM1TlRoaU1tUXlNV1ZoIiwgImJvdF9uYW1lIjogIlBUQiB0ZXN0cyBvbiBUcmF2aXMgdXNpbmcgUHlQeSAyLjciLCAiYm90X3VzZXJuYW1lIjogIkBwdGJfdHJhdmlzX3B5cHlfMjdfYm90In0sIHsidG9rZW4iOiAiNjg0MzM5OTg0OkFBRk1nRUVqcDAxcjVyQjAwN3lDZFZOc2c4QWxOc2FVLWNjIiwgInBheW1lbnRfcHJvdmlkZXJfdG9rZW4iOiAiMjg0Njg1MDYzOlRFU1Q6TVRBek1UWTNNR1V5TmpnMCIsICJib3RfbmFtZSI6ICJQVEIgdGVzdHMgb24gVHJhdmlzIHVzaW5nIFB5UHkgMy41IiwgImJvdF91c2VybmFtZSI6ICJAcHRiX3RyYXZpc19weXB5XzM1X2JvdCJ9LCB7InRva2VuIjogIjY5MDA5MTM0NzpBQUZMbVI1cEFCNVljcGVfbU9oN3pNNEpGQk9oMHozVDBUbyIsICJwYXltZW50X3Byb3ZpZGVyX3Rva2VuIjogIjI4NDY4NTA2MzpURVNUOlpEaGxOekU1TURrd1lXSmkiLCAiYm90X25hbWUiOiAiUFRCIHRlc3RzIG9uIEFwcFZleW9yIHVzaW5nIENQeXRob24gMy40IiwgImJvdF91c2VybmFtZSI6ICJAcHRiX2FwcHZleW9yX2NweXRob25fMzRfYm90In0sIHsidG9rZW4iOiAiNjk0MzA4MDUyOkFBRUIyX3NvbkNrNTVMWTlCRzlBTy1IOGp4aVBTNTVvb0JBIiwgInBheW1lbnRfcHJvdmlkZXJfdG9rZW4iOiAiMjg0Njg1MDYzOlRFU1Q6WW1aaVlXWm1NakpoWkdNeSIsICJib3RfbmFtZSI6ICJQVEIgdGVzdHMgb24gQXBwVmV5b3IgdXNpbmcgQ1B5dGhvbiAyLjciLCAiYm90X3VzZXJuYW1lIjogIkBwdGJfYXBwdmV5b3JfY3B5dGhvbl8yN19ib3QifSwgeyJ0b2tlbiI6ICIxMDU1Mzk3NDcxOkFBRzE4bkJfUzJXQXd1SjNnN29oS0JWZ1hYY2VNbklPeVNjIiwgInBheW1lbnRfcHJvdmlkZXJfdG9rZW4iOiAiMjg0Njg1MDYzOlRFU1Q6TmpBd056QXpZalZpTkdOayIsICJuYW1lIjogIlBUQiB0ZXN0cyBbMF0iLCAidXNlcm5hbWUiOiAicHRiXzBfYm90In0sIHsidG9rZW4iOiAiMTA0NzMyNjc3MTpBQUY4bk90ODFGcFg4bGJidno4VWV3UVF2UmZUYkZmQnZ1SSIsICJwYXltZW50X3Byb3ZpZGVyX3Rva2VuIjogIjI4NDY4NTA2MzpURVNUOllUVTFOVEk0WkdSallqbGkiLCAibmFtZSI6ICJQVEIgdGVzdHMgWzFdIiwgInVzZXJuYW1lIjogInB0Yl8xX2JvdCJ9LCB7InRva2VuIjogIjk3MTk5Mjc0NTpBQUdPa09hVzBOSGpnSXY1LTlqUWJPajR2R3FkaFNGLVV1cyIsICJwYXltZW50X3Byb3ZpZGVyX3Rva2VuIjogIjI4NDY4NTA2MzpURVNUOk5XWmtNV1ZoWWpsallqVTUiLCAibmFtZSI6ICJQVEIgdGVzdHMgWzJdIiwgInVzZXJuYW1lIjogInB0Yl8yX2JvdCJ9XQ==
+          TEST_BUILD: ${{ matrix.test-build }}
+          TEST_PRE_COMMIT: ${{ matrix.test-pre-commit }}
+        shell: bash --noprofile --norc {0}
+
+      - name: Submit coverage
+        run: |
+          if [ "$CODECOV_TOKEN" != "" ]; then
+             codecov -F github -t $CODECOV_TOKEN --name "${{ matrix.os }}-${{ matrix.python-version }}"
+          fi
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        shell: bash
+  test_official:
+    name: test-official
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        python-version: [3.7]
+        os: [ubuntu-latest]
+      fail-fast: False
+    steps:
+      - uses: actions/checkout@v2
+      - name: Initialize vendored libs
+        run:
+          git submodule update --init --recursive
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -W ignore -m pip install --upgrade pip
+          python -W ignore -m pip install -r requirements.txt
+          python -W ignore -m pip install -r requirements-dev.txt
+      - name: Compare to official api
+        run: |
+          pytest -v tests/test_official.py
+          exit $?
+        env:
+          TEST_OFFICIAL: "true"
+        shell: bash --noprofile --norc {0}
+  test_pre_commit:
+    name: test-pre-commit
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        python-version: [3.7]
+        os: [ubuntu-latest]
+      fail-fast: False
+    steps:
+      - uses: actions/checkout@v2
+      - name: Initialize vendored libs
+        run:
+          git submodule update --init --recursive
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -W ignore -m pip install --upgrade pip
+          python -W ignore -m pip install -r requirements.txt
+          python -W ignore -m pip install -r requirements-dev.txt
+      - name: Run pre-commit tests
+        run: pre-commit run --all-files

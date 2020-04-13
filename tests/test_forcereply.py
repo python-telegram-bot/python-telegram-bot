@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 import pytest
+from flaky import flaky
 
 from telegram import ForceReply
 
@@ -31,6 +32,8 @@ class TestForceReply(object):
     force_reply = True
     selective = True
 
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     def test_send_message_with_force_reply(self, bot, chat_id, force_reply):
         message = bot.send_message(chat_id, 'text', reply_markup=force_reply)
 

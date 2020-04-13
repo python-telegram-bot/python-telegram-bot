@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -36,30 +36,31 @@ class CallbackQuery(TelegramObject):
     Attributes:
         id (:obj:`str`): Unique identifier for this query.
         from_user (:class:`telegram.User`): Sender.
+        chat_instance (:obj:`str`): Global identifier, uniquely corresponding to the chat to which
+            the message with the callback button was sent.
         message (:class:`telegram.Message`): Optional. Message with the callback button that
             originated the query.
+        data (:obj:`str`): Optional. Data associated with the callback button.
         inline_message_id (:obj:`str`): Optional. Identifier of the message sent via the bot in
                 inline mode, that originated the query.
-        chat_instance (:obj:`str`): Optional. Global identifier, uniquely corresponding to the chat
-            to which the message with the callback button was sent.
-        data (:obj:`str`): Optional. Data associated with the callback button.
         game_short_name (:obj:`str`): Optional. Short name of a Game to be returned.
+        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
 
     Args:
         id (:obj:`str`): Unique identifier for this query.
         from_user (:class:`telegram.User`): Sender.
+        chat_instance (:obj:`str`): Global identifier, uniquely corresponding to the chat to which
+            the message with the callback button was sent. Useful for high scores in games.
         message (:class:`telegram.Message`, optional): Message with the callback button that
             originated the query. Note that message content and message date will not be available
             if the message is too old.
-        inline_message_id (:obj:`str`, optional): Identifier of the message sent via the bot in
-            inline mode, that originated the query.
-        chat_instance (:obj:`str`, optional): Global identifier, uniquely corresponding to the chat
-            to which the message with the callback button was sent. Useful for high scores in
-            games.
         data (:obj:`str`, optional): Data associated with the callback button. Be aware that a bad
             client can send arbitrary data in this field.
+        inline_message_id (:obj:`str`, optional): Identifier of the message sent via the bot in
+            inline mode, that originated the query.
         game_short_name (:obj:`str`, optional): Short name of a Game to be returned, serves as
             the unique identifier for the game
+        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
 
     Note:
         After the user presses an inline button, Telegram clients will display a progress bar
@@ -101,7 +102,10 @@ class CallbackQuery(TelegramObject):
         data = super(CallbackQuery, cls).de_json(data, bot)
 
         data['from_user'] = User.de_json(data.get('from'), bot)
-        data['message'] = Message.de_json(data.get('message'), bot)
+        message = data.get('message')
+        if message:
+            message['default_quote'] = data.get('default_quote')
+        data['message'] = Message.de_json(message, bot)
 
         return cls(bot=bot, **data)
 
@@ -116,16 +120,16 @@ class CallbackQuery(TelegramObject):
         """
         return self.bot.answerCallbackQuery(self.id, *args, **kwargs)
 
-    def edit_message_text(self, *args, **kwargs):
+    def edit_message_text(self, text, *args, **kwargs):
         """Shortcut for either::
 
-            bot.edit_message_text(chat_id=update.callback_query.message.chat_id,
+            bot.edit_message_text(text, chat_id=update.callback_query.message.chat_id,
                                 message_id=update.callback_query.message.message_id,
                                 *args, **kwargs)
 
         or::
 
-            bot.edit_message_text(inline_message_id=update.callback_query.inline_message_id,
+            bot.edit_message_text(text, inline_message_id=update.callback_query.inline_message_id,
                                 *args, **kwargs)
 
         Returns:
@@ -134,22 +138,24 @@ class CallbackQuery(TelegramObject):
 
         """
         if self.inline_message_id:
-            return self.bot.edit_message_text(
-                inline_message_id=self.inline_message_id, *args, **kwargs)
+            return self.bot.edit_message_text(text, inline_message_id=self.inline_message_id,
+                                              *args, **kwargs)
         else:
-            return self.bot.edit_message_text(
-                chat_id=self.message.chat_id, message_id=self.message.message_id, *args, **kwargs)
+            return self.bot.edit_message_text(text, chat_id=self.message.chat_id,
+                                              message_id=self.message.message_id, *args, **kwargs)
 
-    def edit_message_caption(self, *args, **kwargs):
+    def edit_message_caption(self, caption, *args, **kwargs):
         """Shortcut for either::
 
-            bot.edit_message_caption(chat_id=update.callback_query.message.chat_id,
+            bot.edit_message_caption(caption=caption,
+                                   chat_id=update.callback_query.message.chat_id,
                                    message_id=update.callback_query.message.message_id,
                                    *args, **kwargs)
 
         or::
 
-            bot.edit_message_caption(inline_message_id=update.callback_query.inline_message_id,
+            bot.edit_message_caption(caption=caption
+                                    inline_message_id=update.callback_query.inline_message_id,
                                    *args, **kwargs)
 
         Returns:
@@ -158,22 +164,26 @@ class CallbackQuery(TelegramObject):
 
         """
         if self.inline_message_id:
-            return self.bot.edit_message_caption(
-                inline_message_id=self.inline_message_id, *args, **kwargs)
+            return self.bot.edit_message_caption(caption=caption,
+                                                 inline_message_id=self.inline_message_id,
+                                                 *args, **kwargs)
         else:
-            return self.bot.edit_message_caption(
-                chat_id=self.message.chat_id, message_id=self.message.message_id, *args, **kwargs)
+            return self.bot.edit_message_caption(caption=caption, chat_id=self.message.chat_id,
+                                                 message_id=self.message.message_id,
+                                                 *args, **kwargs)
 
-    def edit_message_reply_markup(self, *args, **kwargs):
+    def edit_message_reply_markup(self, reply_markup, *args, **kwargs):
         """Shortcut for either::
 
             bot.edit_message_replyMarkup(chat_id=update.callback_query.message.chat_id,
                                        message_id=update.callback_query.message.message_id,
+                                       reply_markup=reply_markup,
                                        *args, **kwargs)
 
         or::
 
             bot.edit_message_reply_markup(inline_message_id=update.callback_query.inline_message_id,
+                                        reply_markup=reply_markup,
                                        *args, **kwargs)
 
         Returns:
@@ -182,8 +192,11 @@ class CallbackQuery(TelegramObject):
 
         """
         if self.inline_message_id:
-            return self.bot.edit_message_reply_markup(
-                inline_message_id=self.inline_message_id, *args, **kwargs)
+            return self.bot.edit_message_reply_markup(reply_markup=reply_markup,
+                                                      inline_message_id=self.inline_message_id,
+                                                      *args, **kwargs)
         else:
-            return self.bot.edit_message_reply_markup(
-                chat_id=self.message.chat_id, message_id=self.message.message_id, *args, **kwargs)
+            return self.bot.edit_message_reply_markup(reply_markup=reply_markup,
+                                                      chat_id=self.message.chat_id,
+                                                      message_id=self.message.message_id,
+                                                      *args, **kwargs)

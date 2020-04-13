@@ -29,14 +29,9 @@ We have a vibrant community of developers helping each other in our `Telegram gr
    :target: https://www.gnu.org/licenses/lgpl-3.0.html
    :alt: LGPLv3 License
 
-.. image:: https://travis-ci.org/python-telegram-bot/python-telegram-bot.svg?branch=master
-   :target: https://travis-ci.org/python-telegram-bot/python-telegram-bot
-   :alt: Travis CI Status
-
-.. image:: https://img.shields.io/appveyor/ci/python-telegram-bot/python-telegram-bot/master.svg?logo=appveyor
-   :target: https://ci.appveyor.com/project/python-telegram-bot/python-telegram-bot
-   :alt: AppVeyor CI Status
-
+.. image:: https://github.com/python-telegram-bot/python-telegram-bot/workflows/GitHub%20Actions/badge.svg?event=schedule
+   :target: https://github.com/python-telegram-bot/python-telegram-bot/
+   :alt: Github Actions workflow
 
 .. image:: https://codecov.io/gh/python-telegram-bot/python-telegram-bot/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/python-telegram-bot/python-telegram-bot
@@ -45,6 +40,10 @@ We have a vibrant community of developers helping each other in our `Telegram gr
 .. image:: http://isitmaintained.com/badge/resolution/python-telegram-bot/python-telegram-bot.svg
    :target: http://isitmaintained.com/project/python-telegram-bot/python-telegram-bot
    :alt: Median time to resolve an issue
+
+.. image:: https://api.codacy.com/project/badge/Grade/99d901eaa09b44b4819aec05c330c968
+   :target: https://www.codacy.com/app/python-telegram-bot/python-telegram-bot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=python-telegram-bot/python-telegram-bot&amp;utm_campaign=Badge_Grade
+   :alt: Code quality
 
 .. image:: https://img.shields.io/badge/Telegram-Group-blue.svg
    :target: https://telegram.me/pythontelegrambotgroup
@@ -84,8 +83,7 @@ Introduction
 
 This library provides a pure Python interface for the
 `Telegram Bot API <https://core.telegram.org/bots/api>`_.
-It's compatible with Python versions 2.7, 3.3+ and `PyPy <http://pypy.org/>`_.
-It also works with `Google App Engine <https://cloud.google.com/appengine>`_.
+It's compatible with Python versions 3.5+ and `PyPy <http://pypy.org/>`_.
 
 In addition to the pure API implementation, this library features a number of high-level classes to
 make the development of bots easy and straightforward. These classes are contained in the
@@ -95,7 +93,7 @@ make the development of bots easy and straightforward. These classes are contain
 Telegram API support
 ====================
 
-All types and methods of the Telegram Bot API 3.6 are supported.
+All types and methods of the Telegram Bot API **4.7** are supported.
 
 ==========
 Installing
@@ -139,9 +137,9 @@ Other references:
 Learning by example
 -------------------
 
-We believe that the best way to learn and understand this simple package is by example. So here
-are some examples for you to review. Even if it's not your approach for learning, please take a
-look at ``echobot2``, it is de facto the base for most of the bots out there. Best of all,
+We believe that the best way to learn this package is by example. Here
+are some examples for you to review. Even if it is not your approach for learning, please take a
+look at ``echobot2``, it is the de facto base for most of the bots out there. Best of all,
 the code for these examples are released to the public domain, so you can start by grabbing the
 code and building on top of it.
 
@@ -189,11 +187,12 @@ You can get help in several ways:
 
 1. We have a vibrant community of developers helping each other in our `Telegram group <https://telegram.me/pythontelegrambotgroup>`_. Join us!
 
-2. Our `Wiki pages <https://github.com/python-telegram-bot/python-telegram-bot/wiki/>`_ offer a growing amount of resources.
+2. Report bugs, request new features or ask questions by `creating an issue <https://github.com/python-telegram-bot/python-telegram-bot/issues/new/choose>`_.
 
-3. You can ask for help on Stack Overflow using the `python-telegram-bot tag <https://stackoverflow.com/questions/tagged/python-telegram-bot>`_.
+3. Our `Wiki pages <https://github.com/python-telegram-bot/python-telegram-bot/wiki/>`_ offer a growing amount of resources.
 
-4. As last resort, the developers are ready to help you with `serious issues <https://github.com/python-telegram-bot/python-telegram-bot/issues/new>`_.
+4. You can even ask for help on Stack Overflow using the `python-telegram-bot tag <https://stackoverflow.com/questions/tagged/python-telegram-bot>`_.
+
 
 
 ============

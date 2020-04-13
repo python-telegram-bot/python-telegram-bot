@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -64,7 +64,7 @@ class ShippingQuery(TelegramObject):
         data['from_user'] = User.de_json(data.pop('from'), bot)
         data['shipping_address'] = ShippingAddress.de_json(data.get('shipping_address'), bot)
 
-        return cls(**data)
+        return cls(bot=bot, **data)
 
     def answer(self, *args, **kwargs):
         """Shortcut for::

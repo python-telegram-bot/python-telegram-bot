@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@
 """This module contains the Dispatcher class."""
 
 import logging
+import warnings
 import weakref
 from functools import wraps
 from threading import Thread, Lock, Event, current_thread, BoundedSemaphore
@@ -30,24 +31,30 @@ from queue import Queue, Empty
 
 from future.builtins import range
 
-from telegram import TelegramError
+from telegram import TelegramError, Update
 from telegram.ext.handler import Handler
+from telegram.ext.callbackcontext import CallbackContext
+from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.promise import Promise
+from telegram.ext import BasePersistence
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 DEFAULT_GROUP = 0
 
 
 def run_async(func):
-    """Function decorator that will run the function in a new thread.
+    """
+    Function decorator that will run the function in a new thread.
 
     Will run :attr:`telegram.ext.Dispatcher.run_async`.
 
     Using this decorator is only possible when only a single Dispatcher exist in the system.
 
-    Note: Use this decorator to run handlers asynchronously.
-
+    Warning:
+        If you're using @run_async you cannot rely on adding custom attributes to
+        :class:`telegram.ext.CallbackContext`. See its docs for more info.
     """
+
     @wraps(func)
     def async_func(*args, **kwargs):
         return Dispatcher.get_instance().run_async(func, *args, **kwargs)
@@ -70,6 +77,11 @@ class Dispatcher(object):
             instance to pass onto handler callbacks.
         workers (:obj:`int`): Number of maximum concurrent worker threads for the ``@run_async``
             decorator.
+        user_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the user.
+        chat_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the chat.
+        bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
+        persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
+            store data that should be persistent over restarts
 
     Args:
         bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
@@ -78,6 +90,11 @@ class Dispatcher(object):
                 instance to pass onto handler callbacks.
         workers (:obj:`int`, optional): Number of maximum concurrent worker threads for the
             ``@run_async`` decorator. defaults to 4.
+        persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
+            store data that should be persistent over restarts
+        use_context (:obj:`bool`, optional): If set to ``True`` Use the context based callback API.
+            During the deprecation period of the old API the default is ``False``. **New users**:
+            set this to ``True``.
 
     """
 
@@ -86,16 +103,46 @@ class Dispatcher(object):
     __singleton = None
     logger = logging.getLogger(__name__)
 
-    def __init__(self, bot, update_queue, workers=4, exception_event=None, job_queue=None):
+    def __init__(self,
+                 bot,
+                 update_queue,
+                 workers=4,
+                 exception_event=None,
+                 job_queue=None,
+                 persistence=None,
+                 use_context=False):
         self.bot = bot
         self.update_queue = update_queue
         self.job_queue = job_queue
         self.workers = workers
+        self.use_context = use_context
+
+        if not use_context:
+            warnings.warn('Old Handler API is deprecated - see https://git.io/fxJuV for details',
+                          TelegramDeprecationWarning, stacklevel=3)
 
         self.user_data = defaultdict(dict)
-        """:obj:`dict`: A dictionary handlers can use to store data for the user."""
         self.chat_data = defaultdict(dict)
-        """:obj:`dict`: A dictionary handlers can use to store data for the chat."""
+        self.bot_data = {}
+        if persistence:
+            if not isinstance(persistence, BasePersistence):
+                raise TypeError("persistence should be based on telegram.ext.BasePersistence")
+            self.persistence = persistence
+            if self.persistence.store_user_data:
+                self.user_data = self.persistence.get_user_data()
+                if not isinstance(self.user_data, defaultdict):
+                    raise ValueError("user_data must be of type defaultdict")
+            if self.persistence.store_chat_data:
+                self.chat_data = self.persistence.get_chat_data()
+                if not isinstance(self.chat_data, defaultdict):
+                    raise ValueError("chat_data must be of type defaultdict")
+            if self.persistence.store_bot_data:
+                self.bot_data = self.persistence.get_bot_data()
+                if not isinstance(self.bot_data, dict):
+                    raise ValueError("bot_data must be of type dict")
+        else:
+            self.persistence = None
+
         self.handlers = {}
         """Dict[:obj:`int`, List[:class:`telegram.ext.Handler`]]: Holds the handlers per group."""
         self.groups = []
@@ -118,11 +165,16 @@ class Dispatcher(object):
             else:
                 self._set_singleton(None)
 
+    @property
+    def exception_event(self):
+        return self.__exception_event
+
     def _init_async_threads(self, base_name, workers):
         base_name = '{}_'.format(base_name) if base_name else ''
 
         for i in range(workers):
-            thread = Thread(target=self._pooled, name='{}{}'.format(base_name, i))
+            thread = Thread(target=self._pooled, name='Bot:{}:worker:{}{}'.format(self.bot.id,
+                                                                                  base_name, i))
             self.__async_threads.add(thread)
             thread.start()
 
@@ -143,7 +195,7 @@ class Dispatcher(object):
 
         """
         if cls.__singleton is not None:
-            return cls.__singleton()
+            return cls.__singleton()  # pylint: disable=not-callable
         else:
             raise RuntimeError('{} not initialized or multiple instances exist'.format(
                 cls.__name__))
@@ -167,6 +219,10 @@ class Dispatcher(object):
 
     def run_async(self, func, *args, **kwargs):
         """Queue a function (with given args/kwargs) to be run asynchronously.
+
+        Warning:
+            If you're using @run_async you cannot rely on adding custom attributes to
+            :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
         Args:
             func (:obj:`callable`): The function to run in the thread.
@@ -226,6 +282,7 @@ class Dispatcher(object):
 
             self.logger.debug('Processing Update: %s' % update)
             self.process_update(update)
+            self.update_queue.task_done()
 
         self.running = False
         self.logger.debug('Dispatcher thread stopped')
@@ -265,6 +322,7 @@ class Dispatcher(object):
                 The update to process.
 
         """
+
         # An error happened while polling
         if isinstance(update, TelegramError):
             try:
@@ -273,37 +331,43 @@ class Dispatcher(object):
                 self.logger.exception('An uncaught error was raised while handling the error')
             return
 
+        context = None
+
         for group in self.groups:
             try:
-                for handler in (x for x in self.handlers[group] if x.check_update(update)):
-                    handler.handle_update(update, self)
-                    break
+                for handler in self.handlers[group]:
+                    check = handler.check_update(update)
+                    if check is not None and check is not False:
+                        if not context and self.use_context:
+                            context = CallbackContext.from_update(update, self)
+                        handler.handle_update(update, self, check, context)
+                        self.update_persistence(update=update)
+                        break
 
             # Stop processing with any other handler.
             except DispatcherHandlerStop:
                 self.logger.debug('Stopping further handlers due to DispatcherHandlerStop')
+                self.update_persistence(update=update)
                 break
 
             # Dispatch any error.
-            except TelegramError as te:
-                self.logger.warning('A TelegramError was raised while processing the Update')
-
+            except Exception as e:
                 try:
-                    self.dispatch_error(update, te)
+                    self.dispatch_error(update, e)
                 except DispatcherHandlerStop:
                     self.logger.debug('Error handler stopped further handlers')
                     break
+                # Errors should not stop the thread.
                 except Exception:
-                    self.logger.exception('An uncaught error was raised while handling the error')
-
-            # Errors should not stop the thread.
-            except Exception:
-                self.logger.exception('An uncaught error was raised while processing the update')
+                    self.logger.exception('An error was raised while processing the update and an '
+                                          'uncaught error was raised while handling the error '
+                                          'with an error_handler')
 
     def add_handler(self, handler, group=DEFAULT_GROUP):
         """Register a handler.
 
-        TL;DR: Order and priority counts. 0 or 1 handlers per group will be used.
+        TL;DR: Order and priority counts. 0 or 1 handlers per group will be used. End handling of
+        update with :class:`telegram.ext.DispatcherHandlerStop`.
 
         A handler must be an instance of a subclass of :class:`telegram.ext.Handler`. All handlers
         are organized in groups with a numeric value. The default group is 0. All groups will be
@@ -324,11 +388,20 @@ class Dispatcher(object):
             group (:obj:`int`, optional): The group identifier. Default is 0.
 
         """
+        # Unfortunately due to circular imports this has to be here
+        from .conversationhandler import ConversationHandler
 
         if not isinstance(handler, Handler):
             raise TypeError('handler is not an instance of {0}'.format(Handler.__name__))
         if not isinstance(group, int):
             raise TypeError('group is not int')
+        if isinstance(handler, ConversationHandler) and handler.persistent:
+            if not self.persistence:
+                raise ValueError(
+                    "Conversationhandler {} can not be persistent if dispatcher has no "
+                    "persistence".format(handler.name))
+            handler.persistence = self.persistence
+            handler.conversations = self.persistence.get_conversations(handler.name)
 
         if group not in self.handlers:
             self.handlers[group] = list()
@@ -351,13 +424,80 @@ class Dispatcher(object):
                 del self.handlers[group]
                 self.groups.remove(group)
 
-    def add_error_handler(self, callback):
-        """Registers an error handler in the Dispatcher.
+    def update_persistence(self, update=None):
+        """Update :attr:`user_data`, :attr:`chat_data` and :attr:`bot_data` in :attr:`persistence`.
 
         Args:
-            callback (:obj:`callable`): A function that takes ``Bot, Update, TelegramError`` as
-                arguments.
+            update (:class:`telegram.Update`, optional): The update to process. If passed, only the
+            corresponding ``user_data`` and ``chat_data`` will be updated.
+        """
+        if self.persistence:
+            chat_ids = self.chat_data.keys()
+            user_ids = self.user_data.keys()
 
+            if isinstance(update, Update):
+                if update.effective_chat:
+                    chat_ids = [update.effective_chat.id]
+                else:
+                    chat_ids = []
+                if update.effective_user:
+                    user_ids = [update.effective_user.id]
+                else:
+                    user_ids = []
+
+            if self.persistence.store_bot_data:
+                try:
+                    self.persistence.update_bot_data(self.bot_data)
+                except Exception as e:
+                    try:
+                        self.dispatch_error(update, e)
+                    except Exception:
+                        message = 'Saving bot data raised an error and an ' \
+                                  'uncaught error was raised while handling ' \
+                                  'the error with an error_handler'
+                        self.logger.exception(message)
+            if self.persistence.store_chat_data:
+                for chat_id in chat_ids:
+                    try:
+                        self.persistence.update_chat_data(chat_id, self.chat_data[chat_id])
+                    except Exception as e:
+                        try:
+                            self.dispatch_error(update, e)
+                        except Exception:
+                            message = 'Saving chat data raised an error and an ' \
+                                      'uncaught error was raised while handling ' \
+                                      'the error with an error_handler'
+                            self.logger.exception(message)
+            if self.persistence.store_user_data:
+                for user_id in user_ids:
+                    try:
+                        self.persistence.update_user_data(user_id, self.user_data[user_id])
+                    except Exception as e:
+                        try:
+                            self.dispatch_error(update, e)
+                        except Exception:
+                            message = 'Saving user data raised an error and an ' \
+                                      'uncaught error was raised while handling ' \
+                                      'the error with an error_handler'
+                            self.logger.exception(message)
+
+    def add_error_handler(self, callback):
+        """Registers an error handler in the Dispatcher. This handler will receive every error
+        which happens in your bot.
+
+        Warning: The errors handled within these handlers won't show up in the logger, so you
+        need to make sure that you reraise the error.
+
+        Args:
+            callback (:obj:`callable`): The callback function for this error handler. Will be
+                called when an error is raised. Callback signature for context based API:
+
+                ``def callback(update: Update, context: CallbackContext)``
+
+                The error that happened will be present in context.error.
+
+        Note:
+            See https://git.io/fxJuV for more info about switching to context based API.
         """
         self.error_handlers.append(callback)
 
@@ -376,13 +516,16 @@ class Dispatcher(object):
 
         Args:
             update (:obj:`str` | :class:`telegram.Update` | None): The update that caused the error
-            error (:class:`telegram.TelegramError`): The Telegram error that was raised.
+            error (:obj:`Exception`): The error that was raised.
 
         """
         if self.error_handlers:
             for callback in self.error_handlers:
-                callback(self.bot, update, error)
+                if self.use_context:
+                    callback(update, CallbackContext.from_error(update, error, self))
+                else:
+                    callback(self.bot, update, error)
 
         else:
             self.logger.exception(
-                'No error handlers are registered, logging exception...', exc_info=error)
+                'No error handlers are registered, logging exception.', exc_info=error)

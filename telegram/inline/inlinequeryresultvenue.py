@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -35,6 +35,9 @@ class InlineQueryResultVenue(InlineQueryResult):
         title (:obj:`str`): Title of the venue.
         address (:obj:`str`): Address of the venue.
         foursquare_id (:obj:`str`): Optional. Foursquare identifier of the venue if known.
+        foursquare_type (:obj:`str`): Optional. Foursquare type of the venue, if known.
+            (For example, "arts_entertainment/default", "arts_entertainment/aquarium" or
+            "food/icecream".)
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
@@ -50,6 +53,9 @@ class InlineQueryResultVenue(InlineQueryResult):
         title (:obj:`str`): Title of the venue.
         address (:obj:`str`): Address of the venue.
         foursquare_id (:obj:`str`, optional): Foursquare identifier of the venue if known.
+        foursquare_type (:obj:`str`, optional): Foursquare type of the venue, if known.
+            (For example, "arts_entertainment/default", "arts_entertainment/aquarium" or
+            "food/icecream".)
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
@@ -68,6 +74,7 @@ class InlineQueryResultVenue(InlineQueryResult):
                  title,
                  address,
                  foursquare_id=None,
+                 foursquare_type=None,
                  reply_markup=None,
                  input_message_content=None,
                  thumb_url=None,
@@ -83,15 +90,10 @@ class InlineQueryResultVenue(InlineQueryResult):
         self.address = address
 
         # Optional
-        if foursquare_id:
-            self.foursquare_id = foursquare_id
-        if reply_markup:
-            self.reply_markup = reply_markup
-        if input_message_content:
-            self.input_message_content = input_message_content
-        if thumb_url:
-            self.thumb_url = thumb_url
-        if thumb_width:
-            self.thumb_width = thumb_width
-        if thumb_height:
-            self.thumb_height = thumb_height
+        self.foursquare_id = foursquare_id
+        self.foursquare_type = foursquare_type
+        self.reply_markup = reply_markup
+        self.input_message_content = input_message_content
+        self.thumb_url = thumb_url
+        self.thumb_width = thumb_width
+        self.thumb_height = thumb_height

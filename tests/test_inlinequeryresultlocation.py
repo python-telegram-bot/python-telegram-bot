@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,7 @@ from telegram import (InputTextMessageContent, InlineQueryResultLocation, Inline
 @pytest.fixture(scope='class')
 def inline_query_result_location():
     return InlineQueryResultLocation(
-        TestInlineQueryResultLocation.id,
+        TestInlineQueryResultLocation.id_,
         TestInlineQueryResultLocation.latitude,
         TestInlineQueryResultLocation.longitude,
         TestInlineQueryResultLocation.title,
@@ -39,8 +39,8 @@ def inline_query_result_location():
 
 
 class TestInlineQueryResultLocation(object):
-    id = 'id'
-    type = 'location'
+    id_ = 'id'
+    type_ = 'location'
     latitude = 0.0
     longitude = 1.0
     title = 'title'
@@ -52,8 +52,8 @@ class TestInlineQueryResultLocation(object):
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
     def test_expected_values(self, inline_query_result_location):
-        assert inline_query_result_location.id == self.id
-        assert inline_query_result_location.type == self.type
+        assert inline_query_result_location.id == self.id_
+        assert inline_query_result_location.type == self.type_
         assert inline_query_result_location.latitude == self.latitude
         assert inline_query_result_location.longitude == self.longitude
         assert inline_query_result_location.title == self.title
@@ -61,8 +61,8 @@ class TestInlineQueryResultLocation(object):
         assert inline_query_result_location.thumb_url == self.thumb_url
         assert inline_query_result_location.thumb_width == self.thumb_width
         assert inline_query_result_location.thumb_height == self.thumb_height
-        assert (inline_query_result_location.input_message_content.to_dict() ==
-                self.input_message_content.to_dict())
+        assert (inline_query_result_location.input_message_content.to_dict()
+                == self.input_message_content.to_dict())
         assert inline_query_result_location.reply_markup.to_dict() == self.reply_markup.to_dict()
 
     def test_to_dict(self, inline_query_result_location):
@@ -71,30 +71,30 @@ class TestInlineQueryResultLocation(object):
         assert isinstance(inline_query_result_location_dict, dict)
         assert inline_query_result_location_dict['id'] == inline_query_result_location.id
         assert inline_query_result_location_dict['type'] == inline_query_result_location.type
-        assert (inline_query_result_location_dict['latitude'] ==
-                inline_query_result_location.latitude)
-        assert (inline_query_result_location_dict['longitude'] ==
-                inline_query_result_location.longitude)
+        assert (inline_query_result_location_dict['latitude']
+                == inline_query_result_location.latitude)
+        assert (inline_query_result_location_dict['longitude']
+                == inline_query_result_location.longitude)
         assert inline_query_result_location_dict['title'] == inline_query_result_location.title
-        assert (inline_query_result_location_dict['live_period'] ==
-                inline_query_result_location.live_period)
-        assert (inline_query_result_location_dict['thumb_url'] ==
-                inline_query_result_location.thumb_url)
-        assert (inline_query_result_location_dict['thumb_width'] ==
-                inline_query_result_location.thumb_width)
-        assert (inline_query_result_location_dict['thumb_height'] ==
-                inline_query_result_location.thumb_height)
-        assert (inline_query_result_location_dict['input_message_content'] ==
-                inline_query_result_location.input_message_content.to_dict())
-        assert (inline_query_result_location_dict['reply_markup'] ==
-                inline_query_result_location.reply_markup.to_dict())
+        assert (inline_query_result_location_dict['live_period']
+                == inline_query_result_location.live_period)
+        assert (inline_query_result_location_dict['thumb_url']
+                == inline_query_result_location.thumb_url)
+        assert (inline_query_result_location_dict['thumb_width']
+                == inline_query_result_location.thumb_width)
+        assert (inline_query_result_location_dict['thumb_height']
+                == inline_query_result_location.thumb_height)
+        assert (inline_query_result_location_dict['input_message_content']
+                == inline_query_result_location.input_message_content.to_dict())
+        assert (inline_query_result_location_dict['reply_markup']
+                == inline_query_result_location.reply_markup.to_dict())
 
     def test_equality(self):
-        a = InlineQueryResultLocation(self.id, self.longitude, self.latitude, self.title)
-        b = InlineQueryResultLocation(self.id, self.longitude, self.latitude, self.title)
-        c = InlineQueryResultLocation(self.id, 0, self.latitude, self.title)
+        a = InlineQueryResultLocation(self.id_, self.longitude, self.latitude, self.title)
+        b = InlineQueryResultLocation(self.id_, self.longitude, self.latitude, self.title)
+        c = InlineQueryResultLocation(self.id_, 0, self.latitude, self.title)
         d = InlineQueryResultLocation('', self.longitude, self.latitude, self.title)
-        e = InlineQueryResultVoice(self.id, '', '')
+        e = InlineQueryResultVoice(self.id_, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

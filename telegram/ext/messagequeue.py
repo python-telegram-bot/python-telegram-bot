@@ -4,7 +4,7 @@
 # Tymofii A. Khodniev (thodnev) <thodnev@mail.ru>
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -247,7 +247,7 @@ class MessageQueue(object):
             is_group_msg (:obj:`bool`, optional): Defines whether ``promise`` would be processed in
                 group*+*all* ``DelayQueue``s (if set to ``True``), or only through *all*
                 ``DelayQueue`` (if set to ``False``), resulting in needed delays to avoid
-                hitting specified limits. Defaults to ``True``.
+                hitting specified limits. Defaults to ``False``.
 
         Notes:
             Method is designed to accept ``telegram.utils.promise.Promise`` as ``promise``

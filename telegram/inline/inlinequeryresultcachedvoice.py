@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@
 """This module contains the classes that represent Telegram InlineQueryResultCachedVoice."""
 
 from telegram import InlineQueryResult
+from telegram.utils.helpers import DEFAULT_NONE
 
 
 class InlineQueryResultCachedVoice(InlineQueryResult):
@@ -32,9 +33,9 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         voice_file_id (:obj:`str`): A valid file identifier for the voice message.
         title (:obj:`str`): Voice message title.
-        caption (:obj:`str`): Optional. Caption, 0-200 characters.
+        caption (:obj:`str`): Optional. Caption, 0-1024 characters after entities parsing.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
@@ -45,9 +46,9 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         voice_file_id (:obj:`str`): A valid file identifier for the voice message.
         title (:obj:`str`): Voice message title.
-        caption (:obj:`str`, optional): Caption, 0-200 characters.
+        caption (:obj:`str`, optional): Caption, 0-1024 characters after entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
@@ -64,7 +65,7 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
                  caption=None,
                  reply_markup=None,
                  input_message_content=None,
-                 parse_mode=None,
+                 parse_mode=DEFAULT_NONE,
                  **kwargs):
         # Required
         super(InlineQueryResultCachedVoice, self).__init__('voice', id)
@@ -72,11 +73,7 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
         self.title = title
 
         # Optionals
-        if caption:
-            self.caption = caption
-        if parse_mode:
-            self.parse_mode = parse_mode
-        if reply_markup:
-            self.reply_markup = reply_markup
-        if input_message_content:
-            self.input_message_content = input_message_content
+        self.caption = caption
+        self.parse_mode = parse_mode
+        self.reply_markup = reply_markup
+        self.input_message_content = input_message_content

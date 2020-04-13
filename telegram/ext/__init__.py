@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,16 +18,20 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Extensions over the Telegram Bot API to facilitate bot making"""
 
+from .basepersistence import BasePersistence
+from .picklepersistence import PicklePersistence
+from .dictpersistence import DictPersistence
+from .handler import Handler
+from .callbackcontext import CallbackContext
 from .dispatcher import Dispatcher, DispatcherHandlerStop, run_async
 from .jobqueue import JobQueue, Job
 from .updater import Updater
 from .callbackqueryhandler import CallbackQueryHandler
 from .choseninlineresulthandler import ChosenInlineResultHandler
-from .commandhandler import CommandHandler
-from .handler import Handler
 from .inlinequeryhandler import InlineQueryHandler
-from .messagehandler import MessageHandler
 from .filters import BaseFilter, Filters
+from .messagehandler import MessageHandler
+from .commandhandler import CommandHandler, PrefixHandler
 from .regexhandler import RegexHandler
 from .stringcommandhandler import StringCommandHandler
 from .stringregexhandler import StringRegexHandler
@@ -37,10 +41,15 @@ from .precheckoutqueryhandler import PreCheckoutQueryHandler
 from .shippingqueryhandler import ShippingQueryHandler
 from .messagequeue import MessageQueue
 from .messagequeue import DelayQueue
+from .pollanswerhandler import PollAnswerHandler
+from .pollhandler import PollHandler
+from .defaults import Defaults
 
 __all__ = ('Dispatcher', 'JobQueue', 'Job', 'Updater', 'CallbackQueryHandler',
            'ChosenInlineResultHandler', 'CommandHandler', 'Handler', 'InlineQueryHandler',
            'MessageHandler', 'BaseFilter', 'Filters', 'RegexHandler', 'StringCommandHandler',
            'StringRegexHandler', 'TypeHandler', 'ConversationHandler',
            'PreCheckoutQueryHandler', 'ShippingQueryHandler', 'MessageQueue', 'DelayQueue',
-           'DispatcherHandlerStop', 'run_async')
+           'DispatcherHandlerStop', 'run_async', 'CallbackContext', 'BasePersistence',
+           'PicklePersistence', 'DictPersistence', 'PrefixHandler', 'PollAnswerHandler',
+           'PollHandler', 'Defaults')

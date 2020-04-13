@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,7 @@ from telegram import (InlineKeyboardMarkup, InlineQueryResultAudio, InlineQueryR
 @pytest.fixture(scope='class')
 def inline_query_result_article():
     return InlineQueryResultArticle(
-        TestInlineQueryResultArticle.id,
+        TestInlineQueryResultArticle.id_,
         TestInlineQueryResultArticle.title,
         input_message_content=TestInlineQueryResultArticle.input_message_content,
         reply_markup=TestInlineQueryResultArticle.reply_markup,
@@ -39,8 +39,8 @@ def inline_query_result_article():
 
 
 class TestInlineQueryResultArticle(object):
-    id = 'id'
-    type = 'article'
+    id_ = 'id'
+    type_ = 'article'
     title = 'title'
     input_message_content = InputTextMessageContent('input_message_content')
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
@@ -52,11 +52,11 @@ class TestInlineQueryResultArticle(object):
     thumb_width = 15
 
     def test_expected_values(self, inline_query_result_article):
-        assert inline_query_result_article.type == self.type
-        assert inline_query_result_article.id == self.id
+        assert inline_query_result_article.type == self.type_
+        assert inline_query_result_article.id == self.id_
         assert inline_query_result_article.title == self.title
-        assert (inline_query_result_article.input_message_content.to_dict() ==
-                self.input_message_content.to_dict())
+        assert (inline_query_result_article.input_message_content.to_dict()
+                == self.input_message_content.to_dict())
         assert inline_query_result_article.reply_markup.to_dict() == self.reply_markup.to_dict()
         assert inline_query_result_article.url == self.url
         assert inline_query_result_article.hide_url == self.hide_url
@@ -72,27 +72,27 @@ class TestInlineQueryResultArticle(object):
         assert inline_query_result_article_dict['type'] == inline_query_result_article.type
         assert inline_query_result_article_dict['id'] == inline_query_result_article.id
         assert inline_query_result_article_dict['title'] == inline_query_result_article.title
-        assert (inline_query_result_article_dict['input_message_content'] ==
-                inline_query_result_article.input_message_content.to_dict())
-        assert (inline_query_result_article_dict['reply_markup'] ==
-                inline_query_result_article.reply_markup.to_dict())
+        assert (inline_query_result_article_dict['input_message_content']
+                == inline_query_result_article.input_message_content.to_dict())
+        assert (inline_query_result_article_dict['reply_markup']
+                == inline_query_result_article.reply_markup.to_dict())
         assert inline_query_result_article_dict['url'] == inline_query_result_article.url
         assert inline_query_result_article_dict['hide_url'] == inline_query_result_article.hide_url
-        assert (inline_query_result_article_dict['description'] ==
-                inline_query_result_article.description)
-        assert (inline_query_result_article_dict['thumb_url'] ==
-                inline_query_result_article.thumb_url)
-        assert (inline_query_result_article_dict['thumb_height'] ==
-                inline_query_result_article.thumb_height)
-        assert (inline_query_result_article_dict['thumb_width'] ==
-                inline_query_result_article.thumb_width)
+        assert (inline_query_result_article_dict['description']
+                == inline_query_result_article.description)
+        assert (inline_query_result_article_dict['thumb_url']
+                == inline_query_result_article.thumb_url)
+        assert (inline_query_result_article_dict['thumb_height']
+                == inline_query_result_article.thumb_height)
+        assert (inline_query_result_article_dict['thumb_width']
+                == inline_query_result_article.thumb_width)
 
     def test_equality(self):
-        a = InlineQueryResultArticle(self.id, self.title, self.input_message_content)
-        b = InlineQueryResultArticle(self.id, self.title, self.input_message_content)
-        c = InlineQueryResultArticle(self.id, '', self.input_message_content)
+        a = InlineQueryResultArticle(self.id_, self.title, self.input_message_content)
+        b = InlineQueryResultArticle(self.id_, self.title, self.input_message_content)
+        c = InlineQueryResultArticle(self.id_, '', self.input_message_content)
         d = InlineQueryResultArticle('', self.title, self.input_message_content)
-        e = InlineQueryResultAudio(self.id, '', '')
+        e = InlineQueryResultAudio(self.id_, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

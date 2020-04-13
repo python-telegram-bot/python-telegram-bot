@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,11 +17,14 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram File."""
+from base64 import b64decode
 from os.path import basename
+import os
 
 from future.backports.urllib import parse as urllib_parse
 
 from telegram import TelegramObject
+from telegram.passport.credentials import decrypt
 
 
 class File(TelegramObject):
@@ -35,29 +38,45 @@ class File(TelegramObject):
 
     Attributes:
         file_id (:obj:`str`): Unique identifier for this file.
+        file_unique_id (:obj:`str`): Unique identifier for this file, which
+            is supposed to be the same over time and for different bots.
+            Can't be used to download or reuse the file.
         file_size (:obj:`str`): Optional. File size.
         file_path (:obj:`str`): Optional. File path. Use :attr:`download` to get the file.
 
     Args:
-        file_id (:obj:`str`): Unique identifier for this file.
+        file_id (:obj:`str`): Identifier for this file, which can be used to download
+            or reuse the file.
+        file_unique_id (:obj:`str`): Unique and the same over time and
+            for different bots file identifier.
         file_size (:obj:`int`, optional): Optional. File size, if known.
         file_path (:obj:`str`, optional): File path. Use :attr:`download` to get the file.
         bot (:obj:`telegram.Bot`, optional): Bot to use with shortcut method.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
+    Note:
+        If you obtain an instance of this class from :attr:`telegram.PassportFile.get_file`,
+        then it will automatically be decrypted as it downloads when you call :attr:`download()`.
+
     """
 
-    def __init__(self, file_id, bot=None, file_size=None, file_path=None, **kwargs):
+    def __init__(self,
+                 file_id,
+                 file_unique_id,
+                 bot=None,
+                 file_size=None,
+                 file_path=None,
+                 **kwargs):
         # Required
         self.file_id = str(file_id)
-
+        self.file_unique_id = str(file_unique_id)
         # Optionals
         self.file_size = file_size
         self.file_path = file_path
-
         self.bot = bot
+        self._credentials = None
 
-        self._id_attrs = (self.file_id,)
+        self._id_attrs = (self.file_unique_id,)
 
     @classmethod
     def de_json(cls, data, bot):
@@ -69,9 +88,10 @@ class File(TelegramObject):
     def download(self, custom_path=None, out=None, timeout=None):
         """
         Download this file. By default, the file is saved in the current working directory with its
-        original filename as reported by Telegram. If a :attr:`custom_path` is supplied, it will be
-        saved to that path instead. If :attr:`out` is defined, the file contents will be saved to
-        that object using the ``out.write`` method.
+        original filename as reported by Telegram. If the file has no filename, it the file ID will
+        be used as filename. If a :attr:`custom_path` is supplied, it will be saved to that path
+        instead. If :attr:`out` is defined, the file contents will be saved to that object using
+        the ``out.write`` method.
 
         Note:
             :attr:`custom_path` and :attr:`out` are mutually exclusive.
@@ -100,15 +120,27 @@ class File(TelegramObject):
 
         if out:
             buf = self.bot.request.retrieve(url)
+            if self._credentials:
+                buf = decrypt(b64decode(self._credentials.secret),
+                              b64decode(self._credentials.hash),
+                              buf)
             out.write(buf)
             return out
         else:
             if custom_path:
                 filename = custom_path
-            else:
+            elif self.file_path:
                 filename = basename(self.file_path)
+            else:
+                filename = os.path.join(os.getcwd(), self.file_id)
 
-            self.bot.request.download(url, filename, timeout=timeout)
+            buf = self.bot.request.retrieve(url, timeout=timeout)
+            if self._credentials:
+                buf = decrypt(b64decode(self._credentials.secret),
+                              b64decode(self._credentials.hash),
+                              buf)
+            with open(filename, 'wb') as fobj:
+                fobj.write(buf)
             return filename
 
     def _get_encoded_url(self):
@@ -133,3 +165,6 @@ class File(TelegramObject):
 
         buf.extend(self.bot.request.retrieve(self._get_encoded_url()))
         return buf
+
+    def set_credentials(self, credentials):
+        self._credentials = credentials

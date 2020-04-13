@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,7 @@ from telegram import (InlineKeyboardMarkup, InlineKeyboardButton, InlineQueryRes
 @pytest.fixture(scope='class')
 def inline_query_result_audio():
     return InlineQueryResultAudio(
-        TestInlineQueryResultAudio.id,
+        TestInlineQueryResultAudio.id_,
         TestInlineQueryResultAudio.audio_url,
         TestInlineQueryResultAudio.title,
         performer=TestInlineQueryResultAudio.performer,
@@ -38,8 +38,8 @@ def inline_query_result_audio():
 
 
 class TestInlineQueryResultAudio(object):
-    id = 'id'
-    type = 'audio'
+    id_ = 'id'
+    type_ = 'audio'
     audio_url = 'audio url'
     title = 'title'
     performer = 'performer'
@@ -50,16 +50,16 @@ class TestInlineQueryResultAudio(object):
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
     def test_expected_values(self, inline_query_result_audio):
-        assert inline_query_result_audio.type == self.type
-        assert inline_query_result_audio.id == self.id
+        assert inline_query_result_audio.type == self.type_
+        assert inline_query_result_audio.id == self.id_
         assert inline_query_result_audio.audio_url == self.audio_url
         assert inline_query_result_audio.title == self.title
         assert inline_query_result_audio.performer == self.performer
         assert inline_query_result_audio.audio_duration == self.audio_duration
         assert inline_query_result_audio.caption == self.caption
         assert inline_query_result_audio.parse_mode == self.parse_mode
-        assert (inline_query_result_audio.input_message_content.to_dict() ==
-                self.input_message_content.to_dict())
+        assert (inline_query_result_audio.input_message_content.to_dict()
+                == self.input_message_content.to_dict())
         assert inline_query_result_audio.reply_markup.to_dict() == self.reply_markup.to_dict()
 
     def test_to_dict(self, inline_query_result_audio):
@@ -71,21 +71,21 @@ class TestInlineQueryResultAudio(object):
         assert inline_query_result_audio_dict['audio_url'] == inline_query_result_audio.audio_url
         assert inline_query_result_audio_dict['title'] == inline_query_result_audio.title
         assert inline_query_result_audio_dict['performer'] == inline_query_result_audio.performer
-        assert (inline_query_result_audio_dict['audio_duration'] ==
-                inline_query_result_audio.audio_duration)
+        assert (inline_query_result_audio_dict['audio_duration']
+                == inline_query_result_audio.audio_duration)
         assert inline_query_result_audio_dict['caption'] == inline_query_result_audio.caption
         assert inline_query_result_audio_dict['parse_mode'] == inline_query_result_audio.parse_mode
-        assert (inline_query_result_audio_dict['input_message_content'] ==
-                inline_query_result_audio.input_message_content.to_dict())
-        assert (inline_query_result_audio_dict['reply_markup'] ==
-                inline_query_result_audio.reply_markup.to_dict())
+        assert (inline_query_result_audio_dict['input_message_content']
+                == inline_query_result_audio.input_message_content.to_dict())
+        assert (inline_query_result_audio_dict['reply_markup']
+                == inline_query_result_audio.reply_markup.to_dict())
 
     def test_equality(self):
-        a = InlineQueryResultAudio(self.id, self.audio_url, self.title)
-        b = InlineQueryResultAudio(self.id, self.title, self.title)
-        c = InlineQueryResultAudio(self.id, '', self.title)
+        a = InlineQueryResultAudio(self.id_, self.audio_url, self.title)
+        b = InlineQueryResultAudio(self.id_, self.title, self.title)
+        c = InlineQueryResultAudio(self.id_, '', self.title)
         d = InlineQueryResultAudio('', self.audio_url, self.title)
-        e = InlineQueryResultVoice(self.id, '', '')
+        e = InlineQueryResultVoice(self.id_, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

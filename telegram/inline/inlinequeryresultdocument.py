@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@
 """This module contains the classes that represent Telegram InlineQueryResultDocument"""
 
 from telegram import InlineQueryResult
+from telegram.utils.helpers import DEFAULT_NONE
 
 
 class InlineQueryResultDocument(InlineQueryResult):
@@ -32,9 +33,10 @@ class InlineQueryResultDocument(InlineQueryResult):
         type (:obj:`str`): 'document'.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         title (:obj:`str`): Title for the result.
-        caption (:obj:`str`): Optional. Caption, 0-200 characters
+        caption (:obj:`str`): Optional. Caption of the document to be sent, 0-1024 characters
+            after entities parsing.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
         document_url (:obj:`str`): A valid URL for the file.
         mime_type (:obj:`str`): Mime type of the content of the file, either "application/pdf"
@@ -51,17 +53,18 @@ class InlineQueryResultDocument(InlineQueryResult):
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         title (:obj:`str`): Title for the result.
-        caption (:obj:`str`, optional): Caption, 0-200 characters
+        caption (:obj:`str`, optional): Caption of the document to be sent, 0-1024 characters
+            after entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
         document_url (:obj:`str`): A valid URL for the file.
         mime_type (:obj:`str`): Mime type of the content of the file, either "application/pdf"
             or "application/zip".
         description (:obj:`str`, optional): Short description of the result.
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
-        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
+        input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the file.
         thumb_url (:obj:`str`, optional): URL of the thumbnail (jpeg only) for the file.
         thumb_width (:obj:`int`, optional): Thumbnail width.
@@ -82,7 +85,7 @@ class InlineQueryResultDocument(InlineQueryResult):
                  thumb_url=None,
                  thumb_width=None,
                  thumb_height=None,
-                 parse_mode=None,
+                 parse_mode=DEFAULT_NONE,
                  **kwargs):
         # Required
         super(InlineQueryResultDocument, self).__init__('document', id)
@@ -91,19 +94,11 @@ class InlineQueryResultDocument(InlineQueryResult):
         self.mime_type = mime_type
 
         # Optionals
-        if caption:
-            self.caption = caption
-        if parse_mode:
-            self.parse_mode = parse_mode
-        if description:
-            self.description = description
-        if reply_markup:
-            self.reply_markup = reply_markup
-        if input_message_content:
-            self.input_message_content = input_message_content
-        if thumb_url:
-            self.thumb_url = thumb_url
-        if thumb_width:
-            self.thumb_width = thumb_width
-        if thumb_height:
-            self.thumb_height = thumb_height
+        self.caption = caption
+        self.parse_mode = parse_mode
+        self.description = description
+        self.reply_markup = reply_markup
+        self.input_message_content = input_message_content
+        self.thumb_url = thumb_url
+        self.thumb_width = thumb_width
+        self.thumb_height = thumb_height
