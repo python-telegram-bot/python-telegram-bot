@@ -17,4 +17,28 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-__version__ = '12.6.1'
+import pytest
+
+from telegram import Dice
+
+
+@pytest.fixture(scope="class")
+def dice():
+    return Dice(value=5)
+
+
+class TestDice(object):
+    value = 4
+
+    def test_de_json(self, bot):
+        json_dict = {'value': self.value}
+        dice = Dice.de_json(json_dict, bot)
+
+        assert dice.value == self.value
+        assert Dice.de_json(None, bot) is None
+
+    def test_to_dict(self, dice):
+        dice_dict = dice.to_dict()
+
+        assert isinstance(dice_dict, dict)
+        assert dice_dict['value'] == dice.value

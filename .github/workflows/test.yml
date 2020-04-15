@@ -26,7 +26,7 @@ jobs:
             test-build: True
       fail-fast: False
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Initialize vendored libs
         run:
           git submodule update --init --recursive
@@ -73,7 +73,7 @@ jobs:
         os: [ubuntu-latest]
       fail-fast: False
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Initialize vendored libs
         run:
           git submodule update --init --recursive
@@ -102,7 +102,7 @@ jobs:
         os: [ubuntu-latest]
       fail-fast: False
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Initialize vendored libs
         run:
           git submodule update --init --recursive

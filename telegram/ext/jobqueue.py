@@ -129,10 +129,11 @@ class JobQueue(object):
                 * :obj:`datetime.timedelta` will be interpreted as "time from now" in which the
                   job should run.
                 * :obj:`datetime.datetime` will be interpreted as a specific date and time at
-                  which the job should run.
+                  which the job should run. If the timezone (``datetime.tzinfo``) is ``None``, UTC
+                  will be assumed.
                 * :obj:`datetime.time` will be interpreted as a specific time of day at which the
                   job should run. This could be either today or, if the time has already passed,
-                  tomorrow.
+                  tomorrow. If the timezone (``time.tzinfo``) is ``None``, UTC will be assumed.
 
             context (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through ``job.context`` in the callback. Defaults to ``None``.
@@ -172,10 +173,11 @@ class JobQueue(object):
                 * :obj:`datetime.timedelta` will be interpreted as "time from now" in which the
                   job should run.
                 * :obj:`datetime.datetime` will be interpreted as a specific date and time at
-                  which the job should run.
+                  which the job should run. If the timezone (``datetime.tzinfo``) is ``None``, UTC
+                  will be assumed.
                 * :obj:`datetime.time` will be interpreted as a specific time of day at which the
                   job should run. This could be either today or, if the time has already passed,
-                  tomorrow.
+                  tomorrow. If the timezone (``time.tzinfo``) is ``None``, UTC will be assumed.
 
                 Defaults to ``interval``
             context (:obj:`object`, optional): Additional data needed for the callback function.
@@ -285,9 +287,10 @@ class JobQueue(object):
             if job.enabled:
                 try:
                     current_week_day = datetime.datetime.now(job.tzinfo).date().weekday()
-                    if any(day == current_week_day for day in job.days):
+                    if current_week_day in job.days:
                         self.logger.debug('Running job %s', job.name)
                         job.run(self._dispatcher)
+                        self._dispatcher.update_persistence()
 
                 except Exception:
                     self.logger.exception('An uncaught error was raised while executing job %s',
@@ -400,7 +403,7 @@ class Job(object):
                  days=Days.EVERY_DAY,
                  name=None,
                  job_queue=None,
-                 tzinfo=_UTC):
+                 tzinfo=None):
 
         self.callback = callback
         self.context = context
@@ -413,7 +416,7 @@ class Job(object):
 
         self._days = None
         self.days = days
-        self.tzinfo = tzinfo
+        self.tzinfo = tzinfo or _UTC
 
         self._job_queue = weakref.proxy(job_queue) if job_queue is not None else None
 

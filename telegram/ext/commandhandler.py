@@ -302,6 +302,10 @@ class PrefixHandler(CommandHandler):
                  pass_user_data=False,
                  pass_chat_data=False):
 
+        self._prefix = list()
+        self._command = list()
+        self._commands = list()
+
         super(PrefixHandler, self).__init__(
             'nocommand', callback, filters=filters, allow_edited=None, pass_args=pass_args,
             pass_update_queue=pass_update_queue,
@@ -309,15 +313,36 @@ class PrefixHandler(CommandHandler):
             pass_user_data=pass_user_data,
             pass_chat_data=pass_chat_data)
 
+        self.prefix = prefix
+        self.command = command
+        self._build_commands()
+
+    @property
+    def prefix(self):
+        return self._prefix
+
+    @prefix.setter
+    def prefix(self, prefix):
         if isinstance(prefix, string_types):
-            self.prefix = [prefix.lower()]
+            self._prefix = [prefix.lower()]
         else:
-            self.prefix = prefix
+            self._prefix = prefix
+        self._build_commands()
+
+    @property
+    def command(self):
+        return self._command
+
+    @command.setter
+    def command(self, command):
         if isinstance(command, string_types):
-            self.command = [command.lower()]
+            self._command = [command.lower()]
         else:
-            self.command = command
-        self.command = [x.lower() + y.lower() for x in self.prefix for y in self.command]
+            self._command = command
+        self._build_commands()
+
+    def _build_commands(self):
+        self._commands = [x.lower() + y.lower() for x in self.prefix for y in self.command]
 
     def check_update(self, update):
         """Determines whether an update should be passed to this handlers :attr:`callback`.
@@ -334,7 +359,7 @@ class PrefixHandler(CommandHandler):
 
             if message.text:
                 text_list = message.text.split()
-                if text_list[0].lower() not in self.command:
+                if text_list[0].lower() not in self._commands:
                     return None
                 filter_result = self.filters(update)
                 if filter_result:
