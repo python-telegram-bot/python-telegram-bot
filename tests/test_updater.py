@@ -225,6 +225,7 @@ class TestUpdater(object):
             updater.stop()
 
     def test_webhook_invalid_callback_data(self, monkeypatch, updater):
+        updater.bot.arbitrary_callback_data = True
         q = Queue()
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
         monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
@@ -265,6 +266,9 @@ class TestUpdater(object):
             sleep(.2)
             assert not updater.httpd.is_running
             updater.stop()
+
+        # Reset b/c bots scope is session
+        updater.bot.arbitrary_callback_data = False
 
     def test_webhook_ssl(self, monkeypatch, updater):
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)

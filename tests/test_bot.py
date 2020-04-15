@@ -106,6 +106,15 @@ class TestBot(object):
         if bot.last_name:
             assert to_dict_bot["last_name"] == bot.last_name
 
+    def test_validate_callback_data_warning(self, bot, recwarn):
+        Bot(bot.token, arbitrary_callback_data=True, validate_callback_data=False)
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message) == (
+            "If 'validate_callback_data' is False, incoming callback data wont be"
+            "validated. Use only if you revoked your bot token and set to true"
+            "after a few days."
+        )
+
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_forward_message(self, bot, chat_id, message):
@@ -525,6 +534,7 @@ class TestBot(object):
                            message=Message(1, User(1, '', False), None, Chat(1, ''),
                                            text='Webhook'))).to_dict()]
 
+        bot.arbitrary_callback_data = True
         monkeypatch.setattr('telegram.utils.request.Request.post', post)
         bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
         updates = bot.get_updates(timeout=1)
@@ -532,6 +542,9 @@ class TestBot(object):
         assert isinstance(updates, list)
         assert isinstance(updates[0], InvalidCallbackData)
         assert updates[0].update_id == 17
+
+        # Reset b/c bots scope is session
+        bot.arbitrary_callback_data = False
 
     @pytest.mark.parametrize('default_bot', [{'quote': True}], indirect=True)
     def test_get_updates_default_quote(self, default_bot, monkeypatch):

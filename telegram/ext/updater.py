@@ -89,14 +89,20 @@ class Updater(object):
             used).
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
             be used if not set explicitly in the bot methods.
+        arbitrary_callback_data (:obj:`bool`, optional): Whether to allow arbitrary objects as
+            callback data for :class:`telegram.InlineKeyboardButton`. For more info, please see
+            our wiki. Defaults to :obj:`False`.
         validate_callback_data (:obj:`bool`, optional): Whether the callback data of
-            :class:`telegram.CallbackQuery` updates recieved by the bot should be validated. For
-            more info, please see our wiki. Defaults to :obj:`True`.
+            :class:`telegram.CallbackQuery` updates received by the bot should be validated. Only
+            relevant, if :attr:`arbitrary_callback_data` as :obj:`True`. For more info, please see
+            our wiki. Defaults to :obj:`True`.
 
     Note:
         * You must supply either a :attr:`bot` or a :attr:`token` argument.
         * If you supply a :attr:`bot`, you will need to pass :attr:`defaults` to *both* the bot and
           the :class:`telegram.ext.Updater`.
+        * If you supply a :attr:`bot`, you will need to pass :attr:`arbitrary_callback_data` and
+          :attr:`validate_callback_data` to the bot instead of the :class:`telegram.ext.Updater`.
 
     Raises:
         ValueError: If both :attr:`token` and :attr:`bot` are passed or none of them.
@@ -119,6 +125,7 @@ class Updater(object):
                  use_context=False,
                  dispatcher=None,
                  base_file_url=None,
+                 arbitrary_callback_data=False,
                  validate_callback_data=True):
 
         if dispatcher is None:
@@ -168,6 +175,7 @@ class Updater(object):
                                private_key=private_key,
                                private_key_password=private_key_password,
                                defaults=defaults,
+                               arbitrary_callback_data=arbitrary_callback_data,
                                validate_callback_data=validate_callback_data)
             self.update_queue = Queue()
             self.job_queue = JobQueue()

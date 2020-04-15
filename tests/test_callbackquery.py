@@ -57,7 +57,7 @@ class TestCallbackQuery(object):
                      'inline_message_id': self.inline_message_id,
                      'game_short_name': self.game_short_name,
                      'default_quote': True}
-        callback_query = CallbackQuery.de_json(json_dict, bot, data_is_signed=False)
+        callback_query = CallbackQuery.de_json(json_dict, bot)
 
         assert callback_query.id == self.id_
         assert callback_query.from_user == self.from_user
@@ -69,6 +69,7 @@ class TestCallbackQuery(object):
         assert callback_query.game_short_name == self.game_short_name
 
     def test_de_json_malicious_callback_data(self, bot):
+        bot.arbitrary_callback_data = True
         signed_data = sign_callback_data(123456, 'callback_data', bot)
         json_dict = {'id': self.id_,
                      'from': self.from_user.to_dict(),

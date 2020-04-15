@@ -88,9 +88,9 @@ class Bot(TelegramObject):
         private_key_password (:obj:`bytes`, optional): Password for above private key.
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
             be used if not set explicitly in the bot methods.
-        validate_callback_data (:obj:`bool`, optional): Whether the callback data of
-            :class:`telegram.CallbackQuery` updates recieved by this bot should be validated. For
-            more info, please see our wiki. Defaults to :obj:`True`.
+        arbitrary_callback_data (:obj:`bool`, optional): Whether to allow arbitrary objects as
+            callback data for :class:`telegram.InlineKeyboardButton`. For more info, please see
+            our wiki. Defaults to :obj:`False`.
 
     """
 
@@ -133,6 +133,7 @@ class Bot(TelegramObject):
                  private_key=None,
                  private_key_password=None,
                  defaults=None,
+                 arbitrary_callback_data=False,
                  validate_callback_data=True):
         self.token = self._validate_token(token)
 
@@ -141,7 +142,13 @@ class Bot(TelegramObject):
 
         # Dictionary for callback_data
         self.callback_data = {}
+        self.arbitrary_callback_data = arbitrary_callback_data
         self.validate_callback_data = validate_callback_data
+
+        if self.arbitrary_callback_data and not self.validate_callback_data:
+            warnings.warn("If 'validate_callback_data' is False, incoming callback data wont be"
+                          "validated. Use only if you revoked your bot token and set to true"
+                          "after a few days.")
 
         if base_url is None:
             base_url = 'https://api.telegram.org/bot'
@@ -181,7 +188,8 @@ class Bot(TelegramObject):
         if reply_markup is not None:
             if isinstance(reply_markup, ReplyMarkup):
                 # Replace callback data by their signed id
-                _replace_callback_data(reply_markup, data['chat_id'])
+                if self.arbitrary_callback_data:
+                    _replace_callback_data(reply_markup, data['chat_id'])
                 # We need to_json() instead of to_dict() here, because reply_markups may be
                 # attached to media messages, which aren't json dumped by utils.request
                 data['reply_markup'] = reply_markup.to_json()
