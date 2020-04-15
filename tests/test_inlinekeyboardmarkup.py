@@ -151,7 +151,15 @@ class TestInlineKeyboardMarkup(object):
             InlineKeyboardButton(label, url=label)
             for label in ['button1', 'button2', 'button3']
         ])
-        f = ReplyKeyboardMarkup.from_column(['button1', 'button2', 'button3'])
+        f = InlineKeyboardMarkup([
+            [InlineKeyboardButton(label, callback_data='data')
+             for label in ['button1', 'button2']],
+            [InlineKeyboardButton(label, callback_data='data')
+             for label in ['button1', 'button2']],
+            [InlineKeyboardButton(label, callback_data='data')
+             for label in ['button1', 'button2']]
+        ])
+        g = ReplyKeyboardMarkup.from_column(['button1', 'button2', 'button3'])
 
         assert a == b
         assert hash(a) == hash(b)
@@ -167,3 +175,6 @@ class TestInlineKeyboardMarkup(object):
 
         assert a != f
         assert hash(a) != hash(f)
+
+        assert a != g
+        assert hash(a) != hash(g)

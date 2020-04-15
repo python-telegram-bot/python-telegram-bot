@@ -114,7 +114,8 @@ class TestReplyKeyboardMarkup(object):
         ])
         c = ReplyKeyboardMarkup.from_column(['button1', 'button2'])
         d = ReplyKeyboardMarkup.from_column(['button1', 'button2', 'button3.1'])
-        e = InlineKeyboardMarkup.from_column(['button1', 'button2', 'button3'])
+        e = ReplyKeyboardMarkup([['button1', 'button1'], ['button2'], ['button3.1']])
+        f = InlineKeyboardMarkup.from_column(['button1', 'button2', 'button3'])
 
         assert a == b
         assert hash(a) == hash(b)
@@ -127,3 +128,6 @@ class TestReplyKeyboardMarkup(object):
 
         assert a != e
         assert hash(a) != hash(e)
+
+        assert a != f
+        assert hash(a) != hash(f)

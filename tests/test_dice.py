@@ -19,7 +19,7 @@
 
 import pytest
 
-from telegram import Dice
+from telegram import Dice, BotCommand
 
 
 @pytest.fixture(scope="class")
@@ -42,3 +42,18 @@ class TestDice(object):
 
         assert isinstance(dice_dict, dict)
         assert dice_dict['value'] == dice.value
+
+    def test_equality(self):
+        a = Dice(3)
+        b = Dice(3)
+        c = Dice(4)
+        d = BotCommand('start', 'description')
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)

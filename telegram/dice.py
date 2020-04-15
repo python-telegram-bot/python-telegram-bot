@@ -35,6 +35,8 @@ class Dice(TelegramObject):
     def __init__(self, value, **kwargs):
         self.value = value
 
+        self._id_attrs = (self.value,)
+
     @classmethod
     def de_json(cls, data, bot):
         if not data:

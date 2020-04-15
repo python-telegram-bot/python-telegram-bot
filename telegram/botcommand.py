@@ -38,6 +38,8 @@ class BotCommand(TelegramObject):
         self.command = command
         self.description = description
 
+        self._id_attrs = (self.command, self.description)
+
     @classmethod
     def de_json(cls, data, bot):
         if not data:
