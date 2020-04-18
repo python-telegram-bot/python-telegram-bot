@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -95,13 +95,14 @@ class JobQueue(object):
 
         """
         # get time at which to run:
-        time_spec = time_spec or job.interval
+        if time_spec is None:
+            time_spec = job.interval
         if time_spec is None:
             raise ValueError("no time specification given for scheduling non-repeating job")
         next_t = to_float_timestamp(time_spec, reference_timestamp=previous_t)
 
         # enqueue:
-        self.logger.debug('Putting job %s with t=%f', job.name, time_spec)
+        self.logger.debug('Putting job %s with t=%s', job.name, time_spec)
         self._queue.put((next_t, job))
         job.next_t = next_t
 
@@ -113,9 +114,12 @@ class JobQueue(object):
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
-                job. It should take ``bot, job`` as parameters, where ``job`` is the
-                :class:`telegram.ext.Job` instance. It can be used to access its
-                ``job.context`` or change it to a repeating job.
+                job. Callback signature for context based API:
+
+                    ``def callback(CallbackContext)``
+
+                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
+                its ``job.context`` or change it to a repeating job.
             when (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |                         \
                   :obj:`datetime.datetime` | :obj:`datetime.time`):
                 Time in or at which the job should run. This parameter will be interpreted
@@ -126,10 +130,11 @@ class JobQueue(object):
                 * :obj:`datetime.timedelta` will be interpreted as "time from now" in which the
                   job should run.
                 * :obj:`datetime.datetime` will be interpreted as a specific date and time at
-                  which the job should run.
+                  which the job should run. If the timezone (``datetime.tzinfo``) is ``None``, UTC
+                  will be assumed.
                 * :obj:`datetime.time` will be interpreted as a specific time of day at which the
                   job should run. This could be either today or, if the time has already passed,
-                  tomorrow.
+                  tomorrow. If the timezone (``time.tzinfo``) is ``None``, UTC will be assumed.
 
                 If ``when`` is :obj:`datetime.datetime` or :obj:`datetime.datetime` type
                 then ``when.tzinfo`` will define ``Job.tzinfo``. Otherwise UTC will be assumed.
@@ -160,9 +165,12 @@ class JobQueue(object):
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
-                job. It should take ``bot, job`` as parameters, where ``job`` is the
-                :class:`telegram.ext.Job` instance. It can be used to access its
-                ``Job.context`` or change it to a repeating job.
+                job. Callback signature for context based API:
+
+                    ``def callback(CallbackContext)``
+
+                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
+                its ``job.context`` or change it to a repeating job.
             interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta`): The interval in which
                 the job will run. If it is an :obj:`int` or a :obj:`float`, it will be interpreted
                 as seconds.
@@ -176,10 +184,11 @@ class JobQueue(object):
                 * :obj:`datetime.timedelta` will be interpreted as "time from now" in which the
                   job should run.
                 * :obj:`datetime.datetime` will be interpreted as a specific date and time at
-                  which the job should run.
+                  which the job should run. If the timezone (``datetime.tzinfo``) is ``None``, UTC
+                  will be assumed.
                 * :obj:`datetime.time` will be interpreted as a specific time of day at which the
                   job should run. This could be either today or, if the time has already passed,
-                  tomorrow.
+                  tomorrow. If the timezone (``time.tzinfo``) is ``None``, UTC will be assumed.
 
                 If ``first`` is :obj:`datetime.datetime` or :obj:`datetime.datetime` type
                 then ``first.tzinfo`` will define ``Job.tzinfo``. Otherwise UTC will be assumed.
@@ -217,9 +226,12 @@ class JobQueue(object):
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
-                job. It should take ``bot, job`` as parameters, where ``job`` is the
-                :class:`telegram.ext.Job` instance. It can be used to access its ``Job.context``
-                or change it to a repeating job.
+                job. Callback signature for context based API:
+
+                    ``def callback(CallbackContext)``
+
+                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
+                its ``job.context`` or change it to a repeating job.
             time (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
                 (``time.tzinfo``) is ``None``, UTC will be assumed.
                 ``time.tzinfo`` also defines ``Job.tzinfo``.
@@ -293,9 +305,10 @@ class JobQueue(object):
             if job.enabled:
                 try:
                     current_week_day = datetime.datetime.now(job.tzinfo).date().weekday()
-                    if any(day == current_week_day for day in job.days):
+                    if current_week_day in job.days:
                         self.logger.debug('Running job %s', job.name)
                         job.run(self._dispatcher)
+                        self._dispatcher.update_persistence()
 
                 except Exception:
                     self.logger.exception('An uncaught error was raised while executing job %s',
@@ -376,9 +389,12 @@ class Job(object):
 
     Args:
         callback (:obj:`callable`): The callback function that should be executed by the new job.
-            It should take ``bot, job`` as parameters, where ``job`` is the
-            :class:`telegram.ext.Job` instance. It can be used to access it's :attr:`context`
-            or change it to a repeating job.
+            Callback signature for context based API:
+
+                ``def callback(CallbackContext)``
+
+            a ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
+            its ``job.context`` or change it to a repeating job.
         interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta`, optional): The time
             interval between executions of the job. If it is an :obj:`int` or a :obj:`float`,
             it will be interpreted as seconds. If you don't set this value, you must set

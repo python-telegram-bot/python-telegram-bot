@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -37,8 +37,8 @@ class InlineQueryResultCachedSticker(InlineQueryResult):
             message to be sent instead of the sticker.
 
     Args:
-        id (:obj:`str`):
-        sticker_file_id (:obj:`str`):
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        sticker_file_id (:obj:`str`): A valid file identifier of the sticker.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the

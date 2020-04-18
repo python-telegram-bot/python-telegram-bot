@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -23,6 +23,11 @@ from telegram import TelegramObject
 
 class ChatPermissions(TelegramObject):
     """Describes actions that a non-administrator user is allowed to take in a chat.
+
+    Note:
+        Though not stated explicitly in the offical docs, Telegram changes not only the permissions
+        that are set, but also sets all the others to :obj:`False`. However, since not documented,
+        this behaviour may change unbeknown to PTB.
 
     Attributes:
         can_send_messages (:obj:`bool`): Optional. True, if the user is allowed to send text

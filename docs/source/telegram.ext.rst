@@ -5,12 +5,14 @@ telegram.ext package
 
     telegram.ext.updater
     telegram.ext.dispatcher
+    telegram.ext.dispatcherhandlerstop
     telegram.ext.filters
     telegram.ext.job
     telegram.ext.jobqueue
     telegram.ext.messagequeue
     telegram.ext.delayqueue
     telegram.ext.callbackcontext
+    telegram.ext.defaults
 
 Handlers
 --------
@@ -24,6 +26,8 @@ Handlers
     telegram.ext.commandhandler
     telegram.ext.inlinequeryhandler
     telegram.ext.messagehandler
+    telegram.ext.pollanswerhandler
+    telegram.ext.pollhandler
     telegram.ext.precheckoutqueryhandler
     telegram.ext.prefixhandler
     telegram.ext.regexhandler

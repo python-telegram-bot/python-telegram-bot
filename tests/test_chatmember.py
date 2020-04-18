@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -47,8 +47,11 @@ class TestChatMember(object):
 
     def test_de_json_all_args(self, bot, user):
         time = datetime.datetime.utcnow()
+        custom_title = 'custom_title'
+
         json_dict = {'user': user.to_dict(),
                      'status': self.status,
+                     'custom_title': custom_title,
                      'until_date': to_timestamp(time),
                      'can_be_edited': False,
                      'can_change_info': True,
@@ -69,6 +72,7 @@ class TestChatMember(object):
 
         assert chat_member.user == user
         assert chat_member.status == self.status
+        assert chat_member.custom_title == custom_title
         assert chat_member.can_be_edited is False
         assert chat_member.can_change_info is True
         assert chat_member.can_post_messages is False

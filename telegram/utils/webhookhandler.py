@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import sys
 import logging
 from telegram import Update
 from future.utils import bytes_to_native_str
@@ -27,7 +28,6 @@ except ImportError:
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 import tornado.web
-import tornado.iostream
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
@@ -71,8 +71,9 @@ class WebhookServer(object):
 
 class WebhookAppClass(tornado.web.Application):
 
-    def __init__(self, webhook_path, bot, update_queue):
-        self.shared_objects = {"bot": bot, "update_queue": update_queue}
+    def __init__(self, webhook_path, bot, update_queue, default_quote=None):
+        self.shared_objects = {"bot": bot, "update_queue": update_queue,
+                               "default_quote": default_quote}
         handlers = [
             (r"{0}/?".format(webhook_path), WebhookHandler,
              self.shared_objects)
@@ -90,10 +91,40 @@ class WebhookHandler(tornado.web.RequestHandler):
     def __init__(self, application, request, **kwargs):
         super(WebhookHandler, self).__init__(application, request, **kwargs)
         self.logger = logging.getLogger(__name__)
+        self._init_asyncio_patch()
 
-    def initialize(self, bot, update_queue):
+    def _init_asyncio_patch(self):
+        """set default asyncio policy to be compatible with tornado
+        Tornado 6 (at least) is not compatible with the default
+        asyncio implementation on Windows
+        Pick the older SelectorEventLoopPolicy on Windows
+        if the known-incompatible default policy is in use.
+        do this as early as possible to make it a low priority and overrideable
+        ref: https://github.com/tornadoweb/tornado/issues/2608
+        TODO: if/when tornado supports the defaults in asyncio,
+                remove and bump tornado requirement for py38
+        Copied from https://github.com/ipython/ipykernel/pull/456/
+        """
+        if sys.platform.startswith("win") and sys.version_info >= (3, 8):
+            import asyncio
+            try:
+                from asyncio import (
+                    WindowsProactorEventLoopPolicy,
+                    WindowsSelectorEventLoopPolicy,
+                )
+            except ImportError:
+                pass
+                # not affected
+            else:
+                if isinstance(asyncio.get_event_loop_policy(), WindowsProactorEventLoopPolicy):
+                    # WindowsProactorEventLoopPolicy is not compatible with tornado 6
+                    # fallback to the pre-3.8 default of Selector
+                    asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())
+
+    def initialize(self, bot, update_queue, default_quote=None):
         self.bot = bot
         self.update_queue = update_queue
+        self._default_quote = default_quote
 
     def set_default_headers(self):
         self.set_header("Content-Type", 'application/json; charset="utf-8"')
@@ -105,6 +136,7 @@ class WebhookHandler(tornado.web.RequestHandler):
         data = json.loads(json_string)
         self.set_status(200)
         self.logger.debug('Webhook received data: ' + json_string)
+        data['default_quote'] = self._default_quote
         update = Update.de_json(data, self.bot)
         self.logger.debug('Received Update with ID %d on Webhook' % update.update_id)
         self.update_queue.put(update)

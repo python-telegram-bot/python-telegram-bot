@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@
 """This module contains the classes that represent Telegram InlineQueryResultCachedVideo."""
 
 from telegram import InlineQueryResult
+from telegram.utils.helpers import DEFAULT_NONE
 
 
 class InlineQueryResultCachedVideo(InlineQueryResult):
@@ -34,7 +35,8 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
         video_file_id (:obj:`str`): A valid file identifier for the video file.
         title (:obj:`str`): Title for the result.
         description (:obj:`str`): Optional. Short description of the result.
-        caption (:obj:`str`): Optional. Caption, 0-1024 characters.
+        caption (:obj:`str`): Optional. Caption of the video to be sent, 0-1024 characters after
+            entities parsing.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
@@ -48,7 +50,8 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
         video_file_id (:obj:`str`): A valid file identifier for the video file.
         title (:obj:`str`): Title for the result.
         description (:obj:`str`, optional): Short description of the result.
-        caption (:obj:`str`, optional): Caption, 0-1024 characters.
+        caption (:obj:`str`, optional): Caption of the video to be sent, 0-1024 characters after
+            entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
@@ -68,7 +71,7 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
                  caption=None,
                  reply_markup=None,
                  input_message_content=None,
-                 parse_mode=None,
+                 parse_mode=DEFAULT_NONE,
                  **kwargs):
         # Required
         super(InlineQueryResultCachedVideo, self).__init__('video', id)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -41,7 +41,6 @@ def job_queue(bot, _dp):
     jq.stop()
 
 
-@pytest.mark.skipif(os.getenv('APPVEYOR'), reason="On Appveyor precise timings are not accurate.")
 @pytest.mark.skipif(os.getenv('GITHUB_ACTIONS', False) and os.name == 'nt',
                     reason="On windows precise timings are not accurate.")
 @flaky(10, 1)  # Timings aren't quite perfect
@@ -77,6 +76,7 @@ class TestJobQueue(object):
                 and context.job.context == 2
                 and context.chat_data is None
                 and context.user_data is None
+                and isinstance(context.bot_data, dict)
                 and context.job_queue is context.job.job_queue):
             self.result += 1
 
@@ -118,6 +118,11 @@ class TestJobQueue(object):
         sleep(0.15)
         assert self.result == 0
         sleep(0.07)
+        assert self.result == 1
+
+    def test_run_repeating_first_immediate(self, job_queue):
+        job_queue.run_repeating(self.job_run_once, 0.1, first=0)
+        sleep(0.05)
         assert self.result == 1
 
     def test_run_repeating_first_timezone(self, job_queue, timezone):
@@ -329,6 +334,17 @@ class TestJobQueue(object):
         sleep(0.03)
 
         assert self.result == 0
+
+    def test_job_default_tzinfo(self, job_queue):
+        """Test that default tzinfo is always set to UTC"""
+        job_1 = job_queue.run_once(self.job_run_once, 0.01)
+        job_2 = job_queue.run_repeating(self.job_run_once, 10)
+        job_3 = job_queue.run_daily(self.job_run_once, time=dtm.time(hour=15))
+
+        jobs = [job_1, job_2, job_3]
+
+        for job in jobs:
+            assert job.tzinfo == _UTC
 
     def test_job_next_t_property(self, job_queue):
         # Testing:

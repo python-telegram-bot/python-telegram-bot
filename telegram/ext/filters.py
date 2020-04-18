@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ import re
 
 from future.utils import string_types
 
-from telegram import Chat, Update
+from telegram import Chat, Update, MessageEntity
 
 __all__ = ['Filters', 'BaseFilter', 'InvertedFilter', 'MergedFilter']
 
@@ -50,7 +50,7 @@ class BaseFilter(object):
         >>> Filters.text & (~ Filters.forwarded)
 
     Note:
-        Filters use the same short circuiting logic that pythons `and`, `or` and `not`.
+        Filters use the same short circuiting logic as python's `and`, `or` and `not`.
         This means that for example:
 
             >>> Filters.regex(r'(a?x)') | Filters.regex(r'(b?x)')
@@ -236,38 +236,35 @@ class Filters(object):
     class _Text(BaseFilter):
         name = 'Filters.text'
 
-        class _TextIterable(BaseFilter):
+        class _TextStrings(BaseFilter):
 
-            def __init__(self, iterable):
-                self.iterable = iterable
-                self.name = 'Filters.text({})'.format(iterable)
+            def __init__(self, strings):
+                self.strings = strings
+                self.name = 'Filters.text({})'.format(strings)
 
             def filter(self, message):
-                if message.text and not message.text.startswith('/'):
-                    return message.text in self.iterable
+                if message.text:
+                    return message.text in self.strings
                 return False
 
         def __call__(self, update):
             if isinstance(update, Update):
-                if self.update_filter:
-                    return self.filter(update)
-                else:
-                    return self.filter(update.effective_message)
+                return self.filter(update.effective_message)
             else:
-                return self._TextIterable(update)
+                return self._TextStrings(update)
 
         def filter(self, message):
-            return bool(message.text and not message.text.startswith('/'))
+            return bool(message.text)
 
     text = _Text()
-    """Text Messages. If an iterable of strings is passed, it filters messages to only allow those
-    whose text is appearing in the given iterable.
+    """Text Messages. If a list of strings is passed, it filters messages to only allow those
+    whose text is appearing in the given list.
 
     Examples:
         To allow any text message, simply use
         ``MessageHandler(Filters.text, callback_method)``.
 
-        A simple usecase for passing an iterable is to allow only messages that were send by a
+        A simple usecase for passing a list is to allow only messages that were send by a
         custom :class:`telegram.ReplyKeyboardMarkup`::
 
             buttons = ['Start', 'Settings', 'Back']
@@ -275,57 +272,94 @@ class Filters(object):
             ...
             MessageHandler(Filters.text(buttons), callback_method)
 
+    Note:
+        * Dice messages don't have text. If you want to filter either text or dice messages, use
+          ``Filters.text | Filters.dice``.
+        * Messages containing a command are accepted by this filter. Use
+          ``Filters.text & (~Filters.command)``, if you want to filter only text messages without
+          commands.
+
     Args:
-        update (Iterable[:obj:`str`], optional): Which messages to allow. Only exact matches
-            are allowed. If not specified, will allow any text message.
+        update (List[:obj:`str`] | Tuple[:obj:`str`], optional): Which messages to allow. Only
+            exact matches are allowed. If not specified, will allow any text message.
     """
 
     class _Caption(BaseFilter):
         name = 'Filters.caption'
 
-        class _CaptionIterable(BaseFilter):
+        class _CaptionStrings(BaseFilter):
 
-            def __init__(self, iterable):
-                self.iterable = iterable
-                self.name = 'Filters.caption({})'.format(iterable)
+            def __init__(self, strings):
+                self.strings = strings
+                self.name = 'Filters.caption({})'.format(strings)
 
             def filter(self, message):
                 if message.caption:
-                    return message.caption in self.iterable
+                    return message.caption in self.strings
                 return False
 
         def __call__(self, update):
             if isinstance(update, Update):
-                if self.update_filter:
-                    return self.filter(update)
-                else:
-                    return self.filter(update.effective_message)
+                return self.filter(update.effective_message)
             else:
-                return self._CaptionIterable(update)
+                return self._CaptionStrings(update)
 
         def filter(self, message):
             return bool(message.caption)
 
     caption = _Caption()
-    """Messages with a caption. If an iterable of strings is passed, it filters messages to only
-    allow those whose caption is appearing in the given iterable.
+    """Messages with a caption. If a list of strings is passed, it filters messages to only
+    allow those whose caption is appearing in the given list.
 
     Examples:
         ``MessageHandler(Filters.caption, callback_method)``
 
     Args:
-        update (Iterable[:obj:`str`], optional): Which captions to allow. Only exact matches
-            are allowed. If not specified, will allow any message with a caption.
+        update (List[:obj:`str`] | Tuple[:obj:`str`], optional): Which captions to allow. Only
+            exact matches are allowed. If not specified, will allow any message with a caption.
     """
 
     class _Command(BaseFilter):
         name = 'Filters.command'
 
+        class _CommandOnlyStart(BaseFilter):
+
+            def __init__(self, only_start):
+                self.only_start = only_start
+                self.name = 'Filters.command({})'.format(only_start)
+
+            def filter(self, message):
+                return (message.entities
+                        and any([e.type == MessageEntity.BOT_COMMAND for e in message.entities]))
+
+        def __call__(self, update):
+            if isinstance(update, Update):
+                return self.filter(update.effective_message)
+            else:
+                return self._CommandOnlyStart(update)
+
         def filter(self, message):
-            return bool(message.text and message.text.startswith('/'))
+            return (message.entities and message.entities[0].type == MessageEntity.BOT_COMMAND
+                    and message.entities[0].offset == 0)
 
     command = _Command()
-    """Messages starting with ``/``."""
+    """
+    Messages with a :attr:`telegram.MessageEntity.BOT_COMMAND`. By default only allows
+    messages `starting` with a bot command. Pass ``False`` to also allow messages that contain a
+    bot command `anywhere` in the text.
+
+    Examples::
+
+        MessageHandler(Filters.command, command_at_start_callback)
+        MessageHandler(Filters.command(False), command_anywhere_callback)
+
+    Note:
+        ``Filters.text`` also accepts messages containing a command.
+
+    Args:
+        update (:obj:`bool`, optional): Whether to only allow messages that `start` with a bot
+            command. Defaults to ``True``.
+    """
 
     class regex(BaseFilter):
         """
@@ -344,7 +378,7 @@ class Filters(object):
             if you need to specify flags on your pattern.
 
         Note:
-            Filters use the same short circuiting logic that pythons `and`, `or` and `not`.
+            Filters use the same short circuiting logic as python's `and`, `or` and `not`.
             This means that for example:
 
                 >>> Filters.regex(r'(a?x)') | Filters.regex(r'(b?x)')
@@ -403,7 +437,7 @@ class Filters(object):
                     send media with wrong types that don't fit to this handler.
 
             Example:
-                Filters.documents.category('audio/') returnes `True` for all types
+                Filters.documents.category('audio/') returns `True` for all types
                 of audio sent as file, for example 'audio/mpeg' or 'audio/x-wav'
             """
 
@@ -481,38 +515,6 @@ class Filters(object):
         ``Filters.document`` for all document messages.
 
     Attributes:
-        category: This Filter filters documents by their category in the mime-type attribute.
-
-            Example:
-                ``Filters.documents.category('audio/')`` filters all types
-                of audio sent as file, for example 'audio/mpeg' or 'audio/x-wav'. The following
-                attributes can be used as a shortcut like: ``Filters.document.audio``
-
-        application:
-        audio:
-        image:
-        video:
-        text:
-        mime_type: This Filter filters documents by their mime-type attribute.
-
-            Example:
-                ``Filters.documents.mime_type('audio/mpeg')`` filters all audio in mp3 format. The
-                following attributes can be used as a shortcut like: ``Filters.document.jpg``
-        apk:
-        doc:
-        docx:
-        exe:
-        gif:
-        jpg:
-        mp3:
-        pdf:
-        py:
-        svg:
-        txt:
-        targz:
-        wav:
-        xml:
-        zip:
         category: This Filter filters documents by their category in the mime-type attribute
 
             Note:
@@ -956,6 +958,57 @@ officedocument.wordprocessingml.document")``-
     passport_data = _PassportData()
     """Messages that contain a :class:`telegram.PassportData`"""
 
+    class _Poll(BaseFilter):
+        name = 'Filters.poll'
+
+        def filter(self, message):
+            return bool(message.poll)
+
+    poll = _Poll()
+    """Messages that contain a :class:`telegram.Poll`."""
+
+    class _Dice(BaseFilter):
+        name = 'Filters.dice'
+
+        class _DiceValues(BaseFilter):
+
+            def __init__(self, values):
+                self.values = [values] if isinstance(values, int) else values
+                self.name = 'Filters.dice({})'.format(values)
+
+            def filter(self, message):
+                return bool(message.dice and message.dice.value in self.values)
+
+        def __call__(self, update):
+            if isinstance(update, Update):
+                return self.filter(update.effective_message)
+            else:
+                return self._DiceValues(update)
+
+        def filter(self, message):
+            return bool(message.dice)
+
+    dice = _Dice()
+    """Dice Messages. If an integer or a list of integers is passed, it filters messages to only
+    allow those whose dice value is appearing in the given list.
+
+    Examples:
+        To allow any dice message, simply use
+        ``MessageHandler(Filters.dice, callback_method)``.
+        To allow only dice with value 6, use
+        ``MessageHandler(Filters.dice(6), callback_method)``.
+        To allow only dice with value 5 `or` 6, use
+        ``MessageHandler(Filters.dice([5, 6]), callback_method)``.
+
+    Args:
+        update (:obj:`int` | List[:obj:`int`], optional): Which values to allow. If not
+            specified, will allow any dice message.
+
+    Note:
+        Dice messages don't have text. If you want to filter either text or dice messages, use
+        ``Filters.text | Filters.dice``.
+    """
+
     class language(BaseFilter):
         """Filters messages to only allow those which are from users with a certain language code.
 
@@ -987,8 +1040,10 @@ officedocument.wordprocessingml.document")``-
 
     class _UpdateType(BaseFilter):
         update_filter = True
+        name = 'Filters.update'
 
         class _Message(BaseFilter):
+            name = 'Filters.update.message'
             update_filter = True
 
             def filter(self, update):
@@ -997,6 +1052,7 @@ officedocument.wordprocessingml.document")``-
         message = _Message()
 
         class _EditedMessage(BaseFilter):
+            name = 'Filters.update.edited_message'
             update_filter = True
 
             def filter(self, update):
@@ -1005,6 +1061,7 @@ officedocument.wordprocessingml.document")``-
         edited_message = _EditedMessage()
 
         class _Messages(BaseFilter):
+            name = 'Filters.update.messages'
             update_filter = True
 
             def filter(self, update):
@@ -1013,6 +1070,7 @@ officedocument.wordprocessingml.document")``-
         messages = _Messages()
 
         class _ChannelPost(BaseFilter):
+            name = 'Filters.update.channel_post'
             update_filter = True
 
             def filter(self, update):
@@ -1022,6 +1080,7 @@ officedocument.wordprocessingml.document")``-
 
         class _EditedChannelPost(BaseFilter):
             update_filter = True
+            name = 'Filters.update.edited_channel_post'
 
             def filter(self, update):
                 return update.edited_channel_post is not None
@@ -1030,6 +1089,7 @@ officedocument.wordprocessingml.document")``-
 
         class _ChannelPosts(BaseFilter):
             update_filter = True
+            name = 'Filters.update.channel_posts'
 
             def filter(self, update):
                 return update.channel_post is not None or update.edited_channel_post is not None
