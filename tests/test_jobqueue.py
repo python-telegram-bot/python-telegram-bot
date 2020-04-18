@@ -312,7 +312,7 @@ class TestJobQueue(object):
             j.days = (0, 6, 12, 14)
 
         with pytest.raises(TypeError, match='argument should be one of the'):
-            j.next_t = 'tomorrow'
+            j._set_next_t('tomorrow')
 
     def test_get_jobs(self, job_queue):
         job1 = job_queue.run_once(self.job_run_once, 10, name='name1')
@@ -374,13 +374,13 @@ class TestJobQueue(object):
         assert job1.next_t is None
         assert job2.next_t is None
 
-    def test_job_next_t_setter(self, job_queue):
+    def test_job_set_next_t(self, job_queue):
         # Testing next_t setter for 'datetime.datetime' values
 
         job = job_queue.run_once(self.job_run_once, 0.05)
 
         t = dtm.datetime.now(tz=_UtcOffsetTimezone(dtm.timedelta(hours=12)))
-        job.next_t = t
+        job._set_next_t(t)
         job.tzinfo = _UtcOffsetTimezone(dtm.timedelta(hours=5))
         assert job.next_t == t.astimezone(job.tzinfo)
 

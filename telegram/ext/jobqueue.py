@@ -104,7 +104,7 @@ class JobQueue(object):
         # enqueue:
         self.logger.debug('Putting job %s with t=%s', job.name, time_spec)
         self._queue.put((next_t, job))
-        job.next_t = next_t
+        job._set_next_t(next_t)
 
         # Wake up the loop if this job should be executed next
         self._set_next_peek(next_t)
@@ -136,7 +136,7 @@ class JobQueue(object):
                   job should run. This could be either today or, if the time has already passed,
                   tomorrow. If the timezone (``time.tzinfo``) is ``None``, UTC will be assumed.
 
-                If ``when`` is :obj:`datetime.datetime` or :obj:`datetime.datetime` type
+                If ``when`` is :obj:`datetime.datetime` or :obj:`datetime.time` type
                 then ``when.tzinfo`` will define ``Job.tzinfo``. Otherwise UTC will be assumed.
 
             context (:obj:`object`, optional): Additional data needed for the callback function.
@@ -190,7 +190,7 @@ class JobQueue(object):
                   job should run. This could be either today or, if the time has already passed,
                   tomorrow. If the timezone (``time.tzinfo``) is ``None``, UTC will be assumed.
 
-                If ``first`` is :obj:`datetime.datetime` or :obj:`datetime.datetime` type
+                If ``first`` is :obj:`datetime.datetime` or :obj:`datetime.time` type
                 then ``first.tzinfo`` will define ``Job.tzinfo``. Otherwise UTC will be assumed.
 
                 Defaults to ``interval``
@@ -234,7 +234,7 @@ class JobQueue(object):
                 its ``job.context`` or change it to a repeating job.
             time (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
                 (``time.tzinfo``) is ``None``, UTC will be assumed.
-                ``time.tzinfo`` also defines ``Job.tzinfo``.
+                ``time.tzinfo`` will implicitly define ``Job.tzinfo``.
             days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should
                 run. Defaults to ``EVERY_DAY``
             context (:obj:`object`, optional): Additional data needed for the callback function.
@@ -256,10 +256,10 @@ class JobQueue(object):
                   interval=datetime.timedelta(days=1),
                   repeat=True,
                   days=days,
+                  tzinfo=time.tzinfo,
                   context=context,
                   name=name,
-                  job_queue=self,
-                  tzinfo=time.tzinfo)
+                  job_queue=self)
         self._put(job, time_spec=time)
         return job
 
@@ -319,7 +319,7 @@ class JobQueue(object):
             if job.repeat and not job.removed:
                 self._put(job, previous_t=t)
             else:
-                job.next_t = None
+                job._set_next_t(None)
                 self.logger.debug('Dropping non-repeating or removed job %s', job.name)
 
     def start(self):
@@ -516,8 +516,7 @@ class Job(object):
         """
         return datetime.datetime.fromtimestamp(self._next_t, self.tzinfo) if self._next_t else None
 
-    @next_t.setter
-    def next_t(self, next_t):
+    def _set_next_t(self, next_t):
         if isinstance(next_t, datetime.datetime):
             # Set timezone to UTC in case datetime is in local timezone.
             next_t = next_t.astimezone(_UTC)
