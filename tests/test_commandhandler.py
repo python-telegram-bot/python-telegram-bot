@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -88,6 +88,7 @@ class BaseTest(object):
                           and isinstance(context.job_queue, JobQueue)
                           and isinstance(context.user_data, dict)
                           and isinstance(context.chat_data, dict)
+                          and isinstance(context.bot_data, dict)
                           and isinstance(update.message, Message))
 
     def callback_context_args(self, update, context):
@@ -377,6 +378,29 @@ class TestPrefixHandler(BaseTest):
         handler = self.make_default_handler(filters=mock_filter)
         assert not is_match(handler, make_message_update('/test'))
         assert not mock_filter.tested
+
+    def test_edit_prefix(self):
+        handler = self.make_default_handler()
+        handler.prefix = ['?', '§']
+        assert handler._commands == list(combinations(['?', '§'], self.COMMANDS))
+        handler.prefix = '+'
+        assert handler._commands == list(combinations(['+'], self.COMMANDS))
+
+    def test_edit_command(self):
+        handler = self.make_default_handler()
+        handler.command = 'foo'
+        assert handler._commands == list(combinations(self.PREFIXES, ['foo']))
+
+    def test_basic_after_editing(self, dp, prefix, command):
+        """Test the basic expected response from a prefix handler"""
+        handler = self.make_default_handler()
+        dp.add_handler(handler)
+        text = prefix + command
+
+        assert self.response(dp, make_message_update(text))
+        handler.command = 'foo'
+        text = prefix + 'foo'
+        assert self.response(dp, make_message_update(text))
 
     def test_context(self, cdp, prefix_message_update):
         handler = self.make_default_handler(self.callback_context)

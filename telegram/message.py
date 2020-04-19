@@ -2,7 +2,7 @@
 # pylint: disable=R0902,R0912,R0913
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ from html import escape
 
 from telegram import (Animation, Audio, Contact, Document, Chat, Location, PhotoSize, Sticker,
                       TelegramObject, User, Video, Voice, Venue, MessageEntity, Game, Invoice,
-                      SuccessfulPayment, VideoNote, PassportData, Poll, InlineKeyboardMarkup)
+                      SuccessfulPayment, VideoNote, PassportData, Poll, InlineKeyboardMarkup, Dice)
 from telegram import ParseMode
 from telegram.utils.helpers import escape_markdown, to_timestamp, from_timestamp
 
@@ -106,9 +106,12 @@ class Message(TelegramObject):
         passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data.
         poll (:class:`telegram.Poll`): Optional. Message is a native poll,
             information about the poll.
+        dice (:class:`telegram.Dice`): Optional. Message is a dice.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+        default_quote (:obj:`bool`): Optional. Default setting for the `quote` parameter of the
+            :attr:`reply_text` and friends.
 
     Args:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -197,7 +200,7 @@ class Message(TelegramObject):
             smaller than 52 bits, so a signed 64 bit integer or double-precision float type are
             safe for storing this identifier.
         pinned_message (:class:`telegram.message`, optional): Specified message was pinned. Note
-            that the Message object in this field will not contain further attr:`reply_to_message`
+            that the Message object in this field will not contain further :attr:`reply_to_message`
             fields even if it is itself a reply.
         invoice (:class:`telegram.Invoice`, optional): Message is an invoice for a payment,
             information about the invoice.
@@ -212,8 +215,11 @@ class Message(TelegramObject):
         passport_data (:class:`telegram.PassportData`, optional): Telegram Passport data.
         poll (:class:`telegram.Poll`, optional): Message is a native poll,
             information about the poll.
+        dice (:class:`telegram.Dice`, optional): Message is a dice with random value from 1 to 6.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. login_url buttons are represented as ordinary url buttons.
+        default_quote (:obj:`bool`, optional): Default setting for the `quote` parameter of the
+            :attr:`reply_text` and friends.
 
     """
 
@@ -225,7 +231,7 @@ class Message(TelegramObject):
     MESSAGE_TYPES = ['text', 'new_chat_members', 'left_chat_member', 'new_chat_title',
                      'new_chat_photo', 'delete_chat_photo', 'group_chat_created',
                      'supergroup_chat_created', 'channel_chat_created', 'migrate_to_chat_id',
-                     'migrate_from_chat_id', 'pinned_message',
+                     'migrate_from_chat_id', 'pinned_message', 'poll', 'dice',
                      'passport_data'] + ATTACHMENT_TYPES
 
     def __init__(self,
@@ -277,6 +283,8 @@ class Message(TelegramObject):
                  forward_sender_name=None,
                  reply_markup=None,
                  bot=None,
+                 default_quote=None,
+                 dice=None,
                  **kwargs):
         # Required
         self.message_id = int(message_id)
@@ -326,8 +334,10 @@ class Message(TelegramObject):
         self.animation = animation
         self.passport_data = passport_data
         self.poll = poll
+        self.dice = dice
         self.reply_markup = reply_markup
         self.bot = bot
+        self.default_quote = default_quote
 
         self._id_attrs = (self.message_id,)
 
@@ -338,10 +348,15 @@ class Message(TelegramObject):
 
     @property
     def link(self):
-        """:obj:`str`: Convenience property. If the chat of the message is a supergroup or a
-        channel and has a :attr:`Chat.username`, returns a t.me link of the message."""
-        if self.chat.type in (Chat.SUPERGROUP, Chat.CHANNEL) and self.chat.username:
-            return "https://t.me/{}/{}".format(self.chat.username, self.message_id)
+        """:obj:`str`: Convenience property. If the chat of the message is not
+        a private chat or normal group, returns a t.me link of the message."""
+        if self.chat.type not in [Chat.PRIVATE, Chat.GROUP]:
+            if self.chat.username:
+                to_link = self.chat.username
+            else:
+                # Get rid of leading -100 for supergroups
+                to_link = "c/{}".format(str(self.chat.id)[4:])
+            return "https://t.me/{}/{}".format(to_link, self.message_id)
         return None
 
     @classmethod
@@ -353,13 +368,22 @@ class Message(TelegramObject):
 
         data['from_user'] = User.de_json(data.get('from'), bot)
         data['date'] = from_timestamp(data['date'])
-        data['chat'] = Chat.de_json(data.get('chat'), bot)
+        chat = data.get('chat')
+        if chat:
+            chat['default_quote'] = data.get('default_quote')
+        data['chat'] = Chat.de_json(chat, bot)
         data['entities'] = MessageEntity.de_list(data.get('entities'), bot)
         data['caption_entities'] = MessageEntity.de_list(data.get('caption_entities'), bot)
         data['forward_from'] = User.de_json(data.get('forward_from'), bot)
-        data['forward_from_chat'] = Chat.de_json(data.get('forward_from_chat'), bot)
+        forward_from_chat = data.get('forward_from_chat')
+        if forward_from_chat:
+            forward_from_chat['default_quote'] = data.get('default_quote')
+        data['forward_from_chat'] = Chat.de_json(forward_from_chat, bot)
         data['forward_date'] = from_timestamp(data.get('forward_date'))
-        data['reply_to_message'] = Message.de_json(data.get('reply_to_message'), bot)
+        reply_to_message = data.get('reply_to_message')
+        if reply_to_message:
+            reply_to_message['default_quote'] = data.get('default_quote')
+        data['reply_to_message'] = Message.de_json(reply_to_message, bot)
         data['edit_date'] = from_timestamp(data.get('edit_date'))
         data['audio'] = Audio.de_json(data.get('audio'), bot)
         data['document'] = Document.de_json(data.get('document'), bot)
@@ -376,11 +400,15 @@ class Message(TelegramObject):
         data['new_chat_members'] = User.de_list(data.get('new_chat_members'), bot)
         data['left_chat_member'] = User.de_json(data.get('left_chat_member'), bot)
         data['new_chat_photo'] = PhotoSize.de_list(data.get('new_chat_photo'), bot)
-        data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
+        pinned_message = data.get('pinned_message')
+        if pinned_message:
+            pinned_message['default_quote'] = data.get('default_quote')
+        data['pinned_message'] = Message.de_json(pinned_message, bot)
         data['invoice'] = Invoice.de_json(data.get('invoice'), bot)
         data['successful_payment'] = SuccessfulPayment.de_json(data.get('successful_payment'), bot)
         data['passport_data'] = PassportData.de_json(data.get('passport_data'), bot)
         data['poll'] = Poll.de_json(data.get('poll'), bot)
+        data['dice'] = Dice.de_json(data.get('dice'), bot)
         data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
 
         return cls(bot=bot, **data)
@@ -459,7 +487,8 @@ class Message(TelegramObject):
             del kwargs['quote']
 
         else:
-            if self.chat.type != Chat.PRIVATE:
+            if ((self.default_quote is None and self.chat.type != Chat.PRIVATE)
+               or self.default_quote):
                 kwargs['reply_to_message_id'] = self.message_id
 
     def reply_text(self, *args, **kwargs):
@@ -473,6 +502,9 @@ class Message(TelegramObject):
                 parameter will be ignored. Default: ``True`` in group chats and ``False`` in
                 private chats.
 
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
         """
         self._quote(kwargs)
         return self.bot.send_message(self.chat_id, *args, **kwargs)
@@ -483,16 +515,43 @@ class Message(TelegramObject):
             bot.send_message(update.message.chat_id, parse_mode=ParseMode.MARKDOWN, *args,
             **kwargs)
 
-        Sends a message with markdown formatting.
+        Sends a message with markdown version 1 formatting.
 
         Keyword Args:
             quote (:obj:`bool`, optional): If set to ``True``, the message is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: ``True`` in group chats and ``False`` in
                 private chats.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
         """
 
         kwargs['parse_mode'] = ParseMode.MARKDOWN
+
+        self._quote(kwargs)
+
+        return self.bot.send_message(self.chat_id, *args, **kwargs)
+
+    def reply_markdown_v2(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_message(update.message.chat_id, parse_mode=ParseMode.MARKDOWN_V2, *args,
+            **kwargs)
+
+        Sends a message with markdown version 2 formatting.
+
+        Keyword Args:
+            quote (:obj:`bool`, optional): If set to ``True``, the message is sent as an actual
+                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
+                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                private chats.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+        """
+
+        kwargs['parse_mode'] = ParseMode.MARKDOWN_V2
 
         self._quote(kwargs)
 
@@ -510,6 +569,9 @@ class Message(TelegramObject):
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: ``True`` in group chats and ``False`` in
                 private chats.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
         """
 
         kwargs['parse_mode'] = ParseMode.HTML
@@ -561,7 +623,7 @@ class Message(TelegramObject):
             bot.send_audio(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
+            quote (:obj:`bool`, optional): If set to ``True``, the audio is sent as an actual reply
                 to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
                 will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
 
@@ -578,9 +640,10 @@ class Message(TelegramObject):
             bot.send_document(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
-                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
-                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+            quote (:obj:`bool`, optional): If set to ``True``, the document is sent as an actual
+                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
+                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                private chats.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -595,9 +658,10 @@ class Message(TelegramObject):
             bot.send_animation(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
-                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
-                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+            quote (:obj:`bool`, optional): If set to ``True``, the animation is sent as an actual
+                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
+                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                private chats.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -612,9 +676,10 @@ class Message(TelegramObject):
             bot.send_sticker(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
-                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
-                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+            quote (:obj:`bool`, optional): If set to ``True``, the sticker is sent as an actual
+                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
+                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                private chats.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -629,9 +694,10 @@ class Message(TelegramObject):
             bot.send_video(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
-                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
-                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+            quote (:obj:`bool`, optional): If set to ``True``, the video is sent as an actual
+                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
+                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                private chats.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -646,9 +712,10 @@ class Message(TelegramObject):
             bot.send_video_note(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
-                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
-                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+            quote (:obj:`bool`, optional): If set to ``True``, the video note is sent as an actual
+                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
+                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                private chats.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -663,9 +730,10 @@ class Message(TelegramObject):
             bot.send_voice(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
-                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
-                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+            quote (:obj:`bool`, optional): If set to ``True``, the voice note is sent as an actual
+                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
+                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                private chats.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -680,9 +748,10 @@ class Message(TelegramObject):
             bot.send_location(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
-                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
-                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+            quote (:obj:`bool`, optional): If set to ``True``, the location is sent as an actual
+                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
+                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                private chats.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -697,9 +766,10 @@ class Message(TelegramObject):
             bot.send_venue(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
-                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
-                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+            quote (:obj:`bool`, optional): If set to ``True``, the venue is sent as an actual
+                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
+                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                private chats.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -714,9 +784,10 @@ class Message(TelegramObject):
             bot.send_contact(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
-                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
-                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+            quote (:obj:`bool`, optional): If set to ``True``, the contact is sent as an actual
+                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
+                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                private chats.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -731,7 +802,7 @@ class Message(TelegramObject):
             bot.send_poll(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
+            quote (:obj:`bool`, optional): If set to ``True``, the poll is sent as an actual reply
                 to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
                 will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
 
@@ -741,6 +812,23 @@ class Message(TelegramObject):
         """
         self._quote(kwargs)
         return self.bot.send_poll(self.chat_id, *args, **kwargs)
+
+    def reply_dice(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_dice(update.message.chat_id, *args, **kwargs)
+
+        Keyword Args:
+            quote (:obj:`bool`, optional): If set to ``True``, the dice is sent as an actual reply
+                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        self._quote(kwargs)
+        return self.bot.send_dice(self.chat_id, *args, **kwargs)
 
     def forward(self, chat_id, *args, **kwargs):
         """Shortcut for::
@@ -857,6 +945,22 @@ class Message(TelegramObject):
         return self.bot.delete_message(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
 
+    def stop_poll(self, *args, **kwargs):
+        """Shortcut for::
+
+             bot.stop_poll(chat_id=message.chat_id,
+                           message_id=message.message_id,
+                           *args,
+                           **kwargs)
+
+        Returns:
+            :class:`telegram.Poll`: On success, the stopped Poll with the
+                final results is returned.
+
+        """
+        return self.bot.stop_poll(
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+
     def parse_entity(self, entity):
         """Returns the text from a given :class:`telegram.MessageEntity`.
 
@@ -970,7 +1074,7 @@ class Message(TelegramObject):
         }
 
     @staticmethod
-    def _parse_html(message_text, entities, urled=False):
+    def _parse_html(message_text, entities, urled=False, offset=0):
         if message_text is None:
             return None
 
@@ -980,38 +1084,78 @@ class Message(TelegramObject):
         html_text = ''
         last_offset = 0
 
-        for entity, text in sorted(entities.items(), key=(lambda item: item[0].offset)):
-            text = escape(text)
+        sorted_entities = sorted(entities.items(), key=(lambda item: item[0].offset))
+        parsed_entities = []
 
-            if entity.type == MessageEntity.TEXT_LINK:
-                insert = '<a href="{}">{}</a>'.format(entity.url, text)
-            elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
-                insert = '<a href="tg://user?id={}">{}</a>'.format(entity.user.id, text)
-            elif entity.type == MessageEntity.URL and urled:
-                insert = '<a href="{0}">{0}</a>'.format(text)
-            elif entity.type == MessageEntity.BOLD:
-                insert = '<b>' + text + '</b>'
-            elif entity.type == MessageEntity.ITALIC:
-                insert = '<i>' + text + '</i>'
-            elif entity.type == MessageEntity.CODE:
-                insert = '<code>' + text + '</code>'
-            elif entity.type == MessageEntity.PRE:
-                insert = '<pre>' + text + '</pre>'
-            else:
-                insert = text
+        for (entity, text) in sorted_entities:
+            if entity not in parsed_entities:
+                nested_entities = {
+                    e: t
+                    for (e, t) in sorted_entities if e.offset >= entity.offset
+                    and e.offset + e.length <= entity.offset + entity.length
+                    and e != entity
+                }
+                parsed_entities.extend([e for e in nested_entities.keys()])
 
+                text = escape(text)
+
+                if nested_entities:
+                    text = Message._parse_html(text, nested_entities,
+                                               urled=urled, offset=entity.offset)
+
+                if entity.type == MessageEntity.TEXT_LINK:
+                    insert = '<a href="{}">{}</a>'.format(entity.url, text)
+                elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
+                    insert = '<a href="tg://user?id={}">{}</a>'.format(entity.user.id, text)
+                elif entity.type == MessageEntity.URL and urled:
+                    insert = '<a href="{0}">{0}</a>'.format(text)
+                elif entity.type == MessageEntity.BOLD:
+                    insert = '<b>' + text + '</b>'
+                elif entity.type == MessageEntity.ITALIC:
+                    insert = '<i>' + text + '</i>'
+                elif entity.type == MessageEntity.CODE:
+                    insert = '<code>' + text + '</code>'
+                elif entity.type == MessageEntity.PRE:
+                    if entity.language:
+                        insert = '<pre><code class="{}">{}</code></pre>'.format(entity.language,
+                                                                                text)
+                    else:
+                        insert = '<pre>' + text + '</pre>'
+                elif entity.type == MessageEntity.UNDERLINE:
+                    insert = '<u>' + text + '</u>'
+                elif entity.type == MessageEntity.STRIKETHROUGH:
+                    insert = '<s>' + text + '</s>'
+                else:
+                    insert = text
+
+                if offset == 0:
+                    if sys.maxunicode == 0xffff:
+                        html_text += escape(message_text[last_offset:entity.offset
+                                                         - offset]) + insert
+                    else:
+                        html_text += escape(message_text[last_offset * 2:(entity.offset
+                                                         - offset) * 2]
+                                            .decode('utf-16-le')) + insert
+                else:
+                    if sys.maxunicode == 0xffff:
+                        html_text += message_text[last_offset:entity.offset - offset] + insert
+                    else:
+                        html_text += message_text[last_offset * 2:(entity.offset
+                                                  - offset) * 2].decode('utf-16-le') + insert
+
+                last_offset = entity.offset - offset + entity.length
+
+        if offset == 0:
             if sys.maxunicode == 0xffff:
-                html_text += escape(message_text[last_offset:entity.offset]) + insert
+                html_text += escape(message_text[last_offset:])
             else:
-                html_text += escape(message_text[last_offset * 2:entity.offset * 2]
-                                    .decode('utf-16-le')) + insert
-
-            last_offset = entity.offset + entity.length
-
-        if sys.maxunicode == 0xffff:
-            html_text += escape(message_text[last_offset:])
+                html_text += escape(message_text[last_offset * 2:].decode('utf-16-le'))
         else:
-            html_text += escape(message_text[last_offset * 2:].decode('utf-16-le'))
+            if sys.maxunicode == 0xffff:
+                html_text += message_text[last_offset:]
+            else:
+                html_text += message_text[last_offset * 2:].decode('utf-16-le')
+
         return html_text
 
     @property
@@ -1069,7 +1213,9 @@ class Message(TelegramObject):
         return self._parse_html(self.caption, self.parse_caption_entities(), urled=True)
 
     @staticmethod
-    def _parse_markdown(message_text, entities, urled=False):
+    def _parse_markdown(message_text, entities, urled=False, version=1, offset=0):
+        version = int(version)
+
         if message_text is None:
             return None
 
@@ -1079,42 +1225,117 @@ class Message(TelegramObject):
         markdown_text = ''
         last_offset = 0
 
-        for entity, text in sorted(entities.items(), key=(lambda item: item[0].offset)):
-            text = escape_markdown(text)
+        sorted_entities = sorted(entities.items(), key=(lambda item: item[0].offset))
+        parsed_entities = []
 
-            if entity.type == MessageEntity.TEXT_LINK:
-                insert = '[{}]({})'.format(text, entity.url)
-            elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
-                insert = '[{}](tg://user?id={})'.format(text, entity.user.id)
-            elif entity.type == MessageEntity.URL and urled:
-                insert = '[{0}]({0})'.format(text)
-            elif entity.type == MessageEntity.BOLD:
-                insert = '*' + text + '*'
-            elif entity.type == MessageEntity.ITALIC:
-                insert = '_' + text + '_'
-            elif entity.type == MessageEntity.CODE:
-                insert = '`' + text + '`'
-            elif entity.type == MessageEntity.PRE:
-                insert = '```' + text + '```'
-            else:
-                insert = text
+        for (entity, text) in sorted_entities:
+            if entity not in parsed_entities:
+                nested_entities = {
+                    e: t
+                    for (e, t) in sorted_entities if e.offset >= entity.offset
+                    and e.offset + e.length <= entity.offset + entity.length
+                    and e != entity
+                }
+                parsed_entities.extend([e for e in nested_entities.keys()])
+
+                orig_text = text
+                text = escape_markdown(text, version=version)
+
+                if nested_entities:
+                    if version < 2:
+                        raise ValueError('Nested entities are not supported for Markdown '
+                                         'version 1')
+
+                    text = Message._parse_markdown(text, nested_entities,
+                                                   urled=urled, offset=entity.offset,
+                                                   version=version)
+
+                if entity.type == MessageEntity.TEXT_LINK:
+                    if version == 1:
+                        url = entity.url
+                    else:
+                        # Links need special escaping. Also can't have entities nested within
+                        url = escape_markdown(entity.url, version=version,
+                                              entity_type=MessageEntity.TEXT_LINK)
+                    insert = '[{}]({})'.format(text, url)
+                elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
+                    insert = '[{}](tg://user?id={})'.format(text, entity.user.id)
+                elif entity.type == MessageEntity.URL and urled:
+                    if version == 1:
+                        link = orig_text
+                    else:
+                        link = text
+                    insert = '[{}]({})'.format(link, orig_text)
+                elif entity.type == MessageEntity.BOLD:
+                    insert = '*' + text + '*'
+                elif entity.type == MessageEntity.ITALIC:
+                    insert = '_' + text + '_'
+                elif entity.type == MessageEntity.CODE:
+                    # Monospace needs special escaping. Also can't have entities nested within
+                    insert = '`' + escape_markdown(orig_text, version=version,
+                                                   entity_type=MessageEntity.CODE) + '`'
+                elif entity.type == MessageEntity.PRE:
+                    # Monospace needs special escaping. Also can't have entities nested within
+                    code = escape_markdown(orig_text, version=version,
+                                           entity_type=MessageEntity.PRE)
+                    if entity.language:
+                        prefix = '```' + entity.language + '\n'
+                    else:
+                        if code.startswith('\\'):
+                            prefix = '```'
+                        else:
+                            prefix = '```\n'
+                    insert = prefix + code + '```'
+                elif entity.type == MessageEntity.UNDERLINE:
+                    if version == 1:
+                        raise ValueError('Underline entities are not supported for Markdown '
+                                         'version 1')
+                    insert = '__' + text + '__'
+                elif entity.type == MessageEntity.STRIKETHROUGH:
+                    if version == 1:
+                        raise ValueError('Strikethrough entities are not supported for Markdown '
+                                         'version 1')
+                    insert = '~' + text + '~'
+                else:
+                    insert = text
+
+                if offset == 0:
+                    if sys.maxunicode == 0xffff:
+                        markdown_text += escape_markdown(message_text[last_offset:entity.offset
+                                                                      - offset],
+                                                         version=version) + insert
+                    else:
+                        markdown_text += escape_markdown(message_text[last_offset * 2:
+                                                                      (entity.offset - offset) * 2]
+                                                         .decode('utf-16-le'),
+                                                         version=version) + insert
+                else:
+                    if sys.maxunicode == 0xffff:
+                        markdown_text += message_text[last_offset:entity.offset - offset] + insert
+                    else:
+                        markdown_text += message_text[last_offset * 2:(entity.offset
+                                                      - offset) * 2].decode('utf-16-le') + insert
+
+                last_offset = entity.offset - offset + entity.length
+
+        if offset == 0:
             if sys.maxunicode == 0xffff:
-                markdown_text += escape_markdown(message_text[last_offset:entity.offset]) + insert
+                markdown_text += escape_markdown(message_text[last_offset:], version=version)
             else:
-                markdown_text += escape_markdown(message_text[last_offset * 2:entity.offset * 2]
-                                                 .decode('utf-16-le')) + insert
-
-            last_offset = entity.offset + entity.length
-
-        if sys.maxunicode == 0xffff:
-            markdown_text += escape_markdown(message_text[last_offset:])
+                markdown_text += escape_markdown(message_text[last_offset * 2:]
+                                                 .decode('utf-16-le'), version=version)
         else:
-            markdown_text += escape_markdown(message_text[last_offset * 2:].decode('utf-16-le'))
+            if sys.maxunicode == 0xffff:
+                markdown_text += message_text[last_offset:]
+            else:
+                markdown_text += message_text[last_offset * 2:].decode('utf-16-le')
+
         return markdown_text
 
     @property
     def text_markdown(self):
-        """Creates an Markdown-formatted string from the markup entities found in the message.
+        """Creates an Markdown-formatted string from the markup entities found in the message
+        using :class:`telegram.ParseMode.MARKDOWN`.
 
         Use this if you want to retrieve the message text with the entities formatted as Markdown
         in the same way the original message was formatted.
@@ -1126,8 +1347,23 @@ class Message(TelegramObject):
         return self._parse_markdown(self.text, self.parse_entities(), urled=False)
 
     @property
+    def text_markdown_v2(self):
+        """Creates an Markdown-formatted string from the markup entities found in the message
+        using :class:`telegram.ParseMode.MARKDOWN_V2`.
+
+        Use this if you want to retrieve the message text with the entities formatted as Markdown
+        in the same way the original message was formatted.
+
+        Returns:
+            :obj:`str`: Message text with entities formatted as Markdown.
+
+        """
+        return self._parse_markdown(self.text, self.parse_entities(), urled=False, version=2)
+
+    @property
     def text_markdown_urled(self):
-        """Creates an Markdown-formatted string from the markup entities found in the message.
+        """Creates an Markdown-formatted string from the markup entities found in the message
+        using :class:`telegram.ParseMode.MARKDOWN`.
 
         Use this if you want to retrieve the message text with the entities formatted as Markdown.
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
@@ -1139,9 +1375,23 @@ class Message(TelegramObject):
         return self._parse_markdown(self.text, self.parse_entities(), urled=True)
 
     @property
+    def text_markdown_v2_urled(self):
+        """Creates an Markdown-formatted string from the markup entities found in the message
+        using :class:`telegram.ParseMode.MARKDOWN_V2`.
+
+        Use this if you want to retrieve the message text with the entities formatted as Markdown.
+        This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
+
+        Returns:
+            :obj:`str`: Message text with entities formatted as Markdown.
+
+        """
+        return self._parse_markdown(self.text, self.parse_entities(), urled=True, version=2)
+
+    @property
     def caption_markdown(self):
         """Creates an Markdown-formatted string from the markup entities found in the message's
-        caption.
+        caption using :class:`telegram.ParseMode.MARKDOWN`.
 
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown in the same way the original message was formatted.
@@ -1153,9 +1403,24 @@ class Message(TelegramObject):
         return self._parse_markdown(self.caption, self.parse_caption_entities(), urled=False)
 
     @property
+    def caption_markdown_v2(self):
+        """Creates an Markdown-formatted string from the markup entities found in the message's
+        caption using :class:`telegram.ParseMode.MARKDOWN_V2`.
+
+        Use this if you want to retrieve the message caption with the caption entities formatted as
+        Markdown in the same way the original message was formatted.
+
+        Returns:
+            :obj:`str`: Message caption with caption entities formatted as Markdown.
+
+        """
+        return self._parse_markdown(self.caption, self.parse_caption_entities(),
+                                    urled=False, version=2)
+
+    @property
     def caption_markdown_urled(self):
         """Creates an Markdown-formatted string from the markup entities found in the message's
-        caption.
+        caption using :class:`telegram.ParseMode.MARKDOWN`.
 
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
@@ -1165,3 +1430,18 @@ class Message(TelegramObject):
 
         """
         return self._parse_markdown(self.caption, self.parse_caption_entities(), urled=True)
+
+    @property
+    def caption_markdown_v2_urled(self):
+        """Creates an Markdown-formatted string from the markup entities found in the message's
+        caption using :class:`telegram.ParseMode.MARKDOWN_V2`.
+
+        Use this if you want to retrieve the message caption with the caption entities formatted as
+        Markdown. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
+
+        Returns:
+            :obj:`str`: Message caption with caption entities formatted as Markdown.
+
+        """
+        return self._parse_markdown(self.caption, self.parse_caption_entities(),
+                                    urled=True, version=2)

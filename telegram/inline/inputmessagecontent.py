@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -29,4 +29,10 @@ class InputMessageContent(TelegramObject):
     :class:`telegram.InputVenueMessageContent` for more details.
 
     """
-    pass
+    @property
+    def _has_parse_mode(self):
+        return hasattr(self, 'parse_mode')
+
+    @property
+    def _has_disable_web_page_preview(self):
+        return hasattr(self, 'disable_web_page_preview')

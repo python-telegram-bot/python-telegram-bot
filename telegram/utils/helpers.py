@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -44,9 +44,31 @@ def get_signal_name(signum):
     return _signames[signum]
 
 
-def escape_markdown(text):
-    """Helper function to escape telegram markup symbols."""
-    escape_chars = '\*_`\['
+def escape_markdown(text, version=1, entity_type=None):
+    """
+    Helper function to escape telegram markup symbols.
+
+    Args:
+        text (:obj:`str`): The text.
+        version (:obj:`int` | :obj:`str`): Use to specify the version of telegrams Markdown.
+            Either ``1`` or ``2``. Defaults to ``1``.
+        entity_type (:obj:`str`, optional): For the entity types ``PRE``, ``CODE`` and the link
+            part of ``TEXT_LINKS``, only certain characters need to be escaped in ``MarkdownV2``.
+            See the official API documentation for details. Only valid in combination with
+            ``version=2``, will be ignored else.
+    """
+    if int(version) == 1:
+        escape_chars = '\*_`\['
+    elif int(version) == 2:
+        if entity_type == 'pre' or entity_type == 'code':
+            escape_chars = '`\\\\'
+        elif entity_type == 'text_link':
+            escape_chars = ')\\\\'
+        else:
+            escape_chars = '_*\[\]()~`>\#\+\-=|{}\.!'
+    else:
+        raise ValueError('Markdown version musst be either 1 or 2!')
+
     return re.sub(r'([%s])' % escape_chars, r'\\\1', text)
 
 
@@ -100,7 +122,7 @@ def to_float_timestamp(t, reference_timestamp=None):
     Converts a given time object to a float POSIX timestamp.
     Used to convert different time specifications to a common format. The time object
     can be relative (i.e. indicate a time increment, or a time of day) or absolute.
-    Any objects from the :module:`datetime` module that are timezone-naive will be assumed
+    Any objects from the :class:`datetime` module that are timezone-naive will be assumed
     to be in UTC.
 
     ``None`` s are left alone (i.e. ``to_float_timestamp(None)`` is ``None``).
@@ -212,17 +234,19 @@ def mention_html(user_id, name):
         return u'<a href="tg://user?id={}">{}</a>'.format(user_id, escape(name))
 
 
-def mention_markdown(user_id, name):
+def mention_markdown(user_id, name, version=1):
     """
     Args:
         user_id (:obj:`int`) The user's id which you want to mention.
         name (:obj:`str`) The name the mention is showing.
+        version (:obj:`int` | :obj:`str`): Use to specify the version of telegrams Markdown.
+            Either ``1`` or ``2``. Defaults to ``1``
 
     Returns:
         :obj:`str`: The inline mention for the user as markdown.
     """
     if isinstance(user_id, int):
-        return u'[{}](tg://user?id={})'.format(escape_markdown(name), user_id)
+        return u'[{}](tg://user?id={})'.format(escape_markdown(name, version=version), user_id)
 
 
 def effective_message_type(entity):
@@ -305,7 +329,7 @@ def create_deep_linked_url(bot_username, payload=None, group=False):
     )
 
 
-def enocde_conversations_to_json(conversations):
+def encode_conversations_to_json(conversations):
     """Helper method to encode a conversations dict (that uses tuples as keys) to a
     JSON-serializable way. Use :attr:`_decode_conversations_from_json` to decode.
 
@@ -365,3 +389,57 @@ def decode_user_chat_data_from_json(data):
                 pass
             tmp[user][key] = value
     return tmp
+
+
+class DefaultValue:
+    """Wrapper for immutable default arguments that allows to check, if the default value was set
+    explicitly. Usage::
+
+        DefaultOne = DefaultValue(1)
+        def f(arg=DefaultOne):
+            if arg is DefaultOne:
+                print('`arg` is the default')
+                arg = arg.value
+            else:
+                print('`arg` was set explicitly')
+            print('`arg` = ' + str(arg))
+
+    This yields::
+
+        >>> f()
+        `arg` is the default
+        `arg` = 1
+        >>> f(1)
+        `arg` was set explicitly
+        `arg` = 1
+        >>> f(2)
+        `arg` was set explicitly
+        `arg` = 2
+
+    Also allows to evaluate truthiness::
+
+        default = DefaultValue(value)
+        if default:
+            ...
+
+    is equivalent to::
+
+        default = DefaultValue(value)
+        if value:
+            ...
+
+    Attributes:
+        value (:obj:`obj`): The value of the default argument
+
+    Args:
+        value (:obj:`obj`): The value of the default argument
+    """
+    def __init__(self, value=None):
+        self.value = value
+
+    def __bool__(self):
+        return bool(self.value)
+
+
+DEFAULT_NONE = DefaultValue(None)
+""":class:`DefaultValue`: Default `None`"""

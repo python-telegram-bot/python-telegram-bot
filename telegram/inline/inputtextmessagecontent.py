@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@
 """This module contains the classes that represent Telegram InputTextMessageContent."""
 
 from telegram import InputMessageContent
+from telegram.utils.helpers import DEFAULT_NONE
 
 
 class InputTextMessageContent(InputMessageContent):
@@ -26,15 +27,16 @@ class InputTextMessageContent(InputMessageContent):
     Represents the content of a text message to be sent as the result of an inline query.
 
     Attributes:
-        message_text (:obj:`str`): Text of the message to be sent, 1-4096 characters.
+        message_text (:obj:`str`): Text of the message to be sent, 1-4096 characters after entities
+            parsing.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in your bot's message.
         disable_web_page_preview (:obj:`bool`): Optional. Disables link previews for links in the
             sent message.
 
     Args:
-        message_text (:obj:`str`): Text of the message to be sent, 1-4096 characters.  Also found
-            as :attr:`telegram.constants.MAX_MESSAGE_LENGTH`.
+        message_text (:obj:`str`): Text of the message to be sent, 1-4096 characters after entities
+            parsing. Also found as :attr:`telegram.constants.MAX_MESSAGE_LENGTH`.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in your bot's message.
         disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in the
@@ -43,7 +45,11 @@ class InputTextMessageContent(InputMessageContent):
 
     """
 
-    def __init__(self, message_text, parse_mode=None, disable_web_page_preview=None, **kwargs):
+    def __init__(self,
+                 message_text,
+                 parse_mode=DEFAULT_NONE,
+                 disable_web_page_preview=DEFAULT_NONE,
+                 **kwargs):
         # Required
         self.message_text = message_text
         # Optionals

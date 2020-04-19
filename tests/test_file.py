@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -29,6 +29,7 @@ from telegram import File, TelegramError, Voice
 @pytest.fixture(scope='class')
 def file(bot):
     return File(TestFile.file_id,
+                TestFile.file_unique_id,
                 file_path=TestFile.file_path,
                 file_size=TestFile.file_size,
                 bot=bot)
@@ -36,6 +37,7 @@ def file(bot):
 
 class TestFile(object):
     file_id = 'NOTVALIDDOESNOTMATTER'
+    file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
     file_path = (
         u'https://api.org/file/bot133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0/document/file_3')
     file_size = 28232
@@ -44,12 +46,14 @@ class TestFile(object):
     def test_de_json(self, bot):
         json_dict = {
             'file_id': self.file_id,
+            'file_unique_id': self.file_unique_id,
             'file_path': self.file_path,
             'file_size': self.file_size
         }
         new_file = File.de_json(json_dict, bot)
 
         assert new_file.file_id == self.file_id
+        assert new_file.file_unique_id == self.file_unique_id
         assert new_file.file_path == self.file_path
         assert new_file.file_size == self.file_size
 
@@ -58,6 +62,7 @@ class TestFile(object):
 
         assert isinstance(file_dict, dict)
         assert file_dict['file_id'] == file.file_id
+        assert file_dict['file_unique_id'] == file.file_unique_id
         assert file_dict['file_path'] == file.file_path
         assert file_dict['file_size'] == file.file_size
 
@@ -96,6 +101,22 @@ class TestFile(object):
             os.close(file_handle)
             os.unlink(custom_path)
 
+    def test_download_no_filename(self, monkeypatch, file):
+        def test(*args, **kwargs):
+            return self.file_content
+
+        file.file_path = None
+
+        monkeypatch.setattr('telegram.utils.request.Request.retrieve', test)
+        out_file = file.download()
+
+        assert out_file[-len(file.file_id):] == file.file_id
+        try:
+            with open(out_file, 'rb') as fobj:
+                assert fobj.read() == self.file_content
+        finally:
+            os.unlink(out_file)
+
     def test_download_file_obj(self, monkeypatch, file):
         def test(*args, **kwargs):
             return self.file_content
@@ -126,11 +147,11 @@ class TestFile(object):
         assert buf2[:len(buf)] == buf
 
     def test_equality(self, bot):
-        a = File(self.file_id, bot)
-        b = File(self.file_id, bot)
-        c = File(self.file_id, None)
-        d = File('', bot)
-        e = Voice(self.file_id, 0)
+        a = File(self.file_id, self.file_unique_id, bot)
+        b = File('', self.file_unique_id, bot)
+        c = File(self.file_id, self.file_unique_id, None)
+        d = File('', '', bot)
+        e = Voice(self.file_id, self.file_unique_id, 0)
 
         assert a == b
         assert hash(a) == hash(b)

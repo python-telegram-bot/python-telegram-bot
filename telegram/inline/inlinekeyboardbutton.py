@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -30,27 +30,28 @@ class InlineKeyboardButton(TelegramObject):
 
     Attributes:
         text (:obj:`str`): Label text on the button.
-        url (:obj:`str`): Optional. HTTP url to be opened when button is pressed.
+        url (:obj:`str`): Optional. HTTP or tg:// url to be opened when button is pressed.
         login_url (:class:`telegram.LoginUrl`) Optional. An HTTP URL used to automatically
-            authorize the user.
+            authorize the user. Can be used as a replacement for the Telegram Login Widget.
         callback_data (:obj:`str`): Optional. Data to be sent in a callback query to the bot when
             button is pressed, UTF-8 1-64 bytes.
         switch_inline_query (:obj:`str`): Optional. Will prompt the user to select one of their
             chats, open that chat and insert the bot's username and the specified inline query in
-            the input field.
+            the input field. Can be empty, in which case just the bot’s username will be inserted.
         switch_inline_query_current_chat (:obj:`str`): Optional. Will insert the bot's username and
-            the specified inline query in the current chat's input field.
+            the specified inline query in the current chat's input field. Can be empty, in which
+            case just the bot’s username will be inserted.
         callback_game (:class:`telegram.CallbackGame`): Optional. Description of the game that will
             be launched when the user presses the button.
         pay (:obj:`bool`): Optional. Specify True, to send a Pay button.
 
     Args:
         text (:obj:`str`): Label text on the button.
-        url (:obj:`str`): HTTP url to be opened when button is pressed.
+        url (:obj:`str`): HTTP or tg:// url to be opened when button is pressed.
         login_url (:class:`telegram.LoginUrl`, optional) An HTTP URL used to automatically
-            authorize the user.
+            authorize the user. Can be used as a replacement for the Telegram Login Widget.
         callback_data (:obj:`str`, optional): Data to be sent in a callback query to the bot when
-            button is pressed, 1-64 UTF-8 bytes.
+            button is pressed, UTF-8 1-64 bytes.
         switch_inline_query (:obj:`str`, optional): If set, pressing the button will prompt the
             user to select one of their chats, open that chat and insert the bot's username and the
             specified inline query in the input field. Can be empty, in which case just the bot's
@@ -86,20 +87,13 @@ class InlineKeyboardButton(TelegramObject):
         self.text = text
 
         # Optionals
-        if url:
-            self.url = url
-        if login_url:
-            self.login_url = login_url
-        if callback_data:
-            self.callback_data = callback_data
-        if switch_inline_query:
-            self.switch_inline_query = switch_inline_query
-        if switch_inline_query_current_chat:
-            self.switch_inline_query_current_chat = switch_inline_query_current_chat
-        if callback_game:
-            self.callback_game = callback_game
-        if pay:
-            self.pay = pay
+        self.url = url
+        self.login_url = login_url
+        self.callback_data = callback_data
+        self.switch_inline_query = switch_inline_query
+        self.switch_inline_query_current_chat = switch_inline_query_current_chat
+        self.callback_game = callback_game
+        self.pay = pay
 
     @classmethod
     def de_json(cls, data, bot):

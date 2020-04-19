@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -23,12 +23,12 @@ class TestUserProfilePhotos(object):
     total_count = 2
     photos = [
         [
-            PhotoSize('file_id1', 512, 512),
-            PhotoSize('file_id2', 512, 512)
+            PhotoSize('file_id1', 'file_un_id1', 512, 512),
+            PhotoSize('file_id2', 'file_un_id1', 512, 512)
         ],
         [
-            PhotoSize('file_id3', 512, 512),
-            PhotoSize('file_id4', 512, 512)
+            PhotoSize('file_id3', 'file_un_id3', 512, 512),
+            PhotoSize('file_id4', 'file_un_id4', 512, 512)
         ]
     ]
 

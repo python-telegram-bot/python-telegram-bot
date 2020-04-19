@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -21,6 +21,7 @@ import pytest
 
 from telegram import (Message, User, Update, Chat, CallbackQuery, InlineQuery,
                       ChosenInlineResult, ShippingQuery, PreCheckoutQuery, Poll, PollOption)
+from telegram.poll import PollAnswer
 
 message = Message(1, User(1, '', False), None, Chat(1, ''), text='Text')
 
@@ -35,12 +36,13 @@ params = [
     {'shipping_query': ShippingQuery('id', User(1, '', False), '', None)},
     {'pre_checkout_query': PreCheckoutQuery('id', User(1, '', False), '', 0, '')},
     {'callback_query': CallbackQuery(1, User(1, '', False), 'chat')},
-    {'poll': Poll('id', '?', [PollOption('.', 1)], False)}
+    {'poll': Poll('id', '?', [PollOption('.', 1)], False, False, False, Poll.REGULAR, True)},
+    {'poll_answer': PollAnswer("id", User(1, '', False), [1])}
 ]
 
 all_types = ('message', 'edited_message', 'callback_query', 'channel_post',
              'edited_channel_post', 'inline_query', 'chosen_inline_result',
-             'shipping_query', 'pre_checkout_query', 'poll')
+             'shipping_query', 'pre_checkout_query', 'poll', 'poll_answer')
 
 ids = all_types + ('callback_query_without_message',)
 
@@ -75,6 +77,14 @@ class TestUpdate(object):
 
         assert update is None
 
+    def test_de_json_default_quote(self, bot):
+        json_dict = {'update_id': TestUpdate.update_id}
+        json_dict['message'] = message.to_dict()
+        json_dict['default_quote'] = True
+        update = Update.de_json(json_dict, bot)
+
+        assert update.message.default_quote is True
+
     def test_to_dict(self, update):
         update_dict = update.to_dict()
 
@@ -93,7 +103,8 @@ class TestUpdate(object):
                     and update.callback_query.message is None)
                 or update.shipping_query is not None
                 or update.pre_checkout_query is not None
-                or update.poll is not None):
+                or update.poll is not None
+                or update.poll_answer is not None):
             assert chat.id == 1
         else:
             assert chat is None
@@ -117,7 +128,8 @@ class TestUpdate(object):
                     and update.callback_query.message is None)
                 or update.shipping_query is not None
                 or update.pre_checkout_query is not None
-                or update.poll is not None):
+                or update.poll is not None
+                or update.poll_answer is not None):
             assert eff_message.message_id == message.message_id
         else:
             assert eff_message is None

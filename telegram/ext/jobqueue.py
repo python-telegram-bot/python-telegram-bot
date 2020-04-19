@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -95,14 +95,16 @@ class JobQueue(object):
 
         """
         # get time at which to run:
-        time_spec = time_spec or job.interval
+        if time_spec is None:
+            time_spec = job.interval
         if time_spec is None:
             raise ValueError("no time specification given for scheduling non-repeating job")
         next_t = to_float_timestamp(time_spec, reference_timestamp=previous_t)
 
         # enqueue:
-        self.logger.debug('Putting job %s with t=%f', job.name, time_spec)
+        self.logger.debug('Putting job %s with t=%s', job.name, time_spec)
         self._queue.put((next_t, job))
+        job._set_next_t(next_t)
 
         # Wake up the loop if this job should be executed next
         self._set_next_peek(next_t)
@@ -112,9 +114,12 @@ class JobQueue(object):
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
-                job. It should take ``bot, job`` as parameters, where ``job`` is the
-                :class:`telegram.ext.Job` instance. It can be used to access its
-                ``job.context`` or change it to a repeating job.
+                job. Callback signature for context based API:
+
+                    ``def callback(CallbackContext)``
+
+                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
+                its ``job.context`` or change it to a repeating job.
             when (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |                         \
                   :obj:`datetime.datetime` | :obj:`datetime.time`):
                 Time in or at which the job should run. This parameter will be interpreted
@@ -125,10 +130,14 @@ class JobQueue(object):
                 * :obj:`datetime.timedelta` will be interpreted as "time from now" in which the
                   job should run.
                 * :obj:`datetime.datetime` will be interpreted as a specific date and time at
-                  which the job should run.
+                  which the job should run. If the timezone (``datetime.tzinfo``) is ``None``, UTC
+                  will be assumed.
                 * :obj:`datetime.time` will be interpreted as a specific time of day at which the
                   job should run. This could be either today or, if the time has already passed,
-                  tomorrow.
+                  tomorrow. If the timezone (``time.tzinfo``) is ``None``, UTC will be assumed.
+
+                If ``when`` is :obj:`datetime.datetime` or :obj:`datetime.time` type
+                then ``when.tzinfo`` will define ``Job.tzinfo``. Otherwise UTC will be assumed.
 
             context (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through ``job.context`` in the callback. Defaults to ``None``.
@@ -140,7 +149,14 @@ class JobQueue(object):
             queue.
 
         """
-        job = Job(callback, repeat=False, context=context, name=name, job_queue=self)
+        tzinfo = when.tzinfo if isinstance(when, (datetime.datetime, datetime.time)) else None
+
+        job = Job(callback,
+                  repeat=False,
+                  context=context,
+                  name=name,
+                  job_queue=self,
+                  tzinfo=tzinfo)
         self._put(job, time_spec=when)
         return job
 
@@ -149,9 +165,12 @@ class JobQueue(object):
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
-                job. It should take ``bot, job`` as parameters, where ``job`` is the
-                :class:`telegram.ext.Job` instance. It can be used to access its
-                ``Job.context`` or change it to a repeating job.
+                job. Callback signature for context based API:
+
+                    ``def callback(CallbackContext)``
+
+                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
+                its ``job.context`` or change it to a repeating job.
             interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta`): The interval in which
                 the job will run. If it is an :obj:`int` or a :obj:`float`, it will be interpreted
                 as seconds.
@@ -165,10 +184,14 @@ class JobQueue(object):
                 * :obj:`datetime.timedelta` will be interpreted as "time from now" in which the
                   job should run.
                 * :obj:`datetime.datetime` will be interpreted as a specific date and time at
-                  which the job should run.
+                  which the job should run. If the timezone (``datetime.tzinfo``) is ``None``, UTC
+                  will be assumed.
                 * :obj:`datetime.time` will be interpreted as a specific time of day at which the
                   job should run. This could be either today or, if the time has already passed,
-                  tomorrow.
+                  tomorrow. If the timezone (``time.tzinfo``) is ``None``, UTC will be assumed.
+
+                If ``first`` is :obj:`datetime.datetime` or :obj:`datetime.time` type
+                then ``first.tzinfo`` will define ``Job.tzinfo``. Otherwise UTC will be assumed.
 
                 Defaults to ``interval``
             context (:obj:`object`, optional): Additional data needed for the callback function.
@@ -186,12 +209,15 @@ class JobQueue(object):
              to pin servers to UTC time, then time related behaviour can always be expected.
 
         """
+        tzinfo = first.tzinfo if isinstance(first, (datetime.datetime, datetime.time)) else None
+
         job = Job(callback,
                   interval=interval,
                   repeat=True,
                   context=context,
                   name=name,
-                  job_queue=self)
+                  job_queue=self,
+                  tzinfo=tzinfo)
         self._put(job, time_spec=first)
         return job
 
@@ -200,11 +226,15 @@ class JobQueue(object):
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
-                job. It should take ``bot, job`` as parameters, where ``job`` is the
-                :class:`telegram.ext.Job` instance. It can be used to access its ``Job.context``
-                or change it to a repeating job.
+                job. Callback signature for context based API:
+
+                    ``def callback(CallbackContext)``
+
+                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
+                its ``job.context`` or change it to a repeating job.
             time (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
                 (``time.tzinfo``) is ``None``, UTC will be assumed.
+                ``time.tzinfo`` will implicitly define ``Job.tzinfo``.
             days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should
                 run. Defaults to ``EVERY_DAY``
             context (:obj:`object`, optional): Additional data needed for the callback function.
@@ -275,9 +305,10 @@ class JobQueue(object):
             if job.enabled:
                 try:
                     current_week_day = datetime.datetime.now(job.tzinfo).date().weekday()
-                    if any(day == current_week_day for day in job.days):
+                    if current_week_day in job.days:
                         self.logger.debug('Running job %s', job.name)
                         job.run(self._dispatcher)
+                        self._dispatcher.update_persistence()
 
                 except Exception:
                     self.logger.exception('An uncaught error was raised while executing job %s',
@@ -288,6 +319,7 @@ class JobQueue(object):
             if job.repeat and not job.removed:
                 self._put(job, previous_t=t)
             else:
+                job._set_next_t(None)
                 self.logger.debug('Dropping non-repeating or removed job %s', job.name)
 
     def start(self):
@@ -357,9 +389,12 @@ class Job(object):
 
     Args:
         callback (:obj:`callable`): The callback function that should be executed by the new job.
-            It should take ``bot, job`` as parameters, where ``job`` is the
-            :class:`telegram.ext.Job` instance. It can be used to access it's :attr:`context`
-            or change it to a repeating job.
+            Callback signature for context based API:
+
+                ``def callback(CallbackContext)``
+
+            a ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
+            its ``job.context`` or change it to a repeating job.
         interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta`, optional): The time
             interval between executions of the job. If it is an :obj:`int` or a :obj:`float`,
             it will be interpreted as seconds. If you don't set this value, you must set
@@ -387,7 +422,7 @@ class Job(object):
                  days=Days.EVERY_DAY,
                  name=None,
                  job_queue=None,
-                 tzinfo=_UTC):
+                 tzinfo=None):
 
         self.callback = callback
         self.context = context
@@ -396,11 +431,12 @@ class Job(object):
         self._repeat = None
         self._interval = None
         self.interval = interval
+        self._next_t = None
         self.repeat = repeat
 
         self._days = None
         self.days = days
-        self.tzinfo = tzinfo
+        self.tzinfo = tzinfo or _UTC
 
         self._job_queue = weakref.proxy(job_queue) if job_queue is not None else None
 
@@ -422,6 +458,7 @@ class Job(object):
 
         """
         self._remove.set()
+        self._next_t = None
 
     @property
     def removed(self):
@@ -455,8 +492,8 @@ class Job(object):
             raise ValueError("The 'interval' can not be 'None' when 'repeat' is set to 'True'")
 
         if not (interval is None or isinstance(interval, (Number, datetime.timedelta))):
-            raise ValueError("The 'interval' must be of type 'datetime.timedelta',"
-                             " 'int' or 'float'")
+            raise TypeError("The 'interval' must be of type 'datetime.timedelta',"
+                            " 'int' or 'float'")
 
         self._interval = interval
 
@@ -468,6 +505,27 @@ class Job(object):
             return interval.total_seconds()
         else:
             return interval
+
+    @property
+    def next_t(self):
+        """
+        ::obj:`datetime.datetime`: Datetime for the next job execution.
+            Datetime is localized according to :attr:`tzinfo`.
+            If job is removed or already ran it equals to ``None``.
+
+        """
+        return datetime.datetime.fromtimestamp(self._next_t, self.tzinfo) if self._next_t else None
+
+    def _set_next_t(self, next_t):
+        if isinstance(next_t, datetime.datetime):
+            # Set timezone to UTC in case datetime is in local timezone.
+            next_t = next_t.astimezone(_UTC)
+            next_t = to_float_timestamp(next_t)
+        elif not (isinstance(next_t, Number) or next_t is None):
+            raise TypeError("The 'next_t' argument should be one of the following types: "
+                            "'float', 'int', 'datetime.datetime' or 'NoneType'")
+
+        self._next_t = next_t
 
     @property
     def repeat(self):
@@ -488,10 +546,10 @@ class Job(object):
     @days.setter
     def days(self, days):
         if not isinstance(days, tuple):
-            raise ValueError("The 'days' argument should be of type 'tuple'")
+            raise TypeError("The 'days' argument should be of type 'tuple'")
 
         if not all(isinstance(day, int) for day in days):
-            raise ValueError("The elements of the 'days' argument should be of type 'int'")
+            raise TypeError("The elements of the 'days' argument should be of type 'int'")
 
         if not all(0 <= day <= 6 for day in days):
             raise ValueError("The elements of the 'days' argument should be from 0 up to and "

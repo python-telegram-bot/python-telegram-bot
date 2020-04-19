@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -74,7 +74,7 @@ class TestChosenInlineResult(object):
         b = ChosenInlineResult(self.result_id, user, 'Query', '')
         c = ChosenInlineResult(self.result_id, user, '', '')
         d = ChosenInlineResult('', user, 'Query', '')
-        e = Voice(self.result_id, 0)
+        e = Voice(self.result_id, 'unique_id', 0)
 
         assert a == b
         assert hash(a) == hash(b)

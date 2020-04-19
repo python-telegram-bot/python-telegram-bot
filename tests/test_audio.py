@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -22,6 +22,7 @@ import pytest
 from flaky import flaky
 
 from telegram import Audio, TelegramError, Voice
+from telegram.utils.helpers import escape_markdown
 
 
 @pytest.fixture(scope='function')
@@ -51,12 +52,16 @@ class TestAudio(object):
     thumb_file_size = 1427
     thumb_width = 50
     thumb_height = 50
+    audio_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
+    audio_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
 
     def test_creation(self, audio):
         # Make sure file has been uploaded.
         assert isinstance(audio, Audio)
         assert isinstance(audio.file_id, str)
+        assert isinstance(audio.file_unique_id, str)
         assert audio.file_id != ''
+        assert audio.file_unique_id != ''
 
     def test_expected_values(self, audio):
         assert audio.duration == self.duration
@@ -80,6 +85,8 @@ class TestAudio(object):
 
         assert isinstance(message.audio, Audio)
         assert isinstance(message.audio.file_id, str)
+        assert isinstance(message.audio.file_unique_id, str)
+        assert message.audio.file_unique_id is not None
         assert message.audio.file_id is not None
         assert message.audio.duration == self.duration
         assert message.audio.performer == self.performer
@@ -97,6 +104,7 @@ class TestAudio(object):
 
         assert new_file.file_size == self.file_size
         assert new_file.file_id == audio.file_id
+        assert new_file.file_unique_id == audio.file_unique_id
         assert new_file.file_path.startswith('https://')
 
         new_file.download('telegram.mp3')
@@ -112,6 +120,8 @@ class TestAudio(object):
 
         assert isinstance(message.audio, Audio)
         assert isinstance(message.audio.file_id, str)
+        assert isinstance(message.audio.file_unique_id, str)
+        assert message.audio.file_unique_id is not None
         assert message.audio.file_id is not None
         assert message.audio.duration == audio.duration
         assert message.audio.mime_type == audio.mime_type
@@ -132,18 +142,55 @@ class TestAudio(object):
         message = bot.send_audio(audio=audio, chat_id=chat_id)
         assert message
 
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
+    def test_send_audio_default_parse_mode_1(self, default_bot, chat_id, audio_file, thumb_file):
+        test_string = 'Italic Bold Code'
+        test_markdown_string = '_Italic_ *Bold* `Code`'
+
+        message = default_bot.send_audio(chat_id, audio_file, caption=test_markdown_string)
+        assert message.caption_markdown == test_markdown_string
+        assert message.caption == test_string
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
+    def test_send_audio_default_parse_mode_2(self, default_bot, chat_id, audio_file, thumb_file):
+        test_markdown_string = '_Italic_ *Bold* `Code`'
+
+        message = default_bot.send_audio(chat_id, audio_file, caption=test_markdown_string,
+                                         parse_mode=None)
+        assert message.caption == test_markdown_string
+        assert message.caption_markdown == escape_markdown(test_markdown_string)
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
+    def test_send_audio_default_parse_mode_3(self, default_bot, chat_id, audio_file, thumb_file):
+        test_markdown_string = '_Italic_ *Bold* `Code`'
+
+        message = default_bot.send_audio(chat_id, audio_file, caption=test_markdown_string,
+                                         parse_mode='HTML')
+        assert message.caption == test_markdown_string
+        assert message.caption_markdown == escape_markdown(test_markdown_string)
+
     def test_de_json(self, bot, audio):
-        json_dict = {'file_id': 'not a file id',
-                     'duration': self.duration,
-                     'performer': self.performer,
-                     'title': self.title,
-                     'caption': self.caption,
-                     'mime_type': self.mime_type,
-                     'file_size': self.file_size,
-                     'thumb': audio.thumb.to_dict()}
+        json_dict = {
+            'file_id': self.audio_file_id,
+            'file_unique_id': self.audio_file_unique_id,
+            'duration': self.duration,
+            'performer': self.performer,
+            'title': self.title,
+            'caption': self.caption,
+            'mime_type': self.mime_type,
+            'file_size': self.file_size,
+            'thumb': audio.thumb.to_dict()
+        }
         json_audio = Audio.de_json(json_dict, bot)
 
-        assert json_audio.file_id == 'not a file id'
+        assert json_audio.file_id == self.audio_file_id
+        assert json_audio.file_unique_id == self.audio_file_unique_id
         assert json_audio.duration == self.duration
         assert json_audio.performer == self.performer
         assert json_audio.title == self.title
@@ -156,6 +203,7 @@ class TestAudio(object):
 
         assert isinstance(audio_dict, dict)
         assert audio_dict['file_id'] == audio.file_id
+        assert audio_dict['file_unique_id'] == audio.file_unique_id
         assert audio_dict['duration'] == audio.duration
         assert audio_dict['mime_type'] == audio.mime_type
         assert audio_dict['file_size'] == audio.file_size
@@ -186,11 +234,11 @@ class TestAudio(object):
         assert audio.get_file()
 
     def test_equality(self, audio):
-        a = Audio(audio.file_id, audio.duration)
-        b = Audio(audio.file_id, audio.duration)
-        c = Audio(audio.file_id, 0)
-        d = Audio('', audio.duration)
-        e = Voice(audio.file_id, audio.duration)
+        a = Audio(audio.file_id, audio.file_unique_id, audio.duration)
+        b = Audio('', audio.file_unique_id, audio.duration)
+        c = Audio(audio.file_id, audio.file_unique_id, 0)
+        d = Audio('', '', audio.duration)
+        e = Voice(audio.file_id, audio.file_unique_id, audio.duration)
 
         assert a == b
         assert hash(a) == hash(b)
