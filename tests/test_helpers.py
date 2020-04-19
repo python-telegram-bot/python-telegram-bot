@@ -27,14 +27,14 @@ from telegram import User
 from telegram import MessageEntity
 from telegram.message import Message
 from telegram.utils import helpers
-from telegram.utils.helpers import _UtcOffsetTimezone, _datetime_to_float_timestamp
+from telegram.utils.helpers import _datetime_to_float_timestamp
 
 
 # sample time specification values categorised into absolute / delta / time-of-day
-ABSOLUTE_TIME_SPECS = [dtm.datetime.now(tz=_UtcOffsetTimezone(dtm.timedelta(hours=-7))),
+ABSOLUTE_TIME_SPECS = [dtm.datetime.now(tz=dtm.timezone(dtm.timedelta(hours=-7))),
                        dtm.datetime.utcnow()]
 DELTA_TIME_SPECS = [dtm.timedelta(hours=3, seconds=42, milliseconds=2), 30, 7.5]
-TIME_OF_DAY_TIME_SPECS = [dtm.time(12, 42, tzinfo=_UtcOffsetTimezone(dtm.timedelta(hours=-7))),
+TIME_OF_DAY_TIME_SPECS = [dtm.time(12, 42, tzinfo=dtm.timezone(dtm.timedelta(hours=-7))),
                           dtm.time(12, 42)]
 RELATIVE_TIME_SPECS = DELTA_TIME_SPECS + TIME_OF_DAY_TIME_SPECS
 TIME_SPECS = ABSOLUTE_TIME_SPECS + RELATIVE_TIME_SPECS
