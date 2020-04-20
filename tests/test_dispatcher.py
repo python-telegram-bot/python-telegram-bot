@@ -534,3 +534,145 @@ class TestDispatcher(object):
         assert cdp.persistence.test_flag_bot_data
         assert not cdp.persistence.test_flag_user_data
         assert cdp.persistence.test_flag_chat_data
+
+    def test_set_commands_simple(self, dp):
+        dp.bot.set_my_commands([])
+
+        handler_1 = CommandHandler('start1', None, description='One')
+        handler_2 = CommandHandler('start2', None, description='Two')
+        handler_3 = CommandHandler('start3', None, description='Three')
+        handler_4 = CommandHandler('start4', None, description='Four')
+        dp.add_handler(handler_1)
+        dp.add_handler(handler_2)
+        dp.add_handler(handler_3)
+        dp.add_handler(handler_4)
+
+        dp.set_commands()
+        bot_commands = dp.bot.get_my_commands()
+        assert len(bot_commands) == 4
+        assert bot_commands[0].command == 'start1'
+        assert bot_commands[0].description == 'One'
+        assert bot_commands[1].command == 'start2'
+        assert bot_commands[1].description == 'Two'
+        assert bot_commands[2].command == 'start3'
+        assert bot_commands[2].description == 'Three'
+        assert bot_commands[3].command == 'start4'
+        assert bot_commands[3].description == 'Four'
+
+        handler_1.description = 'One1'
+        handler_2.description = 'Two2'
+        handler_3.description = 'Three3'
+        handler_4.description = 'Four4'
+
+        dp.set_commands(update=True)
+        bot_commands = dp.bot.get_my_commands()
+        assert len(bot_commands) == 4
+        assert bot_commands[0].command == 'start1'
+        assert bot_commands[0].description == 'One1'
+        assert bot_commands[1].command == 'start2'
+        assert bot_commands[1].description == 'Two2'
+        assert bot_commands[2].command == 'start3'
+        assert bot_commands[2].description == 'Three3'
+        assert bot_commands[3].command == 'start4'
+        assert bot_commands[3].description == 'Four4'
+
+    def test_set_commands_alphabetical(self, dp):
+        dp.bot.set_my_commands([])
+
+        dp.add_handler(CommandHandler('start4', None, description='Four'))
+        dp.add_handler(CommandHandler('start3', None, description='Three'))
+        dp.add_handler(CommandHandler('start2', None, description='Two'))
+        dp.add_handler(CommandHandler('start1', None, description='One'))
+
+        dp.set_commands(alphabetical=True)
+        bot_commands = dp.bot.get_my_commands()
+        assert len(bot_commands) == 4
+        assert bot_commands[0].command == 'start1'
+        assert bot_commands[0].description == 'One'
+        assert bot_commands[1].command == 'start2'
+        assert bot_commands[1].description == 'Two'
+        assert bot_commands[2].command == 'start3'
+        assert bot_commands[2].description == 'Three'
+        assert bot_commands[3].command == 'start4'
+        assert bot_commands[3].description == 'Four'
+
+    def test_set_commands_update_add(self, dp):
+        dp.bot.set_my_commands([])
+
+        handler_1 = CommandHandler('start1', None, description='One')
+        handler_2 = CommandHandler('start2', None, description='Two')
+        handler_3 = CommandHandler('start3', None, description='Three')
+        handler_4 = CommandHandler('start4', None, description='Four')
+        dp.add_handler(handler_1)
+        dp.add_handler(handler_2)
+
+        dp.set_commands()
+        bot_commands = dp.bot.get_my_commands()
+        assert len(bot_commands) == 2
+        assert bot_commands[0].command == 'start1'
+        assert bot_commands[0].description == 'One'
+        assert bot_commands[1].command == 'start2'
+        assert bot_commands[1].description == 'Two'
+
+        handler_1.description = 'One1'
+        handler_2.description = 'Two2'
+        dp.add_handler(handler_3)
+        dp.add_handler(handler_4)
+
+        dp.set_commands(add=False, update=False)
+        bot_commands = dp.bot.get_my_commands()
+        assert len(bot_commands) == 2
+        assert bot_commands[0].command == 'start1'
+        assert bot_commands[0].description == 'One'
+        assert bot_commands[1].command == 'start2'
+        assert bot_commands[1].description == 'Two'
+
+        dp.set_commands(add=False, update=True)
+        bot_commands = dp.bot.get_my_commands()
+        assert len(bot_commands) == 2
+        assert bot_commands[0].command == 'start1'
+        assert bot_commands[0].description == 'One1'
+        assert bot_commands[1].command == 'start2'
+        assert bot_commands[1].description == 'Two2'
+
+    def test_set_command_delete(self, dp):
+        dp.bot.set_my_commands([('one', 'desc1'), ('two', 'desc2')])
+
+        handler_1 = CommandHandler('start1', None, description='One')
+        handler_2 = CommandHandler('start2', None, description='Two')
+        dp.add_handler(handler_1)
+        dp.add_handler(handler_2)
+
+        dp.set_commands(delete=False)
+        bot_commands = dp.bot.get_my_commands()
+        assert len(bot_commands) == 4
+        assert bot_commands[0].command == 'start1'
+        assert bot_commands[0].description == 'One'
+        assert bot_commands[1].command == 'start2'
+        assert bot_commands[1].description == 'Two'
+        assert bot_commands[2].command == 'one'
+        assert bot_commands[2].description == 'desc1'
+        assert bot_commands[3].command == 'two'
+        assert bot_commands[3].description == 'desc2'
+
+        dp.set_commands(delete=True)
+        bot_commands = dp.bot.get_my_commands()
+        assert len(bot_commands) == 2
+        assert bot_commands[0].command == 'start1'
+        assert bot_commands[0].description == 'One'
+        assert bot_commands[1].command == 'start2'
+        assert bot_commands[1].description == 'Two'
+
+    def test_set_command_skip_empty(self, dp):
+        dp.bot.set_my_commands([])
+        dp.add_handler(CommandHandler('start1', None, description=None))
+
+        dp.set_commands(skip_empty=True)
+        bot_commands = dp.bot.get_my_commands()
+        assert bot_commands == []
+
+        dp.set_commands(skip_empty=False)
+        bot_commands = dp.bot.get_my_commands()
+        assert len(bot_commands) == 1
+        assert bot_commands[0].command == 'start1'
+        assert bot_commands[0].description == 'Command "start1"'

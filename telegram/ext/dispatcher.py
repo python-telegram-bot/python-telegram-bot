@@ -31,7 +31,7 @@ from queue import Queue, Empty
 
 from future.builtins import range
 
-from telegram import TelegramError, Update
+from telegram import TelegramError, Update, BotCommand
 from telegram.ext.handler import Handler
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.utils.deprecate import TelegramDeprecationWarning
@@ -529,3 +529,72 @@ class Dispatcher(object):
         else:
             self.logger.exception(
                 'No error handlers are registered, logging exception.', exc_info=error)
+
+    def set_commands(self, add=True, update=True, delete=True, skip_empty=False,
+                     alphabetical=False):
+        """
+        Convenience method or registering bot commands with Botfather. Uses
+        :meth:`telegram.Bot.set_my_commands` for all :class:`telegram.ext.CommandHandler` s
+        registered with this dispatcher.
+
+        Note:
+            While this method already allows for some customization, it is to be understood as a
+            simple helper for the most common use cases. If you need to set your bots commands in
+            a specific manner not covered by this method, use :meth:`telegram.Bot.set_my_commands`
+            directly.
+
+        Args:
+            add (:obj:`bool`, optional): If there are commands set for the bot and :attr:`add` is
+                :obj:`False`, no new commands are added. Defaults to :obj:`True`.
+            update (:obj:`bool`, optional): Whether to override descriptions of commands already
+                set. Defaults to :obj:`True`.
+            delete (:obj:`bool`, optional): Whether to delete commands, which are currently set but
+                don't have a corresponding :class:`telegram.ext.CommandHandler` listening for that
+                command. Defaults to :obj:`True`.
+            skip_empty (:obj:`bool`, optional): Whether to skip
+                :class:`telegram.ext.CommandHandler` s with an empty description. If :obj:`False`,
+                empty descriptions will be replaced by ``Command "<command>"``.
+            alphabetical (:obj:`bool`, optional): Whether to sort commands by alphabetical order.
+                If :obj:`False`, commands are sorted in the same order, in with :meth:`add_handler`
+                is invoked. If :attr:`delete` is :obj:`False`, commands without corresponding
+                handler will be last. Defaults to :obj:`False`.
+        """
+        set_bot_commands = self.bot.get_my_commands()
+
+        dp_bot_commands = []
+        for group in self.handlers:
+            for handler in self.handlers[group]:
+                if hasattr(handler, 'command') and hasattr(handler, 'description'):
+                    for cmd in handler.command:
+                        if handler.description or not skip_empty:
+                            desc = handler.description or 'Command "{}"'.format(cmd)
+                            dp_bot_commands.extend([BotCommand(cmd, desc)])
+
+        if not set_bot_commands:
+            new_bot_commands = [bc for bc in dp_bot_commands]
+        else:
+            if add:
+                new_bot_commands = [bc for bc in dp_bot_commands]
+                new_commands = [nbc.command for nbc in new_bot_commands]
+                new_bot_commands.extend([bc for bc in set_bot_commands
+                                         if bc.command not in new_commands])
+            else:
+                new_bot_commands = [bc for bc in set_bot_commands]
+
+            if delete:
+                dp_commands = [bc.command for bc in dp_bot_commands]
+                new_bot_commands = [bc for bc in new_bot_commands if bc.command in dp_commands]
+
+            if update:
+                for bot_command in new_bot_commands:
+                    old_bc = next((bc for bc in set_bot_commands
+                                   if bc.command == bot_command.command), None)
+                    new_bc = next((bc for bc in dp_bot_commands
+                                   if bc.command == bot_command.command), None)
+                    if new_bc and old_bc and new_bc.description != old_bc.description:
+                        bot_command.description = new_bc.description
+
+        if alphabetical:
+            new_bot_commands = sorted(new_bot_commands, key=lambda c: c.command)
+
+        self.bot.set_my_commands(new_bot_commands)

@@ -170,6 +170,19 @@ class TestCommandHandler(BaseTest):
         assert not is_match(handler, make_command_update('/not{}'.format(command[1:])))
         assert not is_match(handler, make_command_update('not {} at start'.format(command)))
 
+    def test_description(self):
+        handler = CommandHandler('start', callback=None)
+        assert handler.description is None
+
+        handler = CommandHandler('start', callback=None, description='Here is a description')
+        assert handler.description == 'Here is a description'
+
+        with pytest.raises(ValueError, match='description'):
+            CommandHandler('start', callback=None, description='ds')
+
+        with pytest.raises(ValueError, match='description'):
+            CommandHandler('start', callback=None, description=257 * '.')
+
     @pytest.mark.parametrize('cmd',
                              ['way_too_longcommand1234567yes_way_toooooooLong', 'ïñválídletters',
                               'invalid #&* chars'],

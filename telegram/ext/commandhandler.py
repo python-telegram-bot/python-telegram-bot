@@ -47,6 +47,7 @@ class CommandHandler(Handler):
         callback (:obj:`callable`): The callback function for this handler.
         filters (:class:`telegram.ext.BaseFilter`): Optional. Only allow updates with these
             Filters.
+        description (:obj:`str`, optional): Description of what this command does.
         allow_edited (:obj:`bool`): Determines Whether the handler should also accept
             edited messages.
         pass_args (:obj:`bool`): Determines whether the handler should be passed
@@ -85,6 +86,9 @@ class CommandHandler(Handler):
             :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
             :class:`telegram.ext.filters.Filters`. Filters can be combined using bitwise
             operators (& for and, | for or, ~ for not).
+        description (:obj:`str`, optional): Description of what this command does. Set, if you
+            register the bots commands with via :meth:`telegram.ext.Dispatcher.set_commands`. Must
+            be 3-256 characters.
         allow_edited (:obj:`bool`, optional): Determines whether the handler should also accept
             edited messages. Default is ``False``.
             DEPRECATED: Edited is allowed by default. To change this behavior use
@@ -124,13 +128,18 @@ class CommandHandler(Handler):
                  pass_update_queue=False,
                  pass_job_queue=False,
                  pass_user_data=False,
-                 pass_chat_data=False):
+                 pass_chat_data=False,
+                 description=None):
         super(CommandHandler, self).__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
             pass_chat_data=pass_chat_data)
+
+        self.description = description
+        if self.description is not None and not 3 <= len(self.description) <= 256:
+            raise ValueError('Command description is not valid.')
 
         if isinstance(command, string_types):
             self.command = [command.lower()]
