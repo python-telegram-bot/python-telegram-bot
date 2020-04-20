@@ -44,8 +44,6 @@ from telegram.error import InvalidToken, TelegramError
 from telegram.utils.helpers import to_timestamp, DEFAULT_NONE
 from telegram.utils.request import Request
 
-logging.getLogger(__name__).addHandler(logging.NullHandler())
-
 
 def info(func):
     @functools.wraps(func)
