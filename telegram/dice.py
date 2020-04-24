@@ -27,6 +27,11 @@ class Dice(TelegramObject):
     (The singular form of "dice" is "die". However, PTB mimics the Telegram API, which uses the
     term "dice".)
 
+    Note:
+        If :attr:`emoji` is "🎯", a value of 6 represents a bullseye, while a value of 1 indicates
+        that the dartboard was missed. However, this behaviour is undocumented and might be changed
+        by Telegram.
+
     Attributes:
         value (:obj:`int`): Value of the dice.
         emoji (:obj:`str`): Emoji on which the dice throw animation is based.
