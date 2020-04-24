@@ -98,7 +98,7 @@ def message(bot):
                         'text': 'next', 'callback_data': 'abcd'}],
                         [{'text': 'Cancel', 'callback_data': 'Cancel'}]]}},
                     {'quote': True},
-                    {'dice': Dice(4)}
+                    {'dice': Dice(4, '🎲')}
                 ],
                 ids=['forwarded_user', 'forwarded_channel', 'reply', 'edited', 'text',
                      'caption_entities', 'audio', 'document', 'animation', 'game', 'photo',

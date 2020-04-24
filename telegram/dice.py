@@ -23,17 +23,21 @@ from telegram import TelegramObject
 
 class Dice(TelegramObject):
     """
-    This object represents a dice with random value from 1 to 6. (The singular form of "dice" is
-    "die". However, PTB mimics the Telegram API, which uses the term "dice".)
+    This object represents a dice with random value from 1 to 6 for currently supported base eomji.
+    (The singular form of "dice" is "die". However, PTB mimics the Telegram API, which uses the
+    term "dice".)
 
     Attributes:
         value (:obj:`int`): Value of the dice.
+        emoji (:obj:`str`): Emoji on which the dice throw animation is based.
 
     Args:
         value (:obj:`int`): Value of the dice, 1-6.
+        emoji (:obj:`str`): Emoji on which the dice throw animation is based.
     """
-    def __init__(self, value, **kwargs):
+    def __init__(self, value, emoji, **kwargs):
         self.value = value
+        self.emoji = emoji
 
     @classmethod
     def de_json(cls, data, bot):
@@ -41,3 +45,6 @@ class Dice(TelegramObject):
             return None
 
         return cls(**data)
+
+    ALL_EMOJI = ['🎲', '🎯']
+    """List[:obj:`str`]: List of all supported base emoji."""
