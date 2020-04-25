@@ -273,8 +273,11 @@ class Filters(object):
             MessageHandler(Filters.text(buttons), callback_method)
 
     Note:
-        Dice messages don't have text. If you want to filter either text or dice messages, use
-        ``Filters.text | Filters.dice``.
+        * Dice messages don't have text. If you want to filter either text or dice messages, use
+          ``Filters.text | Filters.dice``.
+        * Messages containing a command are accepted by this filter. Use
+          ``Filters.text & (~Filters.command)``, if you want to filter only text messages without
+          commands.
 
     Args:
         update (List[:obj:`str`] | Tuple[:obj:`str`], optional): Which messages to allow. Only
@@ -349,6 +352,9 @@ class Filters(object):
 
         MessageHandler(Filters.command, command_at_start_callback)
         MessageHandler(Filters.command(False), command_anywhere_callback)
+
+    Note:
+        ``Filters.text`` also accepts messages containing a command.
 
     Args:
         update (:obj:`bool`, optional): Whether to only allow messages that `start` with a bot
@@ -998,9 +1004,9 @@ officedocument.wordprocessingml.document")``-
         update (:obj:`int` | List[:obj:`int`], optional): Which values to allow. If not
             specified, will allow any dice message.
 
-        Note:
-            Dice messages don't have text. If you want to filter either text or dice messages, use
-            ``Filters.text | Filters.dice``.
+    Note:
+        Dice messages don't have text. If you want to filter either text or dice messages, use
+        ``Filters.text | Filters.dice``.
     """
 
     class language(BaseFilter):

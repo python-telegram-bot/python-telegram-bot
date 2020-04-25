@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+
 import datetime as dtm
 import os
 import sys
@@ -298,17 +299,20 @@ class TestJobQueue(object):
         with pytest.raises(ValueError, match='can not be'):
             j.interval = None
         j.repeat = False
-        with pytest.raises(ValueError, match='must be of type'):
+        with pytest.raises(TypeError, match='must be of type'):
             j.interval = 'every 3 minutes'
         j.interval = 15
         assert j.interval_seconds == 15
 
-        with pytest.raises(ValueError, match='argument should be of type'):
+        with pytest.raises(TypeError, match='argument should be of type'):
             j.days = 'every day'
-        with pytest.raises(ValueError, match='The elements of the'):
+        with pytest.raises(TypeError, match='The elements of the'):
             j.days = ('mon', 'wed')
         with pytest.raises(ValueError, match='from 0 up to and'):
             j.days = (0, 6, 12, 14)
+
+        with pytest.raises(TypeError, match='argument should be one of the'):
+            j._set_next_t('tomorrow')
 
     def test_get_jobs(self, job_queue):
         job1 = job_queue.run_once(self.job_run_once, 10, name='name1')
@@ -341,3 +345,95 @@ class TestJobQueue(object):
 
         for job in jobs:
             assert job.tzinfo == _UTC
+
+    def test_job_next_t_property(self, job_queue):
+        # Testing:
+        # - next_t values match values from self._queue.queue (for run_once and run_repeating jobs)
+        # - next_t equals None if job is removed or if it's already ran
+
+        job1 = job_queue.run_once(self.job_run_once, 0.06, name='run_once job')
+        job2 = job_queue.run_once(self.job_run_once, 0.06, name='canceled run_once job')
+        job_queue.run_repeating(self.job_run_once, 0.04, name='repeatable job')
+
+        sleep(0.05)
+        job2.schedule_removal()
+
+        with job_queue._queue.mutex:
+            for t, job in job_queue._queue.queue:
+                t = dtm.datetime.fromtimestamp(t, job.tzinfo)
+
+                if job.removed:
+                    assert job.next_t is None
+                else:
+                    assert job.next_t == t
+
+        assert self.result == 1
+        sleep(0.02)
+
+        assert self.result == 2
+        assert job1.next_t is None
+        assert job2.next_t is None
+
+    def test_job_set_next_t(self, job_queue):
+        # Testing next_t setter for 'datetime.datetime' values
+
+        job = job_queue.run_once(self.job_run_once, 0.05)
+
+        t = dtm.datetime.now(tz=_UtcOffsetTimezone(dtm.timedelta(hours=12)))
+        job._set_next_t(t)
+        job.tzinfo = _UtcOffsetTimezone(dtm.timedelta(hours=5))
+        assert job.next_t == t.astimezone(job.tzinfo)
+
+    def test_passing_tzinfo_to_job(self, job_queue):
+        """Test that tzinfo is correctly passed to job with run_once, run_daily
+        and run_repeating methods"""
+
+        when_dt_tz_specific = dtm.datetime.now(
+            tz=_UtcOffsetTimezone(dtm.timedelta(hours=12))
+        ) + dtm.timedelta(seconds=2)
+        when_dt_tz_utc = dtm.datetime.now() + dtm.timedelta(seconds=2)
+        job_once1 = job_queue.run_once(self.job_run_once, when_dt_tz_specific)
+        job_once2 = job_queue.run_once(self.job_run_once, when_dt_tz_utc)
+
+        when_time_tz_specific = (dtm.datetime.now(
+            tz=_UtcOffsetTimezone(dtm.timedelta(hours=12))
+        ) + dtm.timedelta(seconds=2)).timetz()
+        when_time_tz_utc = (dtm.datetime.now() + dtm.timedelta(seconds=2)).timetz()
+        job_once3 = job_queue.run_once(self.job_run_once, when_time_tz_specific)
+        job_once4 = job_queue.run_once(self.job_run_once, when_time_tz_utc)
+
+        first_dt_tz_specific = dtm.datetime.now(
+            tz=_UtcOffsetTimezone(dtm.timedelta(hours=12))
+        ) + dtm.timedelta(seconds=2)
+        first_dt_tz_utc = dtm.datetime.now() + dtm.timedelta(seconds=2)
+        job_repeating1 = job_queue.run_repeating(
+            self.job_run_once, 2, first=first_dt_tz_specific)
+        job_repeating2 = job_queue.run_repeating(
+            self.job_run_once, 2, first=first_dt_tz_utc)
+
+        first_time_tz_specific = (dtm.datetime.now(
+            tz=_UtcOffsetTimezone(dtm.timedelta(hours=12))
+        ) + dtm.timedelta(seconds=2)).timetz()
+        first_time_tz_utc = (dtm.datetime.now() + dtm.timedelta(seconds=2)).timetz()
+        job_repeating3 = job_queue.run_repeating(
+            self.job_run_once, 2, first=first_time_tz_specific)
+        job_repeating4 = job_queue.run_repeating(
+            self.job_run_once, 2, first=first_time_tz_utc)
+
+        time_tz_specific = (dtm.datetime.now(
+            tz=_UtcOffsetTimezone(dtm.timedelta(hours=12))
+        ) + dtm.timedelta(seconds=2)).timetz()
+        time_tz_utc = (dtm.datetime.now() + dtm.timedelta(seconds=2)).timetz()
+        job_daily1 = job_queue.run_daily(self.job_run_once, time_tz_specific)
+        job_daily2 = job_queue.run_daily(self.job_run_once, time_tz_utc)
+
+        assert job_once1.tzinfo == when_dt_tz_specific.tzinfo
+        assert job_once2.tzinfo == _UTC
+        assert job_once3.tzinfo == when_time_tz_specific.tzinfo
+        assert job_once4.tzinfo == _UTC
+        assert job_repeating1.tzinfo == first_dt_tz_specific.tzinfo
+        assert job_repeating2.tzinfo == _UTC
+        assert job_repeating3.tzinfo == first_time_tz_specific.tzinfo
+        assert job_repeating4.tzinfo == _UTC
+        assert job_daily1.tzinfo == time_tz_specific.tzinfo
+        assert job_daily2.tzinfo == _UTC
