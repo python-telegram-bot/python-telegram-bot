@@ -23,6 +23,7 @@ try:
 except ImportError:
     import json
 
+import warnings
 from abc import ABCMeta
 
 
@@ -81,6 +82,9 @@ class TelegramObject(object):
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
+            if self._id_attrs == ():
+                warnings.warn("Objects of type {} can not be meaningfully tested for "
+                              "equivalence.".format(self.__class__.__name__))
             return self._id_attrs == other._id_attrs
         return super(TelegramObject, self).__eq__(other)  # pylint: disable=no-member
 

@@ -74,3 +74,24 @@ class TestTelegramObject(object):
 
         monkeypatch.setattr('telegram.TelegramObject.to_dict', lambda _: d)
         telegram_object.to_json()
+
+    def test_meaningless_comparison(self, recwarn):
+        class TGO(TelegramObject):
+            pass
+
+        a = TGO()
+        b = TGO()
+        assert a == b
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message) == (
+            "Objects of type TGO can not be meaningfully tested for equivalence."
+        )
+
+    def test_meaningful_comparison(self, recwarn):
+        class TGO(TelegramObject):
+            _id_attrs = (1,)
+
+        a = TGO()
+        b = TGO()
+        assert a == b
+        assert len(recwarn) == 0
