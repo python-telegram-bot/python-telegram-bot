@@ -434,7 +434,7 @@ class Bot(TelegramObject):
 
     @log
     def send_photo(self,
-                   chat_id,
+                   chat_id: int,
                    photo,
                    caption=None,
                    disable_notification=False,
