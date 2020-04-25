@@ -6,7 +6,7 @@ PYTEST          := pytest
 PEP257          := pep257
 PEP8            := flake8
 YAPF            := yapf
-MYPY			:= mypy
+MYPY            := mypy
 PIP             := pip
 
 clean:
