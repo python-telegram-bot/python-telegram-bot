@@ -76,6 +76,26 @@ class TestBot(object):
         with pytest.raises(InvalidToken):
             bot.get_me()
 
+    def test_unknown_kwargs_post(self, bot, monkeypatch, recwarn):
+        def post(url, data, timeout):
+            assert data['unknown_kwarg_1'] == 7
+            assert data['unknown_kwarg_2'] == 5
+
+        monkeypatch.setattr(bot.request, 'post', post)
+        bot.send_message(123, 'text', unknown_kwarg_1=7, unknown_kwarg_2=5)
+
+        assert len(recwarn) == 1
+        assert 'sendMessage got unknown' in str(recwarn[0].message)
+        assert 'unknown_kwarg_1, unknown_kwarg_2' in str(recwarn[0].message)
+
+    def test_unknown_kwargs_get(self, bot, monkeypatch, recwarn):
+        monkeypatch.setattr(bot.request, 'get', lambda *args, **kwargs: None)
+        bot.get_me(unknown_kwargs=7)
+
+        assert len(recwarn) == 1
+        assert 'getMe got unknown' in str(recwarn[0].message)
+        assert 'unknown_kwargs' in str(recwarn[0].message)
+
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_get_me_and_properties(self, bot):
