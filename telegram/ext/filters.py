@@ -870,49 +870,55 @@ officedocument.wordprocessingml.document")``-
             if (user_id is None) == (username is None):
                 raise ValueError('One and only one of user_id or username must be used')
 
-            self._user_ids_lock = Lock()
-            self._usernames_lock = Lock()
+            self.__lock = Lock()
 
-            # Initialize in a way that will not fail the first setter calls
-            self._user_ids = user_id
-            self._usernames = username
-            # Actually initialize
-            self.user_ids = user_id
-            self.usernames = username
+            self._user_ids = None
+            self._usernames = None
+
+            self._set_user_ids(user_id)
+            self._set_usernames(username)
+
+        def _set_user_ids(self, user_id):
+            if user_id is None:
+                self._user_ids = None
+            elif isinstance(user_id, int):
+                self._user_ids = {user_id}
+            else:
+                self._user_ids = set(user_id)
+
+        def _set_usernames(self, username):
+            if username is None:
+                self._usernames = None
+            elif isinstance(username, str):
+                self._usernames = {username.replace('@', '')}
+            else:
+                self._usernames = set([user.replace('@', '') for user in username])
 
         @property
         def user_ids(self):
-            with self._user_ids_lock:
-                return self._user_ids
+            with self.__lock:
+                return frozenset(self._user_ids) if self._user_ids is not None else None
 
         @user_ids.setter
         def user_ids(self, user_id):
-            if (user_id is None) == (self.usernames is None):
-                raise ValueError('One and only one of user_id or username must be used')
-            with self._user_ids_lock:
-                if user_id is None:
-                    self._user_ids = None
-                elif isinstance(user_id, int):
-                    self._user_ids = set([user_id])
-                else:
-                    self._user_ids = set(user_id)
+            with self.__lock:
+                if (user_id is None) == (self._usernames is None):
+                    raise RuntimeError(('Can\'t set user_id in conjunction with (already set) '
+                                        'usernames.'))
+                self._set_user_ids(user_id)
 
         @property
         def usernames(self):
-            with self._usernames_lock:
-                return self._usernames
+            with self.__lock:
+                return frozenset(self._usernames) if self._usernames is not None else None
 
         @usernames.setter
         def usernames(self, username):
-            if (username is None) == (self.user_ids is None):
-                raise ValueError('One and only one of user_id or username must be used')
-            with self._usernames_lock:
-                if username is None:
-                    self._usernames = None
-                elif isinstance(username, str):
-                    self._usernames = set([username.replace('@', '')])
-                else:
-                    self._usernames = set([user.replace('@', '') for user in username])
+            with self.__lock:
+                if (username is None) == (self._user_ids is None):
+                    raise RuntimeError(('Can\'t set username in conjunction with (already set) '
+                                        'user_ids.'))
+                self._set_usernames(username)
 
         def filter(self, message):
             """"""  # remove method from docs

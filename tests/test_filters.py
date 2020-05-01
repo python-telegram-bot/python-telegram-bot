@@ -593,7 +593,7 @@ class TestFilters(object):
         f.user_ids = 2
         assert f(update)
 
-        with pytest.raises(ValueError, match='user_id or username'):
+        with pytest.raises(RuntimeError, match='username in conjunction'):
             f.usernames = 'user'
 
     def test_filters_user_change_username(self, update):
@@ -605,7 +605,7 @@ class TestFilters(object):
         f.usernames = 'User'
         assert f(update)
 
-        with pytest.raises(ValueError, match='user_id or username'):
+        with pytest.raises(RuntimeError, match='user_id in conjunction'):
             f.user_ids = 1
 
     def test_filters_chat(self):
