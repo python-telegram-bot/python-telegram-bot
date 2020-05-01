@@ -557,15 +557,13 @@ class TestFilters(object):
         update.message.chat.type = 'supergroup'
         assert Filters.group(update)
 
-    def test_filters_user(self):
-        with pytest.raises(ValueError, match='user_id or username'):
+    def test_filters_user_init(self):
+        with pytest.raises(RuntimeError, match='in conjunction with'):
             Filters.user(user_id=1, username='user')
-        with pytest.raises(ValueError, match='user_id or username'):
-            Filters.user()
 
-    def test_filters_user_empty_args(self, update):
-        assert not Filters.user(user_id=[])(update)
-        assert not Filters.user(username=[])(update)
+    def test_filters_user_allow_empty(self, update):
+        assert not Filters.user()(update)
+        assert Filters.user(allow_empty=True)(update)
 
     def test_filters_user_id(self, update):
         assert not Filters.user(user_id=1)(update)

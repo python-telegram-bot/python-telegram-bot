@@ -855,32 +855,34 @@ officedocument.wordprocessingml.document")``-
             user_ids(set(:obj:`int`), optional): Which user ID(s) to allow through.
             usernames(set(:obj:`str`), optional): Which username(s) (without leading '@') to allow
                 through.
+            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
+                is specified in :attr:`user_ids` and :attr:`usernames`.
         Args:
             user_id(:obj:`int` | List[:obj:`int`], optional): Which user ID(s) to allow
                 through.
             username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow
                 through. If username starts with '@' symbol, it will be ignored.
+            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
+                is specified in :attr:`user_ids` and :attr:`usernames`. Defaults to :obj:`False`
 
         Raises:
             ValueError: If chat_id and username are both present, or neither is.
 
         """
 
-        def __init__(self, user_id=None, username=None):
-            if (user_id is None) == (username is None):
-                raise ValueError('One and only one of user_id or username must be used')
-
+        def __init__(self, user_id=None, username=None, allow_empty=False):
+            self.allow_empty = allow_empty
             self.__lock = Lock()
 
-            self._user_ids = None
-            self._usernames = None
+            self._user_ids = {}
+            self._usernames = {}
 
-            self._set_user_ids(user_id)
-            self._set_usernames(username)
+            self.user_ids = user_id
+            self.usernames = username
 
         def _set_user_ids(self, user_id):
             if user_id is None:
-                self._user_ids = None
+                self._user_ids = {}
             elif isinstance(user_id, int):
                 self._user_ids = {user_id}
             else:
@@ -888,7 +890,7 @@ officedocument.wordprocessingml.document")``-
 
         def _set_usernames(self, username):
             if username is None:
-                self._usernames = None
+                self._usernames = {}
             elif isinstance(username, str):
                 self._usernames = {username.replace('@', '')}
             else:
@@ -902,7 +904,7 @@ officedocument.wordprocessingml.document")``-
         @user_ids.setter
         def user_ids(self, user_id):
             with self.__lock:
-                if (user_id is None) == (self._usernames is None):
+                if user_id and self._usernames:
                     raise RuntimeError(('Can\'t set user_id in conjunction with (already set) '
                                         'usernames.'))
                 self._set_user_ids(user_id)
@@ -915,19 +917,21 @@ officedocument.wordprocessingml.document")``-
         @usernames.setter
         def usernames(self, username):
             with self.__lock:
-                if (username is None) == (self._user_ids is None):
+                if username and self._user_ids:
                     raise RuntimeError(('Can\'t set username in conjunction with (already set) '
                                         'user_ids.'))
                 self._set_usernames(username)
 
         def filter(self, message):
             """"""  # remove method from docs
-            if self.user_ids is not None:
-                return bool(message.from_user and message.from_user.id in self.user_ids)
-            else:
-                # self.usernames is not None
-                return bool(message.from_user and message.from_user.username
-                            and message.from_user.username in self.usernames)
+            if bool(message.from_user):
+                if self.user_ids:
+                    return bool(message.from_user.id in self.user_ids)
+                if self.usernames:
+                    return bool(message.from_user.username
+                                and message.from_user.username in self.usernames)
+                return self.allow_empty
+            return False
 
     class chat(BaseFilter):
         """Filters messages to allow only those which are from specified chat ID.
