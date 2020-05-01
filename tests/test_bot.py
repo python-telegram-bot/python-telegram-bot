@@ -30,6 +30,7 @@ from telegram import (Bot, Update, ChatAction, TelegramError, User, InlineKeyboa
                       InlineQueryResultDocument)
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
 from telegram.utils.helpers import from_timestamp, escape_markdown
+from tests.conftest import expect_bad_request
 
 BASE_TIME = time.time()
 HIGHSCORE_DELTA = 1450000000
@@ -816,13 +817,19 @@ class TestBot(object):
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_set_chat_photo(self, bot, channel_id):
-        with open('tests/data/telegram_test_channel.jpg', 'rb') as f:
+        def func():
             assert bot.set_chat_photo(channel_id, f)
+
+        with open('tests/data/telegram_test_channel.jpg', 'rb') as f:
+            expect_bad_request(func, 'Type of file mismatch', 'Telegram did not accept the file.')
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_delete_chat_photo(self, bot, channel_id):
-        assert bot.delete_chat_photo(channel_id)
+        def func():
+            assert bot.delete_chat_photo(channel_id)
+
+        expect_bad_request(func, 'Chat_not_modified', 'Chat photo was not set.')
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
