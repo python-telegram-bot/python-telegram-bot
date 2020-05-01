@@ -2103,7 +2103,7 @@ class Bot(TelegramObject):
                 updates may be received for a short period of time.
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
-        Notes:
+        Note:
             1. This method will not work if an outgoing webhook is set up.
             2. In order to avoid getting duplicate updates, recalculate offset after each
                server response.

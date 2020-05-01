@@ -249,7 +249,7 @@ class MessageQueue(object):
                 ``DelayQueue`` (if set to ``False``), resulting in needed delays to avoid
                 hitting specified limits. Defaults to ``False``.
 
-        Notes:
+        Note:
             Method is designed to accept ``telegram.utils.promise.Promise`` as ``promise``
             argument, but other callables could be used too. For example, lambdas or simple
             functions could be used to wrap original func to be called with needed args. In that
