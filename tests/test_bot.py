@@ -285,12 +285,15 @@ class TestBot(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    @pytest.mark.parametrize('emoji', Dice.ALL_EMOJI)
+    @pytest.mark.parametrize('emoji', Dice.ALL_EMOJI + [None])
     def test_send_dice(self, bot, chat_id, emoji):
         message = bot.send_dice(chat_id, emoji=emoji)
 
         assert message.dice
-        assert message.dice.emoji == emoji
+        if emoji is None:
+            assert message.dice.emoji == Dice.DICE
+        else:
+            assert message.dice.emoji == emoji
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

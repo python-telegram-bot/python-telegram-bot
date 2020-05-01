@@ -223,13 +223,10 @@ class _DiceEmoji(BaseFilter):
 
     class _DiceValues(BaseFilter):
 
-        def __init__(self, values, emoji=None, name=None):
+        def __init__(self, values, name, emoji=None):
             self.values = [values] if isinstance(values, int) else values
             self.emoji = emoji
-            if name:
-                self.name = 'Filters.dice.{}({})'.format(name, values)
-            else:
-                self.name = 'Filters.dice({})'.format(values)
+            self.name = '{}({})'.format(name, values)
 
         def filter(self, message):
             if bool(message.dice and message.dice.value in self.values):
@@ -241,7 +238,7 @@ class _DiceEmoji(BaseFilter):
         if isinstance(update, Update):
             return self.filter(update.effective_message)
         else:
-            return self._DiceValues(update, emoji=self.emoji, name=self.name)
+            return self._DiceValues(update, self.name, emoji=self.emoji)
 
     def filter(self, message):
         if bool(message.dice):
