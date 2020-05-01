@@ -29,10 +29,11 @@ from telegram.utils.promise import Promise
 
 
 class _ConversationTimeoutContext(object):
-    def __init__(self, conversation_key, update, dispatcher):
+    def __init__(self, conversation_key, update, dispatcher, callback_context):
         self.conversation_key = conversation_key
         self.update = update
         self.dispatcher = dispatcher
+        self.callback_context = callback_context
 
 
 class ConversationHandler(Handler):
@@ -96,8 +97,9 @@ class ConversationHandler(Handler):
         conversation_timeout (:obj:`float` | :obj:`datetime.timedelta`): Optional. When this
             handler is inactive more than this timeout (in seconds), it will be automatically
             ended. If this value is 0 (default), there will be no timeout. When it's triggered, the
-            last received update will be handled by ALL the handler's who's `check_update` method
-            returns True that are in the state :attr:`ConversationHandler.TIMEOUT`.
+            last received update and the corresponding ``context`` will be handled by ALL the
+            handler's who's `check_update` method returns True that are in the state
+            :attr:`ConversationHandler.TIMEOUT`.
         name (:obj:`str`): Optional. The name for this conversationhandler. Required for
             persistence
         persistent (:obj:`bool`): Optional. If the conversations dict for this handler should be
@@ -130,8 +132,9 @@ class ConversationHandler(Handler):
         conversation_timeout (:obj:`float` | :obj:`datetime.timedelta`, optional): When this
             handler is inactive more than this timeout (in seconds), it will be automatically
             ended. If this value is 0 or None (default), there will be no timeout. The last
-            received update will be handled by ALL the handler's who's `check_update` method
-            returns True that are in the state :attr:`ConversationHandler.TIMEOUT`.
+            received update and the corresponding ``context`` will be handled by ALL the handler's
+            who's `check_update` method returns True that are in the state
+            :attr:`ConversationHandler.TIMEOUT`.
         name (:obj:`str`, optional): The name for this conversationhandler. Required for
             persistence
         persistent (:obj:`bool`, optional): If the conversations dict for this handler should be
@@ -466,7 +469,8 @@ class ConversationHandler(Handler):
                 # Add the new timeout job
                 self.timeout_jobs[conversation_key] = dispatcher.job_queue.run_once(
                     self._trigger_timeout, self.conversation_timeout,
-                    context=_ConversationTimeoutContext(conversation_key, update, dispatcher))
+                    context=_ConversationTimeoutContext(conversation_key, update,
+                                                        dispatcher, context))
 
         if isinstance(self.map_to_parent, dict) and new_state in self.map_to_parent:
             self.update_state(self.END, conversation_key)
@@ -503,9 +507,9 @@ class ConversationHandler(Handler):
         callback_context = None
         if isinstance(context, CallbackContext):
             job = context.job
-            callback_context = context
 
         context = job.context
+        callback_context = context.callback_context
 
         with self._timeout_jobs_lock:
             found_job = self.timeout_jobs[context.conversation_key]

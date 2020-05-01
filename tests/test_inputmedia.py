@@ -31,6 +31,7 @@ from .test_document import document, document_file  # noqa: F401
 from .test_photo import _photo, photo_file, photo, thumb  # noqa: F401
 # noinspection PyUnresolvedReferences
 from .test_video import video, video_file  # noqa: F401
+from tests.conftest import expect_bad_request
 
 
 @pytest.fixture(scope='class')
@@ -320,10 +321,14 @@ class TestSendMediaGroup(object):
     @pytest.mark.timeout(10)  # noqa: F811
     def test_send_media_group_new_files(self, bot, chat_id, video_file, photo_file,  # noqa: F811
                                         animation_file):  # noqa: F811
-        messages = bot.send_media_group(chat_id, [
-            InputMediaVideo(video_file),
-            InputMediaPhoto(photo_file)
-        ])
+        def func():
+            return bot.send_media_group(chat_id, [
+                InputMediaVideo(video_file),
+                InputMediaPhoto(photo_file)
+            ])
+        messages = expect_bad_request(func, 'Type of file mismatch',
+                                      'Telegram did not accept the file.')
+
         assert isinstance(messages, list)
         assert len(messages) == 2
         assert all([isinstance(mes, Message) for mes in messages])

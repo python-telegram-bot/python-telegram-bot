@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# pylint: disable=R0903
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2020
@@ -16,5 +17,27 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+"""This module contains an object that represents a Telegram Dice."""
+from telegram import TelegramObject
 
-__version__ = '12.6.1'
+
+class Dice(TelegramObject):
+    """
+    This object represents a dice with random value from 1 to 6. (The singular form of "dice" is
+    "die". However, PTB mimics the Telegram API, which uses the term "dice".)
+
+    Attributes:
+        value (:obj:`int`): Value of the dice.
+
+    Args:
+        value (:obj:`int`): Value of the dice, 1-6.
+    """
+    def __init__(self, value, **kwargs):
+        self.value = value
+
+    @classmethod
+    def de_json(cls, data, bot):
+        if not data:
+            return None
+
+        return cls(**data)

@@ -449,3 +449,88 @@ class TestDispatcher(object):
         with pytest.warns(TelegramDeprecationWarning):
             Dispatcher(dp.bot, dp.update_queue, job_queue=dp.job_queue, workers=0,
                        use_context=False)
+
+    def test_error_while_persisting(self, cdp, monkeypatch):
+        class OwnPersistence(BasePersistence):
+            def __init__(self):
+                super(OwnPersistence, self).__init__()
+                self.store_user_data = True
+                self.store_chat_data = True
+                self.store_bot_data = True
+
+            def update(self, data):
+                raise Exception('PersistenceError')
+
+            def update_bot_data(self, data):
+                self.update(data)
+
+            def update_chat_data(self, chat_id, data):
+                self.update(data)
+
+            def update_user_data(self, user_id, data):
+                self.update(data)
+
+        def callback(update, context):
+            pass
+
+        test_flag = False
+
+        def error(update, context):
+            nonlocal test_flag
+            test_flag = str(context.error) == 'PersistenceError'
+            raise Exception('ErrorHandlingError')
+
+        def logger(message):
+            assert 'uncaught error was raised while handling' in message
+
+        update = Update(1, message=Message(1, User(1, '', False), None, Chat(1, ''), text='Text'))
+        handler = MessageHandler(Filters.all, callback)
+        cdp.add_handler(handler)
+        cdp.add_error_handler(error)
+        monkeypatch.setattr(cdp.logger, 'exception', logger)
+
+        cdp.persistence = OwnPersistence()
+        cdp.process_update(update)
+        assert test_flag
+
+    def test_persisting_no_user_no_chat(self, cdp):
+        class OwnPersistence(BasePersistence):
+            def __init__(self):
+                super(OwnPersistence, self).__init__()
+                self.store_user_data = True
+                self.store_chat_data = True
+                self.store_bot_data = True
+                self.test_flag_bot_data = False
+                self.test_flag_chat_data = False
+                self.test_flag_user_data = False
+
+            def update_bot_data(self, data):
+                self.test_flag_bot_data = True
+
+            def update_chat_data(self, chat_id, data):
+                self.test_flag_chat_data = True
+
+            def update_user_data(self, user_id, data):
+                self.test_flag_user_data = True
+
+        def callback(update, context):
+            pass
+
+        handler = MessageHandler(Filters.all, callback)
+        cdp.add_handler(handler)
+        cdp.persistence = OwnPersistence()
+
+        update = Update(1, message=Message(1, User(1, '', False), None, None, text='Text'))
+        cdp.process_update(update)
+        assert cdp.persistence.test_flag_bot_data
+        assert cdp.persistence.test_flag_user_data
+        assert not cdp.persistence.test_flag_chat_data
+
+        cdp.persistence.test_flag_bot_data = False
+        cdp.persistence.test_flag_user_data = False
+        cdp.persistence.test_flag_chat_data = False
+        update = Update(1, message=Message(1, None, None, Chat(1, ''), text='Text'))
+        cdp.process_update(update)
+        assert cdp.persistence.test_flag_bot_data
+        assert not cdp.persistence.test_flag_user_data
+        assert cdp.persistence.test_flag_chat_data

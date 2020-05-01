@@ -22,7 +22,7 @@ import pytest
 
 from telegram import (Update, Message, User, MessageEntity, Chat, Audio, Document, Animation,
                       Game, PhotoSize, Sticker, Video, Voice, VideoNote, Contact, Location, Venue,
-                      Invoice, SuccessfulPayment, PassportData, ParseMode, Poll, PollOption)
+                      Invoice, SuccessfulPayment, PassportData, ParseMode, Poll, PollOption, Dice)
 from tests.test_passport import RAW_PASSPORT_DATA
 
 
@@ -97,7 +97,8 @@ def message(bot):
                         'text': 'start', 'url': 'http://google.com'}, {
                         'text': 'next', 'callback_data': 'abcd'}],
                         [{'text': 'Cancel', 'callback_data': 'Cancel'}]]}},
-                    {'quote': True}
+                    {'quote': True},
+                    {'dice': Dice(4)}
                 ],
                 ids=['forwarded_user', 'forwarded_channel', 'reply', 'edited', 'text',
                      'caption_entities', 'audio', 'document', 'animation', 'game', 'photo',
@@ -107,7 +108,7 @@ def message(bot):
                      'migrated_from', 'pinned', 'invoice', 'successful_payment',
                      'connected_website', 'forward_signature', 'author_signature',
                      'photo_from_media_group', 'passport_data', 'poll', 'reply_markup',
-                     'default_quote'])
+                     'default_quote', 'dice'])
 def message_params(bot, request):
     return Message(message_id=TestMessage.id_,
                    from_user=TestMessage.from_user,
@@ -702,7 +703,7 @@ class TestMessage(object):
     def test_reply_poll(self, monkeypatch, message):
         def test(*args, **kwargs):
             id_ = args[0] == message.chat_id
-            contact = kwargs['contact'] == 'test_poll'
+            contact = kwargs['question'] == 'test_poll'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
@@ -710,8 +711,22 @@ class TestMessage(object):
             return id_ and contact and reply
 
         monkeypatch.setattr(message.bot, 'send_poll', test)
-        assert message.reply_poll(contact='test_poll')
-        assert message.reply_poll(contact='test_poll', quote=True)
+        assert message.reply_poll(question='test_poll')
+        assert message.reply_poll(question='test_poll', quote=True)
+
+    def test_reply_dice(self, monkeypatch, message):
+        def test(*args, **kwargs):
+            id_ = args[0] == message.chat_id
+            contact = kwargs['disable_notification'] is True
+            if kwargs.get('reply_to_message_id'):
+                reply = kwargs['reply_to_message_id'] == message.message_id
+            else:
+                reply = True
+            return id_ and contact and reply
+
+        monkeypatch.setattr(message.bot, 'send_dice', test)
+        assert message.reply_dice(disable_notification=True)
+        assert message.reply_dice(disable_notification=True, quote=True)
 
     def test_forward(self, monkeypatch, message):
         def test(*args, **kwargs):

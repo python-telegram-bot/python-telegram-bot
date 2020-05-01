@@ -138,6 +138,8 @@ class StickerSet(TelegramObject):
         is_animated (:obj:`bool`): True, if the sticker set contains animated stickers.
         contains_masks (:obj:`bool`): True, if the sticker set contains masks.
         stickers (List[:class:`telegram.Sticker`]): List of all set stickers.
+        thumb (:class:`telegram.PhotoSize`): Optional. Sticker set thumbnail in the .WEBP or .TGS
+            format
 
     Args:
         name (:obj:`str`): Sticker set name.
@@ -145,15 +147,20 @@ class StickerSet(TelegramObject):
         is_animated (:obj:`bool`): True, if the sticker set contains animated stickers.
         contains_masks (:obj:`bool`): True, if the sticker set contains masks.
         stickers (List[:class:`telegram.Sticker`]): List of all set stickers.
+        thumb (:class:`telegram.PhotoSize`, optional): Sticker set thumbnail in the .WEBP or .TGS
+            format
 
     """
 
-    def __init__(self, name, title, is_animated, contains_masks, stickers, bot=None, **kwargs):
+    def __init__(self, name, title, is_animated, contains_masks, stickers, bot=None, thumb=None,
+                 **kwargs):
         self.name = name
         self.title = title
         self.is_animated = is_animated
         self.contains_masks = contains_masks
         self.stickers = stickers
+        # Optionals
+        self.thumb = thumb
 
         self._id_attrs = (self.name,)
 
@@ -164,6 +171,7 @@ class StickerSet(TelegramObject):
 
         data = super(StickerSet, StickerSet).de_json(data, bot)
 
+        data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
         data['stickers'] = Sticker.de_list(data.get('stickers'), bot)
 
         return StickerSet(bot=bot, **data)
@@ -187,7 +195,7 @@ class MaskPosition(TelegramObject):
             size, from top to bottom.
         scale (:obj:`float`): Mask scaling coefficient. For example, 2.0 means double size.
 
-    Notes:
+    Note:
         :attr:`type` should be one of the following: `forehead`, `eyes`, `mouth` or `chin`. You can
         use the classconstants for those.
 
