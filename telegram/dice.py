@@ -28,9 +28,9 @@ class Dice(TelegramObject):
     term "dice".)
 
     Note:
-        If :attr:`emoji` is "🎯", a value of 6 represents a bullseye, while a value of 1 indicates
-        that the dartboard was missed. However, this behaviour is undocumented and might be changed
-        by Telegram.
+        If :attr:`emoji` is "🎯", a value of 6 currently represents a bullseye, while a value of 1
+        indicates that the dartboard was missed. However, this behaviour is undocumented and might
+        be changed by Telegram.
 
     Attributes:
         value (:obj:`int`): Value of the dice.
@@ -51,5 +51,10 @@ class Dice(TelegramObject):
 
         return cls(**data)
 
-    ALL_EMOJI = ['🎲', '🎯']
-    """List[:obj:`str`]: List of all supported base emoji."""
+    DICE = '🎲'
+    """:obj:`str`: '🎲'"""
+    DARTS = '🎯'
+    """:obj:`str`: '🎯'"""
+    ALL_EMOJI = [DICE, DARTS]
+    """List[:obj:`str`]: List of all supported base emoji. Currently :attr:`DICE` and
+    :attr:`DARTS`."""
