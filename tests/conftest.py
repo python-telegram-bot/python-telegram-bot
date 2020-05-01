@@ -32,6 +32,7 @@ from telegram import (Bot, Message, User, Chat, MessageEntity, Update,
                       ChosenInlineResult)
 from telegram.ext import Dispatcher, JobQueue, Updater, BaseFilter, Defaults
 from telegram.utils.helpers import _UtcOffsetTimezone
+from telegram.error import BadRequest
 from tests.bots import get_bot
 
 GITHUB_ACTION = os.getenv('GITHUB_ACTION', False)
@@ -281,3 +282,26 @@ def utc_offset(request):
 @pytest.fixture()
 def timezone(utc_offset):
     return _UtcOffsetTimezone(utc_offset)
+
+
+def expect_bad_request(func, message, reason):
+    """
+    Wrapper for testing bot functions expected to result in an :class:`telegram.error.BadRequest`.
+    Makes it XFAIL, if the specified error message is present.
+
+    Args:
+        func: The callable to be executed.
+        message: The expected message of the bad request error. If another message is present,
+            the error will be reraised.
+        reason: Explanation for the XFAIL.
+
+    Returns:
+        On success, returns the return value of :attr:`func`
+    """
+    try:
+        return func()
+    except BadRequest as e:
+        if message in str(e):
+            pytest.xfail('{}. {}'.format(reason, e))
+        else:
+            raise e
