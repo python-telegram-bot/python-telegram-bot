@@ -22,6 +22,7 @@ import pytest
 from flaky import flaky
 
 from telegram import ChatPhoto, Voice, TelegramError
+from tests.conftest import expect_bad_request
 
 
 @pytest.fixture(scope='function')
@@ -33,7 +34,10 @@ def chatphoto_file():
 
 @pytest.fixture(scope='function')
 def chat_photo(bot, super_group_id):
-    return bot.get_chat(super_group_id, timeout=50).photo
+    def func():
+        return bot.get_chat(super_group_id, timeout=50).photo
+
+    return expect_bad_request(func, 'Type of file mismatch', 'Telegram did not accept the file.')
 
 
 class TestChatPhoto(object):
@@ -46,7 +50,10 @@ class TestChatPhoto(object):
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_all_args(self, bot, super_group_id, chatphoto_file, chat_photo, thumb_file):
-        assert bot.set_chat_photo(super_group_id, chatphoto_file)
+        def func():
+            assert bot.set_chat_photo(super_group_id, chatphoto_file)
+
+        expect_bad_request(func, 'Type of file mismatch', 'Telegram did not accept the file.')
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

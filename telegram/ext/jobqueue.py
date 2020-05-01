@@ -203,7 +203,7 @@ class JobQueue(object):
             :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
             queue.
 
-        Notes:
+        Note:
              `interval` is always respected "as-is". That means that if DST changes during that
              interval, the job might not run at the time one would expect. It is always recommended
              to pin servers to UTC time, then time related behaviour can always be expected.
@@ -246,7 +246,7 @@ class JobQueue(object):
             :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
             queue.
 
-        Notes:
+        Note:
              Daily is just an alias for "24 Hours". That means that if DST changes during that
              interval, the job might not run at the time one would expect. It is always recommended
              to pin servers to UTC time, then time related behaviour can always be expected.
@@ -509,7 +509,7 @@ class Job(object):
     @property
     def next_t(self):
         """
-        ::obj:`datetime.datetime`: Datetime for the next job execution.
+        :obj:`datetime.datetime`: Datetime for the next job execution.
             Datetime is localized according to :attr:`tzinfo`.
             If job is removed or already ran it equals to ``None``.
 

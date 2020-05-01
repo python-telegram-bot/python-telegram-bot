@@ -18,8 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the BasePersistence class."""
 
+from abc import ABC, abstractmethod
 
-class BasePersistence(object):
+
+class BasePersistence(ABC):
     """Interface class for adding persistence to your bot.
     Subclass this object for different implementations of a persistent bot.
 
@@ -57,6 +59,7 @@ class BasePersistence(object):
         self.store_chat_data = store_chat_data
         self.store_bot_data = store_bot_data
 
+    @abstractmethod
     def get_user_data(self):
         """"Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the user_data if stored, or an empty
@@ -65,8 +68,8 @@ class BasePersistence(object):
         Returns:
             :obj:`defaultdict`: The restored user data.
         """
-        raise NotImplementedError
 
+    @abstractmethod
     def get_chat_data(self):
         """"Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the chat_data if stored, or an empty
@@ -75,8 +78,8 @@ class BasePersistence(object):
         Returns:
             :obj:`defaultdict`: The restored chat data.
         """
-        raise NotImplementedError
 
+    @abstractmethod
     def get_bot_data(self):
         """"Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the bot_data if stored, or an empty
@@ -85,8 +88,8 @@ class BasePersistence(object):
         Returns:
             :obj:`defaultdict`: The restored bot data.
         """
-        raise NotImplementedError
 
+    @abstractmethod
     def get_conversations(self, name):
         """"Will be called by :class:`telegram.ext.Dispatcher` when a
         :class:`telegram.ext.ConversationHandler` is added if
@@ -99,8 +102,8 @@ class BasePersistence(object):
         Returns:
             :obj:`dict`: The restored conversations for the handler.
         """
-        raise NotImplementedError
 
+    @abstractmethod
     def update_conversation(self, name, key, new_state):
         """Will be called when a :attr:`telegram.ext.ConversationHandler.update_state`
         is called. this allows the storeage of the new state in the persistence.
@@ -110,8 +113,8 @@ class BasePersistence(object):
             key (:obj:`tuple`): The key the state is changed for.
             new_state (:obj:`tuple` | :obj:`any`): The new state for the given key.
         """
-        raise NotImplementedError
 
+    @abstractmethod
     def update_user_data(self, user_id, data):
         """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
         handled an update.
@@ -120,8 +123,8 @@ class BasePersistence(object):
             user_id (:obj:`int`): The user the data might have been changed for.
             data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.user_data` [user_id].
         """
-        raise NotImplementedError
 
+    @abstractmethod
     def update_chat_data(self, chat_id, data):
         """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
         handled an update.
@@ -130,8 +133,8 @@ class BasePersistence(object):
             chat_id (:obj:`int`): The chat the data might have been changed for.
             data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.chat_data` [chat_id].
         """
-        raise NotImplementedError
 
+    @abstractmethod
     def update_bot_data(self, data):
         """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
         handled an update.
@@ -139,7 +142,6 @@ class BasePersistence(object):
         Args:
             data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.bot_data` .
         """
-        raise NotImplementedError
 
     def flush(self):
         """Will be called by :class:`telegram.ext.Updater` upon receiving a stop signal. Gives the

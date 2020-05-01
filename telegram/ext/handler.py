@@ -18,8 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the base class for handlers as used by the Dispatcher."""
 
+from abc import ABC, abstractmethod
 
-class Handler(object):
+
+class Handler(ABC):
     """The base class for all update handlers. Create custom handlers by inheriting from it.
 
     Attributes:
@@ -82,6 +84,7 @@ class Handler(object):
         self.pass_user_data = pass_user_data
         self.pass_chat_data = pass_chat_data
 
+    @abstractmethod
     def check_update(self, update):
         """
         This method is called to determine if an update should be handled by
@@ -96,7 +99,6 @@ class Handler(object):
             when the update gets handled.
 
         """
-        raise NotImplementedError
 
     def handle_update(self, update, dispatcher, check_result, context=None):
         """
