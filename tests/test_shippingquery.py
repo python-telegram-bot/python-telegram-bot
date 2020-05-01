@@ -24,7 +24,7 @@ from telegram import Update, User, ShippingAddress, ShippingQuery
 
 @pytest.fixture(scope='class')
 def shipping_query(bot):
-    return ShippingQuery(TestShippingQuery.id,
+    return ShippingQuery(TestShippingQuery.id_,
                          TestShippingQuery.from_user,
                          TestShippingQuery.invoice_payload,
                          TestShippingQuery.shipping_address,
@@ -32,21 +32,21 @@ def shipping_query(bot):
 
 
 class TestShippingQuery(object):
-    id = 5
+    id_ = 5
     invoice_payload = 'invoice_payload'
     from_user = User(0, '', False)
     shipping_address = ShippingAddress('GB', '', 'London', '12 Grimmauld Place', '', 'WC1')
 
     def test_de_json(self, bot):
         json_dict = {
-            'id': TestShippingQuery.id,
+            'id': TestShippingQuery.id_,
             'invoice_payload': TestShippingQuery.invoice_payload,
             'from': TestShippingQuery.from_user.to_dict(),
             'shipping_address': TestShippingQuery.shipping_address.to_dict()
         }
         shipping_query = ShippingQuery.de_json(json_dict, bot)
 
-        assert shipping_query.id == self.id
+        assert shipping_query.id == self.id_
         assert shipping_query.invoice_payload == self.invoice_payload
         assert shipping_query.from_user == self.from_user
         assert shipping_query.shipping_address == self.shipping_address
@@ -69,11 +69,11 @@ class TestShippingQuery(object):
         assert shipping_query.answer()
 
     def test_equality(self):
-        a = ShippingQuery(self.id, self.from_user, self.invoice_payload, self.shipping_address)
-        b = ShippingQuery(self.id, self.from_user, self.invoice_payload, self.shipping_address)
-        c = ShippingQuery(self.id, None, '', None)
+        a = ShippingQuery(self.id_, self.from_user, self.invoice_payload, self.shipping_address)
+        b = ShippingQuery(self.id_, self.from_user, self.invoice_payload, self.shipping_address)
+        c = ShippingQuery(self.id_, None, '', None)
         d = ShippingQuery(0, self.from_user, self.invoice_payload, self.shipping_address)
-        e = Update(self.id)
+        e = Update(self.id_)
 
         assert a == b
         assert hash(a) == hash(b)

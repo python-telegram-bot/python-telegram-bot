@@ -81,12 +81,12 @@ class PicklePersistence(BasePersistence):
         try:
             filename = self.filename
             with open(self.filename, "rb") as f:
-                all = pickle.load(f)
-                self.user_data = defaultdict(dict, all['user_data'])
-                self.chat_data = defaultdict(dict, all['chat_data'])
+                data = pickle.load(f)
+                self.user_data = defaultdict(dict, data['user_data'])
+                self.chat_data = defaultdict(dict, data['chat_data'])
                 # For backwards compatibility with files not containing bot data
-                self.bot_data = all.get('bot_data', {})
-                self.conversations = all['conversations']
+                self.bot_data = data.get('bot_data', {})
+                self.conversations = data['conversations']
         except IOError:
             self.conversations = {}
             self.user_data = defaultdict(dict)
@@ -110,9 +110,9 @@ class PicklePersistence(BasePersistence):
 
     def dump_singlefile(self):
         with open(self.filename, "wb") as f:
-            all = {'conversations': self.conversations, 'user_data': self.user_data,
-                   'chat_data': self.chat_data, 'bot_data': self.bot_data}
-            pickle.dump(all, f)
+            data = {'conversations': self.conversations, 'user_data': self.user_data,
+                    'chat_data': self.chat_data, 'bot_data': self.bot_data}
+            pickle.dump(data, f)
 
     def dump_file(self, filename, data):
         with open(filename, "wb") as f:
@@ -224,6 +224,8 @@ class PicklePersistence(BasePersistence):
             user_id (:obj:`int`): The user the data might have been changed for.
             data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.user_data` [user_id].
         """
+        if self.user_data is None:
+            self.user_data = defaultdict(dict)
         if self.user_data.get(user_id) == data:
             return
         self.user_data[user_id] = data
@@ -242,6 +244,8 @@ class PicklePersistence(BasePersistence):
             chat_id (:obj:`int`): The chat the data might have been changed for.
             data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.chat_data` [chat_id].
         """
+        if self.chat_data is None:
+            self.chat_data = defaultdict(dict)
         if self.chat_data.get(chat_id) == data:
             return
         self.chat_data[chat_id] = data

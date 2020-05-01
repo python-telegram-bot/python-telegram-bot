@@ -53,15 +53,22 @@ class TestVideo(object):
     caption = u'<b>VideoTest</b> - *Caption*'
     video_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.mp4'
 
+    video_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
+    video_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
+
     def test_creation(self, video):
         # Make sure file has been uploaded.
         assert isinstance(video, Video)
         assert isinstance(video.file_id, str)
+        assert isinstance(video.file_unique_id, str)
         assert video.file_id != ''
+        assert video.file_unique_id != ''
 
         assert isinstance(video.thumb, PhotoSize)
         assert isinstance(video.thumb.file_id, str)
+        assert isinstance(video.thumb.file_unique_id, str)
         assert video.thumb.file_id != ''
+        assert video.thumb.file_unique_id != ''
 
     def test_expected_values(self, video):
         assert video.width == self.width
@@ -80,7 +87,9 @@ class TestVideo(object):
 
         assert isinstance(message.video, Video)
         assert isinstance(message.video.file_id, str)
+        assert isinstance(message.video.file_unique_id, str)
         assert message.video.file_id != ''
+        assert message.video.file_unique_id != ''
         assert message.video.width == video.width
         assert message.video.height == video.height
         assert message.video.duration == video.duration
@@ -99,6 +108,7 @@ class TestVideo(object):
 
         assert new_file.file_size == self.file_size
         assert new_file.file_id == video.file_id
+        assert new_file.file_unique_id == video.file_unique_id
         assert new_file.file_path.startswith('https://')
 
         new_file.download('telegram.mp4')
@@ -112,7 +122,9 @@ class TestVideo(object):
 
         assert isinstance(message.video, Video)
         assert isinstance(message.video.file_id, str)
+        assert isinstance(message.video.file_unique_id, str)
         assert message.video.file_id != ''
+        assert message.video.file_unique_id != ''
         assert message.video.width == video.width
         assert message.video.height == video.height
         assert message.video.duration == video.duration
@@ -120,7 +132,9 @@ class TestVideo(object):
 
         assert isinstance(message.video.thumb, PhotoSize)
         assert isinstance(message.video.thumb.file_id, str)
+        assert isinstance(message.video.thumb.file_unique_id, str)
         assert message.video.thumb.file_id != ''
+        assert message.video.thumb.file_unique_id != ''
         assert message.video.thumb.width == 51  # This seems odd that it's not self.thumb_width
         assert message.video.thumb.height == 90  # Ditto
         assert message.video.thumb.file_size == 645  # same
@@ -129,7 +143,6 @@ class TestVideo(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    @pytest.mark.skip(reason='Doesnt work without API 4.5')
     def test_resend(self, bot, chat_id, video):
         message = bot.send_video(chat_id, video.file_id)
 
@@ -178,7 +191,8 @@ class TestVideo(object):
 
     def test_de_json(self, bot):
         json_dict = {
-            'file_id': 'not a file id',
+            'file_id': self.video_file_id,
+            'file_unique_id': self.video_file_unique_id,
             'width': self.width,
             'height': self.height,
             'duration': self.duration,
@@ -187,7 +201,8 @@ class TestVideo(object):
         }
         json_video = Video.de_json(json_dict, bot)
 
-        assert json_video.file_id == 'not a file id'
+        assert json_video.file_id == self.video_file_id
+        assert json_video.file_unique_id == self.video_file_unique_id
         assert json_video.width == self.width
         assert json_video.height == self.height
         assert json_video.duration == self.duration
@@ -199,6 +214,7 @@ class TestVideo(object):
 
         assert isinstance(video_dict, dict)
         assert video_dict['file_id'] == video.file_id
+        assert video_dict['file_unique_id'] == video.file_unique_id
         assert video_dict['width'] == video.width
         assert video_dict['height'] == video.height
         assert video_dict['duration'] == video.duration
@@ -229,11 +245,11 @@ class TestVideo(object):
         assert video.get_file()
 
     def test_equality(self, video):
-        a = Video(video.file_id, self.width, self.height, self.duration)
-        b = Video(video.file_id, self.width, self.height, self.duration)
-        c = Video(video.file_id, 0, 0, 0)
-        d = Video('', self.width, self.height, self.duration)
-        e = Voice(video.file_id, self.duration)
+        a = Video(video.file_id, video.file_unique_id, self.width, self.height, self.duration)
+        b = Video('', video.file_unique_id, self.width, self.height, self.duration)
+        c = Video(video.file_id, video.file_unique_id, 0, 0, 0)
+        d = Video('', '', self.width, self.height, self.duration)
+        e = Voice(video.file_id, video.file_unique_id, self.duration)
 
         assert a == b
         assert hash(a) == hash(b)

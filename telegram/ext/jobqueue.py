@@ -105,6 +105,7 @@ class JobQueue(object):
         # enqueue:
         self.logger.debug('Putting job %s with t=%s', job.name, time_spec)
         self._queue.put((next_t, job))
+        job._set_next_t(next_t)
 
         # Wake up the loop if this job should be executed next
         self._set_next_peek(next_t)
@@ -130,10 +131,14 @@ class JobQueue(object):
                 * :obj:`datetime.timedelta` will be interpreted as "time from now" in which the
                   job should run.
                 * :obj:`datetime.datetime` will be interpreted as a specific date and time at
-                  which the job should run.
+                  which the job should run. If the timezone (``datetime.tzinfo``) is ``None``, UTC
+                  will be assumed.
                 * :obj:`datetime.time` will be interpreted as a specific time of day at which the
                   job should run. This could be either today or, if the time has already passed,
-                  tomorrow.
+                  tomorrow. If the timezone (``time.tzinfo``) is ``None``, UTC will be assumed.
+
+                If ``when`` is :obj:`datetime.datetime` or :obj:`datetime.time` type
+                then ``when.tzinfo`` will define ``Job.tzinfo``. Otherwise UTC will be assumed.
 
             context (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through ``job.context`` in the callback. Defaults to ``None``.
@@ -145,7 +150,14 @@ class JobQueue(object):
             queue.
 
         """
-        job = Job(callback, repeat=False, context=context, name=name, job_queue=self)
+        tzinfo = when.tzinfo if isinstance(when, (datetime.datetime, datetime.time)) else None
+
+        job = Job(callback,
+                  repeat=False,
+                  context=context,
+                  name=name,
+                  job_queue=self,
+                  tzinfo=tzinfo)
         self._put(job, time_spec=when)
         return job
 
@@ -173,10 +185,14 @@ class JobQueue(object):
                 * :obj:`datetime.timedelta` will be interpreted as "time from now" in which the
                   job should run.
                 * :obj:`datetime.datetime` will be interpreted as a specific date and time at
-                  which the job should run.
+                  which the job should run. If the timezone (``datetime.tzinfo``) is ``None``, UTC
+                  will be assumed.
                 * :obj:`datetime.time` will be interpreted as a specific time of day at which the
                   job should run. This could be either today or, if the time has already passed,
-                  tomorrow.
+                  tomorrow. If the timezone (``time.tzinfo``) is ``None``, UTC will be assumed.
+
+                If ``first`` is :obj:`datetime.datetime` or :obj:`datetime.time` type
+                then ``first.tzinfo`` will define ``Job.tzinfo``. Otherwise UTC will be assumed.
 
                 Defaults to ``interval``
             context (:obj:`object`, optional): Additional data needed for the callback function.
@@ -188,18 +204,21 @@ class JobQueue(object):
             :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
             queue.
 
-        Notes:
+        Note:
              `interval` is always respected "as-is". That means that if DST changes during that
              interval, the job might not run at the time one would expect. It is always recommended
              to pin servers to UTC time, then time related behaviour can always be expected.
 
         """
+        tzinfo = first.tzinfo if isinstance(first, (datetime.datetime, datetime.time)) else None
+
         job = Job(callback,
                   interval=interval,
                   repeat=True,
                   context=context,
                   name=name,
-                  job_queue=self)
+                  job_queue=self,
+                  tzinfo=tzinfo)
         self._put(job, time_spec=first)
         return job
 
@@ -319,6 +338,7 @@ class JobQueue(object):
                 its ``job.context`` or change it to a repeating job.
             time (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
                 (``time.tzinfo``) is ``None``, UTC will be assumed.
+                ``time.tzinfo`` will implicitly define ``Job.tzinfo``.
             days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should
                 run. Defaults to ``EVERY_DAY``
             context (:obj:`object`, optional): Additional data needed for the callback function.
@@ -330,7 +350,7 @@ class JobQueue(object):
             :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
             queue.
 
-        Notes:
+        Note:
              Daily is just an alias for "24 Hours". That means that if DST changes during that
              interval, the job might not run at the time one would expect. It is always recommended
              to pin servers to UTC time, then time related behaviour can always be expected.
@@ -389,9 +409,10 @@ class JobQueue(object):
             if job.enabled:
                 try:
                     current_week_day = datetime.datetime.now(job.tzinfo).date().weekday()
-                    if any(day == current_week_day for day in job.days):
+                    if current_week_day in job.days:
                         self.logger.debug('Running job %s', job.name)
                         job.run(self._dispatcher)
+                        self._dispatcher.update_persistence()
 
                 except Exception:
                     self.logger.exception('An uncaught error was raised while executing job %s',
@@ -407,6 +428,7 @@ class JobQueue(object):
                 self._put(job, time_spec=self._get_next_month_date(dt.day, job.day_is_strict,
                                                                    dt_time))
             else:
+                job._set_next_t(None)
                 self.logger.debug('Dropping non-repeating or removed job %s', job.name)
 
     def start(self):
@@ -516,7 +538,7 @@ class Job(object):
                  days=Days.EVERY_DAY,
                  name=None,
                  job_queue=None,
-                 tzinfo=_UTC,
+                 tzinfo=None,
                  is_monthly=False,
                  day_is_strict=True):
 
@@ -527,13 +549,14 @@ class Job(object):
         self._repeat = None
         self._interval = None
         self.interval = interval
+        self._next_t = None
         self.repeat = repeat
         self.is_monthly = is_monthly
         self.day_is_strict = day_is_strict
 
         self._days = None
         self.days = days
-        self.tzinfo = tzinfo
+        self.tzinfo = tzinfo or _UTC
 
         self._job_queue = weakref.proxy(job_queue) if job_queue is not None else None
 
@@ -555,6 +578,7 @@ class Job(object):
 
         """
         self._remove.set()
+        self._next_t = None
 
     @property
     def removed(self):
@@ -588,8 +612,8 @@ class Job(object):
             raise ValueError("The 'interval' can not be 'None' when 'repeat' is set to 'True'")
 
         if not (interval is None or isinstance(interval, (Number, datetime.timedelta))):
-            raise ValueError("The 'interval' must be of type 'datetime.timedelta',"
-                             " 'int' or 'float'")
+            raise TypeError("The 'interval' must be of type 'datetime.timedelta',"
+                            " 'int' or 'float'")
 
         self._interval = interval
 
@@ -601,6 +625,27 @@ class Job(object):
             return interval.total_seconds()
         else:
             return interval
+
+    @property
+    def next_t(self):
+        """
+        :obj:`datetime.datetime`: Datetime for the next job execution.
+            Datetime is localized according to :attr:`tzinfo`.
+            If job is removed or already ran it equals to ``None``.
+
+        """
+        return datetime.datetime.fromtimestamp(self._next_t, self.tzinfo) if self._next_t else None
+
+    def _set_next_t(self, next_t):
+        if isinstance(next_t, datetime.datetime):
+            # Set timezone to UTC in case datetime is in local timezone.
+            next_t = next_t.astimezone(_UTC)
+            next_t = to_float_timestamp(next_t)
+        elif not (isinstance(next_t, Number) or next_t is None):
+            raise TypeError("The 'next_t' argument should be one of the following types: "
+                            "'float', 'int', 'datetime.datetime' or 'NoneType'")
+
+        self._next_t = next_t
 
     @property
     def repeat(self):
@@ -621,10 +666,10 @@ class Job(object):
     @days.setter
     def days(self, days):
         if not isinstance(days, tuple):
-            raise ValueError("The 'days' argument should be of type 'tuple'")
+            raise TypeError("The 'days' argument should be of type 'tuple'")
 
         if not all(isinstance(day, int) for day in days):
-            raise ValueError("The elements of the 'days' argument should be of type 'int'")
+            raise TypeError("The elements of the 'days' argument should be of type 'int'")
 
         if not all(0 <= day <= 6 for day in days):
             raise ValueError("The elements of the 'days' argument should be from 0 up to and "

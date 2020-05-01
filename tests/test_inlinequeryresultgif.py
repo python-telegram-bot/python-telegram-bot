@@ -26,7 +26,7 @@ from telegram import (InlineKeyboardButton, InputTextMessageContent, InlineQuery
 @pytest.fixture(scope='class')
 def inline_query_result_gif():
     return InlineQueryResultGif(
-        TestInlineQueryResultGif.id,
+        TestInlineQueryResultGif.id_,
         TestInlineQueryResultGif.gif_url,
         TestInlineQueryResultGif.thumb_url,
         gif_width=TestInlineQueryResultGif.gif_width,
@@ -40,8 +40,8 @@ def inline_query_result_gif():
 
 
 class TestInlineQueryResultGif(object):
-    id = 'id'
-    type = 'gif'
+    id_ = 'id'
+    type_ = 'gif'
     gif_url = 'gif url'
     gif_width = 10
     gif_height = 15
@@ -54,8 +54,8 @@ class TestInlineQueryResultGif(object):
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
     def test_expected_values(self, inline_query_result_gif):
-        assert inline_query_result_gif.type == self.type
-        assert inline_query_result_gif.id == self.id
+        assert inline_query_result_gif.type == self.type_
+        assert inline_query_result_gif.id == self.id_
         assert inline_query_result_gif.gif_url == self.gif_url
         assert inline_query_result_gif.gif_width == self.gif_width
         assert inline_query_result_gif.gif_height == self.gif_height
@@ -88,11 +88,11 @@ class TestInlineQueryResultGif(object):
                 == inline_query_result_gif.reply_markup.to_dict())
 
     def test_equality(self):
-        a = InlineQueryResultGif(self.id, self.gif_url, self.thumb_url)
-        b = InlineQueryResultGif(self.id, self.gif_url, self.thumb_url)
-        c = InlineQueryResultGif(self.id, '', self.thumb_url)
+        a = InlineQueryResultGif(self.id_, self.gif_url, self.thumb_url)
+        b = InlineQueryResultGif(self.id_, self.gif_url, self.thumb_url)
+        c = InlineQueryResultGif(self.id_, '', self.thumb_url)
         d = InlineQueryResultGif('', self.gif_url, self.thumb_url)
-        e = InlineQueryResultVoice(self.id, '', '')
+        e = InlineQueryResultVoice(self.id_, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

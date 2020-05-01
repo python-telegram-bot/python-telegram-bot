@@ -2,6 +2,110 @@
 Changelog
 =========
 
+Version 12.6.1
+==============
+*Released 2020-04-11*
+
+**Bug fixes:**
+
+- Fix serialization of ``reply_markup`` in media messages (`#1889`_)
+
+.. _`#1889`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1889
+
+Version 12.6
+============
+*Released 2020-04-10*
+
+**Major Changes:**
+
+- Bot API 4.7 support. **Note:** In ``Bot.create_new_sticker_set`` and ``Bot.add_sticker_to_set``, the order of the parameters had be changed, as the ``png_sticker`` parameter is now optional. (`#1858`_)
+
+**Minor changes, CI improvements or bug fixes:**
+
+- Add tests for ``swtich_inline_query(_current_chat)`` with empty string (`#1635`_)
+- Doc fixes (`#1854`_, `#1874`_, `#1884`_)
+- Update issue templates (`#1880`_)
+- Favor concrete types over "Iterable" (`#1882`_)
+- Pass last valid ``CallbackContext`` to ``TIMEOUT`` handlers of ``ConversationHandler`` (`#1826`_)
+- Tweak handling of persistence and update persistence after job calls (`#1827`_)
+- Use checkout@v2 for GitHub actions (`#1887`_)
+
+.. _`#1858`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1858
+.. _`#1635`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1635
+.. _`#1854`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1854
+.. _`#1874`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1874
+.. _`#1884`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1884
+.. _`#1880`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1880
+.. _`#1882`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1882
+.. _`#1826`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1826
+.. _`#1827`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1827
+.. _`#1887`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1887
+
+Version 12.5.1
+==============
+*Released 2020-03-30*
+
+**Minor changes, doc fixes or bug fixes:**
+
+- Add missing docs for `PollHandler` and `PollAnswerHandler` (`#1853`_)
+- Fix wording in `Filters` docs (`#1855`_)
+- Reorder tests to make them more stable (`#1835`_)
+- Make `ConversationHandler` attributes immutable (`#1756`_)
+- Make `PrefixHandler` attributes `command` and `prefix` editable (`#1636`_)
+- Fix UTC as default `tzinfo` for `Job` (`#1696`_)
+
+.. _`#1853`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1853
+.. _`#1855`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1855
+.. _`#1835`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1835
+.. _`#1756`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1756
+.. _`#1636`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1636
+.. _`#1696`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1696
+
+Version 12.5
+============
+*Released 2020-03-29*
+
+**New Features:**
+
+- `Bot.link` gives the `t.me` link of the bot (`#1770`_)
+
+**Major Changes:**
+
+- Bot API 4.5 and 4.6 support. (`#1508`_, `#1723`_)
+
+**Minor changes, CI improvements or bug fixes:**
+
+- Remove legacy CI files (`#1783`_, `#1791`_)
+- Update pre-commit config file (`#1787`_)
+- Remove builtin names (`#1792`_)
+- CI improvements (`#1808`_, `#1848`_)
+- Support Python 3.8 (`#1614`_, `#1824`_)
+- Use stale bot for auto closing stale issues (`#1820`_, `#1829`_, `#1840`_)
+- Doc fixes (`#1778`_, `#1818`_)
+- Fix typo in `edit_message_media` (`#1779`_)
+- In examples, answer CallbackQueries and use `edit_message_text` shortcut (`#1721`_)
+- Revert accidental change in vendored urllib3 (`#1775`_)
+
+.. _`#1783`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1783
+.. _`#1787`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1787
+.. _`#1792`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1792
+.. _`#1791`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1791
+.. _`#1808`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1808
+.. _`#1614`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1614
+.. _`#1770`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1770
+.. _`#1824`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1824
+.. _`#1820`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1820
+.. _`#1829`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1829
+.. _`#1840`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1840
+.. _`#1778`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1778
+.. _`#1779`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1779
+.. _`#1721`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1721
+.. _`#1775`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1775
+.. _`#1848`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1848
+.. _`#1818`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1818
+.. _`#1508`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1508
+.. _`#1723`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1723
+
 Version 12.4.2
 ==============
 *Released 2020-02-10*

@@ -25,5 +25,7 @@ class ParseMode(object):
 
     MARKDOWN = 'Markdown'
     """:obj:`str`: 'Markdown'"""
+    MARKDOWN_V2 = 'MarkdownV2'
+    """:obj:`str`: 'MarkdownV2'"""
     HTML = 'HTML'
     """:obj:`str`: 'HTML'"""

@@ -29,6 +29,10 @@ def start(update, context):
 def button(update, context):
     query = update.callback_query
 
+    # CallbackQueries need to be answered, even if no notification to the user is needed
+    # Some clients may have trouble otherwise. See https://core.telegram.org/bots/api#callbackquery
+    query.answer()
+
     query.edit_message_text(text="Selected option: {}".format(query.data))
 
 

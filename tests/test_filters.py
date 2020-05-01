@@ -20,7 +20,7 @@ import datetime
 
 import pytest
 
-from telegram import Message, User, Chat, MessageEntity, Document, Update
+from telegram import Message, User, Chat, MessageEntity, Document, Update, Dice
 from telegram.ext import Filters, BaseFilter
 import re
 
@@ -47,7 +47,7 @@ class TestFilters(object):
         update.message.text = '/test'
         assert (Filters.text)(update)
 
-    def test_filters_text_iterable(self, update):
+    def test_filters_text_strings(self, update):
         update.message.text = '/test'
         assert Filters.text({'/test', 'test1'})(update)
         assert not Filters.text(['test1', 'test2'])(update)
@@ -58,7 +58,7 @@ class TestFilters(object):
         update.message.caption = None
         assert not (Filters.caption)(update)
 
-    def test_filters_caption_iterable(self, update):
+    def test_filters_caption_strings(self, update):
         update.message.caption = 'test'
         assert Filters.caption({'test', 'test1'})(update)
         assert not Filters.caption(['test1', 'test2'])(update)
@@ -300,7 +300,7 @@ class TestFilters(object):
         assert Filters.document(update)
 
     def test_filters_document_type(self, update):
-        update.message.document = Document("file_id",
+        update.message.document = Document("file_id", 'unique_id',
                                            mime_type="application/vnd.android.package-archive")
         assert Filters.document.apk(update)
         assert Filters.document.application(update)
@@ -621,6 +621,22 @@ class TestFilters(object):
         assert not Filters.poll(update)
         update.message.poll = 'test'
         assert Filters.poll(update)
+
+    def test_filters_dice(self, update):
+        update.message.dice = Dice(4)
+        assert Filters.dice(update)
+        update.message.dice = None
+        assert not Filters.dice(update)
+
+    def test_filters_dice_iterable(self, update):
+        update.message.dice = None
+        assert not Filters.dice(5)(update)
+
+        update.message.dice = Dice(5)
+        assert Filters.dice(5)(update)
+        assert Filters.dice({5, 6})(update)
+        assert not Filters.dice(1)(update)
+        assert not Filters.dice([2, 3])(update)
 
     def test_language_filter_single(self, update):
         update.message.from_user.language_code = 'en_US'

@@ -19,6 +19,7 @@
 """A library that provides a Python interface to the Telegram Bot API"""
 
 from .base import TelegramObject
+from .botcommand import BotCommand
 from .user import User
 from .files.chatphoto import ChatPhoto
 from .chat import Chat
@@ -36,8 +37,10 @@ from .files.location import Location
 from .files.venue import Venue
 from .files.videonote import VideoNote
 from .chataction import ChatAction
+from .dice import Dice
 from .userprofilephotos import UserProfilePhotos
 from .keyboardbutton import KeyboardButton
+from .keyboardbuttonpolltype import KeyboardButtonPollType
 from .replymarkup import ReplyMarkup
 from .replykeyboardmarkup import ReplyKeyboardMarkup
 from .replykeyboardremove import ReplyKeyboardRemove
@@ -48,7 +51,7 @@ from .files.file import File
 from .parsemode import ParseMode
 from .messageentity import MessageEntity
 from .games.game import Game
-from .poll import Poll, PollOption
+from .poll import Poll, PollOption, PollAnswer
 from .loginurl import LoginUrl
 from .games.callbackgame import CallbackGame
 from .payment.shippingaddress import ShippingAddress
@@ -138,7 +141,7 @@ __all__ = [
     'InlineQueryResultPhoto', 'InlineQueryResultVenue', 'InlineQueryResultVideo',
     'InlineQueryResultVoice', 'InlineQueryResultGame', 'InputContactMessageContent', 'InputFile',
     'InputLocationMessageContent', 'InputMessageContent', 'InputTextMessageContent',
-    'InputVenueMessageContent', 'KeyboardButton', 'Location', 'EncryptedCredentials',
+    'InputVenueMessageContent', 'Location', 'EncryptedCredentials',
     'PassportFile', 'EncryptedPassportElement', 'PassportData', 'Message', 'MessageEntity',
     'ParseMode', 'PhotoSize', 'ReplyKeyboardRemove', 'ReplyKeyboardMarkup', 'ReplyMarkup',
     'Sticker', 'TelegramError', 'TelegramObject', 'Update', 'User', 'UserProfilePhotos', 'Venue',
@@ -156,5 +159,6 @@ __all__ = [
     'InputMediaAudio', 'InputMediaDocument', 'TelegramDecryptionError',
     'PassportElementErrorSelfie', 'PassportElementErrorTranslationFile',
     'PassportElementErrorTranslationFiles', 'PassportElementErrorUnspecified', 'Poll',
-    'PollOption', 'LoginUrl'
+    'PollOption', 'PollAnswer', 'LoginUrl', 'KeyboardButton', 'KeyboardButtonPollType', 'Dice',
+    'BotCommand'
 ]

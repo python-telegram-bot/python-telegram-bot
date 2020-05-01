@@ -25,20 +25,20 @@ from telegram import (InlineKeyboardButton, InlineQueryResultGame,
 
 @pytest.fixture(scope='class')
 def inline_query_result_game():
-    return InlineQueryResultGame(TestInlineQueryResultGame.id,
+    return InlineQueryResultGame(TestInlineQueryResultGame.id_,
                                  TestInlineQueryResultGame.game_short_name,
                                  reply_markup=TestInlineQueryResultGame.reply_markup)
 
 
 class TestInlineQueryResultGame(object):
-    id = 'id'
-    type = 'game'
+    id_ = 'id'
+    type_ = 'game'
     game_short_name = 'game short name'
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
     def test_expected_values(self, inline_query_result_game):
-        assert inline_query_result_game.type == self.type
-        assert inline_query_result_game.id == self.id
+        assert inline_query_result_game.type == self.type_
+        assert inline_query_result_game.id == self.id_
         assert inline_query_result_game.game_short_name == self.game_short_name
         assert (inline_query_result_game.reply_markup.to_dict()
                 == self.reply_markup.to_dict())
@@ -55,11 +55,11 @@ class TestInlineQueryResultGame(object):
                 == inline_query_result_game.reply_markup.to_dict())
 
     def test_equality(self):
-        a = InlineQueryResultGame(self.id, self.game_short_name)
-        b = InlineQueryResultGame(self.id, self.game_short_name)
-        c = InlineQueryResultGame(self.id, '')
+        a = InlineQueryResultGame(self.id_, self.game_short_name)
+        b = InlineQueryResultGame(self.id_, self.game_short_name)
+        c = InlineQueryResultGame(self.id_, '')
         d = InlineQueryResultGame('', self.game_short_name)
-        e = InlineQueryResultVoice(self.id, '', '')
+        e = InlineQueryResultVoice(self.id_, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

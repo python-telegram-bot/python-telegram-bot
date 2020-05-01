@@ -120,6 +120,8 @@ def check_object(h4):
         ignored |= {'credentials'}
     elif name == 'PassportElementError':
         ignored |= {'message', 'type', 'source'}
+    elif name == 'Message':
+        ignored |= {'default_quote'}
 
     assert (sig.parameters.keys() ^ checked) - ignored == set()
 

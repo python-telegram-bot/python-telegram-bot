@@ -27,22 +27,22 @@ from telegram import (InputTextMessageContent, InlineKeyboardButton,
 @pytest.fixture(scope='class')
 def inline_query_result_cached_sticker():
     return InlineQueryResultCachedSticker(
-        TestInlineQueryResultCachedSticker.id,
+        TestInlineQueryResultCachedSticker.id_,
         TestInlineQueryResultCachedSticker.sticker_file_id,
         input_message_content=TestInlineQueryResultCachedSticker.input_message_content,
         reply_markup=TestInlineQueryResultCachedSticker.reply_markup)
 
 
 class TestInlineQueryResultCachedSticker(object):
-    id = 'id'
-    type = 'sticker'
+    id_ = 'id'
+    type_ = 'sticker'
     sticker_file_id = 'sticker file id'
     input_message_content = InputTextMessageContent('input_message_content')
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
     def test_expected_values(self, inline_query_result_cached_sticker):
-        assert inline_query_result_cached_sticker.type == self.type
-        assert inline_query_result_cached_sticker.id == self.id
+        assert inline_query_result_cached_sticker.type == self.type_
+        assert inline_query_result_cached_sticker.id == self.id_
         assert inline_query_result_cached_sticker.sticker_file_id == self.sticker_file_id
         assert (inline_query_result_cached_sticker.input_message_content.to_dict()
                 == self.input_message_content.to_dict())
@@ -65,11 +65,11 @@ class TestInlineQueryResultCachedSticker(object):
                 == inline_query_result_cached_sticker.reply_markup.to_dict())
 
     def test_equality(self):
-        a = InlineQueryResultCachedSticker(self.id, self.sticker_file_id)
-        b = InlineQueryResultCachedSticker(self.id, self.sticker_file_id)
-        c = InlineQueryResultCachedSticker(self.id, '')
+        a = InlineQueryResultCachedSticker(self.id_, self.sticker_file_id)
+        b = InlineQueryResultCachedSticker(self.id_, self.sticker_file_id)
+        c = InlineQueryResultCachedSticker(self.id_, '')
         d = InlineQueryResultCachedSticker('', self.sticker_file_id)
-        e = InlineQueryResultCachedVoice(self.id, '', '')
+        e = InlineQueryResultCachedVoice(self.id_, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

@@ -18,6 +18,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Alateas <https://github.com/alateas>`_
 - `Ales Dokshanin <https://github.com/alesdokshanin>`_
 - `Ambro17 <https://github.com/Ambro17>`_
+- `Andrej Zhilenkov <https://github.com/Andrej730>`_
 - `Anton Tagunov <https://github.com/anton-tagunov>`_
 - `Avanatiker <https://github.com/Avanatiker>`_
 - `Balduro <https://github.com/Balduro>`_
@@ -37,6 +38,8 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Evan Haberecht <https://github.com/habereet>`_
 - `evgfilim1 <https://github.com/evgfilim1>`_
 - `franciscod <https://github.com/franciscod>`_
+- `gamgi <https://github.com/gamgi>`_
+- `Harshil <https://github.com/harshil21>`_
 - `Hugo Damer <https://github.com/HakimusGIT>`_
 - `ihoru <https://github.com/ihoru>`_
 - `Jasmin Bom <https://github.com/jsmnbom>`_
