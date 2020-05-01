@@ -21,6 +21,9 @@ import json
 import base64
 import os
 import random
+import pytest
+from telegram.utils.request import Request
+from telegram.error import RetryAfter
 
 # Provide some public fallbacks so it's easy for contributors to run tests on their local machine
 # These bots are only able to talk in our test chats, so they are quite useless for other
@@ -73,3 +76,17 @@ def get(name, fallback):
 
 def get_bot():
     return {k: get(k, v) for k, v in random.choice(FALLBACKS).items()}
+
+
+# Patch request to xfail on flood control errors
+original_request_wrapper = Request._request_wrapper
+
+
+def patient_request_wrapper(*args, **kwargs):
+    try:
+        return original_request_wrapper(*args, **kwargs)
+    except RetryAfter as e:
+        pytest.xfail('Not waiting for flood control: {}'.format(e))
+
+
+Request._request_wrapper = patient_request_wrapper
