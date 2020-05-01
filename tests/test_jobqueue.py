@@ -29,7 +29,6 @@ from flaky import flaky
 
 from telegram.ext import JobQueue, Updater, Job, CallbackContext
 from telegram.utils.deprecate import TelegramDeprecationWarning
-from telegram.utils.helpers import _UtcOffsetTimezone, _UTC
 
 
 @pytest.fixture(scope='function')
@@ -277,7 +276,7 @@ class TestJobQueue(object):
         # must subtract one minute because the UTC offset has to be strictly less than 24h
         # thus this test will xpass if run in the interval [00:00, 00:01) UTC time
         # (because target time will be 23:59 UTC, so local and target weekday will be the same)
-        target_tzinfo = _UtcOffsetTimezone(dtm.timedelta(days=1, minutes=-1))
+        target_tzinfo = dtm.timezone(dtm.timedelta(days=1, minutes=-1))
         target_datetime = (utcnow + dtm.timedelta(days=1, minutes=-1, seconds=delta)).replace(
             tzinfo=target_tzinfo)
         target_time = target_datetime.timetz()
@@ -344,7 +343,7 @@ class TestJobQueue(object):
         jobs = [job_1, job_2, job_3]
 
         for job in jobs:
-            assert job.tzinfo == _UTC
+            assert job.tzinfo == dtm.timezone.utc
 
     def test_job_next_t_property(self, job_queue):
         # Testing:
@@ -379,9 +378,9 @@ class TestJobQueue(object):
 
         job = job_queue.run_once(self.job_run_once, 0.05)
 
-        t = dtm.datetime.now(tz=_UtcOffsetTimezone(dtm.timedelta(hours=12)))
+        t = dtm.datetime.now(tz=dtm.timezone(dtm.timedelta(hours=12)))
         job._set_next_t(t)
-        job.tzinfo = _UtcOffsetTimezone(dtm.timedelta(hours=5))
+        job.tzinfo = dtm.timezone(dtm.timedelta(hours=5))
         assert job.next_t == t.astimezone(job.tzinfo)
 
     def test_passing_tzinfo_to_job(self, job_queue):
@@ -389,21 +388,21 @@ class TestJobQueue(object):
         and run_repeating methods"""
 
         when_dt_tz_specific = dtm.datetime.now(
-            tz=_UtcOffsetTimezone(dtm.timedelta(hours=12))
+            tz=dtm.timezone(dtm.timedelta(hours=12))
         ) + dtm.timedelta(seconds=2)
         when_dt_tz_utc = dtm.datetime.now() + dtm.timedelta(seconds=2)
         job_once1 = job_queue.run_once(self.job_run_once, when_dt_tz_specific)
         job_once2 = job_queue.run_once(self.job_run_once, when_dt_tz_utc)
 
         when_time_tz_specific = (dtm.datetime.now(
-            tz=_UtcOffsetTimezone(dtm.timedelta(hours=12))
+            tz=dtm.timezone(dtm.timedelta(hours=12))
         ) + dtm.timedelta(seconds=2)).timetz()
         when_time_tz_utc = (dtm.datetime.now() + dtm.timedelta(seconds=2)).timetz()
         job_once3 = job_queue.run_once(self.job_run_once, when_time_tz_specific)
         job_once4 = job_queue.run_once(self.job_run_once, when_time_tz_utc)
 
         first_dt_tz_specific = dtm.datetime.now(
-            tz=_UtcOffsetTimezone(dtm.timedelta(hours=12))
+            tz=dtm.timezone(dtm.timedelta(hours=12))
         ) + dtm.timedelta(seconds=2)
         first_dt_tz_utc = dtm.datetime.now() + dtm.timedelta(seconds=2)
         job_repeating1 = job_queue.run_repeating(
@@ -412,7 +411,7 @@ class TestJobQueue(object):
             self.job_run_once, 2, first=first_dt_tz_utc)
 
         first_time_tz_specific = (dtm.datetime.now(
-            tz=_UtcOffsetTimezone(dtm.timedelta(hours=12))
+            tz=dtm.timezone(dtm.timedelta(hours=12))
         ) + dtm.timedelta(seconds=2)).timetz()
         first_time_tz_utc = (dtm.datetime.now() + dtm.timedelta(seconds=2)).timetz()
         job_repeating3 = job_queue.run_repeating(
@@ -421,19 +420,19 @@ class TestJobQueue(object):
             self.job_run_once, 2, first=first_time_tz_utc)
 
         time_tz_specific = (dtm.datetime.now(
-            tz=_UtcOffsetTimezone(dtm.timedelta(hours=12))
+            tz=dtm.timezone(dtm.timedelta(hours=12))
         ) + dtm.timedelta(seconds=2)).timetz()
         time_tz_utc = (dtm.datetime.now() + dtm.timedelta(seconds=2)).timetz()
         job_daily1 = job_queue.run_daily(self.job_run_once, time_tz_specific)
         job_daily2 = job_queue.run_daily(self.job_run_once, time_tz_utc)
 
         assert job_once1.tzinfo == when_dt_tz_specific.tzinfo
-        assert job_once2.tzinfo == _UTC
+        assert job_once2.tzinfo == dtm.timezone.utc
         assert job_once3.tzinfo == when_time_tz_specific.tzinfo
-        assert job_once4.tzinfo == _UTC
+        assert job_once4.tzinfo == dtm.timezone.utc
         assert job_repeating1.tzinfo == first_dt_tz_specific.tzinfo
-        assert job_repeating2.tzinfo == _UTC
+        assert job_repeating2.tzinfo == dtm.timezone.utc
         assert job_repeating3.tzinfo == first_time_tz_specific.tzinfo
-        assert job_repeating4.tzinfo == _UTC
+        assert job_repeating4.tzinfo == dtm.timezone.utc
         assert job_daily1.tzinfo == time_tz_specific.tzinfo
-        assert job_daily2.tzinfo == _UTC
+        assert job_daily2.tzinfo == dtm.timezone.utc

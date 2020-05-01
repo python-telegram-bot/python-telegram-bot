@@ -29,7 +29,7 @@ from threading import Thread, Lock, Event
 
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.utils.deprecate import TelegramDeprecationWarning
-from telegram.utils.helpers import to_float_timestamp, _UTC
+from telegram.utils.helpers import to_float_timestamp
 
 
 class Days(object):
@@ -436,7 +436,7 @@ class Job(object):
 
         self._days = None
         self.days = days
-        self.tzinfo = tzinfo or _UTC
+        self.tzinfo = tzinfo or datetime.timezone.utc
 
         self._job_queue = weakref.proxy(job_queue) if job_queue is not None else None
 
@@ -519,7 +519,7 @@ class Job(object):
     def _set_next_t(self, next_t):
         if isinstance(next_t, datetime.datetime):
             # Set timezone to UTC in case datetime is in local timezone.
-            next_t = next_t.astimezone(_UTC)
+            next_t = next_t.astimezone(datetime.timezone.utc)
             next_t = to_float_timestamp(next_t)
         elif not (isinstance(next_t, Number) or next_t is None):
             raise TypeError("The 'next_t' argument should be one of the following types: "
