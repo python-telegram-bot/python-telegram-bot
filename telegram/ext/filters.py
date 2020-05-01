@@ -861,6 +861,14 @@ officedocument.wordprocessingml.document")``-
         Examples:
             ``MessageHandler(Filters.user(1234), callback_method)``
 
+        Warning:
+            :attr:`user_ids` will give a *copy* of the saved user ids as :class:`frozenset`. This
+            is to ensure thread safety. To add/remove a user, you should use :meth:`add_user` and
+            :meth:`remove_user`. Only update the entire set by
+            ``filter.user_ids/usernames = new_set``, if you are entirely sure that it is not
+            causing race conditions, as this will complete replace the current set of allowed
+            users.
+
         Attributes:
             user_ids(set(:obj:`int`), optional): Which user ID(s) to allow through.
             usernames(set(:obj:`str`), optional): Which username(s) (without leading '@') to allow
@@ -884,27 +892,35 @@ officedocument.wordprocessingml.document")``-
             self.allow_empty = allow_empty
             self.__lock = Lock()
 
-            self._user_ids = {}
-            self._usernames = {}
+            self._user_ids = set()
+            self._usernames = set()
 
             self.user_ids = user_id
             self.usernames = username
 
-        def _set_user_ids(self, user_id):
+        @staticmethod
+        def _parse_user_id(user_id):
             if user_id is None:
-                self._user_ids = {}
+                return set()
             elif isinstance(user_id, int):
-                self._user_ids = {user_id}
+                return {user_id}
             else:
-                self._user_ids = set(user_id)
+                return set(user_id)
+
+        @staticmethod
+        def _parse_username(username):
+            if username is None:
+                return set()
+            elif isinstance(username, str):
+                return {username.replace('@', '')}
+            else:
+                return set([user.replace('@', '') for user in username])
+
+        def _set_user_ids(self, user_id):
+            self._user_ids = self._parse_user_id(user_id)
 
         def _set_usernames(self, username):
-            if username is None:
-                self._usernames = {}
-            elif isinstance(username, str):
-                self._usernames = {username.replace('@', '')}
-            else:
-                self._usernames = set([user.replace('@', '') for user in username])
+            self._usernames = self._parse_username(username)
 
         @property
         def user_ids(self):
@@ -915,8 +931,8 @@ officedocument.wordprocessingml.document")``-
         def user_ids(self, user_id):
             with self.__lock:
                 if user_id and self._usernames:
-                    raise RuntimeError(('Can\'t set user_id in conjunction with (already set) '
-                                        'usernames.'))
+                    raise RuntimeError("Can't set user_id in conjunction with (already set) "
+                                       "usernames.")
                 self._set_user_ids(user_id)
 
         @property
@@ -928,18 +944,70 @@ officedocument.wordprocessingml.document")``-
         def usernames(self, username):
             with self.__lock:
                 if username and self._user_ids:
-                    raise RuntimeError(('Can\'t set username in conjunction with (already set) '
-                                        'user_ids.'))
+                    raise RuntimeError("Can't set username in conjunction with (already set) "
+                                       "user_ids.")
                 self._set_usernames(username)
+
+        def add_users(self, user_id=None, username=None):
+            """
+            Adds a user(s) to the allowed users.
+
+            Args:
+                user_id(:obj:`int` | List[:obj:`int`], optional): Which user ID(s) to allow
+                    through.
+                username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow
+                    through. If username starts with '@' symbol, it will be ignored.
+            """
+            with self.__lock:
+                if user_id and self._usernames:
+                    raise RuntimeError("Can't set user_id in conjunction with (already set) "
+                                       "usernames.")
+                if username and self._user_ids:
+                    raise RuntimeError("Can't set username in conjunction with (already set) "
+                                       "user_ids.")
+
+                user_id = self._parse_user_id(user_id)
+                username = self._parse_username(username)
+
+                for uid in user_id:
+                    self._user_ids.add(uid)
+                for name in username:
+                    self._usernames.add(name)
+
+        def remove_users(self, user_id=None, username=None):
+            """
+            Removes a user(s) from the allowed users.
+
+            Args:
+                user_id(:obj:`int` | List[:obj:`int`], optional): Which user ID(s) to disallow
+                    through.
+                username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to disallow
+                    through. If username starts with '@' symbol, it will be ignored.
+            """
+            with self.__lock:
+                if user_id and self._usernames:
+                    raise RuntimeError("Can't set user_id in conjunction with (already set) "
+                                       "usernames.")
+                if username and self._user_ids:
+                    raise RuntimeError("Can't set username in conjunction with (already set) "
+                                       "user_ids.")
+
+                user_id = self._parse_user_id(user_id)
+                username = self._parse_username(username)
+
+                for uid in user_id:
+                    self._user_ids.discard(uid)
+                for name in username:
+                    self._usernames.discard(name)
 
         def filter(self, message):
             """"""  # remove method from docs
-            if bool(message.from_user):
+            if message.from_user:
                 if self.user_ids:
-                    return bool(message.from_user.id in self.user_ids)
+                    return message.from_user.id in self.user_ids
                 if self.usernames:
-                    return bool(message.from_user.username
-                                and message.from_user.username in self.usernames)
+                    return (message.from_user.username
+                            and message.from_user.username in self.usernames)
                 return self.allow_empty
             return False
 
