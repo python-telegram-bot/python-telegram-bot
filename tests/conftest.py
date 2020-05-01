@@ -31,7 +31,6 @@ from telegram import (Bot, Message, User, Chat, MessageEntity, Update,
                       InlineQuery, CallbackQuery, ShippingQuery, PreCheckoutQuery,
                       ChosenInlineResult)
 from telegram.ext import Dispatcher, JobQueue, Updater, BaseFilter, Defaults
-from telegram.utils.helpers import _UtcOffsetTimezone
 from telegram.error import BadRequest
 from tests.bots import get_bot
 
@@ -281,7 +280,7 @@ def utc_offset(request):
 
 @pytest.fixture()
 def timezone(utc_offset):
-    return _UtcOffsetTimezone(utc_offset)
+    return datetime.timezone(utc_offset)
 
 
 def expect_bad_request(func, message, reason):

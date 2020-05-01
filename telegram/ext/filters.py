@@ -21,13 +21,14 @@
 import re
 
 from future.utils import string_types
+from abc import ABC, abstractmethod
 
 from telegram import Chat, Update, MessageEntity
 
 __all__ = ['Filters', 'BaseFilter', 'InvertedFilter', 'MergedFilter']
 
 
-class BaseFilter(object):
+class BaseFilter(ABC):
     """Base class for all Message Filters.
 
     Subclassing from this class filters to be combined using bitwise operators:
@@ -103,6 +104,7 @@ class BaseFilter(object):
             self.name = self.__class__.__name__
         return self.name
 
+    @abstractmethod
     def filter(self, update):
         """This method must be overwritten.
 
@@ -117,8 +119,6 @@ class BaseFilter(object):
             :obj:`dict` or :obj:`bool`
 
         """
-
-        raise NotImplementedError
 
 
 class InvertedFilter(BaseFilter):

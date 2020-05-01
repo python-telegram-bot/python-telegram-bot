@@ -553,7 +553,7 @@ class TestBot(object):
         chat = bot.get_chat(super_group_id)
 
         assert chat.type == 'supergroup'
-        assert chat.title == '>>> telegram.Bot(test)'
+        assert chat.title == '>>> telegram.Bot(test) @{}'.format(bot.username)
         assert chat.id == int(super_group_id)
 
     # TODO: Add bot to group to test there too

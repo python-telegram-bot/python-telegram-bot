@@ -730,10 +730,8 @@ class TestFilters(object):
         class _CustomFilter(BaseFilter):
             pass
 
-        custom = _CustomFilter()
-
-        with pytest.raises(NotImplementedError):
-            (custom & Filters.text)(update)
+        with pytest.raises(TypeError, match='Can\'t instantiate abstract class _CustomFilter'):
+            _CustomFilter()
 
     def test_custom_unnamed_filter(self, update):
         class Unnamed(BaseFilter):
