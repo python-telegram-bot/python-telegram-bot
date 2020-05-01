@@ -909,7 +909,7 @@ officedocument.wordprocessingml.document")``-
         @property
         def user_ids(self):
             with self.__lock:
-                return frozenset(self._user_ids) if self._user_ids is not None else None
+                return frozenset(self._user_ids)
 
         @user_ids.setter
         def user_ids(self, user_id):
@@ -922,7 +922,7 @@ officedocument.wordprocessingml.document")``-
         @property
         def usernames(self):
             with self.__lock:
-                return frozenset(self._usernames) if self._usernames is not None else None
+                return frozenset(self._usernames)
 
         @usernames.setter
         def usernames(self, username):
