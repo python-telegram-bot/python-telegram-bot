@@ -170,7 +170,7 @@ def from_timestamp(unixtime, tzinfo=dtm.timezone.utc):
     Args:
         unixtime (int): integer POSIX timestamp
         tzinfo (:obj:`datetime.tzinfo`, optional): The timezone, the timestamp is to be converted
-            to. Default to UTC.
+            to. Defaults to UTC.
 
     Returns:
         timezone aware equivalent :obj:`datetime.datetime` value if ``timestamp`` is not
