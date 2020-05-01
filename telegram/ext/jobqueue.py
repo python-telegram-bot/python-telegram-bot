@@ -236,7 +236,8 @@ class JobQueue(object):
                 The return value of the callback is usually ignored except for the special case of
                 :class:`telegram.ext.ConversationHandler`.
             when (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
-                (``when.tzinfo``) is ``None``, UTC will be assumed.
+                (``when.tzinfo``) is ``None``, UTC will be assumed. This will also implicitly
+                define ``Job.tzinfo``.
             day (:obj:`int`): Defines the day of the month whereby the job would run. It should
                 be within the range of 1 and 31, inclusive.
             context (:obj:`object`, optional): Additional data needed for the callback function.
@@ -251,17 +252,18 @@ class JobQueue(object):
             queue.
 
         """
+        tzinfo = when.tzinfo if isinstance(when, (datetime.datetime, datetime.time)) else None
         if 1 <= day <= 31:
-            next_dt = self._get_next_month_date(day, day_is_strict, when)
+            next_dt = self._get_next_month_date(day, day_is_strict, when, allow_now=True)
             job = Job(callback, repeat=False, context=context, name=name, job_queue=self,
-                      is_monthly=True, day_is_strict=day_is_strict)
+                      is_monthly=True, day_is_strict=day_is_strict, tzinfo=tzinfo)
             self._put(job, time_spec=next_dt)
             return job
         else:
             raise ValueError("The elements of the 'day' argument should be from 1 up to"
                              " and including 31")
 
-    def _get_next_month_date(self, day, day_is_strict, when):
+    def _get_next_month_date(self, day, day_is_strict, when, allow_now=False):
         """This method returns the date that the next monthly job should be scheduled.
 
         Args:
@@ -276,6 +278,9 @@ class JobQueue(object):
                the job would run on April 30th.
            when (:obj:`datetime.time`): Time of day at which the job should run. If the
                timezone (``time.tzinfo``) is ``None``, UTC will be assumed.
+           allow_now (:obj:`bool`): Whether executing the job right now is a feasible options.
+               For stability reasons, this defaults to :obj:`False`, but it needs to be :obj:`True`
+               on initializing a job.
 
         """
         dt = datetime.datetime.now(tz=when.tzinfo or _UTC)
@@ -296,7 +301,8 @@ class JobQueue(object):
             if dt.day < day:
                 # day is upcoming
                 next_dt = dt + datetime.timedelta(day - dt.day)
-            elif dt.day > day or (dt.day == day and dt_time > when):
+            elif dt.day > day or (dt.day == day and ((not allow_now and dt_time >= when)
+                                                     or (allow_now and dt_time > when))):
                 # run next month if day has already passed
                 next_year = dt.year + 1 if dt.month == 12 else dt.year
                 next_month = 1 if dt.month == 12 else dt.month + 1

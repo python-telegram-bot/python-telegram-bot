@@ -304,8 +304,10 @@ class TestJobQueue(object):
         assert job_queue._queue.get(False)[0] == pytest.approx(expected_reschedule_time)
 
     def test_run_monthly_and_not_strict(self, job_queue):
-        delta, now = 0.1, dtm.datetime(dtm.datetime.utcnow().year, 2, 1, 0, 0).replace(
-            tzinfo=dtm.timezone.utc).timestamp()
+        # This only really tests something in months with < 31 days.
+        # But the trouble of patching datetime is probably not worth it
+
+        delta, now = 0.1, time.time()
         date_time = dtm.datetime.utcfromtimestamp(now)
         time_of_day = (date_time + dtm.timedelta(seconds=delta)).time()
         expected_reschedule_time = now + delta
@@ -445,8 +447,8 @@ class TestJobQueue(object):
         assert job.next_t == t.astimezone(job.tzinfo)
 
     def test_passing_tzinfo_to_job(self, job_queue):
-        """Test that tzinfo is correctly passed to job with run_once, run_daily
-        and run_repeating methods"""
+        """Test that tzinfo is correctly passed to job with run_once, run_daily, run_repeating
+        and run_monthly methods"""
 
         when_dt_tz_specific = dtm.datetime.now(
             tz=_UtcOffsetTimezone(dtm.timedelta(hours=12))
@@ -487,6 +489,9 @@ class TestJobQueue(object):
         job_daily1 = job_queue.run_daily(self.job_run_once, time_tz_specific)
         job_daily2 = job_queue.run_daily(self.job_run_once, time_tz_utc)
 
+        job_monthly1 = job_queue.run_monthly(self.job_run_once, time_tz_specific, 1)
+        job_monthly2 = job_queue.run_monthly(self.job_run_once, time_tz_utc, 1)
+
         assert job_once1.tzinfo == when_dt_tz_specific.tzinfo
         assert job_once2.tzinfo == _UTC
         assert job_once3.tzinfo == when_time_tz_specific.tzinfo
@@ -497,3 +502,5 @@ class TestJobQueue(object):
         assert job_repeating4.tzinfo == _UTC
         assert job_daily1.tzinfo == time_tz_specific.tzinfo
         assert job_daily2.tzinfo == _UTC
+        assert job_monthly1.tzinfo == time_tz_specific.tzinfo
+        assert job_monthly2.tzinfo == _UTC
