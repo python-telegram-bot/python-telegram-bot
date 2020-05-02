@@ -226,15 +226,13 @@ class JobQueue(object):
         """Creates a new ``Job`` that runs on a monthly basis and adds it to the queue.
 
         Args:
-            callback (:obj:`callable`): The callback function for this handler. Will be called when
-                :attr:`check_update` has determined that an update should be processed by this
-                 handler.
-                Callback signature for context based API:
+            callback (:obj:`callable`):  The callback function that should be executed by the new
+                job. Callback signature for context based API:
 
-                ``def callback(update: Update, context: CallbackContext)``
+                    ``def callback(CallbackContext)``
 
-                The return value of the callback is usually ignored except for the special case of
-                :class:`telegram.ext.ConversationHandler`.
+                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
+                its ``job.context`` or change it to a repeating job.
             when (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
                 (``when.tzinfo``) is ``None``, UTC will be assumed. This will also implicitly
                 define ``Job.tzinfo``.
