@@ -245,7 +245,6 @@ break the API classes. For example:
 
 .. _`Code of Conduct`: https://www.python.org/psf/codeofconduct/
 .. _`issue tracker`: https://github.com/python-telegram-bot/python-telegram-bot/issues
-.. _`developers' mailing list`: mailto:devs@python-telegram-bot.org
 .. _`PEP 8 Style Guide`: https://www.python.org/dev/peps/pep-0008/
 .. _`sphinx`: http://sphinx-doc.org
 .. _`Google Python Style Guide`: http://google.github.io/styleguide/pyguide.html
