@@ -27,7 +27,7 @@ from future.utils import string_types
 from telegram import (Bot, Update, ChatAction, TelegramError, User, InlineKeyboardMarkup,
                       InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent,
                       ShippingOption, LabeledPrice, ChatPermissions, Poll, BotCommand,
-                      InlineQueryResultDocument)
+                      InlineQueryResultDocument, Dice, MessageEntity, ParseMode)
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
 from telegram.utils.helpers import from_timestamp, escape_markdown
 from tests.conftest import expect_bad_request
@@ -214,18 +214,86 @@ class TestBot(object):
         assert poll.question == question
         assert poll.total_voter_count == 0
 
+        explanation = '[Here is a link](https://google.com)'
+        explanation_entities = [
+            MessageEntity(MessageEntity.TEXT_LINK, 0, 14, url='https://google.com')
+        ]
         message_quiz = bot.send_poll(chat_id=super_group_id, question=question, options=answers,
-                                     type=Poll.QUIZ, correct_option_id=2, is_closed=True)
+                                     type=Poll.QUIZ, correct_option_id=2, is_closed=True,
+                                     explanation=explanation,
+                                     explanation_parse_mode=ParseMode.MARKDOWN_V2)
         assert message_quiz.poll.correct_option_id == 2
         assert message_quiz.poll.type == Poll.QUIZ
         assert message_quiz.poll.is_closed
+        assert message_quiz.poll.explanation == 'Here is a link'
+        assert message_quiz.poll.explanation_entities == explanation_entities
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_dice(self, bot, chat_id):
-        message = bot.send_dice(chat_id)
+    @pytest.mark.parametrize(['open_period', 'close_date'], [(5, None), (None, True)])
+    def test_send_open_period(self, bot, super_group_id, open_period, close_date):
+        question = 'Is this a test?'
+        answers = ['Yes', 'No', 'Maybe']
+        reply_markup = InlineKeyboardMarkup.from_button(
+            InlineKeyboardButton(text='text', callback_data='data'))
+
+        if close_date:
+            close_date = dtm.datetime.utcnow() + dtm.timedelta(seconds=5)
+
+        message = bot.send_poll(chat_id=super_group_id, question=question, options=answers,
+                                is_anonymous=False, allows_multiple_answers=True, timeout=60,
+                                open_period=open_period, close_date=close_date)
+        time.sleep(5.1)
+        new_message = bot.edit_message_reply_markup(chat_id=super_group_id,
+                                                    message_id=message.message_id,
+                                                    reply_markup=reply_markup, timeout=60)
+        assert new_message.poll.id == message.poll.id
+        assert new_message.poll.is_closed
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
+    def test_send_poll_default_parse_mode(self, default_bot, super_group_id):
+        explanation = 'Italic Bold Code'
+        explanation_markdown = '_Italic_ *Bold* `Code`'
+        question = 'Is this a test?'
+        answers = ['Yes', 'No', 'Maybe']
+
+        message = default_bot.send_poll(chat_id=super_group_id, question=question, options=answers,
+                                        type=Poll.QUIZ, correct_option_id=2, is_closed=True,
+                                        explanation=explanation_markdown)
+        assert message.poll.explanation == explanation
+        assert message.poll.explanation_entities == [
+            MessageEntity(MessageEntity.ITALIC, 0, 6),
+            MessageEntity(MessageEntity.BOLD, 7, 4),
+            MessageEntity(MessageEntity.CODE, 12, 4)
+        ]
+
+        message = default_bot.send_poll(chat_id=super_group_id, question=question, options=answers,
+                                        type=Poll.QUIZ, correct_option_id=2, is_closed=True,
+                                        explanation=explanation_markdown,
+                                        explanation_parse_mode=None)
+        assert message.poll.explanation == explanation_markdown
+        assert message.poll.explanation_entities == []
+
+        message = default_bot.send_poll(chat_id=super_group_id, question=question, options=answers,
+                                        type=Poll.QUIZ, correct_option_id=2, is_closed=True,
+                                        explanation=explanation_markdown,
+                                        explanation_parse_mode='HTML')
+        assert message.poll.explanation == explanation_markdown
+        assert message.poll.explanation_entities == []
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize('emoji', Dice.ALL_EMOJI + [None])
+    def test_send_dice(self, bot, chat_id, emoji):
+        message = bot.send_dice(chat_id, emoji=emoji)
 
         assert message.dice
+        if emoji is None:
+            assert message.dice.emoji == Dice.DICE
+        else:
+            assert message.dice.emoji == emoji
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

@@ -622,21 +622,36 @@ class TestFilters(object):
         update.message.poll = 'test'
         assert Filters.poll(update)
 
-    def test_filters_dice(self, update):
-        update.message.dice = Dice(4)
+    @pytest.mark.parametrize('emoji', Dice.ALL_EMOJI)
+    def test_filters_dice(self, update, emoji):
+        update.message.dice = Dice(4, emoji)
         assert Filters.dice(update)
         update.message.dice = None
         assert not Filters.dice(update)
 
-    def test_filters_dice_iterable(self, update):
+    @pytest.mark.parametrize('emoji', Dice.ALL_EMOJI)
+    def test_filters_dice_list(self, update, emoji):
         update.message.dice = None
         assert not Filters.dice(5)(update)
 
-        update.message.dice = Dice(5)
+        update.message.dice = Dice(5, emoji)
         assert Filters.dice(5)(update)
         assert Filters.dice({5, 6})(update)
         assert not Filters.dice(1)(update)
         assert not Filters.dice([2, 3])(update)
+
+    def test_filters_dice_type(self, update):
+        update.message.dice = Dice(5, '🎲')
+        assert Filters.dice.dice(update)
+        assert Filters.dice.dice([4, 5])(update)
+        assert not Filters.dice.darts(update)
+        assert not Filters.dice.dice([6])(update)
+
+        update.message.dice = Dice(5, '🎯')
+        assert Filters.dice.darts(update)
+        assert Filters.dice.darts([4, 5])(update)
+        assert not Filters.dice.dice(update)
+        assert not Filters.dice.darts([6])(update)
 
     def test_language_filter_single(self, update):
         update.message.from_user.language_code = 'en_US'

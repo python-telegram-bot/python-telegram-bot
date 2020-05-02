@@ -215,6 +215,38 @@ class MergedFilter(BaseFilter):
                                    self.and_filter or self.or_filter)
 
 
+class _DiceEmoji(BaseFilter):
+
+    def __init__(self, emoji=None, name=None):
+        self.name = 'Filters.dice.{}'.format(name) if name else 'Filters.dice'
+        self.emoji = emoji
+
+    class _DiceValues(BaseFilter):
+
+        def __init__(self, values, name, emoji=None):
+            self.values = [values] if isinstance(values, int) else values
+            self.emoji = emoji
+            self.name = '{}({})'.format(name, values)
+
+        def filter(self, message):
+            if bool(message.dice and message.dice.value in self.values):
+                if self.emoji:
+                    return message.dice.emoji == self.emoji
+                return True
+
+    def __call__(self, update):
+        if isinstance(update, Update):
+            return self.filter(update.effective_message)
+        else:
+            return self._DiceValues(update, self.name, emoji=self.emoji)
+
+    def filter(self, message):
+        if bool(message.dice):
+            if self.emoji:
+                return message.dice.emoji == self.emoji
+            return True
+
+
 class Filters(object):
     """Predefined filters for use as the `filter` argument of :class:`telegram.ext.MessageHandler`.
 
@@ -967,26 +999,9 @@ officedocument.wordprocessingml.document")``-
     poll = _Poll()
     """Messages that contain a :class:`telegram.Poll`."""
 
-    class _Dice(BaseFilter):
-        name = 'Filters.dice'
-
-        class _DiceValues(BaseFilter):
-
-            def __init__(self, values):
-                self.values = [values] if isinstance(values, int) else values
-                self.name = 'Filters.dice({})'.format(values)
-
-            def filter(self, message):
-                return bool(message.dice and message.dice.value in self.values)
-
-        def __call__(self, update):
-            if isinstance(update, Update):
-                return self.filter(update.effective_message)
-            else:
-                return self._DiceValues(update)
-
-        def filter(self, message):
-            return bool(message.dice)
+    class _Dice(_DiceEmoji):
+        dice = _DiceEmoji('🎲', 'dice')
+        darts = _DiceEmoji('🎯', 'darts')
 
     dice = _Dice()
     """Dice Messages. If an integer or a list of integers is passed, it filters messages to only
@@ -1007,6 +1022,12 @@ officedocument.wordprocessingml.document")``-
     Note:
         Dice messages don't have text. If you want to filter either text or dice messages, use
         ``Filters.text | Filters.dice``.
+
+    Attributes:
+        dice: Dice messages with the emoji 🎲. Passing a list of integers is supported just as for
+            :attr:`Filters.dice`.
+        darts: Dice messages with the emoji 🎯. Passing a list of integers is supported just as for
+            :attr:`Filters.dice`.
     """
 
     class language(BaseFilter):
