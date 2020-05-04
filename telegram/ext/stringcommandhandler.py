@@ -18,8 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the StringCommandHandler class."""
 
-from future.utils import string_types
-
 from .handler import Handler
 
 
@@ -90,7 +88,7 @@ class StringCommandHandler(Handler):
             :obj:`bool`
 
         """
-        if isinstance(update, string_types) and update.startswith('/'):
+        if isinstance(update, str) and update.startswith('/'):
             args = update[1:].split(' ')
             if args[0] == self.command:
                 return args[1:]

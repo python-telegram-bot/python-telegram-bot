@@ -19,8 +19,6 @@
 """ This module contains the InlineQueryHandler class """
 import re
 
-from future.utils import string_types
-
 from telegram import Update
 from .handler import Handler
 
@@ -111,7 +109,7 @@ class InlineQueryHandler(Handler):
             pass_user_data=pass_user_data,
             pass_chat_data=pass_chat_data)
 
-        if isinstance(pattern, string_types):
+        if isinstance(pattern, str):
             pattern = re.compile(pattern)
 
         self.pattern = pattern

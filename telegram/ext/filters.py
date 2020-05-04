@@ -20,7 +20,6 @@
 
 import re
 
-from future.utils import string_types
 from abc import ABC, abstractmethod
 
 from telegram import Chat, Update, MessageEntity
@@ -425,7 +424,7 @@ class Filters(object):
         data_filter = True
 
         def __init__(self, pattern):
-            if isinstance(pattern, string_types):
+            if isinstance(pattern, str):
                 pattern = re.compile(pattern)
             self.pattern = pattern
             self.name = 'Filters.regex({})'.format(self.pattern)
@@ -911,7 +910,7 @@ officedocument.wordprocessingml.document")``-
                 self.user_ids = user_id
             if username is None:
                 self.usernames = username
-            elif isinstance(username, string_types):
+            elif isinstance(username, str):
                 self.usernames = [username.replace('@', '')]
             else:
                 self.usernames = [user.replace('@', '') for user in username]
@@ -950,7 +949,7 @@ officedocument.wordprocessingml.document")``-
                 self.chat_ids = chat_id
             if username is None:
                 self.usernames = username
-            elif isinstance(username, string_types):
+            elif isinstance(username, str):
                 self.usernames = [username.replace('@', '')]
             else:
                 self.usernames = [chat.replace('@', '') for chat in username]
@@ -1048,7 +1047,7 @@ officedocument.wordprocessingml.document")``-
         """
 
         def __init__(self, lang):
-            if isinstance(lang, string_types):
+            if isinstance(lang, str):
                 self.lang = [lang]
             else:
                 self.lang = lang

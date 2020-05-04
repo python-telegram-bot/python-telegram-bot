@@ -20,8 +20,6 @@
 import re
 import warnings
 
-from future.utils import string_types
-
 from telegram.ext import Filters
 from telegram.utils.deprecate import TelegramDeprecationWarning
 
@@ -132,7 +130,7 @@ class CommandHandler(Handler):
             pass_user_data=pass_user_data,
             pass_chat_data=pass_chat_data)
 
-        if isinstance(command, string_types):
+        if isinstance(command, str):
             self.command = [command.lower()]
         else:
             self.command = [x.lower() for x in command]
@@ -323,7 +321,7 @@ class PrefixHandler(CommandHandler):
 
     @prefix.setter
     def prefix(self, prefix):
-        if isinstance(prefix, string_types):
+        if isinstance(prefix, str):
             self._prefix = [prefix.lower()]
         else:
             self._prefix = prefix
@@ -335,7 +333,7 @@ class PrefixHandler(CommandHandler):
 
     @command.setter
     def command(self, command):
-        if isinstance(command, string_types):
+        if isinstance(command, str):
             self._command = [command.lower()]
         else:
             self._command = command

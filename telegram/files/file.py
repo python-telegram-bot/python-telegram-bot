@@ -20,8 +20,7 @@
 from base64 import b64decode
 from os.path import basename
 import os
-
-from future.backports.urllib import parse as urllib_parse
+import urllib.parse as urllib_parse
 
 from telegram import TelegramObject
 from telegram.passport.credentials import decrypt
@@ -145,9 +144,9 @@ class File(TelegramObject):
 
     def _get_encoded_url(self):
         """Convert any UTF-8 char in :obj:`File.file_path` into a url encoded ASCII string."""
-        sres = urllib_parse.urlsplit(self.file_path)
+        el = urllib_parse.urlsplit(self.file_path)
         return urllib_parse.urlunsplit(urllib_parse.SplitResult(
-            sres.scheme, sres.netloc, urllib_parse.quote(sres.path), sres.query, sres.fragment))
+            el.scheme, el.netloc, urllib_parse.quote(el.path), el.query, el.fragment))
 
     def download_as_bytearray(self, buf=None):
         """Download this file and return it as a bytearray.

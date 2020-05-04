@@ -19,7 +19,6 @@
 import sys
 import logging
 from telegram import Update
-from future.utils import bytes_to_native_str
 from threading import Lock
 try:
     import ujson as json
@@ -130,10 +129,10 @@ class WebhookHandler(tornado.web.RequestHandler):
     def post(self):
         self.logger.debug('Webhook triggered')
         self._validate_post()
-        json_string = bytes_to_native_str(self.request.body)
-        data = json.loads(json_string)
+        string_request = self.request.body.decode('utf-8')
+        data = json.loads(string_request)
         self.set_status(200)
-        self.logger.debug('Webhook received data: ' + json_string)
+        self.logger.debug('Webhook received data: ' + string_request)
         data['default_quote'] = self._default_quote
         update = Update.de_json(data, self.bot)
         self.logger.debug('Received Update with ID %d on Webhook' % update.update_id)

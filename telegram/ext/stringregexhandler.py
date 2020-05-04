@@ -20,8 +20,6 @@
 
 import re
 
-from future.utils import string_types
-
 from .handler import Handler
 
 
@@ -90,7 +88,7 @@ class StringRegexHandler(Handler):
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue)
 
-        if isinstance(pattern, string_types):
+        if isinstance(pattern, str):
             pattern = re.compile(pattern)
 
         self.pattern = pattern
@@ -107,7 +105,7 @@ class StringRegexHandler(Handler):
             :obj:`bool`
 
         """
-        if isinstance(update, string_types):
+        if isinstance(update, str):
             match = re.match(self.pattern, update)
             if match:
                 return match

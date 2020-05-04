@@ -34,7 +34,6 @@ from datetime import datetime
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
-from future.utils import string_types
 
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
                       ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore, StickerSet,
@@ -2700,10 +2699,7 @@ class Bot(TelegramObject):
             'prices': [p.to_dict() for p in prices]
         }
         if provider_data is not None:
-            if isinstance(provider_data, string_types):
-                data['provider_data'] = provider_data
-            else:
-                data['provider_data'] = json.dumps(provider_data)
+            data['provider_data'] = json.dumps(provider_data)
         if photo_url is not None:
             data['photo_url'] = photo_url
         if photo_size is not None:
