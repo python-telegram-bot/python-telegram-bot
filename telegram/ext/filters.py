@@ -927,32 +927,38 @@ officedocument.wordprocessingml.document")``-
             self._user_ids = set()
             self._usernames = set()
 
-            self.user_ids = user_id
-            self.usernames = username
+            self._set_user_ids(user_id)
+            self._set_usernames(username)
 
         @staticmethod
         def _parse_user_id(user_id):
             if user_id is None:
                 return set()
-            elif isinstance(user_id, int):
+            if isinstance(user_id, int):
                 return {user_id}
-            else:
-                return set(user_id)
+            return set(user_id)
 
         @staticmethod
         def _parse_username(username):
             if username is None:
                 return set()
-            elif isinstance(username, str):
+            if isinstance(username, str):
                 return {username.replace('@', '')}
-            else:
-                return set([user.replace('@', '') for user in username])
+            return {user.replace('@', '') for user in username}
 
         def _set_user_ids(self, user_id):
-            self._user_ids = self._parse_user_id(user_id)
+            with self.__lock:
+                if user_id and self._usernames:
+                    raise RuntimeError("Can't set user_id in conjunction with (already set) "
+                                       "usernames.")
+                self._user_ids = self._parse_user_id(user_id)
 
         def _set_usernames(self, username):
-            self._usernames = self._parse_username(username)
+            with self.__lock:
+                if username and self._user_ids:
+                    raise RuntimeError("Can't set username in conjunction with (already set) "
+                                       "user_ids.")
+                self._usernames = self._parse_username(username)
 
         @property
         def user_ids(self):
@@ -961,11 +967,7 @@ officedocument.wordprocessingml.document")``-
 
         @user_ids.setter
         def user_ids(self, user_id):
-            with self.__lock:
-                if user_id and self._usernames:
-                    raise RuntimeError("Can't set user_id in conjunction with (already set) "
-                                       "usernames.")
-                self._set_user_ids(user_id)
+            self._set_user_ids(user_id)
 
         @property
         def usernames(self):
@@ -974,11 +976,7 @@ officedocument.wordprocessingml.document")``-
 
         @usernames.setter
         def usernames(self, username):
-            with self.__lock:
-                if username and self._user_ids:
-                    raise RuntimeError("Can't set username in conjunction with (already set) "
-                                       "user_ids.")
-                self._set_usernames(username)
+            self._set_usernames(username)
 
         def add_users(self, user_id=None, username=None):
             """
