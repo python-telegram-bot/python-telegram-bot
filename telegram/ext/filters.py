@@ -911,7 +911,7 @@ officedocument.wordprocessingml.document")``-
             user_id(:obj:`int` | List[:obj:`int`], optional): Which user ID(s) to allow
                 through.
             username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow
-                through. If username starts with '@' symbol, it will be ignored.
+                through. Leading '@'s in usernames will be discarded.
             allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
                 is specified in :attr:`user_ids` and :attr:`usernames`. Defaults to :obj:`False`
 
@@ -978,57 +978,73 @@ officedocument.wordprocessingml.document")``-
         def usernames(self, username):
             self._set_usernames(username)
 
-        def add_users(self, user_id=None, username=None):
+        def add_usernames(self, username):
             """
-            Adds a user(s) to the allowed users.
+            Adds (a) user(s) to the allowed users by name.
+
+            Args:
+                username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow
+                    through. Leading '@'s in usernames will be discarded.
+            """
+            with self.__lock:
+                if self._user_ids:
+                    raise RuntimeError("Can't set username in conjunction with (already set) "
+                                       "user_ids.")
+
+                username = self._parse_username(username)
+                for name in username:
+                    self._usernames.add(name)
+
+        def add_user_ids(self, user_id):
+            """
+            Adds (a) user(s) to the allowed users by id.
 
             Args:
                 user_id(:obj:`int` | List[:obj:`int`], optional): Which user ID(s) to allow
                     through.
-                username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow
-                    through. If username starts with '@' symbol, it will be ignored.
             """
             with self.__lock:
-                if user_id and self._usernames:
+                if self._usernames:
                     raise RuntimeError("Can't set user_id in conjunction with (already set) "
                                        "usernames.")
-                if username and self._user_ids:
-                    raise RuntimeError("Can't set username in conjunction with (already set) "
-                                       "user_ids.")
 
                 user_id = self._parse_user_id(user_id)
-                username = self._parse_username(username)
 
                 for uid in user_id:
                     self._user_ids.add(uid)
-                for name in username:
-                    self._usernames.add(name)
 
-        def remove_users(self, user_id=None, username=None):
+        def remove_usernames(self, username):
             """
-            Removes a user(s) from the allowed users.
+            Removes (a) user(s) from the allowed users by name.
+
+            Args:
+                username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to disallow
+                    through. Leading '@'s in usernames will be discarded.
+            """
+            with self.__lock:
+                if self._user_ids:
+                    raise RuntimeError("Can't set username in conjunction with (already set) "
+                                       "user_ids.")
+
+                username = self._parse_username(username)
+                for name in username:
+                    self._usernames.discard(name)
+
+        def remove_user_ids(self, user_id):
+            """
+            Removes (a) user(s) from the allowed users by id.
 
             Args:
                 user_id(:obj:`int` | List[:obj:`int`], optional): Which user ID(s) to disallow
                     through.
-                username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to disallow
-                    through. If username starts with '@' symbol, it will be ignored.
             """
             with self.__lock:
-                if user_id and self._usernames:
+                if self._usernames:
                     raise RuntimeError("Can't set user_id in conjunction with (already set) "
                                        "usernames.")
-                if username and self._user_ids:
-                    raise RuntimeError("Can't set username in conjunction with (already set) "
-                                       "user_ids.")
-
                 user_id = self._parse_user_id(user_id)
-                username = self._parse_username(username)
-
                 for uid in user_id:
                     self._user_ids.discard(uid)
-                for name in username:
-                    self._usernames.discard(name)
 
         def filter(self, message):
             """"""  # remove method from docs

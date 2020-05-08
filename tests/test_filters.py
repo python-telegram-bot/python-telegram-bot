@@ -572,6 +572,8 @@ class TestFilters(object):
         update.message.from_user.id = 2
         assert Filters.user(user_id=[1, 2])(update)
         assert not Filters.user(user_id=[3, 4])(update)
+        update.message.from_user = None
+        assert not Filters.user(user_id=[3, 4])(update)
 
     def test_filters_username(self, update):
         assert not Filters.user(username='user')(update)
@@ -580,6 +582,8 @@ class TestFilters(object):
         assert Filters.user(username='@user')(update)
         assert Filters.user(username='user')(update)
         assert Filters.user(username=['user1', 'user', 'user2'])(update)
+        assert not Filters.user(username=['@username', '@user_2'])(update)
+        update.message.from_user = None
         assert not Filters.user(username=['@username', '@user_2'])(update)
 
     def test_filters_user_change_id(self, update):
@@ -614,15 +618,15 @@ class TestFilters(object):
             update.message.from_user.username = user
             assert not f(update)
 
-        f.add_users(username='user_a')
-        f.add_users(username=['user_b', 'user_c'])
+        f.add_usernames('user_a')
+        f.add_usernames(['user_b', 'user_c'])
 
         for user in users:
             update.message.from_user.username = user
             assert f(update)
 
         with pytest.raises(RuntimeError, match='user_id in conjunction'):
-            f.add_users(user_id=1)
+            f.add_user_ids(1)
 
     def test_filters_user_add_user_by_id(self, update):
         users = [1, 2, 3]
@@ -632,29 +636,29 @@ class TestFilters(object):
             update.message.from_user.id = user
             assert not f(update)
 
-        f.add_users(user_id=1)
-        f.add_users(user_id=[2, 3])
+        f.add_user_ids(1)
+        f.add_user_ids([2, 3])
 
         for user in users:
             update.message.from_user.username = user
             assert f(update)
 
         with pytest.raises(RuntimeError, match='username in conjunction'):
-            f.add_users(username='user')
+            f.add_usernames('user')
 
     def test_filters_user_remove_user_by_name(self, update):
         users = ['user_a', 'user_b', 'user_c']
         f = Filters.user(username=users)
 
         with pytest.raises(RuntimeError, match='user_id in conjunction'):
-            f.remove_users(user_id=1)
+            f.remove_user_ids(1)
 
         for user in users:
             update.message.from_user.username = user
             assert f(update)
 
-        f.remove_users(username='user_a')
-        f.remove_users(username=['user_b', 'user_c'])
+        f.remove_usernames('user_a')
+        f.remove_usernames(['user_b', 'user_c'])
 
         for user in users:
             update.message.from_user.username = user
@@ -665,14 +669,14 @@ class TestFilters(object):
         f = Filters.user(user_id=users)
 
         with pytest.raises(RuntimeError, match='username in conjunction'):
-            f.remove_users(username='user')
+            f.remove_usernames('user')
 
         for user in users:
             update.message.from_user.id = user
             assert f(update)
 
-        f.remove_users(user_id=1)
-        f.remove_users(user_id=[2, 3])
+        f.remove_user_ids(1)
+        f.remove_user_ids([2, 3])
 
         for user in users:
             update.message.from_user.username = user
