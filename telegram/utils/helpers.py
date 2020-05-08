@@ -75,46 +75,12 @@ def escape_markdown(text, version=1, entity_type=None):
 # -------- date/time related helpers --------
 # TODO: add generic specification of UTC for naive datetimes to docs
 
-if hasattr(dtm, 'timezone'):
-    # Python 3.3+
-    def _datetime_to_float_timestamp(dt_obj):
-        if dt_obj.tzinfo is None:
-            dt_obj = dt_obj.replace(tzinfo=_UTC)
-        return dt_obj.timestamp()
-
-    _UtcOffsetTimezone = dtm.timezone
-    _UTC = dtm.timezone.utc
-else:
-    # Python < 3.3 (incl 2.7)
-
-    # hardcoded timezone class (`datetime.timezone` isn't available in py2)
-    class _UtcOffsetTimezone(dtm.tzinfo):
-        def __init__(self, offset):
-            self.offset = offset
-
-        def tzname(self, dt):
-            return 'UTC +{}'.format(self.offset)
-
-        def utcoffset(self, dt):
-            return self.offset
-
-        def dst(self, dt):
-            return dtm.timedelta(0)
-
-    _UTC = _UtcOffsetTimezone(dtm.timedelta(0))
-    __EPOCH_DT = dtm.datetime.fromtimestamp(0, tz=_UTC)
-    __NAIVE_EPOCH_DT = __EPOCH_DT.replace(tzinfo=None)
-
-    # _datetime_to_float_timestamp
-    # Not using future.backports.datetime here as datetime value might be an input from the user,
-    # making every isinstace() call more delicate. So we just use our own compat layer.
-    def _datetime_to_float_timestamp(dt_obj):
-        epoch_dt = __EPOCH_DT if dt_obj.tzinfo is not None else __NAIVE_EPOCH_DT
-        return (dt_obj - epoch_dt).total_seconds()
-
-_datetime_to_float_timestamp.__doc__ = \
+def _datetime_to_float_timestamp(dt_obj):
     """Converts a datetime object to a float timestamp (with sub-second precision).
-If the datetime object is timezone-naive, it is assumed to be in UTC."""
+    If the datetime object is timezone-naive, it is assumed to be in UTC."""
+    if dt_obj.tzinfo is None:
+        dt_obj = dt_obj.replace(tzinfo=dtm.timezone.utc)
+    return dt_obj.timestamp()
 
 
 def to_float_timestamp(t, reference_timestamp=None):
@@ -196,22 +162,27 @@ def to_timestamp(dt_obj, reference_timestamp=None):
     return int(to_float_timestamp(dt_obj, reference_timestamp)) if dt_obj is not None else None
 
 
-def from_timestamp(unixtime):
+def from_timestamp(unixtime, tzinfo=dtm.timezone.utc):
     """
-    Converts an (integer) unix timestamp to a naive datetime object in UTC.
+    Converts an (integer) unix timestamp to a timezone aware datetime object.
     ``None`` s are left alone (i.e. ``from_timestamp(None)`` is ``None``).
 
     Args:
         unixtime (int): integer POSIX timestamp
+        tzinfo (:obj:`datetime.tzinfo`, optional): The timezone, the timestamp is to be converted
+            to. Defaults to UTC.
 
     Returns:
-        equivalent :obj:`datetime.datetime` value in naive UTC if ``timestamp`` is not
+        timezone aware equivalent :obj:`datetime.datetime` value if ``timestamp`` is not
         ``None``; else ``None``
     """
     if unixtime is None:
         return None
 
-    return dtm.datetime.utcfromtimestamp(unixtime)
+    if tzinfo is not None:
+        return dtm.datetime.fromtimestamp(unixtime, tz=tzinfo)
+    else:
+        return dtm.datetime.utcfromtimestamp(unixtime)
 
 # -------- end --------
 

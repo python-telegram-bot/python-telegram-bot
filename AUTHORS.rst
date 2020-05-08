@@ -27,6 +27,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `d-qoi <https://github.com/d-qoi>`_
 - `daimajia <https://github.com/daimajia>`_
 - `Daniel Reed <https://github.com/nmlorg>`_
+- `D David Livingston <https://github.com/daviddl9>`_
 - `Eana Hufwe <https://github.com/blueset>`_
 - `Ehsan Online <https://github.com/ehsanonline>`_
 - `Eli Gao <https://github.com/eligao>`_

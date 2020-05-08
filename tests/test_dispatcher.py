@@ -373,6 +373,12 @@ class TestDispatcher(object):
             def update_user_data(self, user_id, data):
                 raise Exception
 
+            def get_conversations(self, name):
+                pass
+
+            def update_conversation(self, name, key, new_state):
+                pass
+
         def start1(b, u):
             pass
 
@@ -470,6 +476,21 @@ class TestDispatcher(object):
             def update_user_data(self, user_id, data):
                 self.update(data)
 
+            def get_chat_data(self):
+                pass
+
+            def get_bot_data(self):
+                pass
+
+            def get_user_data(self):
+                pass
+
+            def get_conversations(self, name):
+                pass
+
+            def update_conversation(self, name, key, new_state):
+                pass
+
         def callback(update, context):
             pass
 
@@ -512,6 +533,21 @@ class TestDispatcher(object):
 
             def update_user_data(self, user_id, data):
                 self.test_flag_user_data = True
+
+            def update_conversation(self, name, key, new_state):
+                pass
+
+            def get_conversations(self, name):
+                pass
+
+            def get_user_data(self):
+                pass
+
+            def get_bot_data(self):
+                pass
+
+            def get_chat_data(self):
+                pass
 
         def callback(update, context):
             pass
