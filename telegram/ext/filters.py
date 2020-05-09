@@ -943,8 +943,8 @@ officedocument.wordprocessingml.document")``-
             if username is None:
                 return set()
             if isinstance(username, str):
-                return {username.replace('@', '')}
-            return {user.replace('@', '') for user in username}
+                return {username[1:] if username.startswith('@') else username}
+            return {user[1:] if user.startswith('@') else user for user in username}
 
         def _set_user_ids(self, user_id):
             with self.__lock:
@@ -980,7 +980,7 @@ officedocument.wordprocessingml.document")``-
 
         def add_usernames(self, username):
             """
-            Adds (a) user(s) to the allowed users by name.
+            Add one or more users to the allowed usernames.
 
             Args:
                 username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow
@@ -992,12 +992,11 @@ officedocument.wordprocessingml.document")``-
                                        "user_ids.")
 
                 username = self._parse_username(username)
-                for name in username:
-                    self._usernames.add(name)
+                self._usernames |= username
 
         def add_user_ids(self, user_id):
             """
-            Adds (a) user(s) to the allowed users by id.
+            Add one or more users to the allowed user ids.
 
             Args:
                 user_id(:obj:`int` | List[:obj:`int`], optional): Which user ID(s) to allow
@@ -1010,12 +1009,11 @@ officedocument.wordprocessingml.document")``-
 
                 user_id = self._parse_user_id(user_id)
 
-                for uid in user_id:
-                    self._user_ids.add(uid)
+                self._user_ids |= user_id
 
         def remove_usernames(self, username):
             """
-            Removes (a) user(s) from the allowed users by name.
+            Remove one or more users from allowed usernames.
 
             Args:
                 username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to disallow
@@ -1027,12 +1025,11 @@ officedocument.wordprocessingml.document")``-
                                        "user_ids.")
 
                 username = self._parse_username(username)
-                for name in username:
-                    self._usernames.discard(name)
+                self._usernames -= username
 
         def remove_user_ids(self, user_id):
             """
-            Removes (a) user(s) from the allowed users by id.
+            Remove one or more users from allowed user ids.
 
             Args:
                 user_id(:obj:`int` | List[:obj:`int`], optional): Which user ID(s) to disallow
@@ -1043,8 +1040,7 @@ officedocument.wordprocessingml.document")``-
                     raise RuntimeError("Can't set user_id in conjunction with (already set) "
                                        "usernames.")
                 user_id = self._parse_user_id(user_id)
-                for uid in user_id:
-                    self._user_ids.discard(uid)
+                self._user_ids -= user_id
 
         def filter(self, message):
             """"""  # remove method from docs

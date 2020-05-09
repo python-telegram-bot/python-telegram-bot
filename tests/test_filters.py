@@ -578,10 +578,10 @@ class TestFilters(object):
     def test_filters_username(self, update):
         assert not Filters.user(username='user')(update)
         assert not Filters.user(username='Testuser')(update)
-        update.message.from_user.username = 'user'
-        assert Filters.user(username='@user')(update)
-        assert Filters.user(username='user')(update)
-        assert Filters.user(username=['user1', 'user', 'user2'])(update)
+        update.message.from_user.username = 'user@'
+        assert Filters.user(username='@user@')(update)
+        assert Filters.user(username='user@')(update)
+        assert Filters.user(username=['user1', 'user@', 'user2'])(update)
         assert not Filters.user(username=['@username', '@user_2'])(update)
         update.message.from_user = None
         assert not Filters.user(username=['@username', '@user_2'])(update)
