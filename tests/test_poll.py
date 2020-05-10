@@ -19,7 +19,9 @@
 
 import pytest
 
-from telegram import Poll, PollOption, PollAnswer, User
+from datetime import datetime
+from telegram import Poll, PollOption, PollAnswer, User, MessageEntity
+from telegram.utils.helpers import to_timestamp
 
 
 @pytest.fixture(scope="class")
@@ -91,7 +93,11 @@ def poll():
                 TestPoll.is_closed,
                 TestPoll.is_anonymous,
                 TestPoll.type,
-                TestPoll.allows_multiple_answers
+                TestPoll.allows_multiple_answers,
+                explanation=TestPoll.explanation,
+                explanation_entities=TestPoll.explanation_entities,
+                open_period=TestPoll.open_period,
+                close_date=TestPoll.close_date,
                 )
 
 
@@ -104,6 +110,11 @@ class TestPoll(object):
     is_anonymous = False
     type = Poll.REGULAR
     allows_multiple_answers = True
+    explanation = (b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
+                   b'\\u200d\\U0001f467\\U0001f431http://google.com').decode('unicode-escape')
+    explanation_entities = [MessageEntity(13, 17, MessageEntity.URL)]
+    open_period = 42
+    close_date = datetime.utcnow()
 
     def test_de_json(self):
         json_dict = {
@@ -114,7 +125,11 @@ class TestPoll(object):
             'is_closed': self.is_closed,
             'is_anonymous': self.is_anonymous,
             'type': self.type,
-            'allows_multiple_answers': self.allows_multiple_answers
+            'allows_multiple_answers': self.allows_multiple_answers,
+            'explanation': self.explanation,
+            'explanation_entities': [self.explanation_entities[0].to_dict()],
+            'open_period': self.open_period,
+            'close_date': to_timestamp(self.close_date)
         }
         poll = Poll.de_json(json_dict, None)
 
@@ -130,6 +145,11 @@ class TestPoll(object):
         assert poll.is_anonymous == self.is_anonymous
         assert poll.type == self.type
         assert poll.allows_multiple_answers == self.allows_multiple_answers
+        assert poll.explanation == self.explanation
+        assert poll.explanation_entities == self.explanation_entities
+        assert poll.open_period == self.open_period
+        assert pytest.approx(poll.close_date == self.close_date)
+        assert to_timestamp(poll.close_date) == to_timestamp(self.close_date)
 
     def test_to_dict(self, poll):
         poll_dict = poll.to_dict()
@@ -143,3 +163,21 @@ class TestPoll(object):
         assert poll_dict['is_anonymous'] == poll.is_anonymous
         assert poll_dict['type'] == poll.type
         assert poll_dict['allows_multiple_answers'] == poll.allows_multiple_answers
+        assert poll_dict['explanation'] == poll.explanation
+        assert poll_dict['explanation_entities'] == [poll.explanation_entities[0].to_dict()]
+        assert poll_dict['open_period'] == poll.open_period
+        assert poll_dict['close_date'] == to_timestamp(poll.close_date)
+
+    def test_parse_entity(self, poll):
+        entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
+        poll.explanation_entities = [entity]
+
+        assert poll.parse_explanation_entity(entity) == 'http://google.com'
+
+    def test_parse_entities(self, poll):
+        entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
+        entity_2 = MessageEntity(type=MessageEntity.BOLD, offset=13, length=1)
+        poll.explanation_entities = [entity_2, entity]
+
+        assert poll.parse_explanation_entities(MessageEntity.URL) == {entity: 'http://google.com'}
+        assert poll.parse_explanation_entities() == {entity: 'http://google.com', entity_2: 'h'}

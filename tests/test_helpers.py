@@ -27,14 +27,14 @@ from telegram import User
 from telegram import MessageEntity
 from telegram.message import Message
 from telegram.utils import helpers
-from telegram.utils.helpers import _UtcOffsetTimezone, _datetime_to_float_timestamp
+from telegram.utils.helpers import _datetime_to_float_timestamp
 
 
 # sample time specification values categorised into absolute / delta / time-of-day
-ABSOLUTE_TIME_SPECS = [dtm.datetime.now(tz=_UtcOffsetTimezone(dtm.timedelta(hours=-7))),
+ABSOLUTE_TIME_SPECS = [dtm.datetime.now(tz=dtm.timezone(dtm.timedelta(hours=-7))),
                        dtm.datetime.utcnow()]
 DELTA_TIME_SPECS = [dtm.timedelta(hours=3, seconds=42, milliseconds=2), 30, 7.5]
-TIME_OF_DAY_TIME_SPECS = [dtm.time(12, 42, tzinfo=_UtcOffsetTimezone(dtm.timedelta(hours=-7))),
+TIME_OF_DAY_TIME_SPECS = [dtm.time(12, 42, tzinfo=dtm.timezone(dtm.timedelta(hours=-7))),
                           dtm.time(12, 42)]
 RELATIVE_TIME_SPECS = DELTA_TIME_SPECS + TIME_OF_DAY_TIME_SPECS
 TIME_SPECS = ABSOLUTE_TIME_SPECS + RELATIVE_TIME_SPECS
@@ -142,8 +142,16 @@ class TestHelpers(object):
         # this 'convenience' behaviour has been left left for backwards compatibility
         assert helpers.to_timestamp(None) is None
 
-    def test_from_timestamp(self):
-        assert helpers.from_timestamp(1573431976) == dtm.datetime(2019, 11, 11, 0, 26, 16)
+    def test_from_timestamp_naive(self):
+        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, tzinfo=None)
+        assert helpers.from_timestamp(1573431976, tzinfo=None) == datetime
+
+    def test_from_timestamp_aware(self, timezone):
+        # we're parametrizing this with two different UTC offsets to exclude the possibility
+        # of an xpass when the test is run in a timezone with the same UTC offset
+        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5, tzinfo=timezone)
+        assert (helpers.from_timestamp(1573431976.1 - timezone.utcoffset(None).total_seconds())
+                == datetime)
 
     def test_create_deep_linked_url(self):
         username = 'JamesTheMock'

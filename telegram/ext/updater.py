@@ -32,8 +32,6 @@ from telegram.utils.helpers import get_signal_name
 from telegram.utils.request import Request
 from telegram.utils.webhookhandler import (WebhookServer, WebhookAppClass)
 
-logging.getLogger(__name__).addHandler(logging.NullHandler())
-
 
 class Updater(object):
     """
