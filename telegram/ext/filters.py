@@ -895,11 +895,11 @@ officedocument.wordprocessingml.document")``-
 
         Warning:
             :attr:`user_ids` will give a *copy* of the saved user ids as :class:`frozenset`. This
-            is to ensure thread safety. To add/remove a user, you should use :meth:`add_user` and
-            :meth:`remove_user`. Only update the entire set by
-            ``filter.user_ids/usernames = new_set``, if you are entirely sure that it is not
-            causing race conditions, as this will complete replace the current set of allowed
-            users.
+            is to ensure thread safety. To add/remove a user, you should use :meth:`add_usernames`,
+            :meth:`add_user_ids`, :meth:`remove_usernames` and :meth:`remove_user_ids`. Only update
+            the entire set by ``filter.user_ids/usernames = new_set``, if you are entirely sure
+            that it is not causing race conditions, as this will complete replace the current set
+            of allowed users.
 
         Attributes:
             user_ids(set(:obj:`int`), optional): Which user ID(s) to allow through.
@@ -907,6 +907,7 @@ officedocument.wordprocessingml.document")``-
                 through.
             allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
                 is specified in :attr:`user_ids` and :attr:`usernames`.
+
         Args:
             user_id(:obj:`int` | List[:obj:`int`], optional): Which user ID(s) to allow
                 through.
@@ -916,7 +917,7 @@ officedocument.wordprocessingml.document")``-
                 is specified in :attr:`user_ids` and :attr:`usernames`. Defaults to :obj:`False`
 
         Raises:
-            ValueError: If chat_id and username are both present, or neither is.
+            RuntimeError: If user_id and username are both present.
 
         """
 
@@ -1059,37 +1060,166 @@ officedocument.wordprocessingml.document")``-
         Examples:
             ``MessageHandler(Filters.chat(-1234), callback_method)``
 
+        Warning:
+            :attr:`chat_ids` will give a *copy* of the saved chat ids as :class:`frozenset`. This
+            is to ensure thread safety. To add/remove a chat, you should use :meth:`add_usernames`,
+            :meth:`add_chat_ids`, :meth:`remove_usernames` and :meth:`remove_chat_ids`. Only update
+            the entire set by ``filter.chat_ids/usernames = new_set``, if you are entirely sure
+            that it is not causing race conditions, as this will complete replace the current set
+            of allowed chats.
+
+        Attributes:
+            chat_ids(set(:obj:`int`), optional): Which chat ID(s) to allow through.
+            usernames(set(:obj:`str`), optional): Which username(s) (without leading '@') to allow
+                through.
+            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
+                is specified in :attr:`chat_ids` and :attr:`usernames`.
+
         Args:
-            chat_id(:obj:`int` | List[:obj:`int`], optional): Which chat ID(s) to allow through.
-            username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow through.
-                If username start swith '@' symbol, it will be ignored.
+            chat_id(:obj:`int` | List[:obj:`int`], optional): Which chat ID(s) to allow
+                through.
+            username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow
+                through. Leading '@'s in usernames will be discarded.
+            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
+                is specified in :attr:`chat_ids` and :attr:`usernames`. Defaults to :obj:`False`
 
         Raises:
-            ValueError: If chat_id and username are both present, or neither is.
+            RuntimeError: If chat_id and username are both present.
 
         """
 
-        def __init__(self, chat_id=None, username=None):
-            if not (bool(chat_id) ^ bool(username)):
-                raise ValueError('One and only one of chat_id or username must be used')
-            if chat_id is not None and isinstance(chat_id, int):
-                self.chat_ids = [chat_id]
-            else:
-                self.chat_ids = chat_id
+        def __init__(self, chat_id=None, username=None, allow_empty=False):
+            self.allow_empty = allow_empty
+            self.__lock = Lock()
+
+            self._chat_ids = set()
+            self._usernames = set()
+
+            self._set_chat_ids(chat_id)
+            self._set_usernames(username)
+
+        @staticmethod
+        def _parse_chat_id(chat_id):
+            if chat_id is None:
+                return set()
+            if isinstance(chat_id, int):
+                return {chat_id}
+            return set(chat_id)
+
+        @staticmethod
+        def _parse_username(username):
             if username is None:
-                self.usernames = username
-            elif isinstance(username, string_types):
-                self.usernames = [username.replace('@', '')]
-            else:
-                self.usernames = [chat.replace('@', '') for chat in username]
+                return set()
+            if isinstance(username, str):
+                return {username[1:] if username.startswith('@') else username}
+            return {chat[1:] if chat.startswith('@') else chat for chat in username}
+
+        def _set_chat_ids(self, chat_id):
+            with self.__lock:
+                if chat_id and self._usernames:
+                    raise RuntimeError("Can't set chat_id in conjunction with (already set) "
+                                       "usernames.")
+                self._chat_ids = self._parse_chat_id(chat_id)
+
+        def _set_usernames(self, username):
+            with self.__lock:
+                if username and self._chat_ids:
+                    raise RuntimeError("Can't set username in conjunction with (already set) "
+                                       "chat_ids.")
+                self._usernames = self._parse_username(username)
+
+        @property
+        def chat_ids(self):
+            with self.__lock:
+                return frozenset(self._chat_ids)
+
+        @chat_ids.setter
+        def chat_ids(self, chat_id):
+            self._set_chat_ids(chat_id)
+
+        @property
+        def usernames(self):
+            with self.__lock:
+                return frozenset(self._usernames)
+
+        @usernames.setter
+        def usernames(self, username):
+            self._set_usernames(username)
+
+        def add_usernames(self, username):
+            """
+            Add one or more chats to the allowed usernames.
+
+            Args:
+                username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow
+                    through. Leading '@'s in usernames will be discarded.
+            """
+            with self.__lock:
+                if self._chat_ids:
+                    raise RuntimeError("Can't set username in conjunction with (already set) "
+                                       "chat_ids.")
+
+                username = self._parse_username(username)
+                self._usernames |= username
+
+        def add_chat_ids(self, chat_id):
+            """
+            Add one or more chats to the allowed chat ids.
+
+            Args:
+                chat_id(:obj:`int` | List[:obj:`int`], optional): Which chat ID(s) to allow
+                    through.
+            """
+            with self.__lock:
+                if self._usernames:
+                    raise RuntimeError("Can't set chat_id in conjunction with (already set) "
+                                       "usernames.")
+
+                chat_id = self._parse_chat_id(chat_id)
+
+                self._chat_ids |= chat_id
+
+        def remove_usernames(self, username):
+            """
+            Remove one or more chats from allowed usernames.
+
+            Args:
+                username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to disallow
+                    through. Leading '@'s in usernames will be discarded.
+            """
+            with self.__lock:
+                if self._chat_ids:
+                    raise RuntimeError("Can't set username in conjunction with (already set) "
+                                       "chat_ids.")
+
+                username = self._parse_username(username)
+                self._usernames -= username
+
+        def remove_chat_ids(self, chat_id):
+            """
+            Remove one or more chats from allowed chat ids.
+
+            Args:
+                chat_id(:obj:`int` | List[:obj:`int`], optional): Which chat ID(s) to disallow
+                    through.
+            """
+            with self.__lock:
+                if self._usernames:
+                    raise RuntimeError("Can't set chat_id in conjunction with (already set) "
+                                       "usernames.")
+                chat_id = self._parse_chat_id(chat_id)
+                self._chat_ids -= chat_id
 
         def filter(self, message):
             """"""  # remove method from docs
-            if self.chat_ids is not None:
-                return bool(message.chat_id in self.chat_ids)
-            else:
-                # self.usernames is not None
-                return bool(message.chat.username and message.chat.username in self.usernames)
+            if message.chat:
+                if self.chat_ids:
+                    return message.chat.id in self.chat_ids
+                if self.usernames:
+                    return (message.chat.username
+                            and message.chat.username in self.usernames)
+                return self.allow_empty
+            return False
 
     class _Invoice(BaseFilter):
         name = 'Filters.invoice'
