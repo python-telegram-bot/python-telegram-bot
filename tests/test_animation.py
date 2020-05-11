@@ -158,10 +158,10 @@ class TestAnimation(object):
         assert message.animation == animation
 
     def test_send_with_animation(self, monkeypatch, bot, chat_id, animation):
-        def test(_, url, data, **kwargs):
+        def test(url, data, **kwargs):
             return data['animation'] == animation.file_id
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr(bot.request, 'post', test)
         message = bot.send_animation(animation=animation, chat_id=chat_id)
         assert message
 
