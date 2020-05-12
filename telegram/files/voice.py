@@ -66,15 +66,6 @@ class Voice(TelegramObject):
 
         self._id_attrs = (self.file_unique_id,)
 
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        data = super(Voice, cls).de_json(data, bot)
-
-        return cls(bot=bot, **data)
-
     def get_file(self, timeout=None, **kwargs):
         """Convenience wrapper over :attr:`telegram.Bot.get_file`
 

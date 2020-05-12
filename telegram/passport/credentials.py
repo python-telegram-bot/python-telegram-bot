@@ -129,15 +129,6 @@ class EncryptedCredentials(TelegramObject):
         self._decrypted_secret = None
         self._decrypted_data = None
 
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        data = super(EncryptedCredentials, cls).de_json(data, bot)
-
-        return cls(bot=bot, **data)
-
     @property
     def decrypted_secret(self):
         """
@@ -200,6 +191,8 @@ class Credentials(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
+        data = cls.parse_data(data)
+
         if not data:
             return None
 
@@ -267,6 +260,8 @@ class SecureData(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
+        data = cls.parse_data(data)
+
         if not data:
             return None
 
@@ -334,6 +329,8 @@ class SecureValue(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
+        data = cls.parse_data(data)
+
         if not data:
             return None
 
@@ -367,13 +364,6 @@ class _CredentialsBase(TelegramObject):
         self.data_hash = self.hash
 
         self.bot = bot
-
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(bot=bot, **data)
 
     @classmethod
     def de_list(cls, data, bot):

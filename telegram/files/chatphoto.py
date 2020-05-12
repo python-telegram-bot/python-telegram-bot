@@ -68,13 +68,6 @@ class ChatPhoto(TelegramObject):
 
         self._id_attrs = (self.small_file_unique_id, self.big_file_unique_id,)
 
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(bot=bot, **data)
-
     def get_small_file(self, timeout=None, **kwargs):
         """Convenience wrapper over :attr:`telegram.Bot.get_file` for getting the
         small (160x160) chat photo

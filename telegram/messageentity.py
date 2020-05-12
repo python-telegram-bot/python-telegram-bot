@@ -65,7 +65,7 @@ class MessageEntity(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
-        data = super(MessageEntity, cls).de_json(data, bot)
+        data = cls.parse_data(data)
 
         if not data:
             return None

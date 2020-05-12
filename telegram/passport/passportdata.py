@@ -55,10 +55,10 @@ class PassportData(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
+        data = cls.parse_data(data)
+
         if not data:
             return None
-
-        data = super(PassportData, cls).de_json(data, bot)
 
         data['data'] = EncryptedPassportElement.de_list(data.get('data'), bot)
         data['credentials'] = EncryptedCredentials.de_json(data.get('credentials'), bot)

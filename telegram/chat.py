@@ -136,6 +136,8 @@ class Chat(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
+        data = cls.parse_data(data)
+
         if not data:
             return None
 

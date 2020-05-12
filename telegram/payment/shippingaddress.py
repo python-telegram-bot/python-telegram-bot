@@ -53,10 +53,3 @@ class ShippingAddress(TelegramObject):
 
         self._id_attrs = (self.country_code, self.state, self.city, self.street_line1,
                           self.street_line2, self.post_code)
-
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(**data)

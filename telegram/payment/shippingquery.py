@@ -56,10 +56,10 @@ class ShippingQuery(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
+        data = cls.parse_data(data)
+
         if not data:
             return None
-
-        data = super(ShippingQuery, cls).de_json(data, bot)
 
         data['from_user'] = User.de_json(data.pop('from'), bot)
         data['shipping_address'] = ShippingAddress.de_json(data.get('shipping_address'), bot)

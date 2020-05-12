@@ -78,13 +78,6 @@ class File(TelegramObject):
 
         self._id_attrs = (self.file_unique_id,)
 
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(bot=bot, **data)
-
     def download(self, custom_path=None, out=None, timeout=None):
         """
         Download this file. By default, the file is saved in the current working directory with its

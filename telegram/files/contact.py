@@ -52,10 +52,3 @@ class Contact(TelegramObject):
         self.vcard = vcard
 
         self._id_attrs = (self.phone_number,)
-
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(**data)

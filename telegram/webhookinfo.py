@@ -70,10 +70,3 @@ class WebhookInfo(TelegramObject):
         self.last_error_message = last_error_message
         self.max_connections = max_connections
         self.allowed_updates = allowed_updates
-
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(**data)

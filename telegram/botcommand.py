@@ -37,10 +37,3 @@ class BotCommand(TelegramObject):
     def __init__(self, command, description, **kwargs):
         self.command = command
         self.description = description
-
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(**data)

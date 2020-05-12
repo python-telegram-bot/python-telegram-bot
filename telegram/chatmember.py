@@ -147,10 +147,10 @@ class ChatMember(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
+        data = cls.parse_data(data)
+
         if not data:
             return None
-
-        data = super(ChatMember, cls).de_json(data, bot)
 
         data['user'] = User.de_json(data.get('user'), bot)
         data['until_date'] = from_timestamp(data.get('until_date', None))

@@ -112,14 +112,6 @@ class User(TelegramObject):
             return "https://t.me/{}".format(self.username)
         return None
 
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-        data = super(User, cls).de_json(data, bot)
-
-        return cls(bot=bot, **data)
-
     def get_profile_photos(self, *args, **kwargs):
         """
         Shortcut for::

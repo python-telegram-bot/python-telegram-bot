@@ -42,10 +42,10 @@ class UserProfilePhotos(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
+        data = cls.parse_data(data)
+
         if not data:
             return None
-
-        data = super(UserProfilePhotos, cls).de_json(data, bot)
 
         data['photos'] = [PhotoSize.de_list(photo, bot) for photo in data['photos']]
 

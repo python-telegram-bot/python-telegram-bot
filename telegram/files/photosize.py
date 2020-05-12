@@ -67,13 +67,6 @@ class PhotoSize(TelegramObject):
         self._id_attrs = (self.file_unique_id,)
 
     @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(bot=bot, **data)
-
-    @classmethod
     def de_list(cls, data, bot):
         if not data:
             return []

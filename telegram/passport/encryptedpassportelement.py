@@ -135,10 +135,10 @@ class EncryptedPassportElement(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
+        data = cls.parse_data(data)
+
         if not data:
             return None
-
-        data = super(EncryptedPassportElement, cls).de_json(data, bot)
 
         data['files'] = PassportFile.de_list(data.get('files'), bot) or None
         data['front_side'] = PassportFile.de_json(data.get('front_side'), bot)
@@ -152,8 +152,6 @@ class EncryptedPassportElement(TelegramObject):
     def de_json_decrypted(cls, data, bot, credentials):
         if not data:
             return None
-
-        data = super(EncryptedPassportElement, cls).de_json(data, bot)
 
         if data['type'] not in ('phone_number', 'email'):
             secure_data = getattr(credentials.secure_data, data['type'])

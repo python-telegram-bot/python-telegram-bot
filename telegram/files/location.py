@@ -41,10 +41,3 @@ class Location(TelegramObject):
         self.latitude = float(latitude)
 
         self._id_attrs = (self.longitude, self.latitude)
-
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(**data)

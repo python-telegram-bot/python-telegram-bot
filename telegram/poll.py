@@ -43,13 +43,6 @@ class PollOption(TelegramObject):
         self.text = text
         self.voter_count = voter_count
 
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(**data)
-
 
 class PollAnswer(TelegramObject):
     """
@@ -74,10 +67,10 @@ class PollAnswer(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
+        data = cls.parse_data(data)
+
         if not data:
             return None
-
-        data = super(PollAnswer, cls).de_json(data, bot)
 
         data['user'] = User.de_json(data.get('user'), bot)
 
@@ -162,10 +155,10 @@ class Poll(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
+        data = cls.parse_data(data)
+
         if not data:
             return None
-
-        data = super(Poll, cls).de_json(data, bot)
 
         data['options'] = [PollOption.de_json(option, bot) for option in data['options']]
         data['explanation_entities'] = MessageEntity.de_list(data.get('explanation_entities'), bot)

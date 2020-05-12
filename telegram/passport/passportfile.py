@@ -67,20 +67,11 @@ class PassportFile(TelegramObject):
         self._id_attrs = (self.file_unique_id,)
 
     @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        data = super(PassportFile, cls).de_json(data, bot)
-
-        return cls(bot=bot, **data)
-
-    @classmethod
     def de_json_decrypted(cls, data, bot, credentials):
+        data = cls.parse_data(data)
+
         if not data:
             return None
-
-        data = super(PassportFile, cls).de_json(data, bot)
 
         data['credentials'] = credentials
 

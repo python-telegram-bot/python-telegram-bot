@@ -47,10 +47,10 @@ class OrderInfo(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
+        data = cls.parse_data(data)
+
         if not data:
             return cls()
-
-        data = super(OrderInfo, cls).de_json(data, bot)
 
         data['shipping_address'] = ShippingAddress.de_json(data.get('shipping_address'), bot)
 

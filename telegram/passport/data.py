@@ -58,13 +58,6 @@ class PersonalDetails(TelegramObject):
 
         self.bot = bot
 
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(bot=bot, **data)
-
 
 class ResidentialAddress(TelegramObject):
     """
@@ -91,13 +84,6 @@ class ResidentialAddress(TelegramObject):
 
         self.bot = bot
 
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(bot=bot, **data)
-
 
 class IdDocumentData(TelegramObject):
     """
@@ -113,10 +99,3 @@ class IdDocumentData(TelegramObject):
         self.expiry_date = expiry_date
 
         self.bot = bot
-
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(bot=bot, **data)

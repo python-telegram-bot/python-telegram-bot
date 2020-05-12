@@ -74,10 +74,10 @@ class Game(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
+        data = cls.parse_data(data)
+
         if not data:
             return None
-
-        data = super(Game, cls).de_json(data, bot)
 
         data['photo'] = PhotoSize.de_list(data.get('photo'), bot)
         data['text_entities'] = MessageEntity.de_list(data.get('text_entities'), bot)

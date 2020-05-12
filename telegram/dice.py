@@ -44,13 +44,6 @@ class Dice(TelegramObject):
         self.value = value
         self.emoji = emoji
 
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(**data)
-
     DICE = '🎲'
     """:obj:`str`: '🎲'"""
     DARTS = '🎯'

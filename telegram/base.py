@@ -35,14 +35,20 @@ class TelegramObject(object):
     def __getitem__(self, item):
         return self.__dict__[item]
 
+    @staticmethod
+    def parse_data(data):
+        if not data:
+            return None
+        return data.copy()
+
     @classmethod
     def de_json(cls, data, bot):
+        data = cls.parse_data(data)
+
         if not data:
             return None
 
-        data = data.copy()
-
-        return data
+        return cls(bot=bot, **data)
 
     def to_json(self):
         """

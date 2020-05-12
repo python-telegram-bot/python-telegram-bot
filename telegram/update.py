@@ -220,10 +220,10 @@ class Update(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
+        data = cls.parse_data(data)
+
         if not data:
             return None
-
-        data = super(Update, cls).de_json(data, bot)
 
         message = data.get('message')
         if message:
