@@ -102,7 +102,7 @@ class Bot(TelegramObject):
         # For each method ...
         for method_name, method in inspect.getmembers(instance, predicate=inspect.ismethod):
             # ... get kwargs
-            argspec = inspect.getargspec(method)
+            argspec = inspect.getfullargspec(method)
             kwarg_names = argspec.args[-len(argspec.defaults or []):]
             # ... check if Defaults has a attribute that matches the kwarg name
             needs_default = [
