@@ -859,7 +859,7 @@ class TestFilters(object):
         assert not Filters.dice.dice(update)
         assert not Filters.dice.basketball(update)
         assert not Filters.dice.darts([6])(update)
-        
+
         update.message.dice = Dice(5, '🏀')
         assert Filters.dice.basketball(update)
         assert Filters.dice.basketball([4, 5])(update)
