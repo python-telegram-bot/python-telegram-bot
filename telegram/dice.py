@@ -37,7 +37,7 @@ class Dice(TelegramObject):
         emoji (:obj:`str`): Emoji on which the dice throw animation is based.
 
     Args:
-        value (:obj:`int`): Value of the dice, 1-6.
+        value (:obj:`int`): Value of the dice, 1-6 for DICE and DARTS, 1-5 for BASKETBALL
         emoji (:obj:`str`): Emoji on which the dice throw animation is based.
     """
     def __init__(self, value, emoji, **kwargs):
@@ -55,6 +55,8 @@ class Dice(TelegramObject):
     """:obj:`str`: '🎲'"""
     DARTS = '🎯'
     """:obj:`str`: '🎯'"""
-    ALL_EMOJI = [DICE, DARTS]
-    """List[:obj:`str`]: List of all supported base emoji. Currently :attr:`DICE` and
-    :attr:`DARTS`."""
+    BASKETBALL = '🏀'
+    """:obj:`str`: '🎯'"""
+    ALL_EMOJI = [DICE, DARTS, BASKETBALL]
+    """List[:obj:`str`]: List of all supported base emoji. Currently :attr:`DICE`,
+    :attr:`DARTS` and :attr: `BASKETBALL`."""
