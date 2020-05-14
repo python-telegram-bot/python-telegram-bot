@@ -31,9 +31,9 @@ class Dice(TelegramObject):
         If :attr:`emoji` is "🎯", a value of 6 currently represents a bullseye, while a value of 1
         indicates that the dartboard was missed. However, this behaviour is undocumented and might
         be changed by Telegram.
-        
-        If :attr:`emoji` is "🏀", a value of 4 or 5 currently score a basket, while a value of 1 to 3
-        indicates that the basket was missed. However, this behaviour is undocumented and might
+
+        If :attr:`emoji` is "🏀", a value of 4 or 5 currently score a basket, while a value of 1 to
+        3 indicates that the basket was missed. However, this behaviour is undocumented and might
         be changed by Telegram.
 
     Attributes:
