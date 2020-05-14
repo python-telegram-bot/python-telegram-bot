@@ -63,4 +63,4 @@ class Dice(TelegramObject):
     """:obj:`str`: '🏀'"""
     ALL_EMOJI = [DICE, DARTS, BASKETBALL]
     """List[:obj:`str`]: List of all supported base emoji. Currently :attr:`DICE`,
-    :attr:`DARTS` and :attr: `BASKETBALL`."""
+    :attr:`DARTS` and :attr:`BASKETBALL`."""
