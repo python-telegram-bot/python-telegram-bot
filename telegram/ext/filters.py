@@ -1287,8 +1287,8 @@ officedocument.wordprocessingml.document")``-
             :attr:`Filters.dice`.
         darts: Dice messages with the emoji 🎯. Passing a list of integers is supported just as for
             :attr:`Filters.dice`.
-        basketball: Dice messages with the emoji 🏀. Passing a list of integers is supported just as for
-            :attr:`Filters.dice`.
+        basketball: Dice messages with the emoji 🏀. Passing a list of integers is supported just
+            as for :attr:`Filters.dice`.
     """
 
     class language(BaseFilter):
