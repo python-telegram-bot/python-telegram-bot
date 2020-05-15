@@ -866,9 +866,9 @@ class Message(TelegramObject):
                                   **kwargs)
 
         Note:
-            You can only edit messages that the bot sent itself,
-            therefore this method can only be used on the
-            return value of the ``bot.send_*`` family of methods.
+            You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
+            of methods) or channel posts, if the bot is an admin in that channel. However, this
+            behaviour is undocumented and might be changed by Telegram.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -887,9 +887,9 @@ class Message(TelegramObject):
                                      **kwargs)
 
         Note:
-            You can only edit messages that the bot sent itself,
-            therefore this method can only be used on the
-            return value of the ``bot.send_*`` family of methods.
+            You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
+            of methods) or channel posts, if the bot is an admin in that channel. However, this
+            behaviour is undocumented and might be changed by Telegram.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -908,9 +908,9 @@ class Message(TelegramObject):
                                    **kwargs)
 
         Note:
-            You can only edit messages that the bot sent itself,
-            therefore this method can only be used on the
-            return value of the ``bot.send_*`` family of methods.
+            You can only edit messages that the bot sent itself(i.e. of the ``bot.send_*`` family
+            of methods) or channel posts, if the bot is an admin in that channel. However, this
+            behaviour is undocumented and might be changed by Telegram.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -929,9 +929,9 @@ class Message(TelegramObject):
                                           **kwargs)
 
         Note:
-            You can only edit messages that the bot sent itself,
-            therefore this method can only be used on the
-            return value of the ``bot.send_*`` family of methods.
+            You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
+            of methods) or channel posts, if the bot is an admin in that channel. However, this
+            behaviour is undocumented and might be changed by Telegram.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the

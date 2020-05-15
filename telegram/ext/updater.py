@@ -47,7 +47,8 @@ class Updater(object):
 
     Attributes:
         bot (:class:`telegram.Bot`): The bot used with this Updater.
-        user_sig_handler (:obj:`signal`): signals the updater will respond to.
+        user_sig_handler (:obj:`function`): Optional. Function to be called when a signal is
+            received.
         update_queue (:obj:`Queue`): Queue for the updates.
         job_queue (:class:`telegram.ext.JobQueue`): Jobqueue for the updater.
         dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that handles the updates and
@@ -55,7 +56,7 @@ class Updater(object):
         running (:obj:`bool`): Indicates if the updater is running.
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
             store data that should be persistent over restarts.
-        use_context (:obj:`bool`, optional): ``True`` if using context based callbacks.
+        use_context (:obj:`bool`): Optional. ``True`` if using context based callbacks.
 
     Args:
         token (:obj:`str`, optional): The bot's token given by the @BotFather.
