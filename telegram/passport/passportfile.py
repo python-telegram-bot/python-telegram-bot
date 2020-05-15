@@ -85,15 +85,6 @@ class PassportFile(TelegramObject):
         return cls(bot=bot, **data)
 
     @classmethod
-    def de_list(cls,
-                data: Optional[List[JSONDict]],
-                bot: 'Bot') -> List[Optional['PassportFile']]:
-        if not data:
-            return []
-
-        return [cls.de_json(passport_file, bot) for passport_file in data]
-
-    @classmethod
     def de_list_decrypted(cls,
                           data: Optional[List[JSONDict]],
                           bot: 'Bot',

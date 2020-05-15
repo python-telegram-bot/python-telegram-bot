@@ -23,7 +23,8 @@ except ImportError:
     import json  # type: ignore[no-redef]
 
 from telegram.utils.typing import JSONDict
-from typing import Tuple, Any, Optional, Type, TypeVar, TYPE_CHECKING
+from typing import Tuple, Any, Optional, Type, TypeVar, TYPE_CHECKING, List
+
 if TYPE_CHECKING:
     from telegram import Bot
 
@@ -61,6 +62,15 @@ class TelegramObject(object):
             return cls()
         else:
             return cls(bot=bot, **data)  # type: ignore[call-arg]
+
+    @classmethod
+    def de_list(cls: Type[TO],
+                data: Optional[List[JSONDict]],
+                bot: 'Bot') -> List[Optional[TO]]:
+        if not data:
+            return []
+
+        return [cls.de_json(d, bot) for d in data]
 
     def to_json(self) -> str:
         """

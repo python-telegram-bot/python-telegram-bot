@@ -193,19 +193,6 @@ class EncryptedPassportElement(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    @classmethod
-    def de_list(cls,
-                data: Optional[List[JSONDict]],
-                bot: 'Bot') -> List[Optional['EncryptedPassportElement']]:
-        if not data:
-            return []
-
-        encrypted_passport_elements = list()
-        for element in data:
-            encrypted_passport_elements.append(cls.de_json(element, bot))
-
-        return encrypted_passport_elements
-
     def to_dict(self) -> JSONDict:
         data = super(EncryptedPassportElement, self).to_dict()
 

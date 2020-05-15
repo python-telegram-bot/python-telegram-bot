@@ -32,7 +32,7 @@ from future.utils import bord
 
 from telegram import TelegramObject, TelegramError
 from telegram.utils.typing import JSONDict
-from typing import Union, Any, Optional, Type, TypeVar, TYPE_CHECKING, List, no_type_check
+from typing import Union, Any, Optional, TYPE_CHECKING, List, no_type_check
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -364,9 +364,6 @@ class SecureValue(TelegramObject):
         return data
 
 
-CB = TypeVar('CB', bound='_CredentialsBase')
-
-
 class _CredentialsBase(TelegramObject):
     """Base class for DataCredentials and FileCredentials."""
 
@@ -379,19 +376,6 @@ class _CredentialsBase(TelegramObject):
         self.data_hash = self.hash
 
         self.bot = bot
-
-    @classmethod
-    def de_list(cls: Type[CB],
-                data: Optional[List[JSONDict]],
-                bot: 'Bot') -> List[Optional[CB]]:
-        if not data:
-            return []
-
-        credentials = list()
-        for c in data:
-            credentials.append(cls.de_json(c, bot=bot))
-
-        return credentials
 
 
 class DataCredentials(_CredentialsBase):

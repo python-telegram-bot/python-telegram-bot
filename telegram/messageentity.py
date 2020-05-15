@@ -86,19 +86,6 @@ class MessageEntity(TelegramObject):
 
         return cls(**data)
 
-    @classmethod
-    def de_list(cls,
-                data: Optional[List[JSONDict]],
-                bot: 'Bot') -> List[Optional['MessageEntity']]:
-        if not data:
-            return list()
-
-        entities = list()
-        for entity in data:
-            entities.append(cls.de_json(entity, bot))
-
-        return entities
-
     MENTION: str = 'mention'
     """:obj:`str`: 'mention'"""
     HASHTAG: str = 'hashtag'

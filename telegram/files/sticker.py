@@ -107,15 +107,6 @@ class Sticker(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    @classmethod
-    def de_list(cls,
-                data: Optional[List[JSONDict]],
-                bot: 'Bot') -> List[Optional['Sticker']]:
-        if not data:
-            return list()
-
-        return [cls.de_json(d, bot) for d in data]
-
     def get_file(self, timeout: str = None, **kwargs: Any) -> 'File':
         """Convenience wrapper over :attr:`telegram.Bot.get_file`
 
