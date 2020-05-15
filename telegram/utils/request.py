@@ -27,7 +27,7 @@ from builtins import str  # For PY2
 try:
     import ujson as json
 except ImportError:
-    import json
+    import json  # type: ignore[no-redef]
 
 import certifi
 
@@ -39,11 +39,11 @@ try:
     from telegram.vendor.ptb_urllib3.urllib3.fields import RequestField
 except ImportError:  # pragma: no cover
     try:
-        import urllib3
-        import urllib3.contrib.appengine as appengine
-        from urllib3.connection import HTTPConnection
-        from urllib3.util.timeout import Timeout
-        from urllib3.fields import RequestField
+        import urllib3  # type: ignore[no-redef]
+        import urllib3.contrib.appengine as appengine  # type: ignore[no-redef]
+        from urllib3.connection import HTTPConnection  # type: ignore[no-redef]
+        from urllib3.util.timeout import Timeout  # type: ignore[no-redef]
+        from urllib3.fields import RequestField  # type: ignore[no-redef]
         warnings.warn('python-telegram-bot is using upstream urllib3. This is allowed but not '
                       'supported by python-telegram-bot maintainers.')
     except ImportError:
@@ -57,8 +57,10 @@ from telegram import (InputFile, TelegramError, InputMedia)
 from telegram.error import (Unauthorized, NetworkError, TimedOut, BadRequest, ChatMigrated,
                             RetryAfter, InvalidToken, Conflict)
 
+from typing import Any, Dict, Union
 
-def _render_part(self, name, value):
+
+def _render_part(self: RequestField, name: str, value: str) -> str:
     """
     Monkey patch urllib3.urllib3.fields.RequestField to make it *not* support RFC2231 compliant
     Content-Disposition headers since telegram servers don't understand it. Instead just escape
@@ -69,7 +71,7 @@ def _render_part(self, name, value):
     return u'%s="%s"' % (name, value)
 
 
-RequestField._render_part = _render_part
+RequestField._render_part = _render_part  # type: ignore
 
 logging.getLogger('urllib3').setLevel(logging.WARNING)
 
@@ -97,11 +99,11 @@ class Request(object):
     """
 
     def __init__(self,
-                 con_pool_size=1,
-                 proxy_url=None,
-                 urllib3_proxy_kwargs=None,
-                 connect_timeout=5.,
-                 read_timeout=5.):
+                 con_pool_size: int = 1,
+                 proxy_url: str = None,
+                 urllib3_proxy_kwargs: Dict[str, Any] = None,
+                 connect_timeout: float = 5.,
+                 read_timeout: float = 5.):
         if urllib3_proxy_kwargs is None:
             urllib3_proxy_kwargs = dict()
 
@@ -138,12 +140,15 @@ class Request(object):
         if not proxy_url:
             proxy_url = os.environ.get('HTTPS_PROXY') or os.environ.get('https_proxy')
 
+        self._con_pool: Union[urllib3.PoolManager, appengine.AppEngineManager,
+                              'SOCKSProxyManager',  # noqa: F821
+                              urllib3.ProxyManager] = None  # type: ignore
         if not proxy_url:
             if appengine.is_appengine_sandbox():
                 # Use URLFetch service if running in App Engine
-                mgr = appengine.AppEngineManager()
+                self._con_pool = appengine.AppEngineManager()
             else:
-                mgr = urllib3.PoolManager(**kwargs)
+                self._con_pool = urllib3.PoolManager(**kwargs)
         else:
             kwargs.update(urllib3_proxy_kwargs)
             if proxy_url.startswith('socks'):
@@ -151,7 +156,7 @@ class Request(object):
                     from telegram.vendor.ptb_urllib3.urllib3.contrib.socks import SOCKSProxyManager
                 except ImportError:
                     raise RuntimeError('PySocks is missing')
-                mgr = SOCKSProxyManager(proxy_url, **kwargs)
+                self._con_pool = SOCKSProxyManager(proxy_url, **kwargs)
             else:
                 mgr = urllib3.proxy_from_url(proxy_url, **kwargs)
                 if mgr.proxy.auth:
@@ -159,18 +164,18 @@ class Request(object):
                     auth_hdrs = urllib3.make_headers(proxy_basic_auth=mgr.proxy.auth)
                     mgr.proxy_headers.update(auth_hdrs)
 
-        self._con_pool = mgr
+                self._con_pool = mgr
 
     @property
-    def con_pool_size(self):
+    def con_pool_size(self) -> int:
         """The size of the connection pool used."""
         return self._con_pool_size
 
-    def stop(self):
-        self._con_pool.clear()
+    def stop(self) -> None:
+        self._con_pool.clear()  # type: ignore
 
     @staticmethod
-    def _parse(json_data):
+    def _parse(json_data: bytes) -> Union[Dict[str, Any], bool]:
         """Try and parse the JSON returned from Telegram.
 
         Returns:
@@ -199,7 +204,7 @@ class Request(object):
 
         return data['result']
 
-    def _request_wrapper(self, *args, **kwargs):
+    def _request_wrapper(self, *args: Any, **kwargs: Any) -> bytes:
         """Wraps urllib3 request for handling known exceptions.
 
         Args:
@@ -207,7 +212,7 @@ class Request(object):
             kwargs: keyword arguments, passed tp urllib3 request.
 
         Returns:
-            str: A non-parsed JSON text.
+            bytes: A non-parsed JSON text.
 
         Raises:
             TelegramError
@@ -235,7 +240,7 @@ class Request(object):
             return resp.data
 
         try:
-            message = self._parse(resp.data)
+            message = str(self._parse(resp.data))
         except ValueError:
             message = 'Unknown HTTPError'
 
@@ -256,7 +261,7 @@ class Request(object):
         else:
             raise NetworkError('{0} ({1})'.format(message, resp.status))
 
-    def get(self, url, timeout=None):
+    def get(self, url: str, timeout: float = None) -> Union[Dict[str, Any], bool]:
         """Request an URL.
 
         Args:
@@ -277,7 +282,10 @@ class Request(object):
         result = self._request_wrapper('GET', url, **urlopen_kwargs)
         return self._parse(result)
 
-    def post(self, url, data, timeout=None):
+    def post(self,
+             url: str,
+             data: Dict[str, Any],
+             timeout: float = None) -> Union[Dict[str, Any], bool]:
         """Request an URL.
 
         Args:
@@ -312,15 +320,15 @@ class Request(object):
                 if isinstance(val, InputMedia):
                     # Attach and set val to attached name
                     data[key] = val.to_json()
-                    if isinstance(val.media, InputFile):
-                        data[val.media.attach] = val.media.field_tuple
+                    if isinstance(val.media, InputFile):  # type: ignore
+                        data[val.media.attach] = val.media.field_tuple  # type: ignore
                 else:
                     # Attach and set val to attached name for all
                     media = []
                     for m in val:
-                        media.append(m.to_dict())
-                        if isinstance(m.media, InputFile):
-                            data[m.media.attach] = m.media.field_tuple
+                        media.append(m.to_dict())  # type: ignore
+                        if isinstance(m.media, InputFile):  # type: ignore
+                            data[m.media.attach] = m.media.field_tuple  # type: ignore
                     data[key] = json.dumps(media)
                 files = True
 
@@ -335,7 +343,7 @@ class Request(object):
 
         return self._parse(result)
 
-    def retrieve(self, url, timeout=None):
+    def retrieve(self, url: str, timeout: float = None) -> bytes:
         """Retrieve the contents of a file by its URL.
 
         Args:
@@ -351,7 +359,7 @@ class Request(object):
 
         return self._request_wrapper('GET', url, **urlopen_kwargs)
 
-    def download(self, url, filename, timeout=None):
+    def download(self, url: str, filename: str, timeout: float = None) -> None:
         """Download a file by its URL.
 
         Args:
@@ -359,9 +367,7 @@ class Request(object):
             timeout (:obj:`int` | :obj:`float`): If this value is specified, use it as the read
                 timeout from the server (instead of the one specified during creation of the
                 connection pool).
-
-          filename:
-            The filename within the path to download the file.
+            filename (:obj:`str`): The filename within the path to download the file.
 
         """
         buf = self.retrieve(url, timeout=timeout)

@@ -186,7 +186,7 @@ class TestUpdater(object):
         sleep(.2)
         try:
             # Now, we send an update to the server via urlopen
-            update = Update(1, message=Message(1, User(1, '', False), None, Chat(1, ''),
+            update = Update(1, message=Message(1, None, Chat(1, ''), from_user=User(1, '', False),
                                                text='Webhook'))
             self._send_webhook_msg(ip, port, update.to_json(), 'TOKEN')
             sleep(.2)
@@ -243,7 +243,7 @@ class TestUpdater(object):
         sleep(.2)
 
         # Now, we send an update to the server via urlopen
-        update = Update(1, message=Message(1, User(1, '', False), None, Chat(1, ''),
+        update = Update(1, message=Message(1, None, Chat(1, ''), from_user=User(1, '', False),
                                            text='Webhook 2'))
         self._send_webhook_msg(ip, port, update.to_json())
         sleep(.2)
@@ -266,7 +266,7 @@ class TestUpdater(object):
         sleep(.2)
 
         # Now, we send an update to the server via urlopen
-        update = Update(1, message=Message(1, User(1, '', False), None, Chat(1, ''),
+        update = Update(1, message=Message(1, None, Chat(1, ''), from_user=User(1, '', False),
                                            text='Webhook'))
         self._send_webhook_msg(ip, port, update.to_json(), 'TOKEN')
         sleep(.2)

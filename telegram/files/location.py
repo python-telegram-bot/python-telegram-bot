@@ -19,6 +19,7 @@
 """This module contains an object that represents a Telegram Location."""
 
 from telegram import TelegramObject
+from typing import Any
 
 
 class Location(TelegramObject):
@@ -35,7 +36,7 @@ class Location(TelegramObject):
 
     """
 
-    def __init__(self, longitude, latitude, **kwargs):
+    def __init__(self, longitude: float, latitude: float, **kwargs: Any):
         # Required
         self.longitude = float(longitude)
         self.latitude = float(latitude)

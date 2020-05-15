@@ -19,6 +19,9 @@
 """This module contains an object that represents a Telegram PreCheckoutQuery."""
 
 from telegram import TelegramObject, User, OrderInfo
+from typing import Any, Dict, Optional, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class PreCheckoutQuery(TelegramObject):
@@ -56,15 +59,15 @@ class PreCheckoutQuery(TelegramObject):
     """
 
     def __init__(self,
-                 id,
-                 from_user,
-                 currency,
-                 total_amount,
-                 invoice_payload,
-                 shipping_option_id=None,
-                 order_info=None,
-                 bot=None,
-                 **kwargs):
+                 id: str,
+                 from_user: User,
+                 currency: str,
+                 total_amount: int,
+                 invoice_payload: str,
+                 shipping_option_id: str = None,
+                 order_info: OrderInfo = None,
+                 bot: 'Bot' = None,
+                 **kwargs: Any):
         self.id = id
         self.from_user = from_user
         self.currency = currency
@@ -78,7 +81,7 @@ class PreCheckoutQuery(TelegramObject):
         self._id_attrs = (self.id,)
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['PreCheckoutQuery']:
         data = cls.parse_data(data)
 
         if not data:
@@ -89,7 +92,7 @@ class PreCheckoutQuery(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def answer(self, *args, **kwargs):
+    def answer(self, *args: Any, **kwargs: Any) -> bool:
         """Shortcut for::
 
             bot.answer_pre_checkout_query(update.pre_checkout_query.id, *args, **kwargs)

@@ -7,7 +7,7 @@ repos:
         args:
         - --diff
 -   repo: https://gitlab.com/pycqa/flake8
-    rev: 3.7.1
+    rev: 3.8.1
     hooks:
     -   id: flake8
 -   repo: git://github.com/pre-commit/mirrors-pylint

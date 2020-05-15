@@ -23,6 +23,10 @@ from telegram import TelegramObject
 from telegram.utils.helpers import mention_html as util_mention_html
 from telegram.utils.helpers import mention_markdown as util_mention_markdown
 
+from typing import Any, Optional, Dict, List, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import Bot, UserProfilePhotos, Message
+
 
 class User(TelegramObject):
     """This object represents a Telegram user or bot.
@@ -60,17 +64,17 @@ class User(TelegramObject):
     """
 
     def __init__(self,
-                 id,
-                 first_name,
-                 is_bot,
-                 last_name=None,
-                 username=None,
-                 language_code=None,
-                 can_join_groups=None,
-                 can_read_all_group_messages=None,
-                 supports_inline_queries=None,
-                 bot=None,
-                 **kwargs):
+                 id: int,
+                 first_name: str,
+                 is_bot: bool,
+                 last_name: str = None,
+                 username: str = None,
+                 language_code: str = None,
+                 can_join_groups: bool = None,
+                 can_read_all_group_messages: bool = None,
+                 supports_inline_queries: bool = None,
+                 bot: 'Bot' = None,
+                 **kwargs: Any):
         # Required
         self.id = int(id)
         self.first_name = first_name
@@ -87,7 +91,7 @@ class User(TelegramObject):
         self._id_attrs = (self.id,)
 
     @property
-    def name(self):
+    def name(self) -> str:
         """:obj:`str`: Convenience property. If available, returns the user's :attr:`username`
         prefixed with "@". If :attr:`username` is not available, returns :attr:`full_name`."""
         if self.username:
@@ -95,7 +99,7 @@ class User(TelegramObject):
         return self.full_name
 
     @property
-    def full_name(self):
+    def full_name(self) -> str:
         """:obj:`str`: Convenience property. The user's :attr:`first_name`, followed by (if
         available) :attr:`last_name`."""
 
@@ -104,7 +108,7 @@ class User(TelegramObject):
         return self.first_name
 
     @property
-    def link(self):
+    def link(self) -> Optional[str]:
         """:obj:`str`: Convenience property. If :attr:`username` is available, returns a t.me link
         of the user."""
 
@@ -112,7 +116,7 @@ class User(TelegramObject):
             return "https://t.me/{}".format(self.username)
         return None
 
-    def get_profile_photos(self, *args, **kwargs):
+    def get_profile_photos(self, *args: Any, **kwargs: Any) -> 'UserProfilePhotos':
         """
         Shortcut for::
 
@@ -123,7 +127,7 @@ class User(TelegramObject):
         return self.bot.get_user_profile_photos(self.id, *args, **kwargs)
 
     @classmethod
-    def de_list(cls, data, bot):
+    def de_list(cls, data: Optional[List[Dict[str, Any]]], bot: 'Bot') -> List[Optional['User']]:
         if not data:
             return []
 
@@ -133,7 +137,7 @@ class User(TelegramObject):
 
         return users
 
-    def mention_markdown(self, name=None):
+    def mention_markdown(self, name: str = None) -> str:
         """
         Args:
             name (:obj:`str`): The name used as a link for the user. Defaults to :attr:`full_name`.
@@ -146,7 +150,7 @@ class User(TelegramObject):
             return util_mention_markdown(self.id, name)
         return util_mention_markdown(self.id, self.full_name)
 
-    def mention_markdown_v2(self, name=None):
+    def mention_markdown_v2(self, name: str = None) -> str:
         """
         Args:
             name (:obj:`str`): The name used as a link for the user. Defaults to :attr:`full_name`.
@@ -159,7 +163,7 @@ class User(TelegramObject):
             return util_mention_markdown(self.id, name, version=2)
         return util_mention_markdown(self.id, self.full_name, version=2)
 
-    def mention_html(self, name=None):
+    def mention_html(self, name: str = None) -> str:
         """
         Args:
             name (:obj:`str`): The name used as a link for the user. Defaults to :attr:`full_name`.
@@ -172,7 +176,7 @@ class User(TelegramObject):
             return util_mention_html(self.id, name)
         return util_mention_html(self.id, self.full_name)
 
-    def send_message(self, *args, **kwargs):
+    def send_message(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_message(User.id, *args, **kwargs)
@@ -185,7 +189,7 @@ class User(TelegramObject):
         """
         return self.bot.send_message(self.id, *args, **kwargs)
 
-    def send_photo(self, *args, **kwargs):
+    def send_photo(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_photo(User.id, *args, **kwargs)
@@ -198,7 +202,7 @@ class User(TelegramObject):
         """
         return self.bot.send_photo(self.id, *args, **kwargs)
 
-    def send_audio(self, *args, **kwargs):
+    def send_audio(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_audio(User.id, *args, **kwargs)
@@ -211,7 +215,7 @@ class User(TelegramObject):
         """
         return self.bot.send_audio(self.id, *args, **kwargs)
 
-    def send_document(self, *args, **kwargs):
+    def send_document(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_document(User.id, *args, **kwargs)
@@ -224,7 +228,7 @@ class User(TelegramObject):
         """
         return self.bot.send_document(self.id, *args, **kwargs)
 
-    def send_animation(self, *args, **kwargs):
+    def send_animation(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_animation(User.id, *args, **kwargs)
@@ -237,7 +241,7 @@ class User(TelegramObject):
         """
         return self.bot.send_animation(self.id, *args, **kwargs)
 
-    def send_sticker(self, *args, **kwargs):
+    def send_sticker(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_sticker(User.id, *args, **kwargs)
@@ -250,7 +254,7 @@ class User(TelegramObject):
         """
         return self.bot.send_sticker(self.id, *args, **kwargs)
 
-    def send_video(self, *args, **kwargs):
+    def send_video(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_video(User.id, *args, **kwargs)
@@ -263,7 +267,7 @@ class User(TelegramObject):
         """
         return self.bot.send_video(self.id, *args, **kwargs)
 
-    def send_video_note(self, *args, **kwargs):
+    def send_video_note(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_video_note(User.id, *args, **kwargs)
@@ -276,7 +280,7 @@ class User(TelegramObject):
         """
         return self.bot.send_video_note(self.id, *args, **kwargs)
 
-    def send_voice(self, *args, **kwargs):
+    def send_voice(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_voice(User.id, *args, **kwargs)

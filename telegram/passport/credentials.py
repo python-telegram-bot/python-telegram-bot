@@ -19,7 +19,7 @@
 try:
     import ujson as json
 except ImportError:
-    import json
+    import json  # type: ignore[no-redef]
 from base64 import b64decode
 
 from cryptography.hazmat.backends import default_backend
@@ -31,6 +31,10 @@ from cryptography.hazmat.primitives.hashes import SHA512, SHA256, Hash, SHA1
 from future.utils import bord
 
 from telegram import TelegramObject, TelegramError
+from typing import Union, Dict, Any, Optional, Type, TypeVar, TYPE_CHECKING, List, no_type_check
+
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class TelegramDecryptionError(TelegramError):
@@ -38,11 +42,12 @@ class TelegramDecryptionError(TelegramError):
     Something went wrong with decryption.
     """
 
-    def __init__(self, message):
+    def __init__(self, message: Union[str, Exception]):
         super(TelegramDecryptionError, self).__init__("TelegramDecryptionError: "
                                                       "{}".format(message))
 
 
+@no_type_check
 def decrypt(secret, hash, data):
     """
     Decrypt per telegram docs at https://core.telegram.org/passport.
@@ -86,6 +91,7 @@ def decrypt(secret, hash, data):
     return data[bord(data[0]):]
 
 
+@no_type_check
 def decrypt_json(secret, hash, data):
     """Decrypts data using secret and hash and then decodes utf-8 string and loads json"""
     return json.loads(decrypt(secret, hash, data).decode('utf-8'))
@@ -117,7 +123,12 @@ class EncryptedCredentials(TelegramObject):
 
     """
 
-    def __init__(self, data, hash, secret, bot=None, **kwargs):
+    def __init__(self,
+                 data: str,
+                 hash: str,
+                 secret: str,
+                 bot: 'Bot' = None,
+                 **kwargs: Any):
         # Required
         self.data = data
         self.hash = hash
@@ -127,10 +138,10 @@ class EncryptedCredentials(TelegramObject):
 
         self.bot = bot
         self._decrypted_secret = None
-        self._decrypted_data = None
+        self._decrypted_data: Optional['Credentials'] = None
 
     @property
-    def decrypted_secret(self):
+    def decrypted_secret(self) -> str:
         """
         :obj:`str`: Lazily decrypt and return secret.
 
@@ -157,7 +168,7 @@ class EncryptedCredentials(TelegramObject):
         return self._decrypted_secret
 
     @property
-    def decrypted_data(self):
+    def decrypted_data(self) -> 'Credentials':
         """
         :class:`telegram.Credentials`: Lazily decrypt and return credentials data. This object
             also contains the user specified nonce as
@@ -182,7 +193,7 @@ class Credentials(TelegramObject):
         nonce (:obj:`str`): Bot-specified nonce
     """
 
-    def __init__(self, secure_data, nonce, bot=None, **kwargs):
+    def __init__(self, secure_data: 'SecureData', nonce: str, bot: 'Bot' = None, **kwargs: Any):
         # Required
         self.secure_data = secure_data
         self.nonce = nonce
@@ -190,7 +201,7 @@ class Credentials(TelegramObject):
         self.bot = bot
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['Credentials']:
         data = cls.parse_data(data)
 
         if not data:
@@ -230,19 +241,19 @@ class SecureData(TelegramObject):
     """
 
     def __init__(self,
-                 personal_details=None,
-                 passport=None,
-                 internal_passport=None,
-                 driver_license=None,
-                 identity_card=None,
-                 address=None,
-                 utility_bill=None,
-                 bank_statement=None,
-                 rental_agreement=None,
-                 passport_registration=None,
-                 temporary_registration=None,
-                 bot=None,
-                 **kwargs):
+                 personal_details: 'SecureValue' = None,
+                 passport: 'SecureValue' = None,
+                 internal_passport: 'SecureValue' = None,
+                 driver_license: 'SecureValue' = None,
+                 identity_card: 'SecureValue' = None,
+                 address: 'SecureValue' = None,
+                 utility_bill: 'SecureValue' = None,
+                 bank_statement: 'SecureValue' = None,
+                 rental_agreement: 'SecureValue' = None,
+                 passport_registration: 'SecureValue' = None,
+                 temporary_registration: 'SecureValue' = None,
+                 bot: 'Bot' = None,
+                 **kwargs: Any):
         # Optionals
         self.temporary_registration = temporary_registration
         self.passport_registration = passport_registration
@@ -259,7 +270,7 @@ class SecureData(TelegramObject):
         self.bot = bot
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['SecureData']:
         data = cls.parse_data(data)
 
         if not data:
@@ -310,14 +321,14 @@ class SecureValue(TelegramObject):
     """
 
     def __init__(self,
-                 data=None,
-                 front_side=None,
-                 reverse_side=None,
-                 selfie=None,
-                 files=None,
-                 translation=None,
-                 bot=None,
-                 **kwargs):
+                 data: 'DataCredentials' = None,
+                 front_side: 'FileCredentials' = None,
+                 reverse_side: 'FileCredentials' = None,
+                 selfie: 'FileCredentials' = None,
+                 files: List['FileCredentials'] = None,
+                 translation: List['FileCredentials'] = None,
+                 bot: 'Bot' = None,
+                 **kwargs: Any):
         self.data = data
         self.front_side = front_side
         self.reverse_side = reverse_side
@@ -328,7 +339,7 @@ class SecureValue(TelegramObject):
         self.bot = bot
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['SecureValue']:
         data = cls.parse_data(data)
 
         if not data:
@@ -343,7 +354,7 @@ class SecureValue(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         data = super(SecureValue, self).to_dict()
 
         data['files'] = [p.to_dict() for p in self.files]
@@ -352,10 +363,13 @@ class SecureValue(TelegramObject):
         return data
 
 
+CB = TypeVar('CB', bound='_CredentialsBase')
+
+
 class _CredentialsBase(TelegramObject):
     """Base class for DataCredentials and FileCredentials."""
 
-    def __init__(self, hash, secret, bot=None, **kwargs):
+    def __init__(self, hash: str, secret: str, bot: 'Bot' = None, **kwargs: Any):
         self.hash = hash
         self.secret = secret
 
@@ -366,7 +380,9 @@ class _CredentialsBase(TelegramObject):
         self.bot = bot
 
     @classmethod
-    def de_list(cls, data, bot):
+    def de_list(cls: Type[CB],
+                data: Optional[List[Dict[str, Any]]],
+                bot: 'Bot') -> List[Optional[CB]]:
         if not data:
             return []
 
@@ -391,10 +407,10 @@ class DataCredentials(_CredentialsBase):
         secret (:obj:`str`): Secret of encrypted data
     """
 
-    def __init__(self, data_hash, secret, **kwargs):
+    def __init__(self, data_hash: str, secret: str, **kwargs: Any):
         super(DataCredentials, self).__init__(data_hash, secret, **kwargs)
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         data = super(DataCredentials, self).to_dict()
 
         del data['file_hash']
@@ -417,10 +433,10 @@ class FileCredentials(_CredentialsBase):
             secret (:obj:`str`): Secret of encrypted file
         """
 
-    def __init__(self, file_hash, secret, **kwargs):
+    def __init__(self, file_hash: str, secret: str, **kwargs: Any):
         super(FileCredentials, self).__init__(file_hash, secret, **kwargs)
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         data = super(FileCredentials, self).to_dict()
 
         del data['data_hash']

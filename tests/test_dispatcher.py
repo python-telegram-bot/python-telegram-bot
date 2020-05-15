@@ -40,7 +40,8 @@ def dp2(bot):
 
 class TestDispatcher(object):
     message_update = Update(1,
-                            message=Message(1, User(1, '', False), None, Chat(1, ''), text='Text'))
+                            message=Message(1, None, Chat(1, ''), from_user=User(1, '', False),
+                                            text='Text'))
     received = None
     count = 0
 
@@ -388,7 +389,8 @@ class TestDispatcher(object):
         # If updating a user_data or chat_data from a persistence object throws an error,
         # the error handler should catch it
 
-        update = Update(1, message=Message(1, User(1, "Test", False), None, Chat(1, "lala"),
+        update = Update(1, message=Message(1, None, Chat(1, "lala"),
+                                           from_user=User(1, "Test", False),
                                            text='/start',
                                            entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
                                                                    offset=0,
@@ -504,7 +506,8 @@ class TestDispatcher(object):
         def logger(message):
             assert 'uncaught error was raised while handling' in message
 
-        update = Update(1, message=Message(1, User(1, '', False), None, Chat(1, ''), text='Text'))
+        update = Update(1, message=Message(1, None, Chat(1, ''), from_user=User(1, '', False),
+                                           text='Text'))
         handler = MessageHandler(Filters.all, callback)
         cdp.add_handler(handler)
         cdp.add_error_handler(error)
@@ -556,7 +559,8 @@ class TestDispatcher(object):
         cdp.add_handler(handler)
         cdp.persistence = OwnPersistence()
 
-        update = Update(1, message=Message(1, User(1, '', False), None, None, text='Text'))
+        update = Update(1, message=Message(1, None, None, from_user=User(1, '', False),
+                                           text='Text'))
         cdp.process_update(update)
         assert cdp.persistence.test_flag_bot_data
         assert cdp.persistence.test_flag_user_data
@@ -565,7 +569,7 @@ class TestDispatcher(object):
         cdp.persistence.test_flag_bot_data = False
         cdp.persistence.test_flag_user_data = False
         cdp.persistence.test_flag_chat_data = False
-        update = Update(1, message=Message(1, None, None, Chat(1, ''), text='Text'))
+        update = Update(1, message=Message(1, None, Chat(1, ''), from_user=None, text='Text'))
         cdp.process_update(update)
         assert cdp.persistence.test_flag_bot_data
         assert not cdp.persistence.test_flag_user_data

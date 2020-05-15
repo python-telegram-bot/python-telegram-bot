@@ -19,6 +19,9 @@
 """This module contains an object that represents a Telegram ShippingOption."""
 
 from telegram import TelegramObject
+from typing import List, Any, Dict, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import LabeledPrice  # noqa
 
 
 class ShippingOption(TelegramObject):
@@ -37,14 +40,14 @@ class ShippingOption(TelegramObject):
 
     """
 
-    def __init__(self, id, title, prices, **kwargs):
+    def __init__(self, id: str, title: str, prices: List['LabeledPrice'], **kwargs: Any):
         self.id = id
         self.title = title
         self.prices = prices
 
         self._id_attrs = (self.id,)
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         data = super(ShippingOption, self).to_dict()
 
         data['prices'] = [p.to_dict() for p in self.prices]

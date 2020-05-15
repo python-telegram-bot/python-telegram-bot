@@ -17,40 +17,51 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram Objects."""
-
 try:
     import ujson as json
 except ImportError:
-    import json
+    import json  # type: ignore[no-redef]
+
+from typing import Tuple, Any, Dict, Optional, Type, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import Bot
+
+TO = TypeVar('TO', bound='TelegramObject')
 
 
 class TelegramObject(object):
     """Base class for most telegram objects."""
 
-    _id_attrs = ()
+    # def __init__(self, *args: Any, **kwargs: Any):
+    #     pass
 
-    def __str__(self):
+    _id_attrs: Tuple[Any, ...] = ()
+
+    def __str__(self) -> str:
         return str(self.to_dict())
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: str) -> Any:
         return self.__dict__[item]
 
     @staticmethod
-    def parse_data(data):
+    def parse_data(data: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
         if not data:
             return None
         return data.copy()
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls: Type[TO], data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional[TO]:
         data = cls.parse_data(data)
 
         if not data:
             return None
 
-        return cls(bot=bot, **data)
+        if cls == TelegramObject:
+            return cls()
+        else:
+            return cls(bot=bot, **data)  # type: ignore[call-arg]
 
-    def to_json(self):
+    def to_json(self) -> str:
         """
         Returns:
             :obj:`str`
@@ -59,7 +70,7 @@ class TelegramObject(object):
 
         return json.dumps(self.to_dict())
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         data = dict()
 
         for key in iter(self.__dict__):
@@ -82,12 +93,12 @@ class TelegramObject(object):
             data['from'] = data.pop('from_user', None)
         return data
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, self.__class__):
             return self._id_attrs == other._id_attrs
         return super(TelegramObject, self).__eq__(other)  # pylint: disable=no-member
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         if self._id_attrs:
             return hash((self.__class__, self._id_attrs))  # pylint: disable=no-member
         return super(TelegramObject, self).__hash__()

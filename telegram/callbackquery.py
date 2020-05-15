@@ -17,8 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram CallbackQuery"""
-
+from __future__ import annotations
 from telegram import TelegramObject, Message, User
+from typing import Dict, Optional, Any, Union, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from telegram import Bot, InlineKeyboardMarkup
 
 
 class CallbackQuery(TelegramObject):
@@ -71,15 +75,15 @@ class CallbackQuery(TelegramObject):
     """
 
     def __init__(self,
-                 id,
-                 from_user,
-                 chat_instance,
-                 message=None,
-                 data=None,
-                 inline_message_id=None,
-                 game_short_name=None,
-                 bot=None,
-                 **kwargs):
+                 id: str,
+                 from_user: User,
+                 chat_instance: str,
+                 message: Message = None,
+                 data: str = None,
+                 inline_message_id: str = None,
+                 game_short_name: str = None,
+                 bot: 'Bot' = None,
+                 **kwargs: Any):
         # Required
         self.id = id
         self.from_user = from_user
@@ -95,7 +99,7 @@ class CallbackQuery(TelegramObject):
         self._id_attrs = (self.id,)
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['CallbackQuery']:
         data = cls.parse_data(data)
 
         if not data:
@@ -109,7 +113,7 @@ class CallbackQuery(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def answer(self, *args, **kwargs):
+    def answer(self, *args: Any, **kwargs: Any) -> bool:
         """Shortcut for::
 
             bot.answer_callback_query(update.callback_query.id, *args, **kwargs)
@@ -118,9 +122,9 @@ class CallbackQuery(TelegramObject):
             :obj:`bool`: On success, ``True`` is returned.
 
         """
-        return self.bot.answerCallbackQuery(self.id, *args, **kwargs)
+        return self.bot.answer_callback_query(self.id, *args, **kwargs)
 
-    def edit_message_text(self, text, *args, **kwargs):
+    def edit_message_text(self, text: str, *args: Any, **kwargs: Any) -> Union[Message, bool]:
         """Shortcut for either::
 
             bot.edit_message_text(text, chat_id=update.callback_query.message.chat_id,
@@ -144,7 +148,8 @@ class CallbackQuery(TelegramObject):
             return self.bot.edit_message_text(text, chat_id=self.message.chat_id,
                                               message_id=self.message.message_id, *args, **kwargs)
 
-    def edit_message_caption(self, caption, *args, **kwargs):
+    def edit_message_caption(self, caption: str, *args: Any,
+                             **kwargs: Any) -> Union[Message, bool]:
         """Shortcut for either::
 
             bot.edit_message_caption(caption=caption,
@@ -172,7 +177,8 @@ class CallbackQuery(TelegramObject):
                                                  message_id=self.message.message_id,
                                                  *args, **kwargs)
 
-    def edit_message_reply_markup(self, reply_markup, *args, **kwargs):
+    def edit_message_reply_markup(self, reply_markup: 'InlineKeyboardMarkup', *args: Any,
+                                  **kwargs: Any) -> Union[Message, bool]:
         """Shortcut for either::
 
             bot.edit_message_replyMarkup(chat_id=update.callback_query.message.chat_id,

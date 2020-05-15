@@ -19,7 +19,7 @@
 """This module contains an object that represents Telegram errors."""
 
 
-def _lstrip_str(in_s, lstr):
+def _lstrip_str(in_s: str, lstr: str) -> str:
     """
     Args:
         in_s (:obj:`str`): in string
@@ -37,7 +37,7 @@ def _lstrip_str(in_s, lstr):
 
 
 class TelegramError(Exception):
-    def __init__(self, message):
+    def __init__(self, message: str):
         super(TelegramError, self).__init__()
 
         msg = _lstrip_str(message, 'Error: ')
@@ -48,8 +48,8 @@ class TelegramError(Exception):
             msg = msg.capitalize()
         self.message = msg
 
-    def __str__(self):
-        return '%s' % (self.message)
+    def __str__(self) -> str:
+        return '%s' % self.message
 
 
 class Unauthorized(TelegramError):
@@ -57,7 +57,7 @@ class Unauthorized(TelegramError):
 
 
 class InvalidToken(TelegramError):
-    def __init__(self):
+    def __init__(self) -> None:
         super(InvalidToken, self).__init__('Invalid token')
 
 
@@ -70,7 +70,7 @@ class BadRequest(NetworkError):
 
 
 class TimedOut(NetworkError):
-    def __init__(self):
+    def __init__(self) -> None:
         super(TimedOut, self).__init__('Timed out')
 
 
@@ -81,7 +81,7 @@ class ChatMigrated(TelegramError):
 
     """
 
-    def __init__(self, new_chat_id):
+    def __init__(self, new_chat_id: int):
         super(ChatMigrated,
               self).__init__('Group migrated to supergroup. New chat id: {}'.format(new_chat_id))
         self.new_chat_id = new_chat_id
@@ -94,7 +94,7 @@ class RetryAfter(TelegramError):
 
     """
 
-    def __init__(self, retry_after):
+    def __init__(self, retry_after: int):
         super(RetryAfter,
               self).__init__('Flood control exceeded. Retry in {} seconds'.format(retry_after))
         self.retry_after = float(retry_after)
@@ -109,5 +109,5 @@ class Conflict(TelegramError):
 
     """
 
-    def __init__(self, msg):
+    def __init__(self, msg: str):
         super(Conflict, self).__init__(msg)

@@ -19,6 +19,7 @@
 """This module contains an object that represents a Telegram Contact."""
 
 from telegram import TelegramObject
+from typing import Any
 
 
 class Contact(TelegramObject):
@@ -41,8 +42,13 @@ class Contact(TelegramObject):
 
     """
 
-    def __init__(self, phone_number, first_name, last_name=None, user_id=None, vcard=None,
-                 **kwargs):
+    def __init__(self,
+                 phone_number: str,
+                 first_name: str,
+                 last_name: str = None,
+                 user_id: int = None,
+                 vcard: str = None,
+                 **kwargs: Any):
         # Required
         self.phone_number = str(phone_number)
         self.first_name = first_name

@@ -28,8 +28,8 @@ from tests.test_passport import RAW_PASSPORT_DATA
 
 @pytest.fixture(scope='class')
 def message(bot):
-    return Message(TestMessage.id_, TestMessage.from_user, TestMessage.date, TestMessage.chat,
-                   bot=bot)
+    return Message(TestMessage.id_, TestMessage.date, TestMessage.chat,
+                   from_user=TestMessage.from_user, bot=bot)
 
 
 @pytest.fixture(scope='function',
@@ -167,7 +167,7 @@ class TestMessage(object):
                                   MessageEntity(**e) for e in test_entities_v2
                               ])
 
-    def test_all_posibilities_de_json_and_to_dict(self, bot, message_params):
+    def test_all_possibilities_de_json_and_to_dict(self, bot, message_params):
         new = Message.de_json(message_params.to_dict(), bot)
 
         assert new.to_dict() == message_params.to_dict()
@@ -816,10 +816,10 @@ class TestMessage(object):
 
     def test_equality(self):
         id_ = 1
-        a = Message(id_, self.from_user, self.date, self.chat)
-        b = Message(id_, self.from_user, self.date, self.chat)
-        c = Message(id_, User(0, '', False), self.date, self.chat)
-        d = Message(0, self.from_user, self.date, self.chat)
+        a = Message(id_, self.date, self.chat, from_user=self.from_user,)
+        b = Message(id_, self.date, self.chat, from_user=self.from_user,)
+        c = Message(id_, self.date, self.chat, from_user=User(0, '', False))
+        d = Message(0, self.date, self.chat, from_user=self.from_user)
         e = Update(id_)
 
         assert a == b

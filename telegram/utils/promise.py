@@ -20,6 +20,8 @@
 
 import logging
 from threading import Event
+from typing import Callable, List, Tuple, Optional, Union, TypeVar, Dict, Any
+RT = TypeVar('RT')
 
 
 logger = logging.getLogger(__name__)
@@ -41,15 +43,18 @@ class Promise(object):
 
     """
 
-    def __init__(self, pooled_function, args, kwargs):
+    def __init__(self,
+                 pooled_function: Callable[..., RT],
+                 args: Union[List, Tuple],
+                 kwargs: Dict[str, Any]):
         self.pooled_function = pooled_function
         self.args = args
         self.kwargs = kwargs
         self.done = Event()
-        self._result = None
-        self._exception = None
+        self._result: Optional[RT] = None
+        self._exception: Optional[Exception] = None
 
-    def run(self):
+    def run(self) -> None:
         """Calls the :attr:`pooled_function` callable."""
 
         try:
@@ -62,10 +67,10 @@ class Promise(object):
         finally:
             self.done.set()
 
-    def __call__(self):
+    def __call__(self) -> None:
         self.run()
 
-    def result(self, timeout=None):
+    def result(self, timeout: float = None) -> Optional[RT]:
         """Return the result of the ``Promise``.
 
         Args:
@@ -85,7 +90,7 @@ class Promise(object):
         return self._result
 
     @property
-    def exception(self):
+    def exception(self) -> Optional[Exception]:
         """The exception raised by :attr:`pooled_function` or ``None`` if no exception has been
         raised (yet)."""
         return self._exception

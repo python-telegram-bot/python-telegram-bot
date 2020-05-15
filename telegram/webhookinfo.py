@@ -19,6 +19,7 @@
 """This module contains an object that represents a Telegram WebhookInfo."""
 
 from telegram import TelegramObject
+from typing import Any, List
 
 
 class WebhookInfo(TelegramObject):
@@ -54,14 +55,14 @@ class WebhookInfo(TelegramObject):
     """
 
     def __init__(self,
-                 url,
-                 has_custom_certificate,
-                 pending_update_count,
-                 last_error_date=None,
-                 last_error_message=None,
-                 max_connections=None,
-                 allowed_updates=None,
-                 **kwargs):
+                 url: str,
+                 has_custom_certificate: bool,
+                 pending_update_count: int,
+                 last_error_date: int = None,
+                 last_error_message: str = None,
+                 max_connections: int = None,
+                 allowed_updates: List[str] = None,
+                 **kwargs: Any):
         # Required
         self.url = url
         self.has_custom_certificate = has_custom_certificate

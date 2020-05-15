@@ -24,15 +24,26 @@ from threading import Lock
 try:
     import ujson as json
 except ImportError:
-    import json
+    import json  # type: ignore[no-redef]
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 import tornado.web
 
+from ssl import SSLContext
+from queue import Queue
+from typing import Any, Dict, TYPE_CHECKING
+from tornado import httputil
+if TYPE_CHECKING:
+    from telegram import Bot
+
 
 class WebhookServer(object):
 
-    def __init__(self, listen, port, webhook_app, ssl_ctx):
+    def __init__(self,
+                 listen: str,
+                 port: int,
+                 webhook_app: 'WebhookAppClass',
+                 ssl_ctx: SSLContext):
         self.http_server = HTTPServer(webhook_app, ssl_options=ssl_ctx)
         self.listen = listen
         self.port = port
@@ -42,26 +53,26 @@ class WebhookServer(object):
         self.server_lock = Lock()
         self.shutdown_lock = Lock()
 
-    def serve_forever(self):
+    def serve_forever(self) -> None:
         with self.server_lock:
             IOLoop().make_current()
             self.is_running = True
             self.logger.debug('Webhook Server started.')
             self.http_server.listen(self.port, address=self.listen)
             self.loop = IOLoop.current()
-            self.loop.start()
+            self.loop.start()  # type: ignore
             self.logger.debug('Webhook Server stopped.')
             self.is_running = False
 
-    def shutdown(self):
+    def shutdown(self) -> None:
         with self.shutdown_lock:
             if not self.is_running:
                 self.logger.warning('Webhook Server already stopped.')
                 return
             else:
-                self.loop.add_callback(self.loop.stop)
+                self.loop.add_callback(self.loop.stop)  # type: ignore
 
-    def handle_error(self, request, client_address):
+    def handle_error(self, request: Any, client_address: str) -> None:
         """Handle an error gracefully."""
         self.logger.debug('Exception happened during processing of request from %s',
                           client_address, exc_info=True)
@@ -69,7 +80,11 @@ class WebhookServer(object):
 
 class WebhookAppClass(tornado.web.Application):
 
-    def __init__(self, webhook_path, bot, update_queue, default_quote=None):
+    def __init__(self,
+                 webhook_path: str,
+                 bot: 'Bot',
+                 update_queue: Queue,
+                 default_quote: bool = None):
         self.shared_objects = {"bot": bot, "update_queue": update_queue,
                                "default_quote": default_quote}
         handlers = [
@@ -78,7 +93,7 @@ class WebhookAppClass(tornado.web.Application):
             ]  # noqa
         tornado.web.Application.__init__(self, handlers)
 
-    def log_request(self, handler):
+    def log_request(self, handler: tornado.web.RequestHandler) -> None:
         pass
 
 
@@ -86,12 +101,15 @@ class WebhookAppClass(tornado.web.Application):
 class WebhookHandler(tornado.web.RequestHandler):
     SUPPORTED_METHODS = ["POST"]
 
-    def __init__(self, application, request, **kwargs):
+    def __init__(self,
+                 application: tornado.web.Application,
+                 request: httputil.HTTPServerRequest,
+                 **kwargs: Dict[str, Any]):
         super(WebhookHandler, self).__init__(application, request, **kwargs)
         self.logger = logging.getLogger(__name__)
         self._init_asyncio_patch()
 
-    def _init_asyncio_patch(self):
+    def _init_asyncio_patch(self) -> None:
         """set default asyncio policy to be compatible with tornado
         Tornado 6 (at least) is not compatible with the default
         asyncio implementation on Windows
@@ -119,15 +137,15 @@ class WebhookHandler(tornado.web.RequestHandler):
                     # fallback to the pre-3.8 default of Selector
                     asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())
 
-    def initialize(self, bot, update_queue, default_quote=None):
+    def initialize(self, bot: 'Bot', update_queue: Queue, default_quote: bool = None) -> None:
         self.bot = bot
         self.update_queue = update_queue
         self._default_quote = default_quote
 
-    def set_default_headers(self):
+    def set_default_headers(self) -> None:
         self.set_header("Content-Type", 'application/json; charset="utf-8"')
 
-    def post(self):
+    def post(self) -> None:
         self.logger.debug('Webhook triggered')
         self._validate_post()
         json_string = bytes_to_native_str(self.request.body)
@@ -136,15 +154,16 @@ class WebhookHandler(tornado.web.RequestHandler):
         self.logger.debug('Webhook received data: ' + json_string)
         data['default_quote'] = self._default_quote
         update = Update.de_json(data, self.bot)
-        self.logger.debug('Received Update with ID %d on Webhook' % update.update_id)
-        self.update_queue.put(update)
+        if update:
+            self.logger.debug('Received Update with ID %d on Webhook' % update.update_id)
+            self.update_queue.put(update)
 
-    def _validate_post(self):
+    def _validate_post(self) -> None:
         ct_header = self.request.headers.get("Content-Type", None)
         if ct_header != 'application/json':
             raise tornado.web.HTTPError(403)
 
-    def write_error(self, status_code, **kwargs):
+    def write_error(self, status_code: int, **kwargs: Any) -> None:
         """Log an arbitrary message.
 
         This is used by all other logging functions.

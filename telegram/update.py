@@ -21,6 +21,10 @@
 from telegram import (Message, TelegramObject, InlineQuery, ChosenInlineResult,
                       CallbackQuery, ShippingQuery, PreCheckoutQuery, Poll)
 from telegram.poll import PollAnswer
+from typing import Any, Dict, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from telegram import Bot, User, Chat  # noqa
 
 
 class Update(TelegramObject):
@@ -79,19 +83,19 @@ class Update(TelegramObject):
     """
 
     def __init__(self,
-                 update_id,
-                 message=None,
-                 edited_message=None,
-                 channel_post=None,
-                 edited_channel_post=None,
-                 inline_query=None,
-                 chosen_inline_result=None,
-                 callback_query=None,
-                 shipping_query=None,
-                 pre_checkout_query=None,
-                 poll=None,
-                 poll_answer=None,
-                 **kwargs):
+                 update_id: int,
+                 message: Message = None,
+                 edited_message: Message = None,
+                 channel_post: Message = None,
+                 edited_channel_post: Message = None,
+                 inline_query: InlineQuery = None,
+                 chosen_inline_result: ChosenInlineResult = None,
+                 callback_query: CallbackQuery = None,
+                 shipping_query: ShippingQuery = None,
+                 pre_checkout_query: PreCheckoutQuery = None,
+                 poll: Poll = None,
+                 poll_answer: PollAnswer = None,
+                 **kwargs: Any):
         # Required
         self.update_id = int(update_id)
         # Optionals
@@ -107,14 +111,14 @@ class Update(TelegramObject):
         self.poll = poll
         self.poll_answer = poll_answer
 
-        self._effective_user = None
-        self._effective_chat = None
-        self._effective_message = None
+        self._effective_user: Optional['User'] = None
+        self._effective_chat: Optional['Chat'] = None
+        self._effective_message: Optional[Message] = None
 
         self._id_attrs = (self.update_id,)
 
     @property
-    def effective_user(self):
+    def effective_user(self) -> Optional['User']:
         """
         :class:`telegram.User`: The user that sent this update, no matter what kind of update this
             is. Will be ``None`` for :attr:`channel_post` and :attr:`poll`.
@@ -153,7 +157,7 @@ class Update(TelegramObject):
         return user
 
     @property
-    def effective_chat(self):
+    def effective_chat(self) -> Optional['Chat']:
         """
         :class:`telegram.Chat`: The chat that this update was sent in, no matter what kind of
             update this is. Will be ``None`` for :attr:`inline_query`,
@@ -186,7 +190,7 @@ class Update(TelegramObject):
         return chat
 
     @property
-    def effective_message(self):
+    def effective_message(self) -> Optional[Message]:
         """
         :class:`telegram.Message`: The message included in this update, no matter what kind of
             update this is. Will be ``None`` for :attr:`inline_query`,
@@ -219,7 +223,7 @@ class Update(TelegramObject):
         return message
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['Update']:
         data = cls.parse_data(data)
 
         if not data:

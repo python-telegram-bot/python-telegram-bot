@@ -19,6 +19,9 @@
 """This module contains an object that represents a Telegram PhotoSize."""
 
 from telegram import TelegramObject
+from typing import Any, Dict, Optional, List, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import Bot, File
 
 
 class PhotoSize(TelegramObject):
@@ -48,13 +51,13 @@ class PhotoSize(TelegramObject):
     """
 
     def __init__(self,
-                 file_id,
-                 file_unique_id,
-                 width,
-                 height,
-                 file_size=None,
-                 bot=None,
-                 **kwargs):
+                 file_id: str,
+                 file_unique_id: str,
+                 width: int,
+                 height: int,
+                 file_size: int = None,
+                 bot: 'Bot' = None,
+                 **kwargs: Any):
         # Required
         self.file_id = str(file_id)
         self.file_unique_id = str(file_unique_id)
@@ -67,7 +70,8 @@ class PhotoSize(TelegramObject):
         self._id_attrs = (self.file_unique_id,)
 
     @classmethod
-    def de_list(cls, data, bot):
+    def de_list(cls, data: Optional[List[Dict[str, Any]]],
+                bot: 'Bot') -> List[Optional['PhotoSize']]:
         if not data:
             return []
 
@@ -77,7 +81,7 @@ class PhotoSize(TelegramObject):
 
         return photos
 
-    def get_file(self, timeout=None, **kwargs):
+    def get_file(self, timeout: int = None, **kwargs: Any) -> 'File':
         """Convenience wrapper over :attr:`telegram.Bot.get_file`
 
         Args:

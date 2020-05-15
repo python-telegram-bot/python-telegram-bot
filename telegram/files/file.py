@@ -26,6 +26,10 @@ from future.backports.urllib import parse as urllib_parse
 from telegram import TelegramObject
 from telegram.passport.credentials import decrypt
 
+from typing import Any, Optional, IO, Union, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import Bot, FileCredentials
+
 
 class File(TelegramObject):
     """
@@ -61,12 +65,12 @@ class File(TelegramObject):
     """
 
     def __init__(self,
-                 file_id,
-                 file_unique_id,
-                 bot=None,
-                 file_size=None,
-                 file_path=None,
-                 **kwargs):
+                 file_id: str,
+                 file_unique_id: str,
+                 bot: 'Bot' = None,
+                 file_size: int = None,
+                 file_path: str = None,
+                 **kwargs: Any):
         # Required
         self.file_id = str(file_id)
         self.file_unique_id = str(file_unique_id)
@@ -74,11 +78,14 @@ class File(TelegramObject):
         self.file_size = file_size
         self.file_path = file_path
         self.bot = bot
-        self._credentials = None
+        self._credentials: Optional['FileCredentials'] = None
 
         self._id_attrs = (self.file_unique_id,)
 
-    def download(self, custom_path=None, out=None, timeout=None):
+    def download(self,
+                 custom_path: str = None,
+                 out: IO = None,
+                 timeout: int = None) -> Union[str, IO]:
         """
         Download this file. By default, the file is saved in the current working directory with its
         original filename as reported by Telegram. If the file has no filename, it the file ID will
@@ -136,13 +143,13 @@ class File(TelegramObject):
                 fobj.write(buf)
             return filename
 
-    def _get_encoded_url(self):
+    def _get_encoded_url(self) -> str:
         """Convert any UTF-8 char in :obj:`File.file_path` into a url encoded ASCII string."""
         sres = urllib_parse.urlsplit(self.file_path)
         return urllib_parse.urlunsplit(urllib_parse.SplitResult(
             sres.scheme, sres.netloc, urllib_parse.quote(sres.path), sres.query, sres.fragment))
 
-    def download_as_bytearray(self, buf=None):
+    def download_as_bytearray(self, buf: bytearray = None) -> bytes:
         """Download this file and return it as a bytearray.
 
         Args:
@@ -159,5 +166,5 @@ class File(TelegramObject):
         buf.extend(self.bot.request.retrieve(self._get_encoded_url()))
         return buf
 
-    def set_credentials(self, credentials):
+    def set_credentials(self, credentials: 'FileCredentials') -> None:
         self._credentials = credentials

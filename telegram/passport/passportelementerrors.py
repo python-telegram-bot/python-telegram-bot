@@ -19,6 +19,7 @@
 """This module contains the classes that represent Telegram PassportElementError."""
 
 from telegram import TelegramObject
+from typing import Any
 
 
 class PassportElementError(TelegramObject):
@@ -36,7 +37,7 @@ class PassportElementError(TelegramObject):
 
     """
 
-    def __init__(self, source, type, message, **kwargs):
+    def __init__(self, source: str, type: str, message: str, **kwargs: Any):
         # Required
         self.source = str(source)
         self.type = str(type)
@@ -70,11 +71,11 @@ class PassportElementErrorDataField(PassportElementError):
     """
 
     def __init__(self,
-                 type,
-                 field_name,
-                 data_hash,
-                 message,
-                 **kwargs):
+                 type: str,
+                 field_name: str,
+                 data_hash: str,
+                 message: str,
+                 **kwargs: Any):
         # Required
         super(PassportElementErrorDataField, self).__init__('data', type, message)
         self.field_name = field_name
@@ -106,10 +107,10 @@ class PassportElementErrorFile(PassportElementError):
     """
 
     def __init__(self,
-                 type,
-                 file_hash,
-                 message,
-                 **kwargs):
+                 type: str,
+                 file_hash: str,
+                 message: str,
+                 **kwargs: Any):
         # Required
         super(PassportElementErrorFile, self).__init__('file', type, message)
         self.file_hash = file_hash
@@ -140,10 +141,10 @@ class PassportElementErrorFiles(PassportElementError):
     """
 
     def __init__(self,
-                 type,
-                 file_hashes,
-                 message,
-                 **kwargs):
+                 type: str,
+                 file_hashes: str,
+                 message: str,
+                 **kwargs: Any):
         # Required
         super(PassportElementErrorFiles, self).__init__('files', type, message)
         self.file_hashes = file_hashes
@@ -175,10 +176,10 @@ class PassportElementErrorFrontSide(PassportElementError):
     """
 
     def __init__(self,
-                 type,
-                 file_hash,
-                 message,
-                 **kwargs):
+                 type: str,
+                 file_hash: str,
+                 message: str,
+                 **kwargs: Any):
         # Required
         super(PassportElementErrorFrontSide, self).__init__('front_side', type, message)
         self.file_hash = file_hash
@@ -209,10 +210,10 @@ class PassportElementErrorReverseSide(PassportElementError):
     """
 
     def __init__(self,
-                 type,
-                 file_hash,
-                 message,
-                 **kwargs):
+                 type: str,
+                 file_hash: str,
+                 message: str,
+                 **kwargs: Any):
         # Required
         super(PassportElementErrorReverseSide, self).__init__('reverse_side', type, message)
         self.file_hash = file_hash
@@ -241,10 +242,10 @@ class PassportElementErrorSelfie(PassportElementError):
     """
 
     def __init__(self,
-                 type,
-                 file_hash,
-                 message,
-                 **kwargs):
+                 type: str,
+                 file_hash: str,
+                 message: str,
+                 **kwargs: Any):
         # Required
         super(PassportElementErrorSelfie, self).__init__('selfie', type, message)
         self.file_hash = file_hash
@@ -277,10 +278,10 @@ class PassportElementErrorTranslationFile(PassportElementError):
     """
 
     def __init__(self,
-                 type,
-                 file_hash,
-                 message,
-                 **kwargs):
+                 type: str,
+                 file_hash: str,
+                 message: str,
+                 **kwargs: Any):
         # Required
         super(PassportElementErrorTranslationFile, self).__init__('translation_file',
                                                                   type, message)
@@ -314,10 +315,10 @@ class PassportElementErrorTranslationFiles(PassportElementError):
     """
 
     def __init__(self,
-                 type,
-                 file_hashes,
-                 message,
-                 **kwargs):
+                 type: str,
+                 file_hashes: str,
+                 message: str,
+                 **kwargs: Any):
         # Required
         super(PassportElementErrorTranslationFiles, self).__init__('translation_files',
                                                                    type, message)
@@ -346,10 +347,10 @@ class PassportElementErrorUnspecified(PassportElementError):
     """
 
     def __init__(self,
-                 type,
-                 element_hash,
-                 message,
-                 **kwargs):
+                 type: str,
+                 element_hash: str,
+                 message: str,
+                 **kwargs: Any):
         # Required
         super(PassportElementErrorUnspecified, self).__init__('unspecified', type, message)
         self.element_hash = element_hash

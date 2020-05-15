@@ -19,6 +19,9 @@
 """This module contains an object that represents a Telegram VideoNote."""
 
 from telegram import PhotoSize, TelegramObject
+from typing import Any, Dict, Optional, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import Bot, File
 
 
 class VideoNote(TelegramObject):
@@ -50,14 +53,14 @@ class VideoNote(TelegramObject):
     """
 
     def __init__(self,
-                 file_id,
-                 file_unique_id,
-                 length,
-                 duration,
-                 thumb=None,
-                 file_size=None,
-                 bot=None,
-                 **kwargs):
+                 file_id: str,
+                 file_unique_id: str,
+                 length: int,
+                 duration: int,
+                 thumb: PhotoSize = None,
+                 file_size: int = None,
+                 bot: 'Bot' = None,
+                 **kwargs: Any):
         # Required
         self.file_id = str(file_id)
         self.file_unique_id = str(file_unique_id)
@@ -71,7 +74,7 @@ class VideoNote(TelegramObject):
         self._id_attrs = (self.file_unique_id,)
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['VideoNote']:
         data = cls.parse_data(data)
 
         if not data:
@@ -81,7 +84,7 @@ class VideoNote(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def get_file(self, timeout=None, **kwargs):
+    def get_file(self, timeout: int = None, **kwargs: Any) -> 'File':
         """Convenience wrapper over :attr:`telegram.Bot.get_file`
 
         Args:

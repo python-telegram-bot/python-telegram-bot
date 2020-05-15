@@ -19,6 +19,10 @@
 """This module contains an object that represents a Telegram UserProfilePhotos."""
 
 from telegram import PhotoSize, TelegramObject
+from typing import Any, List, Dict, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class UserProfilePhotos(TelegramObject):
@@ -35,13 +39,13 @@ class UserProfilePhotos(TelegramObject):
 
     """
 
-    def __init__(self, total_count, photos, **kwargs):
+    def __init__(self, total_count: int, photos: List[List[PhotoSize]], **kwargs: Any):
         # Required
         self.total_count = int(total_count)
         self.photos = photos
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['UserProfilePhotos']:
         data = cls.parse_data(data)
 
         if not data:
@@ -51,7 +55,7 @@ class UserProfilePhotos(TelegramObject):
 
         return cls(**data)
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         data = super(UserProfilePhotos, self).to_dict()
 
         data['photos'] = []

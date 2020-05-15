@@ -18,7 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ReplyKeyboardMarkup."""
 
-from telegram import ReplyMarkup
+from telegram import ReplyMarkup, KeyboardButton
+from typing import List, Union, Any, Dict
 
 
 class ReplyKeyboardMarkup(ReplyMarkup):
@@ -60,11 +61,11 @@ class ReplyKeyboardMarkup(ReplyMarkup):
     """
 
     def __init__(self,
-                 keyboard,
-                 resize_keyboard=False,
-                 one_time_keyboard=False,
-                 selective=False,
-                 **kwargs):
+                 keyboard: List[List[Union[str, KeyboardButton]]],
+                 resize_keyboard: bool = False,
+                 one_time_keyboard: bool = False,
+                 selective: bool = False,
+                 **kwargs: Any):
         # Required
         self.keyboard = keyboard
         # Optionals
@@ -72,14 +73,14 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         self.one_time_keyboard = bool(one_time_keyboard)
         self.selective = bool(selective)
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         data = super(ReplyKeyboardMarkup, self).to_dict()
 
         data['keyboard'] = []
         for row in self.keyboard:
-            r = []
+            r: List[Union[Dict[str, Any], str]] = []
             for button in row:
-                if hasattr(button, 'to_dict'):
+                if isinstance(button, KeyboardButton):
                     r.append(button.to_dict())  # telegram.KeyboardButton
                 else:
                     r.append(button)  # str
@@ -88,11 +89,11 @@ class ReplyKeyboardMarkup(ReplyMarkup):
 
     @classmethod
     def from_button(cls,
-                    button,
-                    resize_keyboard=False,
-                    one_time_keyboard=False,
-                    selective=False,
-                    **kwargs):
+                    button: Union[KeyboardButton, str],
+                    resize_keyboard: bool = False,
+                    one_time_keyboard: bool = False,
+                    selective: bool = False,
+                    **kwargs: Any) -> 'ReplyKeyboardMarkup':
         """Shortcut for::
 
             ReplyKeyboardMarkup([[button]], **kwargs)
@@ -129,11 +130,11 @@ class ReplyKeyboardMarkup(ReplyMarkup):
 
     @classmethod
     def from_row(cls,
-                 button_row,
-                 resize_keyboard=False,
-                 one_time_keyboard=False,
-                 selective=False,
-                 **kwargs):
+                 button_row: List[Union[str, KeyboardButton]],
+                 resize_keyboard: bool = False,
+                 one_time_keyboard: bool = False,
+                 selective: bool = False,
+                 **kwargs: Any) -> 'ReplyKeyboardMarkup':
         """Shortcut for::
 
             ReplyKeyboardMarkup([button_row], **kwargs)
@@ -172,11 +173,11 @@ class ReplyKeyboardMarkup(ReplyMarkup):
 
     @classmethod
     def from_column(cls,
-                    button_column,
-                    resize_keyboard=False,
-                    one_time_keyboard=False,
-                    selective=False,
-                    **kwargs):
+                    button_column: List[Union[str, KeyboardButton]],
+                    resize_keyboard: bool = False,
+                    one_time_keyboard: bool = False,
+                    selective: bool = False,
+                    **kwargs: Any) -> 'ReplyKeyboardMarkup':
         """Shortcut for::
 
             ReplyKeyboardMarkup([[button] for button in button_column], **kwargs)

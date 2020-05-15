@@ -19,6 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Message."""
 import sys
+import datetime
 from html import escape
 
 from telegram import (Animation, Audio, Contact, Document, Chat, Location, PhotoSize, Sticker,
@@ -26,6 +27,10 @@ from telegram import (Animation, Audio, Contact, Document, Chat, Location, Photo
                       SuccessfulPayment, VideoNote, PassportData, Poll, InlineKeyboardMarkup, Dice)
 from telegram import ParseMode
 from telegram.utils.helpers import escape_markdown, to_timestamp, from_timestamp
+
+from typing import Any, List, Dict, Optional, Union, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import Bot, InputMedia
 
 _UNDEFINED = object()
 
@@ -199,7 +204,7 @@ class Message(TelegramObject):
             programming languages may have difficulty/silent defects in interpreting it. But it is
             smaller than 52 bits, so a signed 64 bit integer or double-precision float type are
             safe for storing this identifier.
-        pinned_message (:class:`telegram.message`, optional): Specified message was pinned. Note
+        pinned_message (:class:`telegram.Message`, optional): Specified message was pinned. Note
             that the Message object in this field will not contain further :attr:`reply_to_message`
             fields even if it is itself a reply.
         invoice (:class:`telegram.Invoice`, optional): Message is an invoice for a payment,
@@ -235,57 +240,57 @@ class Message(TelegramObject):
                      'passport_data'] + ATTACHMENT_TYPES
 
     def __init__(self,
-                 message_id,
-                 from_user,
-                 date,
-                 chat,
-                 forward_from=None,
-                 forward_from_chat=None,
-                 forward_from_message_id=None,
-                 forward_date=None,
-                 reply_to_message=None,
-                 edit_date=None,
-                 text=None,
-                 entities=None,
-                 caption_entities=None,
-                 audio=None,
-                 document=None,
-                 game=None,
-                 photo=None,
-                 sticker=None,
-                 video=None,
-                 voice=None,
-                 video_note=None,
-                 new_chat_members=None,
-                 caption=None,
-                 contact=None,
-                 location=None,
-                 venue=None,
-                 left_chat_member=None,
-                 new_chat_title=None,
-                 new_chat_photo=None,
-                 delete_chat_photo=False,
-                 group_chat_created=False,
-                 supergroup_chat_created=False,
-                 channel_chat_created=False,
-                 migrate_to_chat_id=None,
-                 migrate_from_chat_id=None,
-                 pinned_message=None,
-                 invoice=None,
-                 successful_payment=None,
-                 forward_signature=None,
-                 author_signature=None,
-                 media_group_id=None,
-                 connected_website=None,
-                 animation=None,
-                 passport_data=None,
-                 poll=None,
-                 forward_sender_name=None,
-                 reply_markup=None,
-                 bot=None,
-                 default_quote=None,
-                 dice=None,
-                 **kwargs):
+                 message_id: int,
+                 date: datetime.datetime,
+                 chat: Chat,
+                 from_user: User = None,
+                 forward_from: User = None,
+                 forward_from_chat: Chat = None,
+                 forward_from_message_id: int = None,
+                 forward_date: datetime.datetime = None,
+                 reply_to_message: 'Message' = None,
+                 edit_date: datetime.datetime = None,
+                 text: str = None,
+                 entities: List[MessageEntity] = None,
+                 caption_entities: List[MessageEntity] = None,
+                 audio: Audio = None,
+                 document: Document = None,
+                 game: Game = None,
+                 photo: List[PhotoSize] = None,
+                 sticker: Sticker = None,
+                 video: Video = None,
+                 voice: Voice = None,
+                 video_note: VideoNote = None,
+                 new_chat_members: List[User] = None,
+                 caption: str = None,
+                 contact: Contact = None,
+                 location: Location = None,
+                 venue: Venue = None,
+                 left_chat_member: User = None,
+                 new_chat_title: str = None,
+                 new_chat_photo: List[PhotoSize] = None,
+                 delete_chat_photo: bool = False,
+                 group_chat_created: bool = False,
+                 supergroup_chat_created: bool = False,
+                 channel_chat_created: bool = False,
+                 migrate_to_chat_id: int = None,
+                 migrate_from_chat_id: int = None,
+                 pinned_message: 'Message' = None,
+                 invoice: Invoice = None,
+                 successful_payment: SuccessfulPayment = None,
+                 forward_signature: str = None,
+                 author_signature: str = None,
+                 media_group_id: str = None,
+                 connected_website: str = None,
+                 animation: Animation = None,
+                 passport_data: PassportData = None,
+                 poll: Poll = None,
+                 forward_sender_name: str = None,
+                 reply_markup: InlineKeyboardMarkup = None,
+                 bot: 'Bot' = None,
+                 default_quote: bool = None,
+                 dice: Dice = None,
+                 **kwargs: Any):
         # Required
         self.message_id = int(message_id)
         self.from_user = from_user
@@ -342,12 +347,12 @@ class Message(TelegramObject):
         self._id_attrs = (self.message_id,)
 
     @property
-    def chat_id(self):
+    def chat_id(self) -> int:
         """:obj:`int`: Shortcut for :attr:`telegram.Chat.id` for :attr:`chat`."""
         return self.chat.id
 
     @property
-    def link(self):
+    def link(self) -> Optional[str]:
         """:obj:`str`: Convenience property. If the chat of the message is not
         a private chat or normal group, returns a t.me link of the message."""
         if self.chat.type not in [Chat.PRIVATE, Chat.GROUP]:
@@ -360,7 +365,7 @@ class Message(TelegramObject):
         return None
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> 'Message':
         data = cls.parse_data(data)
 
         if not data:
@@ -414,7 +419,9 @@ class Message(TelegramObject):
         return cls(bot=bot, **data)
 
     @property
-    def effective_attachment(self):
+    def effective_attachment(self) -> Union[Contact, Document, Animation, Game, Invoice, Location,
+                                            List[PhotoSize], Sticker, SuccessfulPayment, Venue,
+                                            Video, VideoNote, Voice, None]:
         """
         :class:`telegram.Audio`
             or :class:`telegram.Contact`
@@ -434,7 +441,7 @@ class Message(TelegramObject):
 
         """
         if self._effective_attachment is not _UNDEFINED:
-            return self._effective_attachment
+            return self._effective_attachment  # type: ignore
 
         for i in Message.ATTACHMENT_TYPES:
             if getattr(self, i, None):
@@ -443,15 +450,15 @@ class Message(TelegramObject):
         else:
             self._effective_attachment = None
 
-        return self._effective_attachment
+        return self._effective_attachment  # type: ignore
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: str) -> Any:
         if item in self.__dict__.keys():
             return self.__dict__[item]
         elif item == 'chat_id':
             return self.chat.id
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         data = super(Message, self).to_dict()
 
         # Required
@@ -474,7 +481,7 @@ class Message(TelegramObject):
 
         return data
 
-    def _quote(self, kwargs):
+    def _quote(self, kwargs: Dict[str, Any]) -> None:
         """Modify kwargs for replying with or without quoting."""
         if 'reply_to_message_id' in kwargs:
             if 'quote' in kwargs:
@@ -491,7 +498,7 @@ class Message(TelegramObject):
                or self.default_quote):
                 kwargs['reply_to_message_id'] = self.message_id
 
-    def reply_text(self, *args, **kwargs):
+    def reply_text(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_message(update.message.chat_id, *args, **kwargs)
@@ -509,7 +516,7 @@ class Message(TelegramObject):
         self._quote(kwargs)
         return self.bot.send_message(self.chat_id, *args, **kwargs)
 
-    def reply_markdown(self, *args, **kwargs):
+    def reply_markdown(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_message(update.message.chat_id, parse_mode=ParseMode.MARKDOWN, *args,
@@ -533,7 +540,7 @@ class Message(TelegramObject):
 
         return self.bot.send_message(self.chat_id, *args, **kwargs)
 
-    def reply_markdown_v2(self, *args, **kwargs):
+    def reply_markdown_v2(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_message(update.message.chat_id, parse_mode=ParseMode.MARKDOWN_V2, *args,
@@ -557,7 +564,7 @@ class Message(TelegramObject):
 
         return self.bot.send_message(self.chat_id, *args, **kwargs)
 
-    def reply_html(self, *args, **kwargs):
+    def reply_html(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_message(update.message.chat_id, parse_mode=ParseMode.HTML, *args, **kwargs)
@@ -580,7 +587,7 @@ class Message(TelegramObject):
 
         return self.bot.send_message(self.chat_id, *args, **kwargs)
 
-    def reply_media_group(self, *args, **kwargs):
+    def reply_media_group(self, *args: Any, **kwargs: Any) -> List[Optional['Message']]:
         """Shortcut for::
 
             bot.reply_media_group(update.message.chat_id, *args, **kwargs)
@@ -600,7 +607,7 @@ class Message(TelegramObject):
         self._quote(kwargs)
         return self.bot.send_media_group(self.chat_id, *args, **kwargs)
 
-    def reply_photo(self, *args, **kwargs):
+    def reply_photo(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_photo(update.message.chat_id, *args, **kwargs)
@@ -617,7 +624,7 @@ class Message(TelegramObject):
         self._quote(kwargs)
         return self.bot.send_photo(self.chat_id, *args, **kwargs)
 
-    def reply_audio(self, *args, **kwargs):
+    def reply_audio(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_audio(update.message.chat_id, *args, **kwargs)
@@ -634,7 +641,7 @@ class Message(TelegramObject):
         self._quote(kwargs)
         return self.bot.send_audio(self.chat_id, *args, **kwargs)
 
-    def reply_document(self, *args, **kwargs):
+    def reply_document(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_document(update.message.chat_id, *args, **kwargs)
@@ -652,7 +659,7 @@ class Message(TelegramObject):
         self._quote(kwargs)
         return self.bot.send_document(self.chat_id, *args, **kwargs)
 
-    def reply_animation(self, *args, **kwargs):
+    def reply_animation(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_animation(update.message.chat_id, *args, **kwargs)
@@ -670,7 +677,7 @@ class Message(TelegramObject):
         self._quote(kwargs)
         return self.bot.send_animation(self.chat_id, *args, **kwargs)
 
-    def reply_sticker(self, *args, **kwargs):
+    def reply_sticker(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_sticker(update.message.chat_id, *args, **kwargs)
@@ -688,7 +695,7 @@ class Message(TelegramObject):
         self._quote(kwargs)
         return self.bot.send_sticker(self.chat_id, *args, **kwargs)
 
-    def reply_video(self, *args, **kwargs):
+    def reply_video(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_video(update.message.chat_id, *args, **kwargs)
@@ -706,7 +713,7 @@ class Message(TelegramObject):
         self._quote(kwargs)
         return self.bot.send_video(self.chat_id, *args, **kwargs)
 
-    def reply_video_note(self, *args, **kwargs):
+    def reply_video_note(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_video_note(update.message.chat_id, *args, **kwargs)
@@ -724,7 +731,7 @@ class Message(TelegramObject):
         self._quote(kwargs)
         return self.bot.send_video_note(self.chat_id, *args, **kwargs)
 
-    def reply_voice(self, *args, **kwargs):
+    def reply_voice(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_voice(update.message.chat_id, *args, **kwargs)
@@ -742,7 +749,7 @@ class Message(TelegramObject):
         self._quote(kwargs)
         return self.bot.send_voice(self.chat_id, *args, **kwargs)
 
-    def reply_location(self, *args, **kwargs):
+    def reply_location(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_location(update.message.chat_id, *args, **kwargs)
@@ -760,7 +767,7 @@ class Message(TelegramObject):
         self._quote(kwargs)
         return self.bot.send_location(self.chat_id, *args, **kwargs)
 
-    def reply_venue(self, *args, **kwargs):
+    def reply_venue(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_venue(update.message.chat_id, *args, **kwargs)
@@ -778,7 +785,7 @@ class Message(TelegramObject):
         self._quote(kwargs)
         return self.bot.send_venue(self.chat_id, *args, **kwargs)
 
-    def reply_contact(self, *args, **kwargs):
+    def reply_contact(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_contact(update.message.chat_id, *args, **kwargs)
@@ -796,7 +803,7 @@ class Message(TelegramObject):
         self._quote(kwargs)
         return self.bot.send_contact(self.chat_id, *args, **kwargs)
 
-    def reply_poll(self, *args, **kwargs):
+    def reply_poll(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_poll(update.message.chat_id, *args, **kwargs)
@@ -813,7 +820,7 @@ class Message(TelegramObject):
         self._quote(kwargs)
         return self.bot.send_poll(self.chat_id, *args, **kwargs)
 
-    def reply_dice(self, *args, **kwargs):
+    def reply_dice(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_dice(update.message.chat_id, *args, **kwargs)
@@ -830,7 +837,7 @@ class Message(TelegramObject):
         self._quote(kwargs)
         return self.bot.send_dice(self.chat_id, *args, **kwargs)
 
-    def forward(self, chat_id, *args, **kwargs):
+    def forward(self, chat_id: int, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.forward_message(chat_id=chat_id,
@@ -850,7 +857,7 @@ class Message(TelegramObject):
             *args,
             **kwargs)
 
-    def edit_text(self, *args, **kwargs):
+    def edit_text(self, *args: Any, **kwargs: Any) -> Union['Message', bool]:
         """Shortcut for::
 
             bot.edit_message_text(chat_id=message.chat_id,
@@ -864,13 +871,14 @@ class Message(TelegramObject):
             return value of the ``bot.send_*`` family of methods.
 
         Returns:
-            :class:`telegram.Message`: On success, instance representing the edited message.
+            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            edited Message is returned, otherwise ``True`` is returned.
 
         """
         return self.bot.edit_message_text(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
 
-    def edit_caption(self, *args, **kwargs):
+    def edit_caption(self, *args: Any, **kwargs: Any) -> Union['Message', bool]:
         """Shortcut for::
 
             bot.edit_message_caption(chat_id=message.chat_id,
@@ -884,34 +892,35 @@ class Message(TelegramObject):
             return value of the ``bot.send_*`` family of methods.
 
         Returns:
-            :class:`telegram.Message`: On success, instance representing the edited message.
+            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            edited Message is returned, otherwise ``True`` is returned.
 
         """
         return self.bot.edit_message_caption(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
 
-    def edit_media(self, media, *args, **kwargs):
+    def edit_media(self, media: 'InputMedia', *args: Any, **kwargs: Any) -> Union['Message', bool]:
         """Shortcut for::
 
-                    bot.edit_message_media(chat_id=message.chat_id,
-                                             message_id=message.message_id,
-                                             *args,
-                                             **kwargs)
+            bot.edit_message_media(chat_id=message.chat_id,
+                                   message_id=message.message_id,
+                                   *args,
+                                   **kwargs)
 
-                Note:
-                    You can only edit messages that the bot sent itself,
-                    therefore this method can only be used on the
-                    return value of the ``bot.send_*`` family of methods.
+        Note:
+            You can only edit messages that the bot sent itself,
+            therefore this method can only be used on the
+            return value of the ``bot.send_*`` family of methods.
 
-                Returns:
-                    :class:`telegram.Message`: On success, instance representing the edited
-                    message.
+        Returns:
+            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            edited Message is returned, otherwise ``True`` is returned.
 
-                """
+        """
         return self.bot.edit_message_media(
             chat_id=self.chat_id, message_id=self.message_id, media=media, *args, **kwargs)
 
-    def edit_reply_markup(self, *args, **kwargs):
+    def edit_reply_markup(self, *args: Any, **kwargs: Any) -> Union['Message', bool]:
         """Shortcut for::
 
             bot.edit_message_reply_markup(chat_id=message.chat_id,
@@ -925,12 +934,13 @@ class Message(TelegramObject):
             return value of the ``bot.send_*`` family of methods.
 
         Returns:
-            :class:`telegram.Message`: On success, instance representing the edited message.
+            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            edited Message is returned, otherwise ``True`` is returned.
         """
         return self.bot.edit_message_reply_markup(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *args: Any, **kwargs: Any) -> bool:
         """Shortcut for::
 
              bot.delete_message(chat_id=message.chat_id,
@@ -945,7 +955,7 @@ class Message(TelegramObject):
         return self.bot.delete_message(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
 
-    def stop_poll(self, *args, **kwargs):
+    def stop_poll(self, *args: Any, **kwargs: Any) -> Poll:
         """Shortcut for::
 
              bot.stop_poll(chat_id=message.chat_id,
@@ -961,7 +971,7 @@ class Message(TelegramObject):
         return self.bot.stop_poll(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
 
-    def parse_entity(self, entity):
+    def parse_entity(self, entity: MessageEntity) -> str:
         """Returns the text from a given :class:`telegram.MessageEntity`.
 
         Note:
@@ -976,7 +986,13 @@ class Message(TelegramObject):
         Returns:
             :obj:`str`: The text of the given entity
 
+        Raises:
+            RuntimeError: If the message has no text.
+
         """
+        if not self.text:
+            raise RuntimeError("This Message has no 'text'.")
+
         # Is it a narrow build, if so we don't need to convert
         if sys.maxunicode == 0xffff:
             return self.text[entity.offset:entity.offset + entity.length]
@@ -986,7 +1002,7 @@ class Message(TelegramObject):
 
             return entity_text.decode('utf-16-le')
 
-    def parse_caption_entity(self, entity):
+    def parse_caption_entity(self, entity: MessageEntity) -> str:
         """Returns the text from a given :class:`telegram.MessageEntity`.
 
         Note:
@@ -1001,7 +1017,13 @@ class Message(TelegramObject):
         Returns:
             :obj:`str`: The text of the given entity
 
+        Raises:
+            RuntimeError: If the message has no caption.
+
         """
+        if not self.caption:
+            raise RuntimeError("This Message has no 'caption'.")
+
         # Is it a narrow build, if so we don't need to convert
         if sys.maxunicode == 0xffff:
             return self.caption[entity.offset:entity.offset + entity.length]
@@ -1011,7 +1033,7 @@ class Message(TelegramObject):
 
             return entity_text.decode('utf-16-le')
 
-    def parse_entities(self, types=None):
+    def parse_entities(self, types: List[str] = None) -> Dict[MessageEntity, str]:
         """
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
         It contains entities from this message filtered by their
@@ -1039,10 +1061,10 @@ class Message(TelegramObject):
 
         return {
             entity: self.parse_entity(entity)
-            for entity in self.entities if entity.type in types
+            for entity in (self.entities or []) if entity.type in types
         }
 
-    def parse_caption_entities(self, types=None):
+    def parse_caption_entities(self, types: List[str] = None) -> Dict[MessageEntity, str]:
         """
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
         It contains entities from this message's caption filtered by their
@@ -1070,16 +1092,19 @@ class Message(TelegramObject):
 
         return {
             entity: self.parse_caption_entity(entity)
-            for entity in self.caption_entities if entity.type in types
+            for entity in (self.caption_entities or []) if entity.type in types
         }
 
     @staticmethod
-    def _parse_html(message_text, entities, urled=False, offset=0):
+    def _parse_html(message_text: Optional[str],
+                    entities: Dict[MessageEntity, str],
+                    urled: bool = False,
+                    offset: int = 0) -> Optional[str]:
         if message_text is None:
             return None
 
         if not sys.maxunicode == 0xffff:
-            message_text = message_text.encode('utf-16-le')
+            message_text = message_text.encode('utf-16-le')  # type: ignore
 
         html_text = ''
         last_offset = 0
@@ -1135,13 +1160,14 @@ class Message(TelegramObject):
                     else:
                         html_text += escape(message_text[last_offset * 2:(entity.offset
                                                          - offset) * 2]
-                                            .decode('utf-16-le')) + insert
+                                            .decode('utf-16-le')) + insert  # type: ignore
                 else:
                     if sys.maxunicode == 0xffff:
                         html_text += message_text[last_offset:entity.offset - offset] + insert
                     else:
-                        html_text += message_text[last_offset * 2:(entity.offset
-                                                  - offset) * 2].decode('utf-16-le') + insert
+                        html_text += message_text[
+                            last_offset * 2:(entity.offset - offset) * 2
+                        ].decode('utf-16-le') + insert  # type: ignore
 
                 last_offset = entity.offset - offset + entity.length
 
@@ -1149,17 +1175,18 @@ class Message(TelegramObject):
             if sys.maxunicode == 0xffff:
                 html_text += escape(message_text[last_offset:])
             else:
-                html_text += escape(message_text[last_offset * 2:].decode('utf-16-le'))
+                html_text += escape(
+                    message_text[last_offset * 2:].decode('utf-16-le'))  # type: ignore
         else:
             if sys.maxunicode == 0xffff:
                 html_text += message_text[last_offset:]
             else:
-                html_text += message_text[last_offset * 2:].decode('utf-16-le')
+                html_text += message_text[last_offset * 2:].decode('utf-16-le')  # type: ignore
 
         return html_text
 
     @property
-    def text_html(self):
+    def text_html(self) -> str:
         """Creates an HTML-formatted string from the markup entities found in the message.
 
         Use this if you want to retrieve the message text with the entities formatted as HTML in
@@ -1172,7 +1199,7 @@ class Message(TelegramObject):
         return self._parse_html(self.text, self.parse_entities(), urled=False)
 
     @property
-    def text_html_urled(self):
+    def text_html_urled(self) -> str:
         """Creates an HTML-formatted string from the markup entities found in the message.
 
         Use this if you want to retrieve the message text with the entities formatted as HTML.
@@ -1185,7 +1212,7 @@ class Message(TelegramObject):
         return self._parse_html(self.text, self.parse_entities(), urled=True)
 
     @property
-    def caption_html(self):
+    def caption_html(self) -> str:
         """Creates an HTML-formatted string from the markup entities found in the message's
         caption.
 
@@ -1199,7 +1226,7 @@ class Message(TelegramObject):
         return self._parse_html(self.caption, self.parse_caption_entities(), urled=False)
 
     @property
-    def caption_html_urled(self):
+    def caption_html_urled(self) -> str:
         """Creates an HTML-formatted string from the markup entities found in the message's
         caption.
 
@@ -1213,14 +1240,18 @@ class Message(TelegramObject):
         return self._parse_html(self.caption, self.parse_caption_entities(), urled=True)
 
     @staticmethod
-    def _parse_markdown(message_text, entities, urled=False, version=1, offset=0):
+    def _parse_markdown(message_text: Optional[str],
+                        entities: Dict[MessageEntity, str],
+                        urled: bool = False,
+                        version: int = 1,
+                        offset: int = 0) -> Optional[str]:
         version = int(version)
 
         if message_text is None:
             return None
 
         if not sys.maxunicode == 0xffff:
-            message_text = message_text.encode('utf-16-le')
+            message_text = message_text.encode('utf-16-le')  # type: ignore
 
         markdown_text = ''
         last_offset = 0
@@ -1305,16 +1336,18 @@ class Message(TelegramObject):
                                                                       - offset],
                                                          version=version) + insert
                     else:
-                        markdown_text += escape_markdown(message_text[last_offset * 2:
-                                                                      (entity.offset - offset) * 2]
-                                                         .decode('utf-16-le'),
-                                                         version=version) + insert
+                        markdown_text += escape_markdown(
+                            message_text[
+                                last_offset * 2: (entity.offset - offset) * 2
+                            ].decode('utf-16-le'),  # type: ignore
+                            version=version) + insert
                 else:
                     if sys.maxunicode == 0xffff:
                         markdown_text += message_text[last_offset:entity.offset - offset] + insert
                     else:
-                        markdown_text += message_text[last_offset * 2:(entity.offset
-                                                      - offset) * 2].decode('utf-16-le') + insert
+                        markdown_text += message_text[
+                            last_offset * 2:(entity.offset - offset) * 2
+                        ].decode('utf-16-le') + insert  # type: ignore
 
                 last_offset = entity.offset - offset + entity.length
 
@@ -1322,18 +1355,19 @@ class Message(TelegramObject):
             if sys.maxunicode == 0xffff:
                 markdown_text += escape_markdown(message_text[last_offset:], version=version)
             else:
-                markdown_text += escape_markdown(message_text[last_offset * 2:]
-                                                 .decode('utf-16-le'), version=version)
+                markdown_text += escape_markdown(
+                    message_text[last_offset * 2:] .decode('utf-16-le'),  # type: ignore
+                    version=version)
         else:
             if sys.maxunicode == 0xffff:
                 markdown_text += message_text[last_offset:]
             else:
-                markdown_text += message_text[last_offset * 2:].decode('utf-16-le')
+                markdown_text += message_text[last_offset * 2:].decode('utf-16-le')  # type: ignore
 
         return markdown_text
 
     @property
-    def text_markdown(self):
+    def text_markdown(self) -> str:
         """Creates an Markdown-formatted string from the markup entities found in the message
         using :class:`telegram.ParseMode.MARKDOWN`.
 
@@ -1347,7 +1381,7 @@ class Message(TelegramObject):
         return self._parse_markdown(self.text, self.parse_entities(), urled=False)
 
     @property
-    def text_markdown_v2(self):
+    def text_markdown_v2(self) -> str:
         """Creates an Markdown-formatted string from the markup entities found in the message
         using :class:`telegram.ParseMode.MARKDOWN_V2`.
 
@@ -1361,7 +1395,7 @@ class Message(TelegramObject):
         return self._parse_markdown(self.text, self.parse_entities(), urled=False, version=2)
 
     @property
-    def text_markdown_urled(self):
+    def text_markdown_urled(self) -> str:
         """Creates an Markdown-formatted string from the markup entities found in the message
         using :class:`telegram.ParseMode.MARKDOWN`.
 
@@ -1375,7 +1409,7 @@ class Message(TelegramObject):
         return self._parse_markdown(self.text, self.parse_entities(), urled=True)
 
     @property
-    def text_markdown_v2_urled(self):
+    def text_markdown_v2_urled(self) -> str:
         """Creates an Markdown-formatted string from the markup entities found in the message
         using :class:`telegram.ParseMode.MARKDOWN_V2`.
 
@@ -1389,7 +1423,7 @@ class Message(TelegramObject):
         return self._parse_markdown(self.text, self.parse_entities(), urled=True, version=2)
 
     @property
-    def caption_markdown(self):
+    def caption_markdown(self) -> str:
         """Creates an Markdown-formatted string from the markup entities found in the message's
         caption using :class:`telegram.ParseMode.MARKDOWN`.
 
@@ -1403,7 +1437,7 @@ class Message(TelegramObject):
         return self._parse_markdown(self.caption, self.parse_caption_entities(), urled=False)
 
     @property
-    def caption_markdown_v2(self):
+    def caption_markdown_v2(self) -> str:
         """Creates an Markdown-formatted string from the markup entities found in the message's
         caption using :class:`telegram.ParseMode.MARKDOWN_V2`.
 
@@ -1418,7 +1452,7 @@ class Message(TelegramObject):
                                     urled=False, version=2)
 
     @property
-    def caption_markdown_urled(self):
+    def caption_markdown_urled(self) -> str:
         """Creates an Markdown-formatted string from the markup entities found in the message's
         caption using :class:`telegram.ParseMode.MARKDOWN`.
 
@@ -1432,7 +1466,7 @@ class Message(TelegramObject):
         return self._parse_markdown(self.caption, self.parse_caption_entities(), urled=True)
 
     @property
-    def caption_markdown_v2_urled(self):
+    def caption_markdown_v2_urled(self) -> str:
         """Creates an Markdown-formatted string from the markup entities found in the message's
         caption using :class:`telegram.ParseMode.MARKDOWN_V2`.
 
