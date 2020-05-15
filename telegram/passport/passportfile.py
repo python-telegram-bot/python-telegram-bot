@@ -19,7 +19,8 @@
 """This module contains an object that represents a Encrypted PassportFile."""
 
 from telegram import TelegramObject
-from typing import Any, Optional, Dict, List, TYPE_CHECKING
+from telegram.utils.typing import JSONDict
+from typing import Any, Optional, List, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot, File, FileCredentials
 
@@ -71,7 +72,7 @@ class PassportFile(TelegramObject):
 
     @classmethod
     def de_json_decrypted(cls,
-                          data: Optional[Dict[str, Any]],
+                          data: Optional[JSONDict],
                           bot: 'Bot',
                           credentials: 'FileCredentials') -> Optional['PassportFile']:
         data = cls.parse_data(data)
@@ -85,7 +86,7 @@ class PassportFile(TelegramObject):
 
     @classmethod
     def de_list(cls,
-                data: Optional[List[Dict[str, Any]]],
+                data: Optional[List[JSONDict]],
                 bot: 'Bot') -> List[Optional['PassportFile']]:
         if not data:
             return []
@@ -94,7 +95,7 @@ class PassportFile(TelegramObject):
 
     @classmethod
     def de_list_decrypted(cls,
-                          data: Optional[List[Dict[str, Any]]],
+                          data: Optional[List[JSONDict]],
                           bot: 'Bot',
                           credentials: List['FileCredentials']) -> List[Optional['PassportFile']]:
         if not data:

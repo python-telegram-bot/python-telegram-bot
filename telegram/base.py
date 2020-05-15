@@ -22,7 +22,8 @@ try:
 except ImportError:
     import json  # type: ignore[no-redef]
 
-from typing import Tuple, Any, Dict, Optional, Type, TypeVar, TYPE_CHECKING
+from telegram.utils.typing import JSONDict
+from typing import Tuple, Any, Optional, Type, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot
 
@@ -44,13 +45,13 @@ class TelegramObject(object):
         return self.__dict__[item]
 
     @staticmethod
-    def parse_data(data: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    def parse_data(data: Optional[JSONDict]) -> Optional[JSONDict]:
         if not data:
             return None
         return data.copy()
 
     @classmethod
-    def de_json(cls: Type[TO], data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional[TO]:
+    def de_json(cls: Type[TO], data: Optional[JSONDict], bot: 'Bot') -> Optional[TO]:
         data = cls.parse_data(data)
 
         if not data:
@@ -70,7 +71,7 @@ class TelegramObject(object):
 
         return json.dumps(self.to_dict())
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> JSONDict:
         data = dict()
 
         for key in iter(self.__dict__):

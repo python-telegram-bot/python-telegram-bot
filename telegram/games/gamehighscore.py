@@ -19,7 +19,8 @@
 """This module contains an object that represents a Telegram GameHighScore."""
 
 from telegram import TelegramObject, User
-from typing import Any, Dict, Optional, TYPE_CHECKING
+from telegram.utils.typing import JSONDict
+from typing import Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot
 
@@ -45,7 +46,7 @@ class GameHighScore(TelegramObject):
         self.score = score
 
     @classmethod
-    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['GameHighScore']:
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['GameHighScore']:
         data = cls.parse_data(data)
 
         if not data:

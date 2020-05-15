@@ -19,7 +19,8 @@
 """This module contains an object that represents a Telegram ReplyKeyboardMarkup."""
 
 from telegram import ReplyMarkup, KeyboardButton
-from typing import List, Union, Any, Dict
+from telegram.utils.typing import JSONDict
+from typing import List, Union, Any
 
 
 class ReplyKeyboardMarkup(ReplyMarkup):
@@ -73,12 +74,12 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         self.one_time_keyboard = bool(one_time_keyboard)
         self.selective = bool(selective)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> JSONDict:
         data = super(ReplyKeyboardMarkup, self).to_dict()
 
         data['keyboard'] = []
         for row in self.keyboard:
-            r: List[Union[Dict[str, Any], str]] = []
+            r: List[Union[JSONDict, str]] = []
             for button in row:
                 if isinstance(button, KeyboardButton):
                     r.append(button.to_dict())  # telegram.KeyboardButton

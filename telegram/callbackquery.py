@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram CallbackQuery"""
-from __future__ import annotations
 from telegram import TelegramObject, Message, User
-from typing import Dict, Optional, Any, Union, TYPE_CHECKING
 
+from telegram.utils.typing import JSONDict
+from typing import Optional, Any, Union, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot, InlineKeyboardMarkup
 
@@ -99,7 +99,7 @@ class CallbackQuery(TelegramObject):
         self._id_attrs = (self.id,)
 
     @classmethod
-    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['CallbackQuery']:
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['CallbackQuery']:
         data = cls.parse_data(data)
 
         if not data:

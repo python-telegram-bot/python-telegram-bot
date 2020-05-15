@@ -19,7 +19,8 @@
 """This module contains an object that represents a Telegram Venue."""
 
 from telegram import TelegramObject, Location
-from typing import Any, Dict, Optional, TYPE_CHECKING
+from telegram.utils.typing import JSONDict
+from typing import Any, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot
 
@@ -64,7 +65,7 @@ class Venue(TelegramObject):
         self._id_attrs = (self.location, self.title)
 
     @classmethod
-    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['Venue']:
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Venue']:
         data = cls.parse_data(data)
 
         if not data:

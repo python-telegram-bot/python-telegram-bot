@@ -28,6 +28,7 @@ from telegram import (Animation, Audio, Contact, Document, Chat, Location, Photo
 from telegram import ParseMode
 from telegram.utils.helpers import escape_markdown, to_timestamp, from_timestamp
 
+from telegram.utils.typing import JSONDict
 from typing import Any, List, Dict, Optional, Union, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot, InputMedia
@@ -365,7 +366,7 @@ class Message(TelegramObject):
         return None
 
     @classmethod
-    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> 'Message':
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> 'Message':
         data = cls.parse_data(data)
 
         if not data:
@@ -458,7 +459,7 @@ class Message(TelegramObject):
         elif item == 'chat_id':
             return self.chat.id
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> JSONDict:
         data = super(Message, self).to_dict()
 
         # Required
@@ -481,7 +482,7 @@ class Message(TelegramObject):
 
         return data
 
-    def _quote(self, kwargs: Dict[str, Any]) -> None:
+    def _quote(self, kwargs: JSONDict) -> None:
         """Modify kwargs for replying with or without quoting."""
         if 'reply_to_message_id' in kwargs:
             if 'quote' in kwargs:

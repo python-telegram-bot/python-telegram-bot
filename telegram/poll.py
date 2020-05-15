@@ -24,6 +24,7 @@ import datetime
 
 from telegram import (TelegramObject, User, MessageEntity)
 from telegram.utils.helpers import to_timestamp, from_timestamp
+from telegram.utils.typing import JSONDict
 from typing import Any, Dict, Optional, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -71,7 +72,7 @@ class PollAnswer(TelegramObject):
         self.option_ids = option_ids
 
     @classmethod
-    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['PollAnswer']:
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['PollAnswer']:
         data = cls.parse_data(data)
 
         if not data:
@@ -159,7 +160,7 @@ class Poll(TelegramObject):
         self._id_attrs = (self.id,)
 
     @classmethod
-    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['Poll']:
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Poll']:
         data = cls.parse_data(data)
 
         if not data:
@@ -171,7 +172,7 @@ class Poll(TelegramObject):
 
         return cls(**data)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> JSONDict:
         data = super(Poll, self).to_dict()
 
         data['options'] = [x.to_dict() for x in self.options]

@@ -19,7 +19,8 @@
 """This module contains an object that represents a Telegram MessageEntity."""
 
 from telegram import User, TelegramObject
-from typing import Any, Dict, Optional, List, TYPE_CHECKING
+from telegram.utils.typing import JSONDict
+from typing import Any, Optional, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -75,7 +76,7 @@ class MessageEntity(TelegramObject):
         self._id_attrs = (self.type, self.offset, self.length)
 
     @classmethod
-    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['MessageEntity']:
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['MessageEntity']:
         data = cls.parse_data(data)
 
         if not data:
@@ -87,7 +88,7 @@ class MessageEntity(TelegramObject):
 
     @classmethod
     def de_list(cls,
-                data: Optional[List[Dict[str, Any]]],
+                data: Optional[List[JSONDict]],
                 bot: 'Bot') -> List[Optional['MessageEntity']]:
         if not data:
             return list()

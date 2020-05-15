@@ -23,7 +23,8 @@ from telegram import (TelegramObject, PassportFile, PersonalDetails, IdDocumentD
                       ResidentialAddress)
 from telegram.passport.credentials import decrypt_json
 
-from typing import List, Any, Optional, Dict, TYPE_CHECKING
+from telegram.utils.typing import JSONDict
+from typing import List, Any, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot, Credentials
 
@@ -139,7 +140,7 @@ class EncryptedPassportElement(TelegramObject):
 
     @classmethod
     def de_json(cls,
-                data: Optional[Dict[str, Any]],
+                data: Optional[JSONDict],
                 bot: 'Bot') -> Optional['EncryptedPassportElement']:
         data = cls.parse_data(data)
 
@@ -156,7 +157,7 @@ class EncryptedPassportElement(TelegramObject):
 
     @classmethod
     def de_json_decrypted(cls,
-                          data: Optional[Dict[str, Any]],
+                          data: Optional[JSONDict],
                           bot: 'Bot',
                           credentials: 'Credentials') -> Optional['EncryptedPassportElement']:
         if not data:
@@ -194,7 +195,7 @@ class EncryptedPassportElement(TelegramObject):
 
     @classmethod
     def de_list(cls,
-                data: Optional[List[Dict[str, Any]]],
+                data: Optional[List[JSONDict]],
                 bot: 'Bot') -> List[Optional['EncryptedPassportElement']]:
         if not data:
             return []
@@ -205,7 +206,7 @@ class EncryptedPassportElement(TelegramObject):
 
         return encrypted_passport_elements
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> JSONDict:
         data = super(EncryptedPassportElement, self).to_dict()
 
         if self.files:

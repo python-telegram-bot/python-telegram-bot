@@ -19,7 +19,8 @@
 """This module contains an object that represents a Telegram InlineKeyboardMarkup."""
 
 from telegram import ReplyMarkup, InlineKeyboardButton
-from typing import Any, Dict, List, Optional, TYPE_CHECKING
+from telegram.utils.typing import JSONDict
+from typing import Any, List, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot
 
@@ -43,7 +44,7 @@ class InlineKeyboardMarkup(ReplyMarkup):
         # Required
         self.inline_keyboard = inline_keyboard
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> JSONDict:
         data = super(InlineKeyboardMarkup, self).to_dict()
 
         data['inline_keyboard'] = []
@@ -53,7 +54,7 @@ class InlineKeyboardMarkup(ReplyMarkup):
         return data
 
     @classmethod
-    def de_json(cls, data: Optional[Dict[str, Any]],
+    def de_json(cls, data: Optional[JSONDict],
                 bot: 'Bot') -> Optional['InlineKeyboardMarkup']:
         data = cls.parse_data(data)
 

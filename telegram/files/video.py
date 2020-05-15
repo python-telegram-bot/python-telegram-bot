@@ -19,7 +19,8 @@
 """This module contains an object that represents a Telegram Video."""
 
 from telegram import PhotoSize, TelegramObject
-from typing import Any, Dict, Optional, TYPE_CHECKING
+from telegram.utils.typing import JSONDict
+from typing import Any, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot, File
 
@@ -82,7 +83,7 @@ class Video(TelegramObject):
         self._id_attrs = (self.file_unique_id,)
 
     @classmethod
-    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['Video']:
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Video']:
         data = cls.parse_data(data)
 
         if not data:

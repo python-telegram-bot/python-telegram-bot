@@ -23,7 +23,8 @@ from telegram import TelegramObject
 from telegram.utils.helpers import mention_html as util_mention_html
 from telegram.utils.helpers import mention_markdown as util_mention_markdown
 
-from typing import Any, Optional, Dict, List, TYPE_CHECKING
+from telegram.utils.typing import JSONDict
+from typing import Any, Optional, List, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot, UserProfilePhotos, Message
 
@@ -127,7 +128,7 @@ class User(TelegramObject):
         return self.bot.get_user_profile_photos(self.id, *args, **kwargs)
 
     @classmethod
-    def de_list(cls, data: Optional[List[Dict[str, Any]]], bot: 'Bot') -> List[Optional['User']]:
+    def de_list(cls, data: Optional[List[JSONDict]], bot: 'Bot') -> List[Optional['User']]:
         if not data:
             return []
 

@@ -19,7 +19,8 @@
 """This module contains objects that represents stickers."""
 
 from telegram import PhotoSize, TelegramObject
-from typing import Any, Dict, Optional, List, TYPE_CHECKING
+from telegram.utils.typing import JSONDict
+from typing import Any, Optional, List, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot, File
 
@@ -95,7 +96,7 @@ class Sticker(TelegramObject):
         self._id_attrs = (self.file_unique_id,)
 
     @classmethod
-    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['Sticker']:
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Sticker']:
         data = cls.parse_data(data)
 
         if not data:
@@ -108,7 +109,7 @@ class Sticker(TelegramObject):
 
     @classmethod
     def de_list(cls,
-                data: Optional[List[Dict[str, Any]]],
+                data: Optional[List[JSONDict]],
                 bot: 'Bot') -> List[Optional['Sticker']]:
         if not data:
             return list()
@@ -177,7 +178,7 @@ class StickerSet(TelegramObject):
         self._id_attrs = (self.name,)
 
     @classmethod
-    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['StickerSet']:
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['StickerSet']:
         if not data:
             return None
 
@@ -186,7 +187,7 @@ class StickerSet(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> JSONDict:
         data = super(StickerSet, self).to_dict()
 
         data['stickers'] = [s.to_dict() for s in data.get('stickers')]
@@ -236,7 +237,7 @@ class MaskPosition(TelegramObject):
         self.scale = scale
 
     @classmethod
-    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['MaskPosition']:
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['MaskPosition']:
         data = cls.parse_data(data)
 
         if data is None:

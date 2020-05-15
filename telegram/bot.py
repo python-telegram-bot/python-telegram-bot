@@ -31,7 +31,7 @@ except ImportError:
     import json  # type: ignore[no-redef]  # noqa: F723
 import logging
 import warnings
-from datetime import datetime  # type: ignore
+from datetime import datetime
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
@@ -46,9 +46,10 @@ from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos
 from telegram.error import InvalidToken, TelegramError
 from telegram.utils.helpers import to_timestamp, DEFAULT_NONE, DefaultValue
 from telegram.utils.request import Request
+from telegram.utils.typing import JSONDict, FileLike
 
-from typing import (Any, Callable, Dict, Optional, TypeVar, Union, TYPE_CHECKING, List, Tuple,
-                    no_type_check, IO)
+from typing import (Any, Callable, Optional, TypeVar, Union, TYPE_CHECKING, List, Tuple,
+                    no_type_check, IO, cast)
 if TYPE_CHECKING:
     from telegram.ext import Defaults
 
@@ -65,7 +66,7 @@ def info(func: Callable[..., RT]) -> Callable[..., RT]:
             self.get_my_commands()
 
         result = func(self, *args, **kwargs)
-        return result  # type: ignore[return-value]
+        return result
 
     return decorator
 
@@ -78,7 +79,7 @@ def log(func: Callable[..., RT], *args: Any, **kwargs: Any) -> Callable[..., RT]
         result = func(*args, **kwargs)
         logger.debug(result)
         logger.debug('Exiting: %s', func.__name__)
-        return result  # type: ignore[return-value]
+        return result
 
     return decorate(func, decorator)
 
@@ -163,7 +164,7 @@ class Bot(TelegramObject):
 
     def _message(self,
                  url: str,
-                 data: Dict[str, Any],
+                 data: JSONDict,
                  reply_to_message_id: Union[str, int] = None,
                  disable_notification: bool = None,
                  reply_markup: ReplyMarkup = None,
@@ -353,7 +354,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/sendMessage'.format(self.base_url)
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'text': text}
+        data: JSONDict = {'chat_id': chat_id, 'text': text}
 
         if parse_mode:
             data['parse_mode'] = parse_mode
@@ -402,7 +403,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/deleteMessage'.format(self.base_url)
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'message_id': message_id}
+        data: JSONDict = {'chat_id': chat_id, 'message_id': message_id}
 
         result = self._request.post(url, data, timeout=timeout)
 
@@ -440,7 +441,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/forwardMessage'.format(self.base_url)
 
-        data: Dict[str, Any] = {}
+        data: JSONDict = {}
 
         if chat_id:
             data['chat_id'] = chat_id
@@ -503,12 +504,11 @@ class Bot(TelegramObject):
 
         if isinstance(photo, PhotoSize):
             photo = photo.file_id
-        elif isinstance(photo, str):
-            pass
         elif InputFile.is_file(photo):
+            photo = cast(IO, photo)
             photo = InputFile(photo)  # type: ignore[assignment]
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'photo': photo}
+        data: JSONDict = {'chat_id': chat_id, 'photo': photo}
 
         if caption:
             data['caption'] = caption
@@ -522,7 +522,7 @@ class Bot(TelegramObject):
     @log
     def send_audio(self,
                    chat_id: Union[int, str],
-                   audio: Union[str, Audio, IO],
+                   audio: Union[str, Audio, FileLike],
                    duration: int = None,
                    performer: str = None,
                    title: str = None,
@@ -532,7 +532,7 @@ class Bot(TelegramObject):
                    reply_markup: ReplyMarkup = None,
                    timeout: float = 20,
                    parse_mode: str = None,
-                   thumb: IO = None,
+                   thumb: FileLike = None,
                    **kwargs: Any) -> Optional[Message]:
         """
         Use this method to send audio files, if you want Telegram clients to display them in the
@@ -589,12 +589,11 @@ class Bot(TelegramObject):
 
         if isinstance(audio, Audio):
             audio = audio.file_id
-        elif isinstance(audio, str):
-            pass
         elif InputFile.is_file(audio):
-            audio = InputFile(audio)  # type: ignore[assignment]
+            audio = cast(IO, audio)
+            audio = InputFile(audio)
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'audio': audio}
+        data: JSONDict = {'chat_id': chat_id, 'audio': audio}
 
         if duration:
             data['duration'] = duration
@@ -608,7 +607,8 @@ class Bot(TelegramObject):
             data['parse_mode'] = parse_mode
         if thumb:
             if InputFile.is_file(thumb):
-                thumb = InputFile(thumb, attach=True)  # type: ignore[assignment]
+                thumb = cast(IO, thumb)
+                thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
 
         return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
@@ -618,7 +618,7 @@ class Bot(TelegramObject):
     @log
     def send_document(self,
                       chat_id: Union[int, str],
-                      document: Union[str, Document, IO],
+                      document: Union[str, Document, FileLike],
                       filename: str = None,
                       caption: str = None,
                       disable_notification: bool = False,
@@ -626,7 +626,7 @@ class Bot(TelegramObject):
                       reply_markup: ReplyMarkup = None,
                       timeout: float = 20,
                       parse_mode: str = None,
-                      thumb: IO = None,
+                      thumb: FileLike = None,
                       **kwargs: Any) -> Optional[Message]:
         """
         Use this method to send general files.
@@ -679,12 +679,11 @@ class Bot(TelegramObject):
 
         if isinstance(document, Document):
             document = document.file_id
-        elif isinstance(document, str):
-            pass
         elif InputFile.is_file(document):
-            document = InputFile(document, filename=filename)  # type: ignore[assignment]
+            document = cast(IO, document)
+            document = InputFile(document, filename=filename)
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'document': document}
+        data: JSONDict = {'chat_id': chat_id, 'document': document}
 
         if caption:
             data['caption'] = caption
@@ -692,7 +691,8 @@ class Bot(TelegramObject):
             data['parse_mode'] = parse_mode
         if thumb:
             if InputFile.is_file(thumb):
-                thumb = InputFile(thumb, attach=True)  # type: ignore[assignment]
+                thumb = cast(IO, thumb)
+                thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
 
         return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
@@ -702,7 +702,7 @@ class Bot(TelegramObject):
     @log
     def send_sticker(self,
                      chat_id: Union[int, str],
-                     sticker: Union[str, Sticker, IO],
+                     sticker: Union[str, Sticker, FileLike],
                      disable_notification: bool = False,
                      reply_to_message_id: Union[int, str] = None,
                      reply_markup: ReplyMarkup = None,
@@ -744,12 +744,11 @@ class Bot(TelegramObject):
 
         if isinstance(sticker, Sticker):
             sticker = sticker.file_id
-        elif isinstance(sticker, str):
-            pass
         elif InputFile.is_file(sticker):
-            sticker = InputFile(sticker)  # type: ignore[assignment]
+            sticker = cast(IO, sticker)
+            sticker = InputFile(sticker)
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'sticker': sticker}
+        data: JSONDict = {'chat_id': chat_id, 'sticker': sticker}
 
         return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
@@ -758,7 +757,7 @@ class Bot(TelegramObject):
     @log
     def send_video(self,
                    chat_id: Union[int, str],
-                   video: Union[str, Video, IO],
+                   video: Union[str, Video, FileLike],
                    duration: int = None,
                    caption: str = None,
                    disable_notification: bool = False,
@@ -769,7 +768,7 @@ class Bot(TelegramObject):
                    height: int = None,
                    parse_mode: str = None,
                    supports_streaming: bool = None,
-                   thumb: IO = None,
+                   thumb: FileLike = None,
                    **kwargs: Any) -> Optional[Message]:
         """
         Use this method to send video files, Telegram clients support mp4 videos
@@ -826,12 +825,11 @@ class Bot(TelegramObject):
 
         if isinstance(video, Video):
             video = video.file_id
-        elif isinstance(video, str):
-            pass
         elif InputFile.is_file(video):
-            video = InputFile(video)  # type: ignore[assignment]
+            video = cast(IO, video)
+            video = InputFile(video)
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'video': video}
+        data: JSONDict = {'chat_id': chat_id, 'video': video}
 
         if duration:
             data['duration'] = duration
@@ -847,7 +845,8 @@ class Bot(TelegramObject):
             data['height'] = height
         if thumb:
             if InputFile.is_file(thumb):
-                thumb = InputFile(thumb, attach=True)  # type: ignore[assignment]
+                thumb = cast(IO, thumb)
+                thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
 
         return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
@@ -857,14 +856,14 @@ class Bot(TelegramObject):
     @log
     def send_video_note(self,
                         chat_id: Union[int, str],
-                        video_note: Union[str, IO, VideoNote],
+                        video_note: Union[str, FileLike, VideoNote],
                         duration: int = None,
                         length: int = None,
                         disable_notification: bool = False,
                         reply_to_message_id: Union[int, str] = None,
                         reply_markup: ReplyMarkup = None,
                         timeout: float = 20,
-                        thumb: IO = None,
+                        thumb: FileLike = None,
                         **kwargs: Any) -> Optional[Message]:
         """
         As of v.4.0, Telegram clients support rounded square mp4 videos of up to 1 minute long.
@@ -911,12 +910,11 @@ class Bot(TelegramObject):
 
         if isinstance(video_note, VideoNote):
             video_note = video_note.file_id
-        elif isinstance(video_note, str):
-            pass
         elif InputFile.is_file(video_note):
-            video_note = InputFile(video_note)  # type: ignore[assignment]
+            video_note = cast(IO, video_note)
+            video_note = InputFile(video_note)
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'video_note': video_note}
+        data: JSONDict = {'chat_id': chat_id, 'video_note': video_note}
 
         if duration is not None:
             data['duration'] = duration
@@ -924,7 +922,8 @@ class Bot(TelegramObject):
             data['length'] = length
         if thumb:
             if InputFile.is_file(thumb):
-                thumb = InputFile(thumb, attach=True)  # type: ignore[assignment]
+                thumb = cast(IO, thumb)
+                thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
 
         return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
@@ -934,11 +933,11 @@ class Bot(TelegramObject):
     @log
     def send_animation(self,
                        chat_id: Union[int, str],
-                       animation: Union[str, IO, Animation],
+                       animation: Union[str, FileLike, Animation],
                        duration: int = None,
                        width: int = None,
                        height: int = None,
-                       thumb: IO = None,
+                       thumb: FileLike = None,
                        caption: str = None,
                        parse_mode: str = None,
                        disable_notification: bool = False,
@@ -993,12 +992,11 @@ class Bot(TelegramObject):
 
         if isinstance(animation, Animation):
             animation = animation.file_id
-        elif isinstance(animation, str):
-            pass
         elif InputFile.is_file(animation):
-            animation = InputFile(animation)  # type: ignore[assignment]
+            animation = cast(IO, animation)
+            animation = InputFile(animation)
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'animation': animation}
+        data: JSONDict = {'chat_id': chat_id, 'animation': animation}
 
         if duration:
             data['duration'] = duration
@@ -1008,7 +1006,8 @@ class Bot(TelegramObject):
             data['height'] = height
         if thumb:
             if InputFile.is_file(thumb):
-                thumb = InputFile(thumb, attach=True)  # type: ignore[assignment]
+                thumb = cast(IO, thumb)
+                thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
         if caption:
             data['caption'] = caption
@@ -1022,7 +1021,7 @@ class Bot(TelegramObject):
     @log
     def send_voice(self,
                    chat_id: Union[int, str],
-                   voice: Union[str, IO, Voice],
+                   voice: Union[str, FileLike, Voice],
                    duration: int = None,
                    caption: str = None,
                    disable_notification: bool = False,
@@ -1076,12 +1075,11 @@ class Bot(TelegramObject):
 
         if isinstance(voice, Voice):
             voice = voice.file_id
-        elif isinstance(voice, str):
-            pass
         elif InputFile.is_file(voice):
-            voice = InputFile(voice)  # type: ignore[assignment]
+            voice = cast(IO, voice)
+            voice = InputFile(voice)
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'voice': voice}
+        data: JSONDict = {'chat_id': chat_id, 'voice': voice}
 
         if duration:
             data['duration'] = duration
@@ -1125,7 +1123,7 @@ class Bot(TelegramObject):
 
         url = '{0}/sendMediaGroup'.format(self.base_url)
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'media': media}
+        data: JSONDict = {'chat_id': chat_id, 'media': media}
 
         for m in data['media']:
             if m.parse_mode == DEFAULT_NONE:
@@ -1205,7 +1203,7 @@ class Bot(TelegramObject):
             latitude = location.latitude
             longitude = location.longitude
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'latitude': latitude, 'longitude': longitude}
+        data: JSONDict = {'chat_id': chat_id, 'latitude': latitude, 'longitude': longitude}
 
         if live_period:
             data['live_period'] = live_period
@@ -1267,7 +1265,7 @@ class Bot(TelegramObject):
             latitude = location.latitude
             longitude = location.longitude
 
-        data: Dict[str, Any] = {'latitude': latitude, 'longitude': longitude}
+        data: JSONDict = {'latitude': latitude, 'longitude': longitude}
 
         if chat_id:
             data['chat_id'] = chat_id
@@ -1277,7 +1275,7 @@ class Bot(TelegramObject):
             data['inline_message_id'] = inline_message_id
 
         return self._message(url, data, timeout=timeout, reply_markup=reply_markup,
-                             **kwargs)  # type: ignore[return-value]
+                             **kwargs)
 
     @log
     def stop_message_live_location(self,
@@ -1311,7 +1309,7 @@ class Bot(TelegramObject):
 
         url = '{0}/stopMessageLiveLocation'.format(self.base_url)
 
-        data: Dict[str, Any] = {}
+        data: JSONDict = {}
 
         if chat_id:
             data['chat_id'] = chat_id
@@ -1321,7 +1319,7 @@ class Bot(TelegramObject):
             data['inline_message_id'] = inline_message_id
 
         return self._message(url, data, timeout=timeout, reply_markup=reply_markup,
-                             **kwargs)  # type: ignore[return-value]
+                             **kwargs)
 
     @log
     def send_venue(self,
@@ -1390,7 +1388,7 @@ class Bot(TelegramObject):
             foursquare_id = venue.foursquare_id
             foursquare_type = venue.foursquare_type
 
-        data: Dict[str, Any] = {
+        data: JSONDict = {
             'chat_id': chat_id,
             'latitude': latitude,
             'longitude': longitude,
@@ -1466,8 +1464,8 @@ class Bot(TelegramObject):
             last_name = contact.last_name
             vcard = contact.vcard
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'phone_number': phone_number,
-                                'first_name': first_name}
+        data: JSONDict = {'chat_id': chat_id, 'phone_number': phone_number,
+                          'first_name': first_name}
 
         if last_name:
             data['last_name'] = last_name
@@ -1515,7 +1513,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/sendGame'.format(self.base_url)
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'game_short_name': game_short_name}
+        data: JSONDict = {'chat_id': chat_id, 'game_short_name': game_short_name}
 
         return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
@@ -1553,7 +1551,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/sendChatAction'.format(self.base_url)
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'action': action}
+        data: JSONDict = {'chat_id': chat_id, 'action': action}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -1644,7 +1642,7 @@ class Bot(TelegramObject):
 
         results_dicts = [res.to_dict() for res in results]
 
-        data: Dict[str, Any] = {'inline_query_id': inline_query_id, 'results': results_dicts}
+        data: JSONDict = {'inline_query_id': inline_query_id, 'results': results_dicts}
 
         if cache_time or cache_time == 0:
             data['cache_time'] = cache_time
@@ -1690,7 +1688,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/getUserProfilePhotos'.format(self.base_url)
 
-        data: Dict[str, Any] = {'user_id': user_id}
+        data: JSONDict = {'user_id': user_id}
 
         if offset is not None:
             data['offset'] = offset
@@ -1747,7 +1745,7 @@ class Bot(TelegramObject):
         except AttributeError:
             pass
 
-        data: Dict[str, Any] = {'file_id': file_id}
+        data: JSONDict = {'file_id': file_id}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -1792,7 +1790,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/kickChatMember'.format(self.base_url)
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'user_id': user_id}
+        data: JSONDict = {'chat_id': chat_id, 'user_id': user_id}
         data.update(kwargs)
 
         if until_date is not None:
@@ -1833,7 +1831,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/unbanChatMember'.format(self.base_url)
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'user_id': user_id}
+        data: JSONDict = {'chat_id': chat_id, 'user_id': user_id}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -1885,7 +1883,7 @@ class Bot(TelegramObject):
         """
         url_ = '{0}/answerCallbackQuery'.format(self.base_url)
 
-        data: Dict[str, Any] = {'callback_query_id': callback_query_id}
+        data: JSONDict = {'callback_query_id': callback_query_id}
 
         if text:
             data['text'] = text
@@ -1947,7 +1945,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/editMessageText'.format(self.base_url)
 
-        data: Dict[str, Any] = {'text': text}
+        data: JSONDict = {'text': text}
 
         if chat_id:
             data['chat_id'] = chat_id
@@ -1961,7 +1959,7 @@ class Bot(TelegramObject):
             data['disable_web_page_preview'] = disable_web_page_preview
 
         return self._message(url, data, timeout=timeout, reply_markup=reply_markup,
-                             **kwargs)  # type: ignore[return-value]
+                             **kwargs)
 
     @log
     def edit_message_caption(self,
@@ -2012,7 +2010,7 @@ class Bot(TelegramObject):
 
         url = '{0}/editMessageCaption'.format(self.base_url)
 
-        data: Dict[str, Any] = {}
+        data: JSONDict = {}
 
         if caption:
             data['caption'] = caption
@@ -2075,7 +2073,7 @@ class Bot(TelegramObject):
 
         url = '{0}/editMessageMedia'.format(self.base_url)
 
-        data: Dict[str, Any] = {'media': media}
+        data: JSONDict = {'media': media}
 
         if chat_id:
             data['chat_id'] = chat_id
@@ -2129,7 +2127,7 @@ class Bot(TelegramObject):
 
         url = '{0}/editMessageReplyMarkup'.format(self.base_url)
 
-        data: Dict[str, Any] = {}
+        data: JSONDict = {}
 
         if chat_id:
             data['chat_id'] = chat_id
@@ -2189,7 +2187,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/getUpdates'.format(self.base_url)
 
-        data: Dict[str, Any] = {'timeout': timeout}
+        data: JSONDict = {'timeout': timeout}
 
         if offset:
             data['offset'] = offset
@@ -2221,7 +2219,7 @@ class Bot(TelegramObject):
     @log
     def set_webhook(self,
                     url: str = None,
-                    certificate: IO = None,
+                    certificate: FileLike = None,
                     timeout: float = None,
                     max_connections: int = 40,
                     allowed_updates: List[str] = None,
@@ -2295,13 +2293,14 @@ class Bot(TelegramObject):
             url = kwargs['webhook_url']
             del kwargs['webhook_url']
 
-        data: Dict[str, Any] = {}
+        data: JSONDict = {}
 
         if url is not None:
             data['url'] = url
         if certificate:
             if InputFile.is_file(certificate):
-                certificate = InputFile(certificate)  # type: ignore[assignment]
+                certificate = cast(IO, certificate)
+                certificate = InputFile(certificate)
             data['certificate'] = certificate
         if max_connections is not None:
             data['max_connections'] = max_connections
@@ -2334,7 +2333,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/deleteWebhook'.format(self.base_url)
 
-        data: Dict[str, Any] = kwargs
+        data: JSONDict = kwargs
 
         result = self._request.post(url, data, timeout=timeout)
 
@@ -2364,7 +2363,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/leaveChat'.format(self.base_url)
 
-        data: Dict[str, Any] = {'chat_id': chat_id}
+        data: JSONDict = {'chat_id': chat_id}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -2397,7 +2396,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/getChat'.format(self.base_url)
 
-        data: Dict[str, Any] = {'chat_id': chat_id}
+        data: JSONDict = {'chat_id': chat_id}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -2435,7 +2434,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/getChatAdministrators'.format(self.base_url)
 
-        data: Dict[str, Any] = {'chat_id': chat_id}
+        data: JSONDict = {'chat_id': chat_id}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -2466,7 +2465,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/getChatMembersCount'.format(self.base_url)
 
-        data: Dict[str, Any] = {'chat_id': chat_id}
+        data: JSONDict = {'chat_id': chat_id}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -2499,7 +2498,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/getChatMember'.format(self.base_url)
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'user_id': user_id}
+        data: JSONDict = {'chat_id': chat_id, 'user_id': user_id}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -2534,7 +2533,7 @@ class Bot(TelegramObject):
 
         url = '{0}/setChatStickerSet'.format(self.base_url)
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'sticker_set_name': sticker_set_name}
+        data: JSONDict = {'chat_id': chat_id, 'sticker_set_name': sticker_set_name}
 
         result = self._request.post(url, data, timeout=timeout)
 
@@ -2564,7 +2563,7 @@ class Bot(TelegramObject):
 
         url = '{0}/deleteChatStickerSet'.format(self.base_url)
 
-        data: Dict[str, Any] = {'chat_id': chat_id}
+        data: JSONDict = {'chat_id': chat_id}
 
         result = self._request.post(url, data, timeout=timeout)
 
@@ -2589,7 +2588,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/getWebhookInfo'.format(self.base_url)
 
-        data: Dict[str, Any] = kwargs
+        data: JSONDict = kwargs
 
         result = self._request.post(url, data, timeout=timeout)
 
@@ -2638,7 +2637,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/setGameScore'.format(self.base_url)
 
-        data: Dict[str, Any] = {'user_id': user_id, 'score': score}
+        data: JSONDict = {'user_id': user_id, 'score': score}
 
         if chat_id:
             data['chat_id'] = chat_id
@@ -2688,7 +2687,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/getGameHighScores'.format(self.base_url)
 
-        data: Dict[str, Any] = {'user_id': user_id}
+        data: JSONDict = {'user_id': user_id}
 
         if chat_id:
             data['chat_id'] = chat_id
@@ -2789,7 +2788,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/sendInvoice'.format(self.base_url)
 
-        data: Dict[str, Any] = {
+        data: JSONDict = {
             'chat_id': chat_id,
             'title': title,
             'description': description,
@@ -2881,7 +2880,7 @@ class Bot(TelegramObject):
 
         url_ = '{0}/answerShippingQuery'.format(self.base_url)
 
-        data: Dict[str, Any] = {'shipping_query_id': shipping_query_id, 'ok': ok}
+        data: JSONDict = {'shipping_query_id': shipping_query_id, 'ok': ok}
 
         if ok:
             assert shipping_options
@@ -2941,7 +2940,7 @@ class Bot(TelegramObject):
 
         url_ = '{0}/answerPreCheckoutQuery'.format(self.base_url)
 
-        data: Dict[str, Any] = {'pre_checkout_query_id': pre_checkout_query_id, 'ok': ok}
+        data: JSONDict = {'pre_checkout_query_id': pre_checkout_query_id, 'ok': ok}
 
         if error_message is not None:
             data['error_message'] = error_message
@@ -2991,8 +2990,8 @@ class Bot(TelegramObject):
         """
         url = '{0}/restrictChatMember'.format(self.base_url)
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'user_id': user_id,
-                                'permissions': permissions.to_dict()}
+        data: JSONDict = {'chat_id': chat_id, 'user_id': user_id,
+                          'permissions': permissions.to_dict()}
 
         if until_date is not None:
             if isinstance(until_date, datetime):
@@ -3059,7 +3058,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/promoteChatMember'.format(self.base_url)
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'user_id': user_id}
+        data: JSONDict = {'chat_id': chat_id, 'user_id': user_id}
 
         if can_change_info is not None:
             data['can_change_info'] = can_change_info
@@ -3112,7 +3111,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/setChatPermissions'.format(self.base_url)
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'permissions': permissions.to_dict()}
+        data: JSONDict = {'chat_id': chat_id, 'permissions': permissions.to_dict()}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -3150,8 +3149,8 @@ class Bot(TelegramObject):
         """
         url = '{0}/setChatAdministratorCustomTitle'.format(self.base_url)
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'user_id': user_id,
-                                'custom_title': custom_title}
+        data: JSONDict = {'chat_id': chat_id, 'user_id': user_id,
+                          'custom_title': custom_title}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -3185,7 +3184,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/exportChatInviteLink'.format(self.base_url)
 
-        data: Dict[str, Any] = {'chat_id': chat_id}
+        data: JSONDict = {'chat_id': chat_id}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -3195,7 +3194,7 @@ class Bot(TelegramObject):
     @log
     def set_chat_photo(self,
                        chat_id: Union[str, int],
-                       photo: IO,
+                       photo: FileLike,
                        timeout: float = 20,
                        **kwargs: Any) -> bool:
         """Use this method to set a new profile photo for the chat.
@@ -3222,9 +3221,10 @@ class Bot(TelegramObject):
         url = '{0}/setChatPhoto'.format(self.base_url)
 
         if InputFile.is_file(photo):
-            photo = InputFile(photo)  # type: ignore[assignment]
+            photo = cast(IO, photo)
+            photo = InputFile(photo)
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'photo': photo}
+        data: JSONDict = {'chat_id': chat_id, 'photo': photo}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -3258,7 +3258,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/deleteChatPhoto'.format(self.base_url)
 
-        data: Dict[str, Any] = {'chat_id': chat_id}
+        data: JSONDict = {'chat_id': chat_id}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -3294,7 +3294,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/setChatTitle'.format(self.base_url)
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'title': title}
+        data: JSONDict = {'chat_id': chat_id, 'title': title}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -3330,7 +3330,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/setChatDescription'.format(self.base_url)
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'description': description}
+        data: JSONDict = {'chat_id': chat_id, 'description': description}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -3371,7 +3371,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/pinChatMessage'.format(self.base_url)
 
-        data: Dict[str, Any] = {'chat_id': chat_id, 'message_id': message_id}
+        data: JSONDict = {'chat_id': chat_id, 'message_id': message_id}
 
         if disable_notification is not None:
             data['disable_notification'] = disable_notification
@@ -3409,7 +3409,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/unpinChatMessage'.format(self.base_url)
 
-        data: Dict[str, Any] = {'chat_id': chat_id}
+        data: JSONDict = {'chat_id': chat_id}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -3439,7 +3439,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/getStickerSet'.format(self.base_url)
 
-        data: Dict[str, Any] = {'name': name}
+        data: JSONDict = {'name': name}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -3449,7 +3449,7 @@ class Bot(TelegramObject):
     @log
     def upload_sticker_file(self,
                             user_id: Union[str, int],
-                            png_sticker: Union[str, IO],
+                            png_sticker: Union[str, FileLike],
                             timeout: float = 20,
                             **kwargs: Any) -> File:
         """
@@ -3483,7 +3483,7 @@ class Bot(TelegramObject):
         if InputFile.is_file(png_sticker):
             png_sticker = InputFile(png_sticker)  # type: ignore[assignment,arg-type]
 
-        data: Dict[str, Any] = {'user_id': user_id, 'png_sticker': png_sticker}
+        data: JSONDict = {'user_id': user_id, 'png_sticker': png_sticker}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -3496,11 +3496,11 @@ class Bot(TelegramObject):
                                name: str,
                                title: str,
                                emojis: str,
-                               png_sticker: Union[str, IO] = None,
+                               png_sticker: Union[str, FileLike] = None,
                                contains_masks: bool = None,
                                mask_position: MaskPosition = None,
                                timeout: float = 20,
-                               tgs_sticker: Union[str, IO] = None,
+                               tgs_sticker: Union[str, FileLike] = None,
                                **kwargs: Any) -> bool:
         """
         Use this method to create new sticker set owned by a user.
@@ -3559,7 +3559,7 @@ class Bot(TelegramObject):
         if InputFile.is_file(tgs_sticker):
             tgs_sticker = InputFile(tgs_sticker)  # type: ignore[assignment,arg-type]
 
-        data: Dict[str, Any] = {'user_id': user_id, 'name': name, 'title': title, 'emojis': emojis}
+        data: JSONDict = {'user_id': user_id, 'name': name, 'title': title, 'emojis': emojis}
 
         if png_sticker is not None:
             data['png_sticker'] = png_sticker
@@ -3582,10 +3582,10 @@ class Bot(TelegramObject):
                            user_id: Union[str, int],
                            name: str,
                            emojis: str,
-                           png_sticker: Union[str, IO] = None,
+                           png_sticker: Union[str, FileLike] = None,
                            mask_position: MaskPosition = None,
                            timeout: float = 20,
-                           tgs_sticker: Union[str, IO] = None,
+                           tgs_sticker: Union[str, FileLike] = None,
                            **kwargs: Any) -> bool:
         """
         Use this method to add a new sticker to a set created by the bot.
@@ -3638,7 +3638,7 @@ class Bot(TelegramObject):
         if InputFile.is_file(tgs_sticker):
             tgs_sticker = InputFile(tgs_sticker)  # type: ignore[assignment,arg-type]
 
-        data: Dict[str, Any] = {'user_id': user_id, 'name': name, 'emojis': emojis}
+        data: JSONDict = {'user_id': user_id, 'name': name, 'emojis': emojis}
 
         if png_sticker is not None:
             data['png_sticker'] = png_sticker
@@ -3679,7 +3679,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/setStickerPositionInSet'.format(self.base_url)
 
-        data: Dict[str, Any] = {'sticker': sticker, 'position': position}
+        data: JSONDict = {'sticker': sticker, 'position': position}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -3709,7 +3709,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/deleteStickerFromSet'.format(self.base_url)
 
-        data: Dict[str, Any] = {'sticker': sticker}
+        data: JSONDict = {'sticker': sticker}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -3720,7 +3720,7 @@ class Bot(TelegramObject):
     def set_sticker_set_thumb(self,
                               name: str,
                               user_id: Union[str, int],
-                              thumb: IO = None,
+                              thumb: FileLike = None,
                               timeout: float = None,
                               **kwargs: Any) -> bool:
         """Use this method to set the thumbnail of a sticker set. Animated thumbnails can be set
@@ -3754,9 +3754,10 @@ class Bot(TelegramObject):
         url = '{}/setStickerSetThumb'.format(self.base_url)
 
         if InputFile.is_file(thumb):
-            thumb = InputFile(thumb)  # type: ignore[assignment,arg-type]
+            thumb = cast(IO, thumb)
+            thumb = InputFile(thumb)
 
-        data: Dict[str, Any] = {'name': name, 'user_id': user_id, 'thumb': thumb}
+        data: JSONDict = {'name': name, 'user_id': user_id, 'thumb': thumb}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -3797,8 +3798,8 @@ class Bot(TelegramObject):
         """
         url_ = '{0}/setPassportDataErrors'.format(self.base_url)
 
-        data: Dict[str, Any] = {'user_id': user_id,
-                                'errors': [error.to_dict() for error in errors]}
+        data: JSONDict = {'user_id': user_id,
+                          'errors': [error.to_dict() for error in errors]}
         data.update(kwargs)
 
         result = self._request.post(url_, data, timeout=timeout)
@@ -3875,7 +3876,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/sendPoll'.format(self.base_url)
 
-        data: Dict[str, Any] = {
+        data: JSONDict = {
             'chat_id': chat_id,
             'question': question,
             'options': options
@@ -3943,7 +3944,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/stopPoll'.format(self.base_url)
 
-        data: Dict[str, Any] = {
+        data: JSONDict = {
             'chat_id': chat_id,
             'message_id': message_id
         }
@@ -3998,7 +3999,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/sendDice'.format(self.base_url)
 
-        data: Dict[str, Any] = {
+        data: JSONDict = {
             'chat_id': chat_id,
         }
 
@@ -4065,7 +4066,7 @@ class Bot(TelegramObject):
 
         cmds = [c if isinstance(c, BotCommand) else BotCommand(c[0], c[1]) for c in commands]
 
-        data: Dict[str, Any] = {'commands': [c.to_dict() for c in cmds]}
+        data: JSONDict = {'commands': [c.to_dict() for c in cmds]}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -4076,9 +4077,9 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    def to_dict(self) -> Dict[str, Any]:
-        data: Dict[str, Any] = {'id': self.id, 'username': self.username,
-                                'first_name': self.first_name}
+    def to_dict(self) -> JSONDict:
+        data: JSONDict = {'id': self.id, 'username': self.username,
+                          'first_name': self.first_name}
 
         if self.last_name:
             data['last_name'] = self.last_name

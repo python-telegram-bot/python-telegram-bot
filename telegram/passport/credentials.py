@@ -31,7 +31,8 @@ from cryptography.hazmat.primitives.hashes import SHA512, SHA256, Hash, SHA1
 from future.utils import bord
 
 from telegram import TelegramObject, TelegramError
-from typing import Union, Dict, Any, Optional, Type, TypeVar, TYPE_CHECKING, List, no_type_check
+from telegram.utils.typing import JSONDict
+from typing import Union, Any, Optional, Type, TypeVar, TYPE_CHECKING, List, no_type_check
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -201,7 +202,7 @@ class Credentials(TelegramObject):
         self.bot = bot
 
     @classmethod
-    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['Credentials']:
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Credentials']:
         data = cls.parse_data(data)
 
         if not data:
@@ -270,7 +271,7 @@ class SecureData(TelegramObject):
         self.bot = bot
 
     @classmethod
-    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['SecureData']:
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['SecureData']:
         data = cls.parse_data(data)
 
         if not data:
@@ -339,7 +340,7 @@ class SecureValue(TelegramObject):
         self.bot = bot
 
     @classmethod
-    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['SecureValue']:
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['SecureValue']:
         data = cls.parse_data(data)
 
         if not data:
@@ -354,7 +355,7 @@ class SecureValue(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> JSONDict:
         data = super(SecureValue, self).to_dict()
 
         data['files'] = [p.to_dict() for p in self.files]
@@ -381,7 +382,7 @@ class _CredentialsBase(TelegramObject):
 
     @classmethod
     def de_list(cls: Type[CB],
-                data: Optional[List[Dict[str, Any]]],
+                data: Optional[List[JSONDict]],
                 bot: 'Bot') -> List[Optional[CB]]:
         if not data:
             return []
@@ -410,7 +411,7 @@ class DataCredentials(_CredentialsBase):
     def __init__(self, data_hash: str, secret: str, **kwargs: Any):
         super(DataCredentials, self).__init__(data_hash, secret, **kwargs)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> JSONDict:
         data = super(DataCredentials, self).to_dict()
 
         del data['file_hash']
@@ -436,7 +437,7 @@ class FileCredentials(_CredentialsBase):
     def __init__(self, file_hash: str, secret: str, **kwargs: Any):
         super(FileCredentials, self).__init__(file_hash, secret, **kwargs)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> JSONDict:
         data = super(FileCredentials, self).to_dict()
 
         del data['data_hash']

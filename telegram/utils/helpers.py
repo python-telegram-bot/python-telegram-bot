@@ -33,6 +33,7 @@ from html import escape
 import re
 import signal
 
+from telegram.utils.typing import JSONDict
 from typing import Union, Any, Optional, Dict, DefaultDict, Tuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import MessageEntity
@@ -310,7 +311,7 @@ def encode_conversations_to_json(conversations: Dict[str, Dict[Tuple, Any]]) -> 
     Returns:
         :obj:`str`: The JSON-serialized conversations dict
     """
-    tmp: Dict[str, Dict[str, Any]] = {}
+    tmp: Dict[str, JSONDict] = {}
     for handler, states in conversations.items():
         tmp[handler] = {}
         for key, state in states.items():

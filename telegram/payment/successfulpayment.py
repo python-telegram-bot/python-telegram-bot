@@ -19,7 +19,8 @@
 """This module contains an object that represents a Telegram SuccessfulPayment."""
 
 from telegram import TelegramObject, OrderInfo
-from typing import Any, Dict, Optional, TYPE_CHECKING
+from telegram.utils.typing import JSONDict
+from typing import Any, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot
 
@@ -73,7 +74,7 @@ class SuccessfulPayment(TelegramObject):
         self._id_attrs = (self.telegram_payment_charge_id, self.provider_payment_charge_id)
 
     @classmethod
-    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['SuccessfulPayment']:
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['SuccessfulPayment']:
         data = cls.parse_data(data)
 
         if not data:

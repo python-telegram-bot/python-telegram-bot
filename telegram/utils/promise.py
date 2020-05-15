@@ -20,7 +20,8 @@
 
 import logging
 from threading import Event
-from typing import Callable, List, Tuple, Optional, Union, TypeVar, Dict, Any
+from telegram.utils.typing import JSONDict
+from typing import Callable, List, Tuple, Optional, Union, TypeVar
 RT = TypeVar('RT')
 
 
@@ -46,7 +47,7 @@ class Promise(object):
     def __init__(self,
                  pooled_function: Callable[..., RT],
                  args: Union[List, Tuple],
-                 kwargs: Dict[str, Any]):
+                 kwargs: JSONDict):
         self.pooled_function = pooled_function
         self.args = args
         self.kwargs = kwargs

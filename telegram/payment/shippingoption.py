@@ -19,7 +19,8 @@
 """This module contains an object that represents a Telegram ShippingOption."""
 
 from telegram import TelegramObject
-from typing import List, Any, Dict, TYPE_CHECKING
+from telegram.utils.typing import JSONDict
+from typing import List, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import LabeledPrice  # noqa
 
@@ -47,7 +48,7 @@ class ShippingOption(TelegramObject):
 
         self._id_attrs = (self.id,)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> JSONDict:
         data = super(ShippingOption, self).to_dict()
 
         data['prices'] = [p.to_dict() for p in self.prices]

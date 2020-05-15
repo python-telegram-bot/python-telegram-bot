@@ -57,7 +57,8 @@ from telegram import (InputFile, TelegramError, InputMedia)
 from telegram.error import (Unauthorized, NetworkError, TimedOut, BadRequest, ChatMigrated,
                             RetryAfter, InvalidToken, Conflict)
 
-from typing import Any, Dict, Union
+from telegram.utils.typing import JSONDict
+from typing import Any, Union
 
 
 def _render_part(self: RequestField, name: str, value: str) -> str:
@@ -101,7 +102,7 @@ class Request(object):
     def __init__(self,
                  con_pool_size: int = 1,
                  proxy_url: str = None,
-                 urllib3_proxy_kwargs: Dict[str, Any] = None,
+                 urllib3_proxy_kwargs: JSONDict = None,
                  connect_timeout: float = 5.,
                  read_timeout: float = 5.):
         if urllib3_proxy_kwargs is None:
@@ -175,7 +176,7 @@ class Request(object):
         self._con_pool.clear()  # type: ignore
 
     @staticmethod
-    def _parse(json_data: bytes) -> Union[Dict[str, Any], bool]:
+    def _parse(json_data: bytes) -> Union[JSONDict, bool]:
         """Try and parse the JSON returned from Telegram.
 
         Returns:
@@ -261,7 +262,7 @@ class Request(object):
         else:
             raise NetworkError('{0} ({1})'.format(message, resp.status))
 
-    def get(self, url: str, timeout: float = None) -> Union[Dict[str, Any], bool]:
+    def get(self, url: str, timeout: float = None) -> Union[JSONDict, bool]:
         """Request an URL.
 
         Args:
@@ -284,8 +285,8 @@ class Request(object):
 
     def post(self,
              url: str,
-             data: Dict[str, Any],
-             timeout: float = None) -> Union[Dict[str, Any], bool]:
+             data: JSONDict,
+             timeout: float = None) -> Union[JSONDict, bool]:
         """Request an URL.
 
         Args:
@@ -326,9 +327,9 @@ class Request(object):
                     # Attach and set val to attached name for all
                     media = []
                     for m in val:
-                        media.append(m.to_dict())  # type: ignore
-                        if isinstance(m.media, InputFile):  # type: ignore
-                            data[m.media.attach] = m.media.field_tuple  # type: ignore
+                        media.append(m.to_dict())
+                        if isinstance(m.media, InputFile):
+                            data[m.media.attach] = m.media.field_tuple
                     data[key] = json.dumps(media)
                 files = True
 

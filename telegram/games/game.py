@@ -21,6 +21,7 @@
 import sys
 
 from telegram import MessageEntity, TelegramObject, Animation, PhotoSize
+from telegram.utils.typing import JSONDict
 from typing import List, Any, Dict, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot
@@ -76,7 +77,7 @@ class Game(TelegramObject):
         self.animation = animation
 
     @classmethod
-    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['Game']:
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Game']:
         data = cls.parse_data(data)
 
         if not data:
@@ -88,7 +89,7 @@ class Game(TelegramObject):
 
         return cls(**data)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> JSONDict:
         data = super(Game, self).to_dict()
 
         data['photo'] = [p.to_dict() for p in self.photo]

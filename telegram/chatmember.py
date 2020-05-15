@@ -22,7 +22,8 @@ import datetime
 from telegram import User, TelegramObject
 from telegram.utils.helpers import to_timestamp, from_timestamp
 
-from typing import Any, Dict, Optional, TYPE_CHECKING
+from telegram.utils.typing import JSONDict
+from typing import Any, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot
 
@@ -165,7 +166,7 @@ class ChatMember(TelegramObject):
         self._id_attrs = (self.user, self.status)
 
     @classmethod
-    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['ChatMember']:
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['ChatMember']:
         data = cls.parse_data(data)
 
         if not data:
@@ -176,7 +177,7 @@ class ChatMember(TelegramObject):
 
         return cls(**data)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> JSONDict:
         data = super(ChatMember, self).to_dict()
 
         data['until_date'] = to_timestamp(self.until_date)

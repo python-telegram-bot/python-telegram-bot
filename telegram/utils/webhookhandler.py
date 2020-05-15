@@ -31,7 +31,8 @@ import tornado.web
 
 from ssl import SSLContext
 from queue import Queue
-from typing import Any, Dict, TYPE_CHECKING
+from telegram.utils.typing import JSONDict
+from typing import Any, TYPE_CHECKING
 from tornado import httputil
 if TYPE_CHECKING:
     from telegram import Bot
@@ -104,7 +105,7 @@ class WebhookHandler(tornado.web.RequestHandler):
     def __init__(self,
                  application: tornado.web.Application,
                  request: httputil.HTTPServerRequest,
-                 **kwargs: Dict[str, Any]):
+                 **kwargs: JSONDict):
         super(WebhookHandler, self).__init__(application, request, **kwargs)
         self.logger = logging.getLogger(__name__)
         self._init_asyncio_patch()

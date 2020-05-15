@@ -19,7 +19,8 @@
 """This module contains an object that represents a Telegram PreCheckoutQuery."""
 
 from telegram import TelegramObject, User, OrderInfo
-from typing import Any, Dict, Optional, TYPE_CHECKING
+from telegram.utils.typing import JSONDict
+from typing import Any, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot
 
@@ -81,7 +82,7 @@ class PreCheckoutQuery(TelegramObject):
         self._id_attrs = (self.id,)
 
     @classmethod
-    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['PreCheckoutQuery']:
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['PreCheckoutQuery']:
         data = cls.parse_data(data)
 
         if not data:

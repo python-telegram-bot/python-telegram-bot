@@ -22,7 +22,8 @@
 from telegram import TelegramObject, ChatPhoto
 from .chatpermissions import ChatPermissions
 
-from typing import Any, Optional, Dict, List, TYPE_CHECKING
+from telegram.utils.typing import JSONDict
+from typing import Any, Optional, List, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot, Message, ChatMember
 
@@ -139,7 +140,7 @@ class Chat(TelegramObject):
         return None
 
     @classmethod
-    def de_json(cls, data: Dict[str, Any], bot: 'Bot') -> Optional['Chat']:
+    def de_json(cls, data: JSONDict, bot: 'Bot') -> Optional['Chat']:
         data = cls.parse_data(data)
 
         if not data:

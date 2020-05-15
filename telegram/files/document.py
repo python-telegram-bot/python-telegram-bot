@@ -20,7 +20,8 @@
 
 from telegram import PhotoSize, TelegramObject
 
-from typing import Any, Dict, Optional, TYPE_CHECKING
+from telegram.utils.typing import JSONDict
+from typing import Any, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot, File
 
@@ -76,7 +77,7 @@ class Document(TelegramObject):
         self._id_attrs = (self.file_unique_id,)
 
     @classmethod
-    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['Document']:
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Document']:
         data = cls.parse_data(data)
 
         if not data:

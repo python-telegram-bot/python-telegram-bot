@@ -19,7 +19,8 @@
 """This module contains an object that represents a Telegram PhotoSize."""
 
 from telegram import TelegramObject
-from typing import Any, Dict, Optional, List, TYPE_CHECKING
+from telegram.utils.typing import JSONDict
+from typing import Any, Optional, List, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot, File
 
@@ -70,7 +71,7 @@ class PhotoSize(TelegramObject):
         self._id_attrs = (self.file_unique_id,)
 
     @classmethod
-    def de_list(cls, data: Optional[List[Dict[str, Any]]],
+    def de_list(cls, data: Optional[List[JSONDict]],
                 bot: 'Bot') -> List[Optional['PhotoSize']]:
         if not data:
             return []

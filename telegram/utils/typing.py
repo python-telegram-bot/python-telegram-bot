@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=R0903
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2020
@@ -17,24 +16,15 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a Telegram Bot Command."""
-from telegram import TelegramObject
-from typing import Any
+"""This module contains custom typing aliases."""
 
+from typing import Union, Any, Dict, TYPE_CHECKING, IO
 
-class BotCommand(TelegramObject):
-    """
-    This object represents a bot command.
+if TYPE_CHECKING:
+    from telegram import InputFile
 
-    Attributes:
-        command (:obj:`str`): Text of the command.
-        description (:obj:`str`): Description of the command.
+FileLike = Union[IO, 'InputFile']
+"""Either an open file handler or in :class:`telegram.InputFile`."""
 
-    Args:
-        command (:obj:`str`): Text of the command, 1-32 characters. Can contain only lowercase
-            English letters, digits and underscores.
-        description (:obj:`str`): Description of the command, 3-256 characters.
-    """
-    def __init__(self, command: str, description: str, **kwargs: Any):
-        self.command = command
-        self.description = description
+JSONDict = Dict[str, Any]
+"""Dictionary containing response from Telegram or data to send to the API."""

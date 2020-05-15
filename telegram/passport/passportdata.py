@@ -20,7 +20,8 @@
 
 from telegram import EncryptedCredentials, EncryptedPassportElement, TelegramObject
 
-from typing import Any, Optional, Dict, List, TYPE_CHECKING
+from telegram.utils.typing import JSONDict
+from typing import Any, Optional, List, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot, Credentials
 
@@ -62,7 +63,7 @@ class PassportData(TelegramObject):
         self._id_attrs = tuple([x.type for x in data] + [credentials.hash])
 
     @classmethod
-    def de_json(cls, data: Optional[Dict[str, Any]], bot: 'Bot') -> Optional['PassportData']:
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['PassportData']:
         data = cls.parse_data(data)
 
         if not data:
@@ -73,7 +74,7 @@ class PassportData(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> JSONDict:
         data = super(PassportData, self).to_dict()
 
         data['data'] = [e.to_dict() for e in self.data]
