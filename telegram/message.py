@@ -859,9 +859,9 @@ class Message(TelegramObject):
                                   **kwargs)
 
         Note:
-            You can only edit messages that the bot sent itself,
-            therefore this method can only be used on the
-            return value of the ``bot.send_*`` family of methods.
+            You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
+            of methods) or channel posts, if the bot is an admin in that channel. However, this
+            behaviour is undocumented and might be changed by Telegram.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the edited message.
@@ -879,9 +879,9 @@ class Message(TelegramObject):
                                      **kwargs)
 
         Note:
-            You can only edit messages that the bot sent itself,
-            therefore this method can only be used on the
-            return value of the ``bot.send_*`` family of methods.
+            You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
+            of methods) or channel posts, if the bot is an admin in that channel. However, this
+            behaviour is undocumented and might be changed by Telegram.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the edited message.
@@ -893,21 +893,21 @@ class Message(TelegramObject):
     def edit_media(self, media, *args, **kwargs):
         """Shortcut for::
 
-                    bot.edit_message_media(chat_id=message.chat_id,
-                                             message_id=message.message_id,
-                                             *args,
-                                             **kwargs)
+            bot.edit_message_media(chat_id=message.chat_id,
+                                     message_id=message.message_id,
+                                     *args,
+                                     **kwargs)
 
-                Note:
-                    You can only edit messages that the bot sent itself,
-                    therefore this method can only be used on the
-                    return value of the ``bot.send_*`` family of methods.
+        Note:
+            You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
+            of methods) or channel posts, if the bot is an admin in that channel. However, this
+            behaviour is undocumented and might be changed by Telegram.
 
-                Returns:
-                    :class:`telegram.Message`: On success, instance representing the edited
-                    message.
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the edited
+            message.
 
-                """
+        """
         return self.bot.edit_message_media(
             chat_id=self.chat_id, message_id=self.message_id, media=media, *args, **kwargs)
 
@@ -920,9 +920,9 @@ class Message(TelegramObject):
                                           **kwargs)
 
         Note:
-            You can only edit messages that the bot sent itself,
-            therefore this method can only be used on the
-            return value of the ``bot.send_*`` family of methods.
+            You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
+            of methods) or channel posts, if the bot is an admin in that channel. However, this
+            behaviour is undocumented and might be changed by Telegram.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the edited message.
