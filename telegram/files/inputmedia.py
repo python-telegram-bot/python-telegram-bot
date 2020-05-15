@@ -38,8 +38,7 @@ class InputMediaAnimation(InputMedia):
 
     Attributes:
         type (:obj:`str`): ``animation``.
-        media (:obj:`str` | :class:`telegram.InputFile` | :class:`telegram.Animation`): Animation
-            to send.
+        media (:obj:`str` | :class:`telegram.InputFile`): Animation to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
         thumb (:class:`telegram.InputFile`): Optional. Thumbnail of the file to send.
@@ -114,8 +113,7 @@ class InputMediaPhoto(InputMedia):
 
     Attributes:
         type (:obj:`str`): ``photo``.
-        media (:obj:`str` | :class:`telegram.InputFile` | :class:`telegram.PhotoSize`): Photo to
-            send.
+        media (:obj:`str` | :class:`telegram.InputFile`): Photo to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
 
@@ -151,8 +149,7 @@ class InputMediaVideo(InputMedia):
 
     Attributes:
         type (:obj:`str`): ``video``.
-        media (:obj:`str` | :class:`telegram.InputFile` | :class:`telegram.Video`): Video file to
-            send.
+        media (:obj:`str` | :class:`telegram.InputFile`): Video file to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
         width (:obj:`int`): Optional. Video width.
@@ -226,8 +223,7 @@ class InputMediaAudio(InputMedia):
 
     Attributes:
         type (:obj:`str`): ``audio``.
-        media (:obj:`str` | :class:`telegram.InputFile` | :class:`telegram.Audio`): Audio file to
-            send.
+        media (:obj:`str` | :class:`telegram.InputFile`): Audio file to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
         duration (:obj:`int`): Duration of the audio in seconds.
@@ -297,8 +293,7 @@ class InputMediaDocument(InputMedia):
 
     Attributes:
         type (:obj:`str`): ``document``.
-        media (:obj:`str` | :class:`telegram.InputFile` | :class:`telegram.Document`): File to
-            send.
+        media (:obj:`str` | :class:`telegram.InputFile`): File to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
         thumb (:class:`telegram.InputFile`): Optional. Thumbnail of the file to send.
