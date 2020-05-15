@@ -641,7 +641,6 @@ class Bot(TelegramObject):
                 in JPEG format and less than 200 kB in size. A thumbnail's width and height should
                 not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
                 Thumbnails can't be reused and can be only uploaded as a new file.
-                multipart/form-data under ``<file_attach_name>``.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
