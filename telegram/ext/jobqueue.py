@@ -32,6 +32,12 @@ from telegram.ext.callbackcontext import CallbackContext
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import to_float_timestamp
 
+from typing import TYPE_CHECKING, Union, Callable, Tuple, Optional
+
+if TYPE_CHECKING:
+    from telegram.ext import Dispatcher
+    from telegram import Bot
+
 
 class Days(object):
     MON, TUE, WED, THU, FRI, SAT, SUN = range(7)
@@ -48,14 +54,15 @@ class JobQueue(object):
 
     """
 
-    def __init__(self, bot=None):
-        self._queue = PriorityQueue()
+    def __init__(self, bot: 'Bot' = None):
+        self._queue: PriorityQueue = PriorityQueue()
+        self._dispatcher: Union['Dispatcher', 'MockDispatcher', None]  # noqa: F821
         if bot:
             warnings.warn("Passing bot to jobqueue is deprecated. Please use set_dispatcher "
                           "instead!", TelegramDeprecationWarning, stacklevel=2)
 
             class MockDispatcher(object):
-                def __init__(self):
+                def __init__(self) -> None:
                     self.bot = bot
                     self.use_context = False
 
@@ -66,11 +73,11 @@ class JobQueue(object):
         self.__start_lock = Lock()
         self.__next_peek_lock = Lock()  # to protect self._next_peek & self.__tick
         self.__tick = Event()
-        self.__thread = None
-        self._next_peek = None
+        self.__thread: Optional[Thread] = None
+        self._next_peek: Optional[float] = None
         self._running = False
 
-    def set_dispatcher(self, dispatcher):
+    def set_dispatcher(self, dispatcher: 'Dispatcher') -> None:
         """Set the dispatcher to be used by this JobQueue. Use this instead of passing a
         :class:`telegram.Bot` to the JobQueue, which is deprecated.
 
@@ -80,7 +87,11 @@ class JobQueue(object):
         """
         self._dispatcher = dispatcher
 
-    def _put(self, job, time_spec=None, previous_t=None):
+    def _put(self,
+             job: 'Job',
+             time_spec: Union[int, float, datetime.timedelta, datetime.datetime,
+                              datetime.time] = None,
+             previous_t: float = None) -> None:
         """
         Enqueues the job, scheduling its next run at the correct time.
 
@@ -110,7 +121,11 @@ class JobQueue(object):
         # Wake up the loop if this job should be executed next
         self._set_next_peek(next_t)
 
-    def run_once(self, callback, when, context=None, name=None):
+    def run_once(self,
+                 callback: Callable[['CallbackContext'], None],
+                 when: Union[float, datetime.timedelta, datetime.datetime, datetime.time],
+                 context: object = None,
+                 name: str = None) -> 'Job':
         """Creates a new ``Job`` that runs once and adds it to the queue.
 
         Args:
@@ -161,7 +176,13 @@ class JobQueue(object):
         self._put(job, time_spec=when)
         return job
 
-    def run_repeating(self, callback, interval, first=None, context=None, name=None):
+    def run_repeating(self,
+                      callback: Callable[['CallbackContext'], None],
+                      interval: Union[float, datetime.timedelta],
+                      first: Union[float, datetime.timedelta, datetime.datetime,
+                                   datetime.time] = None,
+                      context: object = None,
+                      name: str = None) -> 'Job':
         """Creates a new ``Job`` that runs at specified intervals and adds it to the queue.
 
         Args:
@@ -222,7 +243,13 @@ class JobQueue(object):
         self._put(job, time_spec=first)
         return job
 
-    def run_monthly(self, callback, when, day, context=None, name=None, day_is_strict=True):
+    def run_monthly(self,
+                    callback: Callable[['CallbackContext'], None],
+                    when: datetime.time,
+                    day: int,
+                    context: object = None,
+                    name: str = None,
+                    day_is_strict: bool = True) -> 'Job':
         """Creates a new ``Job`` that runs on a monthly basis and adds it to the queue.
 
         Args:
@@ -261,7 +288,11 @@ class JobQueue(object):
             raise ValueError("The elements of the 'day' argument should be from 1 up to"
                              " and including 31")
 
-    def _get_next_month_date(self, day, day_is_strict, when, allow_now=False):
+    def _get_next_month_date(self,
+                             day: int,
+                             day_is_strict: bool,
+                             when: datetime.time,
+                             allow_now: bool = False) -> datetime.datetime:
         """This method returns the date that the next monthly job should be scheduled.
 
         Args:
@@ -329,7 +360,12 @@ class JobQueue(object):
             next_dt = next_dt.replace(fold=when.fold)
         return next_dt
 
-    def run_daily(self, callback, time, days=Days.EVERY_DAY, context=None, name=None):
+    def run_daily(self,
+                  callback: Callable[['CallbackContext'], None],
+                  time: datetime.time,
+                  days: Tuple[int, ...] = Days.EVERY_DAY,
+                  context: object = None,
+                  name: str = None) -> 'Job':
         """Creates a new ``Job`` that runs on a daily basis and adds it to the queue.
 
         Args:
@@ -371,7 +407,7 @@ class JobQueue(object):
         self._put(job, time_spec=time)
         return job
 
-    def _set_next_peek(self, t):
+    def _set_next_peek(self, t: float) -> None:
         # """
         # Set next peek if not defined or `t` is before next peek.
         # In case the next peek was set, also trigger the `self.__tick` event.
@@ -381,7 +417,7 @@ class JobQueue(object):
                 self._next_peek = t
                 self.__tick.set()
 
-    def tick(self):
+    def tick(self) -> None:
         """Run all jobs that are due and re-enqueue them with their interval."""
         now = time.time()
 
@@ -416,7 +452,8 @@ class JobQueue(object):
                     if current_week_day in job.days:
                         self.logger.debug('Running job %s', job.name)
                         job.run(self._dispatcher)
-                        self._dispatcher.update_persistence()
+                        if hasattr(self._dispatcher, 'update_persistence'):
+                            self._dispatcher.update_persistence()  # type: ignore[union-attr]
 
                 except Exception:
                     self.logger.exception('An uncaught error was raised while executing job %s',
@@ -435,7 +472,7 @@ class JobQueue(object):
                 job._set_next_t(None)
                 self.logger.debug('Dropping non-repeating or removed job %s', job.name)
 
-    def start(self):
+    def start(self) -> None:
         """Starts the job_queue thread."""
         self.__start_lock.acquire()
 
@@ -443,13 +480,14 @@ class JobQueue(object):
             self._running = True
             self.__start_lock.release()
             self.__thread = Thread(target=self._main_loop,
-                                   name="Bot:{}:job_queue".format(self._dispatcher.bot.id))
+                                   name="Bot:{}:job_queue".format(
+                                       self._dispatcher.bot.id))  # type: ignore[union-attr]
             self.__thread.start()
             self.logger.debug('%s thread started', self.__class__.__name__)
         else:
             self.__start_lock.release()
 
-    def _main_loop(self):
+    def _main_loop(self) -> None:
         """
         Thread target of thread ``job_queue``. Runs in background and performs ticks on the job
         queue.
@@ -472,7 +510,7 @@ class JobQueue(object):
 
         self.logger.debug('%s thread stopped', self.__class__.__name__)
 
-    def stop(self):
+    def stop(self) -> None:
         """Stops the thread."""
         with self.__start_lock:
             self._running = False
@@ -481,12 +519,12 @@ class JobQueue(object):
         if self.__thread is not None:
             self.__thread.join()
 
-    def jobs(self):
+    def jobs(self) -> Tuple['Job', ...]:
         """Returns a tuple of all jobs that are currently in the ``JobQueue``."""
         with self._queue.mutex:
             return tuple(job[1] for job in self._queue.queue if job)
 
-    def get_jobs_by_name(self, name):
+    def get_jobs_by_name(self, name: str) -> Tuple['Job', ...]:
         """Returns a tuple of jobs with the given name that are currently in the ``JobQueue``"""
         with self._queue.mutex:
             return tuple(job[1] for job in self._queue.queue if job and job[1].name == name)
@@ -535,30 +573,30 @@ class Job(object):
     """
 
     def __init__(self,
-                 callback,
-                 interval=None,
-                 repeat=True,
-                 context=None,
-                 days=Days.EVERY_DAY,
-                 name=None,
-                 job_queue=None,
-                 tzinfo=None,
-                 is_monthly=False,
-                 day_is_strict=True):
+                 callback: Callable[['CallbackContext'], None],
+                 interval: Union[float, datetime.timedelta] = None,
+                 repeat: bool = True,
+                 context: object = None,
+                 days: Tuple[int, ...] = Days.EVERY_DAY,
+                 name: str = None,
+                 job_queue: JobQueue = None,
+                 tzinfo: datetime.tzinfo = None,
+                 is_monthly: bool = False,
+                 day_is_strict: bool = True):
 
         self.callback = callback
         self.context = context
         self.name = name or callback.__name__
 
         self._repeat = None
-        self._interval = None
+        self._interval: Union[float, datetime.timedelta, None] = None
         self.interval = interval
-        self._next_t = None
+        self._next_t: Optional[float] = None
         self.repeat = repeat
         self.is_monthly = is_monthly
         self.day_is_strict = day_is_strict
 
-        self._days = None
+        self._days: Optional[Tuple[int, ...]] = None
         self.days = days
         self.tzinfo = tzinfo or datetime.timezone.utc
 
@@ -568,14 +606,14 @@ class Job(object):
         self._enabled = Event()
         self._enabled.set()
 
-    def run(self, dispatcher):
+    def run(self, dispatcher: 'Dispatcher') -> None:
         """Executes the callback function."""
         if dispatcher.use_context:
             self.callback(CallbackContext.from_job(self, dispatcher))
         else:
-            self.callback(dispatcher.bot, self)
+            self.callback(dispatcher.bot, self)  # type: ignore[call-arg]
 
-    def schedule_removal(self):
+    def schedule_removal(self) -> None:
         """
         Schedules this job for removal from the ``JobQueue``. It will be removed without executing
         its callback function again.
@@ -585,24 +623,24 @@ class Job(object):
         self._next_t = None
 
     @property
-    def removed(self):
+    def removed(self) -> bool:
         """:obj:`bool`: Whether this job is due to be removed."""
         return self._remove.is_set()
 
     @property
-    def enabled(self):
+    def enabled(self) -> bool:
         """:obj:`bool`: Whether this job is enabled."""
         return self._enabled.is_set()
 
     @enabled.setter
-    def enabled(self, status):
+    def enabled(self, status: bool) -> None:
         if status:
             self._enabled.set()
         else:
             self._enabled.clear()
 
     @property
-    def interval(self):
+    def interval(self) -> Union[int, float, datetime.timedelta, None]:
         """
         :obj:`int` | :obj:`float` | :obj:`datetime.timedelta`: Optional. The interval in which the
             job will run.
@@ -611,7 +649,7 @@ class Job(object):
         return self._interval
 
     @interval.setter
-    def interval(self, interval):
+    def interval(self, interval: Union[int, float, datetime.timedelta]) -> None:
         if interval is None and self.repeat:
             raise ValueError("The 'interval' can not be 'None' when 'repeat' is set to 'True'")
 
@@ -622,8 +660,8 @@ class Job(object):
         self._interval = interval
 
     @property
-    def interval_seconds(self):
-        """:obj:`int`: The interval for this job in seconds."""
+    def interval_seconds(self) -> Optional[float]:
+        """:obj:`float`: The interval for this job in seconds."""
         interval = self.interval
         if isinstance(interval, datetime.timedelta):
             return interval.total_seconds()
@@ -631,16 +669,18 @@ class Job(object):
             return interval
 
     @property
-    def next_t(self):
+    def next_t(self) -> Optional[datetime.datetime]:
         """
         :obj:`datetime.datetime`: Datetime for the next job execution.
             Datetime is localized according to :attr:`tzinfo`.
             If job is removed or already ran it equals to ``None``.
 
         """
-        return datetime.datetime.fromtimestamp(self._next_t, self.tzinfo) if self._next_t else None
+        if self._next_t is None:
+            return None
+        return datetime.datetime.fromtimestamp(self._next_t, self.tzinfo)
 
-    def _set_next_t(self, next_t):
+    def _set_next_t(self, next_t: Union[float, datetime.datetime]) -> None:
         if isinstance(next_t, datetime.datetime):
             # Set timezone to UTC in case datetime is in local timezone.
             next_t = next_t.astimezone(datetime.timezone.utc)
@@ -652,23 +692,23 @@ class Job(object):
         self._next_t = next_t
 
     @property
-    def repeat(self):
+    def repeat(self) -> Optional[bool]:
         """:obj:`bool`: Optional. If this job should periodically execute its callback function."""
         return self._repeat
 
     @repeat.setter
-    def repeat(self, repeat):
+    def repeat(self, repeat: bool) -> None:
         if self.interval is None and repeat:
             raise ValueError("'repeat' can not be set to 'True' when no 'interval' is set")
         self._repeat = repeat
 
     @property
-    def days(self):
+    def days(self) -> Optional[Tuple[int, ...]]:
         """Tuple[:obj:`int`]: Optional. Defines on which days of the week the job should run."""
         return self._days
 
     @days.setter
-    def days(self, days):
+    def days(self, days: Tuple[int, ...]) -> None:
         if not isinstance(days, tuple):
             raise TypeError("The 'days' argument should be of type 'tuple'")
 
@@ -682,17 +722,17 @@ class Job(object):
         self._days = days
 
     @property
-    def job_queue(self):
+    def job_queue(self) -> Optional[JobQueue]:
         """:class:`telegram.ext.JobQueue`: Optional. The ``JobQueue`` this job belongs to."""
         return self._job_queue
 
     @job_queue.setter
-    def job_queue(self, job_queue):
+    def job_queue(self, job_queue: JobQueue) -> None:
         # Property setter for backward compatibility with JobQueue.put()
         if not self._job_queue:
             self._job_queue = weakref.proxy(job_queue)
         else:
             raise RuntimeError("The 'job_queue' attribute can only be set once.")
 
-    def __lt__(self, other):
+    def __lt__(self, other: object) -> bool:
         return False

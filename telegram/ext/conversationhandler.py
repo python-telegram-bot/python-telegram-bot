@@ -531,7 +531,7 @@ class ConversationHandler(Handler):
         if isinstance(context, CallbackContext):
             job = context.job
 
-        context = job.context  # type:ignore[union-attr]
+        context = job.context  # type:ignore[union-attr,assignment]
         callback_context = context.callback_context
 
         with self._timeout_jobs_lock:
