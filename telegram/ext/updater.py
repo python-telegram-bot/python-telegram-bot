@@ -32,6 +32,11 @@ from telegram.utils.helpers import get_signal_name
 from telegram.utils.request import Request
 from telegram.utils.webhookhandler import (WebhookServer, WebhookAppClass)
 
+from typing import Callable, Dict, TYPE_CHECKING, Any, List, Union, Tuple, no_type_check, Optional
+
+if TYPE_CHECKING:
+    from telegram.ext import BasePersistence, Defaults
+
 
 class Updater(object):
     """
@@ -102,19 +107,19 @@ class Updater(object):
     _request = None
 
     def __init__(self,
-                 token=None,
-                 base_url=None,
-                 workers=4,
-                 bot=None,
-                 private_key=None,
-                 private_key_password=None,
-                 user_sig_handler=None,
-                 request_kwargs=None,
-                 persistence=None,
-                 defaults=None,
-                 use_context=False,
-                 dispatcher=None,
-                 base_file_url=None):
+                 token: str = None,
+                 base_url: str = None,
+                 workers: int = 4,
+                 bot: Bot = None,
+                 private_key: bytes = None,
+                 private_key_password: bytes = None,
+                 user_sig_handler: Callable = None,
+                 request_kwargs: Dict[str, Any] = None,
+                 persistence: 'BasePersistence' = None,
+                 defaults: 'Defaults' = None,
+                 use_context: bool = False,
+                 dispatcher: Dispatcher = None,
+                 base_file_url: str = None):
 
         if dispatcher is None:
             if (token is None) and (bot is None):
@@ -156,14 +161,14 @@ class Updater(object):
                 if 'con_pool_size' not in request_kwargs:
                     request_kwargs['con_pool_size'] = con_pool_size
                 self._request = Request(**request_kwargs)
-                self.bot = Bot(token,
+                self.bot = Bot(token,  # type: ignore[arg-type]
                                base_url,
                                base_file_url=base_file_url,
                                request=self._request,
                                private_key=private_key,
                                private_key_password=private_key_password,
                                defaults=defaults)
-            self.update_queue = Queue()
+            self.update_queue: Queue = Queue()
             self.job_queue = JobQueue()
             self.__exception_event = Event()
             self.persistence = persistence
@@ -195,12 +200,12 @@ class Updater(object):
         self.is_idle = False
         self.httpd = None
         self.__lock = Lock()
-        self.__threads = []
+        self.__threads: List[Thread] = []
 
         # Just for passing to WebhookAppClass
         self._default_quote = defaults.quote if defaults else None
 
-    def _init_thread(self, target, name, *args, **kwargs):
+    def _init_thread(self, target: Callable, name: str, *args: Any, **kwargs: Any) -> None:
         thr = Thread(target=self._thread_wrapper,
                      name="Bot:{}:{}".format(self.bot.id, name),
                      args=(target,) + args,
@@ -208,7 +213,7 @@ class Updater(object):
         thr.start()
         self.__threads.append(thr)
 
-    def _thread_wrapper(self, target, *args, **kwargs):
+    def _thread_wrapper(self, target: Callable, *args: Any, **kwargs: Any) -> None:
         thr_name = current_thread().name
         self.logger.debug('{0} - started'.format(thr_name))
         try:
@@ -220,12 +225,12 @@ class Updater(object):
         self.logger.debug('{0} - ended'.format(thr_name))
 
     def start_polling(self,
-                      poll_interval=0.0,
-                      timeout=10,
-                      clean=False,
-                      bootstrap_retries=-1,
-                      read_latency=2.,
-                      allowed_updates=None):
+                      poll_interval: float = 0.0,
+                      timeout: float = 10,
+                      clean: bool = False,
+                      bootstrap_retries: int = -1,
+                      read_latency: float = 2.,
+                      allowed_updates: List[str] = None) -> Optional[Queue]:
         """Starts polling updates from Telegram.
 
         Args:
@@ -266,17 +271,18 @@ class Updater(object):
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
+            return None
 
     def start_webhook(self,
-                      listen='127.0.0.1',
-                      port=80,
-                      url_path='',
-                      cert=None,
-                      key=None,
-                      clean=False,
-                      bootstrap_retries=0,
-                      webhook_url=None,
-                      allowed_updates=None):
+                      listen: str = '127.0.0.1',
+                      port: int = 80,
+                      url_path: str = '',
+                      cert: str = None,
+                      key: str = None,
+                      clean: bool = False,
+                      bootstrap_retries: int = 0,
+                      webhook_url: str = None,
+                      allowed_updates: List[str] = None) -> Optional[Queue]:
         """
         Starts a small http server to listen for updates via webhook. If cert
         and key are not provided, the webhook will be started directly on
@@ -314,13 +320,15 @@ class Updater(object):
 
                 # Create & start threads
                 self.job_queue.start()
-                self._init_thread(self.dispatcher.start, "dispatcher"),
+                self._init_thread(self.dispatcher.start, "dispatcher")
                 self._init_thread(self._start_webhook, "updater", listen, port, url_path, cert,
                                   key, bootstrap_retries, clean, webhook_url, allowed_updates)
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
+            return None
 
+    @no_type_check
     def _start_polling(self, poll_interval, timeout, read_latency, bootstrap_retries, clean,
                        allowed_updates):  # pragma: no cover
         # Thread target of thread 'updater'. Runs in background, pulls
@@ -357,6 +365,7 @@ class Updater(object):
         self._network_loop_retry(polling_action_cb, polling_onerr_cb, 'getting Updates',
                                  poll_interval)
 
+    @no_type_check
     def _network_loop_retry(self, action_cb, onerr_cb, description, interval):
         """Perform a loop calling `action_cb`, retrying after network errors.
 
@@ -399,7 +408,7 @@ class Updater(object):
                 sleep(cur_interval)
 
     @staticmethod
-    def _increase_poll_interval(current_interval):
+    def _increase_poll_interval(current_interval: float) -> float:
         # increase waiting times on subsequent errors up to 30secs
         if current_interval == 0:
             current_interval = 1
@@ -409,6 +418,7 @@ class Updater(object):
             current_interval = 30
         return current_interval
 
+    @no_type_check
     def _start_webhook(self, listen, port, url_path, cert, key, bootstrap_retries, clean,
                        webhook_url, allowed_updates):
         self.logger.debug('Updater thread started (webhook)')
@@ -451,9 +461,10 @@ class Updater(object):
         self.httpd.serve_forever()
 
     @staticmethod
-    def _gen_webhook_url(listen, port, url_path):
+    def _gen_webhook_url(listen: str, port: int, url_path: str) -> str:
         return 'https://{listen}:{port}{path}'.format(listen=listen, port=port, path=url_path)
 
+    @no_type_check
     def _bootstrap(self,
                    max_retries,
                    clean,
@@ -511,7 +522,7 @@ class Updater(object):
             self._network_loop_retry(bootstrap_set_webhook, bootstrap_onerr_cb,
                                      'bootstrap set webhook', bootstrap_interval)
 
-    def stop(self):
+    def stop(self) -> None:
         """Stops the polling/webhook thread, the dispatcher and the job queue."""
 
         self.job_queue.stop()
@@ -529,7 +540,8 @@ class Updater(object):
                 if self._request:
                     self._request.stop()
 
-    def _stop_httpd(self):
+    @no_type_check
+    def _stop_httpd(self) -> None:
         if self.httpd:
             self.logger.debug('Waiting for current webhook connection to be '
                               'closed... Send a Telegram message to the bot to exit '
@@ -537,18 +549,21 @@ class Updater(object):
             self.httpd.shutdown()
             self.httpd = None
 
-    def _stop_dispatcher(self):
+    @no_type_check
+    def _stop_dispatcher(self) -> None:
         self.logger.debug('Requesting Dispatcher to stop...')
         self.dispatcher.stop()
 
-    def _join_threads(self):
+    @no_type_check
+    def _join_threads(self) -> None:
         for thr in self.__threads:
             self.logger.debug('Waiting for {0} thread to end'.format(thr.name))
             thr.join()
             self.logger.debug('{0} thread has ended'.format(thr.name))
         self.__threads = []
 
-    def signal_handler(self, signum, frame):
+    @no_type_check
+    def signal_handler(self, signum, frame) -> None:
         self.is_idle = False
         if self.running:
             self.logger.info('Received signal {} ({}), stopping...'.format(
@@ -565,7 +580,7 @@ class Updater(object):
             import os
             os._exit(1)
 
-    def idle(self, stop_signals=(SIGINT, SIGTERM, SIGABRT)):
+    def idle(self, stop_signals: Union[List, Tuple] = (SIGINT, SIGTERM, SIGABRT)) -> None:
         """Blocks until one of the signals are received and stops the updater.
 
         Args:
