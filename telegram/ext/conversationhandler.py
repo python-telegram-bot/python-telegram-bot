@@ -24,12 +24,23 @@ from threading import Lock
 
 from telegram import Update
 from telegram.ext import (Handler, CallbackQueryHandler, InlineQueryHandler,
-                          ChosenInlineResultHandler, CallbackContext)
+                          ChosenInlineResultHandler, CallbackContext, BasePersistence)
 from telegram.utils.promise import Promise
+
+from telegram.utils.typing import ConversationDict, HandlerArg
+from typing import Dict, Any, List, Optional, Tuple, TYPE_CHECKING, cast
+
+if TYPE_CHECKING:
+    from telegram.ext import Dispatcher, Job
+CheckUpdateType = Optional[Tuple[Tuple[int, ...], Handler, object]]
 
 
 class _ConversationTimeoutContext(object):
-    def __init__(self, conversation_key, update, dispatcher, callback_context):
+    def __init__(self,
+                 conversation_key: Tuple[int, ...],
+                 update: Update,
+                 dispatcher: 'Dispatcher',
+                 callback_context: Optional[CallbackContext]):
         self.conversation_key = conversation_key
         self.update = update
         self.dispatcher = dispatcher
@@ -156,17 +167,17 @@ class ConversationHandler(Handler):
     previous ``@run_sync`` decorated running handler to finish."""
 
     def __init__(self,
-                 entry_points,
-                 states,
-                 fallbacks,
-                 allow_reentry=False,
-                 per_chat=True,
-                 per_user=True,
-                 per_message=False,
-                 conversation_timeout=None,
-                 name=None,
-                 persistent=False,
-                 map_to_parent=None):
+                 entry_points: List[Handler],
+                 states: Dict[object, List[Handler]],
+                 fallbacks: List[Handler],
+                 allow_reentry: bool = False,
+                 per_chat: bool = True,
+                 per_user: bool = True,
+                 per_message: bool = False,
+                 conversation_timeout: int = None,
+                 name: str = None,
+                 persistent: bool = False,
+                 map_to_parent: Dict[object, object] = None):
 
         self._entry_points = entry_points
         self._states = states
@@ -181,14 +192,14 @@ class ConversationHandler(Handler):
         if persistent and not self.name:
             raise ValueError("Conversations can't be persistent when handler is unnamed.")
         self.persistent = persistent
-        self._persistence = None
+        self._persistence: Optional[BasePersistence] = None
         """:obj:`telegram.ext.BasePersistance`: The persistence used to store conversations.
         Set by dispatcher"""
         self._map_to_parent = map_to_parent
 
-        self.timeout_jobs = dict()
+        self.timeout_jobs: Dict[Tuple[int, ...], 'Job'] = dict()
         self._timeout_jobs_lock = Lock()
-        self._conversations = dict()
+        self._conversations: ConversationDict = dict()
         self._conversations_lock = Lock()
 
         self.logger = logging.getLogger(__name__)
@@ -229,92 +240,92 @@ class ConversationHandler(Handler):
                     break
 
     @property
-    def entry_points(self):
+    def entry_points(self) -> List[Handler]:
         return self._entry_points
 
     @entry_points.setter
-    def entry_points(self, value):
+    def entry_points(self, value: Any) -> None:
         raise ValueError('You can not assign a new value to entry_points after initialization.')
 
     @property
-    def states(self):
+    def states(self) -> Dict[object, List[Handler]]:
         return self._states
 
     @states.setter
-    def states(self, value):
+    def states(self, value: Any) -> None:
         raise ValueError('You can not assign a new value to states after initialization.')
 
     @property
-    def fallbacks(self):
+    def fallbacks(self) -> List[Handler]:
         return self._fallbacks
 
     @fallbacks.setter
-    def fallbacks(self, value):
+    def fallbacks(self, value: Any) -> None:
         raise ValueError('You can not assign a new value to fallbacks after initialization.')
 
     @property
-    def allow_reentry(self):
+    def allow_reentry(self) -> bool:
         return self._allow_reentry
 
     @allow_reentry.setter
-    def allow_reentry(self, value):
+    def allow_reentry(self, value: Any) -> None:
         raise ValueError('You can not assign a new value to allow_reentry after initialization.')
 
     @property
-    def per_user(self):
+    def per_user(self) -> bool:
         return self._per_user
 
     @per_user.setter
-    def per_user(self, value):
+    def per_user(self, value: Any) -> None:
         raise ValueError('You can not assign a new value to per_user after initialization.')
 
     @property
-    def per_chat(self):
+    def per_chat(self) -> bool:
         return self._per_chat
 
     @per_chat.setter
-    def per_chat(self, value):
+    def per_chat(self, value: Any) -> None:
         raise ValueError('You can not assign a new value to per_chat after initialization.')
 
     @property
-    def per_message(self):
+    def per_message(self) -> bool:
         return self._per_message
 
     @per_message.setter
-    def per_message(self, value):
+    def per_message(self, value: Any) -> None:
         raise ValueError('You can not assign a new value to per_message after initialization.')
 
     @property
-    def conversation_timeout(self):
+    def conversation_timeout(self) -> Optional[int]:
         return self._conversation_timeout
 
     @conversation_timeout.setter
-    def conversation_timeout(self, value):
+    def conversation_timeout(self, value: Any) -> None:
         raise ValueError('You can not assign a new value to conversation_timeout after '
                          'initialization.')
 
     @property
-    def name(self):
+    def name(self) -> Optional[str]:
         return self._name
 
     @name.setter
-    def name(self, value):
+    def name(self, value: Any) -> None:
         raise ValueError('You can not assign a new value to name after initialization.')
 
     @property
-    def map_to_parent(self):
+    def map_to_parent(self) -> Optional[Dict[object, object]]:
         return self._map_to_parent
 
     @map_to_parent.setter
-    def map_to_parent(self, value):
+    def map_to_parent(self, value: Any) -> None:
         raise ValueError('You can not assign a new value to map_to_parent after initialization.')
 
     @property
-    def persistence(self):
+    def persistence(self) -> Optional[BasePersistence]:
         return self._persistence
 
     @persistence.setter
-    def persistence(self, persistence):
+    def persistence(self, persistence: BasePersistence) -> None:
         self._persistence = persistence
         # Set persistence for nested conversations
         for handlers in self.states.values():
@@ -323,37 +334,37 @@ class ConversationHandler(Handler):
                     handler.persistence = self.persistence
 
     @property
-    def conversations(self):
+    def conversations(self) -> ConversationDict:
         return self._conversations
 
     @conversations.setter
-    def conversations(self, value):
+    def conversations(self, value: ConversationDict) -> None:
         self._conversations = value
         # Set conversations for nested conversations
         for handlers in self.states.values():
             for handler in handlers:
-                if isinstance(handler, ConversationHandler):
+                if isinstance(handler, ConversationHandler) and self.persistence and handler.name:
                     handler.conversations = self.persistence.get_conversations(handler.name)
 
-    def _get_key(self, update):
+    def _get_key(self, update: Update) -> Tuple[int, ...]:
         chat = update.effective_chat
         user = update.effective_user
 
         key = list()
 
         if self.per_chat:
-            key.append(chat.id)
+            key.append(chat.id)  # type: ignore[union-attr]
 
         if self.per_user and user is not None:
             key.append(user.id)
 
         if self.per_message:
-            key.append(update.callback_query.inline_message_id
-                       or update.callback_query.message.message_id)
+            key.append(update.callback_query.inline_message_id  # type: ignore[union-attr]
+                       or update.callback_query.message.message_id)  # type: ignore[union-attr]
 
         return tuple(key)
 
-    def check_update(self, update):
+    def check_update(self, update: HandlerArg) -> CheckUpdateType:
         """
         Determines whether an update should be handled by this conversationhandler, and if so in
         which state the conversation currently is.
@@ -397,11 +408,11 @@ class ConversationHandler(Handler):
                     with self._conversations_lock:
                         state = self.conversations.get(key)
             else:
-                handlers = self.states.get(self.WAITING, [])
-                for handler in handlers:
-                    check = handler.check_update(update)
+                hdlrs = self.states.get(self.WAITING, [])
+                for hdlr in hdlrs:
+                    check = hdlr.check_update(update)
                     if check is not None and check is not False:
-                        return key, handler, check
+                        return key, hdlr, check
                 return None
 
         self.logger.debug('selecting conversation %s with state %s' % (str(key), str(state)))
@@ -441,9 +452,13 @@ class ConversationHandler(Handler):
                 else:
                     return None
 
-        return key, handler, check
+        return key, handler, check  # type: ignore[return-value]
 
-    def handle_update(self, update, dispatcher, check_result, context=None):
+    def handle_update(self,  # type: ignore[override]
+                      update: HandlerArg,
+                      dispatcher: 'Dispatcher',
+                      check_result: CheckUpdateType,
+                      context: CallbackContext = None) -> Optional[object]:
         """Send the update to the callback for the current state and Handler
 
         Args:
@@ -451,9 +466,12 @@ class ConversationHandler(Handler):
                 handler, and the handler's check result.
             update (:class:`telegram.Update`): Incoming telegram update.
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
+            context (:class:`telegram.ext.CallbackContext`, optional): The context as provided by
+                the dispatcher.
 
         """
-        conversation_key, handler, check_result = check_result
+        update = cast(Update, update)  # for mypy
+        conversation_key, handler, check_result = check_result  # type: ignore[assignment,misc]
 
         with self._timeout_jobs_lock:
             # Remove the old timeout job (if present)
@@ -477,30 +495,35 @@ class ConversationHandler(Handler):
             return self.map_to_parent.get(new_state)
         else:
             self.update_state(new_state, conversation_key)
+        return None
 
-    def update_state(self, new_state, key):
+    def update_state(self,
+                     new_state: object,
+                     key: Tuple[int, ...]) -> None:
         if new_state == self.END:
             with self._conversations_lock:
                 if key in self.conversations:
                     # If there is no key in conversations, nothing is done.
                     del self.conversations[key]
-                    if self.persistent:
+                    if self.persistent and self.persistence and self.name:
                         self.persistence.update_conversation(self.name, key, None)
 
         elif isinstance(new_state, Promise):
             with self._conversations_lock:
                 self.conversations[key] = (self.conversations.get(key), new_state)
-                if self.persistent:
+                if self.persistent and self.persistence and self.name:
                     self.persistence.update_conversation(self.name, key,
                                                          (self.conversations.get(key), new_state))
 
         elif new_state is not None:
             with self._conversations_lock:
                 self.conversations[key] = new_state
-                if self.persistent:
+                if self.persistent and self.persistence and self.name:
                     self.persistence.update_conversation(self.name, key, new_state)
 
-    def _trigger_timeout(self, context, job=None):
+    def _trigger_timeout(self,
+                         context: _ConversationTimeoutContext,
+                         job: 'Job' = None) -> None:
         self.logger.debug('conversation timeout was triggered!')
 
         # Backward compatibility with bots that do not use CallbackContext
@@ -508,7 +531,7 @@ class ConversationHandler(Handler):
         if isinstance(context, CallbackContext):
             job = context.job
 
-        context = job.context
+        context = job.context  # type:ignore[union-attr]
         callback_context = context.callback_context
 
         with self._timeout_jobs_lock:

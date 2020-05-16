@@ -22,11 +22,18 @@ import warnings
 
 from future.utils import string_types
 
-from telegram.ext import Filters
+from telegram.ext import Filters, BaseFilter
 from telegram.utils.deprecate import TelegramDeprecationWarning
 
 from telegram import Update, MessageEntity
 from .handler import Handler
+
+from telegram.utils.typing import HandlerArg
+from typing import Callable, TYPE_CHECKING, Any, Optional, Union, TypeVar, Dict, List, Tuple
+if TYPE_CHECKING:
+    from telegram.ext import CallbackContext, Dispatcher
+
+RT = TypeVar('RT')
 
 
 class CommandHandler(Handler):
@@ -116,15 +123,15 @@ class CommandHandler(Handler):
     """
 
     def __init__(self,
-                 command,
-                 callback,
-                 filters=None,
-                 allow_edited=None,
-                 pass_args=False,
-                 pass_update_queue=False,
-                 pass_job_queue=False,
-                 pass_user_data=False,
-                 pass_chat_data=False):
+                 command: Union[str, List[str]],
+                 callback: Callable[[HandlerArg, 'CallbackContext'], RT],
+                 filters: BaseFilter = None,
+                 allow_edited: bool = None,
+                 pass_args: bool = False,
+                 pass_update_queue: bool = False,
+                 pass_job_queue: bool = False,
+                 pass_user_data: bool = False,
+                 pass_chat_data: bool = False):
         super(CommandHandler, self).__init__(
             callback,
             pass_update_queue=pass_update_queue,
@@ -153,7 +160,9 @@ class CommandHandler(Handler):
                 self.filters &= ~Filters.update.edited_message
         self.pass_args = pass_args
 
-    def check_update(self, update):
+    def check_update(
+            self,
+            update: HandlerArg) -> Optional[Union[bool, Tuple[List[str], Optional[bool]]]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
@@ -167,14 +176,14 @@ class CommandHandler(Handler):
             message = update.effective_message
 
             if (message.entities and message.entities[0].type == MessageEntity.BOT_COMMAND
-                    and message.entities[0].offset == 0):
+                    and message.entities[0].offset == 0 and message.text and message.bot):
                 command = message.text[1:message.entities[0].length]
                 args = message.text.split()[1:]
-                command = command.split('@')
-                command.append(message.bot.username)
+                command_parts = command.split('@')
+                command_parts.append(message.bot.username)
 
-                if not (command[0].lower() in self.command
-                        and command[1].lower() == message.bot.username.lower()):
+                if not (command_parts[0].lower() in self.command
+                        and command_parts[1].lower() == message.bot.username.lower()):
                     return None
 
                 filter_result = self.filters(update)
@@ -182,17 +191,29 @@ class CommandHandler(Handler):
                     return args, filter_result
                 else:
                     return False
+        return None
 
-    def collect_optional_args(self, dispatcher, update=None, check_result=None):
+    def collect_optional_args(
+            self,
+            dispatcher: 'Dispatcher',
+            update: HandlerArg = None,
+            check_result: Optional[Union[bool, Tuple[List[str],
+                                                     Optional[bool]]]] = None) -> Dict[str, Any]:
         optional_args = super(CommandHandler, self).collect_optional_args(dispatcher, update)
-        if self.pass_args:
+        if self.pass_args and isinstance(check_result, tuple):
             optional_args['args'] = check_result[0]
         return optional_args
 
-    def collect_additional_context(self, context, update, dispatcher, check_result):
-        context.args = check_result[0]
-        if isinstance(check_result[1], dict):
-            context.update(check_result[1])
+    def collect_additional_context(
+            self,
+            context: 'CallbackContext',
+            update: HandlerArg,
+            dispatcher: 'Dispatcher',
+            check_result: Optional[Union[bool, Tuple[List[str], Optional[bool]]]]) -> None:
+        if isinstance(check_result, tuple):
+            context.args = check_result[0]
+            if isinstance(check_result[1], dict):
+                context.update(check_result[1])
 
 
 class PrefixHandler(CommandHandler):
@@ -292,19 +313,19 @@ class PrefixHandler(CommandHandler):
     """
 
     def __init__(self,
-                 prefix,
-                 command,
-                 callback,
-                 filters=None,
-                 pass_args=False,
-                 pass_update_queue=False,
-                 pass_job_queue=False,
-                 pass_user_data=False,
-                 pass_chat_data=False):
+                 prefix: Union[str, List[str]],
+                 command: Union[str, List[str]],
+                 callback: Callable[[HandlerArg, 'CallbackContext'], RT],
+                 filters: BaseFilter = None,
+                 pass_args: bool = False,
+                 pass_update_queue: bool = False,
+                 pass_job_queue: bool = False,
+                 pass_user_data: bool = False,
+                 pass_chat_data: bool = False):
 
-        self._prefix = list()
-        self._command = list()
-        self._commands = list()
+        self._prefix: List[str] = list()
+        self._command: List[str] = list()
+        self._commands: List[str] = list()
 
         super(PrefixHandler, self).__init__(
             'nocommand', callback, filters=filters, allow_edited=None, pass_args=pass_args,
@@ -313,38 +334,39 @@ class PrefixHandler(CommandHandler):
             pass_user_data=pass_user_data,
             pass_chat_data=pass_chat_data)
 
-        self.prefix = prefix
-        self.command = command
+        self.prefix = prefix  # type: ignore[assignment]
+        self.command = command  # type: ignore[assignment]
         self._build_commands()
 
     @property
-    def prefix(self):
+    def prefix(self) -> List[str]:
         return self._prefix
 
     @prefix.setter
-    def prefix(self, prefix):
+    def prefix(self, prefix: Union[str, List[str]]) -> None:
         if isinstance(prefix, string_types):
             self._prefix = [prefix.lower()]
         else:
-            self._prefix = prefix
+            self._prefix = prefix  # type: ignore[assignment]
         self._build_commands()
 
-    @property
-    def command(self):
+    @property  # type: ignore[override]
+    def command(self) -> List[str]:  # type: ignore[override]
         return self._command
 
     @command.setter
-    def command(self, command):
+    def command(self, command: Union[str, List[str]]) -> None:
         if isinstance(command, string_types):
             self._command = [command.lower()]
         else:
-            self._command = command
+            self._command = command  # type: ignore[assignment]
         self._build_commands()
 
-    def _build_commands(self):
+    def _build_commands(self) -> None:
         self._commands = [x.lower() + y.lower() for x in self.prefix for y in self.command]
 
-    def check_update(self, update):
+    def check_update(self, update: HandlerArg) -> Optional[Union[bool, Tuple[List[str],
+                                                                             Optional[bool]]]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
@@ -366,8 +388,15 @@ class PrefixHandler(CommandHandler):
                     return text_list[1:], filter_result
                 else:
                     return False
+        return None
 
-    def collect_additional_context(self, context, update, dispatcher, check_result):
-        context.args = check_result[0]
-        if isinstance(check_result[1], dict):
-            context.update(check_result[1])
+    def collect_additional_context(
+            self,
+            context: 'CallbackContext',
+            update: HandlerArg,
+            dispatcher: 'Dispatcher',
+            check_result: Optional[Union[bool, Tuple[List[str], Optional[bool]]]]) -> None:
+        if isinstance(check_result, tuple):
+            context.args = check_result[0]
+            if isinstance(check_result[1], dict):
+                context.update(check_result[1])

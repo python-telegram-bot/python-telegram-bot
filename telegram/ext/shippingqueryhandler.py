@@ -21,6 +21,8 @@
 from telegram import Update
 from .handler import Handler
 
+from telegram.utils.typing import HandlerArg
+
 
 class ShippingQueryHandler(Handler):
     """Handler class to handle Telegram shipping callback queries.
@@ -73,7 +75,7 @@ class ShippingQueryHandler(Handler):
 
     """
 
-    def check_update(self, update):
+    def check_update(self, update: HandlerArg) -> bool:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
@@ -83,4 +85,4 @@ class ShippingQueryHandler(Handler):
             :obj:`bool`
 
         """
-        return isinstance(update, Update) and update.shipping_query
+        return isinstance(update, Update) and bool(update.shipping_query)

@@ -17,14 +17,19 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains custom typing aliases."""
-
-from typing import Union, Any, Dict, TYPE_CHECKING, IO
+from typing import Union, Any, Dict, TYPE_CHECKING, IO, Tuple, Optional
 
 if TYPE_CHECKING:
-    from telegram import InputFile
+    from telegram import InputFile, Update
 
 FileLike = Union[IO, 'InputFile']
 """Either an open file handler or in :class:`telegram.InputFile`."""
 
 JSONDict = Dict[str, Any]
 """Dictionary containing response from Telegram or data to send to the API."""
+
+HandlerArg = Union[str, 'Update']
+"""The argument that handlers parse for :meth:`telegram.ext.handler.check_update` etc."""
+
+ConversationDict = Dict[Tuple[int, ...], Optional[object]]
+"""Dicts as maintained by the :class:`telegram.ext.ConversationHandler`."""

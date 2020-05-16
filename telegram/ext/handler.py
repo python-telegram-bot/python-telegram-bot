@@ -20,6 +20,14 @@
 
 from abc import ABC, abstractmethod
 
+from telegram.utils.typing import HandlerArg
+from telegram import Update
+from typing import Callable, TYPE_CHECKING, Any, Optional, Union, TypeVar, Dict
+if TYPE_CHECKING:
+    from telegram.ext import CallbackContext, Dispatcher
+
+RT = TypeVar('RT')
+
 
 class Handler(ABC):
     """The base class for all update handlers. Create custom handlers by inheriting from it.
@@ -71,21 +79,20 @@ class Handler(ABC):
             DEPRECATED: Please switch to context based callbacks.
 
     """
-
     def __init__(self,
-                 callback,
-                 pass_update_queue=False,
-                 pass_job_queue=False,
-                 pass_user_data=False,
-                 pass_chat_data=False):
-        self.callback = callback
+                 callback: Callable[[HandlerArg, 'CallbackContext'], RT],
+                 pass_update_queue: bool = False,
+                 pass_job_queue: bool = False,
+                 pass_user_data: bool = False,
+                 pass_chat_data: bool = False):
+        self.callback: Callable[[HandlerArg, 'CallbackContext'], RT] = callback
         self.pass_update_queue = pass_update_queue
         self.pass_job_queue = pass_job_queue
         self.pass_user_data = pass_user_data
         self.pass_chat_data = pass_chat_data
 
     @abstractmethod
-    def check_update(self, update):
+    def check_update(self, update: HandlerArg) -> Optional[Union[bool, object]]:
         """
         This method is called to determine if an update should be handled by
         this handler instance. It should always be overridden.
@@ -100,7 +107,11 @@ class Handler(ABC):
 
         """
 
-    def handle_update(self, update, dispatcher, check_result, context=None):
+    def handle_update(self,
+                      update: HandlerArg,
+                      dispatcher: 'Dispatcher',
+                      check_result: object,
+                      context: 'CallbackContext' = None) -> RT:
         """
         This method is called if it was determined that an update should indeed
         be handled by this instance. Calls :attr:`self.callback` along with its respectful
@@ -111,7 +122,9 @@ class Handler(ABC):
         Args:
             update (:obj:`str` | :class:`telegram.Update`): The update to be handled.
             dispatcher (:class:`telegram.ext.Dispatcher`): The calling dispatcher.
-            check_result: The result from :attr:`check_update`.
+            check_result (:obj:`obj`): The result from :attr:`check_update`.
+            context (:class:`telegram.ext.CallbackContext`, optional): The context as provided by
+                the dispatcher.
 
         """
         if context:
@@ -119,9 +132,13 @@ class Handler(ABC):
             return self.callback(update, context)
         else:
             optional_args = self.collect_optional_args(dispatcher, update, check_result)
-            return self.callback(dispatcher.bot, update, **optional_args)
+            return self.callback(dispatcher.bot, update, **optional_args)  # type: ignore
 
-    def collect_additional_context(self, context, update, dispatcher, check_result):
+    def collect_additional_context(self,
+                                   context: 'CallbackContext',
+                                   update: HandlerArg,
+                                   dispatcher: 'Dispatcher',
+                                   check_result: Any) -> None:
         """Prepares additional arguments for the context. Override if needed.
 
         Args:
@@ -133,7 +150,10 @@ class Handler(ABC):
         """
         pass
 
-    def collect_optional_args(self, dispatcher, update=None, check_result=None):
+    def collect_optional_args(self,
+                              dispatcher: 'Dispatcher',
+                              update: HandlerArg = None,
+                              check_result: Any = None) -> Dict[str, Any]:
         """
         Prepares the optional arguments. If the handler has additional optional args,
         it should subclass this method, but remember to call this super method.
@@ -153,10 +173,10 @@ class Handler(ABC):
             optional_args['update_queue'] = dispatcher.update_queue
         if self.pass_job_queue:
             optional_args['job_queue'] = dispatcher.job_queue
-        if self.pass_user_data:
+        if self.pass_user_data and isinstance(update, Update):
             user = update.effective_user
             optional_args['user_data'] = dispatcher.user_data[user.id if user else None]
-        if self.pass_chat_data:
+        if self.pass_chat_data and isinstance(update, Update):
             chat = update.effective_chat
             optional_args['chat_data'] = dispatcher.chat_data[chat.id if chat else None]
 
