@@ -1159,16 +1159,16 @@ class Message(TelegramObject):
                         html_text += escape(message_text[last_offset:entity.offset
                                                          - offset]) + insert
                     else:
-                        html_text += escape(message_text[last_offset * 2:(entity.offset
-                                                         - offset) * 2]
-                                            .decode('utf-16-le')) + insert  # type: ignore
+                        html_text += escape(message_text[  # type: ignore
+                            last_offset * 2:(entity.offset - offset) * 2].decode('utf-16-le')
+                        ) + insert
                 else:
                     if sys.maxunicode == 0xffff:
                         html_text += message_text[last_offset:entity.offset - offset] + insert
                     else:
-                        html_text += message_text[
+                        html_text += message_text[  # type: ignore
                             last_offset * 2:(entity.offset - offset) * 2
-                        ].decode('utf-16-le') + insert  # type: ignore
+                        ].decode('utf-16-le') + insert
 
                 last_offset = entity.offset - offset + entity.length
 
@@ -1338,17 +1338,17 @@ class Message(TelegramObject):
                                                          version=version) + insert
                     else:
                         markdown_text += escape_markdown(
-                            message_text[
+                            message_text[  # type: ignore
                                 last_offset * 2: (entity.offset - offset) * 2
-                            ].decode('utf-16-le'),  # type: ignore
+                            ].decode('utf-16-le'),
                             version=version) + insert
                 else:
                     if sys.maxunicode == 0xffff:
                         markdown_text += message_text[last_offset:entity.offset - offset] + insert
                     else:
-                        markdown_text += message_text[
+                        markdown_text += message_text[  # type: ignore
                             last_offset * 2:(entity.offset - offset) * 2
-                        ].decode('utf-16-le') + insert  # type: ignore
+                        ].decode('utf-16-le') + insert
 
                 last_offset = entity.offset - offset + entity.length
 

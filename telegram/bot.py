@@ -361,9 +361,10 @@ class Bot(TelegramObject):
         if disable_web_page_preview:
             data['disable_web_page_preview'] = disable_web_page_preview
 
-        return self._message(url, data, disable_notification=disable_notification,
+        return self._message(url, data,  # type: ignore[return-value]
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             timeout=timeout, **kwargs)  # type: ignore[return-value]
+                             timeout=timeout, **kwargs)
 
     @log
     def delete_message(self,
@@ -450,8 +451,9 @@ class Bot(TelegramObject):
         if message_id:
             data['message_id'] = message_id
 
-        return self._message(url, data, disable_notification=disable_notification,
-                             timeout=timeout, **kwargs)  # type: ignore[return-value]
+        return self._message(url, data,   # type: ignore[return-value]
+                             disable_notification=disable_notification,
+                             timeout=timeout, **kwargs)
 
     @log
     def send_photo(self,
@@ -515,9 +517,10 @@ class Bot(TelegramObject):
         if parse_mode:
             data['parse_mode'] = parse_mode
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message(url, data,  # type: ignore[return-value]
+                             timeout=timeout, disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)  # type: ignore[return-value]
+                             **kwargs)
 
     @log
     def send_audio(self,
@@ -611,9 +614,10 @@ class Bot(TelegramObject):
                 thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message(url, data,  # type: ignore[return-value]
+                             timeout=timeout, disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)  # type: ignore[return-value]
+                             **kwargs)
 
     @log
     def send_document(self,
@@ -695,9 +699,10 @@ class Bot(TelegramObject):
                 thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message(url, data, timeout=timeout,  # type: ignore[return-value]
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)  # type: ignore[return-value]
+                             **kwargs)
 
     @log
     def send_sticker(self,
@@ -750,9 +755,10 @@ class Bot(TelegramObject):
 
         data: JSONDict = {'chat_id': chat_id, 'sticker': sticker}
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message(url, data, timeout=timeout,  # type: ignore[return-value]
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)  # type: ignore[return-value]
+                             **kwargs)
 
     @log
     def send_video(self,
@@ -849,9 +855,10 @@ class Bot(TelegramObject):
                 thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message(url, data,  # type: ignore[return-value]
+                             timeout=timeout, disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)  # type: ignore[return-value]
+                             **kwargs)
 
     @log
     def send_video_note(self,
@@ -926,9 +933,10 @@ class Bot(TelegramObject):
                 thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message(url, data, timeout=timeout,  # type: ignore[return-value]
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)  # type: ignore[return-value]
+                             **kwargs)
 
     @log
     def send_animation(self,
@@ -1014,9 +1022,10 @@ class Bot(TelegramObject):
         if parse_mode:
             data['parse_mode'] = parse_mode
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message(url, data, timeout=timeout,  # type: ignore[return-value]
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)  # type: ignore[return-value]
+                             **kwargs)
 
     @log
     def send_voice(self,
@@ -1088,9 +1097,10 @@ class Bot(TelegramObject):
         if parse_mode:
             data['parse_mode'] = parse_mode
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message(url, data, timeout=timeout,  # type: ignore[return-value]
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)  # type: ignore[return-value]
+                             **kwargs)
 
     @log
     def send_media_group(self,
@@ -1208,9 +1218,10 @@ class Bot(TelegramObject):
         if live_period:
             data['live_period'] = live_period
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message(url, data, timeout=timeout,  # type: ignore[return-value]
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)  # type: ignore[return-value]
+                             **kwargs)
 
     @log
     def edit_message_live_location(self,
@@ -1401,9 +1412,10 @@ class Bot(TelegramObject):
         if foursquare_type:
             data['foursquare_type'] = foursquare_type
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message(url, data, timeout=timeout,  # type: ignore[return-value]
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)  # type: ignore[return-value]
+                             **kwargs)
 
     @log
     def send_contact(self,
@@ -1472,9 +1484,10 @@ class Bot(TelegramObject):
         if vcard:
             data['vcard'] = vcard
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message(url, data, timeout=timeout,  # type: ignore[return-value]
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)  # type: ignore[return-value]
+                             **kwargs)
 
     @log
     def send_game(self,
@@ -1515,9 +1528,10 @@ class Bot(TelegramObject):
 
         data: JSONDict = {'chat_id': chat_id, 'game_short_name': game_short_name}
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message(url, data, timeout=timeout,  # type: ignore[return-value]
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)  # type: ignore[return-value]
+                             **kwargs)
 
     @log
     def send_chat_action(self,
@@ -2023,8 +2037,8 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return self._message(url, data, timeout=timeout, reply_markup=reply_markup,
-                             **kwargs)  # type: ignore[return-value]
+        return self._message(url, data, timeout=timeout,  # type: ignore[return-value]
+                             reply_markup=reply_markup, **kwargs)
 
     @log
     def edit_message_media(self,
@@ -2082,8 +2096,8 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return self._message(url, data, timeout=timeout, reply_markup=reply_markup,
-                             **kwargs)  # type: ignore[return-value]
+        return self._message(url, data, timeout=timeout,  # type: ignore[return-value]
+                             reply_markup=reply_markup, **kwargs)
 
     @log
     def edit_message_reply_markup(self,
@@ -2136,8 +2150,8 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return self._message(url, data, timeout=timeout, reply_markup=reply_markup,
-                             **kwargs)  # type: ignore[return-value]
+        return self._message(url, data, timeout=timeout,  # type: ignore[return-value]
+                             reply_markup=reply_markup, **kwargs)
 
     @log
     def get_updates(self,
@@ -2650,8 +2664,8 @@ class Bot(TelegramObject):
         if disable_edit_message is not None:
             data['disable_edit_message'] = disable_edit_message
 
-        return self._message(url, data, timeout=timeout,
-                             **kwargs)  # type: ignore[return-value]
+        return self._message(url, data, timeout=timeout,  # type: ignore[return-value]
+                             **kwargs)
 
     @log
     def get_game_high_scores(self,
@@ -2826,9 +2840,10 @@ class Bot(TelegramObject):
         if send_email_to_provider is not None:
             data['send_email_to_provider'] = send_email_to_provider
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message(url, data, timeout=timeout,  # type: ignore[return-value]
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)  # type: ignore[return-value]
+                             **kwargs)
 
     @log
     def answer_shipping_query(self,
@@ -3909,9 +3924,10 @@ class Bot(TelegramObject):
                 close_date = to_timestamp(close_date)
             data['close_date'] = close_date
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message(url, data, timeout=timeout,  # type: ignore[return-value]
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)  # type: ignore[return-value]
+                             **kwargs)
 
     @log
     def stop_poll(self,
@@ -4006,9 +4022,10 @@ class Bot(TelegramObject):
         if emoji:
             data['emoji'] = emoji
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message(url, data, timeout=timeout,  # type: ignore[return-value]
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)  # type: ignore[return-value]
+                             **kwargs)
 
     @log
     def get_my_commands(self,

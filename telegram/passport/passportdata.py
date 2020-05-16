@@ -59,7 +59,7 @@ class PassportData(TelegramObject):
         self.credentials = credentials
 
         self.bot = bot
-        self._decrypted_data = None
+        self._decrypted_data: Optional[List[EncryptedPassportElement]] = None
         self._id_attrs = tuple([x.type for x in data] + [credentials.hash])
 
     @classmethod

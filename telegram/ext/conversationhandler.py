@@ -191,7 +191,7 @@ class ConversationHandler(Handler):
         self._name = name
         if persistent and not self.name:
             raise ValueError("Conversations can't be persistent when handler is unnamed.")
-        self.persistent = persistent
+        self.persistent: bool = persistent
         self._persistence: Optional[BasePersistence] = None
         """:obj:`telegram.ext.BasePersistance`: The persistence used to store conversations.
         Set by dispatcher"""
