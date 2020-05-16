@@ -162,7 +162,8 @@ class CommandHandler(Handler):
 
     def check_update(
             self,
-            update: HandlerArg) -> Optional[Union[bool, Tuple[List[str], Optional[bool]]]]:
+            update: HandlerArg) -> Optional[Union[bool, Tuple[List[str],
+                                                              Optional[Union[bool, Dict]]]]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
@@ -366,7 +367,7 @@ class PrefixHandler(CommandHandler):
         self._commands = [x.lower() + y.lower() for x in self.prefix for y in self.command]
 
     def check_update(self, update: HandlerArg) -> Optional[Union[bool, Tuple[List[str],
-                                                                             Optional[bool]]]]:
+                                                                 Optional[Union[bool, Dict]]]]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
