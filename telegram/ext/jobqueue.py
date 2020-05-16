@@ -611,7 +611,7 @@ class Job(object):
         if dispatcher.use_context:
             self.callback(CallbackContext.from_job(self, dispatcher))
         else:
-            self.callback(dispatcher.bot, self)  # type: ignore[call-arg]
+            self.callback(dispatcher.bot, self)  # type: ignore[call-arg,arg-type]
 
     def schedule_removal(self) -> None:
         """

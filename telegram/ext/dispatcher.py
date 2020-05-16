@@ -38,10 +38,17 @@ from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.promise import Promise
 from telegram.ext import BasePersistence
 
+from typing import Any, Callable, TYPE_CHECKING, Optional, Union, DefaultDict, Dict, List, Set
+
+if TYPE_CHECKING:
+    from telegram import Bot
+    from telegram.ext import JobQueue
+
 DEFAULT_GROUP = 0
 
 
-def run_async(func):
+def run_async(func: Callable[[Update, CallbackContext],
+                             Any]) -> Callable[[Update, CallbackContext], Any]:
     """
     Function decorator that will run the function in a new thread.
 
@@ -55,7 +62,7 @@ def run_async(func):
     """
 
     @wraps(func)
-    def async_func(*args, **kwargs):
+    def async_func(*args: Any, **kwargs: Any) -> Any:
         return Dispatcher.get_instance().run_async(func, *args, **kwargs)
 
     return async_func
@@ -103,13 +110,13 @@ class Dispatcher(object):
     logger = logging.getLogger(__name__)
 
     def __init__(self,
-                 bot,
-                 update_queue,
-                 workers=4,
-                 exception_event=None,
-                 job_queue=None,
-                 persistence=None,
-                 use_context=False):
+                 bot: 'Bot',
+                 update_queue: Queue,
+                 workers: int = 4,
+                 exception_event: Event = None,
+                 job_queue: 'JobQueue' = None,
+                 persistence: BasePersistence = None,
+                 use_context: bool = False):
         self.bot = bot
         self.update_queue = update_queue
         self.job_queue = job_queue
@@ -120,9 +127,10 @@ class Dispatcher(object):
             warnings.warn('Old Handler API is deprecated - see https://git.io/fxJuV for details',
                           TelegramDeprecationWarning, stacklevel=3)
 
-        self.user_data = defaultdict(dict)
-        self.chat_data = defaultdict(dict)
+        self.user_data: DefaultDict[int, Dict[Any, Any]] = defaultdict(dict)
+        self.chat_data: DefaultDict[int, Dict[Any, Any]] = defaultdict(dict)
         self.bot_data = {}
+        self.persistence: Optional[BasePersistence] = None
         if persistence:
             if not isinstance(persistence, BasePersistence):
                 raise TypeError("persistence should be based on telegram.ext.BasePersistence")
@@ -142,33 +150,33 @@ class Dispatcher(object):
         else:
             self.persistence = None
 
-        self.handlers = {}
+        self.handlers: Dict[int, List[Handler]] = {}
         """Dict[:obj:`int`, List[:class:`telegram.ext.Handler`]]: Holds the handlers per group."""
-        self.groups = []
+        self.groups: List[int] = []
         """List[:obj:`int`]: A list with all groups."""
-        self.error_handlers = []
+        self.error_handlers: List[Callable] = []
         """List[:obj:`callable`]: A list of errorHandlers."""
 
         self.running = False
         """:obj:`bool`: Indicates if this dispatcher is running."""
         self.__stop_event = Event()
         self.__exception_event = exception_event or Event()
-        self.__async_queue = Queue()
-        self.__async_threads = set()
+        self.__async_queue: Queue = Queue()
+        self.__async_threads: Set[Thread] = set()
 
         # For backward compatibility, we allow a "singleton" mode for the dispatcher. When there's
         # only one instance of Dispatcher, it will be possible to use the `run_async` decorator.
         with self.__singleton_lock:
-            if self.__singleton_semaphore.acquire(blocking=0):
+            if self.__singleton_semaphore.acquire(blocking=False):
                 self._set_singleton(self)
             else:
                 self._set_singleton(None)
 
     @property
-    def exception_event(self):
+    def exception_event(self) -> Event:
         return self.__exception_event
 
-    def _init_async_threads(self, base_name, workers):
+    def _init_async_threads(self, base_name: str, workers: int) -> None:
         base_name = '{}_'.format(base_name) if base_name else ''
 
         for i in range(workers):
@@ -178,12 +186,12 @@ class Dispatcher(object):
             thread.start()
 
     @classmethod
-    def _set_singleton(cls, val):
+    def _set_singleton(cls, val: Optional['Dispatcher']) -> None:
         cls.logger.debug('Setting singleton dispatcher as %s', val)
         cls.__singleton = weakref.ref(val) if val else None
 
     @classmethod
-    def get_instance(cls):
+    def get_instance(cls) -> 'Dispatcher':
         """Get the singleton instance of this class.
 
         Returns:
@@ -194,12 +202,12 @@ class Dispatcher(object):
 
         """
         if cls.__singleton is not None:
-            return cls.__singleton()  # pylint: disable=not-callable
+            return cls.__singleton()  # type: ignore[return-value] # pylint: disable=not-callable
         else:
             raise RuntimeError('{} not initialized or multiple instances exist'.format(
                 cls.__name__))
 
-    def _pooled(self):
+    def _pooled(self) -> None:
         thr_name = current_thread().getName()
         while 1:
             promise = self.__async_queue.get()
@@ -216,7 +224,10 @@ class Dispatcher(object):
                     'DispatcherHandlerStop is not supported with async functions; func: %s',
                     promise.pooled_function.__name__)
 
-    def run_async(self, func, *args, **kwargs):
+    def run_async(self,
+                  func: Callable[[Update, CallbackContext], Any],
+                  *args: Any,
+                  **kwargs: Any) -> Promise:
         """Queue a function (with given args/kwargs) to be run asynchronously.
 
         Warning:
@@ -238,7 +249,7 @@ class Dispatcher(object):
         self.__async_queue.put(promise)
         return promise
 
-    def start(self, ready=None):
+    def start(self, ready: Event = None) -> None:
         """Thread target of thread 'dispatcher'.
 
         Runs in background and processes the update queue.
@@ -259,7 +270,7 @@ class Dispatcher(object):
             self.logger.error(msg)
             raise TelegramError(msg)
 
-        self._init_async_threads(uuid4(), self.workers)
+        self._init_async_threads(str(uuid4()), self.workers)
         self.running = True
         self.logger.debug('Dispatcher started')
 
@@ -286,7 +297,7 @@ class Dispatcher(object):
         self.running = False
         self.logger.debug('Dispatcher thread stopped')
 
-    def stop(self):
+    def stop(self) -> None:
         """Stops the thread."""
         if self.running:
             self.__stop_event.set()
@@ -310,10 +321,10 @@ class Dispatcher(object):
             self.logger.debug('async thread {0}/{1} has ended'.format(i + 1, total))
 
     @property
-    def has_running_threads(self):
+    def has_running_threads(self) -> bool:
         return self.running or bool(self.__async_threads)
 
-    def process_update(self, update):
+    def process_update(self, update: Union[str, Update, TelegramError, object]) -> None:
         """Processes a single update.
 
         Args:
@@ -335,11 +346,11 @@ class Dispatcher(object):
         for group in self.groups:
             try:
                 for handler in self.handlers[group]:
-                    check = handler.check_update(update)
+                    check = handler.check_update(update)  # type: ignore
                     if check is not None and check is not False:
                         if not context and self.use_context:
                             context = CallbackContext.from_update(update, self)
-                        handler.handle_update(update, self, check, context)
+                        handler.handle_update(update, self, check, context)  # type: ignore
                         self.update_persistence(update=update)
                         break
 
@@ -362,7 +373,7 @@ class Dispatcher(object):
                                           'uncaught error was raised while handling the error '
                                           'with an error_handler')
 
-    def add_handler(self, handler, group=DEFAULT_GROUP):
+    def add_handler(self, handler: Handler, group: int = DEFAULT_GROUP) -> None:
         """Register a handler.
 
         TL;DR: Order and priority counts. 0 or 1 handlers per group will be used. End handling of
@@ -394,7 +405,7 @@ class Dispatcher(object):
             raise TypeError('handler is not an instance of {0}'.format(Handler.__name__))
         if not isinstance(group, int):
             raise TypeError('group is not int')
-        if isinstance(handler, ConversationHandler) and handler.persistent:
+        if isinstance(handler, ConversationHandler) and handler.persistent and handler.name:
             if not self.persistence:
                 raise ValueError(
                     "Conversationhandler {} can not be persistent if dispatcher has no "
@@ -409,7 +420,7 @@ class Dispatcher(object):
 
         self.handlers[group].append(handler)
 
-    def remove_handler(self, handler, group=DEFAULT_GROUP):
+    def remove_handler(self, handler: Handler, group: int = DEFAULT_GROUP) -> None:
         """Remove a handler from the specified group.
 
         Args:
@@ -423,7 +434,7 @@ class Dispatcher(object):
                 del self.handlers[group]
                 self.groups.remove(group)
 
-    def update_persistence(self, update=None):
+    def update_persistence(self, update: object = None) -> None:
         """Update :attr:`user_data`, :attr:`chat_data` and :attr:`bot_data` in :attr:`persistence`.
 
         Args:
@@ -431,8 +442,8 @@ class Dispatcher(object):
             corresponding ``user_data`` and ``chat_data`` will be updated.
         """
         if self.persistence:
-            chat_ids = self.chat_data.keys()
-            user_ids = self.user_data.keys()
+            chat_ids = list(self.chat_data.keys())
+            user_ids = list(self.user_data.keys())
 
             if isinstance(update, Update):
                 if update.effective_chat:
@@ -480,7 +491,7 @@ class Dispatcher(object):
                                       'the error with an error_handler'
                             self.logger.exception(message)
 
-    def add_error_handler(self, callback):
+    def add_error_handler(self, callback: Callable[[Any, CallbackContext], None]) -> None:
         """Registers an error handler in the Dispatcher. This handler will receive every error
         which happens in your bot.
 
@@ -500,7 +511,7 @@ class Dispatcher(object):
         """
         self.error_handlers.append(callback)
 
-    def remove_error_handler(self, callback):
+    def remove_error_handler(self, callback: Callable[[Any, CallbackContext], None]) -> None:
         """Removes an error handler.
 
         Args:
@@ -510,7 +521,9 @@ class Dispatcher(object):
         if callback in self.error_handlers:
             self.error_handlers.remove(callback)
 
-    def dispatch_error(self, update, error):
+    def dispatch_error(self,
+                       update: Union[str, Update, object, None],
+                       error: Exception) -> None:
         """Dispatches an error.
 
         Args:

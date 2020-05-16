@@ -483,10 +483,10 @@ class ConversationHandler(Handler):
         new_state = handler.handle_update(update, dispatcher, check_result, context)
 
         with self._timeout_jobs_lock:
-            if self.conversation_timeout and new_state != self.END:
+            if self.conversation_timeout and new_state != self.END and dispatcher.job_queue:
                 # Add the new timeout job
                 self.timeout_jobs[conversation_key] = dispatcher.job_queue.run_once(
-                    self._trigger_timeout, self.conversation_timeout,
+                    self._trigger_timeout, self.conversation_timeout,  # type: ignore[arg-type]
                     context=_ConversationTimeoutContext(conversation_key, update,
                                                         dispatcher, context))
 

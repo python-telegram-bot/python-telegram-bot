@@ -22,7 +22,7 @@ from typing import Dict, Any, TYPE_CHECKING, Optional, Match, List
 
 from telegram import Update
 if TYPE_CHECKING:
-    from telegram import TelegramError, Bot
+    from telegram import Bot
     from telegram.ext import Dispatcher, Job, JobQueue
 
 
@@ -88,11 +88,11 @@ class CallbackContext(object):
                              'dispatcher!')
         self._dispatcher = dispatcher
         self._bot_data = dispatcher.bot_data
-        self._chat_data = None
-        self._user_data = None
+        self._chat_data: Optional[Dict[Any, Any]] = None
+        self._user_data: Optional[Dict[Any, Any]] = None
         self.args: Optional[List[str]] = None
         self.matches: Optional[List[Match]] = None
-        self.error: Optional['TelegramError'] = None
+        self.error: Optional[Exception] = None
         self.job: Optional['Job'] = None
 
     @property
@@ -129,15 +129,15 @@ class CallbackContext(object):
 
     @classmethod
     def from_error(cls,
-                   update: Update,
-                   error: 'TelegramError',
+                   update: object,
+                   error: Exception,
                    dispatcher: 'Dispatcher') -> 'CallbackContext':
         self = cls.from_update(update, dispatcher)
         self.error = error
         return self
 
     @classmethod
-    def from_update(cls, update: Update, dispatcher: 'Dispatcher') -> 'CallbackContext':
+    def from_update(cls, update: object, dispatcher: 'Dispatcher') -> 'CallbackContext':
         self = cls(dispatcher)
 
         if update is not None and isinstance(update, Update):
@@ -165,7 +165,7 @@ class CallbackContext(object):
         return self._dispatcher.bot
 
     @property
-    def job_queue(self) -> 'JobQueue':
+    def job_queue(self) -> Optional['JobQueue']:
         """
         :class:`telegram.ext.JobQueue`: The ``JobQueue`` used by the
             :class:`telegram.ext.Dispatcher` and (usually) the :class:`telegram.ext.Updater`

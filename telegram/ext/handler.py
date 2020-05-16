@@ -167,7 +167,7 @@ class Handler(ABC):
             check_result: The result from check_update
 
         """
-        optional_args = dict()
+        optional_args: Dict[str, Any] = dict()
 
         if self.pass_update_queue:
             optional_args['update_queue'] = dispatcher.update_queue
@@ -175,9 +175,11 @@ class Handler(ABC):
             optional_args['job_queue'] = dispatcher.job_queue
         if self.pass_user_data and isinstance(update, Update):
             user = update.effective_user
-            optional_args['user_data'] = dispatcher.user_data[user.id if user else None]
+            optional_args['user_data'] = dispatcher.user_data[
+                user.id if user else None]  # type: ignore[index]
         if self.pass_chat_data and isinstance(update, Update):
             chat = update.effective_chat
-            optional_args['chat_data'] = dispatcher.chat_data[chat.id if chat else None]
+            optional_args['chat_data'] = dispatcher.chat_data[
+                chat.id if chat else None]  # type: ignore[index]
 
         return optional_args
