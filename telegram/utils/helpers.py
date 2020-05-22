@@ -67,7 +67,7 @@ def escape_markdown(text, version=1, entity_type=None):
         else:
             escape_chars = '_*\[\]()~`>\#\+\-=|{}\.!'
     else:
-        raise ValueError('Markdown version musst be either 1 or 2!')
+        raise ValueError('Markdown version must be either 1 or 2!')
 
     return re.sub(r'([%s])' % escape_chars, r'\\\1', text)
 
