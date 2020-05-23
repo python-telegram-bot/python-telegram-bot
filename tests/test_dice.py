@@ -48,10 +48,11 @@ class TestDice(object):
         assert dice_dict['emoji'] == dice.emoji
 
     def test_equality(self):
-        a = Dice(3)
-        b = Dice(3)
-        c = Dice(4)
-        d = BotCommand('start', 'description')
+        a = Dice(3, '🎯')
+        b = Dice(3, '🎯')
+        c = Dice(3, '🎲')
+        d = Dice(4, '🎯')
+        e = BotCommand('start', 'description')
 
         assert a == b
         assert hash(a) == hash(b)
@@ -61,3 +62,6 @@ class TestDice(object):
 
         assert a != d
         assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)

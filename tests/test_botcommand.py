@@ -52,7 +52,7 @@ class TestBotCommand(object):
         b = BotCommand('start', 'some description')
         c = BotCommand('start', 'some other description')
         d = BotCommand('hepl', 'some description')
-        e = Dice(4)
+        e = Dice(4, 'emoji')
 
         assert a == b
         assert hash(a) == hash(b)

@@ -44,7 +44,7 @@ class Dice(TelegramObject):
         self.value = value
         self.emoji = emoji
 
-        self._id_attrs = (self.value,)
+        self._id_attrs = (self.value, self.emoji)
 
     @classmethod
     def de_json(cls, data, bot):
