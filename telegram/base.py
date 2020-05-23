@@ -24,13 +24,11 @@ except ImportError:
     import json
 
 import warnings
-from abc import ABCMeta
 
 
 class TelegramObject(object):
     """Base class for most telegram objects."""
 
-    __metaclass__ = ABCMeta
     _id_attrs = ()
 
     def __str__(self):

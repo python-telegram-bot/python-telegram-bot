@@ -44,8 +44,6 @@ from telegram.error import InvalidToken, TelegramError
 from telegram.utils.helpers import to_timestamp, DEFAULT_NONE
 from telegram.utils.request import Request
 
-logging.getLogger(__name__).addHandler(logging.NullHandler())
-
 
 def info(func):
     @functools.wraps(func)
@@ -551,9 +549,10 @@ class Bot(TelegramObject):
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
             thumb (`filelike object`, optional): Thumbnail of the file sent; can be ignored if
-                thumbnail generation for the file is supported server-side. The thumbnail should
-                be in JPEG format and less than 200 kB in size. A thumbnail's width and height
-                should not exceed 320. Ignored if the file is not is passed as a string or file_id.
+                thumbnail generation for the file is supported server-side. The thumbnail should be
+                in JPEG format and less than 200 kB in size. A thumbnail's width and height should
+                not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
+                Thumbnails can't be reused and can be only uploaded as a new file.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -638,9 +637,10 @@ class Bot(TelegramObject):
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
             thumb (`filelike object`, optional): Thumbnail of the file sent; can be ignored if
-                thumbnail generation for the file is supported server-side. The thumbnail should
-                be in JPEG format and less than 200 kB in size. A thumbnail's width and height
-                should not exceed 320. Ignored if the file is not passed as a string or file_id.
+                thumbnail generation for the file is supported server-side. The thumbnail should be
+                in JPEG format and less than 200 kB in size. A thumbnail's width and height should
+                not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
+                Thumbnails can't be reused and can be only uploaded as a new file.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -780,9 +780,10 @@ class Bot(TelegramObject):
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
             thumb (`filelike object`, optional): Thumbnail of the file sent; can be ignored if
-                thumbnail generation for the file is supported server-side. The thumbnail should
-                be in JPEG format and less than 200 kB in size. A thumbnail‘s width and height
-                should not exceed 320. Ignored if the file is not is passed as a string or file_id.
+                thumbnail generation for the file is supported server-side. The thumbnail should be
+                in JPEG format and less than 200 kB in size. A thumbnail's width and height should
+                not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
+                Thumbnails can't be reused and can be only uploaded as a new file.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -862,9 +863,10 @@ class Bot(TelegramObject):
                 JSON-serialized object for an inline keyboard, custom reply keyboard,
                 instructions to remove reply keyboard or to force a reply from the user.
             thumb (`filelike object`, optional): Thumbnail of the file sent; can be ignored if
-                thumbnail generation for the file is supported server-side. The thumbnail should
-                be in JPEG format and less than 200 kB in size. A thumbnail‘s width and height
-                should not exceed 320. Ignored if the file is not is passed as a string or file_id.
+                thumbnail generation for the file is supported server-side. The thumbnail should be
+                in JPEG format and less than 200 kB in size. A thumbnail's width and height should
+                not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
+                Thumbnails can't be reused and can be only uploaded as a new file.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -929,9 +931,10 @@ class Bot(TelegramObject):
             width (:obj:`int`, optional): Animation width.
             height (:obj:`int`, optional): Animation height.
             thumb (`filelike object`, optional): Thumbnail of the file sent; can be ignored if
-                thumbnail generation for the file is supported server-side. The thumbnail should
-                be in JPEG format and less than 200 kB in size. A thumbnail‘s width and height
-                should not exceed 320. Ignored if the file is not is passed as a string or file_id.
+                thumbnail generation for the file is supported server-side. The thumbnail should be
+                in JPEG format and less than 200 kB in size. A thumbnail's width and height should
+                not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
+                Thumbnails can't be reused and can be only uploaded as a new file.
             caption (:obj:`str`, optional): Animation caption (may also be used when resending
                 animations by file_id), 0-1024 characters after entities parsing.
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
@@ -3633,6 +3636,10 @@ class Bot(TelegramObject):
                   reply_to_message_id=None,
                   reply_markup=None,
                   timeout=None,
+                  explanation=None,
+                  explanation_parse_mode=DEFAULT_NONE,
+                  open_period=None,
+                  close_date=None,
                   **kwargs):
         """
         Use this method to send a native poll.
@@ -3650,6 +3657,18 @@ class Bot(TelegramObject):
                 answers, ignored for polls in quiz mode, defaults to False.
             correct_option_id (:obj:`int`, optional): 0-based identifier of the correct answer
                 option, required for polls in quiz mode.
+            explanation (:obj:`str`, optional): Text that is shown when a user chooses an incorrect
+                answer or taps on the lamp icon in a quiz-style poll, 0-200 characters with at most
+                2 line feeds after entities parsing.
+            explanation_parse_mode (:obj:`str`, optional): Mode for parsing entities in the
+                explanation. See the constants in :class:`telegram.ParseMode` for the available
+                modes.
+            open_period (:obj:`int`, optional): Amount of time in seconds the poll will be active
+                after creation, 5-600. Can't be used together with :attr:`close_date`.
+            close_date (:obj:`int` | :obj:`datetime.datetime`, optional): Point in time (Unix
+                timestamp) when the poll will be automatically closed. Must be at least 5 and no
+                more than 600 seconds in the future. Can't be used together with
+                :attr:`open_period`.
             is_closed (:obj:`bool`, optional): Pass True, if the poll needs to be immediately
                 closed. This can be useful for poll preview.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
@@ -3679,6 +3698,12 @@ class Bot(TelegramObject):
             'options': options
         }
 
+        if explanation_parse_mode == DEFAULT_NONE:
+            if self.defaults:
+                explanation_parse_mode = self.defaults.parse_mode
+            else:
+                explanation_parse_mode = None
+
         if not is_anonymous:
             data['is_anonymous'] = is_anonymous
         if type:
@@ -3689,6 +3714,16 @@ class Bot(TelegramObject):
             data['correct_option_id'] = correct_option_id
         if is_closed:
             data['is_closed'] = is_closed
+        if explanation:
+            data['explanation'] = explanation
+        if explanation_parse_mode:
+            data['explanation_parse_mode'] = explanation_parse_mode
+        if open_period:
+            data['open_period'] = open_period
+        if close_date:
+            if isinstance(close_date, datetime):
+                close_date = to_timestamp(close_date)
+            data['close_date'] = close_date
 
         return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
@@ -3749,6 +3784,7 @@ class Bot(TelegramObject):
                   reply_to_message_id=None,
                   reply_markup=None,
                   timeout=None,
+                  emoji=None,
                   **kwargs):
         """
         Use this method to send a dice, which will have a random value from 1 to 6. On success, the
@@ -3756,6 +3792,8 @@ class Bot(TelegramObject):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target private chat.
+            emoji (:obj:`str`, optional): Emoji on which the dice throw animation is based.
+                Currently, must be one of “🎲” or “🎯”. Defaults to “🎲”
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
@@ -3780,6 +3818,9 @@ class Bot(TelegramObject):
         data = {
             'chat_id': chat_id,
         }
+
+        if emoji:
+            data['emoji'] = emoji
 
         return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
