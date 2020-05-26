@@ -110,7 +110,7 @@ class Message(TelegramObject):
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
-        default_quote (:obj:`bool`): Optional. Default setting for the `quote` parameter of the
+        default_quote (:obj:`bool`): Optional. Default setting for the ``quote`` parameter of the
             :attr:`reply_text` and friends.
 
     Args:
@@ -218,8 +218,13 @@ class Message(TelegramObject):
         dice (:class:`telegram.Dice`, optional): Message is a dice with random value from 1 to 6.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. login_url buttons are represented as ordinary url buttons.
-        default_quote (:obj:`bool`, optional): Default setting for the `quote` parameter of the
+        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+        default_quote (:obj:`bool`, optional): Default setting for the ``quote`` parameter of the
             :attr:`reply_text` and friends.
+
+            Warning:
+                If both :attr:`bot` and :attr:`default_quote` are passed, :attr:`default_quote`
+                will override ``bot.defaults.quote``.
 
     """
 
@@ -337,7 +342,7 @@ class Message(TelegramObject):
         self.dice = dice
         self.reply_markup = reply_markup
         self.bot = bot
-        self.default_quote = default_quote
+        self._default_quote = default_quote
 
         self._id_attrs = (self.message_id,)
 
@@ -359,6 +364,14 @@ class Message(TelegramObject):
             return "https://t.me/{}/{}".format(to_link, self.message_id)
         return None
 
+    @property
+    def default_quote(self):
+        if self._default_quote is not None:
+            return self._default_quote
+        if self.bot.defaults:
+            return self.bot.defaults.quote
+        return None
+
     @classmethod
     def de_json(cls, data, bot):
         if not data:
@@ -368,22 +381,13 @@ class Message(TelegramObject):
 
         data['from_user'] = User.de_json(data.get('from'), bot)
         data['date'] = from_timestamp(data['date'])
-        chat = data.get('chat')
-        if chat:
-            chat['default_quote'] = data.get('default_quote')
-        data['chat'] = Chat.de_json(chat, bot)
+        data['chat'] = Chat.de_json(data.get('chat'), bot)
         data['entities'] = MessageEntity.de_list(data.get('entities'), bot)
         data['caption_entities'] = MessageEntity.de_list(data.get('caption_entities'), bot)
         data['forward_from'] = User.de_json(data.get('forward_from'), bot)
-        forward_from_chat = data.get('forward_from_chat')
-        if forward_from_chat:
-            forward_from_chat['default_quote'] = data.get('default_quote')
-        data['forward_from_chat'] = Chat.de_json(forward_from_chat, bot)
+        data['forward_from_chat'] = Chat.de_json(data.get('forward_from_chat'), bot)
         data['forward_date'] = from_timestamp(data.get('forward_date'))
-        reply_to_message = data.get('reply_to_message')
-        if reply_to_message:
-            reply_to_message['default_quote'] = data.get('default_quote')
-        data['reply_to_message'] = Message.de_json(reply_to_message, bot)
+        data['reply_to_message'] = Message.de_json(data.get('reply_to_message'), bot)
         data['edit_date'] = from_timestamp(data.get('edit_date'))
         data['audio'] = Audio.de_json(data.get('audio'), bot)
         data['document'] = Document.de_json(data.get('document'), bot)
@@ -400,10 +404,7 @@ class Message(TelegramObject):
         data['new_chat_members'] = User.de_list(data.get('new_chat_members'), bot)
         data['left_chat_member'] = User.de_json(data.get('left_chat_member'), bot)
         data['new_chat_photo'] = PhotoSize.de_list(data.get('new_chat_photo'), bot)
-        pinned_message = data.get('pinned_message')
-        if pinned_message:
-            pinned_message['default_quote'] = data.get('default_quote')
-        data['pinned_message'] = Message.de_json(pinned_message, bot)
+        data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
         data['invoice'] = Invoice.de_json(data.get('invoice'), bot)
         data['successful_payment'] = SuccessfulPayment.de_json(data.get('successful_payment'), bot)
         data['passport_data'] = PassportData.de_json(data.get('passport_data'), bot)

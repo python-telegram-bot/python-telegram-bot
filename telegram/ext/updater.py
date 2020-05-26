@@ -197,9 +197,6 @@ class Updater(object):
         self.__lock = Lock()
         self.__threads = []
 
-        # Just for passing to WebhookAppClass
-        self._default_quote = defaults.quote if defaults else None
-
     def _init_thread(self, target, name, *args, **kwargs):
         thr = Thread(target=self._thread_wrapper,
                      name="Bot:{}:{}".format(self.bot.id, name),
@@ -417,8 +414,7 @@ class Updater(object):
             url_path = '/{0}'.format(url_path)
 
         # Create Tornado app instance
-        app = WebhookAppClass(url_path, self.bot, self.update_queue,
-                              default_quote=self._default_quote)
+        app = WebhookAppClass(url_path, self.bot, self.update_queue)
 
         # Form SSL Context
         # An SSLError is raised if the private key does not match with the certificate

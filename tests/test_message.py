@@ -23,6 +23,7 @@ import pytest
 from telegram import (Update, Message, User, MessageEntity, Chat, Audio, Document, Animation,
                       Game, PhotoSize, Sticker, Video, Voice, VideoNote, Contact, Location, Venue,
                       Invoice, SuccessfulPayment, PassportData, ParseMode, Poll, PollOption, Dice)
+from telegram.ext import Defaults
 from tests.test_passport import RAW_PASSPORT_DATA
 
 
@@ -793,19 +794,43 @@ class TestMessage(object):
         monkeypatch.setattr(message.bot, 'delete_message', test)
         assert message.delete()
 
-    def test_default_quote(self, message):
+    def test_default_quote_by_arg(self, message):
+        message.bot.defaults = None
         kwargs = {}
 
-        message.default_quote = False
+        message._default_quote = False
         message._quote(kwargs)
         assert 'reply_to_message_id' not in kwargs
 
-        message.default_quote = True
+        message._default_quote = True
         message._quote(kwargs)
         assert 'reply_to_message_id' in kwargs
 
         kwargs = {}
-        message.default_quote = None
+        message._default_quote = None
+        message.chat.type = Chat.PRIVATE
+        message._quote(kwargs)
+        assert 'reply_to_message_id' not in kwargs
+
+        message.chat.type = Chat.GROUP
+        message._quote(kwargs)
+        assert 'reply_to_message_id' in kwargs
+
+    def test_default_quote_by_bot(self, message):
+        message._default_quote = None
+        message.bot.defaults = Defaults()
+        kwargs = {}
+
+        message.bot.defaults._quote = False
+        message._quote(kwargs)
+        assert 'reply_to_message_id' not in kwargs
+
+        message.bot.defaults._quote = True
+        message._quote(kwargs)
+        assert 'reply_to_message_id' in kwargs
+
+        kwargs = {}
+        message.bot.defaults._quote = None
         message.chat.type = Chat.PRIVATE
         message._quote(kwargs)
         assert 'reply_to_message_id' not in kwargs

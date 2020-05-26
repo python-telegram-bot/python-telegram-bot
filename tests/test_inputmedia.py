@@ -339,6 +339,7 @@ class TestSendMediaGroup(object):
     @pytest.mark.parametrize('default_bot', [{'quote': True}], indirect=True)
     def test_send_media_group_default_quote(self, default_bot, chat_id, media_group):
         messages = default_bot.send_media_group(chat_id, media_group)
+        assert all([mes._default_quote is None for mes in messages])
         assert all([mes.default_quote is True for mes in messages])
 
     @flaky(3, 1)

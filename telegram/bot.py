@@ -178,9 +178,6 @@ class Bot(TelegramObject):
         if result is True:
             return result
 
-        if self.defaults:
-            result['default_quote'] = self.defaults.quote
-
         return Message.de_json(result, self)
 
     @property
@@ -1104,10 +1101,6 @@ class Bot(TelegramObject):
             data['disable_notification'] = disable_notification
 
         result = self._request.post(url, data, timeout=timeout)
-
-        if self.defaults:
-            for res in result:
-                res['default_quote'] = self.defaults.quote
 
         return [Message.de_json(res, self) for res in result]
 
@@ -2143,10 +2136,6 @@ class Bot(TelegramObject):
         else:
             self.logger.debug('No new updates found.')
 
-        if self.defaults:
-            for u in result:
-                u['default_quote'] = self.defaults.quote
-
         return [Update.de_json(u, self) for u in result]
 
     @log
@@ -2326,9 +2315,6 @@ class Bot(TelegramObject):
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
-
-        if self.defaults:
-            result['default_quote'] = self.defaults.quote
 
         return Chat.de_json(result, self)
 
