@@ -83,6 +83,9 @@ class TelegramObject(object):
             if self._id_attrs == ():
                 warnings.warn("Objects of type {} can not be meaningfully tested for "
                               "equivalence.".format(self.__class__.__name__))
+            if other._id_attrs == ():
+                warnings.warn("Objects of type {} can not be meaningfully tested for "
+                              "equivalence.".format(other.__class__.__name__))
             return self._id_attrs == other._id_attrs
         return super(TelegramObject, self).__eq__(other)  # pylint: disable=no-member
 
