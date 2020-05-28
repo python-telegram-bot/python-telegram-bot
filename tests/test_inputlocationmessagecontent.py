@@ -52,8 +52,8 @@ class TestInputLocationMessageContent(object):
 
     def test_equality(self):
         a = InputLocationMessageContent(123, 456, 70)
-        b = InputLocationMessageContent(123, 456, 70)
-        c = InputLocationMessageContent(123, 456, 80)
+        b = InputLocationMessageContent(123, 456, 90)
+        c = InputLocationMessageContent(123, 457, 70)
         d = Location(123, 456)
 
         assert a == b

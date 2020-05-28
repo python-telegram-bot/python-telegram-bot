@@ -26,8 +26,7 @@ class InputLocationMessageContent(InputMessageContent):
     Represents the content of a location message to be sent as the result of an inline query.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`latitude`, :attr:`longitude` and :attr:`live_period` are
-    equal.
+    considered equal, if their :attr:`latitude` and :attr:`longitude` are equal.
 
     Attributes:
         latitude (:obj:`float`): Latitude of the location in degrees.
@@ -50,4 +49,4 @@ class InputLocationMessageContent(InputMessageContent):
         self.longitude = longitude
         self.live_period = live_period
 
-        self._id_attrs = (self.latitude, self.longitude, self.live_period)
+        self._id_attrs = (self.latitude, self.longitude)

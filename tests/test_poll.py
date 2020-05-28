@@ -53,9 +53,10 @@ class TestPollOption(object):
 
     def test_equality(self):
         a = PollOption('text', 1)
-        b = PollOption('text', 2)
+        b = PollOption('text', 1)
         c = PollOption('text_1', 1)
-        d = Poll(123, 'question', ['O1', 'O2'], 1, False, True, Poll.REGULAR, True)
+        d = PollOption('text', 2)
+        e = Poll(123, 'question', ['O1', 'O2'], 1, False, True, Poll.REGULAR, True)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -65,6 +66,9 @@ class TestPollOption(object):
 
         assert a != d
         assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
 
 
 @pytest.fixture(scope="class")

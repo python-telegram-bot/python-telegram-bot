@@ -30,7 +30,7 @@ class PollOption(TelegramObject):
     This object contains information about one answer option in a poll.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`text` is equal.
+    considered equal, if their :attr:`text` and :attr:`voter_count` are equal.
 
     Attributes:
         text (:obj:`str`): Option text, 1-100 characters.
@@ -46,7 +46,7 @@ class PollOption(TelegramObject):
         self.text = text
         self.voter_count = voter_count
 
-        self._id_attrs = (self.text,)
+        self._id_attrs = (self.text, self.voter_count)
 
     @classmethod
     def de_json(cls, data, bot):
