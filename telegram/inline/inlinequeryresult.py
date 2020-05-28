@@ -24,6 +24,9 @@ from telegram import TelegramObject
 class InlineQueryResult(TelegramObject):
     """Baseclass for the InlineQueryResult* classes.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`id` is equal.
+
     Attributes:
         type (:obj:`str`): Type of the result.
         id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.

@@ -25,6 +25,9 @@ class InlineKeyboardMarkup(ReplyMarkup):
     """
     This object represents an inline keyboard that appears right next to the message it belongs to.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their the size of :attr:`inline_keyboard` and all the buttons are equal.
+
     Attributes:
         inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): Array of button rows,
             each represented by an Array of InlineKeyboardButton objects.

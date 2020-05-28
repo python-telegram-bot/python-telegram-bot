@@ -27,6 +27,9 @@ class ChosenInlineResult(TelegramObject):
     Represents a result of an inline query that was chosen by the user and sent to their chat
     partner.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`result_id` is equal.
+
     Note:
         In Python `from` is a reserved word, use `from_user` instead.
 

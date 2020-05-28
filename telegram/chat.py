@@ -26,6 +26,9 @@ from .chatpermissions import ChatPermissions
 class Chat(TelegramObject):
     """This object represents a chat.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`id` is equal.
+
     Attributes:
         id (:obj:`int`): Unique identifier for this chat.
         type (:obj:`str`): Type of chat.

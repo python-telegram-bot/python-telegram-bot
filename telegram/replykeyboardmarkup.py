@@ -25,6 +25,9 @@ from .keyboardbutton import KeyboardButton
 class ReplyKeyboardMarkup(ReplyMarkup):
     """This object represents a custom keyboard with reply options.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their the size of :attr:`keyboard` and all the buttons are equal.
+
     Attributes:
         keyboard (List[List[:class:`telegram.KeyboardButton` | :obj:`str`]]): Array of button rows.
         resize_keyboard (:obj:`bool`): Optional. Requests clients to resize the keyboard.

@@ -26,6 +26,11 @@ class WebhookInfo(TelegramObject):
 
     Contains information about the current status of a webhook.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`url`, :attr:`has_custom_certificate`,
+    :attr:`pending_update_count`, :attr:`last_error_date`, :attr:`last_error_message`,
+    :attr:`max_connections` and :attr:`allowed_updates` are equal.
+
     Attributes:
         url (:obj:`str`): Webhook URL.
         has_custom_certificate (:obj:`bool`): If a custom certificate was provided for webhook.

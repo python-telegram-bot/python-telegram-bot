@@ -29,6 +29,9 @@ class PollOption(TelegramObject):
     """
     This object contains information about one answer option in a poll.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`text` is equal.
+
     Attributes:
         text (:obj:`str`): Option text, 1-100 characters.
         voter_count (:obj:`int`): Number of users that voted for this option.
@@ -56,6 +59,9 @@ class PollOption(TelegramObject):
 class PollAnswer(TelegramObject):
     """
     This object represents an answer of a user in a non-anonymous poll.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`poll_id`, :attr:`user` and :attr:`options_ids` are equal.
 
     Attributes:
         poll_id (:obj:`str`): Unique poll identifier.
@@ -91,6 +97,9 @@ class PollAnswer(TelegramObject):
 class Poll(TelegramObject):
     """
     This object contains information about a poll.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`id` is equal.
 
     Attributes:
         id (:obj:`str`): Unique poll identifier.

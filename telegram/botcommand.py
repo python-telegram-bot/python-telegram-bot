@@ -25,6 +25,9 @@ class BotCommand(TelegramObject):
     """
     This object represents a bot command.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`command` and :attr:`description` are equal.
+
     Attributes:
         command (:obj:`str`): Text of the command.
         description (:obj:`str`): Description of the command.

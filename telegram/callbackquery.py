@@ -29,6 +29,9 @@ class CallbackQuery(TelegramObject):
     :attr:`message` will be present. If the button was attached to a message sent via the bot (in
     inline mode), the field :attr:`inline_message_id` will be present.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`id` is equal.
+
     Note:
         * In Python `from` is a reserved word, use `from_user` instead.
         * Exactly one of the fields :attr:`data` or :attr:`game_short_name` will be present.

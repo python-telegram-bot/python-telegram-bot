@@ -24,6 +24,9 @@ from telegram import PhotoSize, TelegramObject
 class UserProfilePhotos(TelegramObject):
     """This object represent a user's profile pictures.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`total_count` and :attr:`photos` are equal.
+
     Attributes:
         total_count (:obj:`int`): Total number of profile pictures.
         photos (List[List[:class:`telegram.PhotoSize`]]): Requested profile pictures.

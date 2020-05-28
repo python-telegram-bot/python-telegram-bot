@@ -27,6 +27,9 @@ class InlineQuery(TelegramObject):
     This object represents an incoming inline query. When the user sends an empty query, your bot
     could return some default or trending results.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`id` is equal.
+
     Note:
         * In Python `from` is a reserved word, use `from_user` instead.
 

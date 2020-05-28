@@ -28,6 +28,9 @@ class Game(TelegramObject):
     This object represents a game. Use BotFather to create and edit games, their short names will
     act as unique identifiers.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`title`, :attr:`description` and :attr:`photo` are equal.
+
     Attributes:
         title (:obj:`str`): Title of the game.
         description (:obj:`str`): Description of the game.

@@ -26,6 +26,9 @@ class MessageEntity(TelegramObject):
     This object represents one special entity in a text message. For example, hashtags,
     usernames, URLs, etc.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`type`, :attr:`offset` and :attr`length` are equal.
+
     Attributes:
         type (:obj:`str`): Type of the entity.
         offset (:obj:`int`): Offset in UTF-16 code units to the start of the entity.
