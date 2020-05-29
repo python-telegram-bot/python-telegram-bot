@@ -43,7 +43,7 @@ class ConversationHandler(Handler):
 
     The first collection, a ``list`` named :attr:`entry_points`, is used to initiate the
     conversation, for example with a :class:`telegram.ext.CommandHandler` or
-    :class:`telegram.ext.RegexHandler`.
+    :class:`telegram.ext.MessageHandler`.
 
     The second collection, a ``dict`` named :attr:`states`, contains the different conversation
     steps and one or more associated handlers that should be used if the user sends a message when
