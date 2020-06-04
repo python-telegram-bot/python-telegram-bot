@@ -1404,7 +1404,7 @@ officedocument.wordprocessingml.document")``-
             of sec ago.
 
         Examples:
-            ``MessageHandler(Filters.date(15), callback_method)``
+            ``MessageHandler(Filters.date(seconds_ago=15), callback_method)``
 
         Args:
             seconds_ago(:obj:`int`, optional): Max time diff between when the message was sent
