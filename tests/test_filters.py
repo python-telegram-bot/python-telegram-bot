@@ -48,8 +48,10 @@ class TestFilters(object):
         assert (Filters.text)(update)
 
     def test_filters_date_init(self):
-        with pytest.raises(ValueError, match='at minimum'):
+        with pytest.raises(ValueError, match='must be used'):
             Filters.date(seconds_ago=0)
+        with pytest.raises(ValueError, match='at minimum'):
+            Filters.date(seconds_ago=1)
 
     def test_filters_date(self, update):
         update.message.date = datetime.datetime.utcnow()
