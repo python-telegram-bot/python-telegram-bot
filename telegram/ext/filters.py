@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the Filters for use with the MessageHandler class."""
 
-import re
+import re, time
 
 from abc import ABC, abstractmethod
 from future.utils import string_types
@@ -1397,3 +1397,32 @@ officedocument.wordprocessingml.document")``-
         channel_posts: Updates with either :attr:`telegram.Update.channel_post` or
             :attr:`telegram.Update.edited_channel_post`
     """
+
+    class date(BaseFilter):
+        """Filters messages to allow only those which are not older than a specified no. of sec ago.
+
+        Examples:
+            ``MessageHandler(Filters.date(15), callback_method)``
+
+        Args:
+            seconds_ago(:obj:`int`, optional): Max time diff between when the message was sent
+                (message.date) and 'now' for message to be allowed through, in seconds.
+
+        Raises:
+            ValueError: If seconds_ago not set or smaller than 2.
+        """
+
+        def __init__(self, seconds_ago=None):
+            if not (bool(seconds_ago)):
+                raise ValueError('seconds_ago must be used')
+            elif seconds_ago is not None and isinstance(seconds_ago, int) and seconds_ago < 2:
+                raise ValueError('seconds_ago must be 2 at minumum')
+            elif seconds_ago is not None and isinstance(seconds_ago, int) and seconds_ago >= 2:
+                self.seconds_ago = seconds_ago
+            else:
+                #should never end up here
+                raise ValueError('Unknown error!')
+
+        def filter(self, message):
+            # msg.date > (now - seconds_ago)
+            return bool(int(message.date.timestamp()) > (int(time.time()) - int(self.seconds_ago)))
