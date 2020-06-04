@@ -32,12 +32,16 @@ class Dice(TelegramObject):
         indicates that the dartboard was missed. However, this behaviour is undocumented and might
         be changed by Telegram.
 
+        If :attr:`emoji` is "🏀", a value of 4 or 5 currently score a basket, while a value of 1 to
+        3 indicates that the basket was missed. However, this behaviour is undocumented and might
+        be changed by Telegram.
+
     Attributes:
         value (:obj:`int`): Value of the dice.
         emoji (:obj:`str`): Emoji on which the dice throw animation is based.
 
     Args:
-        value (:obj:`int`): Value of the dice, 1-6.
+        value (:obj:`int`): Value of the dice
         emoji (:obj:`str`): Emoji on which the dice throw animation is based.
     """
     def __init__(self, value, emoji, **kwargs):
@@ -55,6 +59,8 @@ class Dice(TelegramObject):
     """:obj:`str`: '🎲'"""
     DARTS = '🎯'
     """:obj:`str`: '🎯'"""
-    ALL_EMOJI = [DICE, DARTS]
-    """List[:obj:`str`]: List of all supported base emoji. Currently :attr:`DICE` and
-    :attr:`DARTS`."""
+    BASKETBALL = '🏀'
+    """:obj:`str`: '🏀'"""
+    ALL_EMOJI = [DICE, DARTS, BASKETBALL]
+    """List[:obj:`str`]: List of all supported base emoji. Currently :attr:`DICE`,
+    :attr:`DARTS` and :attr:`BASKETBALL`."""

@@ -1260,6 +1260,7 @@ officedocument.wordprocessingml.document")``-
     class _Dice(_DiceEmoji):
         dice = _DiceEmoji('🎲', 'dice')
         darts = _DiceEmoji('🎯', 'darts')
+        basketball = _DiceEmoji('🏀', 'basketball')
 
     dice = _Dice()
     """Dice Messages. If an integer or a list of integers is passed, it filters messages to only
@@ -1286,6 +1287,8 @@ officedocument.wordprocessingml.document")``-
             :attr:`Filters.dice`.
         darts: Dice messages with the emoji 🎯. Passing a list of integers is supported just as for
             :attr:`Filters.dice`.
+        basketball: Dice messages with the emoji 🏀. Passing a list of integers is supported just
+            as for :attr:`Filters.dice`.
     """
 
     class language(BaseFilter):
