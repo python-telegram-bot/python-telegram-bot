@@ -1416,7 +1416,7 @@ officedocument.wordprocessingml.document")``-
             if not (bool(seconds_ago)):
                 raise ValueError('seconds_ago must be used')
             elif seconds_ago is not None and isinstance(seconds_ago, int) and seconds_ago < 2:
-                raise ValueError('seconds_ago must be 2 at minumum')
+                raise ValueError('seconds_ago must be 2 at minimum')
             elif seconds_ago is not None and isinstance(seconds_ago, int) and seconds_ago >= 2:
                 self.seconds_ago = seconds_ago
             else:
