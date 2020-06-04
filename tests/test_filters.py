@@ -47,6 +47,16 @@ class TestFilters(object):
         update.message.text = '/test'
         assert (Filters.text)(update)
 
+    def test_filters_date_init(self):
+        with pytest.raises(ValueError, match='at minimum'):
+            Filters.date(seconds_ago=0)
+
+    def test_filters_date(self, update):
+        update.message.date = datetime.datetime.utcnow()
+        assert Filters.date(seconds_ago=10)(update)
+        update.message.date = datetime.datetime.utcnow() - datetime.timedelta(seconds = 100)
+        assert not Filters.date(seconds_ago=10)(update)
+
     def test_filters_text_strings(self, update):
         update.message.text = '/test'
         assert Filters.text({'/test', 'test1'})(update)
