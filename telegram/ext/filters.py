@@ -18,7 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the Filters for use with the MessageHandler class."""
 
-import re, time
+import re
+import time
 
 from abc import ABC, abstractmethod
 from future.utils import string_types
@@ -1420,7 +1421,7 @@ officedocument.wordprocessingml.document")``-
             elif seconds_ago is not None and isinstance(seconds_ago, int) and seconds_ago >= 2:
                 self.seconds_ago = seconds_ago
             else:
-                #should never end up here
+                # should never end up here
                 raise ValueError('Unknown error!')
 
         def filter(self, message):

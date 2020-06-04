@@ -56,7 +56,7 @@ class TestFilters(object):
     def test_filters_date(self, update):
         update.message.date = datetime.datetime.utcnow()
         assert Filters.date(seconds_ago=10)(update)
-        update.message.date = datetime.datetime.utcnow() - datetime.timedelta(seconds = 100)
+        update.message.date = datetime.datetime.utcnow() - datetime.timedelta(seconds=100)
         assert not Filters.date(seconds_ago=10)(update)
 
     def test_filters_text_strings(self, update):
