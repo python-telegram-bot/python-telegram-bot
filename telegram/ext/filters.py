@@ -1400,7 +1400,8 @@ officedocument.wordprocessingml.document")``-
     """
 
     class date(BaseFilter):
-        """Filters messages to allow only those which are not older than a specified no. of sec ago.
+        """Filters messages to allow only those which are not older than a specified number
+            of sec ago.
 
         Examples:
             ``MessageHandler(Filters.date(15), callback_method)``
@@ -1414,7 +1415,7 @@ officedocument.wordprocessingml.document")``-
         """
 
         def __init__(self, seconds_ago=None):
-            if not (bool(seconds_ago)):
+            if not bool(seconds_ago):
                 raise ValueError('seconds_ago must be used')
             elif seconds_ago is not None and isinstance(seconds_ago, int) and seconds_ago < 2:
                 raise ValueError('seconds_ago must be 2 at minimum')
