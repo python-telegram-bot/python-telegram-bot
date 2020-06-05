@@ -530,8 +530,9 @@ class TestConversationHandler(object):
                           bot=bot)
         dp.process_update(Update(update_id=0, message=message))
         assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
-        sleep(0.5)
+        sleep(0.6)
         dp.job_queue.tick()
+        sleep(0.05)
         assert handler.conversations.get((self.group.id, user1.id)) is None
 
         # Start state machine, do something, then reach timeout
@@ -542,7 +543,7 @@ class TestConversationHandler(object):
         dp.job_queue.tick()
         dp.process_update(Update(update_id=2, message=message))
         assert handler.conversations.get((self.group.id, user1.id)) == self.BREWING
-        sleep(0.5)
+        sleep(0.6)
         dp.job_queue.tick()
         assert handler.conversations.get((self.group.id, user1.id)) is None
 
@@ -578,7 +579,7 @@ class TestConversationHandler(object):
         timeout_handler.callback = timeout_callback
 
         cdp.process_update(update)
-        sleep(0.5)
+        sleep(0.6)
         cdp.job_queue.tick()
         assert handler.conversations.get((self.group.id, user1.id)) is None
         assert self.is_timeout
@@ -618,7 +619,7 @@ class TestConversationHandler(object):
         sleep(.4)  # t=1
         dp.job_queue.tick()
         assert handler.conversations.get((self.group.id, user1.id)) == self.DRINKING
-        sleep(.1)  # t=1.1
+        sleep(.2)  # t=1.2
         dp.job_queue.tick()
         assert handler.conversations.get((self.group.id, user1.id)) is None
 
@@ -646,7 +647,7 @@ class TestConversationHandler(object):
         dp.job_queue.tick()
         dp.process_update(Update(update_id=0, message=message))
         assert handler.conversations.get((self.group.id, user2.id)) == self.THIRSTY
-        sleep(0.5)
+        sleep(0.6)
         dp.job_queue.tick()
         assert handler.conversations.get((self.group.id, user1.id)) is None
         assert handler.conversations.get((self.group.id, user2.id)) is None
@@ -670,7 +671,7 @@ class TestConversationHandler(object):
         message.text = '/brew'
         message.entities[0].length = len('/brew')
         dp.process_update(Update(update_id=0, message=message))
-        sleep(0.5)
+        sleep(0.6)
         dp.job_queue.tick()
         assert handler.conversations.get((self.group.id, user1.id)) is None
         assert self.is_timeout
@@ -680,7 +681,7 @@ class TestConversationHandler(object):
         message.text = '/start'
         message.entities[0].length = len('/start')
         dp.process_update(Update(update_id=1, message=message))
-        sleep(0.5)
+        sleep(0.6)
         dp.job_queue.tick()
         assert handler.conversations.get((self.group.id, user1.id)) is None
         assert self.is_timeout
@@ -694,7 +695,7 @@ class TestConversationHandler(object):
         message.text = '/startCoding'
         message.entities[0].length = len('/startCoding')
         dp.process_update(Update(update_id=0, message=message))
-        sleep(0.5)
+        sleep(0.6)
         dp.job_queue.tick()
         assert handler.conversations.get((self.group.id, user1.id)) is None
         assert not self.is_timeout
@@ -718,7 +719,7 @@ class TestConversationHandler(object):
         message.text = '/brew'
         message.entities[0].length = len('/brew')
         cdp.process_update(Update(update_id=0, message=message))
-        sleep(0.5)
+        sleep(0.6)
         cdp.job_queue.tick()
         assert handler.conversations.get((self.group.id, user1.id)) is None
         assert self.is_timeout
@@ -728,7 +729,7 @@ class TestConversationHandler(object):
         message.text = '/start'
         message.entities[0].length = len('/start')
         cdp.process_update(Update(update_id=1, message=message))
-        sleep(0.5)
+        sleep(0.6)
         cdp.job_queue.tick()
         assert handler.conversations.get((self.group.id, user1.id)) is None
         assert self.is_timeout
@@ -742,7 +743,7 @@ class TestConversationHandler(object):
         message.text = '/startCoding'
         message.entities[0].length = len('/startCoding')
         cdp.process_update(Update(update_id=0, message=message))
-        sleep(0.5)
+        sleep(0.6)
         cdp.job_queue.tick()
         assert handler.conversations.get((self.group.id, user1.id)) is None
         assert not self.is_timeout
@@ -789,7 +790,7 @@ class TestConversationHandler(object):
         assert handler.conversations.get((self.group.id, user1.id)) is not None
         assert not self.is_timeout
 
-        sleep(0.5)
+        sleep(0.6)
         dp.job_queue.tick()
         assert handler.conversations.get((self.group.id, user1.id)) is None
         assert self.is_timeout
