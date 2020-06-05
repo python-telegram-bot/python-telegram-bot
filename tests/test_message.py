@@ -794,30 +794,7 @@ class TestMessage(object):
         monkeypatch.setattr(message.bot, 'delete_message', test)
         assert message.delete()
 
-    def test_default_quote_by_arg(self, message):
-        message.bot.defaults = None
-        kwargs = {}
-
-        message._default_quote = False
-        message._quote(kwargs)
-        assert 'reply_to_message_id' not in kwargs
-
-        message._default_quote = True
-        message._quote(kwargs)
-        assert 'reply_to_message_id' in kwargs
-
-        kwargs = {}
-        message._default_quote = None
-        message.chat.type = Chat.PRIVATE
-        message._quote(kwargs)
-        assert 'reply_to_message_id' not in kwargs
-
-        message.chat.type = Chat.GROUP
-        message._quote(kwargs)
-        assert 'reply_to_message_id' in kwargs
-
-    def test_default_quote_by_bot(self, message):
-        message._default_quote = None
+    def test_default_quote(self, message):
         message.bot.defaults = Defaults()
         kwargs = {}
 

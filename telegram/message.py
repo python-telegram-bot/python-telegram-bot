@@ -110,8 +110,6 @@ class Message(TelegramObject):
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
-        default_quote (:obj:`bool`): Optional. Default setting for the ``quote`` parameter of the
-            :attr:`reply_text` and friends.
 
     Args:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -219,12 +217,6 @@ class Message(TelegramObject):
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. login_url buttons are represented as ordinary url buttons.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
-        default_quote (:obj:`bool`, optional): Default setting for the ``quote`` parameter of the
-            :attr:`reply_text` and friends.
-
-            Warning:
-                If both :attr:`bot` and :attr:`default_quote` are passed, :attr:`default_quote`
-                will override ``bot.defaults.quote``.
 
     """
 
@@ -288,7 +280,6 @@ class Message(TelegramObject):
                  forward_sender_name=None,
                  reply_markup=None,
                  bot=None,
-                 default_quote=None,
                  dice=None,
                  **kwargs):
         # Required
@@ -342,7 +333,6 @@ class Message(TelegramObject):
         self.dice = dice
         self.reply_markup = reply_markup
         self.bot = bot
-        self._default_quote = default_quote
 
         self._id_attrs = (self.message_id,)
 
@@ -362,14 +352,6 @@ class Message(TelegramObject):
                 # Get rid of leading -100 for supergroups
                 to_link = "c/{}".format(str(self.chat.id)[4:])
             return "https://t.me/{}/{}".format(to_link, self.message_id)
-        return None
-
-    @property
-    def default_quote(self):
-        if self._default_quote is not None:
-            return self._default_quote
-        if self.bot.defaults:
-            return self.bot.defaults.quote
         return None
 
     @classmethod
@@ -488,8 +470,11 @@ class Message(TelegramObject):
             del kwargs['quote']
 
         else:
-            if ((self.default_quote is None and self.chat.type != Chat.PRIVATE)
-               or self.default_quote):
+            if self.bot.defaults:
+                default_quote = self.bot.defaults.quote
+            else:
+                default_quote = None
+            if (default_quote is None and self.chat.type != Chat.PRIVATE) or default_quote:
                 kwargs['reply_to_message_id'] = self.message_id
 
     def reply_text(self, *args, **kwargs):

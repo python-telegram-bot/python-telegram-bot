@@ -69,8 +69,7 @@ class WebhookServer(object):
 
 class WebhookAppClass(tornado.web.Application):
 
-    # default_quote for backwards compatibility only
-    def __init__(self, webhook_path, bot, update_queue, default_quote=None):
+    def __init__(self, webhook_path, bot, update_queue):
         self.shared_objects = {"bot": bot, "update_queue": update_queue}
         handlers = [
             (r"{0}/?".format(webhook_path), WebhookHandler,
@@ -119,8 +118,7 @@ class WebhookHandler(tornado.web.RequestHandler):
                     # fallback to the pre-3.8 default of Selector
                     asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())
 
-    # default_quote for backwards compatibility only
-    def initialize(self, bot, update_queue, default_quote=None):
+    def initialize(self, bot, update_queue):
         self.bot = bot
         self.update_queue = update_queue
 

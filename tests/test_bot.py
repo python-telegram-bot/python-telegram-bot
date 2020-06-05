@@ -979,14 +979,6 @@ class TestBot(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    @pytest.mark.parametrize('default_bot', [{'quote': True}], indirect=True)
-    def test_send_message_default_quote(self, default_bot, chat_id):
-        message = default_bot.send_message(chat_id, 'test')
-        assert message._default_quote is None
-        assert message.default_quote is True
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_set_and_get_my_commands(self, bot):
         commands = [
             BotCommand('cmd1', 'descr1'),
