@@ -3884,7 +3884,8 @@ class Bot(TelegramObject):
 
     def __reduce__(self):
         return (self.__class__, (self.token, self.base_url.replace(self.token, ''),
-                                 self.base_file_url.replace(self.token, '')))
+                                 self.base_file_url.replace(self.token, ''), None, None, None,
+                                 self.defaults))
 
     # camelCase aliases
     getMe = get_me
