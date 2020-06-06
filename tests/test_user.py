@@ -190,6 +190,13 @@ class TestUser(object):
         monkeypatch.setattr(user.bot, 'send_animation', test)
         assert user.send_animation('test_animation')
 
+    def test_instance_method_send_poll(self, monkeypatch, user):
+        def test(*args, **kwargs):
+            return args[0] == user.id and args[1] == 'test_poll'
+
+        monkeypatch.setattr(user.bot, 'send_poll', test)
+        assert user.send_poll('test_poll')
+
     def test_mention_html(self, user):
         expected = u'<a href="tg://user?id={}">{}</a>'
 
