@@ -3,6 +3,7 @@ on:
   pull_request:
     branches:
       - master
+      - v13
   schedule:
     - cron: 7 3 * * *
   push:
