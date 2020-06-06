@@ -243,7 +243,8 @@ class JobQueue(object):
         j = self.scheduler.add_job(callback,
                                    trigger='interval',
                                    args=self._build_args(job),
-                                   start_date=dt_first, end_date=dt_last,
+                                   start_date=dt_first,
+                                   end_date=dt_last,
                                    seconds=interval,
                                    name=name,
                                    **job_kwargs)
