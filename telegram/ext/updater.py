@@ -526,9 +526,14 @@ class Updater(object):
             retries[0] = 0
 
         # Clean pending messages, if requested.
-        if clean:
+        if isinstance(clean, bool) and clean :
             self._network_loop_retry(bootstrap_clean_updates, bootstrap_onerr_cb,
                                      'bootstrap clean updates', bootstrap_interval)
+            retries[0] = 0
+            sleep(1)
+        elif isinstance(clean, timedelta) and clean is not None:
+            self._network_loop_retry(bootstrap_clean_updates_timedelta, bootstrap_onerr_cb,
+                                     'bootstrap clean updates', bootstrap_interval, **dict(clean=clean))
             retries[0] = 0
             sleep(1)
 
