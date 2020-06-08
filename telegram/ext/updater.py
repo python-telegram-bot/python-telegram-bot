@@ -359,7 +359,7 @@ class Updater(object):
         self._network_loop_retry(polling_action_cb, polling_onerr_cb, 'getting Updates',
                                  poll_interval)
 
-    def _network_loop_retry(self, action_cb, onerr_cb, description, interval):
+    def _network_loop_retry(self, action_cb, onerr_cb, description, interval, **kwargs):
         """Perform a loop calling `action_cb`, retrying after network errors.
 
         Stop condition for loop: `self.running` evaluates False or return value of `action_cb`
@@ -378,7 +378,7 @@ class Updater(object):
         cur_interval = interval
         while self.running:
             try:
-                if not action_cb():
+                if not action_cb(**kwargs):
                     break
             except RetryAfter as e:
                 self.logger.info('%s', e)
