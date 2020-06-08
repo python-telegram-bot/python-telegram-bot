@@ -486,7 +486,7 @@ class Updater(object):
             for up in reversed(updates):
                 msgdate = up.message.date.replace(tzinfo=timezone.utc)
                 if delta:
-                    if up.message and (now - msgdate >= delta):
+                    if up.message and (now - msgdate > delta):
                         # break out, we want to process this and all following msg's
                         temp = self.bot.get_updates(up.update_id + 1)
                         return False
