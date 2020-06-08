@@ -5,43 +5,54 @@
 """
 This is a very simple example on how one could implement a custom error handler
 """
+import html
 import logging
+import traceback
 
 from telegram import Update, ParseMode
 from telegram.ext import Updater, CallbackContext
-
-import traceback
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
+
 # this can be your own ID, or one for a developer group/channel
-BOT_DEV = 208589966
+DEVELOPER_CHAT_ID = 208589966
 
 
-def on_error(update: Update, context: CallbackContext):
-    # lets log the error before we do anything else, so this appears at least in the logs
-    logger.error(msg="The following error happened while handling an update",
-                 exc_info=context.error)
-    # now we collect chat and user data
-    chat_data = str(context.chat_data)
-    user_data = str(context.user_data)
-    # format_tb returns the traceback in a list. We take the traceback from the error object
-    tb_list = traceback.format_tb(context.error.__traceback__)
-    # now we turn the list into a string
+def error_handler(update: Update, context: CallbackContext):
+    """To be used with Dispatcher.add_error_handler, sends notification to the developer"""
+    # Log the error before we do anything else, so we can see it even if something breaks.
+    # If you are going to use multiple error handlers, which is totally possible, you might want
+    # to put this line in its own separate error handler.
+    logger.error(msg="Exception while handling an update:", exc_info=context.error)
+
+    # traceback.format_exception returns the usual python message about an exception, but as a
+    # list of strings rather than a single string, so we have to join them together.
+    tb_list = traceback.format_exception(None, context.error, context.error.__traceback__)
     tb = ''.join(tb_list)
-    # build the message with some markdown
-    message = 'Update <pre>{}</pre> caused the error <i>{}</i>. The current chat data is ' \
-              '<i>{}</i>, the user data <i>{}</i>. The traceback is as follows:\n<pre>{}</pre>'
-    # and send it away
-    context.bot.send_message(chat_id=BOT_DEV,
-                             text=message.format(update, context.error, chat_data, user_data, tb),
-                             parse_mode=ParseMode.HTML)
+
+    # Build the message with some markup and additional information about what happened.
+    # You might need to add some logic to deal with messages longer then the 4096 character limit.
+    message = (
+        'An exception was raised while handling an update\n'
+        '<pre>update = {}</pre>\n\n'
+        '<pre>context.chat_data = {}</pre>\n\n'
+        '<pre>context.user_data = {}</pre>\n\n'
+        '<pre>{}</pre>'
+    ).format(
+        html.escape(update.to_json()),
+        html.escape(str(context.chat_data)),
+        html.escape(str(context.user_data)),
+        html.escape(tb)
+    )
+
+    # Finally, send the message
+    context.bot.send_message(chat_id=DEVELOPER_CHAT_ID, text=message, parse_mode=ParseMode.HTML)
 
 
 def main():
-    """Start the bot."""
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
@@ -50,11 +61,12 @@ def main():
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
-    # when an error happens, forward the error to the error handler
-    dp.add_error_handler(on_error)
+    # When an error happens, forward the error to the error handler
+    dp.add_error_handler(error_handler)
 
     # Start the Bot
     updater.start_polling()
+
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
     # start_polling() is non-blocking and will stop the bot gracefully.
