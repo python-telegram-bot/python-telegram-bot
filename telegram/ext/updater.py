@@ -485,8 +485,7 @@ class Updater(object):
 
             for up in reversed(updates):
                 self.logger.debug('msg update_id: "%s"', up.update_id)
-                msgdate = up.message.date.replace(tzinfo=None)
-                msgdate = up.message.date
+                msgdate = up.message.date.replace(tzinfo=timezone.utc)
                 if delta:
                     self.logger.debug('now: "%s"', now)
                     self.logger.debug('msg date: "%s"', msgdate)
