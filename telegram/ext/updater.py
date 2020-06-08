@@ -477,24 +477,17 @@ class Updater(object):
             return False
 
         def bootstrap_clean_updates_timedelta(**kwargs):
-            self.logger.debug('Cleaning updates from Telegram server with timedelta')
-            self.logger.debug('kwargs: "%s"', kwargs)
+            self.logger.debug('Cleaning updates from Telegram server with timedelta "%s"', kwargs['clean'])
             updates = self.bot.get_updates()
             now = datetime.now(timezone.utc)
             delta = kwargs['clean']
 
+            # reversed as we just need to find the first msg that's too old
             for up in reversed(updates):
-                self.logger.debug('msg update_id: "%s"', up.update_id)
                 msgdate = up.message.date.replace(tzinfo=timezone.utc)
                 if delta:
-                    self.logger.debug('now: "%s"', now)
-                    self.logger.debug('msg date: "%s"', msgdate)
-                    self.logger.debug('now - msg date: "%s"', (now - msgdate))
-                    self.logger.debug('delta: "%s"', delta)
-                    self.logger.debug('now - msg date >= delta (do not process msg):  "%s"', (now - msgdate >= delta))
                     if up.message and (now - msgdate >= delta):
                         # break out, we want to process this and all following msg's
-                        self.logger.debug('return false (do not process msg)')
                         temp = self.bot.get_updates(up.update_id + 1)
                         return False
 
