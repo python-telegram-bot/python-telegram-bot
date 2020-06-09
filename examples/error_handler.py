@@ -10,7 +10,7 @@ import logging
 import traceback
 
 from telegram import Update, ParseMode
-from telegram.ext import Updater, CallbackContext
+from telegram.ext import Updater, CallbackContext, CommandHandler
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -52,6 +52,11 @@ def error_handler(update: Update, context: CallbackContext):
     context.bot.send_message(chat_id=DEVELOPER_CHAT_ID, text=message, parse_mode=ParseMode.HTML)
 
 
+def bad_command(udpate: Update, context: CallbackContext):
+    """Raise an error to trigger the error handler."""
+    context.bot.wrong_method_name()
+
+
 def main():
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
@@ -61,7 +66,10 @@ def main():
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
-    # When an error happens, forward the error to the error handler
+    # Register the command...
+    dp.add_handler(CommandHandler('bad_command', bad_command))
+
+    # ...and the error handler
     dp.add_error_handler(error_handler)
 
     # Start the Bot
