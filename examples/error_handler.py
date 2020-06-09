@@ -22,10 +22,8 @@ DEVELOPER_CHAT_ID = 208589966
 
 
 def error_handler(update: Update, context: CallbackContext):
-    """To be used with Dispatcher.add_error_handler, sends notification to the developer"""
+    """Log the error and send a telegram message to notify the developer."""
     # Log the error before we do anything else, so we can see it even if something breaks.
-    # If you are going to use multiple error handlers, which is totally possible, you might want
-    # to put this line in its own separate error handler.
     logger.error(msg="Exception while handling an update:", exc_info=context.error)
 
     # traceback.format_exception returns the usual python message about an exception, but as a
@@ -34,7 +32,7 @@ def error_handler(update: Update, context: CallbackContext):
     tb = ''.join(tb_list)
 
     # Build the message with some markup and additional information about what happened.
-    # You might need to add some logic to deal with messages longer then the 4096 character limit.
+    # You might need to add some logic to deal with messages longer than the 4096 character limit.
     message = (
         'An exception was raised while handling an update\n'
         '<pre>update = {}</pre>\n\n'
