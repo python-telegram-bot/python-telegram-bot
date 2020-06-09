@@ -234,8 +234,9 @@ class Updater(object):
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
                 Telegram in seconds. Default is 0.0.
             timeout (:obj:`float`, optional): Passed to :attr:`telegram.Bot.get_updates`.
-            clean (:obj:`bool`, optional): Whether to clean any pending updates on Telegram servers
-                before actually starting to poll. Default is False.
+            clean (:obj:`bool` | :obj:`datetime.timedelta`, optional): Whether to clean any pending updates on Telegram servers
+                before actually starting to poll. Default is ``False``.
+                If a :obj:`datetime.timedelta` object is passed, pending updates older than :math:`now() - timedelta` are ignored.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 `Updater` will retry on failures on the Telegram server.
 
@@ -251,6 +252,9 @@ class Updater(object):
 
         Returns:
             :obj:`Queue`: The update queue that can be filled from the main thread.
+
+        Raises:
+            ValueError: If :attr:`clean` is set as :obj:`datetime.timedelta` and is < 1 second.
 
         """
         with self.__lock:
@@ -294,8 +298,9 @@ class Updater(object):
             url_path (:obj:`str`, optional): Path inside url.
             cert (:obj:`str`, optional): Path to the SSL certificate file.
             key (:obj:`str`, optional): Path to the SSL key file.
-            clean (:obj:`bool`, optional): Whether to clean any pending updates on Telegram servers
-                before actually starting the webhook. Default is ``False``.
+            clean (:obj:`bool` | :obj:`datetime.timedelta`, optional): Whether to clean any pending updates on Telegram servers
+                before actually starting to poll. Default is ``False``.
+                If a :obj:`datetime.timedelta` object is passed, pending updates older than :math:`now() - timedelta` are ignored.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 `Updater` will retry on failures on the Telegram server.
 
@@ -310,6 +315,9 @@ class Updater(object):
 
         Returns:
             :obj:`Queue`: The update queue that can be filled from the main thread.
+
+        Raises:
+            ValueError: If :attr:`clean` is set as :obj:`datetime.timedelta` and is < 1 second.
 
         """
         with self.__lock:
