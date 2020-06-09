@@ -256,6 +256,8 @@ class Updater(object):
         with self.__lock:
             if not self.running:
                 self.running = True
+                if isinstance(clean, datetime.timedelta) and clean.total_seconds() < 1:
+                    raise ValueError('Clean as timedelta needs to be >= 1 second')
 
                 # Create & start threads
                 self.job_queue.start()
@@ -313,6 +315,8 @@ class Updater(object):
         with self.__lock:
             if not self.running:
                 self.running = True
+                if isinstance(clean, datetime.timedelta) and clean.total_seconds() < 1:
+                    raise ValueError('Clean as timedelta needs to be >= 1 second')
 
                 # Create & start threads
                 self.job_queue.start()
@@ -523,7 +527,7 @@ class Updater(object):
                                      'bootstrap clean updates', bootstrap_interval)
             retries[0] = 0
             sleep(1)
-        elif isinstance(clean, timedelta) and clean is not None:
+        elif isinstance(clean, timedelta):
             self._network_loop_retry(bootstrap_clean_updates_timedelta, bootstrap_onerr_cb,
                                      'bootstrap clean updates', bootstrap_interval, **dict(clean=clean))
             retries[0] = 0
