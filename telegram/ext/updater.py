@@ -234,9 +234,10 @@ class Updater(object):
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
                 Telegram in seconds. Default is 0.0.
             timeout (:obj:`float`, optional): Passed to :attr:`telegram.Bot.get_updates`.
-            clean (:obj:`bool` | :obj:`datetime.timedelta`, optional): Whether to clean any pending updates on Telegram servers
-                before actually starting to poll. Default is ``False``.
-                If a :obj:`datetime.timedelta` object is passed, pending updates older than :math:`now() - timedelta` are ignored.
+            clean (:obj:`bool` | :obj:`datetime.timedelta`, optional): Whether to clean any pending
+                updates on Telegram servers before actually starting to poll. Default is ``False``.
+                If a :obj:`datetime.timedelta` object is passed, pending updates older
+                than :math:`now() - timedelta` are ignored.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 `Updater` will retry on failures on the Telegram server.
 
@@ -260,7 +261,7 @@ class Updater(object):
         with self.__lock:
             if not self.running:
                 self.running = True
-                if isinstance(clean, datetime.timedelta) and clean.total_seconds() < 1:
+                if isinstance(clean, timedelta) and clean.total_seconds() < 1:
                     raise ValueError('Clean as timedelta needs to be >= 1 second')
 
                 # Create & start threads
@@ -323,7 +324,7 @@ class Updater(object):
         with self.__lock:
             if not self.running:
                 self.running = True
-                if isinstance(clean, datetime.timedelta) and clean.total_seconds() < 1:
+                if isinstance(clean, timedelta) and clean.total_seconds() < 1:
                     raise ValueError('Clean as timedelta needs to be >= 1 second')
 
                 # Create & start threads
@@ -489,7 +490,8 @@ class Updater(object):
             return False
 
         def bootstrap_clean_updates_timedelta(**kwargs):
-            self.logger.debug('Cleaning updates from Telegram server with timedelta "%s"', kwargs['clean'])
+            self.logger.debug('Cleaning updates from Telegram server with timedelta "%s"',
+                                    kwargs['clean'])
             updates = self.bot.get_updates()
             now = datetime.now(timezone.utc)
             delta = kwargs['clean']
@@ -530,14 +532,15 @@ class Updater(object):
             retries[0] = 0
 
         # Clean pending messages, if requested.
-        if isinstance(clean, bool) and clean :
+        if isinstance(clean, bool) and clean:
             self._network_loop_retry(bootstrap_clean_updates, bootstrap_onerr_cb,
                                      'bootstrap clean updates', bootstrap_interval)
             retries[0] = 0
             sleep(1)
         elif isinstance(clean, timedelta):
             self._network_loop_retry(bootstrap_clean_updates_timedelta, bootstrap_onerr_cb,
-                                     'bootstrap clean updates', bootstrap_interval, **dict(clean=clean))
+                                     'bootstrap clean updates', bootstrap_interval,
+                                     **dict(clean=clean))
             retries[0] = 0
             sleep(1)
 
