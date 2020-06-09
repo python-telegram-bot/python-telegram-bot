@@ -299,9 +299,10 @@ class Updater(object):
             url_path (:obj:`str`, optional): Path inside url.
             cert (:obj:`str`, optional): Path to the SSL certificate file.
             key (:obj:`str`, optional): Path to the SSL key file.
-            clean (:obj:`bool` | :obj:`datetime.timedelta`, optional): Whether to clean any pending updates on Telegram servers
-                before actually starting to poll. Default is ``False``.
-                If a :obj:`datetime.timedelta` object is passed, pending updates older than :math:`now() - timedelta` are ignored.
+            clean (:obj:`bool` | :obj:`datetime.timedelta`, optional): Whether to clean any pending
+                updates on Telegram servers before actually starting to poll. Default is ``False``.
+                If a :obj:`datetime.timedelta` object is passed, pending updates older
+                than :math:`now() - timedelta` are ignored.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 `Updater` will retry on failures on the Telegram server.
 
