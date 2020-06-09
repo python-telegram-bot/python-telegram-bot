@@ -6,6 +6,7 @@
 This is a very simple example on how one could implement a custom error handler
 """
 import html
+import json
 import logging
 import traceback
 
@@ -40,7 +41,7 @@ def error_handler(update: Update, context: CallbackContext):
         '<pre>context.user_data = {}</pre>\n\n'
         '<pre>{}</pre>'
     ).format(
-        html.escape(update.to_json()),
+        html.escape(json.dumps(update.to_dict(), indent=2, ensure_ascii=False)),
         html.escape(str(context.chat_data)),
         html.escape(str(context.user_data)),
         html.escape(tb)
@@ -50,7 +51,7 @@ def error_handler(update: Update, context: CallbackContext):
     context.bot.send_message(chat_id=DEVELOPER_CHAT_ID, text=message, parse_mode=ParseMode.HTML)
 
 
-def bad_command(udpate: Update, context: CallbackContext):
+def bad_command(update: Update, context: CallbackContext):
     """Raise an error to trigger the error handler."""
     context.bot.wrong_method_name()
 
