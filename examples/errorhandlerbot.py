@@ -56,6 +56,10 @@ def bad_command(update: Update, context: CallbackContext):
     context.bot.wrong_method_name()
 
 
+def start(update: Update, context: CallbackContext):
+    update.effective_message.reply_text('Use /bad_command to cause an error.')
+
+
 def main():
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
@@ -65,7 +69,8 @@ def main():
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
-    # Register the command...
+    # Register the commands...
+    dp.add_handler(CommandHandler('start', start))
     dp.add_handler(CommandHandler('bad_command', bad_command))
 
     # ...and the error handler
