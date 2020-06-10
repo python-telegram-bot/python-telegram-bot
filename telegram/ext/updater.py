@@ -262,24 +262,46 @@ class Updater(object):
         with self.__lock:
             if not self.running:
                 self.running = True
-                self.logger.debug('clean: "%s"', type(clean))
-                self.logger.debug('clean: "%s"', clean)
-                self.logger.debug('now: "%s"', datetime.now())
-                a=(datetime.now() -timedelta(seconds=1)))
-                self.logger.debug('now - delta: "%s"', (a)
-                self.logger.debug('clean > (now - delta): "%s"', (clean > a)))
+
+                self.logger.debug('clean:               "%s"', type(clean))
+                self.logger.debug('clean:               "%s"', clean)
+                self.logger.debug('now:                 "%s"', datetime.now(tz=timezone.utc))
+
                 if isinstance(clean, timedelta):
                     if clean.total_seconds() < 1:
                         raise ValueError('Clean as timedelta needs to be >= 1 second')
                     else:
-                        self.logger.debug('clean as delta: "%s"', clean)
-                        clean = datetime.now() - clean
-                        self.logger.debug('clean as datetime: "%s"', clean)
-                if isinstance(clean, datetime) and clean > (datetime.now() - timedelta(seconds=1)):
-                    raise ValueError('Clean as datetime ("%s") needs to be at least 1 second older'
-                                        'than "now"("%s")', clean, datetime.now())
-                self.logger.debug('clean after: "%s"', clean)
+                        a=(datetime.now(tz=timezone.utc) - clean)
+                        self.logger.debug('now - delta:         "%s"', a)
+                        self.logger.debug('now - delta type:    "%s"', type(a))
+                        self.logger.debug('clean as delta:      "%s"', clean)
+                        # convert to datetime
+                        clean = datetime.now(tz=timezone.utc) - clean
+                        self.logger.debug('clean as datetime:   "%s"', clean)
+                elif isinstance(clean, datetime):
 
+                    self.logger.debug('clean tz:            "%s"', clean.tzname())
+
+                    if (
+                            clean.tzinfo is None or
+                            (clean.tzinfo is not None and clean.tzinfo.utcoffset(clean) is None)
+                        ):
+                            # we need a tz as msg.date is aware and we want to compare
+                            # no tz passed so we assume it's UTC
+                            self.logger.warning('"clean" passed as datetime object ("%s") but'
+                                                ' has no timezone set, we\'re assuming it\'s UTC!'
+                                                , clean)
+                            clean=clean.replace(tzinfo=timezone.utc)
+
+                    self.logger.debug('clean > (now - 1sec): "%s"',
+                            (clean > (datetime.now(tz=timezone.utc) - timedelta(seconds=1))))
+
+                    if clean > (datetime.now(tz=timezone.utc) - timedelta(seconds=1)):
+                        raise ValueError('Clean as datetime ("%s") needs to be at least 1 second'
+                                        ' older than "now"("%s")' % (clean,
+                                        datetime.now(tz=timezone.utc)))
+
+                self.logger.debug('clean after: "%s"', clean)
 
                 # Create & start threads
                 self.job_queue.start()
