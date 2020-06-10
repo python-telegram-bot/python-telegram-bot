@@ -505,21 +505,20 @@ class Updater(object):
                 updates = self.bot.get_updates(updates[-1].update_id + 1)
             return False
 
-        def bootstrap_clean_updates_datetime(clean):
+        def bootstrap_clean_updates_datetime(datetime_cutoff):
             self.logger.debug('Cleaning updates from Telegram server with datetime "%s"',
                                     datetime_cutoff)
             updates = self.bot.get_updates()
 
             # reversed as we just need to find the first msg that's too old
             for up in reversed(updates):
-                if delta:
-                    self.logger.debug('cutoff: "%s"', datetime_cutoff)
-                    self.logger.debug('msg date: "%s"', up.message.date)
-                    self.logger.debug('msg date < cutoff: "%s"', (up.message.date < datetime_cutoff))
-                    if up.message and (up.message.date < datetime_cutoff):
-                        # break out, we want to process the 'next' and all following msg's
-                        updates = self.bot.get_updates(up.update_id + 1)
-                        return False
+                self.logger.debug('cutoff:              "%s"', datetime_cutoff)
+                self.logger.debug('msg date:            "%s"', up.message.date)
+                self.logger.debug('msg date < cutoff:   "%s"', (up.message.date < datetime_cutoff))
+                if up.message and (up.message.date < datetime_cutoff):
+                    # break out, we want to process the 'next' and all following msg's
+                    updates = self.bot.get_updates(up.update_id + 1)
+                    return False
 
             return False
 
