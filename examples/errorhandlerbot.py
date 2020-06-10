@@ -18,12 +18,9 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
-# this can be your own ID, or one for a developer group/channel
-DEVELOPER_CHAT_ID = 208589966
-
 
 def error_handler(update: Update, context: CallbackContext):
-    """Log the error and send a telegram message to notify the developer."""
+    """Log the error and send a telegram message with error details."""
     # Log the error before we do anything else, so we can see it even if something breaks.
     logger.error(msg="Exception while handling an update:", exc_info=context.error)
 
@@ -47,8 +44,10 @@ def error_handler(update: Update, context: CallbackContext):
         html.escape(tb)
     )
 
-    # Finally, send the message
-    context.bot.send_message(chat_id=DEVELOPER_CHAT_ID, text=message, parse_mode=ParseMode.HTML)
+    # Finally, send the message. You can replace this with something like
+    # context.bot.send_message(chat_id=DEVELOPER_CHAT_ID, text=message, parse_mode=ParseMode.HTML)
+    # to send the message to the bot developer rather than the user.
+    update.effective_message.reply_text(text=message, parse_mode=ParseMode.HTML)
 
 
 def bad_command(update: Update, context: CallbackContext):
