@@ -25,6 +25,7 @@ from time import sleep
 from datetime import datetime, timedelta, timezone
 from signal import signal, SIGINT, SIGTERM, SIGABRT
 from queue import Queue
+from functools import partial
 
 from telegram import Bot, TelegramError
 from telegram.ext import Dispatcher, JobQueue
@@ -261,8 +262,14 @@ class Updater(object):
         with self.__lock:
             if not self.running:
                 self.running = True
-                if isinstance(clean, timedelta) and clean.total_seconds() < 1:
-                    raise ValueError('Clean as timedelta needs to be >= 1 second')
+                if isinstance(clean, timedelta):
+                    if clean.total_seconds() < 1:
+                        raise ValueError('Clean as timedelta needs to be >= 1 second')
+                    else:
+                        clean = datetime.now() - clean
+                if isinstance(clean, datetime) and clean > (datetime.now() - timedelta(seconds=1)):
+                    raise ValueError('Clean as datetime ("%s") needs to be at least 1 second older'
+                                        'than "now"("%s")', clean, datetime.now())
 
                 # Create & start threads
                 self.job_queue.start()
@@ -325,8 +332,14 @@ class Updater(object):
         with self.__lock:
             if not self.running:
                 self.running = True
-                if isinstance(clean, timedelta) and clean.total_seconds() < 1:
-                    raise ValueError('Clean as timedelta needs to be >= 1 second')
+                if isinstance(clean, timedelta):
+                    if clean.total_seconds() < 1:
+                        raise ValueError('Clean as timedelta needs to be >= 1 second')
+                    else:
+                        clean = datetime.now() - clean
+                if isinstance(clean, datetime) and clean > (datetime.now() - timedelta(seconds=1)):
+                    raise ValueError('Clean as datetime ("%s") needs to be at least 1 second older'
+                                        'than "now"("%s")', clean, datetime.now())
 
                 # Create & start threads
                 self.job_queue.start()
@@ -373,7 +386,7 @@ class Updater(object):
         self._network_loop_retry(polling_action_cb, polling_onerr_cb, 'getting Updates',
                                  poll_interval)
 
-    def _network_loop_retry(self, action_cb, onerr_cb, description, interval, **kwargs):
+    def _network_loop_retry(self, action_cb, onerr_cb, description, interval):
         """Perform a loop calling `action_cb`, retrying after network errors.
 
         Stop condition for loop: `self.running` evaluates False or return value of `action_cb`
@@ -392,7 +405,7 @@ class Updater(object):
         cur_interval = interval
         while self.running:
             try:
-                if not action_cb(**kwargs):
+                if not action_cb():
                     break
             except RetryAfter as e:
                 self.logger.info('%s', e)
@@ -490,18 +503,15 @@ class Updater(object):
                 updates = self.bot.get_updates(updates[-1].update_id + 1)
             return False
 
-        def bootstrap_clean_updates_timedelta(**kwargs):
-            self.logger.debug('Cleaning updates from Telegram server with timedelta "%s"',
-                                    kwargs['clean'])
+        def bootstrap_clean_updates_datetime(clean):
+            self.logger.debug('Cleaning updates from Telegram server with datetime "%s"',
+                                    datetime_cutoff)
             updates = self.bot.get_updates()
-            now = datetime.now(timezone.utc)
-            delta = kwargs['clean']
 
             # reversed as we just need to find the first msg that's too old
             for up in reversed(updates):
-                msgdate = up.message.date.replace()
                 if delta:
-                    if up.message and (now - msgdate > delta):
+                    if up.message and (up.message.date < datetime_cutoff):
                         # break out, we want to process the 'next' and all following msg's
                         updates = self.bot.get_updates(up.update_id + 1)
                         return False
@@ -538,10 +548,11 @@ class Updater(object):
                                      'bootstrap clean updates', bootstrap_interval)
             retries[0] = 0
             sleep(1)
-        elif isinstance(clean, timedelta):
-            self._network_loop_retry(bootstrap_clean_updates_timedelta, bootstrap_onerr_cb,
-                                     'bootstrap clean updates', bootstrap_interval,
-                                     **dict(clean=clean))
+        elif isinstance(clean, datetime):
+            bootstrap_clean_updates_datetime_p = partial(bootstrap_clean_updates_datetime,
+                                                            datetime_cutoff=clean)
+            self._network_loop_retry(bootstrap_clean_updates_datetime_p, bootstrap_onerr_cb,
+                                     'bootstrap clean updates datetime', bootstrap_interval)
             retries[0] = 0
             sleep(1)
 
