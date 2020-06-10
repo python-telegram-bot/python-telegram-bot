@@ -499,7 +499,7 @@ class Updater(object):
 
             # reversed as we just need to find the first msg that's too old
             for up in reversed(updates):
-                msgdate = up.message.date.replace(tzinfo=timezone.utc)
+                msgdate = up.message.date.replace()
                 if delta:
                     if up.message and (now - msgdate > delta):
                         # break out, we want to process the 'next' and all following msg's
