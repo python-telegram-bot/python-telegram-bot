@@ -241,11 +241,18 @@ class Updater(object):
 
                 * :obj:`bool` ``True`` cleans all update. Default is ``False``.
                 * :obj:`datetime.timedelta` will be interpreted as "time before now" cut off.
-                  Pending updates older than the cut off will be cleaned up. timedelta is sign
-                  independent, both positive and negative deltas are interpreted as "in the past".
+                  Pending updates older than the cut off will be cleaned up.
+                  :obj:`datetime.timedelta` is sign independent, both positive and negative deltas
+                  are interpreted as "in the past".
                 * :obj:`datetime.datetime` will be interpreted as a specific date and time as
-                   cut off. Pending updates older than the cut off will be cleaned up.
-                   If the timezone (``datetime.tzinfo``) is ``None``, UTC will be assumed.
+                  cut off. Pending updates older than the cut off will be cleaned up.
+                  If the timezone (``datetime.tzinfo``) is ``None``, UTC will be assumed.
+
+                Note:
+                    If :attr:`clean` is :obj:`datetime.timedelta` or :obj:`datetime.datetime` and
+                    if a :class:`telegram.Update.effective_message` is found with
+                    :attr:`telegram.Message.date` is ``None``, before the :obj:`datetime.timedelta`
+                    or :obj:`datetime.datetime` condition is met, all updates will pass through.
 
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 `Updater` will retry on failures on the Telegram server.
@@ -264,7 +271,9 @@ class Updater(object):
             :obj:`Queue`: The update queue that can be filled from the main thread.
 
         Raises:
-            ValueError: If :attr:`clean` is set as :obj:`datetime.timedelta` and is < 1 second.
+            ValueError: if :attr:`clean` is :obj:`datetime.timedelta` and is < 1 second.
+            ValueError: if :attr:`clean` is :obj:`datetime.datetime` is not a least 1 second older
+                than `now()`.
 
         """
         with self.__lock:
