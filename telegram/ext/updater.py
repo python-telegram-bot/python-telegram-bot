@@ -337,10 +337,25 @@ class Updater(object):
             url_path (:obj:`str`, optional): Path inside url.
             cert (:obj:`str`, optional): Path to the SSL certificate file.
             key (:obj:`str`, optional): Path to the SSL key file.
-            clean (:obj:`bool` | :obj:`datetime.timedelta`, optional): Whether to clean any pending
-                updates on Telegram servers before actually starting to poll. Default is ``False``.
-                If a :obj:`datetime.timedelta` object is passed, pending updates older
-                than :math:`now() - timedelta` are ignored.
+            clean (:obj:`bool` | :obj:`datetime.timedelta` | :obj:`datetime.timedelta`, optional):
+                Whether to clean any pending updates on Telegram servers before actually starting
+                to poll. This parameter will be interpreted depending on its type.
+
+                * :obj:`bool` ``True`` cleans all update. Default is ``False``.
+                * :obj:`datetime.timedelta` will be interpreted as "time before now" cut off.
+                  Pending updates older than the cut off will be cleaned up.
+                  :obj:`datetime.timedelta` is sign independent, both positive and negative deltas
+                  are interpreted as "in the past".
+                * :obj:`datetime.datetime` will be interpreted as a specific date and time as
+                  cut off. Pending updates older than the cut off will be cleaned up.
+                  If the timezone (``datetime.tzinfo``) is ``None``, UTC will be assumed.
+
+                Note:
+                    If :attr:`clean` is :obj:`datetime.timedelta` or :obj:`datetime.datetime` and
+                    if a :class:`telegram.Update.effective_message` is found with
+                    :attr:`telegram.Message.date` is ``None``, before the :obj:`datetime.timedelta`
+                    or :obj:`datetime.datetime` condition is met, all updates will pass through.
+
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 `Updater` will retry on failures on the Telegram server.
 
@@ -357,12 +372,35 @@ class Updater(object):
             :obj:`Queue`: The update queue that can be filled from the main thread.
 
         Raises:
-            ValueError: If :attr:`clean` is set as :obj:`datetime.timedelta` and is < 1 second.
+            ValueError: if :attr:`clean` is :obj:`datetime.timedelta` and is < 1 second.
+            ValueError: if :attr:`clean` is :obj:`datetime.datetime` is not a least 1 second older
+                than `now()`.
 
         """
         with self.__lock:
             if not self.running:
                 self.running = True
+
+               if isinstance(clean, timedelta):
+                    if clean.total_seconds() < 0:
+                        clean = clean * -1
+
+                    if clean.total_seconds() < 1:
+                        raise ValueError('Clean as timedelta needs to be >= 1 second')
+                    else:
+                        # convert to datetime
+                        clean = datetime.now(tz=timezone.utc) - clean
+                elif isinstance(clean, datetime):
+                    if (
+                            clean.tzinfo is None or
+                            (clean.tzinfo is not None and clean.tzinfo.utcoffset(clean) is None)
+                        ):
+                            clean=clean.replace(tzinfo=timezone.utc)
+
+                    if clean > (datetime.now(tz=timezone.utc) - timedelta(seconds=1)):
+                        raise ValueError('Clean as datetime ("%s") needs to be at least 1 second'
+                                        ' older than "now"("%s")' % (clean,
+                                        datetime.now(tz=timezone.utc)))
 
                 # Create & start threads
                 self.job_queue.start()
