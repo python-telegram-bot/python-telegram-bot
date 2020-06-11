@@ -524,7 +524,7 @@ class Updater(object):
 
             # reversed as we just need to find the first msg that's too old
             for up in reversed(updates):
-                if up.message and (up.message.date < datetime_cutoff):
+                if up.effective_message and (up.effective_message.date < datetime_cutoff):
                     # break out, we want to process the 'next' and all following msg's
                     updates = self.bot.get_updates(up.update_id + 1)
                     return False
