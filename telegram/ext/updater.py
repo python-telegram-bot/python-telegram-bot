@@ -239,7 +239,7 @@ class Updater(object):
                 Whether to clean any pending updates on Telegram servers before actually starting
                 to poll. This parameter will be interpreted depending on its type.
 
-                * :obj:`bool` ``True`` cleans all update. Default is ``False``.
+                * :obj:`bool` ``True`` cleans all updates. Default is ``False``.
                 * :obj:`datetime.timedelta` will be interpreted as "time before now" cut off.
                   Pending updates older than the cut off will be cleaned up.
                   :obj:`datetime.timedelta` is sign independent, both positive and negative deltas
@@ -341,7 +341,7 @@ class Updater(object):
                 Whether to clean any pending updates on Telegram servers before actually starting
                 to poll. This parameter will be interpreted depending on its type.
 
-                * :obj:`bool` ``True`` cleans all update. Default is ``False``.
+                * :obj:`bool` ``True`` cleans all updates. Default is ``False``.
                 * :obj:`datetime.timedelta` will be interpreted as "time before now" cut off.
                   Pending updates older than the cut off will be cleaned up.
                   :obj:`datetime.timedelta` is sign independent, both positive and negative deltas
