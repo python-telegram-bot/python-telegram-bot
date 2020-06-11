@@ -264,6 +264,9 @@ class Updater(object):
                 self.running = True
 
                 if isinstance(clean, timedelta):
+                    if clean.total_seconds() < 0:
+                        clean = clean * -1
+
                     if clean.total_seconds() < 1:
                         raise ValueError('Clean as timedelta needs to be >= 1 second')
                     else:
