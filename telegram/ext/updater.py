@@ -235,10 +235,18 @@ class Updater(object):
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
                 Telegram in seconds. Default is 0.0.
             timeout (:obj:`float`, optional): Passed to :attr:`telegram.Bot.get_updates`.
-            clean (:obj:`bool` | :obj:`datetime.timedelta`, optional): Whether to clean any pending
-                updates on Telegram servers before actually starting to poll. Default is ``False``.
-                If a :obj:`datetime.timedelta` object is passed, pending updates older
-                than :math:`now() - timedelta` are ignored.
+            clean (:obj:`bool` | :obj:`datetime.timedelta` | :obj:`datetime.timedelta`, optional):
+                Whether to clean any pending updates on Telegram servers before actually starting
+                to poll. This parameter will be interpreted depending on its type.
+
+                * :obj:`bool` ``True`` cleans all update. Default is ``False``.
+                * :obj:`datetime.timedelta` will be interpreted as "time before now" cut off.
+                  Pending updates older than the cut off will be cleaned up. timedelta is sign
+                  independent, both positive and negative deltas are interpreted as "in the past".
+                * :obj:`datetime.datetime` will be interpreted as a specific date and time as
+                   cut off. Pending updates older than the cut off will be cleaned up.
+                   If the timezone (``datetime.tzinfo``) is ``None``, UTC will be assumed.
+
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 `Updater` will retry on failures on the Telegram server.
 
