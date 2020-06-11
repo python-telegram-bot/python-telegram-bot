@@ -286,11 +286,6 @@ class Updater(object):
                             clean.tzinfo is None or
                             (clean.tzinfo is not None and clean.tzinfo.utcoffset(clean) is None)
                         ):
-                            # we need a tz as msg.date is aware and we want to compare
-                            # no tz passed so we assume it's UTC
-                            self.logger.warning('"clean" passed as datetime object ("%s") but'
-                                                ' has no timezone set, we\'re assuming it\'s UTC!'
-                                                , clean)
                             clean=clean.replace(tzinfo=timezone.utc)
 
                     if clean > (datetime.now(tz=timezone.utc) - timedelta(seconds=1)):
