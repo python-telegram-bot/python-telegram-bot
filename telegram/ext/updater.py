@@ -262,30 +262,14 @@ class Updater(object):
         with self.__lock:
             if not self.running:
                 self.running = True
-                ### for my debugging will be removed in cleanup ###
-                self.logger.debug('clean:               "%s"', type(clean))
-                self.logger.debug('clean:               "%s"', clean)
-                self.logger.debug('now:                 "%s"', datetime.now(tz=timezone.utc))
-                ### for my debugging will be removed in cleanup ###
 
                 if isinstance(clean, timedelta):
                     if clean.total_seconds() < 1:
                         raise ValueError('Clean as timedelta needs to be >= 1 second')
                     else:
-                        ### for my debugging will be removed in cleanup ###
-                        a=(datetime.now(tz=timezone.utc) - clean)
-                        self.logger.debug('now - delta:         "%s"', a)
-                        self.logger.debug('now - delta type:    "%s"', type(a))
-                        self.logger.debug('clean as delta:      "%s"', clean)
-                        ### for my debugging will be removed in cleanup ###
-
                         # convert to datetime
                         clean = datetime.now(tz=timezone.utc) - clean
-                        self.logger.debug('clean as datetime:   "%s"', clean)
                 elif isinstance(clean, datetime):
-                    ### for my debugging will be removed in cleanup ###
-                    self.logger.debug('clean tz:            "%s"', clean.tzname())
-                    ### for my debugging will be removed in cleanup ###
 
                     if (
                             clean.tzinfo is None or
@@ -298,19 +282,10 @@ class Updater(object):
                                                 , clean)
                             clean=clean.replace(tzinfo=timezone.utc)
 
-                    ### for my debugging will be removed in cleanup ###
-                    self.logger.debug('clean > (now - 1sec): "%s"',
-                            (clean > (datetime.now(tz=timezone.utc) - timedelta(seconds=1))))
-                    ### for my debugging will be removed in cleanup ###
-
                     if clean > (datetime.now(tz=timezone.utc) - timedelta(seconds=1)):
                         raise ValueError('Clean as datetime ("%s") needs to be at least 1 second'
                                         ' older than "now"("%s")' % (clean,
                                         datetime.now(tz=timezone.utc)))
-
-                ### for my debugging will be removed in cleanup ###
-                self.logger.debug('clean after: "%s"', clean)
-                ### for my debugging will be removed in cleanup ###
 
                 # Create & start threads
                 self.job_queue.start()
@@ -543,12 +518,6 @@ class Updater(object):
 
             # reversed as we just need to find the first msg that's too old
             for up in reversed(updates):
-                ### for my debugging will be removed in cleanup ###
-                self.logger.debug('cutoff:              "%s"', datetime_cutoff)
-                self.logger.debug('msg date:            "%s"', up.message.date)
-                self.logger.debug('msg date < cutoff:   "%s"', (up.message.date < datetime_cutoff))
-                ### for my debugging will be removed in cleanup ###
-
                 if up.message and (up.message.date < datetime_cutoff):
                     # break out, we want to process the 'next' and all following msg's
                     updates = self.bot.get_updates(up.update_id + 1)
