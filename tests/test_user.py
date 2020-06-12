@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import User, Update
+from telegram import Update, User
 from telegram.utils.helpers import escape_markdown
 
 
@@ -221,8 +221,8 @@ class TestUser:
 
         assert user.mention_markdown_v2() == expected.format(escape_markdown(user.full_name,
                                                                              version=2), user.id)
-        assert user.mention_markdown_v2('the{name>\u2022') == expected.format('the\\{name\\>\u2022',
-                                                                              user.id)
+        assert user.mention_markdown_v2('the{name>\u2022') == expected.format(
+            'the\\{name\\>\u2022', user.id)
         assert user.mention_markdown_v2(user.username) == expected.format(user.username, user.id)
 
     def test_equality(self):

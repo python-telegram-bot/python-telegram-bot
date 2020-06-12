@@ -20,7 +20,8 @@
 
 from abc import ABC, abstractmethod
 
-class BasePersistence:
+
+class BasePersistence(ABC):
     """Interface class for adding persistence to your bot.
     Subclass this object for different implementations of a persistent bot.
 
