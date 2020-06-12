@@ -3029,7 +3029,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/setChatAdministratorCustomTitle'.format(self.base_url)
+        url = '{}/setChatAdministratorCustomTitle'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'user_id': user_id, 'custom_title': custom_title}
         data.update(kwargs)
@@ -3812,7 +3812,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendDice'.format(self.base_url)
+        url = '{}/sendDice'.format(self.base_url)
 
         data = {
             'chat_id': chat_id,
@@ -3843,7 +3843,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/getMyCommands'.format(self.base_url)
+        url = '{}/getMyCommands'.format(self.base_url)
 
         result = self._request.get(url, timeout=timeout)
 
@@ -3872,7 +3872,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/setMyCommands'.format(self.base_url)
+        url = '{}/setMyCommands'.format(self.base_url)
 
         cmds = [c if isinstance(c, BotCommand) else BotCommand(c[0], c[1]) for c in commands]
 

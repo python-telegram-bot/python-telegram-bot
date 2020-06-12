@@ -49,14 +49,14 @@ class TestHelpers:
 
     def test_escape_markdown_v2(self):
         test_str = 'a_b*c[d]e (fg) h~I`>JK#L+MN -O=|p{qr}s.t! u'
-        expected_str = 'a\_b\*c\[d\]e \(fg\) h\~I\`\>JK\#L\+MN \-O\=\|p\{qr\}s\.t\! u'
+        expected_str = r'a\_b\*c\[d\]e \(fg\) h\~I\`\>JK\#L\+MN \-O\=\|p\{qr\}s\.t\! u'
 
         assert expected_str == helpers.escape_markdown(test_str, version=2)
 
     def test_escape_markdown_v2_monospaced(self):
 
-        test_str = 'mono/pre: `abc` \int (`\some \`stuff)'
-        expected_str = 'mono/pre: \`abc\` \\\\int (\`\\\\some \\\\\`stuff)'
+        test_str = r'mono/pre: `abc` \int (`\some \`stuff)'
+        expected_str = 'mono/pre: \\`abc\\` \\\\int (\\`\\\\some \\\\\\`stuff)'
 
         assert expected_str == helpers.escape_markdown(test_str, version=2,
                                                        entity_type=MessageEntity.PRE)
@@ -65,8 +65,8 @@ class TestHelpers:
 
     def test_escape_markdown_v2_text_link(self):
 
-        test_str = 'https://url.containing/funny)cha)\\ra\)cter\s'
-        expected_str = 'https://url.containing/funny\)cha\)\\\\ra\\\\\)cter\\\\s'
+        test_str = 'https://url.containing/funny)cha)\\ra\\)cter\\s'
+        expected_str = 'https://url.containing/funny\\)cha\\)\\\\ra\\\\\\)cter\\\\s'
 
         assert expected_str == helpers.escape_markdown(test_str, version=2,
                                                        entity_type=MessageEntity.TEXT_LINK)

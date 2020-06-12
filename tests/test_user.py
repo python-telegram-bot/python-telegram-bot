@@ -221,7 +221,7 @@ class TestUser:
 
         assert user.mention_markdown_v2() == expected.format(escape_markdown(user.full_name,
                                                                              version=2), user.id)
-        assert user.mention_markdown_v2('the{name>\u2022') == expected.format('the\{name\>\u2022',
+        assert user.mention_markdown_v2('the{name>\u2022') == expected.format('the\\{name\\>\u2022',
                                                                               user.id)
         assert user.mention_markdown_v2(user.username) == expected.format(user.username, user.id)
 
