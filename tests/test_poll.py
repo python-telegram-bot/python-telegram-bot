@@ -58,7 +58,7 @@ def poll_answer():
                       option_ids=TestPollAnswer.poll_id)
 
 
-class TestPollAnswer(object):
+class TestPollAnswer:
     poll_id = 'id'
     user = User(1, '', False)
     option_ids = [2]
