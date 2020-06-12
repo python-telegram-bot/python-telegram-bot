@@ -23,7 +23,7 @@ from telegram import TelegramObject
 
 class Dice(TelegramObject):
     """
-    This object represents a dice with random value from 1 to 6 for currently supported base eomji.
+    This object represents an animated emoji with a random value for currently supported base emoji.
     (The singular form of "dice" is "die". However, PTB mimics the Telegram API, which uses the
     term "dice".)
 
