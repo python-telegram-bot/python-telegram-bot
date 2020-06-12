@@ -19,20 +19,29 @@ A more complex example of a bot that uses the `ConversationHandler`. It is also 
 ### [`nestedconversationbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/nestedconversationbot.py)
 A even more complex example of a bot that uses the nested `ConversationHandler`s. While it's certainly not that complex that you couldn't built it without nested `ConversationHanldler`s, it gives a good impression on how to work with them. Of course, there is a [fancy state diagram](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/nestedconversationbot.png) for this example, too!
 
+### [`persistentconversationbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/persistentconversationbot.py)
+A basic example of a bot store conversation state and user_data over multiple restarts.
+
 ### [`inlinekeyboard.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/inlinekeyboard.py)
 This example sheds some light on inline keyboards, callback queries and message editing.
 
 ### [`inlinekeyboard2.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/inlinekeyboard2.py)
 A more complex example about inline keyboards, callback queries and message editing. This example showcases how an interactive menu could be build using inline keyboards.
 
+### [`deeplinking.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/deeplinking.py)
+A basic example on how to use deeplinking with inline keyboards.
+
 ### [`inlinebot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/inlinebot.py)
 A basic example of an [inline bot](https://core.telegram.org/bots/inline). Don't forget to enable inline mode with [@BotFather](https://telegram.me/BotFather).
 
+### [`pollbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/pollbot.py)
+This example sheds some light on polls, poll answers and the corresponding handlers.
+
+### [`passportbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/passportbot.py)
+A basic example of a bot that can accept passports. Use in combination with [`passportbot.html`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/passportbot.html). Don't forget to enable and configure payments with [@BotFather](https://telegram.me/BotFather). Check out this [guide](https://git.io/fAvYd) on Telegram passports in PTB.
+
 ### [`paymentbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/paymentbot.py)
 A basic example of a bot that can accept payments. Don't forget to enable and configure payments with [@BotFather](https://telegram.me/BotFather).
-
-### [`persistentconversationbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/persistentconversationbot.py)
-A basic example of a bot store conversation state and user_data over multiple restarts.
 
 ## Pure API
 The [`echobot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/echobot.py) example uses only the pure, "bare-metal" API wrapper.
