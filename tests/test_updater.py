@@ -35,7 +35,7 @@ import pytest
 
 from telegram import TelegramError, Message, User, Chat, Update, Bot
 from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter
-from telegram.ext import Updater, Dispatcher, BasePersistence
+from telegram.ext import Updater, Dispatcher, DictPersistence
 
 signalskip = pytest.mark.skipif(sys.platform == 'win32',
                                 reason='Can\'t send signals without stopping '
@@ -461,7 +461,7 @@ class TestUpdater:
 
     def test_mutual_exclude_persistence_dispatcher(self):
         dispatcher = Dispatcher(None, None)
-        persistence = BasePersistence()
+        persistence = DictPersistence()
         with pytest.raises(ValueError):
             Updater(dispatcher=dispatcher, persistence=persistence)
 

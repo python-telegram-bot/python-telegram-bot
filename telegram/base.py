@@ -23,8 +23,6 @@ try:
 except ImportError:
     import json
 
-from abc import ABCMeta
-
 
 class TelegramObject(metaclass=ABCMeta):
     """Base class for most telegram objects."""
@@ -59,12 +57,7 @@ class TelegramObject(metaclass=ABCMeta):
         data = dict()
 
         for key in iter(self.__dict__):
-            if key in ('bot',
-                       '_id_attrs',
-                       '_credentials',
-                       '_decrypted_credentials',
-                       '_decrypted_data',
-                       '_decrypted_secret'):
+            if key == 'bot' or key.startswith('_'):
                 continue
 
             value = self.__dict__[key]

@@ -24,6 +24,7 @@ import pytest
 from flaky import flaky
 
 from telegram import Sticker, PhotoSize, TelegramError, StickerSet, Audio, MaskPosition
+from telegram.error import BadRequest
 
 
 @pytest.fixture(scope='function')
@@ -256,7 +257,11 @@ class TestSticker:
 def sticker_set(bot):
     ss = bot.get_sticker_set('test_by_{}'.format(bot.username))
     if len(ss.stickers) > 100:
-        raise Exception('stickerset is growing too large.')
+        try:
+            for i in range(1, 50):
+                bot.delete_sticker_from_set(ss.stickers[-i].file_id)
+        except BadRequest:
+            raise Exception('stickerset is growing too large.')
     return ss
 
 
@@ -264,7 +269,11 @@ def sticker_set(bot):
 def animated_sticker_set(bot):
     ss = bot.get_sticker_set('animated_test_by_{}'.format(bot.username))
     if len(ss.stickers) > 100:
-        raise Exception('stickerset is growing too large.')
+        try:
+            for i in range(1, 50):
+                bot.delete_sticker_from_set(ss.stickers[-i].file_id)
+        except BadRequest:
+            raise Exception('stickerset is growing too large.')
     return ss
 
 

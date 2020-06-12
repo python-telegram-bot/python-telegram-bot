@@ -92,13 +92,13 @@ def message(bot):
                                   options=[PollOption(text='a', voter_count=1),
                                            PollOption(text='b', voter_count=2)], is_closed=False,
                                   total_voter_count=0, is_anonymous=False, type=Poll.REGULAR,
-                                  allows_multiple_answers=True)},
+                                  allows_multiple_answers=True, explanation_entities=[])},
                     {'text': 'a text message', 'reply_markup': {'inline_keyboard': [[{
                         'text': 'start', 'url': 'http://google.com'}, {
                         'text': 'next', 'callback_data': 'abcd'}],
                         [{'text': 'Cancel', 'callback_data': 'Cancel'}]]}},
                     {'quote': True},
-                    {'dice': Dice(4)}
+                    {'dice': Dice(4, '🎲')}
                 ],
                 ids=['forwarded_user', 'forwarded_channel', 'reply', 'edited', 'text',
                      'caption_entities', 'audio', 'document', 'animation', 'game', 'photo',

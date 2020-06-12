@@ -18,6 +18,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Alateas <https://github.com/alateas>`_
 - `Ales Dokshanin <https://github.com/alesdokshanin>`_
 - `Ambro17 <https://github.com/Ambro17>`_
+- `Andrej Zhilenkov <https://github.com/Andrej730>`_
 - `Anton Tagunov <https://github.com/anton-tagunov>`_
 - `Avanatiker <https://github.com/Avanatiker>`_
 - `Balduro <https://github.com/Balduro>`_
@@ -26,6 +27,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `d-qoi <https://github.com/d-qoi>`_
 - `daimajia <https://github.com/daimajia>`_
 - `Daniel Reed <https://github.com/nmlorg>`_
+- `D David Livingston <https://github.com/daviddl9>`_
 - `Eana Hufwe <https://github.com/blueset>`_
 - `Ehsan Online <https://github.com/ehsanonline>`_
 - `Eli Gao <https://github.com/eligao>`_

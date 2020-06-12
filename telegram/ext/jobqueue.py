@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes JobQueue and Job."""
 
+import calendar
 import datetime
 import logging
 import time
@@ -104,6 +105,7 @@ class JobQueue:
         # enqueue:
         self.logger.debug('Putting job %s with t=%s', job.name, time_spec)
         self._queue.put((next_t, job))
+        job._set_next_t(next_t)
 
         # Wake up the loop if this job should be executed next
         self._set_next_peek(next_t)
@@ -135,6 +137,9 @@ class JobQueue:
                   job should run. This could be either today or, if the time has already passed,
                   tomorrow. If the timezone (``time.tzinfo``) is ``None``, UTC will be assumed.
 
+                If ``when`` is :obj:`datetime.datetime` or :obj:`datetime.time` type
+                then ``when.tzinfo`` will define ``Job.tzinfo``. Otherwise UTC will be assumed.
+
             context (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through ``job.context`` in the callback. Defaults to ``None``.
             name (:obj:`str`, optional): The name of the new job. Defaults to
@@ -145,7 +150,14 @@ class JobQueue:
             queue.
 
         """
-        job = Job(callback, repeat=False, context=context, name=name, job_queue=self)
+        tzinfo = when.tzinfo if isinstance(when, (datetime.datetime, datetime.time)) else None
+
+        job = Job(callback,
+                  repeat=False,
+                  context=context,
+                  name=name,
+                  job_queue=self,
+                  tzinfo=tzinfo)
         self._put(job, time_spec=when)
         return job
 
@@ -179,6 +191,9 @@ class JobQueue:
                   job should run. This could be either today or, if the time has already passed,
                   tomorrow. If the timezone (``time.tzinfo``) is ``None``, UTC will be assumed.
 
+                If ``first`` is :obj:`datetime.datetime` or :obj:`datetime.time` type
+                then ``first.tzinfo`` will define ``Job.tzinfo``. Otherwise UTC will be assumed.
+
                 Defaults to ``interval``
             context (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through ``job.context`` in the callback. Defaults to ``None``.
@@ -189,20 +204,130 @@ class JobQueue:
             :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
             queue.
 
-        Notes:
+        Note:
              `interval` is always respected "as-is". That means that if DST changes during that
              interval, the job might not run at the time one would expect. It is always recommended
              to pin servers to UTC time, then time related behaviour can always be expected.
 
         """
+        tzinfo = first.tzinfo if isinstance(first, (datetime.datetime, datetime.time)) else None
+
         job = Job(callback,
                   interval=interval,
                   repeat=True,
                   context=context,
                   name=name,
-                  job_queue=self)
+                  job_queue=self,
+                  tzinfo=tzinfo)
         self._put(job, time_spec=first)
         return job
+
+    def run_monthly(self, callback, when, day, context=None, name=None, day_is_strict=True):
+        """Creates a new ``Job`` that runs on a monthly basis and adds it to the queue.
+
+        Args:
+            callback (:obj:`callable`):  The callback function that should be executed by the new
+                job. Callback signature for context based API:
+
+                    ``def callback(CallbackContext)``
+
+                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
+                its ``job.context`` or change it to a repeating job.
+            when (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
+                (``when.tzinfo``) is ``None``, UTC will be assumed. This will also implicitly
+                define ``Job.tzinfo``.
+            day (:obj:`int`): Defines the day of the month whereby the job would run. It should
+                be within the range of 1 and 31, inclusive.
+            context (:obj:`object`, optional): Additional data needed for the callback function.
+                Can be accessed through ``job.context`` in the callback. Defaults to ``None``.
+            name (:obj:`str`, optional): The name of the new job. Defaults to
+                ``callback.__name__``.
+            day_is_strict (:obj:`bool`, optional): If ``False`` and day > month.days, will pick
+                the last day in the month. Defaults to ``True``.
+
+        Returns:
+            :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
+            queue.
+
+        """
+        tzinfo = when.tzinfo if isinstance(when, (datetime.datetime, datetime.time)) else None
+        if 1 <= day <= 31:
+            next_dt = self._get_next_month_date(day, day_is_strict, when, allow_now=True)
+            job = Job(callback, repeat=False, context=context, name=name, job_queue=self,
+                      is_monthly=True, day_is_strict=day_is_strict, tzinfo=tzinfo)
+            self._put(job, time_spec=next_dt)
+            return job
+        else:
+            raise ValueError("The elements of the 'day' argument should be from 1 up to"
+                             " and including 31")
+
+    def _get_next_month_date(self, day, day_is_strict, when, allow_now=False):
+        """This method returns the date that the next monthly job should be scheduled.
+
+        Args:
+           day (:obj:`int`): The day of the month the job should run.
+           day_is_strict (:obj:`bool`):
+               Specification as to whether the specified day of job should be strictly
+               respected. If day_is_strict is ``True`` it ignores months whereby the
+               specified date does not exist (e.g February 31st). If it set to ``False``,
+               it returns the last valid date of the month instead. For example,
+               if the user runs a job on the 31st of every month, and sets
+               the day_is_strict variable to ``False``, April, for example,
+               the job would run on April 30th.
+           when (:obj:`datetime.time`): Time of day at which the job should run. If the
+               timezone (``time.tzinfo``) is ``None``, UTC will be assumed.
+           allow_now (:obj:`bool`): Whether executing the job right now is a feasible options.
+               For stability reasons, this defaults to :obj:`False`, but it needs to be :obj:`True`
+               on initializing a job.
+
+        """
+        dt = datetime.datetime.now(tz=when.tzinfo or datetime.timezone.utc)
+        dt_time = dt.time().replace(tzinfo=when.tzinfo)
+        days_in_current_month = calendar.monthrange(dt.year, dt.month)[1]
+        days_till_months_end = days_in_current_month - dt.day
+        if days_in_current_month < day:
+            # if the day does not exist in the current month (e.g Feb 31st)
+            if day_is_strict is False:
+                # set day as last day of month instead
+                next_dt = dt + datetime.timedelta(days=days_till_months_end)
+            else:
+                # else set as day in subsequent month. Subsequent month is
+                # guaranteed to have the date, if current month does not have the date.
+                next_dt = dt + datetime.timedelta(days=days_till_months_end + day)
+        else:
+            # if the day exists in the current month
+            if dt.day < day:
+                # day is upcoming
+                next_dt = dt + datetime.timedelta(day - dt.day)
+            elif dt.day > day or (dt.day == day and ((not allow_now and dt_time >= when)
+                                                     or (allow_now and dt_time > when))):
+                # run next month if day has already passed
+                next_year = dt.year + 1 if dt.month == 12 else dt.year
+                next_month = 1 if dt.month == 12 else dt.month + 1
+                days_in_next_month = calendar.monthrange(next_year, next_month)[1]
+                next_month_has_date = days_in_next_month >= day
+                if next_month_has_date:
+                    next_dt = dt + datetime.timedelta(days=days_till_months_end + day)
+                elif day_is_strict:
+                    # schedule the subsequent month if day is strict
+                    next_dt = dt + datetime.timedelta(
+                        days=days_till_months_end + days_in_next_month + day)
+                else:
+                    # schedule in the next month last date if day is not strict
+                    next_dt = dt + datetime.timedelta(days=days_till_months_end
+                                                      + days_in_next_month)
+
+            else:
+                # day is today but time has not yet come
+                next_dt = dt
+
+        # Set the correct time
+        next_dt = next_dt.replace(hour=when.hour, minute=when.minute, second=when.second,
+                                  microsecond=when.microsecond)
+        # fold is new in Py3.6
+        if hasattr(next_dt, 'fold'):
+            next_dt = next_dt.replace(fold=when.fold)
+        return next_dt
 
     def run_daily(self, callback, time, days=Days.EVERY_DAY, context=None, name=None):
         """Creates a new ``Job`` that runs on a daily basis and adds it to the queue.
@@ -217,6 +342,7 @@ class JobQueue:
                 its ``job.context`` or change it to a repeating job.
             time (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
                 (``time.tzinfo``) is ``None``, UTC will be assumed.
+                ``time.tzinfo`` will implicitly define ``Job.tzinfo``.
             days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should
                 run. Defaults to ``EVERY_DAY``
             context (:obj:`object`, optional): Additional data needed for the callback function.
@@ -228,7 +354,7 @@ class JobQueue:
             :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
             queue.
 
-        Notes:
+        Note:
              Daily is just an alias for "24 Hours". That means that if DST changes during that
              interval, the job might not run at the time one would expect. It is always recommended
              to pin servers to UTC time, then time related behaviour can always be expected.
@@ -300,7 +426,13 @@ class JobQueue:
 
             if job.repeat and not job.removed:
                 self._put(job, previous_t=t)
+            elif job.is_monthly and not job.removed:
+                dt = datetime.datetime.now(tz=job.tzinfo)
+                dt_time = dt.time().replace(tzinfo=job.tzinfo)
+                self._put(job, time_spec=self._get_next_month_date(dt.day, job.day_is_strict,
+                                                                   dt_time))
             else:
+                job._set_next_t(None)
                 self.logger.debug('Dropping non-repeating or removed job %s', job.name)
 
     def start(self):
@@ -367,6 +499,8 @@ class Job:
         callback (:obj:`callable`): The callback function that should be executed by the new job.
         context (:obj:`object`): Optional. Additional data needed for the callback function.
         name (:obj:`str`): Optional. The name of the new job.
+        is_monthly (:obj: `bool`): Optional. Indicates whether it is a monthly job.
+        day_is_strict (:obj: `bool`): Optional. Indicates whether the monthly jobs day is strict.
 
     Args:
         callback (:obj:`callable`): The callback function that should be executed by the new job.
@@ -393,6 +527,11 @@ class Job:
         tzinfo (:obj:`datetime.tzinfo`, optional): timezone associated to this job. Used when
             checking the day of the week to determine whether a job should run (only relevant when
             ``days is not Days.EVERY_DAY``). Defaults to UTC.
+        is_monthly (:obj:`bool`, optional): If this job is supposed to be a monthly scheduled job.
+            Defaults to ``False``.
+        day_is_strict (:obj:`bool`, optional): If ``False`` and day > month.days, will pick the
+            last day in the month. Defaults to ``True``. Only relevant when ``is_monthly`` is
+            ``True``.
     """
 
     def __init__(self,
@@ -403,7 +542,9 @@ class Job:
                  days=Days.EVERY_DAY,
                  name=None,
                  job_queue=None,
-                 tzinfo=None):
+                 tzinfo=None,
+                 is_monthly=False,
+                 day_is_strict=True):
 
         self.callback = callback
         self.context = context
@@ -412,7 +553,10 @@ class Job:
         self._repeat = None
         self._interval = None
         self.interval = interval
+        self._next_t = None
         self.repeat = repeat
+        self.is_monthly = is_monthly
+        self.day_is_strict = day_is_strict
 
         self._days = None
         self.days = days
@@ -438,6 +582,7 @@ class Job:
 
         """
         self._remove.set()
+        self._next_t = None
 
     @property
     def removed(self):
@@ -471,8 +616,8 @@ class Job:
             raise ValueError("The 'interval' can not be 'None' when 'repeat' is set to 'True'")
 
         if not (interval is None or isinstance(interval, (Number, datetime.timedelta))):
-            raise ValueError("The 'interval' must be of type 'datetime.timedelta',"
-                             " 'int' or 'float'")
+            raise TypeError("The 'interval' must be of type 'datetime.timedelta',"
+                            " 'int' or 'float'")
 
         self._interval = interval
 
@@ -484,6 +629,27 @@ class Job:
             return interval.total_seconds()
         else:
             return interval
+
+    @property
+    def next_t(self):
+        """
+        :obj:`datetime.datetime`: Datetime for the next job execution.
+            Datetime is localized according to :attr:`tzinfo`.
+            If job is removed or already ran it equals to ``None``.
+
+        """
+        return datetime.datetime.fromtimestamp(self._next_t, self.tzinfo) if self._next_t else None
+
+    def _set_next_t(self, next_t):
+        if isinstance(next_t, datetime.datetime):
+            # Set timezone to UTC in case datetime is in local timezone.
+            next_t = next_t.astimezone(datetime.timezone.utc)
+            next_t = to_float_timestamp(next_t)
+        elif not (isinstance(next_t, Number) or next_t is None):
+            raise TypeError("The 'next_t' argument should be one of the following types: "
+                            "'float', 'int', 'datetime.datetime' or 'NoneType'")
+
+        self._next_t = next_t
 
     @property
     def repeat(self):
@@ -504,10 +670,10 @@ class Job:
     @days.setter
     def days(self, days):
         if not isinstance(days, tuple):
-            raise ValueError("The 'days' argument should be of type 'tuple'")
+            raise TypeError("The 'days' argument should be of type 'tuple'")
 
         if not all(isinstance(day, int) for day in days):
-            raise ValueError("The elements of the 'days' argument should be of type 'int'")
+            raise TypeError("The elements of the 'days' argument should be of type 'int'")
 
         if not all(0 <= day <= 6 for day in days):
             raise ValueError("The elements of the 'days' argument should be from 0 up to and "

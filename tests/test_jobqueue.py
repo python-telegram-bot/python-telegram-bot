@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import calendar
 import datetime as dtm
 import os
 import time
@@ -24,7 +25,6 @@ from time import sleep
 
 import pytest
 from flaky import flaky
-
 from telegram.ext import JobQueue, Updater, Job, CallbackContext
 from telegram.utils.deprecate import TelegramDeprecationWarning
 
@@ -286,6 +286,69 @@ class TestJobQueue:
         assert self.result == 1
         assert job_queue._queue.get(False)[0] == pytest.approx(expected_reschedule_time)
 
+    def test_run_monthly(self, job_queue):
+        delta, now = 0.1, time.time()
+        date_time = dtm.datetime.utcfromtimestamp(now)
+        time_of_day = (date_time + dtm.timedelta(seconds=delta)).time()
+        expected_reschedule_time = now + delta
+
+        day = date_time.day
+        expected_reschedule_time += calendar.monthrange(date_time.year,
+                                                        date_time.month)[1] * 24 * 60 * 60
+
+        job_queue.run_monthly(self.job_run_once, time_of_day, day)
+        sleep(0.2)
+        assert self.result == 1
+        assert job_queue._queue.get(False)[0] == pytest.approx(expected_reschedule_time)
+
+    def test_run_monthly_and_not_strict(self, job_queue):
+        # This only really tests something in months with < 31 days.
+        # But the trouble of patching datetime is probably not worth it
+
+        delta, now = 0.1, time.time()
+        date_time = dtm.datetime.utcfromtimestamp(now)
+        time_of_day = (date_time + dtm.timedelta(seconds=delta)).time()
+        expected_reschedule_time = now + delta
+
+        day = date_time.day
+        date_time += dtm.timedelta(calendar.monthrange(date_time.year,
+                                                       date_time.month)[1] - day)
+        # next job should be scheduled on last day of month if day_is_strict is False
+        expected_reschedule_time += (calendar.monthrange(date_time.year,
+                                                         date_time.month)[1] - day) * 24 * 60 * 60
+
+        job_queue.run_monthly(self.job_run_once, time_of_day, 31, day_is_strict=False)
+        assert job_queue._queue.get(False)[0] == pytest.approx(expected_reschedule_time)
+
+    def test_run_monthly_with_timezone(self, job_queue):
+        """test that the day is retrieved based on the job's timezone
+        We set a job to run at the current UTC time of day (plus a small delay buffer) with a
+        timezone that is---approximately (see below)---UTC +24, and set it to run on the weekday
+        after the current UTC weekday. The job should therefore be executed now (because in UTC+24,
+        the time of day is the same as the current weekday is the one after the current UTC
+        weekday).
+        """
+        now = time.time()
+        utcnow = dtm.datetime.utcfromtimestamp(now)
+        delta = 0.1
+
+        # must subtract one minute because the UTC offset has to be strictly less than 24h
+        # thus this test will xpass if run in the interval [00:00, 00:01) UTC time
+        # (because target time will be 23:59 UTC, so local and target weekday will be the same)
+        target_tzinfo = dtm.timezone(dtm.timedelta(days=1, minutes=-1))
+        target_datetime = (utcnow + dtm.timedelta(days=1, minutes=-1, seconds=delta)).replace(
+            tzinfo=target_tzinfo)
+        target_time = target_datetime.timetz()
+        target_day = target_datetime.day
+        expected_reschedule_time = now + delta
+        expected_reschedule_time += calendar.monthrange(target_datetime.year,
+                                                        target_datetime.month)[1] * 24 * 60 * 60
+
+        job_queue.run_monthly(self.job_run_once, target_time, target_day)
+        sleep(delta + 0.1)
+        assert self.result == 1
+        assert job_queue._queue.get(False)[0] == pytest.approx(expected_reschedule_time)
+
     def test_warnings(self, job_queue):
         j = Job(self.job_run_once, repeat=False)
         with pytest.raises(ValueError, match='can not be set to'):
@@ -296,17 +359,20 @@ class TestJobQueue:
         with pytest.raises(ValueError, match='can not be'):
             j.interval = None
         j.repeat = False
-        with pytest.raises(ValueError, match='must be of type'):
+        with pytest.raises(TypeError, match='must be of type'):
             j.interval = 'every 3 minutes'
         j.interval = 15
         assert j.interval_seconds == 15
 
-        with pytest.raises(ValueError, match='argument should be of type'):
+        with pytest.raises(TypeError, match='argument should be of type'):
             j.days = 'every day'
-        with pytest.raises(ValueError, match='The elements of the'):
+        with pytest.raises(TypeError, match='The elements of the'):
             j.days = ('mon', 'wed')
         with pytest.raises(ValueError, match='from 0 up to and'):
             j.days = (0, 6, 12, 14)
+
+        with pytest.raises(TypeError, match='argument should be one of the'):
+            j._set_next_t('tomorrow')
 
     def test_get_jobs(self, job_queue):
         job1 = job_queue.run_once(self.job_run_once, 10, name='name1')
@@ -338,3 +404,100 @@ class TestJobQueue:
 
         for job in jobs:
             assert job.tzinfo == dtm.timezone.utc
+
+    def test_job_next_t_property(self, job_queue):
+        # Testing:
+        # - next_t values match values from self._queue.queue (for run_once and run_repeating jobs)
+        # - next_t equals None if job is removed or if it's already ran
+
+        job1 = job_queue.run_once(self.job_run_once, 0.06, name='run_once job')
+        job2 = job_queue.run_once(self.job_run_once, 0.06, name='canceled run_once job')
+        job_queue.run_repeating(self.job_run_once, 0.04, name='repeatable job')
+
+        sleep(0.05)
+        job2.schedule_removal()
+
+        with job_queue._queue.mutex:
+            for t, job in job_queue._queue.queue:
+                t = dtm.datetime.fromtimestamp(t, job.tzinfo)
+
+                if job.removed:
+                    assert job.next_t is None
+                else:
+                    assert job.next_t == t
+
+        assert self.result == 1
+        sleep(0.02)
+
+        assert self.result == 2
+        assert job1.next_t is None
+        assert job2.next_t is None
+
+    def test_job_set_next_t(self, job_queue):
+        # Testing next_t setter for 'datetime.datetime' values
+
+        job = job_queue.run_once(self.job_run_once, 0.05)
+
+        t = dtm.datetime.now(tz=dtm.timezone(dtm.timedelta(hours=12)))
+        job._set_next_t(t)
+        job.tzinfo = dtm.timezone(dtm.timedelta(hours=5))
+        assert job.next_t == t.astimezone(job.tzinfo)
+
+    def test_passing_tzinfo_to_job(self, job_queue):
+        """Test that tzinfo is correctly passed to job with run_once, run_daily, run_repeating
+        and run_monthly methods"""
+
+        when_dt_tz_specific = dtm.datetime.now(
+            tz=dtm.timezone(dtm.timedelta(hours=12))
+        ) + dtm.timedelta(seconds=2)
+        when_dt_tz_utc = dtm.datetime.now() + dtm.timedelta(seconds=2)
+        job_once1 = job_queue.run_once(self.job_run_once, when_dt_tz_specific)
+        job_once2 = job_queue.run_once(self.job_run_once, when_dt_tz_utc)
+
+        when_time_tz_specific = (dtm.datetime.now(
+            tz=dtm.timezone(dtm.timedelta(hours=12))
+        ) + dtm.timedelta(seconds=2)).timetz()
+        when_time_tz_utc = (dtm.datetime.now() + dtm.timedelta(seconds=2)).timetz()
+        job_once3 = job_queue.run_once(self.job_run_once, when_time_tz_specific)
+        job_once4 = job_queue.run_once(self.job_run_once, when_time_tz_utc)
+
+        first_dt_tz_specific = dtm.datetime.now(
+            tz=dtm.timezone(dtm.timedelta(hours=12))
+        ) + dtm.timedelta(seconds=2)
+        first_dt_tz_utc = dtm.datetime.now() + dtm.timedelta(seconds=2)
+        job_repeating1 = job_queue.run_repeating(
+            self.job_run_once, 2, first=first_dt_tz_specific)
+        job_repeating2 = job_queue.run_repeating(
+            self.job_run_once, 2, first=first_dt_tz_utc)
+
+        first_time_tz_specific = (dtm.datetime.now(
+            tz=dtm.timezone(dtm.timedelta(hours=12))
+        ) + dtm.timedelta(seconds=2)).timetz()
+        first_time_tz_utc = (dtm.datetime.now() + dtm.timedelta(seconds=2)).timetz()
+        job_repeating3 = job_queue.run_repeating(
+            self.job_run_once, 2, first=first_time_tz_specific)
+        job_repeating4 = job_queue.run_repeating(
+            self.job_run_once, 2, first=first_time_tz_utc)
+
+        time_tz_specific = (dtm.datetime.now(
+            tz=dtm.timezone(dtm.timedelta(hours=12))
+        ) + dtm.timedelta(seconds=2)).timetz()
+        time_tz_utc = (dtm.datetime.now() + dtm.timedelta(seconds=2)).timetz()
+        job_daily1 = job_queue.run_daily(self.job_run_once, time_tz_specific)
+        job_daily2 = job_queue.run_daily(self.job_run_once, time_tz_utc)
+
+        job_monthly1 = job_queue.run_monthly(self.job_run_once, time_tz_specific, 1)
+        job_monthly2 = job_queue.run_monthly(self.job_run_once, time_tz_utc, 1)
+
+        assert job_once1.tzinfo == when_dt_tz_specific.tzinfo
+        assert job_once2.tzinfo == dtm.timezone.utc
+        assert job_once3.tzinfo == when_time_tz_specific.tzinfo
+        assert job_once4.tzinfo == dtm.timezone.utc
+        assert job_repeating1.tzinfo == first_dt_tz_specific.tzinfo
+        assert job_repeating2.tzinfo == dtm.timezone.utc
+        assert job_repeating3.tzinfo == first_time_tz_specific.tzinfo
+        assert job_repeating4.tzinfo == dtm.timezone.utc
+        assert job_daily1.tzinfo == time_tz_specific.tzinfo
+        assert job_daily2.tzinfo == dtm.timezone.utc
+        assert job_monthly1.tzinfo == time_tz_specific.tzinfo
+        assert job_monthly2.tzinfo == dtm.timezone.utc

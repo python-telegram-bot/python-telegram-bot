@@ -28,8 +28,6 @@ from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 import tornado.web
 
-logging.getLogger(__name__).addHandler(logging.NullHandler())
-
 
 class WebhookServer:
 

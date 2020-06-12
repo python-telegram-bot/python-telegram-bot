@@ -66,7 +66,7 @@ def escape_markdown(text, version=1, entity_type=None):
         else:
             escape_chars = r'_*[]()~`>#+-=|{}.!'
     else:
-        raise ValueError('Markdown version musst be either 1 or 2!')
+        raise ValueError('Markdown version must be either 1 or 2!')
 
     return re.sub('([{}])'.format(re.escape(escape_chars)), r'\\\1', text)
 
@@ -164,22 +164,27 @@ def to_timestamp(dt_obj, reference_timestamp=None):
     return int(to_float_timestamp(dt_obj, reference_timestamp)) if dt_obj is not None else None
 
 
-def from_timestamp(unixtime):
+def from_timestamp(unixtime, tzinfo=dtm.timezone.utc):
     """
-    Converts an (integer) unix timestamp to a naive datetime object in UTC.
+    Converts an (integer) unix timestamp to a timezone aware datetime object.
     ``None`` s are left alone (i.e. ``from_timestamp(None)`` is ``None``).
 
     Args:
         unixtime (int): integer POSIX timestamp
+        tzinfo (:obj:`datetime.tzinfo`, optional): The timezone, the timestamp is to be converted
+            to. Defaults to UTC.
 
     Returns:
-        equivalent :obj:`datetime.datetime` value in naive UTC if ``timestamp`` is not
+        timezone aware equivalent :obj:`datetime.datetime` value if ``timestamp`` is not
         ``None``; else ``None``
     """
     if unixtime is None:
         return None
 
-    return dtm.datetime.utcfromtimestamp(unixtime)
+    if tzinfo is not None:
+        return dtm.datetime.fromtimestamp(unixtime, tz=tzinfo)
+    else:
+        return dtm.datetime.utcfromtimestamp(unixtime)
 
 # -------- end --------
 

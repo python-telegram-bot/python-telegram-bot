@@ -195,7 +195,7 @@ class MaskPosition(TelegramObject):
             size, from top to bottom.
         scale (:obj:`float`): Mask scaling coefficient. For example, 2.0 means double size.
 
-    Notes:
+    Note:
         :attr:`type` should be one of the following: `forehead`, `eyes`, `mouth` or `chin`. You can
         use the classconstants for those.
 
