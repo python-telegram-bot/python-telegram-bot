@@ -24,7 +24,7 @@ except ImportError:
     import json
 
 
-class TelegramObject(metaclass=ABCMeta):
+class TelegramObject:
     """Base class for most telegram objects."""
 
     _id_attrs = ()
