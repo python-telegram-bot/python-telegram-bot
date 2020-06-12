@@ -72,11 +72,6 @@ def deep_linked_level_3(update, context):
                               "The payload was: {0}".format(payload))
 
 
-def error(update, context):
-    """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, context.error)
-
-
 def main():
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
@@ -102,9 +97,6 @@ def main():
 
     # Make sure the deep-linking handlers occur *before* the normal /start handler.
     dp.add_handler(CommandHandler("start", start))
-
-    # log all errors
-    dp.add_error_handler(error)
 
     # Start the Bot
     updater.start_polling()
