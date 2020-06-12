@@ -21,7 +21,8 @@ logger = logging.getLogger(__name__)
 # The token you got from @botfather when you created the bot
 BOT_TOKEN = "TOKEN"
 
-# This can be your own ID, or one for a developer group/channel
+# This can be your own ID, or one for a developer group/channel.
+# You can use the /start command of this bot to see your chat id.
 DEVELOPER_CHAT_ID = 123456789
 
 
@@ -60,7 +61,9 @@ def bad_command(update: Update, context: CallbackContext):
 
 
 def start(update: Update, context: CallbackContext):
-    update.effective_message.reply_text('Use /bad_command to cause an error.')
+    update.effective_message.reply_html('Use /bad_command to cause an error.\n'
+                                        'Your chat id is <code>{}</code>.'
+                                        .format(update.effective_chat.id))
 
 
 def main():
