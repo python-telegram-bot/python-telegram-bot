@@ -18,8 +18,11 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
-# this can be your own ID, or one for a developer group/channel
-DEVELOPER_CHAT_ID = 208589966
+# The token you got from @botfather when you created the bot
+BOT_TOKEN = "TOKEN"
+
+# This can be your own ID, or one for a developer group/channel
+DEVELOPER_CHAT_ID = 123456789
 
 
 def error_handler(update: Update, context: CallbackContext):
@@ -64,7 +67,7 @@ def main():
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
-    updater = Updater("TOKEN", use_context=True)
+    updater = Updater(BOT_TOKEN, use_context=True)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
