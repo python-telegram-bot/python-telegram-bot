@@ -610,14 +610,12 @@ class Updater(object):
             self._network_loop_retry(bootstrap_clean_updates, bootstrap_onerr_cb,
                                      'bootstrap clean updates', bootstrap_interval)
             retries[0] = 0
-            sleep(1)
         elif isinstance(clean, datetime):
             bootstrap_clean_updates_datetime_p = partial(bootstrap_clean_updates_datetime,
                                                             datetime_cutoff=clean)
             self._network_loop_retry(bootstrap_clean_updates_datetime_p, bootstrap_onerr_cb,
                                      'bootstrap clean updates datetime', bootstrap_interval)
             retries[0] = 0
-            sleep(1)
 
         # Restore/set webhook settings, if needed. Again, we don't know ahead if a webhook is set,
         # so we set it anyhow.
