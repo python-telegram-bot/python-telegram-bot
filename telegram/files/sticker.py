@@ -174,7 +174,7 @@ class StickerSet(TelegramObject):
         data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
         data['stickers'] = Sticker.de_list(data.get('stickers'), bot)
 
-        return StickerSet(bot=bot, **data)
+        return cls(bot=bot, **data)
 
     def to_dict(self):
         data = super().to_dict()
