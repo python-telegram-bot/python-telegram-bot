@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from telegram.ext import Dispatcher, Job, JobQueue
 
 
-class CallbackContext(object):
+class CallbackContext:
     """
     This is a context object passed to the callback called by :class:`telegram.ext.Handler`
     or by the :class:`telegram.ext.Dispatcher` in an error handler added by

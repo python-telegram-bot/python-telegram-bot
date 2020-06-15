@@ -28,7 +28,7 @@ def dice(request):
     return Dice(value=5, emoji=request.param)
 
 
-class TestDice(object):
+class TestDice:
     value = 4
 
     @pytest.mark.parametrize('emoji', Dice.ALL_EMOJI)

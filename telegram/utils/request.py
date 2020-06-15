@@ -22,7 +22,6 @@ import os
 import socket
 import sys
 import warnings
-from builtins import str  # For PY2
 
 try:
     import ujson as json
@@ -65,11 +64,11 @@ def _render_part(self: RequestField, name: str, value: str) -> str:
     """
     Monkey patch urllib3.urllib3.fields.RequestField to make it *not* support RFC2231 compliant
     Content-Disposition headers since telegram servers don't understand it. Instead just escape
-    \ and " and replace any \n and \r with a space.
+    \\ and " and replace any \n and \r with a space.
     """
     value = value.replace(u'\\', u'\\\\').replace(u'"', u'\\"')
     value = value.replace(u'\r', u' ').replace(u'\n', u' ')
-    return u'%s="%s"' % (name, value)
+    return u'{}="{}"'.format(name, value)
 
 
 RequestField._render_part = _render_part  # type: ignore
@@ -79,7 +78,7 @@ logging.getLogger('urllib3').setLevel(logging.WARNING)
 USER_AGENT = 'Python Telegram Bot (https://github.com/python-telegram-bot/python-telegram-bot)'
 
 
-class Request(object):
+class Request:
     """
     Helper class for python-telegram-bot which provides methods to perform POST & GET towards
     telegram servers.
@@ -234,7 +233,7 @@ class Request(object):
         except urllib3.exceptions.HTTPError as error:
             # HTTPError must come last as its the base urllib3 exception class
             # TODO: do something smart here; for now just raise NetworkError
-            raise NetworkError('urllib3 HTTPError {0}'.format(error))
+            raise NetworkError('urllib3 HTTPError {}'.format(error))
 
         if 200 <= resp.status <= 299:
             # 200-299 range are HTTP success statuses
@@ -260,7 +259,7 @@ class Request(object):
         elif resp.status == 502:
             raise NetworkError('Bad Gateway')
         else:
-            raise NetworkError('{0} ({1})'.format(message, resp.status))
+            raise NetworkError('{} ({})'.format(message, resp.status))
 
     def get(self, url: str, timeout: float = None) -> Union[JSONDict, bool]:
         """Request an URL.
@@ -291,7 +290,7 @@ class Request(object):
 
         Args:
             url (:obj:`str`): The web location we want to retrieve.
-            data (dict[str, str|int]): A dict of key/value pairs. Note: On py2.7 value is unicode.
+            data (dict[str, str|int]): A dict of key/value pairs.
             timeout (:obj:`int` | :obj:`float`): If this value is specified, use it as the read
                 timeout from the server (instead of the one specified during creation of the
                 connection pool).

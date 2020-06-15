@@ -173,7 +173,7 @@ class Poll(TelegramObject):
         return cls(**data)
 
     def to_dict(self) -> JSONDict:
-        data = super(Poll, self).to_dict()
+        data = super().to_dict()
 
         data['options'] = [x.to_dict() for x in self.options]
         if self.explanation_entities:

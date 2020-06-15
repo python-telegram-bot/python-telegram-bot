@@ -35,7 +35,7 @@ if TYPE_CHECKING:
 CheckUpdateType = Optional[Tuple[Tuple[int, ...], Handler, object]]
 
 
-class _ConversationTimeoutContext(object):
+class _ConversationTimeoutContext:
     def __init__(self,
                  conversation_key: Tuple[int, ...],
                  update: Update,
@@ -415,7 +415,7 @@ class ConversationHandler(Handler):
                         return key, hdlr, check
                 return None
 
-        self.logger.debug('selecting conversation %s with state %s' % (str(key), str(state)))
+        self.logger.debug('selecting conversation {} with state {}'.format(str(key), str(state)))
 
         handler = None
 

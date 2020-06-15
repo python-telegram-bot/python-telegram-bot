@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import User, Update
+from telegram import Update, User
 from telegram.utils.helpers import escape_markdown
 
 
@@ -46,7 +46,7 @@ def user(bot):
                 supports_inline_queries=TestUser.supports_inline_queries, bot=bot)
 
 
-class TestUser(object):
+class TestUser:
     id_ = 1
     is_bot = True
     first_name = u'first\u2022name'
@@ -190,6 +190,13 @@ class TestUser(object):
         monkeypatch.setattr(user.bot, 'send_animation', test)
         assert user.send_animation('test_animation')
 
+    def test_instance_method_send_poll(self, monkeypatch, user):
+        def test(*args, **kwargs):
+            return args[0] == user.id and args[1] == 'test_poll'
+
+        monkeypatch.setattr(user.bot, 'send_poll', test)
+        assert user.send_poll('test_poll')
+
     def test_mention_html(self, user):
         expected = u'<a href="tg://user?id={}">{}</a>'
 
@@ -202,7 +209,7 @@ class TestUser(object):
         expected = u'[{}](tg://user?id={})'
 
         assert user.mention_markdown() == expected.format(user.full_name, user.id)
-        assert user.mention_markdown('the_name*\u2022') == expected.format('the\_name\*\u2022',
+        assert user.mention_markdown('the_name*\u2022') == expected.format('the\\_name\\*\u2022',
                                                                            user.id)
         assert user.mention_markdown(user.username) == expected.format(user.username, user.id)
 
@@ -214,8 +221,8 @@ class TestUser(object):
 
         assert user.mention_markdown_v2() == expected.format(escape_markdown(user.full_name,
                                                                              version=2), user.id)
-        assert user.mention_markdown_v2('the{name>\u2022') == expected.format('the\{name\>\u2022',
-                                                                              user.id)
+        assert user.mention_markdown_v2('the{name>\u2022') == expected.format(
+            'the\\{name\\>\u2022', user.id)
         assert user.mention_markdown_v2(user.username) == expected.format(user.username, user.id)
 
     def test_equality(self):

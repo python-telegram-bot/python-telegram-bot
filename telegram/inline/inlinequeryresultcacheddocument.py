@@ -76,7 +76,7 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
                  parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
                  **kwargs: Any):
         # Required
-        super(InlineQueryResultCachedDocument, self).__init__('document', id)
+        super().__init__('document', id)
         self.title = title
         self.document_file_id = document_file_id
 

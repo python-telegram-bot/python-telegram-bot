@@ -75,7 +75,7 @@ class InlineQueryResultArticle(InlineQueryResult):
                  **kwargs: Any):
 
         # Required
-        super(InlineQueryResultArticle, self).__init__('article', id)
+        super().__init__('article', id)
         self.title = title
         self.input_message_content = input_message_content
 

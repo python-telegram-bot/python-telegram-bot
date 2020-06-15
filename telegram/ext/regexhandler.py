@@ -117,15 +117,15 @@ class RegexHandler(MessageHandler):
         warnings.warn('RegexHandler is deprecated. See https://git.io/fxJuV for more info',
                       TelegramDeprecationWarning,
                       stacklevel=2)
-        super(RegexHandler, self).__init__(Filters.regex(pattern),
-                                           callback,
-                                           pass_update_queue=pass_update_queue,
-                                           pass_job_queue=pass_job_queue,
-                                           pass_user_data=pass_user_data,
-                                           pass_chat_data=pass_chat_data,
-                                           message_updates=message_updates,
-                                           channel_post_updates=channel_post_updates,
-                                           edited_updates=edited_updates)
+        super().__init__(Filters.regex(pattern),
+                         callback,
+                         pass_update_queue=pass_update_queue,
+                         pass_job_queue=pass_job_queue,
+                         pass_user_data=pass_user_data,
+                         pass_chat_data=pass_chat_data,
+                         message_updates=message_updates,
+                         channel_post_updates=channel_post_updates,
+                         edited_updates=edited_updates)
         self.pass_groups = pass_groups
         self.pass_groupdict = pass_groupdict
 
@@ -134,8 +134,7 @@ class RegexHandler(MessageHandler):
             dispatcher: 'Dispatcher',
             update: HandlerArg = None,
             check_result: Optional[Union[bool, Dict[str, Any]]] = None) -> Dict[str, Any]:
-        optional_args = super(RegexHandler, self).collect_optional_args(dispatcher, update,
-                                                                        check_result)
+        optional_args = super().collect_optional_args(dispatcher, update, check_result)
         if isinstance(check_result, dict):
             if self.pass_groups:
                 optional_args['groups'] = check_result['matches'][0].groups()

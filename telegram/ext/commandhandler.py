@@ -20,8 +20,6 @@
 import re
 import warnings
 
-from future.utils import string_types
-
 from telegram.ext import Filters, BaseFilter
 from telegram.utils.deprecate import TelegramDeprecationWarning
 
@@ -132,14 +130,14 @@ class CommandHandler(Handler):
                  pass_job_queue: bool = False,
                  pass_user_data: bool = False,
                  pass_chat_data: bool = False):
-        super(CommandHandler, self).__init__(
+        super().__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
             pass_chat_data=pass_chat_data)
 
-        if isinstance(command, string_types):
+        if isinstance(command, str):
             self.command = [command.lower()]
         else:
             self.command = [x.lower() for x in command]
@@ -200,7 +198,7 @@ class CommandHandler(Handler):
             update: HandlerArg = None,
             check_result: Optional[Union[bool, Tuple[List[str],
                                                      Optional[bool]]]] = None) -> Dict[str, Any]:
-        optional_args = super(CommandHandler, self).collect_optional_args(dispatcher, update)
+        optional_args = super().collect_optional_args(dispatcher, update)
         if self.pass_args and isinstance(check_result, tuple):
             optional_args['args'] = check_result[0]
         return optional_args
@@ -328,7 +326,7 @@ class PrefixHandler(CommandHandler):
         self._command: List[str] = list()
         self._commands: List[str] = list()
 
-        super(PrefixHandler, self).__init__(
+        super().__init__(
             'nocommand', callback, filters=filters, allow_edited=None, pass_args=pass_args,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
@@ -345,10 +343,10 @@ class PrefixHandler(CommandHandler):
 
     @prefix.setter
     def prefix(self, prefix: Union[str, List[str]]) -> None:
-        if isinstance(prefix, string_types):
+        if isinstance(prefix, str):
             self._prefix = [prefix.lower()]
         else:
-            self._prefix = prefix  # type: ignore[assignment]
+            self._prefix = prefix
         self._build_commands()
 
     @property  # type: ignore[override]
@@ -357,10 +355,10 @@ class PrefixHandler(CommandHandler):
 
     @command.setter
     def command(self, command: Union[str, List[str]]) -> None:
-        if isinstance(command, string_types):
+        if isinstance(command, str):
             self._command = [command.lower()]
         else:
-            self._command = command  # type: ignore[assignment]
+            self._command = command
         self._build_commands()
 
     def _build_commands(self) -> None:

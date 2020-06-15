@@ -56,7 +56,7 @@ def shiping_query():
                                                                'steer_1', '', 'post_code')))
 
 
-class TestShippingQueryHandler(object):
+class TestShippingQueryHandler:
     test_flag = False
 
     @pytest.fixture(autouse=True)

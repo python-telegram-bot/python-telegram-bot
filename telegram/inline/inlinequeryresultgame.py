@@ -49,7 +49,7 @@ class InlineQueryResultGame(InlineQueryResult):
                  reply_markup: 'ReplyMarkup' = None,
                  **kwargs: Any):
         # Required
-        super(InlineQueryResultGame, self).__init__('game', id)
+        super().__init__('game', id)
         self.id = id
         self.game_short_name = game_short_name
 

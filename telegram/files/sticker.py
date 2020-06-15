@@ -179,7 +179,7 @@ class StickerSet(TelegramObject):
         return cls(bot=bot, **data)
 
     def to_dict(self) -> JSONDict:
-        data = super(StickerSet, self).to_dict()
+        data = super().to_dict()
 
         data['stickers'] = [s.to_dict() for s in data.get('stickers')]
 

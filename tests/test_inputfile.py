@@ -25,7 +25,7 @@ from io import BytesIO
 from telegram import InputFile
 
 
-class TestInputFile(object):
+class TestInputFile:
     png = os.path.join('tests', 'data', 'game.png')
 
     def test_subprocess_pipe(self):
@@ -76,7 +76,7 @@ class TestInputFile(object):
         assert InputFile(open('tests/data/telegram', 'rb'),
                          filename='blah.jpg').filename == 'blah.jpg'
 
-        class MockedFileobject(object):
+        class MockedFileobject:
             # A open(?, 'rb') without a .name
             def __init__(self, f):
                 self.f = open(f, 'rb')

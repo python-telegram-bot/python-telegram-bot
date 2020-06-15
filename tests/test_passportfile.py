@@ -30,7 +30,7 @@ def passport_file():
                         file_date=TestPassportFile.file_date)
 
 
-class TestPassportFile(object):
+class TestPassportFile:
     file_id = 'data'
     file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
     file_size = 50

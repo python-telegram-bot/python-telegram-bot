@@ -23,13 +23,9 @@
 from telegram.utils import promise
 
 import functools
-import sys
 import time
 import threading
-if sys.version_info.major > 2:
-    import queue as q
-else:
-    import Queue as q  # type: ignore[no-redef]
+import queue as q
 
 from typing import Callable, Any, TYPE_CHECKING, List
 
@@ -37,18 +33,7 @@ if TYPE_CHECKING:
     from telegram import Bot
 
 # We need to count < 1s intervals, so the most accurate timer is needed
-# Starting from Python 3.3 we have time.perf_counter which is the clock
-#  with the highest resolution available to the system, so let's use it there.
-# In Python 2.7, there's no perf_counter yet, so fallback on what we have:
-#  on Windows, the best available is time.clock while time.time is on
-#  another platforms (M. Lutz, "Learning Python," 4ed, p.630-634)
-if sys.version_info.major == 3 and sys.version_info.minor >= 3:
-    curtime = time.perf_counter  # pylint: disable=E1101
-else:
-    if sys.platform[:3] == 'win':
-        curtime = time.clock  # pylint: disable=E1101
-    else:
-        curtime = time.time
+curtime = time.perf_counter
 
 
 class DelayQueueError(RuntimeError):
@@ -103,11 +88,11 @@ class DelayQueue(threading.Thread):
         self.__exit_req = False  # flag to gently exit thread
         self.__class__._instcnt += 1
         if name is None:
-            name = '%s-%s' % (self.__class__.__name__, self.__class__._instcnt)
-        super(DelayQueue, self).__init__(name=name)
+            name = '{}-{}'.format(self.__class__.__name__, self.__class__._instcnt)
+        super().__init__(name=name)
         self.daemon = False
         if autostart:  # immediately start processing
-            super(DelayQueue, self).start()
+            super().start()
 
     def run(self) -> None:
         """
@@ -122,7 +107,7 @@ class DelayQueue(threading.Thread):
             if self.__exit_req:
                 return  # shutdown thread
             # delay routine
-            now = curtime()
+            now = time.perf_counter()
             t_delta = now - self.time_limit  # calculate early to improve perf.
             if times and t_delta > times[-1]:
                 # if last call was before the limit time-window
@@ -154,7 +139,7 @@ class DelayQueue(threading.Thread):
 
         self.__exit_req = True  # gently request
         self._queue.put(None)  # put something to unfreeze if frozen
-        super(DelayQueue, self).join(timeout=timeout)
+        super().join(timeout=timeout)
 
     @staticmethod
     def _default_exception_handler(exc: Exception) -> None:
@@ -188,7 +173,7 @@ class DelayQueue(threading.Thread):
 # msg --> group delay if group msg, else no delay --> normal msg delay --> out
 # This way OS threading scheduler cares of timings accuracy.
 # (see time.time, time.clock, time.perf_counter, time.sleep @ docs.python.org)
-class MessageQueue(object):
+class MessageQueue:
     """
     Implements callback processing with proper delays to avoid hitting Telegram's message limits.
     Contains two ``DelayQueue``, for group and for all messages, interconnected in delay chain.

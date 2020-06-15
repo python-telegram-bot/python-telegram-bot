@@ -178,7 +178,7 @@ class ChatMember(TelegramObject):
         return cls(**data)
 
     def to_dict(self) -> JSONDict:
-        data = super(ChatMember, self).to_dict()
+        data = super().to_dict()
 
         data['until_date'] = to_timestamp(self.until_date)
 

@@ -57,7 +57,7 @@ class InlineQueryResultCachedSticker(InlineQueryResult):
                  input_message_content: 'InputMessageContent' = None,
                  **kwargs: Any):
         # Required
-        super(InlineQueryResultCachedSticker, self).__init__('sticker', id)
+        super().__init__('sticker', id)
         self.sticker_file_id = sticker_file_id
 
         # Optionals

@@ -77,7 +77,7 @@ class InlineQueryResultLocation(InlineQueryResult):
                  thumb_height: int = None,
                  **kwargs: Any):
         # Required
-        super(InlineQueryResultLocation, self).__init__('location', id)
+        super().__init__('location', id)
         self.latitude = latitude
         self.longitude = longitude
         self.title = title

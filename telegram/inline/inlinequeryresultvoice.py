@@ -76,7 +76,7 @@ class InlineQueryResultVoice(InlineQueryResult):
                  **kwargs: Any):
 
         # Required
-        super(InlineQueryResultVoice, self).__init__('voice', id)
+        super().__init__('voice', id)
         self.voice_url = voice_url
         self.title = title
 

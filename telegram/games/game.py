@@ -90,7 +90,7 @@ class Game(TelegramObject):
         return cls(**data)
 
     def to_dict(self) -> JSONDict:
-        data = super(Game, self).to_dict()
+        data = super().to_dict()
 
         data['photo'] = [p.to_dict() for p in self.photo]
         if self.text_entities:

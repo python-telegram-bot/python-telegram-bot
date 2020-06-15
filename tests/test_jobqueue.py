@@ -19,7 +19,6 @@
 import calendar
 import datetime as dtm
 import os
-import sys
 import time
 from queue import Queue
 from time import sleep
@@ -42,7 +41,7 @@ def job_queue(bot, _dp):
 @pytest.mark.skipif(os.getenv('GITHUB_ACTIONS', False) and os.name == 'nt',
                     reason="On windows precise timings are not accurate.")
 @flaky(10, 1)  # Timings aren't quite perfect
-class TestJobQueue(object):
+class TestJobQueue:
     result = 0
     job_time = 0
 
@@ -384,7 +383,6 @@ class TestJobQueue(object):
         assert job_queue.get_jobs_by_name('name1') == (job1, job2)
         assert job_queue.get_jobs_by_name('name2') == (job3,)
 
-    @pytest.mark.skipif(sys.version_info < (3, 0), reason='pytest fails this for no reason')
     def test_bot_in_init_deprecation(self, bot):
         with pytest.warns(TelegramDeprecationWarning):
             JobQueue(bot)

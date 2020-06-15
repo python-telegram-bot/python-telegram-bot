@@ -21,8 +21,6 @@
 import re
 
 from abc import ABC, abstractmethod
-
-from future.utils import string_types
 from threading import Lock
 
 from telegram import Chat, Update, MessageEntity, Message
@@ -258,7 +256,7 @@ class _DiceEmoji(BaseFilter):
         return False
 
 
-class Filters(object):
+class Filters:
     """Predefined filters for use as the `filter` argument of :class:`telegram.ext.MessageHandler`.
 
     Examples:
@@ -440,7 +438,7 @@ class Filters(object):
         data_filter = True
 
         def __init__(self, pattern: Union[str, Pattern]):
-            if isinstance(pattern, string_types):
+            if isinstance(pattern, str):
                 pattern = re.compile(pattern)
             pattern = cast(Pattern, pattern)
             self.pattern: Pattern = pattern
@@ -1330,7 +1328,7 @@ officedocument.wordprocessingml.document")``-
         """
 
         def __init__(self, lang: Union[str, List[str]]):
-            if isinstance(lang, string_types):
+            if isinstance(lang, str):
                 lang = cast(str, lang)
                 self.lang = [lang]
             else:

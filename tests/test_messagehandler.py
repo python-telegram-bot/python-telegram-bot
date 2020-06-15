@@ -51,7 +51,7 @@ def message(bot):
     return Message(1, None, Chat(1, ''), from_user=User(1, '', False), bot=bot)
 
 
-class TestMessageHandler(object):
+class TestMessageHandler:
     test_flag = False
     SRE_TYPE = type(re.match("", ""))
 

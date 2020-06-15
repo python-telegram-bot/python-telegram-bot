@@ -6,7 +6,7 @@
 export PYBUILD_NAME=telegram
 
 %:
-	DEB_BUILD_OPTIONS=nocheck dh $@ --with python2,python3 --buildsystem=pybuild
+	DEB_BUILD_OPTIONS=nocheck dh $@ --with python3 --buildsystem=pybuild
 
 
 # If you need to rebuild the Sphinx documentation

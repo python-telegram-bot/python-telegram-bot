@@ -37,7 +37,7 @@ def message_entity(request):
     return MessageEntity(request.param, 0, 0, url='', user='')
 
 
-class TestFilters(object):
+class TestFilters:
     def test_filters_all(self, update):
         assert Filters.all(update)
 
@@ -912,9 +912,9 @@ class TestFilters(object):
         update.message.pinned_message = True
         assert (Filters.text & (Filters.forwarded | Filters.status_update)(update))
 
-        assert str((Filters.text & (Filters.forwarded | Filters.entity(
-            MessageEntity.MENTION)))) == '<Filters.text and <Filters.forwarded or ' \
-                                         'Filters.entity(mention)>>'
+        assert str(Filters.text & (Filters.forwarded | Filters.entity(
+            MessageEntity.MENTION))) == '<Filters.text and <Filters.forwarded or ' \
+                                        'Filters.entity(mention)>>'
 
     def test_inverted_filters(self, update):
         update.message.text = '/test'

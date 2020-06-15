@@ -29,7 +29,7 @@ def passport_element_error_unspecified():
                                            TestPassportElementErrorUnspecified.message)
 
 
-class TestPassportElementErrorUnspecified(object):
+class TestPassportElementErrorUnspecified:
     source = 'unspecified'
     type_ = 'test_type'
     element_hash = 'element_hash'

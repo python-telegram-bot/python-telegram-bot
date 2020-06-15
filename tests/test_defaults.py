@@ -23,7 +23,7 @@ from telegram.ext import Defaults
 from telegram import User
 
 
-class TestDefault(object):
+class TestDefault:
     def test_data_assignment(self, cdp):
         defaults = Defaults()
 

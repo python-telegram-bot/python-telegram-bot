@@ -20,8 +20,6 @@
 
 import re
 
-from future.utils import string_types
-
 from .handler import Handler
 
 from typing import Callable, TYPE_CHECKING, Optional, TypeVar, Match, Dict, Any, Union, Pattern
@@ -92,12 +90,12 @@ class StringRegexHandler(Handler):
                  pass_groupdict: bool = False,
                  pass_update_queue: bool = False,
                  pass_job_queue: bool = False):
-        super(StringRegexHandler, self).__init__(
+        super().__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue)
 
-        if isinstance(pattern, string_types):
+        if isinstance(pattern, str):
             pattern = re.compile(pattern)
 
         self.pattern = pattern
@@ -114,7 +112,7 @@ class StringRegexHandler(Handler):
             :obj:`bool`
 
         """
-        if isinstance(update, string_types):
+        if isinstance(update, str):
             match = re.match(self.pattern, update)
             if match:
                 return match
@@ -124,8 +122,7 @@ class StringRegexHandler(Handler):
                               dispatcher: 'Dispatcher',
                               update: HandlerArg = None,
                               check_result: Optional[Match] = None) -> Dict[str, Any]:
-        optional_args = super(StringRegexHandler, self).collect_optional_args(dispatcher,
-                                                                              update, check_result)
+        optional_args = super().collect_optional_args(dispatcher, update, check_result)
         if self.pattern:
             if self.pass_groups and check_result:
                 optional_args['groups'] = check_result.groups()

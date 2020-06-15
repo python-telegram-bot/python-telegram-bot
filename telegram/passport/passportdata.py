@@ -75,7 +75,7 @@ class PassportData(TelegramObject):
         return cls(bot=bot, **data)
 
     def to_dict(self) -> JSONDict:
-        data = super(PassportData, self).to_dict()
+        data = super().to_dict()
 
         data['data'] = [e.to_dict() for e in self.data]
 

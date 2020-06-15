@@ -71,7 +71,7 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
                  parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
                  **kwargs: Any):
         # Required
-        super(InlineQueryResultCachedVoice, self).__init__('voice', id)
+        super().__init__('voice', id)
         self.voice_file_id = voice_file_id
         self.title = title
 

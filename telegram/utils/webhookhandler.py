@@ -19,7 +19,6 @@
 import sys
 import logging
 from telegram import Update
-from future.utils import bytes_to_native_str
 from threading import Lock
 try:
     import ujson as json
@@ -38,7 +37,7 @@ if TYPE_CHECKING:
     from telegram import Bot
 
 
-class WebhookServer(object):
+class WebhookServer:
 
     def __init__(self,
                  listen: str,
@@ -89,7 +88,7 @@ class WebhookAppClass(tornado.web.Application):
         self.shared_objects = {"bot": bot, "update_queue": update_queue,
                                "default_quote": default_quote}
         handlers = [
-            (r"{0}/?".format(webhook_path), WebhookHandler,
+            (r"{}/?".format(webhook_path), WebhookHandler,
              self.shared_objects)
             ]  # noqa
         tornado.web.Application.__init__(self, handlers)
@@ -106,7 +105,7 @@ class WebhookHandler(tornado.web.RequestHandler):
                  application: tornado.web.Application,
                  request: httputil.HTTPServerRequest,
                  **kwargs: JSONDict):
-        super(WebhookHandler, self).__init__(application, request, **kwargs)
+        super().__init__(application, request, **kwargs)
         self.logger = logging.getLogger(__name__)
         self._init_asyncio_patch()
 
@@ -149,7 +148,7 @@ class WebhookHandler(tornado.web.RequestHandler):
     def post(self) -> None:
         self.logger.debug('Webhook triggered')
         self._validate_post()
-        json_string = bytes_to_native_str(self.request.body)
+        json_string = self.request.body.decode()
         data = json.loads(json_string)
         self.set_status(200)
         self.logger.debug('Webhook received data: ' + json_string)
@@ -178,6 +177,7 @@ class WebhookHandler(tornado.web.RequestHandler):
         The client ip is prefixed to every message.
 
         """
-        super(WebhookHandler, self).write_error(status_code, **kwargs)
-        self.logger.debug("%s - - %s" % (self.request.remote_ip, "Exception in WebhookHandler"),
+        super().write_error(status_code, **kwargs)
+        self.logger.debug("{} - - {}".format(self.request.remote_ip,
+                                             "Exception in WebhookHandler"),
                           exc_info=kwargs['exc_info'])

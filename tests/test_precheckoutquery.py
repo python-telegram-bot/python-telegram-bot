@@ -34,7 +34,7 @@ def pre_checkout_query(bot):
                             bot=bot)
 
 
-class TestPreCheckoutQuery(object):
+class TestPreCheckoutQuery:
     id_ = 5
     invoice_payload = 'invoice_payload'
     shipping_option_id = 'shipping_option_id'

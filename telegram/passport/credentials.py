@@ -28,7 +28,6 @@ from cryptography.hazmat.primitives.ciphers import Cipher
 from cryptography.hazmat.primitives.ciphers.algorithms import AES
 from cryptography.hazmat.primitives.ciphers.modes import CBC
 from cryptography.hazmat.primitives.hashes import SHA512, SHA256, Hash, SHA1
-from future.utils import bord
 
 from telegram import TelegramObject, TelegramError
 from telegram.utils.typing import JSONDict
@@ -44,8 +43,7 @@ class TelegramDecryptionError(TelegramError):
     """
 
     def __init__(self, message: Union[str, Exception]):
-        super(TelegramDecryptionError, self).__init__("TelegramDecryptionError: "
-                                                      "{}".format(message))
+        super().__init__("TelegramDecryptionError: {}".format(message))
 
 
 @no_type_check
@@ -89,7 +87,7 @@ def decrypt(secret, hash, data):
         # Raise a error that is caught inside telegram.PassportData and transformed into a warning
         raise TelegramDecryptionError("Hashes are not equal! {} != {}".format(data_hash, hash))
     # Return data without padding
-    return data[bord(data[0]):]
+    return data[data[0]:]
 
 
 @no_type_check
@@ -356,7 +354,7 @@ class SecureValue(TelegramObject):
         return cls(bot=bot, **data)
 
     def to_dict(self) -> JSONDict:
-        data = super(SecureValue, self).to_dict()
+        data = super().to_dict()
 
         data['files'] = [p.to_dict() for p in self.files]
         data['translation'] = [p.to_dict() for p in self.translation]
@@ -393,10 +391,10 @@ class DataCredentials(_CredentialsBase):
     """
 
     def __init__(self, data_hash: str, secret: str, **kwargs: Any):
-        super(DataCredentials, self).__init__(data_hash, secret, **kwargs)
+        super().__init__(data_hash, secret, **kwargs)
 
     def to_dict(self) -> JSONDict:
-        data = super(DataCredentials, self).to_dict()
+        data = super().to_dict()
 
         del data['file_hash']
         del data['hash']
@@ -419,10 +417,10 @@ class FileCredentials(_CredentialsBase):
         """
 
     def __init__(self, file_hash: str, secret: str, **kwargs: Any):
-        super(FileCredentials, self).__init__(file_hash, secret, **kwargs)
+        super().__init__(file_hash, secret, **kwargs)
 
     def to_dict(self) -> JSONDict:
-        data = super(FileCredentials, self).to_dict()
+        data = super().to_dict()
 
         del data['data_hash']
         del data['hash']

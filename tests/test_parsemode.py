@@ -22,7 +22,7 @@ from flaky import flaky
 from telegram import ParseMode
 
 
-class TestParseMode(object):
+class TestParseMode:
     markdown_text = '*bold* _italic_ [link](http://google.com) [name](tg://user?id=123456789).'
     html_text = ('<b>bold</b> <i>italic</i> <a href="http://google.com">link</a> '
                  '<a href="tg://user?id=123456789">name</a>.')

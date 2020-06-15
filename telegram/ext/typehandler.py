@@ -73,7 +73,7 @@ class TypeHandler(Handler):
                  strict: bool = False,
                  pass_update_queue: bool = False,
                  pass_job_queue: bool = False):
-        super(TypeHandler, self).__init__(
+        super().__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue)

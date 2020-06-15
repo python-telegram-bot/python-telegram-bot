@@ -57,7 +57,7 @@ class UserProfilePhotos(TelegramObject):
         return cls(**data)
 
     def to_dict(self) -> JSONDict:
-        data = super(UserProfilePhotos, self).to_dict()
+        data = super().to_dict()
 
         data['photos'] = []
         for photo in self.photos:

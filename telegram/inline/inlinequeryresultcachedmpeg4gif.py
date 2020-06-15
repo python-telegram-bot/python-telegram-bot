@@ -74,7 +74,7 @@ class InlineQueryResultCachedMpeg4Gif(InlineQueryResult):
                  parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
                  **kwargs: Any):
         # Required
-        super(InlineQueryResultCachedMpeg4Gif, self).__init__('mpeg4_gif', id)
+        super().__init__('mpeg4_gif', id)
         self.mpeg4_file_id = mpeg4_file_id
 
         # Optionals

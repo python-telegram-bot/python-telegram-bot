@@ -51,7 +51,7 @@ def message(bot):
                    bot=bot)
 
 
-class TestRegexHandler(object):
+class TestRegexHandler:
     test_flag = False
 
     @pytest.fixture(autouse=True)
