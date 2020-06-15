@@ -84,7 +84,7 @@ class InlineQueryResultPhoto(InlineQueryResult):
                  parse_mode=DEFAULT_NONE,
                  **kwargs):
         # Required
-        super(InlineQueryResultPhoto, self).__init__('photo', id)
+        super().__init__('photo', id)
         self.photo_url = photo_url
         self.thumb_url = thumb_url
 

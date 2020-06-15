@@ -61,7 +61,7 @@ def deep_linked_level_2(update, context):
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.get_me().username, USING_ENTITIES)
     text = "You can also mask the deep-linked URLs as links: " \
-           "[▶️ CLICK HERE]({0}).".format(url)
+           "[▶️ CLICK HERE]({}).".format(url)
     update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 
@@ -69,12 +69,7 @@ def deep_linked_level_3(update, context):
     """Reached through the USING_ENTITIES payload"""
     payload = context.args
     update.message.reply_text("Congratulations! This is as deep as it gets 👏🏻\n\n"
-                              "The payload was: {0}".format(payload))
-
-
-def error(update, context):
-    """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, context.error)
+                              "The payload was: {}".format(payload))
 
 
 def main():
@@ -102,9 +97,6 @@ def main():
 
     # Make sure the deep-linking handlers occur *before* the normal /start handler.
     dp.add_handler(CommandHandler("start", start))
-
-    # log all errors
-    dp.add_error_handler(error)
 
     # Start the Bot
     updater.start_polling()

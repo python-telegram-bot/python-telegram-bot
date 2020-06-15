@@ -29,7 +29,7 @@ from telegram import TelegramError
 DEFAULT_MIME_TYPE = 'application/octet-stream'
 
 
-class InputFile(object):
+class InputFile:
     """This object represents a Telegram InputFile.
 
     Attributes:
@@ -55,11 +55,7 @@ class InputFile(object):
 
         if filename:
             self.filename = filename
-        elif (hasattr(obj, 'name')
-              and not isinstance(obj.name, int)  # py3
-              and obj.name != '<fdopen>'):  # py2
-            # on py2.7, pylint fails to understand this properly
-            # pylint: disable=E1101
+        elif (hasattr(obj, 'name') and not isinstance(obj.name, int)):
             self.filename = os.path.basename(obj.name)
 
         try:

@@ -29,7 +29,7 @@ def input_location_message_content():
                                        live_period=TestInputLocationMessageContent.live_period)
 
 
-class TestInputLocationMessageContent(object):
+class TestInputLocationMessageContent:
     latitude = -23.691288
     longitude = -46.788279
     live_period = 80

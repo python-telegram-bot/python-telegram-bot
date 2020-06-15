@@ -116,7 +116,7 @@ class User(TelegramObject):
     def de_json(cls, data, bot):
         if not data:
             return None
-        data = super(User, cls).de_json(data, bot)
+        data = super().de_json(data, bot)
 
         return cls(bot=bot, **data)
 
@@ -296,3 +296,16 @@ class User(TelegramObject):
 
         """
         return self.bot.send_voice(self.id, *args, **kwargs)
+
+    def send_poll(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_poll(User.id, *args, **kwargs)
+
+        Where User is the current instance.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.send_poll(self.id, *args, **kwargs)

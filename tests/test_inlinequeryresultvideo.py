@@ -41,7 +41,7 @@ def inline_query_result_video():
         reply_markup=TestInlineQueryResultVideo.reply_markup)
 
 
-class TestInlineQueryResultVideo(object):
+class TestInlineQueryResultVideo:
     id_ = 'id'
     type_ = 'video'
     video_url = 'video url'

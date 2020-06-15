@@ -73,7 +73,7 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
                  parse_mode=DEFAULT_NONE,
                  **kwargs):
         # Required
-        super(InlineQueryResultCachedDocument, self).__init__('document', id)
+        super().__init__('document', id)
         self.title = title
         self.document_file_id = document_file_id
 

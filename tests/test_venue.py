@@ -31,7 +31,7 @@ def venue():
                  foursquare_type=TestVenue.foursquare_type)
 
 
-class TestVenue(object):
+class TestVenue:
     location = Location(longitude=-46.788279, latitude=-23.691288)
     title = 'title'
     address = 'address'

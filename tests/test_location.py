@@ -29,7 +29,7 @@ def location():
     return Location(latitude=TestLocation.latitude, longitude=TestLocation.longitude)
 
 
-class TestLocation(object):
+class TestLocation:
     latitude = -23.691288
     longitude = -46.788279
 

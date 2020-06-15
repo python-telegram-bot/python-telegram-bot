@@ -58,7 +58,7 @@ class PassportData(TelegramObject):
         if not data:
             return None
 
-        data = super(PassportData, cls).de_json(data, bot)
+        data = super().de_json(data, bot)
 
         data['data'] = EncryptedPassportElement.de_list(data.get('data'), bot)
         data['credentials'] = EncryptedCredentials.de_json(data.get('credentials'), bot)
@@ -66,7 +66,7 @@ class PassportData(TelegramObject):
         return cls(bot=bot, **data)
 
     def to_dict(self):
-        data = super(PassportData, self).to_dict()
+        data = super().to_dict()
 
         data['data'] = [e.to_dict() for e in self.data]
 

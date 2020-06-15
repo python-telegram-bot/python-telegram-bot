@@ -53,7 +53,7 @@ def photo(_photo):
     return _photo[1]
 
 
-class TestPhoto(object):
+class TestPhoto:
     width = 800
     height = 800
     caption = u'<b>PhotoTest</b> - *Caption*'

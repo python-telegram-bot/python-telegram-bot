@@ -71,7 +71,7 @@ class InlineQueryResultCachedGif(InlineQueryResult):
                  parse_mode=DEFAULT_NONE,
                  **kwargs):
         # Required
-        super(InlineQueryResultCachedGif, self).__init__('gif', id)
+        super().__init__('gif', id)
         self.gif_file_id = gif_file_id
 
         # Optionals

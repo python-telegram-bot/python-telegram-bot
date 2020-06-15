@@ -24,7 +24,7 @@ except ImportError:
     import json
 
 
-class TelegramObject(object):
+class TelegramObject:
     """Base class for most telegram objects."""
 
     _id_attrs = ()
@@ -57,12 +57,7 @@ class TelegramObject(object):
         data = dict()
 
         for key in iter(self.__dict__):
-            if key in ('bot',
-                       '_id_attrs',
-                       '_credentials',
-                       '_decrypted_credentials',
-                       '_decrypted_data',
-                       '_decrypted_secret'):
+            if key == 'bot' or key.startswith('_'):
                 continue
 
             value = self.__dict__[key]
@@ -79,9 +74,9 @@ class TelegramObject(object):
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return self._id_attrs == other._id_attrs
-        return super(TelegramObject, self).__eq__(other)  # pylint: disable=no-member
+        return super().__eq__(other)  # pylint: disable=no-member
 
     def __hash__(self):
         if self._id_attrs:
             return hash((self.__class__, self._id_attrs))  # pylint: disable=no-member
-        return super(TelegramObject, self).__hash__()
+        return super().__hash__()

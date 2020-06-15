@@ -38,7 +38,7 @@ def message_entity(request):
     return MessageEntity(type, 1, 3, url=url, user=user, language=language)
 
 
-class TestMessageEntity(object):
+class TestMessageEntity:
     type_ = 'url'
     offset = 1
     length = 2

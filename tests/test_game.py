@@ -32,7 +32,7 @@ def game():
                 animation=TestGame.animation)
 
 
-class TestGame(object):
+class TestGame:
     title = 'Python-telegram-bot Test Game'
     description = 'description'
     photo = [PhotoSize('Blah', 'ElseBlah', 640, 360, file_size=0)]

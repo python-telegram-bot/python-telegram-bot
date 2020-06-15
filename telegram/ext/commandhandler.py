@@ -20,8 +20,6 @@
 import re
 import warnings
 
-from future.utils import string_types
-
 from telegram.ext import Filters
 from telegram.utils.deprecate import TelegramDeprecationWarning
 
@@ -125,14 +123,14 @@ class CommandHandler(Handler):
                  pass_job_queue=False,
                  pass_user_data=False,
                  pass_chat_data=False):
-        super(CommandHandler, self).__init__(
+        super().__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
             pass_chat_data=pass_chat_data)
 
-        if isinstance(command, string_types):
+        if isinstance(command, str):
             self.command = [command.lower()]
         else:
             self.command = [x.lower() for x in command]
@@ -184,7 +182,7 @@ class CommandHandler(Handler):
                     return False
 
     def collect_optional_args(self, dispatcher, update=None, check_result=None):
-        optional_args = super(CommandHandler, self).collect_optional_args(dispatcher, update)
+        optional_args = super().collect_optional_args(dispatcher, update)
         if self.pass_args:
             optional_args['args'] = check_result[0]
         return optional_args
@@ -306,7 +304,7 @@ class PrefixHandler(CommandHandler):
         self._command = list()
         self._commands = list()
 
-        super(PrefixHandler, self).__init__(
+        super().__init__(
             'nocommand', callback, filters=filters, allow_edited=None, pass_args=pass_args,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
@@ -323,7 +321,7 @@ class PrefixHandler(CommandHandler):
 
     @prefix.setter
     def prefix(self, prefix):
-        if isinstance(prefix, string_types):
+        if isinstance(prefix, str):
             self._prefix = [prefix.lower()]
         else:
             self._prefix = prefix
@@ -335,7 +333,7 @@ class PrefixHandler(CommandHandler):
 
     @command.setter
     def command(self, command):
-        if isinstance(command, string_types):
+        if isinstance(command, str):
             self._command = [command.lower()]
         else:
             self._command = command

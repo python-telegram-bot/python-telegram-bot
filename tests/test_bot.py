@@ -22,7 +22,6 @@ from platform import python_implementation
 
 import pytest
 from flaky import flaky
-from future.utils import string_types
 
 from telegram import (Bot, Update, ChatAction, TelegramError, User, InlineKeyboardMarkup,
                       InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent,
@@ -55,7 +54,7 @@ def chat_permissions():
     return ChatPermissions(can_send_messages=False, can_change_info=False, can_invite_users=False)
 
 
-class TestBot(object):
+class TestBot:
     @pytest.mark.parametrize('token', argvalues=[
         '123',
         '12a:abcd1234',
@@ -695,19 +694,24 @@ class TestBot(object):
     @pytest.mark.timeout(10)
     def test_set_game_score_1(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
-        game_short_name = 'test_game'
-        game = bot.send_game(chat_id, game_short_name)
 
-        message = bot.set_game_score(
-            user_id=chat_id,
-            score=int(BASE_TIME) - HIGHSCORE_DELTA,
-            chat_id=game.chat_id,
-            message_id=game.message_id)
+        def func():
+            game_short_name = 'test_game'
+            game = bot.send_game(chat_id, game_short_name)
 
-        assert message.game.description == game.game.description
-        assert message.game.animation.file_id == game.game.animation.file_id
-        assert message.game.photo[0].file_size == game.game.photo[0].file_size
-        assert message.game.text != game.game.text
+            message = bot.set_game_score(
+                user_id=chat_id,
+                score=int(BASE_TIME) - HIGHSCORE_DELTA,
+                chat_id=game.chat_id,
+                message_id=game.message_id)
+
+            assert message.game.description == game.game.description
+            assert message.game.animation.file_id == game.game.animation.file_id
+            assert message.game.photo[0].file_size == game.game.photo[0].file_size
+            assert message.game.text != game.game.text
+
+        expect_bad_request(func, 'Bot_score_not_modified',
+                           'This test is a diva for some reason.')
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -887,7 +891,7 @@ class TestBot(object):
     def test_export_chat_invite_link(self, bot, channel_id):
         # Each link is unique apparently
         invite_link = bot.export_chat_invite_link(channel_id)
-        assert isinstance(invite_link, string_types)
+        assert isinstance(invite_link, str)
         assert invite_link != ''
 
     @flaky(3, 1)

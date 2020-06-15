@@ -40,7 +40,7 @@ def chat_photo(bot, super_group_id):
     return expect_bad_request(func, 'Type of file mismatch', 'Telegram did not accept the file.')
 
 
-class TestChatPhoto(object):
+class TestChatPhoto:
     chatphoto_small_file_id = 'smallCgADAQADngIAAuyVeEez0xRovKi9VAI'
     chatphoto_big_file_id = 'bigCgADAQADngIAAuyVeEez0xRovKi9VAI'
     chatphoto_small_file_unique_id = 'smalladc3145fd2e84d95b64d68eaa22aa33e'

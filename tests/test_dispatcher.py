@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import sys
 from queue import Queue
 from threading import current_thread
 from time import sleep
@@ -38,7 +37,7 @@ def dp2(bot):
         yield dp
 
 
-class TestDispatcher(object):
+class TestDispatcher:
     message_update = Update(1,
                             message=Message(1, User(1, '', False), None, Chat(1, ''), text='Text'))
     received = None
@@ -350,7 +349,7 @@ class TestDispatcher(object):
 
         class OwnPersistence(BasePersistence):
             def __init__(self):
-                super(BasePersistence, self).__init__()
+                super().__init__()
                 self.store_user_data = True
                 self.store_chat_data = True
                 self.store_bot_data = True
@@ -450,7 +449,6 @@ class TestDispatcher(object):
         for thread_name in thread_names:
             assert thread_name.startswith("Bot:{}:worker:".format(dp2.bot.id))
 
-    @pytest.mark.skipif(sys.version_info < (3, 0), reason='pytest fails this for no reason')
     def test_non_context_deprecation(self, dp):
         with pytest.warns(TelegramDeprecationWarning):
             Dispatcher(dp.bot, dp.update_queue, job_queue=dp.job_queue, workers=0,

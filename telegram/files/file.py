@@ -21,7 +21,7 @@ from base64 import b64decode
 from os.path import basename
 import os
 
-from future.backports.urllib import parse as urllib_parse
+import urllib.parse as urllib_parse
 
 from telegram import TelegramObject
 from telegram.passport.credentials import decrypt

@@ -74,7 +74,7 @@ class InlineQueryResultCachedPhoto(InlineQueryResult):
                  parse_mode=DEFAULT_NONE,
                  **kwargs):
         # Required
-        super(InlineQueryResultCachedPhoto, self).__init__('photo', id)
+        super().__init__('photo', id)
         self.photo_file_id = photo_file_id
 
         # Optionals

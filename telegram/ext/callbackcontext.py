@@ -21,7 +21,7 @@
 from telegram import Update
 
 
-class CallbackContext(object):
+class CallbackContext:
     """
     This is a context object passed to the callback called by :class:`telegram.ext.Handler`
     or by the :class:`telegram.ext.Dispatcher` in an error handler added by
@@ -43,9 +43,9 @@ class CallbackContext(object):
          that you think you added will not be present.
 
     Attributes:
-        bot_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
+        bot_data (:obj:`dict`): Optional. A dict that can be used to keep any data in. For each
             update it will be the same ``dict``.
-        chat_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
+        chat_data (:obj:`dict`): Optional. A dict that can be used to keep any data in. For each
             update from the same chat id it will be the same ``dict``.
 
             Warning:
@@ -54,18 +54,18 @@ class CallbackContext(object):
                 <https://github.com/python-telegram-bot/python-telegram-bot/wiki/
                 Storing-user--and-chat-related-data#chat-migration>`_.
 
-        user_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
+        user_data (:obj:`dict`): Optional. A dict that can be used to keep any data in. For each
             update from the same user it will be the same ``dict``.
-        matches (List[:obj:`re match object`], optional): If the associated update originated from
+        matches (List[:obj:`re match object`]): Optional. If the associated update originated from
             a regex-supported handler or had a :class:`Filters.regex`, this will contain a list of
             match objects for every pattern where ``re.search(pattern, string)`` returned a match.
             Note that filters short circuit, so combined regex filters will not always
             be evaluated.
-        args (List[:obj:`str`], optional): Arguments passed to a command if the associated update
+        args (List[:obj:`str`]): Optional. Arguments passed to a command if the associated update
             is handled by :class:`telegram.ext.CommandHandler`, :class:`telegram.ext.PrefixHandler`
             or :class:`telegram.ext.StringCommandHandler`. It contains a list of the words in the
             text after the command, using any whitespace string as a delimiter.
-        error (:class:`telegram.TelegramError`, optional): The Telegram error that was raised.
+        error (:class:`telegram.TelegramError`): Optional. The Telegram error that was raised.
             Only present when passed to a error handler registered with
             :attr:`telegram.ext.Dispatcher.add_error_handler`.
         job (:class:`telegram.ext.Job`): The job that that originated this callback.

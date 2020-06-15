@@ -83,7 +83,7 @@ class Video(TelegramObject):
         if not data:
             return None
 
-        data = super(Video, cls).de_json(data, bot)
+        data = super().de_json(data, bot)
 
         data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
 

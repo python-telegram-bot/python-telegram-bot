@@ -121,7 +121,7 @@ def job_queue(bot):
     jq.stop()
 
 
-class TestBasePersistence(object):
+class TestBasePersistence:
 
     def test_creation(self, base_persistence):
         assert base_persistence.store_chat_data
@@ -287,7 +287,7 @@ class TestBasePersistence(object):
 
         dp.persistence = base_persistence
 
-        class MyUpdate(object):
+        class MyUpdate:
             pass
 
         dp.add_handler(TypeHandler(MyUpdate, lambda *_: None))
@@ -385,7 +385,7 @@ def update(bot):
     return Update(0, message=message)
 
 
-class TestPickelPersistence(object):
+class TestPickelPersistence:
     def test_no_files_present_multi_file(self, pickle_persistence):
         assert pickle_persistence.get_user_data() == defaultdict(dict)
         assert pickle_persistence.get_user_data() == defaultdict(dict)
@@ -984,7 +984,7 @@ def conversations_json(conversations):
               {"[123, 321]": 1, "[890, 890]": 2}}"""
 
 
-class TestDictPersistence(object):
+class TestDictPersistence:
     def test_no_json_given(self):
         dict_persistence = DictPersistence()
         assert dict_persistence.get_user_data() == defaultdict(dict)

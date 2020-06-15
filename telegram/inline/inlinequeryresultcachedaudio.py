@@ -65,7 +65,7 @@ class InlineQueryResultCachedAudio(InlineQueryResult):
                  parse_mode=DEFAULT_NONE,
                  **kwargs):
         # Required
-        super(InlineQueryResultCachedAudio, self).__init__('audio', id)
+        super().__init__('audio', id)
         self.audio_file_id = audio_file_id
 
         # Optionals

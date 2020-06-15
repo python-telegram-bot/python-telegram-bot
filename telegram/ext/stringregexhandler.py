@@ -20,8 +20,6 @@
 
 import re
 
-from future.utils import string_types
-
 from .handler import Handler
 
 
@@ -85,12 +83,12 @@ class StringRegexHandler(Handler):
                  pass_groupdict=False,
                  pass_update_queue=False,
                  pass_job_queue=False):
-        super(StringRegexHandler, self).__init__(
+        super().__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue)
 
-        if isinstance(pattern, string_types):
+        if isinstance(pattern, str):
             pattern = re.compile(pattern)
 
         self.pattern = pattern
@@ -107,14 +105,13 @@ class StringRegexHandler(Handler):
             :obj:`bool`
 
         """
-        if isinstance(update, string_types):
+        if isinstance(update, str):
             match = re.match(self.pattern, update)
             if match:
                 return match
 
     def collect_optional_args(self, dispatcher, update=None, check_result=None):
-        optional_args = super(StringRegexHandler, self).collect_optional_args(dispatcher,
-                                                                              update, check_result)
+        optional_args = super().collect_optional_args(dispatcher, update, check_result)
         if self.pattern:
             if self.pass_groups:
                 optional_args['groups'] = check_result.groups()
