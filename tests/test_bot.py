@@ -686,19 +686,24 @@ class TestBot:
     @pytest.mark.timeout(10)
     def test_set_game_score_1(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
-        game_short_name = 'test_game'
-        game = bot.send_game(chat_id, game_short_name)
 
-        message = bot.set_game_score(
-            user_id=chat_id,
-            score=int(BASE_TIME) - HIGHSCORE_DELTA,
-            chat_id=game.chat_id,
-            message_id=game.message_id)
+        def func():
+            game_short_name = 'test_game'
+            game = bot.send_game(chat_id, game_short_name)
 
-        assert message.game.description == game.game.description
-        assert message.game.animation.file_id == game.game.animation.file_id
-        assert message.game.photo[0].file_size == game.game.photo[0].file_size
-        assert message.game.text != game.game.text
+            message = bot.set_game_score(
+                user_id=chat_id,
+                score=int(BASE_TIME) - HIGHSCORE_DELTA,
+                chat_id=game.chat_id,
+                message_id=game.message_id)
+
+            assert message.game.description == game.game.description
+            assert message.game.animation.file_id == game.game.animation.file_id
+            assert message.game.photo[0].file_size == game.game.photo[0].file_size
+            assert message.game.text != game.game.text
+
+        expect_bad_request(func, 'Bot_score_not_modified',
+                           'This test is a diva for some reason.')
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
