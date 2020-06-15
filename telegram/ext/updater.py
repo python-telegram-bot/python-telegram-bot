@@ -33,7 +33,7 @@ from telegram.utils.request import Request
 from telegram.utils.webhookhandler import (WebhookServer, WebhookAppClass)
 
 
-class Updater(object):
+class Updater:
     """
     This class, which employs the :class:`telegram.ext.Dispatcher`, provides a frontend to
     :class:`telegram.Bot` to the programmer, so they can focus on coding the bot. Its purpose is to
@@ -210,14 +210,14 @@ class Updater(object):
 
     def _thread_wrapper(self, target, *args, **kwargs):
         thr_name = current_thread().name
-        self.logger.debug('{0} - started'.format(thr_name))
+        self.logger.debug('{} - started'.format(thr_name))
         try:
             target(*args, **kwargs)
         except Exception:
             self.__exception_event.set()
             self.logger.exception('unhandled exception in %s', thr_name)
             raise
-        self.logger.debug('{0} - ended'.format(thr_name))
+        self.logger.debug('{} - ended'.format(thr_name))
 
     def start_polling(self,
                       poll_interval=0.0,
@@ -414,7 +414,7 @@ class Updater(object):
         self.logger.debug('Updater thread started (webhook)')
         use_ssl = cert is not None and key is not None
         if not url_path.startswith('/'):
-            url_path = '/{0}'.format(url_path)
+            url_path = '/{}'.format(url_path)
 
         # Create Tornado app instance
         app = WebhookAppClass(url_path, self.bot, self.update_queue,
@@ -543,9 +543,9 @@ class Updater(object):
 
     def _join_threads(self):
         for thr in self.__threads:
-            self.logger.debug('Waiting for {0} thread to end'.format(thr.name))
+            self.logger.debug('Waiting for {} thread to end'.format(thr.name))
             thr.join()
-            self.logger.debug('{0} thread has ended'.format(thr.name))
+            self.logger.debug('{} thread has ended'.format(thr.name))
         self.__threads = []
 
     def signal_handler(self, signum, frame):

@@ -29,7 +29,7 @@ def invoice():
                    TestInvoice.currency, TestInvoice.total_amount)
 
 
-class TestInvoice(object):
+class TestInvoice:
     payload = 'payload'
     prices = [LabeledPrice('Fish', 100), LabeledPrice('Fish Tax', 1000)]
     provider_data = """{"test":"test"}"""

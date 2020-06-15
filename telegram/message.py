@@ -364,7 +364,7 @@ class Message(TelegramObject):
         if not data:
             return None
 
-        data = super(Message, cls).de_json(data, bot)
+        data = super().de_json(data, bot)
 
         data['from_user'] = User.de_json(data.get('from'), bot)
         data['date'] = from_timestamp(data['date'])
@@ -452,7 +452,7 @@ class Message(TelegramObject):
             return self.chat.id
 
     def to_dict(self):
-        data = super(Message, self).to_dict()
+        data = super().to_dict()
 
         # Required
         data['date'] = to_timestamp(self.date)

@@ -38,7 +38,7 @@ def video(bot, chat_id):
         return bot.send_video(chat_id, video=f, timeout=50).video
 
 
-class TestVideo(object):
+class TestVideo:
     width = 360
     height = 640
     duration = 5

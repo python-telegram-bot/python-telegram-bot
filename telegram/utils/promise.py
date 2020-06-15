@@ -25,7 +25,7 @@ from threading import Event
 logger = logging.getLogger(__name__)
 
 
-class Promise(object):
+class Promise:
     """A simple Promise implementation for use with the run_async decorator, DelayQueue etc.
 
     Args:

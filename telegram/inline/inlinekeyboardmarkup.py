@@ -41,7 +41,7 @@ class InlineKeyboardMarkup(ReplyMarkup):
         self.inline_keyboard = inline_keyboard
 
     def to_dict(self):
-        data = super(InlineKeyboardMarkup, self).to_dict()
+        data = super().to_dict()
 
         data['inline_keyboard'] = []
         for inline_keyboard in self.inline_keyboard:

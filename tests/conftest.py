@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime
 import os
-import sys
 import re
 from collections import defaultdict
 from queue import Queue
@@ -164,9 +163,8 @@ def class_thumb_file():
 
 
 def pytest_configure(config):
-    if sys.version_info >= (3,):
-        config.addinivalue_line('filterwarnings', 'ignore::ResourceWarning')
-        # TODO: Write so good code that we don't need to ignore ResourceWarnings anymore
+    config.addinivalue_line('filterwarnings', 'ignore::ResourceWarning')
+    # TODO: Write so good code that we don't need to ignore ResourceWarnings anymore
 
 
 def make_bot(bot_info, **kwargs):

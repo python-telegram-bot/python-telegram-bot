@@ -35,7 +35,7 @@ def file(bot):
                 bot=bot)
 
 
-class TestFile(object):
+class TestFile:
     file_id = 'NOTVALIDDOESNOTMATTER'
     file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
     file_path = (

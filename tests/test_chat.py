@@ -33,7 +33,7 @@ def chat(bot):
                 slow_mode_delay=TestChat.slow_mode_delay)
 
 
-class TestChat(object):
+class TestChat:
     id_ = -28767330
     title = 'ToledosPalaceBot - Group'
     type_ = 'group'

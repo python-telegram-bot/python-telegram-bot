@@ -28,7 +28,7 @@ from telegram.ext import (Handler, CallbackQueryHandler, InlineQueryHandler,
 from telegram.utils.promise import Promise
 
 
-class _ConversationTimeoutContext(object):
+class _ConversationTimeoutContext:
     def __init__(self, conversation_key, update, dispatcher, callback_context):
         self.conversation_key = conversation_key
         self.update = update
@@ -404,7 +404,7 @@ class ConversationHandler(Handler):
                         return key, handler, check
                 return None
 
-        self.logger.debug('selecting conversation %s with state %s' % (str(key), str(state)))
+        self.logger.debug('selecting conversation {} with state {}'.format(str(key), str(state)))
 
         handler = None
 

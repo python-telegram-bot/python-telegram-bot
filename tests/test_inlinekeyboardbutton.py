@@ -35,7 +35,7 @@ def inline_keyboard_button():
                                 login_url=TestInlineKeyboardButton.login_url)
 
 
-class TestInlineKeyboardButton(object):
+class TestInlineKeyboardButton:
     text = 'text'
     url = 'url'
     callback_data = 'callback data'

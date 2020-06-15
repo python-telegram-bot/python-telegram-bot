@@ -20,7 +20,7 @@
 """This module contains an object that represents a Telegram Message Parse Modes."""
 
 
-class ParseMode(object):
+class ParseMode:
     """This object represents a Telegram Message Parse Modes."""
 
     MARKDOWN = 'Markdown'

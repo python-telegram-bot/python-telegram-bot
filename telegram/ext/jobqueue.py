@@ -33,12 +33,12 @@ from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import to_float_timestamp
 
 
-class Days(object):
+class Days:
     MON, TUE, WED, THU, FRI, SAT, SUN = range(7)
     EVERY_DAY = tuple(range(7))
 
 
-class JobQueue(object):
+class JobQueue:
     """This class allows you to periodically perform tasks with the bot.
 
     Attributes:
@@ -54,7 +54,7 @@ class JobQueue(object):
             warnings.warn("Passing bot to jobqueue is deprecated. Please use set_dispatcher "
                           "instead!", TelegramDeprecationWarning, stacklevel=2)
 
-            class MockDispatcher(object):
+            class MockDispatcher:
                 def __init__(self):
                     self.bot = bot
                     self.use_context = False
@@ -492,7 +492,7 @@ class JobQueue(object):
             return tuple(job[1] for job in self._queue.queue if job and job[1].name == name)
 
 
-class Job(object):
+class Job:
     """This class encapsulates a Job.
 
     Attributes:

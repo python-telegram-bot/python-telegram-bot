@@ -150,7 +150,7 @@ class ChatMember(TelegramObject):
         if not data:
             return None
 
-        data = super(ChatMember, cls).de_json(data, bot)
+        data = super().de_json(data, bot)
 
         data['user'] = User.de_json(data.get('user'), bot)
         data['until_date'] = from_timestamp(data.get('until_date', None))
@@ -158,7 +158,7 @@ class ChatMember(TelegramObject):
         return cls(**data)
 
     def to_dict(self):
-        data = super(ChatMember, self).to_dict()
+        data = super().to_dict()
 
         data['until_date'] = to_timestamp(self.until_date)
 

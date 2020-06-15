@@ -37,7 +37,7 @@ def inline_query_result_contact():
         reply_markup=TestInlineQueryResultContact.reply_markup)
 
 
-class TestInlineQueryResultContact(object):
+class TestInlineQueryResultContact:
     id_ = 'id'
     type_ = 'contact'
     phone_number = 'phone_number'

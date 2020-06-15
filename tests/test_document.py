@@ -38,7 +38,7 @@ def document(bot, chat_id):
         return bot.send_document(chat_id, document=f, timeout=50).document
 
 
-class TestDocument(object):
+class TestDocument:
     caption = 'DocumentTest - *Caption*'
     document_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.gif'
     file_size = 12948
