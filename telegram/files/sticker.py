@@ -96,7 +96,7 @@ class Sticker(TelegramObject):
         if not data:
             return None
 
-        data = super(Sticker, cls).de_json(data, bot)
+        data = super().de_json(data, bot)
 
         data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
         data['mask_position'] = MaskPosition.de_json(data.get('mask_position'), bot)
@@ -164,20 +164,20 @@ class StickerSet(TelegramObject):
 
         self._id_attrs = (self.name,)
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         if not data:
             return None
 
-        data = super(StickerSet, StickerSet).de_json(data, bot)
+        data = super().de_json(data, bot)
 
         data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
         data['stickers'] = Sticker.de_list(data.get('stickers'), bot)
 
-        return StickerSet(bot=bot, **data)
+        return cls(bot=bot, **data)
 
     def to_dict(self):
-        data = super(StickerSet, self).to_dict()
+        data = super().to_dict()
 
         data['stickers'] = [s.to_dict() for s in data.get('stickers')]
 

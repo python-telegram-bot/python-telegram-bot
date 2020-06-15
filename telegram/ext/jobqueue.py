@@ -32,12 +32,12 @@ from telegram.ext.callbackcontext import CallbackContext
 from telegram.utils.deprecate import TelegramDeprecationWarning
 
 
-class Days(object):
+class Days:
     MON, TUE, WED, THU, FRI, SAT, SUN = range(7)
     EVERY_DAY = tuple(range(7))
 
 
-class JobQueue(object):
+class JobQueue:
     """This class allows you to periodically perform tasks with the bot.
 
     Attributes:
@@ -52,7 +52,7 @@ class JobQueue(object):
             warnings.warn("Passing bot to jobqueue is deprecated. Please use set_dispatcher "
                           "instead!", TelegramDeprecationWarning, stacklevel=2)
 
-            class MockDispatcher(object):
+            class MockDispatcher:
                 def __init__(self):
                     self.bot = bot
                     self.use_context = False
@@ -443,7 +443,7 @@ class JobQueue(object):
         return tuple(job for job in self.jobs() if job.name == name)
 
 
-class Job(object):
+class Job:
     """This class is a convenience wrapper for the jobs held in a :class:`telegram.ext.JobQueue`.
     With the current backend APScheduler, :attr:`job` holds a :class:`apscheduler.job.Job`
     instance.

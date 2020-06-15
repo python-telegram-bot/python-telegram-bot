@@ -34,7 +34,6 @@ from datetime import datetime
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
-from future.utils import string_types
 
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
                       ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore, StickerSet,
@@ -94,7 +93,7 @@ class Bot(TelegramObject):
         defaults = kwargs.get('defaults')
 
         # Make an instance of the class
-        instance = super(Bot, cls).__new__(cls)
+        instance = super().__new__(cls)
 
         if not defaults:
             return instance
@@ -266,7 +265,7 @@ class Bot(TelegramObject):
     def name(self):
         """:obj:`str`: Bot's @username."""
 
-        return '@{0}'.format(self.username)
+        return '@{}'.format(self.username)
 
     @log
     def get_me(self, timeout=None, **kwargs):
@@ -285,7 +284,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/getMe'.format(self.base_url)
+        url = '{}/getMe'.format(self.base_url)
 
         result = self._request.get(url, timeout=timeout)
 
@@ -335,7 +334,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendMessage'.format(self.base_url)
+        url = '{}/sendMessage'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'text': text}
 
@@ -380,7 +379,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/deleteMessage'.format(self.base_url)
+        url = '{}/deleteMessage'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'message_id': message_id}
 
@@ -418,7 +417,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/forwardMessage'.format(self.base_url)
+        url = '{}/forwardMessage'.format(self.base_url)
 
         data = {}
 
@@ -479,7 +478,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendPhoto'.format(self.base_url)
+        url = '{}/sendPhoto'.format(self.base_url)
 
         if isinstance(photo, PhotoSize):
             photo = photo.file_id
@@ -563,7 +562,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendAudio'.format(self.base_url)
+        url = '{}/sendAudio'.format(self.base_url)
 
         if isinstance(audio, Audio):
             audio = audio.file_id
@@ -651,7 +650,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendDocument'.format(self.base_url)
+        url = '{}/sendDocument'.format(self.base_url)
 
         if isinstance(document, Document):
             document = document.file_id
@@ -714,7 +713,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendSticker'.format(self.base_url)
+        url = '{}/sendSticker'.format(self.base_url)
 
         if isinstance(sticker, Sticker):
             sticker = sticker.file_id
@@ -794,7 +793,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendVideo'.format(self.base_url)
+        url = '{}/sendVideo'.format(self.base_url)
 
         if isinstance(video, Video):
             video = video.file_id
@@ -877,7 +876,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendVideoNote'.format(self.base_url)
+        url = '{}/sendVideoNote'.format(self.base_url)
 
         if isinstance(video_note, VideoNote):
             video_note = video_note.file_id
@@ -957,7 +956,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendAnimation'.format(self.base_url)
+        url = '{}/sendAnimation'.format(self.base_url)
 
         if isinstance(animation, Animation):
             animation = animation.file_id
@@ -1038,7 +1037,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendVoice'.format(self.base_url)
+        url = '{}/sendVoice'.format(self.base_url)
 
         if isinstance(voice, Voice):
             voice = voice.file_id
@@ -1087,7 +1086,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
         """
 
-        url = '{0}/sendMediaGroup'.format(self.base_url)
+        url = '{}/sendMediaGroup'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'media': media}
 
@@ -1155,7 +1154,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendLocation'.format(self.base_url)
+        url = '{}/sendLocation'.format(self.base_url)
 
         if not ((latitude is not None and longitude is not None) or location):
             raise ValueError("Either location or latitude and longitude must be passed as"
@@ -1218,7 +1217,7 @@ class Bot(TelegramObject):
             edited Message is returned, otherwise ``True`` is returned.
         """
 
-        url = '{0}/editMessageLiveLocation'.format(self.base_url)
+        url = '{}/editMessageLiveLocation'.format(self.base_url)
 
         if not (all([latitude, longitude]) or location):
             raise ValueError("Either location or latitude and longitude must be passed as"
@@ -1272,7 +1271,7 @@ class Bot(TelegramObject):
             edited Message is returned, otherwise ``True`` is returned.
         """
 
-        url = '{0}/stopMessageLiveLocation'.format(self.base_url)
+        url = '{}/stopMessageLiveLocation'.format(self.base_url)
 
         data = {}
 
@@ -1338,7 +1337,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendVenue'.format(self.base_url)
+        url = '{}/sendVenue'.format(self.base_url)
 
         if not (venue or all([latitude, longitude, address, title])):
             raise ValueError("Either venue or latitude, longitude, address and title must be"
@@ -1416,7 +1415,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendContact'.format(self.base_url)
+        url = '{}/sendContact'.format(self.base_url)
 
         if (not contact) and (not all([phone_number, first_name])):
             raise ValueError("Either contact or phone_number and first_name must be passed as"
@@ -1474,7 +1473,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendGame'.format(self.base_url)
+        url = '{}/sendGame'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'game_short_name': game_short_name}
 
@@ -1508,7 +1507,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendChatAction'.format(self.base_url)
+        url = '{}/sendChatAction'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'action': action}
         data.update(kwargs)
@@ -1572,7 +1571,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/answerInlineQuery'.format(self.base_url)
+        url = '{}/answerInlineQuery'.format(self.base_url)
 
         for res in results:
             if res._has_parse_mode and res.parse_mode == DEFAULT_NONE:
@@ -1638,7 +1637,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/getUserProfilePhotos'.format(self.base_url)
+        url = '{}/getUserProfilePhotos'.format(self.base_url)
 
         data = {'user_id': user_id}
 
@@ -1686,7 +1685,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/getFile'.format(self.base_url)
+        url = '{}/getFile'.format(self.base_url)
 
         try:
             file_id = file_id.file_id
@@ -1699,7 +1698,7 @@ class Bot(TelegramObject):
         result = self._request.post(url, data, timeout=timeout)
 
         if result.get('file_path'):
-            result['file_path'] = '%s/%s' % (self.base_file_url, result['file_path'])
+            result['file_path'] = '{}/{}'.format(self.base_file_url, result['file_path'])
 
         return File.de_json(result, self)
 
@@ -1730,7 +1729,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/kickChatMember'.format(self.base_url)
+        url = '{}/kickChatMember'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'user_id': user_id}
         data.update(kwargs)
@@ -1767,7 +1766,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/unbanChatMember'.format(self.base_url)
+        url = '{}/unbanChatMember'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'user_id': user_id}
         data.update(kwargs)
@@ -1819,7 +1818,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url_ = '{0}/answerCallbackQuery'.format(self.base_url)
+        url_ = '{}/answerCallbackQuery'.format(self.base_url)
 
         data = {'callback_query_id': callback_query_id}
 
@@ -1881,7 +1880,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/editMessageText'.format(self.base_url)
+        url = '{}/editMessageText'.format(self.base_url)
 
         data = {'text': text}
 
@@ -1945,7 +1944,7 @@ class Bot(TelegramObject):
                 'edit_message_caption: Both chat_id and message_id are required when '
                 'inline_message_id is not specified')
 
-        url = '{0}/editMessageCaption'.format(self.base_url)
+        url = '{}/editMessageCaption'.format(self.base_url)
 
         data = {}
 
@@ -2007,7 +2006,7 @@ class Bot(TelegramObject):
                 'edit_message_media: Both chat_id and message_id are required when '
                 'inline_message_id is not specified')
 
-        url = '{0}/editMessageMedia'.format(self.base_url)
+        url = '{}/editMessageMedia'.format(self.base_url)
 
         data = {'media': media}
 
@@ -2060,7 +2059,7 @@ class Bot(TelegramObject):
                 'edit_message_reply_markup: Both chat_id and message_id are required when '
                 'inline_message_id is not specified')
 
-        url = '{0}/editMessageReplyMarkup'.format(self.base_url)
+        url = '{}/editMessageReplyMarkup'.format(self.base_url)
 
         data = {}
 
@@ -2119,7 +2118,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/getUpdates'.format(self.base_url)
+        url = '{}/getUpdates'.format(self.base_url)
 
         data = {'timeout': timeout}
 
@@ -2213,7 +2212,7 @@ class Bot(TelegramObject):
         .. _`guide to Webhooks`: https://core.telegram.org/bots/webhooks
 
         """
-        url_ = '{0}/setWebhook'.format(self.base_url)
+        url_ = '{}/setWebhook'.format(self.base_url)
 
         # Backwards-compatibility: 'url' used to be named 'webhook_url'
         if 'webhook_url' in kwargs:  # pragma: no cover
@@ -2263,7 +2262,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/deleteWebhook'.format(self.base_url)
+        url = '{}/deleteWebhook'.format(self.base_url)
 
         data = kwargs
 
@@ -2290,7 +2289,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/leaveChat'.format(self.base_url)
+        url = '{}/leaveChat'.format(self.base_url)
 
         data = {'chat_id': chat_id}
         data.update(kwargs)
@@ -2320,7 +2319,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/getChat'.format(self.base_url)
+        url = '{}/getChat'.format(self.base_url)
 
         data = {'chat_id': chat_id}
         data.update(kwargs)
@@ -2355,7 +2354,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/getChatAdministrators'.format(self.base_url)
+        url = '{}/getChatAdministrators'.format(self.base_url)
 
         data = {'chat_id': chat_id}
         data.update(kwargs)
@@ -2383,7 +2382,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/getChatMembersCount'.format(self.base_url)
+        url = '{}/getChatMembersCount'.format(self.base_url)
 
         data = {'chat_id': chat_id}
         data.update(kwargs)
@@ -2412,7 +2411,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/getChatMember'.format(self.base_url)
+        url = '{}/getChatMember'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'user_id': user_id}
         data.update(kwargs)
@@ -2443,7 +2442,7 @@ class Bot(TelegramObject):
             :obj:`bool`: On success, ``True`` is returned.
         """
 
-        url = '{0}/setChatStickerSet'.format(self.base_url)
+        url = '{}/setChatStickerSet'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'sticker_set_name': sticker_set_name}
 
@@ -2470,7 +2469,7 @@ class Bot(TelegramObject):
              :obj:`bool`: On success, ``True`` is returned.
         """
 
-        url = '{0}/deleteChatStickerSet'.format(self.base_url)
+        url = '{}/deleteChatStickerSet'.format(self.base_url)
 
         data = {'chat_id': chat_id}
 
@@ -2493,7 +2492,7 @@ class Bot(TelegramObject):
             :class:`telegram.WebhookInfo`
 
         """
-        url = '{0}/getWebhookInfo'.format(self.base_url)
+        url = '{}/getWebhookInfo'.format(self.base_url)
 
         data = kwargs
 
@@ -2542,7 +2541,7 @@ class Bot(TelegramObject):
             current score in the chat and force is False.
 
         """
-        url = '{0}/setGameScore'.format(self.base_url)
+        url = '{}/setGameScore'.format(self.base_url)
 
         data = {'user_id': user_id, 'score': score}
 
@@ -2591,7 +2590,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/getGameHighScores'.format(self.base_url)
+        url = '{}/getGameHighScores'.format(self.base_url)
 
         data = {'user_id': user_id}
 
@@ -2692,7 +2691,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendInvoice'.format(self.base_url)
+        url = '{}/sendInvoice'.format(self.base_url)
 
         data = {
             'chat_id': chat_id,
@@ -2705,7 +2704,7 @@ class Bot(TelegramObject):
             'prices': [p.to_dict() for p in prices]
         }
         if provider_data is not None:
-            if isinstance(provider_data, string_types):
+            if isinstance(provider_data, str):
                 data['provider_data'] = provider_data
             else:
                 data['provider_data'] = json.dumps(provider_data)
@@ -2784,7 +2783,7 @@ class Bot(TelegramObject):
                 'answerShippingQuery: If ok is False, error_message '
                 'should not be empty and there should not be shipping_options')
 
-        url_ = '{0}/answerShippingQuery'.format(self.base_url)
+        url_ = '{}/answerShippingQuery'.format(self.base_url)
 
         data = {'shipping_query_id': shipping_query_id, 'ok': ok}
 
@@ -2839,7 +2838,7 @@ class Bot(TelegramObject):
                 'not be error_message; if ok is False, error_message '
                 'should not be empty')
 
-        url_ = '{0}/answerPreCheckoutQuery'.format(self.base_url)
+        url_ = '{}/answerPreCheckoutQuery'.format(self.base_url)
 
         data = {'pre_checkout_query_id': pre_checkout_query_id, 'ok': ok}
 
@@ -2884,7 +2883,7 @@ class Bot(TelegramObject):
         Raises:
             :class:`telegram.TelegramError`
         """
-        url = '{0}/restrictChatMember'.format(self.base_url)
+        url = '{}/restrictChatMember'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'user_id': user_id, 'permissions': permissions.to_dict()}
 
@@ -2943,7 +2942,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/promoteChatMember'.format(self.base_url)
+        url = '{}/promoteChatMember'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'user_id': user_id}
 
@@ -2992,7 +2991,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/setChatPermissions'.format(self.base_url)
+        url = '{}/setChatPermissions'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'permissions': permissions.to_dict()}
         data.update(kwargs)
@@ -3030,7 +3029,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/setChatAdministratorCustomTitle'.format(self.base_url)
+        url = '{}/setChatAdministratorCustomTitle'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'user_id': user_id, 'custom_title': custom_title}
         data.update(kwargs)
@@ -3061,7 +3060,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/exportChatInviteLink'.format(self.base_url)
+        url = '{}/exportChatInviteLink'.format(self.base_url)
 
         data = {'chat_id': chat_id}
         data.update(kwargs)
@@ -3093,7 +3092,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/setChatPhoto'.format(self.base_url)
+        url = '{}/setChatPhoto'.format(self.base_url)
 
         if InputFile.is_file(photo):
             photo = InputFile(photo)
@@ -3127,7 +3126,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/deleteChatPhoto'.format(self.base_url)
+        url = '{}/deleteChatPhoto'.format(self.base_url)
 
         data = {'chat_id': chat_id}
         data.update(kwargs)
@@ -3159,7 +3158,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/setChatTitle'.format(self.base_url)
+        url = '{}/setChatTitle'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'title': title}
         data.update(kwargs)
@@ -3191,7 +3190,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/setChatDescription'.format(self.base_url)
+        url = '{}/setChatDescription'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'description': description}
         data.update(kwargs)
@@ -3228,7 +3227,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/pinChatMessage'.format(self.base_url)
+        url = '{}/pinChatMessage'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'message_id': message_id}
 
@@ -3263,7 +3262,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/unpinChatMessage'.format(self.base_url)
+        url = '{}/unpinChatMessage'.format(self.base_url)
 
         data = {'chat_id': chat_id}
         data.update(kwargs)
@@ -3290,7 +3289,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/getStickerSet'.format(self.base_url)
+        url = '{}/getStickerSet'.format(self.base_url)
 
         data = {'name': name}
         data.update(kwargs)
@@ -3327,7 +3326,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/uploadStickerFile'.format(self.base_url)
+        url = '{}/uploadStickerFile'.format(self.base_url)
 
         if InputFile.is_file(png_sticker):
             png_sticker = InputFile(png_sticker)
@@ -3392,7 +3391,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/createNewStickerSet'.format(self.base_url)
+        url = '{}/createNewStickerSet'.format(self.base_url)
 
         if InputFile.is_file(png_sticker):
             png_sticker = InputFile(png_sticker)
@@ -3464,7 +3463,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/addStickerToSet'.format(self.base_url)
+        url = '{}/addStickerToSet'.format(self.base_url)
 
         if InputFile.is_file(png_sticker):
             png_sticker = InputFile(png_sticker)
@@ -3507,7 +3506,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/setStickerPositionInSet'.format(self.base_url)
+        url = '{}/setStickerPositionInSet'.format(self.base_url)
 
         data = {'sticker': sticker, 'position': position}
         data.update(kwargs)
@@ -3534,7 +3533,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/deleteStickerFromSet'.format(self.base_url)
+        url = '{}/deleteStickerFromSet'.format(self.base_url)
 
         data = {'sticker': sticker}
         data.update(kwargs)
@@ -3613,7 +3612,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url_ = '{0}/setPassportDataErrors'.format(self.base_url)
+        url_ = '{}/setPassportDataErrors'.format(self.base_url)
 
         data = {'user_id': user_id, 'errors': [error.to_dict() for error in errors]}
         data.update(kwargs)
@@ -3690,7 +3689,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendPoll'.format(self.base_url)
+        url = '{}/sendPoll'.format(self.base_url)
 
         data = {
             'chat_id': chat_id,
@@ -3758,7 +3757,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/stopPoll'.format(self.base_url)
+        url = '{}/stopPoll'.format(self.base_url)
 
         data = {
             'chat_id': chat_id,
@@ -3813,7 +3812,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendDice'.format(self.base_url)
+        url = '{}/sendDice'.format(self.base_url)
 
         data = {
             'chat_id': chat_id,
@@ -3844,7 +3843,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/getMyCommands'.format(self.base_url)
+        url = '{}/getMyCommands'.format(self.base_url)
 
         result = self._request.get(url, timeout=timeout)
 
@@ -3873,7 +3872,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/setMyCommands'.format(self.base_url)
+        url = '{}/setMyCommands'.format(self.base_url)
 
         cmds = [c if isinstance(c, BotCommand) else BotCommand(c[0], c[1]) for c in commands]
 

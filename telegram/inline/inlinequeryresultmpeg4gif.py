@@ -84,7 +84,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
                  **kwargs):
 
         # Required
-        super(InlineQueryResultMpeg4Gif, self).__init__('mpeg4_gif', id)
+        super().__init__('mpeg4_gif', id)
         self.mpeg4_url = mpeg4_url
         self.thumb_url = thumb_url
 

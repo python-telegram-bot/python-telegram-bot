@@ -50,7 +50,7 @@ class OrderInfo(TelegramObject):
         if not data:
             return cls()
 
-        data = super(OrderInfo, cls).de_json(data, bot)
+        data = super().de_json(data, bot)
 
         data['shipping_address'] = ShippingAddress.de_json(data.get('shipping_address'), bot)
 

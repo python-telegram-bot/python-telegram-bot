@@ -40,7 +40,7 @@ def inline_query_result_document():
         reply_markup=TestInlineQueryResultDocument.reply_markup)
 
 
-class TestInlineQueryResultDocument(object):
+class TestInlineQueryResultDocument:
     id_ = 'id'
     type_ = 'document'
     document_url = 'document url'

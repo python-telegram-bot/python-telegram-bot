@@ -74,7 +74,7 @@ class InlineQueryResultContact(InlineQueryResult):
                  vcard=None,
                  **kwargs):
         # Required
-        super(InlineQueryResultContact, self).__init__('contact', id)
+        super().__init__('contact', id)
         self.phone_number = phone_number
         self.first_name = first_name
 

@@ -28,16 +28,10 @@ from random import randrange
 from threading import Thread, Event
 from time import sleep
 
-try:
-    # python2
-    from urllib2 import urlopen, Request, HTTPError
-except ImportError:
-    # python3
-    from urllib.request import Request, urlopen
-    from urllib.error import HTTPError
+from urllib.request import Request, urlopen
+from urllib.error import HTTPError
 
 import pytest
-from future.builtins import bytes
 
 from telegram import TelegramError, Message, User, Chat, Update, Bot
 from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter
@@ -75,7 +69,7 @@ if sys.platform.startswith("win") and sys.version_info >= (3, 8):
             asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())
 
 
-class TestUpdater(object):
+class TestUpdater:
     message_count = 0
     received = None
     attempts = 0

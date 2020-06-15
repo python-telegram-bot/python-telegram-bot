@@ -83,7 +83,7 @@ class InlineQueryResultGif(InlineQueryResult):
                  **kwargs):
 
         # Required
-        super(InlineQueryResultGif, self).__init__('gif', id)
+        super().__init__('gif', id)
         self.gif_url = gif_url
         self.thumb_url = thumb_url
 

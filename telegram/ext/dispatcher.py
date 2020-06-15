@@ -29,8 +29,6 @@ from collections import defaultdict
 
 from queue import Queue, Empty
 
-from future.builtins import range
-
 from telegram import TelegramError, Update
 from telegram.ext.handler import Handler
 from telegram.ext.callbackcontext import CallbackContext
@@ -66,7 +64,7 @@ class DispatcherHandlerStop(Exception):
     pass
 
 
-class Dispatcher(object):
+class Dispatcher:
     """This class dispatches all kinds of updates to its registered handlers.
 
     Attributes:
@@ -304,10 +302,10 @@ class Dispatcher(object):
             self.__async_queue.put(None)
 
         for i, thr in enumerate(threads):
-            self.logger.debug('Waiting for async thread {0}/{1} to end'.format(i + 1, total))
+            self.logger.debug('Waiting for async thread {}/{} to end'.format(i + 1, total))
             thr.join()
             self.__async_threads.remove(thr)
-            self.logger.debug('async thread {0}/{1} has ended'.format(i + 1, total))
+            self.logger.debug('async thread {}/{} has ended'.format(i + 1, total))
 
     @property
     def has_running_threads(self):
@@ -391,7 +389,7 @@ class Dispatcher(object):
         from .conversationhandler import ConversationHandler
 
         if not isinstance(handler, Handler):
-            raise TypeError('handler is not an instance of {0}'.format(Handler.__name__))
+            raise TypeError('handler is not an instance of {}'.format(Handler.__name__))
         if not isinstance(group, int):
             raise TypeError('group is not int')
         if isinstance(handler, ConversationHandler) and handler.persistent:

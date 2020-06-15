@@ -75,7 +75,7 @@ class InlineQueryResultAudio(InlineQueryResult):
                  **kwargs):
 
         # Required
-        super(InlineQueryResultAudio, self).__init__('audio', id)
+        super().__init__('audio', id)
         self.audio_url = audio_url
         self.title = title
 

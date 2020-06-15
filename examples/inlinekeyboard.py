@@ -40,11 +40,6 @@ def help(update, context):
     update.message.reply_text("Use /start to test this bot.")
 
 
-def error(update, context):
-    """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, context.error)
-
-
 def main():
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
@@ -54,7 +49,6 @@ def main():
     updater.dispatcher.add_handler(CommandHandler('start', start))
     updater.dispatcher.add_handler(CallbackQueryHandler(button))
     updater.dispatcher.add_handler(CommandHandler('help', help))
-    updater.dispatcher.add_error_handler(error)
 
     # Start the Bot
     updater.start_polling()

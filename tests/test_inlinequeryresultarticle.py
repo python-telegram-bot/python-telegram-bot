@@ -38,7 +38,7 @@ def inline_query_result_article():
         thumb_width=TestInlineQueryResultArticle.thumb_width)
 
 
-class TestInlineQueryResultArticle(object):
+class TestInlineQueryResultArticle:
     id_ = 'id'
     type_ = 'article'
     title = 'title'

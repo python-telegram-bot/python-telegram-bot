@@ -28,7 +28,7 @@ def contact():
                    TestContact.user_id)
 
 
-class TestContact(object):
+class TestContact:
     phone_number = '+11234567890'
     first_name = 'Leandro'
     last_name = 'Toledo'
