@@ -28,7 +28,7 @@ from telegram import (Animation, Audio, Contact, Document, Chat, Location, Photo
 from telegram import ParseMode
 from telegram.utils.helpers import escape_markdown, to_timestamp, from_timestamp
 
-from telegram.utils.typing import JSONDict
+from telegram.utils.types import JSONDict
 from typing import Any, List, Dict, Optional, Union, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot, InputMedia

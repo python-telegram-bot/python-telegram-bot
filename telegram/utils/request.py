@@ -56,7 +56,7 @@ from telegram import (InputFile, TelegramError, InputMedia)
 from telegram.error import (Unauthorized, NetworkError, TimedOut, BadRequest, ChatMigrated,
                             RetryAfter, InvalidToken, Conflict)
 
-from telegram.utils.typing import JSONDict
+from telegram.utils.types import JSONDict
 from typing import Any, Union
 
 

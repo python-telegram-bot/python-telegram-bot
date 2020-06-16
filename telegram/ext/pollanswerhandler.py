@@ -20,7 +20,7 @@
 from telegram import Update
 from .handler import Handler
 
-from telegram.utils.typing import HandlerArg
+from telegram.utils.types import HandlerArg
 
 
 class PollAnswerHandler(Handler):

@@ -45,7 +45,7 @@ from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos
 from telegram.error import InvalidToken, TelegramError
 from telegram.utils.helpers import to_timestamp, DEFAULT_NONE, DefaultValue
 from telegram.utils.request import Request
-from telegram.utils.typing import JSONDict, FileLike
+from telegram.utils.types import JSONDict, FileLike
 
 from typing import (Any, Callable, Optional, TypeVar, Union, TYPE_CHECKING, List, Tuple,
                     no_type_check, IO, cast)

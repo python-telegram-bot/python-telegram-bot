@@ -22,7 +22,7 @@ try:
 except ImportError:
     import json  # type: ignore[no-redef]
 
-from telegram.utils.typing import JSONDict
+from telegram.utils.types import JSONDict
 from typing import Tuple, Any, Optional, Type, TypeVar, TYPE_CHECKING, List
 
 if TYPE_CHECKING:

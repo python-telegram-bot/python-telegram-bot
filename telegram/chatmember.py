@@ -22,7 +22,7 @@ import datetime
 from telegram import User, TelegramObject
 from telegram.utils.helpers import to_timestamp, from_timestamp
 
-from telegram.utils.typing import JSONDict
+from telegram.utils.types import JSONDict
 from typing import Any, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot

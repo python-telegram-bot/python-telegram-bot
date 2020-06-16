@@ -25,7 +25,7 @@ from telegram.utils.deprecate import TelegramDeprecationWarning
 
 from telegram.ext import MessageHandler, Filters
 
-from telegram.utils.typing import HandlerArg
+from telegram.utils.types import HandlerArg
 from typing import Callable, TYPE_CHECKING, Any, Optional, Union, TypeVar, Dict, Pattern
 if TYPE_CHECKING:
     from telegram.ext import CallbackContext, Dispatcher

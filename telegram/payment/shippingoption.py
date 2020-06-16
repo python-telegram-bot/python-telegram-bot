@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram ShippingOption."""
 
 from telegram import TelegramObject
-from telegram.utils.typing import JSONDict
+from telegram.utils.types import JSONDict
 from typing import List, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import LabeledPrice  # noqa

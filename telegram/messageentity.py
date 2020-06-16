@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram MessageEntity."""
 
 from telegram import User, TelegramObject
-from telegram.utils.typing import JSONDict
+from telegram.utils.types import JSONDict
 from typing import Any, Optional, List, TYPE_CHECKING
 
 if TYPE_CHECKING:

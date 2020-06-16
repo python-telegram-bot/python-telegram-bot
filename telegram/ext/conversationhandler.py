@@ -27,7 +27,7 @@ from telegram.ext import (Handler, CallbackQueryHandler, InlineQueryHandler,
                           ChosenInlineResultHandler, CallbackContext, BasePersistence)
 from telegram.utils.promise import Promise
 
-from telegram.utils.typing import ConversationDict, HandlerArg
+from telegram.utils.types import ConversationDict, HandlerArg
 from typing import Dict, Any, List, Optional, Tuple, TYPE_CHECKING, cast
 
 if TYPE_CHECKING:

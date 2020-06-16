@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram UserProfilePhotos."""
 
 from telegram import PhotoSize, TelegramObject
-from telegram.utils.typing import JSONDict
+from telegram.utils.types import JSONDict
 from typing import Any, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:

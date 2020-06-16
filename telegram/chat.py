@@ -22,7 +22,7 @@
 from telegram import TelegramObject, ChatPhoto
 from .chatpermissions import ChatPermissions
 
-from telegram.utils.typing import JSONDict
+from telegram.utils.types import JSONDict
 from typing import Any, Optional, List, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot, Message, ChatMember

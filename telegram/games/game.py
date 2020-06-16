@@ -21,7 +21,7 @@
 import sys
 
 from telegram import MessageEntity, TelegramObject, Animation, PhotoSize
-from telegram.utils.typing import JSONDict
+from telegram.utils.types import JSONDict
 from typing import List, Any, Dict, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot

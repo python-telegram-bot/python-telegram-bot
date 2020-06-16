@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram ReplyKeyboardMarkup."""
 
 from telegram import ReplyMarkup, KeyboardButton
-from telegram.utils.typing import JSONDict
+from telegram.utils.types import JSONDict
 from typing import List, Union, Any
 
 

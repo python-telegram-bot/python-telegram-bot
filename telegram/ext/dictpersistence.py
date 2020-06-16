@@ -30,7 +30,7 @@ from collections import defaultdict
 from telegram.ext import BasePersistence
 
 from typing import DefaultDict, Dict, Any, Tuple, Optional
-from telegram.utils.typing import ConversationDict
+from telegram.utils.types import ConversationDict
 
 
 class DictPersistence(BasePersistence):

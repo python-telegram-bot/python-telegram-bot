@@ -19,7 +19,7 @@
 """This module contains an object that represents a Encrypted PassportFile."""
 
 from telegram import TelegramObject
-from telegram.utils.typing import JSONDict
+from telegram.utils.types import JSONDict
 from typing import Any, Optional, List, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot, File, FileCredentials

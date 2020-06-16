@@ -21,7 +21,7 @@
 from telegram import (Message, TelegramObject, InlineQuery, ChosenInlineResult,
                       CallbackQuery, ShippingQuery, PreCheckoutQuery, Poll)
 from telegram.poll import PollAnswer
-from telegram.utils.typing import JSONDict
+from telegram.utils.types import JSONDict
 from typing import Any, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:

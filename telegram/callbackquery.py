@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram CallbackQuery"""
 from telegram import TelegramObject, Message, User
 
-from telegram.utils.typing import JSONDict
+from telegram.utils.types import JSONDict
 from typing import Optional, Any, Union, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot, InlineKeyboardMarkup

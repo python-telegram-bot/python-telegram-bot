@@ -20,7 +20,7 @@
 
 from abc import ABC, abstractmethod
 
-from telegram.utils.typing import HandlerArg
+from telegram.utils.types import HandlerArg
 from telegram import Update
 from typing import Callable, TYPE_CHECKING, Any, Optional, Union, TypeVar, Dict
 if TYPE_CHECKING:

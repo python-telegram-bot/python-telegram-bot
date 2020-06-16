@@ -6,4 +6,4 @@ telegram.utils package
     telegram.utils.helpers
     telegram.utils.promise
     telegram.utils.request
-    telegram.utils.typing
+    telegram.utils.types

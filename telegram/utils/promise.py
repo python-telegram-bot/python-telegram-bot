@@ -20,7 +20,7 @@
 
 import logging
 from threading import Event
-from telegram.utils.typing import JSONDict
+from telegram.utils.types import JSONDict
 from typing import Callable, List, Tuple, Optional, Union, TypeVar
 RT = TypeVar('RT')
 

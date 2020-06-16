@@ -21,7 +21,7 @@
 from abc import ABC, abstractmethod
 
 from typing import DefaultDict, Dict, Any, Tuple, Optional
-from telegram.utils.typing import ConversationDict
+from telegram.utils.types import ConversationDict
 
 
 class BasePersistence(ABC):

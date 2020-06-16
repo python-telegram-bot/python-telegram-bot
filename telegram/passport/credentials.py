@@ -30,7 +30,7 @@ from cryptography.hazmat.primitives.ciphers.modes import CBC
 from cryptography.hazmat.primitives.hashes import SHA512, SHA256, Hash, SHA1
 
 from telegram import TelegramObject, TelegramError
-from telegram.utils.typing import JSONDict
+from telegram.utils.types import JSONDict
 from typing import Union, Any, Optional, TYPE_CHECKING, List, no_type_check
 
 if TYPE_CHECKING:

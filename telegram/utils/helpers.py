@@ -32,7 +32,7 @@ except ImportError:
     import json  # type: ignore[no-redef]
 
 
-from telegram.utils.typing import JSONDict
+from telegram.utils.types import JSONDict
 from typing import Union, Any, Optional, Dict, DefaultDict, Tuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import MessageEntity

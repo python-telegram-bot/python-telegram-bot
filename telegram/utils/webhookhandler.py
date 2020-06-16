@@ -30,7 +30,7 @@ import tornado.web
 
 from ssl import SSLContext
 from queue import Queue
-from telegram.utils.typing import JSONDict
+from telegram.utils.types import JSONDict
 from typing import Any, TYPE_CHECKING
 from tornado import httputil
 if TYPE_CHECKING:

@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram PreCheckoutQuery."""
 
 from telegram import TelegramObject, User, OrderInfo
-from telegram.utils.typing import JSONDict
+from telegram.utils.types import JSONDict
 from typing import Any, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot

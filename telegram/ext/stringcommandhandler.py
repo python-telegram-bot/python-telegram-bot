@@ -20,7 +20,7 @@
 
 from .handler import Handler
 
-from telegram.utils.typing import HandlerArg
+from telegram.utils.types import HandlerArg
 from typing import Callable, TYPE_CHECKING, Any, Optional, TypeVar, Dict, List
 if TYPE_CHECKING:
     from telegram.ext import CallbackContext, Dispatcher

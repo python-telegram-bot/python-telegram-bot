@@ -23,7 +23,7 @@ from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
 
 from typing import Union, IO, cast
 
-from telegram.utils.typing import FileLike
+from telegram.utils.types import FileLike
 
 
 class InputMedia(TelegramObject):
