@@ -167,7 +167,7 @@ class TestUpdater(object):
 
             # case 2
             if len(args) > 0:
-                self.attempts
+                self.attempts+=1
                 raise error
                 
             class fakeUpdate(object):
