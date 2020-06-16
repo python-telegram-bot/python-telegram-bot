@@ -162,6 +162,10 @@ class TestUpdater(object):
             # 1. no args, expecting list of updates
             # 2. with arg, int, expecting list args, delete all updates with updated_id < int
 
+            # case ???
+            if self.attempts>0:
+                raise error
+
             # case 2
             if len(args) > 0:
                 self.attempts+=1
