@@ -36,7 +36,7 @@ def button(update, context):
     query.edit_message_text(text="Selected option: {}".format(query.data))
 
 
-def help(update, context):
+def help_command(update, context):
     update.message.reply_text("Use /start to test this bot.")
 
 
@@ -48,7 +48,7 @@ def main():
 
     updater.dispatcher.add_handler(CommandHandler('start', start))
     updater.dispatcher.add_handler(CallbackQueryHandler(button))
-    updater.dispatcher.add_handler(CommandHandler('help', help))
+    updater.dispatcher.add_handler(CommandHandler('help', help_command))
 
     # Start the Bot
     updater.start_polling()
