@@ -169,7 +169,7 @@ class TestUpdater(object):
             # case 2
             if len(args) > 0:
                 # we expect to get int(4)
-                self.update_id = int(arg[0])
+                self.update_id = int(args[0])
                 raise error
                 
             if len(args) > 0:
@@ -194,6 +194,6 @@ class TestUpdater(object):
 
         updater.running = True
         with pytest.raises(type(error)):
-            updater._bootstrap(retries, clean, None, None, bootstrap_interval=0)
-        assert self.update_id == retries
+            updater._bootstrap(1, clean, None, None, bootstrap_interval=0)
+        assert self.update_id == expected_id
 
