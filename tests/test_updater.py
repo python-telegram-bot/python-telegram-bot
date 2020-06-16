@@ -156,6 +156,7 @@ class TestUpdater(object):
     def test_bootstrap_clean_bool(self, monkeypatch, updater, error, clean):
         clean = False
         expected_id = 4 # max 9
+        print(error)
 
         def updates(*args, **kwargs):
             # we're hitting this func twice
