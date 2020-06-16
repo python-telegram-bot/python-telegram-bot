@@ -83,6 +83,7 @@ class TestUpdater(object):
     err_handler_called = Event()
     cb_handler_called = Event()
     update_id = 0
+    expected_id = 0
 
     @pytest.fixture(autouse=True)
     def reset(self):
@@ -154,9 +155,11 @@ class TestUpdater(object):
                                         (InvalidToken(), 1)],
                              ids=('TelegramError', 'Unauthorized', 'InvalidToken'))
     def test_bootstrap_clean_bool(self, monkeypatch, updater, error, clean):
-        clean = False
-        expected_id = 4 # max 9
-        print(error)
+        #~ print(clean)
+        clean = True
+        self.expected_id = 4 # max 9
+        self.update_id = 0
+        #~ print(error)
 
         def updates(*args, **kwargs):
             # we're hitting this func twice
@@ -184,7 +187,7 @@ class TestUpdater(object):
             # return list of dict's
             i=1
             ls = []
-            while i < (expected_id):
+            while i < (self.expected_id):
                 o = fakeUpdate()
                 o.update_id = i
                 ls.append(copy.deepcopy(o))
@@ -196,5 +199,9 @@ class TestUpdater(object):
         updater.running = True
         with pytest.raises(type(error)):
             updater._bootstrap(1, clean, None, None, bootstrap_interval=0)
-        assert self.update_id == expected_id
+
+        print ('update-id:   "%s"', self.update_id)
+        print ('expected-id: "%s"', self.expected_id)
+
+        assert self.update_id == self.expected_id
 
