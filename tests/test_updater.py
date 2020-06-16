@@ -82,6 +82,7 @@ class TestUpdater(object):
     attempts = 0
     err_handler_called = Event()
     cb_handler_called = Event()
+    update_id = 0
 
     @pytest.fixture(autouse=True)
     def reset(self):
@@ -154,25 +155,25 @@ class TestUpdater(object):
                              ids=('TelegramError', 'Unauthorized', 'InvalidToken'))
     def test_bootstrap_clean_bool(self, monkeypatch, updater, error, clean):
         clean = True
-        retries =1
-        self.attempts = 0
+        expected_id = 4 # max 9
 
         def updates(*args, **kwargs):
             # we're hitting this func twice
-            # 1. no args, expecting list of updates
-            # 2. with arg, int, expecting list args, delete all updates with updated_id < int
+            # 1. no args, return list of updates
+            # 2. with arg, int = 4, expecting list args, delete all updates with updated_id < int
 
             # case ???
-            if self.attempts>10:
+            if self.update_id>10:
                 raise error
 
             # case 2
-            if len(args) > 0 and isinstance(args[0], int) and args[0] == 4:
-                self.attempts=1
+            if len(args) > 0:
+                # we expect to get int(4)
+                self.update_id = int(arg[0])
                 raise error
                 
             if len(args) > 0:
-                self.attempts+=1
+                self.update_id+=1
                 print(args[0])
                 
             class fakeUpdate(object):
@@ -180,9 +181,9 @@ class TestUpdater(object):
 
             # case 1
             # return list of dict's
-            i=0
+            i=1
             ls = []
-            while i < 4:
+            while i < (expected_id):
                 o = fakeUpdate()
                 o.update_id = i
                 ls.append(copy.deepcopy(o))
@@ -194,5 +195,5 @@ class TestUpdater(object):
         updater.running = True
         with pytest.raises(type(error)):
             updater._bootstrap(retries, clean, None, None, bootstrap_interval=0)
-        assert self.attempts == retries
+        assert self.update_id == retries
 
