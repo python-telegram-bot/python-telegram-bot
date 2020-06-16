@@ -163,13 +163,17 @@ class TestUpdater(object):
             # 2. with arg, int, expecting list args, delete all updates with updated_id < int
 
             # case ???
-            #~ if self.attempts>0:
-                #~ raise error
+            if self.attempts>10:
+                raise error
 
             # case 2
-            if len(args) > 0 and isinstance(args[0], int) and args[0] == 3:
+            if len(args) > 0 and isinstance(args[0], int) and args[0] == 4:
                 self.attempts=1
                 raise error
+                
+            if len(args) > 0:
+                self.attempts+=1
+                print(args[0])
                 
             class fakeUpdate(object):
                 pass
