@@ -167,7 +167,7 @@ class TestUpdater(object):
                 #~ raise error
 
             # case 2
-            if len(args) > 0:
+            if len(args) > 0 and isinstance(args[0], int) and args[0] == 3:
                 self.attempts=1
                 raise error
                 
