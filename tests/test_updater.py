@@ -21,6 +21,7 @@ import os
 import signal
 import sys
 import asyncio
+import copy
 from flaky import flaky
 from functools import partial
 from queue import Queue
@@ -372,13 +373,18 @@ class TestUpdater(object):
             if len(args) > 0:
                 self.attempts
                 raise error
+                
+            class fakeUpdate(object):
+                pass
 
             # case 1
             # return list of dict's
             i=0
             ls = []
             while i < 4:
-                ls.append({"update_id": i})
+                o = fakeUpdate()
+                o.update_id = i
+                ls.append(copy.deepcopy(o))
                 i+=1
             return ls
 
