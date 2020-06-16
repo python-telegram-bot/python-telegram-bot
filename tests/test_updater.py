@@ -301,6 +301,19 @@ class TestUpdater(object):
 
         updater.stop()
 
+
+
+
+
+
+
+
+
+
+
+
+
+
     @pytest.mark.parametrize(('error',),
                              argvalues=[(TelegramError(''),)],
                              ids=('TelegramError',))
@@ -336,6 +349,21 @@ class TestUpdater(object):
         with pytest.raises(type(error)):
             updater._bootstrap(retries, False, 'path', None, bootstrap_interval=0)
         assert self.attempts == attempts
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     @flaky(3, 1)
     def test_webhook_invalid_posts(self, updater):
@@ -408,38 +436,6 @@ class TestUpdater(object):
             sleep(0.2)
 
         os.kill(os.getpid(), signal.SIGTERM)
-
-    @signalskip
-    def test_idle(self, updater, caplog):
-        updater.start_polling(0.01)
-        Thread(target=partial(self.signal_sender, updater=updater)).start()
-
-        with caplog.at_level(logging.INFO):
-            updater.idle()
-
-        rec = caplog.records[-1]
-        assert rec.msg.startswith('Received signal {}'.format(signal.SIGTERM))
-        assert rec.levelname == 'INFO'
-
-        # If we get this far, idle() ran through
-        sleep(.5)
-        assert updater.running is False
-
-    @signalskip
-    def test_user_signal(self, updater):
-        temp_var = {'a': 0}
-
-        def user_signal_inc(signum, frame):
-            temp_var['a'] = 1
-
-        updater.user_sig_handler = user_signal_inc
-        updater.start_polling(0.01)
-        Thread(target=partial(self.signal_sender, updater=updater)).start()
-        updater.idle()
-        # If we get this far, idle() ran through
-        sleep(.5)
-        assert updater.running is False
-        assert temp_var['a'] != 0
 
     def test_create_bot(self):
         updater = Updater('123:abcd')
