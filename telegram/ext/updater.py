@@ -381,7 +381,7 @@ class Updater(object):
             if not self.running:
                 self.running = True
 
-               if isinstance(clean, timedelta):
+                if isinstance(clean, timedelta):
                     if clean.total_seconds() < 0:
                         clean = clean * -1
 
