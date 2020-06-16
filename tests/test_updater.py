@@ -155,6 +155,7 @@ class TestUpdater(object):
     def test_bootstrap_clean_bool(self, monkeypatch, updater, error, clean):
         clean = True
         retries =1
+        self.attempts = 0
 
         def attempt(*args, **kwargs):
             self.attempts += 1
