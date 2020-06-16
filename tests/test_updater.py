@@ -75,6 +75,7 @@ class TestUpdater:
     attempts = 0
     err_handler_called = Event()
     cb_handler_called = Event()
+    update_id = 0
 
     @pytest.fixture(autouse=True)
     def reset(self):
@@ -330,6 +331,56 @@ class TestUpdater:
         with pytest.raises(type(error)):
             updater._bootstrap(retries, False, 'path', None, bootstrap_interval=0)
         assert self.attempts == attempts
+
+    @pytest.mark.parametrize(('error', ),
+                             argvalues=[(TelegramError(''),)],
+                             ids=('TelegramError', ))
+    def test_bootstrap_clean_bool(self, monkeypatch, updater, error):
+        clean = True
+        expected_id = 4 # max 9 otherwise we hit our inf loop protection
+        self.update_id = 0
+
+        def updates(*args, **kwargs):
+            # we're hitting this func twice
+            # 1. no args, return list of updates
+            # 2. with 1 arg, int => if int == expected_id => test successful
+
+            # case inf loop protection
+            if self.update_id>10:
+                raise ValueError
+
+            # case 2
+            if len(args) > 0:
+                self.update_id = int(args[0])
+                raise error
+
+            class fakeUpdate(object):
+                pass
+
+            # case 1
+            # return list of obj's
+
+            # inf loop protection
+            self.update_id+=1
+            
+            # build list of fake updates
+            # returns list of 3 objects with
+            # update_id's 1, 2 and 3
+            i=1
+            ls = []
+            while i < (expected_id):
+                o = fakeUpdate()
+                o.update_id = i
+                ls.append(o)
+                i+=1
+            return ls
+
+        monkeypatch.setattr(updater.bot, 'get_updates', updates)
+
+        updater.running = True
+        with pytest.raises(type(error)):
+            updater._bootstrap(1, clean, None, None, bootstrap_interval=0)
+        assert self.update_id == expected_id
 
     @flaky(3, 1)
     def test_webhook_invalid_posts(self, updater):
