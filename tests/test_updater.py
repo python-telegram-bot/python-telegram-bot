@@ -148,7 +148,7 @@ class TestUpdater(object):
         assert self.attempts == attempts
 
     @pytest.mark.parametrize(('error', 'clean'),
-                             argvalues=[(TelegramError(''), 2),
+                             argvalues=[(TelegramError(''), 3),
                                         (Unauthorized(''), 1),
                                         (InvalidToken(), 1)],
                              ids=('TelegramError', 'Unauthorized', 'InvalidToken'))
