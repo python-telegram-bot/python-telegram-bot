@@ -157,10 +157,6 @@ class TestUpdater(object):
         retries =1
         self.attempts = 0
 
-        def attempt(*args, **kwargs):
-            self.attempts += 1
-            raise error
-
         def updates(*args, **kwargs):
             # we're hitting this func twice
             # 1. no args, expecting list of updates
