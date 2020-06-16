@@ -350,6 +350,45 @@ class TestUpdater(object):
             updater._bootstrap(retries, False, 'path', None, bootstrap_interval=0)
         assert self.attempts == attempts
 
+    @pytest.mark.parametrize(('error', 'clean'),
+                             argvalues=[(TelegramError(''), 2),
+                                        (Unauthorized(''), 1),
+                                        (InvalidToken(), 1)],
+                             ids=('TelegramError', 'Unauthorized', 'InvalidToken'))
+    def test_bootstrap_clean_bool(self, monkeypatch, updater, error, clean):
+        clean = True
+        retries =1
+
+        def attempt(*args, **kwargs):
+            self.attempts += 1
+            raise error
+
+        def updates(*args, **kwargs):
+            # we're hitting this func twice
+            # 1. no args, expecting list of updates
+            # 2. with arg, int, expecting list args, delete all updates with updated_id < int
+
+            # case 2
+            if len(args) > 0:
+                self.attempts
+                raise error
+
+            # case 1
+            # return list of dict's
+            i=0
+            ls = []
+            while i < 4:
+                ls.append({"update_id": i})
+                i+=1
+            return ls
+
+        monkeypatch.setattr(updater.bot, 'get_updates', updates)
+
+        updater.running = True
+        with pytest.raises(type(error)):
+            updater._bootstrap(retries, clean, None, None, bootstrap_interval=0)
+        assert self.attempts == retries
+
 
 
 
