@@ -155,44 +155,6 @@ class TestUpdater(object):
         clean = True
         expected_id = 4 # max 9
 
-        def updates(uid, *args, **kwargs):
-            # we're hitting this func twice
-            # 1. no args, return list of updates
-            # 2. with arg, int = 4, expecting list args, delete all updates with updated_id < int
-
-            # case ???
-            if uid:
-                print('uid: "%s"', uid)
-                raise error
-
-            # case ???
-            if self.update_id>10:
-                raise error
-
-            # case 2
-            if len(args) > 0:
-                # we expect to get int(4)
-                self.update_id = int(args[0])
-                raise error
-                
-            if len(args) > 0:
-                self.update_id+=1
-                print(args[0])
-                
-            class fakeUpdate(object):
-                pass
-
-            # case 1
-            # return list of dict's
-            i=1
-            ls = []
-            while i < (expected_id):
-                o = fakeUpdate()
-                o.update_id = i
-                ls.append(copy.deepcopy(o))
-                i+=1
-            return ls
-
         def updates(*args, **kwargs):
             # we're hitting this func twice
             # 1. no args, return list of updates
