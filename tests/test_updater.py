@@ -93,8 +93,6 @@ class TestUpdater:
         self.received = update.message.text
         self.cb_handler_called.set()
 
-    # TODO: test clean= argument of Updater._bootstrap
-
     @pytest.mark.parametrize(('error',),
                              argvalues=[(TelegramError('Test Error 2'),),
                                         (Unauthorized('Test Unauthorized'),)],
