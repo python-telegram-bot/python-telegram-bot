@@ -158,7 +158,7 @@ class TestUpdater(object):
         def updates(*args, **kwargs):
             # we're hitting this func twice
             # 1. no args, return list of updates
-            # 2. with arg, int = 4, expecting list args, delete all updates with updated_id < int
+            # 2. with arg, int => if int == expected_id => test successful
 
             # case inf loop protection
             if self.update_id>10:
