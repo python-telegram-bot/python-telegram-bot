@@ -165,7 +165,7 @@ class TestUpdater(object):
                 raise ValueError
 
             # case 2
-            if len(args) > 0:
+            if len(args) > 0 and int(args[0]) > 10:
                 # we expect to get int(4)
                 self.update_id = int(args[0])
                 raise error
