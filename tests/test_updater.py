@@ -148,12 +148,10 @@ class TestUpdater(object):
             updater._bootstrap(retries, False, 'path', None, bootstrap_interval=0)
         assert self.attempts == attempts
 
-    @pytest.mark.parametrize(('error', 'clean'),
-                             argvalues=[(TelegramError(''), 3),
-                                        (Unauthorized(''), 1),
-                                        (InvalidToken(), 1)],
-                             ids=('TelegramError', 'Unauthorized', 'InvalidToken'))
-    def test_bootstrap_clean_bool(self, monkeypatch, updater, error, clean):
+    @pytest.mark.parametrize(('error', ),
+                             argvalues=[(TelegramError(''),)],
+                             ids=('TelegramError', ))
+    def test_bootstrap_clean_bool(self, monkeypatch, updater, error):
         clean = True
         expected_id = 4 # max 9
 
