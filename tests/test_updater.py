@@ -21,7 +21,6 @@ import os
 import signal
 import sys
 import asyncio
-import copy
 from flaky import flaky
 from functools import partial
 from queue import Queue
@@ -188,7 +187,7 @@ class TestUpdater(object):
             while i < (expected_id):
                 o = fakeUpdate()
                 o.update_id = i
-                ls.append(copy.deepcopy(o))
+                ls.append(o)
                 i+=1
             return ls
 
