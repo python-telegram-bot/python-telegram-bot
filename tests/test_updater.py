@@ -344,7 +344,7 @@ class TestUpdater:
             # 2. with 1 arg, int => if int == expected_id => test successful
 
             # case inf loop protection
-            if self.update_id>10:
+            if self.update_id > 10:
                 raise ValueError
 
             # case 2
@@ -359,18 +359,18 @@ class TestUpdater:
             # return list of obj's
 
             # inf loop protection
-            self.update_id+=1
-            
+            self.update_id += 1
+
             # build list of fake updates
             # returns list of 3 objects with
             # update_id's 1, 2 and 3
-            i=1
+            i = 1
             ls = []
             while i < (expected_id):
                 o = fakeUpdate()
                 o.update_id = i
                 ls.append(o)
-                i+=1
+                i += 1
             return ls
 
         monkeypatch.setattr(updater.bot, 'get_updates', updates)
