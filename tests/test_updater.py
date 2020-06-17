@@ -153,16 +153,16 @@ class TestUpdater(object):
                              ids=('TelegramError', ))
     def test_bootstrap_clean_bool(self, monkeypatch, updater, error):
         clean = True
-        expected_id = 4 # max 9
+        expected_id = 4 # max 9 otherwise we hit our inf loop protection
 
         def updates(*args, **kwargs):
             # we're hitting this func twice
             # 1. no args, return list of updates
             # 2. with arg, int = 4, expecting list args, delete all updates with updated_id < int
 
-            # case ???
+            # case inf loop protection
             if self.update_id>10:
-                raise error
+                raise ValueError
 
             # case 2
             if len(args) > 0:
@@ -170,15 +170,18 @@ class TestUpdater(object):
                 self.update_id = int(args[0])
                 raise error
                 
-            if len(args) > 0:
-                self.update_id+=1
-                print(args[0])
-                
             class fakeUpdate(object):
                 pass
 
             # case 1
-            # return list of dict's
+            # return list of obj's
+            
+            # inf loop protection
+            self.update_id+=1
+            
+            # build list of fake updates
+            # results in list of 3 objects with
+            # update_id's 1, 2 and 3
             i=1
             ls = []
             while i < (expected_id):
