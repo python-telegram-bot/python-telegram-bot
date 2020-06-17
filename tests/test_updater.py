@@ -158,7 +158,7 @@ class TestUpdater(object):
         def updates(*args, **kwargs):
             # we're hitting this func twice
             # 1. no args, return list of updates
-            # 2. with arg, int => if int == expected_id => test successful
+            # 2. with 1 arg, int => if int == expected_id => test successful
 
             # case inf loop protection
             if self.update_id>10:
