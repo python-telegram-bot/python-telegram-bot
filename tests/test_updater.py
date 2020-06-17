@@ -205,7 +205,6 @@ class TestUpdater(object):
             # case 2
             if len(args) > 0:
                 # we expect to get int(4)
-                print ("in here")
                 self.update_id = int(args[0])
                 raise error
                 
@@ -232,5 +231,5 @@ class TestUpdater(object):
         updater.running = True
         with pytest.raises(type(error)):
             updater._bootstrap(1, clean, None, None, bootstrap_interval=0)
-        assert self.update_id == expected_id+1
+        assert self.update_id == expected_id
 
