@@ -181,7 +181,7 @@ class TestUpdater(object):
             self.update_id+=1
             
             # build list of fake updates
-            # results in list of 3 objects with
+            # returns list of 3 objects with
             # update_id's 1, 2 and 3
             i=1
             ls = []
