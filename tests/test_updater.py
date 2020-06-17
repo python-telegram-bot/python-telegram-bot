@@ -154,7 +154,7 @@ class TestUpdater(object):
                                         (InvalidToken(), 1)],
                              ids=('TelegramError', 'Unauthorized', 'InvalidToken'))
     def test_bootstrap_clean_bool(self, monkeypatch, updater, error, clean):
-        clean = False
+        clean = True
         expected_id = 4 # max 9
         print(error)
 
