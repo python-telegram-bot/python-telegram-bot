@@ -351,7 +351,6 @@ class TestUpdater:
             class FakeUpdate():
                 def __init__(self, update_id):
                     self.update_id = update_id
-                pass
 
             # case 1
             # return list of obj's
