@@ -368,7 +368,7 @@ class TestUpdater:
             # update_id's 1, 2 and 3
             i = 1
             updates = []
-            while i < (expected_id):
+            for i in range(1, expected_id):
                 updates.append(FakeUpdate(i))
                 i += 1
             return updates
