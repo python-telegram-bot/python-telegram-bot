@@ -111,10 +111,9 @@ class TestUpdater:
             # 2nd call from bootstrap____clean
             # we should be called with update_id = 4
             # save value passed in self.update_id for evaluation down below
-            # raise error to step out of this and evaluate
             if len(args) > 0:
                 self.update_id = int(args[0])
-                raise ValueError('bla')
+                return []
 
             class FakeUpdate():
                 def __init__(self, update_id):
@@ -140,6 +139,5 @@ class TestUpdater:
         monkeypatch.setattr(updater.bot, 'get_updates', get_updates)
 
         updater.running = True
-        with pytest.raises(ValueError, match='bla'):
-            updater._bootstrap(1, clean, None, None, bootstrap_interval=0)
+        updater._bootstrap(1, clean, None, None, bootstrap_interval=0)
         assert self.update_id == expected_id
