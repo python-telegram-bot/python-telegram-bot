@@ -330,7 +330,7 @@ class TestUpdater:
             updater._bootstrap(retries, False, 'path', None, bootstrap_interval=0)
         assert self.attempts == attempts
 
-    def test_bootstrap_clean(self, monkeypatch, updater):
+    def test_bootstrap_clean_updates(self, monkeypatch, updater):
         clean = True
         expected_id = 4
         self.offset = 0
@@ -345,12 +345,12 @@ class TestUpdater:
             # we should be called with offset = 4
             # save value passed in self.update_id for assert down below
             if len(args) > 0:
-                self.update_id = int(args[0])
+                self.offset = int(args[0])
                 return []
 
             class FakeUpdate():
                 def __init__(self, update_id):
-                    self.offset = update_id
+                    self.update_id = update_id
 
             # case 1
             # return list of obj's
