@@ -75,7 +75,7 @@ class TestUpdater:
     attempts = 0
     err_handler_called = Event()
     cb_handler_called = Event()
-    update_id = 0
+    offset = 0
 
     @pytest.fixture(autouse=True)
     def reset(self):
@@ -333,7 +333,7 @@ class TestUpdater:
     def test_bootstrap_clean(self, monkeypatch, updater):
         clean = True
         expected_id = 4
-        self.update_id = 0
+        self.offset = 0
 
         def get_updates(*args, **kwargs):
             # we're hitting this func twice
@@ -342,7 +342,7 @@ class TestUpdater:
 
             # case 2
             # 2nd call from bootstrap____clean
-            # we should be called with update_id = 4
+            # we should be called with offset = 4
             # save value passed in self.update_id for assert down below
             if len(args) > 0:
                 self.update_id = int(args[0])
@@ -350,7 +350,7 @@ class TestUpdater:
 
             class FakeUpdate():
                 def __init__(self, update_id):
-                    self.update_id = update_id
+                    self.offset = update_id
 
             # case 1
             # return list of obj's
@@ -367,7 +367,7 @@ class TestUpdater:
 
         updater.running = True
         updater._bootstrap(1, clean, None, None, bootstrap_interval=0)
-        assert self.update_id == expected_id
+        assert self.offset == expected_id
 
     @flaky(3, 1)
     def test_webhook_invalid_posts(self, updater):
