@@ -103,14 +103,10 @@ class TestUpdater:
             # 1. no args, return list of updates
             # 2. with 1 arg, int => if int == expected_id => test successful
 
-            # case inf loop protection
-            if self.update_id > 10:
-                raise RuntimeError('Looks like we are hitting an infinity loop. Stopping.')
-
             # case 2
             # 2nd call from bootstrap____clean
             # we should be called with update_id = 4
-            # save value passed in self.update_id for evaluation down below
+            # save value passed in self.update_id for assert down below
             if len(args) > 0:
                 self.update_id = int(args[0])
                 return []
@@ -123,17 +119,12 @@ class TestUpdater:
             # case 1
             # return list of obj's
 
-            # inf loop protection
-            self.update_id += 1
-
             # build list of fake updates
             # returns list of 3 objects with
             # update_id's 1, 2 and 3
-            i = 1
             updates = []
             for i in range(1, expected_id):
                 updates.append(FakeUpdate(i))
-                i += 1
             return updates
 
         monkeypatch.setattr(updater.bot, 'get_updates', get_updates)
