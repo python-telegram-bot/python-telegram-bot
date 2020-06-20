@@ -108,6 +108,10 @@ class TestUpdater:
                 raise RuntimeError('Looks like we are hitting an infinity loop. Stopping.')
 
             # case 2
+            # 2nd call from bootstrap____clean
+            # we should be called with update_id = 4
+            # save value passed in self.update_id for evaluation down below
+            # raise error to step out of this and evaluate
             if len(args) > 0:
                 self.update_id = int(args[0])
                 raise ValueError('bla')
