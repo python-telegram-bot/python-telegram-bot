@@ -352,7 +352,9 @@ class TestUpdater:
                 self.update_id = int(args[0])
                 raise error
 
-            class fakeUpdate(object):
+            class FakeUpdate():
+                def __init__(self, update_id):
+                    self.update_id = update_id
                 pass
 
             # case 1
@@ -365,13 +367,11 @@ class TestUpdater:
             # returns list of 3 objects with
             # update_id's 1, 2 and 3
             i = 1
-            ls = []
+            updates = []
             while i < (expected_id):
-                o = fakeUpdate()
-                o.update_id = i
-                ls.append(o)
+                updates.append(FakeUpdate(i))
                 i += 1
-            return ls
+            return updates
 
         monkeypatch.setattr(updater.bot, 'get_updates', get_updates)
 
