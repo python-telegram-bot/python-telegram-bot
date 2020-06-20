@@ -330,10 +330,7 @@ class TestUpdater:
             updater._bootstrap(retries, False, 'path', None, bootstrap_interval=0)
         assert self.attempts == attempts
 
-    @pytest.mark.parametrize(('error', ),
-                             argvalues=[(TelegramError(''),)],
-                             ids=('TelegramError', ))
-    def test_bootstrap_clean(self, monkeypatch, updater, error):
+    def test_bootstrap_clean(self, monkeypatch, updater):
         clean = True
         expected_id = 4  # max 9 otherwise we hit our inf loop protection
         self.update_id = 0
