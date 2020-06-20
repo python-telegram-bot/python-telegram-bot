@@ -332,7 +332,7 @@ class TestUpdater:
 
     def test_bootstrap_clean(self, monkeypatch, updater):
         clean = True
-        expected_id = 4  # max 9 otherwise we hit our inf loop protection
+        expected_id = 4
         self.update_id = 0
 
         def get_updates(*args, **kwargs):
