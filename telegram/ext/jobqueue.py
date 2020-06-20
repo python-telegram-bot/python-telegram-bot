@@ -351,9 +351,10 @@ class JobQueue:
             queue.
 
         Note:
-             Daily is just an alias for "24 Hours". That means that if DST changes during that
-             interval, the job might not run at the time one would expect. It is always recommended
-             to pin servers to UTC time, then time related behaviour can always be expected.
+            For a note about DST, please see the documentation of `APScheduler`_.
+
+        .. _`APScheduler`: https://apscheduler.readthedocs.io/en/stable/modules/triggers/cron.html
+                           #daylight-saving-time-behavior
 
         """
         if not job_kwargs:
@@ -398,15 +399,7 @@ class JobQueue:
             :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
             queue.
 
-        Note:
-             Daily is just an alias for "24 Hours". That means that if DST changes during that
-             interval, the job might not run at the time one would expect. It is always recommended
-             to pin servers to UTC time, then time related behaviour can always be expected.
-
         """
-        if not job_kwargs:
-            job_kwargs = {}
-
         name = name or callback.__name__
         job = Job(callback, context, name, self)
 
@@ -436,7 +429,7 @@ class JobQueue:
 
     def jobs(self):
         """Returns a tuple of all jobs that are currently in the ``JobQueue``."""
-        return tuple(Job._from_aps_job(job, self) for job in self.scheduler.get_jobs())
+        return tuple(Job.from_aps_job(job, self) for job in self.scheduler.get_jobs())
 
     def get_jobs_by_name(self, name):
         """Returns a tuple of jobs with the given name that are currently in the ``JobQueue``"""
@@ -453,6 +446,8 @@ class Job:
           attributes/methods of the corresponding :class:`telegram.ext.Job` object.
         * Two instances of :class:`telegram.ext.Job` are considered equal, if their corresponding
           ``job`` attributes have the same ``id``.
+        * If :attr:`job` isn't passed on initialization, it must be set manually afterwards for
+          this :class:`telegram.ext.Job` to be useful.
 
     Attributes:
         callback (:obj:`callable`): The callback function that should be executed by the new job.
@@ -464,7 +459,9 @@ class Job:
     Args:
         callback (:obj:`callable`): The callback function that should be executed by the new job.
             Callback signature for context based API:
+
                 ``def callback(CallbackContext)``
+
             a ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
             its ``job.context`` or change it to a repeating job.
         context (:obj:`object`, optional): Additional data needed for the callback function. Can be
@@ -473,10 +470,6 @@ class Job:
         job_queue (:class:`telegram.ext.JobQueue`, optional): The ``JobQueue`` this job belongs to.
             Only optional for backward compatibility with ``JobQueue.put()``.
         job (:class:`apscheduler.job.Job`, optional): The APS Job this job is a wrapper for.
-
-        Note:
-            If :attr:`job` isn't passed on initialization, it must be set manually afterwards for
-            this job to be useful.
     """
 
     def __init__(self,
@@ -539,7 +532,7 @@ class Job:
         return self.job.next_run_time
 
     @classmethod
-    def _from_aps_job(cls, job, job_queue):
+    def from_aps_job(cls, job, job_queue):
         # context based callbacks
         if len(job.args) == 1:
             context = job.args[0].job.context

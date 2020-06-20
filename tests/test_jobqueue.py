@@ -66,7 +66,6 @@ class TestJobQueue:
         self.result += job.context
 
     def job_datetime_tests(self, bot, job):
-        print('this is job_datetime_tests')
         self.job_time = time.time()
 
     def job_context_based_callback(self, context):
@@ -116,9 +115,40 @@ class TestJobQueue:
 
     def test_run_repeating_first_timezone(self, job_queue, timezone):
         """Test correct scheduling of job when passing a timezone-aware datetime as ``first``"""
-        job_queue.run_repeating(self.job_run_once, 0.1, first=0.05)
+        job_queue.run_repeating(self.job_run_once, 0.1,
+                                first=dtm.datetime.now(timezone) + dtm.timedelta(seconds=0.05))
         sleep(0.1)
         assert self.result == 1
+
+    def test_run_repeating_last(self, job_queue):
+        job_queue.run_repeating(self.job_run_once, 0.05, last=0.06)
+        sleep(0.1)
+        assert self.result == 1
+        sleep(0.1)
+        assert self.result == 1
+
+    def test_run_repeating_last_timezone(self, job_queue, timezone):
+        """Test correct scheduling of job when passing a timezone-aware datetime as ``first``"""
+        job_queue.run_repeating(self.job_run_once, 0.05,
+                                last=dtm.datetime.now(timezone) + dtm.timedelta(seconds=0.06))
+        sleep(0.1)
+        assert self.result == 1
+        sleep(0.1)
+        assert self.result == 1
+
+    def test_run_repeating_last_before_first(self, job_queue):
+        with pytest.raises(ValueError, match="'last' must not be before 'first'!"):
+            job_queue.run_repeating(self.job_run_once, 0.05, first=1, last=0.5)
+
+    def test_run_repeating_timedelta(self, job_queue):
+        job_queue.run_repeating(self.job_run_once, dtm.timedelta(minutes=3.3333e-4))
+        sleep(0.05)
+        assert self.result == 2
+
+    def test_run_custom(self, job_queue):
+        job_queue.run_custom(self.job_run_once, {'trigger': 'interval', 'seconds': 0.02})
+        sleep(0.05)
+        assert self.result == 2
 
     def test_multiple(self, job_queue):
         job_queue.run_once(self.job_run_once, 0.01)
@@ -271,10 +301,40 @@ class TestJobQueue:
         scheduled_time = job_queue.jobs()[0].next_t.timestamp()
         assert scheduled_time == pytest.approx(expected_reschedule_time)
 
-    def test_get_jobs(self, job_queue):
-        job1 = job_queue.run_once(self.job_run_once, 10, name='name1')
-        job2 = job_queue.run_once(self.job_run_once, 10, name='name1')
-        job3 = job_queue.run_once(self.job_run_once, 10, name='name2')
+    def test_run_monthly_non_strict_day(self, job_queue, timezone):
+        delta, now = 1, dtm.datetime.now(timezone)
+        expected_reschedule_time = now + dtm.timedelta(seconds=delta)
+        time_of_day = expected_reschedule_time.time().replace(tzinfo=timezone)
+
+        expected_reschedule_time += (dtm.timedelta(calendar.monthrange(now.year, now.month)[1])
+                                     - dtm.timedelta(days=now.day))
+        expected_reschedule_time = expected_reschedule_time.timestamp()
+
+        job_queue.run_monthly(self.job_run_once, time_of_day, 31, day_is_strict=False)
+        scheduled_time = job_queue.jobs()[0].next_t.timestamp()
+        assert scheduled_time == pytest.approx(expected_reschedule_time)
+
+    def test_tick(self, _dp):
+        job_queue = JobQueue()
+        job_queue.set_dispatcher(_dp)
+        job_queue.run_repeating(self.job_run_once, 0.02)
+        sleep(0.05)
+        assert self.result == 0
+        job_queue.tick()
+        sleep(0.05)
+        assert self.result == 2
+
+    @pytest.mark.parametrize('use_context', [True, False])
+    def test_get_jobs(self, job_queue, use_context):
+        job_queue._dispatcher.use_context = use_context
+        if use_context:
+            callback = self.job_context_based_callback
+        else:
+            callback = self.job_run_once
+
+        job1 = job_queue.run_once(callback, 10, name='name1')
+        job2 = job_queue.run_once(callback, 10, name='name1')
+        job3 = job_queue.run_once(callback, 10, name='name2')
 
         assert job_queue.jobs() == (job1, job2, job3)
         assert job_queue.get_jobs_by_name('name1') == (job1, job2)
@@ -292,3 +352,44 @@ class TestJobQueue:
 
         assert self.result == 1
         job_queue._dispatcher.use_context = False
+
+    @pytest.mark.parametrize('use_context', [True, False])
+    def test_job_run(self, _dp, use_context):
+        _dp.use_context = use_context
+        job_queue = JobQueue()
+        job_queue.set_dispatcher(_dp)
+        if use_context:
+            job = job_queue.run_repeating(self.job_context_based_callback, 0.02, context=2)
+        else:
+            job = job_queue.run_repeating(self.job_run_once, 0.02, context=2)
+        assert self.result == 0
+        job.run(_dp)
+        assert self.result == 1
+
+    def test_enable_disable_job(self, job_queue):
+        job = job_queue.run_repeating(self.job_run_once, 0.02)
+        sleep(0.05)
+        assert self.result == 2
+        job.enabled = False
+        assert not job.enabled
+        sleep(0.05)
+        assert self.result == 2
+        job.enabled = True
+        assert job.enabled
+        sleep(0.05)
+        assert self.result == 4
+
+    def test_remove_job(self, job_queue):
+        job = job_queue.run_repeating(self.job_run_once, 0.02)
+        sleep(0.05)
+        assert self.result == 2
+        assert not job.removed
+        job.schedule_removal()
+        assert job.removed
+        sleep(0.05)
+        assert self.result == 2
+
+    def test_job_lt_eq(self, job_queue):
+        job = job_queue.run_repeating(self.job_run_once, 0.02)
+        assert not job == job_queue
+        assert not job < job
