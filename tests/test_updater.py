@@ -338,7 +338,7 @@ class TestUpdater:
         expected_id = 4  # max 9 otherwise we hit our inf loop protection
         self.update_id = 0
 
-        def updates(*args, **kwargs):
+        def get_updates(*args, **kwargs):
             # we're hitting this func twice
             # 1. no args, return list of updates
             # 2. with 1 arg, int => if int == expected_id => test successful
@@ -373,7 +373,7 @@ class TestUpdater:
                 i += 1
             return ls
 
-        monkeypatch.setattr(updater.bot, 'get_updates', updates)
+        monkeypatch.setattr(updater.bot, 'get_updates', get_updates)
 
         updater.running = True
         with pytest.raises(type(error)):
