@@ -345,7 +345,7 @@ class TestUpdater:
 
             # case inf loop protection
             if self.update_id > 10:
-                raise ValueError
+                raise RuntimeError('Looks like we are hitting an infinity loop. Stopping.')
 
             # case 2
             if len(args) > 0:
