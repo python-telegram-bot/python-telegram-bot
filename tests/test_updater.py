@@ -103,8 +103,8 @@ class TestUpdater:
 
         # build list of fake updates
         # returns list of 3 objects with
-        # update_id's 1, 2 and 3
-        self.updates = [FakeUpdate(i) for i in range(1, expected_id)]
+        # update_id's 0, 1, 2 and 3
+        self.updates = [FakeUpdate(i) for i in range(0, expected_id)]
 
         def get_updates(*args, **kwargs):
             # we're hitting this func twice
