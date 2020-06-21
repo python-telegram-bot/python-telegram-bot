@@ -333,24 +333,21 @@ class TestUpdater:
     def test_bootstrap_clean_updates(self, monkeypatch, updater):
         clean = True
         expected_id = 4
-        self.offset = 0
 
         def get_updates(*args, **kwargs):
             # we're hitting this func twice
             # 1. no args, return list of updates
             # 2. with 1 arg, int => if int == expected_id => test successful
+            class FakeUpdate():
+                def __init__(self, update_id):
+                    self.update_id = update_id
 
             # case 2
             # 2nd call from bootstrap____clean
             # we should be called with offset = 4
             # save value passed in self.offset for assert down below
             if len(args) > 0:
-                self.offset = int(args[0])
-                return []
-
-            class FakeUpdate():
-                def __init__(self, update_id):
-                    self.update_id = update_id
+                return [FakeUpdate(i) for i in range(args[0], expected_id)]
 
             # case 1
             # return list of obj's
@@ -364,7 +361,7 @@ class TestUpdater:
 
         updater.running = True
         updater._bootstrap(1, clean, None, None, bootstrap_interval=0)
-        assert self.offset == expected_id
+        assert updater.bot.get_updates() == []
 
     @flaky(3, 1)
     def test_webhook_invalid_posts(self, updater):
