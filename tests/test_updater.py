@@ -75,7 +75,7 @@ class TestUpdater:
     attempts = 0
     err_handler_called = Event()
     cb_handler_called = Event()
-    offset = 0
+    updates = []
 
     @pytest.fixture(autouse=True)
     def reset(self):
@@ -110,7 +110,7 @@ class TestUpdater:
             # we should be called with offset = 4
             # save value passed in self.offset for assert down below
             if len(args) > 0:
-                return [FakeUpdate(i) for i in range(args[0], expected_id)]
+                return [self.updates[i] for i in range(args[0], expected_id)]
 
             # case 1
             # return list of obj's
@@ -119,7 +119,8 @@ class TestUpdater:
             # returns list of 3 objects with
             # update_id's 1, 2 and 3
             print ('bla')
-            return [FakeUpdate(i) for i in range(1, expected_id)]
+            self.updates = [FakeUpdate(i) for i in range(1, expected_id)]
+            return self.updates
 
         monkeypatch.setattr(updater.bot, 'get_updates', get_updates)
 
