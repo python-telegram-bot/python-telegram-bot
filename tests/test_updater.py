@@ -102,14 +102,14 @@ class TestUpdater:
                 self.update_id = update_id
 
         # build list of fake updates
-        # returns list of 3 objects with
+        # saves list of 3 objects with
         # update_id's 0, 1, 2 and 3
         self.updates = [FakeUpdate(i) for i in range(0, expected_id)]
 
         def get_updates(*args, **kwargs):
             # we're hitting this func twice
             # 1. no args, return list of updates
-            # 2. with 1 arg, int => if int == expected_id => test successful
+            # 2. update list of updates, than return it
 
             # case 2
             # 2nd call from bootstrap____clean
@@ -118,7 +118,7 @@ class TestUpdater:
             if len(args) > 0:
                 self.updates = [self.updates[i] for i in range(args[0], expected_id)]
 
-            # case 1
+            # case 1 (and 2)
             # return list of obj's
             print ('bla')
             return self.updates
