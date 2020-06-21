@@ -358,10 +358,7 @@ class TestUpdater:
             # build list of fake updates
             # returns list of 3 objects with
             # update_id's 1, 2 and 3
-            updates = []
-            for i in range(1, expected_id):
-                updates.append(FakeUpdate(i))
-            return updates
+            return [FakeUpdate(i) for i in range(1, expected_id)]
 
         monkeypatch.setattr(updater.bot, 'get_updates', get_updates)
 
