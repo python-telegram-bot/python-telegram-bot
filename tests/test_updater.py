@@ -339,7 +339,7 @@ class TestUpdater:
                 self.update_id = update_id
 
         # build list of fake updates
-        # saves list of 3 objects with
+        # saves list of 4 objects with
         # update_id's 0, 1, 2 and 3
         self.updates = [FakeUpdate(i) for i in range(0, expected_id)]
 
