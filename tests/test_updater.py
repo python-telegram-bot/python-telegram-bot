@@ -97,30 +97,29 @@ class TestUpdater:
         clean = True
         expected_id = 4
 
-        class FakeUpdate():
-            def __init__(self, update_id):
-                self.update_id = update_id
-
-        # build list of fake updates
-        # returns list of 3 objects with
-        # update_id's 1, 2 and 3
-        self.updates = [FakeUpdate(i) for i in range(1, expected_id)]
-
         def get_updates(*args, **kwargs):
             # we're hitting this func twice
             # 1. no args, return list of updates
             # 2. with 1 arg, int => if int == expected_id => test successful
+            class FakeUpdate():
+                def __init__(self, update_id):
+                    self.update_id = update_id
 
             # case 2
             # 2nd call from bootstrap____clean
             # we should be called with offset = 4
-            # if args[0] >= expected_id this will effectively become self.updates = []
+            # save value passed in self.offset for assert down below
             if len(args) > 0:
-                self.updates = [self.updates[i] for i in range(args[0], expected_id)]
+                return [self.updates[i] for i in range(args[0], expected_id)]
 
             # case 1
             # return list of obj's
+
+            # build list of fake updates
+            # returns list of 3 objects with
+            # update_id's 1, 2 and 3
             print ('bla')
+            self.updates = [FakeUpdate(i) for i in range(1, expected_id)]
             return self.updates
 
         monkeypatch.setattr(updater.bot, 'get_updates', get_updates)
