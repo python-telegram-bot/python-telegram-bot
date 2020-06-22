@@ -314,16 +314,6 @@ class TestJobQueue:
         scheduled_time = job_queue.jobs()[0].next_t.timestamp()
         assert scheduled_time == pytest.approx(expected_reschedule_time)
 
-    def test_tick(self, _dp):
-        job_queue = JobQueue()
-        job_queue.set_dispatcher(_dp)
-        job_queue.run_repeating(self.job_run_once, 0.02)
-        sleep(0.05)
-        assert self.result == 0
-        job_queue.tick()
-        sleep(0.05)
-        assert self.result == 2
-
     @pytest.mark.parametrize('use_context', [True, False])
     def test_get_jobs(self, job_queue, use_context):
         job_queue._dispatcher.use_context = use_context
