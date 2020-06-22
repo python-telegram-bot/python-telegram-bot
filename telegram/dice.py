@@ -23,9 +23,9 @@ from telegram import TelegramObject
 
 class Dice(TelegramObject):
     """
-    This object represents an animated emoji with a random value for currently supported base emoji.
-    (The singular form of "dice" is "die". However, PTB mimics the Telegram API, which uses the
-    term "dice".)
+    This object represents an animated emoji with a random value for currently supported base
+    emoji. (The singular form of "dice" is "die". However, PTB mimics the Telegram API, which uses
+    the term "dice".)
 
     Note:
         If :attr:`emoji` is "🎯", a value of 6 currently represents a bullseye, while a value of 1

@@ -217,7 +217,7 @@ class Message(TelegramObject):
         poll (:class:`telegram.Poll`, optional): Message is a native poll,
             information about the poll.
         dice (:class:`telegram.Dice`, optional): Message is a dice with random value from 1 to 6.
-        via_bot (:class:`telegram.User`, optional): Message was send through an inline bot.
+        via_bot (:class:`telegram.User`, optional): Message was sent through an inline bot.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. login_url buttons are represented as ordinary url buttons.
         default_quote (:obj:`bool`, optional): Default setting for the `quote` parameter of the
