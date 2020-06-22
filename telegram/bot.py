@@ -3786,13 +3786,14 @@ class Bot(TelegramObject):
                   emoji=None,
                   **kwargs):
         """
-        Use this method to send a dice, which will have a random value from 1 to 6. On success, the
+        Use this method to send an animated emoji, which will have a random value. On success, the
         sent Message is returned.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target private chat.
             emoji (:obj:`str`, optional): Emoji on which the dice throw animation is based.
-                Currently, must be one of “🎲” or “🎯”. Defaults to “🎲”
+                Currently, must be one of “🎲”, “🎯” or “🏀”. Dice can have values 1-6 for “🎲” and
+                “🎯”, and values 1-5 for “🏀” . Defaults to “🎲”
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
