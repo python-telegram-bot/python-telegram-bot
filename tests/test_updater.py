@@ -75,6 +75,7 @@ class TestUpdater:
     attempts = 0
     err_handler_called = Event()
     cb_handler_called = Event()
+    offset = 0
 
     @pytest.fixture(autouse=True)
     def reset(self):
@@ -91,8 +92,6 @@ class TestUpdater:
     def callback(self, bot, update):
         self.received = update.message.text
         self.cb_handler_called.set()
-
-    # TODO: test clean= argument of Updater._bootstrap
 
     @pytest.mark.parametrize(('error',),
                              argvalues=[(TelegramError('Test Error 2'),),
@@ -330,6 +329,42 @@ class TestUpdater:
         with pytest.raises(type(error)):
             updater._bootstrap(retries, False, 'path', None, bootstrap_interval=0)
         assert self.attempts == attempts
+
+    def test_bootstrap_clean_updates(self, monkeypatch, updater):
+        clean = True
+        expected_id = 4
+        self.offset = 0
+
+        def get_updates(*args, **kwargs):
+            # we're hitting this func twice
+            # 1. no args, return list of updates
+            # 2. with 1 arg, int => if int == expected_id => test successful
+
+            # case 2
+            # 2nd call from bootstrap____clean
+            # we should be called with offset = 4
+            # save value passed in self.offset for assert down below
+            if len(args) > 0:
+                self.offset = int(args[0])
+                return []
+
+            class FakeUpdate():
+                def __init__(self, update_id):
+                    self.update_id = update_id
+
+            # case 1
+            # return list of obj's
+
+            # build list of fake updates
+            # returns list of 4 objects with
+            # update_id's 0, 1, 2 and 3
+            return [FakeUpdate(i) for i in range(0, expected_id)]
+
+        monkeypatch.setattr(updater.bot, 'get_updates', get_updates)
+
+        updater.running = True
+        updater._bootstrap(1, clean, None, None, bootstrap_interval=0)
+        assert self.offset == expected_id
 
     @flaky(3, 1)
     def test_webhook_invalid_posts(self, updater):
