@@ -84,10 +84,8 @@ class JobQueue:
         if isinstance(time, datetime.timedelta):
             return self._tz_now() + time
         if isinstance(time, datetime.time):
-            dt = datetime.datetime.combine(
-                datetime.datetime.now(time.tzinfo or self.scheduler.timezone).date(), time)
-            if dt.tzinfo is None:
-                dt = dt.replace(tzinfo=self.scheduler.timezone)
+            dt = datetime.datetime.combine(datetime.datetime.now().date(), time,
+                                           tzinfo=time.tzinfo or self.scheduler.timezone)
             if shift_day and dt <= datetime.datetime.now(pytz.utc):
                 dt += datetime.timedelta(days=1)
             return dt
@@ -205,7 +203,7 @@ class JobQueue:
                 depending on its type. See ``first`` for details.
 
                 If ``last`` is :obj:`datetime.datetime` or :obj:`datetime.time` type
-                and ``last.tzinfo`` is :obj:`None` UTC will be assumed.
+                and ``last.tzinfo`` is :obj:`None`, UTC will be assumed.
 
                 Defaults to :obj:`None`.
             context (:obj:`object`, optional): Additional data needed for the callback function.
