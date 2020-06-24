@@ -409,12 +409,6 @@ class JobQueue:
         job.job = j
         return job
 
-    def tick(self):
-        """Run all jobs that are due and re-enqueue them with their interval. Also starts the
-        JobQueue, if needed."""
-        self.start()
-        self.scheduler.wakeup()
-
     def start(self):
         """Starts the job_queue thread."""
         if not self.scheduler.running:
