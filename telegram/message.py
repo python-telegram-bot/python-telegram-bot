@@ -588,7 +588,7 @@ class Message(TelegramObject):
     def reply_media_group(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.reply_media_group(update.message.chat_id, *args, **kwargs)
+            bot.send_media_group(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
             quote (:obj:`bool`, optional): If set to ``True``, the media group is sent as an
