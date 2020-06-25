@@ -85,10 +85,7 @@ class TestJobQueue:
         assert self.result == 1
 
     def test_run_once_timezone(self, job_queue, timezone):
-        """Test the correct handling of aware datetimes.
-        Set the target datetime to utcnow + x hours (naive) with the timezone set to utc + x hours,
-        which is equivalent to now.
-        """
+        """Test the correct handling of aware datetimes"""
         # we're parametrizing this with two different UTC offsets to exclude the possibility
         # of an xpass when the test is run in a timezone with the same UTC offset
         when = dtm.datetime.now(timezone)

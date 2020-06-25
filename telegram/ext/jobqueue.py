@@ -84,8 +84,9 @@ class JobQueue:
         if isinstance(time, datetime.timedelta):
             return self._tz_now() + time
         if isinstance(time, datetime.time):
-            dt = datetime.datetime.combine(datetime.datetime.now().date(), time,
-                                           tzinfo=time.tzinfo or self.scheduler.timezone)
+            dt = datetime.datetime.combine(
+                datetime.datetime.now(tz=time.tzinfo or self.scheduler.timezone).date(), time,
+                tzinfo=time.tzinfo or self.scheduler.timezone)
             if shift_day and dt <= datetime.datetime.now(pytz.utc):
                 dt += datetime.timedelta(days=1)
             return dt
