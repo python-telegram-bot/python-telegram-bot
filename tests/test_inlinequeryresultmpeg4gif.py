@@ -36,7 +36,8 @@ def inline_query_result_mpeg4_gif():
         caption=TestInlineQueryResultMpeg4Gif.caption,
         parse_mode=TestInlineQueryResultMpeg4Gif.parse_mode,
         input_message_content=TestInlineQueryResultMpeg4Gif.input_message_content,
-        reply_markup=TestInlineQueryResultMpeg4Gif.reply_markup)
+        reply_markup=TestInlineQueryResultMpeg4Gif.reply_markup,
+        thumb_mime_type=TestInlineQueryResultMpeg4Gif.thumb_mime_type)
 
 
 class TestInlineQueryResultMpeg4Gif:
@@ -47,6 +48,7 @@ class TestInlineQueryResultMpeg4Gif:
     mpeg4_height = 15
     mpeg4_duration = 1
     thumb_url = 'thumb url'
+    thumb_mime_type = 'image/jpeg'
     title = 'title'
     caption = 'caption'
     parse_mode = 'Markdown'
@@ -61,6 +63,7 @@ class TestInlineQueryResultMpeg4Gif:
         assert inline_query_result_mpeg4_gif.mpeg4_height == self.mpeg4_height
         assert inline_query_result_mpeg4_gif.mpeg4_duration == self.mpeg4_duration
         assert inline_query_result_mpeg4_gif.thumb_url == self.thumb_url
+        assert inline_query_result_mpeg4_gif.thumb_mime_type == self.thumb_mime_type
         assert inline_query_result_mpeg4_gif.title == self.title
         assert inline_query_result_mpeg4_gif.caption == self.caption
         assert inline_query_result_mpeg4_gif.parse_mode == self.parse_mode
@@ -84,6 +87,8 @@ class TestInlineQueryResultMpeg4Gif:
                 == inline_query_result_mpeg4_gif.mpeg4_duration)
         assert (inline_query_result_mpeg4_gif_dict['thumb_url']
                 == inline_query_result_mpeg4_gif.thumb_url)
+        assert (inline_query_result_mpeg4_gif_dict['thumb_mime_type']
+                == inline_query_result_mpeg4_gif.thumb_mime_type)
         assert inline_query_result_mpeg4_gif_dict['title'] == inline_query_result_mpeg4_gif.title
         assert (inline_query_result_mpeg4_gif_dict['caption']
                 == inline_query_result_mpeg4_gif.caption)
