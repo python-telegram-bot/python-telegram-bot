@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import calendar
 import datetime as dtm
+import logging
 import os
 import time
 from queue import Queue
@@ -46,16 +47,18 @@ def job_queue(bot, _dp):
 class TestJobQueue:
     result = 0
     job_time = 0
+    received_error = None
 
     @pytest.fixture(autouse=True)
     def reset(self):
         self.result = 0
         self.job_time = 0
+        self.received_error = None
 
     def job_run_once(self, bot, job):
         self.result += 1
 
-    def job_with_exception(self, bot, job):
+    def job_with_exception(self, bot, job=None):
         raise Exception('Test Error')
 
     def job_remove_self(self, bot, job):
@@ -78,6 +81,15 @@ class TestJobQueue:
                 and isinstance(context.bot_data, dict)
                 and context.job_queue is not context.job.job_queue):
             self.result += 1
+
+    def error_handler(self, bot, update, error):
+        self.received_error = str(error)
+
+    def error_handler_context(self, update, context):
+        self.received_error = str(context.error)
+
+    def error_handler_raise_error(self, *args):
+        raise Exception('Failing bigly')
 
     def test_run_once(self, job_queue):
         job_queue.run_once(self.job_run_once, 0.01)
@@ -380,3 +392,81 @@ class TestJobQueue:
         job = job_queue.run_repeating(self.job_run_once, 0.02)
         assert not job == job_queue
         assert not job < job
+
+    def test_dispatch_error(self, job_queue, dp):
+        dp.add_error_handler(self.error_handler)
+
+        job = job_queue.run_once(self.job_with_exception, 0.05)
+        sleep(.1)
+        assert self.received_error == 'Test Error'
+        self.received_error = None
+        job.run(dp)
+        assert self.received_error == 'Test Error'
+
+        # Remove handler
+        dp.remove_error_handler(self.error_handler)
+        self.received_error = None
+
+        job = job_queue.run_once(self.job_with_exception, 0.05)
+        sleep(.1)
+        assert self.received_error is None
+        job.run(dp)
+        assert self.received_error is None
+
+    def test_dispatch_error_context(self, job_queue, cdp):
+        cdp.add_error_handler(self.error_handler_context)
+
+        job = job_queue.run_once(self.job_with_exception, 0.05)
+        sleep(.1)
+        assert self.received_error == 'Test Error'
+        self.received_error = None
+        job.run(cdp)
+        assert self.received_error == 'Test Error'
+
+        # Remove handler
+        cdp.remove_error_handler(self.error_handler_context)
+        self.received_error = None
+
+        job = job_queue.run_once(self.job_with_exception, 0.05)
+        sleep(.1)
+        assert self.received_error is None
+        job.run(cdp)
+        assert self.received_error is None
+
+    def test_dispatch_error_that_raises_errors(self, job_queue, dp, caplog):
+        dp.add_error_handler(self.error_handler_raise_error)
+
+        with caplog.at_level(logging.ERROR):
+            job = job_queue.run_once(self.job_with_exception, 0.05)
+        sleep(.1)
+        assert len(caplog.records) == 1
+        rec = caplog.records[-1]
+        assert 'processing the job' in rec.msg
+        assert 'uncaught error was raised while handling' in rec.msg
+        caplog.clear()
+
+        with caplog.at_level(logging.ERROR):
+            job.run(dp)
+        assert len(caplog.records) == 1
+        rec = caplog.records[-1]
+        assert 'processing the job' in rec.msg
+        assert 'uncaught error was raised while handling' in rec.msg
+        caplog.clear()
+
+        # Remove handler
+        dp.remove_error_handler(self.error_handler_raise_error)
+        self.received_error = None
+
+        with caplog.at_level(logging.ERROR):
+            job = job_queue.run_once(self.job_with_exception, 0.05)
+        sleep(.1)
+        assert len(caplog.records) == 1
+        rec = caplog.records[-1]
+        assert 'No error handlers are registered' in rec.msg
+        caplog.clear()
+
+        with caplog.at_level(logging.ERROR):
+            job.run(dp)
+        assert len(caplog.records) == 1
+        rec = caplog.records[-1]
+        assert 'No error handlers are registered' in rec.msg
