@@ -2648,7 +2648,7 @@ class Bot(TelegramObject):
             prices (List[:class:`telegram.LabeledPrice`)]: Price breakdown, a JSON-serialized list
                 of components (e.g. product price, tax, discount, delivery cost, delivery tax,
                 bonus, etc.).
-            provider_data (:obj:`str` | :obj:`object`, optional): JSON-encoded data about the
+            provider_data (:obj:`str` | :obj:`object`, optional): JSON-serialized data about the
                 invoice, which will be shared with the payment provider. A detailed description of
                 required fields should be provided by the payment provider. When an object is
                 passed, it will be encoded as JSON.
@@ -2871,7 +2871,8 @@ class Bot(TelegramObject):
                 will be lifted for the user, unix time. If user is restricted for more than 366
                 days or less than 30 seconds from the current time, they are considered to be
                 restricted forever.
-            permissions (:class:`telegram.ChatPermissions`): New user permissions.
+            permissions (:class:`telegram.ChatPermissions`): A JSON-serialized object for new user
+                permissions.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
