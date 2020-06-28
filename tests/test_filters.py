@@ -1102,6 +1102,7 @@ class TestFilters:
 
     def test_filters_via_bot_allow_empty(self, update):
         assert not Filters.via_bot()(update)
+        update.message.via_bot = None
         assert Filters.via_bot(allow_empty=True)(update)
 
     def test_filters_via_bot_id(self, update):
