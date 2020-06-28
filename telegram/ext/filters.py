@@ -887,7 +887,8 @@ officedocument.wordprocessingml.document")``-
     """Messages sent in a group chat."""
 
     class user(BaseFilter):
-        """Filters messages to allow only those which are from specified user ID.
+        """Filters messages to allow only those which are from specified user ID(s) and/or
+        username(s).
 
         Examples:
             ``MessageHandler(Filters.user(1234), callback_method)``
@@ -919,7 +920,7 @@ officedocument.wordprocessingml.document")``-
             RuntimeError: If user_id and username are both present.
 
         """
-
+        # The via_bot filter subclasses this one. Make sure changes here don't destroy it
         def __init__(self, user_id=None, username=None, allow_empty=False):
             self.allow_empty = allow_empty
             self.__lock = Lock()
@@ -1050,11 +1051,34 @@ officedocument.wordprocessingml.document")``-
                 if self.usernames:
                     return (message.from_user.username
                             and message.from_user.username in self.usernames)
+                return False
+            else:
                 return self.allow_empty
-            return False
+
+    class via_bot(user):
+        """Filters messages to allow only those which are from specified via_bot ID(s) and/or
+        username(s).
+
+        Warning:
+            This Filter subclasses the Filters.user which is linked above. Read its
+            documentation in order to learn how to use this one.
+        """
+
+        def __init__(self, user_id=None, username=None, allow_empty=False):
+            super().__init__(user_id, username, allow_empty)
+
+        def filter(self, message):
+            """"""  # remove method from docs
+            if message.via_bot:
+                if self.user_ids:
+                    return message.via_bot.id in self.user_ids
+                if self.usernames:
+                    return message.via_bot.username in self.usernames
+            else:
+                return self.allow_empty
 
     class chat(BaseFilter):
-        """Filters messages to allow only those which are from specified chat ID.
+        """Filters messages to allow only those which are from a specified chat ID or username.
 
         Examples:
             ``MessageHandler(Filters.chat(-1234), callback_method)``
