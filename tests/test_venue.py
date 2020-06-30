@@ -55,7 +55,7 @@ class TestVenue:
         assert venue.foursquare_type == self.foursquare_type
 
     def test_send_with_venue(self, monkeypatch, bot, chat_id, venue):
-        def test(_, url, data, **kwargs):
+        def test(url, data, **kwargs):
             return (data['longitude'] == self.location.longitude
                     and data['latitude'] == self.location.latitude
                     and data['title'] == self.title
@@ -63,7 +63,7 @@ class TestVenue:
                     and data['foursquare_id'] == self.foursquare_id
                     and data['foursquare_type'] == self.foursquare_type)
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr(bot.request, 'post', test)
         message = bot.send_venue(chat_id, venue=venue)
         assert message
 
