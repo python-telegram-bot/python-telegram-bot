@@ -194,10 +194,10 @@ class TestSticker:
         assert json_sticker.thumb == sticker.thumb
 
     def test_send_with_sticker(self, monkeypatch, bot, chat_id, sticker):
-        def test(_, url, data, **kwargs):
+        def test(url, data, **kwargs):
             return data['sticker'] == sticker.file_id
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr(bot.request, 'post', test)
         message = bot.send_sticker(sticker=sticker, chat_id=chat_id)
         assert message
 

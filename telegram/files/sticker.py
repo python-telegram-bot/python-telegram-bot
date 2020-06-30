@@ -112,14 +112,15 @@ class Sticker(TelegramObject):
 
         return [cls.de_json(d, bot) for d in data]
 
-    def get_file(self, timeout=None, **kwargs):
+    def get_file(self, timeout=None, api_kwargs=None):
         """Convenience wrapper over :attr:`telegram.Bot.get_file`
 
         Args:
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.File`
@@ -128,7 +129,7 @@ class Sticker(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        return self.bot.get_file(self.file_id, timeout=timeout, **kwargs)
+        return self.bot.get_file(self.file_id, timeout=timeout, api_kwargs=api_kwargs)
 
 
 class StickerSet(TelegramObject):
