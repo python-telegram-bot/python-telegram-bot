@@ -349,7 +349,7 @@ class TestPassport:
         assert file._credentials.secret == self.driver_license_selfie_credentials_secret
 
     def test_mocked_set_passport_data_errors(self, monkeypatch, bot, chat_id, passport_data):
-        def test(_, url, data, **kwargs):
+        def test(url, data, **kwargs):
             return (data['user_id'] == chat_id
                     and data['errors'][0]['file_hash'] == (passport_data.decrypted_credentials
                                                            .secure_data.driver_license
@@ -358,7 +358,7 @@ class TestPassport:
                                                            .secure_data.driver_license
                                                            .data.data_hash))
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr(bot.request, 'post', test)
         message = bot.set_passport_data_errors(chat_id, [
             PassportElementErrorSelfie('driver_license',
                                        (passport_data.decrypted_credentials

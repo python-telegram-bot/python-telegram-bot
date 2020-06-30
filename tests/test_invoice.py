@@ -111,11 +111,11 @@ class TestInvoice:
         assert message.invoice.total_amount == self.total_amount
 
     def test_send_object_as_provider_data(self, monkeypatch, bot, chat_id, provider_token):
-        def test(_, url, data, **kwargs):
+        def test(url, data, **kwargs):
             return (data['provider_data'] == '{"test_data": 123456789}'  # Depends if using
                     or data['provider_data'] == '{"test_data":123456789}')  # ujson or not
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr(bot.request, 'post', test)
 
         assert bot.send_invoice(chat_id, self.title, self.description, self.payload,
                                 provider_token, self.start_parameter, self.currency,
