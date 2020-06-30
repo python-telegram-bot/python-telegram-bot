@@ -72,7 +72,7 @@ class TestAnimation:
         message = bot.send_animation(chat_id, animation_file, duration=self.duration,
                                      width=self.width, height=self.height, caption=self.caption,
                                      parse_mode='Markdown', disable_notification=False,
-                                     filename=self.file_name, thumb=thumb_file)
+                                     thumb=thumb_file)
 
         assert isinstance(message.animation, Animation)
         assert isinstance(message.animation.file_id, str)
@@ -158,10 +158,10 @@ class TestAnimation:
         assert message.animation == animation
 
     def test_send_with_animation(self, monkeypatch, bot, chat_id, animation):
-        def test(_, url, data, **kwargs):
+        def test(url, data, **kwargs):
             return data['animation'] == animation.file_id
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr(bot.request, 'post', test)
         message = bot.send_animation(animation=animation, chat_id=chat_id)
         assert message
 
