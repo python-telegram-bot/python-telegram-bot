@@ -115,10 +115,10 @@ class TestVoice:
         assert message.voice == voice
 
     def test_send_with_voice(self, monkeypatch, bot, chat_id, voice):
-        def test(_, url, data, **kwargs):
+        def test(url, data, **kwargs):
             return data['voice'] == voice.file_id
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr(bot.request, 'post', test)
         message = bot.send_voice(chat_id, voice=voice)
         assert message
 
