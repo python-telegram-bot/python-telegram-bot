@@ -64,40 +64,40 @@ class TestLocation:
 
     # TODO: Needs improvement with in inline sent live location.
     def test_edit_live_inline_message(self, monkeypatch, bot, location):
-        def test(_, url, data, **kwargs):
+        def test(url, data, **kwargs):
             lat = data['latitude'] == location.latitude
             lon = data['longitude'] == location.longitude
             id_ = data['inline_message_id'] == 1234
             return lat and lon and id_
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr(bot.request, 'post', test)
         assert bot.edit_message_live_location(inline_message_id=1234, location=location)
 
     # TODO: Needs improvement with in inline sent live location.
     def test_stop_live_inline_message(self, monkeypatch, bot):
-        def test(_, url, data, **kwargs):
+        def test(url, data, **kwargs):
             id_ = data['inline_message_id'] == 1234
             return id_
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr(bot.request, 'post', test)
         assert bot.stop_message_live_location(inline_message_id=1234)
 
     def test_send_with_location(self, monkeypatch, bot, chat_id, location):
-        def test(_, url, data, **kwargs):
+        def test(url, data, **kwargs):
             lat = data['latitude'] == location.latitude
             lon = data['longitude'] == location.longitude
             return lat and lon
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr(bot.request, 'post', test)
         assert bot.send_location(location=location, chat_id=chat_id)
 
     def test_edit_live_location_with_location(self, monkeypatch, bot, location):
-        def test(_, url, data, **kwargs):
+        def test(url, data, **kwargs):
             lat = data['latitude'] == location.latitude
             lon = data['longitude'] == location.longitude
             return lat and lon
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr(bot.request, 'post', test)
         assert bot.edit_message_live_location(None, None, location=location)
 
     def test_send_location_without_required(self, bot, chat_id):

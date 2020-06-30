@@ -124,10 +124,10 @@ class TestDocument:
         assert message.document == document
 
     def test_send_with_document(self, monkeypatch, bot, chat_id, document):
-        def test(_, url, data, **kwargs):
+        def test(url, data, **kwargs):
             return data['document'] == document.file_id
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr(bot.request, 'post', test)
 
         message = bot.send_document(document=document, chat_id=chat_id)
 
