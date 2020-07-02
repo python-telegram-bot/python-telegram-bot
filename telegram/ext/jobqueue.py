@@ -65,6 +65,13 @@ class JobQueue:
         self.scheduler.add_listener(self._update_persistence,
                                     mask=EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
 
+        # Dispatch errors and don't log them in the APS logger
+        def aps_log_filter(record):
+            return 'raised an exception' not in record.msg
+
+        logging.getLogger('apscheduler.executors.default').addFilter(aps_log_filter)
+        self.scheduler.add_listener(self._dispatch_error, EVENT_JOB_ERROR)
+
     def _build_args(self, job):
         if self._dispatcher.use_context:
             return [CallbackContext.from_job(job, self._dispatcher)]
@@ -76,6 +83,15 @@ class JobQueue:
     def _update_persistence(self, event):
         self._dispatcher.update_persistence()
 
+    def _dispatch_error(self, event):
+        try:
+            self._dispatcher.dispatch_error(None, event.exception)
+        # Errors should not stop the thread.
+        except Exception:
+            self.logger.exception('An error was raised while processing the job and an '
+                                  'uncaught error was raised while handling the error '
+                                  'with an error_handler.')
+
     def _parse_time_input(self, time, shift_day=False):
         if time is None:
             return None
@@ -85,9 +101,8 @@ class JobQueue:
             return self._tz_now() + time
         if isinstance(time, datetime.time):
             dt = datetime.datetime.combine(
-                datetime.datetime.now(time.tzinfo or self.scheduler.timezone).date(), time)
-            if dt.tzinfo is None:
-                dt = dt.replace(tzinfo=self.scheduler.timezone)
+                datetime.datetime.now(tz=time.tzinfo or self.scheduler.timezone).date(), time,
+                tzinfo=time.tzinfo or self.scheduler.timezone)
             if shift_day and dt <= datetime.datetime.now(pytz.utc):
                 dt += datetime.timedelta(days=1)
             return dt
@@ -205,7 +220,7 @@ class JobQueue:
                 depending on its type. See ``first`` for details.
 
                 If ``last`` is :obj:`datetime.datetime` or :obj:`datetime.time` type
-                and ``last.tzinfo`` is :obj:`None` UTC will be assumed.
+                and ``last.tzinfo`` is :obj:`None`, UTC will be assumed.
 
                 Defaults to :obj:`None`.
             context (:obj:`object`, optional): Additional data needed for the callback function.
@@ -484,11 +499,20 @@ class Job:
         self.job = job
 
     def run(self, dispatcher):
-        """Executes the callback function."""
-        if dispatcher.use_context:
-            self.callback(CallbackContext.from_job(self, dispatcher))
-        else:
-            self.callback(dispatcher.bot, self)
+        """Executes the callback function independently of the jobs schedule."""
+        try:
+            if dispatcher.use_context:
+                self.callback(CallbackContext.from_job(self, dispatcher))
+            else:
+                self.callback(dispatcher.bot, self)
+        except Exception as e:
+            try:
+                dispatcher.dispatch_error(None, e)
+            # Errors should not stop the thread.
+            except Exception:
+                dispatcher.logger.exception('An error was raised while processing the job and an '
+                                            'uncaught error was raised while handling the error '
+                                            'with an error_handler.')
 
     def schedule_removal(self):
         """
