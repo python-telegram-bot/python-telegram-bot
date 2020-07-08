@@ -168,7 +168,7 @@ class JobQueue:
         return job
 
     def run_repeating(self, callback, interval, first=None, last=None, context=None, name=None,
-                      **job_kwargs):
+                      job_kwargs=None):
         """Creates a new ``Job`` that runs at specified intervals and adds it to the queue.
 
         Args:
@@ -256,7 +256,7 @@ class JobQueue:
         return job
 
     def run_monthly(self, callback, when, day, context=None, name=None, day_is_strict=True,
-                    **job_kwargs):
+                    job_kwargs=None):
         """Creates a new ``Job`` that runs on a monthly basis and adds it to the queue.
 
         Args:
@@ -326,7 +326,7 @@ class JobQueue:
         return job
 
     def run_daily(self, callback, time, days=Days.EVERY_DAY, context=None, name=None,
-                  **job_kwargs):
+                  job_kwargs=None):
         """Creates a new ``Job`` that runs on a daily basis and adds it to the queue.
 
         Args:
