@@ -29,7 +29,6 @@ import pytz
 from apscheduler.schedulers import SchedulerNotRunningError
 from flaky import flaky
 from telegram.ext import JobQueue, Updater, Job, CallbackContext
-from telegram.utils.deprecate import TelegramDeprecationWarning
 
 
 @pytest.fixture(scope='function')
@@ -338,10 +337,6 @@ class TestJobQueue:
         assert job_queue.jobs() == (job1, job2, job3)
         assert job_queue.get_jobs_by_name('name1') == (job1, job2)
         assert job_queue.get_jobs_by_name('name2') == (job3,)
-
-    def test_bot_in_init_deprecation(self, bot):
-        with pytest.warns(TelegramDeprecationWarning):
-            JobQueue(bot)
 
     def test_context_based_callback(self, job_queue):
         job_queue._dispatcher.use_context = True

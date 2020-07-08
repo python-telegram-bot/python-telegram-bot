@@ -20,7 +20,6 @@
 
 import datetime
 import logging
-import warnings
 import pytz
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -29,7 +28,6 @@ from apscheduler.triggers.combining import OrTrigger
 from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
 
 from telegram.ext.callbackcontext import CallbackContext
-from telegram.utils.deprecate import TelegramDeprecationWarning
 
 
 class Days:
@@ -38,7 +36,8 @@ class Days:
 
 
 class JobQueue:
-    """This class allows you to periodically perform tasks with the bot.
+    """This class allows you to periodically perform tasks with the bot. It is a convenience
+    wrapper for the APScheduler library.
 
     Attributes:
         scheduler (:class:`apscheduler.schedulers.background.BackgroundScheduler`): The APScheduler
@@ -47,19 +46,8 @@ class JobQueue:
 
     """
 
-    def __init__(self, bot=None):
-        if bot:
-            warnings.warn("Passing bot to jobqueue is deprecated. Please use set_dispatcher "
-                          "instead!", TelegramDeprecationWarning, stacklevel=2)
-
-            class MockDispatcher:
-                def __init__(self):
-                    self.bot = bot
-                    self.use_context = False
-
-            self._dispatcher = MockDispatcher()
-        else:
-            self._dispatcher = None
+    def __init__(self):
+        self._dispatcher = None
         self.logger = logging.getLogger(self.__class__.__name__)
         self.scheduler = BackgroundScheduler(timezone=pytz.utc)
         self.scheduler.add_listener(self._update_persistence,
