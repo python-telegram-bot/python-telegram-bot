@@ -83,7 +83,7 @@ Introduction
 
 This library provides a pure Python interface for the
 `Telegram Bot API <https://core.telegram.org/bots/api>`_.
-It's compatible with Python versions 3.5+. PTB might also work on `PyPy <http://pypy.org/>`_, though there have been a lot of issues before. Hence, PyPy is not officially supported.
+It's compatible with Python versions 3.6+. PTB might also work on `PyPy <http://pypy.org/>`_, though there have been a lot of issues before. Hence, PyPy is not officially supported.
 
 In addition to the pure API implementation, this library features a number of high-level classes to
 make the development of bots easy and straightforward. These classes are contained in the
