@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import signal
-import sys
 
 from telegram.utils.helpers import encode_conversations_to_json
 
@@ -1169,7 +1168,6 @@ class TestDictPersistence:
         assert dict_persistence.bot_data == bot_data
         assert dict_persistence.conversations == conversations
 
-    @pytest.mark.skipif(sys.version_info < (3, 6), reason="dicts are not ordered in py<=3.5")
     def test_json_outputs(self, user_data_json, chat_data_json, bot_data_json, conversations_json):
         dict_persistence = DictPersistence(user_data_json=user_data_json,
                                            chat_data_json=chat_data_json,
@@ -1180,7 +1178,6 @@ class TestDictPersistence:
         assert dict_persistence.bot_data_json == bot_data_json
         assert dict_persistence.conversations_json == conversations_json
 
-    @pytest.mark.skipif(sys.version_info < (3, 6), reason="dicts are not ordered in py<=3.5")
     def test_json_changes(self, user_data, user_data_json, chat_data, chat_data_json,
                           bot_data, bot_data_json,
                           conversations, conversations_json):
