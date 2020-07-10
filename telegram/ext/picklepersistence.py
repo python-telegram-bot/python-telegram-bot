@@ -277,7 +277,7 @@ class PicklePersistence(BasePersistence):
         """ Will save all data in memory to pickle file(s).
         """
         if self.single_file:
-            if self.user_data or self.chat_data or self.conversations:
+            if self.user_data or self.chat_data or self.bot_data or self.conversations:
                 self.dump_singlefile()
         else:
             if self.user_data:
