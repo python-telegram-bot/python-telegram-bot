@@ -51,8 +51,7 @@ class TestInputFile:
     def test_mimetypes(self):
         # Only test a few to make sure logic works okay
         assert InputFile(open('tests/data/telegram.jpg', 'rb')).mimetype == 'image/jpeg'
-        if sys.version_info >= (3, 5):
-            assert InputFile(open('tests/data/telegram.webp', 'rb')).mimetype == 'image/webp'
+        assert InputFile(open('tests/data/telegram.webp', 'rb')).mimetype == 'image/webp'
         assert InputFile(open('tests/data/telegram.mp3', 'rb')).mimetype == 'audio/mpeg'
 
         # Test guess from file
