@@ -39,6 +39,7 @@ class InlineQueryResultGif(InlineQueryResult):
         gif_height (:obj:`int`): Optional. Height of the GIF.
         gif_duration (:obj:`int`): Optional. Duration of the GIF.
         thumb_url (:obj:`str`): URL of the static thumbnail for the result (jpeg or gif).
+        thumb_mime_type (:obj:`str`): Optional. MIME type of the thumbnail.
         title (:obj:`str`): Optional. Title for the result.
         caption (:obj:`str`): Optional. Caption of the GIF file to be sent, 0-1024 characters
             after entities parsing.
@@ -57,6 +58,8 @@ class InlineQueryResultGif(InlineQueryResult):
         gif_height (:obj:`int`, optional): Height of the GIF.
         gif_duration (:obj:`int`, optional): Duration of the GIF
         thumb_url (:obj:`str`): URL of the static thumbnail for the result (jpeg or gif).
+        thumb_mime_type (:obj:`str`): Optional. MIME type of the thumbnail, must be one of
+            “image/jpeg”, “image/gif”, or “video/mp4”. Defaults to “image/jpeg”.
         title (:obj:`str`, optional): Title for the result.
         caption (:obj:`str`, optional): Caption of the GIF file to be sent, 0-1024 characters
             after entities parsing.
@@ -83,6 +86,7 @@ class InlineQueryResultGif(InlineQueryResult):
                  input_message_content: 'InputMessageContent' = None,
                  gif_duration: int = None,
                  parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+                 thumb_mime_type: str = None,
                  **kwargs: Any):
 
         # Required
@@ -99,3 +103,4 @@ class InlineQueryResultGif(InlineQueryResult):
         self.parse_mode = parse_mode
         self.reply_markup = reply_markup
         self.input_message_content = input_message_content
+        self.thumb_mime_type = thumb_mime_type

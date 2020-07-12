@@ -40,6 +40,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         mpeg4_height (:obj:`int`): Optional. Video height.
         mpeg4_duration (:obj:`int`): Optional. Video duration.
         thumb_url (:obj:`str`): URL of the static thumbnail (jpeg or gif) for the result.
+        thumb_mime_type (:obj:`str`): Optional. MIME type of the thumbnail.
         title (:obj:`str`): Optional. Title for the result.
         caption (:obj:`str`): Optional. Caption of the MPEG-4 file to be sent, 0-1024 characters
             after entities parsing.
@@ -58,6 +59,8 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         mpeg4_height (:obj:`int`, optional): Video height.
         mpeg4_duration (:obj:`int`, optional): Video duration.
         thumb_url (:obj:`str`): URL of the static thumbnail (jpeg or gif) for the result.
+        thumb_mime_type (:obj:`str`): Optional. MIME type of the thumbnail, must be one of
+            “image/jpeg”, “image/gif”, or “video/mp4”. Defaults to “image/jpeg”.
         title (:obj:`str`, optional): Title for the result.
         caption (:obj:`str`, optional): Caption of the MPEG-4 file to be sent, 0-1024 characters
             after entities parsing.
@@ -84,6 +87,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
                  input_message_content: 'InputMessageContent' = None,
                  mpeg4_duration: int = None,
                  parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+                 thumb_mime_type: str = None,
                  **kwargs: Any):
 
         # Required
@@ -100,3 +104,4 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         self.parse_mode = parse_mode
         self.reply_markup = reply_markup
         self.input_message_content = input_message_content
+        self.thumb_mime_type = thumb_mime_type

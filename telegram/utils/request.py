@@ -261,27 +261,6 @@ class Request:
         else:
             raise NetworkError('{} ({})'.format(message, resp.status))
 
-    def get(self, url: str, timeout: float = None) -> Union[JSONDict, bool]:
-        """Request an URL.
-
-        Args:
-            url (:obj:`str`): The web location we want to retrieve.
-            timeout (:obj:`int` | :obj:`float`): If this value is specified, use it as the read
-                timeout from the server (instead of the one specified during creation of the
-                connection pool).
-
-        Returns:
-          A JSON object.
-
-        """
-        urlopen_kwargs = {}
-
-        if timeout is not None:
-            urlopen_kwargs['timeout'] = Timeout(read=timeout, connect=self._connect_timeout)
-
-        result = self._request_wrapper('GET', url, **urlopen_kwargs)
-        return self._parse(result)
-
     def post(self,
              url: str,
              data: JSONDict,
@@ -290,10 +269,10 @@ class Request:
 
         Args:
             url (:obj:`str`): The web location we want to retrieve.
-            data (dict[str, str|int]): A dict of key/value pairs.
-            timeout (:obj:`int` | :obj:`float`): If this value is specified, use it as the read
-                timeout from the server (instead of the one specified during creation of the
-                connection pool).
+            data (dict[str, str|int], optional): A dict of key/value pairs.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
 
         Returns:
           A JSON object.
@@ -303,6 +282,9 @@ class Request:
 
         if timeout is not None:
             urlopen_kwargs['timeout'] = Timeout(read=timeout, connect=self._connect_timeout)
+
+        if data is None:
+            data = {}
 
         # Are we uploading files?
         files = False

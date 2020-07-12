@@ -98,7 +98,8 @@ def message(bot):
                         'text': 'next', 'callback_data': 'abcd'}],
                         [{'text': 'Cancel', 'callback_data': 'Cancel'}]]}},
                     {'quote': True},
-                    {'dice': Dice(4, '🎲')}
+                    {'dice': Dice(4, '🎲')},
+                    {'via_bot': User(9, 'A_Bot', True)}
                 ],
                 ids=['forwarded_user', 'forwarded_channel', 'reply', 'edited', 'text',
                      'caption_entities', 'audio', 'document', 'animation', 'game', 'photo',
@@ -108,7 +109,7 @@ def message(bot):
                      'migrated_from', 'pinned', 'invoice', 'successful_payment',
                      'connected_website', 'forward_signature', 'author_signature',
                      'photo_from_media_group', 'passport_data', 'poll', 'reply_markup',
-                     'default_quote', 'dice'])
+                     'default_quote', 'dice', 'via_bot'])
 def message_params(bot, request):
     return Message(message_id=TestMessage.id_,
                    from_user=TestMessage.from_user,

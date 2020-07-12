@@ -81,7 +81,8 @@ class ChatPhoto(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.File`
@@ -100,7 +101,8 @@ class ChatPhoto(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.File`

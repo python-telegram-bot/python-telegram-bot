@@ -4,6 +4,7 @@ on:
     branches:
       - master
       - type_hinting_master
+      - v13
   schedule:
     - cron: 7 3 * * *
   push:
