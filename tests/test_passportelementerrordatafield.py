@@ -30,7 +30,7 @@ def passport_element_error_data_field():
                                          TestPassportElementErrorDataField.message)
 
 
-class TestPassportElementErrorDataField(object):
+class TestPassportElementErrorDataField:
     source = 'data'
     type_ = 'test_type'
     field_name = 'test_field'

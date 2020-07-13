@@ -29,7 +29,7 @@ def passport_element_error_front_side():
                                          TestPassportElementErrorFrontSide.message)
 
 
-class TestPassportElementErrorFrontSide(object):
+class TestPassportElementErrorFrontSide:
     source = 'front_side'
     type_ = 'test_type'
     file_hash = 'file_hash'

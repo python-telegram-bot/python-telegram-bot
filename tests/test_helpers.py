@@ -40,23 +40,23 @@ RELATIVE_TIME_SPECS = DELTA_TIME_SPECS + TIME_OF_DAY_TIME_SPECS
 TIME_SPECS = ABSOLUTE_TIME_SPECS + RELATIVE_TIME_SPECS
 
 
-class TestHelpers(object):
+class TestHelpers:
     def test_escape_markdown(self):
         test_str = '*bold*, _italic_, `code`, [text_link](http://github.com/)'
-        expected_str = '\*bold\*, \_italic\_, \`code\`, \[text\_link](http://github.com/)'
+        expected_str = r'\*bold\*, \_italic\_, \`code\`, \[text\_link](http://github.com/)'
 
         assert expected_str == helpers.escape_markdown(test_str)
 
     def test_escape_markdown_v2(self):
         test_str = 'a_b*c[d]e (fg) h~I`>JK#L+MN -O=|p{qr}s.t! u'
-        expected_str = 'a\_b\*c\[d\]e \(fg\) h\~I\`\>JK\#L\+MN \-O\=\|p\{qr\}s\.t\! u'
+        expected_str = r'a\_b\*c\[d\]e \(fg\) h\~I\`\>JK\#L\+MN \-O\=\|p\{qr\}s\.t\! u'
 
         assert expected_str == helpers.escape_markdown(test_str, version=2)
 
     def test_escape_markdown_v2_monospaced(self):
 
-        test_str = 'mono/pre: `abc` \int (`\some \`stuff)'
-        expected_str = 'mono/pre: \`abc\` \\\\int (\`\\\\some \\\\\`stuff)'
+        test_str = r'mono/pre: `abc` \int (`\some \`stuff)'
+        expected_str = 'mono/pre: \\`abc\\` \\\\int (\\`\\\\some \\\\\\`stuff)'
 
         assert expected_str == helpers.escape_markdown(test_str, version=2,
                                                        entity_type=MessageEntity.PRE)
@@ -65,8 +65,8 @@ class TestHelpers(object):
 
     def test_escape_markdown_v2_text_link(self):
 
-        test_str = 'https://url.containing/funny)cha)\\ra\)cter\s'
-        expected_str = 'https://url.containing/funny\)cha\)\\\\ra\\\\\)cter\\\\s'
+        test_str = 'https://url.containing/funny)cha)\\ra\\)cter\\s'
+        expected_str = 'https://url.containing/funny\\)cha\\)\\\\ra\\\\\\)cter\\\\s'
 
         assert expected_str == helpers.escape_markdown(test_str, version=2,
                                                        entity_type=MessageEntity.TEXT_LINK)
@@ -86,9 +86,10 @@ class TestHelpers(object):
         """Conversion from timezone-aware datetime to timestamp"""
         # we're parametrizing this with two different UTC offsets to exclude the possibility
         # of an xpass when the test is run in a timezone with the same UTC offset
-        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5, tzinfo=timezone)
+        test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5)
+        datetime = timezone.localize(test_datetime)
         assert (helpers.to_float_timestamp(datetime)
-                == 1573431976.1 - timezone.utcoffset(None).total_seconds())
+                == 1573431976.1 - timezone.utcoffset(test_datetime).total_seconds())
 
     def test_to_float_timestamp_absolute_no_reference(self):
         """A reference timestamp is only relevant for relative time specifications"""
@@ -116,14 +117,15 @@ class TestHelpers(object):
         """Conversion from timezone-aware time-of-day specification to timestamp"""
         # we're parametrizing this with two different UTC offsets to exclude the possibility
         # of an xpass when the test is run in a timezone with the same UTC offset
-        utc_offset = timezone.utcoffset(None)
         ref_datetime = dtm.datetime(1970, 1, 1, 12)
+        utc_offset = timezone.utcoffset(ref_datetime)
         ref_t, time_of_day = _datetime_to_float_timestamp(ref_datetime), ref_datetime.time()
+        aware_time_of_day = timezone.localize(ref_datetime).timetz()
 
         # first test that naive time is assumed to be utc:
         assert helpers.to_float_timestamp(time_of_day, ref_t) == pytest.approx(ref_t)
         # test that by setting the timezone the timestamp changes accordingly:
-        assert (helpers.to_float_timestamp(time_of_day.replace(tzinfo=timezone), ref_t)
+        assert (helpers.to_float_timestamp(aware_time_of_day, ref_t)
                 == pytest.approx(ref_t + (-utc_offset.total_seconds() % (24 * 60 * 60))))
 
     @pytest.mark.parametrize('time_spec', RELATIVE_TIME_SPECS, ids=str)
@@ -149,9 +151,10 @@ class TestHelpers(object):
     def test_from_timestamp_aware(self, timezone):
         # we're parametrizing this with two different UTC offsets to exclude the possibility
         # of an xpass when the test is run in a timezone with the same UTC offset
-        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5, tzinfo=timezone)
-        assert (helpers.from_timestamp(1573431976.1 - timezone.utcoffset(None).total_seconds())
-                == datetime)
+        test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5)
+        datetime = timezone.localize(test_datetime)
+        assert (helpers.from_timestamp(
+            1573431976.1 - timezone.utcoffset(test_datetime).total_seconds()) == datetime)
 
     def test_create_deep_linked_url(self):
         username = 'JamesTheMock'

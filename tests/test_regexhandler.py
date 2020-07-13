@@ -50,7 +50,7 @@ def message(bot):
     return Message(1, User(1, '', False), None, Chat(1, ''), text='test message', bot=bot)
 
 
-class TestRegexHandler(object):
+class TestRegexHandler:
     test_flag = False
 
     @pytest.fixture(autouse=True)

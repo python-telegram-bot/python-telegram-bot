@@ -19,9 +19,8 @@
 """ This module contains the InlineQueryHandler class """
 import re
 
-from future.utils import string_types
-
 from telegram import Update
+
 from .handler import Handler
 
 
@@ -104,14 +103,14 @@ class InlineQueryHandler(Handler):
                  pass_groupdict=False,
                  pass_user_data=False,
                  pass_chat_data=False):
-        super(InlineQueryHandler, self).__init__(
+        super().__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
             pass_chat_data=pass_chat_data)
 
-        if isinstance(pattern, string_types):
+        if isinstance(pattern, str):
             pattern = re.compile(pattern)
 
         self.pattern = pattern
@@ -140,8 +139,7 @@ class InlineQueryHandler(Handler):
                 return True
 
     def collect_optional_args(self, dispatcher, update=None, check_result=None):
-        optional_args = super(InlineQueryHandler, self).collect_optional_args(dispatcher,
-                                                                              update, check_result)
+        optional_args = super().collect_optional_args(dispatcher, update, check_result)
         if self.pattern:
             if self.pass_groups:
                 optional_args['groups'] = check_result.groups()

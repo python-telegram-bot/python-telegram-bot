@@ -96,7 +96,7 @@ class Sticker(TelegramObject):
         if not data:
             return None
 
-        data = super(Sticker, cls).de_json(data, bot)
+        data = super().de_json(data, bot)
 
         data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
         data['mask_position'] = MaskPosition.de_json(data.get('mask_position'), bot)
@@ -110,14 +110,15 @@ class Sticker(TelegramObject):
 
         return [cls.de_json(d, bot) for d in data]
 
-    def get_file(self, timeout=None, **kwargs):
+    def get_file(self, timeout=None, api_kwargs=None):
         """Convenience wrapper over :attr:`telegram.Bot.get_file`
 
         Args:
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.File`
@@ -126,7 +127,7 @@ class Sticker(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        return self.bot.get_file(self.file_id, timeout=timeout, **kwargs)
+        return self.bot.get_file(self.file_id, timeout=timeout, api_kwargs=api_kwargs)
 
 
 class StickerSet(TelegramObject):
@@ -164,20 +165,20 @@ class StickerSet(TelegramObject):
 
         self._id_attrs = (self.name,)
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         if not data:
             return None
 
-        data = super(StickerSet, StickerSet).de_json(data, bot)
+        data = super().de_json(data, bot)
 
         data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
         data['stickers'] = Sticker.de_list(data.get('stickers'), bot)
 
-        return StickerSet(bot=bot, **data)
+        return cls(bot=bot, **data)
 
     def to_dict(self):
-        data = super(StickerSet, self).to_dict()
+        data = super().to_dict()
 
         data['stickers'] = [s.to_dict() for s in data.get('stickers')]
 

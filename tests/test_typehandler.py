@@ -25,7 +25,7 @@ from telegram import Bot
 from telegram.ext import TypeHandler, CallbackContext, JobQueue
 
 
-class TestTypeHandler(object):
+class TestTypeHandler:
     test_flag = False
 
     @pytest.fixture(autouse=True)

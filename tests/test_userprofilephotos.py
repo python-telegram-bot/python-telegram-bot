@@ -19,7 +19,7 @@
 from telegram import PhotoSize, UserProfilePhotos
 
 
-class TestUserProfilePhotos(object):
+class TestUserProfilePhotos:
     total_count = 2
     photos = [
         [

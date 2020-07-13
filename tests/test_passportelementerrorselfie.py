@@ -29,7 +29,7 @@ def passport_element_error_selfie():
                                       TestPassportElementErrorSelfie.message)
 
 
-class TestPassportElementErrorSelfie(object):
+class TestPassportElementErrorSelfie:
     source = 'selfie'
     type_ = 'test_type'
     file_hash = 'file_hash'

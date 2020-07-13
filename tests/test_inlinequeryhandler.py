@@ -56,7 +56,7 @@ def inline_query(bot):
                                                                 longitude=-46.788279)))
 
 
-class TestCallbackQueryHandler(object):
+class TestCallbackQueryHandler:
     test_flag = False
 
     @pytest.fixture(autouse=True)

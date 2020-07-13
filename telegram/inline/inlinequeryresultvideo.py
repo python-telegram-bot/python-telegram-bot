@@ -97,7 +97,7 @@ class InlineQueryResultVideo(InlineQueryResult):
                  **kwargs):
 
         # Required
-        super(InlineQueryResultVideo, self).__init__('video', id)
+        super().__init__('video', id)
         self.video_url = video_url
         self.mime_type = mime_type
         self.thumb_url = thumb_url

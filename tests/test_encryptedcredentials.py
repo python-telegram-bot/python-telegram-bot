@@ -29,7 +29,7 @@ def encrypted_credentials():
                                 TestEncryptedCredentials.secret)
 
 
-class TestEncryptedCredentials(object):
+class TestEncryptedCredentials:
     data = 'data'
     hash = 'hash'
     secret = 'secret'

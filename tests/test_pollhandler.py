@@ -54,7 +54,7 @@ def poll(bot):
                   False, Poll.REGULAR, True))
 
 
-class TestPollHandler(object):
+class TestPollHandler:
     test_flag = False
 
     @pytest.fixture(autouse=True)

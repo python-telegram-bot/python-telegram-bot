@@ -28,7 +28,7 @@ def contact():
                    TestContact.user_id)
 
 
-class TestContact(object):
+class TestContact:
     phone_number = '+11234567890'
     first_name = 'Leandro'
     last_name = 'Toledo'
@@ -52,13 +52,13 @@ class TestContact(object):
         assert contact.user_id == self.user_id
 
     def test_send_with_contact(self, monkeypatch, bot, chat_id, contact):
-        def test(_, url, data, **kwargs):
+        def test(url, data, **kwargs):
             phone = data['phone_number'] == contact.phone_number
             first = data['first_name'] == contact.first_name
             last = data['last_name'] == contact.last_name
             return phone and first and last
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr(bot.request, 'post', test)
         message = bot.send_contact(contact=contact, chat_id=chat_id)
         assert message
 

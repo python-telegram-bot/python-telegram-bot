@@ -29,12 +29,10 @@ try:
 except ImportError:
     import json
 import logging
-import warnings
 from datetime import datetime
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
-from future.utils import string_types
 
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
                       ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore, StickerSet,
@@ -87,6 +85,12 @@ class Bot(TelegramObject):
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
             be used if not set explicitly in the bot methods.
 
+    Note:
+        Most bot methods have the argument ``api_kwargs`` which allows to pass arbitrary keywords
+        to the Telegram API. This can be used to access new features of the API before they were
+        incorporated into PTB. However, this is not guaranteed to work, i.e. it will fail for
+        passing files.
+
     """
 
     def __new__(cls, *args, **kwargs):
@@ -94,7 +98,7 @@ class Bot(TelegramObject):
         defaults = kwargs.get('defaults')
 
         # Make an instance of the class
-        instance = super(Bot, cls).__new__(cls)
+        instance = super().__new__(cls)
 
         if not defaults:
             return instance
@@ -151,8 +155,18 @@ class Bot(TelegramObject):
                                                                   password=private_key_password,
                                                                   backend=default_backend())
 
-    def _message(self, url, data, reply_to_message_id=None, disable_notification=None,
-                 reply_markup=None, timeout=None, **kwargs):
+    def _post(self, endpoint, data=None, timeout=None, api_kwargs=None):
+        if api_kwargs:
+            if data:
+                data.update(api_kwargs)
+            else:
+                data = api_kwargs
+
+        return self._request.post('{}/{}'.format(self.base_url, endpoint), data=data,
+                                  timeout=timeout)
+
+    def _message(self, endpoint, data, reply_to_message_id=None, disable_notification=None,
+                 reply_markup=None, timeout=None, api_kwargs=None):
         if reply_to_message_id is not None:
             data['reply_to_message_id'] = reply_to_message_id
 
@@ -173,7 +187,7 @@ class Bot(TelegramObject):
             else:
                 data['media'].parse_mode = None
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post(endpoint, data, timeout=timeout, api_kwargs=api_kwargs)
 
         if result is True:
             return result
@@ -263,16 +277,18 @@ class Bot(TelegramObject):
     def name(self):
         """:obj:`str`: Bot's @username."""
 
-        return '@{0}'.format(self.username)
+        return '@{}'.format(self.username)
 
     @log
-    def get_me(self, timeout=None, **kwargs):
+    def get_me(self, timeout=None, api_kwargs=None):
         """A simple method for testing your bot's auth token. Requires no parameters.
 
         Args:
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.User`: A :class:`telegram.User` instance representing that bot if the
@@ -282,9 +298,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/getMe'.format(self.base_url)
-
-        result = self._request.get(url, timeout=timeout)
+        result = self._post('getMe', timeout=timeout, api_kwargs=api_kwargs)
 
         self.bot = User.de_json(result, self)
 
@@ -300,7 +314,7 @@ class Bot(TelegramObject):
                      reply_to_message_id=None,
                      reply_markup=None,
                      timeout=None,
-                     **kwargs):
+                     api_kwargs=None):
         """Use this method to send text messages.
 
         Args:
@@ -323,7 +337,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Message`: On success, the sent message is returned.
@@ -332,8 +347,6 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendMessage'.format(self.base_url)
-
         data = {'chat_id': chat_id, 'text': text}
 
         if parse_mode:
@@ -341,12 +354,12 @@ class Bot(TelegramObject):
         if disable_web_page_preview:
             data['disable_web_page_preview'] = disable_web_page_preview
 
-        return self._message(url, data, disable_notification=disable_notification,
+        return self._message('sendMessage', data, disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             timeout=timeout, **kwargs)
+                             timeout=timeout, api_kwargs=api_kwargs)
 
     @log
-    def delete_message(self, chat_id, message_id, timeout=None, **kwargs):
+    def delete_message(self, chat_id, message_id, timeout=None, api_kwargs=None):
         """
         Use this method to delete a message, including service messages, with the following
         limitations:
@@ -368,7 +381,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool`: On success, ``True`` is returned.
@@ -377,11 +391,9 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/deleteMessage'.format(self.base_url)
-
         data = {'chat_id': chat_id, 'message_id': message_id}
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('deleteMessage', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
@@ -392,7 +404,7 @@ class Bot(TelegramObject):
                         message_id,
                         disable_notification=False,
                         timeout=None,
-                        **kwargs):
+                        api_kwargs=None):
         """Use this method to forward messages of any kind.
 
         Args:
@@ -406,7 +418,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -415,8 +428,6 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/forwardMessage'.format(self.base_url)
-
         data = {}
 
         if chat_id:
@@ -426,8 +437,8 @@ class Bot(TelegramObject):
         if message_id:
             data['message_id'] = message_id
 
-        return self._message(url, data, disable_notification=disable_notification,
-                             timeout=timeout, **kwargs)
+        return self._message('forwardMessage', data, disable_notification=disable_notification,
+                             timeout=timeout, api_kwargs=api_kwargs)
 
     @log
     def send_photo(self,
@@ -439,7 +450,7 @@ class Bot(TelegramObject):
                    reply_markup=None,
                    timeout=20,
                    parse_mode=None,
-                   **kwargs):
+                   api_kwargs=None):
         """Use this method to send photos.
 
         Note:
@@ -467,7 +478,8 @@ class Bot(TelegramObject):
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -476,8 +488,6 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendPhoto'.format(self.base_url)
-
         if isinstance(photo, PhotoSize):
             photo = photo.file_id
         elif InputFile.is_file(photo):
@@ -490,9 +500,10 @@ class Bot(TelegramObject):
         if parse_mode:
             data['parse_mode'] = parse_mode
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message('sendPhoto', data, timeout=timeout,
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)
+                             api_kwargs=api_kwargs)
 
     @log
     def send_audio(self,
@@ -508,7 +519,7 @@ class Bot(TelegramObject):
                    timeout=20,
                    parse_mode=None,
                    thumb=None,
-                   **kwargs):
+                   api_kwargs=None):
         """
         Use this method to send audio files, if you want Telegram clients to display them in the
         music player. Your audio must be in the .mp3 or .m4a format.
@@ -551,7 +562,8 @@ class Bot(TelegramObject):
                 not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
                 Thumbnails can't be reused and can be only uploaded as a new file.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -560,8 +572,6 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendAudio'.format(self.base_url)
-
         if isinstance(audio, Audio):
             audio = audio.file_id
         elif InputFile.is_file(audio):
@@ -584,9 +594,10 @@ class Bot(TelegramObject):
                 thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message('sendAudio', data, timeout=timeout,
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)
+                             api_kwargs=api_kwargs)
 
     @log
     def send_document(self,
@@ -600,7 +611,7 @@ class Bot(TelegramObject):
                       timeout=20,
                       parse_mode=None,
                       thumb=None,
-                      **kwargs):
+                      api_kwargs=None):
         """
         Use this method to send general files.
 
@@ -639,7 +650,8 @@ class Bot(TelegramObject):
                 not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
                 Thumbnails can't be reused and can be only uploaded as a new file.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -648,8 +660,6 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendDocument'.format(self.base_url)
-
         if isinstance(document, Document):
             document = document.file_id
         elif InputFile.is_file(document):
@@ -666,9 +676,10 @@ class Bot(TelegramObject):
                 thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message('sendDocument', data, timeout=timeout,
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)
+                             api_kwargs=api_kwargs)
 
     @log
     def send_sticker(self,
@@ -678,7 +689,7 @@ class Bot(TelegramObject):
                      reply_to_message_id=None,
                      reply_markup=None,
                      timeout=20,
-                     **kwargs):
+                     api_kwargs=None):
         """
         Use this method to send static .WEBP or animated .TGS stickers.
 
@@ -702,7 +713,8 @@ class Bot(TelegramObject):
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -711,8 +723,6 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendSticker'.format(self.base_url)
-
         if isinstance(sticker, Sticker):
             sticker = sticker.file_id
         elif InputFile.is_file(sticker):
@@ -720,9 +730,10 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id, 'sticker': sticker}
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message('sendSticker', data, timeout=timeout,
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)
+                             api_kwargs=api_kwargs)
 
     @log
     def send_video(self,
@@ -739,7 +750,7 @@ class Bot(TelegramObject):
                    parse_mode=None,
                    supports_streaming=None,
                    thumb=None,
-                   **kwargs):
+                   api_kwargs=None):
         """
         Use this method to send video files, Telegram clients support mp4 videos
         (other formats may be sent as Document).
@@ -782,7 +793,8 @@ class Bot(TelegramObject):
                 not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
                 Thumbnails can't be reused and can be only uploaded as a new file.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -791,8 +803,6 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendVideo'.format(self.base_url)
-
         if isinstance(video, Video):
             video = video.file_id
         elif InputFile.is_file(video):
@@ -817,9 +827,10 @@ class Bot(TelegramObject):
                 thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message('sendVideo', data, timeout=timeout,
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)
+                             api_kwargs=api_kwargs)
 
     @log
     def send_video_note(self,
@@ -832,7 +843,7 @@ class Bot(TelegramObject):
                         reply_markup=None,
                         timeout=20,
                         thumb=None,
-                        **kwargs):
+                        api_kwargs=None):
         """
         As of v.4.0, Telegram clients support rounded square mp4 videos of up to 1 minute long.
         Use this method to send video messages.
@@ -865,7 +876,8 @@ class Bot(TelegramObject):
                 not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
                 Thumbnails can't be reused and can be only uploaded as a new file.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -874,8 +886,6 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendVideoNote'.format(self.base_url)
-
         if isinstance(video_note, VideoNote):
             video_note = video_note.file_id
         elif InputFile.is_file(video_note):
@@ -892,9 +902,10 @@ class Bot(TelegramObject):
                 thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message('sendVideoNote', data, timeout=timeout,
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)
+                             api_kwargs=api_kwargs)
 
     @log
     def send_animation(self,
@@ -910,7 +921,7 @@ class Bot(TelegramObject):
                        reply_to_message_id=None,
                        reply_markup=None,
                        timeout=20,
-                       **kwargs):
+                       api_kwargs=None):
         """
         Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound).
         Bots can currently send animation files of up to 50 MB in size, this limit may be changed
@@ -945,7 +956,8 @@ class Bot(TelegramObject):
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -954,8 +966,6 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendAnimation'.format(self.base_url)
-
         if isinstance(animation, Animation):
             animation = animation.file_id
         elif InputFile.is_file(animation):
@@ -978,9 +988,10 @@ class Bot(TelegramObject):
         if parse_mode:
             data['parse_mode'] = parse_mode
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message('sendAnimation', data, timeout=timeout,
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)
+                             api_kwargs=api_kwargs)
 
     @log
     def send_voice(self,
@@ -993,7 +1004,7 @@ class Bot(TelegramObject):
                    reply_markup=None,
                    timeout=20,
                    parse_mode=None,
-                   **kwargs):
+                   api_kwargs=None):
         """
         Use this method to send audio files, if you want Telegram clients to display the file
         as a playable voice message. For this to work, your audio must be in an .ogg file
@@ -1026,7 +1037,8 @@ class Bot(TelegramObject):
                 JSON-serialized object for an inline keyboard, custom reply keyboard,
                 instructions to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -1035,8 +1047,6 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendVoice'.format(self.base_url)
-
         if isinstance(voice, Voice):
             voice = voice.file_id
         elif InputFile.is_file(voice):
@@ -1051,9 +1061,10 @@ class Bot(TelegramObject):
         if parse_mode:
             data['parse_mode'] = parse_mode
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message('sendVoice', data, timeout=timeout,
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)
+                             api_kwargs=api_kwargs)
 
     @log
     def send_media_group(self,
@@ -1062,7 +1073,7 @@ class Bot(TelegramObject):
                          disable_notification=None,
                          reply_to_message_id=None,
                          timeout=20,
-                         **kwargs):
+                         api_kwargs=None):
         """Use this method to send a group of photos or videos as an album.
 
         Args:
@@ -1075,7 +1086,8 @@ class Bot(TelegramObject):
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             List[:class:`telegram.Message`]: An array of the sent Messages.
@@ -1083,9 +1095,6 @@ class Bot(TelegramObject):
         Raises:
             :class:`telegram.TelegramError`
         """
-
-        url = '{0}/sendMediaGroup'.format(self.base_url)
-
         data = {'chat_id': chat_id, 'media': media}
 
         for m in data['media']:
@@ -1100,7 +1109,7 @@ class Bot(TelegramObject):
         if disable_notification:
             data['disable_notification'] = disable_notification
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('sendMediaGroup', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return [Message.de_json(res, self) for res in result]
 
@@ -1115,7 +1124,7 @@ class Bot(TelegramObject):
                       timeout=None,
                       location=None,
                       live_period=None,
-                      **kwargs):
+                      api_kwargs=None):
         """Use this method to send point on the map.
 
         Note:
@@ -1139,7 +1148,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -1148,8 +1158,6 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendLocation'.format(self.base_url)
-
         if not ((latitude is not None and longitude is not None) or location):
             raise ValueError("Either location or latitude and longitude must be passed as"
                              "argument.")
@@ -1167,9 +1175,10 @@ class Bot(TelegramObject):
         if live_period:
             data['live_period'] = live_period
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message('sendLocation', data, timeout=timeout,
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)
+                             api_kwargs=api_kwargs)
 
     @log
     def edit_message_live_location(self,
@@ -1181,7 +1190,7 @@ class Bot(TelegramObject):
                                    location=None,
                                    reply_markup=None,
                                    timeout=None,
-                                   **kwargs):
+                                   api_kwargs=None):
         """Use this method to edit live location messages sent by the bot or via the bot
         (for inline bots). A location can be edited until its :attr:`live_period` expires or
         editing is explicitly disabled by a call to :attr:`stop_message_live_location`.
@@ -1205,14 +1214,13 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
             edited Message is returned, otherwise ``True`` is returned.
         """
-
-        url = '{0}/editMessageLiveLocation'.format(self.base_url)
-
         if not (all([latitude, longitude]) or location):
             raise ValueError("Either location or latitude and longitude must be passed as"
                              "argument.")
@@ -1233,7 +1241,8 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return self._message(url, data, timeout=timeout, reply_markup=reply_markup, **kwargs)
+        return self._message('editMessageLiveLocation', data, timeout=timeout,
+                             reply_markup=reply_markup, api_kwargs=api_kwargs)
 
     @log
     def stop_message_live_location(self,
@@ -1242,7 +1251,7 @@ class Bot(TelegramObject):
                                    inline_message_id=None,
                                    reply_markup=None,
                                    timeout=None,
-                                   **kwargs):
+                                   api_kwargs=None):
         """Use this method to stop updating a live location message sent by the bot or via the bot
         (for inline bots) before live_period expires.
 
@@ -1259,14 +1268,13 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
             edited Message is returned, otherwise ``True`` is returned.
         """
-
-        url = '{0}/stopMessageLiveLocation'.format(self.base_url)
-
         data = {}
 
         if chat_id:
@@ -1276,7 +1284,8 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return self._message(url, data, timeout=timeout, reply_markup=reply_markup, **kwargs)
+        return self._message('stopMessageLiveLocation', data, timeout=timeout,
+                             reply_markup=reply_markup, api_kwargs=api_kwargs)
 
     @log
     def send_venue(self,
@@ -1292,7 +1301,7 @@ class Bot(TelegramObject):
                    timeout=None,
                    venue=None,
                    foursquare_type=None,
-                   **kwargs):
+                   api_kwargs=None):
         """Use this method to send information about a venue.
 
         Note:
@@ -1322,7 +1331,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -1331,8 +1341,6 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendVenue'.format(self.base_url)
-
         if not (venue or all([latitude, longitude, address, title])):
             raise ValueError("Either venue or latitude, longitude, address and title must be"
                              "passed as arguments.")
@@ -1358,9 +1366,10 @@ class Bot(TelegramObject):
         if foursquare_type:
             data['foursquare_type'] = foursquare_type
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message('sendVenue', data, timeout=timeout,
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)
+                             api_kwargs=api_kwargs)
 
     @log
     def send_contact(self,
@@ -1374,7 +1383,7 @@ class Bot(TelegramObject):
                      timeout=None,
                      contact=None,
                      vcard=None,
-                     **kwargs):
+                     api_kwargs=None):
         """Use this method to send phone contacts.
 
         Note:
@@ -1400,7 +1409,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -1409,8 +1419,6 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendContact'.format(self.base_url)
-
         if (not contact) and (not all([phone_number, first_name])):
             raise ValueError("Either contact or phone_number and first_name must be passed as"
                              "arguments.")
@@ -1428,9 +1436,10 @@ class Bot(TelegramObject):
         if vcard:
             data['vcard'] = vcard
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message('sendContact', data, timeout=timeout,
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)
+                             api_kwargs=api_kwargs)
 
     @log
     def send_game(self,
@@ -1440,7 +1449,7 @@ class Bot(TelegramObject):
                   reply_to_message_id=None,
                   reply_markup=None,
                   timeout=None,
-                  **kwargs):
+                  api_kwargs=None):
         """Use this method to send a game.
 
         Args:
@@ -1458,7 +1467,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -1467,16 +1477,15 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendGame'.format(self.base_url)
-
         data = {'chat_id': chat_id, 'game_short_name': game_short_name}
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message('sendGame', data, timeout=timeout,
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)
+                             api_kwargs=api_kwargs)
 
     @log
-    def send_chat_action(self, chat_id, action, timeout=None, **kwargs):
+    def send_chat_action(self, chat_id, action, timeout=None, api_kwargs=None):
         """
         Use this method when you need to tell the user that something is happening on the bot's
         side. The status is set for 5 seconds or less (when a message arrives from your bot,
@@ -1492,7 +1501,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool`:  On success, ``True`` is returned.
@@ -1501,12 +1511,9 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendChatAction'.format(self.base_url)
-
         data = {'chat_id': chat_id, 'action': action}
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('sendChatAction', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
@@ -1520,7 +1527,7 @@ class Bot(TelegramObject):
                             switch_pm_text=None,
                             switch_pm_parameter=None,
                             timeout=None,
-                            **kwargs):
+                            api_kwargs=None):
         """
         Use this method to send answers to an inline query. No more than 50 results per query are
         allowed.
@@ -1547,7 +1554,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 he read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Example:
             An inline bot that sends YouTube videos can ask the user to connect the bot to their
@@ -1565,8 +1573,6 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/answerInlineQuery'.format(self.base_url)
-
         for res in results:
             if res._has_parse_mode and res.parse_mode == DEFAULT_NONE:
                 if self.defaults:
@@ -1603,14 +1609,13 @@ class Bot(TelegramObject):
         if switch_pm_parameter:
             data['switch_pm_parameter'] = switch_pm_parameter
 
-        data.update(kwargs)
-
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('answerInlineQuery', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
     @log
-    def get_user_profile_photos(self, user_id, offset=None, limit=100, timeout=None, **kwargs):
+    def get_user_profile_photos(self, user_id, offset=None, limit=100, timeout=None,
+                                api_kwargs=None):
         """Use this method to get a list of profile pictures for a user.
 
         Args:
@@ -1622,7 +1627,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.UserProfilePhotos`
@@ -1631,22 +1637,19 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/getUserProfilePhotos'.format(self.base_url)
-
         data = {'user_id': user_id}
 
         if offset is not None:
             data['offset'] = offset
         if limit:
             data['limit'] = limit
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('getUserProfilePhotos', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return UserProfilePhotos.de_json(result, self)
 
     @log
-    def get_file(self, file_id, timeout=None, **kwargs):
+    def get_file(self, file_id, timeout=None, api_kwargs=None):
         """
         Use this method to get basic info about a file and prepare it for downloading. For the
         moment, bots can download files of up to 20MB in size. The file can then be downloaded
@@ -1670,7 +1673,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.File`
@@ -1679,25 +1683,22 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/getFile'.format(self.base_url)
-
         try:
             file_id = file_id.file_id
         except AttributeError:
             pass
 
         data = {'file_id': file_id}
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('getFile', data, timeout=timeout, api_kwargs=api_kwargs)
 
         if result.get('file_path'):
-            result['file_path'] = '%s/%s' % (self.base_file_url, result['file_path'])
+            result['file_path'] = '{}/{}'.format(self.base_file_url, result['file_path'])
 
         return File.de_json(result, self)
 
     @log
-    def kick_chat_member(self, chat_id, user_id, timeout=None, until_date=None, **kwargs):
+    def kick_chat_member(self, chat_id, user_id, timeout=None, until_date=None, api_kwargs=None):
         """
         Use this method to kick a user from a group or a supergroup or a channel. In the case of
         supergroups and channels, the user will not be able to return to the group on their own
@@ -1714,7 +1715,8 @@ class Bot(TelegramObject):
             until_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the user will
                 be unbanned, unix time. If user is banned for more than 366 days or less than 30
                 seconds from the current time they are considered to be banned forever.
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool` On success, ``True`` is returned.
@@ -1723,22 +1725,19 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/kickChatMember'.format(self.base_url)
-
         data = {'chat_id': chat_id, 'user_id': user_id}
-        data.update(kwargs)
 
         if until_date is not None:
             if isinstance(until_date, datetime):
                 until_date = to_timestamp(until_date)
             data['until_date'] = until_date
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('kickChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
     @log
-    def unban_chat_member(self, chat_id, user_id, timeout=None, **kwargs):
+    def unban_chat_member(self, chat_id, user_id, timeout=None, api_kwargs=None):
         """Use this method to unban a previously kicked user in a supergroup or channel.
 
         The user will not return to the group automatically, but will be able to join via link,
@@ -1751,7 +1750,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool` On success, ``True`` is returned.
@@ -1760,12 +1760,9 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/unbanChatMember'.format(self.base_url)
-
         data = {'chat_id': chat_id, 'user_id': user_id}
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('unbanChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
@@ -1777,7 +1774,7 @@ class Bot(TelegramObject):
                               url=None,
                               cache_time=None,
                               timeout=None,
-                              **kwargs):
+                              api_kwargs=None):
         """
         Use this method to send answers to callback queries sent from inline keyboards. The answer
         will be displayed to the user as a notification at the top of the chat screen or as an
@@ -1803,7 +1800,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool` On success, ``True`` is returned.
@@ -1812,8 +1810,6 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url_ = '{0}/answerCallbackQuery'.format(self.base_url)
-
         data = {'callback_query_id': callback_query_id}
 
         if text:
@@ -1824,9 +1820,8 @@ class Bot(TelegramObject):
             data['url'] = url
         if cache_time is not None:
             data['cache_time'] = cache_time
-        data.update(kwargs)
 
-        result = self._request.post(url_, data, timeout=timeout)
+        result = self._post('answerCallbackQuery', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
@@ -1840,7 +1835,7 @@ class Bot(TelegramObject):
                           disable_web_page_preview=None,
                           reply_markup=None,
                           timeout=None,
-                          **kwargs):
+                          api_kwargs=None):
         """
         Use this method to edit text and game messages sent by the bot or via the bot (for inline
         bots).
@@ -1864,7 +1859,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -1874,8 +1870,6 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/editMessageText'.format(self.base_url)
-
         data = {'text': text}
 
         if chat_id:
@@ -1889,7 +1883,8 @@ class Bot(TelegramObject):
         if disable_web_page_preview:
             data['disable_web_page_preview'] = disable_web_page_preview
 
-        return self._message(url, data, timeout=timeout, reply_markup=reply_markup, **kwargs)
+        return self._message('editMessageText', data, timeout=timeout, reply_markup=reply_markup,
+                             api_kwargs=api_kwargs)
 
     @log
     def edit_message_caption(self,
@@ -1900,7 +1895,7 @@ class Bot(TelegramObject):
                              reply_markup=None,
                              timeout=None,
                              parse_mode=None,
-                             **kwargs):
+                             api_kwargs=None):
         """
         Use this method to edit captions of messages sent by the bot or via the bot
         (for inline bots).
@@ -1923,7 +1918,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -1938,8 +1934,6 @@ class Bot(TelegramObject):
                 'edit_message_caption: Both chat_id and message_id are required when '
                 'inline_message_id is not specified')
 
-        url = '{0}/editMessageCaption'.format(self.base_url)
-
         data = {}
 
         if caption:
@@ -1953,7 +1947,8 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return self._message(url, data, timeout=timeout, reply_markup=reply_markup, **kwargs)
+        return self._message('editMessageCaption', data, timeout=timeout,
+                             reply_markup=reply_markup, api_kwargs=api_kwargs)
 
     @log
     def edit_message_media(self,
@@ -1963,7 +1958,7 @@ class Bot(TelegramObject):
                            media=None,
                            reply_markup=None,
                            timeout=None,
-                           **kwargs):
+                           api_kwargs=None):
         """
         Use this method to edit animation, audio, document, photo, or video messages. If a
         message is a part of a message album, then it can be edited only to a photo or a video.
@@ -1985,7 +1980,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -2000,8 +1996,6 @@ class Bot(TelegramObject):
                 'edit_message_media: Both chat_id and message_id are required when '
                 'inline_message_id is not specified')
 
-        url = '{0}/editMessageMedia'.format(self.base_url)
-
         data = {'media': media}
 
         if chat_id:
@@ -2011,7 +2005,8 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return self._message(url, data, timeout=timeout, reply_markup=reply_markup, **kwargs)
+        return self._message('editMessageMedia', data, timeout=timeout, reply_markup=reply_markup,
+                             api_kwargs=api_kwargs)
 
     @log
     def edit_message_reply_markup(self,
@@ -2020,7 +2015,7 @@ class Bot(TelegramObject):
                                   inline_message_id=None,
                                   reply_markup=None,
                                   timeout=None,
-                                  **kwargs):
+                                  api_kwargs=None):
         """
         Use this method to edit only the reply markup of messages sent by the bot or via the bot
         (for inline bots).
@@ -2038,7 +2033,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -2053,8 +2049,6 @@ class Bot(TelegramObject):
                 'edit_message_reply_markup: Both chat_id and message_id are required when '
                 'inline_message_id is not specified')
 
-        url = '{0}/editMessageReplyMarkup'.format(self.base_url)
-
         data = {}
 
         if chat_id:
@@ -2064,7 +2058,8 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return self._message(url, data, timeout=timeout, reply_markup=reply_markup, **kwargs)
+        return self._message('editMessageReplyMarkup', data, timeout=timeout,
+                             reply_markup=reply_markup, api_kwargs=api_kwargs)
 
     @log
     def get_updates(self,
@@ -2073,7 +2068,7 @@ class Bot(TelegramObject):
                     timeout=0,
                     read_latency=2.,
                     allowed_updates=None,
-                    **kwargs):
+                    api_kwargs=None):
         """Use this method to receive incoming updates using long polling.
 
         Args:
@@ -2097,7 +2092,8 @@ class Bot(TelegramObject):
                 specified, the previous setting will be used. Please note that this parameter
                 doesn't affect updates created before the call to the get_updates, so unwanted
                 updates may be received for a short period of time.
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Note:
             1. This method will not work if an outgoing webhook is set up.
@@ -2112,8 +2108,6 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/getUpdates'.format(self.base_url)
-
         data = {'timeout': timeout}
 
         if offset:
@@ -2122,14 +2116,14 @@ class Bot(TelegramObject):
             data['limit'] = limit
         if allowed_updates is not None:
             data['allowed_updates'] = allowed_updates
-        data.update(kwargs)
 
         # Ideally we'd use an aggressive read timeout for the polling. However,
         # * Short polling should return within 2 seconds.
         # * Long polling poses a different problem: the connection might have been dropped while
         #   waiting for the server to return and there's no way of knowing the connection had been
         #   dropped in real time.
-        result = self._request.post(url, data, timeout=float(read_latency) + float(timeout))
+        result = self._post('getUpdates', data, timeout=float(read_latency) + float(timeout),
+                            api_kwargs=api_kwargs)
 
         if result:
             self.logger.debug('Getting updates: %s', [u['update_id'] for u in result])
@@ -2145,7 +2139,7 @@ class Bot(TelegramObject):
                     timeout=None,
                     max_connections=40,
                     allowed_updates=None,
-                    **kwargs):
+                    api_kwargs=None):
         """
         Use this method to specify a url and receive incoming updates via an outgoing webhook.
         Whenever there is an update for the bot, Telegram will send an HTTPS POST request to the
@@ -2180,7 +2174,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Note:
             1. You will not be able to receive updates using get_updates for as long as an outgoing
@@ -2202,19 +2197,6 @@ class Bot(TelegramObject):
         .. _`guide to Webhooks`: https://core.telegram.org/bots/webhooks
 
         """
-        url_ = '{0}/setWebhook'.format(self.base_url)
-
-        # Backwards-compatibility: 'url' used to be named 'webhook_url'
-        if 'webhook_url' in kwargs:  # pragma: no cover
-            warnings.warn("The 'webhook_url' parameter has been renamed to 'url' in accordance "
-                          "with the API")
-
-            if url is not None:
-                raise ValueError("The parameters 'url' and 'webhook_url' are mutually exclusive")
-
-            url = kwargs['webhook_url']
-            del kwargs['webhook_url']
-
         data = {}
 
         if url is not None:
@@ -2227,14 +2209,13 @@ class Bot(TelegramObject):
             data['max_connections'] = max_connections
         if allowed_updates is not None:
             data['allowed_updates'] = allowed_updates
-        data.update(kwargs)
 
-        result = self._request.post(url_, data, timeout=timeout)
+        result = self._post('setWebhook', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
     @log
-    def delete_webhook(self, timeout=None, **kwargs):
+    def delete_webhook(self, timeout=None, api_kwargs=None):
         """
         Use this method to remove webhook integration if you decide to switch back to
         getUpdates. Requires no parameters.
@@ -2243,7 +2224,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool` On success, ``True`` is returned.
@@ -2252,16 +2234,12 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/deleteWebhook'.format(self.base_url)
-
-        data = kwargs
-
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('deleteWebhook', None, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
     @log
-    def leave_chat(self, chat_id, timeout=None, **kwargs):
+    def leave_chat(self, chat_id, timeout=None, api_kwargs=None):
         """Use this method for your bot to leave a group, supergroup or channel.
 
         Args:
@@ -2270,7 +2248,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool` On success, ``True`` is returned.
@@ -2279,17 +2258,14 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/leaveChat'.format(self.base_url)
-
         data = {'chat_id': chat_id}
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('leaveChat', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
     @log
-    def get_chat(self, chat_id, timeout=None, **kwargs):
+    def get_chat(self, chat_id, timeout=None, api_kwargs=None):
         """
         Use this method to get up to date information about the chat (current name of the user for
         one-on-one conversations, current username of a user, group or channel, etc.).
@@ -2300,7 +2276,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Chat`
@@ -2309,17 +2286,14 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/getChat'.format(self.base_url)
-
         data = {'chat_id': chat_id}
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('getChat', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return Chat.de_json(result, self)
 
     @log
-    def get_chat_administrators(self, chat_id, timeout=None, **kwargs):
+    def get_chat_administrators(self, chat_id, timeout=None, api_kwargs=None):
         """
         Use this method to get a list of administrators in a chat.
 
@@ -2329,7 +2303,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             List[:class:`telegram.ChatMember`]: On success, returns a list of ``ChatMember``
@@ -2341,17 +2316,14 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/getChatAdministrators'.format(self.base_url)
-
         data = {'chat_id': chat_id}
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('getChatAdministrators', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return [ChatMember.de_json(x, self) for x in result]
 
     @log
-    def get_chat_members_count(self, chat_id, timeout=None, **kwargs):
+    def get_chat_members_count(self, chat_id, timeout=None, api_kwargs=None):
         """Use this method to get the number of members in a chat.
 
         Args:
@@ -2360,7 +2332,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`int`: Number of members in the chat.
@@ -2369,17 +2342,14 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/getChatMembersCount'.format(self.base_url)
-
         data = {'chat_id': chat_id}
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('getChatMembersCount', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
     @log
-    def get_chat_member(self, chat_id, user_id, timeout=None, **kwargs):
+    def get_chat_member(self, chat_id, user_id, timeout=None, api_kwargs=None):
         """Use this method to get information about a member of a chat.
 
         Args:
@@ -2389,7 +2359,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.ChatMember`
@@ -2398,17 +2369,14 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/getChatMember'.format(self.base_url)
-
         data = {'chat_id': chat_id, 'user_id': user_id}
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('getChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return ChatMember.de_json(result, self)
 
     @log
-    def set_chat_sticker_set(self, chat_id, sticker_set_name, timeout=None, **kwargs):
+    def set_chat_sticker_set(self, chat_id, sticker_set_name, timeout=None, api_kwargs=None):
         """Use this method to set a new group sticker set for a supergroup.
         The bot must be an administrator in the chat for this to work and must have the appropriate
         admin rights. Use the field :attr:`telegram.Chat.can_set_sticker_set` optionally returned
@@ -2422,23 +2390,20 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
-
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool`: On success, ``True`` is returned.
         """
-
-        url = '{0}/setChatStickerSet'.format(self.base_url)
-
         data = {'chat_id': chat_id, 'sticker_set_name': sticker_set_name}
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('setChatStickerSet', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
     @log
-    def delete_chat_sticker_set(self, chat_id, timeout=None, **kwargs):
+    def delete_chat_sticker_set(self, chat_id, timeout=None, api_kwargs=None):
         """Use this method to delete a group sticker set from a supergroup. The bot must be an
         administrator in the chat for this to work and must have the appropriate admin rights.
         Use the field :attr:`telegram.Chat.can_set_sticker_set` optionally returned in
@@ -2450,21 +2415,19 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
              :obj:`bool`: On success, ``True`` is returned.
         """
-
-        url = '{0}/deleteChatStickerSet'.format(self.base_url)
-
         data = {'chat_id': chat_id}
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('deleteChatStickerSet', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
-    def get_webhook_info(self, timeout=None, **kwargs):
+    def get_webhook_info(self, timeout=None, api_kwargs=None):
         """Use this method to get current webhook status. Requires no parameters.
 
         If the bot is using getUpdates, will return an object with the url field empty.
@@ -2473,17 +2436,14 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.WebhookInfo`
 
         """
-        url = '{0}/getWebhookInfo'.format(self.base_url)
-
-        data = kwargs
-
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('getWebhookInfo', None, timeout=timeout, api_kwargs=api_kwargs)
 
         return WebhookInfo.de_json(result, self)
 
@@ -2497,7 +2457,7 @@ class Bot(TelegramObject):
                        force=None,
                        disable_edit_message=None,
                        timeout=None,
-                       **kwargs):
+                       api_kwargs=None):
         """
         Use this method to set the score of the specified user in a game.
 
@@ -2517,7 +2477,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Message`: The edited message, or if the message wasn't sent by the bot
@@ -2528,8 +2489,6 @@ class Bot(TelegramObject):
             current score in the chat and force is False.
 
         """
-        url = '{0}/setGameScore'.format(self.base_url)
-
         data = {'user_id': user_id, 'score': score}
 
         if chat_id:
@@ -2543,7 +2502,7 @@ class Bot(TelegramObject):
         if disable_edit_message is not None:
             data['disable_edit_message'] = disable_edit_message
 
-        return self._message(url, data, timeout=timeout, **kwargs)
+        return self._message('setGameScore', data, timeout=timeout, api_kwargs=api_kwargs)
 
     @log
     def get_game_high_scores(self,
@@ -2552,7 +2511,7 @@ class Bot(TelegramObject):
                              message_id=None,
                              inline_message_id=None,
                              timeout=None,
-                             **kwargs):
+                             api_kwargs=None):
         """
         Use this method to get data for high score tables. Will return the score of the specified
         user and several of his neighbors in a game.
@@ -2568,7 +2527,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             List[:class:`telegram.GameHighScore`]
@@ -2577,8 +2537,6 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/getGameHighScores'.format(self.base_url)
-
         data = {'user_id': user_id}
 
         if chat_id:
@@ -2587,9 +2545,8 @@ class Bot(TelegramObject):
             data['message_id'] = message_id
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('getGameHighScores', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return [GameHighScore.de_json(hs, self) for hs in result]
 
@@ -2619,7 +2576,7 @@ class Bot(TelegramObject):
                      send_phone_number_to_provider=None,
                      send_email_to_provider=None,
                      timeout=None,
-                     **kwargs):
+                     api_kwargs=None):
         """Use this method to send invoices.
 
         Args:
@@ -2669,7 +2626,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -2678,8 +2636,6 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendInvoice'.format(self.base_url)
-
         data = {
             'chat_id': chat_id,
             'title': title,
@@ -2691,7 +2647,7 @@ class Bot(TelegramObject):
             'prices': [p.to_dict() for p in prices]
         }
         if provider_data is not None:
-            if isinstance(provider_data, string_types):
+            if isinstance(provider_data, str):
                 data['provider_data'] = provider_data
             else:
                 data['provider_data'] = json.dumps(provider_data)
@@ -2718,9 +2674,10 @@ class Bot(TelegramObject):
         if send_email_to_provider is not None:
             data['send_email_to_provider'] = send_email_to_provider
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message('sendInvoice', data, timeout=timeout,
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)
+                             api_kwargs=api_kwargs)
 
     @log
     def answer_shipping_query(self,
@@ -2729,7 +2686,7 @@ class Bot(TelegramObject):
                               shipping_options=None,
                               error_message=None,
                               timeout=None,
-                              **kwargs):
+                              api_kwargs=None):
         """
         If you sent an invoice requesting a shipping address and the parameter is_flexible was
         specified, the Bot API will send an Update with a shipping_query field to the bot. Use
@@ -2749,7 +2706,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool`: On success, True is returned.
@@ -2770,23 +2728,20 @@ class Bot(TelegramObject):
                 'answerShippingQuery: If ok is False, error_message '
                 'should not be empty and there should not be shipping_options')
 
-        url_ = '{0}/answerShippingQuery'.format(self.base_url)
-
         data = {'shipping_query_id': shipping_query_id, 'ok': ok}
 
         if ok:
             data['shipping_options'] = [option.to_dict() for option in shipping_options]
         if error_message is not None:
             data['error_message'] = error_message
-        data.update(kwargs)
 
-        result = self._request.post(url_, data, timeout=timeout)
+        result = self._post('answerShippingQuery', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
     @log
     def answer_pre_checkout_query(self, pre_checkout_query_id, ok,
-                                  error_message=None, timeout=None, **kwargs):
+                                  error_message=None, timeout=None, api_kwargs=None):
         """
         Once the user has confirmed their payment and shipping details, the Bot API sends the final
         confirmation in the form of an Update with the field pre_checkout_query. Use this method to
@@ -2808,7 +2763,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool`: On success, ``True`` is returned.
@@ -2825,21 +2781,18 @@ class Bot(TelegramObject):
                 'not be error_message; if ok is False, error_message '
                 'should not be empty')
 
-        url_ = '{0}/answerPreCheckoutQuery'.format(self.base_url)
-
         data = {'pre_checkout_query_id': pre_checkout_query_id, 'ok': ok}
 
         if error_message is not None:
             data['error_message'] = error_message
-        data.update(kwargs)
 
-        result = self._request.post(url_, data, timeout=timeout)
+        result = self._post('answerPreCheckoutQuery', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
     @log
     def restrict_chat_member(self, chat_id, user_id, permissions, until_date=None,
-                             timeout=None, **kwargs):
+                             timeout=None, api_kwargs=None):
         """
         Use this method to restrict a user in a supergroup. The bot must be an administrator in
         the supergroup for this to work and must have the appropriate admin rights. Pass True for
@@ -2862,7 +2815,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool`: On success, ``True`` is returned.
@@ -2870,17 +2824,14 @@ class Bot(TelegramObject):
         Raises:
             :class:`telegram.TelegramError`
         """
-        url = '{0}/restrictChatMember'.format(self.base_url)
-
         data = {'chat_id': chat_id, 'user_id': user_id, 'permissions': permissions.to_dict()}
 
         if until_date is not None:
             if isinstance(until_date, datetime):
                 until_date = to_timestamp(until_date)
             data['until_date'] = until_date
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('restrictChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
@@ -2889,7 +2840,7 @@ class Bot(TelegramObject):
                             can_post_messages=None, can_edit_messages=None,
                             can_delete_messages=None, can_invite_users=None,
                             can_restrict_members=None, can_pin_messages=None,
-                            can_promote_members=None, timeout=None, **kwargs):
+                            can_promote_members=None, timeout=None, api_kwargs=None):
         """
         Use this method to promote or demote a user in a supergroup or a channel. The bot must be
         an administrator in the chat for this to work and must have the appropriate admin rights.
@@ -2920,7 +2871,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool`: On success, ``True`` is returned.
@@ -2929,8 +2881,6 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/promoteChatMember'.format(self.base_url)
-
         data = {'chat_id': chat_id, 'user_id': user_id}
 
         if can_change_info is not None:
@@ -2949,14 +2899,13 @@ class Bot(TelegramObject):
             data['can_pin_messages'] = can_pin_messages
         if can_promote_members is not None:
             data['can_promote_members'] = can_promote_members
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('promoteChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
     @log
-    def set_chat_permissions(self, chat_id, permissions, timeout=None, **kwargs):
+    def set_chat_permissions(self, chat_id, permissions, timeout=None, api_kwargs=None):
         """
         Use this method to set default chat permissions for all members. The bot must be an
         administrator in the group or a supergroup for this to work and must have the
@@ -2969,7 +2918,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool`: On success, ``True`` is returned.
@@ -2978,12 +2928,9 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/setChatPermissions'.format(self.base_url)
-
         data = {'chat_id': chat_id, 'permissions': permissions.to_dict()}
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('setChatPermissions', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
@@ -2993,7 +2940,7 @@ class Bot(TelegramObject):
                                             user_id,
                                             custom_title,
                                             timeout=None,
-                                            **kwargs):
+                                            api_kwargs=None):
         """
         Use this method to set a custom title for administrators promoted by the bot in a
         supergroup. The bot must be an administrator for this to work.
@@ -3007,7 +2954,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool`: On success, ``True`` is returned.
@@ -3016,17 +2964,15 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/setChatAdministratorCustomTitle'.format(self.base_url)
-
         data = {'chat_id': chat_id, 'user_id': user_id, 'custom_title': custom_title}
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('setChatAdministratorCustomTitle', data, timeout=timeout,
+                            api_kwargs=api_kwargs)
 
         return result
 
     @log
-    def export_chat_invite_link(self, chat_id, timeout=None, **kwargs):
+    def export_chat_invite_link(self, chat_id, timeout=None, api_kwargs=None):
         """
         Use this method to generate a new invite link for a chat; any previously generated link
         is revoked. The bot must be an administrator in the chat for this to work and must have
@@ -3038,7 +2984,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`str`: New invite link on success.
@@ -3047,17 +2994,14 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/exportChatInviteLink'.format(self.base_url)
-
         data = {'chat_id': chat_id}
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('exportChatInviteLink', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
     @log
-    def set_chat_photo(self, chat_id, photo, timeout=20, **kwargs):
+    def set_chat_photo(self, chat_id, photo, timeout=20, api_kwargs=None):
         """Use this method to set a new profile photo for the chat.
 
         Photos can't be changed for private chats. The bot must be an administrator in the chat
@@ -3070,7 +3014,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool`: On success, ``True`` is returned.
@@ -3079,20 +3024,17 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/setChatPhoto'.format(self.base_url)
-
         if InputFile.is_file(photo):
             photo = InputFile(photo)
 
         data = {'chat_id': chat_id, 'photo': photo}
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('setChatPhoto', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
     @log
-    def delete_chat_photo(self, chat_id, timeout=None, **kwargs):
+    def delete_chat_photo(self, chat_id, timeout=None, api_kwargs=None):
         """
         Use this method to delete a chat photo. Photos can't be changed for private chats. The bot
         must be an administrator in the chat for this to work and must have the appropriate admin
@@ -3104,7 +3046,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool`: On success, ``True`` is returned.
@@ -3113,17 +3056,14 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/deleteChatPhoto'.format(self.base_url)
-
         data = {'chat_id': chat_id}
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('deleteChatPhoto', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
     @log
-    def set_chat_title(self, chat_id, title, timeout=None, **kwargs):
+    def set_chat_title(self, chat_id, title, timeout=None, api_kwargs=None):
         """
         Use this method to change the title of a chat. Titles can't be changed for private chats.
         The bot must be an administrator in the chat for this to work and must have the appropriate
@@ -3136,7 +3076,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool`: On success, ``True`` is returned.
@@ -3145,17 +3086,14 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/setChatTitle'.format(self.base_url)
-
         data = {'chat_id': chat_id, 'title': title}
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('setChatTitle', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
     @log
-    def set_chat_description(self, chat_id, description, timeout=None, **kwargs):
+    def set_chat_description(self, chat_id, description, timeout=None, api_kwargs=None):
         """
         Use this method to change the description of a group, a supergroup or a channel. The bot
         must be an administrator in the chat for this to work and must have the appropriate admin
@@ -3168,7 +3106,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool`: On success, ``True`` is returned.
@@ -3177,18 +3116,15 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/setChatDescription'.format(self.base_url)
-
         data = {'chat_id': chat_id, 'description': description}
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('setChatDescription', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
     @log
     def pin_chat_message(self, chat_id, message_id, disable_notification=None, timeout=None,
-                         **kwargs):
+                         api_kwargs=None):
         """
         Use this method to pin a message in a group, a supergroup, or a channel.
         The bot must be an administrator in the chat for this to work and must have the
@@ -3205,7 +3141,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool`: On success, ``True`` is returned.
@@ -3214,20 +3151,17 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/pinChatMessage'.format(self.base_url)
-
         data = {'chat_id': chat_id, 'message_id': message_id}
 
         if disable_notification is not None:
             data['disable_notification'] = disable_notification
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('pinChatMessage', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
     @log
-    def unpin_chat_message(self, chat_id, timeout=None, **kwargs):
+    def unpin_chat_message(self, chat_id, timeout=None, api_kwargs=None):
         """
         Use this method to unpin a message in a group, a supergroup, or a channel.
         The bot must be an administrator in the chat for this to work and must have the
@@ -3240,7 +3174,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool`: On success, ``True`` is returned.
@@ -3249,17 +3184,14 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/unpinChatMessage'.format(self.base_url)
-
         data = {'chat_id': chat_id}
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('unpinChatMessage', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
     @log
-    def get_sticker_set(self, name, timeout=None, **kwargs):
+    def get_sticker_set(self, name, timeout=None, api_kwargs=None):
         """Use this method to get a sticker set.
 
         Args:
@@ -3267,7 +3199,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during
                 creation of the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.StickerSet`
@@ -3276,17 +3209,14 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/getStickerSet'.format(self.base_url)
-
         data = {'name': name}
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('getStickerSet', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return StickerSet.de_json(result, self)
 
     @log
-    def upload_sticker_file(self, user_id, png_sticker, timeout=20, **kwargs):
+    def upload_sticker_file(self, user_id, png_sticker, timeout=20, api_kwargs=None):
         """
         Use this method to upload a .png file with a sticker for later use in
         :attr:`create_new_sticker_set` and :attr:`add_sticker_to_set` methods (can be used multiple
@@ -3304,7 +3234,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during
                 creation of the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.File`: The uploaded File
@@ -3313,22 +3244,19 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/uploadStickerFile'.format(self.base_url)
-
         if InputFile.is_file(png_sticker):
             png_sticker = InputFile(png_sticker)
 
         data = {'user_id': user_id, 'png_sticker': png_sticker}
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('uploadStickerFile', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return File.de_json(result, self)
 
     @log
     def create_new_sticker_set(self, user_id, name, title, emojis, png_sticker=None,
                                contains_masks=None, mask_position=None, timeout=20,
-                               tgs_sticker=None, **kwargs):
+                               tgs_sticker=None, api_kwargs=None):
         """
         Use this method to create new sticker set owned by a user.
         The bot will be able to edit the created sticker set.
@@ -3369,7 +3297,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during
                 creation of the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool`: On success, ``True`` is returned.
@@ -3378,8 +3307,6 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/createNewStickerSet'.format(self.base_url)
-
         if InputFile.is_file(png_sticker):
             png_sticker = InputFile(png_sticker)
 
@@ -3398,15 +3325,14 @@ class Bot(TelegramObject):
             # We need to_json() instead of to_dict() here, because we're sending a media
             # message here, which isn't json dumped by utils.request
             data['mask_position'] = mask_position.to_json()
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('createNewStickerSet', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
     @log
     def add_sticker_to_set(self, user_id, name, emojis, png_sticker=None, mask_position=None,
-                           timeout=20, tgs_sticker=None, **kwargs):
+                           timeout=20, tgs_sticker=None, api_kwargs=None):
         """
         Use this method to add a new sticker to a set created by the bot.
         You must use exactly one of the fields png_sticker or tgs_sticker. Animated stickers
@@ -3441,7 +3367,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during
                 creation of the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool`: On success, ``True`` is returned.
@@ -3450,8 +3377,6 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/addStickerToSet'.format(self.base_url)
-
         if InputFile.is_file(png_sticker):
             png_sticker = InputFile(png_sticker)
 
@@ -3468,14 +3393,13 @@ class Bot(TelegramObject):
             # We need to_json() instead of to_dict() here, because we're sending a media
             # message here, which isn't json dumped by utils.request
             data['mask_position'] = mask_position.to_json()
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('addStickerToSet', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
     @log
-    def set_sticker_position_in_set(self, sticker, position, timeout=None, **kwargs):
+    def set_sticker_position_in_set(self, sticker, position, timeout=None, api_kwargs=None):
         """Use this method to move a sticker in a set created by the bot to a specific position.
 
         Args:
@@ -3484,7 +3408,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during
                 creation of the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool`: On success, ``True`` is returned.
@@ -3493,17 +3418,15 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/setStickerPositionInSet'.format(self.base_url)
-
         data = {'sticker': sticker, 'position': position}
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('setStickerPositionInSet', data, timeout=timeout,
+                            api_kwargs=api_kwargs)
 
         return result
 
     @log
-    def delete_sticker_from_set(self, sticker, timeout=None, **kwargs):
+    def delete_sticker_from_set(self, sticker, timeout=None, api_kwargs=None):
         """Use this method to delete a sticker from a set created by the bot.
 
         Args:
@@ -3511,7 +3434,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during
                 creation of the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool`: On success, ``True`` is returned.
@@ -3520,17 +3444,14 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/deleteStickerFromSet'.format(self.base_url)
-
         data = {'sticker': sticker}
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('deleteStickerFromSet', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
     @log
-    def set_sticker_set_thumb(self, name, user_id, thumb=None, timeout=None, **kwargs):
+    def set_sticker_set_thumb(self, name, user_id, thumb=None, timeout=None, api_kwargs=None):
         """Use this method to set the thumbnail of a sticker set. Animated thumbnails can be set
         for animated sticker sets only.
 
@@ -3541,16 +3462,17 @@ class Bot(TelegramObject):
             name (:obj:`str`): Sticker set name
             user_id (:obj:`int`): User identifier of created sticker set owner.
             thumb (:obj:`str` | `filelike object`, optional): A PNG image with the thumbnail, must
-            be up to 128 kilobytes in size and have width and height exactly 100px, or a TGS
-            animation with the thumbnail up to 32 kilobytes in size; see
-            https://core.telegram.org/animated_stickers#technical-requirements for animated sticker
-            technical requirements. Pass a file_id as a String to send a file that already exists
-            on the Telegram servers, pass an HTTP URL as a String for Telegram to get a file from
-            the Internet, or upload a new one using multipart/form-data.
+                be up to 128 kilobytes in size and have width and height exactly 100px, or a TGS
+                animation with the thumbnail up to 32 kilobytes in size; see
+                https://core.telegram.org/animated_stickers#technical-requirements for animated
+                sticker technical requirements. Pass a file_id as a String to send a file that
+                already exists on the Telegram servers, pass an HTTP URL as a String for Telegram
+                to get a file from the Internet, or upload a new one using multipart/form-data.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during
                 creation of the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool`: On success, ``True`` is returned.
@@ -3559,20 +3481,18 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{}/setStickerSetThumb'.format(self.base_url)
 
         if InputFile.is_file(thumb):
             thumb = InputFile(thumb)
 
         data = {'name': name, 'user_id': user_id, 'thumb': thumb}
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('setStickerSetThumb', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
     @log
-    def set_passport_data_errors(self, user_id, errors, timeout=None, **kwargs):
+    def set_passport_data_errors(self, user_id, errors, timeout=None, api_kwargs=None):
         """
         Informs a user that some of the Telegram Passport elements they provided contains errors.
         The user will not be able to re-submit their Passport to you until the errors are fixed
@@ -3590,7 +3510,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during
                 creation of the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`bool`: On success, ``True`` is returned.
@@ -3599,12 +3520,9 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url_ = '{0}/setPassportDataErrors'.format(self.base_url)
-
         data = {'user_id': user_id, 'errors': [error.to_dict() for error in errors]}
-        data.update(kwargs)
 
-        result = self._request.post(url_, data, timeout=timeout)
+        result = self._post('setPassportDataErrors', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result
 
@@ -3626,7 +3544,7 @@ class Bot(TelegramObject):
                   explanation_parse_mode=DEFAULT_NONE,
                   open_period=None,
                   close_date=None,
-                  **kwargs):
+                  api_kwargs=None):
         """
         Use this method to send a native poll.
 
@@ -3667,7 +3585,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -3676,8 +3595,6 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendPoll'.format(self.base_url)
-
         data = {
             'chat_id': chat_id,
             'question': question,
@@ -3711,9 +3628,10 @@ class Bot(TelegramObject):
                 close_date = to_timestamp(close_date)
             data['close_date'] = close_date
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message('sendPoll', data, timeout=timeout,
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)
+                             api_kwargs=api_kwargs)
 
     @log
     def stop_poll(self,
@@ -3721,7 +3639,7 @@ class Bot(TelegramObject):
                   message_id,
                   reply_markup=None,
                   timeout=None,
-                  **kwargs):
+                  api_kwargs=None):
         """
         Use this method to stop a poll which was sent by the bot.
 
@@ -3734,7 +3652,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Poll`: On success, the stopped Poll with the final results is
@@ -3744,8 +3663,6 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/stopPoll'.format(self.base_url)
-
         data = {
             'chat_id': chat_id,
             'message_id': message_id
@@ -3759,7 +3676,7 @@ class Bot(TelegramObject):
             else:
                 data['reply_markup'] = reply_markup
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('stopPoll', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return Poll.de_json(result, self)
 
@@ -3771,15 +3688,16 @@ class Bot(TelegramObject):
                   reply_markup=None,
                   timeout=None,
                   emoji=None,
-                  **kwargs):
+                  api_kwargs=None):
         """
-        Use this method to send a dice, which will have a random value from 1 to 6. On success, the
+        Use this method to send an animated emoji, which will have a random value. On success, the
         sent Message is returned.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target private chat.
             emoji (:obj:`str`, optional): Emoji on which the dice throw animation is based.
-                Currently, must be one of “🎲” or “🎯”. Defaults to “🎲”
+                Currently, must be one of “🎲”, “🎯” or “🏀”. Dice can have values 1-6 for “🎲” and
+                “🎯”, and values 1-5 for “🏀” . Defaults to “🎲”
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
@@ -3790,7 +3708,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -3799,8 +3718,6 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendDice'.format(self.base_url)
-
         data = {
             'chat_id': chat_id,
         }
@@ -3808,12 +3725,13 @@ class Bot(TelegramObject):
         if emoji:
             data['emoji'] = emoji
 
-        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+        return self._message('sendDice', data, timeout=timeout,
+                             disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
-                             **kwargs)
+                             api_kwargs=api_kwargs)
 
     @log
-    def get_my_commands(self, timeout=None, **kwargs):
+    def get_my_commands(self, timeout=None, api_kwargs=None):
         """
         Use this method to get the current list of the bot's commands.
 
@@ -3821,7 +3739,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             List[:class:`telegram.BotCommand]`: On success, the commands set for the bot
@@ -3830,16 +3749,14 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/getMyCommands'.format(self.base_url)
-
-        result = self._request.get(url, timeout=timeout)
+        result = self._post('getMyCommands', timeout=timeout, api_kwargs=api_kwargs)
 
         self._commands = [BotCommand.de_json(c, self) for c in result]
 
         return self._commands
 
     @log
-    def set_my_commands(self, commands, timeout=None, **kwargs):
+    def set_my_commands(self, commands, timeout=None, api_kwargs=None):
         """
         Use this method to change the list of the bot's commands.
 
@@ -3850,7 +3767,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`True`: On success
@@ -3859,14 +3777,11 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/setMyCommands'.format(self.base_url)
-
         cmds = [c if isinstance(c, BotCommand) else BotCommand(c[0], c[1]) for c in commands]
 
         data = {'commands': [c.to_dict() for c in cmds]}
-        data.update(kwargs)
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._post('setMyCommands', data, timeout=timeout, api_kwargs=api_kwargs)
 
         # Set commands. No need to check for outcome.
         # If request failed, we won't come this far
@@ -3881,11 +3796,6 @@ class Bot(TelegramObject):
             data['last_name'] = self.last_name
 
         return data
-
-    def __reduce__(self):
-        return (self.__class__, (self.token, self.base_url.replace(self.token, ''),
-                                 self.base_file_url.replace(self.token, ''), None, None, None,
-                                 self.defaults))
 
     # camelCase aliases
     getMe = get_me

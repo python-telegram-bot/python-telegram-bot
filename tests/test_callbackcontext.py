@@ -22,7 +22,7 @@ from telegram import Update, Message, Chat, User, TelegramError
 from telegram.ext import CallbackContext
 
 
-class TestCallbackContext(object):
+class TestCallbackContext:
     def test_non_context_dp(self, dp):
         with pytest.raises(ValueError):
             CallbackContext(dp)

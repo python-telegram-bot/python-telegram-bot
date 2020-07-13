@@ -88,7 +88,7 @@ class InlineQueryResultDocument(InlineQueryResult):
                  parse_mode=DEFAULT_NONE,
                  **kwargs):
         # Required
-        super(InlineQueryResultDocument, self).__init__('document', id)
+        super().__init__('document', id)
         self.document_url = document_url
         self.title = title
         self.mime_type = mime_type

@@ -34,7 +34,7 @@ def encrypted_passport_element():
                                     selfie=TestEncryptedPassportElement.selfie)
 
 
-class TestEncryptedPassportElement(object):
+class TestEncryptedPassportElement:
     type_ = 'type'
     data = 'data'
     phone_number = 'phone_number'

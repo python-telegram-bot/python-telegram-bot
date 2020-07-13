@@ -15,7 +15,7 @@ Depends: ${python3:Depends}, ${misc:Depends}
 Description: We have made you a wrapper you can't refuse!
  The Python Telegram bot (Python 3)
  This library provides a pure Python interface for the Telegram Bot API.
- It's compatible with Python versions 2.7, 3.3+ and PyPy.
+ It's compatible with Python versions 3.5+ and PyPy.
  .
  In addition to the pure API implementation, this library features
  a number of high-level

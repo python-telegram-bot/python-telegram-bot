@@ -36,7 +36,7 @@ def inline_query_result_cached_video():
         reply_markup=TestInlineQueryResultCachedVideo.reply_markup)
 
 
-class TestInlineQueryResultCachedVideo(object):
+class TestInlineQueryResultCachedVideo:
     id_ = 'id'
     type_ = 'video'
     video_file_id = 'video file id'

@@ -30,7 +30,7 @@ def poll_option():
                       voter_count=TestPollOption.voter_count)
 
 
-class TestPollOption(object):
+class TestPollOption:
     text = "test option"
     voter_count = 3
 
@@ -58,7 +58,7 @@ def poll_answer():
                       option_ids=TestPollAnswer.poll_id)
 
 
-class TestPollAnswer(object):
+class TestPollAnswer:
     poll_id = 'id'
     user = User(1, '', False)
     option_ids = [2]
@@ -101,7 +101,7 @@ def poll():
                 )
 
 
-class TestPoll(object):
+class TestPoll:
     id_ = 'id'
     question = 'Test?'
     options = [PollOption('test', 10), PollOption('test2', 11)]

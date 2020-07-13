@@ -42,7 +42,7 @@ def is_match(handler, update):
     return check is not None and check is not False
 
 
-class BaseTest(object):
+class BaseTest:
     """Base class for command and prefix handler test classes. Contains
     utility methods an several callbacks used by both classes."""
     test_flag = False

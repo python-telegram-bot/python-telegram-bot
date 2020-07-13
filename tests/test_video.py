@@ -38,7 +38,7 @@ def video(bot, chat_id):
         return bot.send_video(chat_id, video=f, timeout=50).video
 
 
-class TestVideo(object):
+class TestVideo:
     width = 360
     height = 640
     duration = 5
@@ -149,10 +149,10 @@ class TestVideo(object):
         assert message.video == video
 
     def test_send_with_video(self, monkeypatch, bot, chat_id, video):
-        def test(_, url, data, **kwargs):
+        def test(url, data, **kwargs):
             return data['video'] == video.file_id
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr(bot.request, 'post', test)
         message = bot.send_video(chat_id, video=video)
         assert message
 

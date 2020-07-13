@@ -31,7 +31,7 @@ def keyboard_button():
                           request_poll=TestKeyboardButton.request_poll)
 
 
-class TestKeyboardButton(object):
+class TestKeyboardButton:
     text = 'text'
     request_location = True
     request_contact = True

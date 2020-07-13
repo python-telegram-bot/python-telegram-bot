@@ -38,7 +38,7 @@ def _lstrip_str(in_s, lstr):
 
 class TelegramError(Exception):
     def __init__(self, message):
-        super(TelegramError, self).__init__()
+        super().__init__()
 
         msg = _lstrip_str(message, 'Error: ')
         msg = _lstrip_str(msg, '[Error]: ')
@@ -58,7 +58,7 @@ class Unauthorized(TelegramError):
 
 class InvalidToken(TelegramError):
     def __init__(self):
-        super(InvalidToken, self).__init__('Invalid token')
+        super().__init__('Invalid token')
 
 
 class NetworkError(TelegramError):
@@ -71,7 +71,7 @@ class BadRequest(NetworkError):
 
 class TimedOut(NetworkError):
     def __init__(self):
-        super(TimedOut, self).__init__('Timed out')
+        super().__init__('Timed out')
 
 
 class ChatMigrated(TelegramError):
@@ -82,8 +82,7 @@ class ChatMigrated(TelegramError):
     """
 
     def __init__(self, new_chat_id):
-        super(ChatMigrated,
-              self).__init__('Group migrated to supergroup. New chat id: {}'.format(new_chat_id))
+        super().__init__('Group migrated to supergroup. New chat id: {}'.format(new_chat_id))
         self.new_chat_id = new_chat_id
 
 
@@ -95,8 +94,7 @@ class RetryAfter(TelegramError):
     """
 
     def __init__(self, retry_after):
-        super(RetryAfter,
-              self).__init__('Flood control exceeded. Retry in {} seconds'.format(retry_after))
+        super().__init__('Flood control exceeded. Retry in {} seconds'.format(retry_after))
         self.retry_after = float(retry_after)
 
 
@@ -110,4 +108,4 @@ class Conflict(TelegramError):
     """
 
     def __init__(self, msg):
-        super(Conflict, self).__init__(msg)
+        super().__init__(msg)

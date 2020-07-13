@@ -39,7 +39,7 @@ def inline_query_result_photo():
         reply_markup=TestInlineQueryResultPhoto.reply_markup)
 
 
-class TestInlineQueryResultPhoto(object):
+class TestInlineQueryResultPhoto:
     id_ = 'id'
     type_ = 'photo'
     photo_url = 'photo url'

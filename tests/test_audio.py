@@ -39,7 +39,7 @@ def audio(bot, chat_id):
                               thumb=open('tests/data/thumb.jpg', 'rb')).audio
 
 
-class TestAudio(object):
+class TestAudio:
     caption = 'Test *audio*'
     performer = 'Leandro Toledo'
     title = 'Teste'
@@ -135,10 +135,10 @@ class TestAudio(object):
         assert message.audio == audio
 
     def test_send_with_audio(self, monkeypatch, bot, chat_id, audio):
-        def test(_, url, data, **kwargs):
+        def test(url, data, **kwargs):
             return data['audio'] == audio.file_id
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr(bot.request, 'post', test)
         message = bot.send_audio(audio=audio, chat_id=chat_id)
         assert message
 
