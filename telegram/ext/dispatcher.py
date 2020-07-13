@@ -155,6 +155,7 @@ class Dispatcher:
             if not isinstance(persistence, BasePersistence):
                 raise TypeError("persistence must be based on telegram.ext.BasePersistence")
             self.persistence = persistence
+            self.persistence.set_bot(self.bot)
             if self.persistence.store_user_data:
                 self.user_data = self.persistence.get_user_data()
                 if not isinstance(self.user_data, defaultdict):

@@ -39,6 +39,15 @@ class DictPersistence(BasePersistence):
         because ``DictPersistence`` is mainly intended as starting point for custom persistence
         classes that need to JSON-serialize the stored data before writing them to file/database.
 
+    Warning:
+        :class:`DictPersistence` will try to replace :class:`telegram.Bot` instances by
+        :attr:`REPLACED_BOT` and insert the bot set with
+        :meth:`telegram.ext.BasePersistence.set_bot` upon loading of the data. This is to ensure
+        that changes to the bot apply to the saved objects, too. If you change the bots token, this
+        may lead to e.g. ``Chat not found`` errors. For the limitations on replacing bots see
+        :meth:`telegram.ext.BasePersistence.replace_bot` and
+        :meth:`telegram.ext.BasePersistence.insert_bot`.
+
     Attributes:
         store_user_data (:obj:`bool`): Whether user_data should be saved by this
             persistence class.

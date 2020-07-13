@@ -395,6 +395,111 @@ class TestBasePersistence:
             dp.process_update(MyUpdate())
         assert 'An uncaught error was raised while processing the update' not in caplog.text
 
+    def test_bot_replace_insert_bot(self, bot):
+
+        class BotPersistence(BasePersistence):
+            def __init__(self):
+                super().__init__()
+                self.bot_data = None
+                self.chat_data = defaultdict(dict)
+                self.user_data = defaultdict(dict)
+
+            def get_bot_data(self):
+                return self.bot_data
+
+            def get_chat_data(self):
+                return self.chat_data
+
+            def get_user_data(self):
+                return self.user_data
+
+            def get_conversations(self, name):
+                raise NotImplementedError
+
+            def update_bot_data(self, data):
+                self.bot_data = data
+
+            def update_chat_data(self, chat_id, data):
+                self.chat_data[chat_id] = data
+
+            def update_user_data(self, user_id, data):
+                self.user_data[user_id] = data
+
+            def update_conversation(self, name, key, new_state):
+                raise NotImplementedError
+
+        class CustomSlottedClass:
+            __slots__ = ('bot',)
+
+            def __init__(self):
+                self.bot = bot
+
+            def __eq__(self, other):
+                if isinstance(other, CustomSlottedClass):
+                    return self.bot is other.bot
+                return False
+
+        class CustomClass:
+            def __init__(self):
+                self.bot = bot
+                self.slotted_object = CustomSlottedClass()
+                self.list_ = [1, 2, bot]
+                self.tuple_ = tuple(self.list_)
+                self.set_ = set(self.list_)
+                self.frozenset_ = frozenset(self.list_)
+                self.dict_ = {item: item for item in self.list_}
+                self.defaultdict_ = defaultdict(dict, self.dict_)
+
+            @staticmethod
+            def replace_bot():
+                cc = CustomClass()
+                cc.bot = BasePersistence.REPLACED_BOT
+                cc.slotted_object.bot = BasePersistence.REPLACED_BOT
+                cc.list_ = [1, 2, BasePersistence.REPLACED_BOT]
+                cc.tuple_ = tuple(cc.list_)
+                cc.set_ = set(cc.list_)
+                cc.frozenset_ = frozenset(cc.list_)
+                cc.dict_ = {item: item for item in cc.list_}
+                cc.defaultdict_ = defaultdict(dict, cc.dict_)
+                return cc
+
+            def __eq__(self, other):
+                if isinstance(other, CustomClass):
+                    # print(self.__dict__)
+                    # print(other.__dict__)
+                    return (self.bot == other.bot
+                            and self.slotted_object == other.slotted_object
+                            and self.list_ == other.list_
+                            and self.tuple_ == other.tuple_
+                            and self.set_ == other.set_
+                            and self.frozenset_ == other.frozenset_
+                            and self.dict_ == other.dict_
+                            and self.defaultdict_ == other.defaultdict_)
+                return False
+
+        persistence = BotPersistence()
+        persistence.set_bot(bot)
+        cc = CustomClass()
+
+        persistence.update_bot_data({1: cc})
+        assert persistence.bot_data[1].bot == BasePersistence.REPLACED_BOT
+        assert persistence.bot_data[1] == cc.replace_bot()
+
+        persistence.update_chat_data(123, {1: cc})
+        assert persistence.chat_data[123][1].bot == BasePersistence.REPLACED_BOT
+        assert persistence.chat_data[123][1] == cc.replace_bot()
+
+        persistence.update_user_data(123, {1: cc})
+        assert persistence.user_data[123][1].bot == BasePersistence.REPLACED_BOT
+        assert persistence.user_data[123][1] == cc.replace_bot()
+
+        assert persistence.get_bot_data()[1] == cc
+        assert persistence.get_bot_data()[1].bot is bot
+        assert persistence.get_chat_data()[123][1] == cc
+        assert persistence.get_chat_data()[123][1].bot is bot
+        assert persistence.get_user_data()[123][1] == cc
+        assert persistence.get_user_data()[123][1].bot is bot
+
 
 @pytest.fixture(scope='function')
 def pickle_persistence():
