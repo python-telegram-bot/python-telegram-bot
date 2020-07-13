@@ -41,6 +41,18 @@ class BasePersistence(ABC):
       must overwrite :meth:`get_conversations` and :meth:`update_conversation`.
     * :meth:`flush` will be called when the bot is shutdown.
 
+    Warning:
+        Persistence will try to replace :class:`telegram.Bot` instances by :attr:`REPLACED_BOT` and
+        insert the bot set with :meth:`set_bot` upon loading of the data. This is to ensure that
+        changes to the bot apply to the saved objects, too. If you change the bots token, this may
+        lead to e.g. ``Chat not found`` errors. For the limitations on replacing bots see
+        :meth:`replace_bot` and :meth:`insert_bot`.
+
+    Note:
+         :meth:`replace_bot` and :meth:`insert_bot` are used *independently* of the implementation
+         of the :meth:`update/get_*` methods, i.e. you don't need to worry about it while
+         implementing a custom persistence subclass.
+
     Attributes:
         store_user_data (:obj:`bool`): Optional, Whether user_data should be saved by this
             persistence class.
@@ -112,7 +124,7 @@ class BasePersistence(ABC):
         """
         Replaces all instances of :class:`telegram.Bot` that occur within the passed object with
         :attr:`REPLACED_BOT`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
-        ``frozenset``, ``dict``, ``defaultdict`` or objects that have a ``__dict__`` or
+        ``frozenset``, ``dict``, ``defaultdict`` and objects that have a ``__dict__`` or
         ``__slot__`` attribute.
 
         Args:
@@ -148,7 +160,7 @@ class BasePersistence(ABC):
         """
         Replaces all instances of :attr:`REPLACED_BOT` that occur within the passed object with
         :attr:`bot`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
-        ``frozenset``, ``dict``, ``defaultdict`` or objects that have a ``__dict__`` or
+        ``frozenset``, ``dict``, ``defaultdict`` and objects that have a ``__dict__`` or
         ``__slot__`` attribute.
 
         Args:
@@ -272,5 +284,5 @@ class BasePersistence(ABC):
         """
         pass
 
-    REPLACED_BOT = 'ReplacedBot'
+    REPLACED_BOT = 'bot_instance_replaced_by_ptb_persistence'
     """:obj:`str`: Placeholder for :class:`telegram.Bot` instances replaced in saved data."""
