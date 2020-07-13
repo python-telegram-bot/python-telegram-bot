@@ -27,6 +27,15 @@ from telegram.ext import BasePersistence
 class PicklePersistence(BasePersistence):
     """Using python's builtin pickle for making you bot persistent.
 
+    Warning:
+        :class:`PicklePersistence` will try to replace :class:`telegram.Bot` instances by
+        :attr:`REPLACED_BOT` and insert the bot set with
+        :meth:`telegram.ext.BasePersistence.set_bot` upon loading of the data. This is to ensure
+        that changes to the bot apply to the saved objects, too. If you change the bots token, this
+        may lead to e.g. ``Chat not found`` errors. For the limitations on replacing bots see
+        :meth:`telegram.ext.BasePersistence.replace_bot` and
+        :meth:`telegram.ext.BasePersistence.insert_bot`.
+
     Attributes:
         filename (:obj:`str`): The filename for storing the pickle files. When :attr:`single_file`
             is :obj:`False` this will be used as a prefix.
