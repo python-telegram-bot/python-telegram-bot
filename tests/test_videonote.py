@@ -111,10 +111,10 @@ class TestVideoNote:
         assert message.video_note == video_note
 
     def test_send_with_video_note(self, monkeypatch, bot, chat_id, video_note):
-        def test(_, url, data, **kwargs):
+        def test(url, data, **kwargs):
             return data['video_note'] == video_note.file_id
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr(bot.request, 'post', test)
         message = bot.send_video_note(chat_id, video_note=video_note)
         assert message
 
