@@ -20,6 +20,7 @@
 
 import logging
 import ssl
+import warnings
 from threading import Thread, Lock, current_thread, Event
 from time import sleep
 from signal import signal, SIGINT, SIGTERM, SIGABRT
@@ -28,6 +29,7 @@ from queue import Queue
 from telegram import Bot, TelegramError
 from telegram.ext import Dispatcher, JobQueue
 from telegram.error import Unauthorized, InvalidToken, RetryAfter, TimedOut
+from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import get_signal_name
 from telegram.utils.request import Request
 from telegram.utils.webhookhandler import (WebhookServer, WebhookAppClass)
@@ -115,6 +117,12 @@ class Updater:
                  use_context=False,
                  dispatcher=None,
                  base_file_url=None):
+
+        if defaults and bot:
+            warnings.warn('Passing defaults to an Updater has no effect, if a Bot is passed, '
+                          'too. Pass it to the Bot instead.',
+                          TelegramDeprecationWarning,
+                          stacklevel=2)
 
         if dispatcher is None:
             if (token is None) and (bot is None):

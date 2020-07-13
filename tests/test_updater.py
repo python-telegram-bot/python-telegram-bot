@@ -35,7 +35,8 @@ import pytest
 
 from telegram import TelegramError, Message, User, Chat, Update, Bot
 from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter
-from telegram.ext import Updater, Dispatcher, DictPersistence
+from telegram.ext import Updater, Dispatcher, DictPersistence, Defaults
+from telegram.utils.deprecate import TelegramDeprecationWarning
 
 signalskip = pytest.mark.skipif(sys.platform == 'win32',
                                 reason='Can\'t send signals without stopping '
@@ -489,3 +490,7 @@ class TestUpdater:
         use_context = not dispatcher.use_context
         with pytest.raises(ValueError):
             Updater(dispatcher=dispatcher, use_context=use_context)
+
+    def test_defaults_warning(self, bot):
+        with pytest.warns(TelegramDeprecationWarning, match='no effect, if a Bot is passed'):
+            Updater(bot=bot, defaults=Defaults())
