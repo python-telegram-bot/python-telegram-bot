@@ -223,7 +223,7 @@ class Update(TelegramObject):
         if not data:
             return None
 
-        data = super(Update, cls).de_json(data, bot)
+        data = super().de_json(data, bot)
 
         message = data.get('message')
         if message:

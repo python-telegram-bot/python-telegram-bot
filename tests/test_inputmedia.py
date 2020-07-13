@@ -83,7 +83,7 @@ def input_media_document(class_thumb_file):
                               parse_mode=TestInputMediaDocument.parse_mode)
 
 
-class TestInputMediaVideo(object):
+class TestInputMediaVideo:
     type_ = "video"
     media = "NOTAREALFILEID"
     caption = "My Caption"
@@ -133,7 +133,7 @@ class TestInputMediaVideo(object):
         assert input_media_video.caption == "test 3"
 
 
-class TestInputMediaPhoto(object):
+class TestInputMediaPhoto:
     type_ = "photo"
     media = "NOTAREALFILEID"
     caption = "My Caption"
@@ -167,7 +167,7 @@ class TestInputMediaPhoto(object):
         assert input_media_photo.caption == "test 2"
 
 
-class TestInputMediaAnimation(object):
+class TestInputMediaAnimation:
     type_ = "animation"
     media = "NOTAREALFILEID"
     caption = "My Caption"
@@ -208,7 +208,7 @@ class TestInputMediaAnimation(object):
         assert input_media_animation.caption == "test 2"
 
 
-class TestInputMediaAudio(object):
+class TestInputMediaAudio:
     type_ = "audio"
     media = "NOTAREALFILEID"
     caption = "My Caption"
@@ -255,7 +255,7 @@ class TestInputMediaAudio(object):
         assert input_media_audio.caption == "test 3"
 
 
-class TestInputMediaDocument(object):
+class TestInputMediaDocument:
     type_ = "document"
     media = "NOTAREALFILEID"
     caption = "My Caption"
@@ -296,7 +296,7 @@ def media_group(photo, thumb):  # noqa: F811
             InputMediaPhoto(thumb, caption='<b>photo</b> 2', parse_mode='HTML')]
 
 
-class TestSendMediaGroup(object):
+class TestSendMediaGroup:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_media_group_photo(self, bot, chat_id, media_group):

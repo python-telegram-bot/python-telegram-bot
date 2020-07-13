@@ -37,7 +37,7 @@ def video_note(bot, chat_id):
         return bot.send_video_note(chat_id, video_note=f, timeout=50).video_note
 
 
-class TestVideoNote(object):
+class TestVideoNote:
     length = 240
     duration = 3
     file_size = 132084
@@ -111,10 +111,10 @@ class TestVideoNote(object):
         assert message.video_note == video_note
 
     def test_send_with_video_note(self, monkeypatch, bot, chat_id, video_note):
-        def test(_, url, data, **kwargs):
+        def test(url, data, **kwargs):
             return data['video_note'] == video_note.file_id
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr(bot.request, 'post', test)
         message = bot.send_video_note(chat_id, video_note=video_note)
         assert message
 

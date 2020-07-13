@@ -19,11 +19,6 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 
-def error(update, context):
-    """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, context.error)
-
-
 def start_callback(update, context):
     msg = "Use /shipping to get an invoice for shipping-payment, "
     msg += "or /noshipping for an invoice without shipping."
@@ -133,9 +128,6 @@ def main():
 
     # Success! Notify your user!
     dp.add_handler(MessageHandler(Filters.successful_payment, successful_payment_callback))
-
-    # log all errors
-    dp.add_error_handler(error)
 
     # Start the Bot
     updater.start_polling()

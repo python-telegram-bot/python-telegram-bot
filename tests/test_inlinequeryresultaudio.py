@@ -37,7 +37,7 @@ def inline_query_result_audio():
         reply_markup=TestInlineQueryResultAudio.reply_markup)
 
 
-class TestInlineQueryResultAudio(object):
+class TestInlineQueryResultAudio:
     id_ = 'id'
     type_ = 'audio'
     audio_url = 'audio url'

@@ -165,7 +165,7 @@ class Poll(TelegramObject):
         if not data:
             return None
 
-        data = super(Poll, cls).de_json(data, bot)
+        data = super().de_json(data, bot)
 
         data['options'] = [PollOption.de_json(option, bot) for option in data['options']]
         data['explanation_entities'] = MessageEntity.de_list(data.get('explanation_entities'), bot)
@@ -174,7 +174,7 @@ class Poll(TelegramObject):
         return cls(**data)
 
     def to_dict(self):
-        data = super(Poll, self).to_dict()
+        data = super().to_dict()
 
         data['options'] = [x.to_dict() for x in self.options]
         if self.explanation_entities:

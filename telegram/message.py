@@ -107,6 +107,7 @@ class Message(TelegramObject):
         poll (:class:`telegram.Poll`): Optional. Message is a native poll,
             information about the poll.
         dice (:class:`telegram.Dice`): Optional. Message is a dice.
+        via_bot (:class:`telegram.User`): Optional. Bot through which the message was sent.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
@@ -216,6 +217,7 @@ class Message(TelegramObject):
         poll (:class:`telegram.Poll`, optional): Message is a native poll,
             information about the poll.
         dice (:class:`telegram.Dice`, optional): Message is a dice with random value from 1 to 6.
+        via_bot (:class:`telegram.User`, optional): Message was sent through an inline bot.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. login_url buttons are represented as ordinary url buttons.
         default_quote (:obj:`bool`, optional): Default setting for the `quote` parameter of the
@@ -285,6 +287,7 @@ class Message(TelegramObject):
                  bot=None,
                  default_quote=None,
                  dice=None,
+                 via_bot=None,
                  **kwargs):
         # Required
         self.message_id = int(message_id)
@@ -335,6 +338,7 @@ class Message(TelegramObject):
         self.passport_data = passport_data
         self.poll = poll
         self.dice = dice
+        self.via_bot = via_bot
         self.reply_markup = reply_markup
         self.bot = bot
         self.default_quote = default_quote
@@ -364,7 +368,7 @@ class Message(TelegramObject):
         if not data:
             return None
 
-        data = super(Message, cls).de_json(data, bot)
+        data = super().de_json(data, bot)
 
         data['from_user'] = User.de_json(data.get('from'), bot)
         data['date'] = from_timestamp(data['date'])
@@ -409,6 +413,7 @@ class Message(TelegramObject):
         data['passport_data'] = PassportData.de_json(data.get('passport_data'), bot)
         data['poll'] = Poll.de_json(data.get('poll'), bot)
         data['dice'] = Dice.de_json(data.get('dice'), bot)
+        data['via_bot'] = User.de_json(data.get('via_bot'), bot)
         data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
 
         return cls(bot=bot, **data)
@@ -452,7 +457,7 @@ class Message(TelegramObject):
             return self.chat.id
 
     def to_dict(self):
-        data = super(Message, self).to_dict()
+        data = super().to_dict()
 
         # Required
         data['date'] = to_timestamp(self.date)
@@ -583,7 +588,7 @@ class Message(TelegramObject):
     def reply_media_group(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.reply_media_group(update.message.chat_id, *args, **kwargs)
+            bot.send_media_group(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
             quote (:obj:`bool`, optional): If set to ``True``, the media group is sent as an

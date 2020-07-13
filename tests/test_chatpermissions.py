@@ -30,7 +30,7 @@ def chat_permissions():
                            can_invite_users=True, can_pin_messages=True)
 
 
-class TestChatPermissions(object):
+class TestChatPermissions:
     can_send_messages = True
     can_send_media_messages = True
     can_send_polls = True

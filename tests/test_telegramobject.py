@@ -29,7 +29,7 @@ except ImportError:
 from telegram import TelegramObject
 
 
-class TestTelegramObject(object):
+class TestTelegramObject:
     def test_to_json_native(self, monkeypatch):
         if ujson:
             monkeypatch.setattr('ujson.dumps', json_lib.dumps)

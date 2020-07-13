@@ -3,6 +3,7 @@ on:
   pull_request:
     branches:
       - master
+      - v13
   schedule:
     - cron: 7 3 * * *
   push:
@@ -15,7 +16,7 @@ jobs:
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        python-version: [3.5, 3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7, 3.8]
         os: [ubuntu-latest, windows-latest]
         include:
           - os: ubuntu-latest

@@ -66,9 +66,9 @@ class PicklePersistence(BasePersistence):
                  store_bot_data=True,
                  single_file=True,
                  on_flush=False):
-        super(PicklePersistence, self).__init__(store_user_data=store_user_data,
-                                                store_chat_data=store_chat_data,
-                                                store_bot_data=store_bot_data)
+        super().__init__(store_user_data=store_user_data,
+                         store_chat_data=store_chat_data,
+                         store_bot_data=store_bot_data)
         self.filename = filename
         self.single_file = single_file
         self.on_flush = on_flush
@@ -277,7 +277,7 @@ class PicklePersistence(BasePersistence):
         """ Will save all data in memory to pickle file(s).
         """
         if self.single_file:
-            if self.user_data or self.chat_data or self.conversations:
+            if self.user_data or self.chat_data or self.bot_data or self.conversations:
                 self.dump_singlefile()
         else:
             if self.user_data:

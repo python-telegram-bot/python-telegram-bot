@@ -45,7 +45,7 @@ class ShippingOption(TelegramObject):
         self._id_attrs = (self.id,)
 
     def to_dict(self):
-        data = super(ShippingOption, self).to_dict()
+        data = super().to_dict()
 
         data['prices'] = [p.to_dict() for p in self.prices]
 

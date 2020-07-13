@@ -29,7 +29,7 @@ def passport_element_error_translation_file():
                                                TestPassportElementErrorTranslationFile.message)
 
 
-class TestPassportElementErrorTranslationFile(object):
+class TestPassportElementErrorTranslationFile:
     source = 'translation_file'
     type_ = 'test_type'
     file_hash = 'file_hash'

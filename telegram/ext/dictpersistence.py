@@ -66,9 +66,9 @@ class DictPersistence(BasePersistence):
                  chat_data_json='',
                  bot_data_json='',
                  conversations_json=''):
-        super(DictPersistence, self).__init__(store_user_data=store_user_data,
-                                              store_chat_data=store_chat_data,
-                                              store_bot_data=store_bot_data)
+        super().__init__(store_user_data=store_user_data,
+                         store_chat_data=store_chat_data,
+                         store_bot_data=store_bot_data)
         self._user_data = None
         self._chat_data = None
         self._bot_data = None

@@ -19,8 +19,8 @@
 """This module contains an object that represents a Telegram EncryptedPassportElement."""
 from base64 import b64decode
 
-from telegram import (TelegramObject, PassportFile, PersonalDetails, IdDocumentData,
-                      ResidentialAddress)
+from telegram import (IdDocumentData, PassportFile, PersonalDetails,
+                      ResidentialAddress, TelegramObject)
 from telegram.passport.credentials import decrypt_json
 
 
@@ -138,7 +138,7 @@ class EncryptedPassportElement(TelegramObject):
         if not data:
             return None
 
-        data = super(EncryptedPassportElement, cls).de_json(data, bot)
+        data = super().de_json(data, bot)
 
         data['files'] = PassportFile.de_list(data.get('files'), bot) or None
         data['front_side'] = PassportFile.de_json(data.get('front_side'), bot)
@@ -153,7 +153,7 @@ class EncryptedPassportElement(TelegramObject):
         if not data:
             return None
 
-        data = super(EncryptedPassportElement, cls).de_json(data, bot)
+        data = super().de_json(data, bot)
 
         if data['type'] not in ('phone_number', 'email'):
             secure_data = getattr(credentials.secure_data, data['type'])
@@ -197,7 +197,7 @@ class EncryptedPassportElement(TelegramObject):
         return encrypted_passport_elements
 
     def to_dict(self):
-        data = super(EncryptedPassportElement, self).to_dict()
+        data = super().to_dict()
 
         if self.files:
             data['files'] = [p.to_dict() for p in self.files]

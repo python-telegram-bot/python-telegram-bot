@@ -30,7 +30,7 @@ def inline_query_result_game():
                                  reply_markup=TestInlineQueryResultGame.reply_markup)
 
 
-class TestInlineQueryResultGame(object):
+class TestInlineQueryResultGame:
     id_ = 'id'
     type_ = 'game'
     game_short_name = 'game short name'

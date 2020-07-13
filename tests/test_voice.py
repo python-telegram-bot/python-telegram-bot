@@ -38,7 +38,7 @@ def voice(bot, chat_id):
         return bot.send_voice(chat_id, voice=f, timeout=50).voice
 
 
-class TestVoice(object):
+class TestVoice:
     duration = 3
     mime_type = 'audio/ogg'
     file_size = 9199
@@ -115,10 +115,10 @@ class TestVoice(object):
         assert message.voice == voice
 
     def test_send_with_voice(self, monkeypatch, bot, chat_id, voice):
-        def test(_, url, data, **kwargs):
+        def test(url, data, **kwargs):
             return data['voice'] == voice.file_id
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr(bot.request, 'post', test)
         message = bot.send_voice(chat_id, voice=voice)
         assert message
 

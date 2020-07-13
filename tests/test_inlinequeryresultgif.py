@@ -36,10 +36,11 @@ def inline_query_result_gif():
         caption=TestInlineQueryResultGif.caption,
         parse_mode=TestInlineQueryResultGif.parse_mode,
         input_message_content=TestInlineQueryResultGif.input_message_content,
-        reply_markup=TestInlineQueryResultGif.reply_markup)
+        reply_markup=TestInlineQueryResultGif.reply_markup,
+        thumb_mime_type=TestInlineQueryResultGif.thumb_mime_type)
 
 
-class TestInlineQueryResultGif(object):
+class TestInlineQueryResultGif:
     id_ = 'id'
     type_ = 'gif'
     gif_url = 'gif url'
@@ -47,6 +48,7 @@ class TestInlineQueryResultGif(object):
     gif_height = 15
     gif_duration = 1
     thumb_url = 'thumb url'
+    thumb_mime_type = 'image/jpeg'
     title = 'title'
     caption = 'caption'
     parse_mode = 'HTML'
@@ -61,6 +63,7 @@ class TestInlineQueryResultGif(object):
         assert inline_query_result_gif.gif_height == self.gif_height
         assert inline_query_result_gif.gif_duration == self.gif_duration
         assert inline_query_result_gif.thumb_url == self.thumb_url
+        assert inline_query_result_gif.thumb_mime_type == self.thumb_mime_type
         assert inline_query_result_gif.title == self.title
         assert inline_query_result_gif.caption == self.caption
         assert inline_query_result_gif.parse_mode == self.parse_mode
@@ -79,6 +82,8 @@ class TestInlineQueryResultGif(object):
         assert inline_query_result_gif_dict['gif_height'] == inline_query_result_gif.gif_height
         assert inline_query_result_gif_dict['gif_duration'] == inline_query_result_gif.gif_duration
         assert inline_query_result_gif_dict['thumb_url'] == inline_query_result_gif.thumb_url
+        assert (inline_query_result_gif_dict['thumb_mime_type']
+                == inline_query_result_gif.thumb_mime_type)
         assert inline_query_result_gif_dict['title'] == inline_query_result_gif.title
         assert inline_query_result_gif_dict['caption'] == inline_query_result_gif.caption
         assert inline_query_result_gif_dict['parse_mode'] == inline_query_result_gif.parse_mode

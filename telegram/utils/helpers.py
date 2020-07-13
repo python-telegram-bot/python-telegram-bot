@@ -19,19 +19,18 @@
 """This module contains helper functions."""
 
 import datetime as dtm  # dtm = "DateTime Module"
+import re
+import signal
 import time
-
 from collections import defaultdict
+from html import escape
 from numbers import Number
 
 try:
     import ujson as json
 except ImportError:
     import json
-from html import escape
 
-import re
-import signal
 
 # From https://stackoverflow.com/questions/2549939/get-signal-names-from-numbers-in-python
 _signames = {v: k
@@ -58,26 +57,29 @@ def escape_markdown(text, version=1, entity_type=None):
             ``version=2``, will be ignored else.
     """
     if int(version) == 1:
-        escape_chars = '\*_`\['
+        escape_chars = r'_*`['
     elif int(version) == 2:
         if entity_type == 'pre' or entity_type == 'code':
-            escape_chars = '`\\\\'
+            escape_chars = r'\`'
         elif entity_type == 'text_link':
-            escape_chars = ')\\\\'
+            escape_chars = r'\)'
         else:
-            escape_chars = '_*\[\]()~`>\#\+\-=|{}\.!'
+            escape_chars = r'_*[]()~`>#+-=|{}.!'
     else:
         raise ValueError('Markdown version must be either 1 or 2!')
 
-    return re.sub(r'([%s])' % escape_chars, r'\\\1', text)
+    return re.sub('([{}])'.format(re.escape(escape_chars)), r'\\\1', text)
 
 
 # -------- date/time related helpers --------
 # TODO: add generic specification of UTC for naive datetimes to docs
 
 def _datetime_to_float_timestamp(dt_obj):
-    """Converts a datetime object to a float timestamp (with sub-second precision).
-    If the datetime object is timezone-naive, it is assumed to be in UTC."""
+    """
+    Converts a datetime object to a float timestamp (with sub-second precision).
+    If the datetime object is timezone-naive, it is assumed to be in UTC.
+    """
+
     if dt_obj.tzinfo is None:
         dt_obj = dt_obj.replace(tzinfo=dtm.timezone.utc)
     return dt_obj.timestamp()
@@ -288,7 +290,7 @@ def create_deep_linked_url(bot_username, payload=None, group=False):
     else:
         key = 'start'
 
-    return '{0}?{1}={2}'.format(
+    return '{}?{}={}'.format(
         base_url,
         key,
         payload

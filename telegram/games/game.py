@@ -77,7 +77,7 @@ class Game(TelegramObject):
         if not data:
             return None
 
-        data = super(Game, cls).de_json(data, bot)
+        data = super().de_json(data, bot)
 
         data['photo'] = PhotoSize.de_list(data.get('photo'), bot)
         data['text_entities'] = MessageEntity.de_list(data.get('text_entities'), bot)
@@ -86,7 +86,7 @@ class Game(TelegramObject):
         return cls(**data)
 
     def to_dict(self):
-        data = super(Game, self).to_dict()
+        data = super().to_dict()
 
         data['photo'] = [p.to_dict() for p in self.photo]
         if self.text_entities:

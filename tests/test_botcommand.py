@@ -27,7 +27,7 @@ def bot_command():
     return BotCommand(command='start', description='A command')
 
 
-class TestBotCommand(object):
+class TestBotCommand:
     command = 'start'
     description = 'A command'
 

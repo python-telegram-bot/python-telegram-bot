@@ -28,7 +28,7 @@ def order_info():
                      TestOrderInfo.email, TestOrderInfo.shipping_address)
 
 
-class TestOrderInfo(object):
+class TestOrderInfo:
     name = 'name'
     phone_number = 'phone_number'
     email = 'email'

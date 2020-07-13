@@ -28,7 +28,6 @@ from cryptography.hazmat.primitives.ciphers import Cipher
 from cryptography.hazmat.primitives.ciphers.algorithms import AES
 from cryptography.hazmat.primitives.ciphers.modes import CBC
 from cryptography.hazmat.primitives.hashes import SHA512, SHA256, Hash, SHA1
-from future.utils import bord
 
 from telegram import TelegramObject, TelegramError
 
@@ -39,8 +38,7 @@ class TelegramDecryptionError(TelegramError):
     """
 
     def __init__(self, message):
-        super(TelegramDecryptionError, self).__init__("TelegramDecryptionError: "
-                                                      "{}".format(message))
+        super().__init__("TelegramDecryptionError: {}".format(message))
 
 
 def decrypt(secret, hash, data):
@@ -83,7 +81,7 @@ def decrypt(secret, hash, data):
         # Raise a error that is caught inside telegram.PassportData and transformed into a warning
         raise TelegramDecryptionError("Hashes are not equal! {} != {}".format(data_hash, hash))
     # Return data without padding
-    return data[bord(data[0]):]
+    return data[data[0]:]
 
 
 def decrypt_json(secret, hash, data):
@@ -134,7 +132,7 @@ class EncryptedCredentials(TelegramObject):
         if not data:
             return None
 
-        data = super(EncryptedCredentials, cls).de_json(data, bot)
+        data = super().de_json(data, bot)
 
         return cls(bot=bot, **data)
 
@@ -347,7 +345,7 @@ class SecureValue(TelegramObject):
         return cls(bot=bot, **data)
 
     def to_dict(self):
-        data = super(SecureValue, self).to_dict()
+        data = super().to_dict()
 
         data['files'] = [p.to_dict() for p in self.files]
         data['translation'] = [p.to_dict() for p in self.translation]
@@ -402,10 +400,10 @@ class DataCredentials(_CredentialsBase):
     """
 
     def __init__(self, data_hash, secret, **kwargs):
-        super(DataCredentials, self).__init__(data_hash, secret, **kwargs)
+        super().__init__(data_hash, secret, **kwargs)
 
     def to_dict(self):
-        data = super(DataCredentials, self).to_dict()
+        data = super().to_dict()
 
         del data['file_hash']
         del data['hash']
@@ -428,10 +426,10 @@ class FileCredentials(_CredentialsBase):
         """
 
     def __init__(self, file_hash, secret, **kwargs):
-        super(FileCredentials, self).__init__(file_hash, secret, **kwargs)
+        super().__init__(file_hash, secret, **kwargs)
 
     def to_dict(self):
-        data = super(FileCredentials, self).to_dict()
+        data = super().to_dict()
 
         del data['data_hash']
         del data['hash']
