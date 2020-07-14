@@ -29,6 +29,9 @@ class LoginUrl(TelegramObject):
 
     Sample bot: `@discussbot <https://t.me/dicussbot>`_
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`url` is equal.
+
     Attributes:
         url (:obj:`str`): An HTTP URL to be opened with user authorization data.
         forward_text (:obj:`str`): Optional. New text of the button in forwarded messages.
