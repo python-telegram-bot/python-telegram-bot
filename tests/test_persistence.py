@@ -467,7 +467,7 @@ class TestBasePersistence:
                 if isinstance(other, CustomClass):
                     # print(self.__dict__)
                     # print(other.__dict__)
-                    return (self.bot == other.bot
+                    return (self.bot is other.bot
                             and self.slotted_object == other.slotted_object
                             and self.list_ == other.list_
                             and self.tuple_ == other.tuple_

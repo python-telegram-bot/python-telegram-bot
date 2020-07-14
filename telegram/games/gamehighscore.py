@@ -24,6 +24,9 @@ from telegram import TelegramObject, User
 class GameHighScore(TelegramObject):
     """This object represents one row of the high scores table for a game.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`position`, :attr:`user` and :attr:`score` are equal.
+
     Attributes:
         position (:obj:`int`): Position in high score table for the game.
         user (:class:`telegram.User`): User.
@@ -40,6 +43,8 @@ class GameHighScore(TelegramObject):
         self.position = position
         self.user = user
         self.score = score
+
+        self._id_attrs = (self.position, self.user, self.score)
 
     @classmethod
     def de_json(cls, data, bot):

@@ -29,6 +29,10 @@ class EncryptedPassportElement(TelegramObject):
     Contains information about documents or other Telegram Passport elements shared with the bot
     by the user. The data has been automatically decrypted by python-telegram-bot.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`type`, :attr:`data`, :attr:`phone_number`, :attr:`email`,
+    :attr:`files`, :attr:`front_side`, :attr:`reverse_side` and :attr:`selfie` are equal.
+
     Attributes:
         type (:obj:`str`): Element type. One of "personal_details", "passport", "driver_license",
             "identity_card", "internal_passport", "address", "utility_bill", "bank_statement",

@@ -25,6 +25,9 @@ class Document(TelegramObject):
     """This object represents a general file
     (as opposed to photos, voice messages and audio files).
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`file_unique_id` is equal.
+
     Attributes:
         file_id (:obj:`str`): File identifier.
         file_unique_id (:obj:`str`): Unique identifier for this file, which
