@@ -19,7 +19,7 @@
 
 import pytest
 
-from telegram import LabeledPrice
+from telegram import LabeledPrice, Location
 
 
 @pytest.fixture(scope='class')
@@ -41,3 +41,18 @@ class TestLabeledPrice:
         assert isinstance(labeled_price_dict, dict)
         assert labeled_price_dict['label'] == labeled_price.label
         assert labeled_price_dict['amount'] == labeled_price.amount
+
+    def test_equality(self):
+        a = LabeledPrice('label', 100)
+        b = LabeledPrice('label', 100)
+        c = LabeledPrice('Label', 101)
+        d = Location(123, 456)
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)

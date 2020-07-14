@@ -24,6 +24,9 @@ from telegram import TelegramObject, User, OrderInfo
 class PreCheckoutQuery(TelegramObject):
     """This object contains information about an incoming pre-checkout query.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`id` is equal.
+
     Note:
         * In Python `from` is a reserved word, use `from_user` instead.
 

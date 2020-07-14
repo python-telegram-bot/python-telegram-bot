@@ -888,7 +888,7 @@ class TestMessage:
         id_ = 1
         a = Message(id_, self.from_user, self.date, self.chat)
         b = Message(id_, self.from_user, self.date, self.chat)
-        c = Message(id_, User(0, '', False), self.date, self.chat)
+        c = Message(id_, self.from_user, self.date, Chat(123, Chat.GROUP))
         d = Message(0, self.from_user, self.date, self.chat)
         e = Update(id_)
 
@@ -896,8 +896,8 @@ class TestMessage:
         assert hash(a) == hash(b)
         assert a is not b
 
-        assert a == c
-        assert hash(a) == hash(c)
+        assert a != c
+        assert hash(a) != hash(c)
 
         assert a != d
         assert hash(a) != hash(d)
