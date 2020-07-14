@@ -563,8 +563,6 @@ class TestFilters:
 
     def test_filters_user_allow_empty(self, update):
         assert not Filters.user()(update)
-        # this happens in a channel post or a poll
-        update.message.from_user = False
         assert Filters.user(allow_empty=True)(update)
 
     def test_filters_user_id(self, update):
@@ -1098,22 +1096,21 @@ class TestFilters:
 
     def test_filters_via_bot_init(self):
         with pytest.raises(RuntimeError, match='in conjunction with'):
-            Filters.via_bot(user_id=1, username='bot')
+            Filters.via_bot(bot_id=1, username='bot')
 
     def test_filters_via_bot_allow_empty(self, update):
         assert not Filters.via_bot()(update)
-        update.message.via_bot = None
         assert Filters.via_bot(allow_empty=True)(update)
 
     def test_filters_via_bot_id(self, update):
-        assert not Filters.via_bot(user_id=1)(update)
+        assert not Filters.via_bot(bot_id=1)(update)
         update.message.via_bot.id = 1
-        assert Filters.via_bot(user_id=1)(update)
+        assert Filters.via_bot(bot_id=1)(update)
         update.message.via_bot.id = 2
-        assert Filters.via_bot(user_id=[1, 2])(update)
-        assert not Filters.via_bot(user_id=[3, 4])(update)
+        assert Filters.via_bot(bot_id=[1, 2])(update)
+        assert not Filters.via_bot(bot_id=[3, 4])(update)
         update.message.via_bot = None
-        assert not Filters.via_bot(user_id=[3, 4])(update)
+        assert not Filters.via_bot(bot_id=[3, 4])(update)
 
     def test_filters_via_bot_username(self, update):
         assert not Filters.via_bot(username='bot')(update)
@@ -1127,12 +1124,12 @@ class TestFilters:
         assert not Filters.user(username=['@username', '@bot_2'])(update)
 
     def test_filters_via_bot_change_id(self, update):
-        f = Filters.via_bot(user_id=3)
+        f = Filters.via_bot(bot_id=3)
         update.message.via_bot.id = 3
         assert f(update)
         update.message.via_bot.id = 2
         assert not f(update)
-        f.user_ids = 2
+        f.bot_ids = 2
         assert f(update)
 
         with pytest.raises(RuntimeError, match='username in conjunction'):
@@ -1147,8 +1144,8 @@ class TestFilters:
         f.usernames = 'Bot'
         assert f(update)
 
-        with pytest.raises(RuntimeError, match='user_id in conjunction'):
-            f.user_ids = 1
+        with pytest.raises(RuntimeError, match='bot_id in conjunction'):
+            f.bot_ids = 1
 
     def test_filters_via_bot_add_user_by_name(self, update):
         users = ['bot_a', 'bot_b', 'bot_c']
@@ -1165,8 +1162,8 @@ class TestFilters:
             update.message.via_bot.username = user
             assert f(update)
 
-        with pytest.raises(RuntimeError, match='user_id in conjunction'):
-            f.add_user_ids(1)
+        with pytest.raises(RuntimeError, match='bot_id in conjunction'):
+            f.add_bot_ids(1)
 
     def test_filters_via_bot_add_user_by_id(self, update):
         users = [1, 2, 3]
@@ -1176,8 +1173,8 @@ class TestFilters:
             update.message.via_bot.id = user
             assert not f(update)
 
-        f.add_user_ids(1)
-        f.add_user_ids([2, 3])
+        f.add_bot_ids(1)
+        f.add_bot_ids([2, 3])
 
         for user in users:
             update.message.via_bot.username = user
@@ -1190,8 +1187,8 @@ class TestFilters:
         users = ['bot_a', 'bot_b', 'bot_c']
         f = Filters.via_bot(username=users)
 
-        with pytest.raises(RuntimeError, match='user_id in conjunction'):
-            f.remove_user_ids(1)
+        with pytest.raises(RuntimeError, match='bot_id in conjunction'):
+            f.remove_bot_ids(1)
 
         for user in users:
             update.message.via_bot.username = user
@@ -1206,7 +1203,7 @@ class TestFilters:
 
     def test_filters_via_bot_remove_user_by_id(self, update):
         users = [1, 2, 3]
-        f = Filters.via_bot(user_id=users)
+        f = Filters.via_bot(bot_id=users)
 
         with pytest.raises(RuntimeError, match='username in conjunction'):
             f.remove_usernames('bot')
@@ -1215,8 +1212,8 @@ class TestFilters:
             update.message.via_bot.id = user
             assert f(update)
 
-        f.remove_user_ids(1)
-        f.remove_user_ids([2, 3])
+        f.remove_bot_ids(1)
+        f.remove_bot_ids([2, 3])
 
         for user in users:
             update.message.via_bot.username = user
