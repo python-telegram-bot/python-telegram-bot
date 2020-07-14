@@ -28,7 +28,7 @@ import re
 @pytest.fixture(scope='function')
 def update():
     return Update(0, Message(0, User(0, 'Testuser', False), datetime.datetime.utcnow(),
-                             Chat(0, 'private')))
+                             Chat(0, 'private'), via_bot=User(0, "Testbot", True)))
 
 
 @pytest.fixture(scope='function',
@@ -1093,3 +1093,128 @@ class TestFilters:
         update.message.text = 'test'
         result = (Filters.command | DataFilter('blah'))(update)
         assert result['test'] == ['blah']
+
+    def test_filters_via_bot_init(self):
+        with pytest.raises(RuntimeError, match='in conjunction with'):
+            Filters.via_bot(bot_id=1, username='bot')
+
+    def test_filters_via_bot_allow_empty(self, update):
+        assert not Filters.via_bot()(update)
+        assert Filters.via_bot(allow_empty=True)(update)
+
+    def test_filters_via_bot_id(self, update):
+        assert not Filters.via_bot(bot_id=1)(update)
+        update.message.via_bot.id = 1
+        assert Filters.via_bot(bot_id=1)(update)
+        update.message.via_bot.id = 2
+        assert Filters.via_bot(bot_id=[1, 2])(update)
+        assert not Filters.via_bot(bot_id=[3, 4])(update)
+        update.message.via_bot = None
+        assert not Filters.via_bot(bot_id=[3, 4])(update)
+
+    def test_filters_via_bot_username(self, update):
+        assert not Filters.via_bot(username='bot')(update)
+        assert not Filters.via_bot(username='Testbot')(update)
+        update.message.via_bot.username = 'bot@'
+        assert Filters.via_bot(username='@bot@')(update)
+        assert Filters.via_bot(username='bot@')(update)
+        assert Filters.via_bot(username=['bot1', 'bot@', 'bot2'])(update)
+        assert not Filters.via_bot(username=['@username', '@bot_2'])(update)
+        update.message.via_bot = None
+        assert not Filters.user(username=['@username', '@bot_2'])(update)
+
+    def test_filters_via_bot_change_id(self, update):
+        f = Filters.via_bot(bot_id=3)
+        update.message.via_bot.id = 3
+        assert f(update)
+        update.message.via_bot.id = 2
+        assert not f(update)
+        f.bot_ids = 2
+        assert f(update)
+
+        with pytest.raises(RuntimeError, match='username in conjunction'):
+            f.usernames = 'user'
+
+    def test_filters_via_bot_change_username(self, update):
+        f = Filters.via_bot(username='bot')
+        update.message.via_bot.username = 'bot'
+        assert f(update)
+        update.message.via_bot.username = 'Bot'
+        assert not f(update)
+        f.usernames = 'Bot'
+        assert f(update)
+
+        with pytest.raises(RuntimeError, match='bot_id in conjunction'):
+            f.bot_ids = 1
+
+    def test_filters_via_bot_add_user_by_name(self, update):
+        users = ['bot_a', 'bot_b', 'bot_c']
+        f = Filters.via_bot()
+
+        for user in users:
+            update.message.via_bot.username = user
+            assert not f(update)
+
+        f.add_usernames('bot_a')
+        f.add_usernames(['bot_b', 'bot_c'])
+
+        for user in users:
+            update.message.via_bot.username = user
+            assert f(update)
+
+        with pytest.raises(RuntimeError, match='bot_id in conjunction'):
+            f.add_bot_ids(1)
+
+    def test_filters_via_bot_add_user_by_id(self, update):
+        users = [1, 2, 3]
+        f = Filters.via_bot()
+
+        for user in users:
+            update.message.via_bot.id = user
+            assert not f(update)
+
+        f.add_bot_ids(1)
+        f.add_bot_ids([2, 3])
+
+        for user in users:
+            update.message.via_bot.username = user
+            assert f(update)
+
+        with pytest.raises(RuntimeError, match='username in conjunction'):
+            f.add_usernames('bot')
+
+    def test_filters_via_bot_remove_user_by_name(self, update):
+        users = ['bot_a', 'bot_b', 'bot_c']
+        f = Filters.via_bot(username=users)
+
+        with pytest.raises(RuntimeError, match='bot_id in conjunction'):
+            f.remove_bot_ids(1)
+
+        for user in users:
+            update.message.via_bot.username = user
+            assert f(update)
+
+        f.remove_usernames('bot_a')
+        f.remove_usernames(['bot_b', 'bot_c'])
+
+        for user in users:
+            update.message.via_bot.username = user
+            assert not f(update)
+
+    def test_filters_via_bot_remove_user_by_id(self, update):
+        users = [1, 2, 3]
+        f = Filters.via_bot(bot_id=users)
+
+        with pytest.raises(RuntimeError, match='username in conjunction'):
+            f.remove_usernames('bot')
+
+        for user in users:
+            update.message.via_bot.id = user
+            assert f(update)
+
+        f.remove_bot_ids(1)
+        f.remove_bot_ids([2, 3])
+
+        for user in users:
+            update.message.via_bot.username = user
+            assert not f(update)
