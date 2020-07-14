@@ -25,6 +25,9 @@ class KeyboardButtonPollType(TelegramObject):
     """This object represents type of a poll, which is allowed to be created
     and sent when the corresponding button is pressed.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`type` is equal.
+
     Attributes:
         type (:obj:`str`): Optional. If :attr:`telegram.Poll.QUIZ` is passed, the user will be
             allowed to create only polls in the quiz mode. If :attr:`telegram.Poll.REGULAR` is

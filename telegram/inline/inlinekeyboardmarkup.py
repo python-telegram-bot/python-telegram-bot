@@ -25,6 +25,9 @@ class InlineKeyboardMarkup(ReplyMarkup):
     """
     This object represents an inline keyboard that appears right next to the message it belongs to.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their the size of :attr:`inline_keyboard` and all the buttons are equal.
+
     Attributes:
         inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
             each represented by a list of InlineKeyboardButton objects.
@@ -109,3 +112,19 @@ class InlineKeyboardMarkup(ReplyMarkup):
         """
         button_grid = [[button] for button in button_column]
         return cls(button_grid, **kwargs)
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            if len(self.inline_keyboard) != len(other.inline_keyboard):
+                return False
+            for idx, row in enumerate(self.inline_keyboard):
+                if len(row) != len(other.inline_keyboard[idx]):
+                    return False
+                for jdx, button in enumerate(row):
+                    if button != other.inline_keyboard[idx][jdx]:
+                        return False
+            return True
+        return super(InlineKeyboardMarkup, self).__eq__(other)  # pylint: disable=no-member
+
+    def __hash__(self):
+        return hash(tuple(tuple(button for button in row) for row in self.inline_keyboard))

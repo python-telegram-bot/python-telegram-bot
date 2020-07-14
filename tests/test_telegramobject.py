@@ -83,3 +83,27 @@ class TestTelegramObject:
 
         subclass_instance = TelegramObjectSubclass()
         assert subclass_instance.to_dict() == {'a': 1}
+
+    def test_meaningless_comparison(self, recwarn):
+        expected_warning = "Objects of type TGO can not be meaningfully tested for equivalence."
+
+        class TGO(TelegramObject):
+            pass
+
+        a = TGO()
+        b = TGO()
+        assert a == b
+        assert len(recwarn) == 2
+        assert str(recwarn[0].message) == expected_warning
+        assert str(recwarn[1].message) == expected_warning
+
+    def test_meaningful_comparison(self, recwarn):
+        class TGO(TelegramObject):
+            _id_attrs = (1,)
+
+        a = TGO()
+        b = TGO()
+        assert a == b
+        assert len(recwarn) == 0
+        assert b == a
+        assert len(recwarn) == 0

@@ -28,6 +28,9 @@ class Game(TelegramObject):
     This object represents a game. Use `BotFather <https://t.me/BotFather>`_ to create and edit
     games, their short names will act as unique identifiers.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`title`, :attr:`description` and :attr:`photo` are equal.
+
     Attributes:
         title (:obj:`str`): Title of the game.
         description (:obj:`str`): Description of the game.
@@ -67,12 +70,16 @@ class Game(TelegramObject):
                  text_entities=None,
                  animation=None,
                  **kwargs):
+        # Required
         self.title = title
         self.description = description
         self.photo = photo
+        # Optionals
         self.text = text
         self.text_entities = text_entities or list()
         self.animation = animation
+
+        self._id_attrs = (self.title, self.description, self.photo)
 
     @classmethod
     def de_json(cls, data, bot):
@@ -149,3 +156,6 @@ class Game(TelegramObject):
             entity: self.parse_text_entity(entity)
             for entity in self.text_entities if entity.type in types
         }
+
+    def __hash__(self):
+        return hash((self.title, self.description, tuple(p for p in self.photo)))

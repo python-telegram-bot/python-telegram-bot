@@ -23,6 +23,10 @@ from telegram import TelegramObject
 class ChatPhoto(TelegramObject):
     """This object represents a chat photo.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`small_file_unique_id` and :attr:`big_file_unique_id` are
+    equal.
+
     Attributes:
         small_file_id (:obj:`str`): File identifier of small (160x160) chat photo.
             This file_id can be used only for photo download and only for as long

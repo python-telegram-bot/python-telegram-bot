@@ -27,6 +27,9 @@ class Dice(TelegramObject):
     emoji. (The singular form of "dice" is "die". However, PTB mimics the Telegram API, which uses
     the term "dice".)
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`value` and :attr:`emoji` are equal.
+
     Note:
         If :attr:`emoji` is "🎯", a value of 6 currently represents a bullseye, while a value of 1
         indicates that the dartboard was missed. However, this behaviour is undocumented and might
@@ -47,6 +50,8 @@ class Dice(TelegramObject):
     def __init__(self, value, emoji, **kwargs):
         self.value = value
         self.emoji = emoji
+
+        self._id_attrs = (self.value, self.emoji)
 
     @classmethod
     def de_json(cls, data, bot):

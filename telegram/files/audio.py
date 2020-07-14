@@ -24,6 +24,9 @@ from telegram import TelegramObject, PhotoSize
 class Audio(TelegramObject):
     """This object represents an audio file to be treated as music by the Telegram clients.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`file_unique_id` is equal.
+
     Attributes:
         file_id (:obj:`str`): Identifier for this file.
         file_unique_id (:obj:`str`): Unique identifier for this file, which
