@@ -65,15 +65,19 @@ class TestInputVenueMessageContent:
 
     def test_equality(self):
         a = InputVenueMessageContent(123, 456, 'title', 'address')
-        b = InputVenueMessageContent(123, 456, 'title', 'address', foursquare_id=123)
-        c = InputVenueMessageContent(456, 123, 'title', 'address', foursquare_id=123)
-        d = Location(123, 456)
+        b = InputVenueMessageContent(123, 456, 'title', '')
+        c = InputVenueMessageContent(123, 456, 'title', 'address', foursquare_id=123)
+        d = InputVenueMessageContent(456, 123, 'title', 'address', foursquare_id=123)
+        e = Location(123, 456)
 
         assert a == b
         assert hash(a) == hash(b)
 
-        assert a != c
-        assert hash(a) != hash(c)
+        assert a == c
+        assert hash(a) == hash(c)
 
         assert a != d
         assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)

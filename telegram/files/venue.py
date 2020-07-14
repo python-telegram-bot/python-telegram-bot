@@ -25,7 +25,7 @@ class Venue(TelegramObject):
     """This object represents a venue.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`location`, :attr:`title` and :attr:`address` are equal.
+    considered equal, if their :attr:`location` and :attr:`title`are equal.
 
     Attributes:
         location (:class:`telegram.Location`): Venue location.
@@ -56,7 +56,7 @@ class Venue(TelegramObject):
         self.foursquare_id = foursquare_id
         self.foursquare_type = foursquare_type
 
-        self._id_attrs = (self.location, self.title, self.address)
+        self._id_attrs = (self.location, self.title)
 
     @classmethod
     def de_json(cls, data, bot):

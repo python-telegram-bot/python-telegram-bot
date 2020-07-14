@@ -195,8 +195,8 @@ class MaskPosition(TelegramObject):
     """This object describes the position on faces where a mask should be placed by default.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`point`, :attr:`x_shift`, :attr:`y_shift`, :attr:`scale` and
-    :attr:`latitude` are equal.
+    considered equal, if their :attr:`point`, :attr:`x_shift`, :attr:`y_shift` and, :attr:`scale`
+    are equal.
 
     Attributes:
         point (:obj:`str`): The part of the face relative to which the mask should be placed.
