@@ -24,6 +24,10 @@ from telegram import TelegramObject, OrderInfo
 class SuccessfulPayment(TelegramObject):
     """This object contains basic information about a successful payment.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`telegram_payment_charge_id` and
+    :attr:`provider_payment_charge_id` are equal.
+
     Attributes:
         currency (:obj:`str`): Three-letter ISO 4217 currency code.
         total_amount (:obj:`int`): Total price in the smallest units of the currency.

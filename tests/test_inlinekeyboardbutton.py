@@ -92,3 +92,26 @@ class TestInlineKeyboardButton:
                 == self.switch_inline_query_current_chat)
         assert inline_keyboard_button.callback_game == self.callback_game
         assert inline_keyboard_button.pay == self.pay
+
+    def test_equality(self):
+        a = InlineKeyboardButton('text', callback_data='data')
+        b = InlineKeyboardButton('text', callback_data='data')
+        c = InlineKeyboardButton('texts', callback_data='data')
+        d = InlineKeyboardButton('text', callback_data='info')
+        e = InlineKeyboardButton('text', url='http://google.com')
+        f = LoginUrl("http://google.com")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
+        assert a != f
+        assert hash(a) != hash(f)

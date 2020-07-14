@@ -26,6 +26,9 @@ class InputTextMessageContent(InputMessageContent):
     """
     Represents the content of a text message to be sent as the result of an inline query.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`message_text` is equal.
+
     Attributes:
         message_text (:obj:`str`): Text of the message to be sent, 1-4096 characters after entities
             parsing.
@@ -57,3 +60,5 @@ class InputTextMessageContent(InputMessageContent):
         # Optionals
         self.parse_mode = parse_mode
         self.disable_web_page_preview = disable_web_page_preview
+
+        self._id_attrs = (self.message_text,)
