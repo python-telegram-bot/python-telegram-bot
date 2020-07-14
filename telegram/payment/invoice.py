@@ -24,6 +24,10 @@ from telegram import TelegramObject
 class Invoice(TelegramObject):
     """This object contains basic information about an invoice.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`title`, :attr:`description`, :attr:`start_parameter`,
+    :attr:`currency` and :attr:`total_amount` are equal.
+
     Attributes:
         title (:obj:`str`): Product name.
         description (:obj:`str`): Product description.
@@ -53,6 +57,14 @@ class Invoice(TelegramObject):
         self.start_parameter = start_parameter
         self.currency = currency
         self.total_amount = total_amount
+
+        self._id_attrs = (
+            self.title,
+            self.description,
+            self.start_parameter,
+            self.currency,
+            self.total_amount,
+        )
 
     @classmethod
     def de_json(cls, data, bot):

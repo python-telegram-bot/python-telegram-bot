@@ -120,3 +120,18 @@ class TestInvoice:
         assert bot.send_invoice(chat_id, self.title, self.description, self.payload,
                                 provider_token, self.start_parameter, self.currency,
                                 self.prices, provider_data={'test_data': 123456789})
+
+    def test_equality(self):
+        a = Invoice('invoice', 'desc', 'start', 'EUR', 7)
+        b = Invoice('invoice', 'desc', 'start', 'EUR', 7)
+        c = Invoice('invoices', 'description', 'stop', 'USD', 8)
+        d = LabeledPrice('label', 5)
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)

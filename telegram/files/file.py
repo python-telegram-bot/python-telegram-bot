@@ -33,6 +33,9 @@ class File(TelegramObject):
     :attr:`download`. It is guaranteed that the link will be valid for at least 1 hour. When the
     link expires, a new one can be requested by calling :meth:`telegram.Bot.get_file`.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`file_unique_id` is equal.
+
     Note:
         Maximum file size to download is 20 MB.
 
