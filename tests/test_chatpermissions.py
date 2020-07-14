@@ -19,7 +19,7 @@
 
 import pytest
 
-from telegram import ChatPermissions
+from telegram import ChatPermissions, User
 
 
 @pytest.fixture(scope="class")
@@ -77,3 +77,34 @@ class TestChatPermissions:
         assert permissions_dict['can_change_info'] == chat_permissions.can_change_info
         assert permissions_dict['can_invite_users'] == chat_permissions.can_invite_users
         assert permissions_dict['can_pin_messages'] == chat_permissions.can_pin_messages
+
+    def test_equality(self):
+        a = ChatPermissions(
+            can_send_messages=True,
+            can_send_media_messages=True,
+            can_send_polls=True,
+            can_send_other_messages=False
+        )
+        b = ChatPermissions(
+            can_send_polls=True,
+            can_send_other_messages=False,
+            can_send_messages=True,
+            can_send_media_messages=True,
+        )
+        c = ChatPermissions(
+            can_send_messages=False,
+            can_send_media_messages=True,
+            can_send_polls=True,
+            can_send_other_messages=False
+        )
+        d = User(123, '', False)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)

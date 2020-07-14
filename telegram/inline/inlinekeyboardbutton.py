@@ -24,6 +24,11 @@ from telegram import TelegramObject
 class InlineKeyboardButton(TelegramObject):
     """This object represents one button of an inline keyboard.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`text`, :attr:`url`, :attr:`login_url`, :attr:`callback_data`,
+    :attr:`switch_inline_query`, :attr:`switch_inline_query_current_chat`, :attr:`callback_game`
+    and :attr:`pay` are equal.
+
     Note:
         You must use exactly one of the optional fields. Mind that :attr:`callback_game` is not
         working as expected. Putting a game short name in it might, but is not guaranteed to work.
@@ -94,6 +99,17 @@ class InlineKeyboardButton(TelegramObject):
         self.switch_inline_query_current_chat = switch_inline_query_current_chat
         self.callback_game = callback_game
         self.pay = pay
+
+        self._id_attrs = (
+            self.text,
+            self.url,
+            self.login_url,
+            self.callback_data,
+            self.switch_inline_query,
+            self.switch_inline_query_current_chat,
+            self.callback_game,
+            self.pay,
+        )
 
     @classmethod
     def de_json(cls, data, bot):

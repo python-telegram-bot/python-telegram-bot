@@ -19,7 +19,7 @@
 
 import pytest
 
-from telegram import InputLocationMessageContent
+from telegram import InputLocationMessageContent, Location
 
 
 @pytest.fixture(scope='class')
@@ -49,3 +49,18 @@ class TestInputLocationMessageContent:
                 == input_location_message_content.longitude)
         assert (input_location_message_content_dict['live_period']
                 == input_location_message_content.live_period)
+
+    def test_equality(self):
+        a = InputLocationMessageContent(123, 456, 70)
+        b = InputLocationMessageContent(123, 456, 90)
+        c = InputLocationMessageContent(123, 457, 70)
+        d = Location(123, 456)
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
