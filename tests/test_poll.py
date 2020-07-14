@@ -51,6 +51,25 @@ class TestPollOption:
         assert poll_option_dict['text'] == poll_option.text
         assert poll_option_dict['voter_count'] == poll_option.voter_count
 
+    def test_equality(self):
+        a = PollOption('text', 1)
+        b = PollOption('text', 1)
+        c = PollOption('text_1', 1)
+        d = PollOption('text', 2)
+        e = Poll(123, 'question', ['O1', 'O2'], 1, False, True, Poll.REGULAR, True)
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
 
 @pytest.fixture(scope="class")
 def poll_answer():
@@ -82,6 +101,25 @@ class TestPollAnswer:
         assert poll_answer_dict['poll_id'] == poll_answer.poll_id
         assert poll_answer_dict['user'] == poll_answer.user.to_dict()
         assert poll_answer_dict['option_ids'] == poll_answer.option_ids
+
+    def test_equality(self):
+        a = PollAnswer(123, self.user, [2])
+        b = PollAnswer(123, User(1, 'first', False), [2])
+        c = PollAnswer(123, self.user, [1, 2])
+        d = PollAnswer(456, self.user, [2])
+        e = PollOption('Text', 1)
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
 
 
 @pytest.fixture(scope='class')
@@ -181,3 +219,18 @@ class TestPoll:
 
         assert poll.parse_explanation_entities(MessageEntity.URL) == {entity: 'http://google.com'}
         assert poll.parse_explanation_entities() == {entity: 'http://google.com', entity_2: 'h'}
+
+    def test_equality(self):
+        a = Poll(123, 'question', ['O1', 'O2'], 1, False, True, Poll.REGULAR, True)
+        b = Poll(123, 'question', ['o1', 'o2'], 1, True, False, Poll.REGULAR, True)
+        c = Poll(456, 'question', ['o1', 'o2'], 1, True, False, Poll.REGULAR, True)
+        d = PollOption('Text', 1)
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
