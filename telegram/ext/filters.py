@@ -21,7 +21,6 @@
 import re
 
 from abc import ABC, abstractmethod
-from future.utils import string_types
 from threading import Lock
 
 from telegram import Chat, Update, MessageEntity
@@ -248,7 +247,7 @@ class _DiceEmoji(BaseFilter):
             return True
 
 
-class Filters(object):
+class Filters:
     """Predefined filters for use as the `filter` argument of :class:`telegram.ext.MessageHandler`.
 
     Examples:
@@ -426,7 +425,7 @@ class Filters(object):
         data_filter = True
 
         def __init__(self, pattern):
-            if isinstance(pattern, string_types):
+            if isinstance(pattern, str):
                 pattern = re.compile(pattern)
             self.pattern = pattern
             self.name = 'Filters.regex({})'.format(self.pattern)
@@ -1260,6 +1259,7 @@ officedocument.wordprocessingml.document")``-
     class _Dice(_DiceEmoji):
         dice = _DiceEmoji('🎲', 'dice')
         darts = _DiceEmoji('🎯', 'darts')
+        basketball = _DiceEmoji('🏀', 'basketball')
 
     dice = _Dice()
     """Dice Messages. If an integer or a list of integers is passed, it filters messages to only
@@ -1286,6 +1286,8 @@ officedocument.wordprocessingml.document")``-
             :attr:`Filters.dice`.
         darts: Dice messages with the emoji 🎯. Passing a list of integers is supported just as for
             :attr:`Filters.dice`.
+        basketball: Dice messages with the emoji 🏀. Passing a list of integers is supported just
+            as for :attr:`Filters.dice`.
     """
 
     class language(BaseFilter):
@@ -1306,7 +1308,7 @@ officedocument.wordprocessingml.document")``-
         """
 
         def __init__(self, lang):
-            if isinstance(lang, string_types):
+            if isinstance(lang, str):
                 self.lang = [lang]
             else:
                 self.lang = lang

@@ -32,7 +32,7 @@ def chosen_inline_result(user):
     return ChosenInlineResult(TestChosenInlineResult.result_id, user, TestChosenInlineResult.query)
 
 
-class TestChosenInlineResult(object):
+class TestChosenInlineResult:
     result_id = 'result id'
     query = 'query text'
 

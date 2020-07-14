@@ -37,7 +37,7 @@ def message_entity(request):
     return MessageEntity(request.param, 0, 0, url='', user='')
 
 
-class TestFilters(object):
+class TestFilters:
     def test_filters_all(self, update):
         assert Filters.all(update)
 
@@ -850,13 +850,22 @@ class TestFilters(object):
         assert Filters.dice.dice(update)
         assert Filters.dice.dice([4, 5])(update)
         assert not Filters.dice.darts(update)
+        assert not Filters.dice.basketball(update)
         assert not Filters.dice.dice([6])(update)
 
         update.message.dice = Dice(5, '🎯')
         assert Filters.dice.darts(update)
         assert Filters.dice.darts([4, 5])(update)
         assert not Filters.dice.dice(update)
+        assert not Filters.dice.basketball(update)
         assert not Filters.dice.darts([6])(update)
+
+        update.message.dice = Dice(5, '🏀')
+        assert Filters.dice.basketball(update)
+        assert Filters.dice.basketball([4, 5])(update)
+        assert not Filters.dice.dice(update)
+        assert not Filters.dice.darts(update)
+        assert not Filters.dice.basketball([4])(update)
 
     def test_language_filter_single(self, update):
         update.message.from_user.language_code = 'en_US'
@@ -912,9 +921,9 @@ class TestFilters(object):
         update.message.pinned_message = True
         assert (Filters.text & (Filters.forwarded | Filters.status_update)(update))
 
-        assert str((Filters.text & (Filters.forwarded | Filters.entity(
-            MessageEntity.MENTION)))) == '<Filters.text and <Filters.forwarded or ' \
-                                         'Filters.entity(mention)>>'
+        assert str(Filters.text & (Filters.forwarded | Filters.entity(
+            MessageEntity.MENTION))) == '<Filters.text and <Filters.forwarded or ' \
+                                        'Filters.entity(mention)>>'
 
     def test_inverted_filters(self, update):
         update.message.text = '/test'

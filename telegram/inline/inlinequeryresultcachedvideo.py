@@ -74,7 +74,7 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
                  parse_mode=DEFAULT_NONE,
                  **kwargs):
         # Required
-        super(InlineQueryResultCachedVideo, self).__init__('video', id)
+        super().__init__('video', id)
         self.video_file_id = video_file_id
         self.title = title
 

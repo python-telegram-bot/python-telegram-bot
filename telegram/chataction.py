@@ -20,7 +20,7 @@
 """This module contains an object that represents a Telegram ChatAction."""
 
 
-class ChatAction(object):
+class ChatAction:
     """Helper class to provide constants for different chatactions."""
 
     FIND_LOCATION = 'find_location'

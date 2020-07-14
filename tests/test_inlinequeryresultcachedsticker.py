@@ -33,7 +33,7 @@ def inline_query_result_cached_sticker():
         reply_markup=TestInlineQueryResultCachedSticker.reply_markup)
 
 
-class TestInlineQueryResultCachedSticker(object):
+class TestInlineQueryResultCachedSticker:
     id_ = 'id'
     type_ = 'sticker'
     sticker_file_id = 'sticker file id'

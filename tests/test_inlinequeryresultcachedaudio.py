@@ -34,7 +34,7 @@ def inline_query_result_cached_audio():
         reply_markup=TestInlineQueryResultCachedAudio.reply_markup)
 
 
-class TestInlineQueryResultCachedAudio(object):
+class TestInlineQueryResultCachedAudio:
     id_ = 'id'
     type_ = 'audio'
     audio_file_id = 'audio file id'

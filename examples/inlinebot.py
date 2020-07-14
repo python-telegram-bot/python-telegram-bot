@@ -34,7 +34,7 @@ def start(update, context):
     update.message.reply_text('Hi!')
 
 
-def help(update, context):
+def help_command(update, context):
     """Send a message when the command /help is issued."""
     update.message.reply_text('Help!')
 
@@ -64,11 +64,6 @@ def inlinequery(update, context):
     update.inline_query.answer(results)
 
 
-def error(update, context):
-    """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, context.error)
-
-
 def main():
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
@@ -80,13 +75,10 @@ def main():
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("help", help))
+    dp.add_handler(CommandHandler("help", help_command))
 
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(InlineQueryHandler(inlinequery))
-
-    # log all errors
-    dp.add_error_handler(error)
 
     # Start the Bot
     updater.start_polling()

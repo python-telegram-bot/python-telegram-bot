@@ -33,6 +33,15 @@ from telegram.ext import BasePersistence
 class DictPersistence(BasePersistence):
     """Using python's dicts and json for making your bot persistent.
 
+    Warning:
+        :class:`DictPersistence` will try to replace :class:`telegram.Bot` instances by
+        :attr:`REPLACED_BOT` and insert the bot set with
+        :meth:`telegram.ext.BasePersistence.set_bot` upon loading of the data. This is to ensure
+        that changes to the bot apply to the saved objects, too. If you change the bots token, this
+        may lead to e.g. ``Chat not found`` errors. For the limitations on replacing bots see
+        :meth:`telegram.ext.BasePersistence.replace_bot` and
+        :meth:`telegram.ext.BasePersistence.insert_bot`.
+
     Attributes:
         store_user_data (:obj:`bool`): Whether user_data should be saved by this
             persistence class.
@@ -66,9 +75,9 @@ class DictPersistence(BasePersistence):
                  chat_data_json='',
                  bot_data_json='',
                  conversations_json=''):
-        super(DictPersistence, self).__init__(store_user_data=store_user_data,
-                                              store_chat_data=store_chat_data,
-                                              store_bot_data=store_bot_data)
+        super().__init__(store_user_data=store_user_data,
+                         store_chat_data=store_chat_data,
+                         store_bot_data=store_bot_data)
         self._user_data = None
         self._chat_data = None
         self._bot_data = None

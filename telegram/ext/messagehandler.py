@@ -117,7 +117,7 @@ class MessageHandler(Handler):
                  channel_post_updates=None,
                  edited_updates=None):
 
-        super(MessageHandler, self).__init__(
+        super().__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,

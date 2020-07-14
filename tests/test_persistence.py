@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import signal
-import sys
 
 from telegram.utils.helpers import encode_conversations_to_json
 
@@ -121,7 +120,7 @@ def job_queue(bot):
     jq.stop()
 
 
-class TestBasePersistence(object):
+class TestBasePersistence:
 
     def test_creation(self, base_persistence):
         assert base_persistence.store_chat_data
@@ -287,7 +286,7 @@ class TestBasePersistence(object):
 
         dp.persistence = base_persistence
 
-        class MyUpdate(object):
+        class MyUpdate:
             pass
 
         dp.add_handler(TypeHandler(MyUpdate, lambda *_: None))
@@ -295,6 +294,111 @@ class TestBasePersistence(object):
         with caplog.at_level(logging.ERROR):
             dp.process_update(MyUpdate())
         assert 'An uncaught error was raised while processing the update' not in caplog.text
+
+    def test_bot_replace_insert_bot(self, bot):
+
+        class BotPersistence(BasePersistence):
+            def __init__(self):
+                super().__init__()
+                self.bot_data = None
+                self.chat_data = defaultdict(dict)
+                self.user_data = defaultdict(dict)
+
+            def get_bot_data(self):
+                return self.bot_data
+
+            def get_chat_data(self):
+                return self.chat_data
+
+            def get_user_data(self):
+                return self.user_data
+
+            def get_conversations(self, name):
+                raise NotImplementedError
+
+            def update_bot_data(self, data):
+                self.bot_data = data
+
+            def update_chat_data(self, chat_id, data):
+                self.chat_data[chat_id] = data
+
+            def update_user_data(self, user_id, data):
+                self.user_data[user_id] = data
+
+            def update_conversation(self, name, key, new_state):
+                raise NotImplementedError
+
+        class CustomSlottedClass:
+            __slots__ = ('bot',)
+
+            def __init__(self):
+                self.bot = bot
+
+            def __eq__(self, other):
+                if isinstance(other, CustomSlottedClass):
+                    return self.bot is other.bot
+                return False
+
+        class CustomClass:
+            def __init__(self):
+                self.bot = bot
+                self.slotted_object = CustomSlottedClass()
+                self.list_ = [1, 2, bot]
+                self.tuple_ = tuple(self.list_)
+                self.set_ = set(self.list_)
+                self.frozenset_ = frozenset(self.list_)
+                self.dict_ = {item: item for item in self.list_}
+                self.defaultdict_ = defaultdict(dict, self.dict_)
+
+            @staticmethod
+            def replace_bot():
+                cc = CustomClass()
+                cc.bot = BasePersistence.REPLACED_BOT
+                cc.slotted_object.bot = BasePersistence.REPLACED_BOT
+                cc.list_ = [1, 2, BasePersistence.REPLACED_BOT]
+                cc.tuple_ = tuple(cc.list_)
+                cc.set_ = set(cc.list_)
+                cc.frozenset_ = frozenset(cc.list_)
+                cc.dict_ = {item: item for item in cc.list_}
+                cc.defaultdict_ = defaultdict(dict, cc.dict_)
+                return cc
+
+            def __eq__(self, other):
+                if isinstance(other, CustomClass):
+                    # print(self.__dict__)
+                    # print(other.__dict__)
+                    return (self.bot == other.bot
+                            and self.slotted_object == other.slotted_object
+                            and self.list_ == other.list_
+                            and self.tuple_ == other.tuple_
+                            and self.set_ == other.set_
+                            and self.frozenset_ == other.frozenset_
+                            and self.dict_ == other.dict_
+                            and self.defaultdict_ == other.defaultdict_)
+                return False
+
+        persistence = BotPersistence()
+        persistence.set_bot(bot)
+        cc = CustomClass()
+
+        persistence.update_bot_data({1: cc})
+        assert persistence.bot_data[1].bot == BasePersistence.REPLACED_BOT
+        assert persistence.bot_data[1] == cc.replace_bot()
+
+        persistence.update_chat_data(123, {1: cc})
+        assert persistence.chat_data[123][1].bot == BasePersistence.REPLACED_BOT
+        assert persistence.chat_data[123][1] == cc.replace_bot()
+
+        persistence.update_user_data(123, {1: cc})
+        assert persistence.user_data[123][1].bot == BasePersistence.REPLACED_BOT
+        assert persistence.user_data[123][1] == cc.replace_bot()
+
+        assert persistence.get_bot_data()[1] == cc
+        assert persistence.get_bot_data()[1].bot is bot
+        assert persistence.get_chat_data()[123][1] == cc
+        assert persistence.get_chat_data()[123][1].bot is bot
+        assert persistence.get_user_data()[123][1] == cc
+        assert persistence.get_user_data()[123][1].bot is bot
 
 
 @pytest.fixture(scope='function')
@@ -385,7 +489,7 @@ def update(bot):
     return Update(0, message=message)
 
 
-class TestPickelPersistence(object):
+class TestPickelPersistence:
     def test_no_files_present_multi_file(self, pickle_persistence):
         assert pickle_persistence.get_user_data() == defaultdict(dict)
         assert pickle_persistence.get_user_data() == defaultdict(dict)
@@ -984,7 +1088,7 @@ def conversations_json(conversations):
               {"[123, 321]": 1, "[890, 890]": 2}}"""
 
 
-class TestDictPersistence(object):
+class TestDictPersistence:
     def test_no_json_given(self):
         dict_persistence = DictPersistence()
         assert dict_persistence.get_user_data() == defaultdict(dict)
@@ -1069,7 +1173,6 @@ class TestDictPersistence(object):
         assert dict_persistence.bot_data == bot_data
         assert dict_persistence.conversations == conversations
 
-    @pytest.mark.skipif(sys.version_info < (3, 6), reason="dicts are not ordered in py<=3.5")
     def test_json_outputs(self, user_data_json, chat_data_json, bot_data_json, conversations_json):
         dict_persistence = DictPersistence(user_data_json=user_data_json,
                                            chat_data_json=chat_data_json,
@@ -1080,7 +1183,6 @@ class TestDictPersistence(object):
         assert dict_persistence.bot_data_json == bot_data_json
         assert dict_persistence.conversations_json == conversations_json
 
-    @pytest.mark.skipif(sys.version_info < (3, 6), reason="dicts are not ordered in py<=3.5")
     def test_json_changes(self, user_data, user_data_json, chat_data, chat_data_json,
                           bot_data, bot_data_json,
                           conversations, conversations_json):

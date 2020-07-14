@@ -77,11 +77,6 @@ def msg(update, context):
                     actual_file.download()
 
 
-def error(update, context):
-    """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, context.error)
-
-
 def main():
     """Start the bot."""
     # Create the Updater and pass it your token and private key
@@ -92,9 +87,6 @@ def main():
 
     # On messages that include passport data call msg
     dp.add_handler(MessageHandler(Filters.passport_data, msg))
-
-    # log all errors
-    dp.add_error_handler(error)
 
     # Start the Bot
     updater.start_polling()

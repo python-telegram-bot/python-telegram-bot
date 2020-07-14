@@ -11,7 +11,7 @@ repos:
     hooks:
     -   id: flake8
 -   repo: git://github.com/pre-commit/mirrors-pylint
-    rev: 9d8dcbc2b86c796275680f239c1e90dcd50bd398
+    rev: v2.5.3
     hooks:
     -   id: pylint
         files: ^telegram/.*\.py$

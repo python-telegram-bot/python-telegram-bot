@@ -18,8 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the StringCommandHandler class."""
 
-from future.utils import string_types
-
 from .handler import Handler
 
 
@@ -73,7 +71,7 @@ class StringCommandHandler(Handler):
                  pass_args=False,
                  pass_update_queue=False,
                  pass_job_queue=False):
-        super(StringCommandHandler, self).__init__(
+        super().__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue)
@@ -90,15 +88,13 @@ class StringCommandHandler(Handler):
             :obj:`bool`
 
         """
-        if isinstance(update, string_types) and update.startswith('/'):
+        if isinstance(update, str) and update.startswith('/'):
             args = update[1:].split(' ')
             if args[0] == self.command:
                 return args[1:]
 
     def collect_optional_args(self, dispatcher, update=None, check_result=None):
-        optional_args = super(StringCommandHandler, self).collect_optional_args(dispatcher,
-                                                                                update,
-                                                                                check_result)
+        optional_args = super().collect_optional_args(dispatcher, update, check_result)
         if self.pass_args:
             optional_args['args'] = check_result
         return optional_args

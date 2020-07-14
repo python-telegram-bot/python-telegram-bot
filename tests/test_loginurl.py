@@ -29,7 +29,7 @@ def login_url():
                     request_write_access=TestLoginUrl.request_write_access)
 
 
-class TestLoginUrl(object):
+class TestLoginUrl:
     url = "http://www.google.com"
     forward_text = "Send me forward!"
     bot_username = "botname"

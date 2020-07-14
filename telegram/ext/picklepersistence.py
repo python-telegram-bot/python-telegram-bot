@@ -27,6 +27,15 @@ from telegram.ext import BasePersistence
 class PicklePersistence(BasePersistence):
     """Using python's builtin pickle for making you bot persistent.
 
+    Warning:
+        :class:`PicklePersistence` will try to replace :class:`telegram.Bot` instances by
+        :attr:`REPLACED_BOT` and insert the bot set with
+        :meth:`telegram.ext.BasePersistence.set_bot` upon loading of the data. This is to ensure
+        that changes to the bot apply to the saved objects, too. If you change the bots token, this
+        may lead to e.g. ``Chat not found`` errors. For the limitations on replacing bots see
+        :meth:`telegram.ext.BasePersistence.replace_bot` and
+        :meth:`telegram.ext.BasePersistence.insert_bot`.
+
     Attributes:
         filename (:obj:`str`): The filename for storing the pickle files. When :attr:`single_file`
             is false this will be used as a prefix.
@@ -66,9 +75,9 @@ class PicklePersistence(BasePersistence):
                  store_bot_data=True,
                  single_file=True,
                  on_flush=False):
-        super(PicklePersistence, self).__init__(store_user_data=store_user_data,
-                                                store_chat_data=store_chat_data,
-                                                store_bot_data=store_bot_data)
+        super().__init__(store_user_data=store_user_data,
+                         store_chat_data=store_chat_data,
+                         store_bot_data=store_bot_data)
         self.filename = filename
         self.single_file = single_file
         self.on_flush = on_flush
@@ -277,7 +286,7 @@ class PicklePersistence(BasePersistence):
         """ Will save all data in memory to pickle file(s).
         """
         if self.single_file:
-            if self.user_data or self.chat_data or self.conversations:
+            if self.user_data or self.chat_data or self.bot_data or self.conversations:
                 self.dump_singlefile()
         else:
             if self.user_data:

@@ -53,7 +53,7 @@ def photo(_photo):
     return _photo[1]
 
 
-class TestPhoto(object):
+class TestPhoto:
     width = 800
     height = 800
     caption = u'<b>PhotoTest</b> - *Caption*'
@@ -304,10 +304,10 @@ class TestPhoto(object):
         assert photo.file_size == 33372
 
     def test_send_with_photosize(self, monkeypatch, bot, chat_id, photo):
-        def test(_, url, data, **kwargs):
+        def test(url, data, **kwargs):
             return data['photo'] == photo.file_id
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr(bot.request, 'post', test)
         message = bot.send_photo(photo=photo, chat_id=chat_id)
         assert message
 

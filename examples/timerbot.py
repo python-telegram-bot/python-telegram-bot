@@ -77,11 +77,6 @@ def unset(update, context):
     update.message.reply_text('Timer successfully unset!')
 
 
-def error(update, context):
-    """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, context.error)
-
-
 def main():
     """Run bot."""
     # Create the Updater and pass it your bot's token.
@@ -100,9 +95,6 @@ def main():
                                   pass_job_queue=True,
                                   pass_chat_data=True))
     dp.add_handler(CommandHandler("unset", unset, pass_chat_data=True))
-
-    # log all errors
-    dp.add_error_handler(error)
 
     # Start the Bot
     updater.start_polling()

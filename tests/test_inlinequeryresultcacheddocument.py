@@ -36,7 +36,7 @@ def inline_query_result_cached_document():
         reply_markup=TestInlineQueryResultCachedDocument.reply_markup)
 
 
-class TestInlineQueryResultCachedDocument(object):
+class TestInlineQueryResultCachedDocument:
     id_ = 'id'
     type_ = 'document'
     document_file_id = 'document file id'

@@ -32,7 +32,7 @@ def shipping_address():
                            TestShippingAddress.post_code)
 
 
-class TestShippingAddress(object):
+class TestShippingAddress:
     country_code = 'GB'
     state = 'state'
     city = 'London'
