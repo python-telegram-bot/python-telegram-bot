@@ -26,6 +26,9 @@ class PassportFile(TelegramObject):
     This object represents a file uploaded to Telegram Passport. Currently all Telegram Passport
     files are in JPEG format when decrypted and don't exceed 10MB.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`file_unique_id` is equal.
+
     Attributes:
         file_id (:obj:`str`): Identifier for this file.
         file_unique_id (:obj:`str`): Unique identifier for this file, which

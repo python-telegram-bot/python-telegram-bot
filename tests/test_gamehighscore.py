@@ -51,3 +51,22 @@ class TestGameHighScore:
         assert game_highscore_dict['position'] == game_highscore.position
         assert game_highscore_dict['user'] == game_highscore.user.to_dict()
         assert game_highscore_dict['score'] == game_highscore.score
+
+    def test_equality(self):
+        a = GameHighScore(1, User(2, 'test user', False), 42)
+        b = GameHighScore(1, User(2, 'test user', False), 42)
+        c = GameHighScore(2, User(2, 'test user', False), 42)
+        d = GameHighScore(1, User(3, 'test user', False), 42)
+        e = User(3, 'test user', False)
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)

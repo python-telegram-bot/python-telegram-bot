@@ -24,6 +24,9 @@ from telegram import PhotoSize, TelegramObject
 class Sticker(TelegramObject):
     """This object represents a sticker.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`file_unique_id` is equal.
+
     Attributes:
         file_id (:obj:`str`): Identifier for this file.
         file_unique_id (:obj:`str`): Unique identifier for this file, which
@@ -135,6 +138,9 @@ class Sticker(TelegramObject):
 class StickerSet(TelegramObject):
     """This object represents a sticker set.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`name` is equal.
+
     Attributes:
         name (:obj:`str`): Sticker set name.
         title (:obj:`str`): Sticker set title.
@@ -190,6 +196,10 @@ class StickerSet(TelegramObject):
 class MaskPosition(TelegramObject):
     """This object describes the position on faces where a mask should be placed by default.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`point`, :attr:`x_shift`, :attr:`y_shift` and, :attr:`scale`
+    are equal.
+
     Attributes:
         point (:obj:`str`): The part of the face relative to which the mask should be placed.
             One of ``'forehead'``, ``'eyes'``, ``'mouth'``, or ``'chin'``.
@@ -229,6 +239,8 @@ class MaskPosition(TelegramObject):
         self.x_shift = x_shift
         self.y_shift = y_shift
         self.scale = scale
+
+        self._id_attrs = (self.point, self.x_shift, self.y_shift, self.scale)
 
     @classmethod
     def de_json(cls, data, bot):

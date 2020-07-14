@@ -98,6 +98,9 @@ class EncryptedCredentials(TelegramObject):
     Telegram Passport Documentation for a complete description of the data decryption and
     authentication processes.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`data`, :attr:`hash` and :attr:`secret` are equal.
+
     Attributes:
         data (:class:`telegram.Credentials` or :obj:`str`): Decrypted data with unique user's
             nonce, data hashes and secrets used for EncryptedPassportElement decryption and
