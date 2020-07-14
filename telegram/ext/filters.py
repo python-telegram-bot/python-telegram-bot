@@ -920,7 +920,6 @@ officedocument.wordprocessingml.document")``-
             RuntimeError: If user_id and username are both present.
 
         """
-        # The via_bot filter subclasses this one. Make sure changes here don't destroy it
         def __init__(self, user_id=None, username=None, allow_empty=False):
             self.allow_empty = allow_empty
             self.__lock = Lock()
@@ -1057,8 +1056,10 @@ officedocument.wordprocessingml.document")``-
     class via_bot(BaseFilter):
         """Filters messages to allow only those which are from specified via_bot ID(s) or
         username(s).
+
         Examples:
             ``MessageHandler(Filters.via_bot(1234), callback_method)``
+
         Warning:
             :attr:`bot_ids` will give a *copy* of the saved bot ids as :class:`frozenset`. This
             is to ensure thread safety. To add/remove a bot, you should use :meth:`add_usernames`,
@@ -1066,12 +1067,14 @@ officedocument.wordprocessingml.document")``-
             the entire set by ``filter.bot_ids/usernames = new_set``, if you are entirely sure
             that it is not causing race conditions, as this will complete replace the current set
             of allowed bots.
+
         Attributes:
             bot_ids(set(:obj:`int`), optional): Which bot ID(s) to allow through.
             usernames(set(:obj:`str`), optional): Which username(s) (without leading '@') to allow
                 through.
             allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no bot
                 is specified in :attr:`bot_ids` and :attr:`usernames`.
+
         Args:
             bot_id(:obj:`int` | List[:obj:`int`], optional): Which bot ID(s) to allow
                 through.
@@ -1079,6 +1082,7 @@ officedocument.wordprocessingml.document")``-
                 through. Leading '@'s in usernames will be discarded.
             allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
                 is specified in :attr:`bot_ids` and :attr:`usernames`. Defaults to :obj:`False`
+
         Raises:
             RuntimeError: If bot_id and username are both present.
         """
