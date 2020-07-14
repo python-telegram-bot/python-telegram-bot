@@ -52,7 +52,7 @@ class TestForceReply:
 
     def test_equality(self):
         a = ForceReply(True, False)
-        b = ForceReply(True, False)
+        b = ForceReply(False, False)
         c = ForceReply(True, True)
         d = ReplyKeyboardRemove()
 

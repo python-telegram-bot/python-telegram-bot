@@ -29,7 +29,7 @@ class ForceReply(ReplyMarkup):
     to sacrifice privacy mode.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`force_reply` and :attr:`selective` are equal.
+    considered equal, if their :attr:`selective` is equal.
 
     Attributes:
         force_reply (:obj:`True`): Shows reply interface to the user.
@@ -53,4 +53,4 @@ class ForceReply(ReplyMarkup):
         # Optionals
         self.selective = bool(selective)
 
-        self._id_attrs = (self.force_reply, self.selective)
+        self._id_attrs = (self.selective,)

@@ -25,7 +25,7 @@ class InputContactMessageContent(InputMessageContent):
     """Represents the content of a contact message to be sent as the result of an inline query.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`phone_number` and :attr:`first_name` are equal.
+    considered equal, if their :attr:`phone_number` is equal.
 
     Attributes:
         phone_number (:obj:`str`): Contact's phone number.
@@ -52,4 +52,4 @@ class InputContactMessageContent(InputMessageContent):
         self.last_name = last_name
         self.vcard = vcard
 
-        self._id_attrs = (self.phone_number, self.first_name)
+        self._id_attrs = (self.phone_number,)

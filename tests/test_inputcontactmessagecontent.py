@@ -52,7 +52,7 @@ class TestInputContactMessageContent:
 
     def test_equality(self):
         a = InputContactMessageContent('phone', 'first', last_name='last')
-        b = InputContactMessageContent('phone', 'first', vcard='vcard')
+        b = InputContactMessageContent('phone', 'first_name', vcard='vcard')
         c = InputContactMessageContent('phone_number', 'first', vcard='vcard')
         d = User(123, 'first', False)
 

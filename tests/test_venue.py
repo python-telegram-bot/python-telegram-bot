@@ -92,8 +92,8 @@ class TestVenue:
         assert hash(a) == hash(b)
         assert a is not b
 
-        assert a == c
-        assert hash(a) == hash(c)
+        assert a != c
+        assert hash(a) != hash(c)
 
         assert a != d
         assert hash(a) != hash(d)
