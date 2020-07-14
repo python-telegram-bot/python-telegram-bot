@@ -24,6 +24,9 @@ from telegram import PhotoSize, TelegramObject
 class UserProfilePhotos(TelegramObject):
     """This object represent a user's profile pictures.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`total_count` and :attr:`photos` are equal.
+
     Attributes:
         total_count (:obj:`int`): Total number of profile pictures.
         photos (List[List[:class:`telegram.PhotoSize`]]): Requested profile pictures.
@@ -39,6 +42,8 @@ class UserProfilePhotos(TelegramObject):
         # Required
         self.total_count = int(total_count)
         self.photos = photos
+
+        self._id_attrs = (self.total_count, self.photos)
 
     @classmethod
     def de_json(cls, data, bot):
@@ -59,3 +64,6 @@ class UserProfilePhotos(TelegramObject):
             data['photos'].append([x.to_dict() for x in photo])
 
         return data
+
+    def __hash__(self):
+        return hash(tuple(tuple(p for p in photo) for photo in self.photos))

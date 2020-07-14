@@ -20,7 +20,7 @@
 import pytest
 from flaky import flaky
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyMarkup, ReplyKeyboardMarkup
 
 
 @pytest.fixture(scope='class')
@@ -129,3 +129,52 @@ class TestInlineKeyboardMarkup:
 
         assert keyboard[0][0].text == 'start'
         assert keyboard[0][0].url == 'http://google.com'
+
+    def test_equality(self):
+        a = InlineKeyboardMarkup.from_column([
+            InlineKeyboardButton(label, callback_data='data')
+            for label in ['button1', 'button2', 'button3']
+        ])
+        b = InlineKeyboardMarkup.from_column([
+            InlineKeyboardButton(label, callback_data='data')
+            for label in ['button1', 'button2', 'button3']
+        ])
+        c = InlineKeyboardMarkup.from_column([
+            InlineKeyboardButton(label, callback_data='data')
+            for label in ['button1', 'button2']
+        ])
+        d = InlineKeyboardMarkup.from_column([
+            InlineKeyboardButton(label, callback_data=label)
+            for label in ['button1', 'button2', 'button3']
+        ])
+        e = InlineKeyboardMarkup.from_column([
+            InlineKeyboardButton(label, url=label)
+            for label in ['button1', 'button2', 'button3']
+        ])
+        f = InlineKeyboardMarkup([
+            [InlineKeyboardButton(label, callback_data='data')
+             for label in ['button1', 'button2']],
+            [InlineKeyboardButton(label, callback_data='data')
+             for label in ['button1', 'button2']],
+            [InlineKeyboardButton(label, callback_data='data')
+             for label in ['button1', 'button2']]
+        ])
+        g = ReplyKeyboardMarkup.from_column(['button1', 'button2', 'button3'])
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
+        assert a != f
+        assert hash(a) != hash(f)
+
+        assert a != g
+        assert hash(a) != hash(g)
