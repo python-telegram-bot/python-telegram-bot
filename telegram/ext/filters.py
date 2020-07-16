@@ -887,7 +887,8 @@ officedocument.wordprocessingml.document")``-
     """Messages sent in a group chat."""
 
     class user(BaseFilter):
-        """Filters messages to allow only those which are from specified user ID.
+        """Filters messages to allow only those which are from specified user ID(s) or
+        username(s).
 
         Examples:
             ``MessageHandler(Filters.user(1234), callback_method)``
@@ -919,7 +920,6 @@ officedocument.wordprocessingml.document")``-
             RuntimeError: If user_id and username are both present.
 
         """
-
         def __init__(self, user_id=None, username=None, allow_empty=False):
             self.allow_empty = allow_empty
             self.__lock = Lock()
@@ -1053,8 +1053,171 @@ officedocument.wordprocessingml.document")``-
                 return self.allow_empty
             return False
 
+    class via_bot(BaseFilter):
+        """Filters messages to allow only those which are from specified via_bot ID(s) or
+        username(s).
+
+        Examples:
+            ``MessageHandler(Filters.via_bot(1234), callback_method)``
+
+        Warning:
+            :attr:`bot_ids` will give a *copy* of the saved bot ids as :class:`frozenset`. This
+            is to ensure thread safety. To add/remove a bot, you should use :meth:`add_usernames`,
+            :meth:`add_bot_ids`, :meth:`remove_usernames` and :meth:`remove_bot_ids`. Only update
+            the entire set by ``filter.bot_ids/usernames = new_set``, if you are entirely sure
+            that it is not causing race conditions, as this will complete replace the current set
+            of allowed bots.
+
+        Attributes:
+            bot_ids(set(:obj:`int`), optional): Which bot ID(s) to allow through.
+            usernames(set(:obj:`str`), optional): Which username(s) (without leading '@') to allow
+                through.
+            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no bot
+                is specified in :attr:`bot_ids` and :attr:`usernames`.
+
+        Args:
+            bot_id(:obj:`int` | List[:obj:`int`], optional): Which bot ID(s) to allow
+                through.
+            username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow
+                through. Leading '@'s in usernames will be discarded.
+            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
+                is specified in :attr:`bot_ids` and :attr:`usernames`. Defaults to :obj:`False`
+
+        Raises:
+            RuntimeError: If bot_id and username are both present.
+        """
+
+        def __init__(self, bot_id=None, username=None, allow_empty=False):
+            self.allow_empty = allow_empty
+            self.__lock = Lock()
+
+            self._bot_ids = set()
+            self._usernames = set()
+
+            self._set_bot_ids(bot_id)
+            self._set_usernames(username)
+
+        @staticmethod
+        def _parse_bot_id(bot_id):
+            if bot_id is None:
+                return set()
+            if isinstance(bot_id, int):
+                return {bot_id}
+            return set(bot_id)
+
+        @staticmethod
+        def _parse_username(username):
+            if username is None:
+                return set()
+            if isinstance(username, str):
+                return {username[1:] if username.startswith('@') else username}
+            return {bot[1:] if bot.startswith('@') else bot for bot in username}
+
+        def _set_bot_ids(self, bot_id):
+            with self.__lock:
+                if bot_id and self._usernames:
+                    raise RuntimeError("Can't set bot_id in conjunction with (already set) "
+                                       "usernames.")
+                self._bot_ids = self._parse_bot_id(bot_id)
+
+        def _set_usernames(self, username):
+            with self.__lock:
+                if username and self._bot_ids:
+                    raise RuntimeError("Can't set username in conjunction with (already set) "
+                                       "bot_ids.")
+                self._usernames = self._parse_username(username)
+
+        @property
+        def bot_ids(self):
+            with self.__lock:
+                return frozenset(self._bot_ids)
+
+        @bot_ids.setter
+        def bot_ids(self, bot_id):
+            self._set_bot_ids(bot_id)
+
+        @property
+        def usernames(self):
+            with self.__lock:
+                return frozenset(self._usernames)
+
+        @usernames.setter
+        def usernames(self, username):
+            self._set_usernames(username)
+
+        def add_usernames(self, username):
+            """
+            Add one or more users to the allowed usernames.
+            Args:
+                username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow
+                    through. Leading '@'s in usernames will be discarded.
+            """
+            with self.__lock:
+                if self._bot_ids:
+                    raise RuntimeError("Can't set username in conjunction with (already set) "
+                                       "bot_ids.")
+
+                username = self._parse_username(username)
+                self._usernames |= username
+
+        def add_bot_ids(self, bot_id):
+            """
+            Add one or more users to the allowed user ids.
+            Args:
+                bot_id(:obj:`int` | List[:obj:`int`], optional): Which bot ID(s) to allow
+                    through.
+            """
+            with self.__lock:
+                if self._usernames:
+                    raise RuntimeError("Can't set bot_id in conjunction with (already set) "
+                                       "usernames.")
+
+                bot_id = self._parse_bot_id(bot_id)
+
+                self._bot_ids |= bot_id
+
+        def remove_usernames(self, username):
+            """
+            Remove one or more users from allowed usernames.
+            Args:
+                username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to disallow
+                    through. Leading '@'s in usernames will be discarded.
+            """
+            with self.__lock:
+                if self._bot_ids:
+                    raise RuntimeError("Can't set username in conjunction with (already set) "
+                                       "bot_ids.")
+
+                username = self._parse_username(username)
+                self._usernames -= username
+
+        def remove_bot_ids(self, bot_id):
+            """
+            Remove one or more users from allowed user ids.
+            Args:
+                bot_id(:obj:`int` | List[:obj:`int`], optional): Which bot ID(s) to disallow
+                    through.
+            """
+            with self.__lock:
+                if self._usernames:
+                    raise RuntimeError("Can't set bot_id in conjunction with (already set) "
+                                       "usernames.")
+                bot_id = self._parse_bot_id(bot_id)
+                self._bot_ids -= bot_id
+
+        def filter(self, message):
+            """"""  # remove method from docs
+            if message.via_bot:
+                if self.bot_ids:
+                    return message.via_bot.id in self.bot_ids
+                if self.usernames:
+                    return (message.via_bot.username
+                            and message.via_bot.username in self.usernames)
+                return self.allow_empty
+            return False
+
     class chat(BaseFilter):
-        """Filters messages to allow only those which are from specified chat ID.
+        """Filters messages to allow only those which are from a specified chat ID or username.
 
         Examples:
             ``MessageHandler(Filters.chat(-1234), callback_method)``

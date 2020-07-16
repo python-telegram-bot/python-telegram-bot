@@ -48,7 +48,7 @@ Version 12.7
 
 **New Features:**
 
-- New method ``run_mothly`` for the ``JobQueue`` (`#1705`_)
+- New method ``run_monthly`` for the ``JobQueue`` (`#1705`_)
 - ``Job.next_t`` now gives the datetime of the jobs next execution (`#1685`_)
 
 **Minor changes, CI improvements, doc fixes or bug fixes:**
