@@ -26,6 +26,9 @@ from typing import List, Union, Any
 class ReplyKeyboardMarkup(ReplyMarkup):
     """This object represents a custom keyboard with reply options.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their the size of :attr:`keyboard` and all the buttons are equal.
+
     Attributes:
         keyboard (List[List[:class:`telegram.KeyboardButton` | :obj:`str`]]): Array of button rows.
         resize_keyboard (:obj:`bool`): Optional. Requests clients to resize the keyboard.
@@ -68,7 +71,16 @@ class ReplyKeyboardMarkup(ReplyMarkup):
                  selective: bool = False,
                  **kwargs: Any):
         # Required
-        self.keyboard = keyboard
+        self.keyboard = []
+        for row in keyboard:
+            r = []
+            for button in row:
+                if isinstance(button, KeyboardButton):
+                    r.append(button)  # telegram.KeyboardButton
+                else:
+                    r.append(KeyboardButton(button))  # str
+            self.keyboard.append(r)
+
         # Optionals
         self.resize_keyboard = bool(resize_keyboard)
         self.one_time_keyboard = bool(one_time_keyboard)
@@ -215,3 +227,22 @@ class ReplyKeyboardMarkup(ReplyMarkup):
                    one_time_keyboard=one_time_keyboard,
                    selective=selective,
                    **kwargs)
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, self.__class__):
+            if len(self.keyboard) != len(other.keyboard):
+                return False
+            for idx, row in enumerate(self.keyboard):
+                if len(row) != len(other.keyboard[idx]):
+                    return False
+                for jdx, button in enumerate(row):
+                    if button != other.keyboard[idx][jdx]:
+                        return False
+            return True
+        return super(ReplyKeyboardMarkup, self).__eq__(other)  # pylint: disable=no-member
+
+    def __hash__(self) -> int:
+        return hash((
+            tuple(tuple(button for button in row) for row in self.keyboard),
+            self.resize_keyboard, self.one_time_keyboard, self.selective
+        ))

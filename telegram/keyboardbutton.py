@@ -27,6 +27,10 @@ class KeyboardButton(TelegramObject):
     This object represents one button of the reply keyboard. For simple text buttons String can be
     used instead of this object to specify text of the button.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`text`, :attr:`request_contact`, :attr:`request_location` and
+    :attr:`request_poll` are equal.
+
     Note:
         Optional fields are mutually exclusive.
 
@@ -68,3 +72,6 @@ class KeyboardButton(TelegramObject):
         self.request_contact = request_contact
         self.request_location = request_location
         self.request_poll = request_poll
+
+        self._id_attrs = (self.text, self.request_contact, self.request_location,
+                          self.request_poll)

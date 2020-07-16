@@ -31,6 +31,9 @@ if TYPE_CHECKING:
 class User(TelegramObject):
     """This object represents a Telegram user or bot.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`id` is equal.
+
     Attributes:
         id (:obj:`int`): Unique identifier for this user or bot.
         is_bot (:obj:`bool`): True, if this user is a bot

@@ -35,6 +35,9 @@ class PollOption(TelegramObject):
     """
     This object contains information about one answer option in a poll.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`text` and :attr:`voter_count` are equal.
+
     Attributes:
         text (:obj:`str`): Option text, 1-100 characters.
         voter_count (:obj:`int`): Number of users that voted for this option.
@@ -49,10 +52,15 @@ class PollOption(TelegramObject):
         self.text = text
         self.voter_count = voter_count
 
+        self._id_attrs = (self.text, self.voter_count)
+
 
 class PollAnswer(TelegramObject):
     """
     This object represents an answer of a user in a non-anonymous poll.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`poll_id`, :attr:`user` and :attr:`options_ids` are equal.
 
     Attributes:
         poll_id (:obj:`str`): Unique poll identifier.
@@ -71,6 +79,8 @@ class PollAnswer(TelegramObject):
         self.user = user
         self.option_ids = option_ids
 
+        self._id_attrs = (self.poll_id, self.user, tuple(self.option_ids))
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['PollAnswer']:
         data = cls.parse_data(data)
@@ -86,6 +96,9 @@ class PollAnswer(TelegramObject):
 class Poll(TelegramObject):
     """
     This object contains information about a poll.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`id` is equal.
 
     Attributes:
         id (:obj:`str`): Unique poll identifier.

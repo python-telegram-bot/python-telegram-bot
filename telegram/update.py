@@ -31,6 +31,9 @@ if TYPE_CHECKING:
 class Update(TelegramObject):
     """This object represents an incoming update.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`update_id` is equal.
+
     Note:
         At most one of the optional parameters can be present in any given update.
 

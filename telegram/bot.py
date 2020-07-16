@@ -2027,7 +2027,8 @@ class Bot(TelegramObject):
             data['inline_message_id'] = inline_message_id
 
         return self._message('editMessageCaption', data,  # type: ignore[return-value]
-                             timeout=timeout, reply_markup=reply_markup, api_kwargs=api_kwargs)
+                             timeout=timeout,
+                             reply_markup=reply_markup, api_kwargs=api_kwargs)
 
     @log
     def edit_message_media(self,
@@ -2138,7 +2139,8 @@ class Bot(TelegramObject):
             data['inline_message_id'] = inline_message_id
 
         return self._message('editMessageReplyMarkup', data,  # type: ignore[return-value]
-                             timeout=timeout, reply_markup=reply_markup, api_kwargs=api_kwargs)
+                             timeout=timeout,
+                             reply_markup=reply_markup, api_kwargs=api_kwargs)
 
     @log
     def get_updates(self,

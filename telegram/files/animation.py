@@ -29,6 +29,9 @@ if TYPE_CHECKING:
 class Animation(TelegramObject):
     """This object represents an animation file to be displayed in the message containing a game.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`file_unique_id` is equal.
+
     Attributes:
         file_id (:obj:`str`): File identifier.
         file_unique_id (:obj:`str`): Unique identifier for this file, which

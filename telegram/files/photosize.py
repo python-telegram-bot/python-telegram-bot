@@ -28,6 +28,9 @@ if TYPE_CHECKING:
 class PhotoSize(TelegramObject):
     """This object represents one size of a photo or a file/sticker thumbnail.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`file_unique_id` is equal.
+
     Attributes:
         file_id (:obj:`str`): Unique identifier for this file.
         file_unique_id (:obj:`str`): Unique identifier for this file, which

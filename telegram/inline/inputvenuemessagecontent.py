@@ -25,6 +25,10 @@ from typing import Any
 class InputVenueMessageContent(InputMessageContent):
     """Represents the content of a venue message to be sent as the result of an inline query.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`latitude`, :attr:`longitude` and :attr:`title`
+    are equal.
+
     Attributes:
         latitude (:obj:`float`): Latitude of the location in degrees.
         longitude (:obj:`float`): Longitude of the location in degrees.
@@ -64,3 +68,9 @@ class InputVenueMessageContent(InputMessageContent):
         # Optionals
         self.foursquare_id = foursquare_id
         self.foursquare_type = foursquare_type
+
+        self._id_attrs = (
+            self.latitude,
+            self.longitude,
+            self.title,
+        )

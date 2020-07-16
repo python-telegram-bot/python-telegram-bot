@@ -29,6 +29,9 @@ class ForceReply(ReplyMarkup):
     extremely useful if you want to create user-friendly step-by-step interfaces without having
     to sacrifice privacy mode.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`selective` is equal.
+
     Attributes:
         force_reply (:obj:`True`): Shows reply interface to the user.
         selective (:obj:`bool`): Optional. Force reply from specific users only.
@@ -50,3 +53,5 @@ class ForceReply(ReplyMarkup):
         self.force_reply = bool(force_reply)
         # Optionals
         self.selective = bool(selective)
+
+        self._id_attrs = (self.selective,)

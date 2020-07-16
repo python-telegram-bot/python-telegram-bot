@@ -50,3 +50,18 @@ class TestInputTextMessageContent:
                 == input_text_message_content.parse_mode)
         assert (input_text_message_content_dict['disable_web_page_preview']
                 == input_text_message_content.disable_web_page_preview)
+
+    def test_equality(self):
+        a = InputTextMessageContent('text')
+        b = InputTextMessageContent('text', parse_mode=ParseMode.HTML)
+        c = InputTextMessageContent('label')
+        d = ParseMode.HTML
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)

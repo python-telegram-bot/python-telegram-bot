@@ -28,6 +28,9 @@ if TYPE_CHECKING:
 class Venue(TelegramObject):
     """This object represents a venue.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`location` and :attr:`title`are equal.
+
     Attributes:
         location (:class:`telegram.Location`): Venue location.
         title (:obj:`str`): Name of the venue.

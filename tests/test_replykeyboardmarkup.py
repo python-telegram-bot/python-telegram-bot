@@ -20,7 +20,7 @@
 import pytest
 from flaky import flaky
 
-from telegram import ReplyKeyboardMarkup, KeyboardButton
+from telegram import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup
 
 
 @pytest.fixture(scope='class')
@@ -106,3 +106,28 @@ class TestReplyKeyboardMarkup:
         assert (reply_keyboard_markup_dict['one_time_keyboard']
                 == reply_keyboard_markup.one_time_keyboard)
         assert reply_keyboard_markup_dict['selective'] == reply_keyboard_markup.selective
+
+    def test_equality(self):
+        a = ReplyKeyboardMarkup.from_column(['button1', 'button2', 'button3'])
+        b = ReplyKeyboardMarkup.from_column([
+            KeyboardButton(text) for text in ['button1', 'button2', 'button3']
+        ])
+        c = ReplyKeyboardMarkup.from_column(['button1', 'button2'])
+        d = ReplyKeyboardMarkup.from_column(['button1', 'button2', 'button3.1'])
+        e = ReplyKeyboardMarkup([['button1', 'button1'], ['button2'], ['button3.1']])
+        f = InlineKeyboardMarkup.from_column(['button1', 'button2', 'button3'])
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
+        assert a != f
+        assert hash(a) != hash(f)

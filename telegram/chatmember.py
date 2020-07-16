@@ -31,6 +31,9 @@ if TYPE_CHECKING:
 class ChatMember(TelegramObject):
     """This object contains information about one member of the chat.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`user` and :attr:`status` are equal.
+
     Attributes:
         user (:class:`telegram.User`): Information about the user.
         status (:obj:`str`): The member's status in the chat.
