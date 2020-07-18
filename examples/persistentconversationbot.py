@@ -126,13 +126,13 @@ def main():
                                       custom_choice),
                        ],
 
-            TYPING_CHOICE: [MessageHandler(Filters.text,
-                                           regular_choice),
-                            ],
+            TYPING_CHOICE: [
+                MessageHandler(Filters.text & ~(Filters.command | Filters.regex('^Done$')),
+                               regular_choice)],
 
-            TYPING_REPLY: [MessageHandler(Filters.text,
-                                          received_information),
-                           ],
+            TYPING_REPLY: [
+                MessageHandler(Filters.text & ~(Filters.command | Filters.regex('^Done$')),
+                               received_information)],
         },
 
         fallbacks=[MessageHandler(Filters.regex('^Done$'), done)],
