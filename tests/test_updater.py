@@ -38,7 +38,8 @@ import pytest
 
 from telegram import TelegramError, Message, User, Chat, Update, Bot
 from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter
-from telegram.ext import Updater, Dispatcher, DictPersistence
+from telegram.ext import Updater, Dispatcher, DictPersistence, Defaults
+from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.webhookhandler import WebhookServer
 
 signalskip = pytest.mark.skipif(sys.platform == 'win32',
@@ -337,30 +338,6 @@ class TestUpdater:
         assert q.get(False) == update
         updater.stop()
 
-    def test_webhook_default_quote(self, monkeypatch, updater):
-        updater._default_quote = True
-        q = Queue()
-        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
-        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
-        monkeypatch.setattr('telegram.ext.Dispatcher.process_update', lambda _, u: q.put(u))
-
-        ip = '127.0.0.1'
-        port = randrange(1024, 49152)  # Select random port
-        updater.start_webhook(
-            ip,
-            port,
-            url_path='TOKEN')
-        sleep(.2)
-
-        # Now, we send an update to the server via urlopen
-        update = Update(1, message=Message(1, User(1, '', False), None, Chat(1, ''),
-                                           text='Webhook'))
-        self._send_webhook_msg(ip, port, update.to_json(), 'TOKEN')
-        sleep(.2)
-        # assert q.get(False) == update
-        assert q.get(False).message.default_quote is True
-        updater.stop()
-
     @pytest.mark.parametrize(('error',),
                              argvalues=[(TelegramError(''),)],
                              ids=('TelegramError',))
@@ -581,3 +558,7 @@ class TestUpdater:
         use_context = not dispatcher.use_context
         with pytest.raises(ValueError):
             Updater(dispatcher=dispatcher, use_context=use_context)
+
+    def test_defaults_warning(self, bot):
+        with pytest.warns(TelegramDeprecationWarning, match='no effect when a Bot is passed'):
+            Updater(bot=bot, defaults=Defaults())

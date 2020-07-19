@@ -20,6 +20,7 @@
 
 import logging
 import ssl
+import warnings
 from threading import Thread, Lock, current_thread, Event
 from time import sleep
 from signal import signal, SIGINT, SIGTERM, SIGABRT
@@ -28,6 +29,7 @@ from queue import Queue
 from telegram import Bot, TelegramError
 from telegram.ext import Dispatcher, JobQueue
 from telegram.error import Unauthorized, InvalidToken, RetryAfter, TimedOut
+from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import get_signal_name
 from telegram.utils.request import Request
 from telegram.utils.webhookhandler import (WebhookServer, WebhookAppClass)
@@ -116,6 +118,12 @@ class Updater:
                  dispatcher=None,
                  base_file_url=None):
 
+        if defaults and bot:
+            warnings.warn('Passing defaults to an Updater has no effect when a Bot is passed '
+                          'as well. Pass them to the Bot instead.',
+                          TelegramDeprecationWarning,
+                          stacklevel=2)
+
         if dispatcher is None:
             if (token is None) and (bot is None):
                 raise ValueError('`token` or `bot` must be passed')
@@ -196,9 +204,6 @@ class Updater:
         self.httpd = None
         self.__lock = Lock()
         self.__threads = []
-
-        # Just for passing to WebhookAppClass
-        self._default_quote = defaults.quote if defaults else None
 
     def _init_thread(self, target, name, *args, **kwargs):
         thr = Thread(target=self._thread_wrapper,
@@ -443,8 +448,7 @@ class Updater:
             url_path = '/{}'.format(url_path)
 
         # Create Tornado app instance
-        app = WebhookAppClass(url_path, self.bot, self.update_queue,
-                              default_quote=self._default_quote)
+        app = WebhookAppClass(url_path, self.bot, self.update_queue)
 
         # Form SSL Context
         # An SSLError is raised if the private key does not match with the certificate

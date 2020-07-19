@@ -53,15 +53,13 @@ class TestCallbackQuery:
                      'message': self.message.to_dict(),
                      'data': self.data,
                      'inline_message_id': self.inline_message_id,
-                     'game_short_name': self.game_short_name,
-                     'default_quote': True}
+                     'game_short_name': self.game_short_name}
         callback_query = CallbackQuery.de_json(json_dict, bot)
 
         assert callback_query.id == self.id_
         assert callback_query.from_user == self.from_user
         assert callback_query.chat_instance == self.chat_instance
         assert callback_query.message == self.message
-        assert callback_query.message.default_quote is True
         assert callback_query.data == self.data
         assert callback_query.inline_message_id == self.inline_message_id
         assert callback_query.game_short_name == self.game_short_name
