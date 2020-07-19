@@ -48,3 +48,18 @@ class TestUserProfilePhotos:
         for ix, x in enumerate(user_profile_photos_dict['photos']):
             for iy, y in enumerate(x):
                 assert y == user_profile_photos.photos[ix][iy].to_dict()
+
+    def test_equality(self):
+        a = UserProfilePhotos(2, self.photos)
+        b = UserProfilePhotos(2, self.photos)
+        c = UserProfilePhotos(1, [self.photos[0]])
+        d = PhotoSize('file_id1', 'unique_id', 512, 512)
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)

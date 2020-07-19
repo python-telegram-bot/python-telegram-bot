@@ -449,3 +449,23 @@ class TestMaskPosition:
         assert mask_position_dict['x_shift'] == mask_position.x_shift
         assert mask_position_dict['y_shift'] == mask_position.y_shift
         assert mask_position_dict['scale'] == mask_position.scale
+
+    def test_equality(self):
+        a = MaskPosition(self.point, self.x_shift, self.y_shift, self.scale)
+        b = MaskPosition(self.point, self.x_shift, self.y_shift, self.scale)
+        c = MaskPosition(MaskPosition.FOREHEAD, self.x_shift, self.y_shift, self.scale)
+        d = MaskPosition(self.point, 0, 0, self.scale)
+        e = Audio('', '', 0, None, None)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)

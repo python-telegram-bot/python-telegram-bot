@@ -19,7 +19,7 @@
 
 import pytest
 
-from telegram import InputContactMessageContent
+from telegram import InputContactMessageContent, User
 
 
 @pytest.fixture(scope='class')
@@ -49,3 +49,18 @@ class TestInputContactMessageContent:
                 == input_contact_message_content.first_name)
         assert (input_contact_message_content_dict['last_name']
                 == input_contact_message_content.last_name)
+
+    def test_equality(self):
+        a = InputContactMessageContent('phone', 'first', last_name='last')
+        b = InputContactMessageContent('phone', 'first_name', vcard='vcard')
+        c = InputContactMessageContent('phone_number', 'first', vcard='vcard')
+        d = User(123, 'first', False)
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)

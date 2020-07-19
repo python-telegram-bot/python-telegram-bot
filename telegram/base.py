@@ -23,6 +23,8 @@ try:
 except ImportError:
     import json
 
+import warnings
+
 
 class TelegramObject:
     """Base class for most telegram objects."""
@@ -73,6 +75,12 @@ class TelegramObject:
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
+            if self._id_attrs == ():
+                warnings.warn("Objects of type {} can not be meaningfully tested for "
+                              "equivalence.".format(self.__class__.__name__))
+            if other._id_attrs == ():
+                warnings.warn("Objects of type {} can not be meaningfully tested for "
+                              "equivalence.".format(other.__class__.__name__))
             return self._id_attrs == other._id_attrs
         return super().__eq__(other)  # pylint: disable=no-member
 

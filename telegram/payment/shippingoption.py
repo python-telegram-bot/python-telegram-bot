@@ -24,6 +24,9 @@ from telegram import TelegramObject
 class ShippingOption(TelegramObject):
     """This object represents one shipping option.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`id` is equal.
+
     Attributes:
         id (:obj:`str`): Shipping option identifier.
         title (:obj:`str`): Option title.

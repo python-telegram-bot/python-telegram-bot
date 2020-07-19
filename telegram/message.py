@@ -33,6 +33,9 @@ _UNDEFINED = object()
 class Message(TelegramObject):
     """This object represents a message.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`message_id` and :attr:`chat` are equal.
+
     Note:
         * In Python `from` is a reserved word, use `from_user` instead.
 
@@ -338,7 +341,7 @@ class Message(TelegramObject):
         self.reply_markup = reply_markup
         self.bot = bot
 
-        self._id_attrs = (self.message_id,)
+        self._id_attrs = (self.message_id, self.chat)
 
     @property
     def chat_id(self):
