@@ -492,5 +492,5 @@ class TestUpdater:
             Updater(dispatcher=dispatcher, use_context=use_context)
 
     def test_defaults_warning(self, bot):
-        with pytest.warns(TelegramDeprecationWarning, match='no effect, if a Bot is passed'):
+        with pytest.warns(TelegramDeprecationWarning, match='no effect when a Bot is passed'):
             Updater(bot=bot, defaults=Defaults())
