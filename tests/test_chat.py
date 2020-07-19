@@ -20,7 +20,7 @@
 import pytest
 
 from telegram import Chat, ChatAction, ChatPermissions
-from telegram import User, Message
+from telegram import User
 
 
 @pytest.fixture(scope='class')
@@ -71,22 +71,6 @@ class TestChat:
         assert chat.can_set_sticker_set == self.can_set_sticker_set
         assert chat.permissions == self.permissions
         assert chat.slow_mode_delay == self.slow_mode_delay
-
-    def test_de_json_default_quote(self, bot):
-        json_dict = {
-            'id': self.id_,
-            'type': self.type_,
-            'pinned_message': Message(
-                message_id=123,
-                from_user=None,
-                date=None,
-                chat=None
-            ).to_dict(),
-            'default_quote': True
-        }
-        chat = Chat.de_json(json_dict, bot)
-
-        assert chat.pinned_message.default_quote is True
 
     def test_to_dict(self, chat):
         chat_dict = chat.to_dict()
