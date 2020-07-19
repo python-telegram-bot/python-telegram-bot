@@ -23,6 +23,7 @@ import pytest
 from telegram import (Update, Message, User, MessageEntity, Chat, Audio, Document, Animation,
                       Game, PhotoSize, Sticker, Video, Voice, VideoNote, Contact, Location, Venue,
                       Invoice, SuccessfulPayment, PassportData, ParseMode, Poll, PollOption, Dice)
+from telegram.ext import Defaults
 from tests.test_passport import RAW_PASSPORT_DATA
 
 
@@ -864,18 +865,19 @@ class TestMessage:
         assert message.pin()
 
     def test_default_quote(self, message):
+        message.bot.defaults = Defaults()
         kwargs = {}
 
-        message.default_quote = False
+        message.bot.defaults._quote = False
         message._quote(kwargs)
         assert 'reply_to_message_id' not in kwargs
 
-        message.default_quote = True
+        message.bot.defaults._quote = True
         message._quote(kwargs)
         assert 'reply_to_message_id' in kwargs
 
         kwargs = {}
-        message.default_quote = None
+        message.bot.defaults._quote = None
         message.chat.type = Chat.PRIVATE
         message._quote(kwargs)
         assert 'reply_to_message_id' not in kwargs
