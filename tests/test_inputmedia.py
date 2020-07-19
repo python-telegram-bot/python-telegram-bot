@@ -350,13 +350,6 @@ class TestSendMediaGroup:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    @pytest.mark.parametrize('default_bot', [{'quote': True}], indirect=True)
-    def test_send_media_group_default_quote(self, default_bot, chat_id, media_group):
-        messages = default_bot.send_media_group(chat_id, media_group)
-        assert all([mes.default_quote is True for mes in messages])
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_edit_message_media(self, bot, chat_id, media_group):
         messages = bot.send_media_group(chat_id, media_group)
         cid = messages[-1].chat.id
