@@ -726,20 +726,6 @@ class TestBot:
         assert chat.title == '>>> telegram.Bot(test) @{}'.format(bot.username)
         assert chat.id == int(super_group_id)
 
-    # TODO: Add bot to group to test there too
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    @pytest.mark.parametrize('default_bot', [{'quote': True}], indirect=True)
-    def test_get_chat_default_quote(self, default_bot, super_group_id):
-        message = default_bot.send_message(super_group_id, text="test_get_chat_default_quote")
-        assert default_bot.pin_chat_message(chat_id=super_group_id, message_id=message.message_id,
-                                            disable_notification=True)
-
-        chat = default_bot.get_chat(super_group_id)
-        assert chat.pinned_message.default_quote is True
-
-        assert default_bot.unpinChatMessage(super_group_id)
-
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_get_chat_administrators(self, bot, channel_id):
@@ -1097,13 +1083,6 @@ class TestBot:
         message = default_bot.send_message(chat_id, test_markdown_string, parse_mode='HTML')
         assert message.text == test_markdown_string
         assert message.text_markdown == escape_markdown(test_markdown_string)
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    @pytest.mark.parametrize('default_bot', [{'quote': True}], indirect=True)
-    def test_send_message_default_quote(self, default_bot, chat_id):
-        message = default_bot.send_message(chat_id, 'test')
-        assert message.default_quote is True
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
