@@ -32,7 +32,7 @@ __all__ = ['Filters', 'BaseFilter', 'MessageFilter', 'UpdateFilter', 'InvertedFi
 class BaseFilter(ABC):
     """Base class for all Filters.
 
-    Subclassing from this class filters to be combined using bitwise operators:
+    Filters subclassing from this class can combined using bitwise operators:
 
     And:
 
@@ -84,7 +84,7 @@ class BaseFilter(ABC):
 
     @abstractmethod
     def __call__(self, update):
-        ...
+        pass
 
     def __and__(self, other):
         return MergedFilter(self, and_filter=other)
@@ -105,6 +105,8 @@ class BaseFilter(ABC):
 class MessageFilter(BaseFilter, ABC):
     """Base class for all Message Filters. In contrast to :class:`UpdateFilter`, the object passed
     to :meth:`filter` is ``update.effective_message``.
+
+    Please see :class:`telegram.ext.BaseFilter` for details on how to create custom filters.
 
     Attributes:
         name (:obj:`str`): Name for this filter. Defaults to the type of filter.
@@ -134,6 +136,8 @@ class UpdateFilter(BaseFilter, ABC):
     """Base class for all Update Filters. In contrast to :class:`UpdateFilter`, the object
     passed to :meth:`filter` is ``update``, which allows to create filters like
     :attr:`Filters.update.edited_message`.
+
+    Please see :class:`telegram.ext.BaseFilter` for details on how to create custom filters.
 
     Attributes:
         name (:obj:`str`): Name for this filter. Defaults to the type of filter.
