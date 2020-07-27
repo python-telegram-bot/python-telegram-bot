@@ -1148,6 +1148,7 @@ officedocument.wordprocessingml.document")``-
         def add_usernames(self, username):
             """
             Add one or more users to the allowed usernames.
+
             Args:
                 username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow
                     through. Leading '@'s in usernames will be discarded.
@@ -1163,6 +1164,7 @@ officedocument.wordprocessingml.document")``-
         def add_bot_ids(self, bot_id):
             """
             Add one or more users to the allowed user ids.
+
             Args:
                 bot_id(:obj:`int` | List[:obj:`int`], optional): Which bot ID(s) to allow
                     through.
@@ -1179,6 +1181,7 @@ officedocument.wordprocessingml.document")``-
         def remove_usernames(self, username):
             """
             Remove one or more users from allowed usernames.
+
             Args:
                 username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to disallow
                     through. Leading '@'s in usernames will be discarded.
@@ -1194,6 +1197,7 @@ officedocument.wordprocessingml.document")``-
         def remove_bot_ids(self, bot_id):
             """
             Remove one or more users from allowed user ids.
+
             Args:
                 bot_id(:obj:`int` | List[:obj:`int`], optional): Which bot ID(s) to disallow
                     through.
