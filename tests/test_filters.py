@@ -21,7 +21,7 @@ import datetime
 import pytest
 
 from telegram import Message, User, Chat, MessageEntity, Document, Update, Dice
-from telegram.ext import Filters, BaseFilter
+from telegram.ext import Filters, BaseFilter, MessageFilter
 import re
 
 
@@ -963,7 +963,7 @@ class TestFilters:
             _CustomFilter()
 
     def test_custom_unnamed_filter(self, update):
-        class Unnamed(BaseFilter):
+        class Unnamed(MessageFilter):
             def filter(self, mes):
                 return True
 
@@ -1016,7 +1016,7 @@ class TestFilters:
         class TestException(Exception):
             pass
 
-        class RaisingFilter(BaseFilter):
+        class RaisingFilter(MessageFilter):
             def filter(self, _):
                 raise TestException
 
@@ -1035,7 +1035,7 @@ class TestFilters:
         class TestException(Exception):
             pass
 
-        class RaisingFilter(BaseFilter):
+        class RaisingFilter(MessageFilter):
             def filter(self, _):
                 raise TestException
 
@@ -1052,7 +1052,7 @@ class TestFilters:
         update.message.text = '/test'
         update.message.entities = [MessageEntity(MessageEntity.BOT_COMMAND, 0, 5)]
 
-        class DataFilter(BaseFilter):
+        class DataFilter(MessageFilter):
             data_filter = True
 
             def __init__(self, data):
@@ -1075,7 +1075,7 @@ class TestFilters:
     def test_merged_data_merging_or(self, update):
         update.message.text = '/test'
 
-        class DataFilter(BaseFilter):
+        class DataFilter(MessageFilter):
             data_filter = True
 
             def __init__(self, data):

@@ -30,7 +30,7 @@ import pytz
 from telegram import (Bot, Message, User, Chat, MessageEntity, Update,
                       InlineQuery, CallbackQuery, ShippingQuery, PreCheckoutQuery,
                       ChosenInlineResult)
-from telegram.ext import Dispatcher, JobQueue, Updater, BaseFilter, Defaults
+from telegram.ext import Dispatcher, JobQueue, Updater, MessageFilter, Defaults
 from telegram.error import BadRequest
 from tests.bots import get_bot
 
@@ -241,7 +241,7 @@ def make_command_update(message, edited=False, **kwargs):
 
 @pytest.fixture(scope='function')
 def mock_filter():
-    class MockFilter(BaseFilter):
+    class MockFilter(MessageFilter):
         def __init__(self):
             self.tested = False
 
