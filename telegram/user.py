@@ -143,6 +143,10 @@ class User(TelegramObject):
 
     def mention_markdown(self, name=None):
         """
+        Note:
+            :attr:`telegram.ParseMode.MARKDOWN` is is a legacy mode, retained by Telegram for
+            backward compatibility. You should use :meth:`mention_markdown_v2` instead.
+
         Args:
             name (:obj:`str`): The name used as a link for the user. Defaults to :attr:`full_name`.
 
