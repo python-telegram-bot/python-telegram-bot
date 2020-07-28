@@ -24,7 +24,7 @@ from telegram.utils.deprecate import TelegramDeprecationWarning
 
 from telegram import (Message, Update, Chat, Bot, User, CallbackQuery, InlineQuery,
                       ChosenInlineResult, ShippingQuery, PreCheckoutQuery)
-from telegram.ext import Filters, MessageHandler, CallbackContext, JobQueue, BaseFilter
+from telegram.ext import Filters, MessageHandler, CallbackContext, JobQueue, UpdateFilter
 
 message = Message(1, User(1, '', False), None, Chat(1, ''), text='Text')
 
@@ -163,8 +163,7 @@ class TestMessageHandler:
 
     def test_callback_query_with_filter(self, message):
 
-        class TestFilter(BaseFilter):
-            update_filter = True
+        class TestFilter(UpdateFilter):
             flag = False
 
             def filter(self, u):
