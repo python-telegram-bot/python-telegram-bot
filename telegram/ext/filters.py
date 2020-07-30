@@ -405,7 +405,7 @@ class Filters:
         Examples:
             Use ``MessageHandler(Filters.regex(r'help'), callback)`` to capture all messages that
             contain the word help. You can also use
-            ``MessageHandler(Filters.regex(re.compile(r'help', re.IGNORECASE), callback)`` if
+            ``MessageHandler(Filters.regex(re.compile(r'help', re.IGNORECASE)), callback)`` if
             you want your pattern to be case insensitive. This approach is recommended
             if you need to specify flags on your pattern.
 
