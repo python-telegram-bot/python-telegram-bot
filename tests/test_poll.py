@@ -20,6 +20,9 @@
 import pytest
 
 from datetime import datetime
+
+import pytz
+
 from telegram import Poll, PollOption, PollAnswer, User, MessageEntity
 from telegram.utils.helpers import to_timestamp
 
@@ -154,7 +157,7 @@ class TestPoll:
     open_period = 42
     close_date = datetime.utcnow()
 
-    def test_de_json(self):
+    def test_de_json(self, bot):
         json_dict = {
             'id': self.id_,
             'question': self.question,
@@ -169,7 +172,7 @@ class TestPoll:
             'open_period': self.open_period,
             'close_date': to_timestamp(self.close_date)
         }
-        poll = Poll.de_json(json_dict, None)
+        poll = Poll.de_json(json_dict, bot)
 
         assert poll.id == self.id_
         assert poll.question == self.question
@@ -205,6 +208,30 @@ class TestPoll:
         assert poll_dict['explanation_entities'] == [poll.explanation_entities[0].to_dict()]
         assert poll_dict['open_period'] == poll.open_period
         assert poll_dict['close_date'] == to_timestamp(poll.close_date)
+
+    def test_default_tzinfo(self, poll, tz_bot):
+        json_dict = {
+            'id': self.id_,
+            'question': self.question,
+            'options': [o.to_dict() for o in self.options],
+            'total_voter_count': self.total_voter_count,
+            'is_closed': self.is_closed,
+            'is_anonymous': self.is_anonymous,
+            'type': self.type,
+            'allows_multiple_answers': self.allows_multiple_answers,
+            'explanation': self.explanation,
+            'explanation_entities': [self.explanation_entities[0].to_dict()],
+            'open_period': self.open_period,
+            'close_date': to_timestamp(self.close_date)
+        }
+        poll = Poll.de_json(json_dict, tz_bot)
+
+        assert poll.close_date == pytz.utc.localize(self.close_date).replace(microsecond=0)
+
+        poll_dict = poll.to_dict()
+
+        assert isinstance(poll_dict, dict)
+        assert poll_dict['close_date'] == to_timestamp(self.close_date)
 
     def test_parse_entity(self, poll):
         entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)

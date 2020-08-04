@@ -369,15 +369,15 @@ class Message(TelegramObject):
         data = super().de_json(data, bot)
 
         data['from_user'] = User.de_json(data.get('from'), bot)
-        data['date'] = from_timestamp(data['date'])
+        data['date'] = from_timestamp(data['date'], defaults=bot.defaults)
         data['chat'] = Chat.de_json(data.get('chat'), bot)
         data['entities'] = MessageEntity.de_list(data.get('entities'), bot)
         data['caption_entities'] = MessageEntity.de_list(data.get('caption_entities'), bot)
         data['forward_from'] = User.de_json(data.get('forward_from'), bot)
         data['forward_from_chat'] = Chat.de_json(data.get('forward_from_chat'), bot)
-        data['forward_date'] = from_timestamp(data.get('forward_date'))
+        data['forward_date'] = from_timestamp(data.get('forward_date'), defaults=bot.defaults)
         data['reply_to_message'] = Message.de_json(data.get('reply_to_message'), bot)
-        data['edit_date'] = from_timestamp(data.get('edit_date'))
+        data['edit_date'] = from_timestamp(data.get('edit_date'), defaults=bot.defaults)
         data['audio'] = Audio.de_json(data.get('audio'), bot)
         data['document'] = Document.de_json(data.get('document'), bot)
         data['animation'] = Animation.de_json(data.get('animation'), bot)
@@ -444,14 +444,15 @@ class Message(TelegramObject):
 
     def to_dict(self):
         data = super().to_dict()
+        defaults = self.bot.defaults if self.bot else None
 
         # Required
-        data['date'] = to_timestamp(self.date)
+        data['date'] = to_timestamp(self.date, defaults=defaults)
         # Optionals
         if self.forward_date:
-            data['forward_date'] = to_timestamp(self.forward_date)
+            data['forward_date'] = to_timestamp(self.forward_date, defaults=defaults)
         if self.edit_date:
-            data['edit_date'] = to_timestamp(self.edit_date)
+            data['edit_date'] = to_timestamp(self.edit_date, defaults=defaults)
         if self.photo:
             data['photo'] = [p.to_dict() for p in self.photo]
         if self.entities:

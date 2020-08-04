@@ -20,11 +20,13 @@ import time
 import datetime as dtm
 
 import pytest
+import pytz
 
 from telegram import Sticker
 from telegram import Update
 from telegram import User
 from telegram import MessageEntity
+from telegram.ext import Defaults
 from telegram.message import Message
 from telegram.utils import helpers
 from telegram.utils.helpers import _datetime_to_float_timestamp
@@ -82,6 +84,10 @@ class TestHelpers:
         datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5)
         assert helpers.to_float_timestamp(datetime) == 1573431976.1
 
+    def test_to_float_timestamp_absolute_naive_with_defaults(self):
+        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5)
+        assert helpers.to_float_timestamp(datetime, defaults=Defaults()) == 1573431976.1
+
     def test_to_float_timestamp_absolute_aware(self, timezone):
         """Conversion from timezone-aware datetime to timestamp"""
         # we're parametrizing this with two different UTC offsets to exclude the possibility
@@ -90,6 +96,13 @@ class TestHelpers:
         datetime = timezone.localize(test_datetime)
         assert (helpers.to_float_timestamp(datetime)
                 == 1573431976.1 - timezone.utcoffset(test_datetime).total_seconds())
+
+    def test_to_float_timestamp_absolute_aware_with_defaults(self, timezone):
+        # we're parametrizing this with two different UTC offsets to exclude the possibility
+        # of an xpass when the test is run in a timezone with the same UTC offset
+        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5)
+        assert (helpers.to_float_timestamp(datetime, defaults=Defaults(tzinfo=timezone))
+                == 1573431976.1 - timezone.utcoffset(datetime).total_seconds())
 
     def test_to_float_timestamp_absolute_no_reference(self):
         """A reference timestamp is only relevant for relative time specifications"""
@@ -128,12 +141,31 @@ class TestHelpers:
         assert (helpers.to_float_timestamp(aware_time_of_day, ref_t)
                 == pytest.approx(ref_t + (-utc_offset.total_seconds() % (24 * 60 * 60))))
 
+    def test_to_float_timestamp_time_of_day_timezone_with_defaults(self, timezone):
+        """Conversion from timezone-aware time-of-day specification to timestamp"""
+        # we're parametrizing this with two different UTC offsets to exclude the possibility
+        # of an xpass when the test is run in a timezone with the same UTC offset
+        ref_datetime = dtm.datetime(1970, 1, 1, 12)
+        utc_offset = timezone.utcoffset(ref_datetime)
+        ref_t, time_of_day = _datetime_to_float_timestamp(ref_datetime), ref_datetime.time()
+
+        # first test that naive time is assumed to be utc:
+        assert helpers.to_float_timestamp(time_of_day, ref_t) == pytest.approx(ref_t)
+        # test that by setting the timezone the timestamp changes accordingly:
+        assert (helpers.to_float_timestamp(time_of_day, ref_t,
+                                           defaults=Defaults(tzinfo=timezone))
+                == pytest.approx(ref_t + (-utc_offset.total_seconds() % (24 * 60 * 60))))
+
     @pytest.mark.parametrize('time_spec', RELATIVE_TIME_SPECS, ids=str)
     def test_to_float_timestamp_default_reference(self, time_spec):
         """The reference timestamp for relative time specifications should default to now"""
         now = time.time()
         assert (helpers.to_float_timestamp(time_spec)
                 == pytest.approx(helpers.to_float_timestamp(time_spec, reference_timestamp=now)))
+
+    def test_to_float_timestamp_error(self):
+        with pytest.raises(TypeError, match='Defaults'):
+            helpers.to_float_timestamp(Defaults())
 
     @pytest.mark.parametrize('time_spec', TIME_SPECS, ids=str)
     def test_to_timestamp(self, time_spec):
@@ -144,9 +176,16 @@ class TestHelpers:
         # this 'convenience' behaviour has been left left for backwards compatibility
         assert helpers.to_timestamp(None) is None
 
+    def test_from_timestamp_none(self):
+        assert helpers.from_timestamp(None) is None
+
     def test_from_timestamp_naive(self):
         datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, tzinfo=None)
-        assert helpers.from_timestamp(1573431976, tzinfo=None) == datetime
+        assert helpers.from_timestamp(1573431976) == datetime.replace(tzinfo=pytz.utc)
+
+    def test_from_timestamp_naive_with_defaults(self):
+        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, tzinfo=None)
+        assert helpers.from_timestamp(1573431976, defaults=Defaults(tzinfo=None)) == datetime
 
     def test_from_timestamp_aware(self, timezone):
         # we're parametrizing this with two different UTC offsets to exclude the possibility
@@ -155,6 +194,16 @@ class TestHelpers:
         datetime = timezone.localize(test_datetime)
         assert (helpers.from_timestamp(
             1573431976.1 - timezone.utcoffset(test_datetime).total_seconds()) == datetime)
+
+    def test_from_timestamp_aware_with_defaults(self, timezone):
+        # we're parametrizing this with two different UTC offsets to exclude the possibility
+        # of an xpass when the test is run in a timezone with the same UTC offset
+        test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5)
+        datetime = timezone.localize(test_datetime)
+        defaults = Defaults(tzinfo=timezone)
+        assert (helpers.from_timestamp(
+            1573431976.1 - timezone.utcoffset(test_datetime).total_seconds(),
+            defaults=defaults) == datetime)
 
     def test_create_deep_linked_url(self):
         username = 'JamesTheMock'

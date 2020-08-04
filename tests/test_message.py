@@ -19,11 +19,13 @@
 from datetime import datetime
 
 import pytest
+import pytz
 
 from telegram import (Update, Message, User, MessageEntity, Chat, Audio, Document, Animation,
                       Game, PhotoSize, Sticker, Video, Voice, VideoNote, Contact, Location, Venue,
                       Invoice, SuccessfulPayment, PassportData, ParseMode, Poll, PollOption, Dice)
 from telegram.ext import Defaults
+from telegram.utils.helpers import to_timestamp
 from tests.test_passport import RAW_PASSPORT_DATA
 
 
@@ -169,10 +171,34 @@ class TestMessage:
                                   MessageEntity(**e) for e in test_entities_v2
                               ])
 
-    def test_all_posibilities_de_json_and_to_dict(self, bot, message_params):
+    def test_all_possibilities_de_json_and_to_dict(self, bot, message_params):
         new = Message.de_json(message_params.to_dict(), bot)
 
         assert new.to_dict() == message_params.to_dict()
+
+    def test_to_dict_default_tzinfo(self, tz_bot):
+        timestamp = to_timestamp(TestMessage.date)
+
+        json_dict = {
+            'message_id': TestMessage.id_,
+            'from_user': TestMessage.from_user.to_dict(),
+            'date': timestamp,
+            'forward_date': timestamp,
+            'edit_date': timestamp,
+            'chat': TestMessage.chat.to_dict()
+        }
+        new = Message.de_json(json_dict, bot=tz_bot)
+
+        aware_date = pytz.utc.localize(TestMessage.date).replace(microsecond=0)
+        assert new.date == aware_date
+        assert new.forward_date == aware_date
+        assert new.edit_date == aware_date
+
+        new_dict = new.to_dict()
+
+        assert new_dict['date'] == timestamp
+        assert new_dict['edit_date'] == timestamp
+        assert new_dict['forward_date'] == timestamp
 
     def test_dict_approach(self, message):
         assert message['date'] == message.date

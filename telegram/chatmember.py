@@ -61,6 +61,7 @@ class ChatMember(TelegramObject):
             stickers and use inline bots, implies can_send_media_messages.
         can_add_web_page_previews (:obj:`bool`): Optional. If user may add web page previews to his
             messages, implies can_send_media_messages
+        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     Args:
         user (:class:`telegram.User`): Information about the user.
@@ -103,6 +104,7 @@ class ChatMember(TelegramObject):
             send animations, games, stickers and use inline bots, implies can_send_media_messages.
         can_add_web_page_previews (:obj:`bool`, optional): Restricted only. True, if user may add
             web page previews to his messages, implies can_send_media_messages.
+        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
 
     """
     ADMINISTRATOR = 'administrator'
@@ -124,7 +126,8 @@ class ChatMember(TelegramObject):
                  can_restrict_members=None, can_pin_messages=None,
                  can_promote_members=None, can_send_messages=None,
                  can_send_media_messages=None, can_send_polls=None, can_send_other_messages=None,
-                 can_add_web_page_previews=None, is_member=None, custom_title=None, **kwargs):
+                 can_add_web_page_previews=None, is_member=None, custom_title=None, bot=None,
+                 **kwargs):
         # Required
         self.user = user
         self.status = status
@@ -146,6 +149,8 @@ class ChatMember(TelegramObject):
         self.can_add_web_page_previews = can_add_web_page_previews
         self.is_member = is_member
 
+        self.bot = bot
+
         self._id_attrs = (self.user, self.status)
 
     @classmethod
@@ -156,13 +161,14 @@ class ChatMember(TelegramObject):
         data = super().de_json(data, bot)
 
         data['user'] = User.de_json(data.get('user'), bot)
-        data['until_date'] = from_timestamp(data.get('until_date', None))
+        data['until_date'] = from_timestamp(data.get('until_date', None), defaults=bot.defaults)
 
         return cls(**data)
 
     def to_dict(self):
         data = super().to_dict()
 
-        data['until_date'] = to_timestamp(self.until_date)
+        data['until_date'] = to_timestamp(self.until_date,
+                                          defaults=self.bot.defaults if self.bot else None)
 
         return data

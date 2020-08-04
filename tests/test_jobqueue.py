@@ -322,6 +322,25 @@ class TestJobQueue:
         scheduled_time = job_queue.jobs()[0].next_t.timestamp()
         assert scheduled_time == pytest.approx(expected_reschedule_time)
 
+    def test_default_tzinfo(self, _dp, tz_bot):
+        # we're parametrizing this with two different UTC offsets to exclude the possibility
+        # of an xpass when the test is run in a timezone with the same UTC offset
+        jq = JobQueue()
+        original_bot = _dp.bot
+        _dp.bot = tz_bot
+        jq.set_dispatcher(_dp)
+        try:
+            jq.start()
+
+            when = dtm.datetime.now(tz_bot.defaults.tzinfo) + dtm.timedelta(seconds=0.0005)
+            jq.run_once(self.job_run_once, when.time())
+            sleep(0.001)
+            assert self.result == 1
+
+            jq.stop()
+        finally:
+            _dp.bot = original_bot
+
     @pytest.mark.parametrize('use_context', [True, False])
     def test_get_jobs(self, job_queue, use_context):
         job_queue._dispatcher.use_context = use_context
