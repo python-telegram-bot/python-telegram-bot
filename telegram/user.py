@@ -206,6 +206,19 @@ class User(TelegramObject):
         """
         return self.bot.send_photo(self.id, *args, **kwargs)
 
+    def send_media_group(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_media_group(User.id, *args, **kwargs)
+
+        Where User is the current instance.
+
+        Returns:
+            List[:class:`telegram.Message`:] On success, instance representing the message posted.
+
+        """
+        return self.bot.send_media_group(self.id, *args, **kwargs)
+
     def send_audio(self, *args, **kwargs):
         """Shortcut for::
 
@@ -219,6 +232,48 @@ class User(TelegramObject):
         """
         return self.bot.send_audio(self.id, *args, **kwargs)
 
+    def send_chat_action(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_chat_action(User.id, *args, **kwargs)
+
+        Where User is the current instance.
+
+        Returns:
+            :obj:`True`: On success.
+
+        """
+        return self.bot.send_chat_action(self.id, *args, **kwargs)
+
+    send_action = send_chat_action
+    """Alias for :attr:`send_chat_action`"""
+
+    def send_contact(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_contact(User.id, *args, **kwargs)
+
+        Where User is the current instance.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.send_contact(self.id, *args, **kwargs)
+
+    def send_dice(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_dice(User.id, *args, **kwargs)
+
+        Where User is the current instance.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.send_dice(self.id, *args, **kwargs)
+
     def send_document(self, *args, **kwargs):
         """Shortcut for::
 
@@ -231,6 +286,45 @@ class User(TelegramObject):
 
         """
         return self.bot.send_document(self.id, *args, **kwargs)
+
+    def send_game(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_game(User.id, *args, **kwargs)
+
+        Where User is the current instance.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.send_game(self.id, *args, **kwargs)
+
+    def send_invoice(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_invoice(User.id, *args, **kwargs)
+
+        Where User is the current instance.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.send_invoice(self.id, *args, **kwargs)
+
+    def send_location(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_location(User.id, *args, **kwargs)
+
+        Where User is the current instance.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.send_location(self.id, *args, **kwargs)
 
     def send_animation(self, *args, **kwargs):
         """Shortcut for::
@@ -270,6 +364,19 @@ class User(TelegramObject):
 
         """
         return self.bot.send_video(self.id, *args, **kwargs)
+
+    def send_venue(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_venue(User.id, *args, **kwargs)
+
+        Where User is the current instance.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.send_venue(self.id, *args, **kwargs)
 
     def send_video_note(self, *args, **kwargs):
         """Shortcut for::
