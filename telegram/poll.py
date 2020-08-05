@@ -22,7 +22,7 @@
 import sys
 
 from telegram import (TelegramObject, User, MessageEntity)
-from telegram.utils.helpers import to_timestamp, from_timestamp
+from telegram.utils.helpers import to_timestamp, from_timestamp, parse_datetime
 
 
 class PollOption(TelegramObject):
@@ -172,11 +172,21 @@ class Poll(TelegramObject):
         self.explanation = explanation
         self.explanation_entities = explanation_entities
         self.open_period = open_period
-        self.close_date = close_date
 
         self.bot = bot
 
+        self._close_date = None
+        self.close_date = close_date
+
         self._id_attrs = (self.id,)
+
+    @property
+    def close_date(self):
+        return self._close_date
+
+    @close_date.setter
+    def close_date(self, value):
+        self._close_date = parse_datetime(value, bot=self.bot)
 
     @classmethod
     def de_json(cls, data, bot):
@@ -187,7 +197,7 @@ class Poll(TelegramObject):
 
         data['options'] = [PollOption.de_json(option, bot) for option in data['options']]
         data['explanation_entities'] = MessageEntity.de_list(data.get('explanation_entities'), bot)
-        data['close_date'] = from_timestamp(data.get('close_date'), defaults=bot.defaults)
+        data['close_date'] = from_timestamp(data.get('close_date'))
 
         return cls(**data)
 
@@ -197,10 +207,14 @@ class Poll(TelegramObject):
         data['options'] = [x.to_dict() for x in self.options]
         if self.explanation_entities:
             data['explanation_entities'] = [e.to_dict() for e in self.explanation_entities]
-        data['close_date'] = to_timestamp(data.get('close_date'),
-                                          defaults=self.bot.defaults if self.bot else None)
+        data['close_date'] = to_timestamp(self.close_date, bot=self.bot)
 
         return data
+
+    def __getitem__(self, item):
+        if item == 'close_date':
+            return self.close_date
+        return super().__getitem__(item)
 
     def parse_explanation_entity(self, entity):
         """Returns the text from a given :class:`telegram.MessageEntity`.

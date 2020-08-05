@@ -19,7 +19,6 @@
 from datetime import datetime
 
 import pytest
-import pytz
 
 from telegram import (Update, Message, User, MessageEntity, Chat, Audio, Document, Animation,
                       Game, PhotoSize, Sticker, Video, Voice, VideoNote, Contact, Location, Venue,
@@ -176,32 +175,36 @@ class TestMessage:
 
         assert new.to_dict() == message_params.to_dict()
 
-    def test_to_dict_default_tzinfo(self, tz_bot):
-        timestamp = to_timestamp(TestMessage.date)
+    def test_to_dict_default_tzinfo(self, message, tz_bot):
+        message.bot = tz_bot
+        tzinfo = tz_bot.defaults.tzinfo
 
-        json_dict = {
-            'message_id': TestMessage.id_,
-            'from_user': TestMessage.from_user.to_dict(),
-            'date': timestamp,
-            'forward_date': timestamp,
-            'edit_date': timestamp,
-            'chat': TestMessage.chat.to_dict()
-        }
-        new = Message.de_json(json_dict, bot=tz_bot)
+        message.date = TestMessage.date
+        message.forward_date = TestMessage.date
+        message.edit_date = TestMessage.date
 
-        aware_date = pytz.utc.localize(TestMessage.date).replace(microsecond=0)
-        assert new.date == aware_date
-        assert new.forward_date == aware_date
-        assert new.edit_date == aware_date
+        aware_date = tzinfo.localize(TestMessage.date)
+        timestamp = to_timestamp(TestMessage.date, bot=tz_bot)
+        utc_offset = tzinfo.utcoffset(TestMessage.date).total_seconds()
 
-        new_dict = new.to_dict()
+        assert message.date == aware_date
+        assert message.forward_date == aware_date
+        assert message.edit_date == aware_date
+        assert message.date.utcoffset().total_seconds() == utc_offset
+        assert message.forward_date.utcoffset().total_seconds() == utc_offset
+        assert message.edit_date.utcoffset().total_seconds() == utc_offset
 
-        assert new_dict['date'] == timestamp
-        assert new_dict['edit_date'] == timestamp
-        assert new_dict['forward_date'] == timestamp
+        message_dict = message.to_dict()
+
+        assert message_dict['date'] == timestamp
+        assert message_dict['edit_date'] == timestamp
+        assert message_dict['forward_date'] == timestamp
 
     def test_dict_approach(self, message):
+        assert message['text'] == message.text
         assert message['date'] == message.date
+        assert message['forward_date'] == message.forward_date
+        assert message['edit_date'] == message.edit_date
         assert message['chat_id'] == message.chat_id
         assert message['no_key'] is None
 

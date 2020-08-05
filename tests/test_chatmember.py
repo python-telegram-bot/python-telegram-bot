@@ -19,7 +19,6 @@
 import datetime
 
 import pytest
-import pytz
 
 from telegram import User, ChatMember
 from telegram.utils.helpers import to_timestamp
@@ -97,19 +96,22 @@ class TestChatMember:
 
     def test_default_tzinfo(self, chat_member, tz_bot, user):
         time = datetime.datetime.utcnow()
-        json_dict = {'user': user.to_dict(),
-                     'status': self.status,
-                     'custom_title': 'custom_title',
-                     'until_date': to_timestamp(time)}
+        chat_member.bot = tz_bot
+        tzinfo = tz_bot.defaults.tzinfo
+        chat_member.until_date = time
 
-        chat_member = ChatMember.de_json(json_dict, tz_bot)
-
-        assert chat_member.until_date == pytz.utc.localize(time).replace(microsecond=0)
+        assert chat_member.until_date == tzinfo.localize(time)
+        assert chat_member.until_date.utcoffset().total_seconds() == tzinfo.utcoffset(
+            time).total_seconds()
 
         chat_member_dict = chat_member.to_dict()
 
         assert isinstance(chat_member_dict, dict)
-        assert chat_member_dict['until_date'] == to_timestamp(time)
+        assert chat_member_dict['until_date'] == to_timestamp(time, bot=tz_bot)
+
+    def test_dict_approach(self, chat_member):
+        assert chat_member['user'] == chat_member.user
+        assert chat_member['until_date'] == chat_member.until_date
 
     def test_equality(self):
         a = ChatMember(User(1, '', False), ChatMember.ADMINISTRATOR)

@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram ChatMember."""
 
 from telegram import User, TelegramObject
-from telegram.utils.helpers import to_timestamp, from_timestamp
+from telegram.utils.helpers import to_timestamp, from_timestamp, parse_datetime
 
 
 class ChatMember(TelegramObject):
@@ -128,10 +128,12 @@ class ChatMember(TelegramObject):
                  can_send_media_messages=None, can_send_polls=None, can_send_other_messages=None,
                  can_add_web_page_previews=None, is_member=None, custom_title=None, bot=None,
                  **kwargs):
+        self.bot = bot
         # Required
         self.user = user
         self.status = status
         self.custom_title = custom_title
+        self._until_date = None
         self.until_date = until_date
         self.can_be_edited = can_be_edited
         self.can_change_info = can_change_info
@@ -149,9 +151,15 @@ class ChatMember(TelegramObject):
         self.can_add_web_page_previews = can_add_web_page_previews
         self.is_member = is_member
 
-        self.bot = bot
-
         self._id_attrs = (self.user, self.status)
+
+    @property
+    def until_date(self):
+        return self._until_date
+
+    @until_date.setter
+    def until_date(self, value):
+        self._until_date = parse_datetime(value, bot=self.bot)
 
     @classmethod
     def de_json(cls, data, bot):
@@ -161,14 +169,18 @@ class ChatMember(TelegramObject):
         data = super().de_json(data, bot)
 
         data['user'] = User.de_json(data.get('user'), bot)
-        data['until_date'] = from_timestamp(data.get('until_date', None), defaults=bot.defaults)
+        data['until_date'] = from_timestamp(data.get('until_date', None))
 
         return cls(**data)
 
     def to_dict(self):
         data = super().to_dict()
 
-        data['until_date'] = to_timestamp(self.until_date,
-                                          defaults=self.bot.defaults if self.bot else None)
+        data['until_date'] = to_timestamp(self.until_date, bot=self.bot)
 
         return data
+
+    def __getitem__(self, item):
+        if item == 'until_date':
+            return self.until_date
+        return super().__getitem__(item)

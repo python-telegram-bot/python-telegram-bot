@@ -448,7 +448,7 @@ class TestBot:
 
     def test_kick_chat_member_default_tz(self, monkeypatch, tz_bot):
         until = dtm.datetime(2020, 1, 11, 16, 13)
-        until_timestamp = to_timestamp(until, defaults=tz_bot.defaults)
+        until_timestamp = to_timestamp(until, bot=tz_bot)
 
         def test(url, data, *args, **kwargs):
             chat_id = data['chat_id'] == 2
@@ -898,7 +898,7 @@ class TestBot:
     def test_restrict_chat_member_default_tz(self, monkeypatch, tz_bot, channel_id,
                                              chat_permissions):
         until = dtm.datetime(2020, 1, 11, 16, 13)
-        until_timestamp = to_timestamp(until, defaults=tz_bot.defaults)
+        until_timestamp = to_timestamp(until, bot=tz_bot)
 
         def test(url, data, *args, **kwargs):
             return data.get('until_date', until_timestamp) == until_timestamp

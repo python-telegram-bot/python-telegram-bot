@@ -85,13 +85,13 @@ def _datetime_to_float_timestamp(dt_obj):
     return dt_obj.timestamp()
 
 
-def to_float_timestamp(t, reference_timestamp=None, defaults=None):
+def to_float_timestamp(t, reference_timestamp=None, bot=None):
     """
     Converts a given time object to a float POSIX timestamp.
     Used to convert different time specifications to a common format. The time object
     can be relative (i.e. indicate a time increment, or a time of day) or absolute.
     Any objects from the :class:`datetime` module that are timezone-naive will be assumed
-    to be in UTC, if ``defaults`` is not passed.
+    to be in UTC, if ``bot`` is not passed or ``bot.defaults`` is :obj:`None`.
 
     ``None`` s are left alone (i.e. ``to_float_timestamp(None)`` is ``None``).
 
@@ -113,8 +113,9 @@ def to_float_timestamp(t, reference_timestamp=None, defaults=None):
             If ``t`` is given as an absolute representation of date & time (i.e. a
             ``datetime.datetime`` object), ``reference_timestamp`` is not relevant and so its
             value should be ``None``. If this is not the case, a ``ValueError`` will be raised.
-        defaults (:class:`telegram.ext.Defaults`, optional): If ``t`` is a naive object from the
-            :class:`datetime` module, it will be interpreted as ``defaults.tzinfo``.
+        bot (:class:`telegram.Bot`, optional): If ``t`` is a naive object from the
+            :class:`datetime` module, and ``bot.defaults`` is not :obj:`None`, it will be
+            interpreted as the bots default timezone.
 
     Returns:
         (float | None) The return value depends on the type of argument ``t``. If ``t`` is
@@ -141,7 +142,7 @@ def to_float_timestamp(t, reference_timestamp=None, defaults=None):
     elif isinstance(t, Number):
         return reference_timestamp + t
 
-    tzinfo = defaults.tzinfo if defaults else pytz.utc
+    tzinfo = bot.defaults.tzinfo if bot and bot.defaults else pytz.utc
 
     if isinstance(t, dtm.time):
         reference_dt = dtm.datetime.fromtimestamp(reference_timestamp, tz=t.tzinfo or tzinfo)
@@ -164,34 +165,31 @@ def to_float_timestamp(t, reference_timestamp=None, defaults=None):
     raise TypeError('Unable to convert {} object to timestamp'.format(type(t).__name__))
 
 
-def to_timestamp(dt_obj, reference_timestamp=None, defaults=None):
+def to_timestamp(dt_obj, reference_timestamp=None, bot=None):
     """
     Wrapper over :func:`to_float_timestamp` which returns an integer (the float value truncated
     down to the nearest integer).
 
     See the documentation for :func:`to_float_timestamp` for more details.
     """
-    return (int(to_float_timestamp(dt_obj, reference_timestamp, defaults))
+    return (int(to_float_timestamp(dt_obj, reference_timestamp, bot))
             if dt_obj is not None else None)
 
 
-def from_timestamp(unixtime, defaults=None):
+def from_timestamp(unixtime, tzinfo=pytz.utc):
     """
     Converts an (integer) unix timestamp to a timezone aware datetime object.
     ``None`` s are left alone (i.e. ``from_timestamp(None)`` is ``None``).
 
     Args:
         unixtime (int): integer POSIX timestamp
-        defaults (:class:`telegram.ext.Defaults`, optional): The timezone, the timestamp is to be
-            converted to will be ``defaults.tzinfo``. If not passed, the timezone will default to
-            UTC.
+        tzinfo (:obj:`datetime.tzinfo`, optional): The timezone, the timestamp is to be converted
+            to. Defaults to UTC.
 
     Returns:
         timezone aware equivalent :obj:`datetime.datetime` value if ``timestamp`` is not
         ``None``; else ``None``
     """
-    tzinfo = defaults.tzinfo if defaults else pytz.utc
-
     if unixtime is None:
         return None
 
@@ -199,6 +197,32 @@ def from_timestamp(unixtime, defaults=None):
         return dtm.datetime.fromtimestamp(unixtime, tz=tzinfo)
     else:
         return dtm.datetime.utcfromtimestamp(unixtime)
+
+
+def parse_datetime(t, bot=None):
+    """
+    Converts the input to an aware datetime object. If ``bot`` is passed and ``bot.defaults`` is
+    not :obj:`None`, ``t`` will be converted to the bots default timezone. Else, UTC is used.
+    If ``t`` is :obj:`None`, :obj:`None` is returned.
+
+    Args:
+        t (:obj:`int`|:obj:`float`|:class:`datetime.datetime`|:obj:`None`): The time. Either as
+            unix timestamp or as datetime object.
+        bot (:class:`telegram.Bot`, optional): The bot the time is parsed for
+
+    Returns:
+        :class:`datetime.datetime`
+    """
+    if t is None:
+        return None
+
+    tzinfo = bot.defaults.tzinfo if bot and bot.defaults else pytz.utc
+
+    if isinstance(t, Number):
+        return from_timestamp(t, tzinfo=tzinfo)
+    if t.tzinfo is None:
+        return tzinfo.localize(t)
+    return t.astimezone(tzinfo)
 
 # -------- end --------
 

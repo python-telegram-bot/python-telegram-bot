@@ -84,9 +84,9 @@ class TestHelpers:
         datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5)
         assert helpers.to_float_timestamp(datetime) == 1573431976.1
 
-    def test_to_float_timestamp_absolute_naive_with_defaults(self):
+    def test_to_float_timestamp_absolute_naive_with_defaults(self, bot):
         datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5)
-        assert helpers.to_float_timestamp(datetime, defaults=Defaults()) == 1573431976.1
+        assert helpers.to_float_timestamp(datetime, bot=bot) == 1573431976.1
 
     def test_to_float_timestamp_absolute_aware(self, timezone):
         """Conversion from timezone-aware datetime to timestamp"""
@@ -97,11 +97,12 @@ class TestHelpers:
         assert (helpers.to_float_timestamp(datetime)
                 == 1573431976.1 - timezone.utcoffset(test_datetime).total_seconds())
 
-    def test_to_float_timestamp_absolute_aware_with_defaults(self, timezone):
+    def test_to_float_timestamp_absolute_aware_with_defaults(self, tz_bot):
         # we're parametrizing this with two different UTC offsets to exclude the possibility
         # of an xpass when the test is run in a timezone with the same UTC offset
         datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5)
-        assert (helpers.to_float_timestamp(datetime, defaults=Defaults(tzinfo=timezone))
+        timezone = tz_bot.defaults.tzinfo
+        assert (helpers.to_float_timestamp(datetime, bot=tz_bot)
                 == 1573431976.1 - timezone.utcoffset(datetime).total_seconds())
 
     def test_to_float_timestamp_absolute_no_reference(self):
@@ -141,10 +142,11 @@ class TestHelpers:
         assert (helpers.to_float_timestamp(aware_time_of_day, ref_t)
                 == pytest.approx(ref_t + (-utc_offset.total_seconds() % (24 * 60 * 60))))
 
-    def test_to_float_timestamp_time_of_day_timezone_with_defaults(self, timezone):
+    def test_to_float_timestamp_time_of_day_timezone_with_defaults(self, tz_bot):
         """Conversion from timezone-aware time-of-day specification to timestamp"""
         # we're parametrizing this with two different UTC offsets to exclude the possibility
         # of an xpass when the test is run in a timezone with the same UTC offset
+        timezone = tz_bot.defaults.tzinfo
         ref_datetime = dtm.datetime(1970, 1, 1, 12)
         utc_offset = timezone.utcoffset(ref_datetime)
         ref_t, time_of_day = _datetime_to_float_timestamp(ref_datetime), ref_datetime.time()
@@ -152,8 +154,7 @@ class TestHelpers:
         # first test that naive time is assumed to be utc:
         assert helpers.to_float_timestamp(time_of_day, ref_t) == pytest.approx(ref_t)
         # test that by setting the timezone the timestamp changes accordingly:
-        assert (helpers.to_float_timestamp(time_of_day, ref_t,
-                                           defaults=Defaults(tzinfo=timezone))
+        assert (helpers.to_float_timestamp(time_of_day, ref_t, bot=tz_bot)
                 == pytest.approx(ref_t + (-utc_offset.total_seconds() % (24 * 60 * 60))))
 
     @pytest.mark.parametrize('time_spec', RELATIVE_TIME_SPECS, ids=str)
@@ -181,11 +182,7 @@ class TestHelpers:
 
     def test_from_timestamp_naive(self):
         datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, tzinfo=None)
-        assert helpers.from_timestamp(1573431976) == datetime.replace(tzinfo=pytz.utc)
-
-    def test_from_timestamp_naive_with_defaults(self):
-        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, tzinfo=None)
-        assert helpers.from_timestamp(1573431976, defaults=Defaults(tzinfo=None)) == datetime
+        assert helpers.from_timestamp(1573431976, tzinfo=None) == datetime
 
     def test_from_timestamp_aware(self, timezone):
         # we're parametrizing this with two different UTC offsets to exclude the possibility
@@ -195,15 +192,46 @@ class TestHelpers:
         assert (helpers.from_timestamp(
             1573431976.1 - timezone.utcoffset(test_datetime).total_seconds()) == datetime)
 
-    def test_from_timestamp_aware_with_defaults(self, timezone):
+    def test_parse_datetime_timestamp(self):
         # we're parametrizing this with two different UTC offsets to exclude the possibility
         # of an xpass when the test is run in a timezone with the same UTC offset
         test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5)
-        datetime = timezone.localize(test_datetime)
-        defaults = Defaults(tzinfo=timezone)
-        assert (helpers.from_timestamp(
-            1573431976.1 - timezone.utcoffset(test_datetime).total_seconds(),
-            defaults=defaults) == datetime)
+        datetime = pytz.utc.localize(test_datetime)
+        assert (helpers.parse_datetime(1573431976.1) == datetime)
+
+    def test_parse_datetime_timestamp_with_bot(self, tz_bot):
+        # we're parametrizing this with two different UTC offsets to exclude the possibility
+        # of an xpass when the test is run in a timezone with the same UTC offset
+        test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5)
+        tzinfo = tz_bot.defaults.tzinfo
+        datetime = tzinfo.localize(test_datetime)
+        assert (helpers.parse_datetime(
+            1573431976.1 - tzinfo.utcoffset(test_datetime).total_seconds(), tz_bot) == datetime)
+
+    def test_parse_datetime_aware_datetime(self, tz_bot):
+        # we're parametrizing this with two different UTC offsets to exclude the possibility
+        # of an xpass when the test is run in a timezone with the same UTC offset
+        tzinfo = tz_bot.defaults.tzinfo
+        test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5)
+        datetime = pytz.utc.localize(test_datetime)
+        parsed = helpers.parse_datetime(datetime, tz_bot)
+        assert parsed == datetime
+        print(parsed, datetime)
+        assert (
+            parsed.utcoffset().total_seconds() == tzinfo.utcoffset(test_datetime).total_seconds())
+
+    def test_parse_datetime_naive_datetime(self, tz_bot):
+        # we're parametrizing this with two different UTC offsets to exclude the possibility
+        # of an xpass when the test is run in a timezone with the same UTC offset
+        tzinfo = tz_bot.defaults.tzinfo
+        test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5)
+        datetime = tzinfo.localize(test_datetime)
+        parsed = helpers.parse_datetime(test_datetime, tz_bot)
+        assert parsed == datetime
+        assert parsed.utcoffset().total_seconds() == datetime.utcoffset().total_seconds()
+
+    def test_parse_datetime_none(self, tz_bot):
+        assert helpers.parse_datetime(None, tz_bot) is None
 
     def test_create_deep_linked_url(self):
         username = 'JamesTheMock'

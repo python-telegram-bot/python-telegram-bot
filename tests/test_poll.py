@@ -21,7 +21,6 @@ import pytest
 
 from datetime import datetime
 
-import pytz
 
 from telegram import Poll, PollOption, PollAnswer, User, MessageEntity
 from telegram.utils.helpers import to_timestamp
@@ -210,28 +209,22 @@ class TestPoll:
         assert poll_dict['close_date'] == to_timestamp(poll.close_date)
 
     def test_default_tzinfo(self, poll, tz_bot):
-        json_dict = {
-            'id': self.id_,
-            'question': self.question,
-            'options': [o.to_dict() for o in self.options],
-            'total_voter_count': self.total_voter_count,
-            'is_closed': self.is_closed,
-            'is_anonymous': self.is_anonymous,
-            'type': self.type,
-            'allows_multiple_answers': self.allows_multiple_answers,
-            'explanation': self.explanation,
-            'explanation_entities': [self.explanation_entities[0].to_dict()],
-            'open_period': self.open_period,
-            'close_date': to_timestamp(self.close_date)
-        }
-        poll = Poll.de_json(json_dict, tz_bot)
+        poll.bot = tz_bot
+        tzinfo = tz_bot.defaults.tzinfo
+        poll.close_date = self.close_date
 
-        assert poll.close_date == pytz.utc.localize(self.close_date).replace(microsecond=0)
+        assert poll.close_date == tzinfo.localize(self.close_date)
+        assert poll.close_date.utcoffset().total_seconds() == tzinfo.utcoffset(
+            self.close_date).total_seconds()
 
         poll_dict = poll.to_dict()
 
         assert isinstance(poll_dict, dict)
-        assert poll_dict['close_date'] == to_timestamp(self.close_date)
+        assert poll_dict['close_date'] == to_timestamp(self.close_date, bot=tz_bot)
+
+    def test_dict_approach(self, poll):
+        assert poll['close_date'] == poll.close_date
+        assert poll['id'] == poll.id
 
     def test_parse_entity(self, poll):
         entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
