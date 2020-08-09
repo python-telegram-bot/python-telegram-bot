@@ -995,13 +995,13 @@ class Message(TelegramObject):
         return self.bot.set_game_score(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
 
-    def get_game_high_score(self, *args, **kwargs):
+    def get_game_high_scores(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.get_game_high_score(chat_id=message.chat_id,
-                                    message_id=message.message_id,
-                                    *args,
-                                    **kwargs)
+            bot.get_game_high_scores(chat_id=message.chat_id,
+                                     message_id=message.message_id,
+                                     *args,
+                                     **kwargs)
 
         Note:
             You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
@@ -1012,7 +1012,7 @@ class Message(TelegramObject):
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
             edited Message is returned, otherwise ``True`` is returned.
         """
-        return self.bot.get_game_high_score(
+        return self.bot.get_game_high_scores(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
 
     def delete(self, *args, **kwargs):

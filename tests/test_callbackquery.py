@@ -133,6 +133,81 @@ class TestCallbackQuery:
         assert callback_query.edit_message_reply_markup(reply_markup=[['1', '2']])
         assert callback_query.edit_message_reply_markup([['1', '2']])
 
+    def test_edit_message_media(self, monkeypatch, callback_query):
+        def test(*args, **kwargs):
+            message_media = kwargs.get('media') == [['1', '2']] or args[0] == [['1', '2']]
+            try:
+                id_ = kwargs['inline_message_id'] == callback_query.inline_message_id
+                return id_ and message_media
+            except KeyError:
+                id_ = kwargs['chat_id'] == callback_query.message.chat_id
+                message = kwargs['message_id'] == callback_query.message.message_id
+                return id_ and message and message_media
+
+        monkeypatch.setattr(callback_query.bot, 'edit_message_media', test)
+        assert callback_query.edit_message_media(media=[['1', '2']])
+        assert callback_query.edit_message_media([['1', '2']])
+
+    def test_edit_message_live_location(self, monkeypatch, callback_query):
+        def test(*args, **kwargs):
+            latitude = kwargs.get('latitude') == 1 or args[0] == 1
+            longitude = kwargs.get('longitude') == 2 or args[1] == 2
+            try:
+                id_ = kwargs['inline_message_id'] == callback_query.inline_message_id
+                return id_ and latitude and longitude
+            except KeyError:
+                id_ = kwargs['chat_id'] == callback_query.message.chat_id
+                message = kwargs['message_id'] == callback_query.message.message_id
+                return id_ and message and latitude and longitude
+
+        monkeypatch.setattr(callback_query.bot, 'edit_message_live_location', test)
+        assert callback_query.edit_message_live_location(latitude=1, longitude=2)
+        assert callback_query.edit_message_live_location(1, 2)
+
+    def test_stop_message_live_location(self, monkeypatch, callback_query):
+        def test(*args, **kwargs):
+            try:
+                id_ = kwargs['inline_message_id'] == callback_query.inline_message_id
+                return id_
+            except KeyError:
+                id_ = kwargs['chat_id'] == callback_query.message.chat_id
+                message = kwargs['message_id'] == callback_query.message.message_id
+                return id_ and message
+
+        monkeypatch.setattr(callback_query.bot, 'stop_message_live_location', test)
+        assert callback_query.stop_message_live_location()
+
+    def test_set_game_score(self, monkeypatch, callback_query):
+        def test(*args, **kwargs):
+            user_id = kwargs.get('user_id') == 1 or args[0] == 1
+            score = kwargs.get('score') == 2 or args[1] == 2
+            try:
+                id_ = kwargs['inline_message_id'] == callback_query.inline_message_id
+                return id_ and user_id and score
+            except KeyError:
+                id_ = kwargs['chat_id'] == callback_query.message.chat_id
+                message = kwargs['message_id'] == callback_query.message.message_id
+                return id_ and message and user_id and score
+
+        monkeypatch.setattr(callback_query.bot, 'set_game_score', test)
+        assert callback_query.set_game_score(user_id=1, score=2)
+        assert callback_query.set_game_score(1, 2)
+
+    def test_get_game_high_scores(self, monkeypatch, callback_query):
+        def test(*args, **kwargs):
+            user_id = kwargs.get('user_id') == 1 or args[0] == 1
+            try:
+                id_ = kwargs['inline_message_id'] == callback_query.inline_message_id
+                return id_ and user_id
+            except KeyError:
+                id_ = kwargs['chat_id'] == callback_query.message.chat_id
+                message = kwargs['message_id'] == callback_query.message.message_id
+                return id_ and message and user_id
+
+        monkeypatch.setattr(callback_query.bot, 'get_game_high_scores', test)
+        assert callback_query.get_game_high_scores(user_id=1)
+        assert callback_query.get_game_high_scores(1)
+
     def test_equality(self):
         a = CallbackQuery(self.id_, self.from_user, 'chat')
         b = CallbackQuery(self.id_, self.from_user, 'chat')

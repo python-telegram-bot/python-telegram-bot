@@ -309,19 +309,19 @@ class CallbackQuery(TelegramObject):
                                            message_id=self.message.message_id,
                                            *args, **kwargs)
 
-    def get_game_high_score(self, *args, **kwargs):
+    def get_game_high_scores(self, *args, **kwargs):
         """Shortcut for either::
 
-            bot.get_game_high_score(chat_id=update.callback_query.message.chat_id,
-                                    message_id=update.callback_query.message.message_id,
-                                    reply_markup=reply_markup,
-                                    *args, **kwargs)
+            bot.get_game_high_scores(chat_id=update.callback_query.message.chat_id,
+                                     message_id=update.callback_query.message.message_id,
+                                     reply_markup=reply_markup,
+                                     *args, **kwargs)
 
         or::
 
-            bot.get_game_high_score(inline_message_id=update.callback_query.inline_message_id,
-                                    reply_markup=reply_markup,
-                                    *args, **kwargs)
+            bot.get_game_high_scores(inline_message_id=update.callback_query.inline_message_id,
+                                     reply_markup=reply_markup,
+                                     *args, **kwargs)
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -329,9 +329,9 @@ class CallbackQuery(TelegramObject):
 
         """
         if self.inline_message_id:
-            return self.bot.get_game_high_score(inline_message_id=self.inline_message_id,
-                                                *args, **kwargs)
+            return self.bot.get_game_high_scores(inline_message_id=self.inline_message_id,
+                                                 *args, **kwargs)
         else:
-            return self.bot.get_game_high_score(chat_id=self.message.chat_id,
-                                                message_id=self.message.message_id,
-                                                *args, **kwargs)
+            return self.bot.get_game_high_scores(chat_id=self.message.chat_id,
+                                                 message_id=self.message.message_id,
+                                                 *args, **kwargs)

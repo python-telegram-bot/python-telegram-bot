@@ -141,6 +141,13 @@ class TestUser:
         monkeypatch.setattr(user.bot, 'send_photo', test)
         assert user.send_photo('test_photo')
 
+    def test_instance_method_send_media_group(self, monkeypatch, user):
+        def test(*args, **kwargs):
+            return args[0] == user.id and args[1] == 'test_media_group'
+
+        monkeypatch.setattr(user.bot, 'send_media_group', test)
+        assert user.send_media_group('test_media_group')
+
     def test_instance_method_send_audio(self, monkeypatch, user):
         def test(*args, **kwargs):
             return args[0] == user.id and args[1] == 'test_audio'
@@ -148,12 +155,54 @@ class TestUser:
         monkeypatch.setattr(user.bot, 'send_audio', test)
         assert user.send_audio('test_audio')
 
+    def test_instance_method_send_chat_action(self, monkeypatch, user):
+        def test(*args, **kwargs):
+            return args[0] == user.id and args[1] == 'test_chat_action'
+
+        monkeypatch.setattr(user.bot, 'send_chat_action', test)
+        assert user.send_chat_action('test_chat_action')
+
+    def test_instance_method_send_contact(self, monkeypatch, user):
+        def test(*args, **kwargs):
+            return args[0] == user.id and args[1] == 'test_contact'
+
+        monkeypatch.setattr(user.bot, 'send_contact', test)
+        assert user.send_contact('test_contact')
+
+    def test_instance_method_send_dice(self, monkeypatch, user):
+        def test(*args, **kwargs):
+            return args[0] == user.id and args[1] == 'test_dice'
+
+        monkeypatch.setattr(user.bot, 'send_dice', test)
+        assert user.send_dice('test_dice')
+
     def test_instance_method_send_document(self, monkeypatch, user):
         def test(*args, **kwargs):
             return args[0] == user.id and args[1] == 'test_document'
 
         monkeypatch.setattr(user.bot, 'send_document', test)
         assert user.send_document('test_document')
+
+    def test_instance_method_send_game(self, monkeypatch, user):
+        def test(*args, **kwargs):
+            return args[0] == user.id and args[1] == 'test_game'
+
+        monkeypatch.setattr(user.bot, 'send_game', test)
+        assert user.send_game('test_game')
+
+    def test_instance_method_send_invoice(self, monkeypatch, user):
+        def test(*args, **kwargs):
+            return args[0] == user.id and args[1] == 'test_invoice'
+
+        monkeypatch.setattr(user.bot, 'send_invoice', test)
+        assert user.send_invoice('test_invoice')
+
+    def test_instance_method_send_location(self, monkeypatch, user):
+        def test(*args, **kwargs):
+            return args[0] == user.id and args[1] == 'test_location'
+
+        monkeypatch.setattr(user.bot, 'send_location', test)
+        assert user.send_location('test_location')
 
     def test_instance_method_send_sticker(self, monkeypatch, user):
         def test(*args, **kwargs):
@@ -168,6 +217,13 @@ class TestUser:
 
         monkeypatch.setattr(user.bot, 'send_video', test)
         assert user.send_video('test_video')
+
+    def test_instance_method_send_venue(self, monkeypatch, user):
+        def test(*args, **kwargs):
+            return args[0] == user.id and args[1] == 'test_venue'
+
+        monkeypatch.setattr(user.bot, 'send_venue', test)
+        assert user.send_venue('test_venue')
 
     def test_instance_method_send_video_note(self, monkeypatch, user):
         def test(*args, **kwargs):
