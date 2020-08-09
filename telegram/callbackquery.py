@@ -238,9 +238,11 @@ class CallbackQuery(TelegramObject):
 
         or::
 
-            bot.edit_message_live_location(inline_message_id=update.callback_query.inline_message_id,
-                                           reply_markup=reply_markup,
-                                           *args, **kwargs)
+            bot.edit_message_live_location(
+                inline_message_id=update.callback_query.inline_message_id,
+                reply_markup=reply_markup,
+                *args, **kwargs
+            )
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -265,9 +267,11 @@ class CallbackQuery(TelegramObject):
 
         or::
 
-            bot.stop_message_live_location(inline_message_id=update.callback_query.inline_message_id,
-                                           reply_markup=reply_markup,
-                                           *args, **kwargs)
+            bot.stop_message_live_location(
+                inline_message_id=update.callback_query.inline_message_id,
+                reply_markup=reply_markup,
+                *args, **kwargs
+            )
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the

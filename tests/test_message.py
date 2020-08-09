@@ -845,6 +845,24 @@ class TestMessage:
         monkeypatch.setattr(message.bot, 'delete_message', test)
         assert message.delete()
 
+    def test_stop_poll(self, monkeypatch, message):
+        def test(*args, **kwargs):
+            chat_id = kwargs['chat_id'] == message.chat_id
+            message_id = kwargs['message_id'] == message.message_id
+            return chat_id and message_id
+
+        monkeypatch.setattr(message.bot, 'stop_poll', test)
+        assert message.stop_poll()
+
+    def test_pin(self, monkeypatch, message):
+        def test(*args, **kwargs):
+            chat_id = kwargs['chat_id'] == message.chat_id
+            message_id = kwargs['message_id'] == message.message_id
+            return chat_id and message_id
+
+        monkeypatch.setattr(message.bot, 'pin_chat_message', test)
+        assert message.pin()
+
     def test_default_quote(self, message):
         kwargs = {}
 
