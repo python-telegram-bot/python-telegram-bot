@@ -124,7 +124,7 @@ class User(TelegramObject):
         """
         Shortcut for::
 
-                bot.get_user_profile_photos(update.message.from_user.id, *args, **kwargs)
+                bot.get_user_profile_photos(update.effective_user.id, *args, **kwargs)
 
         """
 
@@ -183,7 +183,7 @@ class User(TelegramObject):
     def send_message(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_message(User.id, *args, **kwargs)
+            bot.send_message(update.effective_user.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -196,7 +196,7 @@ class User(TelegramObject):
     def send_photo(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_photo(User.id, *args, **kwargs)
+            bot.send_photo(update.effective_user.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -209,7 +209,7 @@ class User(TelegramObject):
     def send_media_group(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_media_group(User.id, *args, **kwargs)
+            bot.send_media_group(update.effective_user.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -222,7 +222,7 @@ class User(TelegramObject):
     def send_audio(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_audio(User.id, *args, **kwargs)
+            bot.send_audio(update.effective_user.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -235,7 +235,7 @@ class User(TelegramObject):
     def send_chat_action(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_chat_action(User.id, *args, **kwargs)
+            bot.send_chat_action(update.effective_user.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -251,7 +251,7 @@ class User(TelegramObject):
     def send_contact(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_contact(User.id, *args, **kwargs)
+            bot.send_contact(update.effective_user.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -264,7 +264,7 @@ class User(TelegramObject):
     def send_dice(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_dice(User.id, *args, **kwargs)
+            bot.send_dice(update.effective_user.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -277,7 +277,7 @@ class User(TelegramObject):
     def send_document(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_document(User.id, *args, **kwargs)
+            bot.send_document(update.effective_user.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -290,7 +290,7 @@ class User(TelegramObject):
     def send_game(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_game(User.id, *args, **kwargs)
+            bot.send_game(update.effective_user.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -303,7 +303,7 @@ class User(TelegramObject):
     def send_invoice(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_invoice(User.id, *args, **kwargs)
+            bot.send_invoice(update.effective_user.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -316,7 +316,7 @@ class User(TelegramObject):
     def send_location(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_location(User.id, *args, **kwargs)
+            bot.send_location(update.effective_user.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -329,7 +329,7 @@ class User(TelegramObject):
     def send_animation(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_animation(User.id, *args, **kwargs)
+            bot.send_animation(update.effective_user.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -342,7 +342,7 @@ class User(TelegramObject):
     def send_sticker(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_sticker(User.id, *args, **kwargs)
+            bot.send_sticker(update.effective_user.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -355,7 +355,7 @@ class User(TelegramObject):
     def send_video(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_video(User.id, *args, **kwargs)
+            bot.send_video(update.effective_user.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -368,7 +368,7 @@ class User(TelegramObject):
     def send_venue(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_venue(User.id, *args, **kwargs)
+            bot.send_venue(update.effective_user.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -381,7 +381,7 @@ class User(TelegramObject):
     def send_video_note(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_video_note(User.id, *args, **kwargs)
+            bot.send_video_note(update.effective_user.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -394,7 +394,7 @@ class User(TelegramObject):
     def send_voice(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_voice(User.id, *args, **kwargs)
+            bot.send_voice(update.effective_user.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -407,7 +407,7 @@ class User(TelegramObject):
     def send_poll(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_poll(User.id, *args, **kwargs)
+            bot.send_poll(update.effective_user.id, *args, **kwargs)
 
         Where User is the current instance.
 
