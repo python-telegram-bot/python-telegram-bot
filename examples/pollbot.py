@@ -29,7 +29,7 @@ def start(update, context):
 def poll(update, context):
     """Sends a predefined poll"""
     questions = ["Good", "Really good", "Fantastic", "Great"]
-    message = context.bot.send_poll(update.effective_user.id, "How are you?", questions,
+    message = context.bot.send_poll(update.effective_chat.id, "How are you?", questions,
                                     is_anonymous=False, allows_multiple_answers=True)
     # Save some info about the poll the bot_data for later use in receive_poll_answer
     payload = {message.poll.id: {"questions": questions, "message_id": message.message_id,
