@@ -795,6 +795,47 @@ class TestMessage:
         monkeypatch.setattr(message.bot, 'edit_message_reply_markup', test)
         assert message.edit_reply_markup(reply_markup=[['1', '2']])
 
+    def test_edit_live_location(self, monkeypatch, message):
+        def test(*args, **kwargs):
+            chat_id = kwargs['chat_id'] == message.chat_id
+            message_id = kwargs['message_id'] == message.message_id
+            latitude = kwargs['latitude'] == 1
+            longitude = kwargs['longitude'] == 2
+            return chat_id and message_id and longitude and latitude
+
+        monkeypatch.setattr(message.bot, 'edit_message_live_location', test)
+        assert message.edit_live_location(latitude=1, longitude=2)
+
+    def test_stop_live_location(self, monkeypatch, message):
+        def test(*args, **kwargs):
+            chat_id = kwargs['chat_id'] == message.chat_id
+            message_id = kwargs['message_id'] == message.message_id
+            return chat_id and message_id
+
+        monkeypatch.setattr(message.bot, 'stop_message_live_location', test)
+        assert message.stop_live_location()
+
+    def test_set_game_score(self, monkeypatch, message):
+        def test(*args, **kwargs):
+            chat_id = kwargs['chat_id'] == message.chat_id
+            message_id = kwargs['message_id'] == message.message_id
+            user_id = kwargs['user_id'] == 1
+            score = kwargs['score'] == 2
+            return chat_id and message_id and user_id and score
+
+        monkeypatch.setattr(message.bot, 'set_game_score', test)
+        assert message.set_game_score(user_id=1, score=2)
+
+    def test_get_game_high_scores(self, monkeypatch, message):
+        def test(*args, **kwargs):
+            chat_id = kwargs['chat_id'] == message.chat_id
+            message_id = kwargs['message_id'] == message.message_id
+            user_id = kwargs['user_id'] == 1
+            return chat_id and message_id and user_id
+
+        monkeypatch.setattr(message.bot, 'get_game_high_scores', test)
+        assert message.get_game_high_scores(user_id=1, score=2)
+
     def test_delete(self, monkeypatch, message):
         def test(*args, **kwargs):
             chat_id = kwargs['chat_id'] == message.chat_id
@@ -803,6 +844,24 @@ class TestMessage:
 
         monkeypatch.setattr(message.bot, 'delete_message', test)
         assert message.delete()
+
+    def test_stop_poll(self, monkeypatch, message):
+        def test(*args, **kwargs):
+            chat_id = kwargs['chat_id'] == message.chat_id
+            message_id = kwargs['message_id'] == message.message_id
+            return chat_id and message_id
+
+        monkeypatch.setattr(message.bot, 'stop_poll', test)
+        assert message.stop_poll()
+
+    def test_pin(self, monkeypatch, message):
+        def test(*args, **kwargs):
+            chat_id = kwargs['chat_id'] == message.chat_id
+            message_id = kwargs['message_id'] == message.message_id
+            return chat_id and message_id
+
+        monkeypatch.setattr(message.bot, 'pin_chat_message', test)
+        assert message.pin()
 
     def test_default_quote(self, message):
         kwargs = {}

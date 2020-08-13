@@ -935,6 +935,86 @@ class Message(TelegramObject):
         return self.bot.edit_message_reply_markup(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
 
+    def edit_live_location(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.edit_message_live_location(chat_id=message.chat_id,
+                                           message_id=message.message_id,
+                                           *args,
+                                           **kwargs)
+
+        Note:
+            You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
+            of methods) or channel posts, if the bot is an admin in that channel. However, this
+            behaviour is undocumented and might be changed by Telegram.
+
+        Returns:
+            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            edited Message is returned, otherwise ``True`` is returned.
+        """
+        return self.bot.edit_message_live_location(
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+
+    def stop_live_location(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.stop_message_live_location(chat_id=message.chat_id,
+                                           message_id=message.message_id,
+                                           *args,
+                                           **kwargs)
+
+        Note:
+            You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
+            of methods) or channel posts, if the bot is an admin in that channel. However, this
+            behaviour is undocumented and might be changed by Telegram.
+
+        Returns:
+            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            edited Message is returned, otherwise ``True`` is returned.
+        """
+        return self.bot.stop_message_live_location(
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+
+    def set_game_score(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.set_game_score(chat_id=message.chat_id,
+                               message_id=message.message_id,
+                               *args,
+                               **kwargs)
+
+        Note:
+            You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
+            of methods) or channel posts, if the bot is an admin in that channel. However, this
+            behaviour is undocumented and might be changed by Telegram.
+
+        Returns:
+            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            edited Message is returned, otherwise ``True`` is returned.
+        """
+        return self.bot.set_game_score(
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+
+    def get_game_high_scores(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.get_game_high_scores(chat_id=message.chat_id,
+                                     message_id=message.message_id,
+                                     *args,
+                                     **kwargs)
+
+        Note:
+            You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
+            of methods) or channel posts, if the bot is an admin in that channel. However, this
+            behaviour is undocumented and might be changed by Telegram.
+
+        Returns:
+            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            edited Message is returned, otherwise ``True`` is returned.
+        """
+        return self.bot.get_game_high_scores(
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+
     def delete(self, *args, **kwargs):
         """Shortcut for::
 
@@ -964,6 +1044,21 @@ class Message(TelegramObject):
 
         """
         return self.bot.stop_poll(
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+
+    def pin(self, *args, **kwargs):
+        """Shortcut for::
+
+             bot.pin_chat_message(chat_id=message.chat_id,
+                                  message_id=message.message_id,
+                                  *args,
+                                  **kwargs)
+
+        Returns:
+            :obj:`True`: On success.
+
+        """
+        return self.bot.pin_chat_message(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
 
     def parse_entity(self, entity):
