@@ -175,10 +175,10 @@ class CallbackQuery(TelegramObject):
     def edit_message_reply_markup(self, reply_markup, *args, **kwargs):
         """Shortcut for either::
 
-            bot.edit_message_replyMarkup(chat_id=update.callback_query.message.chat_id,
-                                       message_id=update.callback_query.message.message_id,
-                                       reply_markup=reply_markup,
-                                       *args, **kwargs)
+            bot.edit_message_reply_markup(chat_id=update.callback_query.message.chat_id,
+                                          message_id=update.callback_query.message.message_id,
+                                          reply_markup=reply_markup,
+                                          *args, **kwargs)
 
         or::
 
@@ -200,3 +200,142 @@ class CallbackQuery(TelegramObject):
                                                       chat_id=self.message.chat_id,
                                                       message_id=self.message.message_id,
                                                       *args, **kwargs)
+
+    def edit_message_media(self, *args, **kwargs):
+        """Shortcut for either::
+
+            bot.edit_message_media(chat_id=update.callback_query.message.chat_id,
+                                   message_id=update.callback_query.message.message_id,
+                                   media=media,
+                                   *args, **kwargs)
+
+        or::
+
+            bot.edit_message_media(inline_message_id=update.callback_query.inline_message_id,
+                                   media=media,
+                                   *args, **kwargs)
+
+        Returns:
+            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            edited Message is returned, otherwise ``True`` is returned.
+
+        """
+        if self.inline_message_id:
+            return self.bot.edit_message_media(inline_message_id=self.inline_message_id,
+                                               *args, **kwargs)
+        else:
+            return self.bot.edit_message_media(chat_id=self.message.chat_id,
+                                               message_id=self.message.message_id,
+                                               *args, **kwargs)
+
+    def edit_message_live_location(self, *args, **kwargs):
+        """Shortcut for either::
+
+            bot.edit_message_live_location(chat_id=update.callback_query.message.chat_id,
+                                           message_id=update.callback_query.message.message_id,
+                                           reply_markup=reply_markup,
+                                           *args, **kwargs)
+
+        or::
+
+            bot.edit_message_live_location(
+                inline_message_id=update.callback_query.inline_message_id,
+                reply_markup=reply_markup,
+                *args, **kwargs
+            )
+
+        Returns:
+            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            edited Message is returned, otherwise ``True`` is returned.
+
+        """
+        if self.inline_message_id:
+            return self.bot.edit_message_live_location(inline_message_id=self.inline_message_id,
+                                                       *args, **kwargs)
+        else:
+            return self.bot.edit_message_live_location(chat_id=self.message.chat_id,
+                                                       message_id=self.message.message_id,
+                                                       *args, **kwargs)
+
+    def stop_message_live_location(self, *args, **kwargs):
+        """Shortcut for either::
+
+            bot.stop_message_live_location(chat_id=update.callback_query.message.chat_id,
+                                           message_id=update.callback_query.message.message_id,
+                                           reply_markup=reply_markup,
+                                           *args, **kwargs)
+
+        or::
+
+            bot.stop_message_live_location(
+                inline_message_id=update.callback_query.inline_message_id,
+                reply_markup=reply_markup,
+                *args, **kwargs
+            )
+
+        Returns:
+            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            edited Message is returned, otherwise ``True`` is returned.
+
+        """
+        if self.inline_message_id:
+            return self.bot.stop_message_live_location(inline_message_id=self.inline_message_id,
+                                                       *args, **kwargs)
+        else:
+            return self.bot.stop_message_live_location(chat_id=self.message.chat_id,
+                                                       message_id=self.message.message_id,
+                                                       *args, **kwargs)
+
+    def set_game_score(self, *args, **kwargs):
+        """Shortcut for either::
+
+            bot.set_game_score(chat_id=update.callback_query.message.chat_id,
+                               message_id=update.callback_query.message.message_id,
+                               reply_markup=reply_markup,
+                               *args, **kwargs)
+
+        or::
+
+            bot.set_game_score(inline_message_id=update.callback_query.inline_message_id,
+                               reply_markup=reply_markup,
+                               *args, **kwargs)
+
+        Returns:
+            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            edited Message is returned, otherwise ``True`` is returned.
+
+        """
+        if self.inline_message_id:
+            return self.bot.set_game_score(inline_message_id=self.inline_message_id,
+                                           *args, **kwargs)
+        else:
+            return self.bot.set_game_score(chat_id=self.message.chat_id,
+                                           message_id=self.message.message_id,
+                                           *args, **kwargs)
+
+    def get_game_high_scores(self, *args, **kwargs):
+        """Shortcut for either::
+
+            bot.get_game_high_scores(chat_id=update.callback_query.message.chat_id,
+                                     message_id=update.callback_query.message.message_id,
+                                     reply_markup=reply_markup,
+                                     *args, **kwargs)
+
+        or::
+
+            bot.get_game_high_scores(inline_message_id=update.callback_query.inline_message_id,
+                                     reply_markup=reply_markup,
+                                     *args, **kwargs)
+
+        Returns:
+            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            edited Message is returned, otherwise ``True`` is returned.
+
+        """
+        if self.inline_message_id:
+            return self.bot.get_game_high_scores(inline_message_id=self.inline_message_id,
+                                                 *args, **kwargs)
+        else:
+            return self.bot.get_game_high_scores(chat_id=self.message.chat_id,
+                                                 message_id=self.message.message_id,
+                                                 *args, **kwargs)

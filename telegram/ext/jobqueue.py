@@ -108,7 +108,8 @@ class JobQueue:
         """
         self._dispatcher = dispatcher
         if dispatcher.bot.defaults:
-            self.scheduler.configure(timezone=dispatcher.bot.defaults.tzinfo or pytz.utc)
+            if dispatcher.bot.defaults:
+                self.scheduler.configure(timezone=dispatcher.bot.defaults.tzinfo or pytz.utc)
 
     def run_once(self, callback, when, context=None, name=None, job_kwargs=None):
         """Creates a new ``Job`` that runs once and adds it to the queue.
