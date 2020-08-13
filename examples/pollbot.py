@@ -13,7 +13,6 @@ from telegram import (Poll, ParseMode, KeyboardButton, KeyboardButtonPollType,
                       ReplyKeyboardMarkup, ReplyKeyboardRemove)
 from telegram.ext import (Updater, CommandHandler, PollAnswerHandler, PollHandler, MessageHandler,
                           Filters)
-from telegram.utils.helpers import mention_html
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -53,9 +52,9 @@ def receive_poll_answer(update, context):
             answer_string += questions[question_id] + " and "
         else:
             answer_string += questions[question_id]
-    user_mention = mention_html(update.effective_user.id, update.effective_user.full_name)
     context.bot.send_message(context.bot_data[poll_id]["chat_id"],
-                             "{} feels {}!".format(user_mention, answer_string),
+                             "{} feels {}!".format(update.effective_user.mention_html(),
+                                                   answer_string),
                              parse_mode=ParseMode.HTML)
     context.bot_data[poll_id]["answers"] += 1
     # Close poll after three participants voted
