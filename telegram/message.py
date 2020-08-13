@@ -25,7 +25,7 @@ from telegram import (Animation, Audio, Contact, Document, Chat, Location, Photo
                       TelegramObject, User, Video, Voice, Venue, MessageEntity, Game, Invoice,
                       SuccessfulPayment, VideoNote, PassportData, Poll, InlineKeyboardMarkup, Dice)
 from telegram import ParseMode
-from telegram.utils.helpers import escape_markdown, to_timestamp, from_timestamp, parse_datetime
+from telegram.utils.helpers import escape_markdown, to_timestamp, from_timestamp
 
 _UNDEFINED = object()
 
@@ -288,20 +288,16 @@ class Message(TelegramObject):
                  dice=None,
                  via_bot=None,
                  **kwargs):
-        self.bot = bot
         # Required
         self.message_id = int(message_id)
         self.from_user = from_user
-        self._date = None
         self.date = date
         self.chat = chat
         # Optionals
         self.forward_from = forward_from
         self.forward_from_chat = forward_from_chat
-        self._forward_date = None
         self.forward_date = forward_date
         self.reply_to_message = reply_to_message
-        self._edit_date = None
         self.edit_date = edit_date
         self.text = text
         self.entities = entities or list()
@@ -343,32 +339,9 @@ class Message(TelegramObject):
         self.dice = dice
         self.via_bot = via_bot
         self.reply_markup = reply_markup
+        self.bot = bot
 
         self._id_attrs = (self.message_id, self.chat)
-
-    @property
-    def date(self):
-        return self._date
-
-    @date.setter
-    def date(self, value):
-        self._date = parse_datetime(value, bot=self.bot)
-
-    @property
-    def forward_date(self):
-        return self._forward_date
-
-    @forward_date.setter
-    def forward_date(self, value):
-        self._forward_date = parse_datetime(value, bot=self.bot)
-
-    @property
-    def edit_date(self):
-        return self._edit_date
-
-    @edit_date.setter
-    def edit_date(self, value):
-        self._edit_date = parse_datetime(value, bot=self.bot)
 
     @property
     def chat_id(self):
@@ -468,23 +441,17 @@ class Message(TelegramObject):
             return self.__dict__[item]
         elif item == 'chat_id':
             return self.chat.id
-        elif item == 'date':
-            return self.date
-        elif item == 'forward_date':
-            return self.forward_date
-        elif item == 'edit_date':
-            return self.edit_date
 
     def to_dict(self):
         data = super().to_dict()
 
         # Required
-        data['date'] = to_timestamp(self.date, bot=self.bot)
+        data['date'] = to_timestamp(self.date)
         # Optionals
         if self.forward_date:
-            data['forward_date'] = to_timestamp(self.forward_date, bot=self.bot)
+            data['forward_date'] = to_timestamp(self.forward_date)
         if self.edit_date:
-            data['edit_date'] = to_timestamp(self.edit_date, bot=self.bot)
+            data['edit_date'] = to_timestamp(self.edit_date)
         if self.photo:
             data['photo'] = [p.to_dict() for p in self.photo]
         if self.entities:

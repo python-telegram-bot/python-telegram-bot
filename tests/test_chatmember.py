@@ -94,25 +94,6 @@ class TestChatMember:
         assert chat_member_dict['user'] == chat_member.user.to_dict()
         assert chat_member['status'] == chat_member.status
 
-    def test_default_tzinfo(self, chat_member, tz_bot, user):
-        time = datetime.datetime.utcnow()
-        chat_member.bot = tz_bot
-        tzinfo = tz_bot.defaults.tzinfo
-        chat_member.until_date = time
-
-        assert chat_member.until_date == tzinfo.localize(time)
-        assert chat_member.until_date.utcoffset().total_seconds() == tzinfo.utcoffset(
-            time).total_seconds()
-
-        chat_member_dict = chat_member.to_dict()
-
-        assert isinstance(chat_member_dict, dict)
-        assert chat_member_dict['until_date'] == to_timestamp(time, bot=tz_bot)
-
-    def test_dict_approach(self, chat_member):
-        assert chat_member['user'] == chat_member.user
-        assert chat_member['until_date'] == chat_member.until_date
-
     def test_equality(self):
         a = ChatMember(User(1, '', False), ChatMember.ADMINISTRATOR)
         b = ChatMember(User(1, '', False), ChatMember.ADMINISTRATOR)

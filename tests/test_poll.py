@@ -208,24 +208,6 @@ class TestPoll:
         assert poll_dict['open_period'] == poll.open_period
         assert poll_dict['close_date'] == to_timestamp(poll.close_date)
 
-    def test_default_tzinfo(self, poll, tz_bot):
-        poll.bot = tz_bot
-        tzinfo = tz_bot.defaults.tzinfo
-        poll.close_date = self.close_date
-
-        assert poll.close_date == tzinfo.localize(self.close_date)
-        assert poll.close_date.utcoffset().total_seconds() == tzinfo.utcoffset(
-            self.close_date).total_seconds()
-
-        poll_dict = poll.to_dict()
-
-        assert isinstance(poll_dict, dict)
-        assert poll_dict['close_date'] == to_timestamp(self.close_date, bot=tz_bot)
-
-    def test_dict_approach(self, poll):
-        assert poll['close_date'] == poll.close_date
-        assert poll['id'] == poll.id
-
     def test_parse_entity(self, poll):
         entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
         poll.explanation_entities = [entity]

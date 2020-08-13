@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram ChatMember."""
 
 from telegram import User, TelegramObject
-from telegram.utils.helpers import to_timestamp, from_timestamp, parse_datetime
+from telegram.utils.helpers import to_timestamp, from_timestamp
 
 
 class ChatMember(TelegramObject):
@@ -61,7 +61,6 @@ class ChatMember(TelegramObject):
             stickers and use inline bots, implies can_send_media_messages.
         can_add_web_page_previews (:obj:`bool`): Optional. If user may add web page previews to his
             messages, implies can_send_media_messages
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     Args:
         user (:class:`telegram.User`): Information about the user.
@@ -104,7 +103,6 @@ class ChatMember(TelegramObject):
             send animations, games, stickers and use inline bots, implies can_send_media_messages.
         can_add_web_page_previews (:obj:`bool`, optional): Restricted only. True, if user may add
             web page previews to his messages, implies can_send_media_messages.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
 
     """
     ADMINISTRATOR = 'administrator'
@@ -126,14 +124,12 @@ class ChatMember(TelegramObject):
                  can_restrict_members=None, can_pin_messages=None,
                  can_promote_members=None, can_send_messages=None,
                  can_send_media_messages=None, can_send_polls=None, can_send_other_messages=None,
-                 can_add_web_page_previews=None, is_member=None, custom_title=None, bot=None,
+                 can_add_web_page_previews=None, is_member=None, custom_title=None,
                  **kwargs):
-        self.bot = bot
         # Required
         self.user = user
         self.status = status
         self.custom_title = custom_title
-        self._until_date = None
         self.until_date = until_date
         self.can_be_edited = can_be_edited
         self.can_change_info = can_change_info
@@ -153,14 +149,6 @@ class ChatMember(TelegramObject):
 
         self._id_attrs = (self.user, self.status)
 
-    @property
-    def until_date(self):
-        return self._until_date
-
-    @until_date.setter
-    def until_date(self, value):
-        self._until_date = parse_datetime(value, bot=self.bot)
-
     @classmethod
     def de_json(cls, data, bot):
         if not data:
@@ -176,11 +164,6 @@ class ChatMember(TelegramObject):
     def to_dict(self):
         data = super().to_dict()
 
-        data['until_date'] = to_timestamp(self.until_date, bot=self.bot)
+        data['until_date'] = to_timestamp(self.until_date)
 
         return data
-
-    def __getitem__(self, item):
-        if item == 'until_date':
-            return self.until_date
-        return super().__getitem__(item)

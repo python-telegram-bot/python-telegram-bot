@@ -1729,7 +1729,8 @@ class Bot(TelegramObject):
 
         if until_date is not None:
             if isinstance(until_date, datetime):
-                until_date = to_timestamp(until_date, bot=self)
+                until_date = to_timestamp(until_date,
+                                          tzinfo=self.defaults.tzinfo if self.defaults else None)
             data['until_date'] = until_date
 
         result = self._post('kickChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
@@ -2828,7 +2829,8 @@ class Bot(TelegramObject):
 
         if until_date is not None:
             if isinstance(until_date, datetime):
-                until_date = to_timestamp(until_date, bot=self)
+                until_date = to_timestamp(until_date,
+                                          tzinfo=self.defaults.tzinfo if self.defaults else None)
             data['until_date'] = until_date
 
         result = self._post('restrictChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
@@ -3625,7 +3627,8 @@ class Bot(TelegramObject):
             data['open_period'] = open_period
         if close_date:
             if isinstance(close_date, datetime):
-                close_date = to_timestamp(close_date, bot=self)
+                close_date = to_timestamp(close_date,
+                                          tzinfo=self.defaults.tzinfo if self.defaults else None)
             data['close_date'] = close_date
 
         return self._message('sendPoll', data, timeout=timeout,

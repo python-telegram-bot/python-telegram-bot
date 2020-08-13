@@ -24,7 +24,6 @@ from telegram import (Update, Message, User, MessageEntity, Chat, Audio, Documen
                       Game, PhotoSize, Sticker, Video, Voice, VideoNote, Contact, Location, Venue,
                       Invoice, SuccessfulPayment, PassportData, ParseMode, Poll, PollOption, Dice)
 from telegram.ext import Defaults
-from telegram.utils.helpers import to_timestamp
 from tests.test_passport import RAW_PASSPORT_DATA
 
 
@@ -175,36 +174,8 @@ class TestMessage:
 
         assert new.to_dict() == message_params.to_dict()
 
-    def test_to_dict_default_tzinfo(self, message, tz_bot):
-        message.bot = tz_bot
-        tzinfo = tz_bot.defaults.tzinfo
-
-        message.date = TestMessage.date
-        message.forward_date = TestMessage.date
-        message.edit_date = TestMessage.date
-
-        aware_date = tzinfo.localize(TestMessage.date)
-        timestamp = to_timestamp(TestMessage.date, bot=tz_bot)
-        utc_offset = tzinfo.utcoffset(TestMessage.date).total_seconds()
-
-        assert message.date == aware_date
-        assert message.forward_date == aware_date
-        assert message.edit_date == aware_date
-        assert message.date.utcoffset().total_seconds() == utc_offset
-        assert message.forward_date.utcoffset().total_seconds() == utc_offset
-        assert message.edit_date.utcoffset().total_seconds() == utc_offset
-
-        message_dict = message.to_dict()
-
-        assert message_dict['date'] == timestamp
-        assert message_dict['edit_date'] == timestamp
-        assert message_dict['forward_date'] == timestamp
-
     def test_dict_approach(self, message):
         assert message['text'] == message.text
-        assert message['date'] == message.date
-        assert message['forward_date'] == message.forward_date
-        assert message['edit_date'] == message.edit_date
         assert message['chat_id'] == message.chat_id
         assert message['no_key'] is None
 
