@@ -189,8 +189,6 @@ class User(TelegramObject):
 
             bot.send_message(update.effective_user.id, *args, **kwargs)
 
-        Where User is the current instance.
-
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -201,8 +199,6 @@ class User(TelegramObject):
         """Shortcut for::
 
             bot.send_photo(update.effective_user.id, *args, **kwargs)
-
-        Where User is the current instance.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -215,8 +211,6 @@ class User(TelegramObject):
 
             bot.send_media_group(update.effective_user.id, *args, **kwargs)
 
-        Where User is the current instance.
-
         Returns:
             List[:class:`telegram.Message`:] On success, instance representing the message posted.
 
@@ -228,8 +222,6 @@ class User(TelegramObject):
 
             bot.send_audio(update.effective_user.id, *args, **kwargs)
 
-        Where User is the current instance.
-
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -240,8 +232,6 @@ class User(TelegramObject):
         """Shortcut for::
 
             bot.send_chat_action(update.effective_user.id, *args, **kwargs)
-
-        Where User is the current instance.
 
         Returns:
             :obj:`True`: On success.
@@ -257,8 +247,6 @@ class User(TelegramObject):
 
             bot.send_contact(update.effective_user.id, *args, **kwargs)
 
-        Where User is the current instance.
-
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -269,8 +257,6 @@ class User(TelegramObject):
         """Shortcut for::
 
             bot.send_dice(update.effective_user.id, *args, **kwargs)
-
-        Where User is the current instance.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -283,8 +269,6 @@ class User(TelegramObject):
 
             bot.send_document(update.effective_user.id, *args, **kwargs)
 
-        Where User is the current instance.
-
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -295,8 +279,6 @@ class User(TelegramObject):
         """Shortcut for::
 
             bot.send_game(update.effective_user.id, *args, **kwargs)
-
-        Where User is the current instance.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -309,8 +291,6 @@ class User(TelegramObject):
 
             bot.send_invoice(update.effective_user.id, *args, **kwargs)
 
-        Where User is the current instance.
-
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -321,8 +301,6 @@ class User(TelegramObject):
         """Shortcut for::
 
             bot.send_location(update.effective_user.id, *args, **kwargs)
-
-        Where User is the current instance.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -335,8 +313,6 @@ class User(TelegramObject):
 
             bot.send_animation(update.effective_user.id, *args, **kwargs)
 
-        Where User is the current instance.
-
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -347,8 +323,6 @@ class User(TelegramObject):
         """Shortcut for::
 
             bot.send_sticker(update.effective_user.id, *args, **kwargs)
-
-        Where User is the current instance.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -361,8 +335,6 @@ class User(TelegramObject):
 
             bot.send_video(update.effective_user.id, *args, **kwargs)
 
-        Where User is the current instance.
-
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -373,8 +345,6 @@ class User(TelegramObject):
         """Shortcut for::
 
             bot.send_venue(update.effective_user.id, *args, **kwargs)
-
-        Where User is the current instance.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -387,8 +357,6 @@ class User(TelegramObject):
 
             bot.send_video_note(update.effective_user.id, *args, **kwargs)
 
-        Where User is the current instance.
-
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -400,8 +368,6 @@ class User(TelegramObject):
 
             bot.send_voice(update.effective_user.id, *args, **kwargs)
 
-        Where User is the current instance.
-
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -412,8 +378,6 @@ class User(TelegramObject):
         """Shortcut for::
 
             bot.send_poll(update.effective_user.id, *args, **kwargs)
-
-        Where User is the current instance.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
