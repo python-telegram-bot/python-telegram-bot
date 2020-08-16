@@ -143,7 +143,7 @@ def cdp(dp):
 
 @pytest.fixture(scope='function')
 def updater(bot):
-    up = Updater(bot=bot, workers=2)
+    up = Updater(bot=bot, workers=2, use_context=False)
     yield up
     if up.running:
         up.stop()
