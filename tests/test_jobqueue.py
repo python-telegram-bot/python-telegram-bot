@@ -141,8 +141,6 @@ class TestJobQueue:
                                 first=dtm.datetime.now(timezone) + dtm.timedelta(seconds=0.05))
         sleep(0.1)
         assert self.result == 1
-        sleep(0.1)
-        assert self.result == 1
 
     def test_run_repeating_last_before_first(self, job_queue):
         with pytest.raises(ValueError, match="'last' must not be before 'first'!"):
@@ -217,7 +215,7 @@ class TestJobQueue:
         assert self.result == 1
 
     def test_in_updater(self, bot):
-        u = Updater(bot=bot)
+        u = Updater(bot=bot, use_context=False)
         u.job_queue.start()
         try:
             u.job_queue.run_repeating(self.job_run_once, 0.02)
