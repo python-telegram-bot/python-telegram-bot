@@ -217,7 +217,7 @@ class TestJobQueue:
         assert self.result == 1
 
     def test_in_updater(self, bot):
-        u = Updater(bot=bot)
+        u = Updater(bot=bot, use_context=False)
         u.job_queue.start()
         try:
             u.job_queue.run_repeating(self.job_run_once, 0.02)
