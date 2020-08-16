@@ -519,7 +519,6 @@ class Dispatcher:
         """
         if self.error_handlers:
             for callback in self.error_handlers:
-                print('This is dispatcher. use_context=', self.use_context)
                 if self.use_context:
                     callback(update, CallbackContext.from_error(update, error, self))
                 else:
