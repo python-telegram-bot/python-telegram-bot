@@ -4009,10 +4009,6 @@ class Bot(TelegramObject):
 
         return data
 
-    def __reduce__(self) -> Tuple:
-        return (self.__class__, (self.token, self.base_url.replace(self.token, ''),
-                                 self.base_file_url.replace(self.token, '')))
-
     # camelCase aliases
     getMe = get_me
     """Alias for :attr:`get_me`"""

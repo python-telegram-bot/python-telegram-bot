@@ -31,7 +31,7 @@ from telegram.utils.helpers import escape_markdown, to_timestamp, from_timestamp
 from telegram.utils.types import JSONDict
 from typing import Any, List, Dict, Optional, Union, TYPE_CHECKING
 if TYPE_CHECKING:
-    from telegram import Bot, InputMedia
+    from telegram import Bot, InputMedia, GameHighScore
 
 _UNDEFINED = object()
 
@@ -120,8 +120,6 @@ class Message(TelegramObject):
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
-        default_quote (:obj:`bool`): Optional. Default setting for the `quote` parameter of the
-            :attr:`reply_text` and friends.
 
     Args:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -229,8 +227,7 @@ class Message(TelegramObject):
         via_bot (:class:`telegram.User`, optional): Message was sent through an inline bot.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. login_url buttons are represented as ordinary url buttons.
-        default_quote (:obj:`bool`, optional): Default setting for the `quote` parameter of the
-            :attr:`reply_text` and friends.
+        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
 
     """
 
@@ -350,7 +347,6 @@ class Message(TelegramObject):
         self.via_bot = via_bot
         self.reply_markup = reply_markup
         self.bot = bot
-        self.default_quote = default_quote
 
         self._id_attrs = (self.message_id, self.chat)
 
@@ -381,22 +377,13 @@ class Message(TelegramObject):
 
         data['from_user'] = User.de_json(data.get('from'), bot)
         data['date'] = from_timestamp(data['date'])
-        chat = data.get('chat')
-        if chat:
-            chat['default_quote'] = data.get('default_quote')
-        data['chat'] = Chat.de_json(chat, bot)
+        data['chat'] = Chat.de_json(data.get('chat'), bot)
         data['entities'] = MessageEntity.de_list(data.get('entities'), bot)
         data['caption_entities'] = MessageEntity.de_list(data.get('caption_entities'), bot)
         data['forward_from'] = User.de_json(data.get('forward_from'), bot)
-        forward_from_chat = data.get('forward_from_chat')
-        if forward_from_chat:
-            forward_from_chat['default_quote'] = data.get('default_quote')
-        data['forward_from_chat'] = Chat.de_json(forward_from_chat, bot)
+        data['forward_from_chat'] = Chat.de_json(data.get('forward_from_chat'), bot)
         data['forward_date'] = from_timestamp(data.get('forward_date'))
-        reply_to_message = data.get('reply_to_message')
-        if reply_to_message:
-            reply_to_message['default_quote'] = data.get('default_quote')
-        data['reply_to_message'] = Message.de_json(reply_to_message, bot)
+        data['reply_to_message'] = Message.de_json(data.get('reply_to_message'), bot)
         data['edit_date'] = from_timestamp(data.get('edit_date'))
         data['audio'] = Audio.de_json(data.get('audio'), bot)
         data['document'] = Document.de_json(data.get('document'), bot)
@@ -413,10 +400,7 @@ class Message(TelegramObject):
         data['new_chat_members'] = User.de_list(data.get('new_chat_members'), bot)
         data['left_chat_member'] = User.de_json(data.get('left_chat_member'), bot)
         data['new_chat_photo'] = PhotoSize.de_list(data.get('new_chat_photo'), bot)
-        pinned_message = data.get('pinned_message')
-        if pinned_message:
-            pinned_message['default_quote'] = data.get('default_quote')
-        data['pinned_message'] = Message.de_json(pinned_message, bot)
+        data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
         data['invoice'] = Invoice.de_json(data.get('invoice'), bot)
         data['successful_payment'] = SuccessfulPayment.de_json(data.get('successful_payment'), bot)
         data['passport_data'] = PassportData.de_json(data.get('passport_data'), bot)
@@ -503,8 +487,11 @@ class Message(TelegramObject):
             del kwargs['quote']
 
         else:
-            if ((self.default_quote is None and self.chat.type != Chat.PRIVATE)
-               or self.default_quote):
+            if self.bot.defaults:
+                default_quote = self.bot.defaults.quote
+            else:
+                default_quote = None
+            if (default_quote is None and self.chat.type != Chat.PRIVATE) or default_quote:
                 kwargs['reply_to_message_id'] = self.message_id
 
     def reply_text(self, *args: Any, **kwargs: Any) -> 'Message':
@@ -949,6 +936,85 @@ class Message(TelegramObject):
         return self.bot.edit_message_reply_markup(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
 
+    def edit_live_location(self, *args: Any, **kwargs: Any) -> Union['Message', bool]:
+        """Shortcut for::
+
+            bot.edit_message_live_location(chat_id=message.chat_id,
+                                           message_id=message.message_id,
+                                           *args,
+                                           **kwargs)
+
+        Note:
+            You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
+            of methods) or channel posts, if the bot is an admin in that channel. However, this
+            behaviour is undocumented and might be changed by Telegram.
+
+        Returns:
+            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            edited Message is returned, otherwise ``True`` is returned.
+        """
+        return self.bot.edit_message_live_location(
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+
+    def stop_live_location(self, *args: Any, **kwargs: Any) -> Union['Message', bool]:
+        """Shortcut for::
+
+            bot.stop_message_live_location(chat_id=message.chat_id,
+                                           message_id=message.message_id,
+                                           *args,
+                                           **kwargs)
+
+        Note:
+            You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
+            of methods) or channel posts, if the bot is an admin in that channel. However, this
+            behaviour is undocumented and might be changed by Telegram.
+
+        Returns:
+            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            edited Message is returned, otherwise ``True`` is returned.
+        """
+        return self.bot.stop_message_live_location(
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+
+    def set_game_score(self, *args: Any, **kwargs: Any) -> Union['Message', bool]:
+        """Shortcut for::
+
+            bot.set_game_score(chat_id=message.chat_id,
+                               message_id=message.message_id,
+                               *args,
+                               **kwargs)
+
+        Note:
+            You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
+            of methods) or channel posts, if the bot is an admin in that channel. However, this
+            behaviour is undocumented and might be changed by Telegram.
+
+        Returns:
+            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            edited Message is returned, otherwise ``True`` is returned.
+        """
+        return self.bot.set_game_score(
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+
+    def get_game_high_scores(self, *args: Any, **kwargs: Any) -> List['GameHighScore']:
+        """Shortcut for::
+
+            bot.get_game_high_scores(chat_id=message.chat_id,
+                                     message_id=message.message_id,
+                                     *args,
+                                     **kwargs)
+
+        Note:
+            You can only edit messages that the bot sent itself (i.e. of the ``bot.send_*`` family
+            of methods) or channel posts, if the bot is an admin in that channel. However, this
+            behaviour is undocumented and might be changed by Telegram.
+
+        Returns:
+            List[:class:`telegram.GameHighScore`]
+        """
+        return self.bot.get_game_high_scores(
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+
     def delete(self, *args: Any, **kwargs: Any) -> bool:
         """Shortcut for::
 
@@ -978,6 +1044,21 @@ class Message(TelegramObject):
 
         """
         return self.bot.stop_poll(
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+
+    def pin(self, *args: Any, **kwargs: Any) -> bool:
+        """Shortcut for::
+
+             bot.pin_chat_message(chat_id=message.chat_id,
+                                  message_id=message.message_id,
+                                  *args,
+                                  **kwargs)
+
+        Returns:
+            :obj:`True`: On success.
+
+        """
+        return self.bot.pin_chat_message(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
 
     def parse_entity(self, entity: MessageEntity) -> str:

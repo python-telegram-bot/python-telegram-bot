@@ -13,7 +13,6 @@ from telegram import (Poll, ParseMode, KeyboardButton, KeyboardButtonPollType,
                       ReplyKeyboardMarkup, ReplyKeyboardRemove)
 from telegram.ext import (Updater, CommandHandler, PollAnswerHandler, PollHandler, MessageHandler,
                           Filters)
-from telegram.utils.helpers import mention_html
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -29,7 +28,7 @@ def start(update, context):
 def poll(update, context):
     """Sends a predefined poll"""
     questions = ["Good", "Really good", "Fantastic", "Great"]
-    message = context.bot.send_poll(update.effective_user.id, "How are you?", questions,
+    message = context.bot.send_poll(update.effective_chat.id, "How are you?", questions,
                                     is_anonymous=False, allows_multiple_answers=True)
     # Save some info about the poll the bot_data for later use in receive_poll_answer
     payload = {message.poll.id: {"questions": questions, "message_id": message.message_id,
@@ -53,9 +52,9 @@ def receive_poll_answer(update, context):
             answer_string += questions[question_id] + " and "
         else:
             answer_string += questions[question_id]
-    user_mention = mention_html(update.effective_user.id, update.effective_user.full_name)
     context.bot.send_message(context.bot_data[poll_id]["chat_id"],
-                             "{} feels {}!".format(user_mention, answer_string),
+                             "{} feels {}!".format(update.effective_user.mention_html(),
+                                                   answer_string),
                              parse_mode=ParseMode.HTML)
     context.bot_data[poll_id]["answers"] += 1
     # Close poll after three participants voted

@@ -20,7 +20,7 @@
 import pytest
 
 from telegram import Chat, ChatAction, ChatPermissions
-from telegram import User, Message
+from telegram import User
 
 
 @pytest.fixture(scope='class')
@@ -72,22 +72,6 @@ class TestChat:
         assert chat.permissions == self.permissions
         assert chat.slow_mode_delay == self.slow_mode_delay
 
-    def test_de_json_default_quote(self, bot):
-        json_dict = {
-            'id': self.id_,
-            'type': self.type_,
-            'pinned_message': Message(
-                message_id=123,
-                from_user=None,
-                date=None,
-                chat=None
-            ).to_dict(),
-            'default_quote': True
-        }
-        chat = Chat.de_json(json_dict, bot)
-
-        assert chat.pinned_message.default_quote is True
-
     def test_to_dict(self, chat):
         chat_dict = chat.to_dict()
 
@@ -113,6 +97,7 @@ class TestChat:
 
         monkeypatch.setattr(chat.bot, 'send_chat_action', test)
         assert chat.send_action(action=ChatAction.TYPING)
+        assert chat.send_chat_action(action=ChatAction.TYPING)
 
     def test_leave(self, monkeypatch, chat):
         def test(*args, **kwargs):
@@ -189,12 +174,26 @@ class TestChat:
         monkeypatch.setattr(chat.bot, 'send_message', test)
         assert chat.send_message('test')
 
+    def test_instance_method_send_media_group(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return args[0] == chat.id and args[1] == 'test_media_group'
+
+        monkeypatch.setattr(chat.bot, 'send_media_group', test)
+        assert chat.send_media_group('test_media_group')
+
     def test_instance_method_send_photo(self, monkeypatch, chat):
         def test(*args, **kwargs):
             return args[0] == chat.id and args[1] == 'test_photo'
 
         monkeypatch.setattr(chat.bot, 'send_photo', test)
         assert chat.send_photo('test_photo')
+
+    def test_instance_method_send_contact(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return args[0] == chat.id and args[1] == 'test_contact'
+
+        monkeypatch.setattr(chat.bot, 'send_contact', test)
+        assert chat.send_contact('test_contact')
 
     def test_instance_method_send_audio(self, monkeypatch, chat):
         def test(*args, **kwargs):
@@ -210,12 +209,47 @@ class TestChat:
         monkeypatch.setattr(chat.bot, 'send_document', test)
         assert chat.send_document('test_document')
 
+    def test_instance_method_send_dice(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return args[0] == chat.id and args[1] == 'test_dice'
+
+        monkeypatch.setattr(chat.bot, 'send_dice', test)
+        assert chat.send_dice('test_dice')
+
+    def test_instance_method_send_game(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return args[0] == chat.id and args[1] == 'test_game'
+
+        monkeypatch.setattr(chat.bot, 'send_game', test)
+        assert chat.send_game('test_game')
+
+    def test_instance_method_send_invoice(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return args[0] == chat.id and args[1] == 'test_invoice'
+
+        monkeypatch.setattr(chat.bot, 'send_invoice', test)
+        assert chat.send_invoice('test_invoice')
+
+    def test_instance_method_send_location(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return args[0] == chat.id and args[1] == 'test_location'
+
+        monkeypatch.setattr(chat.bot, 'send_location', test)
+        assert chat.send_location('test_location')
+
     def test_instance_method_send_sticker(self, monkeypatch, chat):
         def test(*args, **kwargs):
             return args[0] == chat.id and args[1] == 'test_sticker'
 
         monkeypatch.setattr(chat.bot, 'send_sticker', test)
         assert chat.send_sticker('test_sticker')
+
+    def test_instance_method_send_venue(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return args[0] == chat.id and args[1] == 'test_venue'
+
+        monkeypatch.setattr(chat.bot, 'send_venue', test)
+        assert chat.send_venue('test_venue')
 
     def test_instance_method_send_video(self, monkeypatch, chat):
         def test(*args, **kwargs):

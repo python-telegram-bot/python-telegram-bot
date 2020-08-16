@@ -284,7 +284,7 @@ def main():
         states={
             SELECTING_FEATURE: [CallbackQueryHandler(ask_for_input,
                                                      pattern='^(?!' + str(END) + ').*$')],
-            TYPING: [MessageHandler(Filters.text, save_input)],
+            TYPING: [MessageHandler(Filters.text & ~Filters.command, save_input)],
         },
 
         fallbacks=[

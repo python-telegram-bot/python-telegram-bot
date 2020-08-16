@@ -115,8 +115,7 @@ class BasePersistence(ABC):
         self.store_user_data = store_user_data
         self.store_chat_data = store_chat_data
         self.store_bot_data = store_bot_data
-
-        self.bot = cast(Bot, None)
+        self.bot: Bot = None  # type: ignore[assignment]
 
     def set_bot(self, bot: Bot) -> None:
         """Set the Bot to be used by this persistence instance.

@@ -96,9 +96,9 @@ class Dispatcher:
             ``@run_async`` decorator. defaults to 4.
         persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
             store data that should be persistent over restarts
-        use_context (:obj:`bool`, optional): If set to ``True`` Use the context based callback API.
-            During the deprecation period of the old API the default is ``False``. **New users**:
-            set this to ``True``.
+        use_context (:obj:`bool`, optional): If set to :obj:`True` uses the context based callback
+            API (ignored if `dispatcher` argument is used). Defaults to :obj:`True`.
+            **New users**: set this to :obj:`True`.
 
     """
 
@@ -114,7 +114,7 @@ class Dispatcher:
                  exception_event: Event = None,
                  job_queue: 'JobQueue' = None,
                  persistence: BasePersistence = None,
-                 use_context: bool = False):
+                 use_context: bool = True):
         self.bot = bot
         self.update_queue = update_queue
         self.job_queue = job_queue

@@ -151,30 +151,15 @@ class Chat(TelegramObject):
 
         data['photo'] = ChatPhoto.de_json(data.get('photo'), bot)
         from telegram import Message
-        pinned_message = data.get('pinned_message')
-        if pinned_message:
-            pinned_message['default_quote'] = data.get('default_quote')
-        data['pinned_message'] = Message.de_json(pinned_message, bot)
+        data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
         data['permissions'] = ChatPermissions.de_json(data.get('permissions'), bot)
 
         return cls(bot=bot, **data)
 
-    def send_action(self, *args: Any, **kwargs: Any) -> bool:
-        """Shortcut for::
-
-            bot.send_chat_action(update.message.chat.id, *args, **kwargs)
-
-        Returns:
-            :obj:`bool`: If the action was sent successfully.
-
-        """
-
-        return self.bot.send_chat_action(self.id, *args, **kwargs)
-
     def leave(self, *args: Any, **kwargs: Any) -> bool:
         """Shortcut for::
 
-            bot.leave_chat(update.message.chat.id, *args, **kwargs)
+            bot.leave_chat(update.effective_chat.id, *args, **kwargs)
 
         Returns:
             :obj:`bool` If the action was sent successfully.
@@ -185,7 +170,7 @@ class Chat(TelegramObject):
     def get_administrators(self, *args: Any, **kwargs: Any) -> List['ChatMember']:
         """Shortcut for::
 
-            bot.get_chat_administrators(update.message.chat.id, *args, **kwargs)
+            bot.get_chat_administrators(update.effective_chat.id, *args, **kwargs)
 
         Returns:
             List[:class:`telegram.ChatMember`]: A list of administrators in a chat. An Array of
@@ -199,7 +184,7 @@ class Chat(TelegramObject):
     def get_members_count(self, *args: Any, **kwargs: Any) -> int:
         """Shortcut for::
 
-            bot.get_chat_members_count(update.message.chat.id, *args, **kwargs)
+            bot.get_chat_members_count(update.effective_chat.id, *args, **kwargs)
 
         Returns:
             :obj:`int`
@@ -210,7 +195,7 @@ class Chat(TelegramObject):
     def get_member(self, *args: Any, **kwargs: Any) -> 'ChatMember':
         """Shortcut for::
 
-            bot.get_chat_member(update.message.chat.id, *args, **kwargs)
+            bot.get_chat_member(update.effective_chat.id, *args, **kwargs)
 
         Returns:
             :class:`telegram.ChatMember`
@@ -221,10 +206,10 @@ class Chat(TelegramObject):
     def kick_member(self, *args: Any, **kwargs: Any) -> bool:
         """Shortcut for::
 
-                bot.kick_chat_member(update.message.chat.id, *args, **kwargs)
+                bot.kick_chat_member(update.effective_chat.id, *args, **kwargs)
 
         Returns:
-            :obj:`bool`: If the action was sent succesfully.
+            :obj:`bool`: If the action was sent successfully.
 
         Note:
             This method will only work if the `All Members Are Admins` setting is off in the
@@ -237,7 +222,7 @@ class Chat(TelegramObject):
     def unban_member(self, *args: Any, **kwargs: Any) -> bool:
         """Shortcut for::
 
-                bot.unban_chat_member(update.message.chat.id, *args, **kwargs)
+                bot.unban_chat_member(update.effective_chat.id, *args, **kwargs)
 
         Returns:
             :obj:`bool`: If the action was sent successfully.
@@ -248,7 +233,7 @@ class Chat(TelegramObject):
     def set_permissions(self, *args: Any, **kwargs: Any) -> bool:
         """Shortcut for::
 
-                bot.set_chat_permissions(update.message.chat.id, *args, **kwargs)
+                bot.set_chat_permissions(update.effective_chat.id, *args, **kwargs)
 
         Returns:
             :obj:`bool`: If the action was sent successfully.
@@ -259,7 +244,7 @@ class Chat(TelegramObject):
     def set_administrator_custom_title(self, *args: Any, **kwargs: Any) -> bool:
         """Shortcut for::
 
-                bot.set_chat_administrator_custom_title(update.message.chat.id, *args, **kwargs)
+                bot.set_chat_administrator_custom_title(update.effective_chat.id, *args, **kwargs)
 
         Returns:
         :obj:`bool`: If the action was sent successfully.
@@ -270,7 +255,7 @@ class Chat(TelegramObject):
     def send_message(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
-            bot.send_message(Chat.id, *args, **kwargs)
+            bot.send_message(update.effective_chat.id, *args, **kwargs)
 
         Where Chat is the current instance.
 
@@ -280,10 +265,39 @@ class Chat(TelegramObject):
         """
         return self.bot.send_message(self.id, *args, **kwargs)
 
+    def send_media_group(self, *args: Any, **kwargs: Any) -> List['Message']:
+        """Shortcut for::
+
+            bot.send_media_group(update.effective_chat.id, *args, **kwargs)
+
+        Where Chat is the current instance.
+
+        Returns:
+            List[:class:`telegram.Message`:] On success, instance representing the message posted.
+
+        """
+        return self.bot.send_media_group(self.id, *args, **kwargs)
+
+    def send_chat_action(self, *args: Any, **kwargs: Any) -> bool:
+        """Shortcut for::
+
+            bot.send_chat_action(update.effective_chat.id, *args, **kwargs)
+
+        Where Chat is the current instance.
+
+        Returns:
+            :obj:`True`: On success.
+
+        """
+        return self.bot.send_chat_action(self.id, *args, **kwargs)
+
+    send_action = send_chat_action
+    """Alias for :attr:`send_chat_action`"""
+
     def send_photo(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
-            bot.send_photo(Chat.id, *args, **kwargs)
+            bot.send_photo(update.effective_chat.id, *args, **kwargs)
 
         Where Chat is the current instance.
 
@@ -293,10 +307,23 @@ class Chat(TelegramObject):
         """
         return self.bot.send_photo(self.id, *args, **kwargs)
 
+    def send_contact(self, *args: Any, **kwargs: Any) -> 'Message':
+        """Shortcut for::
+
+            bot.send_contact(update.effective_chat.id, *args, **kwargs)
+
+        Where Chat is the current instance.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.send_contact(self.id, *args, **kwargs)
+
     def send_audio(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
-            bot.send_audio(Chat.id, *args, **kwargs)
+            bot.send_audio(update.effective_chat.id, *args, **kwargs)
 
         Where Chat is the current instance.
 
@@ -309,7 +336,7 @@ class Chat(TelegramObject):
     def send_document(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
-            bot.send_document(Chat.id, *args, **kwargs)
+            bot.send_document(update.effective_chat.id, *args, **kwargs)
 
         Where Chat is the current instance.
 
@@ -319,10 +346,62 @@ class Chat(TelegramObject):
         """
         return self.bot.send_document(self.id, *args, **kwargs)
 
+    def send_dice(self, *args: Any, **kwargs: Any) -> 'Message':
+        """Shortcut for::
+
+            bot.send_dice(update.effective_chat.id, *args, **kwargs)
+
+        Where Chat is the current instance.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.send_dice(self.id, *args, **kwargs)
+
+    def send_game(self, *args: Any, **kwargs: Any) -> 'Message':
+        """Shortcut for::
+
+            bot.send_game(update.effective_chat.id, *args, **kwargs)
+
+        Where Chat is the current instance.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.send_game(self.id, *args, **kwargs)
+
+    def send_invoice(self, *args: Any, **kwargs: Any) -> 'Message':
+        """Shortcut for::
+
+            bot.send_invoice(update.effective_chat.id, *args, **kwargs)
+
+        Where Chat is the current instance.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.send_invoice(self.id, *args, **kwargs)
+
+    def send_location(self, *args: Any, **kwargs: Any) -> 'Message':
+        """Shortcut for::
+
+            bot.send_location(update.effective_chat.id, *args, **kwargs)
+
+        Where Chat is the current instance.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.send_location(self.id, *args, **kwargs)
+
     def send_animation(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
-            bot.send_animation(Chat.id, *args, **kwargs)
+            bot.send_animation(update.effective_chat.id, *args, **kwargs)
 
         Where Chat is the current instance.
 
@@ -335,7 +414,7 @@ class Chat(TelegramObject):
     def send_sticker(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
-            bot.send_sticker(Chat.id, *args, **kwargs)
+            bot.send_sticker(update.effective_chat.id, *args, **kwargs)
 
         Where Chat is the current instance.
 
@@ -345,10 +424,23 @@ class Chat(TelegramObject):
         """
         return self.bot.send_sticker(self.id, *args, **kwargs)
 
+    def send_venue(self, *args: Any, **kwargs: Any) -> 'Message':
+        """Shortcut for::
+
+            bot.send_venue(update.effective_chat.id, *args, **kwargs)
+
+        Where Chat is the current instance.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.send_venue(self.id, *args, **kwargs)
+
     def send_video(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
-            bot.send_video(Chat.id, *args, **kwargs)
+            bot.send_video(update.effective_chat.id, *args, **kwargs)
 
         Where Chat is the current instance.
 
@@ -361,7 +453,7 @@ class Chat(TelegramObject):
     def send_video_note(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
-            bot.send_video_note(Chat.id, *args, **kwargs)
+            bot.send_video_note(update.effective_chat.id, *args, **kwargs)
 
         Where Chat is the current instance.
 
@@ -374,7 +466,7 @@ class Chat(TelegramObject):
     def send_voice(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
-            bot.send_voice(Chat.id, *args, **kwargs)
+            bot.send_voice(update.effective_chat.id, *args, **kwargs)
 
         Where Chat is the current instance.
 
@@ -387,7 +479,7 @@ class Chat(TelegramObject):
     def send_poll(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
-            bot.send_poll(Chat.id, *args, **kwargs)
+            bot.send_poll(update.effective_chat.id, *args, **kwargs)
 
         Where Chat is the current instance.
 

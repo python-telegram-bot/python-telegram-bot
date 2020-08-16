@@ -21,7 +21,7 @@ import datetime
 import pytest
 
 from telegram import Message, User, Chat, MessageEntity, Document, Update, Dice
-from telegram.ext import Filters, BaseFilter
+from telegram.ext import Filters, BaseFilter, MessageFilter, UpdateFilter
 import re
 
 
@@ -36,6 +36,16 @@ def update():
                 params=MessageEntity.ALL_TYPES)
 def message_entity(request):
     return MessageEntity(request.param, 0, 0, url='', user='')
+
+
+@pytest.fixture(scope='class',
+                params=[
+                    {'class': MessageFilter},
+                    {'class': UpdateFilter}
+                ],
+                ids=['MessageFilter', 'UpdateFilter'])
+def base_class(request):
+    return request.param['class']
 
 
 class TestFilters:
@@ -963,8 +973,8 @@ class TestFilters:
         with pytest.raises(TypeError, match='Can\'t instantiate abstract class _CustomFilter'):
             _CustomFilter()
 
-    def test_custom_unnamed_filter(self, update):
-        class Unnamed(BaseFilter):
+    def test_custom_unnamed_filter(self, update, base_class):
+        class Unnamed(base_class):
             def filter(self, mes):
                 return True
 
@@ -1010,14 +1020,14 @@ class TestFilters:
         assert Filters.update.channel_posts(update)
         assert Filters.update(update)
 
-    def test_merged_short_circuit_and(self, update):
+    def test_merged_short_circuit_and(self, update, base_class):
         update.message.text = '/test'
         update.message.entities = [MessageEntity(MessageEntity.BOT_COMMAND, 0, 5)]
 
         class TestException(Exception):
             pass
 
-        class RaisingFilter(BaseFilter):
+        class RaisingFilter(base_class):
             def filter(self, _):
                 raise TestException
 
@@ -1030,13 +1040,13 @@ class TestFilters:
         update.message.entities = []
         (Filters.command & raising_filter)(update)
 
-    def test_merged_short_circuit_or(self, update):
+    def test_merged_short_circuit_or(self, update, base_class):
         update.message.text = 'test'
 
         class TestException(Exception):
             pass
 
-        class RaisingFilter(BaseFilter):
+        class RaisingFilter(base_class):
             def filter(self, _):
                 raise TestException
 
@@ -1049,11 +1059,11 @@ class TestFilters:
         update.message.entities = [MessageEntity(MessageEntity.BOT_COMMAND, 0, 5)]
         (Filters.command | raising_filter)(update)
 
-    def test_merged_data_merging_and(self, update):
+    def test_merged_data_merging_and(self, update, base_class):
         update.message.text = '/test'
         update.message.entities = [MessageEntity(MessageEntity.BOT_COMMAND, 0, 5)]
 
-        class DataFilter(BaseFilter):
+        class DataFilter(base_class):
             data_filter = True
 
             def __init__(self, data):
@@ -1073,10 +1083,10 @@ class TestFilters:
         result = (Filters.command & DataFilter('blah'))(update)
         assert not result
 
-    def test_merged_data_merging_or(self, update):
+    def test_merged_data_merging_or(self, update, base_class):
         update.message.text = '/test'
 
-        class DataFilter(BaseFilter):
+        class DataFilter(base_class):
             data_filter = True
 
             def __init__(self, data):

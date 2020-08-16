@@ -20,6 +20,7 @@
 
 import logging
 import ssl
+import warnings
 from threading import Thread, Lock, current_thread, Event
 from time import sleep
 from signal import signal, SIGINT, SIGTERM, SIGABRT
@@ -28,6 +29,7 @@ from queue import Queue
 from telegram import Bot, TelegramError
 from telegram.ext import Dispatcher, JobQueue
 from telegram.error import Unauthorized, InvalidToken, RetryAfter, TimedOut
+from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import get_signal_name
 from telegram.utils.request import Request
 from telegram.utils.webhookhandler import (WebhookServer, WebhookAppClass)
@@ -85,9 +87,9 @@ class Updater:
             `telegram.utils.request.Request` object (ignored if `bot` or `dispatcher` argument is
             used). The request_kwargs are very useful for the advanced users who would like to
             control the default timeouts and/or control the proxy used for http communication.
-        use_context (:obj:`bool`, optional): If set to ``True`` Use the context based callback API
-            (ignored if `dispatcher` argument is used). During the deprecation period of the old
-            API the default is ``False``. **New users**: set this to ``True``.
+        use_context (:obj:`bool`, optional): If set to :obj:`True` uses the context based callback
+            API (ignored if `dispatcher` argument is used). Defaults to :obj:`True`.
+            **New users**: set this to :obj:`True`.
         persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
             store data that should be persistent over restarts (ignored if `dispatcher` argument is
             used).
@@ -117,9 +119,15 @@ class Updater:
                  request_kwargs: Dict[str, Any] = None,
                  persistence: 'BasePersistence' = None,
                  defaults: 'Defaults' = None,
-                 use_context: bool = False,
+                 use_context: bool = True,
                  dispatcher: Dispatcher = None,
                  base_file_url: str = None):
+
+        if defaults and bot:
+            warnings.warn('Passing defaults to an Updater has no effect when a Bot is passed '
+                          'as well. Pass them to the Bot instead.',
+                          TelegramDeprecationWarning,
+                          stacklevel=2)
 
         if dispatcher is None:
             if (token is None) and (bot is None):
@@ -201,9 +209,6 @@ class Updater:
         self.httpd = None
         self.__lock = Lock()
         self.__threads: List[Thread] = []
-
-        # Just for passing to WebhookAppClass
-        self._default_quote = defaults.quote if defaults else None
 
     def _init_thread(self, target: Callable, name: str, *args: Any, **kwargs: Any) -> None:
         thr = Thread(target=self._thread_wrapper,
@@ -427,8 +432,7 @@ class Updater:
             url_path = '/{}'.format(url_path)
 
         # Create Tornado app instance
-        app = WebhookAppClass(url_path, self.bot, self.update_queue,
-                              default_quote=self._default_quote)
+        app = WebhookAppClass(url_path, self.bot, self.update_queue)
 
         # Form SSL Context
         # An SSLError is raised if the private key does not match with the certificate

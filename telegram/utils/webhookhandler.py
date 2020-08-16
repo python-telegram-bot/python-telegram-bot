@@ -83,10 +83,8 @@ class WebhookAppClass(tornado.web.Application):
     def __init__(self,
                  webhook_path: str,
                  bot: 'Bot',
-                 update_queue: Queue,
-                 default_quote: bool = None):
-        self.shared_objects = {"bot": bot, "update_queue": update_queue,
-                               "default_quote": default_quote}
+                 update_queue: Queue):
+        self.shared_objects = {"bot": bot, "update_queue": update_queue}
         handlers = [
             (r"{}/?".format(webhook_path), WebhookHandler,
              self.shared_objects)
@@ -137,10 +135,9 @@ class WebhookHandler(tornado.web.RequestHandler):
                     # fallback to the pre-3.8 default of Selector
                     asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())
 
-    def initialize(self, bot: 'Bot', update_queue: Queue, default_quote: bool = None) -> None:
+    def initialize(self, bot: 'Bot', update_queue: Queue) -> None:
         self.bot = bot
         self.update_queue = update_queue
-        self._default_quote = default_quote
 
     def set_default_headers(self) -> None:
         self.set_header("Content-Type", 'application/json; charset="utf-8"')
@@ -152,7 +149,6 @@ class WebhookHandler(tornado.web.RequestHandler):
         data = json.loads(json_string)
         self.set_status(200)
         self.logger.debug('Webhook received data: ' + json_string)
-        data['default_quote'] = self._default_quote
         update = Update.de_json(data, self.bot)
         if update:
             self.logger.debug('Received Update with ID %d on Webhook' % update.update_id)

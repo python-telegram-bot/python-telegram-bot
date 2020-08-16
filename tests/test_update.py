@@ -77,14 +77,6 @@ class TestUpdate:
 
         assert update is None
 
-    def test_de_json_default_quote(self, bot):
-        json_dict = {'update_id': TestUpdate.update_id}
-        json_dict['message'] = message.to_dict()
-        json_dict['default_quote'] = True
-        update = Update.de_json(json_dict, bot)
-
-        assert update.message.default_quote is True
-
     def test_to_dict(self, update):
         update_dict = update.to_dict()
 
