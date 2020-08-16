@@ -82,9 +82,9 @@ class Updater:
             `telegram.utils.request.Request` object (ignored if `bot` or `dispatcher` argument is
             used). The request_kwargs are very useful for the advanced users who would like to
             control the default timeouts and/or control the proxy used for http communication.
-        use_context (:obj:`bool`, optional): If set to :obj:`True` Use the context based callback
-            API (ignored if :attr:`dispatcher` argument is used). During the deprecation period of
-            the old API the default is :obj:`False`. **New users**: set this to :obj:`True`.
+        use_context (:obj:`bool`, optional): If set to :obj:`True` uses the context based callback
+            API (ignored if `dispatcher` argument is used). Defaults to :obj:`True`.
+            **New users**: set this to :obj:`True`.
         persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
             store data that should be persistent over restarts (ignored if `dispatcher` argument is
             used).
@@ -114,7 +114,7 @@ class Updater:
                  request_kwargs=None,
                  persistence=None,
                  defaults=None,
-                 use_context=False,
+                 use_context=True,
                  dispatcher=None,
                  base_file_url=None):
 
