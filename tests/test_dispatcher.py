@@ -480,7 +480,7 @@ class TestDispatcher:
         assert passed == ['start1', 'error', err, 'start3']
         assert passed[2] is err
 
-    def test_error_while_saving_chat_data(self, dp, bot):
+    def test_error_while_saving_chat_data(self, bot):
         increment = []
 
         class OwnPersistence(BasePersistence):
@@ -530,7 +530,7 @@ class TestDispatcher:
                                                                    length=len('/start'))],
                                            bot=bot))
         my_persistence = OwnPersistence()
-        dp = Dispatcher(bot, None, persistence=my_persistence)
+        dp = Dispatcher(bot, None, persistence=my_persistence, use_context=False)
         dp.add_handler(CommandHandler('start', start1))
         dp.add_error_handler(error)
         dp.process_update(update)
