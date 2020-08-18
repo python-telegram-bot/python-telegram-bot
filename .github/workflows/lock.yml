@@ -3,6 +3,7 @@ name: 'Lock Closed Threads'
 on:
   schedule:
     - cron: '8 4 * * *'
+    - cron: '19 42 * * *'
 
 jobs:
   lock:
@@ -12,4 +13,6 @@ jobs:
         with:
           github-token: ${{ github.token }}
           issue-lock-inactive-days: '1'
+          issue-lock-reason: ''
           pr-lock-inactive-days: '1'
+          pr-lock-reason: ''
