@@ -190,6 +190,18 @@ class TestDispatcher:
         sleep(.1)
         assert self.received == self.message_update.message
 
+    def test_multiple_run_async_deprecation(self, dp):
+        assert isinstance(dp, Dispatcher)
+
+        @run_async
+        def callback(update, context):
+            pass
+
+        dp.add_handler(MessageHandler(Filters.all, callback))
+
+        with pytest.warns(TelegramDeprecationWarning, match='@run_async decorator'):
+            dp.process_update(self.message_update)
+
     def test_error_in_handler(self, dp):
         dp.add_handler(MessageHandler(Filters.all, self.callback_raise_error))
         dp.add_error_handler(self.error_handler)

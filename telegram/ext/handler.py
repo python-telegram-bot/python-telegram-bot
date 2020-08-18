@@ -34,6 +34,8 @@ class Handler(ABC):
             the callback function.
         pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
             the callback function.
+        run_async (:obj:`bool`): Determines whether this handlers callback function will be run
+            asynchronously.
 
     Note:
         :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
@@ -83,6 +85,7 @@ class Handler(ABC):
         self.pass_job_queue = pass_job_queue
         self.pass_user_data = pass_user_data
         self.pass_chat_data = pass_chat_data
+        self.run_async = False
 
     @abstractmethod
     def check_update(self, update):

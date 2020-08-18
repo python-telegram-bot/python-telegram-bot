@@ -48,13 +48,18 @@ def run_async(func):
     Using this decorator is only possible when only a single Dispatcher exist in the system.
 
     Warning:
-        If you're using @run_async you cannot rely on adding custom attributes to
+        If you're using ``@run_async`` you cannot rely on adding custom attributes to
         :class:`telegram.ext.CallbackContext`. See its docs for more info.
     """
 
     @wraps(func)
     def async_func(*args, **kwargs):
-        return Dispatcher.get_instance().run_async(func, *args, **kwargs)
+        warnings.warn('The @run_async decorator is deprecated. Use the `run_async` parameter of'
+                      '`Dispatcher.add_handler` or `Dispatcher.run_async` instead.',
+                      TelegramDeprecationWarning,
+                      stacklevel=2)
+        return Dispatcher.get_instance().run_async(func, *args, update=None, error_handler=None,
+                                                   **kwargs)
 
     return async_func
 
@@ -72,8 +77,8 @@ class Dispatcher:
         update_queue (:obj:`Queue`): The synchronized queue that will contain the updates.
         job_queue (:class:`telegram.ext.JobQueue`): Optional. The :class:`telegram.ext.JobQueue`
             instance to pass onto handler callbacks.
-        workers (:obj:`int`): Number of maximum concurrent worker threads for the ``@run_async``
-            decorator.
+        workers (:obj:`int`, optional): Number of maximum concurrent worker threads for the
+            ``@run_async`` decorator and :meth:`run_async`.
         user_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the user.
         chat_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the chat.
         bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
@@ -86,7 +91,7 @@ class Dispatcher:
         job_queue (:class:`telegram.ext.JobQueue`, optional): The :class:`telegram.ext.JobQueue`
                 instance to pass onto handler callbacks.
         workers (:obj:`int`, optional): Number of maximum concurrent worker threads for the
-            ``@run_async`` decorator. defaults to 4.
+            ``@run_async`` decorator and :meth:`run_async`. Defaults to 4.
         persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
             store data that should be persistent over restarts
         use_context (:obj:`bool`, optional): If set to ``True`` Use the context based callback API.
@@ -144,8 +149,9 @@ class Dispatcher:
         """Dict[:obj:`int`, List[:class:`telegram.ext.Handler`]]: Holds the handlers per group."""
         self.groups = []
         """List[:obj:`int`]: A list with all groups."""
-        self.error_handlers = []
-        """List[:obj:`callable`]: A list of errorHandlers."""
+        self.error_handlers = {}
+        """Dict[:obj:`callable`, :obj:`bool`]: A dict, where the keys are error handlers and the
+        values indicate whether they are to be run asynchronously."""
 
         self.running = False
         """:obj:`bool`: Indicates if this dispatcher is running."""
@@ -209,22 +215,70 @@ class Dispatcher:
                 break
 
             promise.run()
+
             if isinstance(promise.exception, DispatcherHandlerStop):
                 self.logger.warning(
                     'DispatcherHandlerStop is not supported with async functions; func: %s',
                     promise.pooled_function.__name__)
+            elif isinstance(promise.exception, Exception):
+                if promise.pooled_function in self.error_handlers:
+                    self.logger.error('An error was raised while processing the update '
+                                      'and an uncaught error was raised while handling '
+                                      'the error with an error_handler')
+                elif promise.error_handler:
+                    try:
+                        context = CallbackContext.from_error(promise.update, promise.exception,
+                                                             self)
+                        if promise.update:
+                            promise.error_handler(promise.update, context, *promise.args,
+                                                  **promise.kwargs)
+                        else:
+                            promise.error_handler(context, *promise.args, **promise.kwargs)
+                    except Exception:
+                        self.logger.exception('An error was raised while processing the update '
+                                              'and an uncaught error was raised while handling '
+                                              'the error with an error_handler')
+                elif promise.update:
+                    try:
+                        self.dispatch_error(promise.update, promise.exception)
+                    except Exception:
+                        self.logger.exception('An error was raised while processing the update '
+                                              'and an uncaught error was raised while handling '
+                                              'the error with an error_handler')
+                else:
+                    self.logger.exception(
+                        'No error handlers are set for async function, logging exception.',
+                        exc_info=promise.exception)
 
-    def run_async(self, func, *args, **kwargs):
+    def run_async(self, func, *args, update=None, error_handler=None, **kwargs):
         """Queue a function (with given args/kwargs) to be run asynchronously.
 
         Warning:
-            If you're using @run_async you cannot rely on adding custom attributes to
-            :class:`telegram.ext.CallbackContext`. See its docs for more info.
+            * If you're using ``@run_async``/:meth:`run_async` you cannot rely on adding custom
+              attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
+            * When using :meth:`run_async` within an asynchronously run error handler (see
+              :meth:`add_error_handler`) and ``update`` is passed, you *must* also pass
+              ``error_handler``, as an exception within ``func`` would cause an infinite loop
+              otherwise.
 
         Args:
             func (:obj:`callable`): The function to run in the thread.
-            *args (:obj:`tuple`, optional): Arguments to `func`.
-            **kwargs (:obj:`dict`, optional): Keyword arguments to `func`.
+            *args (:obj:`tuple`, optional): Arguments to ``func``.
+            update (:class:`telegram.Update`, optional): The update associated with the functions
+                call.
+            error_handler (:obj:`callable`, optional): An error handler to call in case of an
+                exception during the call of ``func``. The callback signature of ``error_handler``
+                must be
+
+                ``def error_handler(context: CallbackContext, *args, **kwargs)``
+
+                or
+
+                ``def error_handler(update: Update, context: CallbackContext, *args, **kwargs)``
+
+                if ``update`` is passed, where ``*args`` and ``**kwargs`` are the arguments for
+                ``func``.
+            **kwargs (:obj:`dict`, optional): Keyword arguments to ``func``.
 
         Returns:
             Promise
@@ -232,7 +286,7 @@ class Dispatcher:
         """
         # TODO: handle exception in async threads
         #       set a threading.Event to notify caller thread
-        promise = Promise(func, args, kwargs)
+        promise = Promise(func, args, kwargs, update=update, error_handler=error_handler)
         self.__async_queue.put(promise)
         return promise
 
@@ -337,7 +391,11 @@ class Dispatcher:
                     if check is not None and check is not False:
                         if not context and self.use_context:
                             context = CallbackContext.from_update(update, self)
-                        handler.handle_update(update, self, check, context)
+                        if handler.run_async:
+                            args = (update, self, check, context)
+                            self.run_async(handler.handle_update, update=update, *args)
+                        else:
+                            handler.handle_update(update, self, check, context)
                         self.update_persistence(update=update)
                         break
 
@@ -360,7 +418,7 @@ class Dispatcher:
                                           'uncaught error was raised while handling the error '
                                           'with an error_handler')
 
-    def add_handler(self, handler, group=DEFAULT_GROUP):
+    def add_handler(self, handler, group=DEFAULT_GROUP, run_async=False):
         """Register a handler.
 
         TL;DR: Order and priority counts. 0 or 1 handlers per group will be used. End handling of
@@ -380,9 +438,17 @@ class Dispatcher:
             group will not be used. The order in which handlers were added to the group defines the
             priority.
 
+        Warning:
+            * When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
+              attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
+            * ``run_async=True`` can not be used for :class:`telegram.ext.ConversationHandler`.
+              Instead set :attr:`telegram.ext.Handler.run_async` to :obj:`True` for
+
         Args:
             handler (:class:`telegram.ext.Handler`): A Handler instance.
             group (:obj:`int`, optional): The group identifier. Default is 0.
+            run_async (:obj:`bool`, optional): Whether this handlers callback should be run
+                asynchronously using :meth:`run_async`. Defaults to :obj:`False`.
 
         """
         # Unfortunately due to circular imports this has to be here
@@ -395,10 +461,16 @@ class Dispatcher:
         if isinstance(handler, ConversationHandler) and handler.persistent:
             if not self.persistence:
                 raise ValueError(
-                    "Conversationhandler {} can not be persistent if dispatcher has no "
+                    "ConversationHandler {} can not be persistent if dispatcher has no "
                     "persistence".format(handler.name))
             handler.persistence = self.persistence
             handler.conversations = self.persistence.get_conversations(handler.name)
+        if isinstance(handler, ConversationHandler) and run_async:
+            raise ValueError(
+                "ConversationHandlers can not be run asynchronously.")
+
+        if run_async:
+            handler.run_async = True
 
         if group not in self.handlers:
             self.handlers[group] = list()
@@ -478,7 +550,7 @@ class Dispatcher:
                                       'the error with an error_handler'
                             self.logger.exception(message)
 
-    def add_error_handler(self, callback):
+    def add_error_handler(self, callback, run_async=False):
         """Registers an error handler in the Dispatcher. This handler will receive every error
         which happens in your bot.
 
@@ -492,11 +564,13 @@ class Dispatcher:
                 ``def callback(update: Update, context: CallbackContext)``
 
                 The error that happened will be present in context.error.
+            run_async (:obj:`bool`, optional): Whether this handlers callback should be run
+                asynchronously using :meth:`run_async`. Defaults to :obj:`False`.
 
         Note:
             See https://git.io/fxJuV for more info about switching to context based API.
         """
-        self.error_handlers.append(callback)
+        self.error_handlers[callback] = run_async
 
     def remove_error_handler(self, callback):
         """Removes an error handler.
@@ -505,8 +579,7 @@ class Dispatcher:
             callback (:obj:`callable`): The error handler to remove.
 
         """
-        if callback in self.error_handlers:
-            self.error_handlers.remove(callback)
+        self.error_handlers.pop(callback, None)
 
     def dispatch_error(self, update, error):
         """Dispatches an error.
@@ -517,11 +590,20 @@ class Dispatcher:
 
         """
         if self.error_handlers:
-            for callback in self.error_handlers:
-                if self.use_context:
-                    callback(update, CallbackContext.from_error(update, error, self))
+            for callback, run_async in self.error_handlers.items():
+                if run_async:
+                    if self.use_context:
+                        self.run_async(callback,
+                                       update,
+                                       CallbackContext.from_error(update, error, self),
+                                       update=update)
+                    else:
+                        self.run_async(callback, self.bot, update, error, update=update)
                 else:
-                    callback(self.bot, update, error)
+                    if self.use_context:
+                        callback(update, CallbackContext.from_error(update, error, self))
+                    else:
+                        callback(self.bot, update, error)
 
         else:
             self.logger.exception(

@@ -38,7 +38,8 @@ class CallbackContext:
         use a fairly unique name for the attributes.
 
     Warning:
-         Do not combine custom attributes and @run_async. Due to how @run_async works, it will
+         Do not combine custom attributes and ``@run_async``/
+         :meth:`telegram.ext.Disptacher.run_async`. Due to how @run_async works, it will
          almost certainly execute the callbacks for an update out of order, and the attributes
          that you think you added will not be present.
 

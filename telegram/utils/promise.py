@@ -41,10 +41,12 @@ class Promise:
 
     """
 
-    def __init__(self, pooled_function, args, kwargs):
+    def __init__(self, pooled_function, args, kwargs, update=None, error_handler=None):
         self.pooled_function = pooled_function
         self.args = args
         self.kwargs = kwargs
+        self.update = update
+        self.error_handler = error_handler
         self.done = Event()
         self._result = None
         self._exception = None
@@ -56,7 +58,7 @@ class Promise:
             self._result = self.pooled_function(*self.args, **self.kwargs)
 
         except Exception as exc:
-            logger.exception('An uncaught error was raised while running the promise')
+            # logger.exception('An uncaught error was raised while running the promise')
             self._exception = exc
 
         finally:
