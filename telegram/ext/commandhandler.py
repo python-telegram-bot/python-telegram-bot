@@ -38,6 +38,9 @@ class CommandHandler(Handler):
     By default the handler listens to messages as well as edited messages. To change this behavior
     use ``~Filters.update.edited_message`` in the filter argument.
 
+    Note:
+        :class:`telegram.ext.CommandHandler` does *not* handle (edited) channel posts.
+
     Attributes:
         command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
             should listen for. Limitations are the same as described here
