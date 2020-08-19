@@ -19,6 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Chat."""
 
+from dataclasses import dataclass
 from telegram import TelegramObject, ChatPhoto
 from .chatpermissions import ChatPermissions
 
@@ -28,7 +29,22 @@ if TYPE_CHECKING:
     from telegram import Bot, Message, ChatMember
 
 
-class Chat(TelegramObject):
+class _Chat:
+    """This object only for storing constants of Chat
+    """
+
+    PRIVATE: str = 'private'
+    """:obj:`str`: 'private'"""
+    GROUP: str = 'group'
+    """:obj:`str`: 'group'"""
+    SUPERGROUP: str = 'supergroup'
+    """:obj:`str`: 'supergroup'"""
+    CHANNEL: str = 'channel'
+    """:obj:`str`: 'channel'"""
+
+
+@dataclass(eq=False)
+class Chat(TelegramObject, _Chat):
     """This object represents a chat.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -86,52 +102,28 @@ class Chat(TelegramObject):
 
     """
 
-    PRIVATE: str = 'private'
-    """:obj:`str`: 'private'"""
-    GROUP: str = 'group'
-    """:obj:`str`: 'group'"""
-    SUPERGROUP: str = 'supergroup'
-    """:obj:`str`: 'supergroup'"""
-    CHANNEL: str = 'channel'
-    """:obj:`str`: 'channel'"""
+    # Required
+    id: int
+    type: str
+    # Optionals
+    title: Optional[str] = None
+    username: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    bot: Optional['Bot'] = None
+    photo: Optional[ChatPhoto] = None
+    description: Optional[str] = None
+    invite_link: Optional[str] = None
+    pinned_message: Optional['Message'] = None
+    permissions: Optional[ChatPermissions] = None
+    sticker_set_name: Optional[str] = None
+    can_set_sticker_set: Optional[bool] = None
+    slow_mode_delay: Optional[int] = None
+    # TODO: Remove (also from tests), when Telegram drops this completely
+    all_members_are_administrators: Optional[bool] = None
 
-    def __init__(self,
-                 id: int,
-                 type: str,
-                 title: str = None,
-                 username: str = None,
-                 first_name: str = None,
-                 last_name: str = None,
-                 bot: 'Bot' = None,
-                 photo: ChatPhoto = None,
-                 description: str = None,
-                 invite_link: str = None,
-                 pinned_message: 'Message' = None,
-                 permissions: ChatPermissions = None,
-                 sticker_set_name: str = None,
-                 can_set_sticker_set: bool = None,
-                 slow_mode_delay: int = None,
-                 **kwargs: Any):
-        # Required
-        self.id = int(id)
-        self.type = type
-        # Optionals
-        self.title = title
-        self.username = username
-        self.first_name = first_name
-        self.last_name = last_name
-        # TODO: Remove (also from tests), when Telegram drops this completely
-        self.all_members_are_administrators = kwargs.get('all_members_are_administrators')
-        self.photo = photo
-        self.description = description
-        self.invite_link = invite_link
-        self.pinned_message = pinned_message
-        self.permissions = permissions
-        self.slow_mode_delay = slow_mode_delay
-        self.sticker_set_name = sticker_set_name
-        self.can_set_sticker_set = can_set_sticker_set
-
-        self.bot = bot
+    def __post_init__(self, **kwargs: Any) -> None:
+        self.id = int(self.id)
         self._id_attrs = (self.id,)
 
     @property

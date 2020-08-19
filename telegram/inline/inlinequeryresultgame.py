@@ -18,12 +18,14 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultGame."""
 
+from dataclasses import dataclass
 from telegram import InlineQueryResult
-from typing import Any, TYPE_CHECKING
+from typing import Any, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import ReplyMarkup
 
 
+@dataclass(eq=False)
 class InlineQueryResultGame(InlineQueryResult):
     """Represents a Game.
 
@@ -43,14 +45,10 @@ class InlineQueryResultGame(InlineQueryResult):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 game_short_name: str,
-                 reply_markup: 'ReplyMarkup' = None,
-                 **kwargs: Any):
-        # Required
-        super().__init__('game', id)
-        self.id = id
-        self.game_short_name = game_short_name
+    # Required
+    id: str
+    game_short_name: str
+    reply_markup: Optional['ReplyMarkup'] = None
 
-        self.reply_markup = reply_markup
+    def __post_init__(self, **kwargs: Any) -> None:
+        super().__init__('game', self.id)

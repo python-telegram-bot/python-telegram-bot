@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Audio."""
 
+from dataclasses import dataclass
 from telegram import TelegramObject, PhotoSize
 
 from telegram.utils.types import JSONDict
@@ -26,6 +27,7 @@ if TYPE_CHECKING:
     from telegram import Bot, File
 
 
+@dataclass(eq=False)
 class Audio(TelegramObject):
     """This object represents an audio file to be treated as music by the Telegram clients.
 

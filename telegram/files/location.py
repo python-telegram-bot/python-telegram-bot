@@ -18,10 +18,14 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Location."""
 
+from dataclasses import dataclass
 from telegram import TelegramObject
-from typing import Any
+from typing import Any, Optional, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
+@dataclass(eq=False)
 class Location(TelegramObject):
     """This object represents a point on the map.
 
@@ -39,9 +43,13 @@ class Location(TelegramObject):
 
     """
 
-    def __init__(self, longitude: float, latitude: float, **kwargs: Any):
+    longitude: float
+    latitude: float
+    bot: Optional['Bot'] = None
+
+    def __post_init__(self, **kwargs: Any) -> None:
         # Required
-        self.longitude = float(longitude)
-        self.latitude = float(latitude)
+        self.longitude = float(self.longitude)
+        self.latitude = float(self.latitude)
 
         self._id_attrs = (self.longitude, self.latitude)

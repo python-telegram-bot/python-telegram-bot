@@ -18,13 +18,15 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultAudio."""
 
+from dataclasses import dataclass
 from telegram import InlineQueryResult
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
-from typing import Any, Union, TYPE_CHECKING
+from typing import Any, Optional, Union, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
 
 
+@dataclass(eq=False)
 class InlineQueryResultAudio(InlineQueryResult):
     """
     Represents a link to an mp3 audio file. By default, this audio file will be sent by the user.
@@ -65,27 +67,17 @@ class InlineQueryResultAudio(InlineQueryResult):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 audio_url: str,
-                 title: str,
-                 performer: str = None,
-                 audio_duration: int = None,
-                 caption: str = None,
-                 reply_markup: 'ReplyMarkup' = None,
-                 input_message_content: 'InputMessageContent' = None,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-                 **kwargs: Any):
+    # Required
+    id: str
+    audio_url: str
+    title: str
+    # Optionals
+    performer: Optional[str] = None
+    audio_duration: Optional[int] = None
+    caption: Optional[str] = None
+    reply_markup: Optional['ReplyMarkup'] = None
+    input_message_content: Optional['InputMessageContent'] = None
+    parse_mode: Optional[Union[str, DefaultValue]] = DEFAULT_NONE
 
-        # Required
-        super().__init__('audio', id)
-        self.audio_url = audio_url
-        self.title = title
-
-        # Optionals
-        self.performer = performer
-        self.audio_duration = audio_duration
-        self.caption = caption
-        self.parse_mode = parse_mode
-        self.reply_markup = reply_markup
-        self.input_message_content = input_message_content
+    def __post_init__(self, **kwargs: Any) -> None:
+        super().__init__('audio', self.id)

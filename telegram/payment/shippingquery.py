@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ShippingQuery."""
 
+from dataclasses import dataclass
 from telegram import TelegramObject, User, ShippingAddress
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, TYPE_CHECKING
@@ -25,6 +26,7 @@ if TYPE_CHECKING:
     from telegram import Bot
 
 
+@dataclass(eq=False)
 class ShippingQuery(TelegramObject):
     """This object contains information about an incoming shipping query.
 
@@ -51,20 +53,13 @@ class ShippingQuery(TelegramObject):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 from_user: User,
-                 invoice_payload: str,
-                 shipping_address: ShippingAddress,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
-        self.id = id
-        self.from_user = from_user
-        self.invoice_payload = invoice_payload
-        self.shipping_address = shipping_address
+    id: str
+    from_user: User
+    invoice_payload: str
+    shipping_address: ShippingAddress
+    bot: Optional['Bot'] = None
 
-        self.bot = bot
-
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.id,)
 
     @classmethod

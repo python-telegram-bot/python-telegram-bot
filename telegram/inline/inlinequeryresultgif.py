@@ -18,13 +18,15 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultGif."""
 
+from dataclasses import dataclass
 from telegram import InlineQueryResult
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
-from typing import Any, Union, TYPE_CHECKING
+from typing import Any, Optional, Union, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
 
 
+@dataclass(eq=False)
 class InlineQueryResultGif(InlineQueryResult):
     """
     Represents a link to an animated GIF file. By default, this animated GIF file will be sent by
@@ -74,33 +76,20 @@ class InlineQueryResultGif(InlineQueryResult):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 gif_url: str,
-                 thumb_url: str,
-                 gif_width: int = None,
-                 gif_height: int = None,
-                 title: str = None,
-                 caption: str = None,
-                 reply_markup: 'ReplyMarkup' = None,
-                 input_message_content: 'InputMessageContent' = None,
-                 gif_duration: int = None,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-                 thumb_mime_type: str = None,
-                 **kwargs: Any):
+    # Required
+    id: str
+    gif_url: str
+    thumb_url: str
+    # Optionals
+    gif_width: Optional[int] = None
+    gif_height: Optional[int] = None
+    title: Optional[str] = None
+    caption: Optional[str] = None
+    reply_markup: Optional['ReplyMarkup'] = None
+    input_message_content: Optional['InputMessageContent'] = None
+    gif_duration: Optional[int] = None
+    parse_mode: Optional[Union[str, DefaultValue]] = DEFAULT_NONE
+    thumb_mime_type: Optional[str] = None
 
-        # Required
-        super().__init__('gif', id)
-        self.gif_url = gif_url
-        self.thumb_url = thumb_url
-
-        # Optionals
-        self.gif_width = gif_width
-        self.gif_height = gif_height
-        self.gif_duration = gif_duration
-        self.title = title
-        self.caption = caption
-        self.parse_mode = parse_mode
-        self.reply_markup = reply_markup
-        self.input_message_content = input_message_content
-        self.thumb_mime_type = thumb_mime_type
+    def __post_init__(self, **kwargs: Any) -> None:
+        super().__init__('gif', self.id)

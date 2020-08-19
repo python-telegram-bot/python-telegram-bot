@@ -18,10 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ShippingAddress."""
 
+from dataclasses import dataclass
 from telegram import TelegramObject
 from typing import Any
 
 
+@dataclass(eq=False)
 class ShippingAddress(TelegramObject):
     """This object represents a Telegram ShippingAddress.
 
@@ -48,20 +50,13 @@ class ShippingAddress(TelegramObject):
 
     """
 
-    def __init__(self,
-                 country_code: str,
-                 state: str,
-                 city: str,
-                 street_line1: str,
-                 street_line2: str,
-                 post_code: str,
-                 **kwargs: Any):
-        self.country_code = country_code
-        self.state = state
-        self.city = city
-        self.street_line1 = street_line1
-        self.street_line2 = street_line2
-        self.post_code = post_code
+    country_code: str
+    state: str
+    city: str
+    street_line1: str
+    street_line2: str
+    post_code: str
 
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.country_code, self.state, self.city, self.street_line1,
                           self.street_line2, self.post_code)

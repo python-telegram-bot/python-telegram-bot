@@ -19,6 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChosenInlineResult."""
 
+from dataclasses import dataclass
 from telegram import TelegramObject, User, Location
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, TYPE_CHECKING
@@ -26,6 +27,7 @@ if TYPE_CHECKING:
     from telegram import Bot
 
 
+@dataclass(eq=False)
 class ChosenInlineResult(TelegramObject):
     """
     Represents a result of an inline query that was chosen by the user and sent to their chat
@@ -57,21 +59,15 @@ class ChosenInlineResult(TelegramObject):
 
     """
 
-    def __init__(self,
-                 result_id: str,
-                 from_user: User,
-                 query: str,
-                 location: Location = None,
-                 inline_message_id: str = None,
-                 **kwargs: Any):
-        # Required
-        self.result_id = result_id
-        self.from_user = from_user
-        self.query = query
-        # Optionals
-        self.location = location
-        self.inline_message_id = inline_message_id
+    # Required
+    result_id: str
+    from_user: User
+    query: str
+    # Optionals
+    location: Optional[Location] = None
+    inline_message_id: Optional[str] = None
 
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.result_id,)
 
     @classmethod

@@ -22,6 +22,7 @@
 import sys
 import datetime
 
+from dataclasses import dataclass
 from telegram import (TelegramObject, User, MessageEntity)
 from telegram.utils.helpers import to_timestamp, from_timestamp
 from telegram.utils.types import JSONDict
@@ -31,6 +32,7 @@ if TYPE_CHECKING:
     from telegram import Bot
 
 
+@dataclass(eq=False)
 class PollOption(TelegramObject):
     """
     This object contains information about one answer option in a poll.
@@ -48,13 +50,15 @@ class PollOption(TelegramObject):
 
     """
 
-    def __init__(self, text: str, voter_count: int, **kwargs: Any):
-        self.text = text
-        self.voter_count = voter_count
+    text: str
+    voter_count: int
+    bot: Optional['Bot'] = None
 
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.text, self.voter_count)
 
 
+@dataclass(eq=False)
 class PollAnswer(TelegramObject):
     """
     This object represents an answer of a user in a non-anonymous poll.
@@ -74,11 +78,12 @@ class PollAnswer(TelegramObject):
             May be empty if the user retracted their vote.
 
     """
-    def __init__(self, poll_id: str, user: User, option_ids: List[int], **kwargs: Any):
-        self.poll_id = poll_id
-        self.user = user
-        self.option_ids = option_ids
 
+    poll_id: str
+    user: User
+    option_ids: List[int]
+
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.poll_id, self.user, tuple(self.option_ids))
 
     @classmethod
@@ -93,6 +98,7 @@ class PollAnswer(TelegramObject):
         return cls(**data)
 
 
+@dataclass(eq=False)
 class Poll(TelegramObject):
     """
     This object contains information about a poll.
@@ -141,35 +147,23 @@ class Poll(TelegramObject):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 question: str,
-                 options: List[PollOption],
-                 total_voter_count: int,
-                 is_closed: bool,
-                 is_anonymous: bool,
-                 type: str,
-                 allows_multiple_answers: bool,
-                 correct_option_id: int = None,
-                 explanation: str = None,
-                 explanation_entities: List[MessageEntity] = None,
-                 open_period: int = None,
-                 close_date: datetime.datetime = None,
-                 **kwargs: Any):
-        self.id = id
-        self.question = question
-        self.options = options
-        self.total_voter_count = total_voter_count
-        self.is_closed = is_closed
-        self.is_anonymous = is_anonymous
-        self.type = type
-        self.allows_multiple_answers = allows_multiple_answers
-        self.correct_option_id = correct_option_id
-        self.explanation = explanation
-        self.explanation_entities = explanation_entities
-        self.open_period = open_period
-        self.close_date = close_date
+    # Required
+    id: str
+    question: str
+    options: List[PollOption]
+    total_voter_count: int
+    is_closed: bool
+    is_anonymous: bool
+    type: str
+    allows_multiple_answers: bool
+    # Optionals
+    correct_option_id: Optional[int] = None
+    explanation: Optional[str] = None
+    explanation_entities: Optional[List[MessageEntity]] = None
+    open_period: Optional[int] = None
+    close_date: Optional[datetime.datetime] = None
 
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.id,)
 
     @classmethod
@@ -252,7 +246,8 @@ class Poll(TelegramObject):
 
         return {
             entity: self.parse_explanation_entity(entity)
-            for entity in (self.explanation_entities or []) if entity.type in types
+            for entity in (self.explanation_entities or [])
+            if entity.type in types
         }
 
     REGULAR: str = "regular"

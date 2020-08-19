@@ -18,10 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Contact."""
 
+from dataclasses import dataclass
 from telegram import TelegramObject
-from typing import Any
+from typing import Any, Optional
 
 
+@dataclass(eq=False)
 class Contact(TelegramObject):
     """This object represents a phone contact.
 
@@ -45,19 +47,14 @@ class Contact(TelegramObject):
 
     """
 
-    def __init__(self,
-                 phone_number: str,
-                 first_name: str,
-                 last_name: str = None,
-                 user_id: int = None,
-                 vcard: str = None,
-                 **kwargs: Any):
-        # Required
-        self.phone_number = str(phone_number)
-        self.first_name = first_name
-        # Optionals
-        self.last_name = last_name
-        self.user_id = user_id
-        self.vcard = vcard
+    # Required
+    phone_number: str
+    first_name: str
+    # Optionals
+    last_name: Optional[str] = None
+    user_id: Optional[int] = None
+    vcard: Optional[str] = None
 
+    def __post_init__(self, **kwargs: Any) -> None:
+        self.phone_number = str(self.phone_number)
         self._id_attrs = (self.phone_number,)

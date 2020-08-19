@@ -17,12 +17,14 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram File."""
+
 from base64 import b64decode
 from os.path import basename
 import os
 
 import urllib.parse as urllib_parse
 
+from dataclasses import dataclass
 from telegram import TelegramObject
 from telegram.passport.credentials import decrypt
 
@@ -31,6 +33,7 @@ if TYPE_CHECKING:
     from telegram import Bot, FileCredentials
 
 
+@dataclass(eq=False)
 class File(TelegramObject):
     """
     This object represents a file ready to be downloaded. The file can be downloaded with
@@ -67,20 +70,17 @@ class File(TelegramObject):
 
     """
 
-    def __init__(self,
-                 file_id: str,
-                 file_unique_id: str,
-                 bot: 'Bot' = None,
-                 file_size: int = None,
-                 file_path: str = None,
-                 **kwargs: Any):
-        # Required
-        self.file_id = str(file_id)
-        self.file_unique_id = str(file_unique_id)
-        # Optionals
-        self.file_size = file_size
-        self.file_path = file_path
-        self.bot = bot
+    # Required
+    file_id: str
+    file_unique_id: str
+    # Optionals
+    bot: Optional['Bot'] = None
+    file_size: Optional[int] = None
+    file_path: Optional[str] = None
+
+    def __post_init__(self, **kwargs: Any) -> None:
+        self.file_id = str(self.file_id)
+        self.file_unique_id = str(self.file_unique_id)
         self._credentials: Optional['FileCredentials'] = None
 
         self._id_attrs = (self.file_unique_id,)

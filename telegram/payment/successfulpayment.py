@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram SuccessfulPayment."""
 
+from dataclasses import dataclass
 from telegram import TelegramObject, OrderInfo
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, TYPE_CHECKING
@@ -25,6 +26,7 @@ if TYPE_CHECKING:
     from telegram import Bot
 
 
+@dataclass(eq=False)
 class SuccessfulPayment(TelegramObject):
     """This object contains basic information about a successful payment.
 
@@ -58,23 +60,15 @@ class SuccessfulPayment(TelegramObject):
 
     """
 
-    def __init__(self,
-                 currency: str,
-                 total_amount: int,
-                 invoice_payload: str,
-                 telegram_payment_charge_id: str,
-                 provider_payment_charge_id: str,
-                 shipping_option_id: str = None,
-                 order_info: OrderInfo = None,
-                 **kwargs: Any):
-        self.currency = currency
-        self.total_amount = total_amount
-        self.invoice_payload = invoice_payload
-        self.shipping_option_id = shipping_option_id
-        self.order_info = order_info
-        self.telegram_payment_charge_id = telegram_payment_charge_id
-        self.provider_payment_charge_id = provider_payment_charge_id
+    currency: str
+    total_amount: int
+    invoice_payload: str
+    telegram_payment_charge_id: str
+    provider_payment_charge_id: str
+    shipping_option_id: Optional[str] = None
+    order_info: Optional[OrderInfo] = None
 
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.telegram_payment_charge_id, self.provider_payment_charge_id)
 
     @classmethod

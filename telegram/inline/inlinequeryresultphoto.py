@@ -18,13 +18,15 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultPhoto."""
 
+from dataclasses import dataclass
 from telegram import InlineQueryResult
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
-from typing import Any, Union, TYPE_CHECKING
+from typing import Any, Optional, Union, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
 
 
+@dataclass(eq=False)
 class InlineQueryResultPhoto(InlineQueryResult):
     """
     Represents a link to a photo. By default, this photo will be sent by the user with optional
@@ -73,30 +75,21 @@ class InlineQueryResultPhoto(InlineQueryResult):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 photo_url: str,
-                 thumb_url: str,
-                 photo_width: int = None,
-                 photo_height: int = None,
-                 title: str = None,
-                 description: str = None,
-                 caption: str = None,
-                 reply_markup: 'ReplyMarkup' = None,
-                 input_message_content: 'InputMessageContent' = None,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-                 **kwargs: Any):
-        # Required
-        super().__init__('photo', id)
-        self.photo_url = photo_url
-        self.thumb_url = thumb_url
+    # Required
+    id: str
+    photo_url: str
+    thumb_url: str
+    # Optionals
+    photo_width: Optional[int] = None
+    photo_height: Optional[int] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
+    caption: Optional[str] = None
+    reply_markup: Optional['ReplyMarkup'] = None
+    input_message_content: Optional['InputMessageContent'] = None
+    parse_mode: Optional[Union[str, DefaultValue]] = DEFAULT_NONE
 
-        # Optionals
-        self.photo_width = int(photo_width)if photo_width is not None else None
-        self.photo_height = int(photo_height) if photo_height is not None else None
-        self.title = title
-        self.description = description
-        self.caption = caption
-        self.parse_mode = parse_mode
-        self.reply_markup = reply_markup
-        self.input_message_content = input_message_content
+    def __post_init__(self, **kwargs: Any) -> None:
+        super().__init__('photo', self.id)
+        self.photo_width = int(self.photo_width) if self.photo_width is not None else None
+        self.photo_height = int(self.photo_height) if self.photo_height is not None else None

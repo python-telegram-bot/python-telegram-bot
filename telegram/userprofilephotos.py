@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram UserProfilePhotos."""
 
+from dataclasses import dataclass
 from telegram import PhotoSize, TelegramObject
 from telegram.utils.types import JSONDict
 from typing import Any, List, Optional, TYPE_CHECKING
@@ -26,6 +27,7 @@ if TYPE_CHECKING:
     from telegram import Bot
 
 
+@dataclass(eq=False)
 class UserProfilePhotos(TelegramObject):
     """This object represent a user's profile pictures.
 
@@ -43,11 +45,12 @@ class UserProfilePhotos(TelegramObject):
 
     """
 
-    def __init__(self, total_count: int, photos: List[List[PhotoSize]], **kwargs: Any):
-        # Required
-        self.total_count = int(total_count)
-        self.photos = photos
+    # Required
+    total_count: int
+    photos: List[List[PhotoSize]]
 
+    def __post_init__(self, **kwargs: Any) -> None:
+        self.total_count = int(self.total_count)
         self._id_attrs = (self.total_count, self.photos)
 
     @classmethod

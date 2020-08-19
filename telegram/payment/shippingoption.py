@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ShippingOption."""
 
+from dataclasses import dataclass
 from telegram import TelegramObject
 from telegram.utils.types import JSONDict
 from typing import List, Any, TYPE_CHECKING
@@ -25,6 +26,7 @@ if TYPE_CHECKING:
     from telegram import LabeledPrice  # noqa
 
 
+@dataclass(eq=False)
 class ShippingOption(TelegramObject):
     """This object represents one shipping option.
 
@@ -44,11 +46,11 @@ class ShippingOption(TelegramObject):
 
     """
 
-    def __init__(self, id: str, title: str, prices: List['LabeledPrice'], **kwargs: Any):
-        self.id = id
-        self.title = title
-        self.prices = prices
+    id: str
+    title: str
+    prices: List['LabeledPrice']
 
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.id,)
 
     def to_dict(self) -> JSONDict:

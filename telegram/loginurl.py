@@ -18,10 +18,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram LoginUrl."""
+from dataclasses import dataclass
 from telegram import TelegramObject
-from typing import Any
+from typing import Any, Optional
 
 
+@dataclass(eq=False)
 class LoginUrl(TelegramObject):
     """This object represents a parameter of the inline keyboard button used to automatically
     authorize a user. Serves as a great replacement for the Telegram Login Widget when the user is
@@ -57,17 +59,12 @@ class LoginUrl(TelegramObject):
             bot to send messages to the user.
     """
 
-    def __init__(self,
-                 url: str,
-                 forward_text: bool = None,
-                 bot_username: str = None,
-                 request_write_access: bool = None,
-                 **kwargs: Any):
-        # Required
-        self.url = url
-        # Optional
-        self.forward_text = forward_text
-        self.bot_username = bot_username
-        self.request_write_access = request_write_access
+    # Required
+    url: str
+    # Optional
+    forward_text: Optional[bool] = None
+    bot_username: Optional[str] = None
+    request_write_access: Optional[bool] = None
 
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.url,)

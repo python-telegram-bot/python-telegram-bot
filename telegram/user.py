@@ -19,6 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram User."""
 
+from dataclasses import dataclass
 from telegram import TelegramObject
 from telegram.utils.helpers import mention_html as util_mention_html
 from telegram.utils.helpers import mention_markdown as util_mention_markdown
@@ -29,6 +30,7 @@ if TYPE_CHECKING:
     from telegram import Bot, UserProfilePhotos, Message
 
 
+@dataclass(eq=False)
 class User(TelegramObject):
     """This object represents a Telegram user or bot.
 
@@ -67,31 +69,20 @@ class User(TelegramObject):
 
     """
 
-    def __init__(self,
-                 id: int,
-                 first_name: str,
-                 is_bot: bool,
-                 last_name: str = None,
-                 username: str = None,
-                 language_code: str = None,
-                 can_join_groups: bool = None,
-                 can_read_all_group_messages: bool = None,
-                 supports_inline_queries: bool = None,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
-        # Required
-        self.id = int(id)
-        self.first_name = first_name
-        self.is_bot = is_bot
-        # Optionals
-        self.last_name = last_name
-        self.username = username
-        self.language_code = language_code
-        self.can_join_groups = can_join_groups
-        self.can_read_all_group_messages = can_read_all_group_messages
-        self.supports_inline_queries = supports_inline_queries
-        self.bot = bot
+    # Required
+    id: int
+    first_name: str
+    is_bot: bool
+    # Optionals
+    last_name: str = None
+    username: str = None
+    language_code: str = None
+    can_join_groups: bool = None
+    can_read_all_group_messages: bool = None
+    supports_inline_queries: bool = None
+    bot: 'Bot' = None
 
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.id,)
 
     @property

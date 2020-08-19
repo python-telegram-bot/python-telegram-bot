@@ -17,13 +17,16 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatPhoto."""
+
+from dataclasses import dataclass
 from telegram import TelegramObject
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot, File
 
 
+@dataclass(eq=False)
 class ChatPhoto(TelegramObject):
     """This object represents a chat photo.
 
@@ -61,20 +64,13 @@ class ChatPhoto(TelegramObject):
 
     """
 
-    def __init__(self,
-                 small_file_id: str,
-                 small_file_unique_id: str,
-                 big_file_id: str,
-                 big_file_unique_id: str,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
-        self.small_file_id = small_file_id
-        self.small_file_unique_id = small_file_unique_id
-        self.big_file_id = big_file_id
-        self.big_file_unique_id = big_file_unique_id
+    small_file_id: str
+    small_file_unique_id: str
+    big_file_id: str
+    big_file_unique_id: str
+    bot: Optional['Bot'] = None
 
-        self.bot = bot
-
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.small_file_unique_id, self.big_file_unique_id,)
 
     def get_small_file(self, timeout: int = None, **kwargs: Any) -> 'File':

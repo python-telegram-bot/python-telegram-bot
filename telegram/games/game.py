@@ -20,6 +20,7 @@
 
 import sys
 
+from dataclasses import dataclass
 from telegram import MessageEntity, TelegramObject, Animation, PhotoSize
 from telegram.utils.types import JSONDict
 from typing import List, Any, Dict, Optional, TYPE_CHECKING
@@ -27,6 +28,7 @@ if TYPE_CHECKING:
     from telegram import Bot
 
 
+@dataclass(eq=False)
 class Game(TelegramObject):
     """
     This object represents a game. Use BotFather to create and edit games, their short names will
@@ -64,22 +66,17 @@ class Game(TelegramObject):
 
     """
 
-    def __init__(self,
-                 title: str,
-                 description: str,
-                 photo: List[PhotoSize],
-                 text: str = None,
-                 text_entities: List[MessageEntity] = None,
-                 animation: Animation = None,
-                 **kwargs: Any):
-        # Required
-        self.title = title
-        self.description = description
-        self.photo = photo
-        # Optionals
-        self.text = text
-        self.text_entities = text_entities or list()
-        self.animation = animation
+    # Required
+    title: str
+    description: str
+    photo: List[PhotoSize]
+    # Optionals
+    text: Optional[str] = None
+    text_entities: Optional[List[MessageEntity]] = None
+    animation: Optional[Animation] = None
+
+    def __post_init__(self, **kwargs: Any) -> None:
+        self.text_entities = self.text_entities or list()
 
         self._id_attrs = (self.title, self.description, self.photo)
 

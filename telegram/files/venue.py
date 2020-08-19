@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Venue."""
 
+from dataclasses import dataclass
 from telegram import TelegramObject, Location
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, TYPE_CHECKING
@@ -25,6 +26,7 @@ if TYPE_CHECKING:
     from telegram import Bot
 
 
+@dataclass(eq=False)
 class Venue(TelegramObject):
     """This object represents a venue.
 
@@ -50,21 +52,15 @@ class Venue(TelegramObject):
 
     """
 
-    def __init__(self,
-                 location: Location,
-                 title: str,
-                 address: str,
-                 foursquare_id: str = None,
-                 foursquare_type: str = None,
-                 **kwargs: Any):
-        # Required
-        self.location = location
-        self.title = title
-        self.address = address
-        # Optionals
-        self.foursquare_id = foursquare_id
-        self.foursquare_type = foursquare_type
+    # Required
+    location: Location
+    title: str
+    address: str
+    # Optionals
+    foursquare_id: Optional[str] = None
+    foursquare_type: Optional[str] = None
 
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.location, self.title)
 
     @classmethod

@@ -18,10 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram LabeledPrice."""
 
+from dataclasses import dataclass
 from telegram import TelegramObject
 from typing import Any
 
 
+@dataclass(eq=False)
 class LabeledPrice(TelegramObject):
     """This object represents a portion of the price for goods or services.
 
@@ -42,8 +44,8 @@ class LabeledPrice(TelegramObject):
 
     """
 
-    def __init__(self, label: str, amount: int, **kwargs: Any):
-        self.label = label
-        self.amount = amount
+    label: str
+    amount: int
 
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.label, self.amount)

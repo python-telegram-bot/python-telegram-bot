@@ -18,13 +18,15 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultMpeg4Gif."""
 
+from dataclasses import dataclass
 from telegram import InlineQueryResult
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
-from typing import Any, Union, TYPE_CHECKING
+from typing import Any, Optional, Union, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
 
 
+@dataclass(eq=False)
 class InlineQueryResultMpeg4Gif(InlineQueryResult):
     """
     Represents a link to a video animation (H.264/MPEG-4 AVC video without sound). By default, this
@@ -75,33 +77,20 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 mpeg4_url: str,
-                 thumb_url: str,
-                 mpeg4_width: int = None,
-                 mpeg4_height: int = None,
-                 title: str = None,
-                 caption: str = None,
-                 reply_markup: 'ReplyMarkup' = None,
-                 input_message_content: 'InputMessageContent' = None,
-                 mpeg4_duration: int = None,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-                 thumb_mime_type: str = None,
-                 **kwargs: Any):
+    # Required
+    id: str
+    mpeg4_url: str
+    thumb_url: str
+    # Optional
+    mpeg4_width: Optional[int] = None
+    mpeg4_height: Optional[int] = None
+    title: Optional[str] = None
+    caption: Optional[str] = None
+    reply_markup: Optional['ReplyMarkup'] = None
+    input_message_content: Optional['InputMessageContent'] = None
+    mpeg4_duration: Optional[int] = None
+    parse_mode: Optional[Union[str, DefaultValue]] = DEFAULT_NONE
+    thumb_mime_type: Optional[str] = None
 
-        # Required
-        super().__init__('mpeg4_gif', id)
-        self.mpeg4_url = mpeg4_url
-        self.thumb_url = thumb_url
-
-        # Optional
-        self.mpeg4_width = mpeg4_width
-        self.mpeg4_height = mpeg4_height
-        self.mpeg4_duration = mpeg4_duration
-        self.title = title
-        self.caption = caption
-        self.parse_mode = parse_mode
-        self.reply_markup = reply_markup
-        self.input_message_content = input_message_content
-        self.thumb_mime_type = thumb_mime_type
+    def __post_init__(self, **kwargs: Any) -> None:
+        super().__init__('mpeg4_gif', self.id)

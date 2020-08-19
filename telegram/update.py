@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Update."""
 
+from dataclasses import dataclass
 from telegram import (Message, TelegramObject, InlineQuery, ChosenInlineResult,
                       CallbackQuery, ShippingQuery, PreCheckoutQuery, Poll)
 from telegram.poll import PollAnswer
@@ -28,6 +29,7 @@ if TYPE_CHECKING:
     from telegram import Bot, User, Chat  # noqa
 
 
+@dataclass(eq=False)
 class Update(TelegramObject):
     """This object represents an incoming update.
 
@@ -85,36 +87,21 @@ class Update(TelegramObject):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
+    update_id: int
+    # Optionals
+    message: Optional[Message] = None
+    edited_message: Optional[Message] = None
+    channel_post: Optional[Message] = None
+    edited_channel_post: Optional[Message] = None
+    inline_query: Optional[InlineQuery] = None
+    chosen_inline_result: Optional[ChosenInlineResult] = None
+    callback_query: Optional[CallbackQuery] = None
+    shipping_query: Optional[ShippingQuery] = None
+    pre_checkout_query: Optional[PreCheckoutQuery] = None
+    poll: Optional[Poll] = None
+    poll_answer: Optional[PollAnswer] = None
 
-    def __init__(self,
-                 update_id: int,
-                 message: Message = None,
-                 edited_message: Message = None,
-                 channel_post: Message = None,
-                 edited_channel_post: Message = None,
-                 inline_query: InlineQuery = None,
-                 chosen_inline_result: ChosenInlineResult = None,
-                 callback_query: CallbackQuery = None,
-                 shipping_query: ShippingQuery = None,
-                 pre_checkout_query: PreCheckoutQuery = None,
-                 poll: Poll = None,
-                 poll_answer: PollAnswer = None,
-                 **kwargs: Any):
-        # Required
-        self.update_id = int(update_id)
-        # Optionals
-        self.message = message
-        self.edited_message = edited_message
-        self.inline_query = inline_query
-        self.chosen_inline_result = chosen_inline_result
-        self.callback_query = callback_query
-        self.shipping_query = shipping_query
-        self.pre_checkout_query = pre_checkout_query
-        self.channel_post = channel_post
-        self.edited_channel_post = edited_channel_post
-        self.poll = poll
-        self.poll_answer = poll_answer
-
+    def __post_init__(self, **kwargs: Any) -> None:
         self._effective_user: Optional['User'] = None
         self._effective_chat: Optional['Chat'] = None
         self._effective_message: Optional[Message] = None

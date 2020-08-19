@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Encrypted PassportFile."""
 
+from dataclasses import dataclass
 from telegram import TelegramObject
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, List, TYPE_CHECKING
@@ -25,6 +26,7 @@ if TYPE_CHECKING:
     from telegram import Bot, File, FileCredentials
 
 
+@dataclass(eq=False)
 class PassportFile(TelegramObject):
     """
     This object represents a file uploaded to Telegram Passport. Currently all Telegram Passport
@@ -54,24 +56,18 @@ class PassportFile(TelegramObject):
 
     """
 
-    def __init__(self,
-                 file_id: str,
-                 file_unique_id: str,
-                 file_date: int,
-                 file_size: int = None,
-                 bot: 'Bot' = None,
-                 credentials: 'FileCredentials' = None,
-                 **kwargs: Any):
-        # Required
-        self.file_id = file_id
-        self.file_unique_id = file_unique_id
-        self.file_size = file_size
-        self.file_date = file_date
-        # Optionals
-        self.bot = bot
-        self._credentials = credentials
+    # Required
+    file_id: str
+    file_unique_id: str
+    file_date: int
+    # Optionals
+    file_size: Optional[int] = None
+    bot: Optional['Bot'] = None
+    credentials: Optional['FileCredentials'] = None
 
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.file_unique_id,)
+        self._credentials = self.credentials
 
     @classmethod
     def de_json_decrypted(cls,

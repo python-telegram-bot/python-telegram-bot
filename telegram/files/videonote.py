@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram VideoNote."""
 
+from dataclasses import dataclass
 from telegram import PhotoSize, TelegramObject
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, TYPE_CHECKING
@@ -25,6 +26,7 @@ if TYPE_CHECKING:
     from telegram import Bot, File
 
 
+@dataclass(eq=False)
 class VideoNote(TelegramObject):
     """This object represents a video message (available in Telegram apps as of v.4.0).
 
@@ -56,24 +58,21 @@ class VideoNote(TelegramObject):
 
     """
 
-    def __init__(self,
-                 file_id: str,
-                 file_unique_id: str,
-                 length: int,
-                 duration: int,
-                 thumb: PhotoSize = None,
-                 file_size: int = None,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
-        # Required
-        self.file_id = str(file_id)
-        self.file_unique_id = str(file_unique_id)
-        self.length = int(length)
-        self.duration = int(duration)
-        # Optionals
-        self.thumb = thumb
-        self.file_size = file_size
-        self.bot = bot
+    # Required
+    file_id: str
+    file_unique_id: str
+    length: int
+    duration: int
+    # Optionals
+    thumb: Optional[PhotoSize] = None
+    file_size: Optional[int] = None
+    bot: Optional['Bot'] = None
+
+    def __post_init__(self, **kwargs: Any) -> None:
+        self.file_id = str(self.file_id)
+        self.file_unique_id = str(self.file_unique_id)
+        self.length = int(self.length)
+        self.duration = int(self.duration)
 
         self._id_attrs = (self.file_unique_id,)
 

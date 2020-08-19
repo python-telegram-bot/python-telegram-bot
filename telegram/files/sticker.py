@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represents stickers."""
 
+from dataclasses import dataclass
 from telegram import PhotoSize, TelegramObject
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, List, TYPE_CHECKING
@@ -25,6 +26,7 @@ if TYPE_CHECKING:
     from telegram import Bot, File
 
 
+@dataclass(eq=False)
 class Sticker(TelegramObject):
     """This object represents a sticker.
 
@@ -69,32 +71,25 @@ class Sticker(TelegramObject):
 
     """
 
-    def __init__(self,
-                 file_id: str,
-                 file_unique_id: str,
-                 width: int,
-                 height: int,
-                 is_animated: bool,
-                 thumb: PhotoSize = None,
-                 emoji: str = None,
-                 file_size: int = None,
-                 set_name: str = None,
-                 mask_position: 'MaskPosition' = None,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
-        # Required
-        self.file_id = str(file_id)
-        self.file_unique_id = str(file_unique_id)
-        self.width = int(width)
-        self.height = int(height)
-        self.is_animated = is_animated
-        # Optionals
-        self.thumb = thumb
-        self.emoji = emoji
-        self.file_size = file_size
-        self.set_name = set_name
-        self.mask_position = mask_position
-        self.bot = bot
+    # Required
+    file_id: str
+    file_unique_id: str
+    width: int
+    height: int
+    is_animated: bool
+    # Optionals
+    thumb: Optional[PhotoSize] = None
+    emoji: Optional[str] = None
+    file_size: Optional[int] = None
+    set_name: Optional[str] = None
+    mask_position: Optional['MaskPosition'] = None
+    bot: Optional['Bot'] = None
+
+    def __post_init__(self, **kwargs: Any) -> None:
+        self.file_id = str(self.file_id)
+        self.file_unique_id = str(self.file_unique_id)
+        self.width = int(self.width)
+        self.height = int(self.height)
 
         self._id_attrs = (self.file_unique_id,)
 

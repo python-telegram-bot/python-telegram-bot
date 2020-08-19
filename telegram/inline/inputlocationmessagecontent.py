@@ -18,10 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputLocationMessageContent."""
 
+from dataclasses import dataclass
 from telegram import InputMessageContent
-from typing import Any
+from typing import Any, Optional
 
 
+@dataclass(eq=False)
 class InputLocationMessageContent(InputMessageContent):
     """
     Represents the content of a location message to be sent as the result of an inline query.
@@ -44,10 +46,10 @@ class InputLocationMessageContent(InputMessageContent):
 
     """
 
-    def __init__(self, latitude: float, longitude: float, live_period: int = None, **kwargs: Any):
-        # Required
-        self.latitude = latitude
-        self.longitude = longitude
-        self.live_period = live_period
+    # Required
+    latitude: float
+    longitude: float
+    live_period: Optional[int] = None
 
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.latitude, self.longitude)

@@ -18,11 +18,30 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Dice."""
+from dataclasses import dataclass
 from telegram import TelegramObject
-from typing import Any, List
+from typing import Any, List, Optional, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
-class Dice(TelegramObject):
+class _Dice:
+    """This object only for storing constants of Dice
+    """
+
+    DICE: str = '🎲'
+    """:obj:`str`: '🎲'"""
+    DARTS: str = '🎯'
+    """:obj:`str`: '🎯'"""
+    BASKETBALL = '🏀'
+    """:obj:`str`: '🏀'"""
+    ALL_EMOJI: List[str] = [DICE, DARTS, BASKETBALL]
+    """List[:obj:`str`]: List of all supported base emoji. Currently :attr:`DICE`,
+    :attr:`DARTS` and :attr:`BASKETBALL`."""
+
+
+@dataclass(eq=False)
+class Dice(TelegramObject, _Dice):
     """
     This object represents an animated emoji with a random value for currently supported base
     emoji. (The singular form of "dice" is "die". However, PTB mimics the Telegram API, which uses
@@ -48,18 +67,10 @@ class Dice(TelegramObject):
         value (:obj:`int`): Value of the dice. 1-6 for dice and darts, 1-5 for basketball.
         emoji (:obj:`str`): Emoji on which the dice throw animation is based.
     """
-    def __init__(self, value: int, emoji: str, **kwargs: Any):
-        self.value = value
-        self.emoji = emoji
 
+    value: int
+    emoji: str
+    bot: Optional['Bot'] = None
+
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.value, self.emoji)
-
-    DICE: str = '🎲'
-    """:obj:`str`: '🎲'"""
-    DARTS: str = '🎯'
-    """:obj:`str`: '🎯'"""
-    BASKETBALL = '🏀'
-    """:obj:`str`: '🏀'"""
-    ALL_EMOJI: List[str] = [DICE, DARTS, BASKETBALL]
-    """List[:obj:`str`]: List of all supported base emoji. Currently :attr:`DICE`,
-    :attr:`DARTS` and :attr:`BASKETBALL`."""

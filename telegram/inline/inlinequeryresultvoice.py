@@ -18,13 +18,15 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultVoice."""
 
+from dataclasses import dataclass
 from telegram import InlineQueryResult
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
-from typing import Any, Union, TYPE_CHECKING
+from typing import Any, Optional, Union, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
 
 
+@dataclass(eq=False)
 class InlineQueryResultVoice(InlineQueryResult):
     """
     Represents a link to a voice recording in an .ogg container encoded with OPUS. By default,
@@ -64,25 +66,16 @@ class InlineQueryResultVoice(InlineQueryResult):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 voice_url: str,
-                 title: str,
-                 voice_duration: int = None,
-                 caption: str = None,
-                 reply_markup: 'ReplyMarkup' = None,
-                 input_message_content: 'InputMessageContent' = None,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-                 **kwargs: Any):
+    # Required
+    id: str
+    voice_url: str
+    title: str
+    # Optional
+    voice_duration: Optional[int] = None
+    caption: Optional[str] = None
+    reply_markup: Optional['ReplyMarkup'] = None
+    input_message_content: Optional['InputMessageContent'] = None
+    parse_mode: Optional[Union[str, DefaultValue]] = DEFAULT_NONE
 
-        # Required
-        super().__init__('voice', id)
-        self.voice_url = voice_url
-        self.title = title
-
-        # Optional
-        self.voice_duration = voice_duration
-        self.caption = caption
-        self.parse_mode = parse_mode
-        self.reply_markup = reply_markup
-        self.input_message_content = input_message_content
+    def __post_init__(self, **kwargs: Any) -> None:
+        super().__init__('voice', self.id)

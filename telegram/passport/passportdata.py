@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Contains information about Telegram Passport data shared with the bot by the user."""
 
+from dataclasses import dataclass
 from telegram import EncryptedCredentials, EncryptedPassportElement, TelegramObject
 
 from telegram.utils.types import JSONDict
@@ -26,6 +27,7 @@ if TYPE_CHECKING:
     from telegram import Bot, Credentials
 
 
+@dataclass(eq=False)
 class PassportData(TelegramObject):
     """Contains information about Telegram Passport data shared with the bot by the user.
 
@@ -50,17 +52,13 @@ class PassportData(TelegramObject):
 
     """
 
-    def __init__(self,
-                 data: List[EncryptedPassportElement],
-                 credentials: EncryptedCredentials,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
-        self.data = data
-        self.credentials = credentials
+    data: List[EncryptedPassportElement]
+    credentials: EncryptedCredentials
+    bot: Optional['Bot'] = None
 
-        self.bot = bot
+    def __post_init__(self, **kwargs: Any) -> None:
         self._decrypted_data: Optional[List[EncryptedPassportElement]] = None
-        self._id_attrs = tuple([x.type for x in data] + [credentials.hash])
+        self._id_attrs = tuple([x.type for x in self.data] + [self.credentials.hash])
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['PassportData']:

@@ -18,10 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputVenueMessageContent."""
 
+from dataclasses import dataclass
 from telegram import InputMessageContent
-from typing import Any
+from typing import Any, Optional
 
 
+@dataclass(eq=False)
 class InputVenueMessageContent(InputMessageContent):
     """Represents the content of a venue message to be sent as the result of an inline query.
 
@@ -52,23 +54,16 @@ class InputVenueMessageContent(InputMessageContent):
 
     """
 
-    def __init__(self,
-                 latitude: float,
-                 longitude: float,
-                 title: str,
-                 address: str,
-                 foursquare_id: str = None,
-                 foursquare_type: str = None,
-                 **kwargs: Any):
-        # Required
-        self.latitude = latitude
-        self.longitude = longitude
-        self.title = title
-        self.address = address
-        # Optionals
-        self.foursquare_id = foursquare_id
-        self.foursquare_type = foursquare_type
+    # Required
+    latitude: float
+    longitude: float
+    title: str
+    address: str
+    # Optionals
+    foursquare_id: Optional[str] = None
+    foursquare_type: Optional[str] = None
 
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (
             self.latitude,
             self.longitude,

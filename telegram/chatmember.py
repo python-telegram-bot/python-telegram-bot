@@ -19,6 +19,7 @@
 """This module contains an object that represents a Telegram ChatMember."""
 import datetime
 
+from dataclasses import dataclass
 from telegram import User, TelegramObject
 from telegram.utils.helpers import to_timestamp, from_timestamp
 
@@ -28,7 +29,26 @@ if TYPE_CHECKING:
     from telegram import Bot
 
 
-class ChatMember(TelegramObject):
+class _ChatMember:
+    """This object only for storing constants of ChatMember
+    """
+
+    ADMINISTRATOR: str = 'administrator'
+    """:obj:`str`: 'administrator'"""
+    CREATOR: str = 'creator'
+    """:obj:`str`: 'creator'"""
+    KICKED: str = 'kicked'
+    """:obj:`str`: 'kicked'"""
+    LEFT: str = 'left'
+    """:obj:`str`: 'left'"""
+    MEMBER: str = 'member'
+    """:obj:`str`: 'member'"""
+    RESTRICTED: str = 'restricted'
+    """:obj:`str`: 'restricted'"""
+
+
+@dataclass(eq=False)
+class ChatMember(TelegramObject, _ChatMember):
     """This object contains information about one member of the chat.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -111,61 +131,30 @@ class ChatMember(TelegramObject):
             web page previews to his messages, implies can_send_media_messages.
 
     """
-    ADMINISTRATOR: str = 'administrator'
-    """:obj:`str`: 'administrator'"""
-    CREATOR: str = 'creator'
-    """:obj:`str`: 'creator'"""
-    KICKED: str = 'kicked'
-    """:obj:`str`: 'kicked'"""
-    LEFT: str = 'left'
-    """:obj:`str`: 'left'"""
-    MEMBER: str = 'member'
-    """:obj:`str`: 'member'"""
-    RESTRICTED: str = 'restricted'
-    """:obj:`str`: 'restricted'"""
 
-    def __init__(self,
-                 user: User,
-                 status: str,
-                 until_date: datetime.datetime = None,
-                 can_be_edited: bool = None,
-                 can_change_info: bool = None,
-                 can_post_messages: bool = None,
-                 can_edit_messages: bool = None,
-                 can_delete_messages: bool = None,
-                 can_invite_users: bool = None,
-                 can_restrict_members: bool = None,
-                 can_pin_messages: bool = None,
-                 can_promote_members: bool = None,
-                 can_send_messages: bool = None,
-                 can_send_media_messages: bool = None,
-                 can_send_polls: bool = None,
-                 can_send_other_messages: bool = None,
-                 can_add_web_page_previews: bool = None,
-                 is_member: bool = None,
-                 custom_title: str = None,
-                 **kwargs: Any):
-        # Required
-        self.user = user
-        self.status = status
-        self.custom_title = custom_title
-        self.until_date = until_date
-        self.can_be_edited = can_be_edited
-        self.can_change_info = can_change_info
-        self.can_post_messages = can_post_messages
-        self.can_edit_messages = can_edit_messages
-        self.can_delete_messages = can_delete_messages
-        self.can_invite_users = can_invite_users
-        self.can_restrict_members = can_restrict_members
-        self.can_pin_messages = can_pin_messages
-        self.can_promote_members = can_promote_members
-        self.can_send_messages = can_send_messages
-        self.can_send_media_messages = can_send_media_messages
-        self.can_send_polls = can_send_polls
-        self.can_send_other_messages = can_send_other_messages
-        self.can_add_web_page_previews = can_add_web_page_previews
-        self.is_member = is_member
+    # Required
+    user: User
+    status: str
+    # Optionals
+    until_date: Optional[datetime.datetime] = None
+    can_be_edited: Optional[bool] = None
+    can_change_info: Optional[bool] = None
+    can_post_messages: Optional[bool] = None
+    can_edit_messages: Optional[bool] = None
+    can_delete_messages: Optional[bool] = None
+    can_invite_users: Optional[bool] = None
+    can_restrict_members: Optional[bool] = None
+    can_pin_messages: Optional[bool] = None
+    can_promote_members: Optional[bool] = None
+    can_send_messages: Optional[bool] = None
+    can_send_media_messages: Optional[bool] = None
+    can_send_polls: Optional[bool] = None
+    can_send_other_messages: Optional[bool] = None
+    can_add_web_page_previews: Optional[bool] = None
+    is_member: Optional[bool] = None
+    custom_title: Optional[str] = None
 
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.user, self.status)
 
     @classmethod

@@ -18,10 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatPermission."""
 
+from dataclasses import dataclass
 from telegram import TelegramObject
-from typing import Any
+from typing import Any, Optional
 
 
+@dataclass(eq=False)
 class ChatPermissions(TelegramObject):
     """Describes actions that a non-administrator user is allowed to take in a chat.
 
@@ -77,26 +79,16 @@ class ChatPermissions(TelegramObject):
 
     """
 
-    def __init__(self,
-                 can_send_messages: bool = None,
-                 can_send_media_messages: bool = None,
-                 can_send_polls: bool = None,
-                 can_send_other_messages: bool = None,
-                 can_add_web_page_previews: bool = None,
-                 can_change_info: bool = None,
-                 can_invite_users: bool = None,
-                 can_pin_messages: bool = None,
-                 **kwargs: Any):
-        # Required
-        self.can_send_messages = can_send_messages
-        self.can_send_media_messages = can_send_media_messages
-        self.can_send_polls = can_send_polls
-        self.can_send_other_messages = can_send_other_messages
-        self.can_add_web_page_previews = can_add_web_page_previews
-        self.can_change_info = can_change_info
-        self.can_invite_users = can_invite_users
-        self.can_pin_messages = can_pin_messages
+    can_send_messages: Optional[bool] = None
+    can_send_media_messages: Optional[bool] = None
+    can_send_polls: Optional[bool] = None
+    can_send_other_messages: Optional[bool] = None
+    can_add_web_page_previews: Optional[bool] = None
+    can_change_info: Optional[bool] = None
+    can_invite_users: Optional[bool] = None
+    can_pin_messages: Optional[bool] = None
 
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (
             self.can_send_messages,
             self.can_send_media_messages,

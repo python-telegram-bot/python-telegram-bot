@@ -19,6 +19,7 @@
 """This module contains an object that represents a Telegram EncryptedPassportElement."""
 from base64 import b64decode
 
+from dataclasses import dataclass
 from telegram import (IdDocumentData, PassportFile, PersonalDetails,
                       ResidentialAddress, TelegramObject)
 from telegram.passport.credentials import decrypt_json
@@ -29,6 +30,7 @@ if TYPE_CHECKING:
     from telegram import Bot, Credentials
 
 
+@dataclass(eq=False)
 class EncryptedPassportElement(TelegramObject):
     """
     Contains information about documents or other Telegram Passport elements shared with the bot
@@ -110,37 +112,24 @@ class EncryptedPassportElement(TelegramObject):
         :obj:`telegram.PassportData.decrypted_data`.
     """
 
-    def __init__(self,
-                 type: str,
-                 data: PersonalDetails = None,
-                 phone_number: str = None,
-                 email: str = None,
-                 files: List[PassportFile] = None,
-                 front_side: PassportFile = None,
-                 reverse_side: PassportFile = None,
-                 selfie: PassportFile = None,
-                 translation: List[PassportFile] = None,
-                 hash: str = None,
-                 bot: 'Bot' = None,
-                 credentials: 'Credentials' = None,
-                 **kwargs: Any):
-        # Required
-        self.type = type
-        # Optionals
-        self.data = data
-        self.phone_number = phone_number
-        self.email = email
-        self.files = files
-        self.front_side = front_side
-        self.reverse_side = reverse_side
-        self.selfie = selfie
-        self.translation = translation
-        self.hash = hash
+    # Required
+    type: str
+    # Optionals
+    data: Optional[PersonalDetails] = None
+    phone_number: Optional[str] = None
+    email: Optional[str] = None
+    files: Optional[List[PassportFile]] = None
+    front_side: Optional[PassportFile] = None
+    reverse_side: Optional[PassportFile] = None
+    selfie: Optional[PassportFile] = None
+    translation: Optional[List[PassportFile]] = None
+    hash: Optional[str] = None
+    bot: Optional['Bot'] = None
+    credentials: Optional['Credentials'] = None
 
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.type, self.data, self.phone_number, self.email, self.files,
                           self.front_side, self.reverse_side, self.selfie)
-
-        self.bot = bot
 
     @classmethod
     def de_json(cls,

@@ -18,11 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputTextMessageContent."""
 
+from dataclasses import dataclass
 from telegram import InputMessageContent
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
-from typing import Any, Union
+from typing import Any, Optional, Union
 
 
+@dataclass(eq=False)
 class InputTextMessageContent(InputMessageContent):
     """
     Represents the content of a text message to be sent as the result of an inline query.
@@ -49,15 +51,11 @@ class InputTextMessageContent(InputMessageContent):
 
     """
 
-    def __init__(self,
-                 message_text: str,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-                 disable_web_page_preview: Union[bool, DefaultValue] = DEFAULT_NONE,
-                 **kwargs: Any):
-        # Required
-        self.message_text = message_text
-        # Optionals
-        self.parse_mode = parse_mode
-        self.disable_web_page_preview = disable_web_page_preview
+    # Required
+    message_text: str
+    # Optionals
+    parse_mode: Optional[Union[str, DefaultValue]] = DEFAULT_NONE
+    disable_web_page_preview: Optional[Union[bool, DefaultValue]] = DEFAULT_NONE
 
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.message_text,)

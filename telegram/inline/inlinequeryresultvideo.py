@@ -18,13 +18,15 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultVideo."""
 
+from dataclasses import dataclass
 from telegram import InlineQueryResult
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
-from typing import Any, Union, TYPE_CHECKING
+from typing import Any, Optional, Union, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
 
 
+@dataclass(eq=False)
 class InlineQueryResultVideo(InlineQueryResult):
     """
     Represents a link to a page containing an embedded video player or a video file. By default,
@@ -83,35 +85,21 @@ class InlineQueryResultVideo(InlineQueryResult):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 video_url: str,
-                 mime_type: str,
-                 thumb_url: str,
-                 title: str,
-                 caption: str = None,
-                 video_width: int = None,
-                 video_height: int = None,
-                 video_duration: int = None,
-                 description: str = None,
-                 reply_markup: 'ReplyMarkup' = None,
-                 input_message_content: 'InputMessageContent' = None,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-                 **kwargs: Any):
+    # Required
+    id: str
+    video_url: str
+    mime_type: str
+    thumb_url: str
+    title: str
+    # Optional
+    caption: Optional[str] = None
+    video_width: Optional[int] = None
+    video_height: Optional[int] = None
+    video_duration: Optional[int] = None
+    description: Optional[str] = None
+    reply_markup: Optional['ReplyMarkup'] = None
+    input_message_content: Optional['InputMessageContent'] = None
+    parse_mode: Optional[Union[str, DefaultValue]] = DEFAULT_NONE
 
-        # Required
-        super().__init__('video', id)
-        self.video_url = video_url
-        self.mime_type = mime_type
-        self.thumb_url = thumb_url
-        self.title = title
-
-        # Optional
-        self.caption = caption
-        self.parse_mode = parse_mode
-        self.video_width = video_width
-        self.video_height = video_height
-        self.video_duration = video_duration
-        self.description = description
-        self.reply_markup = reply_markup
-        self.input_message_content = input_message_content
+    def __post_init__(self, **kwargs: Any) -> None:
+        super().__init__('video', self.id)

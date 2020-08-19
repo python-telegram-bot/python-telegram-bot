@@ -18,10 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram KeyboardButton."""
 
+from dataclasses import dataclass
 from telegram import TelegramObject
-from typing import Any
+from typing import Any, Optional
 
 
+@dataclass(eq=False)
 class KeyboardButton(TelegramObject):
     """
     This object represents one button of the reply keyboard. For simple text buttons String can be
@@ -60,18 +62,13 @@ class KeyboardButton(TelegramObject):
 
     """
 
-    def __init__(self,
-                 text: str,
-                 request_contact: bool = None,
-                 request_location: bool = None,
-                 request_poll: bool = None,
-                 **kwargs: Any):
-        # Required
-        self.text = text
-        # Optionals
-        self.request_contact = request_contact
-        self.request_location = request_location
-        self.request_poll = request_poll
+    # Required
+    text: str
+    # Optionals
+    request_contact: Optional[bool] = None
+    request_location: Optional[bool] = None
+    request_poll: Optional[bool] = None
 
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.text, self.request_contact, self.request_location,
                           self.request_poll)

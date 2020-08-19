@@ -20,6 +20,7 @@
 """This module contains an object that represents a Telegram Message."""
 import sys
 import datetime
+from dataclasses import dataclass
 from html import escape
 
 from telegram import (Animation, Audio, Contact, Document, Chat, Location, PhotoSize, Sticker,
@@ -36,7 +37,24 @@ if TYPE_CHECKING:
 _UNDEFINED = object()
 
 
-class Message(TelegramObject):
+class _Message:
+    """This object only for storing constants of Message
+    """
+
+    _effective_attachment = _UNDEFINED
+
+    ATTACHMENT_TYPES = ['audio', 'game', 'animation', 'document', 'photo', 'sticker', 'video',
+                        'voice', 'video_note', 'contact', 'location', 'venue', 'invoice',
+                        'successful_payment']
+    MESSAGE_TYPES = ['text', 'new_chat_members', 'left_chat_member', 'new_chat_title',
+                     'new_chat_photo', 'delete_chat_photo', 'group_chat_created',
+                     'supergroup_chat_created', 'channel_chat_created', 'migrate_to_chat_id',
+                     'migrate_from_chat_id', 'pinned_message', 'poll', 'dice',
+                     'passport_data'] + ATTACHMENT_TYPES
+
+
+@dataclass(eq=False)
+class Message(TelegramObject, _Message):
     """This object represents a message.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -231,122 +249,71 @@ class Message(TelegramObject):
 
     """
 
-    _effective_attachment = _UNDEFINED
+    # Required
+    message_id: int
+    date: datetime.datetime
+    chat: Chat
+    # Optionals
+    from_user: Optional[User] = None
+    forward_from: Optional[User] = None
+    forward_from_chat: Optional[Chat] = None
+    forward_from_message_id: Optional[int] = None
+    forward_date: Optional[datetime.datetime] = None
+    reply_to_message: Optional['Message'] = None
+    edit_date: Optional[datetime.datetime] = None
+    text: Optional[str] = None
+    entities: Optional[List[MessageEntity]] = None
+    caption_entities: Optional[List[MessageEntity]] = None
+    audio: Optional[Audio] = None
+    document: Optional[Document] = None
+    game: Optional[Game] = None
+    photo: Optional[List[PhotoSize]] = None
+    sticker: Optional[Sticker] = None
+    video: Optional[Video] = None
+    voice: Optional[Voice] = None
+    video_note: Optional[VideoNote] = None
+    new_chat_members: Optional[List[User]] = None
+    caption: Optional[str] = None
+    contact: Optional[Contact] = None
+    location: Optional[Location] = None
+    venue: Optional[Venue] = None
+    left_chat_member: Optional[User] = None
+    new_chat_title: Optional[str] = None
+    new_chat_photo: Optional[List[PhotoSize]] = None
+    delete_chat_photo: bool = False
+    group_chat_created: bool = False
+    supergroup_chat_created: bool = False
+    channel_chat_created: bool = False
+    migrate_to_chat_id: Optional[int] = None
+    migrate_from_chat_id: Optional[int] = None
+    pinned_message: Optional['Message'] = None
+    invoice: Optional[Invoice] = None
+    successful_payment: Optional[SuccessfulPayment] = None
+    forward_signature: Optional[str] = None
+    author_signature: Optional[str] = None
+    media_group_id: Optional[str] = None
+    connected_website: Optional[str] = None
+    animation: Optional[Animation] = None
+    passport_data: Optional[PassportData] = None
+    poll: Optional[Poll] = None
+    forward_sender_name: Optional[str] = None
+    reply_markup: Optional[InlineKeyboardMarkup] = None
+    bot: Optional['Bot'] = None
+    default_quote: Optional[bool] = None
+    dice: Optional[Dice] = None
+    via_bot: Optional[User] = None
 
-    ATTACHMENT_TYPES = ['audio', 'game', 'animation', 'document', 'photo', 'sticker', 'video',
-                        'voice', 'video_note', 'contact', 'location', 'venue', 'invoice',
-                        'successful_payment']
-    MESSAGE_TYPES = ['text', 'new_chat_members', 'left_chat_member', 'new_chat_title',
-                     'new_chat_photo', 'delete_chat_photo', 'group_chat_created',
-                     'supergroup_chat_created', 'channel_chat_created', 'migrate_to_chat_id',
-                     'migrate_from_chat_id', 'pinned_message', 'poll', 'dice',
-                     'passport_data'] + ATTACHMENT_TYPES
-
-    def __init__(self,
-                 message_id: int,
-                 date: datetime.datetime,
-                 chat: Chat,
-                 from_user: User = None,
-                 forward_from: User = None,
-                 forward_from_chat: Chat = None,
-                 forward_from_message_id: int = None,
-                 forward_date: datetime.datetime = None,
-                 reply_to_message: 'Message' = None,
-                 edit_date: datetime.datetime = None,
-                 text: str = None,
-                 entities: List[MessageEntity] = None,
-                 caption_entities: List[MessageEntity] = None,
-                 audio: Audio = None,
-                 document: Document = None,
-                 game: Game = None,
-                 photo: List[PhotoSize] = None,
-                 sticker: Sticker = None,
-                 video: Video = None,
-                 voice: Voice = None,
-                 video_note: VideoNote = None,
-                 new_chat_members: List[User] = None,
-                 caption: str = None,
-                 contact: Contact = None,
-                 location: Location = None,
-                 venue: Venue = None,
-                 left_chat_member: User = None,
-                 new_chat_title: str = None,
-                 new_chat_photo: List[PhotoSize] = None,
-                 delete_chat_photo: bool = False,
-                 group_chat_created: bool = False,
-                 supergroup_chat_created: bool = False,
-                 channel_chat_created: bool = False,
-                 migrate_to_chat_id: int = None,
-                 migrate_from_chat_id: int = None,
-                 pinned_message: 'Message' = None,
-                 invoice: Invoice = None,
-                 successful_payment: SuccessfulPayment = None,
-                 forward_signature: str = None,
-                 author_signature: str = None,
-                 media_group_id: str = None,
-                 connected_website: str = None,
-                 animation: Animation = None,
-                 passport_data: PassportData = None,
-                 poll: Poll = None,
-                 forward_sender_name: str = None,
-                 reply_markup: InlineKeyboardMarkup = None,
-                 bot: 'Bot' = None,
-                 default_quote: bool = None,
-                 dice: Dice = None,
-                 via_bot: User = None,
-                 **kwargs: Any):
-        # Required
-        self.message_id = int(message_id)
-        self.from_user = from_user
-        self.date = date
-        self.chat = chat
-        # Optionals
-        self.forward_from = forward_from
-        self.forward_from_chat = forward_from_chat
-        self.forward_date = forward_date
-        self.reply_to_message = reply_to_message
-        self.edit_date = edit_date
-        self.text = text
-        self.entities = entities or list()
-        self.caption_entities = caption_entities or list()
-        self.audio = audio
-        self.game = game
-        self.document = document
-        self.photo = photo or list()
-        self.sticker = sticker
-        self.video = video
-        self.voice = voice
-        self.video_note = video_note
-        self.caption = caption
-        self.contact = contact
-        self.location = location
-        self.venue = venue
-        self.new_chat_members = new_chat_members or list()
-        self.left_chat_member = left_chat_member
-        self.new_chat_title = new_chat_title
-        self.new_chat_photo = new_chat_photo or list()
-        self.delete_chat_photo = bool(delete_chat_photo)
-        self.group_chat_created = bool(group_chat_created)
-        self.supergroup_chat_created = bool(supergroup_chat_created)
-        self.migrate_to_chat_id = migrate_to_chat_id
-        self.migrate_from_chat_id = migrate_from_chat_id
-        self.channel_chat_created = bool(channel_chat_created)
-        self.pinned_message = pinned_message
-        self.forward_from_message_id = forward_from_message_id
-        self.invoice = invoice
-        self.successful_payment = successful_payment
-        self.connected_website = connected_website
-        self.forward_signature = forward_signature
-        self.forward_sender_name = forward_sender_name
-        self.author_signature = author_signature
-        self.media_group_id = media_group_id
-        self.animation = animation
-        self.passport_data = passport_data
-        self.poll = poll
-        self.dice = dice
-        self.via_bot = via_bot
-        self.reply_markup = reply_markup
-        self.bot = bot
+    def __post_init__(self, **kwargs: Any) -> None:
+        self.message_id = int(self.message_id)
+        self.entities = self.entities or list()
+        self.caption_entities = self.caption_entities or list()
+        self.photo = self.photo or list()
+        self.new_chat_members = self.new_chat_members or list()
+        self.new_chat_photo = self.new_chat_photo or list()
+        self.delete_chat_photo = bool(self.delete_chat_photo)
+        self.group_chat_created = bool(self.group_chat_created)
+        self.supergroup_chat_created = bool(self.supergroup_chat_created)
+        self.channel_chat_created = bool(self.channel_chat_created)
 
         self._id_attrs = (self.message_id, self.chat)
 
@@ -409,6 +376,8 @@ class Message(TelegramObject):
         data['via_bot'] = User.de_json(data.get('via_bot'), bot)
         data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
 
+        # Remove 'from' from data to prevent unexpected keyword argument
+        data.pop('from')
         return cls(bot=bot, **data)
 
     @property

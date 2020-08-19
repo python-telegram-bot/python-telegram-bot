@@ -18,13 +18,15 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultDocument"""
 
+from dataclasses import dataclass
 from telegram import InlineQueryResult
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
-from typing import Any, Union, TYPE_CHECKING
+from typing import Any, Optional, Union, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
 
 
+@dataclass(eq=False)
 class InlineQueryResultDocument(InlineQueryResult):
     """
     Represents a link to a file. By default, this file will be sent by the user with an optional
@@ -76,32 +78,20 @@ class InlineQueryResultDocument(InlineQueryResult):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 document_url: str,
-                 title: str,
-                 mime_type: str,
-                 caption: str = None,
-                 description: str = None,
-                 reply_markup: 'ReplyMarkup' = None,
-                 input_message_content: 'InputMessageContent' = None,
-                 thumb_url: str = None,
-                 thumb_width: int = None,
-                 thumb_height: int = None,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-                 **kwargs: Any):
-        # Required
-        super().__init__('document', id)
-        self.document_url = document_url
-        self.title = title
-        self.mime_type = mime_type
+    # Required
+    id: str
+    document_url: str
+    title: str
+    mime_type: str
+    # Optionals
+    caption: Optional[str] = None
+    description: Optional[str] = None
+    reply_markup: Optional['ReplyMarkup'] = None
+    input_message_content: Optional['InputMessageContent'] = None
+    thumb_url: Optional[str] = None
+    thumb_width: Optional[int] = None
+    thumb_height: Optional[int] = None
+    parse_mode: Optional[Union[str, DefaultValue]] = DEFAULT_NONE
 
-        # Optionals
-        self.caption = caption
-        self.parse_mode = parse_mode
-        self.description = description
-        self.reply_markup = reply_markup
-        self.input_message_content = input_message_content
-        self.thumb_url = thumb_url
-        self.thumb_width = thumb_width
-        self.thumb_height = thumb_height
+    def __post_init__(self, **kwargs: Any) -> None:
+        super().__init__('document', self.id)

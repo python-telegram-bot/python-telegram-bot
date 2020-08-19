@@ -18,12 +18,14 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultContact."""
 
+from dataclasses import dataclass
 from telegram import InlineQueryResult
-from typing import Any, TYPE_CHECKING
+from typing import Any, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import ReplyMarkup, InputMessageContent
 
 
+@dataclass(eq=False)
 class InlineQueryResultContact(InlineQueryResult):
     """
     Represents a contact with a phone number. By default, this contact will be sent by the user.
@@ -64,28 +66,18 @@ class InlineQueryResultContact(InlineQueryResult):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 phone_number: str,
-                 first_name: str,
-                 last_name: str = None,
-                 reply_markup: 'ReplyMarkup' = None,
-                 input_message_content: 'InputMessageContent' = None,
-                 thumb_url: str = None,
-                 thumb_width: int = None,
-                 thumb_height: int = None,
-                 vcard: str = None,
-                 **kwargs: Any):
-        # Required
-        super().__init__('contact', id)
-        self.phone_number = phone_number
-        self.first_name = first_name
+    # Required
+    id: str
+    phone_number: str
+    first_name: str
+    # Optionals
+    last_name: Optional[str] = None
+    reply_markup: Optional['ReplyMarkup'] = None
+    input_message_content: Optional['InputMessageContent'] = None
+    thumb_url: Optional[str] = None
+    thumb_width: Optional[int] = None
+    thumb_height: Optional[int] = None
+    vcard: Optional[str] = None
 
-        # Optionals
-        self.last_name = last_name
-        self.vcard = vcard
-        self.reply_markup = reply_markup
-        self.input_message_content = input_message_content
-        self.thumb_url = thumb_url
-        self.thumb_width = thumb_width
-        self.thumb_height = thumb_height
+    def __post_init__(self, **kwargs: Any) -> None:
+        super().__init__('contact', self.id)

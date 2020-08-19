@@ -16,12 +16,14 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+from dataclasses import dataclass
 from telegram import TelegramObject
-from typing import Any, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot
 
 
+@dataclass(eq=False)
 class PersonalDetails(TelegramObject):
     """
     This object represents personal details.
@@ -43,34 +45,22 @@ class PersonalDetails(TelegramObject):
             residence.
     """
 
-    def __init__(self,
-                 first_name: str,
-                 last_name: str,
-                 birth_date: str,
-                 gender: str,
-                 country_code: str,
-                 residence_country_code: str,
-                 first_name_native: str = None,
-                 last_name_native: str = None,
-                 middle_name: str = None,
-                 middle_name_native: str = None,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
-        # Required
-        self.first_name = first_name
-        self.last_name = last_name
-        self.middle_name = middle_name
-        self.birth_date = birth_date
-        self.gender = gender
-        self.country_code = country_code
-        self.residence_country_code = residence_country_code
-        self.first_name_native = first_name_native
-        self.last_name_native = last_name_native
-        self.middle_name_native = middle_name_native
-
-        self.bot = bot
+    # Required
+    first_name: str
+    last_name: str
+    birth_date: str
+    gender: str
+    country_code: str
+    residence_country_code: str
+    # Optional
+    first_name_native: Optional[str] = None
+    last_name_native: Optional[str] = None
+    middle_name: Optional[str] = None
+    middle_name_native: Optional[str] = None
+    bot: Optional['Bot'] = None
 
 
+@dataclass(eq=False)
 class ResidentialAddress(TelegramObject):
     """
     This object represents a residential address.
@@ -84,26 +74,18 @@ class ResidentialAddress(TelegramObject):
         post_code (:obj:`str`): Address post code.
     """
 
-    def __init__(self,
-                 street_line1: str,
-                 street_line2: str,
-                 city: str,
-                 state: str,
-                 country_code: str,
-                 post_code: str,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
-        # Required
-        self.street_line1 = street_line1
-        self.street_line2 = street_line2
-        self.city = city
-        self.state = state
-        self.country_code = country_code
-        self.post_code = post_code
-
-        self.bot = bot
+    # Required
+    street_line1: str
+    street_line2: str
+    city: str
+    state: str
+    country_code: str
+    post_code: str
+    # Not required
+    bot: Optional['Bot'] = None
 
 
+@dataclass(eq=False)
 class IdDocumentData(TelegramObject):
     """
     This object represents the data of an identity document.
@@ -113,8 +95,6 @@ class IdDocumentData(TelegramObject):
         expiry_date (:obj:`str`): Optional. Date of expiry, in DD.MM.YYYY format.
     """
 
-    def __init__(self, document_no: str, expiry_date: str, bot: 'Bot' = None, **kwargs: Any):
-        self.document_no = document_no
-        self.expiry_date = expiry_date
-
-        self.bot = bot
+    document_no: str
+    expiry_date: str
+    bot: Optional['Bot'] = None

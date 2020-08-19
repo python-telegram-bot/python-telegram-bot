@@ -18,13 +18,15 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram PhotoSize."""
 
+from dataclasses import dataclass
 from telegram import TelegramObject
 from telegram.utils.types import JSONDict
-from typing import Any, TYPE_CHECKING
+from typing import Any, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import Bot, File
 
 
+@dataclass(eq=False)
 class PhotoSize(TelegramObject):
     """This object represents one size of a photo or a file/sticker thumbnail.
 
@@ -54,22 +56,20 @@ class PhotoSize(TelegramObject):
 
     """
 
-    def __init__(self,
-                 file_id: str,
-                 file_unique_id: str,
-                 width: int,
-                 height: int,
-                 file_size: int = None,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
-        # Required
-        self.file_id = str(file_id)
-        self.file_unique_id = str(file_unique_id)
-        self.width = int(width)
-        self.height = int(height)
-        # Optionals
-        self.file_size = file_size
-        self.bot = bot
+    # Required
+    file_id: str
+    file_unique_id: str
+    width: int
+    height: int
+    # Optionals
+    file_size: Optional[int] = None
+    bot: Optional['Bot'] = None
+
+    def __post_init__(self, **kwargs: Any) -> None:
+        self.file_id = str(self.file_id)
+        self.file_unique_id = str(self.file_unique_id)
+        self.width = int(self.width)
+        self.height = int(self.height)
 
         self._id_attrs = (self.file_unique_id,)
 

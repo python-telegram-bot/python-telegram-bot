@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram CallbackQuery"""
+from dataclasses import dataclass
 from telegram import TelegramObject, Message, User
 
 from telegram.utils.types import JSONDict
@@ -26,6 +27,7 @@ if TYPE_CHECKING:
     from telegram import Bot, InlineKeyboardMarkup, GameHighScore
 
 
+@dataclass(eq=False)
 class CallbackQuery(TelegramObject):
     """
     This object represents an incoming callback query from a callback button in an inline keyboard.
@@ -78,28 +80,17 @@ class CallbackQuery(TelegramObject):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 from_user: User,
-                 chat_instance: str,
-                 message: Message = None,
-                 data: str = None,
-                 inline_message_id: str = None,
-                 game_short_name: str = None,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
-        # Required
-        self.id = id
-        self.from_user = from_user
-        self.chat_instance = chat_instance
-        # Optionals
-        self.message = message
-        self.data = data
-        self.inline_message_id = inline_message_id
-        self.game_short_name = game_short_name
+    id: str
+    from_user: User
+    chat_instance: str
+    # Optionals
+    message: Optional[Message] = None
+    data: Optional[str] = None
+    inline_message_id: Optional[str] = None
+    game_short_name: Optional[str] = None
+    bot: Optional['Bot'] = None
 
-        self.bot = bot
-
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.id,)
 
     @classmethod

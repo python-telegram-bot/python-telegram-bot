@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram PreCheckoutQuery."""
 
+from dataclasses import dataclass
 from telegram import TelegramObject, User, OrderInfo
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, TYPE_CHECKING
@@ -25,6 +26,7 @@ if TYPE_CHECKING:
     from telegram import Bot
 
 
+@dataclass(eq=False)
 class PreCheckoutQuery(TelegramObject):
     """This object contains information about an incoming pre-checkout query.
 
@@ -62,26 +64,16 @@ class PreCheckoutQuery(TelegramObject):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 from_user: User,
-                 currency: str,
-                 total_amount: int,
-                 invoice_payload: str,
-                 shipping_option_id: str = None,
-                 order_info: OrderInfo = None,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
-        self.id = id
-        self.from_user = from_user
-        self.currency = currency
-        self.total_amount = total_amount
-        self.invoice_payload = invoice_payload
-        self.shipping_option_id = shipping_option_id
-        self.order_info = order_info
+    id: str
+    from_user: User
+    currency: str
+    total_amount: int
+    invoice_payload: str
+    shipping_option_id: Optional[str] = None
+    order_info: Optional[OrderInfo] = None
+    bot: Optional['Bot'] = None
 
-        self.bot = bot
-
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.id,)
 
     @classmethod

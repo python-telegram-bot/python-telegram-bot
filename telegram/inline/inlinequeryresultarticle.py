@@ -18,12 +18,14 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultArticle."""
 
+from dataclasses import dataclass
 from telegram import InlineQueryResult
-from typing import Any, TYPE_CHECKING
+from typing import Any, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
 
 
+@dataclass(eq=False)
 class InlineQueryResultArticle(InlineQueryResult):
     """This object represents a Telegram InlineQueryResultArticle.
 
@@ -61,29 +63,18 @@ class InlineQueryResultArticle(InlineQueryResult):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 title: str,
-                 input_message_content: 'InputMessageContent',
-                 reply_markup: 'ReplyMarkup' = None,
-                 url: str = None,
-                 hide_url: bool = None,
-                 description: str = None,
-                 thumb_url: str = None,
-                 thumb_width: int = None,
-                 thumb_height: int = None,
-                 **kwargs: Any):
+    # Required
+    id: str
+    title: str
+    input_message_content: 'InputMessageContent'
+    # Optional
+    reply_markup: Optional['ReplyMarkup'] = None
+    url: Optional[str] = None
+    hide_url: Optional[bool] = None
+    description: Optional[str] = None
+    thumb_url: Optional[str] = None
+    thumb_width: Optional[int] = None
+    thumb_height: Optional[int] = None
 
-        # Required
-        super().__init__('article', id)
-        self.title = title
-        self.input_message_content = input_message_content
-
-        # Optional
-        self.reply_markup = reply_markup
-        self.url = url
-        self.hide_url = hide_url
-        self.description = description
-        self.thumb_url = thumb_url
-        self.thumb_width = thumb_width
-        self.thumb_height = thumb_height
+    def __post_init__(self, **kwargs: Any) -> None:
+        super().__init__('article', self.id)

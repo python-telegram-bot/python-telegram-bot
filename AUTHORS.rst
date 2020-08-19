@@ -39,6 +39,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `evgfilim1 <https://github.com/evgfilim1>`_
 - `franciscod <https://github.com/franciscod>`_
 - `gamgi <https://github.com/gamgi>`_
+- `Habib Rohman <https://github.com/hexatester>`_
 - `Harshil <https://github.com/harshil21>`_
 - `Hugo Damer <https://github.com/HakimusGIT>`_
 - `ihoru <https://github.com/ihoru>`_

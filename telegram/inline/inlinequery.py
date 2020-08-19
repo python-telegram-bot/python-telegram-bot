@@ -19,6 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineQuery."""
 
+from dataclasses import dataclass
 from telegram import TelegramObject, User, Location
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, TYPE_CHECKING
@@ -26,6 +27,7 @@ if TYPE_CHECKING:
     from telegram import Bot
 
 
+@dataclass(eq=False)
 class InlineQuery(TelegramObject):
     """
     This object represents an incoming inline query. When the user sends an empty query, your bot
@@ -57,24 +59,16 @@ class InlineQuery(TelegramObject):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 from_user: User,
-                 query: str,
-                 offset: str,
-                 location: Location = None,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
-        # Required
-        self.id = id
-        self.from_user = from_user
-        self.query = query
-        self.offset = offset
+    # Required
+    id: str
+    from_user: User
+    query: str
+    offset: str
+    # Optional
+    location: Optional[Location] = None
+    bot: Optional['Bot'] = None
 
-        # Optional
-        self.location = location
-
-        self.bot = bot
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.id,)
 
     @classmethod

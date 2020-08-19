@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram GameHighScore."""
 
+from dataclasses import dataclass
 from telegram import TelegramObject, User
 from telegram.utils.types import JSONDict
 from typing import Optional, TYPE_CHECKING
@@ -25,6 +26,7 @@ if TYPE_CHECKING:
     from telegram import Bot
 
 
+@dataclass(eq=False)
 class GameHighScore(TelegramObject):
     """This object represents one row of the high scores table for a game.
 
@@ -43,11 +45,11 @@ class GameHighScore(TelegramObject):
 
     """
 
-    def __init__(self, position: int, user: User, score: int):
-        self.position = position
-        self.user = user
-        self.score = score
+    position: int
+    user: User
+    score: int
 
+    def __post_init__(self) -> None:
         self._id_attrs = (self.position, self.user, self.score)
 
     @classmethod

@@ -18,12 +18,14 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardButton."""
 
+from dataclasses import dataclass
 from telegram import TelegramObject
-from typing import Any, TYPE_CHECKING
+from typing import Any, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import CallbackGame, LoginUrl
 
 
+@dataclass(eq=False)
 class InlineKeyboardButton(TelegramObject):
     """This object represents one button of an inline keyboard.
 
@@ -81,28 +83,18 @@ class InlineKeyboardButton(TelegramObject):
 
     """
 
-    def __init__(self,
-                 text: str,
-                 url: str = None,
-                 callback_data: str = None,
-                 switch_inline_query: str = None,
-                 switch_inline_query_current_chat: str = None,
-                 callback_game: 'CallbackGame' = None,
-                 pay: bool = None,
-                 login_url: 'LoginUrl' = None,
-                 **kwargs: Any):
-        # Required
-        self.text = text
+    # Required
+    text: str
+    # Optionals
+    url: Optional[str] = None
+    callback_data: Optional[str] = None
+    switch_inline_query: Optional[str] = None
+    switch_inline_query_current_chat: Optional[str] = None
+    callback_game: Optional['CallbackGame'] = None
+    pay: Optional[bool] = None
+    login_url: Optional['LoginUrl'] = None
 
-        # Optionals
-        self.url = url
-        self.login_url = login_url
-        self.callback_data = callback_data
-        self.switch_inline_query = switch_inline_query
-        self.switch_inline_query_current_chat = switch_inline_query_current_chat
-        self.callback_game = callback_game
-        self.pay = pay
-
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (
             self.text,
             self.url,

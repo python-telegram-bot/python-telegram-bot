@@ -18,10 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Invoice."""
 
+from dataclasses import dataclass
 from telegram import TelegramObject
 from typing import Any
 
 
+@dataclass(eq=False)
 class Invoice(TelegramObject):
     """This object contains basic information about an invoice.
 
@@ -48,19 +50,13 @@ class Invoice(TelegramObject):
 
     """
 
-    def __init__(self,
-                 title: str,
-                 description: str,
-                 start_parameter: str,
-                 currency: str,
-                 total_amount: int,
-                 **kwargs: Any):
-        self.title = title
-        self.description = description
-        self.start_parameter = start_parameter
-        self.currency = currency
-        self.total_amount = total_amount
+    title: str
+    description: str
+    start_parameter: str
+    currency: str
+    total_amount: int
 
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (
             self.title,
             self.description,

@@ -18,10 +18,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a type of a Telegram Poll."""
+from dataclasses import dataclass
 from telegram import TelegramObject
-from typing import Any
+from typing import Any, Optional
 
 
+@dataclass(eq=False)
 class KeyboardButtonPollType(TelegramObject):
     """This object represents type of a poll, which is allowed to be created
     and sent when the corresponding button is pressed.
@@ -35,7 +37,8 @@ class KeyboardButtonPollType(TelegramObject):
             passed, only regular polls will be allowed. Otherwise, the user will be allowed to
             create a poll of any type.
     """
-    def __init__(self, type: str = None, **kwargs: Any):
-        self.type = type
 
+    type: Optional[str] = None
+
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.type,)

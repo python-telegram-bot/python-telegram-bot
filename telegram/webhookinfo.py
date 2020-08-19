@@ -18,10 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram WebhookInfo."""
 
+from dataclasses import dataclass
 from telegram import TelegramObject
-from typing import Any, List
+from typing import Any, List, Optional
 
 
+@dataclass(eq=False)
 class WebhookInfo(TelegramObject):
     """This object represents a Telegram WebhookInfo.
 
@@ -59,24 +61,17 @@ class WebhookInfo(TelegramObject):
 
     """
 
-    def __init__(self,
-                 url: str,
-                 has_custom_certificate: bool,
-                 pending_update_count: int,
-                 last_error_date: int = None,
-                 last_error_message: str = None,
-                 max_connections: int = None,
-                 allowed_updates: List[str] = None,
-                 **kwargs: Any):
-        # Required
-        self.url = url
-        self.has_custom_certificate = has_custom_certificate
-        self.pending_update_count = pending_update_count
-        self.last_error_date = last_error_date
-        self.last_error_message = last_error_message
-        self.max_connections = max_connections
-        self.allowed_updates = allowed_updates
+    # Required
+    url: str
+    has_custom_certificate: bool
+    pending_update_count: int
+    # Optionals
+    last_error_date: Optional[int] = None
+    last_error_message: Optional[str] = None
+    max_connections: Optional[int] = None
+    allowed_updates: Optional[List[str]] = None
 
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (
             self.url,
             self.has_custom_certificate,

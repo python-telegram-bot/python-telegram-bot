@@ -18,12 +18,14 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultLocation."""
 
+from dataclasses import dataclass
 from telegram import InlineQueryResult
-from typing import Any, TYPE_CHECKING
+from typing import Any, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from telegram import ReplyMarkup, InputMessageContent
 
 
+@dataclass(eq=False)
 class InlineQueryResultLocation(InlineQueryResult):
     """
     Represents a location on a map. By default, the location will be sent by the user.
@@ -64,28 +66,18 @@ class InlineQueryResultLocation(InlineQueryResult):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 latitude: float,
-                 longitude: float,
-                 title: str,
-                 live_period: int = None,
-                 reply_markup: 'ReplyMarkup' = None,
-                 input_message_content: 'InputMessageContent' = None,
-                 thumb_url: str = None,
-                 thumb_width: int = None,
-                 thumb_height: int = None,
-                 **kwargs: Any):
-        # Required
-        super().__init__('location', id)
-        self.latitude = latitude
-        self.longitude = longitude
-        self.title = title
+    # Required
+    id: str
+    latitude: float
+    longitude: float
+    title: str
+    # Optionals
+    live_period: Optional[int] = None
+    reply_markup: Optional['ReplyMarkup'] = None
+    input_message_content: Optional['InputMessageContent'] = None
+    thumb_url: Optional[str] = None
+    thumb_width: Optional[int] = None
+    thumb_height: Optional[int] = None
 
-        # Optionals
-        self.live_period = live_period
-        self.reply_markup = reply_markup
-        self.input_message_content = input_message_content
-        self.thumb_url = thumb_url
-        self.thumb_width = thumb_width
-        self.thumb_height = thumb_height
+    def __post_init__(self, **kwargs: Any) -> None:
+        super().__init__('location', self.id)

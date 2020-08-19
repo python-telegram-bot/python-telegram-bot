@@ -18,10 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputContactMessageContent."""
 
+from dataclasses import dataclass
 from telegram import InputMessageContent
-from typing import Any
+from typing import Any, Optional
 
 
+@dataclass(eq=False)
 class InputContactMessageContent(InputMessageContent):
     """Represents the content of a contact message to be sent as the result of an inline query.
 
@@ -45,17 +47,12 @@ class InputContactMessageContent(InputMessageContent):
 
     """
 
-    def __init__(self,
-                 phone_number: str,
-                 first_name: str,
-                 last_name: str = None,
-                 vcard: str = None,
-                 **kwargs: Any):
-        # Required
-        self.phone_number = phone_number
-        self.first_name = first_name
-        # Optionals
-        self.last_name = last_name
-        self.vcard = vcard
+    # Required
+    phone_number: str
+    first_name: str
+    # Optionals
+    last_name: Optional[str] = None
+    vcard: Optional[str] = None
 
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.phone_number,)

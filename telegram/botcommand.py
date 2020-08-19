@@ -18,10 +18,14 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Bot Command."""
+from dataclasses import dataclass
 from telegram import TelegramObject
-from typing import Any
+from typing import Any, Optional, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
+@dataclass(eq=False)
 class BotCommand(TelegramObject):
     """
     This object represents a bot command.
@@ -38,8 +42,9 @@ class BotCommand(TelegramObject):
             English letters, digits and underscores.
         description (:obj:`str`): Description of the command, 3-256 characters.
     """
-    def __init__(self, command: str, description: str, **kwargs: Any):
-        self.command = command
-        self.description = description
+    command: str
+    description: str
+    bot: Optional['Bot'] = None
 
+    def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.command, self.description)
