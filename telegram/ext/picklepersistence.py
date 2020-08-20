@@ -29,35 +29,35 @@ class PicklePersistence(BasePersistence):
 
     Attributes:
         filename (:obj:`str`): The filename for storing the pickle files. When :attr:`single_file`
-            is false this will be used as a prefix.
+            is ``False`` this will be used as a prefix.
         store_user_data (:obj:`bool`): Optional. Whether user_data should be saved by this
             persistence class.
         store_chat_data (:obj:`bool`): Optional. Whether user_data should be saved by this
             persistence class.
         store_bot_data (:obj:`bool`): Optional. Whether bot_data should be saved by this
             persistence class.
-        single_file (:obj:`bool`): Optional. When ``False`` will store 3 sperate files of
+        single_file (:obj:`bool`): Optional. When ``False`` will store 3 separate files of
             `filename_user_data`, `filename_chat_data` and `filename_conversations`. Default is
             ``True``.
         on_flush (:obj:`bool`, optional): When ``True`` will only save to file when :meth:`flush`
             is called and keep data in memory until that happens. When ``False`` will store data
-            on any transaction *and* on call fo :meth:`flush`. Default is ``False``.
+            on any transaction *and* on call to :meth:`flush`. Default is ``False``.
 
     Args:
         filename (:obj:`str`): The filename for storing the pickle files. When :attr:`single_file`
-            is false this will be used as a prefix.
+            is ``False`` this will be used as a prefix.
         store_user_data (:obj:`bool`, optional): Whether user_data should be saved by this
             persistence class. Default is ``True``.
         store_chat_data (:obj:`bool`, optional): Whether user_data should be saved by this
             persistence class. Default is ``True``.
         store_bot_data (:obj:`bool`, optional): Whether bot_data should be saved by this
             persistence class. Default is ``True`` .
-        single_file (:obj:`bool`, optional): When ``False`` will store 3 sperate files of
+        single_file (:obj:`bool`, optional): When ``False`` will store 3 separate files of
             `filename_user_data`, `filename_chat_data` and `filename_conversations`. Default is
             ``True``.
         on_flush (:obj:`bool`, optional): When ``True`` will only save to file when :meth:`flush`
             is called and keep data in memory until that happens. When ``False`` will store data
-            on any transaction *and* on call fo :meth:`flush`. Default is ``False``.
+            on any transaction *and* on call to :meth:`flush`. Default is ``False``.
     """
 
     def __init__(self, filename,
@@ -119,7 +119,7 @@ class PicklePersistence(BasePersistence):
             pickle.dump(data, f)
 
     def get_user_data(self):
-        """Returns the user_data from the pickle file if it exsists or an empty defaultdict.
+        """Returns the user_data from the pickle file if it exists or an empty ``defaultdict``.
 
         Returns:
             :obj:`defaultdict`: The restored user data.
@@ -139,7 +139,7 @@ class PicklePersistence(BasePersistence):
         return deepcopy(self.user_data)
 
     def get_chat_data(self):
-        """Returns the chat_data from the pickle file if it exsists or an empty defaultdict.
+        """Returns the chat_data from the pickle file if it exists or an empty ``defaultdict``.
 
         Returns:
             :obj:`defaultdict`: The restored chat data.
@@ -159,10 +159,10 @@ class PicklePersistence(BasePersistence):
         return deepcopy(self.chat_data)
 
     def get_bot_data(self):
-        """Returns the bot_data from the pickle file if it exsists or an empty dict.
+        """Returns the bot_data from the pickle file if it exists or an empty ``dict``.
 
         Returns:
-            :obj:`defaultdict`: The restored bot data.
+            :obj:`dict`: The restored bot data.
         """
         if self.bot_data:
             pass
@@ -177,13 +177,13 @@ class PicklePersistence(BasePersistence):
         return deepcopy(self.bot_data)
 
     def get_conversations(self, name):
-        """Returns the conversations from the pickle file if it exsists or an empty defaultdict.
+        """Returns the conversations from the pickle file if it exists or an empty ``dict``.
 
         Args:
             name (:obj:`str`): The handlers name.
 
         Returns:
-            :obj:`dict`: The restored conversations for the handler.
+            :obj:`dict`: The restored conversations data.
         """
         if self.conversations:
             pass
@@ -198,11 +198,11 @@ class PicklePersistence(BasePersistence):
         return self.conversations.get(name, {}).copy()
 
     def update_conversation(self, name, key, new_state):
-        """Will update the conversations for the given handler and depending on :attr:`on_flush`
-        save the pickle file.
+        """Will update the conversations (if changed) and depending on :attr:`on_flush`
+        saves the pickle file.
 
         Args:
-            name (:obj:`str`): The handlers name.
+            name (:obj:`str`): The handler's name.
             key (:obj:`tuple`): The key the state is changed for.
             new_state (:obj:`tuple` | :obj:`any`): The new state for the given key.
         """
@@ -217,7 +217,7 @@ class PicklePersistence(BasePersistence):
                 self.dump_singlefile()
 
     def update_user_data(self, user_id, data):
-        """Will update the user_data (if changed) and depending on :attr:`on_flush` save the
+        """Will update the user_data (if changed) and depending on :attr:`on_flush` saves the
         pickle file.
 
         Args:
@@ -237,7 +237,7 @@ class PicklePersistence(BasePersistence):
                 self.dump_singlefile()
 
     def update_chat_data(self, chat_id, data):
-        """Will update the chat_data (if changed) and depending on :attr:`on_flush` save the
+        """Will update the chat_data (if changed) and depending on :attr:`on_flush` saves the
         pickle file.
 
         Args:
@@ -257,7 +257,7 @@ class PicklePersistence(BasePersistence):
                 self.dump_singlefile()
 
     def update_bot_data(self, data):
-        """Will update the bot_data (if changed) and depending on :attr:`on_flush` save the
+        """Will update the bot_data (if changed) and depending on :attr:`on_flush` saves the
         pickle file.
 
         Args:

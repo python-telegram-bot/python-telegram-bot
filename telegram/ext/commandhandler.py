@@ -48,7 +48,7 @@ class CommandHandler(Handler):
         callback (:obj:`callable`): The callback function for this handler.
         filters (:class:`telegram.ext.BaseFilter`): Optional. Only allow updates with these
             Filters.
-        allow_edited (:obj:`bool`): Determines Whether the handler should also accept
+        allow_edited (:obj:`bool`): Determines whether the handler should also accept
             edited messages.
         pass_args (:obj:`bool`): Determines whether the handler should be passed
             ``args``.
@@ -161,7 +161,7 @@ class CommandHandler(Handler):
             update (:class:`telegram.Update`): Incoming telegram update.
 
         Returns:
-            :obj:`list`: The list of args for the handler
+            :obj:`list`: The list of args for the handler.
 
         """
         if isinstance(update, Update) and update.effective_message:
@@ -216,7 +216,7 @@ class PrefixHandler(CommandHandler):
             PrefixHandler(['!', '#'], 'test', callback) will respond to '!test' and
             '#test'.
 
-        Miltiple prefixes and commands:
+        Multiple prefixes and commands:
 
             PrefixHandler(['!', '#'], ['test', 'help`], callback) will respond to '!test',
             '#test', '!help' and '#help'.
@@ -352,7 +352,7 @@ class PrefixHandler(CommandHandler):
             update (:class:`telegram.Update`): Incoming telegram update.
 
         Returns:
-            :obj:`list`: The list of args for the handler
+            :obj:`list`: The list of args for the handler.
 
         """
         if isinstance(update, Update) and update.effective_message:

@@ -86,7 +86,7 @@ class BasePersistence(ABC):
         ``dict``.
 
         Returns:
-            :obj:`defaultdict`: The restored bot data.
+            :obj:`dict`: The restored bot data.
         """
 
     @abstractmethod
@@ -106,10 +106,10 @@ class BasePersistence(ABC):
     @abstractmethod
     def update_conversation(self, name, key, new_state):
         """Will be called when a :attr:`telegram.ext.ConversationHandler.update_state`
-        is called. this allows the storeage of the new state in the persistence.
+        is called. This allows the storage of the new state in the persistence.
 
         Args:
-            name (:obj:`str`): The handlers name.
+            name (:obj:`str`): The handler's name.
             key (:obj:`tuple`): The key the state is changed for.
             new_state (:obj:`tuple` | :obj:`any`): The new state for the given key.
         """

@@ -75,7 +75,7 @@ class Updater:
         private_key_password (:obj:`bytes`, optional): Password for above private key.
         user_sig_handler (:obj:`function`, optional): Takes ``signum, frame`` as positional
             arguments. This will be called when a signal is received, defaults are (SIGINT,
-            SIGTERM, SIGABRT) setable with :attr:`idle`.
+            SIGTERM, SIGABRT) settable with :attr:`idle`.
         request_kwargs (:obj:`dict`, optional): Keyword args to control the creation of a
             `telegram.utils.request.Request` object (ignored if `bot` or `dispatcher` argument is
             used). The request_kwargs are very useful for the advanced users who would like to
@@ -360,8 +360,8 @@ class Updater:
     def _network_loop_retry(self, action_cb, onerr_cb, description, interval):
         """Perform a loop calling `action_cb`, retrying after network errors.
 
-        Stop condition for loop: `self.running` evaluates False or return value of `action_cb`
-        evaluates False.
+        Stop condition for loop: `self.running` evaluates ``False`` or return value of `action_cb`
+        evaluates ``False``.
 
         Args:
             action_cb (:obj:`callable`): Network oriented callback function to call.
@@ -554,7 +554,7 @@ class Updater:
             self.logger.info('Received signal {} ({}), stopping...'.format(
                 signum, get_signal_name(signum)))
             if self.persistence:
-                # Update user_data and chat_data before flushing
+                # Update user_data, chat_data and bot_data before flushing
                 self.dispatcher.update_persistence()
                 self.persistence.flush()
             self.stop()

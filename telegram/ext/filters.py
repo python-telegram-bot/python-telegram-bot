@@ -109,14 +109,14 @@ class BaseFilter(ABC):
         """This method must be overwritten.
 
         Note:
-            If :attr:`update_filter` is false then the first argument is `message` and of
+            If :attr:`update_filter` is ``False`` then the first argument is `message` and of
             type :class:`telegram.Message`.
 
         Args:
             update (:class:`telegram.Update`): The update that is tested.
 
         Returns:
-            :obj:`dict` or :obj:`bool`
+            :obj:`dict` or :obj:`bool`.
 
         """
 
@@ -144,7 +144,7 @@ class MergedFilter(BaseFilter):
     """Represents a filter consisting of two other filters.
 
     Args:
-        base_filter: Filter 1 of the merged filter
+        base_filter: Filter 1 of the merged filter.
         and_filter: Optional filter to "and" with base_filter. Mutually exclusive with or_filter.
         or_filter: Optional filter to "or" with base_filter. Mutually exclusive with and_filter.
 
@@ -296,7 +296,7 @@ class Filters:
         To allow any text message, simply use
         ``MessageHandler(Filters.text, callback_method)``.
 
-        A simple usecase for passing a list is to allow only messages that were send by a
+        A simple use case for passing a list is to allow only messages that were sent by a
         custom :class:`telegram.ReplyKeyboardMarkup`::
 
             buttons = ['Start', 'Settings', 'Back']
@@ -396,7 +396,7 @@ class Filters:
     class regex(BaseFilter):
         """
         Filters updates by searching for an occurrence of ``pattern`` in the message text.
-        The ``re.search`` function is used to determine whether an update should be filtered.
+        The ``re.search()`` function is used to determine whether an update should be filtered.
 
         Refer to the documentation of the ``re`` module for more information.
 
@@ -404,7 +404,7 @@ class Filters:
 
         Examples:
             Use ``MessageHandler(Filters.regex(r'help'), callback)`` to capture all messages that
-            contain the word help. You can also use
+            contain the word 'help'. You can also use
             ``MessageHandler(Filters.regex(re.compile(r'help', re.IGNORECASE)), callback)`` if
             you want your pattern to be case insensitive. This approach is recommended
             if you need to specify flags on your pattern.
@@ -460,7 +460,7 @@ class Filters:
         name = 'Filters.document'
 
         class category(BaseFilter):
-            """This Filter filters documents by their category in the mime-type attribute
+            """Filters documents by their category in the mime-type attribute.
 
             Note:
                 This Filter only filters by the mime_type of the document,
@@ -470,7 +470,7 @@ class Filters:
 
             Example:
                 Filters.documents.category('audio/') returns `True` for all types
-                of audio sent as file, for example 'audio/mpeg' or 'audio/x-wav'
+                of audio sent as file, for example 'audio/mpeg' or 'audio/x-wav'.
             """
 
             def __init__(self, category):
@@ -547,7 +547,7 @@ class Filters:
         ``Filters.document`` for all document messages.
 
     Attributes:
-        category: This Filter filters documents by their category in the mime-type attribute
+        category: Filters documents by their category in the mime-type attribute
 
             Note:
                 This Filter only filters by the mime_type of the document,
@@ -557,13 +557,13 @@ class Filters:
 
             Example:
                 ``Filters.documents.category('audio/')`` filters all types
-                of audio sent as file, for example 'audio/mpeg' or 'audio/x-wav'
+                of audio sent as file, for example 'audio/mpeg' or 'audio/x-wav'.
         application: Same as ``Filters.document.category("application")``.
         audio: Same as ``Filters.document.category("audio")``.
         image: Same as ``Filters.document.category("image")``.
         video: Same as ``Filters.document.category("video")``.
         text: Same as ``Filters.document.category("text")``.
-        mime_type: This Filter filters documents by their mime-type attribute
+        mime_type: Filters documents by their mime-type attribute
 
             Note:
                 This Filter only filters by the mime_type of the document,
@@ -1461,7 +1461,7 @@ officedocument.wordprocessingml.document")``-
         """Filters messages to only allow those which are from users with a certain language code.
 
         Note:
-            According to official telegram api documentation, not every single user has the
+            According to official Telegram API documentation, not every single user has the
             `language_code` attribute. Do not count on this filter working on all users.
 
         Examples:
