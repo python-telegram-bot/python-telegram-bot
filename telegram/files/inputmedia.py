@@ -18,10 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram InputMedia Objects."""
 
+from dataclasses import dataclass, InitVar
 from telegram import TelegramObject, InputFile, PhotoSize, Animation, Video, Audio, Document
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
 
-from typing import Union, IO, cast
+from typing import Optional, Union, IO, cast
 
 from telegram.utils.types import FileLike
 
@@ -37,6 +38,7 @@ class InputMedia(TelegramObject):
     pass
 
 
+@dataclass(eq=False)
 class InputMediaAnimation(InputMedia):
     """Represents an animation file (GIF or H.264/MPEG-4 AVC video without sound) to be sent.
 
@@ -76,14 +78,17 @@ class InputMediaAnimation(InputMedia):
         arguments.
     """
 
-    def __init__(self,
-                 media: Union[str, FileLike, Animation],
-                 thumb: FileLike = None,
-                 caption: str = None,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-                 width: int = None,
-                 height: int = None,
-                 duration: int = None):
+    media: Union[str, FileLike, Animation]
+    thumb: Optional[FileLike] = None
+    caption: Optional[str] = None
+    parse_mode: Optional[Union[str, DefaultValue]] = DEFAULT_NONE
+    width: Optional[int] = None
+    height: Optional[int] = None
+    duration: Optional[int] = None
+
+    def __post_init__(self,
+                      media: Union[str, FileLike, Animation],
+                      thumb: FileLike = None) -> None:
         self.type = 'animation'
 
         if isinstance(media, Animation):
@@ -95,26 +100,17 @@ class InputMediaAnimation(InputMedia):
             media = cast(IO, media)
             self.media = InputFile(media, attach=True)
         else:
-            self.media = media  # type: ignore[assignment]
+            self.media = media
 
         if thumb:
             if InputFile.is_file(thumb):
                 thumb = cast(IO, thumb)
                 self.thumb = InputFile(thumb, attach=True)
             else:
-                self.thumb = thumb  # type: ignore[assignment]
-
-        if caption:
-            self.caption = caption
-        self.parse_mode = parse_mode
-        if width:
-            self.width = width
-        if height:
-            self.height = height
-        if duration:
-            self.duration = duration
+                self.thumb = thumb
 
 
+@dataclass(eq=False)
 class InputMediaPhoto(InputMedia):
     """Represents a photo to be sent.
 
@@ -136,10 +132,11 @@ class InputMediaPhoto(InputMedia):
             in :class:`telegram.ParseMode` for the available modes.
     """
 
-    def __init__(self,
-                 media: Union[str, FileLike, PhotoSize],
-                 caption: str = None,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE):
+    media: InitVar[Union[str, FileLike, PhotoSize]]
+    caption: InitVar[str] = None
+    parse_mode: Optional[Union[str, DefaultValue]] = DEFAULT_NONE
+
+    def __post_init__(self, media: Union[str, FileLike, PhotoSize], caption: str = None) -> None:
         self.type = 'photo'
 
         if isinstance(media, PhotoSize):
@@ -152,9 +149,9 @@ class InputMediaPhoto(InputMedia):
 
         if caption:
             self.caption = caption
-        self.parse_mode = parse_mode
 
 
+@dataclass(eq=False)
 class InputMediaVideo(InputMedia):
     """Represents a video to be sent.
 
@@ -197,15 +194,16 @@ class InputMediaVideo(InputMedia):
         arguments.
     """
 
-    def __init__(self,
-                 media: Union[str, FileLike, Video],
-                 caption: str = None,
-                 width: int = None,
-                 height: int = None,
-                 duration: int = None,
-                 supports_streaming: bool = None,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-                 thumb: FileLike = None):
+    media: Union[str, FileLike, Video]
+    caption: Optional[str] = None
+    width: Optional[int] = None
+    height: Optional[int] = None
+    duration: Optional[int] = None
+    supports_streaming: Optional[bool] = None
+    parse_mode: Union[str, DefaultValue] = DEFAULT_NONE
+    thumb: FileLike = None
+
+    def __post_init__(self, media: Union[str, FileLike, Video], thumb: FileLike = None) -> None:
         self.type = 'video'
 
         if isinstance(media, Video):
@@ -217,28 +215,17 @@ class InputMediaVideo(InputMedia):
             media = cast(IO, media)
             self.media = InputFile(media, attach=True)
         else:
-            self.media = media  # type: ignore[assignment]
+            self.media = media
 
         if thumb:
             if InputFile.is_file(thumb):
                 thumb = cast(IO, thumb)
                 self.thumb = InputFile(thumb, attach=True)
             else:
-                self.thumb = thumb  # type: ignore[assignment]
-
-        if caption:
-            self.caption = caption
-        self.parse_mode = parse_mode
-        if width:
-            self.width = width
-        if height:
-            self.height = height
-        if duration:
-            self.duration = duration
-        if supports_streaming:
-            self.supports_streaming = supports_streaming
+                self.thumb = thumb
 
 
+@dataclass(eq=False)
 class InputMediaAudio(InputMedia):
     """Represents an audio file to be treated as music to be sent.
 
@@ -279,14 +266,15 @@ class InputMediaAudio(InputMedia):
         optional arguments.
     """
 
-    def __init__(self,
-                 media: Union[str, FileLike, Audio],
-                 thumb: FileLike = None,
-                 caption: str = None,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-                 duration: int = None,
-                 performer: str = None,
-                 title: str = None):
+    media: InitVar[Union[str, FileLike, Audio]]
+    thumb: InitVar[FileLike] = None
+    caption: str = None
+    parse_mode: Union[str, DefaultValue] = DEFAULT_NONE
+    duration: int = None
+    performer: str = None
+    title: str = None
+
+    def __post_init__(self, media: Union[str, FileLike, Audio], thumb: FileLike = None) -> None:
         self.type = 'audio'
 
         if isinstance(media, Audio):
@@ -307,17 +295,8 @@ class InputMediaAudio(InputMedia):
             else:
                 self.thumb = thumb  # type: ignore[assignment]
 
-        if caption:
-            self.caption = caption
-        self.parse_mode = parse_mode
-        if duration:
-            self.duration = duration
-        if performer:
-            self.performer = performer
-        if title:
-            self.title = title
 
-
+@dataclass(eq=False)
 class InputMediaDocument(InputMedia):
     """Represents a general file to be sent.
 
@@ -345,11 +324,12 @@ class InputMediaDocument(InputMedia):
             Thumbnails can't be reused and can be only uploaded as a new file.
     """
 
-    def __init__(self,
-                 media: Union[str, FileLike, Document],
-                 thumb: FileLike = None,
-                 caption: str = None,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE):
+    media: InitVar[Union[str, FileLike, Document]]
+    thumb: InitVar[FileLike] = None
+    caption: Optional[str] = None
+    parse_mode: Optional[Union[str, DefaultValue]] = DEFAULT_NONE
+
+    def __post_init__(self, media: Union[str, FileLike, Document], thumb: FileLike = None) -> None:
         self.type = 'document'
 
         if isinstance(media, Document):
@@ -366,7 +346,3 @@ class InputMediaDocument(InputMedia):
                 self.thumb = InputFile(thumb, attach=True)
             else:
                 self.thumb = thumb  # type: ignore[assignment]
-
-        if caption:
-            self.caption = caption
-        self.parse_mode = parse_mode
