@@ -24,7 +24,7 @@ except ImportError:
 
 import warnings
 
-from dataclasses import is_dataclass
+from dataclasses import is_dataclass, MISSING
 from telegram.utils.helpers import get_dataclass_fields
 from telegram.utils.types import JSONDict
 from typing import Tuple, Any, Optional, Type, TypeVar, TYPE_CHECKING, List
@@ -82,15 +82,21 @@ class TelegramObject:
     @classmethod
     def de_safe_dataclass(cls: Type[TO], data: JSONDict) -> Optional[TO]:
         # TODO : Implement safe init_values from cls
-        field_names = [field.name for field in get_dataclass_fields(cls)]
+        fields = [field for field in get_dataclass_fields(cls)]
         safe_data: JSONDict = {}
+        for field in fields:
+            key = field.name
+            value = data.pop(key, None)
+            if value:
+                safe_data[key] = value
+            elif field.default != MISSING:
+                safe_data[key] = field.default
+            elif field.default_factory != MISSING:  # type: ignore
+                safe_data[key] = field.default_factory()  # type: ignore
+        res = cls(**safe_data)  # type: ignore[call-arg]
         for key, value in data.items():
-            if value is not None and key in field_names:
-                if hasattr(value, 'to_dict'):
-                    safe_data[key] = value.to_dict()
-                else:
-                    safe_data[key] = value
-        return cls(**safe_data)  # type: ignore[call-arg]
+            setattr(res, key, value)
+        return res
 
     def to_json(self) -> str:
         """
