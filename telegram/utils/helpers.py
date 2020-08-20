@@ -23,6 +23,7 @@ import re
 import signal
 import time
 from collections import defaultdict
+from dataclasses import Field, _FIELD, _FIELDS, _FIELD_INITVAR  # type: ignore
 from html import escape
 from numbers import Number
 
@@ -33,7 +34,8 @@ except ImportError:
 
 
 from telegram.utils.types import JSONDict
-from typing import Union, Any, Optional, Dict, DefaultDict, Tuple, TYPE_CHECKING
+from typing import (
+    Union, Any, Optional, Dict, DefaultDict, List, Tuple, Type, TypeVar, TYPE_CHECKING)
 if TYPE_CHECKING:
     from telegram import MessageEntity
 
@@ -416,3 +418,20 @@ class DefaultValue:
 
 DEFAULT_NONE: DefaultValue = DefaultValue(None)
 """:class:`DefaultValue`: Default `None`"""
+
+AnyT = TypeVar("AnyT", bound=Any)
+
+
+def get_dataclass_fields(data_class: Type[AnyT]) -> List[Field]:
+    """Helper method to get fields of dataclass
+
+    Args:
+        data_class (Type[AnyT]): A dataclass object or an instance of dataclass is preferred
+
+    Returns:
+        List[Field]: The fields of data_class
+    """
+    fields = getattr(data_class, _FIELDS)
+    return [
+        f for f in fields.values() if f._field_type is _FIELD or f._field_type is _FIELD_INITVAR
+    ]
