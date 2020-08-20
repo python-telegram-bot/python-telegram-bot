@@ -24,6 +24,8 @@ except ImportError:
 
 import warnings
 
+from dataclasses import is_dataclass
+from telegram.utils.helpers import get_dataclass_fields
 from telegram.utils.types import JSONDict
 from typing import Tuple, Any, Optional, Type, TypeVar, TYPE_CHECKING, List
 
@@ -62,6 +64,9 @@ class TelegramObject:
 
         if cls == TelegramObject:
             return cls()
+        elif is_dataclass(cls):
+            data['bot'] = bot
+            return cls.de_safe_dataclass(data)
         else:
             return cls(bot=bot, **data)  # type: ignore[call-arg]
 
@@ -73,6 +78,19 @@ class TelegramObject:
             return []
 
         return [cls.de_json(d, bot) for d in data]
+
+    @classmethod
+    def de_safe_dataclass(cls: Type[TO], data: JSONDict) -> Optional[TO]:
+        # TODO : Implement safe init_values from cls
+        field_names = [field.name for field in get_dataclass_fields(cls)]
+        safe_data: JSONDict = {}
+        for key, value in data.items():
+            if value is not None and key in field_names:
+                if hasattr(value, 'to_dict'):
+                    safe_data[key] = value.to_dict()
+                else:
+                    safe_data[key] = value
+        return cls(**safe_data)  # type: ignore[call-arg]
 
     def to_json(self) -> str:
         """
