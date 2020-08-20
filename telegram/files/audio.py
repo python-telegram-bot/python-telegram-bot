@@ -67,28 +67,22 @@ class Audio(TelegramObject):
 
     """
 
-    def __init__(self,
-                 file_id: str,
-                 file_unique_id: str,
-                 duration: int,
-                 performer: str = None,
-                 title: str = None,
-                 mime_type: str = None,
-                 file_size: int = None,
-                 thumb: PhotoSize = None,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
-        # Required
-        self.file_id = str(file_id)
-        self.file_unique_id = str(file_unique_id)
-        self.duration = int(duration)
-        # Optionals
-        self.performer = performer
-        self.title = title
-        self.mime_type = mime_type
-        self.file_size = file_size
-        self.thumb = thumb
-        self.bot = bot
+    # Required
+    file_id: str
+    file_unique_id: str
+    duration: int
+    # Optionals
+    performer: Optional[str] = None
+    title: Optional[str] = None
+    mime_type: Optional[str] = None
+    file_size: Optional[int] = None
+    thumb: Optional[PhotoSize] = None
+    bot: Optional['Bot'] = None
+
+    def __post_init__(self, **kwargs: Any) -> None:
+        self.file_id = str(self.file_id)
+        self.file_unique_id = str(self.file_unique_id)
+        self.duration = int(self.duration)
 
         self._id_attrs = (self.file_unique_id,)
 
