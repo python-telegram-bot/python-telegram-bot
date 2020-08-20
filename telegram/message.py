@@ -20,7 +20,7 @@
 """This module contains an object that represents a Telegram Message."""
 import sys
 import datetime
-from dataclasses import dataclass
+from dataclasses import dataclass, InitVar, field
 from html import escape
 
 from telegram import (Animation, Audio, Contact, Document, Chat, Location, PhotoSize, Sticker,
@@ -250,7 +250,7 @@ class Message(TelegramObject, _Message):
     """
 
     # Required
-    message_id: int
+    message_id: InitVar[int]
     date: datetime.datetime
     chat: Chat
     # Optionals
@@ -262,28 +262,34 @@ class Message(TelegramObject, _Message):
     reply_to_message: Optional['Message'] = None
     edit_date: Optional[datetime.datetime] = None
     text: Optional[str] = None
-    entities: Optional[List[MessageEntity]] = None
-    caption_entities: Optional[List[MessageEntity]] = None
+    quote: InitVar[Optional[bool]] = None
+    entities: Optional[List[MessageEntity]] = field(  # type: ignore[assignment]
+        default_factory=list)
+    caption_entities: Optional[List[MessageEntity]] = field(  # type: ignore[assignment]
+        default_factory=list)
     audio: Optional[Audio] = None
     document: Optional[Document] = None
     game: Optional[Game] = None
-    photo: Optional[List[PhotoSize]] = None
+    photo: Optional[List[PhotoSize]] = field(  # type: ignore[assignment]
+        default_factory=list)
     sticker: Optional[Sticker] = None
     video: Optional[Video] = None
     voice: Optional[Voice] = None
     video_note: Optional[VideoNote] = None
-    new_chat_members: Optional[List[User]] = None
+    new_chat_members: Optional[List[User]] = field(  # type: ignore[assignment]
+        default_factory=list)
     caption: Optional[str] = None
     contact: Optional[Contact] = None
     location: Optional[Location] = None
     venue: Optional[Venue] = None
     left_chat_member: Optional[User] = None
     new_chat_title: Optional[str] = None
-    new_chat_photo: Optional[List[PhotoSize]] = None
-    delete_chat_photo: bool = False
-    group_chat_created: bool = False
-    supergroup_chat_created: bool = False
-    channel_chat_created: bool = False
+    new_chat_photo: Optional[List[PhotoSize]] = field(  # type: ignore[assignment]
+        default_factory=list)
+    delete_chat_photo: InitVar[bool] = False
+    group_chat_created: InitVar[bool] = False
+    supergroup_chat_created: InitVar[bool] = False
+    channel_chat_created: InitVar[bool] = False
     migrate_to_chat_id: Optional[int] = None
     migrate_from_chat_id: Optional[int] = None
     pinned_message: Optional['Message'] = None
@@ -303,19 +309,23 @@ class Message(TelegramObject, _Message):
     dice: Optional[Dice] = None
     via_bot: Optional[User] = None
 
-    def __post_init__(self, **kwargs: Any) -> None:
-        self.message_id = int(self.message_id)
-        self.entities = self.entities or list()
-        self.caption_entities = self.caption_entities or list()
-        self.photo = self.photo or list()
-        self.new_chat_members = self.new_chat_members or list()
-        self.new_chat_photo = self.new_chat_photo or list()
-        self.delete_chat_photo = bool(self.delete_chat_photo)
-        self.group_chat_created = bool(self.group_chat_created)
-        self.supergroup_chat_created = bool(self.supergroup_chat_created)
-        self.channel_chat_created = bool(self.channel_chat_created)
+    def __post_init__(self,
+                      message_id: int,
+                      delete_chat_photo: bool = False,
+                      group_chat_created: bool = False,
+                      supergroup_chat_created: bool = False,
+                      channel_chat_created: bool = False,
+                      quote: Optional[bool] = None,
+                      **kwargs: Any) -> None:
+        self.message_id = int(message_id)
+        self.delete_chat_photo = bool(delete_chat_photo)
+        self.group_chat_created = bool(group_chat_created)
+        self.supergroup_chat_created = bool(supergroup_chat_created)
+        self.channel_chat_created = bool(channel_chat_created)
+        # TODO : Remove this (test_all_possibilities workaround)
+        self.quote = bool(quote)
 
-        self._id_attrs = (self.message_id, self.chat)
+        self._id_attrs = (message_id, self.chat)
 
     @property
     def chat_id(self) -> int:
