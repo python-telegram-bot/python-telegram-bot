@@ -66,6 +66,7 @@ class ChosenInlineResult(TelegramObject):
     # Optionals
     location: Optional[Location] = None
     inline_message_id: Optional[str] = None
+    bot: Optional['Bot'] = None
 
     def __post_init__(self, **kwargs: Any) -> None:
         self._id_attrs = (self.result_id,)

@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultVoice."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, InitVar
 from telegram import InlineQueryResult
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
 from typing import Any, Optional, Union, TYPE_CHECKING
@@ -76,6 +76,7 @@ class InlineQueryResultVoice(InlineQueryResult):
     reply_markup: Optional['ReplyMarkup'] = None
     input_message_content: Optional['InputMessageContent'] = None
     parse_mode: Optional[Union[str, DefaultValue]] = DEFAULT_NONE
+    type: InitVar[Optional[str]] = None
 
     def __post_init__(self, **kwargs: Any) -> None:
         super().__init__('voice', self.id)

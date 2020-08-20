@@ -78,8 +78,8 @@ class InputMediaAnimation(InputMedia):
         arguments.
     """
 
-    media: Union[str, FileLike, Animation]
-    thumb: Optional[FileLike] = None
+    media: InitVar[Union[str, FileLike, Animation]]
+    thumb: InitVar[Optional[FileLike]] = None
     caption: Optional[str] = None
     parse_mode: Optional[Union[str, DefaultValue]] = DEFAULT_NONE
     width: Optional[int] = None
@@ -100,14 +100,14 @@ class InputMediaAnimation(InputMedia):
             media = cast(IO, media)
             self.media = InputFile(media, attach=True)
         else:
-            self.media = media
+            self.media = media  # type: ignore[assignment]
 
         if thumb:
             if InputFile.is_file(thumb):
                 thumb = cast(IO, thumb)
                 self.thumb = InputFile(thumb, attach=True)
             else:
-                self.thumb = thumb
+                self.thumb = thumb  # type: ignore[assignment]
 
 
 @dataclass(eq=False)
@@ -194,14 +194,14 @@ class InputMediaVideo(InputMedia):
         arguments.
     """
 
-    media: Union[str, FileLike, Video]
+    media: InitVar[Union[str, FileLike, Video]]
     caption: Optional[str] = None
     width: Optional[int] = None
     height: Optional[int] = None
     duration: Optional[int] = None
     supports_streaming: Optional[bool] = None
     parse_mode: Union[str, DefaultValue] = DEFAULT_NONE
-    thumb: FileLike = None
+    thumb: InitVar[FileLike] = None
 
     def __post_init__(self, media: Union[str, FileLike, Video], thumb: FileLike = None) -> None:
         self.type = 'video'
@@ -215,14 +215,14 @@ class InputMediaVideo(InputMedia):
             media = cast(IO, media)
             self.media = InputFile(media, attach=True)
         else:
-            self.media = media
+            self.media = media  # type: ignore[assignment]
 
         if thumb:
             if InputFile.is_file(thumb):
                 thumb = cast(IO, thumb)
                 self.thumb = InputFile(thumb, attach=True)
             else:
-                self.thumb = thumb
+                self.thumb = thumb  # type: ignore[assignment]
 
 
 @dataclass(eq=False)

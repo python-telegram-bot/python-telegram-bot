@@ -87,5 +87,5 @@ class InlineQueryResultVenue(InlineQueryResult):
     thumb_width: Optional[int] = None
     thumb_height: Optional[int] = None
 
-    def __init__(self, **kwargs: Any):
+    def __post_init__(self, **kwargs: Any) -> None:
         super().__init__('venue', self.id)
