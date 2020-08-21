@@ -418,7 +418,7 @@ class Dispatcher:
                                           'uncaught error was raised while handling the error '
                                           'with an error_handler')
 
-    def add_handler(self, handler, group=DEFAULT_GROUP, run_async=False):
+    def add_handler(self, handler, group=DEFAULT_GROUP):
         """Register a handler.
 
         TL;DR: Order and priority counts. 0 or 1 handlers per group will be used. End handling of
@@ -438,17 +438,9 @@ class Dispatcher:
             group will not be used. The order in which handlers were added to the group defines the
             priority.
 
-        Warning:
-            * When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
-              attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
-            * ``run_async=True`` can not be used for :class:`telegram.ext.ConversationHandler`.
-              Instead set :attr:`telegram.ext.Handler.run_async` to :obj:`True` for
-
         Args:
             handler (:class:`telegram.ext.Handler`): A Handler instance.
             group (:obj:`int`, optional): The group identifier. Default is 0.
-            run_async (:obj:`bool`, optional): Whether this handlers callback should be run
-                asynchronously using :meth:`run_async`. Defaults to :obj:`False`.
 
         """
         # Unfortunately due to circular imports this has to be here
@@ -465,12 +457,6 @@ class Dispatcher:
                     "persistence".format(handler.name))
             handler.persistence = self.persistence
             handler.conversations = self.persistence.get_conversations(handler.name)
-        if isinstance(handler, ConversationHandler) and run_async:
-            raise ValueError(
-                "ConversationHandlers can not be run asynchronously.")
-
-        if run_async:
-            handler.run_async = True
 
         if group not in self.handlers:
             self.handlers[group] = list()

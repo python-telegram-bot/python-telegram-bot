@@ -167,6 +167,7 @@ class ConversationHandler(Handler):
                  name=None,
                  persistent=False,
                  map_to_parent=None):
+        self._run_async = False
 
         self._entry_points = entry_points
         self._states = states
@@ -227,6 +228,14 @@ class ConversationHandler(Handler):
                     warnings.warn("If 'per_chat=True', 'InlineQueryHandler' can not be used, "
                                   "since inline queries have no chat context.")
                     break
+
+    @property
+    def run_async(self):
+        """
+        Determines whether the current handlers callback function will be run asynchronously. Will
+        change dependent on the current state and the selected handler.
+        """
+        return self._run_async
 
     @property
     def entry_points(self):
@@ -401,6 +410,7 @@ class ConversationHandler(Handler):
                 for handler in handlers:
                     check = handler.check_update(update)
                     if check is not None and check is not False:
+                        self._run_async = handler.run_async
                         return key, handler, check
                 return None
 
@@ -441,6 +451,7 @@ class ConversationHandler(Handler):
                 else:
                     return None
 
+        self._run_async = handler.run_async
         return key, handler, check
 
     def handle_update(self, update, dispatcher, check_result, context=None):
@@ -453,6 +464,7 @@ class ConversationHandler(Handler):
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
 
         """
+        self._run_async = False
         conversation_key, handler, check_result = check_result
 
         with self._timeout_jobs_lock:

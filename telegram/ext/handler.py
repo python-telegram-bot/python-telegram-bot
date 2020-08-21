@@ -46,6 +46,10 @@ class Handler(ABC):
         Note that this is DEPRECATED, and you should use context based callbacks. See
         https://git.io/fxJuV for more info.
 
+    Warning:
+        When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
+        attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
+
     Args:
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
@@ -71,6 +75,8 @@ class Handler(ABC):
         pass_chat_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``chat_data`` will be passed to the callback function. Default is ``False``.
             DEPRECATED: Please switch to context based callbacks.
+        run_async (:obj:`bool`): Determines whether this handlers callback function will be run
+            asynchronously. Defaults to :obj:`False`.
 
     """
 
@@ -79,13 +85,14 @@ class Handler(ABC):
                  pass_update_queue=False,
                  pass_job_queue=False,
                  pass_user_data=False,
-                 pass_chat_data=False):
+                 pass_chat_data=False,
+                 run_async=False):
         self.callback = callback
         self.pass_update_queue = pass_update_queue
         self.pass_job_queue = pass_job_queue
         self.pass_user_data = pass_user_data
         self.pass_chat_data = pass_chat_data
-        self.run_async = False
+        self.run_async = run_async
 
     @abstractmethod
     def check_update(self, update):
