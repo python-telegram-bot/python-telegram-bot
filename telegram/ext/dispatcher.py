@@ -60,8 +60,27 @@ def run_async(func):
 
 
 class DispatcherHandlerStop(Exception):
-    """Raise this in handler to prevent execution any other handler (even in different group)."""
-    pass
+    """
+    Raise this in handler to prevent execution any other handler (even in different group).
+
+    In order to use this exception in a :class:`telegram.ext.ConversationHandler`, pass the
+    optional ``state`` parameter instead of returning the next state:
+
+    .. code-block:: python
+
+        def callback(update, context):
+            ...
+            raise DispatcherHandlerStop(next_state)
+
+    Attributes:
+        state (:obj:`object`): Optional. The next state of the conversation.
+
+    Args:
+        state (:obj:`object`, optional): The next state of the conversation.
+    """
+    def __init__(self, state=None):
+        super().__init__()
+        self.state = state
 
 
 class Dispatcher:

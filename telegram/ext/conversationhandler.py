@@ -24,7 +24,7 @@ from threading import Lock
 
 from telegram import Update
 from telegram.ext import (Handler, CallbackQueryHandler, InlineQueryHandler,
-                          ChosenInlineResultHandler, CallbackContext)
+                          ChosenInlineResultHandler, CallbackContext, DispatcherHandlerStop)
 from telegram.utils.promise import Promise
 
 
@@ -454,6 +454,7 @@ class ConversationHandler(Handler):
 
         """
         conversation_key, handler, check_result = check_result
+        raise_dp_handler_stop = False
 
         with self._timeout_jobs_lock:
             # Remove the old timeout job (if present)
@@ -462,7 +463,11 @@ class ConversationHandler(Handler):
             if timeout_job is not None:
                 timeout_job.schedule_removal()
 
-        new_state = handler.handle_update(update, dispatcher, check_result, context)
+        try:
+            new_state = handler.handle_update(update, dispatcher, check_result, context)
+        except DispatcherHandlerStop as e:
+            new_state = e.state
+            raise_dp_handler_stop = True
 
         with self._timeout_jobs_lock:
             if self.conversation_timeout and new_state != self.END:
@@ -474,9 +479,16 @@ class ConversationHandler(Handler):
 
         if isinstance(self.map_to_parent, dict) and new_state in self.map_to_parent:
             self.update_state(self.END, conversation_key)
-            return self.map_to_parent.get(new_state)
+            if raise_dp_handler_stop:
+                raise DispatcherHandlerStop(self.map_to_parent.get(new_state))
+            else:
+                return self.map_to_parent.get(new_state)
         else:
             self.update_state(new_state, conversation_key)
+            if raise_dp_handler_stop:
+                # Don't pass the new state here. If we're in a nested conversation, the parent is
+                # expecting None as return value.
+                raise DispatcherHandlerStop()
 
     def update_state(self, new_state, key):
         if new_state == self.END:
@@ -522,5 +534,10 @@ class ConversationHandler(Handler):
         for handler in handlers:
             check = handler.check_update(context.update)
             if check is not None and check is not False:
-                handler.handle_update(context.update, context.dispatcher, check, callback_context)
+                try:
+                    handler.handle_update(context.update, context.dispatcher, check,
+                                          callback_context)
+                except DispatcherHandlerStop:
+                    self.logger.warning('DispatcherHandlerStop in TIMEOUT state of '
+                                        'ConversationHandler has no effect. Ignoring.')
         self.update_state(self.END, context.conversation_key)
