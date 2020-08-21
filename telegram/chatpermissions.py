@@ -42,8 +42,8 @@ class ChatPermissions(TelegramObject):
             :attr:`can_send_media_messages`.
         can_add_web_page_previews (:obj:`bool`): Optional. ``True``, if the user is allowed to
             add web page previews to their messages, implies :attr:`can_send_media_messages`.
-        can_change_info (:obj:`bool`): Optional. ``True``, if the user is allowed to change the chat
-            title, photo and other settings. Ignored in public supergroups.
+        can_change_info (:obj:`bool`): Optional. ``True``, if the user is allowed to change the
+            chat title, photo and other settings. Ignored in public supergroups.
         can_invite_users (:obj:`bool`): Optional. ``True``, if the user is allowed to invite
             new users to the chat.
         can_pin_messages (:obj:`bool`): Optional. ``True``, if the user is allowed to pin messages.

@@ -159,7 +159,7 @@ class DelayQueue(threading.Thread):
         self._queue.put((func, args, kwargs))
 
 
-# The most straightforward way to implement this is to use 2 sequenital delay
+# The most straightforward way to implement this is to use 2 sequential delay
 # queues, like on classic delay chain schematics in electronics.
 # So, message path is:
 # msg --> group delay if group msg, else no delay --> normal msg delay --> out
@@ -198,7 +198,7 @@ class MessageQueue:
                  group_time_limit_ms=60000,
                  exc_route=None,
                  autostart=True):
-        # create accoring delay queues, use composition
+        # create according delay queues, use composition
         self._all_delayq = DelayQueue(
             burst_limit=all_burst_limit,
             time_limit_ms=all_time_limit_ms,
@@ -219,11 +219,11 @@ class MessageQueue:
         self._group_delayq.stop(timeout=timeout)
         self._all_delayq.stop(timeout=timeout)
 
-    stop.__doc__ = DelayQueue.stop.__doc__ or ''  # reuse docsting if any
+    stop.__doc__ = DelayQueue.stop.__doc__ or ''  # reuse docstring if any
 
     def __call__(self, promise, is_group_msg=False):
         """
-        Processes callables in troughput-limiting queues to avoid hitting limits (specified with
+        Processes callables in throughput-limiting queues to avoid hitting limits (specified with
         :attr:`burst_limit` and :attr:`time_limit`.
 
         Args:

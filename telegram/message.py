@@ -1045,7 +1045,8 @@ class Message(TelegramObject):
                            **kwargs)
 
         Returns:
-            :class:`telegram.Poll`: On success, the stopped Poll with the final results is returned.
+            :class:`telegram.Poll`: On success, the stopped Poll with the final results is
+            returned.
 
         """
         return self.bot.stop_poll(
