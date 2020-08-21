@@ -43,7 +43,7 @@ class WebhookInfo(TelegramObject):
             webhook certificate checks.
         pending_update_count (:obj:`int`): Number of updates awaiting delivery.
         last_error_date (:obj:`int`, optional): Unix time for the most recent error that happened
-            when trying todeliver an update via webhook.
+            when trying to deliver an update via webhook.
         last_error_message (:obj:`str`, optional): Error message in human-readable format for the
             most recent error that happened when trying to deliver an update via webhook.
         max_connections (:obj:`int`, optional): Maximum allowed number of simultaneous HTTPS

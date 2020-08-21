@@ -21,7 +21,7 @@
 
 
 class ChatAction:
-    """Helper class to provide constants for different chatactions."""
+    """Helper class to provide constants for different chat actions."""
 
     FIND_LOCATION = 'find_location'
     """:obj:`str`: 'find_location'"""

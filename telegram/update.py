@@ -52,7 +52,9 @@ class Update(TelegramObject):
         update_id (:obj:`int`): The update's unique identifier. Update identifiers start from a
             certain positive number and increase sequentially. This ID becomes especially handy if
             you're using Webhooks, since it allows you to ignore repeated updates or to restore the
-            correct update sequence, should they get out of order.
+            correct update sequence, should they get out of order.If there are no new updates for
+            at least a week, then identifier of the next update will be chosen randomly instead of
+            sequentially.
         message (:class:`telegram.Message`, optional): New incoming message of any kind - text,
             photo, sticker, etc.
         edited_message (:class:`telegram.Message`, optional): New version of a message that is
@@ -68,9 +70,9 @@ class Update(TelegramObject):
         shipping_query (:class:`telegram.ShippingQuery`, optional): New incoming shipping query.
             Only for invoices with flexible price.
         pre_checkout_query (:class:`telegram.PreCheckoutQuery`, optional): New incoming
-            pre-checkout query. Contains full information about checkout
-        poll (:class:`telegram.Poll`, optional): New poll state. Bots receive only updates
-            about polls, which are sent or stopped by the bot
+            pre-checkout query. Contains full information about checkout.
+        poll (:class:`telegram.Poll`, optional): New poll state. Bots receive only updates about
+            stopped polls and polls, which are sent by the bot.
         poll_answer (:class:`telegram.PollAnswer`, optional): A user changed their answer
             in a non-anonymous poll. Bots receive new votes only in polls that were sent
             by the bot itself.

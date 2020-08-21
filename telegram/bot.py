@@ -1551,7 +1551,7 @@ class Bot(TelegramObject):
                 message sent to the bot when user presses the switch button. 1-64 characters,
                 only A-Z, a-z, 0-9, _ and - are allowed.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
-                he read timeout from the server (instead of the one specified during creation of
+                the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -3321,7 +3321,7 @@ class Bot(TelegramObject):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            :class:`telegram.File`: The uploaded File
+            :class:`telegram.File`: On success, the uploaded File is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -3374,10 +3374,10 @@ class Bot(TelegramObject):
             tgs_sticker (:obj:`str` | `filelike object`, optional): TGS animation with the sticker,
                 uploaded using multipart/form-data. See
                 https://core.telegram.org/animated_stickers#technical-requirements for technical
-                requirements
+                requirements.
             emojis (:obj:`str`): One or more emoji corresponding to the sticker.
-            contains_masks (:obj:`bool`, optional): Pass True, if a set of mask stickers should be
-                created.
+            contains_masks (:obj:`bool`, optional): Pass `True`, if a set of mask stickers should
+                be created.
             mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
                 should be placed on faces.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -3439,7 +3439,7 @@ class Bot(TelegramObject):
         Args:
             user_id (:obj:`int`): User identifier of created sticker set owner.
             name (:obj:`str`): Sticker set name.
-            png_sticker (:obj:`str` | `filelike object`, optional): Png image with the sticker,
+            png_sticker (:obj:`str` | `filelike object`, optional): PNG image with the sticker,
                 must be up to 512 kilobytes in size, dimensions must not exceed 512px,
                 and either width or height must be exactly 512px. Pass a file_id as a String to
                 send a file that already exists on the Telegram servers, pass an HTTP URL as a
@@ -3448,7 +3448,7 @@ class Bot(TelegramObject):
             tgs_sticker (:obj:`str` | `filelike object`, optional): TGS animation with the sticker,
                 uploaded using multipart/form-data. See
                 https://core.telegram.org/animated_stickers#technical-requirements for technical
-                requirements
+                requirements.
             emojis (:obj:`str`): One or more emoji corresponding to the sticker.
             mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
                 should be placed on faces.
@@ -3560,7 +3560,8 @@ class Bot(TelegramObject):
             https://core.telegram.org/animated_stickers#technical-requirements for animated sticker
             technical requirements. Pass a file_id as a String to send a file that already exists
             on the Telegram servers, pass an HTTP URL as a String for Telegram to get a file from
-            the Internet, or upload a new one using multipart/form-data.
+            the Internet, or upload a new one using multipart/form-data. Animated sticker set
+            thumbnail can't be uploaded via HTTP URL.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during
                 creation of the connection pool).
@@ -3650,11 +3651,11 @@ class Bot(TelegramObject):
             question (:obj:`str`): Poll question, 1-255 characters.
             options (List[:obj:`str`]): List of answer options, 2-10 strings 1-100 characters each.
             is_anonymous (:obj:`bool`, optional): True, if the poll needs to be anonymous,
-                defaults to True.
+                defaults to `True`.
             type (:obj:`str`, optional): Poll type, :attr:`telegram.Poll.QUIZ` or
                 :attr:`telegram.Poll.REGULAR`, defaults to :attr:`telegram.Poll.REGULAR`.
             allows_multiple_answers (:obj:`bool`, optional): True, if the poll allows multiple
-                answers, ignored for polls in quiz mode, defaults to False.
+                answers, ignored for polls in quiz mode, defaults to `False`.
             correct_option_id (:obj:`int`, optional): 0-based identifier of the correct answer
                 option, required for polls in quiz mode.
             explanation (:obj:`str`, optional): Text that is shown when a user chooses an incorrect

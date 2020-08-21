@@ -48,6 +48,10 @@ class ChosenInlineResult(TelegramObject):
         query (:obj:`str`): The query that was used to obtain the result.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
+    Note:
+        It is necessary to enable inline feedback via `@Botfather <https://t.me/BotFather>`_ in
+        order to receive these objects in updates.
+
     """
 
     def __init__(self,
