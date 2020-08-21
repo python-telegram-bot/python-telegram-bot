@@ -486,7 +486,9 @@ class ConversationHandler(Handler):
         else:
             self.update_state(new_state, conversation_key)
             if raise_dp_handler_stop:
-                raise DispatcherHandlerStop(new_state)
+                # Don't pass the new state here. If we're in a nested conversation, the parent is
+                # expecting None as return value.
+                raise DispatcherHandlerStop()
 
     def update_state(self, new_state, key):
         if new_state == self.END:
