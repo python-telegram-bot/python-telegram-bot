@@ -126,10 +126,17 @@ class Handler(ABC):
         """
         if context:
             self.collect_additional_context(context, update, dispatcher, check_result)
-            return self.callback(update, context)
+            if self.run_async:
+                return dispatcher.run_async(self.callback, update, context, update=update)
+            else:
+                return self.callback(update, context)
         else:
             optional_args = self.collect_optional_args(dispatcher, update, check_result)
-            return self.callback(dispatcher.bot, update, **optional_args)
+            if self.run_async:
+                return dispatcher.run_async(self.callback, dispatcher.bot, update, update=update,
+                                            **optional_args)
+            else:
+                return self.callback(dispatcher.bot, update, **optional_args)
 
     def collect_additional_context(self, context, update, dispatcher, check_result):
         """Prepares additional arguments for the context. Override if needed.

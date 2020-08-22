@@ -249,6 +249,8 @@ class Dispatcher:
                     self.logger.exception(
                         'No error handlers are set for async function, logging exception.',
                         exc_info=promise.exception)
+            else:
+                self.update_persistence(update=promise.update)
 
     def run_async(self, func, *args, update=None, error_handler=None, **kwargs):
         """Queue a function (with given args/kwargs) to be run asynchronously.
@@ -395,12 +397,11 @@ class Dispatcher:
                     if check is not None and check is not False:
                         if not context and self.use_context:
                             context = CallbackContext.from_update(update, self)
-                        if handler.run_async:
-                            args = (update, self, check, context)
-                            self.run_async(handler.handle_update, update=update, *args)
-                        else:
-                            handler.handle_update(update, self, check, context)
-                        self.update_persistence(update=update)
+                        handler.handle_update(update, self, check, context)
+
+                        # If handler runs async updating immediately doesn't make sense
+                        if not handler.run_async:
+                            self.update_persistence(update=update)
                         break
 
             # Stop processing with any other handler.
