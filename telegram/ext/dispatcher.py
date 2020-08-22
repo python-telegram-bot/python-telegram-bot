@@ -74,11 +74,9 @@ class Dispatcher:
             instance to pass onto handler callbacks.
         workers (:obj:`int`): Number of maximum concurrent worker threads for the ``@run_async``
             decorator.
-        user_data (:obj:`defaultdict`): A dictionary handler can be used to store data for the
-            user.
-        chat_data (:obj:`defaultdict`): A dictionary handler can be used to store data for the
-            chat.
-        bot_data (:obj:`dict`): A dictionary handler can be used to store data for the bot.
+        user_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the user.
+        chat_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the chat.
+        bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
             store data that should be persistent over restarts.
 

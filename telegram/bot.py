@@ -769,7 +769,7 @@ class Bot(TelegramObject):
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
                 constants in :class:`telegram.ParseMode` for the available modes.
-            supports_streaming (:obj:`bool`, optional): Pass True, if the uploaded video is
+            supports_streaming (:obj:`bool`, optional): Pass ``True``, if the uploaded video is
                 suitable for streaming.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
@@ -1537,9 +1537,9 @@ class Bot(TelegramObject):
                 query.
             cache_time (:obj:`int`, optional): The maximum amount of time in seconds that the
                 result of the inline query may be cached on the server. Defaults to 300.
-            is_personal (:obj:`bool`, optional): Pass True, if results may be cached on the server
-                side only for the user that sent the query. By default, results may be returned to
-                any user who sends the same query.
+            is_personal (:obj:`bool`, optional): Pass ``True``, if results may be cached on
+                the server side only for the user that sent the query. By default,
+                results may be returned to any user who sends the same query.
             next_offset (:obj:`str`, optional): Pass the offset that a client should send in the
                 next query with the same text to receive more results. Pass an empty string if
                 there are no more results or if you don't support pagination. Offset length can't
@@ -1797,7 +1797,7 @@ class Bot(TelegramObject):
             callback_query_id (:obj:`str`): Unique identifier for the query to be answered.
             text (:obj:`str`, optional): Text of the notification. If not specified, nothing will
                 be shown to the user, 0-200 characters.
-            show_alert (:obj:`bool`, optional): If true, an alert will be shown by the client
+            show_alert (:obj:`bool`, optional): If ``True``, an alert will be shown by the client
                 instead of a notification at the top of the chat screen. Defaults to false.
             url (:obj:`str`, optional): URL that will be opened by the user's client. If you have
                 created a Game and accepted the conditions via @Botfather, specify the URL that
@@ -2517,10 +2517,10 @@ class Bot(TelegramObject):
         Args:
             user_id (:obj:`int`): User identifier.
             score (:obj:`int`): New score, must be non-negative.
-            force (:obj:`bool`, optional): Pass True, if the high score is allowed to decrease.
-                This can be useful when fixing mistakes or banning cheaters.
-            disable_edit_message (:obj:`bool`, optional): Pass True, if the game message should not
-                be automatically edited to include the current scoreboard.
+            force (:obj:`bool`, optional): Pass ``True``, if the high score is allowed to
+                decrease. This can be useful when fixing mistakes or banning cheaters.
+            disable_edit_message (:obj:`bool`, optional): Pass ``True``, if the game message
+                should not be automatically edited to include the current scoreboard.
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
                 specified. Unique identifier for the target chat.
             message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
@@ -2538,7 +2538,7 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`: If the new score is not greater than the user's
-            current score in the chat and force is False.
+            current score in the chat and force is ``False``.
 
         """
         url = '{}/setGameScore'.format(self.base_url)
@@ -2658,19 +2658,19 @@ class Bot(TelegramObject):
             photo_size (:obj:`str`, optional): Photo size.
             photo_width (:obj:`int`, optional): Photo width.
             photo_height (:obj:`int`, optional): Photo height.
-            need_name (:obj:`bool`, optional): Pass True, if you require the user's full name to
-                complete the order.
-            need_phone_number (:obj:`bool`, optional): Pass True, if you require the user's
+            need_name (:obj:`bool`, optional): Pass ``True``, if you require the user's full
+                name to complete the order.
+            need_phone_number (:obj:`bool`, optional): Pass ``True``, if you require the user's
                 phone number to complete the order.
-            need_email (:obj:`bool`, optional): Pass True, if you require the user's email to
+            need_email (:obj:`bool`, optional): Pass ``True``, if you require the user's email to
                 complete the order.
-            need_shipping_address (:obj:`bool`, optional): Pass True, if you require the user's
-                shipping address to complete the order.
-            send_phone_number_to_provider (:obj:`bool`, optional): Pass True, if user's phone
+            need_shipping_address (:obj:`bool`, optional): Pass ``True``, if you require the
+                user's shipping address to complete the order.
+            send_phone_number_to_provider (:obj:`bool`, optional): Pass ``True``, if user's phone
                 number should be sent to provider.
-            send_email_to_provider (:obj:`bool`, optional): Pass True, if user's email address
+            send_email_to_provider (:obj:`bool`, optional): Pass ``True``, if user's email address
                 should be sent to provider.
-            is_flexible (:obj:`bool`, optional): Pass True, if the final price depends on the
+            is_flexible (:obj:`bool`, optional): Pass ``True``, if the final price depends on the
                 shipping method.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
@@ -2750,12 +2750,12 @@ class Bot(TelegramObject):
 
         Args:
             shipping_query_id (:obj:`str`): Unique identifier for the query to be answered.
-            ok (:obj:`bool`): Specify True if delivery to the specified address is possible and
-                False if there are any problems (for example, if delivery to the specified address
-                is not possible).
+            ok (:obj:`bool`): Specify ``True`` if delivery to the specified address is possible
+                and ``False`` if there are any problems (for example, if delivery to the
+                specified address is not possible).
             shipping_options (List[:class:`telegram.ShippingOption`]), optional]: Required if ok is
-                True. A JSON-serialized array of available shipping options.
-            error_message (:obj:`str`, optional): Required if ok is False. Error message in
+                ``True``. A JSON-serialized array of available shipping options.
+            error_message (:obj:`str`, optional): Required if ok is ``False``. Error message in
                 human readable form that explains why it is impossible to complete the order (e.g.
                 "Sorry, delivery to your desired address is unavailable"). Telegram will display
                 this message to the user.
@@ -2765,7 +2765,7 @@ class Bot(TelegramObject):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            :obj:`bool`: On success, True is returned.
+            :obj:`bool`: On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2811,13 +2811,14 @@ class Bot(TelegramObject):
 
         Args:
             pre_checkout_query_id (:obj:`str`): Unique identifier for the query to be answered.
-            ok (:obj:`bool`): Specify True if everything is alright (goods are available, etc.) and
-                the bot is ready to proceed with the order. Use False if there are any problems.
-            error_message (:obj:`str`, optional): Required if ok is False. Error message in human
-                readable form that explains the reason for failure to proceed with the checkout
-                (e.g. "Sorry, somebody just bought the last of our amazing black T-shirts while you
-                were busy filling out your payment details. Please choose a different color or
-                garment!"). Telegram will display this message to the user.
+            ok (:obj:`bool`): Specify ``True`` if everything is alright
+                (goods are available, etc.) and the bot is ready to proceed with the order. Use
+                ``False`` if there are any problems.
+            error_message (:obj:`str`, optional): Required if ok is ``False``. Error message
+                in human readable form that explains the reason for failure to proceed with
+                the checkout (e.g. "Sorry, somebody just bought the last of our amazing black
+                T-shirts while you were busy filling out your payment details. Please choose a
+                different color or garment!"). Telegram will display this message to the user.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -2855,8 +2856,8 @@ class Bot(TelegramObject):
                              timeout=None, **kwargs):
         """
         Use this method to restrict a user in a supergroup. The bot must be an administrator in
-        the supergroup for this to work and must have the appropriate admin rights. Pass True for
-        all boolean parameters to lift restrictions from a user.
+        the supergroup for this to work and must have the appropriate admin rights. Pass ``True``
+        for all boolean parameters to lift restrictions from a user.
 
         Note:
             Since Bot API 4.4, :attr:`restrict_chat_member` takes the new user permissions in a
@@ -2907,28 +2908,28 @@ class Bot(TelegramObject):
         """
         Use this method to promote or demote a user in a supergroup or a channel. The bot must be
         an administrator in the chat for this to work and must have the appropriate admin rights.
-        Pass False for all boolean parameters to demote a user.
+        Pass ``False`` for all boolean parameters to demote a user.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target supergroup (in the format @supergroupusername).
             user_id (:obj:`int`): Unique identifier of the target user.
-            can_change_info (:obj:`bool`, optional): Pass True, if the administrator can change
+            can_change_info (:obj:`bool`, optional): Pass ``True``, if the administrator can change
                 chat title, photo and other settings.
-            can_post_messages (:obj:`bool`, optional): Pass True, if the administrator can
+            can_post_messages (:obj:`bool`, optional): Pass ``True``, if the administrator can
                 create channel posts, channels only.
-            can_edit_messages (:obj:`bool`, optional): Pass True, if the administrator can edit
+            can_edit_messages (:obj:`bool`, optional): Pass ``True``, if the administrator can edit
                 messages of other users, channels only.
-            can_delete_messages (:obj:`bool`, optional): Pass True, if the administrator can
+            can_delete_messages (:obj:`bool`, optional): Pass ``True``, if the administrator can
                 delete messages of other users.
-            can_invite_users (:obj:`bool`, optional): Pass True, if the administrator can invite
-                new users to the chat.
-            can_restrict_members (:obj:`bool`, optional): Pass True, if the administrator can
+            can_invite_users (:obj:`bool`, optional): Pass ``True``, if the administrator can
+                invite new users to the chat.
+            can_restrict_members (:obj:`bool`, optional): Pass ``True``, if the administrator can
                 restrict, ban or unban chat members.
-            can_pin_messages (:obj:`bool`, optional): Pass True, if the administrator can pin
+            can_pin_messages (:obj:`bool`, optional): Pass ``True``, if the administrator can pin
                 messages, supergroups only.
-            can_promote_members (:obj:`bool`, optional): Pass True, if the administrator can add
-                new administrators with a subset of his own privileges or demote administrators
+            can_promote_members (:obj:`bool`, optional): Pass ``True``, if the administrator can
+                add new administrators with a subset of his own privileges or demote administrators
                 that he has promoted, directly or indirectly (promoted by administrators that were
                 appointed by him).
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -3213,9 +3214,9 @@ class Bot(TelegramObject):
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
             message_id (:obj:`int`): Identifier of a message to pin.
-            disable_notification (:obj:`bool`, optional): Pass True, if it is not necessary to send
-                a notification to all group members about the new pinned message. Notifications
-                are always disabled in channels.
+            disable_notification (:obj:`bool`, optional): Pass ``True``, if it is not necessary
+                to send a notification to all group members about the new pinned message.
+                Notifications are always disabled in channels.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -3376,8 +3377,8 @@ class Bot(TelegramObject):
                 https://core.telegram.org/animated_stickers#technical-requirements for technical
                 requirements.
             emojis (:obj:`str`): One or more emoji corresponding to the sticker.
-            contains_masks (:obj:`bool`, optional): Pass `True`, if a set of mask stickers should
-                be created.
+            contains_masks (:obj:`bool`, optional): Pass ``True``, if a set of mask stickers
+                should be created.
             mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
                 should be placed on faces.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -3650,12 +3651,12 @@ class Bot(TelegramObject):
                 of the target channel (in the format @channelusername).
             question (:obj:`str`): Poll question, 1-255 characters.
             options (List[:obj:`str`]): List of answer options, 2-10 strings 1-100 characters each.
-            is_anonymous (:obj:`bool`, optional): True, if the poll needs to be anonymous,
-                defaults to `True`.
+            is_anonymous (:obj:`bool`, optional): ``True``, if the poll needs to be anonymous,
+                defaults to ``True``.
             type (:obj:`str`, optional): Poll type, :attr:`telegram.Poll.QUIZ` or
                 :attr:`telegram.Poll.REGULAR`, defaults to :attr:`telegram.Poll.REGULAR`.
-            allows_multiple_answers (:obj:`bool`, optional): True, if the poll allows multiple
-                answers, ignored for polls in quiz mode, defaults to `False`.
+            allows_multiple_answers (:obj:`bool`, optional): ``True``, if the poll allows multiple
+                answers, ignored for polls in quiz mode, defaults to ``False``.
             correct_option_id (:obj:`int`, optional): 0-based identifier of the correct answer
                 option, required for polls in quiz mode.
             explanation (:obj:`str`, optional): Text that is shown when a user chooses an incorrect
@@ -3670,7 +3671,7 @@ class Bot(TelegramObject):
                 timestamp) when the poll will be automatically closed. Must be at least 5 and no
                 more than 600 seconds in the future. Can't be used together with
                 :attr:`open_period`.
-            is_closed (:obj:`bool`, optional): Pass True, if the poll needs to be immediately
+            is_closed (:obj:`bool`, optional): Pass ``True``, if the poll needs to be immediately
                 closed. This can be useful for poll preview.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.

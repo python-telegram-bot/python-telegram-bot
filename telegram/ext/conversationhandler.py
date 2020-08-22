@@ -60,7 +60,7 @@ class ConversationHandler(Handler):
 
     To change the state of conversation, the callback function of a handler must return the new
     state after responding to the user. If it does not return anything (returning ``None`` by
-    default), the state will not change. If an entry point callback function returns None,
+    default), the state will not change. If an entry point callback function returns ``None``,
     the conversation ends immediately after the execution of this callback function.
     To end the conversation, the callback function must return :attr:`END` or ``-1``. To
     handle the conversation timeout, use handler :attr:`TIMEOUT` or ``-2``.
@@ -98,7 +98,7 @@ class ConversationHandler(Handler):
             handler is inactive more than this timeout (in seconds), it will be automatically
             ended. If this value is 0 (default), there will be no timeout. When it's triggered, the
             last received update and the corresponding ``context`` will be handled by ALL the
-            handler's who's `check_update` method returns True that are in the state
+            handler's who's `check_update` method returns ``True`` that are in the state
             :attr:`ConversationHandler.TIMEOUT`.
         name (:obj:`str`): Optional. The name for this conversationhandler. Required for
             persistence
@@ -131,9 +131,9 @@ class ConversationHandler(Handler):
             ID. Default is ``False``.
         conversation_timeout (:obj:`float` | :obj:`datetime.timedelta`, optional): When this
             handler is inactive more than this timeout (in seconds), it will be automatically
-            ended. If this value is 0 or None (default), there will be no timeout. The last
+            ended. If this value is 0 or ``None`` (default), there will be no timeout. The last
             received update and the corresponding ``context`` will be handled by ALL the handler's
-            who's `check_update` method returns True that are in the state
+            who's `check_update` method returns ``True`` that are in the state
             :attr:`ConversationHandler.TIMEOUT`.
         name (:obj:`str`, optional): The name for this conversationhandler. Required for
             persistence

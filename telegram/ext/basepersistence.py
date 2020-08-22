@@ -83,7 +83,7 @@ class BasePersistence(ABC):
     def get_bot_data(self):
         """"Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the bot_data if stored, or an empty
-        ``dict``.
+        :obj:`dict`.
 
         Returns:
             :obj:`dict`: The restored bot data.
@@ -94,7 +94,7 @@ class BasePersistence(ABC):
         """"Will be called by :class:`telegram.ext.Dispatcher` when a
         :class:`telegram.ext.ConversationHandler` is added if
         :attr:`telegram.ext.ConversationHandler.persistent` is ``True``.
-        It should return the conversations for the handler with `name` or an empty ``dict``
+        It should return the conversations for the handler with `name` or an empty :obj:`dict`
 
         Args:
             name (:obj:`str`): The handlers name.

@@ -37,11 +37,12 @@ class Chat(TelegramObject):
         description (:obj:`str`): Optional. Description, for groups, supergroups and channel chats.
         invite_link (:obj:`str`): Optional. Chat invite link, for supergroups and channel chats.
         pinned_message (:class:`telegram.Message`): Optional. Pinned message, for supergroups.
-            Returned only in ``get_chat()``.
+            Returned only in :meth:`telegram.Bot.get_chat`.
         permissions (:class:`telegram.ChatPermission`): Optional. Default chat member permissions,
-            for groups and supergroups. Returned only in ``get_chat()``.
+            for groups and supergroups. Returned only in :meth:`telegram.Bot.get_chat`.
         slow_mode_delay (:obj:`int`): Optional. For supergroups, the minimum allowed delay between
-            consecutive messages sent by each unprivileged user. Returned only in ``get_chat()``.
+            consecutive messages sent by each unprivileged user. Returned only in
+            :meth:`telegram.Bot.get_chat`.
         sticker_set_name (:obj:`str`): Optional. For supergroups, name of Group sticker set.
         can_set_sticker_set (:obj:`bool`): Optional. ``True``, if the bot can change group the
             sticker set.
@@ -58,24 +59,26 @@ class Chat(TelegramObject):
             available.
         first_name(:obj:`str`, optional): First name of the other party in a private chat.
         last_name(:obj:`str`, optional): Last name of the other party in a private chat.
-        photo (:class:`telegram.ChatPhoto`, optional): Chat photo. Returned only in ``get_chat()``.
+        photo (:class:`telegram.ChatPhoto`, optional): Chat photo.
+            Returned only in :meth:`telegram.Bot.get_chat`.
         description (:obj:`str`, optional): Description, for groups, supergroups and channel chats.
-            Returned only in ``get_chat()``.
+            Returned only in :meth:`telegram.Bot.get_chat`.
         invite_link (:obj:`str`, optional): Chat invite link, for groups, supergroups and channel
             chats. Each administrator in a chat generates their own invite links, so the bot must
             first generate the link using ``export_chat_invite_link()``. Returned only
-            in ``get_chat()``.
+            in :meth:`telegram.Bot.get_chat`.
         pinned_message (:class:`telegram.Message`, optional): Pinned message, for groups,
-            supergroups and channels. Returned only in ``get_chat()``.
+            supergroups and channels. Returned only in :meth:`telegram.Bot.get_chat`.
         permissions (:class:`telegram.ChatPermission`): Optional. Default chat member permissions,
-            for groups and supergroups. Returned only in ``get_chat()``.
+            for groups and supergroups. Returned only in :meth:`telegram.Bot.get_chat`.
         slow_mode_delay (:obj:`int`, optional): For supergroups, the minimum allowed delay between
-            consecutive messages sent by each unprivileged user. Returned only in ``get_chat()``.
+            consecutive messages sent by each unprivileged user.
+            Returned only in :meth:`telegram.Bot.get_chat`.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         sticker_set_name (:obj:`str`, optional): For supergroups, name of group sticker set.
-            Returned only in ``get_chat()``.
+            Returned only in :meth:`telegram.Bot.get_chat`.
         can_set_sticker_set (:obj:`bool`, optional): ``True``, if the bot can change group the
-            sticker set. Returned only in ``get_chat()``.
+            sticker set. Returned only in :meth:`telegram.Bot.get_chat`.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """

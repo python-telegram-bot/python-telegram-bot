@@ -119,7 +119,7 @@ class PicklePersistence(BasePersistence):
             pickle.dump(data, f)
 
     def get_user_data(self):
-        """Returns the user_data from the pickle file if it exists or an empty ``defaultdict``.
+        """Returns the user_data from the pickle file if it exists or an empty :obj:`defaultdict`.
 
         Returns:
             :obj:`defaultdict`: The restored user data.
@@ -139,7 +139,7 @@ class PicklePersistence(BasePersistence):
         return deepcopy(self.user_data)
 
     def get_chat_data(self):
-        """Returns the chat_data from the pickle file if it exists or an empty ``defaultdict``.
+        """Returns the chat_data from the pickle file if it exists or an empty :obj:`defaultdict`.
 
         Returns:
             :obj:`defaultdict`: The restored chat data.
@@ -159,7 +159,7 @@ class PicklePersistence(BasePersistence):
         return deepcopy(self.chat_data)
 
     def get_bot_data(self):
-        """Returns the bot_data from the pickle file if it exists or an empty ``dict``.
+        """Returns the bot_data from the pickle file if it exists or an empty :obj:`dict`.
 
         Returns:
             :obj:`dict`: The restored bot data.
@@ -177,13 +177,13 @@ class PicklePersistence(BasePersistence):
         return deepcopy(self.bot_data)
 
     def get_conversations(self, name):
-        """Returns the conversations from the pickle file if it exists or an empty ``dict``.
+        """Returns the conversations from the pickle file if it exists or an empty :obj:`dict`.
 
         Args:
             name (:obj:`str`): The handlers name.
 
         Returns:
-            :obj:`dict`: The restored conversations data.
+            :obj:`dict`: The restored conversations for the handler.
         """
         if self.conversations:
             pass
@@ -198,8 +198,8 @@ class PicklePersistence(BasePersistence):
         return self.conversations.get(name, {}).copy()
 
     def update_conversation(self, name, key, new_state):
-        """Will update the conversations (if changed) and depending on :attr:`on_flush`
-        saves the pickle file.
+        """Will update the conversations for the given handler and depending on :attr:`on_flush`
+        save the pickle file.
 
         Args:
             name (:obj:`str`): The handler's name.
@@ -217,8 +217,7 @@ class PicklePersistence(BasePersistence):
                 self.dump_singlefile()
 
     def update_user_data(self, user_id, data):
-        """Will update the user_data (if changed) and depending on :attr:`on_flush` saves the
-        pickle file.
+        """Will update the user_data and depending on :attr:`on_flush` save the pickle file.
 
         Args:
             user_id (:obj:`int`): The user the data might have been changed for.
@@ -237,8 +236,7 @@ class PicklePersistence(BasePersistence):
                 self.dump_singlefile()
 
     def update_chat_data(self, chat_id, data):
-        """Will update the chat_data (if changed) and depending on :attr:`on_flush` saves the
-        pickle file.
+        """Will update the chat_data and depending on :attr:`on_flush` save the pickle file.
 
         Args:
             chat_id (:obj:`int`): The chat the data might have been changed for.
@@ -257,8 +255,7 @@ class PicklePersistence(BasePersistence):
                 self.dump_singlefile()
 
     def update_bot_data(self, data):
-        """Will update the bot_data (if changed) and depending on :attr:`on_flush` saves the
-        pickle file.
+        """Will update the bot_data and depending on :attr:`on_flush` save the pickle file.
 
         Args:
             data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.bot_data`.

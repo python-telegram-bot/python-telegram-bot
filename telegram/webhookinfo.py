@@ -39,7 +39,7 @@ class WebhookInfo(TelegramObject):
 
     Args:
         url (:obj:`str`): Webhook URL, may be empty if webhook is not set up.
-        has_custom_certificate (:obj:`bool`): True, if a custom certificate was provided for
+        has_custom_certificate (:obj:`bool`): ``True``, if a custom certificate was provided for
             webhook certificate checks.
         pending_update_count (:obj:`int`): Number of updates awaiting delivery.
         last_error_date (:obj:`int`, optional): Unix time for the most recent error that happened

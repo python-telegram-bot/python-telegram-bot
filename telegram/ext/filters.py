@@ -61,9 +61,9 @@ class BaseFilter(ABC):
 
 
     If you want to create your own filters create a class inheriting from this class and implement
-    a `filter` method that returns a boolean: `True` if the message should be handled, `False`
-    otherwise. Note that the filters work only as class instances, not actual class objects
-    (so remember to initialize your filter classes).
+    a `filter` method that returns a boolean: ``True`` if the message should be
+    handled, ``False`` otherwise. Note that the filters work only as class instances, not
+    actual class objects (so remember to initialize your filter classes).
 
     By default the filters name (what will get printed when converted to a string for display)
     will be the class name. If you want to overwrite this assign a better name to the `name`
@@ -469,7 +469,7 @@ class Filters:
                     send media with wrong types that don't fit to this handler.
 
             Example:
-                Filters.documents.category('audio/') returns `True` for all types
+                Filters.documents.category('audio/') returns ``True`` for all types
                 of audio sent as file, for example 'audio/mpeg' or 'audio/x-wav'.
             """
 

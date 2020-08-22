@@ -28,9 +28,7 @@ class ReplyKeyboardRemove(ReplyMarkup):
     hidden immediately after the user presses a button (see :class:`telegram.ReplyKeyboardMarkup`).
 
     Attributes:
-        remove_keyboard (:obj:`True`): Requests clients to remove the custom keyboard. (user will
-            not be able to summon this keyboard; if you want to hide the keyboard from sight but
-            keep it accessible, use one_time_keyboard in :class:`telegram.ReplyKeyboardMarkup`).
+        remove_keyboard (:obj:`True`): Requests clients to remove the custom keyboard.
         selective (:obj:`bool`): Optional. Use this parameter if you want to remove the keyboard
             for specific users only.
 
@@ -48,6 +46,10 @@ class ReplyKeyboardRemove(ReplyMarkup):
                message.
 
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Note:
+        User will not be able to summon this keyboard; if you want to hide the keyboard from
+        sight but keep it accessible, use :attr:`telegram.ReplyKeyboardMarkup.one_time_keyboard`.
 
     """
 

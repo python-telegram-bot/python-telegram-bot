@@ -158,7 +158,8 @@ class DictPersistence(BasePersistence):
             return encode_conversations_to_json(self.conversations)
 
     def get_user_data(self):
-        """Returns the user_data created from the ``user_data_json`` or an empty ``defaultdict``.
+        """Returns the user_data created from the ``user_data_json`` or an empty
+        :obj:`defaultdict`.
 
         Returns:
             :obj:`defaultdict`: The restored user data.
@@ -170,7 +171,8 @@ class DictPersistence(BasePersistence):
         return deepcopy(self.user_data)
 
     def get_chat_data(self):
-        """Returns the chat_data created from the ``chat_data_json`` or an empty ``defaultdict``.
+        """Returns the chat_data created from the ``chat_data_json`` or an empty
+        :obj:`defaultdict`.
 
         Returns:
             :obj:`defaultdict`: The restored chat data.
@@ -182,7 +184,7 @@ class DictPersistence(BasePersistence):
         return deepcopy(self.chat_data)
 
     def get_bot_data(self):
-        """Returns the bot_data created from the ``bot_data_json`` or an empty ``dict``.
+        """Returns the bot_data created from the ``bot_data_json`` or an empty :obj:`dict`.
 
         Returns:
             :obj:`dict`: The restored bot data.
@@ -195,7 +197,7 @@ class DictPersistence(BasePersistence):
 
     def get_conversations(self, name):
         """Returns the conversations created from the ``conversations_json`` or an empty
-        ``dict``.
+        :obj:`dict`.
 
         Returns:
             :obj:`dict`: The restored conversations data.
@@ -207,7 +209,7 @@ class DictPersistence(BasePersistence):
         return self.conversations.get(name, {}).copy()
 
     def update_conversation(self, name, key, new_state):
-        """Will update the conversations (if changed).
+        """Will update the conversations for the given handler.
 
         Args:
             name (:obj:`str`): The handler's name.

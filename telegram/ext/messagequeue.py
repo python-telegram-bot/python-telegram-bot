@@ -57,8 +57,9 @@ class DelayQueue(threading.Thread):
             route exceptions from processor thread to main thread; is called on `Exception`
             subclass exceptions. If not provided, exceptions are routed through dummy handler,
             which re-raises them.
-        autostart (:obj:`bool`, optional): If True, processor is started immediately after object's
-            creation; if ``False``, should be started manually by `start` method. Defaults to True.
+        autostart (:obj:`bool`, optional): If ``True``, processor is started immediately after
+            object's creation; if ``False``, should be started manually by `start` method.
+            Defaults to ``True``.
         name (:obj:`str`, optional): Thread's name. Defaults to ``'DelayQueue-N'``, where N is
             sequential number of object created.
 
@@ -125,7 +126,8 @@ class DelayQueue(threading.Thread):
             timeout (:obj:`float`): Indicates maximum time to wait for processor to stop and its
                 thread to exit. If timeout exceeds and processor has not stopped, method silently
                 returns. :attr:`is_alive` could be used afterwards to check the actual status.
-                ``timeout`` set to None, blocks until processor is shut down. Defaults to None.
+                ``timeout`` set to ``None``, blocks until processor is shut down.
+                Defaults to ``None``.
 
         """
 
@@ -185,7 +187,7 @@ class MessageQueue:
             to route exceptions from processor threads to main thread; is called on ``Exception``
             subclass exceptions. If not provided, exceptions are routed through dummy handler,
             which re-raises them.
-        autostart (:obj:`bool`, optional): If True, processors are started immediately after
+        autostart (:obj:`bool`, optional): If ``True``, processors are started immediately after
             object's creation; if ``False``, should be started manually by :attr:`start` method.
             Defaults to ``True``.
 
