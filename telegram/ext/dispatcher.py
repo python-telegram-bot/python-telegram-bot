@@ -260,6 +260,8 @@ class Dispatcher:
               :meth:`add_error_handler`) and ``update`` is passed, you *must* also pass
               ``error_handler``, as an exception within ``func`` would cause an infinite loop
               otherwise.
+            * passing ``error_handler`` is not supported for the old style API, i.e.
+              ``use_context=False``
 
         Args:
             func (:obj:`callable`): The function to run in the thread.
@@ -284,8 +286,10 @@ class Dispatcher:
             Promise
 
         """
-        # TODO: handle exception in async threads
-        #       set a threading.Event to notify caller thread
+        if self.use_context is False and error_handler:
+            raise ValueError('Passing `error_handler` is not supported for non context aware '
+                             'dispatchers!')
+
         promise = Promise(func, args, kwargs, update=update, error_handler=error_handler)
         self.__async_queue.put(promise)
         return promise

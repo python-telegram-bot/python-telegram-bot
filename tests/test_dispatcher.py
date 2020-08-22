@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import logging
 from queue import Queue
 from threading import current_thread
 from time import sleep
@@ -54,6 +55,9 @@ class TestDispatcher:
     def error_handler(self, bot, update, error):
         self.received = error.message
 
+    def error_handler_context(self, update, context):
+        self.received = context.error.message
+
     def error_handler_raise_error(self, bot, update, error):
         raise Exception('Failing bigly')
 
@@ -67,7 +71,9 @@ class TestDispatcher:
         return callback
 
     def callback_raise_error(self, bot, update):
-        raise TelegramError(update.message.text)
+        if isinstance(bot, Bot):
+            raise TelegramError(update.message.text)
+        raise TelegramError(bot.message.text)
 
     def callback_if_not_update_queue(self, bot, update, update_queue=None):
         if update_queue is not None:
@@ -201,6 +207,154 @@ class TestDispatcher:
 
         with pytest.warns(TelegramDeprecationWarning, match='@run_async decorator'):
             dp.process_update(self.message_update)
+
+    def test_async_raises_dispatcher_handler_stop(self, dp, caplog):
+        @run_async
+        def callback(update, context):
+            raise DispatcherHandlerStop()
+
+        dp.add_handler(MessageHandler(Filters.all, callback))
+
+        with caplog.at_level(logging.WARNING):
+            dp.update_queue.put(self.message_update)
+            sleep(.1)
+            assert len(caplog.records) == 1
+            assert caplog.records[-1].msg.startswith('DispatcherHandlerStop is not supported '
+                                                     'with async functions')
+
+    def test_add_async_handler(self, dp):
+        dp.add_handler(MessageHandler(Filters.all,
+                                      self.callback_if_not_update_queue,
+                                      pass_update_queue=True,
+                                      run_async=True))
+
+        dp.update_queue.put(self.message_update)
+        sleep(.1)
+        assert self.received == self.message_update.message
+
+    def test_run_async_no_error_handler(self, dp, caplog):
+        def func():
+            raise RuntimeError('Async Error')
+
+        with caplog.at_level(logging.ERROR):
+            dp.run_async(func)
+            sleep(.1)
+            assert len(caplog.records) == 1
+            assert caplog.records[-1].msg.startswith('No error handlers are set for async')
+
+    def test_async_handler_error_handler(self, dp):
+        dp.add_handler(MessageHandler(Filters.all,
+                                      self.callback_raise_error,
+                                      run_async=True))
+        dp.add_error_handler(self.error_handler)
+
+        dp.update_queue.put(self.message_update)
+        sleep(.1)
+        assert self.received == self.message_update.message.text
+
+    def test_async_handler_async_error_handler_context(self, cdp):
+        cdp.add_handler(MessageHandler(Filters.all,
+                                       self.callback_raise_error,
+                                       run_async=True))
+        cdp.add_error_handler(self.error_handler_context, run_async=True)
+
+        cdp.update_queue.put(self.message_update)
+        sleep(2)
+        assert self.received == self.message_update.message.text
+
+    def test_async_handler_error_handler_that_raises_error(self, dp, caplog):
+        handler = MessageHandler(Filters.all,
+                                 self.callback_raise_error,
+                                 run_async=True)
+        dp.add_handler(handler)
+        dp.add_error_handler(self.error_handler_raise_error, run_async=False)
+
+        with caplog.at_level(logging.ERROR):
+            dp.update_queue.put(self.message_update)
+            sleep(.1)
+            assert len(caplog.records) == 1
+            assert caplog.records[-1].msg.startswith('An error was raised while processing the')
+
+        # Make sure that the main loop still runs
+        dp.remove_handler(handler)
+        dp.add_handler(MessageHandler(Filters.all,
+                                      self.callback_increase_count,
+                                      run_async=True))
+        dp.update_queue.put(self.message_update)
+        sleep(.1)
+        assert self.count == 1
+
+    def test_async_handler_async_error_handler_that_raises_error(self, dp, caplog):
+        handler = MessageHandler(Filters.all,
+                                 self.callback_raise_error,
+                                 run_async=True)
+        dp.add_handler(handler)
+        dp.add_error_handler(self.error_handler_raise_error, run_async=True)
+
+        with caplog.at_level(logging.ERROR):
+            dp.update_queue.put(self.message_update)
+            sleep(.1)
+            assert len(caplog.records) == 1
+            assert caplog.records[-1].msg.startswith('An error was raised while processing the')
+
+        # Make sure that the main loop still runs
+        dp.remove_handler(handler)
+        dp.add_handler(MessageHandler(Filters.all,
+                                      self.callback_increase_count,
+                                      run_async=True))
+        dp.update_queue.put(self.message_update)
+        sleep(.1)
+        assert self.count == 1
+
+    def test_custom_error_handler_non_context(self, dp):
+        with pytest.raises(ValueError, match='Passing `error_handler` is not'):
+            dp.run_async(lambda x: x, self.message_update, error_handler=lambda x: x)
+
+    def test_custom_error_handler_1(self, cdp):
+        def func(update, b, c=0, d=0):
+            raise RuntimeError('Error')
+
+        def error_handler(update, context, a, b, c=0, d=0):
+            self.received = (isinstance(context, CallbackContext)
+                             and update is self.message_update
+                             and a is self.message_update
+                             and b == 'b'
+                             and c == 'c'
+                             and d == 'd')
+
+        cdp.run_async(func, self.message_update, 'b', update=self.message_update,
+                      error_handler=error_handler, c='c', d='d')
+        sleep(0.1)
+        assert self.received is True
+
+    def test_custom_error_handler_2(self, cdp):
+        def func(update, b, c=0, d=0):
+            raise RuntimeError('Error')
+
+        def error_handler(context, a, b, c=0, d=0):
+            self.received = (isinstance(context, CallbackContext)
+                             and a is self.message_update
+                             and b == 'b'
+                             and c == 'c'
+                             and d == 'd')
+
+        cdp.run_async(func, self.message_update, 'b', error_handler=error_handler, c='c', d='d')
+        sleep(0.1)
+        assert self.received is True
+
+    def test_custom_error_handler_that_raises_error(self, cdp, caplog):
+        def func(update, b, c=0, d=0):
+            raise RuntimeError('Error')
+
+        def error_handler(context, a, b, c=0, d=0):
+            raise TelegramError('ErrorHandler Error')
+
+        with caplog.at_level(logging.ERROR):
+            cdp.run_async(func, self.message_update, 'b', error_handler=error_handler,
+                          c='c', d='d')
+            sleep(.1)
+            assert len(caplog.records) == 1
+            assert caplog.records[-1].msg.startswith('An error was raised while processing the')
 
     def test_error_in_handler(self, dp):
         dp.add_handler(MessageHandler(Filters.all, self.callback_raise_error))
