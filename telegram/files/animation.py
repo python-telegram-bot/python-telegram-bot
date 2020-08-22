@@ -22,7 +22,7 @@ from telegram import TelegramObject
 
 
 class Animation(TelegramObject):
-    """This object represents an animation file to be displayed in the message containing a game.
+    """This object represents an animation file (GIF or H.264/MPEG-4 AVC video without sound).
 
     Attributes:
         file_id (:obj:`str`): File identifier.
@@ -32,8 +32,7 @@ class Animation(TelegramObject):
         width (:obj:`int`): Video width as defined by sender.
         height (:obj:`int`): Video height as defined by sender.
         duration (:obj:`int`): Duration of the video in seconds as defined by sender.
-        thumb (:class:`telegram.PhotoSize`): Optional. Animation thumbnail as defined
-            by sender.
+        thumb (:class:`telegram.PhotoSize`): Optional. Animation thumbnail as defined by sender.
         file_name (:obj:`str`): Optional. Original animation filename as defined by sender.
         mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
         file_size (:obj:`int`): Optional. File size.
@@ -42,8 +41,9 @@ class Animation(TelegramObject):
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.
-        file_unique_id (:obj:`str`): Unique and the same over time and
-            for different bots file identifier.
+        file_unique_id (:obj:`str`): Unique identifier for this file, which
+            is supposed to be the same over time and for different bots.
+            Can't be used to download or reuse the file.
         width (:obj:`int`): Video width as defined by sender.
         height (:obj:`int`): Video height as defined by sender.
         duration (:obj:`int`): Duration of the video in seconds as defined by sender.
