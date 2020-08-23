@@ -98,7 +98,7 @@ class ConversationHandler(Handler):
             handler is inactive more than this timeout (in seconds), it will be automatically
             ended. If this value is 0 (default), there will be no timeout. When it's triggered, the
             last received update and the corresponding ``context`` will be handled by ALL the
-            handler's who's `check_update` method returns ``True`` that are in the state
+            handler's who's :attr:`check_update` method returns ``True`` that are in the state
             :attr:`ConversationHandler.TIMEOUT`.
         name (:obj:`str`): Optional. The name for this conversationhandler. Required for
             persistence
@@ -133,7 +133,7 @@ class ConversationHandler(Handler):
             handler is inactive more than this timeout (in seconds), it will be automatically
             ended. If this value is 0 or ``None`` (default), there will be no timeout. The last
             received update and the corresponding ``context`` will be handled by ALL the handler's
-            who's `check_update` method returns ``True`` that are in the state
+            who's :attr:`check_update` method returns ``True`` that are in the state
             :attr:`ConversationHandler.TIMEOUT`.
         name (:obj:`str`, optional): The name for this conversationhandler. Required for
             persistence

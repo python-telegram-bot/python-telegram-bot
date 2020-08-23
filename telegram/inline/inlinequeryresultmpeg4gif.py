@@ -58,7 +58,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         mpeg4_duration (:obj:`int`, optional): Video duration.
         thumb_url (:obj:`str`): URL of the static thumbnail (jpeg or gif) for the result.
         thumb_mime_type (:obj:`str`): Optional. MIME type of the thumbnail, must be one of
-            “image/jpeg”, “image/gif”, or “video/mp4”. Defaults to “image/jpeg”.
+            ``'image/jpeg'``, ``'image/gif'``, or ``'video/mp4'``. Defaults to ``'image/jpeg'``.
         title (:obj:`str`, optional): Title for the result.
         caption (:obj:`str`, optional): Caption of the MPEG-4 file to be sent, 0-1024 characters
             after entities parsing.

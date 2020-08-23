@@ -61,18 +61,18 @@ class BaseFilter(ABC):
 
 
     If you want to create your own filters create a class inheriting from this class and implement
-    a `filter` method that returns a boolean: ``True`` if the message should be
+    a :meth:`filter` method that returns a boolean: ``True`` if the message should be
     handled, ``False`` otherwise. Note that the filters work only as class instances, not
     actual class objects (so remember to initialize your filter classes).
 
     By default the filters name (what will get printed when converted to a string for display)
-    will be the class name. If you want to overwrite this assign a better name to the `name`
+    will be the class name. If you want to overwrite this assign a better name to the :attr:`name`
     class variable.
 
     Attributes:
         name (:obj:`str`): Name for this filter. Defaults to the type of filter.
         update_filter (:obj:`bool`): Whether this filter should work on update. If ``False`` it
-            will run the filter on :attr:`update.effective_message``. Default is ``False``.
+            will run the filter on :attr:`update.effective_message`. Default is ``False``.
         data_filter (:obj:`bool`): Whether this filter is a data filter. A data filter should
             return a dict with lists. The dict will be merged with
             :class:`telegram.ext.CallbackContext`'s internal dict in most cases
