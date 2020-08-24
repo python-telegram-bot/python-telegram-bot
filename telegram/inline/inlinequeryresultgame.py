@@ -22,7 +22,7 @@ from telegram import InlineQueryResult
 
 
 class InlineQueryResultGame(InlineQueryResult):
-    """Represents a Game.
+    """Represents a :class:`telegram.Game`.
 
     Attributes:
         type (:obj:`str`): 'game'.

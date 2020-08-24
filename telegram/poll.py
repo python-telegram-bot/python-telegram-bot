@@ -93,10 +93,10 @@ class Poll(TelegramObject):
         question (:obj:`str`): Poll question, 1-255 characters.
         options (List[:class:`PollOption`]): List of poll options.
         total_voter_count (:obj:`int`): Total number of users that voted in the poll.
-        is_closed (:obj:`bool`): True, if the poll is closed.
-        is_anonymous (:obj:`bool`): True, if the poll is anonymous.
+        is_closed (:obj:`bool`): :obj:`True`, if the poll is closed.
+        is_anonymous (:obj:`bool`): :obj:`True`, if the poll is anonymous.
         type (:obj:`str`): Poll type, currently can be :attr:`REGULAR` or :attr:`QUIZ`.
-        allows_multiple_answers (:obj:`bool`): True, if the poll allows multiple answers.
+        allows_multiple_answers (:obj:`bool`): :obj:`True`, if the poll allows multiple answers.
         correct_option_id (:obj:`int`): Optional. Identifier of the correct answer option.
         explanation (:obj:`str`): Optional. Text that is shown when a user chooses an incorrect
             answer or taps on the lamp icon in a quiz-style poll.
@@ -111,10 +111,10 @@ class Poll(TelegramObject):
         id (:obj:`str`): Unique poll identifier.
         question (:obj:`str`): Poll question, 1-255 characters.
         options (List[:class:`PollOption`]): List of poll options.
-        is_closed (:obj:`bool`): True, if the poll is closed.
-        is_anonymous (:obj:`bool`): True, if the poll is anonymous.
+        is_closed (:obj:`bool`): :obj:`True`, if the poll is closed.
+        is_anonymous (:obj:`bool`): :obj:`True`, if the poll is anonymous.
         type (:obj:`str`): Poll type, currently can be :attr:`REGULAR` or :attr:`QUIZ`.
-        allows_multiple_answers (:obj:`bool`): True, if the poll allows multiple answers.
+        allows_multiple_answers (:obj:`bool`): :obj:`True`, if the poll allows multiple answers.
         correct_option_id (:obj:`int`, optional): 0-based identifier of the correct answer option.
             Available only for polls in the quiz mode, which are closed, or was sent (not
             forwarded) by the bot or to the private chat with the bot.

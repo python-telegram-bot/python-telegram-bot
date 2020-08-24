@@ -92,7 +92,7 @@ class JobQueue:
                 :func:`telegram.ext.JobQueue.run_repeating` for details).
                 Defaults to now + ``job.interval``.
             previous_t (optional):
-                Time at which the job last ran (``None`` if it hasn't run yet).
+                Time at which the job last ran (:obj:`None` if it hasn't run yet).
 
         """
         # get time at which to run:
@@ -131,17 +131,17 @@ class JobQueue:
                 * :obj:`datetime.timedelta` will be interpreted as "time from now" in which the
                   job should run.
                 * :obj:`datetime.datetime` will be interpreted as a specific date and time at
-                  which the job should run. If the timezone (``datetime.tzinfo``) is ``None``, UTC
-                  will be assumed.
+                  which the job should run. If the timezone (``datetime.tzinfo``) is :obj:`None`,
+                  UTC will be assumed.
                 * :obj:`datetime.time` will be interpreted as a specific time of day at which the
                   job should run. This could be either today or, if the time has already passed,
-                  tomorrow. If the timezone (``time.tzinfo``) is ``None``, UTC will be assumed.
+                  tomorrow. If the timezone (``time.tzinfo``) is :obj:`None`, UTC will be assumed.
 
                 If ``when`` is :obj:`datetime.datetime` or :obj:`datetime.time` type
                 then ``when.tzinfo`` will define ``Job.tzinfo``. Otherwise UTC will be assumed.
 
             context (:obj:`object`, optional): Additional data needed for the callback function.
-                Can be accessed through ``job.context`` in the callback. Defaults to ``None``.
+                Can be accessed through ``job.context`` in the callback. Defaults to :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
                 ``callback.__name__``.
 
@@ -185,18 +185,18 @@ class JobQueue:
                 * :obj:`datetime.timedelta` will be interpreted as "time from now" in which the
                   job should run.
                 * :obj:`datetime.datetime` will be interpreted as a specific date and time at
-                  which the job should run. If the timezone (``datetime.tzinfo``) is ``None``, UTC
-                  will be assumed.
+                  which the job should run. If the timezone (``datetime.tzinfo``) is :obj:`None`,
+                  UTC will be assumed.
                 * :obj:`datetime.time` will be interpreted as a specific time of day at which the
                   job should run. This could be either today or, if the time has already passed,
-                  tomorrow. If the timezone (``time.tzinfo``) is ``None``, UTC will be assumed.
+                  tomorrow. If the timezone (``time.tzinfo``) is :obj:`None`, UTC will be assumed.
 
                 If ``first`` is :obj:`datetime.datetime` or :obj:`datetime.time` type
                 then ``first.tzinfo`` will define ``Job.tzinfo``. Otherwise UTC will be assumed.
 
                 Defaults to ``interval``
             context (:obj:`object`, optional): Additional data needed for the callback function.
-                Can be accessed through ``job.context`` in the callback. Defaults to ``None``.
+                Can be accessed through ``job.context`` in the callback. Defaults to :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
                 ``callback.__name__``.
 
@@ -234,16 +234,16 @@ class JobQueue:
                 ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
                 its ``job.context`` or change it to a repeating job.
             when (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
-                (``when.tzinfo``) is ``None``, UTC will be assumed. This will also implicitly
+                (``when.tzinfo``) is :obj:`None`, UTC will be assumed. This will also implicitly
                 define ``Job.tzinfo``.
             day (:obj:`int`): Defines the day of the month whereby the job would run. It should
                 be within the range of 1 and 31, inclusive.
             context (:obj:`object`, optional): Additional data needed for the callback function.
-                Can be accessed through ``job.context`` in the callback. Defaults to ``None``.
+                Can be accessed through ``job.context`` in the callback. Defaults to :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
                 ``callback.__name__``.
-            day_is_strict (:obj:`bool`, optional): If ``False`` and day > month.days, will pick
-                the last day in the month. Defaults to ``True``.
+            day_is_strict (:obj:`bool`, optional): If :obj:`False` and day > month.days, will pick
+                the last day in the month. Defaults to :obj:`True`.
 
         Returns:
             :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
@@ -268,14 +268,14 @@ class JobQueue:
            day (:obj:`int`): The day of the month the job should run.
            day_is_strict (:obj:`bool`):
                Specification as to whether the specified day of job should be strictly
-               respected. If day_is_strict is ``True`` it ignores months whereby the
-               specified date does not exist (e.g February 31st). If it set to ``False``,
+               respected. If day_is_strict is :obj:`True` it ignores months whereby the
+               specified date does not exist (e.g February 31st). If it set to :obj:`False`,
                it returns the last valid date of the month instead. For example,
                if the user runs a job on the 31st of every month, and sets
-               the day_is_strict variable to ``False``, April, for example,
+               the day_is_strict variable to :obj:`False`, April, for example,
                the job would run on April 30th.
            when (:obj:`datetime.time`): Time of day at which the job should run. If the
-               timezone (``time.tzinfo``) is ``None``, UTC will be assumed.
+               timezone (``time.tzinfo``) is :obj:`None`, UTC will be assumed.
            allow_now (:obj:`bool`): Whether executing the job right now is a feasible options.
                For stability reasons, this defaults to :obj:`False`, but it needs to be :obj:`True`
                on initializing a job.
@@ -341,12 +341,12 @@ class JobQueue:
                 ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
                 its ``job.context`` or change it to a repeating job.
             time (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
-                (``time.tzinfo``) is ``None``, UTC will be assumed.
+                (``time.tzinfo``) is :obj:`None`, UTC will be assumed.
                 ``time.tzinfo`` will implicitly define ``Job.tzinfo``.
             days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should
                 run. Defaults to ``EVERY_DAY``
             context (:obj:`object`, optional): Additional data needed for the callback function.
-                Can be accessed through ``job.context`` in the callback. Defaults to ``None``.
+                Can be accessed through ``job.context`` in the callback. Defaults to :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
                 ``callback.__name__``.
 
@@ -513,12 +513,12 @@ class Job:
         interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta`, optional): The time
             interval between executions of the job. If it is an :obj:`int` or a :obj:`float`,
             it will be interpreted as seconds. If you don't set this value, you must set
-            :attr:`repeat` to ``False`` and specify :attr:`time_spec` when you put the job into
+            :attr:`repeat` to :obj:`False` and specify :attr:`time_spec` when you put the job into
             the job queue.
         repeat (:obj:`bool`, optional): If this job should be periodically execute its callback
-            function (``True``) or only once (``False``). Defaults to ``True``.
+            function (:obj:`True`) or only once (:obj:`False`). Defaults to :obj:`True`.
         context (:obj:`object`, optional): Additional data needed for the callback function. Can be
-            accessed through ``job.context`` in the callback. Defaults to ``None``.
+            accessed through ``job.context`` in the callback. Defaults to :obj:`None`.
         name (:obj:`str`, optional): The name of the new job. Defaults to ``callback.__name__``.
         days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should run.
             Defaults to ``Days.EVERY_DAY``
@@ -528,10 +528,10 @@ class Job:
             checking the day of the week to determine whether a job should run (only relevant when
             ``days is not Days.EVERY_DAY``). Defaults to UTC.
         is_monthly (:obj:`bool`, optional): If this job is supposed to be a monthly scheduled job.
-            Defaults to ``False``.
-        day_is_strict (:obj:`bool`, optional): If ``False`` and day > month.days, will pick the
-            last day in the month. Defaults to ``True``. Only relevant when ``is_monthly`` is
-            ``True``.
+            Defaults to :obj:`False`.
+        day_is_strict (:obj:`bool`, optional): If :obj:`False` and day > month.days, will pick the
+            last day in the month. Defaults to :obj:`True`. Only relevant when ``is_monthly`` is
+            :obj:`True`.
     """
 
     def __init__(self,
@@ -635,7 +635,7 @@ class Job:
         """
         :obj:`datetime.datetime`: Datetime for the next job execution.
             Datetime is localized according to :attr:`tzinfo`.
-            If job is removed or already ran it equals to ``None``.
+            If job is removed or already ran it equals to :obj:`None`.
 
         """
         return datetime.datetime.fromtimestamp(self._next_t, self.tzinfo) if self._next_t else None

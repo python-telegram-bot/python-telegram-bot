@@ -57,8 +57,9 @@ class DelayQueue(threading.Thread):
             route exceptions from processor thread to main thread; is called on `Exception`
             subclass exceptions. If not provided, exceptions are routed through dummy handler,
             which re-raises them.
-        autostart (:obj:`bool`, optional): If True, processor is started immediately after object's
-            creation; if ``False``, should be started manually by `start` method. Defaults to True.
+        autostart (:obj:`bool`, optional): If :obj:`True`, processor is started immediately after
+            object's creation; if :obj:`False`, should be started manually by `start` method.
+            Defaults to :obj:`True`.
         name (:obj:`str`, optional): Thread's name. Defaults to ``'DelayQueue-N'``, where N is
             sequential number of object created.
 
@@ -125,7 +126,8 @@ class DelayQueue(threading.Thread):
             timeout (:obj:`float`): Indicates maximum time to wait for processor to stop and its
                 thread to exit. If timeout exceeds and processor has not stopped, method silently
                 returns. :attr:`is_alive` could be used afterwards to check the actual status.
-                ``timeout`` set to None, blocks until processor is shut down. Defaults to None.
+                ``timeout`` set to :obj:`None`, blocks until processor is shut down.
+                Defaults to :obj:`None`.
 
         """
 
@@ -159,7 +161,7 @@ class DelayQueue(threading.Thread):
         self._queue.put((func, args, kwargs))
 
 
-# The most straightforward way to implement this is to use 2 sequenital delay
+# The most straightforward way to implement this is to use 2 sequential delay
 # queues, like on classic delay chain schematics in electronics.
 # So, message path is:
 # msg --> group delay if group msg, else no delay --> normal msg delay --> out
@@ -185,9 +187,9 @@ class MessageQueue:
             to route exceptions from processor threads to main thread; is called on ``Exception``
             subclass exceptions. If not provided, exceptions are routed through dummy handler,
             which re-raises them.
-        autostart (:obj:`bool`, optional): If True, processors are started immediately after
-            object's creation; if ``False``, should be started manually by :attr:`start` method.
-            Defaults to ``True``.
+        autostart (:obj:`bool`, optional): If :obj:`True`, processors are started immediately after
+            object's creation; if :obj:`False`, should be started manually by :attr:`start` method.
+            Defaults to :obj:`True`.
 
     """
 
@@ -198,7 +200,7 @@ class MessageQueue:
                  group_time_limit_ms=60000,
                  exc_route=None,
                  autostart=True):
-        # create accoring delay queues, use composition
+        # create according delay queues, use composition
         self._all_delayq = DelayQueue(
             burst_limit=all_burst_limit,
             time_limit_ms=all_time_limit_ms,
@@ -219,20 +221,20 @@ class MessageQueue:
         self._group_delayq.stop(timeout=timeout)
         self._all_delayq.stop(timeout=timeout)
 
-    stop.__doc__ = DelayQueue.stop.__doc__ or ''  # reuse docsting if any
+    stop.__doc__ = DelayQueue.stop.__doc__ or ''  # reuse docstring if any
 
     def __call__(self, promise, is_group_msg=False):
         """
-        Processes callables in troughput-limiting queues to avoid hitting limits (specified with
+        Processes callables in throughput-limiting queues to avoid hitting limits (specified with
         :attr:`burst_limit` and :attr:`time_limit`.
 
         Args:
             promise (:obj:`callable`): Mainly the ``telegram.utils.promise.Promise`` (see Notes for
                 other callables), that is processed in delay queues.
             is_group_msg (:obj:`bool`, optional): Defines whether ``promise`` would be processed in
-                group*+*all* ``DelayQueue``s (if set to ``True``), or only through *all*
-                ``DelayQueue`` (if set to ``False``), resulting in needed delays to avoid
-                hitting specified limits. Defaults to ``False``.
+                group*+*all* ``DelayQueue``s (if set to :obj:`True`), or only through *all*
+                ``DelayQueue`` (if set to :obj:`False`), resulting in needed delays to avoid
+                hitting specified limits. Defaults to :obj:`False`.
 
         Note:
             Method is designed to accept ``telegram.utils.promise.Promise`` as ``promise``
@@ -272,12 +274,12 @@ def queuedmessage(method):
     Wrapped method starts accepting the next kwargs:
 
     Args:
-        queued (:obj:`bool`, optional): If set to ``True``, the ``MessageQueue`` is used to process
-            output messages. Defaults to `self._is_queued_out`.
-        isgroup (:obj:`bool`, optional): If set to ``True``, the message is meant to be group-type
-            (as there's no obvious way to determine its type in other way at the moment).
+        queued (:obj:`bool`, optional): If set to :obj:`True`, the ``MessageQueue`` is used to
+            process output messages. Defaults to `self._is_queued_out`.
+        isgroup (:obj:`bool`, optional): If set to :obj:`True`, the message is meant to be
+            group-type(as there's no obvious way to determine its type in other way at the moment).
             Group-type messages could have additional processing delay according to limits set
-            in `self._out_queue`. Defaults to ``False``.
+            in `self._out_queue`. Defaults to :obj:`False`.
 
     Returns:
         ``telegram.utils.promise.Promise``: In case call is queued or original method's return

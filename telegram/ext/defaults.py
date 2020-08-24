@@ -34,9 +34,9 @@ class Defaults:
         timeout (:obj:`int` | :obj:`float`): Optional. If this value is specified, use it as the
             read timeout from the server (instead of the one specified during creation of the
             connection pool).
-        quote (:obj:`bool`): Optional. If set to ``True``, the reply is sent as an actual reply to
-            the message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter will
-            be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+        quote (:obj:`bool`): Optional. If set to :obj:`True`, the reply is sent as an actual reply
+            to the message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter will
+            be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
 
     Parameters:
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
@@ -48,9 +48,9 @@ class Defaults:
         timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as the
             read timeout from the server (instead of the one specified during creation of the
             connection pool).
-        quote (:obj:`bool`, optional): If set to ``True``, the reply is sent as an actual reply to
-            the message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter will
-            be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+        quote (:obj:`bool`, optional): If set to :obj:`True`, the reply is sent as an actual reply
+            to the message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter will
+            be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
     """
     def __init__(self,
                  parse_mode=None,

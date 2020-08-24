@@ -27,7 +27,7 @@ class ParseMode:
     """:obj:`str`: 'Markdown'
 
     Note:
-        :attr:`MARKDOWN` is is a legacy mode, retained by Telegram for backward compatibility.
+        :attr:`MARKDOWN` is a legacy mode, retained by Telegram for backward compatibility.
         You should use :attr:`MARKDOWN_V2` instead.
     """
     MARKDOWN_V2 = 'MarkdownV2'

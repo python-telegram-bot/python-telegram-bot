@@ -30,7 +30,8 @@ class InputTextMessageContent(InputMessageContent):
         message_text (:obj:`str`): Text of the message to be sent, 1-4096 characters after entities
             parsing.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in your bot's message.
+            bold, italic, fixed-width text or inline URLs in your bot's message. See the constants
+            in :class:`telegram.ParseMode` for the available modes.
         disable_web_page_preview (:obj:`bool`): Optional. Disables link previews for links in the
             sent message.
 
@@ -38,7 +39,8 @@ class InputTextMessageContent(InputMessageContent):
         message_text (:obj:`str`): Text of the message to be sent, 1-4096 characters after entities
             parsing. Also found as :attr:`telegram.constants.MAX_MESSAGE_LENGTH`.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in your bot's message.
+            bold, italic, fixed-width text or inline URLs in your bot's message. See the constants
+            in :class:`telegram.ParseMode` for the available modes.
         disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in the
             sent message.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
