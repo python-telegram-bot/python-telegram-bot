@@ -34,8 +34,8 @@ class LoginUrl(TelegramObject):
         forward_text (:obj:`str`): Optional. New text of the button in forwarded messages.
         bot_username (:obj:`str`): Optional. Username of a bot, which will be used for user
             authorization.
-        request_write_access (:obj:`bool`): Optional. Pass ``True`` to request the permission for
-            your bot to send messages to the user.
+        request_write_access (:obj:`bool`): Optional. Pass :obj:`True` to request the permission
+            for your bot to send messages to the user.
 
     Args:
         url (:obj:`str`): An HTTP URL to be opened with user authorization data added to the query
@@ -54,7 +54,7 @@ class LoginUrl(TelegramObject):
             `Linking your domain to the bot
             <https://core.telegram.org/widgets/login#linking-your-domain-to-the-bot>`_
             for more details.
-        request_write_access (:obj:`bool`, optional): Pass ``True`` to request the permission
+        request_write_access (:obj:`bool`, optional): Pass :obj:`True` to request the permission
             for your bot to send messages to the user.
 
     Note:

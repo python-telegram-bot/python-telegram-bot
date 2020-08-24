@@ -29,35 +29,37 @@ class PicklePersistence(BasePersistence):
 
     Attributes:
         filename (:obj:`str`): The filename for storing the pickle files. When :attr:`single_file`
-            is ``False`` this will be used as a prefix.
+            is :obj:`False` this will be used as a prefix.
         store_user_data (:obj:`bool`): Optional. Whether user_data should be saved by this
             persistence class.
         store_chat_data (:obj:`bool`): Optional. Whether user_data should be saved by this
             persistence class.
         store_bot_data (:obj:`bool`): Optional. Whether bot_data should be saved by this
             persistence class.
-        single_file (:obj:`bool`): Optional. When ``False`` will store 3 separate files of
+        single_file (:obj:`bool`): Optional. When :obj:`False` will store 3 separate files of
             `filename_user_data`, `filename_chat_data` and `filename_conversations`. Default is
-            ``True``.
-        on_flush (:obj:`bool`, optional): When ``True`` will only save to file when :meth:`flush`
-            is called and keep data in memory until that happens. When ``False`` will store data
-            on any transaction *and* on call to :meth:`flush`. Default is ``False``.
+            :obj:`True`.
+        on_flush (:obj:`bool`, optional): When :obj:`True` will only save to file when
+            :meth:`flush` is called and keep data in memory until that happens. When
+            :obj:`False` will store data on any transaction *and* on call to :meth:`flush`.
+            Default is :obj:`False`.
 
     Args:
         filename (:obj:`str`): The filename for storing the pickle files. When :attr:`single_file`
-            is ``False`` this will be used as a prefix.
+            is :obj:`False` this will be used as a prefix.
         store_user_data (:obj:`bool`, optional): Whether user_data should be saved by this
-            persistence class. Default is ``True``.
+            persistence class. Default is :obj:`True`.
         store_chat_data (:obj:`bool`, optional): Whether user_data should be saved by this
-            persistence class. Default is ``True``.
+            persistence class. Default is :obj:`True`.
         store_bot_data (:obj:`bool`, optional): Whether bot_data should be saved by this
-            persistence class. Default is ``True`` .
-        single_file (:obj:`bool`, optional): When ``False`` will store 3 separate files of
+            persistence class. Default is :obj:`True` .
+        single_file (:obj:`bool`, optional): When :obj:`False` will store 3 separate files of
             `filename_user_data`, `filename_chat_data` and `filename_conversations`. Default is
-            ``True``.
-        on_flush (:obj:`bool`, optional): When ``True`` will only save to file when :meth:`flush`
-            is called and keep data in memory until that happens. When ``False`` will store data
-            on any transaction *and* on call to :meth:`flush`. Default is ``False``.
+            :obj:`True`.
+        on_flush (:obj:`bool`, optional): When :obj:`True` will only save to file when
+            :meth:`flush` is called and keep data in memory until that happens. When
+            :obj:`False` will store data on any transaction *and* on call to :meth:`flush`.
+            Default is :obj:`False`.
     """
 
     def __init__(self, filename,

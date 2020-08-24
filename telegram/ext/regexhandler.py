@@ -50,7 +50,7 @@ class RegexHandler(MessageHandler):
             the callback function.
 
     Note:
-        This handler is being deprecated. For the same usecase use:
+        This handler is being deprecated. For the same use case use:
         ``MessageHandler(Filters.regex(r'pattern'), callback)``
 
 
@@ -66,28 +66,28 @@ class RegexHandler(MessageHandler):
             :class:`telegram.ext.ConversationHandler`.
         pass_groups (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groups()`` as a keyword argument called ``groups``.
-            Default is ``False``
+            Default is :obj:`False`
         pass_groupdict (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groupdict()`` as a keyword argument called ``groupdict``.
-            Default is ``False``
-        pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
+            Default is :obj:`False`
+        pass_update_queue (:obj:`bool`, optional): If set to :obj:`True`, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
-            that contains new updates which can be used to insert updates. Default is ``False``.
-        pass_job_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
+            that contains new updates which can be used to insert updates. Default is :obj:`False`.
+        pass_job_queue (:obj:`bool`, optional): If set to :obj:`True`, a keyword argument called
             ``job_queue`` will be passed to the callback function. It will be a
             :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
-            which can be used to schedule new jobs. Default is ``False``.
-        pass_user_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
-            ``user_data`` will be passed to the callback function. Default is ``False``.
-        pass_chat_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
-            ``chat_data`` will be passed to the callback function. Default is ``False``.
+            which can be used to schedule new jobs. Default is :obj:`False`.
+        pass_user_data (:obj:`bool`, optional): If set to :obj:`True`, a keyword argument called
+            ``user_data`` will be passed to the callback function. Default is :obj:`False`.
+        pass_chat_data (:obj:`bool`, optional): If set to :obj:`True`, a keyword argument called
+            ``chat_data`` will be passed to the callback function. Default is :obj:`False`.
         message_updates (:obj:`bool`, optional): Should "normal" message updates be handled?
-            Default is ``True``.
+            Default is :obj:`True`.
         channel_post_updates (:obj:`bool`, optional): Should channel posts updates be handled?
-            Default is ``True``.
+            Default is :obj:`True`.
         edited_updates (:obj:`bool`, optional): Should "edited" message updates be handled? Default
-            is ``False``.
+            is :obj:`False`.
 
     Raises:
         ValueError

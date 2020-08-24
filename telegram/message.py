@@ -437,7 +437,7 @@ class Message(TelegramObject):
             or :class:`telegram.Video`
             or :class:`telegram.VideoNote`
             or :class:`telegram.Voice`: The attachment that this message was sent with. May be
-            ``None`` if no attachment was sent.
+            :obj:`None` if no attachment was sent.
 
         """
         if self._effective_attachment is not _UNDEFINED:
@@ -504,9 +504,9 @@ class Message(TelegramObject):
             bot.send_message(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the message is sent as an actual
+            quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
-                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
                 private chats.
 
         Returns:
@@ -529,9 +529,9 @@ class Message(TelegramObject):
             backward compatibility. You should use :meth:`reply_markdown_v2` instead.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the message is sent as an actual
+            quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
-                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
                 private chats.
 
         Returns:
@@ -553,9 +553,9 @@ class Message(TelegramObject):
         Sends a message with markdown version 2 formatting.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the message is sent as an actual
+            quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
-                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
                 private chats.
 
         Returns:
@@ -576,9 +576,9 @@ class Message(TelegramObject):
         Sends a message with HTML formatting.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the message is sent as an actual
+            quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
-                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
                 private chats.
 
         Returns:
@@ -597,10 +597,10 @@ class Message(TelegramObject):
             bot.send_media_group(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the media group is sent as an
+            quote (:obj:`bool`, optional): If set to :obj:`True`, the media group is sent as an
                 actual reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
-                this parameter will be ignored. Default: ``True`` in group chats and ``False`` in
-                private chats.
+                this parameter will be ignored. Default: :obj:`True` in group chats and
+                :obj:`False` in private chats.
 
         Returns:
             List[:class:`telegram.Message`]: An array of the sent Messages.
@@ -617,9 +617,10 @@ class Message(TelegramObject):
             bot.send_photo(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
-                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
-                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+            quote (:obj:`bool`, optional): If set to :obj:`True`, the photo is sent as an actual
+                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
+                this parameter will be ignored. Default: :obj:`True` in group chats and
+                :obj:`False` in private chats.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -634,9 +635,10 @@ class Message(TelegramObject):
             bot.send_audio(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the audio is sent as an actual reply
-                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
-                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+            quote (:obj:`bool`, optional): If set to :obj:`True`, the audio is sent as an actual
+                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
+                this parameter will be ignored. Default: :obj:`True` in group chats and
+                :obj:`False` in private chats.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -651,9 +653,9 @@ class Message(TelegramObject):
             bot.send_document(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the document is sent as an actual
+            quote (:obj:`bool`, optional): If set to :obj:`True`, the document is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
-                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
                 private chats.
 
         Returns:
@@ -669,10 +671,10 @@ class Message(TelegramObject):
             bot.send_animation(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the animation is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
-                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
-                private chats.
+            quote (:obj:`bool`, optional): If set to :obj:`True`, the animation is sent as an
+                actual reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
+                this parameter will be ignored. Default: :obj:`True` in group chats and
+                :obj:`False` in private chats.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -687,9 +689,9 @@ class Message(TelegramObject):
             bot.send_sticker(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the sticker is sent as an actual
+            quote (:obj:`bool`, optional): If set to :obj:`True`, the sticker is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
-                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
                 private chats.
 
         Returns:
@@ -705,9 +707,9 @@ class Message(TelegramObject):
             bot.send_video(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the video is sent as an actual
+            quote (:obj:`bool`, optional): If set to :obj:`True`, the video is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
-                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
                 private chats.
 
         Returns:
@@ -723,10 +725,10 @@ class Message(TelegramObject):
             bot.send_video_note(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the video note is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
-                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
-                private chats.
+            quote (:obj:`bool`, optional): If set to :obj:`True`, the video note is sent as an
+                actual reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
+                this parameter will be ignored. Default: :obj:`True` in group chats and
+                :obj:`False` in private chats.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -741,10 +743,10 @@ class Message(TelegramObject):
             bot.send_voice(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the voice note is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
-                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
-                private chats.
+            quote (:obj:`bool`, optional): If set to :obj:`True`, the voice note is sent as an
+                actual reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
+                this parameter will be ignored. Default: :obj:`True` in group chats and
+                :obj:`False` in private chats.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -759,9 +761,9 @@ class Message(TelegramObject):
             bot.send_location(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the location is sent as an actual
+            quote (:obj:`bool`, optional): If set to :obj:`True`, the location is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
-                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
                 private chats.
 
         Returns:
@@ -777,9 +779,9 @@ class Message(TelegramObject):
             bot.send_venue(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the venue is sent as an actual
+            quote (:obj:`bool`, optional): If set to :obj:`True`, the venue is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
-                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
                 private chats.
 
         Returns:
@@ -795,9 +797,9 @@ class Message(TelegramObject):
             bot.send_contact(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the contact is sent as an actual
+            quote (:obj:`bool`, optional): If set to :obj:`True`, the contact is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
-                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
                 private chats.
 
         Returns:
@@ -813,9 +815,10 @@ class Message(TelegramObject):
             bot.send_poll(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the poll is sent as an actual reply
-                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
-                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+            quote (:obj:`bool`, optional): If set to :obj:`True`, the poll is sent as an actual
+                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
+                this parameter will be ignored. Default: :obj:`True` in group chats and
+                :obj:`False` in private chats.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -830,9 +833,10 @@ class Message(TelegramObject):
             bot.send_dice(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to ``True``, the dice is sent as an actual reply
-                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
-                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+            quote (:obj:`bool`, optional): If set to :obj:`True`, the dice is sent as an actual
+                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
+                parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False`
+                in private chats.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -956,7 +960,7 @@ class Message(TelegramObject):
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise ``True`` is returned.
+            edited Message is returned, otherwise :obj:`True` is returned.
         """
         return self.bot.edit_message_live_location(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
@@ -976,7 +980,7 @@ class Message(TelegramObject):
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise ``True`` is returned.
+            edited Message is returned, otherwise :obj:`True` is returned.
         """
         return self.bot.stop_message_live_location(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
@@ -996,7 +1000,7 @@ class Message(TelegramObject):
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise ``True`` is returned.
+            edited Message is returned, otherwise :obj:`True` is returned.
         """
         return self.bot.set_game_score(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
@@ -1016,7 +1020,7 @@ class Message(TelegramObject):
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise ``True`` is returned.
+            edited Message is returned, otherwise :obj:`True` is returned.
         """
         return self.bot.get_game_high_scores(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
@@ -1030,7 +1034,7 @@ class Message(TelegramObject):
                                 **kwargs)
 
         Returns:
-            :obj:`bool`: On success, ``True`` is returned.
+            :obj:`bool`: On success, :obj:`True` is returned.
 
         """
         return self.bot.delete_message(

@@ -31,7 +31,7 @@ class Sticker(TelegramObject):
             Can't be used to download or reuse the file.
         width (:obj:`int`): Sticker width.
         height (:obj:`int`): Sticker height.
-        is_animated (:obj:`bool`): ``True``, if the sticker is animated.
+        is_animated (:obj:`bool`): :obj:`True`, if the sticker is animated.
         thumb (:class:`telegram.PhotoSize`): Optional. Sticker thumbnail in the .webp or .jpg
             format.
         emoji (:obj:`str`): Optional. Emoji associated with the sticker.
@@ -49,7 +49,7 @@ class Sticker(TelegramObject):
             Can't be used to download or reuse the file.
         width (:obj:`int`): Sticker width.
         height (:obj:`int`): Sticker height.
-        is_animated (:obj:`bool`): ``True``, if the sticker is animated.
+        is_animated (:obj:`bool`): :obj:`True`, if the sticker is animated.
         thumb (:class:`telegram.PhotoSize`, optional): Sticker thumbnail in the .WEBP or .JPG
             format.
         emoji (:obj:`str`, optional): Emoji associated with the sticker
@@ -137,8 +137,8 @@ class StickerSet(TelegramObject):
     Attributes:
         name (:obj:`str`): Sticker set name.
         title (:obj:`str`): Sticker set title.
-        is_animated (:obj:`bool`): ``True``, if the sticker set contains animated stickers.
-        contains_masks (:obj:`bool`): ``True``, if the sticker set contains masks.
+        is_animated (:obj:`bool`): :obj:`True`, if the sticker set contains animated stickers.
+        contains_masks (:obj:`bool`): :obj:`True`, if the sticker set contains masks.
         stickers (List[:class:`telegram.Sticker`]): List of all set stickers.
         thumb (:class:`telegram.PhotoSize`): Optional. Sticker set thumbnail in the .WEBP or .TGS
             format.
@@ -146,8 +146,8 @@ class StickerSet(TelegramObject):
     Args:
         name (:obj:`str`): Sticker set name.
         title (:obj:`str`): Sticker set title.
-        is_animated (:obj:`bool`): ``True``, if the sticker set contains animated stickers.
-        contains_masks (:obj:`bool`): ``True``, if the sticker set contains masks.
+        is_animated (:obj:`bool`): :obj:`True`, if the sticker set contains animated stickers.
+        contains_masks (:obj:`bool`): :obj:`True`, if the sticker set contains masks.
         stickers (List[:class:`telegram.Sticker`]): List of all set stickers.
         thumb (:class:`telegram.PhotoSize`, optional): Sticker set thumbnail in the .WEBP or .TGS
             format.

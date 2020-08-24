@@ -53,21 +53,21 @@ class Handler(ABC):
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
-        pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
+        pass_update_queue (:obj:`bool`, optional): If set to :obj:`True`, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
-            that contains new updates which can be used to insert updates. Default is ``False``.
+            that contains new updates which can be used to insert updates. Default is :obj:`False`.
             DEPRECATED: Please switch to context based callbacks.
-        pass_job_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
+        pass_job_queue (:obj:`bool`, optional): If set to :obj:`True`, a keyword argument called
             ``job_queue`` will be passed to the callback function. It will be a
             :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
-            which can be used to schedule new jobs. Default is ``False``.
+            which can be used to schedule new jobs. Default is :obj:`False`.
             DEPRECATED: Please switch to context based callbacks.
-        pass_user_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
-            ``user_data`` will be passed to the callback function. Default is ``False``.
+        pass_user_data (:obj:`bool`, optional): If set to :obj:`True`, a keyword argument called
+            ``user_data`` will be passed to the callback function. Default is :obj:`False`.
             DEPRECATED: Please switch to context based callbacks.
-        pass_chat_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
-            ``chat_data`` will be passed to the callback function. Default is ``False``.
+        pass_chat_data (:obj:`bool`, optional): If set to :obj:`True`, a keyword argument called
+            ``chat_data`` will be passed to the callback function. Default is :obj:`False`.
             DEPRECATED: Please switch to context based callbacks.
 
     """
@@ -94,18 +94,18 @@ class Handler(ABC):
             update (:obj:`str` | :class:`telegram.Update`): The update to be tested.
 
         Returns:
-            Either ``None`` or ``False`` if the update should not be handled. Otherwise an object
-            that will be passed to :attr:`handle_update` and :attr:`collect_additional_context`
-            when the update gets handled.
+            Either :obj:`None` or :obj:`False` if the update should not be handled. Otherwise an
+            object that will be passed to :meth:`handle_update` and
+            :meth:`collect_additional_context` when the update gets handled.
 
         """
 
     def handle_update(self, update, dispatcher, check_result, context=None):
         """
         This method is called if it was determined that an update should indeed
-        be handled by this instance. Calls :attr:`self.callback` along with its respectful
+        be handled by this instance. Calls :attr:`callback` along with its respectful
         arguments. To work with the :class:`telegram.ext.ConversationHandler`, this method
-        returns the value returned from ``self.callback``.
+        returns the value returned from :attr:`callback`.
         Note that it can be overridden if needed by the subclassing handler.
 
         Args:

@@ -27,11 +27,11 @@ class BasePersistence(ABC):
 
     All relevant methods must be overwritten. This means:
 
-    * If :attr:`store_bot_data` is ``True`` you must overwrite :meth:`get_bot_data` and
+    * If :attr:`store_bot_data` is :obj:`True` you must overwrite :meth:`get_bot_data` and
       :meth:`update_bot_data`.
-    * If :attr:`store_chat_data` is ``True`` you must overwrite :meth:`get_chat_data` and
+    * If :attr:`store_chat_data` is :obj:`True` you must overwrite :meth:`get_chat_data` and
       :meth:`update_chat_data`.
-    * If :attr:`store_user_data` is ``True`` you must overwrite :meth:`get_user_data` and
+    * If :attr:`store_user_data` is :obj:`True` you must overwrite :meth:`get_user_data` and
       :meth:`update_user_data`.
     * If you want to store conversation data with :class:`telegram.ext.ConversationHandler`, you
       must overwrite :meth:`get_conversations` and :meth:`update_conversation`.
@@ -47,11 +47,11 @@ class BasePersistence(ABC):
 
     Args:
         store_user_data (:obj:`bool`, optional): Whether user_data should be saved by this
-            persistence class. Default is ``True``.
+            persistence class. Default is :obj:`True`.
         store_chat_data (:obj:`bool`, optional): Whether chat_data should be saved by this
-            persistence class. Default is ``True`` .
+            persistence class. Default is :obj:`True` .
         store_bot_data (:obj:`bool`, optional): Whether bot_data should be saved by this
-            persistence class. Default is ``True`` .
+            persistence class. Default is :obj:`True` .
     """
 
     def __init__(self, store_user_data=True, store_chat_data=True, store_bot_data=True):
@@ -93,7 +93,7 @@ class BasePersistence(ABC):
     def get_conversations(self, name):
         """"Will be called by :class:`telegram.ext.Dispatcher` when a
         :class:`telegram.ext.ConversationHandler` is added if
-        :attr:`telegram.ext.ConversationHandler.persistent` is ``True``.
+        :attr:`telegram.ext.ConversationHandler.persistent` is :obj:`True`.
         It should return the conversations for the handler with `name` or an empty :obj:`dict`
 
         Args:

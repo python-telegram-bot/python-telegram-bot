@@ -61,8 +61,8 @@ class BaseFilter(ABC):
 
 
     If you want to create your own filters create a class inheriting from this class and implement
-    a :meth:`filter` method that returns a boolean: ``True`` if the message should be
-    handled, ``False`` otherwise. Note that the filters work only as class instances, not
+    a :meth:`filter` method that returns a boolean: :obj:`True` if the message should be
+    handled, :obj:`False` otherwise. Note that the filters work only as class instances, not
     actual class objects (so remember to initialize your filter classes).
 
     By default the filters name (what will get printed when converted to a string for display)
@@ -71,8 +71,8 @@ class BaseFilter(ABC):
 
     Attributes:
         name (:obj:`str`): Name for this filter. Defaults to the type of filter.
-        update_filter (:obj:`bool`): Whether this filter should work on update. If ``False`` it
-            will run the filter on :attr:`update.effective_message`. Default is ``False``.
+        update_filter (:obj:`bool`): Whether this filter should work on update. If :obj:`False` it
+            will run the filter on :attr:`update.effective_message`. Default is :obj:`False`.
         data_filter (:obj:`bool`): Whether this filter is a data filter. A data filter should
             return a dict with lists. The dict will be merged with
             :class:`telegram.ext.CallbackContext`'s internal dict in most cases
@@ -109,7 +109,7 @@ class BaseFilter(ABC):
         """This method must be overwritten.
 
         Note:
-            If :attr:`update_filter` is ``False`` then the first argument is `message` and of
+            If :attr:`update_filter` is :obj:`False` then the first argument is `message` and of
             type :class:`telegram.Message`.
 
         Args:
@@ -377,7 +377,7 @@ class Filters:
     command = _Command()
     """
     Messages with a :attr:`telegram.MessageEntity.BOT_COMMAND`. By default only allows
-    messages `starting` with a bot command. Pass ``False`` to also allow messages that contain a
+    messages `starting` with a bot command. Pass :obj:`False` to also allow messages that contain a
     bot command `anywhere` in the text.
 
     Examples::
@@ -390,7 +390,7 @@ class Filters:
 
     Args:
         update (:obj:`bool`, optional): Whether to only allow messages that `start` with a bot
-            command. Defaults to ``True``.
+            command. Defaults to :obj:`True`.
     """
 
     class regex(BaseFilter):
@@ -469,7 +469,7 @@ class Filters:
                     send media with wrong types that don't fit to this handler.
 
             Example:
-                Filters.documents.category('audio/') returns ``True`` for all types
+                Filters.documents.category('audio/') returns :obj:`True` for all types
                 of audio sent as file, for example 'audio/mpeg' or 'audio/x-wav'.
             """
 
@@ -1245,7 +1245,7 @@ officedocument.wordprocessingml.document")``-
             chat_id(:obj:`int` | List[:obj:`int`], optional): Which chat ID(s) to allow
                 through.
             username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow
-                through. Leading '@'s in usernames will be discarded.
+                through. Leading `'@'` s in usernames will be discarded.
             allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
                 is specified in :attr:`chat_ids` and :attr:`usernames`. Defaults to :obj:`False`
 
@@ -1318,7 +1318,7 @@ officedocument.wordprocessingml.document")``-
 
             Args:
                 username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow
-                    through. Leading '@'s in usernames will be discarded.
+                    through. Leading `'@'` s in usernames will be discarded.
             """
             with self.__lock:
                 if self._chat_ids:

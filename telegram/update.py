@@ -119,7 +119,7 @@ class Update(TelegramObject):
     def effective_user(self):
         """
         :class:`telegram.User`: The user that sent this update, no matter what kind of update this
-            is. Will be ``None`` for :attr:`channel_post` and :attr:`poll`.
+            is. Will be :obj:`None` for :attr:`channel_post` and :attr:`poll`.
 
         """
         if self._effective_user:
@@ -158,7 +158,7 @@ class Update(TelegramObject):
     def effective_chat(self):
         """
         :class:`telegram.Chat`: The chat that this update was sent in, no matter what kind of
-            update this is. Will be ``None`` for :attr:`inline_query`,
+            update this is. Will be :obj:`None` for :attr:`inline_query`,
             :attr:`chosen_inline_result`, :attr:`callback_query` from inline messages,
             :attr:`shipping_query`, :attr:`pre_checkout_query`, :attr:`poll` and
             :attr:`poll_answer`.
@@ -191,7 +191,7 @@ class Update(TelegramObject):
     def effective_message(self):
         """
         :class:`telegram.Message`: The message included in this update, no matter what kind of
-            update this is. Will be ``None`` for :attr:`inline_query`,
+            update this is. Will be :obj:`None` for :attr:`inline_query`,
             :attr:`chosen_inline_result`, :attr:`callback_query` from inline messages,
             :attr:`shipping_query`, :attr:`pre_checkout_query`, :attr:`poll` and
             :attr:`poll_answer`.

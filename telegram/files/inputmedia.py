@@ -155,7 +155,7 @@ class InputMediaVideo(InputMedia):
         width (:obj:`int`): Optional. Video width.
         height (:obj:`int`): Optional. Video height.
         duration (:obj:`int`): Optional. Video duration.
-        supports_streaming (:obj:`bool`): Optional. Pass ``True``, if the uploaded video is
+        supports_streaming (:obj:`bool`): Optional. Pass :obj:`True`, if the uploaded video is
             suitable for streaming.
         thumb (:class:`telegram.InputFile`): Optional. Thumbnail of the file to send.
 
@@ -172,7 +172,7 @@ class InputMediaVideo(InputMedia):
         width (:obj:`int`, optional): Video width.
         height (:obj:`int`, optional): Video height.
         duration (:obj:`int`, optional): Video duration.
-        supports_streaming (:obj:`bool`, optional): Pass ``True``, if the uploaded video is
+        supports_streaming (:obj:`bool`, optional): Pass :obj:`True`, if the uploaded video is
             suitable for streaming.
         thumb (`filelike object`, optional): Thumbnail of the file sent; can be ignored if
             thumbnail generation for the file is supported server-side. The thumbnail should be

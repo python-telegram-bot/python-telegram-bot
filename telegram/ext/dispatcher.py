@@ -89,9 +89,10 @@ class Dispatcher:
             ``@run_async`` decorator. Defaults to 4.
         persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
             store data that should be persistent over restarts.
-        use_context (:obj:`bool`, optional): If set to ``True`` Use the context based callback API.
-            During the deprecation period of the old API the default is ``False``. **New users**:
-            set this to ``True``.
+        use_context (:obj:`bool`, optional): If set to :obj:`True` Use the context based
+            callback API.
+            During the deprecation period of the old API the default is :obj:`False`.
+            **New users**: Set this to :obj:`True`.
 
     """
 

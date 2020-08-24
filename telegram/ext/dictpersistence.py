@@ -43,11 +43,11 @@ class DictPersistence(BasePersistence):
 
     Args:
         store_user_data (:obj:`bool`, optional): Whether user_data should be saved by this
-            persistence class. Default is ``True``.
+            persistence class. Default is :obj:`True`.
         store_chat_data (:obj:`bool`, optional): Whether user_data should be saved by this
-            persistence class. Default is ``True``.
+            persistence class. Default is :obj:`True`.
         store_bot_data (:obj:`bool`, optional): Whether bot_data should be saved by this
-            persistence class. Default is ``True`` .
+            persistence class. Default is :obj:`True` .
         user_data_json (:obj:`str`, optional): Json string that will be used to reconstruct
             user_data on creating this persistence. Default is ``""``.
         chat_data_json (:obj:`str`, optional): Json string that will be used to reconstruct

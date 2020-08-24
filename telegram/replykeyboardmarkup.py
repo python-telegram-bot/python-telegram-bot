@@ -40,12 +40,12 @@ class ReplyKeyboardMarkup(ReplyMarkup):
                 each represented by an Array of :class:`telegram.KeyboardButton` objects.
         resize_keyboard (:obj:`bool`, optional): Requests clients to resize the keyboard vertically
             for optimal fit (e.g., make the keyboard smaller if there are just two rows of
-            buttons). Defaults to ``False``, in which case the custom keyboard is always of the
+            buttons). Defaults to :obj:`False`, in which case the custom keyboard is always of the
             same height as the app's standard keyboard.
         one_time_keyboard (:obj:`bool`, optional): Requests clients to hide the keyboard as soon as
             it's been used. The keyboard will still be available, but clients will automatically
             display the usual letter-keyboard in the chat - the user can press a special button in
-            the input field to see the custom keyboard again. Defaults to ``False``.
+            the input field to see the custom keyboard again. Defaults to :obj:`False`.
         selective (:obj:`bool`, optional): Use this parameter if you want to show the keyboard to
             specific users only. Targets:
 
@@ -53,7 +53,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
             2) If the bot's message is a reply (has ``reply_to_message_id``), sender of the
                original message.
 
-            Defaults to ``False``.
+            Defaults to :obj:`False`.
 
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -104,13 +104,13 @@ class ReplyKeyboardMarkup(ReplyMarkup):
                 the markup.
             resize_keyboard (:obj:`bool`, optional): Requests clients to resize the keyboard
                 vertically for optimal fit (e.g., make the keyboard smaller if there are just two
-                rows of buttons). Defaults to ``False``, in which case the custom keyboard is
+                rows of buttons). Defaults to :obj:`False`, in which case the custom keyboard is
                 always of the same height as the app's standard keyboard.
             one_time_keyboard (:obj:`bool`, optional): Requests clients to hide the keyboard as
                 soon as it's been used. The keyboard will still be available, but clients will
                 automatically display the usual letter-keyboard in the chat - the user can press
                 a special button in the input field to see the custom keyboard again.
-                Defaults to ``False``.
+                Defaults to :obj:`False`.
             selective (:obj:`bool`, optional): Use this parameter if you want to show the keyboard
                 to specific users only. Targets:
 
@@ -118,7 +118,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
                 2) If the bot's message is a reply (has reply_to_message_id), sender of the
                     original message.
 
-                Defaults to ``False``.
+                Defaults to :obj:`False`.
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
         """
         return cls([[button]],
@@ -145,13 +145,13 @@ class ReplyKeyboardMarkup(ReplyMarkup):
                 the markup.
             resize_keyboard (:obj:`bool`, optional): Requests clients to resize the keyboard
                 vertically for optimal fit (e.g., make the keyboard smaller if there are just two
-                rows of buttons). Defaults to ``False``, in which case the custom keyboard is
+                rows of buttons). Defaults to :obj:`False`, in which case the custom keyboard is
                 always of the same height as the app's standard keyboard.
             one_time_keyboard (:obj:`bool`, optional): Requests clients to hide the keyboard as
                 soon as it's been used. The keyboard will still be available, but clients will
                 automatically display the usual letter-keyboard in the chat - the user can press
                 a special button in the input field to see the custom keyboard again.
-                Defaults to ``False``.
+                Defaults to :obj:`False`.
             selective (:obj:`bool`, optional): Use this parameter if you want to show the keyboard
                 to specific users only. Targets:
 
@@ -159,7 +159,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
                 2) If the bot's message is a reply (has reply_to_message_id), sender of the
                     original message.
 
-                Defaults to ``False``.
+                Defaults to :obj:`False`.
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         """
@@ -187,13 +187,13 @@ class ReplyKeyboardMarkup(ReplyMarkup):
                 in the markup.
             resize_keyboard (:obj:`bool`, optional): Requests clients to resize the keyboard
                 vertically for optimal fit (e.g., make the keyboard smaller if there are just two
-                rows of buttons). Defaults to ``False``, in which case the custom keyboard is
+                rows of buttons). Defaults to :obj:`False`, in which case the custom keyboard is
                 always of the same height as the app's standard keyboard.
             one_time_keyboard (:obj:`bool`, optional): Requests clients to hide the keyboard as
                 soon as it's been used. The keyboard will still be available, but clients will
                 automatically display the usual letter-keyboard in the chat - the user can press
                 a special button in the input field to see the custom keyboard again.
-                Defaults to ``False``.
+                Defaults to :obj:`False`.
             selective (:obj:`bool`, optional): Use this parameter if you want to show the keyboard
                 to specific users only. Targets:
 
@@ -201,7 +201,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
                 2) If the bot's message is a reply (has reply_to_message_id), sender of the
                     original message.
 
-                Defaults to ``False``.
+                Defaults to :obj:`False`.
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         """

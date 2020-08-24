@@ -97,10 +97,10 @@ class PreCheckoutQuery(TelegramObject):
             bot.answer_pre_checkout_query(update.pre_checkout_query.id, *args, **kwargs)
 
         Args:
-            ok (:obj:`bool`): Specify ``True`` if everything is alright
+            ok (:obj:`bool`): Specify :obj:`True` if everything is alright
                 (goods are available, etc.) and the bot is ready to proceed with the order.
-                Use ``False`` if there are any problems.
-            error_message (:obj:`str`, optional): Required if ok is ``False``. Error message in
+                Use :obj:`False` if there are any problems.
+            error_message (:obj:`str`, optional): Required if ok is :obj:`False`. Error message in
                 human readable form that explains the reason for failure to proceed with the
                 checkout (e.g. "Sorry, somebody just bought the last of our amazing black T-shirts
                 while you were busy filling out your payment details. Please choose a different

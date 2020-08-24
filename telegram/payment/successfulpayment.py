@@ -45,7 +45,7 @@ class SuccessfulPayment(TelegramObject):
         invoice_payload (:obj:`str`): Bot specified invoice payload.
         shipping_option_id (:obj:`str`, optional): Identifier of the shipping option chosen by the
             user.
-        order_info (:class:`telegram.OrderInfo`, optional): Order info provided by the user
+        order_info (:class:`telegram.OrderInfo`, optional): Order info provided by the user.
         telegram_payment_charge_id (:obj:`str`): Telegram payment identifier.
         provider_payment_charge_id (:obj:`str`): Provider payment identifier.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.

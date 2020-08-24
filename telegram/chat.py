@@ -44,7 +44,7 @@ class Chat(TelegramObject):
             consecutive messages sent by each unprivileged user. Returned only in
             :meth:`telegram.Bot.get_chat`.
         sticker_set_name (:obj:`str`): Optional. For supergroups, name of Group sticker set.
-        can_set_sticker_set (:obj:`bool`): Optional. ``True``, if the bot can change group the
+        can_set_sticker_set (:obj:`bool`): Optional. :obj:`True`, if the bot can change group the
             sticker set.
 
     Args:
@@ -77,7 +77,7 @@ class Chat(TelegramObject):
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         sticker_set_name (:obj:`str`, optional): For supergroups, name of group sticker set.
             Returned only in :meth:`telegram.Bot.get_chat`.
-        can_set_sticker_set (:obj:`bool`, optional): ``True``, if the bot can change group the
+        can_set_sticker_set (:obj:`bool`, optional): :obj:`True`, if the bot can change group the
             sticker set. Returned only in :meth:`telegram.Bot.get_chat`.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
