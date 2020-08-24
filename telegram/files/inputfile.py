@@ -33,9 +33,9 @@ class InputFile:
     """This object represents a Telegram InputFile.
 
     Attributes:
-        input_file_content (:obj:`bytes`): The binaray content of the file to send.
-        filename (:obj:`str`): Optional, Filename for the file to be sent.
-        attach (:obj:`str`): Optional, attach id for sending multiple files.
+        input_file_content (:obj:`bytes`): The binary content of the file to send.
+        filename (:obj:`str`): Optional. Filename for the file to be sent.
+        attach (:obj:`str`): Optional. Attach id for sending multiple files.
 
     Args:
         obj (:obj:`File handler`): An open file descriptor.

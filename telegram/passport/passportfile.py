@@ -30,7 +30,7 @@ class PassportFile(TelegramObject):
     considered equal, if their :attr:`file_unique_id` is equal.
 
     Attributes:
-        file_id (:obj:`str`): Unique identifier for this file.
+        file_id (:obj:`str`): Identifier for this file.
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
@@ -41,8 +41,9 @@ class PassportFile(TelegramObject):
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.
-        file_unique_id (:obj:`str`): Unique and the same over time and
-            for different bots file identifier.
+        file_unique_id (:obj:`str`): Unique identifier for this file, which
+            is supposed to be the same over time and for different bots.
+            Can't be used to download or reuse the file.
         file_size (:obj:`int`): File size.
         file_date (:obj:`int`): Unix time when the file was uploaded.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.

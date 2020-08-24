@@ -58,7 +58,7 @@ class Updater:
         running (:obj:`bool`): Indicates if the updater is running.
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
             store data that should be persistent over restarts.
-        use_context (:obj:`bool`): Optional. ``True`` if using context based callbacks.
+        use_context (:obj:`bool`): Optional. :obj:`True` if using context based callbacks.
 
     Args:
         token (:obj:`str`, optional): The bot's token given by the @BotFather.
@@ -77,7 +77,7 @@ class Updater:
         private_key_password (:obj:`bytes`, optional): Password for above private key.
         user_sig_handler (:obj:`function`, optional): Takes ``signum, frame`` as positional
             arguments. This will be called when a signal is received, defaults are (SIGINT,
-            SIGTERM, SIGABRT) setable with :attr:`idle`.
+            SIGTERM, SIGABRT) settable with :attr:`idle`.
         request_kwargs (:obj:`dict`, optional): Keyword args to control the creation of a
             `telegram.utils.request.Request` object (ignored if `bot` or `dispatcher` argument is
             used). The request_kwargs are very useful for the advanced users who would like to
@@ -238,7 +238,7 @@ class Updater:
                 Telegram in seconds. Default is 0.0.
             timeout (:obj:`float`, optional): Passed to :attr:`telegram.Bot.get_updates`.
             clean (:obj:`bool`, optional): Whether to clean any pending updates on Telegram servers
-                before actually starting to poll. Default is False.
+                before actually starting to poll. Default is :obj:`False`.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 `Updater` will retry on failures on the Telegram server.
 
@@ -296,7 +296,7 @@ class Updater:
             cert (:obj:`str`, optional): Path to the SSL certificate file.
             key (:obj:`str`, optional): Path to the SSL key file.
             clean (:obj:`bool`, optional): Whether to clean any pending updates on Telegram servers
-                before actually starting the webhook. Default is ``False``.
+                before actually starting the webhook. Default is :obj:`False`.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 `Updater` will retry on failures on the Telegram server.
 
@@ -365,8 +365,8 @@ class Updater:
     def _network_loop_retry(self, action_cb, onerr_cb, description, interval):
         """Perform a loop calling `action_cb`, retrying after network errors.
 
-        Stop condition for loop: `self.running` evaluates False or return value of `action_cb`
-        evaluates False.
+        Stop condition for loop: `self.running` evaluates :obj:`False` or return value of
+        `action_cb` evaluates :obj:`False`.
 
         Args:
             action_cb (:obj:`callable`): Network oriented callback function to call.
@@ -558,7 +558,7 @@ class Updater:
             self.logger.info('Received signal {} ({}), stopping...'.format(
                 signum, get_signal_name(signum)))
             if self.persistence:
-                # Update user_data and chat_data before flushing
+                # Update user_data, chat_data and bot_data before flushing
                 self.dispatcher.update_persistence()
                 self.persistence.flush()
             self.stop()

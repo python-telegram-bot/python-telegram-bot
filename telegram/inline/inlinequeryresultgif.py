@@ -35,7 +35,8 @@ class InlineQueryResultGif(InlineQueryResult):
         gif_width (:obj:`int`): Optional. Width of the GIF.
         gif_height (:obj:`int`): Optional. Height of the GIF.
         gif_duration (:obj:`int`): Optional. Duration of the GIF.
-        thumb_url (:obj:`str`): URL of the static thumbnail for the result (jpeg or gif).
+        thumb_url (:obj:`str`): URL of the static (JPEG or GIF) or animated (MPEG4) thumbnail for
+            the result.
         thumb_mime_type (:obj:`str`): Optional. MIME type of the thumbnail.
         title (:obj:`str`): Optional. Title for the result.
         caption (:obj:`str`): Optional. Caption of the GIF file to be sent, 0-1024 characters
@@ -54,9 +55,10 @@ class InlineQueryResultGif(InlineQueryResult):
         gif_width (:obj:`int`, optional): Width of the GIF.
         gif_height (:obj:`int`, optional): Height of the GIF.
         gif_duration (:obj:`int`, optional): Duration of the GIF
-        thumb_url (:obj:`str`): URL of the static thumbnail for the result (jpeg or gif).
-        thumb_mime_type (:obj:`str`): Optional. MIME type of the thumbnail, must be one of
-            “image/jpeg”, “image/gif”, or “video/mp4”. Defaults to “image/jpeg”.
+        thumb_url (:obj:`str`): URL of the static (JPEG or GIF) or animated (MPEG4) thumbnail for
+            the result.
+        thumb_mime_type (:obj:`str`, optional): MIME type of the thumbnail, must be one of
+            ``'image/jpeg'``, ``'image/gif'``, or ``'video/mp4'``. Defaults to ``'image/jpeg'``.
         title (:obj:`str`, optional): Title for the result.
         caption (:obj:`str`, optional): Caption of the GIF file to be sent, 0-1024 characters
             after entities parsing.

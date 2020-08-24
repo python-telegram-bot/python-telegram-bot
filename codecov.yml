@@ -1,1 +1,10 @@
 comment: false
+
+coverage:
+  status:
+    project:
+      default:
+        # We allow small coverage decreases in the project because we don't retry
+        # on hitting flood limits, which adds noise to the coverage
+        target: auto
+        threshold: 0.1%

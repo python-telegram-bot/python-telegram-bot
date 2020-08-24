@@ -60,8 +60,27 @@ def run_async(func):
 
 
 class DispatcherHandlerStop(Exception):
-    """Raise this in handler to prevent execution any other handler (even in different group)."""
-    pass
+    """
+    Raise this in handler to prevent execution any other handler (even in different group).
+
+    In order to use this exception in a :class:`telegram.ext.ConversationHandler`, pass the
+    optional ``state`` parameter instead of returning the next state:
+
+    .. code-block:: python
+
+        def callback(update, context):
+            ...
+            raise DispatcherHandlerStop(next_state)
+
+    Attributes:
+        state (:obj:`object`): Optional. The next state of the conversation.
+
+    Args:
+        state (:obj:`object`, optional): The next state of the conversation.
+    """
+    def __init__(self, state=None):
+        super().__init__()
+        self.state = state
 
 
 class Dispatcher:
@@ -78,7 +97,7 @@ class Dispatcher:
         chat_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the chat.
         bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
-            store data that should be persistent over restarts
+            store data that should be persistent over restarts.
 
     Args:
         bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
@@ -86,9 +105,9 @@ class Dispatcher:
         job_queue (:class:`telegram.ext.JobQueue`, optional): The :class:`telegram.ext.JobQueue`
                 instance to pass onto handler callbacks.
         workers (:obj:`int`, optional): Number of maximum concurrent worker threads for the
-            ``@run_async`` decorator. defaults to 4.
+            ``@run_async`` decorator. Defaults to 4.
         persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
-            store data that should be persistent over restarts
+            store data that should be persistent over restarts.
         use_context (:obj:`bool`, optional): If set to :obj:`True` uses the context based callback
             API (ignored if `dispatcher` argument is used). Defaults to :obj:`True`.
             **New users**: set this to :obj:`True`.

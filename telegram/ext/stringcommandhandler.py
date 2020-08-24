@@ -50,17 +50,17 @@ class StringCommandHandler(Handler):
         pass_args (:obj:`bool`, optional): Determines whether the handler should be passed the
             arguments passed to the command as a keyword argument called ``args``. It will contain
             a list of strings, which is the text following the command split on single or
-            consecutive whitespace characters. Default is ``False``
+            consecutive whitespace characters. Default is :obj:`False`
             DEPRECATED: Please switch to context based callbacks.
-        pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
+        pass_update_queue (:obj:`bool`, optional): If set to :obj:`True`, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
-            that contains new updates which can be used to insert updates. Default is ``False``.
+            that contains new updates which can be used to insert updates. Default is :obj:`False`.
             DEPRECATED: Please switch to context based callbacks.
-        pass_job_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
+        pass_job_queue (:obj:`bool`, optional): If set to :obj:`True`, a keyword argument called
             ``job_queue`` will be passed to the callback function. It will be a
             class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
-            which can be used to schedule new jobs. Default is ``False``.
+            which can be used to schedule new jobs. Default is :obj:`False`.
             DEPRECATED: Please switch to context based callbacks.
 
     """

@@ -44,15 +44,15 @@ Version 12.7
 **Major Changes:**
 
 - Bot API 4.8 support. **Note:** The ``Dice`` object now has a second positional argument ``emoji``. This is relevant, if you instantiate ``Dice`` objects manually. (`#1917`_)
+- Added ``tzinfo`` argument to ``helpers.from_timestamp``. It now returns an timezone aware object. This is relevant for ``Message.{date,forward_date,edit_date}``, ``Poll.close_date`` and ``ChatMember.until_date`` (`#1621`_)
 
 **New Features:**
 
-- New method ``run_mothly`` for the ``JobQueue`` (`#1705`_)
+- New method ``run_monthly`` for the ``JobQueue`` (`#1705`_)
 - ``Job.next_t`` now gives the datetime of the jobs next execution (`#1685`_)
 
 **Minor changes, CI improvements, doc fixes or bug fixes:**
 
-- Added ``tzinfo`` argument to ``helpers.from_timestamp`` (`#1621`_)
 - Stabalize CI (`#1919`_, `#1931`_)
 - Use ABCs ``@abstractmethod`` instead of raising ``NotImplementedError`` for ``Handler``, ``BasePersistence`` and ``BaseFilter`` (`#1905`_)
 - Doc fixes (`#1914`_, `#1902`_, `#1910`_)
