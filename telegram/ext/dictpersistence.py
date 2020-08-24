@@ -43,11 +43,11 @@ class DictPersistence(BasePersistence):
 
     Args:
         store_user_data (:obj:`bool`, optional): Whether user_data should be saved by this
-            persistence class. Default is ``True``.
+            persistence class. Default is :obj:`True`.
         store_chat_data (:obj:`bool`, optional): Whether user_data should be saved by this
-            persistence class. Default is ``True``.
+            persistence class. Default is :obj:`True`.
         store_bot_data (:obj:`bool`, optional): Whether bot_data should be saved by this
-            persistence class. Default is ``True`` .
+            persistence class. Default is :obj:`True` .
         user_data_json (:obj:`str`, optional): Json string that will be used to reconstruct
             user_data on creating this persistence. Default is ``""``.
         chat_data_json (:obj:`str`, optional): Json string that will be used to reconstruct
@@ -107,7 +107,7 @@ class DictPersistence(BasePersistence):
 
     @property
     def user_data(self):
-        """:obj:`dict`: The user_data as a dict"""
+        """:obj:`dict`: The user_data as a dict."""
         return self._user_data
 
     @property
@@ -120,7 +120,7 @@ class DictPersistence(BasePersistence):
 
     @property
     def chat_data(self):
-        """:obj:`dict`: The chat_data as a dict"""
+        """:obj:`dict`: The chat_data as a dict."""
         return self._chat_data
 
     @property
@@ -133,7 +133,7 @@ class DictPersistence(BasePersistence):
 
     @property
     def bot_data(self):
-        """:obj:`dict`: The bot_data as a dict"""
+        """:obj:`dict`: The bot_data as a dict."""
         return self._bot_data
 
     @property
@@ -146,7 +146,7 @@ class DictPersistence(BasePersistence):
 
     @property
     def conversations(self):
-        """:obj:`dict`: The conversations as a dict"""
+        """:obj:`dict`: The conversations as a dict."""
         return self._conversations
 
     @property
@@ -158,7 +158,8 @@ class DictPersistence(BasePersistence):
             return encode_conversations_to_json(self.conversations)
 
     def get_user_data(self):
-        """Returns the user_data created from the ``user_data_json`` or an empty defaultdict.
+        """Returns the user_data created from the ``user_data_json`` or an empty
+        :obj:`defaultdict`.
 
         Returns:
             :obj:`defaultdict`: The restored user data.
@@ -170,10 +171,11 @@ class DictPersistence(BasePersistence):
         return deepcopy(self.user_data)
 
     def get_chat_data(self):
-        """Returns the chat_data created from the ``chat_data_json`` or an empty defaultdict.
+        """Returns the chat_data created from the ``chat_data_json`` or an empty
+        :obj:`defaultdict`.
 
         Returns:
-            :obj:`defaultdict`: The restored user data.
+            :obj:`defaultdict`: The restored chat data.
         """
         if self.chat_data:
             pass
@@ -182,10 +184,10 @@ class DictPersistence(BasePersistence):
         return deepcopy(self.chat_data)
 
     def get_bot_data(self):
-        """Returns the bot_data created from the ``bot_data_json`` or an empty dict.
+        """Returns the bot_data created from the ``bot_data_json`` or an empty :obj:`dict`.
 
         Returns:
-            :obj:`defaultdict`: The restored user data.
+            :obj:`dict`: The restored bot data.
         """
         if self.bot_data:
             pass
@@ -195,10 +197,10 @@ class DictPersistence(BasePersistence):
 
     def get_conversations(self, name):
         """Returns the conversations created from the ``conversations_json`` or an empty
-        defaultdict.
+        :obj:`dict`.
 
         Returns:
-            :obj:`defaultdict`: The restored user data.
+            :obj:`dict`: The restored conversations data.
         """
         if self.conversations:
             pass
@@ -210,7 +212,7 @@ class DictPersistence(BasePersistence):
         """Will update the conversations for the given handler.
 
         Args:
-            name (:obj:`str`): The handlers name.
+            name (:obj:`str`): The handler's name.
             key (:obj:`tuple`): The key the state is changed for.
             new_state (:obj:`tuple` | :obj:`any`): The new state for the given key.
         """

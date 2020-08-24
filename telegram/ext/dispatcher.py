@@ -97,7 +97,7 @@ class Dispatcher:
         chat_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the chat.
         bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
-            store data that should be persistent over restarts
+            store data that should be persistent over restarts.
 
     Args:
         bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
@@ -105,12 +105,13 @@ class Dispatcher:
         job_queue (:class:`telegram.ext.JobQueue`, optional): The :class:`telegram.ext.JobQueue`
                 instance to pass onto handler callbacks.
         workers (:obj:`int`, optional): Number of maximum concurrent worker threads for the
-            ``@run_async`` decorator. defaults to 4.
+            ``@run_async`` decorator. Defaults to 4.
         persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
-            store data that should be persistent over restarts
-        use_context (:obj:`bool`, optional): If set to ``True`` Use the context based callback API.
-            During the deprecation period of the old API the default is ``False``. **New users**:
-            set this to ``True``.
+            store data that should be persistent over restarts.
+        use_context (:obj:`bool`, optional): If set to :obj:`True` Use the context based
+            callback API.
+            During the deprecation period of the old API the default is :obj:`False`.
+            **New users**: Set this to :obj:`True`.
 
     """
 

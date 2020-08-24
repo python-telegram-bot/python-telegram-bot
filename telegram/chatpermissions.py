@@ -25,49 +25,49 @@ class ChatPermissions(TelegramObject):
     """Describes actions that a non-administrator user is allowed to take in a chat.
 
     Note:
-        Though not stated explicitly in the offical docs, Telegram changes not only the permissions
-        that are set, but also sets all the others to :obj:`False`. However, since not documented,
-        this behaviour may change unbeknown to PTB.
+        Though not stated explicitly in the official docs, Telegram changes not only the
+        permissions that are set, but also sets all the others to :obj:`False`. However, since not
+        documented, this behaviour may change unbeknown to PTB.
 
     Attributes:
-        can_send_messages (:obj:`bool`): Optional. True, if the user is allowed to send text
+        can_send_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to send text
             messages, contacts, locations and venues.
-        can_send_media_messages (:obj:`bool`): Optional. True, if the user is allowed to send
-            audios, documents, photos, videos, video notes and voice notes, implies
+        can_send_media_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to
+            send audios, documents, photos, videos, video notes and voice notes, implies
             :attr:`can_send_messages`.
-        can_send_polls (:obj:`bool`): Optional. True, if the user is allowed to send polls, implies
-            :attr:`can_send_messages`.
-        can_send_other_messages (:obj:`bool`): Optional. True, if the user is allowed to send
-            animations, games, stickers and use inline bots, implies
+        can_send_polls (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to send polls,
+            implies :attr:`can_send_messages`.
+        can_send_other_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to
+            send animations, games, stickers and use inline bots, implies
             :attr:`can_send_media_messages`.
-        can_add_web_page_previews (:obj:`bool`): Optional. True, if the user is allowed to add web
-            page previews to their messages, implies :attr:`can_send_media_messages`.
-        can_change_info (:obj:`bool`): Optional. True, if the user is allowed to change the chat
-            title, photo and other settings. Ignored in public supergroups.
-        can_invite_users (:obj:`bool`): Optional. True, if the user is allowed to invite new users
-            to the chat.
-        can_pin_messages (:obj:`bool`): Optional. True, if the user is allowed to pin messages.
-            Ignored in public supergroups.
+        can_add_web_page_previews (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to
+            add web page previews to their messages, implies :attr:`can_send_media_messages`.
+        can_change_info (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to change the
+            chat title, photo and other settings. Ignored in public supergroups.
+        can_invite_users (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to invite
+            new users to the chat.
+        can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to pin
+            messages. Ignored in public supergroups.
 
     Args:
-        can_send_messages (:obj:`bool`, optional): True, if the user is allowed to send text
+        can_send_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed to send text
             messages, contacts, locations and venues.
-        can_send_media_messages (:obj:`bool`, optional): True, if the user is allowed to send
-            audios, documents, photos, videos, video notes and voice notes, implies
+        can_send_media_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed to
+            send audios, documents, photos, videos, video notes and voice notes, implies
             :attr:`can_send_messages`.
-        can_send_polls (:obj:`bool`, optional): True, if the user is allowed to send polls, implies
-            :attr:`can_send_messages`.
-        can_send_other_messages (:obj:`bool`, optional): True, if the user is allowed to send
-            animations, games, stickers and use inline bots, implies
+        can_send_polls (:obj:`bool`, optional): :obj:`True`, if the user is allowed to send polls,
+            implies :attr:`can_send_messages`.
+        can_send_other_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed to
+            send animations, games, stickers and use inline bots, implies
             :attr:`can_send_media_messages`.
-        can_add_web_page_previews (:obj:`bool`, optional): True, if the user is allowed to add web
-            page previews to their messages, implies :attr:`can_send_media_messages`.
-        can_change_info (:obj:`bool`, optional): True, if the user is allowed to change the chat
-            title, photo and other settings. Ignored in public supergroups.
-        can_invite_users (:obj:`bool`, optional): True, if the user is allowed to invite new users
-            to the chat.
-        can_pin_messages (:obj:`bool`, optional): True, if the user is allowed to pin messages.
-            Ignored in public supergroups.
+        can_add_web_page_previews (:obj:`bool`, optional): :obj:`True`, if the user is allowed to
+            add web page previews to their messages, implies :attr:`can_send_media_messages`.
+        can_change_info (:obj:`bool`, optional): :obj:`True`, if the user is allowed to change the
+            chat title, photo and other settings. Ignored in public supergroups.
+        can_invite_users (:obj:`bool`, optional): :obj:`True`, if the user is allowed to invite new
+            users to the chat.
+        can_pin_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed to pin
+            messages. Ignored in public supergroups.
 
     """
 

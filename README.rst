@@ -17,7 +17,7 @@ We have a vibrant community of developers helping each other in our `Telegram gr
    :target: https://pypi.org/project/python-telegram-bot/
    :alt: Supported Python versions
 
-.. image:: https://www.cpu.re/static/python-telegram-bot/downloads.svg
+.. image:: https://cpu.re/static/python-telegram-bot/downloads.svg
    :target: https://www.cpu.re/static/python-telegram-bot/downloads-by-python-version.txt
    :alt: PyPi Package Monthly Download
 
@@ -187,11 +187,13 @@ You can get help in several ways:
 
 1. We have a vibrant community of developers helping each other in our `Telegram group <https://telegram.me/pythontelegrambotgroup>`_. Join us!
 
-2. Report bugs, request new features or ask questions by `creating an issue <https://github.com/python-telegram-bot/python-telegram-bot/issues/new/choose>`_.
+2. In case you are unable to join our group due to Telegram restrictions, you can use our `IRC channel <https://webchat.freenode.net/?channels=##python-telegram-bot>`_.
 
-3. Our `Wiki pages <https://github.com/python-telegram-bot/python-telegram-bot/wiki/>`_ offer a growing amount of resources.
+3. Report bugs, request new features or ask questions by `creating an issue <https://github.com/python-telegram-bot/python-telegram-bot/issues/new/choose>`_.
 
-4. You can even ask for help on Stack Overflow using the `python-telegram-bot tag <https://stackoverflow.com/questions/tagged/python-telegram-bot>`_.
+4. Our `Wiki pages <https://github.com/python-telegram-bot/python-telegram-bot/wiki/>`_ offer a growing amount of resources.
+
+5. You can even ask for help on Stack Overflow using the `python-telegram-bot tag <https://stackoverflow.com/questions/tagged/python-telegram-bot>`_.
 
 
 

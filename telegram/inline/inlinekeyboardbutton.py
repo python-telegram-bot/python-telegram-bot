@@ -67,8 +67,8 @@ class InlineKeyboardButton(TelegramObject):
         callback_game (:class:`telegram.CallbackGame`, optional): Description of the game that will
             be launched when the user presses the button. This type of button must always be
             the ``first`` button in the first row.
-        pay (:obj:`bool`, optional): Specify True, to send a Pay button. This type of button must
-            always be the ``first`` button in the first row.
+        pay (:obj:`bool`, optional): Specify :obj:`True`, to send a Pay button. This type of button
+            must always be the ``first`` button in the first row.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """

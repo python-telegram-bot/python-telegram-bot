@@ -26,7 +26,7 @@ class Defaults:
 
     Attributes:
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width toxt or URLs in your bot's message.
+            bold, italic, fixed-width text or URLs in your bot's message.
         disable_notification (:obj:`bool`): Optional. Sends the message silently. Users will
             receive a notification with no sound.
         disable_web_page_preview (:obj:`bool`): Optional. Disables link previews for links in this
@@ -34,13 +34,13 @@ class Defaults:
         timeout (:obj:`int` | :obj:`float`): Optional. If this value is specified, use it as the
             read timeout from the server (instead of the one specified during creation of the
             connection pool).
-        quote (:obj:`bool`): Optional. If set to ``True``, the reply is sent as an actual reply to
-            the message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter will
-            be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+        quote (:obj:`bool`): Optional. If set to :obj:`True`, the reply is sent as an actual reply
+            to the message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter will
+            be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
 
     Parameters:
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width toxt or URLs in your bot's message.
+            bold, italic, fixed-width text or URLs in your bot's message.
         disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
             receive a notification with no sound.
         disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in this
@@ -48,9 +48,9 @@ class Defaults:
         timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as the
             read timeout from the server (instead of the one specified during creation of the
             connection pool).
-        quote (:obj:`bool`, opitonal): If set to ``True``, the reply is sent as an actual reply to
-            the message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter will
-            be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+        quote (:obj:`bool`, optional): If set to :obj:`True`, the reply is sent as an actual reply
+            to the message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter will
+            be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
     """
     def __init__(self,
                  parse_mode=None,
