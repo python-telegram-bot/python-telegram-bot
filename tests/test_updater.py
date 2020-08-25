@@ -211,7 +211,7 @@ class TestUpdater:
             updater.stop()
         assert not caplog.records
 
-    @pytest.mark.skipif(os.name == 'nt' and sys.version_info < (3, 8),
+    @pytest.mark.skipif(os.name != 'nt' or sys.version_info < (3, 8),
                         reason='Workaround only relevant on windows with py3.8+')
     def test_start_webhook_ensure_event_loop(self, updater, monkeypatch):
         def serve_forever(self, force_event_loop=False, ready=None):
@@ -243,7 +243,7 @@ class TestUpdater:
 
             assert isinstance(asyncio.get_event_loop(), asyncio.SelectorEventLoop)
 
-    @pytest.mark.skipif(os.name == 'nt' and sys.version_info < (3, 8),
+    @pytest.mark.skipif(os.name != 'nt' or sys.version_info < (3, 8),
                         reason='Workaround only relevant on windows with py3.8+')
     def test_start_webhook_force_event_loop_false(self, updater, monkeypatch):
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
@@ -265,7 +265,7 @@ class TestUpdater:
                     webhook_url=None,
                     allowed_updates=None)
 
-    @pytest.mark.skipif(os.name == 'nt' and sys.version_info < (3, 8),
+    @pytest.mark.skipif(os.name != 'nt' or sys.version_info < (3, 8),
                         reason='Workaround only relevant on windows with py3.8+')
     def test_start_webhook_force_event_loop_true(self, updater, monkeypatch):
         def serve_forever(self, force_event_loop=False, ready=None):

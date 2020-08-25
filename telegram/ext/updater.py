@@ -332,7 +332,7 @@ class Updater:
                 webhook_ready = Event()
                 dispatcher_ready = Event()
                 self.job_queue.start()
-                self._init_thread(self.dispatcher.start, "dispatcher", dispatcher_ready),
+                self._init_thread(self.dispatcher.start, "dispatcher", dispatcher_ready)
                 self._init_thread(self._start_webhook, "updater", listen, port, url_path, cert,
                                   key, bootstrap_retries, clean, webhook_url, allowed_updates,
                                   ready=webhook_ready, force_event_loop=force_event_loop)
