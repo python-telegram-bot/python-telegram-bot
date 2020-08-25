@@ -98,8 +98,9 @@ class WebhookServer:
                     and sys.version_info >= (3, 8)
                     # OS+version check makes hasattr check redundant, but just to be sure
                     and hasattr(asyncio, 'WindowsProactorEventLoopPolicy')
-                    and (type(asyncio.get_event_loop_policy())
-                         is asyncio.WindowsProactorEventLoopPolicy)):  # pylint: disable=E1101
+                    and (isinstance(
+                         asyncio.get_event_loop_policy(),
+                         asyncio.WindowsProactorEventLoopPolicy))):  # pylint: disable=E1101
                 self.logger.debug(
                     'Applying Tornado asyncio event loop fix for Python 3.8+ on Windows')
                 loop = asyncio.SelectorEventLoop()
