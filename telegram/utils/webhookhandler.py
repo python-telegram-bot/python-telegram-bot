@@ -73,12 +73,12 @@ class WebhookServer:
                           client_address, exc_info=True)
 
     def _ensure_event_loop(self, force_event_loop=False):
-        """If there's no asyncio event loop set for the current thread - create one"""
+        """If there's no asyncio event loop set for the current thread - create one."""
         try:
             loop = asyncio.get_event_loop()
             if (not force_event_loop and os.name == 'nt' and sys.version_info >= (3, 8)
                     and isinstance(loop, asyncio.ProactorEventLoop)):
-                raise TypeError('`ProactorEventLoop` is incompatible is incompatible with '
+                raise TypeError('`ProactorEventLoop` is incompatible with '
                                 'Tornado. Please switch to `SelectorEventLoop`.')
         except RuntimeError:
             # Python 3.8 changed default asyncio event loop implementation on windows
