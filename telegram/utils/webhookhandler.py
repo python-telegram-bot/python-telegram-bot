@@ -22,6 +22,7 @@ import sys
 import logging
 from telegram import Update
 from threading import Lock
+
 try:
     import ujson as json
 except ImportError:
@@ -43,13 +44,17 @@ class WebhookServer:
         self.server_lock = Lock()
         self.shutdown_lock = Lock()
 
-    def serve_forever(self):
+    def serve_forever(self, force_event_loop=False, ready=None):
         with self.server_lock:
             self.is_running = True
             self.logger.debug('Webhook Server started.')
-            self._ensure_event_loop()
+            self._ensure_event_loop(force_event_loop=force_event_loop)
             self.loop = IOLoop.current()
             self.http_server.listen(self.port, address=self.listen)
+
+            if ready is not None:
+                ready.set()
+
             self.loop.start()
             self.logger.debug('Webhook Server stopped.')
             self.is_running = False
@@ -67,10 +72,14 @@ class WebhookServer:
         self.logger.debug('Exception happened during processing of request from %s',
                           client_address, exc_info=True)
 
-    def _ensure_event_loop(self):
+    def _ensure_event_loop(self, force_event_loop=False):
         """If there's no asyncio event loop set for the current thread - create one"""
         try:
-            asyncio.get_event_loop()
+            loop = asyncio.get_event_loop()
+            if (not force_event_loop and os.name == 'nt' and sys.version_info >= (3, 8)
+                    and isinstance(loop, asyncio.ProactorEventLoop)):
+                raise TypeError('`ProactorEventLoop` is incompatible is incompatible with '
+                                'Tornado. Please switch to `SelectorEventLoop`.')
         except RuntimeError:
             # Python 3.8 changed default asyncio event loop implementation on windows
             # from SelectorEventLoop to ProactorEventLoop. At the time of this writing
@@ -107,7 +116,7 @@ class WebhookAppClass(tornado.web.Application):
         handlers = [
             (r"{}/?".format(webhook_path), WebhookHandler,
              self.shared_objects)
-            ]  # noqa
+        ]  # noqa
         tornado.web.Application.__init__(self, handlers)
 
     def log_request(self, handler):

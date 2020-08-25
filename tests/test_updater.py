@@ -16,10 +16,14 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import asyncio
 import logging
 import os
 import signal
 import sys
+import threading
+from contextlib import contextmanager
+
 from flaky import flaky
 from functools import partial
 from queue import Queue
@@ -35,10 +39,28 @@ import pytest
 from telegram import TelegramError, Message, User, Chat, Update, Bot
 from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter
 from telegram.ext import Updater, Dispatcher, DictPersistence
+from telegram.utils.webhookhandler import WebhookServer
 
 signalskip = pytest.mark.skipif(sys.platform == 'win32',
                                 reason='Can\'t send signals without stopping '
                                        'whole process on windows')
+
+
+ASYNCIO_LOCK = threading.Lock()
+
+
+@contextmanager
+def set_asyncio_event_loop(loop):
+    with ASYNCIO_LOCK:
+        try:
+            orig_lop = asyncio.get_event_loop()
+        except RuntimeError:
+            orig_lop = None
+        asyncio.set_event_loop(loop)
+        try:
+            yield
+        finally:
+            asyncio.set_event_loop(orig_lop)
 
 
 class TestUpdater:
@@ -186,11 +208,94 @@ class TestUpdater:
         port = randrange(1024, 49152)  # Select random port
         with caplog.at_level(logging.WARNING):
             updater.start_webhook(ip, port)
-            # start_webhook doesn't wait for webhook thread to finish initializing,
-            # updater.stop() will raise an error if called without a delay.
-            sleep(0.1)
             updater.stop()
         assert not caplog.records
+
+    @pytest.mark.skipif(os.name == 'nt' and sys.version_info < (3, 8),
+                        reason='Workaround only relevant on windows with py3.8+')
+    def test_start_webhook_ensure_event_loop(self, updater, monkeypatch):
+        def serve_forever(self, force_event_loop=False, ready=None):
+            with self.server_lock:
+                self.is_running = True
+                self._ensure_event_loop(force_event_loop=force_event_loop)
+
+                if ready is not None:
+                    ready.set()
+
+        monkeypatch.setattr(WebhookServer, 'serve_forever', serve_forever)
+        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
+
+        ip = '127.0.0.1'
+        port = randrange(1024, 49152)  # Select random port
+
+        with set_asyncio_event_loop(None):
+            updater._start_webhook(
+                ip,
+                port,
+                url_path='TOKEN',
+                cert=None,
+                key=None,
+                bootstrap_retries=0,
+                clean=False,
+                webhook_url=None,
+                allowed_updates=None)
+
+            assert isinstance(asyncio.get_event_loop(), asyncio.SelectorEventLoop)
+
+    @pytest.mark.skipif(os.name == 'nt' and sys.version_info < (3, 8),
+                        reason='Workaround only relevant on windows with py3.8+')
+    def test_start_webhook_force_event_loop_false(self, updater, monkeypatch):
+        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
+
+        ip = '127.0.0.1'
+        port = randrange(1024, 49152)  # Select random port
+
+        with set_asyncio_event_loop(asyncio.ProactorEventLoop()):
+            with pytest.raises(TypeError, match='`ProactorEventLoop` is incompatible'):
+                updater._start_webhook(
+                    ip,
+                    port,
+                    url_path='TOKEN',
+                    cert=None,
+                    key=None,
+                    bootstrap_retries=0,
+                    clean=False,
+                    webhook_url=None,
+                    allowed_updates=None)
+
+    @pytest.mark.skipif(os.name == 'nt' and sys.version_info < (3, 8),
+                        reason='Workaround only relevant on windows with py3.8+')
+    def test_start_webhook_force_event_loop_true(self, updater, monkeypatch):
+        def serve_forever(self, force_event_loop=False, ready=None):
+            with self.server_lock:
+                self.is_running = True
+                self._ensure_event_loop(force_event_loop=force_event_loop)
+
+                if ready is not None:
+                    ready.set()
+
+        monkeypatch.setattr(WebhookServer, 'serve_forever', serve_forever)
+        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
+
+        ip = '127.0.0.1'
+        port = randrange(1024, 49152)  # Select random port
+
+        with set_asyncio_event_loop(asyncio.ProactorEventLoop()):
+            updater._start_webhook(
+                ip,
+                port,
+                url_path='TOKEN',
+                cert=None,
+                key=None,
+                bootstrap_retries=0,
+                clean=False,
+                webhook_url=None,
+                allowed_updates=None,
+                force_event_loop=True)
+            assert isinstance(asyncio.get_event_loop(), asyncio.ProactorEventLoop)
 
     def test_webhook_ssl(self, monkeypatch, updater):
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
