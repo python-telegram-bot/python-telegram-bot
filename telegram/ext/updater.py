@@ -258,11 +258,15 @@ class Updater:
                 # Create & start threads
                 self.job_queue.start()
                 dispatcher_ready = Event()
+                polling_ready = Event()
                 self._init_thread(self.dispatcher.start, "dispatcher", ready=dispatcher_ready)
                 self._init_thread(self._start_polling, "updater", poll_interval, timeout,
-                                  read_latency, bootstrap_retries, clean, allowed_updates)
+                                  read_latency, bootstrap_retries, clean, allowed_updates,
+                                  ready=polling_ready)
 
+                self.logger.debug('Waiting for Dispatcher and polling to start')
                 dispatcher_ready.wait()
+                polling_ready.wait()
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
@@ -276,13 +280,23 @@ class Updater:
                       clean=False,
                       bootstrap_retries=0,
                       webhook_url=None,
-                      allowed_updates=None):
+                      allowed_updates=None,
+                      force_event_loop=False):
         """
         Starts a small http server to listen for updates via webhook. If cert
         and key are not provided, the webhook will be started directly on
         http://listen:port/url_path, so SSL can be handled by another
         application. Else, the webhook will be started on
         https://listen:port/url_path
+
+        Note:
+            Due to an incompatibility of the Tornado library PTB uses for the webhook with Python
+            3.8+ on Windows machines, PTB will attempt to set the event loop to
+            :attr:`asyncio.SelectorEventLoop` and raise an exception, if an incompatible event loop
+            has already been specified. See this `thread`_ for more details. To suppress the
+            exception, set :attr:`force_event_loop` to :obj:`True`.
+
+            .. _thread: https://github.com/tornadoweb/tornado/issues/2608
 
         Args:
             listen (:obj:`str`, optional): IP-Address to listen on. Default ``127.0.0.1``.
@@ -303,6 +317,8 @@ class Updater:
                 NAT, reverse proxy, etc. Default is derived from `listen`, `port` & `url_path`.
             allowed_updates (List[:obj:`str`], optional): Passed to
                 :attr:`telegram.Bot.set_webhook`.
+            force_event_loop (:obj:`bool`, optional): Force using the current event loop. See above
+                note for details. Defaults to :obj:`False`
 
         Returns:
             :obj:`Queue`: The update queue that can be filled from the main thread.
@@ -313,16 +329,23 @@ class Updater:
                 self.running = True
 
                 # Create & start threads
+                webhook_ready = Event()
+                dispatcher_ready = Event()
                 self.job_queue.start()
-                self._init_thread(self.dispatcher.start, "dispatcher"),
+                self._init_thread(self.dispatcher.start, "dispatcher", dispatcher_ready)
                 self._init_thread(self._start_webhook, "updater", listen, port, url_path, cert,
-                                  key, bootstrap_retries, clean, webhook_url, allowed_updates)
+                                  key, bootstrap_retries, clean, webhook_url, allowed_updates,
+                                  ready=webhook_ready, force_event_loop=force_event_loop)
+
+                self.logger.debug('Waiting for Dispatcher and Webhook to start')
+                webhook_ready.wait()
+                dispatcher_ready.wait()
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
 
     def _start_polling(self, poll_interval, timeout, read_latency, bootstrap_retries, clean,
-                       allowed_updates):  # pragma: no cover
+                       allowed_updates, ready=None):  # pragma: no cover
         # Thread target of thread 'updater'. Runs in background, pulls
         # updates from Telegram and inserts them in the update queue of the
         # Dispatcher.
@@ -353,6 +376,9 @@ class Updater:
             # Put the error into the update queue and let the Dispatcher
             # broadcast it
             self.update_queue.put(exc)
+
+        if ready is not None:
+            ready.set()
 
         self._network_loop_retry(polling_action_cb, polling_onerr_cb, 'getting Updates',
                                  poll_interval)
@@ -410,7 +436,7 @@ class Updater:
         return current_interval
 
     def _start_webhook(self, listen, port, url_path, cert, key, bootstrap_retries, clean,
-                       webhook_url, allowed_updates):
+                       webhook_url, allowed_updates, ready=None, force_event_loop=False):
         self.logger.debug('Updater thread started (webhook)')
         use_ssl = cert is not None and key is not None
         if not url_path.startswith('/'):
@@ -448,7 +474,7 @@ class Updater:
             self.logger.warning("cleaning updates is not supported if "
                                 "SSL-termination happens elsewhere; skipping")
 
-        self.httpd.serve_forever()
+        self.httpd.serve_forever(force_event_loop=force_event_loop, ready=ready)
 
     @staticmethod
     def _gen_webhook_url(listen, port, url_path):
