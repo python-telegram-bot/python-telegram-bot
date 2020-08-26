@@ -155,8 +155,8 @@ class InputMediaVideo(InputMedia):
         width (:obj:`int`): Optional. Video width.
         height (:obj:`int`): Optional. Video height.
         duration (:obj:`int`): Optional. Video duration.
-        supports_streaming (:obj:`bool`): Optional. Pass True, if the uploaded video is suitable
-            for streaming.
+        supports_streaming (:obj:`bool`): Optional. Pass :obj:`True`, if the uploaded video is
+            suitable for streaming.
         thumb (:class:`telegram.InputFile`): Optional. Thumbnail of the file to send.
 
     Args:
@@ -172,8 +172,8 @@ class InputMediaVideo(InputMedia):
         width (:obj:`int`, optional): Video width.
         height (:obj:`int`, optional): Video height.
         duration (:obj:`int`, optional): Video duration.
-        supports_streaming (:obj:`bool`, optional): Pass True, if the uploaded video is suitable
-            for streaming.
+        supports_streaming (:obj:`bool`, optional): Pass :obj:`True`, if the uploaded video is
+            suitable for streaming.
         thumb (`filelike object`, optional): Thumbnail of the file sent; can be ignored if
             thumbnail generation for the file is supported server-side. The thumbnail should be
             in JPEG format and less than 200 kB in size. A thumbnail's width and height should
@@ -236,7 +236,7 @@ class InputMediaAudio(InputMedia):
         media (:obj:`str` | `filelike object` | :class:`telegram.Audio`): File to send. Pass a
             file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP
             URL for Telegram to get a file from the Internet. Lastly you can pass an existing
-            :class:`telegram.Document` object to send.
+            :class:`telegram.Audio` object to send.
         caption (:obj:`str`, optional): Caption of the audio to be sent, 0-1024 characters after
             entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show

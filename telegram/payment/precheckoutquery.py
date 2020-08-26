@@ -41,11 +41,13 @@ class PreCheckoutQuery(TelegramObject):
     Args:
         id (:obj:`str`): Unique query identifier.
         from_user (:class:`telegram.User`): User who sent the query.
-        currency (:obj:`str`): Three-letter ISO 4217 currency code
+        currency (:obj:`str`): Three-letter ISO 4217 currency code.
         total_amount (:obj:`int`): Total price in the smallest units of the currency (integer, not
-            float/double). For example, for a price of US$ 1.45 pass amount = 145. See the exp
-            parameter in currencies.json, it shows the number of digits past the decimal point for
-            each currency (2 for the majority of currencies).
+            float/double). For example, for a price of US$ 1.45 pass ``amount = 145``.
+            See the :obj:`exp` parameter in
+            `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_,
+            it shows the number of digits past the decimal point for each currency
+            (2 for the majority of currencies).
         invoice_payload (:obj:`str`): Bot specified invoice payload.
         shipping_option_id (:obj:`str`, optional): Identifier of the shipping option chosen by the
             user.
@@ -95,13 +97,14 @@ class PreCheckoutQuery(TelegramObject):
             bot.answer_pre_checkout_query(update.pre_checkout_query.id, *args, **kwargs)
 
         Args:
-            ok (:obj:`bool`): Specify True if everything is alright (goods are available, etc.) and
-                the bot is ready to proceed with the order. Use False if there are any problems.
-            error_message (:obj:`str`, optional): Required if ok is False. Error message in human
-                readable form that explains the reason for failure to proceed with the checkout
-                (e.g. "Sorry, somebody just bought the last of our amazing black T-shirts while you
-                were busy filling out your payment details. Please choose a different color or
-                garment!"). Telegram will display this message to the user.
+            ok (:obj:`bool`): Specify :obj:`True` if everything is alright
+                (goods are available, etc.) and the bot is ready to proceed with the order.
+                Use :obj:`False` if there are any problems.
+            error_message (:obj:`str`, optional): Required if ok is :obj:`False`. Error message in
+                human readable form that explains the reason for failure to proceed with the
+                checkout (e.g. "Sorry, somebody just bought the last of our amazing black T-shirts
+                while you were busy filling out your payment details. Please choose a different
+                color or garment!"). Telegram will display this message to the user.
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         """

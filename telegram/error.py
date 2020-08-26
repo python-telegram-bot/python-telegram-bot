@@ -26,7 +26,7 @@ def _lstrip_str(in_s, lstr):
         lstr (:obj:`str`): substr to strip from left side
 
     Returns:
-        str:
+        :obj:`str`: The stripped string.
 
     """
     if in_s.startswith(lstr):
@@ -77,7 +77,7 @@ class TimedOut(NetworkError):
 class ChatMigrated(TelegramError):
     """
     Args:
-        new_chat_id (:obj:`int`):
+        new_chat_id (:obj:`int`): The new chat id of the group.
 
     """
 
@@ -89,7 +89,7 @@ class ChatMigrated(TelegramError):
 class RetryAfter(TelegramError):
     """
     Args:
-        retry_after (:obj:`int`):
+        retry_after (:obj:`int`): Time in seconds, after which the bot can retry the request.
 
     """
 

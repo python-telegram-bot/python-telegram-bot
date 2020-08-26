@@ -85,9 +85,9 @@ class InlineQuery(TelegramObject):
                 query.
             cache_time (:obj:`int`, optional): The maximum amount of time in seconds that the
                 result of the inline query may be cached on the server. Defaults to 300.
-            is_personal (:obj:`bool`, optional): Pass True, if results may be cached on the server
-                side only for the user that sent the query. By default, results may be returned to
-                any user who sends the same query.
+            is_personal (:obj:`bool`, optional): Pass :obj:`True`, if results may be cached on the
+                server side only for the user that sent the query. By default, results may be
+                returned to any user who sends the same query.
             next_offset (:obj:`str`, optional): Pass the offset that a client should send in the
                 next query with the same text to receive more results. Pass an empty string if
                 there are no more results or if you don't support pagination. Offset length can't

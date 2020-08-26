@@ -25,13 +25,13 @@ class Sticker(TelegramObject):
     """This object represents a sticker.
 
     Attributes:
-        file_id (:obj:`str`): Unique identifier for this file.
+        file_id (:obj:`str`): Identifier for this file.
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
         width (:obj:`int`): Sticker width.
         height (:obj:`int`): Sticker height.
-        is_animated (:obj:`bool`): True, if the sticker is animated.
+        is_animated (:obj:`bool`): :obj:`True`, if the sticker is animated.
         thumb (:class:`telegram.PhotoSize`): Optional. Sticker thumbnail in the .webp or .jpg
             format.
         emoji (:obj:`str`): Optional. Emoji associated with the sticker.
@@ -44,12 +44,13 @@ class Sticker(TelegramObject):
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.
-        file_unique_id (:obj:`str`): Unique and the same over time and
-            for different bots file identifier.
+        file_unique_id (:obj:`str`): Unique identifier for this file, which
+            is supposed to be the same over time and for different bots.
+            Can't be used to download or reuse the file.
         width (:obj:`int`): Sticker width.
         height (:obj:`int`): Sticker height.
-        is_animated (:obj:`bool`): True, if the sticker is animated.
-        thumb (:class:`telegram.PhotoSize`, optional): Sticker thumbnail in the .webp or .jpg
+        is_animated (:obj:`bool`): :obj:`True`, if the sticker is animated.
+        thumb (:class:`telegram.PhotoSize`, optional): Sticker thumbnail in the .WEBP or .JPG
             format.
         emoji (:obj:`str`, optional): Emoji associated with the sticker
         set_name (:obj:`str`, optional): Name of the sticker set to which the sticker
@@ -57,8 +58,9 @@ class Sticker(TelegramObject):
         mask_position (:class:`telegram.MaskPosition`, optional): For mask stickers, the
             position where the mask should be placed.
         file_size (:obj:`int`, optional): File size.
-        **kwargs (obj:`dict`): Arbitrary keyword arguments.7
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+        **kwargs (obj:`dict`): Arbitrary keyword arguments.
+
 
     """
 
@@ -135,20 +137,20 @@ class StickerSet(TelegramObject):
     Attributes:
         name (:obj:`str`): Sticker set name.
         title (:obj:`str`): Sticker set title.
-        is_animated (:obj:`bool`): True, if the sticker set contains animated stickers.
-        contains_masks (:obj:`bool`): True, if the sticker set contains masks.
+        is_animated (:obj:`bool`): :obj:`True`, if the sticker set contains animated stickers.
+        contains_masks (:obj:`bool`): :obj:`True`, if the sticker set contains masks.
         stickers (List[:class:`telegram.Sticker`]): List of all set stickers.
         thumb (:class:`telegram.PhotoSize`): Optional. Sticker set thumbnail in the .WEBP or .TGS
-            format
+            format.
 
     Args:
         name (:obj:`str`): Sticker set name.
         title (:obj:`str`): Sticker set title.
-        is_animated (:obj:`bool`): True, if the sticker set contains animated stickers.
-        contains_masks (:obj:`bool`): True, if the sticker set contains masks.
+        is_animated (:obj:`bool`): :obj:`True`, if the sticker set contains animated stickers.
+        contains_masks (:obj:`bool`): :obj:`True`, if the sticker set contains masks.
         stickers (List[:class:`telegram.Sticker`]): List of all set stickers.
         thumb (:class:`telegram.PhotoSize`, optional): Sticker set thumbnail in the .WEBP or .TGS
-            format
+            format.
 
     """
 
@@ -189,6 +191,7 @@ class MaskPosition(TelegramObject):
 
     Attributes:
         point (:obj:`str`): The part of the face relative to which the mask should be placed.
+            One of ``'forehead'``, ``'eyes'``, ``'mouth'``, or ``'chin'``.
         x_shift (:obj:`float`): Shift by X-axis measured in widths of the mask scaled to the face
             size, from left to right.
         y_shift (:obj:`float`): Shift by Y-axis measured in heights of the mask scaled to the face
@@ -197,10 +200,11 @@ class MaskPosition(TelegramObject):
 
     Note:
         :attr:`type` should be one of the following: `forehead`, `eyes`, `mouth` or `chin`. You can
-        use the classconstants for those.
+        use the class constants for those.
 
     Args:
         point (:obj:`str`): The part of the face relative to which the mask should be placed.
+            One of ``'forehead'``, ``'eyes'``, ``'mouth'``, or ``'chin'``.
         x_shift (:obj:`float`): Shift by X-axis measured in widths of the mask scaled to the face
             size, from left to right. For example, choosing -1.0 will place mask just to the left
             of the default mask position.

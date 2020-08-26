@@ -40,7 +40,7 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-            message to be sent instead of the voice.
+            message to be sent instead of the voice message.
 
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
@@ -53,7 +53,7 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
-            message to be sent instead of the voice.
+            message to be sent instead of the voice message.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """

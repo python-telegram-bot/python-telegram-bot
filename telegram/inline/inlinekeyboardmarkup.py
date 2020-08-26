@@ -26,12 +26,12 @@ class InlineKeyboardMarkup(ReplyMarkup):
     This object represents an inline keyboard that appears right next to the message it belongs to.
 
     Attributes:
-        inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): Array of button rows,
-            each represented by an Array of InlineKeyboardButton objects.
+        inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
+            each represented by a list of InlineKeyboardButton objects.
 
     Args:
-        inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): Array of button rows,
-            each represented by an Array of InlineKeyboardButton objects.
+        inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
+            each represented by a list of InlineKeyboardButton objects.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """

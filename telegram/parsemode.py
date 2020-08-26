@@ -24,7 +24,12 @@ class ParseMode:
     """This object represents a Telegram Message Parse Modes."""
 
     MARKDOWN = 'Markdown'
-    """:obj:`str`: 'Markdown'"""
+    """:obj:`str`: 'Markdown'
+
+    Note:
+        :attr:`MARKDOWN` is a legacy mode, retained by Telegram for backward compatibility.
+        You should use :attr:`MARKDOWN_V2` instead.
+    """
     MARKDOWN_V2 = 'MarkdownV2'
     """:obj:`str`: 'MarkdownV2'"""
     HTML = 'HTML'
