@@ -68,6 +68,15 @@ class TestInlineQuery:
         monkeypatch.setattr(inline_query.bot, 'answer_inline_query', test)
         assert inline_query.answer()
 
+    def test_answer_auto_pagination(self, monkeypatch, inline_query):
+        def test(*args, **kwargs):
+            inline_query_id = args[0] == inline_query.id
+            offset = kwargs.get('current_offset') == inline_query.offset
+            return offset and inline_query_id
+
+        monkeypatch.setattr(inline_query.bot, 'answer_inline_query', test)
+        assert inline_query.answer(auto_pagination=True)
+
     def test_equality(self):
         a = InlineQuery(self.id_, User(1, '', False), '', '')
         b = InlineQuery(self.id_, User(1, '', False), '', '')

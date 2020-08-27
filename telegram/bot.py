@@ -39,6 +39,7 @@ from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos
                       ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore, StickerSet,
                       PhotoSize, Audio, Document, Sticker, Video, Animation, Voice, VideoNote,
                       Location, Venue, Contact, InputFile, Poll, BotCommand)
+from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import InvalidToken, TelegramError
 from telegram.utils.helpers import to_timestamp, DEFAULT_NONE
 from telegram.utils.request import Request
@@ -1526,6 +1527,7 @@ class Bot(TelegramObject):
                             switch_pm_text=None,
                             switch_pm_parameter=None,
                             timeout=None,
+                            current_offset=None,
                             **kwargs):
         """
         Use this method to send answers to an inline query. No more than 50 results per query are
@@ -1533,8 +1535,12 @@ class Bot(TelegramObject):
 
         Args:
             inline_query_id (:obj:`str`): Unique identifier for the answered query.
-            results (List[:class:`telegram.InlineQueryResult`)]: A list of results for the inline
-                query.
+            results (List[:class:`telegram.InlineQueryResult`] | Callable): A list of results for
+                the inline query. In case :attr:`current_offset` is passed, ``results`` may also be
+                a callable taking a single integer argument, being the 0-based current number of
+                the result pagination. It must return either a list of
+                :class:`telegram.InlineResult` instances or :obj:`None`, if there are no more
+                results.
             cache_time (:obj:`int`, optional): The maximum amount of time in seconds that the
                 result of the inline query may be cached on the server. Defaults to 300.
             is_personal (:obj:`bool`, optional): Pass :obj:`True`, if results may be cached on
@@ -1550,6 +1556,10 @@ class Bot(TelegramObject):
             switch_pm_parameter (:obj:`str`, optional): Deep-linking parameter for the /start
                 message sent to the bot when user presses the switch button. 1-64 characters,
                 only A-Z, a-z, 0-9, _ and - are allowed.
+            current_offset (:obj:`int`, optional): The :attr:`telegram.InlineQuery.offset` of
+                the inline query to answer. If passed, PTB will automatically take care of
+                the pagination for you, i.e. pass set the correct ``next_offset`` and truncate the
+                results list/call the callable you passed.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -1573,6 +1583,32 @@ class Bot(TelegramObject):
         """
         url = '{}/answerInlineQuery'.format(self.base_url)
 
+        if current_offset is not None and next_offset is not None:
+            raise ValueError('`current_offset` and `next_offset` are mutually exclusive!')
+
+        if current_offset is not None:
+            next_offset = ''
+
+            if callable(results):
+                results = results(current_offset)
+                if not results:
+                    self.logger.debug('No results returned by results generator. Not answering '
+                                      'InlineQuery.')
+                    return
+                else:
+                    next_offset = current_offset + 1
+            else:
+                if current_offset == 0:
+                    if len(results) > MAX_INLINE_QUERY_RESULTS:
+                        next_offset = current_offset + 1
+                        results = results[:MAX_INLINE_QUERY_RESULTS]
+                elif len(results) > current_offset:
+                    if len(results) > (current_offset + 1) * MAX_INLINE_QUERY_RESULTS:
+                        next_offset = current_offset + 1
+                    results = results[
+                        current_offset * MAX_INLINE_QUERY_RESULTS:
+                        current_offset * MAX_INLINE_QUERY_RESULTS + MAX_INLINE_QUERY_RESULTS]
+
         for res in results:
             if res._has_parse_mode and res.parse_mode == DEFAULT_NONE:
                 if self.defaults:
@@ -1595,9 +1631,7 @@ class Bot(TelegramObject):
                         res.input_message_content.disable_web_page_preview = None
 
         results = [res.to_dict() for res in results]
-
         data = {'inline_query_id': inline_query_id, 'results': results}
-
         if cache_time or cache_time == 0:
             data['cache_time'] = cache_time
         if is_personal:
