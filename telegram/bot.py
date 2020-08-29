@@ -1556,7 +1556,7 @@ class Bot(TelegramObject):
             switch_pm_parameter (:obj:`str`, optional): Deep-linking parameter for the /start
                 message sent to the bot when user presses the switch button. 1-64 characters,
                 only A-Z, a-z, 0-9, _ and - are allowed.
-            current_offset (:obj:`int`, optional): The :attr:`telegram.InlineQuery.offset` of
+            current_offset (:obj:`str`, optional): The :attr:`telegram.InlineQuery.offset` of
                 the inline query to answer. If passed, PTB will automatically take care of
                 the pagination for you, i.e. pass set the correct ``next_offset`` and truncate the
                 results list/call the callable you passed.
@@ -1587,14 +1587,17 @@ class Bot(TelegramObject):
             raise ValueError('`current_offset` and `next_offset` are mutually exclusive!')
 
         if current_offset is not None:
+            if current_offset == '':
+                current_offset = 0
+            else:
+                current_offset = int(current_offset)
+
             next_offset = ''
 
             if callable(results):
                 results = results(current_offset)
                 if not results:
-                    self.logger.debug('No results returned by results generator. Not answering '
-                                      'InlineQuery.')
-                    return
+                    results = []
                 else:
                     next_offset = current_offset + 1
             else:

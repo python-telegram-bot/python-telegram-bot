@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import logging
 import time
 import datetime as dtm
 from platform import python_implementation
@@ -414,6 +413,17 @@ class TestBot:
         def test(_, url, data, *args, **kwargs):
             results = data['results']
             length = len(results) == MAX_INLINE_QUERY_RESULTS
+            ids = all([int(res['id']) == 1 + i for i, res in enumerate(results)])
+            next_offset = data['next_offset'] == 1
+            return length and ids and next_offset
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+
+        assert bot.answer_inline_query(1234, results=inline_results, current_offset='')
+
+        def test(_, url, data, *args, **kwargs):
+            results = data['results']
+            length = len(results) == MAX_INLINE_QUERY_RESULTS
             ids = all([int(res['id']) == 51 + i for i, res in enumerate(results)])
             next_offset = data['next_offset'] == 2
             return length and ids and next_offset
@@ -473,16 +483,15 @@ class TestBot:
         assert bot.answer_inline_query(1234, results=inline_results_callback, current_offset=1)
 
         def test(_, url, data, *args, **kwargs):
-            return False
+            results = data['results']
+            length = len(results) == MAX_INLINE_QUERY_RESULTS
+            ids = all([int(res['id']) == 51 + i for i, res in enumerate(results)])
+            next_offset = data['next_offset'] == 2
+            return length and ids and next_offset
 
         monkeypatch.setattr('telegram.utils.request.Request.post', test)
 
-        with caplog.at_level(logging.DEBUG):
-            assert None is bot.answer_inline_query(1234,
-                                                   results=inline_results_callback,
-                                                   current_offset=6)
-            assert any([rec.msg.startswith('No results returned by results generator')
-                        for rec in caplog.records if rec.msg])
+        assert bot.answer_inline_query(1234, results=inline_results_callback, current_offset=1)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
