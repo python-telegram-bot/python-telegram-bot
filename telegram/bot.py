@@ -1601,16 +1601,13 @@ class Bot(TelegramObject):
                 else:
                     next_offset = current_offset + 1
             else:
-                if current_offset == 0:
-                    if len(results) > MAX_INLINE_QUERY_RESULTS:
-                        next_offset = current_offset + 1
-                        results = results[:MAX_INLINE_QUERY_RESULTS]
-                elif len(results) > current_offset:
-                    if len(results) > (current_offset + 1) * MAX_INLINE_QUERY_RESULTS:
-                        next_offset = current_offset + 1
+                if len(results) > (current_offset + 1) * MAX_INLINE_QUERY_RESULTS:
+                    next_offset = current_offset + 1
                     results = results[
                         current_offset * MAX_INLINE_QUERY_RESULTS:
                         current_offset * MAX_INLINE_QUERY_RESULTS + MAX_INLINE_QUERY_RESULTS]
+                else:
+                    results = results[current_offset * MAX_INLINE_QUERY_RESULTS:]
 
         for res in results:
             if res._has_parse_mode and res.parse_mode == DEFAULT_NONE:

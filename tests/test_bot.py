@@ -469,7 +469,7 @@ class TestBot:
 
         assert bot.answer_inline_query(1234, results=inline_results, current_offset=0)
 
-    def test_answer_inline_query_current_offset_callback_1(self, monkeypatch, bot, caplog):
+    def test_answer_inline_query_current_offset_callback(self, monkeypatch, bot, caplog):
         # For now just test that our internals pass the correct data
         def test(_, url, data, *args, **kwargs):
             results = data['results']
@@ -484,14 +484,13 @@ class TestBot:
 
         def test(_, url, data, *args, **kwargs):
             results = data['results']
-            length = len(results) == MAX_INLINE_QUERY_RESULTS
-            ids = all([int(res['id']) == 51 + i for i, res in enumerate(results)])
-            next_offset = data['next_offset'] == 2
-            return length and ids and next_offset
+            length = results == []
+            next_offset = data['next_offset'] == ''
+            return length and next_offset
 
         monkeypatch.setattr('telegram.utils.request.Request.post', test)
 
-        assert bot.answer_inline_query(1234, results=inline_results_callback, current_offset=1)
+        assert bot.answer_inline_query(1234, results=inline_results_callback, current_offset=6)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
