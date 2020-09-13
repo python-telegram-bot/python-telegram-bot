@@ -29,8 +29,11 @@ if TYPE_CHECKING:
 
 class Game(TelegramObject):
     """
-    This object represents a game. Use BotFather to create and edit games, their short names will
-    act as unique identifiers.
+    This object represents a game. Use `BotFather <https://t.me/BotFather>`_ to create and edit
+    games, their short names will act as unique identifiers.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`title`, :attr:`description` and :attr:`photo` are equal.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`title`, :attr:`description` and :attr:`photo` are equal.
@@ -42,11 +45,12 @@ class Game(TelegramObject):
             in chats.
         text (:obj:`str`): Optional. Brief description of the game or high scores included in the
             game message. Can be automatically edited to include current high scores for the game
-            when the bot calls set_game_score, or manually edited using edit_message_text.
+            when the bot calls :meth:`telegram.Bot.set_game_score`, or manually edited
+            using :meth:`telegram.Bot.edit_message_text`.
         text_entities (List[:class:`telegram.MessageEntity`]): Optional. Special entities that
             appear in text, such as usernames, URLs, bot commands, etc.
         animation (:class:`telegram.Animation`): Optional. Animation that will be displayed in the
-            game message in chats. Upload via BotFather.
+            game message in chats. Upload via `BotFather <https://t.me/BotFather>`_.
 
     Args:
         title (:obj:`str`): Title of the game.
@@ -55,12 +59,13 @@ class Game(TelegramObject):
             in chats.
         text (:obj:`str`, optional): Brief description of the game or high scores included in the
             game message. Can be automatically edited to include current high scores for the game
-            when the bot calls set_game_score, or manually edited using edit_message_text.
-            0-4096 characters. Also found as ``telegram.constants.MAX_MESSAGE_LENGTH``.
+            when the bot calls :meth:`telegram.Bot.set_game_score`, or manually edited
+            using :meth:`telegram.Bot.edit_message_text`.
+            1-4096 characters. Also found as ``telegram.constants.MAX_MESSAGE_LENGTH``.
         text_entities (List[:class:`telegram.MessageEntity`], optional): Special entities that
             appear in text, such as usernames, URLs, bot commands, etc.
         animation (:class:`telegram.Animation`, optional): Animation that will be displayed in the
-            game message in chats. Upload via BotFather.
+            game message in chats. Upload via `BotFather <https://t.me/BotFather>`_.
 
     """
 

@@ -63,7 +63,7 @@ class Updater:
         running (:obj:`bool`): Indicates if the updater is running.
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
             store data that should be persistent over restarts.
-        use_context (:obj:`bool`): Optional. ``True`` if using context based callbacks.
+        use_context (:obj:`bool`): Optional. :obj:`True` if using context based callbacks.
 
     Args:
         token (:obj:`str`, optional): The bot's token given by the @BotFather.
@@ -82,7 +82,7 @@ class Updater:
         private_key_password (:obj:`bytes`, optional): Password for above private key.
         user_sig_handler (:obj:`function`, optional): Takes ``signum, frame`` as positional
             arguments. This will be called when a signal is received, defaults are (SIGINT,
-            SIGTERM, SIGABRT) setable with :attr:`idle`.
+            SIGTERM, SIGABRT) settable with :attr:`idle`.
         request_kwargs (:obj:`dict`, optional): Keyword args to control the creation of a
             `telegram.utils.request.Request` object (ignored if `bot` or `dispatcher` argument is
             used). The request_kwargs are very useful for the advanced users who would like to
@@ -122,6 +122,12 @@ class Updater:
                  use_context: bool = True,
                  dispatcher: Dispatcher = None,
                  base_file_url: str = None):
+
+        if defaults and bot:
+            warnings.warn('Passing defaults to an Updater has no effect when a Bot is passed '
+                          'as well. Pass them to the Bot instead.',
+                          TelegramDeprecationWarning,
+                          stacklevel=2)
 
         if defaults and bot:
             warnings.warn('Passing defaults to an Updater has no effect when a Bot is passed '
@@ -243,7 +249,7 @@ class Updater:
                 Telegram in seconds. Default is 0.0.
             timeout (:obj:`float`, optional): Passed to :attr:`telegram.Bot.get_updates`.
             clean (:obj:`bool`, optional): Whether to clean any pending updates on Telegram servers
-                before actually starting to poll. Default is False.
+                before actually starting to poll. Default is :obj:`False`.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 `Updater` will retry on failures on the Telegram server.
 
@@ -268,11 +274,15 @@ class Updater:
                 # Create & start threads
                 self.job_queue.start()
                 dispatcher_ready = Event()
+                polling_ready = Event()
                 self._init_thread(self.dispatcher.start, "dispatcher", ready=dispatcher_ready)
                 self._init_thread(self._start_polling, "updater", poll_interval, timeout,
-                                  read_latency, bootstrap_retries, clean, allowed_updates)
+                                  read_latency, bootstrap_retries, clean, allowed_updates,
+                                  ready=polling_ready)
 
+                self.logger.debug('Waiting for Dispatcher and polling to start')
                 dispatcher_ready.wait()
+                polling_ready.wait()
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
@@ -287,13 +297,23 @@ class Updater:
                       clean: bool = False,
                       bootstrap_retries: int = 0,
                       webhook_url: str = None,
-                      allowed_updates: List[str] = None) -> Optional[Queue]:
+                      allowed_updates: List[str] = None,
+                      force_event_loop: bool = False) -> Optional[Queue]:
         """
         Starts a small http server to listen for updates via webhook. If cert
         and key are not provided, the webhook will be started directly on
         http://listen:port/url_path, so SSL can be handled by another
         application. Else, the webhook will be started on
         https://listen:port/url_path
+
+        Note:
+            Due to an incompatibility of the Tornado library PTB uses for the webhook with Python
+            3.8+ on Windows machines, PTB will attempt to set the event loop to
+            :attr:`asyncio.SelectorEventLoop` and raise an exception, if an incompatible event loop
+            has already been specified. See this `thread`_ for more details. To suppress the
+            exception, set :attr:`force_event_loop` to :obj:`True`.
+
+            .. _thread: https://github.com/tornadoweb/tornado/issues/2608
 
         Args:
             listen (:obj:`str`, optional): IP-Address to listen on. Default ``127.0.0.1``.
@@ -302,7 +322,7 @@ class Updater:
             cert (:obj:`str`, optional): Path to the SSL certificate file.
             key (:obj:`str`, optional): Path to the SSL key file.
             clean (:obj:`bool`, optional): Whether to clean any pending updates on Telegram servers
-                before actually starting the webhook. Default is ``False``.
+                before actually starting the webhook. Default is :obj:`False`.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 `Updater` will retry on failures on the Telegram server.
 
@@ -314,6 +334,8 @@ class Updater:
                 NAT, reverse proxy, etc. Default is derived from `listen`, `port` & `url_path`.
             allowed_updates (List[:obj:`str`], optional): Passed to
                 :attr:`telegram.Bot.set_webhook`.
+            force_event_loop (:obj:`bool`, optional): Force using the current event loop. See above
+                note for details. Defaults to :obj:`False`
 
         Returns:
             :obj:`Queue`: The update queue that can be filled from the main thread.
@@ -324,10 +346,17 @@ class Updater:
                 self.running = True
 
                 # Create & start threads
+                webhook_ready = Event()
+                dispatcher_ready = Event()
                 self.job_queue.start()
-                self._init_thread(self.dispatcher.start, "dispatcher")
+                self._init_thread(self.dispatcher.start, "dispatcher", dispatcher_ready)
                 self._init_thread(self._start_webhook, "updater", listen, port, url_path, cert,
-                                  key, bootstrap_retries, clean, webhook_url, allowed_updates)
+                                  key, bootstrap_retries, clean, webhook_url, allowed_updates,
+                                  ready=webhook_ready, force_event_loop=force_event_loop)
+
+                self.logger.debug('Waiting for Dispatcher and Webhook to start')
+                webhook_ready.wait()
+                dispatcher_ready.wait()
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
@@ -335,7 +364,7 @@ class Updater:
 
     @no_type_check
     def _start_polling(self, poll_interval, timeout, read_latency, bootstrap_retries, clean,
-                       allowed_updates):  # pragma: no cover
+                       allowed_updates, ready=None):  # pragma: no cover
         # Thread target of thread 'updater'. Runs in background, pulls
         # updates from Telegram and inserts them in the update queue of the
         # Dispatcher.
@@ -367,6 +396,9 @@ class Updater:
             # broadcast it
             self.update_queue.put(exc)
 
+        if ready is not None:
+            ready.set()
+
         self._network_loop_retry(polling_action_cb, polling_onerr_cb, 'getting Updates',
                                  poll_interval)
 
@@ -374,8 +406,8 @@ class Updater:
     def _network_loop_retry(self, action_cb, onerr_cb, description, interval):
         """Perform a loop calling `action_cb`, retrying after network errors.
 
-        Stop condition for loop: `self.running` evaluates False or return value of `action_cb`
-        evaluates False.
+        Stop condition for loop: `self.running` evaluates :obj:`False` or return value of
+        `action_cb` evaluates :obj:`False`.
 
         Args:
             action_cb (:obj:`callable`): Network oriented callback function to call.
@@ -425,7 +457,7 @@ class Updater:
 
     @no_type_check
     def _start_webhook(self, listen, port, url_path, cert, key, bootstrap_retries, clean,
-                       webhook_url, allowed_updates):
+                       webhook_url, allowed_updates, ready=None, force_event_loop=False):
         self.logger.debug('Updater thread started (webhook)')
         use_ssl = cert is not None and key is not None
         if not url_path.startswith('/'):
@@ -462,7 +494,7 @@ class Updater:
             self.logger.warning("cleaning updates is not supported if "
                                 "SSL-termination happens elsewhere; skipping")
 
-        self.httpd.serve_forever()
+        self.httpd.serve_forever(force_event_loop=force_event_loop, ready=ready)
 
     @staticmethod
     def _gen_webhook_url(listen: str, port: int, url_path: str) -> str:
@@ -573,7 +605,7 @@ class Updater:
             self.logger.info('Received signal {} ({}), stopping...'.format(
                 signum, get_signal_name(signum)))
             if self.persistence:
-                # Update user_data and chat_data before flushing
+                # Update user_data, chat_data and bot_data before flushing
                 self.dispatcher.update_persistence()
                 self.persistence.flush()
             self.stop()

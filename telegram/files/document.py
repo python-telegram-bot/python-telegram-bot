@@ -27,13 +27,17 @@ if TYPE_CHECKING:
 
 
 class Document(TelegramObject):
-    """This object represents a general file (as opposed to photos, voice messages and audio files).
+    """This object represents a general file
+    (as opposed to photos, voice messages and audio files).
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`file_unique_id` is equal.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
 
     Attributes:
-        file_id (:obj:`str`): Unique file identifier.
+        file_id (:obj:`str`): File identifier.
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
@@ -46,8 +50,8 @@ class Document(TelegramObject):
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.
-        file_unique_id (:obj:`str`): Unique and the same over time and
-            for different bots file identifier.
+        file_unique_id (:obj:`str`): Unique identifier for this file, which is supposed to be
+            the same over time and for different bots. Can't be used to download or reuse the file.
         thumb (:class:`telegram.PhotoSize`, optional): Document thumbnail as defined by sender.
         file_name (:obj:`str`, optional): Original filename as defined by sender.
         mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.

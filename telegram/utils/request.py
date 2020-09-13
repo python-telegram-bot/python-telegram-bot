@@ -292,6 +292,9 @@ class Request:
         if data is None:
             data = {}
 
+        if data is None:
+            data = {}
+
         # Are we uploading files?
         files = False
 

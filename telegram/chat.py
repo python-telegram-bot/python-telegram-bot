@@ -45,13 +45,14 @@ class Chat(TelegramObject):
         description (:obj:`str`): Optional. Description, for groups, supergroups and channel chats.
         invite_link (:obj:`str`): Optional. Chat invite link, for supergroups and channel chats.
         pinned_message (:class:`telegram.Message`): Optional. Pinned message, for supergroups.
-            Returned only in get_chat.
+            Returned only in :meth:`telegram.Bot.get_chat`.
         permissions (:class:`telegram.ChatPermissions`): Optional. Default chat member permissions,
-            for groups and supergroups. Returned only in getChat.
+            for groups and supergroups. Returned only in :meth:`telegram.Bot.get_chat`.
         slow_mode_delay (:obj:`int`): Optional. For supergroups, the minimum allowed delay between
-            consecutive messages sent by each unpriviledged user. Returned only in getChat.
+            consecutive messages sent by each unprivileged user. Returned only in
+            :meth:`telegram.Bot.get_chat`.
         sticker_set_name (:obj:`str`): Optional. For supergroups, name of Group sticker set.
-        can_set_sticker_set (:obj:`bool`): Optional. ``True``, if the bot can change group the
+        can_set_sticker_set (:obj:`bool`): Optional. :obj:`True`, if the bot can change group the
             sticker set.
 
     Args:
@@ -66,22 +67,26 @@ class Chat(TelegramObject):
             available.
         first_name(:obj:`str`, optional): First name of the other party in a private chat.
         last_name(:obj:`str`, optional): Last name of the other party in a private chat.
-        photo (:class:`telegram.ChatPhoto`, optional): Chat photo. Returned only in getChat.
+        photo (:class:`telegram.ChatPhoto`, optional): Chat photo.
+            Returned only in :meth:`telegram.Bot.get_chat`.
         description (:obj:`str`, optional): Description, for groups, supergroups and channel chats.
-            Returned only in get_chat.
-        invite_link (:obj:`str`, optional): Chat invite link, for supergroups and channel chats.
-            Returned only in get_chat.
-        pinned_message (:class:`telegram.Message`, optional): Pinned message, for supergroups.
-            Returned only in get_chat.
+            Returned only in :meth:`telegram.Bot.get_chat`.
+        invite_link (:obj:`str`, optional): Chat invite link, for groups, supergroups and channel
+            chats. Each administrator in a chat generates their own invite links, so the bot must
+            first generate the link using ``export_chat_invite_link()``. Returned only
+            in :meth:`telegram.Bot.get_chat`.
+        pinned_message (:class:`telegram.Message`, optional): Pinned message, for groups,
+            supergroups and channels. Returned only in :meth:`telegram.Bot.get_chat`.
         permissions (:class:`telegram.ChatPermissions`): Optional. Default chat member permissions,
-            for groups and supergroups. Returned only in getChat.
+            for groups and supergroups. Returned only in :meth:`telegram.Bot.get_chat`.
         slow_mode_delay (:obj:`int`, optional): For supergroups, the minimum allowed delay between
-            consecutive messages sent by each unpriviledged user. Returned only in getChat.
+            consecutive messages sent by each unprivileged user.
+            Returned only in :meth:`telegram.Bot.get_chat`.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
-        sticker_set_name (:obj:`str`, optional): For supergroups, name of Group sticker set.
-            Returned only in get_chat.
-        can_set_sticker_set (:obj:`bool`, optional): ``True``, if the bot can change group the
-            sticker set. Returned only in get_chat.
+        sticker_set_name (:obj:`str`, optional): For supergroups, name of group sticker set.
+            Returned only in :meth:`telegram.Bot.get_chat`.
+        can_set_sticker_set (:obj:`bool`, optional): :obj:`True`, if the bot can change group the
+            sticker set. Returned only in :meth:`telegram.Bot.get_chat`.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
@@ -176,7 +181,7 @@ class Chat(TelegramObject):
             List[:class:`telegram.ChatMember`]: A list of administrators in a chat. An Array of
             :class:`telegram.ChatMember` objects that contains information about all
             chat administrators except other bots. If the chat is a group or a supergroup
-            and no administrators were appointed, only the creator will be returned
+            and no administrators were appointed, only the creator will be returned.
 
         """
         return self.bot.get_chat_administrators(self.id, *args, **kwargs)
@@ -257,8 +262,6 @@ class Chat(TelegramObject):
 
             bot.send_message(update.effective_chat.id, *args, **kwargs)
 
-        Where Chat is the current instance.
-
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -270,8 +273,6 @@ class Chat(TelegramObject):
 
             bot.send_media_group(update.effective_chat.id, *args, **kwargs)
 
-        Where Chat is the current instance.
-
         Returns:
             List[:class:`telegram.Message`:] On success, instance representing the message posted.
 
@@ -282,8 +283,6 @@ class Chat(TelegramObject):
         """Shortcut for::
 
             bot.send_chat_action(update.effective_chat.id, *args, **kwargs)
-
-        Where Chat is the current instance.
 
         Returns:
             :obj:`True`: On success.
@@ -299,8 +298,6 @@ class Chat(TelegramObject):
 
             bot.send_photo(update.effective_chat.id, *args, **kwargs)
 
-        Where Chat is the current instance.
-
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -311,8 +308,6 @@ class Chat(TelegramObject):
         """Shortcut for::
 
             bot.send_contact(update.effective_chat.id, *args, **kwargs)
-
-        Where Chat is the current instance.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -325,8 +320,6 @@ class Chat(TelegramObject):
 
             bot.send_audio(update.effective_chat.id, *args, **kwargs)
 
-        Where Chat is the current instance.
-
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -337,8 +330,6 @@ class Chat(TelegramObject):
         """Shortcut for::
 
             bot.send_document(update.effective_chat.id, *args, **kwargs)
-
-        Where Chat is the current instance.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -351,8 +342,6 @@ class Chat(TelegramObject):
 
             bot.send_dice(update.effective_chat.id, *args, **kwargs)
 
-        Where Chat is the current instance.
-
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -363,8 +352,6 @@ class Chat(TelegramObject):
         """Shortcut for::
 
             bot.send_game(update.effective_chat.id, *args, **kwargs)
-
-        Where Chat is the current instance.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -377,8 +364,6 @@ class Chat(TelegramObject):
 
             bot.send_invoice(update.effective_chat.id, *args, **kwargs)
 
-        Where Chat is the current instance.
-
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -389,8 +374,6 @@ class Chat(TelegramObject):
         """Shortcut for::
 
             bot.send_location(update.effective_chat.id, *args, **kwargs)
-
-        Where Chat is the current instance.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -403,8 +386,6 @@ class Chat(TelegramObject):
 
             bot.send_animation(update.effective_chat.id, *args, **kwargs)
 
-        Where Chat is the current instance.
-
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -415,8 +396,6 @@ class Chat(TelegramObject):
         """Shortcut for::
 
             bot.send_sticker(update.effective_chat.id, *args, **kwargs)
-
-        Where Chat is the current instance.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -429,8 +408,6 @@ class Chat(TelegramObject):
 
             bot.send_venue(update.effective_chat.id, *args, **kwargs)
 
-        Where Chat is the current instance.
-
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -441,8 +418,6 @@ class Chat(TelegramObject):
         """Shortcut for::
 
             bot.send_video(update.effective_chat.id, *args, **kwargs)
-
-        Where Chat is the current instance.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -455,8 +430,6 @@ class Chat(TelegramObject):
 
             bot.send_video_note(update.effective_chat.id, *args, **kwargs)
 
-        Where Chat is the current instance.
-
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -468,8 +441,6 @@ class Chat(TelegramObject):
 
             bot.send_voice(update.effective_chat.id, *args, **kwargs)
 
-        Where Chat is the current instance.
-
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -480,8 +451,6 @@ class Chat(TelegramObject):
         """Shortcut for::
 
             bot.send_poll(update.effective_chat.id, *args, **kwargs)
-
-        Where Chat is the current instance.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.

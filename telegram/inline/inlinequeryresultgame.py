@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 
 
 class InlineQueryResultGame(InlineQueryResult):
-    """Represents a Game.
+    """Represents a :class:`telegram.Game`.
 
     Attributes:
         type (:obj:`str`): 'game'.

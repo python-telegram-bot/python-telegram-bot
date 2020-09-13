@@ -120,7 +120,7 @@ class CallbackQuery(TelegramObject):
             bot.answer_callback_query(update.callback_query.id, *args, **kwargs)
 
         Returns:
-            :obj:`bool`: On success, ``True`` is returned.
+            :obj:`bool`: On success, :obj:`True` is returned.
 
         """
         return self.bot.answer_callback_query(self.id, *args, **kwargs)
@@ -139,7 +139,7 @@ class CallbackQuery(TelegramObject):
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise ``True`` is returned.
+            edited Message is returned, otherwise :obj:`True` is returned.
 
         """
         if self.inline_message_id:
@@ -166,7 +166,7 @@ class CallbackQuery(TelegramObject):
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise ``True`` is returned.
+            edited Message is returned, otherwise :obj:`True` is returned.
 
         """
         if self.inline_message_id:
@@ -195,7 +195,7 @@ class CallbackQuery(TelegramObject):
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise ``True`` is returned.
+            edited Message is returned, otherwise :obj:`True` is returned.
 
         """
         if self.inline_message_id:
@@ -224,7 +224,7 @@ class CallbackQuery(TelegramObject):
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise ``True`` is returned.
+            edited Message is returned, otherwise :obj:`True` is returned.
 
         """
         if self.inline_message_id:
@@ -253,7 +253,7 @@ class CallbackQuery(TelegramObject):
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise ``True`` is returned.
+            edited Message is returned, otherwise :obj:`True` is returned.
 
         """
         if self.inline_message_id:
@@ -282,7 +282,7 @@ class CallbackQuery(TelegramObject):
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise ``True`` is returned.
+            edited Message is returned, otherwise :obj:`True` is returned.
 
         """
         if self.inline_message_id:
@@ -309,7 +309,7 @@ class CallbackQuery(TelegramObject):
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise ``True`` is returned.
+            edited Message is returned, otherwise :obj:`True` is returned.
 
         """
         if self.inline_message_id:
