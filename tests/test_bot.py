@@ -60,8 +60,7 @@ def inline_results_callback(page=None):
         return [InlineQueryResultArticle(i, str(i), None) for i in range(1, 254)]
     elif page <= 5:
         return [InlineQueryResultArticle(i, str(i), None)
-                for i in range(page * MAX_INLINE_QUERY_RESULTS + 1,
-                               (page + 1) * MAX_INLINE_QUERY_RESULTS + 1)]
+                for i in range(page * 5 + 1, (page + 1) * 5 + 1)]
     return None
 
 
@@ -473,8 +472,8 @@ class TestBot:
         # For now just test that our internals pass the correct data
         def test(_, url, data, *args, **kwargs):
             results = data['results']
-            length = len(results) == MAX_INLINE_QUERY_RESULTS
-            ids = all([int(res['id']) == 51 + i for i, res in enumerate(results)])
+            length = len(results) == 5
+            ids = all([int(res['id']) == 6 + i for i, res in enumerate(results)])
             next_offset = data['next_offset'] == 2
             return length and ids and next_offset
 
