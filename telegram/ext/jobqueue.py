@@ -280,8 +280,6 @@ class JobQueue:
                 the last day in the month. Defaults to :obj:`True`.
             job_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to pass to the
                 ``scheduler.add_job()``.
-            job_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to pass to the
-                ``scheduler.add_job()``.
 
         Returns:
             :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job

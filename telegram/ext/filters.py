@@ -62,7 +62,7 @@ class BaseFilter(ABC):
 
 
     If you want to create your own filters create a class inheriting from either
-    :class:`MessageFilter` or :class:`UpdateFilter` and implement a ``filter`` method that
+    :class:`MessageFilter` or :class:`UpdateFilter` and implement a :meth:`filter` method that
     returns a boolean: :obj:`True` if the message should be handled, :obj:`False` otherwise.
     Note that the filters work only as class instances, not actual class objects (so remember to
     initialize your filter classes).
