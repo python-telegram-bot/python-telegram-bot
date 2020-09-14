@@ -126,9 +126,8 @@ class MessageHandler(Handler):
         if message_updates is False and channel_post_updates is False and edited_updates is False:
             raise ValueError(
                 'message_updates, channel_post_updates and edited_updates are all False')
-        self.filters = filters
-        if self.filters is not None:
-            self.filters &= Filters.update
+        if filters is not None:
+            self.filters = Filters.update & filters
         else:
             self.filters = Filters.update
         if message_updates is not None:
