@@ -161,7 +161,7 @@ class TestMessageHandler:
         message.chat.type = 'private'
         assert not handler.check_update(Update(0, message))
 
-    def test_callback_query_with_filter(self):
+    def test_callback_query_with_filter(self, message):
 
         class TestFilter(BaseFilter):
             update_filter = True
@@ -173,8 +173,9 @@ class TestMessageHandler:
         test_filter = TestFilter()
         handler = MessageHandler(test_filter, self.callback_basic)
 
-        update = Update(1, callback_query=CallbackQuery(1, None, None))
+        update = Update(1, callback_query=CallbackQuery(1, None, None, message=message))
 
+        assert update.effective_message
         assert not handler.check_update(update)
         assert not test_filter.flag
 
