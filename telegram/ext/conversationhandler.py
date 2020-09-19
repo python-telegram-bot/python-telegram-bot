@@ -168,6 +168,7 @@ class ConversationHandler(Handler):
                  name=None,
                  persistent=False,
                  map_to_parent=None):
+        self.run_async = False
 
         self._entry_points = entry_points
         self._states = states
