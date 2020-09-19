@@ -16,10 +16,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import asyncio
+import os
 import sys
 import logging
 from telegram import Update
 from threading import Lock
+
 try:
     import ujson as json
 except ImportError:
@@ -41,13 +44,17 @@ class WebhookServer:
         self.server_lock = Lock()
         self.shutdown_lock = Lock()
 
-    def serve_forever(self):
+    def serve_forever(self, force_event_loop=False, ready=None):
         with self.server_lock:
-            IOLoop().make_current()
             self.is_running = True
             self.logger.debug('Webhook Server started.')
-            self.http_server.listen(self.port, address=self.listen)
+            self._ensure_event_loop(force_event_loop=force_event_loop)
             self.loop = IOLoop.current()
+            self.http_server.listen(self.port, address=self.listen)
+
+            if ready is not None:
+                ready.set()
+
             self.loop.start()
             self.logger.debug('Webhook Server stopped.')
             self.is_running = False
@@ -65,6 +72,42 @@ class WebhookServer:
         self.logger.debug('Exception happened during processing of request from %s',
                           client_address, exc_info=True)
 
+    def _ensure_event_loop(self, force_event_loop=False):
+        """If there's no asyncio event loop set for the current thread - create one."""
+        try:
+            loop = asyncio.get_event_loop()
+            if (not force_event_loop and os.name == 'nt' and sys.version_info >= (3, 8)
+                    and isinstance(loop, asyncio.ProactorEventLoop)):
+                raise TypeError('`ProactorEventLoop` is incompatible with '
+                                'Tornado. Please switch to `SelectorEventLoop`.')
+        except RuntimeError:
+            # Python 3.8 changed default asyncio event loop implementation on windows
+            # from SelectorEventLoop to ProactorEventLoop. At the time of this writing
+            # Tornado doesn't support ProactorEventLoop and suggests that end users
+            # change asyncio event loop policy to WindowsSelectorEventLoopPolicy.
+            # https://github.com/tornadoweb/tornado/issues/2608
+            # To avoid changing the global event loop policy, we manually construct
+            # a SelectorEventLoop instance instead of using asyncio.new_event_loop().
+            # Note that the fix is not applied in the main thread, as that can break
+            # user code in even more ways than changing the global event loop policy can,
+            # and because Updater always starts its webhook server in a separate thread.
+            # Ideally, we would want to check that Tornado actually raises the expected
+            # NotImplementedError, but it's not possible to cleanly recover from that
+            # exception in current Tornado version.
+            if (os.name == 'nt'
+                    and sys.version_info >= (3, 8)
+                    # OS+version check makes hasattr check redundant, but just to be sure
+                    and hasattr(asyncio, 'WindowsProactorEventLoopPolicy')
+                    and (isinstance(
+                         asyncio.get_event_loop_policy(),
+                         asyncio.WindowsProactorEventLoopPolicy))):  # pylint: disable=E1101
+                self.logger.debug(
+                    'Applying Tornado asyncio event loop fix for Python 3.8+ on Windows')
+                loop = asyncio.SelectorEventLoop()
+            else:
+                loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
 
 class WebhookAppClass(tornado.web.Application):
 
@@ -74,7 +117,7 @@ class WebhookAppClass(tornado.web.Application):
         handlers = [
             (r"{}/?".format(webhook_path), WebhookHandler,
              self.shared_objects)
-            ]  # noqa
+        ]  # noqa
         tornado.web.Application.__init__(self, handlers)
 
     def log_request(self, handler):
@@ -88,35 +131,6 @@ class WebhookHandler(tornado.web.RequestHandler):
     def __init__(self, application, request, **kwargs):
         super().__init__(application, request, **kwargs)
         self.logger = logging.getLogger(__name__)
-        self._init_asyncio_patch()
-
-    def _init_asyncio_patch(self):
-        """set default asyncio policy to be compatible with tornado
-        Tornado 6 (at least) is not compatible with the default
-        asyncio implementation on Windows
-        Pick the older SelectorEventLoopPolicy on Windows
-        if the known-incompatible default policy is in use.
-        do this as early as possible to make it a low priority and overrideable
-        ref: https://github.com/tornadoweb/tornado/issues/2608
-        TODO: if/when tornado supports the defaults in asyncio,
-                remove and bump tornado requirement for py38
-        Copied from https://github.com/ipython/ipykernel/pull/456/
-        """
-        if sys.platform.startswith("win") and sys.version_info >= (3, 8):
-            import asyncio
-            try:
-                from asyncio import (
-                    WindowsProactorEventLoopPolicy,
-                    WindowsSelectorEventLoopPolicy,
-                )
-            except ImportError:
-                pass
-                # not affected
-            else:
-                if isinstance(asyncio.get_event_loop_policy(), WindowsProactorEventLoopPolicy):
-                    # WindowsProactorEventLoopPolicy is not compatible with tornado 6
-                    # fallback to the pre-3.8 default of Selector
-                    asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())
 
     def initialize(self, bot, update_queue, default_quote=None):
         self.bot = bot

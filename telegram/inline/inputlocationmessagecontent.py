@@ -28,7 +28,8 @@ class InputLocationMessageContent(InputMessageContent):
     Attributes:
         latitude (:obj:`float`): Latitude of the location in degrees.
         longitude (:obj:`float`): Longitude of the location in degrees.
-
+        live_period	(:obj:`int`): Optional. Period in seconds for which the location can be
+            updated, should be between 60 and 86400.
     Args:
         latitude (:obj:`float`): Latitude of the location in degrees.
         longitude (:obj:`float`): Longitude of the location in degrees.

@@ -44,7 +44,7 @@ A basic example of a bot that can accept passports. Use in combination with [`pa
 A basic example of a bot that can accept payments. Don't forget to enable and configure payments with [@BotFather](https://telegram.me/BotFather).
 
 ### [`errorhandlerbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/errorhandlerbot.py)
-A basic example on how to set up a costum error handler.
+A basic example on how to set up a custom error handler.
 
 ## Pure API
 The [`rawapibot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/rawapibot.py) example uses only the pure, "bare-metal" API wrapper.

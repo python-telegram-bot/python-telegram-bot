@@ -93,7 +93,7 @@ def to_float_timestamp(t, reference_timestamp=None):
     Any objects from the :class:`datetime` module that are timezone-naive will be assumed
     to be in UTC.
 
-    ``None`` s are left alone (i.e. ``to_float_timestamp(None)`` is ``None``).
+    :obj:`None` s are left alone (i.e. ``to_float_timestamp(None)`` is :obj:`None`).
 
     Args:
         t (int | float | datetime.timedelta | datetime.datetime | datetime.time):
@@ -112,7 +112,7 @@ def to_float_timestamp(t, reference_timestamp=None):
 
             If ``t`` is given as an absolute representation of date & time (i.e. a
             ``datetime.datetime`` object), ``reference_timestamp`` is not relevant and so its
-            value should be ``None``. If this is not the case, a ``ValueError`` will be raised.
+            value should be :obj:`None`. If this is not the case, a ``ValueError`` will be raised.
 
     Returns:
         (float | None) The return value depends on the type of argument ``t``. If ``t`` is
@@ -167,16 +167,16 @@ def to_timestamp(dt_obj, reference_timestamp=None):
 def from_timestamp(unixtime, tzinfo=dtm.timezone.utc):
     """
     Converts an (integer) unix timestamp to a timezone aware datetime object.
-    ``None`` s are left alone (i.e. ``from_timestamp(None)`` is ``None``).
+    :obj:`None`s are left alone (i.e. ``from_timestamp(None)`` is :obj:`None`).
 
     Args:
-        unixtime (int): integer POSIX timestamp
+        unixtime (int): Integer POSIX timestamp.
         tzinfo (:obj:`datetime.tzinfo`, optional): The timezone, the timestamp is to be converted
             to. Defaults to UTC.
 
     Returns:
         timezone aware equivalent :obj:`datetime.datetime` value if ``timestamp`` is not
-        ``None``; else ``None``
+        :obj:`None`; else :obj:`None`
     """
     if unixtime is None:
         return None
@@ -265,8 +265,9 @@ def create_deep_linked_url(bot_username, payload=None, group=False):
     Args:
         bot_username (:obj:`str`): The username to link to
         payload (:obj:`str`, optional): Parameters to encode in the created URL
-        group (:obj:`bool`, optional): If `True` the user is prompted to select a group to add the
-            bot to. If `False`, opens a one-on-one conversation with the bot. Defaults to `False`.
+        group (:obj:`bool`, optional): If :obj:`True` the user is prompted to select a group to
+            add the bot to. If :obj:`False`, opens a one-on-one conversation with the bot.
+            Defaults to :obj:`False`.
 
     Returns:
         :obj:`str`: An URL to start the bot with specific parameters
