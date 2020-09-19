@@ -317,9 +317,13 @@ class Request:
                     # Attach and set val to attached name for all
                     media = []
                     for m in val:
-                        media.append(m.to_dict())
+                        media_dict = m.to_dict()
+                        media.append(media_dict)
                         if isinstance(m.media, InputFile):
                             data[m.media.attach] = m.media.field_tuple
+                            # if the file has a thumb, we also need to attach it to the data
+                            if "thumb" in media_dict:
+                                data[m.thumb.attach] = m.thumb.field_tuple
                     data[key] = json.dumps(media)
                 files = True
 
