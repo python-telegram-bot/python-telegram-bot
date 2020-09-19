@@ -181,9 +181,12 @@ class InputMediaVideo(InputMedia):
             Thumbnails can't be reused and can be only uploaded as a new file.
 
     Note:
-        When using a :class:`telegram.Video` for the :attr:`media` attribute. It will take the
-        width, height and duration from that video, unless otherwise specified with the optional
-        arguments.
+        *  When using a :class:`telegram.Video` for the :attr:`media` attribute. It will take the
+           width, height and duration from that video, unless otherwise specified with the optional
+           arguments.
+        *  ``thumb`` will be ignored for small video files, for which Telegram can easily
+           generate thumb nails. However, this behaviour is undocumented and might be changed
+           by Telegram.
     """
 
     def __init__(self, media, caption=None, width=None, height=None, duration=None,
