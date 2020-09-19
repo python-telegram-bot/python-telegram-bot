@@ -317,6 +317,20 @@ class TestSendMediaGroup:
         assert all([isinstance(mes, Message) for mes in messages])
         assert all([mes.media_group_id == messages[0].media_group_id for mes in messages])
 
+    def test_send_media_group_with_thumbs(self, bot, chat_id, video_file, photo_file,  # noqa: F811
+                                          monkeypatch):
+        def test(*args, **kwargs):
+            data = kwargs['fields']
+            video_check = data[input_video.media.attach] == input_video.media.field_tuple
+            thumb_check = data[input_video.thumb.attach] == input_video.thumb.field_tuple
+            result = video_check and thumb_check
+            raise(Exception('Test was {}'.format('successful' if result else 'failing')))
+
+        monkeypatch.setattr('telegram.utils.request.Request._request_wrapper', test)
+        input_video = InputMediaVideo(video_file, thumb=photo_file)
+        with pytest.raises(Exception, match='Test was successful'):
+            bot.send_media_group(chat_id, [input_video, input_video])
+
     @flaky(3, 1)  # noqa: F811
     @pytest.mark.timeout(10)  # noqa: F811
     def test_send_media_group_new_files(self, bot, chat_id, video_file, photo_file,  # noqa: F811
