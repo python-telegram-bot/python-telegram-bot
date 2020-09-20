@@ -48,7 +48,7 @@ class RegexHandler(MessageHandler):
             the callback function.
         pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
             the callback function.
-        run_async (:obj:`bool`):  Determines whether the callback will run asynchronously.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     Note:
         This handler is being deprecated. For the same use case use:
@@ -93,7 +93,7 @@ class RegexHandler(MessageHandler):
             Default is :obj:`True`.
         edited_updates (:obj:`bool`, optional): Should "edited" message updates be handled? Default
             is :obj:`False`.
-        run_async (:obj:`bool`):  Determines whether the callback will run asynchronously.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
             Defaults to :obj:`False`.
 
     Raises:

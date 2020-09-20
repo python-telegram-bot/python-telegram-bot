@@ -45,7 +45,7 @@ class CallbackQueryHandler(Handler):
             the callback function.
         pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
             the callback function.
-        run_async (:obj:`bool`):  Determines whether the callback will run asynchronously.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     Note:
         :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
@@ -96,7 +96,7 @@ class CallbackQueryHandler(Handler):
         pass_chat_data (:obj:`bool`, optional): If set to :obj:`True`, a keyword argument called
             ``chat_data`` will be passed to the callback function. Default is :obj:`False`.
             DEPRECATED: Please switch to context based callbacks.
-        run_async (:obj:`bool`):  Determines whether the callback will run asynchronously.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
             Defaults to :obj:`False`.
 
     """
