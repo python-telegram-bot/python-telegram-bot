@@ -123,8 +123,7 @@ class ChatMember(TelegramObject):
                  can_restrict_members=None, can_pin_messages=None,
                  can_promote_members=None, can_send_messages=None,
                  can_send_media_messages=None, can_send_polls=None, can_send_other_messages=None,
-                 can_add_web_page_previews=None, is_member=None, custom_title=None,
-                 **kwargs):
+                 can_add_web_page_previews=None, is_member=None, custom_title=None, **kwargs):
         # Required
         self.user = user
         self.status = status

@@ -1715,6 +1715,8 @@ class Bot(TelegramObject):
             until_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the user will
                 be unbanned, unix time. If user is banned for more than 366 days or less than 30
                 seconds from the current time they are considered to be banned forever.
+                For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
+                bot will be used.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
@@ -2816,6 +2818,8 @@ class Bot(TelegramObject):
                 will be lifted for the user, unix time. If user is restricted for more than 366
                 days or less than 30 seconds from the current time, they are considered to be
                 restricted forever.
+                For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
+                bot will be used.
             permissions (:class:`telegram.ChatPermissions`): A JSON-serialized object for new user
                 permissions.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -3581,6 +3585,8 @@ class Bot(TelegramObject):
                 timestamp) when the poll will be automatically closed. Must be at least 5 and no
                 more than 600 seconds in the future. Can't be used together with
                 :attr:`open_period`.
+                For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
+                bot will be used.
             is_closed (:obj:`bool`, optional): Pass :obj:`True`, if the poll needs to be
                 immediately closed. This can be useful for poll preview.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
