@@ -130,7 +130,7 @@ class TestDispatcher:
                 self.store_bot_data = False
 
         with pytest.raises(TypeError,
-                           match='persistence should be based on telegram.ext.BasePersistence'):
+                           match='persistence must be based on telegram.ext.BasePersistence'):
             Dispatcher(bot, None, persistence=my_per())
 
     def test_error_handler_that_raises_errors(self, dp):
@@ -307,7 +307,7 @@ class TestDispatcher:
         assert self.count == 1
 
     def test_custom_error_handler_non_context(self, dp):
-        with pytest.raises(ValueError, match='Passing `error_handler` is not'):
+        with pytest.raises(ValueError, match='`error_handler` is not'):
             dp.run_async(lambda x: x, self.message_update, error_handler=lambda x: x)
 
     def test_custom_error_handler_1(self, cdp):

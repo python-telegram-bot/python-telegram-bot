@@ -48,8 +48,7 @@ class MessageHandler(Handler):
             Default is :obj:`None`.
         edited_updates (:obj:`bool`): Should "edited" message updates be handled?
             Default is :obj:`None`.
-        run_async (:obj:`bool`): Determines whether this handlers callback function will be run
-            asynchronously.
+        run_async (:obj:`bool`):  Determines whether the callback will run asynchronously.
 
     Note:
         :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
@@ -106,8 +105,8 @@ class MessageHandler(Handler):
         edited_updates (:obj:`bool`, optional): Should "edited" message updates be handled? Default
             is :obj:`None`.
             DEPRECATED: Please switch to filters for update filtering.
-        run_async (:obj:`bool`): Determines whether this handlers callback function will be run
-            asynchronously. Defaults to :obj:`False`.
+        run_async (:obj:`bool`):  Determines whether the callback will run asynchronously.
+            Defaults to :obj:`False`.
 
     Raises:
         ValueError

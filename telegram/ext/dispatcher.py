@@ -149,7 +149,7 @@ class Dispatcher:
         self._update_persistence_lock = Lock()
         if persistence:
             if not isinstance(persistence, BasePersistence):
-                raise TypeError("persistence should be based on telegram.ext.BasePersistence")
+                raise TypeError("persistence must be based on telegram.ext.BasePersistence")
             self.persistence = persistence
             if self.persistence.store_user_data:
                 self.user_data = self.persistence.get_user_data()
@@ -237,41 +237,46 @@ class Dispatcher:
 
             promise.run()
 
+            if not promise.exception:
+                self.update_persistence(update=promise.update)
+                continue
+
             if isinstance(promise.exception, DispatcherHandlerStop):
                 self.logger.warning(
                     'DispatcherHandlerStop is not supported with async functions; func: %s',
                     promise.pooled_function.__name__)
-            elif isinstance(promise.exception, Exception):
-                if promise.pooled_function in self.error_handlers:
-                    self.logger.error('An error was raised while processing the update '
-                                      'and an uncaught error was raised while handling '
-                                      'the error with an error_handler')
-                elif promise.error_handler:
-                    try:
-                        context = CallbackContext.from_error(promise.update, promise.exception,
-                                                             self)
-                        if promise.update:
-                            promise.error_handler(promise.update, context, *promise.args,
-                                                  **promise.kwargs)
-                        else:
-                            promise.error_handler(context, *promise.args, **promise.kwargs)
-                    except Exception:
-                        self.logger.exception('An error was raised while processing the update '
-                                              'and an uncaught error was raised while handling '
-                                              'the error with an error_handler')
-                elif promise.update:
-                    try:
-                        self.dispatch_error(promise.update, promise.exception)
-                    except Exception:
-                        self.logger.exception('An error was raised while processing the update '
-                                              'and an uncaught error was raised while handling '
-                                              'the error with an error_handler')
-                else:
-                    self.logger.exception(
-                        'No error handlers are set for async function, logging exception.',
-                        exc_info=promise.exception)
+                continue
+
+            if promise.pooled_function in self.error_handlers:
+                self.logger.error('An error was raised while processing the update '
+                                  'and an uncaught error was raised while handling '
+                                  'the error with an error_handler')
+                continue
+
+            if promise.error_handler:
+                try:
+                    context = CallbackContext.from_error(promise.update, promise.exception,
+                                                         self)
+                    if promise.update:
+                        promise.error_handler(promise.update, context, *promise.args,
+                                              **promise.kwargs)
+                    else:
+                        promise.error_handler(context, *promise.args, **promise.kwargs)
+                except Exception:
+                    self.logger.exception('An error was raised while processing the update '
+                                          'and an uncaught error was raised while handling '
+                                          'the error with an error_handler')
+            elif promise.update:
+                try:
+                    self.dispatch_error(promise.update, promise.exception)
+                except Exception:
+                    self.logger.exception('An error was raised while processing the update '
+                                          'and an uncaught error was raised while handling '
+                                          'the error with an error_handler')
             else:
-                self.update_persistence(update=promise.update)
+                self.logger.exception(
+                    'No error handlers are set for async function, logging exception.',
+                    exc_info=promise.exception)
 
     def run_async(self, func, *args, update=None, error_handler=None, **kwargs):
         """Queue a function (with given args/kwargs) to be run asynchronously.
@@ -309,8 +314,8 @@ class Dispatcher:
             Promise
 
         """
-        if self.use_context is False and error_handler:
-            raise ValueError('Passing `error_handler` is not supported for non context aware '
+        if error_handler and not self.use_context:
+            raise ValueError('`error_handler` is not supported for non context aware '
                              'dispatchers!')
 
         promise = Promise(func, args, kwargs, update=update, error_handler=error_handler)
@@ -513,55 +518,58 @@ class Dispatcher:
             corresponding ``user_data`` and ``chat_data`` will be updated.
         """
         with self._update_persistence_lock:
-            if self.persistence:
-                chat_ids = list(self.chat_data.keys())
-                user_ids = list(self.user_data.keys())
+            self.__update_persistence(update)
 
-                if isinstance(update, Update):
-                    if update.effective_chat:
-                        chat_ids = [update.effective_chat.id]
-                    else:
-                        chat_ids = []
-                    if update.effective_user:
-                        user_ids = [update.effective_user.id]
-                    else:
-                        user_ids = []
+    def __update_persistence(self, update):
+        if self.persistence:
+            chat_ids = list(self.chat_data.keys())
+            user_ids = list(self.user_data.keys())
 
-                if self.persistence.store_bot_data:
+            if isinstance(update, Update):
+                if update.effective_chat:
+                    chat_ids = [update.effective_chat.id]
+                else:
+                    chat_ids = []
+                if update.effective_user:
+                    user_ids = [update.effective_user.id]
+                else:
+                    user_ids = []
+
+            if self.persistence.store_bot_data:
+                try:
+                    self.persistence.update_bot_data(self.bot_data)
+                except Exception as e:
                     try:
-                        self.persistence.update_bot_data(self.bot_data)
+                        self.dispatch_error(update, e)
+                    except Exception:
+                        message = 'Saving bot data raised an error and an ' \
+                                  'uncaught error was raised while handling ' \
+                                  'the error with an error_handler'
+                        self.logger.exception(message)
+            if self.persistence.store_chat_data:
+                for chat_id in chat_ids:
+                    try:
+                        self.persistence.update_chat_data(chat_id, self.chat_data[chat_id])
                     except Exception as e:
                         try:
                             self.dispatch_error(update, e)
                         except Exception:
-                            message = 'Saving bot data raised an error and an ' \
+                            message = 'Saving chat data raised an error and an ' \
                                       'uncaught error was raised while handling ' \
                                       'the error with an error_handler'
                             self.logger.exception(message)
-                if self.persistence.store_chat_data:
-                    for chat_id in chat_ids:
+            if self.persistence.store_user_data:
+                for user_id in user_ids:
+                    try:
+                        self.persistence.update_user_data(user_id, self.user_data[user_id])
+                    except Exception as e:
                         try:
-                            self.persistence.update_chat_data(chat_id, self.chat_data[chat_id])
-                        except Exception as e:
-                            try:
-                                self.dispatch_error(update, e)
-                            except Exception:
-                                message = 'Saving chat data raised an error and an ' \
-                                          'uncaught error was raised while handling ' \
-                                          'the error with an error_handler'
-                                self.logger.exception(message)
-                if self.persistence.store_user_data:
-                    for user_id in user_ids:
-                        try:
-                            self.persistence.update_user_data(user_id, self.user_data[user_id])
-                        except Exception as e:
-                            try:
-                                self.dispatch_error(update, e)
-                            except Exception:
-                                message = 'Saving user data raised an error and an ' \
-                                          'uncaught error was raised while handling ' \
-                                          'the error with an error_handler'
-                                self.logger.exception(message)
+                            self.dispatch_error(update, e)
+                        except Exception:
+                            message = 'Saving user data raised an error and an ' \
+                                      'uncaught error was raised while handling ' \
+                                      'the error with an error_handler'
+                            self.logger.exception(message)
 
     def add_error_handler(self, callback, run_async=False):
         """Registers an error handler in the Dispatcher. This handler will receive every error
