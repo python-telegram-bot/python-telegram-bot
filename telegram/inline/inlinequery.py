@@ -80,15 +80,15 @@ class InlineQuery(TelegramObject):
 
             bot.answer_inline_query(update.inline_query.id,
                                     *args,
-                                    current_offset = self.offset if auto_pagination else None,
+                                    current_offset=self.offset if auto_pagination else None,
                                     **kwargs)
 
         Args:
             results (List[:class:`telegram.InlineQueryResult`] | Callable): A list of results for
                 the inline query. In case :attr:`auto_pagination` is set to :obj:`True`,
-                ``results`` may also be a callable taking a single integer argument, being the
-                0-based current number of the result pagination. It must return either a list of
-                :class:`telegram.InlineResult` instances or :obj:`None`, if there are no more
+                ``results`` may also be a callable may also be a callable accepts the current page
+                index starting from 0. It must return either a list of
+                :class:`telegram.InlineResult` instances or :obj:`None` if there are no more
                 results.
             cache_time (:obj:`int`, optional): The maximum amount of time in seconds that the
                 result of the inline query may be cached on the server. Defaults to 300.

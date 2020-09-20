@@ -69,12 +69,12 @@ class TestInlineQuery:
         assert inline_query.answer()
 
     def test_answer_auto_pagination(self, monkeypatch, inline_query):
-        def test(*args, **kwargs):
-            inline_query_id = args[0] == inline_query.id
-            offset = kwargs.get('current_offset') == inline_query.offset
-            return offset and inline_query_id
+        def make_assertion(*args, **kwargs):
+            inline_query_id_matches = args[0] == inline_query.id
+            offset_matches = kwargs.get('current_offset') == inline_query.offset
+            return offset_matches and inline_query_id_matches
 
-        monkeypatch.setattr(inline_query.bot, 'answer_inline_query', test)
+        monkeypatch.setattr(inline_query.bot, 'answer_inline_query', make_assertion)
         assert inline_query.answer(auto_pagination=True)
 
     def test_equality(self):

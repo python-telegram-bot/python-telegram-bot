@@ -407,64 +407,53 @@ class TestBot:
                                     next_offset=42,
                                     current_offset=51)
 
-    def test_answer_inline_query_current_offset_1(self, monkeypatch, bot, inline_results):
+    @pytest.mark.parametrize('current_offset,num_results,id_offset,expected_next_offset',
+                             [('', MAX_INLINE_QUERY_RESULTS, 1, 1),
+                              (1, MAX_INLINE_QUERY_RESULTS, 51, 2),
+                              (5, 3, 251, '')])
+    def test_answer_inline_query_current_offset_1(self,
+                                                  monkeypatch,
+                                                  bot,
+                                                  inline_results,
+                                                  current_offset,
+                                                  num_results,
+                                                  id_offset,
+                                                  expected_next_offset):
         # For now just test that our internals pass the correct data
-        def test(_, url, data, *args, **kwargs):
+        def make_assertion(_, url, data, *args, **kwargs):
             results = data['results']
-            length = len(results) == MAX_INLINE_QUERY_RESULTS
-            ids = all([int(res['id']) == 1 + i for i, res in enumerate(results)])
-            next_offset = data['next_offset'] == 1
-            return length and ids and next_offset
+            length_matches = len(results) == num_results
+            ids_match = all([int(res['id']) == id_offset + i for i, res in enumerate(results)])
+            next_offset_matches = data['next_offset'] == expected_next_offset
+            return length_matches and ids_match and next_offset_matches
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr('telegram.utils.request.Request.post', make_assertion)
 
-        assert bot.answer_inline_query(1234, results=inline_results, current_offset='')
-
-        def test(_, url, data, *args, **kwargs):
-            results = data['results']
-            length = len(results) == MAX_INLINE_QUERY_RESULTS
-            ids = all([int(res['id']) == 51 + i for i, res in enumerate(results)])
-            next_offset = data['next_offset'] == 2
-            return length and ids and next_offset
-
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
-
-        assert bot.answer_inline_query(1234, results=inline_results, current_offset=1)
-
-        def test(_, url, data, *args, **kwargs):
-            results = data['results']
-            length = len(results) == 3
-            ids = all([int(res['id']) == 251 + i for i, res in enumerate(results)])
-            next_offset = data['next_offset'] == ''
-            return length and ids and next_offset
-
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
-
-        assert bot.answer_inline_query(1234, results=inline_results, current_offset=5)
+        assert bot.answer_inline_query(1234, results=inline_results, current_offset=current_offset)
 
     def test_answer_inline_query_current_offset_2(self, monkeypatch, bot, inline_results):
         # For now just test that our internals pass the correct data
-        def test(_, url, data, *args, **kwargs):
+        def make_assertion(_, url, data, *args, **kwargs):
             results = data['results']
-            length = len(results) == MAX_INLINE_QUERY_RESULTS
-            ids = all([int(res['id']) == 1 + i for i, res in enumerate(results)])
-            next_offset = data['next_offset'] == 1
-            return length and ids and next_offset
+            length_matches = len(results) == MAX_INLINE_QUERY_RESULTS
+            ids_match = all([int(res['id']) == 1 + i for i, res in enumerate(results)])
+            next_offset_matches = data['next_offset'] == 1
+            return length_matches and ids_match and next_offset_matches
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr('telegram.utils.request.Request.post', make_assertion)
 
         assert bot.answer_inline_query(1234, results=inline_results, current_offset=0)
 
         inline_results = inline_results[:30]
 
-        def test(_, url, data, *args, **kwargs):
+        def make_assertion(_, url, data, *args, **kwargs):
             results = data['results']
-            length = len(results) == 30
-            ids = all([int(res['id']) == 1 + i for i, res in enumerate(results)])
-            next_offset = data['next_offset'] == ''
-            return length and ids and next_offset
+            length_matches = len(results) == 30
+            ids_match = all([int(res['id']) == 1 + i for i, res in enumerate(results)])
+            next_offset_matches = data['next_offset'] == ''
+            return length_matches and ids_match and next_offset_matches
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr('telegram.utils.request.Request.post', make_assertion)
 
         assert bot.answer_inline_query(1234, results=inline_results, current_offset=0)
 
