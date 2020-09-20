@@ -522,6 +522,8 @@ class Dispatcher:
 
     def __update_persistence(self, update):
         if self.persistence:
+            # We use list() here in order to decouple chat_ids from self.chat_data, as dict view
+            # objects will change, when the dict does and we want to loop over chat_ids
             chat_ids = list(self.chat_data.keys())
             user_ids = list(self.user_data.keys())
 
