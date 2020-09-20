@@ -1533,6 +1533,11 @@ class Bot(TelegramObject):
         Use this method to send answers to an inline query. No more than 50 results per query are
         allowed.
 
+        Warning:
+            In most use cases :attr:`current_offset` should not be passed manually. Instead of
+            calling this method directly, use the shortcut :meth:`telegram.InlineQuery.answer` with
+            ``auto_pagination=True``, which will take care of passing the correct value.
+
         Args:
             inline_query_id (:obj:`str`): Unique identifier for the answered query.
             results (List[:class:`telegram.InlineQueryResult`] | Callable): A list of results for
