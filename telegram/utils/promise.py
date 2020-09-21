@@ -33,18 +33,8 @@ class Promise:
         args (:obj:`list` | :obj:`tuple`): Positional arguments for :attr:`pooled_function`.
         kwargs (:obj:`dict`): Keyword arguments for :attr:`pooled_function`.
         update (:class:`telegram.Update`, optional): The update this promise is associated with.
-        error_handler (:obj:`callable`, optional): An error handler to call in case of an
-            exception during the call of :attr:`pooled_function`. The callback signature of
-            :attr:`error_handler` must be
-
-            ``def error_handler(context: CallbackContext, *args, **kwargs)``
-
-            or
-
-            ``def error_handler(update: Update, context: CallbackContext, *args, **kwargs)``
-
-            if :attr:`update` is passed, where ``*args`` and ``**kwargs`` are the arguments for
-            :attr:`pooled_function`.
+        async_error_handling (:obj:`bool`, optional): Whether exceptions raised by :attr:`func`
+            may be handled by asynchronously run error handlers. Defaults to :obj:`True`.
 
     Attributes:
         pooled_function (:obj:`callable`): The callable that will be called concurrently.
@@ -52,17 +42,17 @@ class Promise:
         kwargs (:obj:`dict`): Keyword arguments for :attr:`pooled_function`.
         done (:obj:`threading.Event`): Is set when the result is available.
         update (:class:`telegram.Update`): Optional. The update this promise is associated with.
-        error_handler (:obj:`callable`): Optional. An error handler to call in case of an
-            exception during the call of :attr:`pooled_function`.
+        async_error_handling (:obj:`bool`): Optional. Whether exceptions raised by :attr:`func`
+            may be handled by asynchronously run error handlers.
 
     """
 
-    def __init__(self, pooled_function, args, kwargs, update=None, error_handler=None):
+    def __init__(self, pooled_function, args, kwargs, update=None, async_error_handling=True):
         self.pooled_function = pooled_function
         self.args = args
         self.kwargs = kwargs
         self.update = update
-        self.error_handler = error_handler
+        self.async_error_handling = async_error_handling
         self.done = Event()
         self._result = None
         self._exception = None

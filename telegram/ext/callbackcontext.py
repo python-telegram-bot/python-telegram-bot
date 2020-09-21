@@ -66,10 +66,14 @@ class CallbackContext:
             is handled by :class:`telegram.ext.CommandHandler`, :class:`telegram.ext.PrefixHandler`
             or :class:`telegram.ext.StringCommandHandler`. It contains a list of the words in the
             text after the command, using any whitespace string as a delimiter.
-        error (:class:`telegram.TelegramError`): Optional. The Telegram error that was raised.
+        error (:class:`telegram.TelegramError`): Optional. The error that was raised.
             Only present when passed to a error handler registered with
             :attr:`telegram.ext.Dispatcher.add_error_handler`.
-        job (:class:`telegram.ext.Job`): The job that that originated this callback.
+        async_params (Tuple(List[:obj:`object`], Dict[:obj:`str`, :obj:`object`])): Optional.
+            ``args`` and ``kwargs``  of the function that raised the error. Only present when
+            the raising function was run asynchronously using
+            :meth:`telegram.ext.Dispatcher.run_async`.
+        job (:class:`telegram.ext.Job`): Optional. The job that that originated this callback.
             Only present when passed to the callback of :class:`telegram.ext.Job`.
 
     """
@@ -90,6 +94,7 @@ class CallbackContext:
         self.matches = None
         self.error = None
         self.job = None
+        self.async_params = None
 
     @property
     def dispatcher(self):
@@ -124,9 +129,10 @@ class CallbackContext:
                              "https://git.io/fjxKe")
 
     @classmethod
-    def from_error(cls, update, error, dispatcher):
+    def from_error(cls, update, error, dispatcher, async_params=None):
         self = cls.from_update(update, dispatcher)
         self.error = error
+        self.async_params = async_params
         return self
 
     @classmethod

@@ -122,6 +122,11 @@ class TestDispatcher:
         sleep(.1)
         assert self.received is None
 
+    def test_double_add_error_handler(self, dp):
+        dp.add_error_handler(self.error_handler)
+        with pytest.raises(ValueError, match='The callback is already registered'):
+            dp.add_error_handler(self.error_handler)
+
     def test_construction_with_bad_persistence(self, caplog, bot):
         class my_per:
             def __init__(self):
@@ -153,6 +158,72 @@ class TestDispatcher:
         dp.add_handler(handler_increase_count)
         dp.update_queue.put(error)
         dp.update_queue.put(self.message_update)
+        sleep(.1)
+
+        assert self.count == 1
+
+    def test_async_error_handler_raises_async_errors(self, cdp, caplog):
+        """
+        Make sure that async functions in async error handlers don't cause infinite loops
+        """
+        handler_raise_error = MessageHandler(Filters.all, self.callback_raise_error)
+        handler_increase_count = MessageHandler(Filters.all, self.callback_increase_count)
+        error = TelegramError('Unauthorized.')
+        count = 0
+
+        def sync_error_handler(u, c):
+            nonlocal count
+            count += 1
+
+        def error_handler_raise_async_error(u, c):
+            c.dispatcher.run_async(self.error_handler_raise_error, None, None, None,
+                                   async_error_handling=False)
+
+        cdp.add_error_handler(error_handler_raise_async_error, run_async=True)
+        cdp.add_error_handler(sync_error_handler)
+
+        # From errors caused by handlers
+        cdp.add_handler(handler_raise_error)
+        cdp.update_queue.put(self.message_update)
+        sleep(.1)
+
+        assert count == 2
+
+        # From errors in the update_queue
+        cdp.remove_handler(handler_raise_error)
+        cdp.add_handler(handler_increase_count)
+        cdp.update_queue.put(error)
+        cdp.update_queue.put(self.message_update)
+        sleep(.1)
+
+        assert self.count == 1
+
+    def test_async_error_handler_raises_async_errors_no_sync_error_handlers(self, cdp, caplog):
+        """
+        Make sure that async functions in async error handlers don't cause infinite loops
+        """
+        handler_raise_error = MessageHandler(Filters.all, self.callback_raise_error)
+        handler_increase_count = MessageHandler(Filters.all, self.callback_increase_count)
+        error = TelegramError('Unauthorized.')
+
+        def error_handler_raise_async_error(u, c):
+            c.dispatcher.run_async(self.error_handler_raise_error, async_error_handling=False)
+
+        cdp.add_error_handler(error_handler_raise_async_error, run_async=True)
+
+        # From errors caused by handlers
+        with caplog.at_level(logging.ERROR):
+            cdp.add_handler(handler_raise_error)
+            cdp.update_queue.put(self.message_update)
+            sleep(.1)
+            assert len(caplog.records) == 1
+            assert caplog.records[-1].msg.startswith('No error synchronous handlers are')
+
+        # From errors in the update_queue
+        cdp.remove_handler(handler_raise_error)
+        cdp.add_handler(handler_increase_count)
+        cdp.update_queue.put(error)
+        cdp.update_queue.put(self.message_update)
         sleep(.1)
 
         assert self.count == 1
@@ -240,7 +311,7 @@ class TestDispatcher:
             dp.run_async(func)
             sleep(.1)
             assert len(caplog.records) == 1
-            assert caplog.records[-1].msg.startswith('No error handlers are set for async')
+            assert caplog.records[-1].msg.startswith('No error handlers are registered')
 
     def test_async_handler_error_handler(self, dp):
         dp.add_handler(MessageHandler(Filters.all,
@@ -273,7 +344,7 @@ class TestDispatcher:
             dp.update_queue.put(self.message_update)
             sleep(.1)
             assert len(caplog.records) == 1
-            assert caplog.records[-1].msg.startswith('An error was raised while processing the')
+            assert caplog.records[-1].msg.startswith('An uncaught error was raised')
 
         # Make sure that the main loop still runs
         dp.remove_handler(handler)
@@ -295,7 +366,7 @@ class TestDispatcher:
             dp.update_queue.put(self.message_update)
             sleep(.1)
             assert len(caplog.records) == 1
-            assert caplog.records[-1].msg.startswith('An error was raised while processing the')
+            assert caplog.records[-1].msg.startswith('An uncaught error was raised')
 
         # Make sure that the main loop still runs
         dp.remove_handler(handler)
@@ -305,56 +376,6 @@ class TestDispatcher:
         dp.update_queue.put(self.message_update)
         sleep(.1)
         assert self.count == 1
-
-    def test_custom_error_handler_non_context(self, dp):
-        with pytest.raises(ValueError, match='`error_handler` is not'):
-            dp.run_async(lambda x: x, self.message_update, error_handler=lambda x: x)
-
-    def test_custom_error_handler_1(self, cdp):
-        def func(update, b, c=0, d=0):
-            raise RuntimeError('Error')
-
-        def error_handler(update, context, a, b, c=0, d=0):
-            self.received = (isinstance(context, CallbackContext)
-                             and update is self.message_update
-                             and a is self.message_update
-                             and b == 'b'
-                             and c == 'c'
-                             and d == 'd')
-
-        cdp.run_async(func, self.message_update, 'b', update=self.message_update,
-                      error_handler=error_handler, c='c', d='d')
-        sleep(0.1)
-        assert self.received is True
-
-    def test_custom_error_handler_2(self, cdp):
-        def func(update, b, c=0, d=0):
-            raise RuntimeError('Error')
-
-        def error_handler(context, a, b, c=0, d=0):
-            self.received = (isinstance(context, CallbackContext)
-                             and a is self.message_update
-                             and b == 'b'
-                             and c == 'c'
-                             and d == 'd')
-
-        cdp.run_async(func, self.message_update, 'b', error_handler=error_handler, c='c', d='d')
-        sleep(0.1)
-        assert self.received is True
-
-    def test_custom_error_handler_that_raises_error(self, cdp, caplog):
-        def func(update, b, c=0, d=0):
-            raise RuntimeError('Error')
-
-        def error_handler(context, a, b, c=0, d=0):
-            raise TelegramError('ErrorHandler Error')
-
-        with caplog.at_level(logging.ERROR):
-            cdp.run_async(func, self.message_update, 'b', error_handler=error_handler,
-                          c='c', d='d')
-            sleep(.1)
-            assert len(caplog.records) == 1
-            assert caplog.records[-1].msg.startswith('An error was raised while processing the')
 
     def test_error_in_handler(self, dp):
         dp.add_handler(MessageHandler(Filters.all, self.callback_raise_error))
