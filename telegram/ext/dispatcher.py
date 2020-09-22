@@ -248,8 +248,13 @@ class Dispatcher:
                 continue
 
             # We don't like infinite loops
-            if not promise.error_handling or promise.pooled_function in self.error_handlers:
+            if promise.pooled_function in self.error_handlers:
                 self.logger.error('An uncaught error was raised while handling the error.')
+                continue
+
+            # We still don't like infinite loops, but here a different error message is needed
+            if not promise.error_handling:
+                self.logger.error('A promise with deactivated error handling raised an error.')
                 continue
 
             # If we arrive here, an exception happened in the promise and was neither

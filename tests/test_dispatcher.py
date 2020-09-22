@@ -179,7 +179,7 @@ class TestDispatcher:
             cdp.update_queue.put(self.message_update)
             sleep(.1)
             assert len(caplog.records) == 1
-            assert caplog.records[-1].msg.startswith('An uncaught error was raised')
+            assert caplog.records[-1].msg.startswith('A promise with deactivated error handling')
 
     def test_run_async_multiple(self, bot, dp, dp2):
         def get_dispatcher_name(q):
