@@ -58,8 +58,8 @@ def run_async(func):
                       '`Dispatcher.add_handler` or `Dispatcher.run_async` instead.',
                       TelegramDeprecationWarning,
                       stacklevel=2)
-        return Dispatcher.get_instance().run_async(func, *args, update=None,
-                                                   async_error_handling=False, **kwargs)
+        return Dispatcher.get_instance().run_async(func, *args, update=None, error_handling=False,
+                                                   **kwargs)
 
     return async_func
 
@@ -248,18 +248,18 @@ class Dispatcher:
                 continue
 
             # We don't like infinite loops
-            if promise.pooled_function in self.error_handlers:
+            if not promise.error_handling or promise.pooled_function in self.error_handlers:
                 self.logger.error('An uncaught error was raised while handling the error.')
                 continue
 
             # If we arrive here, an exception happened in the promise and was neither
-            # DispatcherHandlerStop nor raised by an error handler. So we must handle it
+            # DispatcherHandlerStop nor raised by an error handler. So we can and must handle it
             try:
                 self.dispatch_error(promise.update, promise.exception, promise=promise)
             except Exception:
                 self.logger.exception('An uncaught error was raised while handling the error.')
 
-    def run_async(self, func, *args, update=None, async_error_handling=True, **kwargs):
+    def run_async(self, func, *args, update=None, error_handling=True, **kwargs):
         """Queue a function (with given args/kwargs) to be run asynchronously. Exceptions raised
         by the asynchronously run function will be handled by the error handlers registered with
         :meth:`add_error_handler`.
@@ -267,10 +267,10 @@ class Dispatcher:
         Warning:
             * If you're using ``@run_async``/:meth:`run_async` you cannot rely on adding custom
               attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
-            * When using :meth:`run_async` within an asynchronously run error handler (see
-              :meth:`add_error_handler`) and, you *must* also set :attr:`async_error_handling` to
-              :obj:`False`, as an exception within :attr:`func` would cause an infinite loop
-              otherwise.
+            * When using :meth:`run_async` within an error handler (see :meth:`add_error_handler`),
+              you *must* also set :attr:`error_handling` to :obj:`False`, as an exception within
+              :attr:`func` would cause an infinite loop otherwise. Eventual exceptions will then
+              only be logged.
 
         Args:
             func (:obj:`callable`): The function to run in the thread.
@@ -278,16 +278,15 @@ class Dispatcher:
             update (:class:`telegram.Update`, optional): The update associated with the functions
                 call. If passed, it will be available in the error handlers, in case an exception
                 is raised by :attr:`func`.
-            async_error_handling (:obj:`bool`, optional): Whether exceptions raised by :attr:`func`
-                may be handled by asynchronously run error handlers. Defaults to :obj:`True`.
+            error_handling (:obj:`bool`, optional): Whether exceptions raised by :attr:`func`
+                may be handled by error handlers. Defaults to :obj:`True`.
             **kwargs (:obj:`dict`, optional): Keyword arguments to ``func``.
 
         Returns:
             Promise
 
         """
-        promise = Promise(func, args, kwargs, update=update,
-                          async_error_handling=async_error_handling)
+        promise = Promise(func, args, kwargs, update=update, error_handling=error_handling)
         self.__async_queue.put(promise)
         return promise
 
@@ -584,19 +583,11 @@ class Dispatcher:
                 raised the error.
 
         """
-        use_async = True if not promise else promise.async_error_handling
         async_params = None if not promise else (promise.args, promise.kwargs)
-
-        if not use_async and all(self.error_handlers.values()):
-            return self.logger.exception(
-                'No error synchronous handlers are registered, logging exception.', exc_info=error)
 
         if self.error_handlers:
             for callback, run_async in self.error_handlers.items():
                 if run_async:
-                    if not use_async:
-                        continue
-
                     if self.use_context:
                         self.run_async(callback,
                                        update,
