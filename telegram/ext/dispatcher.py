@@ -247,12 +247,14 @@ class Dispatcher:
                     promise.pooled_function.__name__)
                 continue
 
-            # We don't like infinite loops
+            # Avoid infinite recursion of error handlers.
             if promise.pooled_function in self.error_handlers:
                 self.logger.error('An uncaught error was raised while handling the error.')
                 continue
 
-            # We still don't like infinite loops, but here a different error message is needed
+            # Don't perform error handling for a `Promise` with deactivated error handling. This
+            # should happen only via the deprecated `@run_async` decorator or `Promises` created
+            # within error handlers
             if not promise.error_handling:
                 self.logger.error('A promise with deactivated error handling raised an error.')
                 continue
@@ -265,8 +267,9 @@ class Dispatcher:
                 self.logger.exception('An uncaught error was raised while handling the error.')
 
     def run_async(self, func, *args, update=None, error_handling=True, **kwargs):
-        """Queue a function (with given args/kwargs) to be run asynchronously. Exceptions raised
-        by the asynchronously run function will be handled by the error handlers registered with
+        """
+        Queue a function (with given args/kwargs) to be run asynchronously. Exceptions raised
+        by the function will be handled by the error handlers registered with
         :meth:`add_error_handler`.
 
         Warning:
@@ -546,7 +549,10 @@ class Dispatcher:
 
     def add_error_handler(self, callback, run_async=False):
         """Registers an error handler in the Dispatcher. This handler will receive every error
-        which happens in your bot. Each callback can be added as error handler only *once*.
+        which happens in your bot.
+
+        Note:
+            Attempts to add the same callback multiple times will be ignored.
 
         Warning:
             The errors handled within these handlers won't show up in the logger, so you
@@ -566,7 +572,8 @@ class Dispatcher:
             See https://git.io/fxJuV for more info about switching to context based API.
         """
         if callback in self.error_handlers:
-            raise ValueError('The callback is already registered as error handler.')
+            self.logger.debug('The callback is already registered as error handler. Ignoring.')
+            return
         self.error_handlers[callback] = run_async
 
     def remove_error_handler(self, callback):
@@ -588,23 +595,22 @@ class Dispatcher:
                 raised the error.
 
         """
-        async_params = None if not promise else (promise.args, promise.kwargs)
+        async_args = None if not promise else promise.args
+        async_kwargs = None if not promise else promise.kwargs
 
         if self.error_handlers:
             for callback, run_async in self.error_handlers.items():
-                if run_async:
-                    if self.use_context:
-                        self.run_async(callback,
-                                       update,
-                                       CallbackContext.from_error(update, error, self,
-                                                                  async_params=async_params),
-                                       update=update)
+                if self.use_context:
+                    context = CallbackContext.from_error(update, error, self,
+                                                         async_args=async_args,
+                                                         async_kwargs=async_kwargs)
+                    if run_async:
+                        self.run_async(callback, update, context, update=update)
                     else:
-                        self.run_async(callback, self.bot, update, error, update=update)
+                        callback(update, context)
                 else:
-                    if self.use_context:
-                        callback(update, CallbackContext.from_error(update, error, self,
-                                                                    async_params=async_params))
+                    if run_async:
+                        self.run_async(callback, self.bot, update, error, update=update)
                     else:
                         callback(self.bot, update, error)
 

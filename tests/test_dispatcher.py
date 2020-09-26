@@ -122,10 +122,12 @@ class TestDispatcher:
         sleep(.1)
         assert self.received is None
 
-    def test_double_add_error_handler(self, dp):
+    def test_double_add_error_handler(self, dp, caplog):
         dp.add_error_handler(self.error_handler)
-        with pytest.raises(ValueError, match='The callback is already registered'):
+        with caplog.at_level(logging.DEBUG):
             dp.add_error_handler(self.error_handler)
+            assert len(caplog.records) == 1
+            assert caplog.records[-1].msg.startswith('The callback is already registered')
 
     def test_construction_with_bad_persistence(self, caplog, bot):
         class my_per:
