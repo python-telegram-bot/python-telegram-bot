@@ -169,13 +169,13 @@ class TestMessage:
                                   MessageEntity(**e) for e in test_entities_v2
                               ])
 
-    def test_all_posibilities_de_json_and_to_dict(self, bot, message_params):
+    def test_all_possibilities_de_json_and_to_dict(self, bot, message_params):
         new = Message.de_json(message_params.to_dict(), bot)
 
         assert new.to_dict() == message_params.to_dict()
 
     def test_dict_approach(self, message):
-        assert message['date'] == message.date
+        assert message['text'] == message.text
         assert message['chat_id'] == message.chat_id
         assert message['no_key'] is None
 
