@@ -89,8 +89,9 @@ class JobQueue:
             return self._tz_now() + time
         if isinstance(time, datetime.time):
             dt = datetime.datetime.combine(
-                datetime.datetime.now(tz=time.tzinfo or self.scheduler.timezone).date(), time,
-                tzinfo=time.tzinfo or self.scheduler.timezone)
+                datetime.datetime.now(tz=time.tzinfo or self.scheduler.timezone).date(), time)
+            if dt.tzinfo is None:
+                dt = self.scheduler.timezone.localize(dt)
             if shift_day and dt <= datetime.datetime.now(pytz.utc):
                 dt += datetime.timedelta(days=1)
             return dt
@@ -106,6 +107,9 @@ class JobQueue:
 
         """
         self._dispatcher = dispatcher
+        if dispatcher.bot.defaults:
+            if dispatcher.bot.defaults:
+                self.scheduler.configure(timezone=dispatcher.bot.defaults.tzinfo or pytz.utc)
 
     def run_once(self, callback, when, context=None, name=None, job_kwargs=None):
         """Creates a new ``Job`` that runs once and adds it to the queue.
@@ -129,13 +133,11 @@ class JobQueue:
                   job should run.
                 * :obj:`datetime.datetime` will be interpreted as a specific date and time at
                   which the job should run. If the timezone (``datetime.tzinfo``) is :obj:`None`,
-                  UTC will be assumed.
+                  the default timezone of the bot will be used.
                 * :obj:`datetime.time` will be interpreted as a specific time of day at which the
                   job should run. This could be either today or, if the time has already passed,
-                  tomorrow. If the timezone (``time.tzinfo``) is :obj:`None`, UTC will be assumed.
-
-                If ``when`` is :obj:`datetime.datetime` or :obj:`datetime.time` type
-                then ``when.tzinfo`` will define ``Job.tzinfo``. Otherwise UTC will be assumed.
+                  tomorrow. If the timezone (``time.tzinfo``) is :obj:`None`, the
+                  default timezone of the bot will be used.
 
             context (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through ``job.context`` in the callback. Defaults to :obj:`None`.
@@ -193,13 +195,11 @@ class JobQueue:
                   job should run.
                 * :obj:`datetime.datetime` will be interpreted as a specific date and time at
                   which the job should run. If the timezone (``datetime.tzinfo``) is :obj:`None`,
-                  UTC will be assumed.
+                  the default timezone of the bot will be used.
                 * :obj:`datetime.time` will be interpreted as a specific time of day at which the
                   job should run. This could be either today or, if the time has already passed,
-                  tomorrow. If the timezone (``time.tzinfo``) is :obj:`None`, UTC will be assumed.
-
-                If ``first`` is :obj:`datetime.datetime` or :obj:`datetime.time` type
-                then ``first.tzinfo`` will define ``Job.tzinfo``. Otherwise UTC will be assumed.
+                  tomorrow. If the timezone (``time.tzinfo``) is :obj:`None`, the
+                  default timezone of the bot will be used.
 
                 Defaults to ``interval``
             last (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |                        \
@@ -208,7 +208,8 @@ class JobQueue:
                 depending on its type. See ``first`` for details.
 
                 If ``last`` is :obj:`datetime.datetime` or :obj:`datetime.time` type
-                and ``last.tzinfo`` is :obj:`None`, UTC will be assumed.
+                and ``last.tzinfo`` is :obj:`None`, the default timezone of the bot will be
+                assumed.
 
                 Defaults to :obj:`None`.
             context (:obj:`object`, optional): Additional data needed for the callback function.
@@ -268,8 +269,7 @@ class JobQueue:
                 ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
                 its ``job.context`` or change it to a repeating job.
             when (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
-                (``when.tzinfo``) is :obj:`None`, UTC will be assumed. This will also implicitly
-                define ``Job.tzinfo``.
+                (``when.tzinfo``) is :obj:`None`, the default timezone of the bot will be used.
             day (:obj:`int`): Defines the day of the month whereby the job would run. It should
                 be within the range of 1 and 31, inclusive.
             context (:obj:`object`, optional): Additional data needed for the callback function.
@@ -338,8 +338,7 @@ class JobQueue:
                 ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
                 its ``job.context`` or change it to a repeating job.
             time (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
-                (``time.tzinfo``) is :obj:`None`, UTC will be assumed.
-                ``time.tzinfo`` will implicitly define ``Job.tzinfo``.
+                (``time.tzinfo``) is :obj:`None`, the default timezone of the bot will be used.
             days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should
                 run. Defaults to ``EVERY_DAY``
             context (:obj:`object`, optional): Additional data needed for the callback function.

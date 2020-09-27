@@ -29,7 +29,7 @@ from telegram import (Bot, Update, ChatAction, TelegramError, User, InlineKeyboa
                       InlineQueryResultDocument, Dice, MessageEntity, ParseMode)
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
-from telegram.utils.helpers import from_timestamp, escape_markdown
+from telegram.utils.helpers import from_timestamp, escape_markdown, to_timestamp
 from tests.conftest import expect_bad_request
 
 BASE_TIME = time.time()
@@ -269,6 +269,29 @@ class TestBot:
         new_message = bot.edit_message_reply_markup(chat_id=super_group_id,
                                                     message_id=message.message_id,
                                                     reply_markup=reply_markup, timeout=60)
+        assert new_message.poll.id == message.poll.id
+        assert new_message.poll.is_closed
+
+    @flaky(5, 1)
+    @pytest.mark.timeout(10)
+    def test_send_close_date_default_tz(self, tz_bot, super_group_id):
+        question = 'Is this a test?'
+        answers = ['Yes', 'No', 'Maybe']
+        reply_markup = InlineKeyboardMarkup.from_button(
+            InlineKeyboardButton(text='text', callback_data='data'))
+
+        aware_close_date = dtm.datetime.now(tz=tz_bot.defaults.tzinfo) + dtm.timedelta(seconds=5)
+        close_date = aware_close_date.replace(tzinfo=None)
+
+        message = tz_bot.send_poll(chat_id=super_group_id, question=question, options=answers,
+                                   close_date=close_date, timeout=60)
+        assert message.poll.close_date == aware_close_date.replace(microsecond=0)
+
+        time.sleep(5.1)
+
+        new_message = tz_bot.edit_message_reply_markup(chat_id=super_group_id,
+                                                       message_id=message.message_id,
+                                                       reply_markup=reply_markup, timeout=60)
         assert new_message.poll.id == message.poll.id
         assert new_message.poll.is_closed
 
@@ -517,6 +540,22 @@ class TestBot:
         assert bot.kick_chat_member(2, 32)
         assert bot.kick_chat_member(2, 32, until_date=until)
         assert bot.kick_chat_member(2, 32, until_date=1577887200)
+
+    def test_kick_chat_member_default_tz(self, monkeypatch, tz_bot):
+        until = dtm.datetime(2020, 1, 11, 16, 13)
+        until_timestamp = to_timestamp(until, tzinfo=tz_bot.defaults.tzinfo)
+
+        def test(url, data, *args, **kwargs):
+            chat_id = data['chat_id'] == 2
+            user_id = data['user_id'] == 32
+            until_date = data.get('until_date', until_timestamp) == until_timestamp
+            return chat_id and user_id and until_date
+
+        monkeypatch.setattr(tz_bot.request, 'post', test)
+
+        assert tz_bot.kick_chat_member(2, 32)
+        assert tz_bot.kick_chat_member(2, 32, until_date=until)
+        assert tz_bot.kick_chat_member(2, 32, until_date=until_timestamp)
 
     # TODO: Needs improvement.
     def test_unban_chat_member(self, monkeypatch, bot):
@@ -950,6 +989,28 @@ class TestBot:
                                             95205500,
                                             chat_permissions,
                                             until_date=dtm.datetime.utcnow())
+
+    def test_restrict_chat_member_default_tz(self, monkeypatch, tz_bot, channel_id,
+                                             chat_permissions):
+        until = dtm.datetime(2020, 1, 11, 16, 13)
+        until_timestamp = to_timestamp(until, tzinfo=tz_bot.defaults.tzinfo)
+
+        def test(url, data, *args, **kwargs):
+            return data.get('until_date', until_timestamp) == until_timestamp
+
+        monkeypatch.setattr(tz_bot.request, 'post', test)
+
+        assert tz_bot.restrict_chat_member(channel_id,
+                                           95205500,
+                                           chat_permissions)
+        assert tz_bot.restrict_chat_member(channel_id,
+                                           95205500,
+                                           chat_permissions,
+                                           until_date=until)
+        assert tz_bot.restrict_chat_member(channel_id,
+                                           95205500,
+                                           chat_permissions,
+                                           until_date=until_timestamp)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

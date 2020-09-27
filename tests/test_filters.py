@@ -190,7 +190,7 @@ class TestFilters:
         matches = result['matches']
         assert isinstance(matches, list)
         assert all([type(res) == SRE_TYPE for res in matches])
-        update.message.forward_date = False
+        update.message.forward_date = None
         result = filter(update)
         assert not result
         update.message.text = 'test it out'
@@ -926,7 +926,7 @@ class TestFilters:
         update.message.text = 'test'
         update.message.forward_date = datetime.datetime.utcnow()
         assert (Filters.text & (Filters.status_update | Filters.forwarded))(update)
-        update.message.forward_date = False
+        update.message.forward_date = None
         assert not (Filters.text & (Filters.forwarded | Filters.status_update))(update)
         update.message.pinned_message = True
         assert (Filters.text & (Filters.forwarded | Filters.status_update)(update))
