@@ -78,6 +78,8 @@ def check_method(h4):
         ignored |= {'location'}  # Added for ease of use
     elif name == 'sendVenue':
         ignored |= {'venue'}  # Added for ease of use
+    elif name == 'answerInlineQuery':
+        ignored |= {'current_offset'}  # Added for ease of use
 
     assert (sig.parameters.keys() ^ checked) - ignored == set()
 

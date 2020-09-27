@@ -75,14 +75,21 @@ class InlineQuery(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def answer(self, *args, **kwargs):
+    def answer(self, *args, auto_pagination=False, **kwargs):
         """Shortcut for::
 
-            bot.answer_inline_query(update.inline_query.id, *args, **kwargs)
+            bot.answer_inline_query(update.inline_query.id,
+                                    *args,
+                                    current_offset=self.offset if auto_pagination else None,
+                                    **kwargs)
 
         Args:
-            results (List[:class:`telegram.InlineQueryResult`]): A list of results for the inline
-                query.
+            results (List[:class:`telegram.InlineQueryResult`] | Callable): A list of results for
+                the inline query. In case :attr:`auto_pagination` is set to :obj:`True`,
+                ``results`` may also be a callable may also be a callable accepts the current page
+                index starting from 0. It must return either a list of
+                :class:`telegram.InlineResult` instances or :obj:`None` if there are no more
+                results.
             cache_time (:obj:`int`, optional): The maximum amount of time in seconds that the
                 result of the inline query may be cached on the server. Defaults to 300.
             is_personal (:obj:`bool`, optional): Pass :obj:`True`, if results may be cached on the
@@ -98,6 +105,14 @@ class InlineQuery(TelegramObject):
             switch_pm_parameter (:obj:`str`, optional): Deep-linking parameter for the /start
                 message sent to the bot when user presses the switch button. 1-64 characters,
                 only A-Z, a-z, 0-9, _ and - are allowed.
+            auto_pagination (:obj:`bool`, optional): If set to :obj:`True`, :attr:`offset` will be
+                passed as :attr:`current_offset` to :meth:telegram.Bot.answer_inline_query`.
+                Defaults to :obj:`False`.
 
         """
-        return self.bot.answer_inline_query(self.id, *args, **kwargs)
+        return self.bot.answer_inline_query(
+            self.id,
+            *args,
+            current_offset=self.offset if auto_pagination else None,
+            **kwargs
+        )

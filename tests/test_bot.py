@@ -27,6 +27,7 @@ from telegram import (Bot, Update, ChatAction, TelegramError, User, InlineKeyboa
                       InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent,
                       ShippingOption, LabeledPrice, ChatPermissions, Poll, BotCommand,
                       InlineQueryResultDocument, Dice, MessageEntity, ParseMode)
+from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
 from telegram.utils.helpers import from_timestamp, escape_markdown
 from tests.conftest import expect_bad_request
@@ -52,6 +53,20 @@ def media_message(bot, chat_id):
 @pytest.fixture(scope='class')
 def chat_permissions():
     return ChatPermissions(can_send_messages=False, can_change_info=False, can_invite_users=False)
+
+
+def inline_results_callback(page=None):
+    if not page:
+        return [InlineQueryResultArticle(i, str(i), None) for i in range(1, 254)]
+    elif page <= 5:
+        return [InlineQueryResultArticle(i, str(i), None)
+                for i in range(page * 5 + 1, (page + 1) * 5 + 1)]
+    return None
+
+
+@pytest.fixture(scope='class')
+def inline_results():
+    return inline_results_callback()
 
 
 class TestBot:
@@ -384,6 +399,86 @@ class TestBot:
                                                next_offset='42',
                                                switch_pm_text='switch pm',
                                                switch_pm_parameter='start_pm')
+
+    def test_answer_inline_query_current_offset_error(self, bot, inline_results):
+        with pytest.raises(ValueError, match=('`current_offset` and `next_offset`')):
+            bot.answer_inline_query(1234,
+                                    results=inline_results,
+                                    next_offset=42,
+                                    current_offset=51)
+
+    @pytest.mark.parametrize('current_offset,num_results,id_offset,expected_next_offset',
+                             [('', MAX_INLINE_QUERY_RESULTS, 1, 1),
+                              (1, MAX_INLINE_QUERY_RESULTS, 51, 2),
+                              (5, 3, 251, '')])
+    def test_answer_inline_query_current_offset_1(self,
+                                                  monkeypatch,
+                                                  bot,
+                                                  inline_results,
+                                                  current_offset,
+                                                  num_results,
+                                                  id_offset,
+                                                  expected_next_offset):
+        # For now just test that our internals pass the correct data
+        def make_assertion(_, url, data, *args, **kwargs):
+            results = data['results']
+            length_matches = len(results) == num_results
+            ids_match = all([int(res['id']) == id_offset + i for i, res in enumerate(results)])
+            next_offset_matches = data['next_offset'] == expected_next_offset
+            return length_matches and ids_match and next_offset_matches
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', make_assertion)
+
+        assert bot.answer_inline_query(1234, results=inline_results, current_offset=current_offset)
+
+    def test_answer_inline_query_current_offset_2(self, monkeypatch, bot, inline_results):
+        # For now just test that our internals pass the correct data
+        def make_assertion(_, url, data, *args, **kwargs):
+            results = data['results']
+            length_matches = len(results) == MAX_INLINE_QUERY_RESULTS
+            ids_match = all([int(res['id']) == 1 + i for i, res in enumerate(results)])
+            next_offset_matches = data['next_offset'] == 1
+            return length_matches and ids_match and next_offset_matches
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', make_assertion)
+
+        assert bot.answer_inline_query(1234, results=inline_results, current_offset=0)
+
+        inline_results = inline_results[:30]
+
+        def make_assertion(_, url, data, *args, **kwargs):
+            results = data['results']
+            length_matches = len(results) == 30
+            ids_match = all([int(res['id']) == 1 + i for i, res in enumerate(results)])
+            next_offset_matches = data['next_offset'] == ''
+            return length_matches and ids_match and next_offset_matches
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', make_assertion)
+
+        assert bot.answer_inline_query(1234, results=inline_results, current_offset=0)
+
+    def test_answer_inline_query_current_offset_callback(self, monkeypatch, bot, caplog):
+        # For now just test that our internals pass the correct data
+        def test(_, url, data, *args, **kwargs):
+            results = data['results']
+            length = len(results) == 5
+            ids = all([int(res['id']) == 6 + i for i, res in enumerate(results)])
+            next_offset = data['next_offset'] == 2
+            return length and ids and next_offset
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+
+        assert bot.answer_inline_query(1234, results=inline_results_callback, current_offset=1)
+
+        def test(_, url, data, *args, **kwargs):
+            results = data['results']
+            length = results == []
+            next_offset = data['next_offset'] == ''
+            return length and next_offset
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+
+        assert bot.answer_inline_query(1234, results=inline_results_callback, current_offset=6)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
