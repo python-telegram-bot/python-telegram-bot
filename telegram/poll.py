@@ -119,7 +119,6 @@ class Poll(TelegramObject):
             after creation.
         close_date (:obj:`datetime.datetime`): Optional. Point in time when the poll will be
             automatically closed.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     Args:
         id (:obj:`str`): Unique poll identifier.
@@ -140,7 +139,6 @@ class Poll(TelegramObject):
             after creation.
         close_date (:obj:`datetime.datetime`, optional): Point in time (Unix timestamp) when the
             poll will be automatically closed. Converted to :obj:`datetime.datetime`.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
 
     """
 
@@ -158,7 +156,6 @@ class Poll(TelegramObject):
                  explanation_entities=None,
                  open_period=None,
                  close_date=None,
-                 bot=None,
                  **kwargs):
         self.id = id
         self.question = question
@@ -173,8 +170,6 @@ class Poll(TelegramObject):
         self.explanation_entities = explanation_entities
         self.open_period = open_period
         self.close_date = close_date
-
-        self.bot = bot
 
         self._id_attrs = (self.id,)
 
@@ -197,7 +192,7 @@ class Poll(TelegramObject):
         data['options'] = [x.to_dict() for x in self.options]
         if self.explanation_entities:
             data['explanation_entities'] = [e.to_dict() for e in self.explanation_entities]
-        data['close_date'] = to_timestamp(self.close_date)
+        data['close_date'] = to_timestamp(data.get('close_date'))
 
         return data
 
