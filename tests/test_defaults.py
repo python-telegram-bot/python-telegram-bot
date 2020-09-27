@@ -37,6 +37,8 @@ class TestDefault:
             defaults.timeout = True
         with pytest.raises(AttributeError):
             defaults.quote = True
+        with pytest.raises(AttributeError):
+            defaults.tzinfo = True
 
     def test_equality(self):
         a = Defaults(parse_mode='HTML', quote=True)

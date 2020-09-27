@@ -25,6 +25,7 @@ from telegram import Sticker
 from telegram import Update
 from telegram import User
 from telegram import MessageEntity
+from telegram.ext import Defaults
 from telegram.message import Message
 from telegram.utils import helpers
 from telegram.utils.helpers import _datetime_to_float_timestamp
@@ -135,6 +136,10 @@ class TestHelpers:
         assert (helpers.to_float_timestamp(time_spec)
                 == pytest.approx(helpers.to_float_timestamp(time_spec, reference_timestamp=now)))
 
+    def test_to_float_timestamp_error(self):
+        with pytest.raises(TypeError, match='Defaults'):
+            helpers.to_float_timestamp(Defaults())
+
     @pytest.mark.parametrize('time_spec', TIME_SPECS, ids=str)
     def test_to_timestamp(self, time_spec):
         # delegate tests to `to_float_timestamp`
@@ -143,6 +148,9 @@ class TestHelpers:
     def test_to_timestamp_none(self):
         # this 'convenience' behaviour has been left left for backwards compatibility
         assert helpers.to_timestamp(None) is None
+
+    def test_from_timestamp_none(self):
+        assert helpers.from_timestamp(None) is None
 
     def test_from_timestamp_naive(self):
         datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, tzinfo=None)
