@@ -41,6 +41,7 @@ from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos
                       Location, Venue, Contact, InputFile, Poll, BotCommand, ChatAction,
                       InlineQueryResult, InputMedia, PassportElementError, MaskPosition,
                       ChatPermissions, ShippingOption, LabeledPrice, ChatPhoto)
+from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import InvalidToken, TelegramError
 from telegram.utils.helpers import to_timestamp, DEFAULT_NONE, DefaultValue
 from telegram.utils.request import Request
@@ -180,8 +181,8 @@ class Bot(TelegramObject):
             else:
                 data = api_kwargs
 
-        return self._request.post('{}/{}'.format(self.base_url, endpoint), data=data,
-                                  timeout=timeout)
+        return self.request.post('{}/{}'.format(self.base_url, endpoint), data=data,
+                                 timeout=timeout)
 
     def _message(self,
                  endpoint: str,
@@ -216,10 +217,7 @@ class Bot(TelegramObject):
         if result is True:
             return result  # type: ignore
 
-        if self.defaults:
-            result['default_quote'] = self.defaults.quote  # type: ignore
-
-        return Message.de_json(result, self)  # type: ignore
+        return Message.de_json(result, self)  # type: ignore[arg-type]
 
     @property
     def request(self) -> Request:
@@ -1585,15 +1583,24 @@ class Bot(TelegramObject):
                             switch_pm_text: str = None,
                             switch_pm_parameter: str = None,
                             timeout: float = None,
+                            current_offset: str = None,
                             api_kwargs: JSONDict = None) -> bool:
         """
         Use this method to send answers to an inline query. No more than 50 results per query are
         allowed.
 
+        Warning:
+            In most use cases :attr:`current_offset` should not be passed manually. Instead of
+            calling this method directly, use the shortcut :meth:`telegram.InlineQuery.answer` with
+            ``auto_pagination=True``, which will take care of passing the correct value.
+
         Args:
             inline_query_id (:obj:`str`): Unique identifier for the answered query.
-            results (List[:class:`telegram.InlineQueryResult`)]: A list of results for the inline
-                query.
+            results (List[:class:`telegram.InlineQueryResult`] | Callable): A list of results for
+                the inline query. In case :attr:`current_offset` is passed, ``results`` may also be
+                a callable accepts the current page index starting from 0. It must return either a
+                list of :class:`telegram.InlineResult` instances or :obj:`None` if there are no
+                more results.
             cache_time (:obj:`int`, optional): The maximum amount of time in seconds that the
                 result of the inline query may be cached on the server. Defaults to 300.
             is_personal (:obj:`bool`, optional): Pass :obj:`True`, if results may be cached on
@@ -1609,6 +1616,10 @@ class Bot(TelegramObject):
             switch_pm_parameter (:obj:`str`, optional): Deep-linking parameter for the /start
                 message sent to the bot when user presses the switch button. 1-64 characters,
                 only A-Z, a-z, 0-9, _ and - are allowed.
+            current_offset (:obj:`str`, optional): The :attr:`telegram.InlineQuery.offset` of
+                the inline query to answer. If passed, PTB will automatically take care of
+                the pagination for you, i.e. pass the correct ``next_offset`` and truncate the
+                results list/get the results from the callable you passed.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -1653,10 +1664,39 @@ class Bot(TelegramObject):
                     else:
                         res.input_message_content.disable_web_page_preview = None
 
-        for result in results:
+        if current_offset is not None and next_offset is not None:
+            raise ValueError('`current_offset` and `next_offset` are mutually exclusive!')
+
+        if current_offset is not None:
+            if current_offset == '':
+                current_offset_int = 0
+            else:
+                current_offset_int = int(current_offset)
+
+            next_offset = ''
+
+            if callable(results):
+                effective_results = results(current_offset_int)
+                if not effective_results:
+                    effective_results = []
+                else:
+                    next_offset = str(current_offset_int + 1)
+            else:
+                if len(results) > (current_offset_int + 1) * MAX_INLINE_QUERY_RESULTS:
+                    next_offset_int = current_offset_int + 1
+                    next_offset = str(next_offset_int)
+                    effective_results = results[
+                        current_offset_int * MAX_INLINE_QUERY_RESULTS:
+                        next_offset_int * MAX_INLINE_QUERY_RESULTS]
+                else:
+                    effective_results = results[current_offset_int * MAX_INLINE_QUERY_RESULTS:]
+        else:
+            effective_results = results
+
+        for result in effective_results:
             _set_defaults(result)
 
-        results_dicts = [res.to_dict() for res in results]
+        results_dicts = [res.to_dict() for res in effective_results]
 
         data: JSONDict = {'inline_query_id': inline_query_id, 'results': results_dicts}
 
@@ -1790,6 +1830,8 @@ class Bot(TelegramObject):
             until_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the user will
                 be unbanned, unix time. If user is banned for more than 366 days or less than 30
                 seconds from the current time they are considered to be banned forever.
+                For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
+                bot will be used.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
@@ -1804,7 +1846,8 @@ class Bot(TelegramObject):
 
         if until_date is not None:
             if isinstance(until_date, datetime):
-                until_date = to_timestamp(until_date)
+                until_date = to_timestamp(until_date,
+                                          tzinfo=self.defaults.tzinfo if self.defaults else None)
             data['until_date'] = until_date
 
         result = self._post('kickChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
@@ -2941,6 +2984,8 @@ class Bot(TelegramObject):
                 will be lifted for the user, unix time. If user is restricted for more than 366
                 days or less than 30 seconds from the current time, they are considered to be
                 restricted forever.
+                For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
+                bot will be used.
             permissions (:class:`telegram.ChatPermissions`): A JSON-serialized object for new user
                 permissions.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -2960,7 +3005,8 @@ class Bot(TelegramObject):
 
         if until_date is not None:
             if isinstance(until_date, datetime):
-                until_date = to_timestamp(until_date)
+                until_date = to_timestamp(until_date,
+                                          tzinfo=self.defaults.tzinfo if self.defaults else None)
             data['until_date'] = until_date
 
         result = self._post('restrictChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
@@ -3785,6 +3831,8 @@ class Bot(TelegramObject):
                 timestamp) when the poll will be automatically closed. Must be at least 5 and no
                 more than 600 seconds in the future. Can't be used together with
                 :attr:`open_period`.
+                For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
+                bot will be used.
             is_closed (:obj:`bool`, optional): Pass :obj:`True`, if the poll needs to be
                 immediately closed. This can be useful for poll preview.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
@@ -3837,7 +3885,8 @@ class Bot(TelegramObject):
             data['open_period'] = open_period
         if close_date:
             if isinstance(close_date, datetime):
-                close_date = to_timestamp(close_date)
+                close_date = to_timestamp(close_date,
+                                          tzinfo=self.defaults.tzinfo if self.defaults else None)
             data['close_date'] = close_date
 
         return self._message('sendPoll', data, timeout=timeout,  # type: ignore[return-value]

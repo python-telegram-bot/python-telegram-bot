@@ -129,12 +129,6 @@ class Updater:
                           TelegramDeprecationWarning,
                           stacklevel=2)
 
-        if defaults and bot:
-            warnings.warn('Passing defaults to an Updater has no effect when a Bot is passed '
-                          'as well. Pass them to the Bot instead.',
-                          TelegramDeprecationWarning,
-                          stacklevel=2)
-
         if dispatcher is None:
             if (token is None) and (bot is None):
                 raise ValueError('`token` or `bot` must be passed')

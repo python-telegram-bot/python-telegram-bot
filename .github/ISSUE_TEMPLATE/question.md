@@ -10,7 +10,7 @@ assignees: ''
 <!--
 Hey there, you have a question? We are happy to answer. Please make sure no similar question was opened already.
 
-To make it easier for us to help you, please try to follow the template below as closely as possible.
+To make it easier for us to help you, please read this article https://git.io/JURJO and try to follow the template below as closely as possible.
 
 Please mind that there is also a users' Telegram group at https://t.me/pythontelegrambotgroup for questions about the library. Questions asked there might be answered quicker than here. In case you are unable to join our group due to Telegram restrictions, you can use our IRC channel at https://webchat.freenode.net/?channels=##python-telegram-bot to participate in the group.
 -->

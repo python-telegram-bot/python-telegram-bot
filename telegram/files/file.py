@@ -40,9 +40,6 @@ class File(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
 
-    Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`file_unique_id` is equal.
-
     Note:
         Maximum file size to download is 20 MB.
 

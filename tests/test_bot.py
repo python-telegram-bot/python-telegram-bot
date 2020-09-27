@@ -27,8 +27,9 @@ from telegram import (Bot, Update, ChatAction, TelegramError, User, InlineKeyboa
                       InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent,
                       ShippingOption, LabeledPrice, ChatPermissions, Poll, BotCommand,
                       InlineQueryResultDocument, Dice, MessageEntity, ParseMode)
+from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
-from telegram.utils.helpers import from_timestamp, escape_markdown
+from telegram.utils.helpers import from_timestamp, escape_markdown, to_timestamp
 from tests.conftest import expect_bad_request
 
 BASE_TIME = time.time()
@@ -52,6 +53,20 @@ def media_message(bot, chat_id):
 @pytest.fixture(scope='class')
 def chat_permissions():
     return ChatPermissions(can_send_messages=False, can_change_info=False, can_invite_users=False)
+
+
+def inline_results_callback(page=None):
+    if not page:
+        return [InlineQueryResultArticle(i, str(i), None) for i in range(1, 254)]
+    elif page <= 5:
+        return [InlineQueryResultArticle(i, str(i), None)
+                for i in range(page * 5 + 1, (page + 1) * 5 + 1)]
+    return None
+
+
+@pytest.fixture(scope='class')
+def inline_results():
+    return inline_results_callback()
 
 
 class TestBot:
@@ -257,6 +272,29 @@ class TestBot:
         assert new_message.poll.id == message.poll.id
         assert new_message.poll.is_closed
 
+    @flaky(5, 1)
+    @pytest.mark.timeout(10)
+    def test_send_close_date_default_tz(self, tz_bot, super_group_id):
+        question = 'Is this a test?'
+        answers = ['Yes', 'No', 'Maybe']
+        reply_markup = InlineKeyboardMarkup.from_button(
+            InlineKeyboardButton(text='text', callback_data='data'))
+
+        aware_close_date = dtm.datetime.now(tz=tz_bot.defaults.tzinfo) + dtm.timedelta(seconds=5)
+        close_date = aware_close_date.replace(tzinfo=None)
+
+        message = tz_bot.send_poll(chat_id=super_group_id, question=question, options=answers,
+                                   close_date=close_date, timeout=60)
+        assert message.poll.close_date == aware_close_date.replace(microsecond=0)
+
+        time.sleep(5.1)
+
+        new_message = tz_bot.edit_message_reply_markup(chat_id=super_group_id,
+                                                       message_id=message.message_id,
+                                                       reply_markup=reply_markup, timeout=60)
+        assert new_message.poll.id == message.poll.id
+        assert new_message.poll.is_closed
+
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
@@ -393,6 +431,86 @@ class TestBot:
                                                switch_pm_text='switch pm',
                                                switch_pm_parameter='start_pm')
 
+    def test_answer_inline_query_current_offset_error(self, bot, inline_results):
+        with pytest.raises(ValueError, match=('`current_offset` and `next_offset`')):
+            bot.answer_inline_query(1234,
+                                    results=inline_results,
+                                    next_offset=42,
+                                    current_offset=51)
+
+    @pytest.mark.parametrize('current_offset,num_results,id_offset,expected_next_offset',
+                             [('', MAX_INLINE_QUERY_RESULTS, 1, 1),
+                              (1, MAX_INLINE_QUERY_RESULTS, 51, 2),
+                              (5, 3, 251, '')])
+    def test_answer_inline_query_current_offset_1(self,
+                                                  monkeypatch,
+                                                  bot,
+                                                  inline_results,
+                                                  current_offset,
+                                                  num_results,
+                                                  id_offset,
+                                                  expected_next_offset):
+        # For now just test that our internals pass the correct data
+        def make_assertion(url, data, *args, **kwargs):
+            results = data['results']
+            length_matches = len(results) == num_results
+            ids_match = all([int(res['id']) == id_offset + i for i, res in enumerate(results)])
+            next_offset_matches = data['next_offset'] == str(expected_next_offset)
+            return length_matches and ids_match and next_offset_matches
+
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+
+        assert bot.answer_inline_query(1234, results=inline_results, current_offset=current_offset)
+
+    def test_answer_inline_query_current_offset_2(self, monkeypatch, bot, inline_results):
+        # For now just test that our internals pass the correct data
+        def make_assertion(url, data, *args, **kwargs):
+            results = data['results']
+            length_matches = len(results) == MAX_INLINE_QUERY_RESULTS
+            ids_match = all([int(res['id']) == 1 + i for i, res in enumerate(results)])
+            next_offset_matches = data['next_offset'] == '1'
+            return length_matches and ids_match and next_offset_matches
+
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+
+        assert bot.answer_inline_query(1234, results=inline_results, current_offset=0)
+
+        inline_results = inline_results[:30]
+
+        def make_assertion(url, data, *args, **kwargs):
+            results = data['results']
+            length_matches = len(results) == 30
+            ids_match = all([int(res['id']) == 1 + i for i, res in enumerate(results)])
+            next_offset_matches = data['next_offset'] == ''
+            return length_matches and ids_match and next_offset_matches
+
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+
+        assert bot.answer_inline_query(1234, results=inline_results, current_offset=0)
+
+    def test_answer_inline_query_current_offset_callback(self, monkeypatch, bot, caplog):
+        # For now just test that our internals pass the correct data
+        def make_assertion(url, data, *args, **kwargs):
+            results = data['results']
+            length = len(results) == 5
+            ids = all([int(res['id']) == 6 + i for i, res in enumerate(results)])
+            next_offset = data['next_offset'] == '2'
+            return length and ids and next_offset
+
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+
+        assert bot.answer_inline_query(1234, results=inline_results_callback, current_offset=1)
+
+        def make_assertion(url, data, *args, **kwargs):
+            results = data['results']
+            length = results == []
+            next_offset = data['next_offset'] == ''
+            return length and next_offset
+
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+
+        assert bot.answer_inline_query(1234, results=inline_results_callback, current_offset=6)
+
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_get_user_profile_photos(self, bot, chat_id):
@@ -422,6 +540,22 @@ class TestBot:
         assert bot.kick_chat_member(2, 32)
         assert bot.kick_chat_member(2, 32, until_date=until)
         assert bot.kick_chat_member(2, 32, until_date=1577887200)
+
+    def test_kick_chat_member_default_tz(self, monkeypatch, tz_bot):
+        until = dtm.datetime(2020, 1, 11, 16, 13)
+        until_timestamp = to_timestamp(until, tzinfo=tz_bot.defaults.tzinfo)
+
+        def test(url, data, *args, **kwargs):
+            chat_id = data['chat_id'] == 2
+            user_id = data['user_id'] == 32
+            until_date = data.get('until_date', until_timestamp) == until_timestamp
+            return chat_id and user_id and until_date
+
+        monkeypatch.setattr(tz_bot.request, 'post', test)
+
+        assert tz_bot.kick_chat_member(2, 32)
+        assert tz_bot.kick_chat_member(2, 32, until_date=until)
+        assert tz_bot.kick_chat_member(2, 32, until_date=until_timestamp)
 
     # TODO: Needs improvement.
     def test_unban_chat_member(self, monkeypatch, bot):
@@ -855,6 +989,28 @@ class TestBot:
                                             95205500,
                                             chat_permissions,
                                             until_date=dtm.datetime.utcnow())
+
+    def test_restrict_chat_member_default_tz(self, monkeypatch, tz_bot, channel_id,
+                                             chat_permissions):
+        until = dtm.datetime(2020, 1, 11, 16, 13)
+        until_timestamp = to_timestamp(until, tzinfo=tz_bot.defaults.tzinfo)
+
+        def test(url, data, *args, **kwargs):
+            return data.get('until_date', until_timestamp) == until_timestamp
+
+        monkeypatch.setattr(tz_bot.request, 'post', test)
+
+        assert tz_bot.restrict_chat_member(channel_id,
+                                           95205500,
+                                           chat_permissions)
+        assert tz_bot.restrict_chat_member(channel_id,
+                                           95205500,
+                                           chat_permissions,
+                                           until_date=until)
+        assert tz_bot.restrict_chat_member(channel_id,
+                                           95205500,
+                                           chat_permissions,
+                                           until_date=until_timestamp)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

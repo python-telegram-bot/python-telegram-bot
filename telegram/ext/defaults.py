@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class Defaults, which allows to pass default values to Updater."""
+import pytz
 from typing import Union, Optional, Any
 
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
@@ -38,6 +39,8 @@ class Defaults:
         quote (:obj:`bool`): Optional. If set to :obj:`True`, the reply is sent as an actual reply
             to the message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter will
             be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+        tzinfo (:obj:`tzinfo`): A timezone to be used for all date(time) objects appearing
+            throughout PTB.
 
     Parameters:
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
@@ -52,6 +55,10 @@ class Defaults:
         quote (:obj:`bool`, optional): If set to :obj:`True`, the reply is sent as an actual reply
             to the message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter will
             be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+        tzinfo (:obj:`tzinfo`, optional): A timezone to be used for all date(time) inputs
+            appearing throughout PTB, i.e. if a timezone naive date(time) object is passed
+            somewhere, it will be assumed to be in ``tzinfo``. Must be a timezone provided by the
+            ``pytz`` module. Defaults to UTC.
     """
     def __init__(self,
                  parse_mode: str = None,
@@ -60,12 +67,14 @@ class Defaults:
                  # Timeout needs special treatment, since the bot methods have two different
                  # default values for timeout (None and 20s)
                  timeout: Union[float, DefaultValue] = DEFAULT_NONE,
-                 quote: bool = None):
+                 quote: bool = None,
+                 tzinfo: pytz.BaseTzInfo = pytz.utc):
         self._parse_mode = parse_mode
         self._disable_notification = disable_notification
         self._disable_web_page_preview = disable_web_page_preview
         self._timeout = timeout
         self._quote = quote
+        self._tzinfo = tzinfo
 
     @property
     def parse_mode(self) -> Optional[str]:
@@ -112,12 +121,22 @@ class Defaults:
         raise AttributeError("You can not assign a new value to defaults after because it would "
                              "not have any effect.")
 
+    @property
+    def tzinfo(self) -> pytz.BaseTzInfo:
+        return self._tzinfo
+
+    @tzinfo.setter
+    def tzinfo(self, value: Any) -> None:
+        raise AttributeError("You can not assign a new value to defaults after because it would "
+                             "not have any effect.")
+
     def __hash__(self) -> int:
         return hash((self._parse_mode,
                      self._disable_notification,
                      self._disable_web_page_preview,
                      self._timeout,
-                     self._quote))
+                     self._quote,
+                     self._tzinfo))
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, Defaults):

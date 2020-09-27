@@ -175,7 +175,7 @@ class TestMessage:
         assert new.to_dict() == message_params.to_dict()
 
     def test_dict_approach(self, message):
-        assert message['date'] == message.date
+        assert message['text'] == message.text
         assert message['chat_id'] == message.chat_id
         assert message['no_key'] is None
 

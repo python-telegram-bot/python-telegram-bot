@@ -24,7 +24,7 @@ from telegram.utils.deprecate import TelegramDeprecationWarning
 
 from telegram import (Message, Update, Chat, Bot, User, CallbackQuery, InlineQuery,
                       ChosenInlineResult, ShippingQuery, PreCheckoutQuery)
-from telegram.ext import Filters, MessageHandler, CallbackContext, JobQueue
+from telegram.ext import Filters, MessageHandler, CallbackContext, JobQueue, UpdateFilter
 
 message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
 
@@ -160,6 +160,23 @@ class TestMessageHandler:
 
         message.chat.type = 'private'
         assert not handler.check_update(Update(0, message))
+
+    def test_callback_query_with_filter(self, message):
+
+        class TestFilter(UpdateFilter):
+            flag = False
+
+            def filter(self, u):
+                self.flag = True
+
+        test_filter = TestFilter()
+        handler = MessageHandler(test_filter, self.callback_basic)
+
+        update = Update(1, callback_query=CallbackQuery(1, None, None, message=message))
+
+        assert update.effective_message
+        assert not handler.check_update(update)
+        assert not test_filter.flag
 
     def test_specific_filters(self, message):
         f = (~Filters.update.messages
