@@ -20,6 +20,8 @@
 import pytest
 
 from datetime import datetime
+
+
 from telegram import Poll, PollOption, PollAnswer, User, MessageEntity
 from telegram.utils.helpers import to_timestamp
 
@@ -154,7 +156,7 @@ class TestPoll:
     open_period = 42
     close_date = datetime.utcnow()
 
-    def test_de_json(self):
+    def test_de_json(self, bot):
         json_dict = {
             'id': self.id_,
             'question': self.question,
@@ -169,7 +171,7 @@ class TestPoll:
             'open_period': self.open_period,
             'close_date': to_timestamp(self.close_date)
         }
-        poll = Poll.de_json(json_dict, None)
+        poll = Poll.de_json(json_dict, bot)
 
         assert poll.id == self.id_
         assert poll.question == self.question

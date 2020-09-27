@@ -121,7 +121,7 @@ class TestJobQueue:
         sleep(0.07)
         assert self.result == 1
 
-    def test_run_repeating_first_timezone(self, job_queue, timezone):
+    def test_run_repeating_last_timezone(self, job_queue, timezone):
         """Test correct scheduling of job when passing a timezone-aware datetime as ``first``"""
         job_queue.run_repeating(self.job_run_once, 0.1,
                                 first=dtm.datetime.now(timezone) + dtm.timedelta(seconds=0.05))
@@ -130,15 +130,6 @@ class TestJobQueue:
 
     def test_run_repeating_last(self, job_queue):
         job_queue.run_repeating(self.job_run_once, 0.05, last=0.06)
-        sleep(0.1)
-        assert self.result == 1
-        sleep(0.1)
-        assert self.result == 1
-
-    def test_run_repeating_last_timezone(self, job_queue, timezone):
-        """Test correct scheduling of job when passing a timezone-aware datetime as ``first``"""
-        job_queue.run_repeating(self.job_run_once, 0.05,
-                                last=dtm.datetime.now(timezone) + dtm.timedelta(seconds=0.06))
         sleep(0.1)
         assert self.result == 1
         sleep(0.1)
@@ -300,7 +291,11 @@ class TestJobQueue:
         time_of_day = expected_reschedule_time.time().replace(tzinfo=timezone)
 
         day = now.day
-        expected_reschedule_time += dtm.timedelta(calendar.monthrange(now.year, now.month)[1])
+        expected_reschedule_time = timezone.normalize(
+            expected_reschedule_time + dtm.timedelta(calendar.monthrange(now.year, now.month)[1]))
+        # Adjust the hour for the special case that between now and next month a DST switch happens
+        expected_reschedule_time += dtm.timedelta(
+            hours=time_of_day.hour - expected_reschedule_time.hour)
         expected_reschedule_time = expected_reschedule_time.timestamp()
 
         job_queue.run_monthly(self.job_run_once, time_of_day, day)
@@ -325,6 +320,25 @@ class TestJobQueue:
         job_queue.run_monthly(self.job_run_once, time_of_day, 31, day_is_strict=False)
         scheduled_time = job_queue.jobs()[0].next_t.timestamp()
         assert scheduled_time == pytest.approx(expected_reschedule_time)
+
+    def test_default_tzinfo(self, _dp, tz_bot):
+        # we're parametrizing this with two different UTC offsets to exclude the possibility
+        # of an xpass when the test is run in a timezone with the same UTC offset
+        jq = JobQueue()
+        original_bot = _dp.bot
+        _dp.bot = tz_bot
+        jq.set_dispatcher(_dp)
+        try:
+            jq.start()
+
+            when = dtm.datetime.now(tz_bot.defaults.tzinfo) + dtm.timedelta(seconds=0.0005)
+            jq.run_once(self.job_run_once, when.time())
+            sleep(0.001)
+            assert self.result == 1
+
+            jq.stop()
+        finally:
+            _dp.bot = original_bot
 
     @pytest.mark.parametrize('use_context', [True, False])
     def test_get_jobs(self, job_queue, use_context):
