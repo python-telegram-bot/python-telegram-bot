@@ -142,7 +142,7 @@ class Message(TelegramObject):
             characters. Also found as :attr:`telegram.constants.MAX_MESSAGE_LENGTH`.
         entities (List[:class:`telegram.MessageEntity`], optional): For text messages, special
             entities like usernames, URLs, bot commands, etc. that appear in the text. See
-            attr:`parse_entity` and attr:`parse_entities` methods for how to use properly.
+            :attr:`parse_entity` and :attr:`parse_entities` methods for how to use properly.
         caption_entities (List[:class:`telegram.MessageEntity`]): Optional. For Messages with a
             Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
             caption. See :attr:`Message.parse_caption_entity` and :attr:`parse_caption_entities`
@@ -191,7 +191,7 @@ class Message(TelegramObject):
         channel_chat_created (:obj:`bool`, optional): Service message: The channel has been
             created. This field can't be received in a message coming through updates, because bot
             can't be a member of a channel when it is created. It can only be found in
-            attr:`reply_to_message` if someone replies to a very first message in a channel.
+            :attr:`reply_to_message` if someone replies to a very first message in a channel.
         migrate_to_chat_id (:obj:`int`, optional): The group has been migrated to a supergroup with
             the specified identifier. This number may be greater than 32 bits and some programming
             languages may have difficulty/silent defects in interpreting it. But it is smaller than

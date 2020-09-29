@@ -748,7 +748,7 @@ officedocument.wordprocessingml.document")``-
 
         migrate = _Migrate()
         """Messages that contain :attr:`telegram.Message.migrate_from_chat_id` or
-            :attr: `telegram.Message.migrate_to_chat_id`."""
+            :attr:`telegram.Message.migrate_to_chat_id`."""
 
         class _PinnedMessage(BaseFilter):
             name = 'Filters.status_update.pinned_message'
