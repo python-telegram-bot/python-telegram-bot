@@ -47,6 +47,10 @@ def run_async(func):
 
     Using this decorator is only possible when only a single Dispatcher exist in the system.
 
+    Note:
+        DEPRECATED. Use :attr:`telegram.ext.Dispatcher.run_async` directly instead or the
+        :attr:`Handler.run_async` parameter.
+
     Warning:
         If you're using ``@run_async`` you cannot rely on adding custom attributes to
         :class:`telegram.ext.CallbackContext`. See its docs for more info.
@@ -275,10 +279,8 @@ class Dispatcher:
         Warning:
             * If you're using ``@run_async``/:meth:`run_async` you cannot rely on adding custom
               attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
-            * When using :meth:`run_async` within an error handler (see :meth:`add_error_handler`),
-              you *must* also set :attr:`error_handling` to :obj:`False`, as an exception within
-              :attr:`func` would cause an infinite loop otherwise. Eventual exceptions will then
-              only be logged.
+            * :meth:`run_async` must not be used within an error handler, as an exception within
+              :attr:`func` would cause an infinite loop otherwise.
 
         Args:
             func (:obj:`callable`): The function to run in the thread.
@@ -286,14 +288,13 @@ class Dispatcher:
             update (:class:`telegram.Update`, optional): The update associated with the functions
                 call. If passed, it will be available in the error handlers, in case an exception
                 is raised by :attr:`func`.
-            error_handling (:obj:`bool`, optional): Whether exceptions raised by :attr:`func`
-                may be handled by error handlers. Defaults to :obj:`True`.
             **kwargs (:obj:`dict`, optional): Keyword arguments to ``func``.
 
         Returns:
             Promise
 
         """
+        # TODO: Remove error_handling parameter once we drop the @run_async decorator
         promise = Promise(func, args, kwargs, update=update, error_handling=error_handling)
         self.__async_queue.put(promise)
         return promise

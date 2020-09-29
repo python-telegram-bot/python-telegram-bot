@@ -47,6 +47,7 @@ class Promise:
 
     """
 
+    # TODO: Remove error_handling parameter once we drop the @run_async decorator
     def __init__(self, pooled_function, args, kwargs, update=None, error_handling=True):
         self.pooled_function = pooled_function
         self.args = args

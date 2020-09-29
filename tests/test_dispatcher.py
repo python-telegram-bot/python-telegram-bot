@@ -164,25 +164,6 @@ class TestDispatcher:
 
         assert self.count == 1
 
-    def test_error_handler_raises_async_errors(self, cdp, caplog):
-        """
-        Make sure that async functions in error handlers don't cause infinite loops
-        """
-        handler_raise_error = MessageHandler(Filters.all, self.callback_raise_error)
-
-        def error_handler_raise_async_error(u, c):
-            c.dispatcher.run_async(self.error_handler_raise_error, None, None, None,
-                                   error_handling=False)
-
-        cdp.add_error_handler(error_handler_raise_async_error)
-
-        with caplog.at_level(logging.INFO):
-            cdp.add_handler(handler_raise_error)
-            cdp.update_queue.put(self.message_update)
-            sleep(.1)
-            assert len(caplog.records) == 1
-            assert caplog.records[-1].msg.startswith('A promise with deactivated error handling')
-
     def test_run_async_multiple(self, bot, dp, dp2):
         def get_dispatcher_name(q):
             q.put(current_thread().name)
