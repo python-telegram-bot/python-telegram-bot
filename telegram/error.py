@@ -52,7 +52,7 @@ class TelegramError(Exception):
         return '%s' % (self.message)
 
     def __reduce__(self):
-        return type(self), (self.message,)
+        return self.__class__, (self.message,)
 
 
 class Unauthorized(TelegramError):
@@ -64,7 +64,7 @@ class InvalidToken(TelegramError):
         super().__init__('Invalid token')
 
     def __reduce__(self):
-        return type(self), ()
+        return self.__class__, ()
 
 
 class NetworkError(TelegramError):
@@ -80,7 +80,7 @@ class TimedOut(NetworkError):
         super().__init__('Timed out')
 
     def __reduce__(self):
-        return type(self), ()
+        return self.__class__, ()
 
 
 class ChatMigrated(TelegramError):
@@ -95,7 +95,7 @@ class ChatMigrated(TelegramError):
         self.new_chat_id = new_chat_id
 
     def __reduce__(self):
-        return type(self), (self.new_chat_id,)
+        return self.__class__, (self.new_chat_id,)
 
 
 class RetryAfter(TelegramError):
@@ -110,7 +110,7 @@ class RetryAfter(TelegramError):
         self.retry_after = float(retry_after)
 
     def __reduce__(self):
-        return type(self), (self.retry_after,)
+        return self.__class__, (self.retry_after,), {"message": self.message}
 
 
 class Conflict(TelegramError):
@@ -126,4 +126,4 @@ class Conflict(TelegramError):
         super().__init__(msg)
 
     def __reduce__(self):
-        return type(self), (self.message,)
+        return self.__class__, (self.message,)

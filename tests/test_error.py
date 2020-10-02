@@ -16,8 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import pickle
-
 import pytest
 
 from telegram import TelegramError
@@ -89,22 +87,3 @@ class TestErrors:
     def test_conflict(self):
         with pytest.raises(Conflict, match='Something something.'):
             raise Conflict('Something something.')
-
-    @pytest.mark.parametrize(
-        "exception",
-        [
-            TelegramError("test message"),
-            Unauthorized("test message"),
-            InvalidToken(),
-            NetworkError("test message"),
-            BadRequest("test message"),
-            TimedOut(),
-            ChatMigrated(1234),
-            RetryAfter(12),
-            Conflict("test message"),
-        ],
-    )
-    def test_pickling(self, exception):
-        pickled = pickle.dumps(exception)
-        unpickled = pickle.loads(pickled)
-        assert type(unpickled) == type(exception)
