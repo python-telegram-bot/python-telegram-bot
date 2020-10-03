@@ -119,9 +119,9 @@ In case you have a previously cloned local repository already, you should initia
 
     $ git submodule update --init --recursive
 
-===============
-Getting started
-===============
+===================================
+Getting Started Python-Telegram-Bot
+===================================
 
 Our Wiki contains a lot of resources to get you started with ``python-telegram-bot``:
 
