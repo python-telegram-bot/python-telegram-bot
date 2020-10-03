@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import pickle
+
 import pytest
 
 from telegram import TelegramError
@@ -81,9 +83,31 @@ class TestErrors:
             assert e.new_chat_id == 1234
 
     def test_retry_after(self):
-        with pytest.raises(RetryAfter, match="Flood control exceeded. Retry in 12 seconds"):
+        with pytest.raises(RetryAfter, match="Flood control exceeded. Retry in 12.0 seconds"):
             raise RetryAfter(12)
 
     def test_conflict(self):
         with pytest.raises(Conflict, match='Something something.'):
             raise Conflict('Something something.')
+
+    @pytest.mark.parametrize(
+        "exception, attributes",
+        [
+            (TelegramError("test message"), ["message"]),
+            (Unauthorized("test message"), ["message"]),
+            (InvalidToken(), ["message"]),
+            (NetworkError("test message"), ["message"]),
+            (BadRequest("test message"), ["message"]),
+            (TimedOut(), ["message"]),
+            (ChatMigrated(1234), ["message", "new_chat_id"]),
+            (RetryAfter(12), ["message", "retry_after"]),
+            (Conflict("test message"), ["message"]),
+        ],
+    )
+    def test_errors_pickling(self, exception, attributes):
+        pickled = pickle.dumps(exception)
+        unpickled = pickle.loads(pickled)
+        assert type(unpickled) is type(exception)
+
+        for attribute in attributes:
+            assert getattr(unpickled, attribute) == getattr(exception, attribute)

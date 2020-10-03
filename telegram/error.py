@@ -106,11 +106,11 @@ class RetryAfter(TelegramError):
     """
 
     def __init__(self, retry_after):
-        super().__init__('Flood control exceeded. Retry in {} seconds'.format(retry_after))
+        super().__init__('Flood control exceeded. Retry in {} seconds'.format(float(retry_after)))
         self.retry_after = float(retry_after)
 
     def __reduce__(self):
-        return self.__class__, (self.retry_after,), {"message": self.message}
+        return self.__class__, (self.retry_after,)
 
 
 class Conflict(TelegramError):
