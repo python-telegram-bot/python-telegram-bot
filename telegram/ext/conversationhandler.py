@@ -29,7 +29,7 @@ from telegram.ext import (Handler, CallbackQueryHandler, InlineQueryHandler,
 from telegram.utils.promise import Promise
 
 from telegram.utils.types import ConversationDict, HandlerArg
-from typing import Dict, Any, List, Optional, Tuple, TYPE_CHECKING, cast
+from typing import Dict, Any, List, Optional, Tuple, TYPE_CHECKING, cast, NoReturn
 
 if TYPE_CHECKING:
     from telegram.ext import Dispatcher, Job
@@ -246,7 +246,7 @@ class ConversationHandler(Handler):
         return self._entry_points
 
     @entry_points.setter
-    def entry_points(self, value: Any) -> None:
+    def entry_points(self, value: Any) -> NoReturn:
         raise ValueError('You can not assign a new value to entry_points after initialization.')
 
     @property
@@ -254,7 +254,7 @@ class ConversationHandler(Handler):
         return self._states
 
     @states.setter
-    def states(self, value: Any) -> None:
+    def states(self, value: Any) -> NoReturn:
         raise ValueError('You can not assign a new value to states after initialization.')
 
     @property
@@ -262,7 +262,7 @@ class ConversationHandler(Handler):
         return self._fallbacks
 
     @fallbacks.setter
-    def fallbacks(self, value: Any) -> None:
+    def fallbacks(self, value: Any) -> NoReturn:
         raise ValueError('You can not assign a new value to fallbacks after initialization.')
 
     @property
@@ -270,7 +270,7 @@ class ConversationHandler(Handler):
         return self._allow_reentry
 
     @allow_reentry.setter
-    def allow_reentry(self, value: Any) -> None:
+    def allow_reentry(self, value: Any) -> NoReturn:
         raise ValueError('You can not assign a new value to allow_reentry after initialization.')
 
     @property
@@ -278,7 +278,7 @@ class ConversationHandler(Handler):
         return self._per_user
 
     @per_user.setter
-    def per_user(self, value: Any) -> None:
+    def per_user(self, value: Any) -> NoReturn:
         raise ValueError('You can not assign a new value to per_user after initialization.')
 
     @property
@@ -286,7 +286,7 @@ class ConversationHandler(Handler):
         return self._per_chat
 
     @per_chat.setter
-    def per_chat(self, value: Any) -> None:
+    def per_chat(self, value: Any) -> NoReturn:
         raise ValueError('You can not assign a new value to per_chat after initialization.')
 
     @property
@@ -294,7 +294,7 @@ class ConversationHandler(Handler):
         return self._per_message
 
     @per_message.setter
-    def per_message(self, value: Any) -> None:
+    def per_message(self, value: Any) -> NoReturn:
         raise ValueError('You can not assign a new value to per_message after initialization.')
 
     @property
@@ -302,7 +302,7 @@ class ConversationHandler(Handler):
         return self._conversation_timeout
 
     @conversation_timeout.setter
-    def conversation_timeout(self, value: Any) -> None:
+    def conversation_timeout(self, value: Any) -> NoReturn:
         raise ValueError('You can not assign a new value to conversation_timeout after '
                          'initialization.')
 
@@ -311,7 +311,7 @@ class ConversationHandler(Handler):
         return self._name
 
     @name.setter
-    def name(self, value: Any) -> None:
+    def name(self, value: Any) -> NoReturn:
         raise ValueError('You can not assign a new value to name after initialization.')
 
     @property
@@ -319,7 +319,7 @@ class ConversationHandler(Handler):
         return self._map_to_parent
 
     @map_to_parent.setter
-    def map_to_parent(self, value: Any) -> None:
+    def map_to_parent(self, value: Any) -> NoReturn:
         raise ValueError('You can not assign a new value to map_to_parent after initialization.')
 
     @property

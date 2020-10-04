@@ -27,7 +27,7 @@ import time
 import threading
 import queue as q
 
-from typing import Callable, Any, TYPE_CHECKING, List
+from typing import Callable, Any, TYPE_CHECKING, List, NoReturn
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -144,7 +144,7 @@ class DelayQueue(threading.Thread):
         super().join(timeout=timeout)
 
     @staticmethod
-    def _default_exception_handler(exc: Exception) -> None:
+    def _default_exception_handler(exc: Exception) -> NoReturn:
         """
         Dummy exception handler which re-raises exception in thread. Could be possibly overwritten
         by subclasses.

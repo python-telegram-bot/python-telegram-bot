@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class Defaults, which allows to pass default values to Updater."""
 import pytz
-from typing import Union, Optional, Any
+from typing import Union, Optional, Any, NoReturn
 
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
 
@@ -81,7 +81,7 @@ class Defaults:
         return self._parse_mode
 
     @parse_mode.setter
-    def parse_mode(self, value: Any) -> None:
+    def parse_mode(self, value: Any) -> NoReturn:
         raise AttributeError("You can not assign a new value to defaults after because it would "
                              "not have any effect.")
 
@@ -90,7 +90,7 @@ class Defaults:
         return self._disable_notification
 
     @disable_notification.setter
-    def disable_notification(self, value: Any) -> None:
+    def disable_notification(self, value: Any) -> NoReturn:
         raise AttributeError("You can not assign a new value to defaults after because it would "
                              "not have any effect.")
 
@@ -99,7 +99,7 @@ class Defaults:
         return self._disable_web_page_preview
 
     @disable_web_page_preview.setter
-    def disable_web_page_preview(self, value: Any) -> None:
+    def disable_web_page_preview(self, value: Any) -> NoReturn:
         raise AttributeError("You can not assign a new value to defaults after because it would "
                              "not have any effect.")
 
@@ -108,7 +108,7 @@ class Defaults:
         return self._timeout
 
     @timeout.setter
-    def timeout(self, value: Any) -> None:
+    def timeout(self, value: Any) -> NoReturn:
         raise AttributeError("You can not assign a new value to defaults after because it would "
                              "not have any effect.")
 
@@ -117,7 +117,7 @@ class Defaults:
         return self._quote
 
     @quote.setter
-    def quote(self, value: Any) -> None:
+    def quote(self, value: Any) -> NoReturn:
         raise AttributeError("You can not assign a new value to defaults after because it would "
                              "not have any effect.")
 
@@ -126,7 +126,7 @@ class Defaults:
         return self._tzinfo
 
     @tzinfo.setter
-    def tzinfo(self, value: Any) -> None:
+    def tzinfo(self, value: Any) -> NoReturn:
         raise AttributeError("You can not assign a new value to defaults after because it would "
                              "not have any effect.")
 

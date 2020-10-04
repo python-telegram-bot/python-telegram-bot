@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the CallbackContext class."""
 from queue import Queue
-from typing import Dict, Any, TYPE_CHECKING, Optional, Match, List
+from typing import Dict, Any, TYPE_CHECKING, Optional, Match, List, NoReturn
 
 from telegram import Update
 if TYPE_CHECKING:
@@ -105,7 +105,7 @@ class CallbackContext:
         return self._bot_data
 
     @bot_data.setter
-    def bot_data(self, value: Any) -> None:
+    def bot_data(self, value: Any) -> NoReturn:
         raise AttributeError("You can not assign a new value to bot_data, see "
                              "https://git.io/fjxKe")
 
@@ -114,7 +114,7 @@ class CallbackContext:
         return self._chat_data
 
     @chat_data.setter
-    def chat_data(self, value: Any) -> None:
+    def chat_data(self, value: Any) -> NoReturn:
         raise AttributeError("You can not assign a new value to chat_data, see "
                              "https://git.io/fjxKe")
 
@@ -123,7 +123,7 @@ class CallbackContext:
         return self._user_data
 
     @user_data.setter
-    def user_data(self, value: Any) -> None:
+    def user_data(self, value: Any) -> NoReturn:
         raise AttributeError("You can not assign a new value to user_data, see "
                              "https://git.io/fjxKe")
 
