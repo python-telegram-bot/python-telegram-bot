@@ -122,15 +122,15 @@ class TestErrors:
         test_errors_pickling test.
         """
         def make_assertion(cls):
-            assert cls.__subclasses__() == covered_subclasses[cls]
+            assert {sc for sc in cls.__subclasses__()} == covered_subclasses[cls]
             for subcls in cls.__subclasses__():
                 make_assertion(subcls)
 
-        covered_subclasses = defaultdict(list)
+        covered_subclasses = defaultdict(set)
         covered_subclasses.update({
-            TelegramError: [Unauthorized, InvalidToken, NetworkError, ChatMigrated, RetryAfter,
-                            Conflict, TelegramDecryptionError],
-            NetworkError: [BadRequest, TimedOut]
+            TelegramError: {Unauthorized, InvalidToken, NetworkError, ChatMigrated, RetryAfter,
+                            Conflict, TelegramDecryptionError},
+            NetworkError: {BadRequest, TimedOut}
         })
 
         make_assertion(TelegramError)
