@@ -34,6 +34,7 @@ class PollAnswerHandler(Handler):
             the callback function.
         pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
             the callback function.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     Note:
         :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
@@ -43,6 +44,10 @@ class PollAnswerHandler(Handler):
 
         Note that this is DEPRECATED, and you should use context based callbacks. See
         https://git.io/fxJuV for more info.
+
+    Warning:
+        When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
+        attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
         callback (:obj:`callable`): The callback function for this handler. Will be called when
@@ -69,6 +74,8 @@ class PollAnswerHandler(Handler):
         pass_chat_data (:obj:`bool`, optional): If set to :obj:`True`, a keyword argument called
             ``chat_data`` will be passed to the callback function. Default is :obj:`False`.
             DEPRECATED: Please switch to context based callbacks.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
+            Defaults to :obj:`False`.
 
     """
 

@@ -104,6 +104,22 @@ class TestCallbackContext:
         assert callback_context.bot is cdp.bot
         assert callback_context.job_queue is cdp.job_queue
         assert callback_context.update_queue is cdp.update_queue
+        assert callback_context.async_args is None
+        assert callback_context.async_kwargs is None
+
+    def test_from_error_async_params(self, cdp):
+        error = TelegramError('test')
+
+        args = [1, '2']
+        kwargs = {'one': 1, 2: 'two'}
+
+        callback_context = CallbackContext.from_error(None, error, cdp,
+                                                      async_args=args,
+                                                      async_kwargs=kwargs)
+
+        assert callback_context.error is error
+        assert callback_context.async_args is args
+        assert callback_context.async_kwargs is kwargs
 
     def test_match(self, cdp):
         callback_context = CallbackContext(cdp)

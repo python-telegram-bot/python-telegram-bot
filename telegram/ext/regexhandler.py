@@ -48,10 +48,15 @@ class RegexHandler(MessageHandler):
             the callback function.
         pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
             the callback function.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     Note:
         This handler is being deprecated. For the same use case use:
         ``MessageHandler(Filters.regex(r'pattern'), callback)``
+
+    Warning:
+        When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
+        attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
 
     Args:
@@ -88,6 +93,8 @@ class RegexHandler(MessageHandler):
             Default is :obj:`True`.
         edited_updates (:obj:`bool`, optional): Should "edited" message updates be handled? Default
             is :obj:`False`.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
+            Defaults to :obj:`False`.
 
     Raises:
         ValueError
@@ -106,7 +113,8 @@ class RegexHandler(MessageHandler):
                  allow_edited=False,
                  message_updates=True,
                  channel_post_updates=False,
-                 edited_updates=False):
+                 edited_updates=False,
+                 run_async=False):
         warnings.warn('RegexHandler is deprecated. See https://git.io/fxJuV for more info',
                       TelegramDeprecationWarning,
                       stacklevel=2)
@@ -118,7 +126,8 @@ class RegexHandler(MessageHandler):
                          pass_chat_data=pass_chat_data,
                          message_updates=message_updates,
                          channel_post_updates=channel_post_updates,
-                         edited_updates=edited_updates)
+                         edited_updates=edited_updates,
+                         run_async=run_async)
         self.pass_groups = pass_groups
         self.pass_groupdict = pass_groupdict
 

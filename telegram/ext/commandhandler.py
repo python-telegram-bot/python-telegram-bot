@@ -60,6 +60,7 @@ class CommandHandler(Handler):
             the callback function.
         pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
             the callback function.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     Note:
         :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a :obj:`dict` you
@@ -69,6 +70,10 @@ class CommandHandler(Handler):
 
         Note that this is DEPRECATED, and you should use context based callbacks. See
         https://git.io/fxJuV for more info.
+
+    Warning:
+        When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
+        attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
         command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
@@ -111,6 +116,8 @@ class CommandHandler(Handler):
         pass_chat_data (:obj:`bool`, optional): If set to :obj:`True`, a keyword argument called
             ``chat_data`` will be passed to the callback function. Default is :obj:`False`.
             DEPRECATED: Please switch to context based callbacks.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
+            Defaults to :obj:`False`.
 
     Raises:
         ValueError - when command is too long or has illegal chars.
@@ -125,13 +132,15 @@ class CommandHandler(Handler):
                  pass_update_queue=False,
                  pass_job_queue=False,
                  pass_user_data=False,
-                 pass_chat_data=False):
+                 pass_chat_data=False,
+                 run_async=False):
         super().__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
-            pass_chat_data=pass_chat_data)
+            pass_chat_data=pass_chat_data,
+            run_async=run_async)
 
         if isinstance(command, str):
             self.command = [command.lower()]
@@ -242,6 +251,7 @@ class PrefixHandler(CommandHandler):
             the callback function.
         pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
             the callback function.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     Note:
         :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
@@ -251,6 +261,10 @@ class PrefixHandler(CommandHandler):
 
         Note that this is DEPRECATED, and you should use context based callbacks. See
         https://git.io/fxJuV for more info.
+
+    Warning:
+        When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
+        attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
         prefix (:obj:`str` | List[:obj:`str`]): The prefix(es) that will precede :attr:`command`.
@@ -289,6 +303,8 @@ class PrefixHandler(CommandHandler):
         pass_chat_data (:obj:`bool`, optional): If set to :obj:`True`, a keyword argument called
             ``chat_data`` will be passed to the callback function. Default is :obj:`False`.
             DEPRECATED: Please switch to context based callbacks.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
+            Defaults to :obj:`False`.
 
     """
 
@@ -301,7 +317,8 @@ class PrefixHandler(CommandHandler):
                  pass_update_queue=False,
                  pass_job_queue=False,
                  pass_user_data=False,
-                 pass_chat_data=False):
+                 pass_chat_data=False,
+                 run_async=False):
 
         self._prefix = list()
         self._command = list()
@@ -312,7 +329,8 @@ class PrefixHandler(CommandHandler):
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
-            pass_chat_data=pass_chat_data)
+            pass_chat_data=pass_chat_data,
+            run_async=run_async)
 
         self.prefix = prefix
         self.command = command

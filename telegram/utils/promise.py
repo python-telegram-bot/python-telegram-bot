@@ -32,19 +32,28 @@ class Promise:
         pooled_function (:obj:`callable`): The callable that will be called concurrently.
         args (:obj:`list` | :obj:`tuple`): Positional arguments for :attr:`pooled_function`.
         kwargs (:obj:`dict`): Keyword arguments for :attr:`pooled_function`.
+        update (:class:`telegram.Update`, optional): The update this promise is associated with.
+        error_handling (:obj:`bool`, optional): Whether exceptions raised by :attr:`func`
+            may be handled by error handlers. Defaults to :obj:`True`.
 
     Attributes:
         pooled_function (:obj:`callable`): The callable that will be called concurrently.
         args (:obj:`list` | :obj:`tuple`): Positional arguments for :attr:`pooled_function`.
         kwargs (:obj:`dict`): Keyword arguments for :attr:`pooled_function`.
         done (:obj:`threading.Event`): Is set when the result is available.
+        update (:class:`telegram.Update`): Optional. The update this promise is associated with.
+        error_handling (:obj:`bool`): Optional. Whether exceptions raised by :attr:`func`
+            may be handled by error handlers. Defaults to :obj:`True`.
 
     """
 
-    def __init__(self, pooled_function, args, kwargs):
+    # TODO: Remove error_handling parameter once we drop the @run_async decorator
+    def __init__(self, pooled_function, args, kwargs, update=None, error_handling=True):
         self.pooled_function = pooled_function
         self.args = args
         self.kwargs = kwargs
+        self.update = update
+        self.error_handling = error_handling
         self.done = Event()
         self._result = None
         self._exception = None
@@ -56,7 +65,6 @@ class Promise:
             self._result = self.pooled_function(*self.args, **self.kwargs)
 
         except Exception as exc:
-            logger.exception('An uncaught error was raised while running the promise')
             self._exception = exc
 
         finally:

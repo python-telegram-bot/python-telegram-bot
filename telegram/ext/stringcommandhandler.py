@@ -28,6 +28,10 @@ class StringCommandHandler(Handler):
         This handler is not used to handle Telegram :attr:`telegram.Update`, but strings manually
         put in the queue. For example to send messages with the bot using command line or API.
 
+    Warning:
+        When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
+        attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
+
     Attributes:
         command (:obj:`str`): The command this handler should listen for.
         callback (:obj:`callable`): The callback function for this handler.
@@ -37,6 +41,7 @@ class StringCommandHandler(Handler):
             passed to the callback function.
         pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
             the callback function.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     Args:
         callback (:obj:`callable`): The callback function for this handler. Will be called when
@@ -62,6 +67,8 @@ class StringCommandHandler(Handler):
             class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
             which can be used to schedule new jobs. Default is :obj:`False`.
             DEPRECATED: Please switch to context based callbacks.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
+            Defaults to :obj:`False`.
 
     """
 
@@ -70,11 +77,13 @@ class StringCommandHandler(Handler):
                  callback,
                  pass_args=False,
                  pass_update_queue=False,
-                 pass_job_queue=False):
+                 pass_job_queue=False,
+                 run_async=False):
         super().__init__(
             callback,
             pass_update_queue=pass_update_queue,
-            pass_job_queue=pass_job_queue)
+            pass_job_queue=pass_job_queue,
+            run_async=run_async)
         self.command = command
         self.pass_args = pass_args
 

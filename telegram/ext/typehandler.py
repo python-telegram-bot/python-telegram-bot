@@ -32,6 +32,11 @@ class TypeHandler(Handler):
             passed to the callback function.
         pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
             the callback function.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
+
+    Warning:
+        When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
+        attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
         type (:obj:`type`): The ``type`` of updates this handler should process, as
@@ -56,6 +61,8 @@ class TypeHandler(Handler):
             :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
             which can be used to schedule new jobs. Default is :obj:`False`.
             DEPRECATED: Please switch to context based callbacks.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
+            Defaults to :obj:`False`.
 
     """
 
@@ -64,11 +71,13 @@ class TypeHandler(Handler):
                  callback,
                  strict=False,
                  pass_update_queue=False,
-                 pass_job_queue=False):
+                 pass_job_queue=False,
+                 run_async=False):
         super().__init__(
             callback,
             pass_update_queue=pass_update_queue,
-            pass_job_queue=pass_job_queue)
+            pass_job_queue=pass_job_queue,
+            run_async=run_async)
         self.type = type
         self.strict = strict
 

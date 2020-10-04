@@ -34,6 +34,7 @@ class Handler(ABC):
             the callback function.
         pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
             the callback function.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     Note:
         :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
@@ -43,6 +44,10 @@ class Handler(ABC):
 
         Note that this is DEPRECATED, and you should use context based callbacks. See
         https://git.io/fxJuV for more info.
+
+    Warning:
+        When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
+        attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
         callback (:obj:`callable`): The callback function for this handler. Will be called when
@@ -69,6 +74,8 @@ class Handler(ABC):
         pass_chat_data (:obj:`bool`, optional): If set to :obj:`True`, a keyword argument called
             ``chat_data`` will be passed to the callback function. Default is :obj:`False`.
             DEPRECATED: Please switch to context based callbacks.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
+            Defaults to :obj:`False`.
 
     """
 
@@ -77,12 +84,14 @@ class Handler(ABC):
                  pass_update_queue=False,
                  pass_job_queue=False,
                  pass_user_data=False,
-                 pass_chat_data=False):
+                 pass_chat_data=False,
+                 run_async=False):
         self.callback = callback
         self.pass_update_queue = pass_update_queue
         self.pass_job_queue = pass_job_queue
         self.pass_user_data = pass_user_data
         self.pass_chat_data = pass_chat_data
+        self.run_async = run_async
 
     @abstractmethod
     def check_update(self, update):
@@ -116,10 +125,17 @@ class Handler(ABC):
         """
         if context:
             self.collect_additional_context(context, update, dispatcher, check_result)
-            return self.callback(update, context)
+            if self.run_async:
+                return dispatcher.run_async(self.callback, update, context, update=update)
+            else:
+                return self.callback(update, context)
         else:
             optional_args = self.collect_optional_args(dispatcher, update, check_result)
-            return self.callback(dispatcher.bot, update, **optional_args)
+            if self.run_async:
+                return dispatcher.run_async(self.callback, dispatcher.bot, update, update=update,
+                                            **optional_args)
+            else:
+                return self.callback(dispatcher.bot, update, **optional_args)
 
     def collect_additional_context(self, context, update, dispatcher, check_result):
         """Prepares additional arguments for the context. Override if needed.

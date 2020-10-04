@@ -486,6 +486,30 @@ class TestConversationHandler:
         # Assert that the Promise has been resolved and the conversation ended.
         assert len(handler.conversations) == 0
 
+    def test_end_on_first_message_async_handler(self, dp, bot, user1):
+        handler = ConversationHandler(
+            entry_points=[CommandHandler('start', self.start_end, run_async=True)], states={},
+            fallbacks=[])
+        dp.add_handler(handler)
+
+        # User starts the state machine with an async function that immediately ends the
+        # conversation. Async results are resolved when the users state is queried next time.
+        message = Message(0, user1, None, self.group, text='/start',
+                          entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
+                                                  offset=0, length=len('/start'))],
+                          bot=bot)
+        dp.update_queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+        # Assert that the Promise has been accepted as the new state
+        assert len(handler.conversations) == 1
+
+        message.text = 'resolve promise pls'
+        message.entities[0].length = len('resolve promise pls')
+        dp.update_queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+        # Assert that the Promise has been resolved and the conversation ended.
+        assert len(handler.conversations) == 0
+
     def test_none_on_first_message(self, dp, bot, user1):
         handler = ConversationHandler(
             entry_points=[CommandHandler('start', self.start_none)], states={}, fallbacks=[])
@@ -501,6 +525,29 @@ class TestConversationHandler:
 
         handler = ConversationHandler(
             entry_points=[CommandHandler('start', start_none_async)], states={}, fallbacks=[])
+        dp.add_handler(handler)
+
+        # User starts the state machine with an async function that returns None
+        # Async results are resolved when the users state is queried next time.
+        message = Message(0, user1, None, self.group, text='/start',
+                          entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
+                                                  offset=0, length=len('/start'))],
+                          bot=bot)
+        dp.update_queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+        # Assert that the Promise has been accepted as the new state
+        assert len(handler.conversations) == 1
+
+        message.text = 'resolve promise pls'
+        dp.update_queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+        # Assert that the Promise has been resolved and the conversation ended.
+        assert len(handler.conversations) == 0
+
+    def test_none_on_first_message_async_handler(self, dp, bot, user1):
+        handler = ConversationHandler(
+            entry_points=[CommandHandler('start', self.start_none, run_async=True)], states={},
+            fallbacks=[])
         dp.add_handler(handler)
 
         # User starts the state machine with an async function that returns None

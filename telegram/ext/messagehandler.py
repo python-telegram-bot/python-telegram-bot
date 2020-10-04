@@ -48,6 +48,7 @@ class MessageHandler(Handler):
             Default is :obj:`None`.
         edited_updates (:obj:`bool`): Should "edited" message updates be handled?
             Default is :obj:`None`.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     Note:
         :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
@@ -57,6 +58,10 @@ class MessageHandler(Handler):
 
         Note that this is DEPRECATED, and you should use context based callbacks. See
         https://git.io/fxJuV for more info.
+
+    Warning:
+        When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
+        attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
         filters (:class:`telegram.ext.BaseFilter`, optional): A filter inheriting from
@@ -100,6 +105,8 @@ class MessageHandler(Handler):
         edited_updates (:obj:`bool`, optional): Should "edited" message updates be handled? Default
             is :obj:`None`.
             DEPRECATED: Please switch to filters for update filtering.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
+            Defaults to :obj:`False`.
 
     Raises:
         ValueError
@@ -115,14 +122,16 @@ class MessageHandler(Handler):
                  pass_chat_data=False,
                  message_updates=None,
                  channel_post_updates=None,
-                 edited_updates=None):
+                 edited_updates=None,
+                 run_async=False):
 
         super().__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
-            pass_chat_data=pass_chat_data)
+            pass_chat_data=pass_chat_data,
+            run_async=run_async)
         if message_updates is False and channel_post_updates is False and edited_updates is False:
             raise ValueError(
                 'message_updates, channel_post_updates and edited_updates are all False')
