@@ -17,10 +17,11 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pickle
+from collections import defaultdict
 
 import pytest
 
-from telegram import TelegramError
+from telegram import TelegramError, TelegramDecryptionError
 from telegram.error import Unauthorized, InvalidToken, NetworkError, BadRequest, TimedOut, \
     ChatMigrated, RetryAfter, Conflict
 
@@ -102,12 +103,34 @@ class TestErrors:
             (ChatMigrated(1234), ["message", "new_chat_id"]),
             (RetryAfter(12), ["message", "retry_after"]),
             (Conflict("test message"), ["message"]),
+            (TelegramDecryptionError("test message"), ["message"])
         ],
     )
     def test_errors_pickling(self, exception, attributes):
         pickled = pickle.dumps(exception)
         unpickled = pickle.loads(pickled)
         assert type(unpickled) is type(exception)
+        assert str(unpickled) == str(exception)
 
         for attribute in attributes:
             assert getattr(unpickled, attribute) == getattr(exception, attribute)
+
+    def test_pickling_test_coverage(self):
+        """
+        This test is only here to make sure that new errors will override __reduce__ properly.
+        Add the new error class to the below covered_subclasses dict, if it's covered in the above
+        test_errors_pickling test.
+        """
+        def make_assertion(cls):
+            assert cls.__subclasses__() == covered_subclasses[cls]
+            for subcls in cls.__subclasses__():
+                make_assertion(subcls)
+
+        covered_subclasses = defaultdict(list)
+        covered_subclasses.update({
+            TelegramError: [Unauthorized, InvalidToken, NetworkError, ChatMigrated, RetryAfter,
+                            Conflict, TelegramDecryptionError],
+            NetworkError: [BadRequest, TimedOut]
+        })
+
+        make_assertion(TelegramError)
