@@ -229,6 +229,19 @@ class TestDispatcher:
             assert caplog.records[-1].msg.startswith('DispatcherHandlerStop is not supported '
                                                      'with async functions')
 
+    def test_async_raises_exception(self, dp, caplog):
+        @run_async
+        def callback(update, context):
+            raise RuntimeError('async raising exception')
+
+        dp.add_handler(MessageHandler(Filters.all, callback))
+
+        with caplog.at_level(logging.WARNING):
+            dp.update_queue.put(self.message_update)
+            sleep(.1)
+            assert len(caplog.records) == 1
+            assert caplog.records[-1].msg.startswith('A promise with deactivated error handling')
+
     def test_add_async_handler(self, dp):
         dp.add_handler(MessageHandler(Filters.all,
                                       self.callback_if_not_update_queue,

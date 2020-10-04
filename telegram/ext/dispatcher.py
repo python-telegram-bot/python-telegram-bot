@@ -62,8 +62,8 @@ def run_async(func):
                       '`Dispatcher.add_handler` or `Dispatcher.run_async` instead.',
                       TelegramDeprecationWarning,
                       stacklevel=2)
-        return Dispatcher.get_instance().run_async(func, *args, update=None, error_handling=False,
-                                                   **kwargs)
+        return Dispatcher.get_instance()._run_async(func, *args, update=None, error_handling=False,
+                                                    **kwargs)
 
     return async_func
 
@@ -270,7 +270,7 @@ class Dispatcher:
             except Exception:
                 self.logger.exception('An uncaught error was raised while handling the error.')
 
-    def run_async(self, func, *args, update=None, error_handling=True, **kwargs):
+    def run_async(self, func, *args, update=None, **kwargs):
         """
         Queue a function (with given args/kwargs) to be run asynchronously. Exceptions raised
         by the function will be handled by the error handlers registered with
@@ -279,8 +279,8 @@ class Dispatcher:
         Warning:
             * If you're using ``@run_async``/:meth:`run_async` you cannot rely on adding custom
               attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
-            * :meth:`run_async` must not be used within an error handler, as an exception within
-              :attr:`func` would cause an infinite loop otherwise.
+            * Calling a function through :meth:`run_async` from within an error handler can lead to
+              an infinite error handling loop.
 
         Args:
             func (:obj:`callable`): The function to run in the thread.
@@ -294,6 +294,9 @@ class Dispatcher:
             Promise
 
         """
+        return self._run_async(func, *args, update=update, error_handling=True, **kwargs)
+
+    def _run_async(self, func, *args, update=None, error_handling=True, **kwargs):
         # TODO: Remove error_handling parameter once we drop the @run_async decorator
         promise = Promise(func, args, kwargs, update=update, error_handling=error_handling)
         self.__async_queue.put(promise)
@@ -573,7 +576,7 @@ class Dispatcher:
             See https://git.io/fxJuV for more info about switching to context based API.
         """
         if callback in self.error_handlers:
-            self.logger.debug('The callback is already registered as error handler. Ignoring.')
+            self.logger.debug('The callback is already registered as an error handler. Ignoring.')
             return
         self.error_handlers[callback] = run_async
 
