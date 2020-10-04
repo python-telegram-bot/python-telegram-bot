@@ -23,7 +23,6 @@ import certifi
 
 from typing import Optional
 
-
 from . import __version__ as telegram_ver
 
 

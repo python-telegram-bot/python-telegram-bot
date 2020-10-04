@@ -30,7 +30,7 @@ from typing import Tuple, Any, Optional, Type, TypeVar, TYPE_CHECKING, List
 if TYPE_CHECKING:
     from telegram import Bot
 
-TO = TypeVar('TO', bound='TelegramObject')
+TO = TypeVar('TO', bound='TelegramObject', covariant=True)
 
 
 class TelegramObject:
