@@ -33,6 +33,12 @@ from telegram.ext import BasePersistence
 class DictPersistence(BasePersistence):
     """Using python's dicts and json for making your bot persistent.
 
+    Note:
+        This class does *not* implement a :meth:`flush` method, meaning that data managed by
+        ``DictPersistence`` is in-memory only and will be lost when the bot shuts down. This is,
+        because ``DictPersistence`` is mainly intended as starting point for custom persistence
+        classes that need to JSON-serialize the stored data before writing them to file/database.
+
     Attributes:
         store_user_data (:obj:`bool`): Whether user_data should be saved by this
             persistence class.
