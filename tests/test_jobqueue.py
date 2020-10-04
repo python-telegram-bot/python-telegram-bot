@@ -320,6 +320,10 @@ class TestJobQueue:
 
         expected_reschedule_time += (dtm.timedelta(calendar.monthrange(now.year, now.month)[1])
                                      - dtm.timedelta(days=now.day))
+        # Adjust the hour for the special case that between now & end of month a DST switch happens
+        expected_reschedule_time = timezone.normalize(expected_reschedule_time)
+        expected_reschedule_time += dtm.timedelta(
+            hours=time_of_day.hour - expected_reschedule_time.hour)
         expected_reschedule_time = expected_reschedule_time.timestamp()
 
         job_queue.run_monthly(self.job_run_once, time_of_day, 31, day_is_strict=False)
