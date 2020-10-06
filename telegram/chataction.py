@@ -23,23 +23,23 @@
 class ChatAction:
     """Helper class to provide constants for different chat actions."""
 
-    FIND_LOCATION = 'find_location'
+    FIND_LOCATION: str = 'find_location'
     """:obj:`str`: 'find_location'"""
-    RECORD_AUDIO = 'record_audio'
+    RECORD_AUDIO: str = 'record_audio'
     """:obj:`str`: 'record_audio'"""
-    RECORD_VIDEO = 'record_video'
+    RECORD_VIDEO: str = 'record_video'
     """:obj:`str`: 'record_video'"""
-    RECORD_VIDEO_NOTE = 'record_video_note'
+    RECORD_VIDEO_NOTE: str = 'record_video_note'
     """:obj:`str`: 'record_video_note'"""
-    TYPING = 'typing'
+    TYPING: str = 'typing'
     """:obj:`str`: 'typing'"""
-    UPLOAD_AUDIO = 'upload_audio'
+    UPLOAD_AUDIO: str = 'upload_audio'
     """:obj:`str`: 'upload_audio'"""
-    UPLOAD_DOCUMENT = 'upload_document'
+    UPLOAD_DOCUMENT: str = 'upload_document'
     """:obj:`str`: 'upload_document'"""
-    UPLOAD_PHOTO = 'upload_photo'
+    UPLOAD_PHOTO: str = 'upload_photo'
     """:obj:`str`: 'upload_photo'"""
-    UPLOAD_VIDEO = 'upload_video'
+    UPLOAD_VIDEO: str = 'upload_video'
     """:obj:`str`: 'upload_video'"""
-    UPLOAD_VIDEO_NOTE = 'upload_video_note'
+    UPLOAD_VIDEO_NOTE: str = 'upload_video_note'
     """:obj:`str`: 'upload_video_note'"""

@@ -23,8 +23,15 @@ import warnings
 from telegram.utils.deprecate import TelegramDeprecationWarning
 
 from telegram import Update
-from telegram.ext import Filters
+from telegram.ext import Filters, BaseFilter
 from .handler import Handler
+
+from telegram.utils.types import HandlerArg
+from typing import Callable, TYPE_CHECKING, Any, Optional, Union, TypeVar, Dict
+if TYPE_CHECKING:
+    from telegram.ext import CallbackContext, Dispatcher
+
+RT = TypeVar('RT')
 
 
 class MessageHandler(Handler):
@@ -114,16 +121,16 @@ class MessageHandler(Handler):
     """
 
     def __init__(self,
-                 filters,
-                 callback,
-                 pass_update_queue=False,
-                 pass_job_queue=False,
-                 pass_user_data=False,
-                 pass_chat_data=False,
-                 message_updates=None,
-                 channel_post_updates=None,
-                 edited_updates=None,
-                 run_async=False):
+                 filters: BaseFilter,
+                 callback: Callable[[HandlerArg, 'CallbackContext'], RT],
+                 pass_update_queue: bool = False,
+                 pass_job_queue: bool = False,
+                 pass_user_data: bool = False,
+                 pass_chat_data: bool = False,
+                 message_updates: bool = None,
+                 channel_post_updates: bool = None,
+                 edited_updates: bool = None,
+                 run_async: bool = False):
 
         super().__init__(
             callback,
@@ -162,7 +169,7 @@ class MessageHandler(Handler):
                 self.filters &= ~(Filters.update.edited_message
                                   | Filters.update.edited_channel_post)
 
-    def check_update(self, update):
+    def check_update(self, update: HandlerArg) -> Optional[Union[bool, Dict[str, Any]]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
@@ -174,7 +181,12 @@ class MessageHandler(Handler):
         """
         if isinstance(update, Update) and update.effective_message:
             return self.filters(update)
+        return None
 
-    def collect_additional_context(self, context, update, dispatcher, check_result):
+    def collect_additional_context(self,
+                                   context: 'CallbackContext',
+                                   update: HandlerArg,
+                                   dispatcher: 'Dispatcher',
+                                   check_result: Optional[Union[bool, Dict[str, Any]]]) -> None:
         if isinstance(check_result, dict):
             context.update(check_result)

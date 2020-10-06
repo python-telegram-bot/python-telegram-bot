@@ -20,6 +20,11 @@
 
 from telegram import EncryptedCredentials, EncryptedPassportElement, TelegramObject
 
+from telegram.utils.types import JSONDict
+from typing import Any, Optional, List, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import Bot, Credentials
+
 
 class PassportData(TelegramObject):
     """Contains information about Telegram Passport data shared with the bot by the user.
@@ -33,7 +38,7 @@ class PassportData(TelegramObject):
     Args:
         data (List[:class:`telegram.EncryptedPassportElement`]): Array with encrypted information
             about documents and other Telegram Passport elements that was shared with the bot.
-        credentials (:obj:`str`): Encrypted credentials.
+        credentials (:class:`telegram.EncryptedCredentials`)): Encrypted credentials.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -45,27 +50,31 @@ class PassportData(TelegramObject):
 
     """
 
-    def __init__(self, data, credentials, bot=None, **kwargs):
+    def __init__(self,
+                 data: List[EncryptedPassportElement],
+                 credentials: EncryptedCredentials,
+                 bot: 'Bot' = None,
+                 **kwargs: Any):
         self.data = data
         self.credentials = credentials
 
         self.bot = bot
-        self._decrypted_data = None
+        self._decrypted_data: Optional[List[EncryptedPassportElement]] = None
         self._id_attrs = tuple([x.type for x in data] + [credentials.hash])
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['PassportData']:
+        data = cls.parse_data(data)
+
         if not data:
             return None
-
-        data = super().de_json(data, bot)
 
         data['data'] = EncryptedPassportElement.de_list(data.get('data'), bot)
         data['credentials'] = EncryptedCredentials.de_json(data.get('credentials'), bot)
 
         return cls(bot=bot, **data)
 
-    def to_dict(self):
+    def to_dict(self) -> JSONDict:
         data = super().to_dict()
 
         data['data'] = [e.to_dict() for e in self.data]
@@ -73,7 +82,7 @@ class PassportData(TelegramObject):
         return data
 
     @property
-    def decrypted_data(self):
+    def decrypted_data(self) -> List[EncryptedPassportElement]:
         """
         List[:class:`telegram.EncryptedPassportElement`]: Lazily decrypt and return information
             about documents and other Telegram Passport elements which were shared with the bot.
@@ -92,7 +101,7 @@ class PassportData(TelegramObject):
         return self._decrypted_data
 
     @property
-    def decrypted_credentials(self):
+    def decrypted_credentials(self) -> 'Credentials':
         """
         :class:`telegram.Credentials`: Lazily decrypt and return credentials that were used
             to decrypt the data. This object also contains the user specified payload as

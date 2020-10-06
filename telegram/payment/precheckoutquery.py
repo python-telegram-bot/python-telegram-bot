@@ -19,6 +19,10 @@
 """This module contains an object that represents a Telegram PreCheckoutQuery."""
 
 from telegram import TelegramObject, User, OrderInfo
+from telegram.utils.types import JSONDict
+from typing import Any, Optional, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class PreCheckoutQuery(TelegramObject):
@@ -61,15 +65,15 @@ class PreCheckoutQuery(TelegramObject):
     """
 
     def __init__(self,
-                 id,
-                 from_user,
-                 currency,
-                 total_amount,
-                 invoice_payload,
-                 shipping_option_id=None,
-                 order_info=None,
-                 bot=None,
-                 **kwargs):
+                 id: str,
+                 from_user: User,
+                 currency: str,
+                 total_amount: int,
+                 invoice_payload: str,
+                 shipping_option_id: str = None,
+                 order_info: OrderInfo = None,
+                 bot: 'Bot' = None,
+                 **kwargs: Any):
         self.id = id
         self.from_user = from_user
         self.currency = currency
@@ -83,18 +87,18 @@ class PreCheckoutQuery(TelegramObject):
         self._id_attrs = (self.id,)
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['PreCheckoutQuery']:
+        data = cls.parse_data(data)
+
         if not data:
             return None
-
-        data = super().de_json(data, bot)
 
         data['from_user'] = User.de_json(data.pop('from'), bot)
         data['order_info'] = OrderInfo.de_json(data.get('order_info'), bot)
 
         return cls(bot=bot, **data)
 
-    def answer(self, *args, **kwargs):
+    def answer(self, *args: Any, **kwargs: Any) -> bool:
         """Shortcut for::
 
             bot.answer_pre_checkout_query(update.pre_checkout_query.id, *args, **kwargs)

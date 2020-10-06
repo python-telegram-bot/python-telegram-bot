@@ -20,6 +20,10 @@
 """This module contains an object that represents a Telegram ChosenInlineResult."""
 
 from telegram import TelegramObject, User, Location
+from telegram.utils.types import JSONDict
+from typing import Any, Optional, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class ChosenInlineResult(TelegramObject):
@@ -58,12 +62,12 @@ class ChosenInlineResult(TelegramObject):
     """
 
     def __init__(self,
-                 result_id,
-                 from_user,
-                 query,
-                 location=None,
-                 inline_message_id=None,
-                 **kwargs):
+                 result_id: str,
+                 from_user: User,
+                 query: str,
+                 location: Location = None,
+                 inline_message_id: str = None,
+                 **kwargs: Any):
         # Required
         self.result_id = result_id
         self.from_user = from_user
@@ -75,11 +79,12 @@ class ChosenInlineResult(TelegramObject):
         self._id_attrs = (self.result_id,)
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['ChosenInlineResult']:
+        data = cls.parse_data(data)
+
         if not data:
             return None
 
-        data = super().de_json(data, bot)
         # Required
         data['from_user'] = User.de_json(data.pop('from'), bot)
         # Optionals

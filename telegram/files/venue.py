@@ -19,6 +19,10 @@
 """This module contains an object that represents a Telegram Venue."""
 
 from telegram import TelegramObject, Location
+from telegram.utils.types import JSONDict
+from typing import Any, Optional, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class Venue(TelegramObject):
@@ -46,8 +50,13 @@ class Venue(TelegramObject):
 
     """
 
-    def __init__(self, location, title, address, foursquare_id=None, foursquare_type=None,
-                 **kwargs):
+    def __init__(self,
+                 location: Location,
+                 title: str,
+                 address: str,
+                 foursquare_id: str = None,
+                 foursquare_type: str = None,
+                 **kwargs: Any):
         # Required
         self.location = location
         self.title = title
@@ -59,8 +68,8 @@ class Venue(TelegramObject):
         self._id_attrs = (self.location, self.title)
 
     @classmethod
-    def de_json(cls, data, bot):
-        data = super().de_json(data, bot)
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Venue']:
+        data = cls.parse_data(data)
 
         if not data:
             return None

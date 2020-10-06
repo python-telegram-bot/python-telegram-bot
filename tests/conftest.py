@@ -55,6 +55,8 @@ def bot(bot_info):
 
 
 DEFAULT_BOTS = {}
+
+
 @pytest.fixture(scope='function')
 def default_bot(request, bot_info):
     param = request.param if hasattr(request, 'param') else {}
@@ -269,7 +271,7 @@ def mock_filter(request):
 
 
 def get_false_update_fixture_decorator_params():
-    message = Message(1, User(1, '', False), DATE, Chat(1, ''), text='test')
+    message = Message(1, DATE, Chat(1, ''), from_user=User(1, '', False), text='test')
     params = [
         {'callback_query': CallbackQuery(1, User(1, '', False), 'chat', message=message)},
         {'channel_post': message},

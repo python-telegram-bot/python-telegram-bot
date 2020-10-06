@@ -19,6 +19,8 @@
 """This module facilitates the deprecation of functions."""
 
 import warnings
+from typing import Callable, TypeVar, Any
+RT = TypeVar('RT')
 
 
 # We use our own DeprecationWarning since they are muted by default and "UserWarning" makes it
@@ -28,17 +30,17 @@ class TelegramDeprecationWarning(Warning):
     pass
 
 
-def warn_deprecate_obj(old, new, stacklevel=3):
+def warn_deprecate_obj(old: str, new: str, stacklevel: int = 3) -> None:
     warnings.warn(
         '{} is being deprecated, please use {} from now on.'.format(old, new),
         category=TelegramDeprecationWarning,
         stacklevel=stacklevel)
 
 
-def deprecate(func, old, new):
+def deprecate(func: Callable[..., RT], old: str, new: str) -> Callable[..., RT]:
     """Warn users invoking old to switch to the new function."""
 
-    def f(*args, **kwargs):
+    def f(*args: Any, **kwargs: Any) -> RT:
         warn_deprecate_obj(old, new)
         return func(*args, **kwargs)
 

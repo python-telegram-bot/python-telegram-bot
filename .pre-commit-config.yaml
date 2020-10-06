@@ -7,7 +7,7 @@ repos:
         args:
         - --diff
 -   repo: https://gitlab.com/pycqa/flake8
-    rev: 3.7.1
+    rev: 3.8.1
     hooks:
     -   id: flake8
 -   repo: git://github.com/pre-commit/mirrors-pylint
@@ -18,3 +18,8 @@ repos:
         args:
         - --errors-only
         - --disable=import-error
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: 'v0.770'
+    hooks:
+    -   id: mypy
+        files: ^telegram/.*\.py$

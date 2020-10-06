@@ -20,6 +20,8 @@
 from telegram import Update
 from .handler import Handler
 
+from telegram.utils.types import HandlerArg
+
 
 class PollHandler(Handler):
     """Handler class to handle Telegram updates that contain a poll.
@@ -79,7 +81,7 @@ class PollHandler(Handler):
 
     """
 
-    def check_update(self, update):
+    def check_update(self, update: HandlerArg) -> bool:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
@@ -89,4 +91,4 @@ class PollHandler(Handler):
             :obj:`bool`
 
         """
-        return isinstance(update, Update) and update.poll
+        return isinstance(update, Update) and bool(update.poll)

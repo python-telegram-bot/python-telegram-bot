@@ -19,6 +19,7 @@
 """This module contains the classes that represent Telegram InputLocationMessageContent."""
 
 from telegram import InputMessageContent
+from typing import Any
 
 
 class InputLocationMessageContent(InputMessageContent):
@@ -43,7 +44,7 @@ class InputLocationMessageContent(InputMessageContent):
 
     """
 
-    def __init__(self, latitude, longitude, live_period=None, **kwargs):
+    def __init__(self, latitude: float, longitude: float, live_period: int = None, **kwargs: Any):
         # Required
         self.latitude = latitude
         self.longitude = longitude

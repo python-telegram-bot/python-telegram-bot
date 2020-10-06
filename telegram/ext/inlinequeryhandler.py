@@ -23,6 +23,15 @@ from telegram import Update
 
 from .handler import Handler
 
+from telegram.utils.types import HandlerArg
+from typing import Callable, TYPE_CHECKING, Any, Optional, Union, TypeVar, Dict, Pattern, Match, \
+    cast
+
+if TYPE_CHECKING:
+    from telegram.ext import CallbackContext, Dispatcher
+
+RT = TypeVar('RT')
+
 
 class InlineQueryHandler(Handler):
     """
@@ -102,22 +111,22 @@ class InlineQueryHandler(Handler):
     """
 
     def __init__(self,
-                 callback,
-                 pass_update_queue=False,
-                 pass_job_queue=False,
-                 pattern=None,
-                 pass_groups=False,
-                 pass_groupdict=False,
-                 pass_user_data=False,
-                 pass_chat_data=False,
-                 run_async=False):
+                 callback: Callable[[HandlerArg, 'CallbackContext'], RT],
+                 pass_update_queue: bool = False,
+                 pass_job_queue: bool = False,
+                 pattern: Union[str, Pattern] = None,
+                 pass_groups: bool = False,
+                 pass_groupdict: bool = False,
+                 pass_user_data: bool = False,
+                 pass_chat_data: bool = False,
+                 run_async: bool = False):
         super().__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
             pass_chat_data=pass_chat_data,
-            run_async=False)
+            run_async=run_async)
 
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
@@ -126,7 +135,7 @@ class InlineQueryHandler(Handler):
         self.pass_groups = pass_groups
         self.pass_groupdict = pass_groupdict
 
-    def check_update(self, update):
+    def check_update(self, update: HandlerArg) -> Optional[Union[bool, Match]]:
         """
         Determines whether an update should be passed to this handlers :attr:`callback`.
 
@@ -146,16 +155,26 @@ class InlineQueryHandler(Handler):
                         return match
             else:
                 return True
+        return None
 
-    def collect_optional_args(self, dispatcher, update=None, check_result=None):
+    def collect_optional_args(self,
+                              dispatcher: 'Dispatcher',
+                              update: HandlerArg = None,
+                              check_result: Optional[Union[bool, Match]] = None) -> Dict[str, Any]:
         optional_args = super().collect_optional_args(dispatcher, update, check_result)
         if self.pattern:
+            check_result = cast(Match, check_result)
             if self.pass_groups:
                 optional_args['groups'] = check_result.groups()
             if self.pass_groupdict:
                 optional_args['groupdict'] = check_result.groupdict()
         return optional_args
 
-    def collect_additional_context(self, context, update, dispatcher, check_result):
+    def collect_additional_context(self,
+                                   context: 'CallbackContext',
+                                   update: HandlerArg,
+                                   dispatcher: 'Dispatcher',
+                                   check_result: Optional[Union[bool, Match]]) -> None:
         if self.pattern:
+            check_result = cast(Match, check_result)
             context.matches = [check_result]

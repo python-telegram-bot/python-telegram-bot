@@ -23,6 +23,9 @@ from copy import deepcopy
 
 from telegram.ext import BasePersistence
 
+from typing import DefaultDict, Dict, Any, Tuple, Optional
+from telegram.utils.types import ConversationDict
+
 
 class PicklePersistence(BasePersistence):
     """Using python's builtin pickle for making you bot persistent.
@@ -71,24 +74,25 @@ class PicklePersistence(BasePersistence):
             Default is :obj:`False`.
     """
 
-    def __init__(self, filename,
-                 store_user_data=True,
-                 store_chat_data=True,
-                 store_bot_data=True,
-                 single_file=True,
-                 on_flush=False):
+    def __init__(self,
+                 filename: str,
+                 store_user_data: bool = True,
+                 store_chat_data: bool = True,
+                 store_bot_data: bool = True,
+                 single_file: bool = True,
+                 on_flush: bool = False):
         super().__init__(store_user_data=store_user_data,
                          store_chat_data=store_chat_data,
                          store_bot_data=store_bot_data)
         self.filename = filename
         self.single_file = single_file
         self.on_flush = on_flush
-        self.user_data = None
-        self.chat_data = None
-        self.bot_data = None
-        self.conversations = None
+        self.user_data: Optional[DefaultDict[int, Dict]] = None
+        self.chat_data: Optional[DefaultDict[int, Dict]] = None
+        self.bot_data: Optional[Dict] = None
+        self.conversations: Optional[Dict[str, Dict[Tuple, Any]]] = None
 
-    def load_singlefile(self):
+    def load_singlefile(self) -> None:
         try:
             filename = self.filename
             with open(self.filename, "rb") as f:
@@ -99,7 +103,7 @@ class PicklePersistence(BasePersistence):
                 self.bot_data = data.get('bot_data', {})
                 self.conversations = data['conversations']
         except IOError:
-            self.conversations = {}
+            self.conversations = dict()
             self.user_data = defaultdict(dict)
             self.chat_data = defaultdict(dict)
             self.bot_data = {}
@@ -108,7 +112,7 @@ class PicklePersistence(BasePersistence):
         except Exception:
             raise TypeError("Something went wrong unpickling {}".format(filename))
 
-    def load_file(self, filename):
+    def load_file(self, filename: str) -> Any:
         try:
             with open(filename, "rb") as f:
                 return pickle.load(f)
@@ -119,17 +123,17 @@ class PicklePersistence(BasePersistence):
         except Exception:
             raise TypeError("Something went wrong unpickling {}".format(filename))
 
-    def dump_singlefile(self):
+    def dump_singlefile(self) -> None:
         with open(self.filename, "wb") as f:
             data = {'conversations': self.conversations, 'user_data': self.user_data,
                     'chat_data': self.chat_data, 'bot_data': self.bot_data}
             pickle.dump(data, f)
 
-    def dump_file(self, filename, data):
+    def dump_file(self, filename: str, data: Any) -> None:
         with open(filename, "wb") as f:
             pickle.dump(data, f)
 
-    def get_user_data(self):
+    def get_user_data(self) -> DefaultDict[int, Dict[Any, Any]]:
         """Returns the user_data from the pickle file if it exists or an empty :obj:`defaultdict`.
 
         Returns:
@@ -147,9 +151,9 @@ class PicklePersistence(BasePersistence):
             self.user_data = data
         else:
             self.load_singlefile()
-        return deepcopy(self.user_data)
+        return deepcopy(self.user_data)  # type: ignore[arg-type]
 
-    def get_chat_data(self):
+    def get_chat_data(self) -> DefaultDict[int, Dict[Any, Any]]:
         """Returns the chat_data from the pickle file if it exists or an empty :obj:`defaultdict`.
 
         Returns:
@@ -167,9 +171,9 @@ class PicklePersistence(BasePersistence):
             self.chat_data = data
         else:
             self.load_singlefile()
-        return deepcopy(self.chat_data)
+        return deepcopy(self.chat_data)  # type: ignore[arg-type]
 
-    def get_bot_data(self):
+    def get_bot_data(self) -> Dict[Any, Any]:
         """Returns the bot_data from the pickle file if it exists or an empty :obj:`dict`.
 
         Returns:
@@ -185,10 +189,10 @@ class PicklePersistence(BasePersistence):
             self.bot_data = data
         else:
             self.load_singlefile()
-        return deepcopy(self.bot_data)
+        return deepcopy(self.bot_data)  # type: ignore[arg-type]
 
-    def get_conversations(self, name):
-        """Returns the conversations from the pickle file if it exists or an empty :obj:`dict`.
+    def get_conversations(self, name: str) -> ConversationDict:
+        """Returns the conversations from the pickle file if it exsists or an empty dict.
 
         Args:
             name (:obj:`str`): The handlers name.
@@ -206,9 +210,11 @@ class PicklePersistence(BasePersistence):
             self.conversations = data
         else:
             self.load_singlefile()
-        return self.conversations.get(name, {}).copy()
+        return self.conversations.get(name, {}).copy()  # type: ignore[union-attr]
 
-    def update_conversation(self, name, key, new_state):
+    def update_conversation(self,
+                            name: str, key: Tuple[int, ...],
+                            new_state: Optional[object]) -> None:
         """Will update the conversations for the given handler and depending on :attr:`on_flush`
         save the pickle file.
 
@@ -217,6 +223,8 @@ class PicklePersistence(BasePersistence):
             key (:obj:`tuple`): The key the state is changed for.
             new_state (:obj:`tuple` | :obj:`any`): The new state for the given key.
         """
+        if not self.conversations:
+            self.conversations = dict()
         if self.conversations.setdefault(name, {}).get(key) == new_state:
             return
         self.conversations[name][key] = new_state
@@ -227,7 +235,7 @@ class PicklePersistence(BasePersistence):
             else:
                 self.dump_singlefile()
 
-    def update_user_data(self, user_id, data):
+    def update_user_data(self, user_id: int, data: Dict) -> None:
         """Will update the user_data and depending on :attr:`on_flush` save the pickle file.
 
         Args:
@@ -246,7 +254,7 @@ class PicklePersistence(BasePersistence):
             else:
                 self.dump_singlefile()
 
-    def update_chat_data(self, chat_id, data):
+    def update_chat_data(self, chat_id: int, data: Dict) -> None:
         """Will update the chat_data and depending on :attr:`on_flush` save the pickle file.
 
         Args:
@@ -265,7 +273,7 @@ class PicklePersistence(BasePersistence):
             else:
                 self.dump_singlefile()
 
-    def update_bot_data(self, data):
+    def update_bot_data(self, data: Dict) -> None:
         """Will update the bot_data and depending on :attr:`on_flush` save the pickle file.
 
         Args:
@@ -281,7 +289,7 @@ class PicklePersistence(BasePersistence):
             else:
                 self.dump_singlefile()
 
-    def flush(self):
+    def flush(self) -> None:
         """ Will save all data in memory to pickle file(s).
         """
         if self.single_file:

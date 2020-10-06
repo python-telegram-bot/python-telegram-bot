@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class Defaults, which allows to pass default values to Updater."""
 import pytz
+from typing import Union, Optional, Any, NoReturn
 
-from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
 
 
 class Defaults:
@@ -60,14 +61,14 @@ class Defaults:
             ``pytz`` module. Defaults to UTC.
     """
     def __init__(self,
-                 parse_mode=None,
-                 disable_notification=None,
-                 disable_web_page_preview=None,
+                 parse_mode: str = None,
+                 disable_notification: bool = None,
+                 disable_web_page_preview: bool = None,
                  # Timeout needs special treatment, since the bot methods have two different
                  # default values for timeout (None and 20s)
-                 timeout=DEFAULT_NONE,
-                 quote=None,
-                 tzinfo=pytz.utc):
+                 timeout: Union[float, DefaultValue] = DEFAULT_NONE,
+                 quote: bool = None,
+                 tzinfo: pytz.BaseTzInfo = pytz.utc):
         self._parse_mode = parse_mode
         self._disable_notification = disable_notification
         self._disable_web_page_preview = disable_web_page_preview
@@ -76,60 +77,60 @@ class Defaults:
         self._tzinfo = tzinfo
 
     @property
-    def parse_mode(self):
+    def parse_mode(self) -> Optional[str]:
         return self._parse_mode
 
     @parse_mode.setter
-    def parse_mode(self, value):
+    def parse_mode(self, value: Any) -> NoReturn:
         raise AttributeError("You can not assign a new value to defaults after because it would "
                              "not have any effect.")
 
     @property
-    def disable_notification(self):
+    def disable_notification(self) -> Optional[bool]:
         return self._disable_notification
 
     @disable_notification.setter
-    def disable_notification(self, value):
+    def disable_notification(self, value: Any) -> NoReturn:
         raise AttributeError("You can not assign a new value to defaults after because it would "
                              "not have any effect.")
 
     @property
-    def disable_web_page_preview(self):
+    def disable_web_page_preview(self) -> Optional[bool]:
         return self._disable_web_page_preview
 
     @disable_web_page_preview.setter
-    def disable_web_page_preview(self, value):
+    def disable_web_page_preview(self, value: Any) -> NoReturn:
         raise AttributeError("You can not assign a new value to defaults after because it would "
                              "not have any effect.")
 
     @property
-    def timeout(self):
+    def timeout(self) -> Union[float, DefaultValue]:
         return self._timeout
 
     @timeout.setter
-    def timeout(self, value):
+    def timeout(self, value: Any) -> NoReturn:
         raise AttributeError("You can not assign a new value to defaults after because it would "
                              "not have any effect.")
 
     @property
-    def quote(self):
+    def quote(self) -> Optional[bool]:
         return self._quote
 
     @quote.setter
-    def quote(self, value):
+    def quote(self, value: Any) -> NoReturn:
         raise AttributeError("You can not assign a new value to defaults after because it would "
                              "not have any effect.")
 
     @property
-    def tzinfo(self):
+    def tzinfo(self) -> pytz.BaseTzInfo:
         return self._tzinfo
 
     @tzinfo.setter
-    def tzinfo(self, value):
+    def tzinfo(self, value: Any) -> NoReturn:
         raise AttributeError("You can not assign a new value to defaults after because it would "
                              "not have any effect.")
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self._parse_mode,
                      self._disable_notification,
                      self._disable_web_page_preview,
@@ -137,10 +138,10 @@ class Defaults:
                      self._quote,
                      self._tzinfo))
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, Defaults):
             return self.__dict__ == other.__dict__
         return False
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return not self == other

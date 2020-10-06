@@ -17,9 +17,15 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatMember."""
+import datetime
 
 from telegram import User, TelegramObject
 from telegram.utils.helpers import to_timestamp, from_timestamp
+
+from telegram.utils.types import JSONDict
+from typing import Any, Optional, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class ChatMember(TelegramObject):
@@ -104,26 +110,40 @@ class ChatMember(TelegramObject):
             may add web page previews to his messages.
 
     """
-    ADMINISTRATOR = 'administrator'
+    ADMINISTRATOR: str = 'administrator'
     """:obj:`str`: 'administrator'"""
-    CREATOR = 'creator'
+    CREATOR: str = 'creator'
     """:obj:`str`: 'creator'"""
-    KICKED = 'kicked'
+    KICKED: str = 'kicked'
     """:obj:`str`: 'kicked'"""
-    LEFT = 'left'
+    LEFT: str = 'left'
     """:obj:`str`: 'left'"""
-    MEMBER = 'member'
+    MEMBER: str = 'member'
     """:obj:`str`: 'member'"""
-    RESTRICTED = 'restricted'
+    RESTRICTED: str = 'restricted'
     """:obj:`str`: 'restricted'"""
 
-    def __init__(self, user, status, until_date=None, can_be_edited=None,
-                 can_change_info=None, can_post_messages=None, can_edit_messages=None,
-                 can_delete_messages=None, can_invite_users=None,
-                 can_restrict_members=None, can_pin_messages=None,
-                 can_promote_members=None, can_send_messages=None,
-                 can_send_media_messages=None, can_send_polls=None, can_send_other_messages=None,
-                 can_add_web_page_previews=None, is_member=None, custom_title=None, **kwargs):
+    def __init__(self,
+                 user: User,
+                 status: str,
+                 until_date: datetime.datetime = None,
+                 can_be_edited: bool = None,
+                 can_change_info: bool = None,
+                 can_post_messages: bool = None,
+                 can_edit_messages: bool = None,
+                 can_delete_messages: bool = None,
+                 can_invite_users: bool = None,
+                 can_restrict_members: bool = None,
+                 can_pin_messages: bool = None,
+                 can_promote_members: bool = None,
+                 can_send_messages: bool = None,
+                 can_send_media_messages: bool = None,
+                 can_send_polls: bool = None,
+                 can_send_other_messages: bool = None,
+                 can_add_web_page_previews: bool = None,
+                 is_member: bool = None,
+                 custom_title: str = None,
+                 **kwargs: Any):
         # Required
         self.user = user
         self.status = status
@@ -148,18 +168,18 @@ class ChatMember(TelegramObject):
         self._id_attrs = (self.user, self.status)
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['ChatMember']:
+        data = cls.parse_data(data)
+
         if not data:
             return None
-
-        data = super().de_json(data, bot)
 
         data['user'] = User.de_json(data.get('user'), bot)
         data['until_date'] = from_timestamp(data.get('until_date', None))
 
         return cls(**data)
 
-    def to_dict(self):
+    def to_dict(self) -> JSONDict:
         data = super().to_dict()
 
         data['until_date'] = to_timestamp(self.until_date)

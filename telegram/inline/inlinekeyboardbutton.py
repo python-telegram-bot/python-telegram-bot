@@ -19,6 +19,9 @@
 """This module contains an object that represents a Telegram InlineKeyboardButton."""
 
 from telegram import TelegramObject
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import CallbackGame, LoginUrl
 
 
 class InlineKeyboardButton(TelegramObject):
@@ -79,15 +82,15 @@ class InlineKeyboardButton(TelegramObject):
     """
 
     def __init__(self,
-                 text,
-                 url=None,
-                 callback_data=None,
-                 switch_inline_query=None,
-                 switch_inline_query_current_chat=None,
-                 callback_game=None,
-                 pay=None,
-                 login_url=None,
-                 **kwargs):
+                 text: str,
+                 url: str = None,
+                 callback_data: str = None,
+                 switch_inline_query: str = None,
+                 switch_inline_query_current_chat: str = None,
+                 callback_game: 'CallbackGame' = None,
+                 pay: bool = None,
+                 login_url: 'LoginUrl' = None,
+                 **kwargs: Any):
         # Required
         self.text = text
 
@@ -110,10 +113,3 @@ class InlineKeyboardButton(TelegramObject):
             self.callback_game,
             self.pay,
         )
-
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(**data)

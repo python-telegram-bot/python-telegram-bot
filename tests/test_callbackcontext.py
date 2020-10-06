@@ -41,7 +41,8 @@ class TestCallbackContext:
         assert callback_context.update_queue is cdp.update_queue
 
     def test_from_update(self, cdp):
-        update = Update(0, message=Message(0, User(1, 'user', False), None, Chat(1, 'chat')))
+        update = Update(0, message=Message(0, None, Chat(1, 'chat'),
+                                           from_user=User(1, 'user', False)))
 
         callback_context = CallbackContext.from_update(update, cdp)
 
@@ -62,8 +63,8 @@ class TestCallbackContext:
         assert callback_context_same_user_chat.chat_data is callback_context.chat_data
         assert callback_context_same_user_chat.user_data is callback_context.user_data
 
-        update_other_user_chat = Update(0, message=Message(0, User(2, 'user', False),
-                                                           None, Chat(2, 'chat')))
+        update_other_user_chat = Update(0, message=Message(0, None, Chat(2, 'chat'),
+                                                           from_user=User(2, 'user', False)))
 
         callback_context_other_user_chat = CallbackContext.from_update(update_other_user_chat, cdp)
 
@@ -93,7 +94,8 @@ class TestCallbackContext:
     def test_from_error(self, cdp):
         error = TelegramError('test')
 
-        update = Update(0, message=Message(0, User(1, 'user', False), None, Chat(1, 'chat')))
+        update = Update(0, message=Message(0, None, Chat(1, 'chat'),
+                                           from_user=User(1, 'user', False)))
 
         callback_context = CallbackContext.from_error(update, error, cdp)
 
@@ -131,7 +133,8 @@ class TestCallbackContext:
         assert callback_context.match == 'test'
 
     def test_data_assignment(self, cdp):
-        update = Update(0, message=Message(0, User(1, 'user', False), None, Chat(1, 'chat')))
+        update = Update(0, message=Message(0, None, Chat(1, 'chat'),
+                                           from_user=User(1, 'user', False)))
 
         callback_context = CallbackContext.from_update(update, cdp)
 

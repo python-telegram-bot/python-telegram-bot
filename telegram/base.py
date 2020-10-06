@@ -17,36 +17,64 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram Objects."""
-
 try:
     import ujson as json
 except ImportError:
-    import json
+    import json  # type: ignore[no-redef]
 
 import warnings
+
+from telegram.utils.types import JSONDict
+from typing import Tuple, Any, Optional, Type, TypeVar, TYPE_CHECKING, List
+
+if TYPE_CHECKING:
+    from telegram import Bot
+
+TO = TypeVar('TO', bound='TelegramObject', covariant=True)
 
 
 class TelegramObject:
     """Base class for most telegram objects."""
 
-    _id_attrs = ()
+    # def __init__(self, *args: Any, **kwargs: Any):
+    #     pass
 
-    def __str__(self):
+    _id_attrs: Tuple[Any, ...] = ()
+
+    def __str__(self) -> str:
         return str(self.to_dict())
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: str) -> Any:
         return self.__dict__[item]
 
+    @staticmethod
+    def parse_data(data: Optional[JSONDict]) -> Optional[JSONDict]:
+        if not data:
+            return None
+        return data.copy()
+
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls: Type[TO], data: Optional[JSONDict], bot: 'Bot') -> Optional[TO]:
+        data = cls.parse_data(data)
+
         if not data:
             return None
 
-        data = data.copy()
+        if cls == TelegramObject:
+            return cls()
+        else:
+            return cls(bot=bot, **data)  # type: ignore[call-arg]
 
-        return data
+    @classmethod
+    def de_list(cls: Type[TO],
+                data: Optional[List[JSONDict]],
+                bot: 'Bot') -> List[Optional[TO]]:
+        if not data:
+            return []
 
-    def to_json(self):
+        return [cls.de_json(d, bot) for d in data]
+
+    def to_json(self) -> str:
         """
         Returns:
             :obj:`str`
@@ -55,7 +83,7 @@ class TelegramObject:
 
         return json.dumps(self.to_dict())
 
-    def to_dict(self):
+    def to_dict(self) -> JSONDict:
         data = dict()
 
         for key in iter(self.__dict__):
@@ -73,7 +101,7 @@ class TelegramObject:
             data['from'] = data.pop('from_user', None)
         return data
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, self.__class__):
             if self._id_attrs == ():
                 warnings.warn("Objects of type {} can not be meaningfully tested for "
@@ -84,7 +112,7 @@ class TelegramObject:
             return self._id_attrs == other._id_attrs
         return super().__eq__(other)  # pylint: disable=no-member
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         if self._id_attrs:
             return hash((self.__class__, self._id_attrs))  # pylint: disable=no-member
         return super().__hash__()

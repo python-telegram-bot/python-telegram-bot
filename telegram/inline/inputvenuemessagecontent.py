@@ -19,6 +19,7 @@
 """This module contains the classes that represent Telegram InputVenueMessageContent."""
 
 from telegram import InputMessageContent
+from typing import Any
 
 
 class InputVenueMessageContent(InputMessageContent):
@@ -51,8 +52,14 @@ class InputVenueMessageContent(InputMessageContent):
 
     """
 
-    def __init__(self, latitude, longitude, title, address, foursquare_id=None,
-                 foursquare_type=None, **kwargs):
+    def __init__(self,
+                 latitude: float,
+                 longitude: float,
+                 title: str,
+                 address: str,
+                 foursquare_id: str = None,
+                 foursquare_type: str = None,
+                 **kwargs: Any):
         # Required
         self.latitude = latitude
         self.longitude = longitude

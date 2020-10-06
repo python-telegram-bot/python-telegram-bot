@@ -19,6 +19,9 @@
 """This module contains the classes that represent Telegram InlineQueryResultContact."""
 
 from telegram import InlineQueryResult
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import ReplyMarkup, InputMessageContent
 
 
 class InlineQueryResultContact(InlineQueryResult):
@@ -62,17 +65,17 @@ class InlineQueryResultContact(InlineQueryResult):
     """
 
     def __init__(self,
-                 id,
-                 phone_number,
-                 first_name,
-                 last_name=None,
-                 reply_markup=None,
-                 input_message_content=None,
-                 thumb_url=None,
-                 thumb_width=None,
-                 thumb_height=None,
-                 vcard=None,
-                 **kwargs):
+                 id: str,
+                 phone_number: str,
+                 first_name: str,
+                 last_name: str = None,
+                 reply_markup: 'ReplyMarkup' = None,
+                 input_message_content: 'InputMessageContent' = None,
+                 thumb_url: str = None,
+                 thumb_width: int = None,
+                 thumb_height: int = None,
+                 vcard: str = None,
+                 **kwargs: Any):
         # Required
         super().__init__('contact', id)
         self.phone_number = phone_number

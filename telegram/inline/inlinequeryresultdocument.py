@@ -19,7 +19,10 @@
 """This module contains the classes that represent Telegram InlineQueryResultDocument"""
 
 from telegram import InlineQueryResult
-from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
+from typing import Any, Union, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import InputMessageContent, ReplyMarkup
 
 
 class InlineQueryResultDocument(InlineQueryResult):
@@ -74,19 +77,19 @@ class InlineQueryResultDocument(InlineQueryResult):
     """
 
     def __init__(self,
-                 id,
-                 document_url,
-                 title,
-                 mime_type,
-                 caption=None,
-                 description=None,
-                 reply_markup=None,
-                 input_message_content=None,
-                 thumb_url=None,
-                 thumb_width=None,
-                 thumb_height=None,
-                 parse_mode=DEFAULT_NONE,
-                 **kwargs):
+                 id: str,
+                 document_url: str,
+                 title: str,
+                 mime_type: str,
+                 caption: str = None,
+                 description: str = None,
+                 reply_markup: 'ReplyMarkup' = None,
+                 input_message_content: 'InputMessageContent' = None,
+                 thumb_url: str = None,
+                 thumb_width: int = None,
+                 thumb_height: int = None,
+                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+                 **kwargs: Any):
         # Required
         super().__init__('document', id)
         self.document_url = document_url

@@ -24,6 +24,9 @@ from copy import copy
 
 from telegram import Bot
 
+from typing import DefaultDict, Dict, Any, Tuple, Optional, cast
+from telegram.utils.types import ConversationDict
+
 
 class BasePersistence(ABC):
     """Interface class for adding persistence to your bot.
@@ -70,7 +73,7 @@ class BasePersistence(ABC):
             persistence class. Default is :obj:`True` .
     """
 
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls, *args: Any, **kwargs: Any) -> 'BasePersistence':
         instance = super().__new__(cls)
         get_user_data = instance.get_user_data
         get_chat_data = instance.get_chat_data
@@ -79,22 +82,22 @@ class BasePersistence(ABC):
         update_chat_data = instance.update_chat_data
         update_bot_data = instance.update_bot_data
 
-        def get_user_data_insert_bot():
+        def get_user_data_insert_bot() -> DefaultDict[int, Dict[Any, Any]]:
             return instance.insert_bot(get_user_data())
 
-        def get_chat_data_insert_bot():
+        def get_chat_data_insert_bot() -> DefaultDict[int, Dict[Any, Any]]:
             return instance.insert_bot(get_chat_data())
 
-        def get_bot_data_insert_bot():
+        def get_bot_data_insert_bot() -> Dict[Any, Any]:
             return instance.insert_bot(get_bot_data())
 
-        def update_user_data_replace_bot(user_id, data):
+        def update_user_data_replace_bot(user_id: int, data: Dict) -> None:
             return update_user_data(user_id, instance.replace_bot(data))
 
-        def update_chat_data_replace_bot(chat_id, data):
+        def update_chat_data_replace_bot(chat_id: int, data: Dict) -> None:
             return update_chat_data(chat_id, instance.replace_bot(data))
 
-        def update_bot_data_replace_bot(data):
+        def update_bot_data_replace_bot(data: Dict) -> None:
             return update_bot_data(instance.replace_bot(data))
 
         instance.get_user_data = get_user_data_insert_bot
@@ -105,13 +108,16 @@ class BasePersistence(ABC):
         instance.update_bot_data = update_bot_data_replace_bot
         return instance
 
-    def __init__(self, store_user_data=True, store_chat_data=True, store_bot_data=True):
+    def __init__(self,
+                 store_user_data: bool = True,
+                 store_chat_data: bool = True,
+                 store_bot_data: bool = True):
         self.store_user_data = store_user_data
         self.store_chat_data = store_chat_data
         self.store_bot_data = store_bot_data
-        self.bot = None
+        self.bot: Bot = None  # type: ignore[assignment]
 
-    def set_bot(self, bot):
+    def set_bot(self, bot: Bot) -> None:
         """Set the Bot to be used by this persistence instance.
 
         Args:
@@ -120,7 +126,7 @@ class BasePersistence(ABC):
         self.bot = bot
 
     @classmethod
-    def replace_bot(cls, obj):
+    def replace_bot(cls, obj: object) -> object:
         """
         Replaces all instances of :class:`telegram.Bot` that occur within the passed object with
         :attr:`REPLACED_BOT`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
@@ -140,6 +146,7 @@ class BasePersistence(ABC):
 
         new_obj = copy(obj)
         if isinstance(obj, (dict, defaultdict)):
+            new_obj = cast(dict, new_obj)
             new_obj.clear()
             for k, v in obj.items():
                 new_obj[cls.replace_bot(k)] = cls.replace_bot(v)
@@ -156,7 +163,7 @@ class BasePersistence(ABC):
 
         return obj
 
-    def insert_bot(self, obj):
+    def insert_bot(self, obj: object) -> object:
         """
         Replaces all instances of :attr:`REPLACED_BOT` that occur within the passed object with
         :attr:`bot`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
@@ -178,6 +185,7 @@ class BasePersistence(ABC):
 
         new_obj = copy(obj)
         if isinstance(obj, (dict, defaultdict)):
+            new_obj = cast(dict, new_obj)
             new_obj.clear()
             for k, v in obj.items():
                 new_obj[self.insert_bot(k)] = self.insert_bot(v)
@@ -194,7 +202,7 @@ class BasePersistence(ABC):
         return obj
 
     @abstractmethod
-    def get_user_data(self):
+    def get_user_data(self) -> DefaultDict[int, Dict[Any, Any]]:
         """"Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the user_data if stored, or an empty
         ``defaultdict(dict)``.
@@ -204,7 +212,7 @@ class BasePersistence(ABC):
         """
 
     @abstractmethod
-    def get_chat_data(self):
+    def get_chat_data(self) -> DefaultDict[int, Dict[Any, Any]]:
         """"Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the chat_data if stored, or an empty
         ``defaultdict(dict)``.
@@ -214,7 +222,7 @@ class BasePersistence(ABC):
         """
 
     @abstractmethod
-    def get_bot_data(self):
+    def get_bot_data(self) -> Dict[Any, Any]:
         """"Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the bot_data if stored, or an empty
         :obj:`dict`.
@@ -224,7 +232,7 @@ class BasePersistence(ABC):
         """
 
     @abstractmethod
-    def get_conversations(self, name):
+    def get_conversations(self, name: str) -> ConversationDict:
         """"Will be called by :class:`telegram.ext.Dispatcher` when a
         :class:`telegram.ext.ConversationHandler` is added if
         :attr:`telegram.ext.ConversationHandler.persistent` is :obj:`True`.
@@ -238,7 +246,9 @@ class BasePersistence(ABC):
         """
 
     @abstractmethod
-    def update_conversation(self, name, key, new_state):
+    def update_conversation(self,
+                            name: str, key: Tuple[int, ...],
+                            new_state: Optional[object]) -> None:
         """Will be called when a :attr:`telegram.ext.ConversationHandler.update_state`
         is called. This allows the storage of the new state in the persistence.
 
@@ -249,7 +259,7 @@ class BasePersistence(ABC):
         """
 
     @abstractmethod
-    def update_user_data(self, user_id, data):
+    def update_user_data(self, user_id: int, data: Dict) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
         handled an update.
 
@@ -259,7 +269,7 @@ class BasePersistence(ABC):
         """
 
     @abstractmethod
-    def update_chat_data(self, chat_id, data):
+    def update_chat_data(self, chat_id: int, data: Dict) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
         handled an update.
 
@@ -269,7 +279,7 @@ class BasePersistence(ABC):
         """
 
     @abstractmethod
-    def update_bot_data(self, data):
+    def update_bot_data(self, data: Dict) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
         handled an update.
 
@@ -277,7 +287,7 @@ class BasePersistence(ABC):
             data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.bot_data` .
         """
 
-    def flush(self):
+    def flush(self) -> None:
         """Will be called by :class:`telegram.ext.Updater` upon receiving a stop signal. Gives the
         persistence a chance to finish up saving or close a database connection gracefully. If this
         is not of any importance just pass will be sufficient.

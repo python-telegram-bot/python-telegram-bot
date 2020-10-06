@@ -270,7 +270,7 @@ class TestConversationHandler:
         dp.add_handler(handler)
 
         # User one, starts the state machine.
-        message = Message(0, user1, None, self.group, text='/start',
+        message = Message(0, None, self.group, from_user=user1, text='/start',
                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
                                                   offset=0, length=len('/start'))],
                           bot=bot)
@@ -307,7 +307,7 @@ class TestConversationHandler:
                                       fallbacks=self.fallbacks)
         dp.add_handler(handler)
 
-        message = Message(0, user1, None, self.group, text='/start',
+        message = Message(0, None, self.group, from_user=user1, text='/start',
                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
                                                   offset=0, length=len('/start'))],
                           bot=bot)
@@ -334,7 +334,7 @@ class TestConversationHandler:
         dp.add_handler(handler)
 
         # first check if fallback will not trigger start when not started
-        message = Message(0, user1, None, self.group, text='/eat',
+        message = Message(0, None, self.group, from_user=user1, text='/eat',
                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
                                                   offset=0, length=len('/eat'))],
                           bot=bot)
@@ -369,7 +369,7 @@ class TestConversationHandler:
         dp.add_handler(handler)
 
         # User one, starts the state machine.
-        message = Message(0, user1, None, self.group, text='/start',
+        message = Message(0, None, self.group, from_user=user1, text='/start',
                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
                                                   offset=0, length=len('/start'))],
                           bot=bot)
@@ -398,7 +398,7 @@ class TestConversationHandler:
         dp.add_handler(handler)
 
         # User one, starts the state machine.
-        message = Message(0, user1, None, self.group, text='/start',
+        message = Message(0, None, self.group, from_user=user1, text='/start',
                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
                                                   offset=0, length=len('/start'))],
                           bot=bot)
@@ -437,7 +437,8 @@ class TestConversationHandler:
         dp.add_handler(handler)
 
         # User one, starts the state machine.
-        message = Message(0, user1, None, self.group, text='msg w/ inlinekeyboard', bot=bot)
+        message = Message(0, None, self.group, from_user=user1, text='msg w/ inlinekeyboard',
+                          bot=bot)
 
         cbq = CallbackQuery(0, user1, None, message=message, data='data', bot=bot)
         dp.process_update(Update(update_id=0, callback_query=cbq))
@@ -462,7 +463,7 @@ class TestConversationHandler:
         dp.add_handler(handler)
 
         # User starts the state machine and immediately ends it.
-        message = Message(0, user1, None, self.group, text='/start',
+        message = Message(0, None, self.group, from_user=user1, text='/start',
                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
                                                   offset=0, length=len('/start'))],
                           bot=bot)
@@ -479,7 +480,7 @@ class TestConversationHandler:
 
         # User starts the state machine with an async function that immediately ends the
         # conversation. Async results are resolved when the users state is queried next time.
-        message = Message(0, user1, None, self.group, text='/start',
+        message = Message(0, None, self.group, from_user=user1, text='/start',
                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
                                                   offset=0, length=len('/start'))],
                           bot=bot)
@@ -503,7 +504,7 @@ class TestConversationHandler:
 
         # User starts the state machine with an async function that immediately ends the
         # conversation. Async results are resolved when the users state is queried next time.
-        message = Message(0, user1, None, self.group, text='/start',
+        message = Message(0, None, self.group, text='/start', from_user=user1,
                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
                                                   offset=0, length=len('/start'))],
                           bot=bot)
@@ -525,7 +526,7 @@ class TestConversationHandler:
         dp.add_handler(handler)
 
         # User starts the state machine and a callback function returns None
-        message = Message(0, user1, None, self.group, text='/start', bot=bot)
+        message = Message(0, None, self.group, from_user=user1, text='/start', bot=bot)
         dp.process_update(Update(update_id=0, message=message))
         assert len(handler.conversations) == 0
 
@@ -538,7 +539,7 @@ class TestConversationHandler:
 
         # User starts the state machine with an async function that returns None
         # Async results are resolved when the users state is queried next time.
-        message = Message(0, user1, None, self.group, text='/start',
+        message = Message(0, None, self.group, from_user=user1, text='/start',
                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
                                                   offset=0, length=len('/start'))],
                           bot=bot)
@@ -561,7 +562,7 @@ class TestConversationHandler:
 
         # User starts the state machine with an async function that returns None
         # Async results are resolved when the users state is queried next time.
-        message = Message(0, user1, None, self.group, text='/start',
+        message = Message(0, None, self.group, text='/start', from_user=user1,
                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
                                                   offset=0, length=len('/start'))],
                           bot=bot)
@@ -594,7 +595,7 @@ class TestConversationHandler:
     def test_all_update_types(self, dp, bot, user1):
         handler = ConversationHandler(entry_points=[CommandHandler('start', self.start_end)],
                                       states={}, fallbacks=[])
-        message = Message(0, user1, None, self.group, text='ignore', bot=bot)
+        message = Message(0, None, self.group, from_user=user1, text='ignore', bot=bot)
         callback_query = CallbackQuery(0, user1, None, message=message, data='data', bot=bot)
         chosen_inline_result = ChosenInlineResult(0, user1, 'query', bot=bot)
         inline_query = InlineQuery(0, user1, 'query', 0, bot=bot)
@@ -613,7 +614,7 @@ class TestConversationHandler:
         dp.add_handler(handler)
 
         # Start state machine, then reach timeout
-        message = Message(0, user1, None, self.group, text='/start',
+        message = Message(0, None, self.group, from_user=user1, text='/start',
                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
                                                   offset=0, length=len('/start'))],
                           bot=bot)
@@ -643,7 +644,7 @@ class TestConversationHandler:
         dp.add_handler(handler)
 
         # Start state machine, then reach timeout
-        message = Message(0, user1, None, self.group, text='/start',
+        message = Message(0, None, self.group, text='/start', from_user=user1,
                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
                                                   offset=0, length=len('/start'))],
                           bot=bot)
@@ -674,7 +675,7 @@ class TestConversationHandler:
         cdp.add_handler(handler)
 
         # Start state machine, then reach timeout
-        message = Message(0, user1, None, self.group, text='/start',
+        message = Message(0, None, self.group, from_user=user1, text='/start',
                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0,
                                                   length=len('/start'))],
                           bot=bot)
@@ -705,7 +706,7 @@ class TestConversationHandler:
         # t=.6 /pourCoffee (timeout=1.1)
         # t=.75 second timeout
         # t=1.1 actual timeout
-        message = Message(0, user1, None, self.group, text='/start',
+        message = Message(0, None, self.group, from_user=user1, text='/start',
                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
                                                   offset=0, length=len('/start'))],
                           bot=bot)
@@ -734,7 +735,7 @@ class TestConversationHandler:
         dp.add_handler(handler)
 
         # Start state machine, do something as second user, then reach timeout
-        message = Message(0, user1, None, self.group, text='/start',
+        message = Message(0, None, self.group, from_user=user1, text='/start',
                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0,
                                                   length=len('/start'))],
                           bot=bot)
@@ -765,7 +766,7 @@ class TestConversationHandler:
         dp.add_handler(handler)
 
         # CommandHandler timeout
-        message = Message(0, user1, None, self.group, text='/start',
+        message = Message(0, None, self.group, from_user=user1, text='/start',
                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0,
                                                   length=len('/start'))],
                           bot=bot)
@@ -810,7 +811,7 @@ class TestConversationHandler:
         cdp.add_handler(handler)
 
         # CommandHandler timeout
-        message = Message(0, user1, None, self.group, text='/start',
+        message = Message(0, None, self.group, from_user=user1, text='/start',
                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0,
                                                   length=len('/start'))],
                           bot=bot)
@@ -871,7 +872,7 @@ class TestConversationHandler:
         dp.add_handler(handler)
 
         # CommandHandler timeout
-        message = Message(0, user1, None, self.group, text='/start',
+        message = Message(0, None, self.group, from_user=user1, text='/start',
                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0,
                                                   length=len('/start'))],
                           bot=bot)
@@ -954,7 +955,7 @@ class TestConversationHandler:
         dp.add_handler(handler)
 
         # User one, starts the state machine.
-        message = Message(0, user1, None, self.group, text='/start', bot=bot,
+        message = Message(0, None, self.group, from_user=user1, text='/start', bot=bot,
                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
                                                   offset=0, length=len('/start'))])
         dp.process_update(Update(update_id=0, message=message))
@@ -1065,7 +1066,7 @@ class TestConversationHandler:
         self.raise_dp_handler_stop = True
 
         # User one, starts the state machine.
-        message = Message(0, user1, None, self.group, text='/start', bot=bot,
+        message = Message(0, None, self.group, text='/start', bot=bot, from_user=user1,
                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
                                                   offset=0, length=len('/start'))])
         dp.process_update(Update(update_id=0, message=message))

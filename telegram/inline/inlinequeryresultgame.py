@@ -19,6 +19,9 @@
 """This module contains the classes that represent Telegram InlineQueryResultGame."""
 
 from telegram import InlineQueryResult
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import ReplyMarkup
 
 
 class InlineQueryResultGame(InlineQueryResult):
@@ -40,7 +43,11 @@ class InlineQueryResultGame(InlineQueryResult):
 
     """
 
-    def __init__(self, id, game_short_name, reply_markup=None, **kwargs):
+    def __init__(self,
+                 id: str,
+                 game_short_name: str,
+                 reply_markup: 'ReplyMarkup' = None,
+                 **kwargs: Any):
         # Required
         super().__init__('game', id)
         self.id = id

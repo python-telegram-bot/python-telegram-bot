@@ -19,6 +19,11 @@
 """This module contains an object that represents a Telegram MessageEntity."""
 
 from telegram import User, TelegramObject
+from telegram.utils.types import JSONDict
+from typing import Any, Optional, List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class MessageEntity(TelegramObject):
@@ -53,7 +58,14 @@ class MessageEntity(TelegramObject):
 
     """
 
-    def __init__(self, type, offset, length, url=None, user=None, language=None, **kwargs):
+    def __init__(self,
+                 type: str,
+                 offset: int,
+                 length: int,
+                 url: str = None,
+                 user: User = None,
+                 language: str = None,
+                 **kwargs: Any):
         # Required
         self.type = type
         self.offset = offset
@@ -66,8 +78,8 @@ class MessageEntity(TelegramObject):
         self._id_attrs = (self.type, self.offset, self.length)
 
     @classmethod
-    def de_json(cls, data, bot):
-        data = super().de_json(data, bot)
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['MessageEntity']:
+        data = cls.parse_data(data)
 
         if not data:
             return None
@@ -76,48 +88,37 @@ class MessageEntity(TelegramObject):
 
         return cls(**data)
 
-    @classmethod
-    def de_list(cls, data, bot):
-        if not data:
-            return list()
-
-        entities = list()
-        for entity in data:
-            entities.append(cls.de_json(entity, bot))
-
-        return entities
-
-    MENTION = 'mention'
+    MENTION: str = 'mention'
     """:obj:`str`: 'mention'"""
-    HASHTAG = 'hashtag'
+    HASHTAG: str = 'hashtag'
     """:obj:`str`: 'hashtag'"""
-    CASHTAG = 'cashtag'
+    CASHTAG: str = 'cashtag'
     """:obj:`str`: 'cashtag'"""
-    PHONE_NUMBER = 'phone_number'
+    PHONE_NUMBER: str = 'phone_number'
     """:obj:`str`: 'phone_number'"""
-    BOT_COMMAND = 'bot_command'
+    BOT_COMMAND: str = 'bot_command'
     """:obj:`str`: 'bot_command'"""
-    URL = 'url'
+    URL: str = 'url'
     """:obj:`str`: 'url'"""
-    EMAIL = 'email'
+    EMAIL: str = 'email'
     """:obj:`str`: 'email'"""
-    BOLD = 'bold'
+    BOLD: str = 'bold'
     """:obj:`str`: 'bold'"""
-    ITALIC = 'italic'
+    ITALIC: str = 'italic'
     """:obj:`str`: 'italic'"""
-    CODE = 'code'
+    CODE: str = 'code'
     """:obj:`str`: 'code'"""
-    PRE = 'pre'
+    PRE: str = 'pre'
     """:obj:`str`: 'pre'"""
-    TEXT_LINK = 'text_link'
+    TEXT_LINK: str = 'text_link'
     """:obj:`str`: 'text_link'"""
-    TEXT_MENTION = 'text_mention'
+    TEXT_MENTION: str = 'text_mention'
     """:obj:`str`: 'text_mention'"""
-    UNDERLINE = 'underline'
+    UNDERLINE: str = 'underline'
     """:obj:`str`: 'underline'"""
-    STRIKETHROUGH = 'strikethrough'
+    STRIKETHROUGH: str = 'strikethrough'
     """:obj:`str`: 'strikethrough'"""
-    ALL_TYPES = [
+    ALL_TYPES: List[str] = [
         MENTION, HASHTAG, CASHTAG, PHONE_NUMBER, BOT_COMMAND, URL,
         EMAIL, BOLD, ITALIC, CODE, PRE, TEXT_LINK, TEXT_MENTION, UNDERLINE, STRIKETHROUGH
     ]

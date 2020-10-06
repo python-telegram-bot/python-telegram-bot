@@ -21,11 +21,12 @@ import subprocess
 
 import certifi
 
+from typing import Optional
 
 from . import __version__ as telegram_ver
 
 
-def _git_revision():
+def _git_revision() -> Optional[str]:
     try:
         output = subprocess.check_output(["git", "describe", "--long", "--tags"],
                                          stderr=subprocess.STDOUT)
@@ -34,15 +35,15 @@ def _git_revision():
     return output.decode().strip()
 
 
-def print_ver_info():
+def print_ver_info() -> None:
     git_revision = _git_revision()
     print('python-telegram-bot {}'.format(telegram_ver) + (' ({})'.format(git_revision)
                                                            if git_revision else ''))
-    print('certifi {}'.format(certifi.__version__))
+    print('certifi {}'.format(certifi.__version__))  # type: ignore[attr-defined]
     print('Python {}'.format(sys.version.replace('\n', ' ')))
 
 
-def main():
+def main() -> None:
     print_ver_info()
 
 

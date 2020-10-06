@@ -19,7 +19,10 @@
 """This module contains the classes that represent Telegram InlineQueryResultCachedAudio."""
 
 from telegram import InlineQueryResult
-from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
+from typing import Any, Union, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import InputMessageContent, ReplyMarkup
 
 
 class InlineQueryResultCachedAudio(InlineQueryResult):
@@ -57,13 +60,13 @@ class InlineQueryResultCachedAudio(InlineQueryResult):
     """
 
     def __init__(self,
-                 id,
-                 audio_file_id,
-                 caption=None,
-                 reply_markup=None,
-                 input_message_content=None,
-                 parse_mode=DEFAULT_NONE,
-                 **kwargs):
+                 id: str,
+                 audio_file_id: str,
+                 caption: str = None,
+                 reply_markup: 'ReplyMarkup' = None,
+                 input_message_content: 'InputMessageContent' = None,
+                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+                 **kwargs: Any):
         # Required
         super().__init__('audio', id)
         self.audio_file_id = audio_file_id
