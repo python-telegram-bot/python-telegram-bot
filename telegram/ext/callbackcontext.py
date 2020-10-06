@@ -17,8 +17,13 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the CallbackContext class."""
+from queue import Queue
+from typing import Dict, Any, Tuple, TYPE_CHECKING, Optional, Match, List, NoReturn, Union
 
 from telegram import Update
+if TYPE_CHECKING:
+    from telegram import Bot
+    from telegram.ext import Dispatcher, Job, JobQueue
 
 
 class CallbackContext:
@@ -80,7 +85,7 @@ class CallbackContext:
 
     """
 
-    def __init__(self, dispatcher):
+    def __init__(self, dispatcher: 'Dispatcher'):
         """
         Args:
             dispatcher (:class:`telegram.ext.Dispatcher`):
@@ -90,49 +95,54 @@ class CallbackContext:
                              'dispatcher!')
         self._dispatcher = dispatcher
         self._bot_data = dispatcher.bot_data
-        self._chat_data = None
-        self._user_data = None
-        self.args = None
-        self.matches = None
-        self.error = None
-        self.job = None
-        self.async_args = None
-        self.async_kwargs = None
+        self._chat_data: Optional[Dict[Any, Any]] = None
+        self._user_data: Optional[Dict[Any, Any]] = None
+        self.args: Optional[List[str]] = None
+        self.matches: Optional[List[Match]] = None
+        self.error: Optional[Exception] = None
+        self.job: Optional['Job'] = None
+        self.async_args: Optional[Union[List, Tuple]] = None
+        self.async_kwargs: Optional[Dict[str, Any]] = None
 
     @property
-    def dispatcher(self):
+    def dispatcher(self) -> 'Dispatcher':
         """:class:`telegram.ext.Dispatcher`: The dispatcher associated with this context."""
         return self._dispatcher
 
     @property
-    def bot_data(self):
+    def bot_data(self) -> Dict:
         return self._bot_data
 
     @bot_data.setter
-    def bot_data(self, value):
+    def bot_data(self, value: Any) -> NoReturn:
         raise AttributeError("You can not assign a new value to bot_data, see "
                              "https://git.io/fjxKe")
 
     @property
-    def chat_data(self):
+    def chat_data(self) -> Optional[Dict]:
         return self._chat_data
 
     @chat_data.setter
-    def chat_data(self, value):
+    def chat_data(self, value: Any) -> NoReturn:
         raise AttributeError("You can not assign a new value to chat_data, see "
                              "https://git.io/fjxKe")
 
     @property
-    def user_data(self):
+    def user_data(self) -> Optional[Dict]:
         return self._user_data
 
     @user_data.setter
-    def user_data(self, value):
+    def user_data(self, value: Any) -> NoReturn:
         raise AttributeError("You can not assign a new value to user_data, see "
                              "https://git.io/fjxKe")
 
     @classmethod
-    def from_error(cls, update, error, dispatcher, async_args=None, async_kwargs=None):
+    def from_error(cls,
+                   update: object,
+                   error: Exception,
+                   dispatcher: 'Dispatcher',
+                   async_args: Union[List, Tuple] = None,
+                   async_kwargs: Dict[str, Any] = None) -> 'CallbackContext':
         self = cls.from_update(update, dispatcher)
         self.error = error
         self.async_args = async_args
@@ -140,7 +150,7 @@ class CallbackContext:
         return self
 
     @classmethod
-    def from_update(cls, update, dispatcher):
+    def from_update(cls, update: object, dispatcher: 'Dispatcher') -> 'CallbackContext':
         self = cls(dispatcher)
 
         if update is not None and isinstance(update, Update):
@@ -154,21 +164,21 @@ class CallbackContext:
         return self
 
     @classmethod
-    def from_job(cls, job, dispatcher):
+    def from_job(cls, job: 'Job', dispatcher: 'Dispatcher') -> 'CallbackContext':
         self = cls(dispatcher)
         self.job = job
         return self
 
-    def update(self, data):
+    def update(self, data: Dict[str, Any]) -> None:
         self.__dict__.update(data)
 
     @property
-    def bot(self):
+    def bot(self) -> 'Bot':
         """:class:`telegram.Bot`: The bot associated with this context."""
         return self._dispatcher.bot
 
     @property
-    def job_queue(self):
+    def job_queue(self) -> Optional['JobQueue']:
         """
         :class:`telegram.ext.JobQueue`: The ``JobQueue`` used by the
             :class:`telegram.ext.Dispatcher` and (usually) the :class:`telegram.ext.Updater`
@@ -178,7 +188,7 @@ class CallbackContext:
         return self._dispatcher.job_queue
 
     @property
-    def update_queue(self):
+    def update_queue(self) -> Queue:
         """
         :class:`queue.Queue`: The ``Queue`` instance used by the
             :class:`telegram.ext.Dispatcher` and (usually) the :class:`telegram.ext.Updater`
@@ -188,13 +198,13 @@ class CallbackContext:
         return self._dispatcher.update_queue
 
     @property
-    def match(self):
+    def match(self) -> Optional[Match[str]]:
         """
         `Regex match type`: The first match from :attr:`matches`.
             Useful if you are only filtering using a single regex filter.
             Returns `None` if :attr:`matches` is empty.
         """
         try:
-            return self.matches[0]  # pylint: disable=unsubscriptable-object
+            return self.matches[0]  # type: ignore[index] # pylint: disable=unsubscriptable-object
         except (IndexError, TypeError):
             return None

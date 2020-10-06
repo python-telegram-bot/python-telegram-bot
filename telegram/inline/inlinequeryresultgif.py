@@ -19,7 +19,10 @@
 """This module contains the classes that represent Telegram InlineQueryResultGif."""
 
 from telegram import InlineQueryResult
-from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
+from typing import Any, Union, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import InputMessageContent, ReplyMarkup
 
 
 class InlineQueryResultGif(InlineQueryResult):
@@ -74,19 +77,19 @@ class InlineQueryResultGif(InlineQueryResult):
     """
 
     def __init__(self,
-                 id,
-                 gif_url,
-                 thumb_url,
-                 gif_width=None,
-                 gif_height=None,
-                 title=None,
-                 caption=None,
-                 reply_markup=None,
-                 input_message_content=None,
-                 gif_duration=None,
-                 parse_mode=DEFAULT_NONE,
-                 thumb_mime_type=None,
-                 **kwargs):
+                 id: str,
+                 gif_url: str,
+                 thumb_url: str,
+                 gif_width: int = None,
+                 gif_height: int = None,
+                 title: str = None,
+                 caption: str = None,
+                 reply_markup: 'ReplyMarkup' = None,
+                 input_message_content: 'InputMessageContent' = None,
+                 gif_duration: int = None,
+                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+                 thumb_mime_type: str = None,
+                 **kwargs: Any):
 
         # Required
         super().__init__('gif', id)

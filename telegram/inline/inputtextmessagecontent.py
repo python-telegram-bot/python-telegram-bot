@@ -19,7 +19,8 @@
 """This module contains the classes that represent Telegram InputTextMessageContent."""
 
 from telegram import InputMessageContent
-from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
+from typing import Any, Union
 
 
 class InputTextMessageContent(InputMessageContent):
@@ -51,10 +52,10 @@ class InputTextMessageContent(InputMessageContent):
     """
 
     def __init__(self,
-                 message_text,
-                 parse_mode=DEFAULT_NONE,
-                 disable_web_page_preview=DEFAULT_NONE,
-                 **kwargs):
+                 message_text: str,
+                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+                 disable_web_page_preview: Union[bool, DefaultValue] = DEFAULT_NONE,
+                 **kwargs: Any):
         # Required
         self.message_text = message_text
         # Optionals

@@ -19,7 +19,10 @@
 """This module contains the classes that represent Telegram InlineQueryResultPhoto."""
 
 from telegram import InlineQueryResult
-from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
+from typing import Any, Union, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import InputMessageContent, ReplyMarkup
 
 
 class InlineQueryResultPhoto(InlineQueryResult):
@@ -71,18 +74,18 @@ class InlineQueryResultPhoto(InlineQueryResult):
     """
 
     def __init__(self,
-                 id,
-                 photo_url,
-                 thumb_url,
-                 photo_width=None,
-                 photo_height=None,
-                 title=None,
-                 description=None,
-                 caption=None,
-                 reply_markup=None,
-                 input_message_content=None,
-                 parse_mode=DEFAULT_NONE,
-                 **kwargs):
+                 id: str,
+                 photo_url: str,
+                 thumb_url: str,
+                 photo_width: int = None,
+                 photo_height: int = None,
+                 title: str = None,
+                 description: str = None,
+                 caption: str = None,
+                 reply_markup: 'ReplyMarkup' = None,
+                 input_message_content: 'InputMessageContent' = None,
+                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+                 **kwargs: Any):
         # Required
         super().__init__('photo', id)
         self.photo_url = photo_url

@@ -27,8 +27,9 @@ import re
 
 @pytest.fixture(scope='function')
 def update():
-    return Update(0, Message(0, User(0, 'Testuser', False), datetime.datetime.utcnow(),
-                             Chat(0, 'private'), via_bot=User(0, "Testbot", True)))
+    return Update(0, Message(0, datetime.datetime.utcnow(),
+                             Chat(0, 'private'), from_user=User(0, 'Testuser', False),
+                             via_bot=User(0, "Testbot", True)))
 
 
 @pytest.fixture(scope='function',
@@ -292,8 +293,8 @@ class TestFilters:
         assert result
 
     def test_filters_reply(self, update):
-        another_message = Message(1, User(1, 'TestOther', False), datetime.datetime.utcnow(),
-                                  Chat(0, 'private'))
+        another_message = Message(1, datetime.datetime.utcnow(), Chat(0, 'private'),
+                                  from_user=User(1, 'TestOther', False))
         update.message.text = 'test'
         assert not Filters.reply(update)
         update.message.reply_to_message = another_message

@@ -242,7 +242,7 @@ class TestBasePersistence:
         user2 = User(id=54321, first_name='test user', is_bot=False)
         chat1 = Chat(id=-67890, type='group')
         chat2 = Chat(id=-987654, type='group')
-        m = Message(1, user1, None, chat2)
+        m = Message(1, None, chat2, from_user=user1)
         u = Update(0, m)
         with caplog.at_level(logging.ERROR):
             dp.process_update(u)
@@ -338,7 +338,7 @@ class TestBasePersistence:
         user2 = User(id=54321, first_name='test user', is_bot=False)
         chat1 = Chat(id=-67890, type='group')
         chat2 = Chat(id=-987654, type='group')
-        m = Message(1, user1, None, chat2)
+        m = Message(1, None, chat2, from_user=user1)
         u = Update(0, m)
         with caplog.at_level(logging.ERROR):
             cdp.process_update(u)
@@ -585,7 +585,7 @@ def pickle_files_wo_bot_data(user_data, chat_data, conversations):
 def update(bot):
     user = User(id=321, first_name='test_user', is_bot=False)
     chat = Chat(id=123, type='group')
-    message = Message(1, user, None, chat, text="Hi there", bot=bot)
+    message = Message(1, None, chat, from_user=user, text="Hi there", bot=bot)
     return Update(0, message=message)
 
 

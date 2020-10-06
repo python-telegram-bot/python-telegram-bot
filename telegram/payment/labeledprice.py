@@ -19,6 +19,7 @@
 """This module contains an object that represents a Telegram LabeledPrice."""
 
 from telegram import TelegramObject
+from typing import Any
 
 
 class LabeledPrice(TelegramObject):
@@ -43,7 +44,7 @@ class LabeledPrice(TelegramObject):
 
     """
 
-    def __init__(self, label, amount, **kwargs):
+    def __init__(self, label: str, amount: int, **kwargs: Any):
         self.label = label
         self.amount = amount
 

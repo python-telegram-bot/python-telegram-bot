@@ -19,6 +19,7 @@
 """This module contains an object that represents a Telegram Invoice."""
 
 from telegram import TelegramObject
+from typing import Any
 
 
 class Invoice(TelegramObject):
@@ -51,7 +52,13 @@ class Invoice(TelegramObject):
 
     """
 
-    def __init__(self, title, description, start_parameter, currency, total_amount, **kwargs):
+    def __init__(self,
+                 title: str,
+                 description: str,
+                 start_parameter: str,
+                 currency: str,
+                 total_amount: int,
+                 **kwargs: Any):
         self.title = title
         self.description = description
         self.start_parameter = start_parameter
@@ -65,10 +72,3 @@ class Invoice(TelegramObject):
             self.currency,
             self.total_amount,
         )
-
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(**data)

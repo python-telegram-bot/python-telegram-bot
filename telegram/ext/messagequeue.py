@@ -27,6 +27,14 @@ import time
 import threading
 import queue as q
 
+from typing import Callable, Any, TYPE_CHECKING, List, NoReturn
+
+if TYPE_CHECKING:
+    from telegram import Bot
+
+# We need to count < 1s intervals, so the most accurate timer is needed
+curtime = time.perf_counter
+
 
 class DelayQueueError(RuntimeError):
     """Indicates processing errors."""
@@ -68,12 +76,12 @@ class DelayQueue(threading.Thread):
     _instcnt = 0  # instance counter
 
     def __init__(self,
-                 queue=None,
-                 burst_limit=30,
-                 time_limit_ms=1000,
-                 exc_route=None,
-                 autostart=True,
-                 name=None):
+                 queue: q.Queue = None,
+                 burst_limit: int = 30,
+                 time_limit_ms: int = 1000,
+                 exc_route: Callable[[Exception], None] = None,
+                 autostart: bool = True,
+                 name: str = None):
         self._queue = queue if queue is not None else q.Queue()
         self.burst_limit = burst_limit
         self.time_limit = time_limit_ms / 1000
@@ -87,14 +95,14 @@ class DelayQueue(threading.Thread):
         if autostart:  # immediately start processing
             super().start()
 
-    def run(self):
+    def run(self) -> None:
         """
         Do not use the method except for unthreaded testing purposes, the method normally is
         automatically called by autostart argument.
 
         """
 
-        times = []  # used to store each callable processing time
+        times: List[float] = []  # used to store each callable processing time
         while True:
             item = self._queue.get()
             if self.__exit_req:
@@ -119,7 +127,7 @@ class DelayQueue(threading.Thread):
             except Exception as exc:  # re-route any exceptions
                 self.exc_route(exc)  # to prevent thread exit
 
-    def stop(self, timeout=None):
+    def stop(self, timeout: float = None) -> None:
         """Used to gently stop processor and shutdown its thread.
 
         Args:
@@ -136,7 +144,7 @@ class DelayQueue(threading.Thread):
         super().join(timeout=timeout)
 
     @staticmethod
-    def _default_exception_handler(exc):
+    def _default_exception_handler(exc: Exception) -> NoReturn:
         """
         Dummy exception handler which re-raises exception in thread. Could be possibly overwritten
         by subclasses.
@@ -145,7 +153,7 @@ class DelayQueue(threading.Thread):
 
         raise exc
 
-    def __call__(self, func, *args, **kwargs):
+    def __call__(self, func: Callable, *args: Any, **kwargs: Any) -> None:
         """Used to process callbacks in throughput-limiting thread through queue.
 
         Args:
@@ -194,12 +202,12 @@ class MessageQueue:
     """
 
     def __init__(self,
-                 all_burst_limit=30,
-                 all_time_limit_ms=1000,
-                 group_burst_limit=20,
-                 group_time_limit_ms=60000,
-                 exc_route=None,
-                 autostart=True):
+                 all_burst_limit: int = 30,
+                 all_time_limit_ms: int = 1000,
+                 group_burst_limit: int = 20,
+                 group_time_limit_ms: int = 60000,
+                 exc_route: Callable[[Exception], None] = None,
+                 autostart: bool = True):
         # create according delay queues, use composition
         self._all_delayq = DelayQueue(
             burst_limit=all_burst_limit,
@@ -212,18 +220,18 @@ class MessageQueue:
             exc_route=exc_route,
             autostart=autostart)
 
-    def start(self):
+    def start(self) -> None:
         """Method is used to manually start the ``MessageQueue`` processing."""
         self._all_delayq.start()
         self._group_delayq.start()
 
-    def stop(self, timeout=None):
+    def stop(self, timeout: float = None) -> None:
         self._group_delayq.stop(timeout=timeout)
         self._all_delayq.stop(timeout=timeout)
 
     stop.__doc__ = DelayQueue.stop.__doc__ or ''  # reuse docstring if any
 
-    def __call__(self, promise, is_group_msg=False):
+    def __call__(self, promise: Callable, is_group_msg: bool = False) -> Callable:
         """
         Processes callables in throughput-limiting queues to avoid hitting limits (specified with
         :attr:`burst_limit` and :attr:`time_limit`.
@@ -255,7 +263,7 @@ class MessageQueue:
         return promise
 
 
-def queuedmessage(method):
+def queuedmessage(method: Callable) -> Callable:
     """A decorator to be used with :attr:`telegram.Bot` send* methods.
 
     Note:
@@ -288,12 +296,13 @@ def queuedmessage(method):
     """
 
     @functools.wraps(method)
-    def wrapped(self, *args, **kwargs):
-        queued = kwargs.pop('queued', self._is_messages_queued_default)
+    def wrapped(self: 'Bot', *args: Any, **kwargs: Any) -> Any:
+        queued = kwargs.pop('queued',
+                            self._is_messages_queued_default)  # type: ignore[attr-defined]
         isgroup = kwargs.pop('isgroup', False)
         if queued:
             prom = promise.Promise(method, (self, ) + args, kwargs)
-            return self._msg_queue(prom, isgroup)
+            return self._msg_queue(prom, isgroup)  # type: ignore[attr-defined]
         return method(self, *args, **kwargs)
 
     return wrapped

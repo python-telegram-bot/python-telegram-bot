@@ -19,7 +19,11 @@
 """Base class for Telegram InputMedia Objects."""
 
 from telegram import TelegramObject, InputFile, PhotoSize, Animation, Video, Audio, Document
-from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
+
+from typing import Union, IO, cast
+
+from telegram.utils.types import FileLike
 
 
 class InputMedia(TelegramObject):
@@ -73,29 +77,32 @@ class InputMediaAnimation(InputMedia):
     """
 
     def __init__(self,
-                 media,
-                 thumb=None,
-                 caption=None,
-                 parse_mode=DEFAULT_NONE,
-                 width=None,
-                 height=None,
-                 duration=None):
+                 media: Union[str, FileLike, Animation],
+                 thumb: FileLike = None,
+                 caption: str = None,
+                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+                 width: int = None,
+                 height: int = None,
+                 duration: int = None):
         self.type = 'animation'
 
         if isinstance(media, Animation):
-            self.media = media.file_id
+            self.media: Union[str, InputFile] = media.file_id
             self.width = media.width
             self.height = media.height
             self.duration = media.duration
         elif InputFile.is_file(media):
+            media = cast(IO, media)
             self.media = InputFile(media, attach=True)
         else:
-            self.media = media
+            self.media = media  # type: ignore[assignment]
 
         if thumb:
-            self.thumb = thumb
-            if InputFile.is_file(self.thumb):
-                self.thumb = InputFile(self.thumb, attach=True)
+            if InputFile.is_file(thumb):
+                thumb = cast(IO, thumb)
+                self.thumb = InputFile(thumb, attach=True)
+            else:
+                self.thumb = thumb  # type: ignore[assignment]
 
         if caption:
             self.caption = caption
@@ -129,15 +136,19 @@ class InputMediaPhoto(InputMedia):
             in :class:`telegram.ParseMode` for the available modes.
     """
 
-    def __init__(self, media, caption=None, parse_mode=DEFAULT_NONE):
+    def __init__(self,
+                 media: Union[str, FileLike, PhotoSize],
+                 caption: str = None,
+                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE):
         self.type = 'photo'
 
         if isinstance(media, PhotoSize):
-            self.media = media.file_id
+            self.media: Union[str, InputFile] = media.file_id
         elif InputFile.is_file(media):
+            media = cast(IO, media)
             self.media = InputFile(media, attach=True)
         else:
-            self.media = media
+            self.media = media  # type: ignore[assignment]
 
         if caption:
             self.caption = caption
@@ -189,24 +200,34 @@ class InputMediaVideo(InputMedia):
            by Telegram.
     """
 
-    def __init__(self, media, caption=None, width=None, height=None, duration=None,
-                 supports_streaming=None, parse_mode=DEFAULT_NONE, thumb=None):
+    def __init__(self,
+                 media: Union[str, FileLike, Video],
+                 caption: str = None,
+                 width: int = None,
+                 height: int = None,
+                 duration: int = None,
+                 supports_streaming: bool = None,
+                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+                 thumb: FileLike = None):
         self.type = 'video'
 
         if isinstance(media, Video):
-            self.media = media.file_id
+            self.media: Union[str, InputFile] = media.file_id
             self.width = media.width
             self.height = media.height
             self.duration = media.duration
         elif InputFile.is_file(media):
+            media = cast(IO, media)
             self.media = InputFile(media, attach=True)
         else:
-            self.media = media
+            self.media = media  # type: ignore[assignment]
 
         if thumb:
-            self.thumb = thumb
-            if InputFile.is_file(self.thumb):
-                self.thumb = InputFile(self.thumb, attach=True)
+            if InputFile.is_file(thumb):
+                thumb = cast(IO, thumb)
+                self.thumb = InputFile(thumb, attach=True)
+            else:
+                self.thumb = thumb  # type: ignore[assignment]
 
         if caption:
             self.caption = caption
@@ -261,24 +282,33 @@ class InputMediaAudio(InputMedia):
         optional arguments.
     """
 
-    def __init__(self, media, thumb=None, caption=None, parse_mode=DEFAULT_NONE,
-                 duration=None, performer=None, title=None):
+    def __init__(self,
+                 media: Union[str, FileLike, Audio],
+                 thumb: FileLike = None,
+                 caption: str = None,
+                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+                 duration: int = None,
+                 performer: str = None,
+                 title: str = None):
         self.type = 'audio'
 
         if isinstance(media, Audio):
-            self.media = media.file_id
+            self.media: Union[str, InputFile] = media.file_id
             self.duration = media.duration
             self.performer = media.performer
             self.title = media.title
         elif InputFile.is_file(media):
+            media = cast(IO, media)
             self.media = InputFile(media, attach=True)
         else:
-            self.media = media
+            self.media = media  # type: ignore[assignment]
 
         if thumb:
-            self.thumb = thumb
-            if InputFile.is_file(self.thumb):
-                self.thumb = InputFile(self.thumb, attach=True)
+            if InputFile.is_file(thumb):
+                thumb = cast(IO, thumb)
+                self.thumb = InputFile(thumb, attach=True)
+            else:
+                self.thumb = thumb  # type: ignore[assignment]
 
         if caption:
             self.caption = caption
@@ -318,20 +348,27 @@ class InputMediaDocument(InputMedia):
             Thumbnails can't be reused and can be only uploaded as a new file.
     """
 
-    def __init__(self, media, thumb=None, caption=None, parse_mode=DEFAULT_NONE):
+    def __init__(self,
+                 media: Union[str, FileLike, Document],
+                 thumb: FileLike = None,
+                 caption: str = None,
+                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE):
         self.type = 'document'
 
         if isinstance(media, Document):
-            self.media = media.file_id
+            self.media: Union[str, InputFile] = media.file_id
         elif InputFile.is_file(media):
+            media = cast(IO, media)
             self.media = InputFile(media, attach=True)
         else:
-            self.media = media
+            self.media = media  # type: ignore[assignment]
 
         if thumb:
-            self.thumb = thumb
-            if InputFile.is_file(self.thumb):
-                self.thumb = InputFile(self.thumb, attach=True)
+            if InputFile.is_file(thumb):
+                thumb = cast(IO, thumb)
+                self.thumb = InputFile(thumb, attach=True)
+            else:
+                self.thumb = thumb  # type: ignore[assignment]
 
         if caption:
             self.caption = caption

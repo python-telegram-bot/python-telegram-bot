@@ -25,9 +25,12 @@ from telegram.utils.helpers import decode_user_chat_data_from_json,\
 try:
     import ujson as json
 except ImportError:
-    import json
+    import json  # type: ignore[no-redef]
 from collections import defaultdict
 from telegram.ext import BasePersistence
+
+from typing import DefaultDict, Dict, Any, Tuple, Optional
+from telegram.utils.types import ConversationDict
 
 
 class DictPersistence(BasePersistence):
@@ -74,13 +77,13 @@ class DictPersistence(BasePersistence):
     """
 
     def __init__(self,
-                 store_user_data=True,
-                 store_chat_data=True,
-                 store_bot_data=True,
-                 user_data_json='',
-                 chat_data_json='',
-                 bot_data_json='',
-                 conversations_json=''):
+                 store_user_data: bool = True,
+                 store_chat_data: bool = True,
+                 store_bot_data: bool = True,
+                 user_data_json: str = '',
+                 chat_data_json: str = '',
+                 bot_data_json: str = '',
+                 conversations_json: str = ''):
         super().__init__(store_user_data=store_user_data,
                          store_chat_data=store_chat_data,
                          store_bot_data=store_bot_data)
@@ -121,12 +124,12 @@ class DictPersistence(BasePersistence):
                 raise TypeError("Unable to deserialize conversations_json. Not valid JSON")
 
     @property
-    def user_data(self):
+    def user_data(self) -> Optional[DefaultDict[int, Dict]]:
         """:obj:`dict`: The user_data as a dict."""
         return self._user_data
 
     @property
-    def user_data_json(self):
+    def user_data_json(self) -> str:
         """:obj:`str`: The user_data serialized as a JSON-string."""
         if self._user_data_json:
             return self._user_data_json
@@ -134,12 +137,12 @@ class DictPersistence(BasePersistence):
             return json.dumps(self.user_data)
 
     @property
-    def chat_data(self):
+    def chat_data(self) -> Optional[DefaultDict[int, Dict]]:
         """:obj:`dict`: The chat_data as a dict."""
         return self._chat_data
 
     @property
-    def chat_data_json(self):
+    def chat_data_json(self) -> str:
         """:obj:`str`: The chat_data serialized as a JSON-string."""
         if self._chat_data_json:
             return self._chat_data_json
@@ -147,12 +150,12 @@ class DictPersistence(BasePersistence):
             return json.dumps(self.chat_data)
 
     @property
-    def bot_data(self):
+    def bot_data(self) -> Optional[Dict]:
         """:obj:`dict`: The bot_data as a dict."""
         return self._bot_data
 
     @property
-    def bot_data_json(self):
+    def bot_data_json(self) -> str:
         """:obj:`str`: The bot_data serialized as a JSON-string."""
         if self._bot_data_json:
             return self._bot_data_json
@@ -160,19 +163,19 @@ class DictPersistence(BasePersistence):
             return json.dumps(self.bot_data)
 
     @property
-    def conversations(self):
+    def conversations(self) -> Optional[Dict[str, Dict[Tuple, Any]]]:
         """:obj:`dict`: The conversations as a dict."""
         return self._conversations
 
     @property
-    def conversations_json(self):
+    def conversations_json(self) -> str:
         """:obj:`str`: The conversations serialized as a JSON-string."""
         if self._conversations_json:
             return self._conversations_json
         else:
-            return encode_conversations_to_json(self.conversations)
+            return encode_conversations_to_json(self.conversations)  # type: ignore[arg-type]
 
-    def get_user_data(self):
+    def get_user_data(self) -> DefaultDict[int, Dict[Any, Any]]:
         """Returns the user_data created from the ``user_data_json`` or an empty
         :obj:`defaultdict`.
 
@@ -183,9 +186,9 @@ class DictPersistence(BasePersistence):
             pass
         else:
             self._user_data = defaultdict(dict)
-        return deepcopy(self.user_data)
+        return deepcopy(self.user_data)  # type: ignore[arg-type]
 
-    def get_chat_data(self):
+    def get_chat_data(self) -> DefaultDict[int, Dict[Any, Any]]:
         """Returns the chat_data created from the ``chat_data_json`` or an empty
         :obj:`defaultdict`.
 
@@ -196,9 +199,9 @@ class DictPersistence(BasePersistence):
             pass
         else:
             self._chat_data = defaultdict(dict)
-        return deepcopy(self.chat_data)
+        return deepcopy(self.chat_data)  # type: ignore[arg-type]
 
-    def get_bot_data(self):
+    def get_bot_data(self) -> Dict[Any, Any]:
         """Returns the bot_data created from the ``bot_data_json`` or an empty :obj:`dict`.
 
         Returns:
@@ -208,9 +211,9 @@ class DictPersistence(BasePersistence):
             pass
         else:
             self._bot_data = {}
-        return deepcopy(self.bot_data)
+        return deepcopy(self.bot_data)  # type: ignore[arg-type]
 
-    def get_conversations(self, name):
+    def get_conversations(self, name: str) -> ConversationDict:
         """Returns the conversations created from the ``conversations_json`` or an empty
         :obj:`dict`.
 
@@ -221,9 +224,11 @@ class DictPersistence(BasePersistence):
             pass
         else:
             self._conversations = {}
-        return self.conversations.get(name, {}).copy()
+        return self.conversations.get(name, {}).copy()  # type: ignore[union-attr]
 
-    def update_conversation(self, name, key, new_state):
+    def update_conversation(self,
+                            name: str, key: Tuple[int, ...],
+                            new_state: Optional[object]) -> None:
         """Will update the conversations for the given handler.
 
         Args:
@@ -231,12 +236,14 @@ class DictPersistence(BasePersistence):
             key (:obj:`tuple`): The key the state is changed for.
             new_state (:obj:`tuple` | :obj:`any`): The new state for the given key.
         """
+        if not self._conversations:
+            self._conversations = {}
         if self._conversations.setdefault(name, {}).get(key) == new_state:
             return
         self._conversations[name][key] = new_state
         self._conversations_json = None
 
-    def update_user_data(self, user_id, data):
+    def update_user_data(self, user_id: int, data: Dict) -> None:
         """Will update the user_data (if changed).
 
         Args:
@@ -250,7 +257,7 @@ class DictPersistence(BasePersistence):
         self._user_data[user_id] = data
         self._user_data_json = None
 
-    def update_chat_data(self, chat_id, data):
+    def update_chat_data(self, chat_id: int, data: Dict) -> None:
         """Will update the chat_data (if changed).
 
         Args:
@@ -264,7 +271,7 @@ class DictPersistence(BasePersistence):
         self._chat_data[chat_id] = data
         self._chat_data_json = None
 
-    def update_bot_data(self, data):
+    def update_bot_data(self, data: Dict) -> None:
         """Will update the bot_data (if changed).
 
         Args:

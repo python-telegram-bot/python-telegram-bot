@@ -21,6 +21,10 @@
 from telegram import Update
 from .handler import Handler
 
+from telegram.utils.types import HandlerArg
+from typing import Optional, Union, TypeVar
+RT = TypeVar('RT')
+
 
 class ChosenInlineResultHandler(Handler):
     """Handler class to handle Telegram updates that contain a chosen inline result.
@@ -80,7 +84,7 @@ class ChosenInlineResultHandler(Handler):
 
     """
 
-    def check_update(self, update):
+    def check_update(self, update: HandlerArg) -> Optional[Union[bool, object]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:

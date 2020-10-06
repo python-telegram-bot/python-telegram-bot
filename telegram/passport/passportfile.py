@@ -19,6 +19,10 @@
 """This module contains an object that represents a Encrypted PassportFile."""
 
 from telegram import TelegramObject
+from telegram.utils.types import JSONDict
+from typing import Any, Optional, List, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import Bot, File, FileCredentials
 
 
 class PassportFile(TelegramObject):
@@ -52,13 +56,13 @@ class PassportFile(TelegramObject):
     """
 
     def __init__(self,
-                 file_id,
-                 file_unique_id,
-                 file_date,
-                 file_size=None,
-                 bot=None,
-                 credentials=None,
-                 **kwargs):
+                 file_id: str,
+                 file_unique_id: str,
+                 file_date: int,
+                 file_size: int = None,
+                 bot: 'Bot' = None,
+                 credentials: 'FileCredentials' = None,
+                 **kwargs: Any):
         # Required
         self.file_id = file_id
         self.file_unique_id = file_unique_id
@@ -71,41 +75,31 @@ class PassportFile(TelegramObject):
         self._id_attrs = (self.file_unique_id,)
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json_decrypted(cls,
+                          data: Optional[JSONDict],
+                          bot: 'Bot',
+                          credentials: 'FileCredentials') -> Optional['PassportFile']:
+        data = cls.parse_data(data)
+
         if not data:
             return None
-
-        data = super().de_json(data, bot)
-
-        return cls(bot=bot, **data)
-
-    @classmethod
-    def de_json_decrypted(cls, data, bot, credentials):
-        if not data:
-            return None
-
-        data = super().de_json(data, bot)
 
         data['credentials'] = credentials
 
         return cls(bot=bot, **data)
 
     @classmethod
-    def de_list(cls, data, bot):
-        if not data:
-            return []
-
-        return [cls.de_json(passport_file, bot) for passport_file in data]
-
-    @classmethod
-    def de_list_decrypted(cls, data, bot, credentials):
+    def de_list_decrypted(cls,
+                          data: Optional[List[JSONDict]],
+                          bot: 'Bot',
+                          credentials: List['FileCredentials']) -> List[Optional['PassportFile']]:
         if not data:
             return []
 
         return [cls.de_json_decrypted(passport_file, bot, credentials[i])
                 for i, passport_file in enumerate(data)]
 
-    def get_file(self, timeout=None, api_kwargs=None):
+    def get_file(self, timeout: int = None, api_kwargs: JSONDict = None) -> 'File':
         """
         Wrapper over :attr:`telegram.Bot.get_file`. Will automatically assign the correct
         credentials to the returned :class:`telegram.File` if originating from

@@ -25,9 +25,15 @@ import pytz
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.combining import OrTrigger
-from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
+from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR, JobEvent
 
 from telegram.ext.callbackcontext import CallbackContext
+
+from typing import TYPE_CHECKING, Union, Callable, Tuple, Optional, List, Any, cast, overload
+from telegram.utils.types import JSONDict
+if TYPE_CHECKING:
+    from telegram.ext import Dispatcher
+    from telegram import Bot
 
 
 class Days:
@@ -46,32 +52,32 @@ class JobQueue:
 
     """
 
-    def __init__(self):
-        self._dispatcher = None
+    def __init__(self) -> None:
+        self._dispatcher: 'Dispatcher' = None  # type: ignore[assignment]
         self.logger = logging.getLogger(self.__class__.__name__)
         self.scheduler = BackgroundScheduler(timezone=pytz.utc)
         self.scheduler.add_listener(self._update_persistence,
                                     mask=EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
 
         # Dispatch errors and don't log them in the APS logger
-        def aps_log_filter(record):
+        def aps_log_filter(record):  # type: ignore
             return 'raised an exception' not in record.msg
 
         logging.getLogger('apscheduler.executors.default').addFilter(aps_log_filter)
         self.scheduler.add_listener(self._dispatch_error, EVENT_JOB_ERROR)
 
-    def _build_args(self, job):
+    def _build_args(self, job: 'Job') -> List[Union[CallbackContext, 'Bot', 'Job']]:
         if self._dispatcher.use_context:
             return [CallbackContext.from_job(job, self._dispatcher)]
         return [self._dispatcher.bot, job]
 
-    def _tz_now(self):
+    def _tz_now(self) -> datetime.datetime:
         return datetime.datetime.now(self.scheduler.timezone)
 
-    def _update_persistence(self, event):
+    def _update_persistence(self, event: JobEvent) -> None:
         self._dispatcher.update_persistence()
 
-    def _dispatch_error(self, event):
+    def _dispatch_error(self, event: JobEvent) -> None:
         try:
             self._dispatcher.dispatch_error(None, event.exception)
         # Errors should not stop the thread.
@@ -80,7 +86,21 @@ class JobQueue:
                                   'uncaught error was raised while handling the error '
                                   'with an error_handler.')
 
-    def _parse_time_input(self, time, shift_day=False):
+    @overload
+    def _parse_time_input(self, time: None, shift_day: bool = False) -> None:
+        ...
+
+    @overload
+    def _parse_time_input(self,
+                          time: Union[float, int, datetime.timedelta, datetime.datetime,
+                                      datetime.time],
+                          shift_day: bool = False) -> datetime.datetime:
+        ...
+
+    def _parse_time_input(self,
+                          time: Union[float, int, datetime.timedelta, datetime.datetime,
+                                      datetime.time, None],
+                          shift_day: bool = False) -> Optional[datetime.datetime]:
         if time is None:
             return None
         if isinstance(time, (int, float)):
@@ -98,7 +118,7 @@ class JobQueue:
         # isinstance(time, datetime.datetime):
         return time
 
-    def set_dispatcher(self, dispatcher):
+    def set_dispatcher(self, dispatcher: 'Dispatcher') -> None:
         """Set the dispatcher to be used by this JobQueue. Use this instead of passing a
         :class:`telegram.Bot` to the JobQueue, which is deprecated.
 
@@ -111,7 +131,12 @@ class JobQueue:
             if dispatcher.bot.defaults:
                 self.scheduler.configure(timezone=dispatcher.bot.defaults.tzinfo or pytz.utc)
 
-    def run_once(self, callback, when, context=None, name=None, job_kwargs=None):
+    def run_once(self,
+                 callback: Callable[['CallbackContext'], None],
+                 when: Union[float, datetime.timedelta, datetime.datetime, datetime.time],
+                 context: object = None,
+                 name: str = None,
+                 job_kwargs: JSONDict = None) -> 'Job':
         """Creates a new ``Job`` that runs once and adds it to the queue.
 
         Args:
@@ -169,8 +194,16 @@ class JobQueue:
         job.job = j
         return job
 
-    def run_repeating(self, callback, interval, first=None, last=None, context=None, name=None,
-                      job_kwargs=None):
+    def run_repeating(self,
+                      callback: Callable[['CallbackContext'], None],
+                      interval: Union[float, datetime.timedelta],
+                      first: Union[float, datetime.timedelta, datetime.datetime,
+                                   datetime.time] = None,
+                      last: Union[float, datetime.timedelta, datetime.datetime,
+                                  datetime.time] = None,
+                      context: object = None,
+                      name: str = None,
+                      job_kwargs: JSONDict = None) -> 'Job':
         """Creates a new ``Job`` that runs at specified intervals and adds it to the queue.
 
         Args:
@@ -256,8 +289,14 @@ class JobQueue:
         job.job = j
         return job
 
-    def run_monthly(self, callback, when, day, context=None, name=None, day_is_strict=True,
-                    job_kwargs=None):
+    def run_monthly(self,
+                    callback: Callable[['CallbackContext'], None],
+                    when: datetime.time,
+                    day: int,
+                    context: object = None,
+                    name: str = None,
+                    day_is_strict: bool = True,
+                    job_kwargs: JSONDict = None) -> 'Job':
         """Creates a new ``Job`` that runs on a monthly basis and adds it to the queue.
 
         Args:
@@ -325,8 +364,13 @@ class JobQueue:
         job.job = j
         return job
 
-    def run_daily(self, callback, time, days=Days.EVERY_DAY, context=None, name=None,
-                  job_kwargs=None):
+    def run_daily(self,
+                  callback: Callable[['CallbackContext'], None],
+                  time: datetime.time,
+                  days: Tuple[int, ...] = Days.EVERY_DAY,
+                  context: object = None,
+                  name: str = None,
+                  job_kwargs: JSONDict = None) -> 'Job':
         """Creates a new ``Job`` that runs on a daily basis and adds it to the queue.
 
         Args:
@@ -379,7 +423,11 @@ class JobQueue:
         job.job = j
         return job
 
-    def run_custom(self, callback, job_kwargs, context=None, name=None):
+    def run_custom(self,
+                   callback: Callable[['CallbackContext'], None],
+                   job_kwargs: JSONDict,
+                   context: object = None,
+                   name: str = None) -> 'Job':
         """Creates a new customly defined ``Job``.
 
         Args:
@@ -393,7 +441,7 @@ class JobQueue:
             job_kwargs (:obj:`dict`): Arbitrary keyword arguments. Used as arguments for
                 ``scheduler.add_job``.
             context (:obj:`object`, optional): Additional data needed for the callback function.
-                Can be accessed through ``job.context`` in the callback. Defaults to :obj:`None`.
+                Can be accessed through ``job.context`` in the callback. Defaults to ``None``.
             name (:obj:`str`, optional): The name of the new job. Defaults to
                 ``callback.__name__``.
 
@@ -413,21 +461,21 @@ class JobQueue:
         job.job = j
         return job
 
-    def start(self):
+    def start(self) -> None:
         """Starts the job_queue thread."""
         if not self.scheduler.running:
             self.scheduler.start()
 
-    def stop(self):
+    def stop(self) -> None:
         """Stops the thread."""
         if self.scheduler.running:
             self.scheduler.shutdown()
 
-    def jobs(self):
+    def jobs(self) -> Tuple['Job', ...]:
         """Returns a tuple of all jobs that are currently in the ``JobQueue``."""
         return tuple(Job.from_aps_job(job, self) for job in self.scheduler.get_jobs())
 
-    def get_jobs_by_name(self, name):
+    def get_jobs_by_name(self, name: str) -> Tuple['Job', ...]:
         """Returns a tuple of jobs with the given name that are currently in the ``JobQueue``"""
         return tuple(job for job in self.jobs() if job.name == name)
 
@@ -469,11 +517,11 @@ class Job:
     """
 
     def __init__(self,
-                 callback,
-                 context=None,
-                 name=None,
-                 job_queue=None,
-                 job=None):
+                 callback: Callable[['CallbackContext'], None],
+                 context: object = None,
+                 name: str = None,
+                 job_queue: JobQueue = None,
+                 job: 'Job' = None):
 
         self.callback = callback
         self.context = context
@@ -483,15 +531,15 @@ class Job:
         self._removed = False
         self._enabled = False
 
-        self.job = job
+        self.job = cast('Job', job)
 
-    def run(self, dispatcher):
+    def run(self, dispatcher: 'Dispatcher') -> None:
         """Executes the callback function independently of the jobs schedule."""
         try:
             if dispatcher.use_context:
                 self.callback(CallbackContext.from_job(self, dispatcher))
             else:
-                self.callback(dispatcher.bot, self)
+                self.callback(dispatcher.bot, self)  # type: ignore[arg-type,call-arg]
         except Exception as e:
             try:
                 dispatcher.dispatch_error(None, e)
@@ -501,7 +549,7 @@ class Job:
                                             'uncaught error was raised while handling the error '
                                             'with an error_handler.')
 
-    def schedule_removal(self):
+    def schedule_removal(self) -> None:
         """
         Schedules this job for removal from the ``JobQueue``. It will be removed without executing
         its callback function again.
@@ -510,17 +558,17 @@ class Job:
         self._removed = True
 
     @property
-    def removed(self):
+    def removed(self) -> bool:
         """:obj:`bool`: Whether this job is due to be removed."""
         return self._removed
 
     @property
-    def enabled(self):
+    def enabled(self) -> bool:
         """:obj:`bool`: Whether this job is enabled."""
         return self._enabled
 
     @enabled.setter
-    def enabled(self, status):
+    def enabled(self, status: bool) -> None:
         if status:
             self.job.resume()
         else:
@@ -528,7 +576,7 @@ class Job:
         self._enabled = status
 
     @property
-    def next_t(self):
+    def next_t(self) -> Optional[datetime.datetime]:
         """
         :obj:`datetime.datetime`: Datetime for the next job execution.
             Datetime is localized according to :attr:`tzinfo`.
@@ -537,7 +585,7 @@ class Job:
         return self.job.next_run_time
 
     @classmethod
-    def from_aps_job(cls, job, job_queue):
+    def from_aps_job(cls, job: 'Job', job_queue: JobQueue) -> 'Job':
         # context based callbacks
         if len(job.args) == 1:
             context = job.args[0].job.context
@@ -545,13 +593,13 @@ class Job:
             context = job.args[1].context
         return cls(job.func, context=context, name=job.name, job_queue=job_queue, job=job)
 
-    def __getattr__(self, item):
+    def __getattr__(self, item: str) -> Any:
         return getattr(self.job, item)
 
-    def __lt__(self, other):
+    def __lt__(self, other: object) -> bool:
         return False
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, self.__class__):
             return self.id == other.id
         return False

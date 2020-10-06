@@ -23,6 +23,11 @@ from telegram import TelegramObject
 from telegram.utils.helpers import mention_html as util_mention_html
 from telegram.utils.helpers import mention_markdown as util_mention_markdown
 
+from typing import Any, Optional, TYPE_CHECKING, List
+
+if TYPE_CHECKING:
+    from telegram import Bot, UserProfilePhotos, Message
+
 
 class User(TelegramObject):
     """This object represents a Telegram user or bot.
@@ -63,17 +68,17 @@ class User(TelegramObject):
     """
 
     def __init__(self,
-                 id,
-                 first_name,
-                 is_bot,
-                 last_name=None,
-                 username=None,
-                 language_code=None,
-                 can_join_groups=None,
-                 can_read_all_group_messages=None,
-                 supports_inline_queries=None,
-                 bot=None,
-                 **kwargs):
+                 id: int,
+                 first_name: str,
+                 is_bot: bool,
+                 last_name: str = None,
+                 username: str = None,
+                 language_code: str = None,
+                 can_join_groups: bool = None,
+                 can_read_all_group_messages: bool = None,
+                 supports_inline_queries: bool = None,
+                 bot: 'Bot' = None,
+                 **kwargs: Any):
         # Required
         self.id = int(id)
         self.first_name = first_name
@@ -90,7 +95,7 @@ class User(TelegramObject):
         self._id_attrs = (self.id,)
 
     @property
-    def name(self):
+    def name(self) -> str:
         """:obj:`str`: Convenience property. If available, returns the user's :attr:`username`
         prefixed with "@". If :attr:`username` is not available, returns :attr:`full_name`."""
         if self.username:
@@ -98,7 +103,7 @@ class User(TelegramObject):
         return self.full_name
 
     @property
-    def full_name(self):
+    def full_name(self) -> str:
         """:obj:`str`: Convenience property. The user's :attr:`first_name`, followed by (if
         available) :attr:`last_name`."""
 
@@ -107,7 +112,7 @@ class User(TelegramObject):
         return self.first_name
 
     @property
-    def link(self):
+    def link(self) -> Optional[str]:
         """:obj:`str`: Convenience property. If :attr:`username` is available, returns a t.me link
         of the user."""
 
@@ -115,15 +120,7 @@ class User(TelegramObject):
             return "https://t.me/{}".format(self.username)
         return None
 
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-        data = super().de_json(data, bot)
-
-        return cls(bot=bot, **data)
-
-    def get_profile_photos(self, *args, **kwargs):
+    def get_profile_photos(self, *args: Any, **kwargs: Any) -> 'UserProfilePhotos':
         """
         Shortcut for::
 
@@ -133,18 +130,7 @@ class User(TelegramObject):
 
         return self.bot.get_user_profile_photos(self.id, *args, **kwargs)
 
-    @classmethod
-    def de_list(cls, data, bot):
-        if not data:
-            return []
-
-        users = list()
-        for user in data:
-            users.append(cls.de_json(user, bot))
-
-        return users
-
-    def mention_markdown(self, name=None):
+    def mention_markdown(self, name: str = None) -> str:
         """
         Note:
             :attr:`telegram.ParseMode.MARKDOWN` is is a legacy mode, retained by Telegram for
@@ -161,7 +147,7 @@ class User(TelegramObject):
             return util_mention_markdown(self.id, name)
         return util_mention_markdown(self.id, self.full_name)
 
-    def mention_markdown_v2(self, name=None):
+    def mention_markdown_v2(self, name: str = None) -> str:
         """
         Args:
             name (:obj:`str`): The name used as a link for the user. Defaults to :attr:`full_name`.
@@ -174,7 +160,7 @@ class User(TelegramObject):
             return util_mention_markdown(self.id, name, version=2)
         return util_mention_markdown(self.id, self.full_name, version=2)
 
-    def mention_html(self, name=None):
+    def mention_html(self, name: str = None) -> str:
         """
         Args:
             name (:obj:`str`): The name used as a link for the user. Defaults to :attr:`full_name`.
@@ -187,7 +173,7 @@ class User(TelegramObject):
             return util_mention_html(self.id, name)
         return util_mention_html(self.id, self.full_name)
 
-    def send_message(self, *args, **kwargs):
+    def send_message(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_message(update.effective_user.id, *args, **kwargs)
@@ -198,7 +184,7 @@ class User(TelegramObject):
         """
         return self.bot.send_message(self.id, *args, **kwargs)
 
-    def send_photo(self, *args, **kwargs):
+    def send_photo(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_photo(update.effective_user.id, *args, **kwargs)
@@ -209,7 +195,7 @@ class User(TelegramObject):
         """
         return self.bot.send_photo(self.id, *args, **kwargs)
 
-    def send_media_group(self, *args, **kwargs):
+    def send_media_group(self, *args: Any, **kwargs: Any) -> List['Message']:
         """Shortcut for::
 
             bot.send_media_group(update.effective_user.id, *args, **kwargs)
@@ -220,7 +206,7 @@ class User(TelegramObject):
         """
         return self.bot.send_media_group(self.id, *args, **kwargs)
 
-    def send_audio(self, *args, **kwargs):
+    def send_audio(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_audio(update.effective_user.id, *args, **kwargs)
@@ -231,7 +217,7 @@ class User(TelegramObject):
         """
         return self.bot.send_audio(self.id, *args, **kwargs)
 
-    def send_chat_action(self, *args, **kwargs):
+    def send_chat_action(self, *args: Any, **kwargs: Any) -> bool:
         """Shortcut for::
 
             bot.send_chat_action(update.effective_user.id, *args, **kwargs)
@@ -245,7 +231,7 @@ class User(TelegramObject):
     send_action = send_chat_action
     """Alias for :attr:`send_chat_action`"""
 
-    def send_contact(self, *args, **kwargs):
+    def send_contact(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_contact(update.effective_user.id, *args, **kwargs)
@@ -256,7 +242,7 @@ class User(TelegramObject):
         """
         return self.bot.send_contact(self.id, *args, **kwargs)
 
-    def send_dice(self, *args, **kwargs):
+    def send_dice(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_dice(update.effective_user.id, *args, **kwargs)
@@ -267,7 +253,7 @@ class User(TelegramObject):
         """
         return self.bot.send_dice(self.id, *args, **kwargs)
 
-    def send_document(self, *args, **kwargs):
+    def send_document(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_document(update.effective_user.id, *args, **kwargs)
@@ -278,7 +264,7 @@ class User(TelegramObject):
         """
         return self.bot.send_document(self.id, *args, **kwargs)
 
-    def send_game(self, *args, **kwargs):
+    def send_game(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_game(update.effective_user.id, *args, **kwargs)
@@ -289,7 +275,7 @@ class User(TelegramObject):
         """
         return self.bot.send_game(self.id, *args, **kwargs)
 
-    def send_invoice(self, *args, **kwargs):
+    def send_invoice(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_invoice(update.effective_user.id, *args, **kwargs)
@@ -300,7 +286,7 @@ class User(TelegramObject):
         """
         return self.bot.send_invoice(self.id, *args, **kwargs)
 
-    def send_location(self, *args, **kwargs):
+    def send_location(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_location(update.effective_user.id, *args, **kwargs)
@@ -311,7 +297,7 @@ class User(TelegramObject):
         """
         return self.bot.send_location(self.id, *args, **kwargs)
 
-    def send_animation(self, *args, **kwargs):
+    def send_animation(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_animation(update.effective_user.id, *args, **kwargs)
@@ -322,7 +308,7 @@ class User(TelegramObject):
         """
         return self.bot.send_animation(self.id, *args, **kwargs)
 
-    def send_sticker(self, *args, **kwargs):
+    def send_sticker(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_sticker(update.effective_user.id, *args, **kwargs)
@@ -333,7 +319,7 @@ class User(TelegramObject):
         """
         return self.bot.send_sticker(self.id, *args, **kwargs)
 
-    def send_video(self, *args, **kwargs):
+    def send_video(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_video(update.effective_user.id, *args, **kwargs)
@@ -344,7 +330,7 @@ class User(TelegramObject):
         """
         return self.bot.send_video(self.id, *args, **kwargs)
 
-    def send_venue(self, *args, **kwargs):
+    def send_venue(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_venue(update.effective_user.id, *args, **kwargs)
@@ -355,7 +341,7 @@ class User(TelegramObject):
         """
         return self.bot.send_venue(self.id, *args, **kwargs)
 
-    def send_video_note(self, *args, **kwargs):
+    def send_video_note(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_video_note(update.effective_user.id, *args, **kwargs)
@@ -366,7 +352,7 @@ class User(TelegramObject):
         """
         return self.bot.send_video_note(self.id, *args, **kwargs)
 
-    def send_voice(self, *args, **kwargs):
+    def send_voice(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_voice(update.effective_user.id, *args, **kwargs)
@@ -377,7 +363,7 @@ class User(TelegramObject):
         """
         return self.bot.send_voice(self.id, *args, **kwargs)
 
-    def send_poll(self, *args, **kwargs):
+    def send_poll(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
 
             bot.send_poll(update.effective_user.id, *args, **kwargs)

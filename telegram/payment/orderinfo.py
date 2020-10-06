@@ -19,6 +19,10 @@
 """This module contains an object that represents a Telegram OrderInfo."""
 
 from telegram import TelegramObject, ShippingAddress
+from telegram.utils.types import JSONDict
+from typing import Any, Optional, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class OrderInfo(TelegramObject):
@@ -43,7 +47,12 @@ class OrderInfo(TelegramObject):
 
     """
 
-    def __init__(self, name=None, phone_number=None, email=None, shipping_address=None, **kwargs):
+    def __init__(self,
+                 name: str = None,
+                 phone_number: str = None,
+                 email: str = None,
+                 shipping_address: str = None,
+                 **kwargs: Any):
         self.name = name
         self.phone_number = phone_number
         self.email = email
@@ -52,11 +61,11 @@ class OrderInfo(TelegramObject):
         self._id_attrs = (self.name, self.phone_number, self.email, self.shipping_address)
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['OrderInfo']:
+        data = cls.parse_data(data)
+
         if not data:
             return cls()
-
-        data = super().de_json(data, bot)
 
         data['shipping_address'] = ShippingAddress.de_json(data.get('shipping_address'), bot)
 

@@ -20,9 +20,15 @@
 """This module contains an object that represents a Telegram Poll."""
 
 import sys
+import datetime
 
 from telegram import (TelegramObject, User, MessageEntity)
 from telegram.utils.helpers import to_timestamp, from_timestamp
+from telegram.utils.types import JSONDict
+from typing import Any, Dict, Optional, List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class PollOption(TelegramObject):
@@ -42,18 +48,11 @@ class PollOption(TelegramObject):
 
     """
 
-    def __init__(self, text, voter_count, **kwargs):
+    def __init__(self, text: str, voter_count: int, **kwargs: Any):
         self.text = text
         self.voter_count = voter_count
 
         self._id_attrs = (self.text, self.voter_count)
-
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(**data)
 
 
 class PollAnswer(TelegramObject):
@@ -75,7 +74,7 @@ class PollAnswer(TelegramObject):
             May be empty if the user retracted their vote.
 
     """
-    def __init__(self, poll_id, user, option_ids, **kwargs):
+    def __init__(self, poll_id: str, user: User, option_ids: List[int], **kwargs: Any):
         self.poll_id = poll_id
         self.user = user
         self.option_ids = option_ids
@@ -83,11 +82,11 @@ class PollAnswer(TelegramObject):
         self._id_attrs = (self.poll_id, self.user, tuple(self.option_ids))
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['PollAnswer']:
+        data = cls.parse_data(data)
+
         if not data:
             return None
-
-        data = super(PollAnswer, cls).de_json(data, bot)
 
         data['user'] = User.de_json(data.get('user'), bot)
 
@@ -143,20 +142,20 @@ class Poll(TelegramObject):
     """
 
     def __init__(self,
-                 id,
-                 question,
-                 options,
-                 total_voter_count,
-                 is_closed,
-                 is_anonymous,
-                 type,
-                 allows_multiple_answers,
-                 correct_option_id=None,
-                 explanation=None,
-                 explanation_entities=None,
-                 open_period=None,
-                 close_date=None,
-                 **kwargs):
+                 id: str,
+                 question: str,
+                 options: List[PollOption],
+                 total_voter_count: int,
+                 is_closed: bool,
+                 is_anonymous: bool,
+                 type: str,
+                 allows_multiple_answers: bool,
+                 correct_option_id: int = None,
+                 explanation: str = None,
+                 explanation_entities: List[MessageEntity] = None,
+                 open_period: int = None,
+                 close_date: datetime.datetime = None,
+                 **kwargs: Any):
         self.id = id
         self.question = question
         self.options = options
@@ -174,11 +173,11 @@ class Poll(TelegramObject):
         self._id_attrs = (self.id,)
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Poll']:
+        data = cls.parse_data(data)
+
         if not data:
             return None
-
-        data = super().de_json(data, bot)
 
         data['options'] = [PollOption.de_json(option, bot) for option in data['options']]
         data['explanation_entities'] = MessageEntity.de_list(data.get('explanation_entities'), bot)
@@ -186,7 +185,7 @@ class Poll(TelegramObject):
 
         return cls(**data)
 
-    def to_dict(self):
+    def to_dict(self) -> JSONDict:
         data = super().to_dict()
 
         data['options'] = [x.to_dict() for x in self.options]
@@ -196,7 +195,7 @@ class Poll(TelegramObject):
 
         return data
 
-    def parse_explanation_entity(self, entity):
+    def parse_explanation_entity(self, entity: MessageEntity) -> str:
         """Returns the text from a given :class:`telegram.MessageEntity`.
 
         Note:
@@ -211,7 +210,13 @@ class Poll(TelegramObject):
         Returns:
             :obj:`str`: The text of the given entity.
 
+        Raises:
+            RuntimeError: If the poll has no explanation.
+
         """
+        if not self.explanation:
+            raise RuntimeError("This Poll has no 'explanation'.")
+
         # Is it a narrow build, if so we don't need to convert
         if sys.maxunicode == 0xffff:
             return self.explanation[entity.offset:entity.offset + entity.length]
@@ -221,7 +226,7 @@ class Poll(TelegramObject):
 
         return entity_text.decode('utf-16-le')
 
-    def parse_explanation_entities(self, types=None):
+    def parse_explanation_entities(self, types: List[str] = None) -> Dict[MessageEntity, str]:
         """
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
         It contains entities from this polls explanation filtered by their ``type`` attribute as
@@ -247,10 +252,10 @@ class Poll(TelegramObject):
 
         return {
             entity: self.parse_explanation_entity(entity)
-            for entity in self.explanation_entities if entity.type in types
+            for entity in (self.explanation_entities or []) if entity.type in types
         }
 
-    REGULAR = "regular"
+    REGULAR: str = "regular"
     """:obj:`str`: 'regular'"""
-    QUIZ = "quiz"
+    QUIZ: str = "quiz"
     """:obj:`str`: 'quiz'"""

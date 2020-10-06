@@ -19,6 +19,10 @@
 """This module contains an object that represents a Telegram ShippingQuery."""
 
 from telegram import TelegramObject, User, ShippingAddress
+from telegram.utils.types import JSONDict
+from typing import Any, Optional, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class ShippingQuery(TelegramObject):
@@ -47,7 +51,13 @@ class ShippingQuery(TelegramObject):
 
     """
 
-    def __init__(self, id, from_user, invoice_payload, shipping_address, bot=None, **kwargs):
+    def __init__(self,
+                 id: str,
+                 from_user: User,
+                 invoice_payload: str,
+                 shipping_address: ShippingAddress,
+                 bot: 'Bot' = None,
+                 **kwargs: Any):
         self.id = id
         self.from_user = from_user
         self.invoice_payload = invoice_payload
@@ -58,18 +68,18 @@ class ShippingQuery(TelegramObject):
         self._id_attrs = (self.id,)
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['ShippingQuery']:
+        data = cls.parse_data(data)
+
         if not data:
             return None
-
-        data = super().de_json(data, bot)
 
         data['from_user'] = User.de_json(data.pop('from'), bot)
         data['shipping_address'] = ShippingAddress.de_json(data.get('shipping_address'), bot)
 
         return cls(bot=bot, **data)
 
-    def answer(self, *args, **kwargs):
+    def answer(self, *args: Any, **kwargs: Any) -> bool:
         """Shortcut for::
 
             bot.answer_shipping_query(update.shipping_query.id, *args, **kwargs)

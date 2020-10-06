@@ -455,7 +455,7 @@ class TestBot:
             results = data['results']
             length_matches = len(results) == num_results
             ids_match = all([int(res['id']) == id_offset + i for i, res in enumerate(results)])
-            next_offset_matches = data['next_offset'] == expected_next_offset
+            next_offset_matches = data['next_offset'] == str(expected_next_offset)
             return length_matches and ids_match and next_offset_matches
 
         monkeypatch.setattr(bot.request, 'post', make_assertion)
@@ -468,7 +468,7 @@ class TestBot:
             results = data['results']
             length_matches = len(results) == MAX_INLINE_QUERY_RESULTS
             ids_match = all([int(res['id']) == 1 + i for i, res in enumerate(results)])
-            next_offset_matches = data['next_offset'] == 1
+            next_offset_matches = data['next_offset'] == '1'
             return length_matches and ids_match and next_offset_matches
 
         monkeypatch.setattr(bot.request, 'post', make_assertion)
@@ -494,7 +494,7 @@ class TestBot:
             results = data['results']
             length = len(results) == 5
             ids = all([int(res['id']) == 6 + i for i, res in enumerate(results)])
-            next_offset = data['next_offset'] == 2
+            next_offset = data['next_offset'] == '2'
             return length and ids and next_offset
 
         monkeypatch.setattr(bot.request, 'post', make_assertion)

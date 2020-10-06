@@ -20,6 +20,13 @@
 
 from .handler import Handler
 
+from telegram.utils.types import HandlerArg
+from typing import Callable, TYPE_CHECKING, Any, Optional, TypeVar, Dict, List
+if TYPE_CHECKING:
+    from telegram.ext import CallbackContext, Dispatcher
+
+RT = TypeVar('RT')
+
 
 class StringCommandHandler(Handler):
     """Handler class to handle string commands. Commands are string updates that start with ``/``.
@@ -44,6 +51,7 @@ class StringCommandHandler(Handler):
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     Args:
+        command (:obj:`str`): The command this handler should listen for.
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
             Callback signature for context based API:
@@ -73,12 +81,12 @@ class StringCommandHandler(Handler):
     """
 
     def __init__(self,
-                 command,
-                 callback,
-                 pass_args=False,
-                 pass_update_queue=False,
-                 pass_job_queue=False,
-                 run_async=False):
+                 command: str,
+                 callback: Callable[[HandlerArg, 'CallbackContext'], RT],
+                 pass_args: bool = False,
+                 pass_update_queue: bool = False,
+                 pass_job_queue: bool = False,
+                 run_async: bool = False):
         super().__init__(
             callback,
             pass_update_queue=pass_update_queue,
@@ -87,7 +95,7 @@ class StringCommandHandler(Handler):
         self.command = command
         self.pass_args = pass_args
 
-    def check_update(self, update):
+    def check_update(self, update: HandlerArg) -> Optional[List[str]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
@@ -101,12 +109,20 @@ class StringCommandHandler(Handler):
             args = update[1:].split(' ')
             if args[0] == self.command:
                 return args[1:]
+        return None
 
-    def collect_optional_args(self, dispatcher, update=None, check_result=None):
+    def collect_optional_args(self,
+                              dispatcher: 'Dispatcher',
+                              update: HandlerArg = None,
+                              check_result: Optional[List[str]] = None) -> Dict[str, Any]:
         optional_args = super().collect_optional_args(dispatcher, update, check_result)
         if self.pass_args:
             optional_args['args'] = check_result
         return optional_args
 
-    def collect_additional_context(self, context, update, dispatcher, check_result):
+    def collect_additional_context(self,
+                                   context: 'CallbackContext',
+                                   update: HandlerArg,
+                                   dispatcher: 'Dispatcher',
+                                   check_result: Optional[List[str]]) -> None:
         context.args = check_result

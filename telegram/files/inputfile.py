@@ -26,6 +26,8 @@ from uuid import uuid4
 
 from telegram import TelegramError
 
+from typing import IO, Tuple, Optional
+
 DEFAULT_MIME_TYPE = 'application/octet-stream'
 
 
@@ -48,7 +50,7 @@ class InputFile:
 
     """
 
-    def __init__(self, obj, filename=None, attach=None):
+    def __init__(self, obj: IO, filename: str = None, attach: bool = None):
         self.filename = None
         self.input_file_content = obj.read()
         self.attach = 'attached' + uuid4().hex if attach else None
@@ -70,15 +72,15 @@ class InputFile:
             self.filename = self.mimetype.replace('/', '.')
 
     @property
-    def field_tuple(self):
+    def field_tuple(self) -> Tuple[str, bytes, str]:
         return self.filename, self.input_file_content, self.mimetype
 
     @staticmethod
-    def is_image(stream):
+    def is_image(stream: bytes) -> str:
         """Check if the content file is an image by analyzing its headers.
 
         Args:
-            stream (:obj:`str`): A str representing the content of a file.
+            stream (:obj:`bytes`): A byte stream representing the content of a file.
 
         Returns:
             :obj:`str`: The str mime-type of an image.
@@ -91,9 +93,10 @@ class InputFile:
         raise TelegramError('Could not parse file content')
 
     @staticmethod
-    def is_file(obj):
+    def is_file(obj: object) -> bool:
         return hasattr(obj, 'read')
 
-    def to_dict(self):
+    def to_dict(self) -> Optional[str]:
         if self.attach:
             return 'attach://' + self.attach
+        return None
