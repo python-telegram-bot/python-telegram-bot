@@ -68,7 +68,9 @@ Here's how to make a one-off code change.
    - You can refer to relevant issues in the commit message by writing, e.g., "#105".
 
    - Your code should adhere to the `PEP 8 Style Guide`_, with the exception that we have a maximum line length of 99.
-   
+
+   - Provide static typing with signature annotations. The documentation of `MyPy`_ will be a good start, the cheat sheet is `here`_. We also have some custom type aliases in ``telegram.utils.helpers.typing``.
+
    - Document your code. This project uses `sphinx`_ to generate static HTML docs. To build them, first make sure you have the required dependencies:
 
      .. code-block:: bash
@@ -251,3 +253,5 @@ break the API classes. For example:
 .. _`Google Python Style Guide`: http://google.github.io/styleguide/pyguide.html
 .. _`Google Python Style Docstrings`: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html
 .. _AUTHORS.rst: ../AUTHORS.rst
+.. _`MyPy`: https://mypy.readthedocs.io/en/stable/index.html
+.. _`here`: https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html

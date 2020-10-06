@@ -19,6 +19,7 @@
 """This module contains the classes that represent Telegram InputContactMessageContent."""
 
 from telegram import InputMessageContent
+from typing import Any
 
 
 class InputContactMessageContent(InputMessageContent):
@@ -44,7 +45,12 @@ class InputContactMessageContent(InputMessageContent):
 
     """
 
-    def __init__(self, phone_number, first_name, last_name=None, vcard=None, **kwargs):
+    def __init__(self,
+                 phone_number: str,
+                 first_name: str,
+                 last_name: str = None,
+                 vcard: str = None,
+                 **kwargs: Any):
         # Required
         self.phone_number = phone_number
         self.first_name = first_name

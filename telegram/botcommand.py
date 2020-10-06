@@ -19,6 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Bot Command."""
 from telegram import TelegramObject
+from typing import Any
 
 
 class BotCommand(TelegramObject):
@@ -37,15 +38,8 @@ class BotCommand(TelegramObject):
             English letters, digits and underscores.
         description (:obj:`str`): Description of the command, 3-256 characters.
     """
-    def __init__(self, command, description, **kwargs):
+    def __init__(self, command: str, description: str, **kwargs: Any):
         self.command = command
         self.description = description
 
         self._id_attrs = (self.command, self.description)
-
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(**data)

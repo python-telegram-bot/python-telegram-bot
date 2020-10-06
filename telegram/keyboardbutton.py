@@ -19,6 +19,7 @@
 """This module contains an object that represents a Telegram KeyboardButton."""
 
 from telegram import TelegramObject
+from typing import Any
 
 
 class KeyboardButton(TelegramObject):
@@ -59,8 +60,12 @@ class KeyboardButton(TelegramObject):
 
     """
 
-    def __init__(self, text, request_contact=None, request_location=None, request_poll=None,
-                 **kwargs):
+    def __init__(self,
+                 text: str,
+                 request_contact: bool = None,
+                 request_location: bool = None,
+                 request_poll: bool = None,
+                 **kwargs: Any):
         # Required
         self.text = text
         # Optionals

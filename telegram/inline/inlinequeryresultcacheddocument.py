@@ -19,7 +19,10 @@
 """This module contains the classes that represent Telegram InlineQueryResultCachedDocument."""
 
 from telegram import InlineQueryResult
-from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
+from typing import Any, Union, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import InputMessageContent, ReplyMarkup
 
 
 class InlineQueryResultCachedDocument(InlineQueryResult):
@@ -63,15 +66,15 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
     """
 
     def __init__(self,
-                 id,
-                 title,
-                 document_file_id,
-                 description=None,
-                 caption=None,
-                 reply_markup=None,
-                 input_message_content=None,
-                 parse_mode=DEFAULT_NONE,
-                 **kwargs):
+                 id: str,
+                 title: str,
+                 document_file_id: str,
+                 description: str = None,
+                 caption: str = None,
+                 reply_markup: 'ReplyMarkup' = None,
+                 input_message_content: 'InputMessageContent' = None,
+                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+                 **kwargs: Any):
         # Required
         super().__init__('document', id)
         self.title = title

@@ -21,6 +21,10 @@
 import sys
 
 from telegram import MessageEntity, TelegramObject, Animation, PhotoSize
+from telegram.utils.types import JSONDict
+from typing import List, Any, Dict, Optional, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class Game(TelegramObject):
@@ -63,13 +67,13 @@ class Game(TelegramObject):
     """
 
     def __init__(self,
-                 title,
-                 description,
-                 photo,
-                 text=None,
-                 text_entities=None,
-                 animation=None,
-                 **kwargs):
+                 title: str,
+                 description: str,
+                 photo: List[PhotoSize],
+                 text: str = None,
+                 text_entities: List[MessageEntity] = None,
+                 animation: Animation = None,
+                 **kwargs: Any):
         # Required
         self.title = title
         self.description = description
@@ -82,11 +86,11 @@ class Game(TelegramObject):
         self._id_attrs = (self.title, self.description, self.photo)
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Game']:
+        data = cls.parse_data(data)
+
         if not data:
             return None
-
-        data = super().de_json(data, bot)
 
         data['photo'] = PhotoSize.de_list(data.get('photo'), bot)
         data['text_entities'] = MessageEntity.de_list(data.get('text_entities'), bot)
@@ -94,7 +98,7 @@ class Game(TelegramObject):
 
         return cls(**data)
 
-    def to_dict(self):
+    def to_dict(self) -> JSONDict:
         data = super().to_dict()
 
         data['photo'] = [p.to_dict() for p in self.photo]
@@ -103,7 +107,7 @@ class Game(TelegramObject):
 
         return data
 
-    def parse_text_entity(self, entity):
+    def parse_text_entity(self, entity: MessageEntity) -> str:
         """Returns the text from a given :class:`telegram.MessageEntity`.
 
         Note:
@@ -118,7 +122,13 @@ class Game(TelegramObject):
         Returns:
             :obj:`str`: The text of the given entity.
 
+        Raises:
+            RuntimeError: If this game has no text.
+
         """
+        if not self.text:
+            raise RuntimeError("This Game has no 'text'.")
+
         # Is it a narrow build, if so we don't need to convert
         if sys.maxunicode == 0xffff:
             return self.text[entity.offset:entity.offset + entity.length]
@@ -128,7 +138,7 @@ class Game(TelegramObject):
 
         return entity_text.decode('utf-16-le')
 
-    def parse_text_entities(self, types=None):
+    def parse_text_entities(self, types: List[str] = None) -> Dict[MessageEntity, str]:
         """
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
         It contains entities from this message filtered by their ``type`` attribute as the key, and
@@ -154,8 +164,8 @@ class Game(TelegramObject):
 
         return {
             entity: self.parse_text_entity(entity)
-            for entity in self.text_entities if entity.type in types
+            for entity in (self.text_entities or []) if entity.type in types
         }
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.title, self.description, tuple(p for p in self.photo)))

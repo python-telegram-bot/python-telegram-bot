@@ -19,7 +19,10 @@
 """This module contains the classes that represent Telegram InlineQueryResultVideo."""
 
 from telegram import InlineQueryResult
-from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
+from typing import Any, Union, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import InputMessageContent, ReplyMarkup
 
 
 class InlineQueryResultVideo(InlineQueryResult):
@@ -81,20 +84,20 @@ class InlineQueryResultVideo(InlineQueryResult):
     """
 
     def __init__(self,
-                 id,
-                 video_url,
-                 mime_type,
-                 thumb_url,
-                 title,
-                 caption=None,
-                 video_width=None,
-                 video_height=None,
-                 video_duration=None,
-                 description=None,
-                 reply_markup=None,
-                 input_message_content=None,
-                 parse_mode=DEFAULT_NONE,
-                 **kwargs):
+                 id: str,
+                 video_url: str,
+                 mime_type: str,
+                 thumb_url: str,
+                 title: str,
+                 caption: str = None,
+                 video_width: int = None,
+                 video_height: int = None,
+                 video_duration: int = None,
+                 description: str = None,
+                 reply_markup: 'ReplyMarkup' = None,
+                 input_message_content: 'InputMessageContent' = None,
+                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+                 **kwargs: Any):
 
         # Required
         super().__init__('video', id)

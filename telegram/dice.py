@@ -19,6 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Dice."""
 from telegram import TelegramObject
+from typing import Any, List
 
 
 class Dice(TelegramObject):
@@ -47,25 +48,18 @@ class Dice(TelegramObject):
         value (:obj:`int`): Value of the dice. 1-6 for dice and darts, 1-5 for basketball.
         emoji (:obj:`str`): Emoji on which the dice throw animation is based.
     """
-    def __init__(self, value, emoji, **kwargs):
+    def __init__(self, value: int, emoji: str, **kwargs: Any):
         self.value = value
         self.emoji = emoji
 
         self._id_attrs = (self.value, self.emoji)
 
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(**data)
-
-    DICE = '🎲'
+    DICE: str = '🎲'
     """:obj:`str`: '🎲'"""
-    DARTS = '🎯'
+    DARTS: str = '🎯'
     """:obj:`str`: '🎯'"""
     BASKETBALL = '🏀'
     """:obj:`str`: '🏀'"""
-    ALL_EMOJI = [DICE, DARTS, BASKETBALL]
+    ALL_EMOJI: List[str] = [DICE, DARTS, BASKETBALL]
     """List[:obj:`str`]: List of all supported base emoji. Currently :attr:`DICE`,
     :attr:`DARTS` and :attr:`BASKETBALL`."""

@@ -19,6 +19,7 @@
 """This module contains an object that represents a Telegram ShippingAddress."""
 
 from telegram import TelegramObject
+from typing import Any
 
 
 class ShippingAddress(TelegramObject):
@@ -47,7 +48,14 @@ class ShippingAddress(TelegramObject):
 
     """
 
-    def __init__(self, country_code, state, city, street_line1, street_line2, post_code, **kwargs):
+    def __init__(self,
+                 country_code: str,
+                 state: str,
+                 city: str,
+                 street_line1: str,
+                 street_line2: str,
+                 post_code: str,
+                 **kwargs: Any):
         self.country_code = country_code
         self.state = state
         self.city = city
@@ -57,10 +65,3 @@ class ShippingAddress(TelegramObject):
 
         self._id_attrs = (self.country_code, self.state, self.city, self.street_line1,
                           self.street_line2, self.post_code)
-
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(**data)

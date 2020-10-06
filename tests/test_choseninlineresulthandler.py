@@ -24,7 +24,7 @@ from telegram import (Update, Chat, Bot, ChosenInlineResult, User, Message, Call
                       InlineQuery, ShippingQuery, PreCheckoutQuery)
 from telegram.ext import ChosenInlineResultHandler, CallbackContext, JobQueue
 
-message = Message(1, User(1, '', False), None, Chat(1, ''), text='Text')
+message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
 
 params = [
     {'message': message},

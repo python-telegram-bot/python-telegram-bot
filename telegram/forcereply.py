@@ -19,6 +19,7 @@
 """This module contains an object that represents a Telegram ForceReply."""
 
 from telegram import ReplyMarkup
+from typing import Any
 
 
 class ForceReply(ReplyMarkup):
@@ -48,7 +49,7 @@ class ForceReply(ReplyMarkup):
 
     """
 
-    def __init__(self, force_reply=True, selective=False, **kwargs):
+    def __init__(self, force_reply: bool = True, selective: bool = False, **kwargs: Any):
         # Required
         self.force_reply = bool(force_reply)
         # Optionals

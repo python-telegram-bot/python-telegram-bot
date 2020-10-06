@@ -20,6 +20,10 @@
 """This module contains an object that represents a Telegram InlineQuery."""
 
 from telegram import TelegramObject, User, Location
+from telegram.utils.types import JSONDict
+from typing import Any, Optional, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class InlineQuery(TelegramObject):
@@ -53,7 +57,14 @@ class InlineQuery(TelegramObject):
 
     """
 
-    def __init__(self, id, from_user, query, offset, location=None, bot=None, **kwargs):
+    def __init__(self,
+                 id: str,
+                 from_user: User,
+                 query: str,
+                 offset: str,
+                 location: Location = None,
+                 bot: 'Bot' = None,
+                 **kwargs: Any):
         # Required
         self.id = id
         self.from_user = from_user
@@ -67,8 +78,8 @@ class InlineQuery(TelegramObject):
         self._id_attrs = (self.id,)
 
     @classmethod
-    def de_json(cls, data, bot):
-        data = super().de_json(data, bot)
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['InlineQuery']:
+        data = cls.parse_data(data)
 
         if not data:
             return None
@@ -78,7 +89,7 @@ class InlineQuery(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def answer(self, *args, auto_pagination=False, **kwargs):
+    def answer(self, *args: Any, auto_pagination: bool = False, **kwargs: Any) -> bool:
         """Shortcut for::
 
             bot.answer_inline_query(update.inline_query.id,

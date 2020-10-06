@@ -26,7 +26,7 @@ from telegram import (Message, Update, Chat, Bot, User, CallbackQuery, InlineQue
                       ChosenInlineResult, ShippingQuery, PreCheckoutQuery)
 from telegram.ext import Filters, MessageHandler, CallbackContext, JobQueue, UpdateFilter
 
-message = Message(1, User(1, '', False), None, Chat(1, ''), text='Text')
+message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
 
 params = [
     {'callback_query': CallbackQuery(1, User(1, '', False), 'chat', message=message)},
@@ -48,7 +48,7 @@ def false_update(request):
 
 @pytest.fixture(scope='class')
 def message(bot):
-    return Message(1, User(1, '', False), None, Chat(1, ''), bot=bot)
+    return Message(1, None, Chat(1, ''), from_user=User(1, '', False), bot=bot)
 
 
 class TestMessageHandler:

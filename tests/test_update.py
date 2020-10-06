@@ -23,7 +23,7 @@ from telegram import (Message, User, Update, Chat, CallbackQuery, InlineQuery,
                       ChosenInlineResult, ShippingQuery, PreCheckoutQuery, Poll, PollOption)
 from telegram.poll import PollAnswer
 
-message = Message(1, User(1, '', False), None, Chat(1, ''), text='Text')
+message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
 
 params = [
     {'message': message},

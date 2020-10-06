@@ -41,7 +41,7 @@ class TestCallbackQuery:
     id_ = 'id'
     from_user = User(1, 'test_user', False)
     chat_instance = 'chat_instance'
-    message = Message(3, User(5, 'bot', False), None, Chat(4, 'private'))
+    message = Message(3, None, Chat(4, 'private'), from_user=User(5, 'bot', False))
     data = 'data'
     inline_message_id = 'inline_message_id'
     game_short_name = 'the_game'
@@ -82,7 +82,7 @@ class TestCallbackQuery:
         def test(*args, **kwargs):
             return args[0] == callback_query.id
 
-        monkeypatch.setattr(callback_query.bot, 'answerCallbackQuery', test)
+        monkeypatch.setattr(callback_query.bot, 'answer_callback_query', test)
         # TODO: PEP8
         assert callback_query.answer()
 

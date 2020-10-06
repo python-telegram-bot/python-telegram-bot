@@ -19,6 +19,10 @@
 """This module contains objects that represents stickers."""
 
 from telegram import PhotoSize, TelegramObject
+from telegram.utils.types import JSONDict
+from typing import Any, Optional, List, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import Bot, File
 
 
 class Sticker(TelegramObject):
@@ -68,18 +72,18 @@ class Sticker(TelegramObject):
     """
 
     def __init__(self,
-                 file_id,
-                 file_unique_id,
-                 width,
-                 height,
-                 is_animated,
-                 thumb=None,
-                 emoji=None,
-                 file_size=None,
-                 set_name=None,
-                 mask_position=None,
-                 bot=None,
-                 **kwargs):
+                 file_id: str,
+                 file_unique_id: str,
+                 width: int,
+                 height: int,
+                 is_animated: bool,
+                 thumb: PhotoSize = None,
+                 emoji: str = None,
+                 file_size: int = None,
+                 set_name: str = None,
+                 mask_position: 'MaskPosition' = None,
+                 bot: 'Bot' = None,
+                 **kwargs: Any):
         # Required
         self.file_id = str(file_id)
         self.file_unique_id = str(file_unique_id)
@@ -97,25 +101,18 @@ class Sticker(TelegramObject):
         self._id_attrs = (self.file_unique_id,)
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Sticker']:
+        data = cls.parse_data(data)
+
         if not data:
             return None
-
-        data = super().de_json(data, bot)
 
         data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
         data['mask_position'] = MaskPosition.de_json(data.get('mask_position'), bot)
 
         return cls(bot=bot, **data)
 
-    @classmethod
-    def de_list(cls, data, bot):
-        if not data:
-            return list()
-
-        return [cls.de_json(d, bot) for d in data]
-
-    def get_file(self, timeout=None, api_kwargs=None):
+    def get_file(self, timeout: str = None, api_kwargs: JSONDict = None) -> 'File':
         """Convenience wrapper over :attr:`telegram.Bot.get_file`
 
         Args:
@@ -161,8 +158,15 @@ class StickerSet(TelegramObject):
 
     """
 
-    def __init__(self, name, title, is_animated, contains_masks, stickers, bot=None, thumb=None,
-                 **kwargs):
+    def __init__(self,
+                 name: str,
+                 title: str,
+                 is_animated: bool,
+                 contains_masks: bool,
+                 stickers: List[Sticker],
+                 bot: 'Bot' = None,
+                 thumb: PhotoSize = None,
+                 **kwargs: Any):
         self.name = name
         self.title = title
         self.is_animated = is_animated
@@ -174,18 +178,16 @@ class StickerSet(TelegramObject):
         self._id_attrs = (self.name,)
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['StickerSet']:
         if not data:
             return None
-
-        data = super().de_json(data, bot)
 
         data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
         data['stickers'] = Sticker.de_list(data.get('stickers'), bot)
 
         return cls(bot=bot, **data)
 
-    def to_dict(self):
+    def to_dict(self) -> JSONDict:
         data = super().to_dict()
 
         data['stickers'] = [s.to_dict() for s in data.get('stickers')]
@@ -225,16 +227,16 @@ class MaskPosition(TelegramObject):
         scale (:obj:`float`): Mask scaling coefficient. For example, 2.0 means double size.
 
     """
-    FOREHEAD = 'forehead'
+    FOREHEAD: str = 'forehead'
     """:obj:`str`: 'forehead'"""
-    EYES = 'eyes'
+    EYES: str = 'eyes'
     """:obj:`str`: 'eyes'"""
-    MOUTH = 'mouth'
+    MOUTH: str = 'mouth'
     """:obj:`str`: 'mouth'"""
-    CHIN = 'chin'
+    CHIN: str = 'chin'
     """:obj:`str`: 'chin'"""
 
-    def __init__(self, point, x_shift, y_shift, scale, **kwargs):
+    def __init__(self, point: str, x_shift: float, y_shift: float, scale: float, **kwargs: Any):
         self.point = point
         self.x_shift = x_shift
         self.y_shift = y_shift
@@ -243,7 +245,9 @@ class MaskPosition(TelegramObject):
         self._id_attrs = (self.point, self.x_shift, self.y_shift, self.scale)
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['MaskPosition']:
+        data = cls.parse_data(data)
+
         if data is None:
             return None
 

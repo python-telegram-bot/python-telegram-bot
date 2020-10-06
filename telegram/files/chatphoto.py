@@ -19,6 +19,10 @@
 """This module contains an object that represents a Telegram ChatPhoto."""
 from telegram import TelegramObject
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import Bot, File
+
 
 class ChatPhoto(TelegramObject):
     """This object represents a chat photo.
@@ -58,11 +62,12 @@ class ChatPhoto(TelegramObject):
     """
 
     def __init__(self,
-                 small_file_id,
-                 small_file_unique_id,
-                 big_file_id,
-                 big_file_unique_id,
-                 bot=None, **kwargs):
+                 small_file_id: str,
+                 small_file_unique_id: str,
+                 big_file_id: str,
+                 big_file_unique_id: str,
+                 bot: 'Bot' = None,
+                 **kwargs: Any):
         self.small_file_id = small_file_id
         self.small_file_unique_id = small_file_unique_id
         self.big_file_id = big_file_id
@@ -72,14 +77,7 @@ class ChatPhoto(TelegramObject):
 
         self._id_attrs = (self.small_file_unique_id, self.big_file_unique_id,)
 
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(bot=bot, **data)
-
-    def get_small_file(self, timeout=None, **kwargs):
+    def get_small_file(self, timeout: int = None, **kwargs: Any) -> 'File':
         """Convenience wrapper over :attr:`telegram.Bot.get_file` for getting the
         small (160x160) chat photo
 
@@ -99,7 +97,7 @@ class ChatPhoto(TelegramObject):
         """
         return self.bot.get_file(self.small_file_id, timeout=timeout, **kwargs)
 
-    def get_big_file(self, timeout=None, **kwargs):
+    def get_big_file(self, timeout: int = None, **kwargs: Any) -> 'File':
         """Convenience wrapper over :attr:`telegram.Bot.get_file` for getting the
         big (640x640) chat photo
 

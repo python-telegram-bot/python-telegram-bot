@@ -19,6 +19,9 @@
 """This module contains the classes that represent Telegram InlineQueryResultArticle."""
 
 from telegram import InlineQueryResult
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import InputMessageContent, ReplyMarkup
 
 
 class InlineQueryResultArticle(InlineQueryResult):
@@ -59,17 +62,17 @@ class InlineQueryResultArticle(InlineQueryResult):
     """
 
     def __init__(self,
-                 id,
-                 title,
-                 input_message_content,
-                 reply_markup=None,
-                 url=None,
-                 hide_url=None,
-                 description=None,
-                 thumb_url=None,
-                 thumb_width=None,
-                 thumb_height=None,
-                 **kwargs):
+                 id: str,
+                 title: str,
+                 input_message_content: 'InputMessageContent',
+                 reply_markup: 'ReplyMarkup' = None,
+                 url: str = None,
+                 hide_url: bool = None,
+                 description: str = None,
+                 thumb_url: str = None,
+                 thumb_width: int = None,
+                 thumb_height: int = None,
+                 **kwargs: Any):
 
         # Required
         super().__init__('article', id)

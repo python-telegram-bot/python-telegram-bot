@@ -20,6 +20,11 @@
 
 from telegram import TelegramObject, PhotoSize
 
+from telegram.utils.types import JSONDict
+from typing import Any, Optional, TYPE_CHECKING
+if TYPE_CHECKING:
+    from telegram import Bot, File
+
 
 class Audio(TelegramObject):
     """This object represents an audio file to be treated as music by the Telegram clients.
@@ -61,16 +66,16 @@ class Audio(TelegramObject):
     """
 
     def __init__(self,
-                 file_id,
-                 file_unique_id,
-                 duration,
-                 performer=None,
-                 title=None,
-                 mime_type=None,
-                 file_size=None,
-                 thumb=None,
-                 bot=None,
-                 **kwargs):
+                 file_id: str,
+                 file_unique_id: str,
+                 duration: int,
+                 performer: str = None,
+                 title: str = None,
+                 mime_type: str = None,
+                 file_size: int = None,
+                 thumb: PhotoSize = None,
+                 bot: 'Bot' = None,
+                 **kwargs: Any):
         # Required
         self.file_id = str(file_id)
         self.file_unique_id = str(file_unique_id)
@@ -86,7 +91,9 @@ class Audio(TelegramObject):
         self._id_attrs = (self.file_unique_id,)
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Audio']:
+        data = cls.parse_data(data)
+
         if not data:
             return None
 
@@ -94,7 +101,7 @@ class Audio(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def get_file(self, timeout=None, api_kwargs=None):
+    def get_file(self, timeout: int = None, api_kwargs: JSONDict = None) -> 'File':
         """Convenience wrapper over :attr:`telegram.Bot.get_file`
 
         Args:

@@ -21,20 +21,32 @@ import os
 import sys
 import logging
 from telegram import Update
-from threading import Lock
+from threading import Lock, Event
 
 try:
     import ujson as json
 except ImportError:
-    import json
+    import json  # type: ignore[no-redef]
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 import tornado.web
 
+from ssl import SSLContext
+from queue import Queue
+from telegram.utils.types import JSONDict
+from typing import Any, TYPE_CHECKING
+from tornado import httputil
+if TYPE_CHECKING:
+    from telegram import Bot
+
 
 class WebhookServer:
 
-    def __init__(self, listen, port, webhook_app, ssl_ctx):
+    def __init__(self,
+                 listen: str,
+                 port: int,
+                 webhook_app: 'WebhookAppClass',
+                 ssl_ctx: SSLContext):
         self.http_server = HTTPServer(webhook_app, ssl_options=ssl_ctx)
         self.listen = listen
         self.port = port
@@ -44,7 +56,7 @@ class WebhookServer:
         self.server_lock = Lock()
         self.shutdown_lock = Lock()
 
-    def serve_forever(self, force_event_loop=False, ready=None):
+    def serve_forever(self, force_event_loop: bool = False, ready: Event = None) -> None:
         with self.server_lock:
             self.is_running = True
             self.logger.debug('Webhook Server started.')
@@ -55,24 +67,24 @@ class WebhookServer:
             if ready is not None:
                 ready.set()
 
-            self.loop.start()
+            self.loop.start()  # type: ignore
             self.logger.debug('Webhook Server stopped.')
             self.is_running = False
 
-    def shutdown(self):
+    def shutdown(self) -> None:
         with self.shutdown_lock:
             if not self.is_running:
                 self.logger.warning('Webhook Server already stopped.')
                 return
             else:
-                self.loop.add_callback(self.loop.stop)
+                self.loop.add_callback(self.loop.stop)  # type: ignore
 
-    def handle_error(self, request, client_address):
+    def handle_error(self, request: Any, client_address: str) -> None:
         """Handle an error gracefully."""
         self.logger.debug('Exception happened during processing of request from %s',
                           client_address, exc_info=True)
 
-    def _ensure_event_loop(self, force_event_loop=False):
+    def _ensure_event_loop(self, force_event_loop: bool = False) -> None:
         """If there's no asyncio event loop set for the current thread - create one."""
         try:
             loop = asyncio.get_event_loop()
@@ -111,7 +123,10 @@ class WebhookServer:
 
 class WebhookAppClass(tornado.web.Application):
 
-    def __init__(self, webhook_path, bot, update_queue):
+    def __init__(self,
+                 webhook_path: str,
+                 bot: 'Bot',
+                 update_queue: Queue):
         self.shared_objects = {"bot": bot, "update_queue": update_queue}
         handlers = [
             (r"{}/?".format(webhook_path), WebhookHandler,
@@ -119,7 +134,7 @@ class WebhookAppClass(tornado.web.Application):
         ]  # noqa
         tornado.web.Application.__init__(self, handlers)
 
-    def log_request(self, handler):
+    def log_request(self, handler: tornado.web.RequestHandler) -> None:
         pass
 
 
@@ -127,18 +142,21 @@ class WebhookAppClass(tornado.web.Application):
 class WebhookHandler(tornado.web.RequestHandler):
     SUPPORTED_METHODS = ["POST"]
 
-    def __init__(self, application, request, **kwargs):
+    def __init__(self,
+                 application: tornado.web.Application,
+                 request: httputil.HTTPServerRequest,
+                 **kwargs: JSONDict):
         super().__init__(application, request, **kwargs)
         self.logger = logging.getLogger(__name__)
 
-    def initialize(self, bot, update_queue):
+    def initialize(self, bot: 'Bot', update_queue: Queue) -> None:
         self.bot = bot
         self.update_queue = update_queue
 
-    def set_default_headers(self):
+    def set_default_headers(self) -> None:
         self.set_header("Content-Type", 'application/json; charset="utf-8"')
 
-    def post(self):
+    def post(self) -> None:
         self.logger.debug('Webhook triggered')
         self._validate_post()
         json_string = self.request.body.decode()
@@ -146,15 +164,16 @@ class WebhookHandler(tornado.web.RequestHandler):
         self.set_status(200)
         self.logger.debug('Webhook received data: ' + json_string)
         update = Update.de_json(data, self.bot)
-        self.logger.debug('Received Update with ID %d on Webhook' % update.update_id)
-        self.update_queue.put(update)
+        if update:
+            self.logger.debug('Received Update with ID %d on Webhook' % update.update_id)
+            self.update_queue.put(update)
 
-    def _validate_post(self):
+    def _validate_post(self) -> None:
         ct_header = self.request.headers.get("Content-Type", None)
         if ct_header != 'application/json':
             raise tornado.web.HTTPError(403)
 
-    def write_error(self, status_code, **kwargs):
+    def write_error(self, status_code: int, **kwargs: Any) -> None:
         """Log an arbitrary message.
 
         This is used by all other logging functions.
