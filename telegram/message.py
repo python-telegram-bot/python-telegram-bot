@@ -454,7 +454,6 @@ class Message(TelegramObject):
 
     def to_dict(self) -> JSONDict:
         data = super().to_dict()
-        print(data)
 
         # Required
         data['date'] = to_timestamp(self.date)
