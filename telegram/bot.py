@@ -751,8 +751,11 @@ class Bot(TelegramObject):
         the future.
 
         Note:
-            The video argument can be either a file_id, an URL or a file from disk
-            ``open(filename, 'rb')``
+            * The video argument can be either a file_id, an URL or a file from disk
+              ``open(filename, 'rb')``
+            * ``thumb`` will be ignored for small video files, for which Telegram can easily
+              generate thumb nails. However, this behaviour is undocumented and might be changed
+              by Telegram.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -841,8 +844,11 @@ class Bot(TelegramObject):
         Use this method to send video messages.
 
         Note:
-            The video_note argument can be either a file_id or a file from disk
-            ``open(filename, 'rb')``
+            * The video_note argument can be either a file_id or a file from disk
+              ``open(filename, 'rb')``
+            * ``thumb`` will be ignored for small video files, for which Telegram can easily
+              generate thumb nails. However, this behaviour is undocumented and might be changed
+              by Telegram.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -918,6 +924,11 @@ class Bot(TelegramObject):
         Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound).
         Bots can currently send animation files of up to 50 MB in size, this limit may be changed
         in the future.
+
+        Note:
+            ``thumb`` will be ignored for small files, for which Telegram can easily
+            generate thumb nails. However, this behaviour is undocumented and might be changed
+            by Telegram.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username

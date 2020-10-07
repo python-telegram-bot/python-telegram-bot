@@ -47,7 +47,9 @@ class Message(TelegramObject):
         forward_from_message_id (:obj:`int`): Optional. Identifier of the original message in the
             channel.
         forward_date (:class:`datetime.datetime`): Optional. Date the original message was sent.
-        reply_to_message (:class:`telegram.Message`): Optional. The original message.
+        reply_to_message (:class:`telegram.Message`): Optional. For replies, the original message.
+            Note that the Message object in this field will not contain further
+            ``reply_to_message`` fields even if it itself is a reply.
         edit_date (:class:`datetime.datetime`): Optional. Date the message was last edited.
         media_group_id (:obj:`str`): Optional. The unique identifier of a media message group this
             message belongs to.
@@ -132,8 +134,6 @@ class Message(TelegramObject):
         forward_date (:class:`datetime.datetime`, optional): For forwarded messages, date the
             original message was sent in Unix time. Converted to :class:`datetime.datetime`.
         reply_to_message (:class:`telegram.Message`, optional): For replies, the original message.
-            Note that the Message object in this field will not contain further
-            ``reply_to_message`` fields even if it itself is a reply.
         edit_date (:class:`datetime.datetime`, optional): Date the message was last edited in Unix
             time. Converted to :class:`datetime.datetime`.
         media_group_id (:obj:`str`, optional): The unique identifier of a media message group this
@@ -142,7 +142,7 @@ class Message(TelegramObject):
             characters. Also found as :attr:`telegram.constants.MAX_MESSAGE_LENGTH`.
         entities (List[:class:`telegram.MessageEntity`], optional): For text messages, special
             entities like usernames, URLs, bot commands, etc. that appear in the text. See
-            attr:`parse_entity` and attr:`parse_entities` methods for how to use properly.
+            :attr:`parse_entity` and :attr:`parse_entities` methods for how to use properly.
         caption_entities (List[:class:`telegram.MessageEntity`]): Optional. For Messages with a
             Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
             caption. See :attr:`Message.parse_caption_entity` and :attr:`parse_caption_entities`
@@ -191,7 +191,7 @@ class Message(TelegramObject):
         channel_chat_created (:obj:`bool`, optional): Service message: The channel has been
             created. This field can't be received in a message coming through updates, because bot
             can't be a member of a channel when it is created. It can only be found in
-            attr:`reply_to_message` if someone replies to a very first message in a channel.
+            :attr:`reply_to_message` if someone replies to a very first message in a channel.
         migrate_to_chat_id (:obj:`int`, optional): The group has been migrated to a supergroup with
             the specified identifier. This number may be greater than 32 bits and some programming
             languages may have difficulty/silent defects in interpreting it. But it is smaller than
