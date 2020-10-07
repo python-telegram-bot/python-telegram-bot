@@ -2,6 +2,82 @@
 Changelog
 =========
 
+Version 13.0
+============
+*Released 2020-10-07*
+
+**For a detailed guide on how to migrate from v12 to v13, see this** `wiki page <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transition-guide-to-Version-13.0>`_.
+
+**Major Changes:**
+
+- Deprecate old-style callbacks, i.e. set ``use_context=True`` by default (`#2050`_)
+- Refactor Handling of Message VS Update Filters (`#2032`_)
+- Deprecate ``Message.default_quote`` (`#1965`_)
+- Refactor persistence of Bot instances (`#1994`_)
+- Refactor ``JobQueue`` (`#1981`_)
+- Refactor handling of kwargs in Bot methods (`#1924`_)
+- Refactor ``Dispatcher.run_async``, deprecating the ``@run_async`` decorator (`#2051`_)
+
+**New Features:**
+
+- Type Hinting (`#1920`_)
+- Automatic Pagination for ``answer_inline_query`` (`#2072`_)
+- ``Defaults.tzinfo`` (`#2042`_)
+- Extend rich comparison of objects (`#1724`_)
+- Add ``Filters.via_bot`` (`#2009`_)
+- Add missing shortcuts (`#2043`_)
+- Allow ``DispatcherHandlerStop`` in ``ConversationHandler`` (`#2059`_)
+- Make Errors picklable (`#2106`_)
+
+**Minor changes, CI improvements, doc fixes or bug fixes:**
+
+- Fix Webhook not working on Windows with Python 3.8+ (`#2067`_)
+- Fix setting thumbs with ``send_media_group`` (`#2093`_)
+- Make ``MessageHandler`` filter for ``Filters.update`` first (`#2085`_)
+- Fix ``PicklePersistence.flush()`` with only ``bot_data`` (`#2017`_)
+- Add test for clean argument of ``Updater.start_polling/webhook`` (`#2002`_)
+- Doc fixes, refinements and additions (`#2005`_, `#2008`_, `#2089`_, `#2094`_, `#2090`_)
+- CI fixes (`#2018`_, `#2061`_)
+- Refine ``pollbot.py`` example (`#2047`_)
+- Refine Filters in examples (`#2027`_)
+- Rename ``echobot`` examples (`#2025`_)
+- Use Lock-Bot to lock old threads (`#2048`_, `#2052`_, `#2049`_, `#2053`_)
+
+.. _`#2050`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2050
+.. _`#2032`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2032
+.. _`#1965`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1965
+.. _`#1994`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1994
+.. _`#1981`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1981
+.. _`#1924`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1924
+.. _`#2051`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2051
+.. _`#1920`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1920
+.. _`#2072`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2072
+.. _`#2042`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2042
+.. _`#1724`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1724
+.. _`#2009`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2009
+.. _`#2043`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2043
+.. _`#2059`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2059
+.. _`#2106`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2106
+.. _`#2067`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2067
+.. _`#2093`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2093
+.. _`#2085`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2085
+.. _`#2017`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2017
+.. _`#2002`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2002
+.. _`#2005`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2005
+.. _`#2008`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2008
+.. _`#2089`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2089
+.. _`#2094`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2094
+.. _`#2090`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2090
+.. _`#2018`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2018
+.. _`#2061`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2061
+.. _`#2047`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2047
+.. _`#2027`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2027
+.. _`#2025`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2025
+.. _`#2048`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2048
+.. _`#2052`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2052
+.. _`#2049`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2049
+.. _`#2053`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2053
+
 Version 12.8
 ============
 *Released 2020-06-22*
