@@ -9,10 +9,6 @@ We have a vibrant community of developers helping each other in our `Telegram gr
 
 *Stay tuned for library updates and new releases on our* `Telegram Channel <https://telegram.me/pythontelegrambotchannel>`_.
 
-.. image:: https://img.shields.io/pypi/v/python-telegram-bot.svg
-   :target: https://pypi.org/project/python-telegram-bot/
-   :alt: PyPi Package Version
-
 .. image:: https://img.shields.io/pypi/pyversions/python-telegram-bot.svg
    :target: https://pypi.org/project/python-telegram-bot/
    :alt: Supported Python versions
