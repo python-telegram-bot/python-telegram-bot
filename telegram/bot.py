@@ -38,7 +38,7 @@ from cryptography.hazmat.primitives import serialization
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
                       ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore, StickerSet,
                       PhotoSize, Audio, Document, Sticker, Video, Animation, Voice, VideoNote,
-                      Location, Venue, Contact, InputFile, Poll, BotCommand, ChatAction,
+                      Location, Venue, Contact, InputFile, Poll, BotCommand,
                       InlineQueryResult, InputMedia, PassportElementError, MaskPosition,
                       ChatPermissions, ShippingOption, LabeledPrice, ChatPhoto)
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
