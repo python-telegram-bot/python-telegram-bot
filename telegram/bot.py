@@ -1967,7 +1967,7 @@ class Bot(TelegramObject):
                           message_id: Union[str, int] = None,
                           inline_message_id: Union[str, int] = None,
                           parse_mode: str = None,
-                          disable_web_page_preview: str = None,
+                          disable_web_page_preview: bool = None,
                           reply_markup: ReplyMarkup = None,
                           timeout: float = None,
                           api_kwargs: JSONDict = None) -> Union[Optional[Message], bool]:
