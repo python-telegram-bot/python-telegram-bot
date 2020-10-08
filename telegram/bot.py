@@ -1550,7 +1550,7 @@ class Bot(TelegramObject):
     @log
     def send_chat_action(self,
                          chat_id: Union[str, int],
-                         action: Union[str, ChatAction],
+                         action: str,
                          timeout: float = None,
                          api_kwargs: JSONDict = None) -> bool:
         """
