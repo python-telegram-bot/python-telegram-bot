@@ -334,7 +334,7 @@ class Bot(TelegramObject):
                      chat_id: Union[int, str],
                      text: str,
                      parse_mode: str = None,
-                     disable_web_page_preview: str = None,
+                     disable_web_page_preview: bool = None,
                      disable_notification: bool = False,
                      reply_to_message_id: Union[int, str] = None,
                      reply_markup: ReplyMarkup = None,
