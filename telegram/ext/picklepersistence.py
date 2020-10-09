@@ -74,16 +74,20 @@ class PicklePersistence(BasePersistence):
             Default is :obj:`False`.
     """
 
-    def __init__(self,
-                 filename: str,
-                 store_user_data: bool = True,
-                 store_chat_data: bool = True,
-                 store_bot_data: bool = True,
-                 single_file: bool = True,
-                 on_flush: bool = False):
-        super().__init__(store_user_data=store_user_data,
-                         store_chat_data=store_chat_data,
-                         store_bot_data=store_bot_data)
+    def __init__(
+        self,
+        filename: str,
+        store_user_data: bool = True,
+        store_chat_data: bool = True,
+        store_bot_data: bool = True,
+        single_file: bool = True,
+        on_flush: bool = False,
+    ):
+        super().__init__(
+            store_user_data=store_user_data,
+            store_chat_data=store_chat_data,
+            store_bot_data=store_bot_data,
+        )
         self.filename = filename
         self.single_file = single_file
         self.on_flush = on_flush
@@ -125,8 +129,12 @@ class PicklePersistence(BasePersistence):
 
     def dump_singlefile(self) -> None:
         with open(self.filename, "wb") as f:
-            data = {'conversations': self.conversations, 'user_data': self.user_data,
-                    'chat_data': self.chat_data, 'bot_data': self.bot_data}
+            data = {
+                'conversations': self.conversations,
+                'user_data': self.user_data,
+                'chat_data': self.chat_data,
+                'bot_data': self.bot_data,
+            }
             pickle.dump(data, f)
 
     def dump_file(self, filename: str, data: Any) -> None:
@@ -212,9 +220,9 @@ class PicklePersistence(BasePersistence):
             self.load_singlefile()
         return self.conversations.get(name, {}).copy()  # type: ignore[union-attr]
 
-    def update_conversation(self,
-                            name: str, key: Tuple[int, ...],
-                            new_state: Optional[object]) -> None:
+    def update_conversation(
+        self, name: str, key: Tuple[int, ...], new_state: Optional[object]
+    ) -> None:
         """Will update the conversations for the given handler and depending on :attr:`on_flush`
         save the pickle file.
 
@@ -290,8 +298,7 @@ class PicklePersistence(BasePersistence):
                 self.dump_singlefile()
 
     def flush(self) -> None:
-        """ Will save all data in memory to pickle file(s).
-        """
+        """Will save all data in memory to pickle file(s)."""
         if self.single_file:
             if self.user_data or self.chat_data or self.bot_data or self.conversations:
                 self.dump_singlefile()

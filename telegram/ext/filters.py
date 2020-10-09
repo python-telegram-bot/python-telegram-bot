@@ -27,8 +27,14 @@ from telegram import Chat, Update, MessageEntity, Message
 
 from typing import Optional, Dict, Union, List, Pattern, Match, cast, Set, FrozenSet
 
-__all__ = ['Filters', 'BaseFilter', 'MessageFilter', 'UpdateFilter', 'InvertedFilter',
-           'MergedFilter']
+__all__ = [
+    'Filters',
+    'BaseFilter',
+    'MessageFilter',
+    'UpdateFilter',
+    'InvertedFilter',
+    'MergedFilter',
+]
 
 
 class BaseFilter(ABC):
@@ -120,6 +126,7 @@ class MessageFilter(BaseFilter, ABC):
             (depends on the handler).
 
     """
+
     def __call__(self, update: Update) -> Optional[Union[bool, Dict]]:
         return self.filter(update.effective_message)
 
@@ -151,12 +158,12 @@ class UpdateFilter(BaseFilter, ABC):
             (depends on the handler).
 
     """
+
     def __call__(self, update: Update) -> Optional[Union[bool, Dict]]:
         return self.filter(update)
 
     @abstractmethod
-    def filter(self,
-               update: Update) -> Optional[Union[bool, Dict]]:
+    def filter(self, update: Update) -> Optional[Union[bool, Dict]]:
         """This method must be overwritten.
 
         Args:
@@ -175,6 +182,7 @@ class InvertedFilter(UpdateFilter):
         f: The filter to invert.
 
     """
+
     def __init__(self, f: BaseFilter):
         self.f = f
 
@@ -194,22 +202,22 @@ class MergedFilter(UpdateFilter):
         or_filter: Optional filter to "or" with base_filter. Mutually exclusive with and_filter.
 
     """
-    def __init__(self,
-                 base_filter: BaseFilter,
-                 and_filter: BaseFilter = None,
-                 or_filter: BaseFilter = None):
+
+    def __init__(
+        self, base_filter: BaseFilter, and_filter: BaseFilter = None, or_filter: BaseFilter = None
+    ):
         self.base_filter = base_filter
         if self.base_filter.data_filter:
             self.data_filter = True
         self.and_filter = and_filter
-        if (self.and_filter
-                and not isinstance(self.and_filter, bool)
-                and self.and_filter.data_filter):
+        if (
+            self.and_filter
+            and not isinstance(self.and_filter, bool)
+            and self.and_filter.data_filter
+        ):
             self.data_filter = True
         self.or_filter = or_filter
-        if (self.or_filter
-                and not isinstance(self.and_filter, bool)
-                and self.or_filter.data_filter):
+        if self.or_filter and not isinstance(self.and_filter, bool) and self.or_filter.data_filter:
             self.data_filter = True
 
     def _merge(self, base_output: Union[bool, Dict], comp_output: Union[bool, Dict]) -> Dict:
@@ -257,18 +265,17 @@ class MergedFilter(UpdateFilter):
         return False
 
     def __repr__(self) -> str:
-        return "<{} {} {}>".format(self.base_filter, "and" if self.and_filter else "or",
-                                   self.and_filter or self.or_filter)
+        return "<{} {} {}>".format(
+            self.base_filter, "and" if self.and_filter else "or", self.and_filter or self.or_filter
+        )
 
 
 class _DiceEmoji(MessageFilter):
-
     def __init__(self, emoji: str = None, name: str = None):
         self.name = 'Filters.dice.{}'.format(name) if name else 'Filters.dice'
         self.emoji = emoji
 
     class _DiceValues(MessageFilter):
-
         def __init__(self, values: Union[int, List[int]], name: str, emoji: str = None):
             self.values = [values] if isinstance(values, int) else values
             self.emoji = emoji
@@ -281,8 +288,9 @@ class _DiceEmoji(MessageFilter):
                 return True
             return False
 
-    def __call__(self,  # type: ignore[override]
-                 update: Union[Update, List[int]]) -> Union[bool, '_DiceValues']:
+    def __call__(  # type: ignore[override]
+        self, update: Union[Update, List[int]]
+    ) -> Union[bool, '_DiceValues']:
         if isinstance(update, Update):
             return self.filter(update.effective_message)
         else:
@@ -319,7 +327,6 @@ class Filters:
         name = 'Filters.text'
 
         class _TextStrings(MessageFilter):
-
             def __init__(self, strings: List[str]):
                 self.strings = strings
                 self.name = 'Filters.text({})'.format(strings)
@@ -329,8 +336,9 @@ class Filters:
                     return message.text in self.strings
                 return False
 
-        def __call__(self,  # type: ignore[override]
-                     update: Union[Update, List[str]]) -> Union[bool, '_TextStrings']:
+        def __call__(  # type: ignore[override]
+            self, update: Union[Update, List[str]]
+        ) -> Union[bool, '_TextStrings']:
             if isinstance(update, Update):
                 return self.filter(update.effective_message)
             else:
@@ -371,7 +379,6 @@ class Filters:
         name = 'Filters.caption'
 
         class _CaptionStrings(MessageFilter):
-
             def __init__(self, strings: List[str]):
                 self.strings = strings
                 self.name = 'Filters.caption({})'.format(strings)
@@ -381,8 +388,9 @@ class Filters:
                     return message.caption in self.strings
                 return False
 
-        def __call__(self,  # type: ignore[override]
-                     update: Union[Update, List[str]]) -> Union[bool, '_CaptionStrings']:
+        def __call__(  # type: ignore[override]
+            self, update: Union[Update, List[str]]
+        ) -> Union[bool, '_CaptionStrings']:
             if isinstance(update, Update):
                 return self.filter(update.effective_message)
             else:
@@ -407,26 +415,30 @@ class Filters:
         name = 'Filters.command'
 
         class _CommandOnlyStart(MessageFilter):
-
             def __init__(self, only_start: bool):
                 self.only_start = only_start
                 self.name = 'Filters.command({})'.format(only_start)
 
             def filter(self, message: Message) -> bool:
-                return bool(message.entities
-                            and any([e.type == MessageEntity.BOT_COMMAND
-                                     for e in message.entities]))
+                return bool(
+                    message.entities
+                    and any([e.type == MessageEntity.BOT_COMMAND for e in message.entities])
+                )
 
-        def __call__(self,  # type: ignore[override]
-                     update: Union[bool, Update]) -> Union[bool, '_CommandOnlyStart']:
+        def __call__(  # type: ignore[override]
+            self, update: Union[bool, Update]
+        ) -> Union[bool, '_CommandOnlyStart']:
             if isinstance(update, Update):
                 return self.filter(update.effective_message)
             else:
                 return self._CommandOnlyStart(update)
 
         def filter(self, message: Message) -> bool:
-            return bool(message.entities and message.entities[0].type == MessageEntity.BOT_COMMAND
-                        and message.entities[0].offset == 0)
+            return bool(
+                message.entities
+                and message.entities[0].type == MessageEntity.BOT_COMMAND
+                and message.entities[0].offset == 0
+            )
 
     command = _Command()
     """
@@ -485,8 +497,7 @@ class Filters:
             self.pattern: Pattern = pattern
             self.name = 'Filters.regex({})'.format(self.pattern)
 
-        def filter(self,
-                   message: Message) -> Optional[Dict[str, List[Match]]]:
+        def filter(self, message: Message) -> Optional[Dict[str, List[Match]]]:
             """"""  # remove method from docs
             if message.text:
                 match = self.pattern.search(message.text)
@@ -739,6 +750,7 @@ officedocument.wordprocessingml.document")``-
             ``Filters.status_update`` for all status update messages.
 
         """
+
         class _NewChatMembers(MessageFilter):
             name = 'Filters.status_update.new_chat_members'
 
@@ -788,8 +800,11 @@ officedocument.wordprocessingml.document")``-
             name = 'Filters.status_update.chat_created'
 
             def filter(self, message: Message) -> bool:
-                return bool(message.group_chat_created or message.supergroup_chat_created
-                            or message.channel_chat_created)
+                return bool(
+                    message.group_chat_created
+                    or message.supergroup_chat_created
+                    or message.channel_chat_created
+                )
 
         chat_created = _ChatCreated()
         """Messages that contain :attr:`telegram.Message.group_chat_created`,
@@ -827,11 +842,17 @@ officedocument.wordprocessingml.document")``-
         name = 'Filters.status_update'
 
         def filter(self, message: Update) -> bool:
-            return bool(self.new_chat_members(message) or self.left_chat_member(message)
-                        or self.new_chat_title(message) or self.new_chat_photo(message)
-                        or self.delete_chat_photo(message) or self.chat_created(message)
-                        or self.migrate(message) or self.pinned_message(message)
-                        or self.connected_website(message))
+            return bool(
+                self.new_chat_members(message)
+                or self.left_chat_member(message)
+                or self.new_chat_title(message)
+                or self.new_chat_photo(message)
+                or self.delete_chat_photo(message)
+                or self.chat_created(message)
+                or self.migrate(message)
+                or self.pinned_message(message)
+                or self.connected_website(message)
+            )
 
     status_update = _StatusUpdate()
     """Subset for messages containing a status update.
@@ -976,10 +997,13 @@ officedocument.wordprocessingml.document")``-
             RuntimeError: If user_id and username are both present.
 
         """
-        def __init__(self,
-                     user_id: Union[int, List[int]] = None,
-                     username: Union[str, List[str]] = None,
-                     allow_empty: bool = False):
+
+        def __init__(
+            self,
+            user_id: Union[int, List[int]] = None,
+            username: Union[str, List[str]] = None,
+            allow_empty: bool = False,
+        ):
             self.allow_empty = allow_empty
             self.__lock = Lock()
 
@@ -1008,15 +1032,17 @@ officedocument.wordprocessingml.document")``-
         def _set_user_ids(self, user_id: Union[int, List[int]]) -> None:
             with self.__lock:
                 if user_id and self._usernames:
-                    raise RuntimeError("Can't set user_id in conjunction with (already set) "
-                                       "usernames.")
+                    raise RuntimeError(
+                        "Can't set user_id in conjunction with (already set) " "usernames."
+                    )
                 self._user_ids = self._parse_user_id(user_id)
 
         def _set_usernames(self, username: Union[str, List[str]]) -> None:
             with self.__lock:
                 if username and self._user_ids:
-                    raise RuntimeError("Can't set username in conjunction with (already set) "
-                                       "user_ids.")
+                    raise RuntimeError(
+                        "Can't set username in conjunction with (already set) " "user_ids."
+                    )
                 self._usernames = self._parse_username(username)
 
         @property
@@ -1047,8 +1073,9 @@ officedocument.wordprocessingml.document")``-
             """
             with self.__lock:
                 if self._user_ids:
-                    raise RuntimeError("Can't set username in conjunction with (already set) "
-                                       "user_ids.")
+                    raise RuntimeError(
+                        "Can't set username in conjunction with (already set) " "user_ids."
+                    )
 
                 parsed_username = self._parse_username(username)
                 self._usernames |= parsed_username
@@ -1063,8 +1090,9 @@ officedocument.wordprocessingml.document")``-
             """
             with self.__lock:
                 if self._usernames:
-                    raise RuntimeError("Can't set user_id in conjunction with (already set) "
-                                       "usernames.")
+                    raise RuntimeError(
+                        "Can't set user_id in conjunction with (already set) " "usernames."
+                    )
 
                 parsed_user_id = self._parse_user_id(user_id)
 
@@ -1080,8 +1108,9 @@ officedocument.wordprocessingml.document")``-
             """
             with self.__lock:
                 if self._user_ids:
-                    raise RuntimeError("Can't set username in conjunction with (already set) "
-                                       "user_ids.")
+                    raise RuntimeError(
+                        "Can't set username in conjunction with (already set) " "user_ids."
+                    )
 
                 parsed_username = self._parse_username(username)
                 self._usernames -= parsed_username
@@ -1096,8 +1125,9 @@ officedocument.wordprocessingml.document")``-
             """
             with self.__lock:
                 if self._usernames:
-                    raise RuntimeError("Can't set user_id in conjunction with (already set) "
-                                       "usernames.")
+                    raise RuntimeError(
+                        "Can't set user_id in conjunction with (already set) " "usernames."
+                    )
                 parsed_user_id = self._parse_user_id(user_id)
                 self._user_ids -= parsed_user_id
 
@@ -1107,8 +1137,9 @@ officedocument.wordprocessingml.document")``-
                 if self.user_ids:
                     return message.from_user.id in self.user_ids
                 if self.usernames:
-                    return bool(message.from_user.username
-                                and message.from_user.username in self.usernames)
+                    return bool(
+                        message.from_user.username and message.from_user.username in self.usernames
+                    )
                 return self.allow_empty
             return False
 
@@ -1145,10 +1176,13 @@ officedocument.wordprocessingml.document")``-
         Raises:
             RuntimeError: If bot_id and username are both present.
         """
-        def __init__(self,
-                     bot_id: Union[int, List[int]] = None,
-                     username: Union[str, List[str]] = None,
-                     allow_empty: bool = False):
+
+        def __init__(
+            self,
+            bot_id: Union[int, List[int]] = None,
+            username: Union[str, List[str]] = None,
+            allow_empty: bool = False,
+        ):
             self.allow_empty = allow_empty
             self.__lock = Lock()
 
@@ -1177,15 +1211,17 @@ officedocument.wordprocessingml.document")``-
         def _set_bot_ids(self, bot_id: Union[int, List[int]]) -> None:
             with self.__lock:
                 if bot_id and self._usernames:
-                    raise RuntimeError("Can't set bot_id in conjunction with (already set) "
-                                       "usernames.")
+                    raise RuntimeError(
+                        "Can't set bot_id in conjunction with (already set) " "usernames."
+                    )
                 self._bot_ids = self._parse_bot_id(bot_id)
 
         def _set_usernames(self, username: Union[str, List[str]]) -> None:
             with self.__lock:
                 if username and self._bot_ids:
-                    raise RuntimeError("Can't set username in conjunction with (already set) "
-                                       "bot_ids.")
+                    raise RuntimeError(
+                        "Can't set username in conjunction with (already set) " "bot_ids."
+                    )
                 self._usernames = self._parse_username(username)
 
         @property
@@ -1216,8 +1252,9 @@ officedocument.wordprocessingml.document")``-
             """
             with self.__lock:
                 if self._bot_ids:
-                    raise RuntimeError("Can't set username in conjunction with (already set) "
-                                       "bot_ids.")
+                    raise RuntimeError(
+                        "Can't set username in conjunction with (already set) " "bot_ids."
+                    )
 
                 parsed_username = self._parse_username(username)
                 self._usernames |= parsed_username
@@ -1233,8 +1270,9 @@ officedocument.wordprocessingml.document")``-
             """
             with self.__lock:
                 if self._usernames:
-                    raise RuntimeError("Can't set bot_id in conjunction with (already set) "
-                                       "usernames.")
+                    raise RuntimeError(
+                        "Can't set bot_id in conjunction with (already set) " "usernames."
+                    )
 
                 parsed_bot_id = self._parse_bot_id(bot_id)
 
@@ -1250,8 +1288,9 @@ officedocument.wordprocessingml.document")``-
             """
             with self.__lock:
                 if self._bot_ids:
-                    raise RuntimeError("Can't set username in conjunction with (already set) "
-                                       "bot_ids.")
+                    raise RuntimeError(
+                        "Can't set username in conjunction with (already set) " "bot_ids."
+                    )
 
                 parsed_username = self._parse_username(username)
                 self._usernames -= parsed_username
@@ -1266,8 +1305,9 @@ officedocument.wordprocessingml.document")``-
             """
             with self.__lock:
                 if self._usernames:
-                    raise RuntimeError("Can't set bot_id in conjunction with (already set) "
-                                       "usernames.")
+                    raise RuntimeError(
+                        "Can't set bot_id in conjunction with (already set) " "usernames."
+                    )
                 parsed_bot_id = self._parse_bot_id(bot_id)
                 self._bot_ids -= parsed_bot_id
 
@@ -1277,8 +1317,9 @@ officedocument.wordprocessingml.document")``-
                 if self.bot_ids:
                     return message.via_bot.id in self.bot_ids
                 if self.usernames:
-                    return bool(message.via_bot.username
-                                and message.via_bot.username in self.usernames)
+                    return bool(
+                        message.via_bot.username and message.via_bot.username in self.usernames
+                    )
                 return self.allow_empty
             return False
 
@@ -1316,10 +1357,12 @@ officedocument.wordprocessingml.document")``-
 
         """
 
-        def __init__(self,
-                     chat_id: Union[int, List[int]] = None,
-                     username: Union[str, List[str]] = None,
-                     allow_empty: bool = False):
+        def __init__(
+            self,
+            chat_id: Union[int, List[int]] = None,
+            username: Union[str, List[str]] = None,
+            allow_empty: bool = False,
+        ):
             self.allow_empty = allow_empty
             self.__lock = Lock()
 
@@ -1348,15 +1391,17 @@ officedocument.wordprocessingml.document")``-
         def _set_chat_ids(self, chat_id: Union[int, List[int]]) -> None:
             with self.__lock:
                 if chat_id and self._usernames:
-                    raise RuntimeError("Can't set chat_id in conjunction with (already set) "
-                                       "usernames.")
+                    raise RuntimeError(
+                        "Can't set chat_id in conjunction with (already set) " "usernames."
+                    )
                 self._chat_ids = self._parse_chat_id(chat_id)
 
         def _set_usernames(self, username: Union[str, List[str]]) -> None:
             with self.__lock:
                 if username and self._chat_ids:
-                    raise RuntimeError("Can't set username in conjunction with (already set) "
-                                       "chat_ids.")
+                    raise RuntimeError(
+                        "Can't set username in conjunction with (already set) " "chat_ids."
+                    )
                 self._usernames = self._parse_username(username)
 
         @property
@@ -1387,8 +1432,9 @@ officedocument.wordprocessingml.document")``-
             """
             with self.__lock:
                 if self._chat_ids:
-                    raise RuntimeError("Can't set username in conjunction with (already set) "
-                                       "chat_ids.")
+                    raise RuntimeError(
+                        "Can't set username in conjunction with (already set) " "chat_ids."
+                    )
 
                 parsed_username = self._parse_username(username)
                 self._usernames |= parsed_username
@@ -1403,8 +1449,9 @@ officedocument.wordprocessingml.document")``-
             """
             with self.__lock:
                 if self._usernames:
-                    raise RuntimeError("Can't set chat_id in conjunction with (already set) "
-                                       "usernames.")
+                    raise RuntimeError(
+                        "Can't set chat_id in conjunction with (already set) " "usernames."
+                    )
 
                 parsed_chat_id = self._parse_chat_id(chat_id)
 
@@ -1420,8 +1467,9 @@ officedocument.wordprocessingml.document")``-
             """
             with self.__lock:
                 if self._chat_ids:
-                    raise RuntimeError("Can't set username in conjunction with (already set) "
-                                       "chat_ids.")
+                    raise RuntimeError(
+                        "Can't set username in conjunction with (already set) " "chat_ids."
+                    )
 
                 parsed_username = self._parse_username(username)
                 self._usernames -= parsed_username
@@ -1436,8 +1484,9 @@ officedocument.wordprocessingml.document")``-
             """
             with self.__lock:
                 if self._usernames:
-                    raise RuntimeError("Can't set chat_id in conjunction with (already set) "
-                                       "usernames.")
+                    raise RuntimeError(
+                        "Can't set chat_id in conjunction with (already set) " "usernames."
+                    )
                 parsed_chat_id = self._parse_chat_id(chat_id)
                 self._chat_ids -= parsed_chat_id
 
@@ -1447,8 +1496,7 @@ officedocument.wordprocessingml.document")``-
                 if self.chat_ids:
                     return message.chat.id in self.chat_ids
                 if self.usernames:
-                    return bool(message.chat.username
-                                and message.chat.username in self.usernames)
+                    return bool(message.chat.username and message.chat.username in self.usernames)
                 return self.allow_empty
             return False
 
@@ -1550,8 +1598,10 @@ officedocument.wordprocessingml.document")``-
 
         def filter(self, message: Message) -> bool:
             """"""  # remove method from docs
-            return bool(message.from_user.language_code and any(
-                        [message.from_user.language_code.startswith(x) for x in self.lang]))
+            return bool(
+                message.from_user.language_code
+                and any([message.from_user.language_code.startswith(x) for x in self.lang])
+            )
 
     class _UpdateType(UpdateFilter):
         name = 'Filters.update'

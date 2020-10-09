@@ -1,0 +1,6 @@
+[tool.black]
+line-length = 99
+target-version = ['py36']
+include = '(telegram|examples|tests)/.*\.py$'
+exclude = 'telegram/vendor'
+skip-string-normalization = true

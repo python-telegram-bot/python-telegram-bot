@@ -19,16 +19,28 @@
 import pytest
 from flaky import flaky
 
-from telegram import (InputMediaVideo, InputMediaPhoto, InputMediaAnimation, Message, InputFile,
-                      InputMediaAudio, InputMediaDocument)
+from telegram import (
+    InputMediaVideo,
+    InputMediaPhoto,
+    InputMediaAnimation,
+    Message,
+    InputFile,
+    InputMediaAudio,
+    InputMediaDocument,
+)
+
 # noinspection PyUnresolvedReferences
 from .test_animation import animation, animation_file  # noqa: F401
+
 # noinspection PyUnresolvedReferences
 from .test_audio import audio, audio_file  # noqa: F401
+
 # noinspection PyUnresolvedReferences
 from .test_document import document, document_file  # noqa: F401
+
 # noinspection PyUnresolvedReferences
 from .test_photo import _photo, photo_file, photo, thumb  # noqa: F401
+
 # noinspection PyUnresolvedReferences
 from .test_video import video, video_file  # noqa: F401
 from tests.conftest import expect_bad_request
@@ -36,51 +48,61 @@ from tests.conftest import expect_bad_request
 
 @pytest.fixture(scope='class')
 def input_media_video(class_thumb_file):
-    return InputMediaVideo(media=TestInputMediaVideo.media,
-                           caption=TestInputMediaVideo.caption,
-                           width=TestInputMediaVideo.width,
-                           height=TestInputMediaVideo.height,
-                           duration=TestInputMediaVideo.duration,
-                           parse_mode=TestInputMediaVideo.parse_mode,
-                           thumb=class_thumb_file,
-                           supports_streaming=TestInputMediaVideo.supports_streaming)
+    return InputMediaVideo(
+        media=TestInputMediaVideo.media,
+        caption=TestInputMediaVideo.caption,
+        width=TestInputMediaVideo.width,
+        height=TestInputMediaVideo.height,
+        duration=TestInputMediaVideo.duration,
+        parse_mode=TestInputMediaVideo.parse_mode,
+        thumb=class_thumb_file,
+        supports_streaming=TestInputMediaVideo.supports_streaming,
+    )
 
 
 @pytest.fixture(scope='class')
 def input_media_photo(class_thumb_file):
-    return InputMediaPhoto(media=TestInputMediaPhoto.media,
-                           caption=TestInputMediaPhoto.caption,
-                           parse_mode=TestInputMediaPhoto.parse_mode)
+    return InputMediaPhoto(
+        media=TestInputMediaPhoto.media,
+        caption=TestInputMediaPhoto.caption,
+        parse_mode=TestInputMediaPhoto.parse_mode,
+    )
 
 
 @pytest.fixture(scope='class')
 def input_media_animation(class_thumb_file):
-    return InputMediaAnimation(media=TestInputMediaAnimation.media,
-                               caption=TestInputMediaAnimation.caption,
-                               parse_mode=TestInputMediaAnimation.parse_mode,
-                               width=TestInputMediaAnimation.width,
-                               height=TestInputMediaAnimation.height,
-                               thumb=class_thumb_file,
-                               duration=TestInputMediaAnimation.duration)
+    return InputMediaAnimation(
+        media=TestInputMediaAnimation.media,
+        caption=TestInputMediaAnimation.caption,
+        parse_mode=TestInputMediaAnimation.parse_mode,
+        width=TestInputMediaAnimation.width,
+        height=TestInputMediaAnimation.height,
+        thumb=class_thumb_file,
+        duration=TestInputMediaAnimation.duration,
+    )
 
 
 @pytest.fixture(scope='class')
 def input_media_audio(class_thumb_file):
-    return InputMediaAudio(media=TestInputMediaAudio.media,
-                           caption=TestInputMediaAudio.caption,
-                           duration=TestInputMediaAudio.duration,
-                           performer=TestInputMediaAudio.performer,
-                           title=TestInputMediaAudio.title,
-                           thumb=class_thumb_file,
-                           parse_mode=TestInputMediaAudio.parse_mode)
+    return InputMediaAudio(
+        media=TestInputMediaAudio.media,
+        caption=TestInputMediaAudio.caption,
+        duration=TestInputMediaAudio.duration,
+        performer=TestInputMediaAudio.performer,
+        title=TestInputMediaAudio.title,
+        thumb=class_thumb_file,
+        parse_mode=TestInputMediaAudio.parse_mode,
+    )
 
 
 @pytest.fixture(scope='class')
 def input_media_document(class_thumb_file):
-    return InputMediaDocument(media=TestInputMediaDocument.media,
-                              caption=TestInputMediaDocument.caption,
-                              thumb=class_thumb_file,
-                              parse_mode=TestInputMediaDocument.parse_mode)
+    return InputMediaDocument(
+        media=TestInputMediaDocument.media,
+        caption=TestInputMediaDocument.caption,
+        thumb=class_thumb_file,
+        parse_mode=TestInputMediaDocument.parse_mode,
+    )
 
 
 class TestInputMediaVideo:
@@ -292,8 +314,10 @@ class TestInputMediaDocument:
 
 @pytest.fixture(scope='function')  # noqa: F811
 def media_group(photo, thumb):  # noqa: F811
-    return [InputMediaPhoto(photo, caption='photo `1`', parse_mode='Markdown'),
-            InputMediaPhoto(thumb, caption='<b>photo</b> 2', parse_mode='HTML')]
+    return [
+        InputMediaPhoto(photo, caption='photo `1`', parse_mode='Markdown'),
+        InputMediaPhoto(thumb, caption='<b>photo</b> 2', parse_mode='HTML'),
+    ]
 
 
 class TestSendMediaGroup:
@@ -310,21 +334,23 @@ class TestSendMediaGroup:
     @pytest.mark.timeout(10)
     def test_send_media_group_all_args(self, bot, chat_id, media_group):
         m1 = bot.send_message(chat_id, text="test")
-        messages = bot.send_media_group(chat_id, media_group, disable_notification=True,
-                                        reply_to_message_id=m1.message_id)
+        messages = bot.send_media_group(
+            chat_id, media_group, disable_notification=True, reply_to_message_id=m1.message_id
+        )
         assert isinstance(messages, list)
         assert len(messages) == 2
         assert all([isinstance(mes, Message) for mes in messages])
         assert all([mes.media_group_id == messages[0].media_group_id for mes in messages])
 
-    def test_send_media_group_with_thumbs(self, bot, chat_id, video_file, photo_file,  # noqa: F811
-                                          monkeypatch):
+    def test_send_media_group_with_thumbs(
+        self, bot, chat_id, video_file, photo_file, monkeypatch  # noqa: F811
+    ):
         def test(*args, **kwargs):
             data = kwargs['fields']
             video_check = data[input_video.media.attach] == input_video.media.field_tuple
             thumb_check = data[input_video.thumb.attach] == input_video.thumb.field_tuple
             result = video_check and thumb_check
-            raise(Exception('Test was {}'.format('successful' if result else 'failing')))
+            raise (Exception('Test was {}'.format('successful' if result else 'failing')))
 
         monkeypatch.setattr('telegram.utils.request.Request._request_wrapper', test)
         input_video = InputMediaVideo(video_file, thumb=photo_file)
@@ -333,15 +359,17 @@ class TestSendMediaGroup:
 
     @flaky(3, 1)  # noqa: F811
     @pytest.mark.timeout(10)  # noqa: F811
-    def test_send_media_group_new_files(self, bot, chat_id, video_file, photo_file,  # noqa: F811
-                                        animation_file):  # noqa: F811
+    def test_send_media_group_new_files(
+        self, bot, chat_id, video_file, photo_file, animation_file  # noqa: F811
+    ):  # noqa: F811
         def func():
-            return bot.send_media_group(chat_id, [
-                InputMediaVideo(video_file),
-                InputMediaPhoto(photo_file)
-            ])
-        messages = expect_bad_request(func, 'Type of file mismatch',
-                                      'Telegram did not accept the file.')
+            return bot.send_media_group(
+                chat_id, [InputMediaVideo(video_file), InputMediaPhoto(photo_file)]
+            )
+
+        messages = expect_bad_request(
+            func, 'Type of file mismatch', 'Telegram did not accept the file.'
+        )
 
         assert isinstance(messages, list)
         assert len(messages) == 2
@@ -363,6 +391,7 @@ class TestSendMediaGroup:
         messages = bot.send_media_group(chat_id, media_group)
         cid = messages[-1].chat.id
         mid = messages[-1].message_id
-        new_message = bot.edit_message_media(chat_id=cid, message_id=mid,
-                                             media=InputMediaPhoto(thumb_file))
+        new_message = bot.edit_message_media(
+            chat_id=cid, message_id=mid, media=InputMediaPhoto(thumb_file)
+        )
         assert isinstance(new_message, Message)

@@ -28,6 +28,7 @@ from .handler import Handler
 
 from telegram.utils.types import HandlerArg
 from typing import Callable, TYPE_CHECKING, Any, Optional, Union, TypeVar, Dict, List, Tuple
+
 if TYPE_CHECKING:
     from telegram.ext import CallbackContext, Dispatcher
 
@@ -130,24 +131,27 @@ class CommandHandler(Handler):
         ValueError - when command is too long or has illegal chars.
     """
 
-    def __init__(self,
-                 command: Union[str, List[str]],
-                 callback: Callable[[HandlerArg, 'CallbackContext'], RT],
-                 filters: BaseFilter = None,
-                 allow_edited: bool = None,
-                 pass_args: bool = False,
-                 pass_update_queue: bool = False,
-                 pass_job_queue: bool = False,
-                 pass_user_data: bool = False,
-                 pass_chat_data: bool = False,
-                 run_async: bool = False):
+    def __init__(
+        self,
+        command: Union[str, List[str]],
+        callback: Callable[[HandlerArg, 'CallbackContext'], RT],
+        filters: BaseFilter = None,
+        allow_edited: bool = None,
+        pass_args: bool = False,
+        pass_update_queue: bool = False,
+        pass_job_queue: bool = False,
+        pass_user_data: bool = False,
+        pass_chat_data: bool = False,
+        run_async: bool = False,
+    ):
         super().__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
             pass_chat_data=pass_chat_data,
-            run_async=run_async)
+            run_async=run_async,
+        )
 
         if isinstance(command, str):
             self.command = [command.lower()]
@@ -163,17 +167,18 @@ class CommandHandler(Handler):
             self.filters = Filters.update.messages
 
         if allow_edited is not None:
-            warnings.warn('allow_edited is deprecated. See https://git.io/fxJuV for more info',
-                          TelegramDeprecationWarning,
-                          stacklevel=2)
+            warnings.warn(
+                'allow_edited is deprecated. See https://git.io/fxJuV for more info',
+                TelegramDeprecationWarning,
+                stacklevel=2,
+            )
             if not allow_edited:
                 self.filters &= ~Filters.update.edited_message
         self.pass_args = pass_args
 
     def check_update(
-            self,
-            update: HandlerArg) -> Optional[Union[bool, Tuple[List[str],
-                                                              Optional[Union[bool, Dict]]]]]:
+        self, update: HandlerArg
+    ) -> Optional[Union[bool, Tuple[List[str], Optional[Union[bool, Dict]]]]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
@@ -186,15 +191,22 @@ class CommandHandler(Handler):
         if isinstance(update, Update) and update.effective_message:
             message = update.effective_message
 
-            if (message.entities and message.entities[0].type == MessageEntity.BOT_COMMAND
-                    and message.entities[0].offset == 0 and message.text and message.bot):
-                command = message.text[1:message.entities[0].length]
+            if (
+                message.entities
+                and message.entities[0].type == MessageEntity.BOT_COMMAND
+                and message.entities[0].offset == 0
+                and message.text
+                and message.bot
+            ):
+                command = message.text[1 : message.entities[0].length]
                 args = message.text.split()[1:]
                 command_parts = command.split('@')
                 command_parts.append(message.bot.username)
 
-                if not (command_parts[0].lower() in self.command
-                        and command_parts[1].lower() == message.bot.username.lower()):
+                if not (
+                    command_parts[0].lower() in self.command
+                    and command_parts[1].lower() == message.bot.username.lower()
+                ):
                     return None
 
                 filter_result = self.filters(update)
@@ -205,22 +217,23 @@ class CommandHandler(Handler):
         return None
 
     def collect_optional_args(
-            self,
-            dispatcher: 'Dispatcher',
-            update: HandlerArg = None,
-            check_result: Optional[Union[bool, Tuple[List[str],
-                                                     Optional[bool]]]] = None) -> Dict[str, Any]:
+        self,
+        dispatcher: 'Dispatcher',
+        update: HandlerArg = None,
+        check_result: Optional[Union[bool, Tuple[List[str], Optional[bool]]]] = None,
+    ) -> Dict[str, Any]:
         optional_args = super().collect_optional_args(dispatcher, update)
         if self.pass_args and isinstance(check_result, tuple):
             optional_args['args'] = check_result[0]
         return optional_args
 
     def collect_additional_context(
-            self,
-            context: 'CallbackContext',
-            update: HandlerArg,
-            dispatcher: 'Dispatcher',
-            check_result: Optional[Union[bool, Tuple[List[str], Optional[bool]]]]) -> None:
+        self,
+        context: 'CallbackContext',
+        update: HandlerArg,
+        dispatcher: 'Dispatcher',
+        check_result: Optional[Union[bool, Tuple[List[str], Optional[bool]]]],
+    ) -> None:
         if isinstance(check_result, tuple):
             context.args = check_result[0]
             if isinstance(check_result[1], dict):
@@ -330,29 +343,36 @@ class PrefixHandler(CommandHandler):
 
     """
 
-    def __init__(self,
-                 prefix: Union[str, List[str]],
-                 command: Union[str, List[str]],
-                 callback: Callable[[HandlerArg, 'CallbackContext'], RT],
-                 filters: BaseFilter = None,
-                 pass_args: bool = False,
-                 pass_update_queue: bool = False,
-                 pass_job_queue: bool = False,
-                 pass_user_data: bool = False,
-                 pass_chat_data: bool = False,
-                 run_async: bool = False):
+    def __init__(
+        self,
+        prefix: Union[str, List[str]],
+        command: Union[str, List[str]],
+        callback: Callable[[HandlerArg, 'CallbackContext'], RT],
+        filters: BaseFilter = None,
+        pass_args: bool = False,
+        pass_update_queue: bool = False,
+        pass_job_queue: bool = False,
+        pass_user_data: bool = False,
+        pass_chat_data: bool = False,
+        run_async: bool = False,
+    ):
 
         self._prefix: List[str] = list()
         self._command: List[str] = list()
         self._commands: List[str] = list()
 
         super().__init__(
-            'nocommand', callback, filters=filters, allow_edited=None, pass_args=pass_args,
+            'nocommand',
+            callback,
+            filters=filters,
+            allow_edited=None,
+            pass_args=pass_args,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
             pass_chat_data=pass_chat_data,
-            run_async=run_async)
+            run_async=run_async,
+        )
 
         self.prefix = prefix  # type: ignore[assignment]
         self.command = command  # type: ignore[assignment]
@@ -385,8 +405,9 @@ class PrefixHandler(CommandHandler):
     def _build_commands(self) -> None:
         self._commands = [x.lower() + y.lower() for x in self.prefix for y in self.command]
 
-    def check_update(self, update: HandlerArg) -> Optional[Union[bool, Tuple[List[str],
-                                                                 Optional[Union[bool, Dict]]]]]:
+    def check_update(
+        self, update: HandlerArg
+    ) -> Optional[Union[bool, Tuple[List[str], Optional[Union[bool, Dict]]]]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
@@ -411,11 +432,12 @@ class PrefixHandler(CommandHandler):
         return None
 
     def collect_additional_context(
-            self,
-            context: 'CallbackContext',
-            update: HandlerArg,
-            dispatcher: 'Dispatcher',
-            check_result: Optional[Union[bool, Tuple[List[str], Optional[bool]]]]) -> None:
+        self,
+        context: 'CallbackContext',
+        update: HandlerArg,
+        dispatcher: 'Dispatcher',
+        check_result: Optional[Union[bool, Tuple[List[str], Optional[bool]]]],
+    ) -> None:
         if isinstance(check_result, tuple):
             context.args = check_result[0]
             if isinstance(check_result[1], dict):

@@ -21,6 +21,7 @@
 from telegram import InlineQueryResult
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
 from typing import Any, Union, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
 
@@ -76,20 +77,22 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 mpeg4_url: str,
-                 thumb_url: str,
-                 mpeg4_width: int = None,
-                 mpeg4_height: int = None,
-                 title: str = None,
-                 caption: str = None,
-                 reply_markup: 'ReplyMarkup' = None,
-                 input_message_content: 'InputMessageContent' = None,
-                 mpeg4_duration: int = None,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-                 thumb_mime_type: str = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        id: str,
+        mpeg4_url: str,
+        thumb_url: str,
+        mpeg4_width: int = None,
+        mpeg4_height: int = None,
+        title: str = None,
+        caption: str = None,
+        reply_markup: 'ReplyMarkup' = None,
+        input_message_content: 'InputMessageContent' = None,
+        mpeg4_duration: int = None,
+        parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+        thumb_mime_type: str = None,
+        **kwargs: Any,
+    ):
 
         # Required
         super().__init__('mpeg4_gif', id)

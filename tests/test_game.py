@@ -24,20 +24,24 @@ from telegram import MessageEntity, Game, PhotoSize, Animation
 
 @pytest.fixture(scope='function')
 def game():
-    return Game(TestGame.title,
-                TestGame.description,
-                TestGame.photo,
-                text=TestGame.text,
-                text_entities=TestGame.text_entities,
-                animation=TestGame.animation)
+    return Game(
+        TestGame.title,
+        TestGame.description,
+        TestGame.photo,
+        text=TestGame.text,
+        text_entities=TestGame.text_entities,
+        animation=TestGame.animation,
+    )
 
 
 class TestGame:
     title = 'Python-telegram-bot Test Game'
     description = 'description'
     photo = [PhotoSize('Blah', 'ElseBlah', 640, 360, file_size=0)]
-    text = (b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
-            b'\\u200d\\U0001f467\\U0001f431http://google.com').decode('unicode-escape')
+    text = (
+        b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
+        b'\\u200d\\U0001f467\\U0001f431http://google.com'
+    ).decode('unicode-escape')
     text_entities = [MessageEntity(13, 17, MessageEntity.URL)]
     animation = Animation('blah', 'unique_id', 320, 180, 1)
 
@@ -60,7 +64,7 @@ class TestGame:
             'photo': [self.photo[0].to_dict()],
             'text': self.text,
             'text_entities': [self.text_entities[0].to_dict()],
-            'animation': self.animation.to_dict()
+            'animation': self.animation.to_dict(),
         }
         game = Game.de_json(json_dict, bot)
 
@@ -98,10 +102,18 @@ class TestGame:
 
     def test_equality(self):
         a = Game('title', 'description', [PhotoSize('Blah', 'unique_id', 640, 360, file_size=0)])
-        b = Game('title', 'description', [PhotoSize('Blah', 'unique_id', 640, 360, file_size=0)],
-                 text='Here is a text')
-        c = Game('eltit', 'description', [PhotoSize('Blah', 'unique_id', 640, 360, file_size=0)],
-                 animation=Animation('blah', 'unique_id', 320, 180, 1))
+        b = Game(
+            'title',
+            'description',
+            [PhotoSize('Blah', 'unique_id', 640, 360, file_size=0)],
+            text='Here is a text',
+        )
+        c = Game(
+            'eltit',
+            'description',
+            [PhotoSize('Blah', 'unique_id', 640, 360, file_size=0)],
+            animation=Animation('blah', 'unique_id', 320, 180, 1),
+        )
         d = Animation('blah', 'unique_id', 320, 180, 1)
 
         assert a == b

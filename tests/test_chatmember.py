@@ -49,24 +49,26 @@ class TestChatMember:
         time = datetime.datetime.utcnow()
         custom_title = 'custom_title'
 
-        json_dict = {'user': user.to_dict(),
-                     'status': self.status,
-                     'custom_title': custom_title,
-                     'until_date': to_timestamp(time),
-                     'can_be_edited': False,
-                     'can_change_info': True,
-                     'can_post_messages': False,
-                     'can_edit_messages': True,
-                     'can_delete_messages': True,
-                     'can_invite_users': False,
-                     'can_restrict_members': True,
-                     'can_pin_messages': False,
-                     'can_promote_members': True,
-                     'can_send_messages': False,
-                     'can_send_media_messages': True,
-                     'can_send_polls': False,
-                     'can_send_other_messages': True,
-                     'can_add_web_page_previews': False}
+        json_dict = {
+            'user': user.to_dict(),
+            'status': self.status,
+            'custom_title': custom_title,
+            'until_date': to_timestamp(time),
+            'can_be_edited': False,
+            'can_change_info': True,
+            'can_post_messages': False,
+            'can_edit_messages': True,
+            'can_delete_messages': True,
+            'can_invite_users': False,
+            'can_restrict_members': True,
+            'can_pin_messages': False,
+            'can_promote_members': True,
+            'can_send_messages': False,
+            'can_send_media_messages': True,
+            'can_send_polls': False,
+            'can_send_other_messages': True,
+            'can_add_web_page_previews': False,
+        }
 
         chat_member = ChatMember.de_json(json_dict, bot)
 

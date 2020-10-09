@@ -48,14 +48,16 @@ class ShippingAddress(TelegramObject):
 
     """
 
-    def __init__(self,
-                 country_code: str,
-                 state: str,
-                 city: str,
-                 street_line1: str,
-                 street_line2: str,
-                 post_code: str,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        country_code: str,
+        state: str,
+        city: str,
+        street_line1: str,
+        street_line2: str,
+        post_code: str,
+        **kwargs: Any,
+    ):
         self.country_code = country_code
         self.state = state
         self.city = city
@@ -63,5 +65,11 @@ class ShippingAddress(TelegramObject):
         self.street_line2 = street_line2
         self.post_code = post_code
 
-        self._id_attrs = (self.country_code, self.state, self.city, self.street_line1,
-                          self.street_line2, self.post_code)
+        self._id_attrs = (
+            self.country_code,
+            self.state,
+            self.city,
+            self.street_line1,
+            self.street_line2,
+            self.post_code,
+        )

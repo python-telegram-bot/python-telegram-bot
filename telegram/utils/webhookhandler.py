@@ -36,17 +36,15 @@ from queue import Queue
 from telegram.utils.types import JSONDict
 from typing import Any, TYPE_CHECKING
 from tornado import httputil
+
 if TYPE_CHECKING:
     from telegram import Bot
 
 
 class WebhookServer:
-
-    def __init__(self,
-                 listen: str,
-                 port: int,
-                 webhook_app: 'WebhookAppClass',
-                 ssl_ctx: SSLContext):
+    def __init__(
+        self, listen: str, port: int, webhook_app: 'WebhookAppClass', ssl_ctx: SSLContext
+    ):
         self.http_server = HTTPServer(webhook_app, ssl_options=ssl_ctx)
         self.listen = listen
         self.port = port
@@ -81,17 +79,26 @@ class WebhookServer:
 
     def handle_error(self, request: Any, client_address: str) -> None:
         """Handle an error gracefully."""
-        self.logger.debug('Exception happened during processing of request from %s',
-                          client_address, exc_info=True)
+        self.logger.debug(
+            'Exception happened during processing of request from %s',
+            client_address,
+            exc_info=True,
+        )
 
     def _ensure_event_loop(self, force_event_loop: bool = False) -> None:
         """If there's no asyncio event loop set for the current thread - create one."""
         try:
             loop = asyncio.get_event_loop()
-            if (not force_event_loop and os.name == 'nt' and sys.version_info >= (3, 8)
-                    and isinstance(loop, asyncio.ProactorEventLoop)):
-                raise TypeError('`ProactorEventLoop` is incompatible with '
-                                'Tornado. Please switch to `SelectorEventLoop`.')
+            if (
+                not force_event_loop
+                and os.name == 'nt'
+                and sys.version_info >= (3, 8)
+                and isinstance(loop, asyncio.ProactorEventLoop)
+            ):
+                raise TypeError(
+                    '`ProactorEventLoop` is incompatible with '
+                    'Tornado. Please switch to `SelectorEventLoop`.'
+                )
         except RuntimeError:
             # Python 3.8 changed default asyncio event loop implementation on windows
             # from SelectorEventLoop to ProactorEventLoop. At the time of this writing
@@ -106,15 +113,20 @@ class WebhookServer:
             # Ideally, we would want to check that Tornado actually raises the expected
             # NotImplementedError, but it's not possible to cleanly recover from that
             # exception in current Tornado version.
-            if (os.name == 'nt'
-                    and sys.version_info >= (3, 8)
-                    # OS+version check makes hasattr check redundant, but just to be sure
-                    and hasattr(asyncio, 'WindowsProactorEventLoopPolicy')
-                    and (isinstance(
-                         asyncio.get_event_loop_policy(),
-                         asyncio.WindowsProactorEventLoopPolicy))):  # pylint: disable=E1101
+            if (
+                os.name == 'nt'
+                and sys.version_info >= (3, 8)
+                # OS+version check makes hasattr check redundant, but just to be sure
+                and hasattr(asyncio, 'WindowsProactorEventLoopPolicy')
+                and (
+                    isinstance(
+                        asyncio.get_event_loop_policy(), asyncio.WindowsProactorEventLoopPolicy
+                    )
+                )
+            ):  # pylint: disable=E1101
                 self.logger.debug(
-                    'Applying Tornado asyncio event loop fix for Python 3.8+ on Windows')
+                    'Applying Tornado asyncio event loop fix for Python 3.8+ on Windows'
+                )
                 loop = asyncio.SelectorEventLoop()
             else:
                 loop = asyncio.new_event_loop()
@@ -122,16 +134,9 @@ class WebhookServer:
 
 
 class WebhookAppClass(tornado.web.Application):
-
-    def __init__(self,
-                 webhook_path: str,
-                 bot: 'Bot',
-                 update_queue: Queue):
+    def __init__(self, webhook_path: str, bot: 'Bot', update_queue: Queue):
         self.shared_objects = {"bot": bot, "update_queue": update_queue}
-        handlers = [
-            (r"{}/?".format(webhook_path), WebhookHandler,
-             self.shared_objects)
-        ]  # noqa
+        handlers = [(r"{}/?".format(webhook_path), WebhookHandler, self.shared_objects)]  # noqa
         tornado.web.Application.__init__(self, handlers)
 
     def log_request(self, handler: tornado.web.RequestHandler) -> None:
@@ -142,10 +147,12 @@ class WebhookAppClass(tornado.web.Application):
 class WebhookHandler(tornado.web.RequestHandler):
     SUPPORTED_METHODS = ["POST"]
 
-    def __init__(self,
-                 application: tornado.web.Application,
-                 request: httputil.HTTPServerRequest,
-                 **kwargs: JSONDict):
+    def __init__(
+        self,
+        application: tornado.web.Application,
+        request: httputil.HTTPServerRequest,
+        **kwargs: JSONDict,
+    ):
         super().__init__(application, request, **kwargs)
         self.logger = logging.getLogger(__name__)
 
@@ -188,6 +195,7 @@ class WebhookHandler(tornado.web.RequestHandler):
 
         """
         super().write_error(status_code, **kwargs)
-        self.logger.debug("{} - - {}".format(self.request.remote_ip,
-                                             "Exception in WebhookHandler"),
-                          exc_info=kwargs['exc_info'])
+        self.logger.debug(
+            "{} - - {}".format(self.request.remote_ip, "Exception in WebhookHandler"),
+            exc_info=kwargs['exc_info'],
+        )

@@ -1,9 +1,8 @@
 repos:
--   repo: git://github.com/python-telegram-bot/mirrors-yapf
-    rev: 5769e088ef6e0a0d1eb63bd6d0c1fe9f3606d6c8
+-   repo: https://github.com/psf/black
+    rev: 20.8b1
     hooks:
-    -   id: yapf
-        files: ^(telegram|tests)/.*\.py$
+    -   id: black
         args:
         - --diff
 -   repo: https://gitlab.com/pycqa/flake8

@@ -17,20 +17,22 @@ bot.
 import logging
 
 from telegram import ReplyKeyboardMarkup
-from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
-                          ConversationHandler)
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
 
 # Enable logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+)
 
 logger = logging.getLogger(__name__)
 
 CHOOSING, TYPING_REPLY, TYPING_CHOICE = range(3)
 
-reply_keyboard = [['Age', 'Favourite colour'],
-                  ['Number of siblings', 'Something else...'],
-                  ['Done']]
+reply_keyboard = [
+    ['Age', 'Favourite colour'],
+    ['Number of siblings', 'Something else...'],
+    ['Done'],
+]
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 
 
@@ -47,7 +49,8 @@ def start(update, context):
     update.message.reply_text(
         "Hi! My name is Doctor Botter. I will hold a more complex conversation with you. "
         "Why don't you tell me something about yourself?",
-        reply_markup=markup)
+        reply_markup=markup,
+    )
 
     return CHOOSING
 
@@ -56,14 +59,16 @@ def regular_choice(update, context):
     text = update.message.text
     context.user_data['choice'] = text
     update.message.reply_text(
-        'Your {}? Yes, I would love to hear about that!'.format(text.lower()))
+        'Your {}? Yes, I would love to hear about that!'.format(text.lower())
+    )
 
     return TYPING_REPLY
 
 
 def custom_choice(update, context):
-    update.message.reply_text('Alright, please send me the category first, '
-                              'for example "Most impressive skill"')
+    update.message.reply_text(
+        'Alright, please send me the category first, ' 'for example "Most impressive skill"'
+    )
 
     return TYPING_CHOICE
 
@@ -75,10 +80,12 @@ def received_information(update, context):
     user_data[category] = text
     del user_data['choice']
 
-    update.message.reply_text("Neat! Just so you know, this is what you already told me:"
-                              "{} You can tell me more, or change your opinion"
-                              " on something.".format(facts_to_str(user_data)),
-                              reply_markup=markup)
+    update.message.reply_text(
+        "Neat! Just so you know, this is what you already told me:"
+        "{} You can tell me more, or change your opinion"
+        " on something.".format(facts_to_str(user_data)),
+        reply_markup=markup,
+    )
 
     return CHOOSING
 
@@ -88,9 +95,9 @@ def done(update, context):
     if 'choice' in user_data:
         del user_data['choice']
 
-    update.message.reply_text("I learned these facts about you:"
-                              "{}"
-                              "Until next time!".format(facts_to_str(user_data)))
+    update.message.reply_text(
+        "I learned these facts about you:" "{}" "Until next time!".format(facts_to_str(user_data))
+    )
 
     user_data.clear()
     return ConversationHandler.END
@@ -108,24 +115,26 @@ def main():
     # Add conversation handler with the states CHOOSING, TYPING_CHOICE and TYPING_REPLY
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
-
         states={
-            CHOOSING: [MessageHandler(Filters.regex('^(Age|Favourite colour|Number of siblings)$'),
-                                      regular_choice),
-                       MessageHandler(Filters.regex('^Something else...$'),
-                                      custom_choice)
-                       ],
-
+            CHOOSING: [
+                MessageHandler(
+                    Filters.regex('^(Age|Favourite colour|Number of siblings)$'), regular_choice
+                ),
+                MessageHandler(Filters.regex('^Something else...$'), custom_choice),
+            ],
             TYPING_CHOICE: [
-                MessageHandler(Filters.text & ~(Filters.command | Filters.regex('^Done$')),
-                               regular_choice)],
-
+                MessageHandler(
+                    Filters.text & ~(Filters.command | Filters.regex('^Done$')), regular_choice
+                )
+            ],
             TYPING_REPLY: [
-                MessageHandler(Filters.text & ~(Filters.command | Filters.regex('^Done$')),
-                               received_information)],
+                MessageHandler(
+                    Filters.text & ~(Filters.command | Filters.regex('^Done$')),
+                    received_information,
+                )
+            ],
         },
-
-        fallbacks=[MessageHandler(Filters.regex('^Done$'), done)]
+        fallbacks=[MessageHandler(Filters.regex('^Done$'), done)],
     )
 
     dp.add_handler(conv_handler)

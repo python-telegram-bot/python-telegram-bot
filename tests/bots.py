@@ -36,16 +36,17 @@ FALLBACKS = [
         'super_group_id': '-1001310911135',
         'channel_id': '@pythontelegrambottests',
         'bot_name': 'PTB tests fallback 1',
-        'bot_username': '@ptb_fallback_1_bot'
-    }, {
+        'bot_username': '@ptb_fallback_1_bot',
+    },
+    {
         'token': '558194066:AAEEylntuKSLXj9odiv3TnX7Z5KY2J3zY3M',
         'payment_provider_token': '284685063:TEST:YjEwODQwMTFmNDcy',
         'chat_id': '675666224',
         'super_group_id': '-1001221216830',
         'channel_id': '@pythontelegrambottests',
         'bot_name': 'PTB tests fallback 2',
-        'bot_username': '@ptb_fallback_2_bot'
-    }
+        'bot_username': '@ptb_fallback_2_bot',
+    },
 ]
 
 GITHUB_ACTION = os.getenv('GITHUB_ACTION', None)

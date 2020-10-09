@@ -77,7 +77,7 @@ def decrypt(secret, hash, data):
     digest.update(secret + hash)
     secret_hash_hash = digest.finalize()
     # First 32 chars is our key, next 16 is the initialisation vector
-    key, iv = secret_hash_hash[:32], secret_hash_hash[32:32 + 16]
+    key, iv = secret_hash_hash[:32], secret_hash_hash[32 : 32 + 16]
     # Init a AES-CBC cipher and decrypt the data
     cipher = Cipher(AES(key), CBC(iv), backend=default_backend())
     decryptor = cipher.decryptor()
@@ -91,7 +91,7 @@ def decrypt(secret, hash, data):
         # Raise a error that is caught inside telegram.PassportData and transformed into a warning
         raise TelegramDecryptionError("Hashes are not equal! {} != {}".format(data_hash, hash))
     # Return data without padding
-    return data[data[0]:]
+    return data[data[0] :]
 
 
 @no_type_check
@@ -129,12 +129,7 @@ class EncryptedCredentials(TelegramObject):
 
     """
 
-    def __init__(self,
-                 data: str,
-                 hash: str,
-                 secret: str,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
+    def __init__(self, data: str, hash: str, secret: str, bot: 'Bot' = None, **kwargs: Any):
         # Required
         self.data = data
         self.hash = hash
@@ -163,11 +158,10 @@ class EncryptedCredentials(TelegramObject):
             # is the default for OAEP, the algorithm is the default for PHP which is what
             # Telegram's backend servers run.
             try:
-                self._decrypted_secret = self.bot.private_key.decrypt(b64decode(self.secret), OAEP(
-                    mgf=MGF1(algorithm=SHA1()),
-                    algorithm=SHA1(),
-                    label=None
-                ))
+                self._decrypted_secret = self.bot.private_key.decrypt(
+                    b64decode(self.secret),
+                    OAEP(mgf=MGF1(algorithm=SHA1()), algorithm=SHA1(), label=None),
+                )
             except ValueError as e:
                 # If decryption fails raise exception
                 raise TelegramDecryptionError(e)
@@ -185,10 +179,10 @@ class EncryptedCredentials(TelegramObject):
                 private/public key but can also suggest malformed/tampered data.
         """
         if self._decrypted_data is None:
-            self._decrypted_data = Credentials.de_json(decrypt_json(self.decrypted_secret,
-                                                                    b64decode(self.hash),
-                                                                    b64decode(self.data)),
-                                                       self.bot)
+            self._decrypted_data = Credentials.de_json(
+                decrypt_json(self.decrypted_secret, b64decode(self.hash), b64decode(self.data)),
+                self.bot,
+            )
         return self._decrypted_data
 
 
@@ -246,20 +240,22 @@ class SecureData(TelegramObject):
             temporary registration.
     """
 
-    def __init__(self,
-                 personal_details: 'SecureValue' = None,
-                 passport: 'SecureValue' = None,
-                 internal_passport: 'SecureValue' = None,
-                 driver_license: 'SecureValue' = None,
-                 identity_card: 'SecureValue' = None,
-                 address: 'SecureValue' = None,
-                 utility_bill: 'SecureValue' = None,
-                 bank_statement: 'SecureValue' = None,
-                 rental_agreement: 'SecureValue' = None,
-                 passport_registration: 'SecureValue' = None,
-                 temporary_registration: 'SecureValue' = None,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        personal_details: 'SecureValue' = None,
+        passport: 'SecureValue' = None,
+        internal_passport: 'SecureValue' = None,
+        driver_license: 'SecureValue' = None,
+        identity_card: 'SecureValue' = None,
+        address: 'SecureValue' = None,
+        utility_bill: 'SecureValue' = None,
+        bank_statement: 'SecureValue' = None,
+        rental_agreement: 'SecureValue' = None,
+        passport_registration: 'SecureValue' = None,
+        temporary_registration: 'SecureValue' = None,
+        bot: 'Bot' = None,
+        **kwargs: Any,
+    ):
         # Optionals
         self.temporary_registration = temporary_registration
         self.passport_registration = passport_registration
@@ -282,10 +278,12 @@ class SecureData(TelegramObject):
         if not data:
             return None
 
-        data['temporary_registration'] = SecureValue.de_json(data.get('temporary_registration'),
-                                                             bot=bot)
-        data['passport_registration'] = SecureValue.de_json(data.get('passport_registration'),
-                                                            bot=bot)
+        data['temporary_registration'] = SecureValue.de_json(
+            data.get('temporary_registration'), bot=bot
+        )
+        data['passport_registration'] = SecureValue.de_json(
+            data.get('passport_registration'), bot=bot
+        )
         data['rental_agreement'] = SecureValue.de_json(data.get('rental_agreement'), bot=bot)
         data['bank_statement'] = SecureValue.de_json(data.get('bank_statement'), bot=bot)
         data['utility_bill'] = SecureValue.de_json(data.get('utility_bill'), bot=bot)
@@ -326,15 +324,17 @@ class SecureValue(TelegramObject):
 
     """
 
-    def __init__(self,
-                 data: 'DataCredentials' = None,
-                 front_side: 'FileCredentials' = None,
-                 reverse_side: 'FileCredentials' = None,
-                 selfie: 'FileCredentials' = None,
-                 files: List['FileCredentials'] = None,
-                 translation: List['FileCredentials'] = None,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        data: 'DataCredentials' = None,
+        front_side: 'FileCredentials' = None,
+        reverse_side: 'FileCredentials' = None,
+        selfie: 'FileCredentials' = None,
+        files: List['FileCredentials'] = None,
+        translation: List['FileCredentials'] = None,
+        bot: 'Bot' = None,
+        **kwargs: Any,
+    ):
         self.data = data
         self.front_side = front_side
         self.reverse_side = reverse_side
@@ -411,17 +411,17 @@ class DataCredentials(_CredentialsBase):
 
 class FileCredentials(_CredentialsBase):
     """
-        These credentials can be used to decrypt encrypted files from the front_side,
-        reverse_side, selfie and files fields in EncryptedPassportData.
+    These credentials can be used to decrypt encrypted files from the front_side,
+    reverse_side, selfie and files fields in EncryptedPassportData.
 
-        Args:
-            file_hash (:obj:`str`): Checksum of encrypted file
-            secret (:obj:`str`): Secret of encrypted file
+    Args:
+        file_hash (:obj:`str`): Checksum of encrypted file
+        secret (:obj:`str`): Secret of encrypted file
 
-        Attributes:
-            hash (:obj:`str`): Checksum of encrypted file
-            secret (:obj:`str`): Secret of encrypted file
-        """
+    Attributes:
+        hash (:obj:`str`): Checksum of encrypted file
+        secret (:obj:`str`): Secret of encrypted file
+    """
 
     def __init__(self, file_hash: str, secret: str, **kwargs: Any):
         super().__init__(file_hash, secret, **kwargs)

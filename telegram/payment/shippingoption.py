@@ -21,6 +21,7 @@
 from telegram import TelegramObject
 from telegram.utils.types import JSONDict
 from typing import List, Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import LabeledPrice  # noqa
 

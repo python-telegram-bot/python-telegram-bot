@@ -56,8 +56,10 @@ def animated_sticker(bot, chat_id):
 class TestSticker:
     # sticker_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.webp'
     # Serving sticker from gh since our server sends wrong content_type
-    sticker_file_url = ('https://github.com/python-telegram-bot/python-telegram-bot/blob/master'
-                        '/tests/data/telegram.webp?raw=true')
+    sticker_file_url = (
+        'https://github.com/python-telegram-bot/python-telegram-bot/blob/master'
+        '/tests/data/telegram.webp?raw=true'
+    )
 
     emoji = '💪'
     width = 510
@@ -180,7 +182,7 @@ class TestSticker:
             'is_animated': self.is_animated,
             'thumb': sticker.thumb.to_dict(),
             'emoji': self.emoji,
-            'file_size': self.file_size
+            'file_size': self.file_size,
         }
         json_sticker = Sticker.de_json(json_dict, bot)
 
@@ -230,14 +232,15 @@ class TestSticker:
             bot.send_sticker(chat_id)
 
     def test_equality(self, sticker):
-        a = Sticker(sticker.file_id, sticker.file_unique_id, self.width,
-                    self.height, self.is_animated)
-        b = Sticker('', sticker.file_unique_id, self.width,
-                    self.height, self.is_animated)
+        a = Sticker(
+            sticker.file_id, sticker.file_unique_id, self.width, self.height, self.is_animated
+        )
+        b = Sticker('', sticker.file_unique_id, self.width, self.height, self.is_animated)
         c = Sticker(sticker.file_id, sticker.file_unique_id, 0, 0, False)
         d = Sticker('', '', self.width, self.height, self.is_animated)
-        e = PhotoSize(sticker.file_id, sticker.file_unique_id, self.width,
-                      self.height, self.is_animated)
+        e = PhotoSize(
+            sticker.file_id, sticker.file_unique_id, self.width, self.height, self.is_animated
+        )
 
         assert a == b
         assert hash(a) == hash(b)
@@ -299,7 +302,7 @@ class TestStickerSet:
             'is_animated': self.is_animated,
             'contains_masks': self.contains_masks,
             'stickers': [x.to_dict() for x in self.stickers],
-            'thumb': sticker.thumb.to_dict()
+            'thumb': sticker.thumb.to_dict(),
         }
         sticker_set = StickerSet.de_json(json_dict, bot)
 
@@ -316,20 +319,27 @@ class TestStickerSet:
         with open('tests/data/telegram_sticker.png', 'rb') as f:
             file = bot.upload_sticker_file(95205500, f)
         assert file
-        assert bot.add_sticker_to_set(chat_id, 'test_by_{}'.format(bot.username),
-                                      png_sticker=file.file_id, emojis='😄')
+        assert bot.add_sticker_to_set(
+            chat_id, 'test_by_{}'.format(bot.username), png_sticker=file.file_id, emojis='😄'
+        )
         # Also test with file input and mask
-        assert bot.add_sticker_to_set(chat_id, 'test_by_{}'.format(bot.username),
-                                      png_sticker=sticker_file, emojis='😄',
-                                      mask_position=MaskPosition(MaskPosition.EYES, -1, 1, 2))
+        assert bot.add_sticker_to_set(
+            chat_id,
+            'test_by_{}'.format(bot.username),
+            png_sticker=sticker_file,
+            emojis='😄',
+            mask_position=MaskPosition(MaskPosition.EYES, -1, 1, 2),
+        )
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_bot_methods_1_tgs(self, bot, chat_id):
         assert bot.add_sticker_to_set(
-            chat_id, 'animated_test_by_{}'.format(bot.username),
+            chat_id,
+            'animated_test_by_{}'.format(bot.username),
             tgs_sticker=open('tests/data/telegram_animated_sticker.tgs', 'rb'),
-            emojis='😄')
+            emojis='😄',
+        )
 
     def test_sticker_set_to_dict(self, sticker_set):
         sticker_set_dict = sticker_set.to_dict()
@@ -357,19 +367,22 @@ class TestStickerSet:
     @pytest.mark.timeout(10)
     def test_bot_methods_3_png(self, bot, chat_id, sticker_set_thumb_file):
         sleep(1)
-        assert bot.set_sticker_set_thumb('test_by_{}'.format(bot.username), chat_id,
-                                         sticker_set_thumb_file)
+        assert bot.set_sticker_set_thumb(
+            'test_by_{}'.format(bot.username), chat_id, sticker_set_thumb_file
+        )
 
     @flaky(10, 1)
     @pytest.mark.timeout(10)
     def test_bot_methods_3_tgs(self, bot, chat_id, animated_sticker_file, animated_sticker_set):
         sleep(1)
-        assert bot.set_sticker_set_thumb('animated_test_by_{}'.format(bot.username), chat_id,
-                                         animated_sticker_file)
+        assert bot.set_sticker_set_thumb(
+            'animated_test_by_{}'.format(bot.username), chat_id, animated_sticker_file
+        )
         file_id = animated_sticker_set.stickers[-1].file_id
         # also test with file input and mask
-        assert bot.set_sticker_set_thumb('animated_test_by_{}'.format(bot.username), chat_id,
-                                         file_id)
+        assert bot.set_sticker_set_thumb(
+            'animated_test_by_{}'.format(bot.username), chat_id, file_id
+        )
 
     @flaky(10, 1)
     @pytest.mark.timeout(10)
@@ -415,10 +428,12 @@ class TestStickerSet:
 
 @pytest.fixture(scope='class')
 def mask_position():
-    return MaskPosition(TestMaskPosition.point,
-                        TestMaskPosition.x_shift,
-                        TestMaskPosition.y_shift,
-                        TestMaskPosition.scale)
+    return MaskPosition(
+        TestMaskPosition.point,
+        TestMaskPosition.x_shift,
+        TestMaskPosition.y_shift,
+        TestMaskPosition.scale,
+    )
 
 
 class TestMaskPosition:
@@ -432,7 +447,7 @@ class TestMaskPosition:
             'point': self.point,
             'x_shift': self.x_shift,
             'y_shift': self.y_shift,
-            'scale': self.scale
+            'scale': self.scale,
         }
         mask_position = MaskPosition.de_json(json_dict, bot)
 

@@ -22,8 +22,16 @@ from collections import defaultdict
 import pytest
 
 from telegram import TelegramError, TelegramDecryptionError
-from telegram.error import Unauthorized, InvalidToken, NetworkError, BadRequest, TimedOut, \
-    ChatMigrated, RetryAfter, Conflict
+from telegram.error import (
+    Unauthorized,
+    InvalidToken,
+    NetworkError,
+    BadRequest,
+    TimedOut,
+    ChatMigrated,
+    RetryAfter,
+    Conflict,
+)
 
 
 class TestErrors:
@@ -103,7 +111,7 @@ class TestErrors:
             (ChatMigrated(1234), ["message", "new_chat_id"]),
             (RetryAfter(12), ["message", "retry_after"]),
             (Conflict("test message"), ["message"]),
-            (TelegramDecryptionError("test message"), ["message"])
+            (TelegramDecryptionError("test message"), ["message"]),
         ],
     )
     def test_errors_pickling(self, exception, attributes):
@@ -122,16 +130,26 @@ class TestErrors:
         Add the new error class to the below covered_subclasses dict, if it's covered in the above
         test_errors_pickling test.
         """
+
         def make_assertion(cls):
             assert {sc for sc in cls.__subclasses__()} == covered_subclasses[cls]
             for subcls in cls.__subclasses__():
                 make_assertion(subcls)
 
         covered_subclasses = defaultdict(set)
-        covered_subclasses.update({
-            TelegramError: {Unauthorized, InvalidToken, NetworkError, ChatMigrated, RetryAfter,
-                            Conflict, TelegramDecryptionError},
-            NetworkError: {BadRequest, TimedOut}
-        })
+        covered_subclasses.update(
+            {
+                TelegramError: {
+                    Unauthorized,
+                    InvalidToken,
+                    NetworkError,
+                    ChatMigrated,
+                    RetryAfter,
+                    Conflict,
+                    TelegramDecryptionError,
+                },
+                NetworkError: {BadRequest, TimedOut},
+            }
+        )
 
         make_assertion(TelegramError)

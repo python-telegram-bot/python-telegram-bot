@@ -22,6 +22,7 @@ import logging
 from threading import Event
 from telegram.utils.types import JSONDict, HandlerArg
 from typing import Callable, List, Tuple, Optional, Union, TypeVar
+
 RT = TypeVar('RT')
 
 
@@ -51,12 +52,14 @@ class Promise:
     """
 
     # TODO: Remove error_handling parameter once we drop the @run_async decorator
-    def __init__(self,
-                 pooled_function: Callable[..., RT],
-                 args: Union[List, Tuple],
-                 kwargs: JSONDict,
-                 update: HandlerArg = None,
-                 error_handling: bool = True):
+    def __init__(
+        self,
+        pooled_function: Callable[..., RT],
+        args: Union[List, Tuple],
+        kwargs: JSONDict,
+        update: HandlerArg = None,
+        error_handling: bool = True,
+    ):
         self.pooled_function = pooled_function
         self.args = args
         self.kwargs = kwargs

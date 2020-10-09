@@ -19,8 +19,13 @@
 
 import pytest
 
-from telegram import (InlineKeyboardButton, InputTextMessageContent, InlineQueryResultDocument,
-                      InlineKeyboardMarkup, InlineQueryResultVoice)
+from telegram import (
+    InlineKeyboardButton,
+    InputTextMessageContent,
+    InlineQueryResultDocument,
+    InlineKeyboardMarkup,
+    InlineQueryResultVoice,
+)
 
 
 @pytest.fixture(scope='class')
@@ -37,7 +42,8 @@ def inline_query_result_document():
         thumb_width=TestInlineQueryResultDocument.thumb_width,
         thumb_height=TestInlineQueryResultDocument.thumb_height,
         input_message_content=TestInlineQueryResultDocument.input_message_content,
-        reply_markup=TestInlineQueryResultDocument.reply_markup)
+        reply_markup=TestInlineQueryResultDocument.reply_markup,
+    )
 
 
 class TestInlineQueryResultDocument:
@@ -67,8 +73,10 @@ class TestInlineQueryResultDocument:
         assert inline_query_result_document.thumb_url == self.thumb_url
         assert inline_query_result_document.thumb_width == self.thumb_width
         assert inline_query_result_document.thumb_height == self.thumb_height
-        assert (inline_query_result_document.input_message_content.to_dict()
-                == self.input_message_content.to_dict())
+        assert (
+            inline_query_result_document.input_message_content.to_dict()
+            == self.input_message_content.to_dict()
+        )
         assert inline_query_result_document.reply_markup.to_dict() == self.reply_markup.to_dict()
 
     def test_to_dict(self, inline_query_result_document):
@@ -77,32 +85,48 @@ class TestInlineQueryResultDocument:
         assert isinstance(inline_query_result_document_dict, dict)
         assert inline_query_result_document_dict['id'] == inline_query_result_document.id
         assert inline_query_result_document_dict['type'] == inline_query_result_document.type
-        assert (inline_query_result_document_dict['document_url']
-                == inline_query_result_document.document_url)
+        assert (
+            inline_query_result_document_dict['document_url']
+            == inline_query_result_document.document_url
+        )
         assert inline_query_result_document_dict['title'] == inline_query_result_document.title
         assert inline_query_result_document_dict['caption'] == inline_query_result_document.caption
-        assert (inline_query_result_document_dict['parse_mode']
-                == inline_query_result_document.parse_mode)
-        assert (inline_query_result_document_dict['mime_type']
-                == inline_query_result_document.mime_type)
-        assert (inline_query_result_document_dict['description']
-                == inline_query_result_document.description)
-        assert (inline_query_result_document_dict['thumb_url']
-                == inline_query_result_document.thumb_url)
-        assert (inline_query_result_document_dict['thumb_width']
-                == inline_query_result_document.thumb_width)
-        assert (inline_query_result_document_dict['thumb_height']
-                == inline_query_result_document.thumb_height)
-        assert (inline_query_result_document_dict['input_message_content']
-                == inline_query_result_document.input_message_content.to_dict())
-        assert (inline_query_result_document_dict['reply_markup']
-                == inline_query_result_document.reply_markup.to_dict())
+        assert (
+            inline_query_result_document_dict['parse_mode']
+            == inline_query_result_document.parse_mode
+        )
+        assert (
+            inline_query_result_document_dict['mime_type']
+            == inline_query_result_document.mime_type
+        )
+        assert (
+            inline_query_result_document_dict['description']
+            == inline_query_result_document.description
+        )
+        assert (
+            inline_query_result_document_dict['thumb_url']
+            == inline_query_result_document.thumb_url
+        )
+        assert (
+            inline_query_result_document_dict['thumb_width']
+            == inline_query_result_document.thumb_width
+        )
+        assert (
+            inline_query_result_document_dict['thumb_height']
+            == inline_query_result_document.thumb_height
+        )
+        assert (
+            inline_query_result_document_dict['input_message_content']
+            == inline_query_result_document.input_message_content.to_dict()
+        )
+        assert (
+            inline_query_result_document_dict['reply_markup']
+            == inline_query_result_document.reply_markup.to_dict()
+        )
 
     def test_equality(self):
-        a = InlineQueryResultDocument(self.id_, self.document_url, self.title,
-                                      self.mime_type)
-        b = InlineQueryResultDocument(self.id_, self.document_url, self.title,
-                                      self.mime_type)
+        a = InlineQueryResultDocument(self.id_, self.document_url, self.title, self.mime_type)
+        b = InlineQueryResultDocument(self.id_, self.document_url, self.title, self.mime_type)
         c = InlineQueryResultDocument(self.id_, '', self.title, self.mime_type)
         d = InlineQueryResultDocument('', self.document_url, self.title, self.mime_type)
         e = InlineQueryResultVoice(self.id_, '', '')

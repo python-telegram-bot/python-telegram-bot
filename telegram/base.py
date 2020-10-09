@@ -66,9 +66,7 @@ class TelegramObject:
             return cls(bot=bot, **data)  # type: ignore[call-arg]
 
     @classmethod
-    def de_list(cls: Type[TO],
-                data: Optional[List[JSONDict]],
-                bot: 'Bot') -> List[Optional[TO]]:
+    def de_list(cls: Type[TO], data: Optional[List[JSONDict]], bot: 'Bot') -> List[Optional[TO]]:
         if not data:
             return []
 
@@ -104,11 +102,15 @@ class TelegramObject:
     def __eq__(self, other: object) -> bool:
         if isinstance(other, self.__class__):
             if self._id_attrs == ():
-                warnings.warn("Objects of type {} can not be meaningfully tested for "
-                              "equivalence.".format(self.__class__.__name__))
+                warnings.warn(
+                    "Objects of type {} can not be meaningfully tested for "
+                    "equivalence.".format(self.__class__.__name__)
+                )
             if other._id_attrs == ():
-                warnings.warn("Objects of type {} can not be meaningfully tested for "
-                              "equivalence.".format(other.__class__.__name__))
+                warnings.warn(
+                    "Objects of type {} can not be meaningfully tested for "
+                    "equivalence.".format(other.__class__.__name__)
+                )
             return self._id_attrs == other._id_attrs
         return super().__eq__(other)  # pylint: disable=no-member
 

@@ -22,8 +22,7 @@ import pytest
 from telegram import MessageEntity, User
 
 
-@pytest.fixture(scope="class",
-                params=MessageEntity.ALL_TYPES)
+@pytest.fixture(scope="class", params=MessageEntity.ALL_TYPES)
 def message_entity(request):
     type_ = request.param
     url = None
@@ -45,11 +44,7 @@ class TestMessageEntity:
     url = 'url'
 
     def test_de_json(self, bot):
-        json_dict = {
-            'type': self.type_,
-            'offset': self.offset,
-            'length': self.length
-        }
+        json_dict = {'type': self.type_, 'offset': self.offset, 'length': self.length}
         entity = MessageEntity.de_json(json_dict, bot)
 
         assert entity.type == self.type_

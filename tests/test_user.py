@@ -33,17 +33,24 @@ def json_dict():
         'language_code': TestUser.language_code,
         'can_join_groups': TestUser.can_join_groups,
         'can_read_all_group_messages': TestUser.can_read_all_group_messages,
-        'supports_inline_queries': TestUser.supports_inline_queries
+        'supports_inline_queries': TestUser.supports_inline_queries,
     }
 
 
 @pytest.fixture(scope='function')
 def user(bot):
-    return User(id=TestUser.id_, first_name=TestUser.first_name, is_bot=TestUser.is_bot,
-                last_name=TestUser.last_name, username=TestUser.username,
-                language_code=TestUser.language_code, can_join_groups=TestUser.can_join_groups,
-                can_read_all_group_messages=TestUser.can_read_all_group_messages,
-                supports_inline_queries=TestUser.supports_inline_queries, bot=bot)
+    return User(
+        id=TestUser.id_,
+        first_name=TestUser.first_name,
+        is_bot=TestUser.is_bot,
+        last_name=TestUser.last_name,
+        username=TestUser.username,
+        language_code=TestUser.language_code,
+        can_join_groups=TestUser.can_join_groups,
+        can_read_all_group_messages=TestUser.can_read_all_group_messages,
+        supports_inline_queries=TestUser.supports_inline_queries,
+        bot=bot,
+    )
 
 
 class TestUser:
@@ -257,16 +264,18 @@ class TestUser:
         expected = u'<a href="tg://user?id={}">{}</a>'
 
         assert user.mention_html() == expected.format(user.id, user.full_name)
-        assert user.mention_html('the<b>name\u2022') == expected.format(user.id,
-                                                                        'the&lt;b&gt;name\u2022')
+        assert user.mention_html('the<b>name\u2022') == expected.format(
+            user.id, 'the&lt;b&gt;name\u2022'
+        )
         assert user.mention_html(user.username) == expected.format(user.id, user.username)
 
     def test_mention_markdown(self, user):
         expected = u'[{}](tg://user?id={})'
 
         assert user.mention_markdown() == expected.format(user.full_name, user.id)
-        assert user.mention_markdown('the_name*\u2022') == expected.format('the\\_name\\*\u2022',
-                                                                           user.id)
+        assert user.mention_markdown('the_name*\u2022') == expected.format(
+            'the\\_name\\*\u2022', user.id
+        )
         assert user.mention_markdown(user.username) == expected.format(user.username, user.id)
 
     def test_mention_markdown_v2(self, user):
@@ -275,10 +284,12 @@ class TestUser:
 
         expected = u'[{}](tg://user?id={})'
 
-        assert user.mention_markdown_v2() == expected.format(escape_markdown(user.full_name,
-                                                                             version=2), user.id)
+        assert user.mention_markdown_v2() == expected.format(
+            escape_markdown(user.full_name, version=2), user.id
+        )
         assert user.mention_markdown_v2('the{name>\u2022') == expected.format(
-            'the\\{name\\>\u2022', user.id)
+            'the\\{name\\>\u2022', user.id
+        )
         assert user.mention_markdown_v2(user.username) == expected.format(user.username, user.id)
 
     def test_equality(self):

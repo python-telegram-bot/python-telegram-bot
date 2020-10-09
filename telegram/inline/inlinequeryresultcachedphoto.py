@@ -21,6 +21,7 @@
 from telegram import InlineQueryResult
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
 from typing import Any, Union, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
 
@@ -66,16 +67,18 @@ class InlineQueryResultCachedPhoto(InlineQueryResult):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 photo_file_id: str,
-                 title: str = None,
-                 description: str = None,
-                 caption: str = None,
-                 reply_markup: 'ReplyMarkup' = None,
-                 input_message_content: 'InputMessageContent' = None,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        id: str,
+        photo_file_id: str,
+        title: str = None,
+        description: str = None,
+        caption: str = None,
+        reply_markup: 'ReplyMarkup' = None,
+        input_message_content: 'InputMessageContent' = None,
+        parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+        **kwargs: Any,
+    ):
         # Required
         super().__init__('photo', id)
         self.photo_file_id = photo_file_id

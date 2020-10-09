@@ -27,8 +27,16 @@ from telegram.vendor.ptb_urllib3 import urllib3
 import telegram
 
 IGNORED_OBJECTS = ('ResponseParameters', 'CallbackGame')
-IGNORED_PARAMETERS = {'self', 'args', 'kwargs', 'read_latency', 'network_delay', 'timeout', 'bot',
-                      'api_kwargs'}
+IGNORED_PARAMETERS = {
+    'self',
+    'args',
+    'kwargs',
+    'read_latency',
+    'network_delay',
+    'timeout',
+    'bot',
+    'api_kwargs',
+}
 
 
 def find_next_sibling_until(tag, name, until):
@@ -60,8 +68,9 @@ def check_method(h4):
     checked = []
     for parameter in table:
         param = sig.parameters.get(parameter[0])
-        assert param is not None, "Parameter {} not found in {}".format(parameter[0],
-                                                                        method.__name__)
+        assert param is not None, "Parameter {} not found in {}".format(
+            parameter[0], method.__name__
+        )
         # TODO: Check type via docstring
         # TODO: Check if optional or required
         checked.append(parameter[0])
@@ -98,8 +107,9 @@ def check_object(h4):
         field = parameter[0]
         if field == 'from':
             field = 'from_user'
-        elif ((name.startswith('InlineQueryResult')
-               or name.startswith('InputMedia')) and field == 'type'):
+        elif (
+            name.startswith('InlineQueryResult') or name.startswith('InputMedia')
+        ) and field == 'type':
             continue
         elif name.startswith('PassportElementError') and field == 'source':
             continue
@@ -131,9 +141,7 @@ def check_object(h4):
 
 argvalues = []
 names = []
-http = urllib3.PoolManager(
-    cert_reqs='CERT_REQUIRED',
-    ca_certs=certifi.where())
+http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 request = http.request('GET', 'https://core.telegram.org/bots/api')
 soup = BeautifulSoup(request.data.decode('utf-8'), 'html.parser')
 
@@ -153,7 +161,6 @@ for thing in soup.select('h4 > a.anchor'):
 
 
 @pytest.mark.parametrize(('method', 'data'), argvalues=argvalues, ids=names)
-@pytest.mark.skipif(os.getenv('TEST_OFFICIAL') != 'true',
-                    reason='test_official is not enabled')
+@pytest.mark.skipif(os.getenv('TEST_OFFICIAL') != 'true', reason='test_official is not enabled')
 def test_official(method, data):
     method(data)

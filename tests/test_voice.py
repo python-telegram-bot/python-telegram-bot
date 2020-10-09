@@ -65,9 +65,14 @@ class TestVoice:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_all_args(self, bot, chat_id, voice_file, voice):
-        message = bot.send_voice(chat_id, voice_file, duration=self.duration,
-                                 caption=self.caption, disable_notification=False,
-                                 parse_mode='Markdown')
+        message = bot.send_voice(
+            chat_id,
+            voice_file,
+            duration=self.duration,
+            caption=self.caption,
+            disable_notification=False,
+            parse_mode='Markdown',
+        )
 
         assert isinstance(message.voice, Voice)
         assert isinstance(message.voice.file_id, str)
@@ -139,8 +144,9 @@ class TestVoice:
     def test_send_voice_default_parse_mode_2(self, default_bot, chat_id, voice):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_voice(chat_id, voice, caption=test_markdown_string,
-                                         parse_mode=None)
+        message = default_bot.send_voice(
+            chat_id, voice, caption=test_markdown_string, parse_mode=None
+        )
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
@@ -150,8 +156,9 @@ class TestVoice:
     def test_send_voice_default_parse_mode_3(self, default_bot, chat_id, voice):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_voice(chat_id, voice, caption=test_markdown_string,
-                                         parse_mode='HTML')
+        message = default_bot.send_voice(
+            chat_id, voice, caption=test_markdown_string, parse_mode='HTML'
+        )
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
@@ -162,7 +169,7 @@ class TestVoice:
             'duration': self.duration,
             'caption': self.caption,
             'mime_type': self.mime_type,
-            'file_size': self.file_size
+            'file_size': self.file_size,
         }
         json_voice = Voice.de_json(json_dict, bot)
 

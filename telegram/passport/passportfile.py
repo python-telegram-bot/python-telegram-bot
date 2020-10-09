@@ -21,6 +21,7 @@
 from telegram import TelegramObject
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, List, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import Bot, File, FileCredentials
 
@@ -55,14 +56,16 @@ class PassportFile(TelegramObject):
 
     """
 
-    def __init__(self,
-                 file_id: str,
-                 file_unique_id: str,
-                 file_date: int,
-                 file_size: int = None,
-                 bot: 'Bot' = None,
-                 credentials: 'FileCredentials' = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        file_id: str,
+        file_unique_id: str,
+        file_date: int,
+        file_size: int = None,
+        bot: 'Bot' = None,
+        credentials: 'FileCredentials' = None,
+        **kwargs: Any,
+    ):
         # Required
         self.file_id = file_id
         self.file_unique_id = file_unique_id
@@ -75,10 +78,9 @@ class PassportFile(TelegramObject):
         self._id_attrs = (self.file_unique_id,)
 
     @classmethod
-    def de_json_decrypted(cls,
-                          data: Optional[JSONDict],
-                          bot: 'Bot',
-                          credentials: 'FileCredentials') -> Optional['PassportFile']:
+    def de_json_decrypted(
+        cls, data: Optional[JSONDict], bot: 'Bot', credentials: 'FileCredentials'
+    ) -> Optional['PassportFile']:
         data = cls.parse_data(data)
 
         if not data:
@@ -89,15 +91,16 @@ class PassportFile(TelegramObject):
         return cls(bot=bot, **data)
 
     @classmethod
-    def de_list_decrypted(cls,
-                          data: Optional[List[JSONDict]],
-                          bot: 'Bot',
-                          credentials: List['FileCredentials']) -> List[Optional['PassportFile']]:
+    def de_list_decrypted(
+        cls, data: Optional[List[JSONDict]], bot: 'Bot', credentials: List['FileCredentials']
+    ) -> List[Optional['PassportFile']]:
         if not data:
             return []
 
-        return [cls.de_json_decrypted(passport_file, bot, credentials[i])
-                for i, passport_file in enumerate(data)]
+        return [
+            cls.de_json_decrypted(passport_file, bot, credentials[i])
+            for i, passport_file in enumerate(data)
+        ]
 
     def get_file(self, timeout: int = None, api_kwargs: JSONDict = None) -> 'File':
         """

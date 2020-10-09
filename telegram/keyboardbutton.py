@@ -60,12 +60,14 @@ class KeyboardButton(TelegramObject):
 
     """
 
-    def __init__(self,
-                 text: str,
-                 request_contact: bool = None,
-                 request_location: bool = None,
-                 request_poll: bool = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        text: str,
+        request_contact: bool = None,
+        request_location: bool = None,
+        request_poll: bool = None,
+        **kwargs: Any,
+    ):
         # Required
         self.text = text
         # Optionals
@@ -73,5 +75,9 @@ class KeyboardButton(TelegramObject):
         self.request_location = request_location
         self.request_poll = request_poll
 
-        self._id_attrs = (self.text, self.request_contact, self.request_location,
-                          self.request_poll)
+        self._id_attrs = (
+            self.text,
+            self.request_contact,
+            self.request_location,
+            self.request_poll,
+        )

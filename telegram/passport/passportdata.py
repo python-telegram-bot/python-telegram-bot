@@ -22,6 +22,7 @@ from telegram import EncryptedCredentials, EncryptedPassportElement, TelegramObj
 
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, List, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import Bot, Credentials
 
@@ -50,11 +51,13 @@ class PassportData(TelegramObject):
 
     """
 
-    def __init__(self,
-                 data: List[EncryptedPassportElement],
-                 credentials: EncryptedCredentials,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        data: List[EncryptedPassportElement],
+        credentials: EncryptedCredentials,
+        bot: 'Bot' = None,
+        **kwargs: Any,
+    ):
         self.data = data
         self.credentials = credentials
 
@@ -93,9 +96,9 @@ class PassportData(TelegramObject):
         """
         if self._decrypted_data is None:
             self._decrypted_data = [
-                EncryptedPassportElement.de_json_decrypted(element.to_dict(),
-                                                           self.bot,
-                                                           self.decrypted_credentials)
+                EncryptedPassportElement.de_json_decrypted(
+                    element.to_dict(), self.bot, self.decrypted_credentials
+                )
                 for element in self.data
             ]
         return self._decrypted_data

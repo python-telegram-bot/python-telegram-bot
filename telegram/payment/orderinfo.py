@@ -21,6 +21,7 @@
 from telegram import TelegramObject, ShippingAddress
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import Bot
 
@@ -47,12 +48,14 @@ class OrderInfo(TelegramObject):
 
     """
 
-    def __init__(self,
-                 name: str = None,
-                 phone_number: str = None,
-                 email: str = None,
-                 shipping_address: str = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        name: str = None,
+        phone_number: str = None,
+        email: str = None,
+        shipping_address: str = None,
+        **kwargs: Any,
+    ):
         self.name = name
         self.phone_number = phone_number
         self.email = email

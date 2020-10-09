@@ -24,14 +24,16 @@ from telegram import EncryptedPassportElement, PassportFile, PassportElementErro
 
 @pytest.fixture(scope='class')
 def encrypted_passport_element():
-    return EncryptedPassportElement(TestEncryptedPassportElement.type_,
-                                    data=TestEncryptedPassportElement.data,
-                                    phone_number=TestEncryptedPassportElement.phone_number,
-                                    email=TestEncryptedPassportElement.email,
-                                    files=TestEncryptedPassportElement.files,
-                                    front_side=TestEncryptedPassportElement.front_side,
-                                    reverse_side=TestEncryptedPassportElement.reverse_side,
-                                    selfie=TestEncryptedPassportElement.selfie)
+    return EncryptedPassportElement(
+        TestEncryptedPassportElement.type_,
+        data=TestEncryptedPassportElement.data,
+        phone_number=TestEncryptedPassportElement.phone_number,
+        email=TestEncryptedPassportElement.email,
+        files=TestEncryptedPassportElement.files,
+        front_side=TestEncryptedPassportElement.front_side,
+        reverse_side=TestEncryptedPassportElement.reverse_side,
+        selfie=TestEncryptedPassportElement.selfie,
+    )
 
 
 class TestEncryptedPassportElement:
@@ -58,21 +60,26 @@ class TestEncryptedPassportElement:
         encrypted_passport_element_dict = encrypted_passport_element.to_dict()
 
         assert isinstance(encrypted_passport_element_dict, dict)
-        assert (encrypted_passport_element_dict['type']
-                == encrypted_passport_element.type)
-        assert (encrypted_passport_element_dict['data']
-                == encrypted_passport_element.data)
-        assert (encrypted_passport_element_dict['phone_number']
-                == encrypted_passport_element.phone_number)
-        assert (encrypted_passport_element_dict['email']
-                == encrypted_passport_element.email)
+        assert encrypted_passport_element_dict['type'] == encrypted_passport_element.type
+        assert encrypted_passport_element_dict['data'] == encrypted_passport_element.data
+        assert (
+            encrypted_passport_element_dict['phone_number']
+            == encrypted_passport_element.phone_number
+        )
+        assert encrypted_passport_element_dict['email'] == encrypted_passport_element.email
         assert isinstance(encrypted_passport_element_dict['files'], list)
-        assert (encrypted_passport_element_dict['front_side']
-                == encrypted_passport_element.front_side.to_dict())
-        assert (encrypted_passport_element_dict['reverse_side']
-                == encrypted_passport_element.reverse_side.to_dict())
-        assert (encrypted_passport_element_dict['selfie']
-                == encrypted_passport_element.selfie.to_dict())
+        assert (
+            encrypted_passport_element_dict['front_side']
+            == encrypted_passport_element.front_side.to_dict()
+        )
+        assert (
+            encrypted_passport_element_dict['reverse_side']
+            == encrypted_passport_element.reverse_side.to_dict()
+        )
+        assert (
+            encrypted_passport_element_dict['selfie']
+            == encrypted_passport_element.selfie.to_dict()
+        )
 
     def test_equality(self):
         a = EncryptedPassportElement(self.type_, data=self.data)

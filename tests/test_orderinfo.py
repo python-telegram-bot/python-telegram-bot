@@ -24,8 +24,12 @@ from telegram import ShippingAddress, OrderInfo
 
 @pytest.fixture(scope='class')
 def order_info():
-    return OrderInfo(TestOrderInfo.name, TestOrderInfo.phone_number,
-                     TestOrderInfo.email, TestOrderInfo.shipping_address)
+    return OrderInfo(
+        TestOrderInfo.name,
+        TestOrderInfo.phone_number,
+        TestOrderInfo.email,
+        TestOrderInfo.shipping_address,
+    )
 
 
 class TestOrderInfo:
@@ -39,7 +43,7 @@ class TestOrderInfo:
             'name': TestOrderInfo.name,
             'phone_number': TestOrderInfo.phone_number,
             'email': TestOrderInfo.email,
-            'shipping_address': TestOrderInfo.shipping_address.to_dict()
+            'shipping_address': TestOrderInfo.shipping_address.to_dict(),
         }
         order_info = OrderInfo.de_json(json_dict, bot)
 
@@ -58,14 +62,30 @@ class TestOrderInfo:
         assert order_info_dict['shipping_address'] == order_info.shipping_address.to_dict()
 
     def test_equality(self):
-        a = OrderInfo('name', 'number', 'mail',
-                      ShippingAddress('GB', '', 'London', '12 Grimmauld Place', '', 'WC1'))
-        b = OrderInfo('name', 'number', 'mail',
-                      ShippingAddress('GB', '', 'London', '12 Grimmauld Place', '', 'WC1'))
-        c = OrderInfo('name', 'number', 'mail',
-                      ShippingAddress('GB', '', 'London', '13 Grimmauld Place', '', 'WC1'))
-        d = OrderInfo('name', 'number', 'e-mail',
-                      ShippingAddress('GB', '', 'London', '12 Grimmauld Place', '', 'WC1'))
+        a = OrderInfo(
+            'name',
+            'number',
+            'mail',
+            ShippingAddress('GB', '', 'London', '12 Grimmauld Place', '', 'WC1'),
+        )
+        b = OrderInfo(
+            'name',
+            'number',
+            'mail',
+            ShippingAddress('GB', '', 'London', '12 Grimmauld Place', '', 'WC1'),
+        )
+        c = OrderInfo(
+            'name',
+            'number',
+            'mail',
+            ShippingAddress('GB', '', 'London', '13 Grimmauld Place', '', 'WC1'),
+        )
+        d = OrderInfo(
+            'name',
+            'number',
+            'e-mail',
+            ShippingAddress('GB', '', 'London', '12 Grimmauld Place', '', 'WC1'),
+        )
         e = ShippingAddress('GB', '', 'London', '12 Grimmauld Place', '', 'WC1')
 
         assert a == b

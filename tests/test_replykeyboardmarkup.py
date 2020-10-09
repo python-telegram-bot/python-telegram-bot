@@ -25,10 +25,12 @@ from telegram import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup
 
 @pytest.fixture(scope='class')
 def reply_keyboard_markup():
-    return ReplyKeyboardMarkup(TestReplyKeyboardMarkup.keyboard,
-                               resize_keyboard=TestReplyKeyboardMarkup.resize_keyboard,
-                               one_time_keyboard=TestReplyKeyboardMarkup.one_time_keyboard,
-                               selective=TestReplyKeyboardMarkup.selective)
+    return ReplyKeyboardMarkup(
+        TestReplyKeyboardMarkup.keyboard,
+        resize_keyboard=TestReplyKeyboardMarkup.resize_keyboard,
+        one_time_keyboard=TestReplyKeyboardMarkup.one_time_keyboard,
+        selective=TestReplyKeyboardMarkup.selective,
+    )
 
 
 class TestReplyKeyboardMarkup:
@@ -53,7 +55,8 @@ class TestReplyKeyboardMarkup:
 
     def test_from_button(self):
         reply_keyboard_markup = ReplyKeyboardMarkup.from_button(
-            KeyboardButton(text='button1')).keyboard
+            KeyboardButton(text='button1')
+        ).keyboard
         assert len(reply_keyboard_markup) == 1
         assert len(reply_keyboard_markup[0]) == 1
 
@@ -62,9 +65,9 @@ class TestReplyKeyboardMarkup:
         assert len(reply_keyboard_markup[0]) == 1
 
     def test_from_row(self):
-        reply_keyboard_markup = ReplyKeyboardMarkup.from_row([
-            KeyboardButton(text='button1'),
-            KeyboardButton(text='button2')]).keyboard
+        reply_keyboard_markup = ReplyKeyboardMarkup.from_row(
+            [KeyboardButton(text='button1'), KeyboardButton(text='button2')]
+        ).keyboard
         assert len(reply_keyboard_markup) == 1
         assert len(reply_keyboard_markup[0]) == 2
 
@@ -73,9 +76,9 @@ class TestReplyKeyboardMarkup:
         assert len(reply_keyboard_markup[0]) == 2
 
     def test_from_column(self):
-        reply_keyboard_markup = ReplyKeyboardMarkup.from_column([
-            KeyboardButton(text='button1'),
-            KeyboardButton(text='button2')]).keyboard
+        reply_keyboard_markup = ReplyKeyboardMarkup.from_column(
+            [KeyboardButton(text='button1'), KeyboardButton(text='button2')]
+        ).keyboard
         assert len(reply_keyboard_markup) == 2
         assert len(reply_keyboard_markup[0]) == 1
         assert len(reply_keyboard_markup[1]) == 1
@@ -97,21 +100,28 @@ class TestReplyKeyboardMarkup:
         reply_keyboard_markup_dict = reply_keyboard_markup.to_dict()
 
         assert isinstance(reply_keyboard_markup_dict, dict)
-        assert (reply_keyboard_markup_dict['keyboard'][0][0]
-                == reply_keyboard_markup.keyboard[0][0].to_dict())
-        assert (reply_keyboard_markup_dict['keyboard'][0][1]
-                == reply_keyboard_markup.keyboard[0][1].to_dict())
-        assert (reply_keyboard_markup_dict['resize_keyboard']
-                == reply_keyboard_markup.resize_keyboard)
-        assert (reply_keyboard_markup_dict['one_time_keyboard']
-                == reply_keyboard_markup.one_time_keyboard)
+        assert (
+            reply_keyboard_markup_dict['keyboard'][0][0]
+            == reply_keyboard_markup.keyboard[0][0].to_dict()
+        )
+        assert (
+            reply_keyboard_markup_dict['keyboard'][0][1]
+            == reply_keyboard_markup.keyboard[0][1].to_dict()
+        )
+        assert (
+            reply_keyboard_markup_dict['resize_keyboard'] == reply_keyboard_markup.resize_keyboard
+        )
+        assert (
+            reply_keyboard_markup_dict['one_time_keyboard']
+            == reply_keyboard_markup.one_time_keyboard
+        )
         assert reply_keyboard_markup_dict['selective'] == reply_keyboard_markup.selective
 
     def test_equality(self):
         a = ReplyKeyboardMarkup.from_column(['button1', 'button2', 'button3'])
-        b = ReplyKeyboardMarkup.from_column([
-            KeyboardButton(text) for text in ['button1', 'button2', 'button3']
-        ])
+        b = ReplyKeyboardMarkup.from_column(
+            [KeyboardButton(text) for text in ['button1', 'button2', 'button3']]
+        )
         c = ReplyKeyboardMarkup.from_column(['button1', 'button2'])
         d = ReplyKeyboardMarkup.from_column(['button1', 'button2', 'button3.1'])
         e = ReplyKeyboardMarkup([['button1', 'button1'], ['button2'], ['button3.1']])

@@ -20,8 +20,18 @@ from queue import Queue
 
 import pytest
 
-from telegram import (Bot, Update, Message, User, Chat, CallbackQuery, InlineQuery,
-                      ChosenInlineResult, ShippingQuery, PreCheckoutQuery)
+from telegram import (
+    Bot,
+    Update,
+    Message,
+    User,
+    Chat,
+    CallbackQuery,
+    InlineQuery,
+    ChosenInlineResult,
+    ShippingQuery,
+    PreCheckoutQuery,
+)
 from telegram.ext import StringRegexHandler, CallbackContext, JobQueue
 
 message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
@@ -36,12 +46,21 @@ params = [
     {'chosen_inline_result': ChosenInlineResult('id', User(1, '', False), '')},
     {'shipping_query': ShippingQuery('id', User(1, '', False), '', None)},
     {'pre_checkout_query': PreCheckoutQuery('id', User(1, '', False), '', 0, '')},
-    {'callback_query': CallbackQuery(1, User(1, '', False), 'chat')}
+    {'callback_query': CallbackQuery(1, User(1, '', False), 'chat')},
 ]
 
-ids = ('message', 'edited_message', 'callback_query', 'channel_post',
-       'edited_channel_post', 'inline_query', 'chosen_inline_result',
-       'shipping_query', 'pre_checkout_query', 'callback_query_without_message')
+ids = (
+    'message',
+    'edited_message',
+    'callback_query',
+    'channel_post',
+    'edited_channel_post',
+    'inline_query',
+    'chosen_inline_result',
+    'shipping_query',
+    'pre_checkout_query',
+    'callback_query_without_message',
+)
 
 
 @pytest.fixture(scope='class', params=params, ids=ids)
@@ -74,11 +93,13 @@ class TestStringRegexHandler:
             self.test_flag = groupdict == {'begin': 't', 'end': ' message'}
 
     def callback_context(self, update, context):
-        self.test_flag = (isinstance(context, CallbackContext)
-                          and isinstance(context.bot, Bot)
-                          and isinstance(update, str)
-                          and isinstance(context.update_queue, Queue)
-                          and isinstance(context.job_queue, JobQueue))
+        self.test_flag = (
+            isinstance(context, CallbackContext)
+            and isinstance(context.bot, Bot)
+            and isinstance(update, str)
+            and isinstance(context.update_queue, Queue)
+            and isinstance(context.job_queue, JobQueue)
+        )
 
     def callback_context_pattern(self, update, context):
         if context.matches[0].groups():
@@ -97,16 +118,18 @@ class TestStringRegexHandler:
         assert not handler.check_update('does not match')
 
     def test_with_passing_group_dict(self, dp):
-        handler = StringRegexHandler('(?P<begin>.*)est(?P<end>.*)', self.callback_group,
-                                     pass_groups=True)
+        handler = StringRegexHandler(
+            '(?P<begin>.*)est(?P<end>.*)', self.callback_group, pass_groups=True
+        )
         dp.add_handler(handler)
 
         dp.process_update('test message')
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = StringRegexHandler('(?P<begin>.*)est(?P<end>.*)', self.callback_group,
-                                     pass_groupdict=True)
+        handler = StringRegexHandler(
+            '(?P<begin>.*)est(?P<end>.*)', self.callback_group, pass_groupdict=True
+        )
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -114,16 +137,14 @@ class TestStringRegexHandler:
         assert self.test_flag
 
     def test_pass_job_or_update_queue(self, dp):
-        handler = StringRegexHandler('test', self.callback_queue_1,
-                                     pass_job_queue=True)
+        handler = StringRegexHandler('test', self.callback_queue_1, pass_job_queue=True)
         dp.add_handler(handler)
 
         dp.process_update('test')
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = StringRegexHandler('test', self.callback_queue_1,
-                                     pass_update_queue=True)
+        handler = StringRegexHandler('test', self.callback_queue_1, pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -131,8 +152,9 @@ class TestStringRegexHandler:
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = StringRegexHandler('test', self.callback_queue_2,
-                                     pass_job_queue=True, pass_update_queue=True)
+        handler = StringRegexHandler(
+            'test', self.callback_queue_2, pass_job_queue=True, pass_update_queue=True
+        )
         dp.add_handler(handler)
 
         self.test_flag = False

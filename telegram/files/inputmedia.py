@@ -34,6 +34,7 @@ class InputMedia(TelegramObject):
     :class:`telegram.InputMediaVideo` for detailed use.
 
     """
+
     pass
 
 
@@ -76,14 +77,16 @@ class InputMediaAnimation(InputMedia):
         arguments.
     """
 
-    def __init__(self,
-                 media: Union[str, FileLike, Animation],
-                 thumb: FileLike = None,
-                 caption: str = None,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-                 width: int = None,
-                 height: int = None,
-                 duration: int = None):
+    def __init__(
+        self,
+        media: Union[str, FileLike, Animation],
+        thumb: FileLike = None,
+        caption: str = None,
+        parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+        width: int = None,
+        height: int = None,
+        duration: int = None,
+    ):
         self.type = 'animation'
 
         if isinstance(media, Animation):
@@ -136,10 +139,12 @@ class InputMediaPhoto(InputMedia):
             in :class:`telegram.ParseMode` for the available modes.
     """
 
-    def __init__(self,
-                 media: Union[str, FileLike, PhotoSize],
-                 caption: str = None,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE):
+    def __init__(
+        self,
+        media: Union[str, FileLike, PhotoSize],
+        caption: str = None,
+        parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+    ):
         self.type = 'photo'
 
         if isinstance(media, PhotoSize):
@@ -200,15 +205,17 @@ class InputMediaVideo(InputMedia):
            by Telegram.
     """
 
-    def __init__(self,
-                 media: Union[str, FileLike, Video],
-                 caption: str = None,
-                 width: int = None,
-                 height: int = None,
-                 duration: int = None,
-                 supports_streaming: bool = None,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-                 thumb: FileLike = None):
+    def __init__(
+        self,
+        media: Union[str, FileLike, Video],
+        caption: str = None,
+        width: int = None,
+        height: int = None,
+        duration: int = None,
+        supports_streaming: bool = None,
+        parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+        thumb: FileLike = None,
+    ):
         self.type = 'video'
 
         if isinstance(media, Video):
@@ -282,14 +289,16 @@ class InputMediaAudio(InputMedia):
         optional arguments.
     """
 
-    def __init__(self,
-                 media: Union[str, FileLike, Audio],
-                 thumb: FileLike = None,
-                 caption: str = None,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-                 duration: int = None,
-                 performer: str = None,
-                 title: str = None):
+    def __init__(
+        self,
+        media: Union[str, FileLike, Audio],
+        thumb: FileLike = None,
+        caption: str = None,
+        parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+        duration: int = None,
+        performer: str = None,
+        title: str = None,
+    ):
         self.type = 'audio'
 
         if isinstance(media, Audio):
@@ -348,11 +357,13 @@ class InputMediaDocument(InputMedia):
             Thumbnails can't be reused and can be only uploaded as a new file.
     """
 
-    def __init__(self,
-                 media: Union[str, FileLike, Document],
-                 thumb: FileLike = None,
-                 caption: str = None,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE):
+    def __init__(
+        self,
+        media: Union[str, FileLike, Document],
+        thumb: FileLike = None,
+        caption: str = None,
+        parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+    ):
         self.type = 'document'
 
         if isinstance(media, Document):

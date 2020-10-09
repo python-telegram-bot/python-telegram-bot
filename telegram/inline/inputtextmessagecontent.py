@@ -51,11 +51,13 @@ class InputTextMessageContent(InputMessageContent):
 
     """
 
-    def __init__(self,
-                 message_text: str,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-                 disable_web_page_preview: Union[bool, DefaultValue] = DEFAULT_NONE,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        message_text: str,
+        parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+        disable_web_page_preview: Union[bool, DefaultValue] = DEFAULT_NONE,
+        **kwargs: Any,
+    ):
         # Required
         self.message_text = message_text
         # Optionals

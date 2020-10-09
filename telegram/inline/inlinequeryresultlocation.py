@@ -20,6 +20,7 @@
 
 from telegram import InlineQueryResult
 from typing import Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import ReplyMarkup, InputMessageContent
 
@@ -64,18 +65,20 @@ class InlineQueryResultLocation(InlineQueryResult):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 latitude: float,
-                 longitude: float,
-                 title: str,
-                 live_period: int = None,
-                 reply_markup: 'ReplyMarkup' = None,
-                 input_message_content: 'InputMessageContent' = None,
-                 thumb_url: str = None,
-                 thumb_width: int = None,
-                 thumb_height: int = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        id: str,
+        latitude: float,
+        longitude: float,
+        title: str,
+        live_period: int = None,
+        reply_markup: 'ReplyMarkup' = None,
+        input_message_content: 'InputMessageContent' = None,
+        thumb_url: str = None,
+        thumb_width: int = None,
+        thumb_height: int = None,
+        **kwargs: Any,
+    ):
         # Required
         super().__init__('location', id)
         self.latitude = latitude

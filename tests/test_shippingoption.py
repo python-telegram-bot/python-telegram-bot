@@ -24,17 +24,15 @@ from telegram import LabeledPrice, ShippingOption, Voice
 
 @pytest.fixture(scope='class')
 def shipping_option():
-    return ShippingOption(TestShippingOption.id_, TestShippingOption.title,
-                          TestShippingOption.prices)
+    return ShippingOption(
+        TestShippingOption.id_, TestShippingOption.title, TestShippingOption.prices
+    )
 
 
 class TestShippingOption:
     id_ = 'id'
     title = 'title'
-    prices = [
-        LabeledPrice('Fish Container', 100),
-        LabeledPrice('Premium Fish Container', 1000)
-    ]
+    prices = [LabeledPrice('Fish Container', 100), LabeledPrice('Premium Fish Container', 1000)]
 
     def test_expected_values(self, shipping_option):
         assert shipping_option.id == self.id_

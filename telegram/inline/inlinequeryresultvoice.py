@@ -21,6 +21,7 @@
 from telegram import InlineQueryResult
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
 from typing import Any, Union, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
 
@@ -64,16 +65,18 @@ class InlineQueryResultVoice(InlineQueryResult):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 voice_url: str,
-                 title: str,
-                 voice_duration: int = None,
-                 caption: str = None,
-                 reply_markup: 'ReplyMarkup' = None,
-                 input_message_content: 'InputMessageContent' = None,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        id: str,
+        voice_url: str,
+        title: str,
+        voice_duration: int = None,
+        caption: str = None,
+        reply_markup: 'ReplyMarkup' = None,
+        input_message_content: 'InputMessageContent' = None,
+        parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+        **kwargs: Any,
+    ):
 
         # Required
         super().__init__('voice', id)

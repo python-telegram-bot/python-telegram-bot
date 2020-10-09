@@ -21,6 +21,7 @@
 from telegram import InlineQueryResult
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
 from typing import Any, Union, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
 
@@ -83,21 +84,23 @@ class InlineQueryResultVideo(InlineQueryResult):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 video_url: str,
-                 mime_type: str,
-                 thumb_url: str,
-                 title: str,
-                 caption: str = None,
-                 video_width: int = None,
-                 video_height: int = None,
-                 video_duration: int = None,
-                 description: str = None,
-                 reply_markup: 'ReplyMarkup' = None,
-                 input_message_content: 'InputMessageContent' = None,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        id: str,
+        video_url: str,
+        mime_type: str,
+        thumb_url: str,
+        title: str,
+        caption: str = None,
+        video_width: int = None,
+        video_height: int = None,
+        video_duration: int = None,
+        description: str = None,
+        reply_markup: 'ReplyMarkup' = None,
+        input_message_content: 'InputMessageContent' = None,
+        parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+        **kwargs: Any,
+    ):
 
         # Required
         super().__init__('video', id)
