@@ -25,8 +25,13 @@ from telegram import LabeledPrice, Invoice
 
 @pytest.fixture(scope='class')
 def invoice():
-    return Invoice(TestInvoice.title, TestInvoice.description, TestInvoice.start_parameter,
-                   TestInvoice.currency, TestInvoice.total_amount)
+    return Invoice(
+        TestInvoice.title,
+        TestInvoice.description,
+        TestInvoice.start_parameter,
+        TestInvoice.currency,
+        TestInvoice.total_amount,
+    )
 
 
 class TestInvoice:
@@ -40,13 +45,16 @@ class TestInvoice:
     total_amount = sum([p.amount for p in prices])
 
     def test_de_json(self, bot):
-        invoice_json = Invoice.de_json({
-            'title': TestInvoice.title,
-            'description': TestInvoice.description,
-            'start_parameter': TestInvoice.start_parameter,
-            'currency': TestInvoice.currency,
-            'total_amount': TestInvoice.total_amount
-        }, bot)
+        invoice_json = Invoice.de_json(
+            {
+                'title': TestInvoice.title,
+                'description': TestInvoice.description,
+                'start_parameter': TestInvoice.start_parameter,
+                'currency': TestInvoice.currency,
+                'total_amount': TestInvoice.total_amount,
+            },
+            bot,
+        )
 
         assert invoice_json.title == self.title
         assert invoice_json.description == self.description
@@ -67,9 +75,16 @@ class TestInvoice:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_required_args_only(self, bot, chat_id, provider_token):
-        message = bot.send_invoice(chat_id, self.title, self.description, self.payload,
-                                   provider_token, self.start_parameter, self.currency,
-                                   self.prices)
+        message = bot.send_invoice(
+            chat_id,
+            self.title,
+            self.description,
+            self.payload,
+            provider_token,
+            self.start_parameter,
+            self.currency,
+            self.prices,
+        )
 
         assert message.invoice.currency == self.currency
         assert message.invoice.start_parameter == self.start_parameter
@@ -91,8 +106,8 @@ class TestInvoice:
             self.prices,
             provider_data=self.provider_data,
             photo_url='https://raw.githubusercontent.com/'
-                      'python-telegram-bot/logos/master/'
-                      'logo/png/ptb-logo_240.png',
+            'python-telegram-bot/logos/master/'
+            'logo/png/ptb-logo_240.png',
             photo_size=240,
             photo_width=240,
             photo_height=240,
@@ -102,7 +117,8 @@ class TestInvoice:
             need_shipping_address=True,
             send_phone_number_to_provider=True,
             send_email_to_provider=True,
-            is_flexible=True)
+            is_flexible=True,
+        )
 
         assert message.invoice.currency == self.currency
         assert message.invoice.start_parameter == self.start_parameter
@@ -112,14 +128,24 @@ class TestInvoice:
 
     def test_send_object_as_provider_data(self, monkeypatch, bot, chat_id, provider_token):
         def test(url, data, **kwargs):
-            return (data['provider_data'] == '{"test_data": 123456789}'  # Depends if using
-                    or data['provider_data'] == '{"test_data":123456789}')  # ujson or not
+            return (
+                data['provider_data'] == '{"test_data": 123456789}'  # Depends if using
+                or data['provider_data'] == '{"test_data":123456789}'
+            )  # ujson or not
 
         monkeypatch.setattr(bot.request, 'post', test)
 
-        assert bot.send_invoice(chat_id, self.title, self.description, self.payload,
-                                provider_token, self.start_parameter, self.currency,
-                                self.prices, provider_data={'test_data': 123456789})
+        assert bot.send_invoice(
+            chat_id,
+            self.title,
+            self.description,
+            self.payload,
+            provider_token,
+            self.start_parameter,
+            self.currency,
+            self.prices,
+            provider_data={'test_data': 123456789},
+        )
 
     def test_equality(self):
         a = Invoice('invoice', 'desc', 'start', 'EUR', 7)

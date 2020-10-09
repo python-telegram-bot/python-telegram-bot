@@ -24,9 +24,11 @@ from telegram import EncryptedCredentials, PassportElementError
 
 @pytest.fixture(scope='class')
 def encrypted_credentials():
-    return EncryptedCredentials(TestEncryptedCredentials.data,
-                                TestEncryptedCredentials.hash,
-                                TestEncryptedCredentials.secret)
+    return EncryptedCredentials(
+        TestEncryptedCredentials.data,
+        TestEncryptedCredentials.hash,
+        TestEncryptedCredentials.secret,
+    )
 
 
 class TestEncryptedCredentials:
@@ -43,12 +45,9 @@ class TestEncryptedCredentials:
         encrypted_credentials_dict = encrypted_credentials.to_dict()
 
         assert isinstance(encrypted_credentials_dict, dict)
-        assert (encrypted_credentials_dict['data']
-                == encrypted_credentials.data)
-        assert (encrypted_credentials_dict['hash']
-                == encrypted_credentials.hash)
-        assert (encrypted_credentials_dict['secret']
-                == encrypted_credentials.secret)
+        assert encrypted_credentials_dict['data'] == encrypted_credentials.data
+        assert encrypted_credentials_dict['hash'] == encrypted_credentials.hash
+        assert encrypted_credentials_dict['secret'] == encrypted_credentials.secret
 
     def test_equality(self):
         a = EncryptedCredentials(self.data, self.hash, self.secret)

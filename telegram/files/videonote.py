@@ -21,6 +21,7 @@
 from telegram import PhotoSize, TelegramObject
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import Bot, File
 
@@ -58,15 +59,17 @@ class VideoNote(TelegramObject):
 
     """
 
-    def __init__(self,
-                 file_id: str,
-                 file_unique_id: str,
-                 length: int,
-                 duration: int,
-                 thumb: PhotoSize = None,
-                 file_size: int = None,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        file_id: str,
+        file_unique_id: str,
+        length: int,
+        duration: int,
+        thumb: PhotoSize = None,
+        file_size: int = None,
+        bot: 'Bot' = None,
+        **kwargs: Any,
+    ):
         # Required
         self.file_id = str(file_id)
         self.file_unique_id = str(file_unique_id)

@@ -40,8 +40,10 @@ def job_queue(bot, _dp):
     jq.stop()
 
 
-@pytest.mark.skipif(os.getenv('GITHUB_ACTIONS', False) and os.name == 'nt',
-                    reason="On windows precise timings are not accurate.")
+@pytest.mark.skipif(
+    os.getenv('GITHUB_ACTIONS', False) and os.name == 'nt',
+    reason="On windows precise timings are not accurate.",
+)
 @flaky(10, 1)  # Timings aren't quite perfect
 class TestJobQueue:
     result = 0
@@ -71,14 +73,16 @@ class TestJobQueue:
         self.job_time = time.time()
 
     def job_context_based_callback(self, context):
-        if (isinstance(context, CallbackContext)
-                and isinstance(context.job, Job)
-                and isinstance(context.update_queue, Queue)
-                and context.job.context == 2
-                and context.chat_data is None
-                and context.user_data is None
-                and isinstance(context.bot_data, dict)
-                and context.job_queue is not context.job.job_queue):
+        if (
+            isinstance(context, CallbackContext)
+            and isinstance(context.job, Job)
+            and isinstance(context.update_queue, Queue)
+            and context.job.context == 2
+            and context.chat_data is None
+            and context.user_data is None
+            and isinstance(context.bot_data, dict)
+            and context.job_queue is not context.job.job_queue
+        ):
             self.result += 1
 
     def error_handler(self, bot, update, error):
@@ -123,8 +127,9 @@ class TestJobQueue:
 
     def test_run_repeating_first_timezone(self, job_queue, timezone):
         """Test correct scheduling of job when passing a timezone-aware datetime as ``first``"""
-        job_queue.run_repeating(self.job_run_once, 0.1,
-                                first=dtm.datetime.now(timezone) + dtm.timedelta(seconds=0.05))
+        job_queue.run_repeating(
+            self.job_run_once, 0.1, first=dtm.datetime.now(timezone) + dtm.timedelta(seconds=0.05)
+        )
         sleep(0.1)
         assert self.result == 1
 
@@ -137,8 +142,9 @@ class TestJobQueue:
 
     def test_run_repeating_last_timezone(self, job_queue, timezone):
         """Test correct scheduling of job when passing a timezone-aware datetime as ``first``"""
-        job_queue.run_repeating(self.job_run_once, 0.05,
-                                last=dtm.datetime.now(timezone) + dtm.timedelta(seconds=0.06))
+        job_queue.run_repeating(
+            self.job_run_once, 0.05, last=dtm.datetime.now(timezone) + dtm.timedelta(seconds=0.06)
+        )
         sleep(0.1)
         assert self.result == 1
         sleep(0.1)
@@ -301,10 +307,12 @@ class TestJobQueue:
 
         day = now.day
         expected_reschedule_time = timezone.normalize(
-            expected_reschedule_time + dtm.timedelta(calendar.monthrange(now.year, now.month)[1]))
+            expected_reschedule_time + dtm.timedelta(calendar.monthrange(now.year, now.month)[1])
+        )
         # Adjust the hour for the special case that between now and next month a DST switch happens
         expected_reschedule_time += dtm.timedelta(
-            hours=time_of_day.hour - expected_reschedule_time.hour)
+            hours=time_of_day.hour - expected_reschedule_time.hour
+        )
         expected_reschedule_time = expected_reschedule_time.timestamp()
 
         job_queue.run_monthly(self.job_run_once, time_of_day, day)
@@ -318,12 +326,14 @@ class TestJobQueue:
         expected_reschedule_time = now + dtm.timedelta(seconds=delta)
         time_of_day = expected_reschedule_time.time().replace(tzinfo=timezone)
 
-        expected_reschedule_time += (dtm.timedelta(calendar.monthrange(now.year, now.month)[1])
-                                     - dtm.timedelta(days=now.day))
+        expected_reschedule_time += dtm.timedelta(
+            calendar.monthrange(now.year, now.month)[1]
+        ) - dtm.timedelta(days=now.day)
         # Adjust the hour for the special case that between now & end of month a DST switch happens
         expected_reschedule_time = timezone.normalize(expected_reschedule_time)
         expected_reschedule_time += dtm.timedelta(
-            hours=time_of_day.hour - expected_reschedule_time.hour)
+            hours=time_of_day.hour - expected_reschedule_time.hour
+        )
         expected_reschedule_time = expected_reschedule_time.timestamp()
 
         job_queue.run_monthly(self.job_run_once, time_of_day, 31, day_is_strict=False)
@@ -419,7 +429,7 @@ class TestJobQueue:
         dp.add_error_handler(self.error_handler)
 
         job = job_queue.run_once(self.job_with_exception, 0.05)
-        sleep(.1)
+        sleep(0.1)
         assert self.received_error == 'Test Error'
         self.received_error = None
         job.run(dp)
@@ -430,7 +440,7 @@ class TestJobQueue:
         self.received_error = None
 
         job = job_queue.run_once(self.job_with_exception, 0.05)
-        sleep(.1)
+        sleep(0.1)
         assert self.received_error is None
         job.run(dp)
         assert self.received_error is None
@@ -439,7 +449,7 @@ class TestJobQueue:
         cdp.add_error_handler(self.error_handler_context)
 
         job = job_queue.run_once(self.job_with_exception, 0.05)
-        sleep(.1)
+        sleep(0.1)
         assert self.received_error == 'Test Error'
         self.received_error = None
         job.run(cdp)
@@ -450,7 +460,7 @@ class TestJobQueue:
         self.received_error = None
 
         job = job_queue.run_once(self.job_with_exception, 0.05)
-        sleep(.1)
+        sleep(0.1)
         assert self.received_error is None
         job.run(cdp)
         assert self.received_error is None
@@ -460,7 +470,7 @@ class TestJobQueue:
 
         with caplog.at_level(logging.ERROR):
             job = job_queue.run_once(self.job_with_exception, 0.05)
-        sleep(.1)
+        sleep(0.1)
         assert len(caplog.records) == 1
         rec = caplog.records[-1]
         assert 'processing the job' in rec.msg
@@ -481,7 +491,7 @@ class TestJobQueue:
 
         with caplog.at_level(logging.ERROR):
             job = job_queue.run_once(self.job_with_exception, 0.05)
-        sleep(.1)
+        sleep(0.1)
         assert len(caplog.records) == 1
         rec = caplog.records[-1]
         assert 'No error handlers are registered' in rec.msg

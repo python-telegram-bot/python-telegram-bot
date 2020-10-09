@@ -36,13 +36,16 @@ except ImportError:
 
 from telegram.utils.types import JSONDict
 from typing import Union, Any, Optional, Dict, DefaultDict, Tuple, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import MessageEntity
 
 # From https://stackoverflow.com/questions/2549939/get-signal-names-from-numbers-in-python
-_signames = {v: k
-             for k, v in reversed(sorted(vars(signal).items()))
-             if k.startswith('SIG') and not k.startswith('SIG_')}
+_signames = {
+    v: k
+    for k, v in reversed(sorted(vars(signal).items()))
+    if k.startswith('SIG') and not k.startswith('SIG_')
+}
 
 
 def get_signal_name(signum: int) -> str:
@@ -89,8 +92,11 @@ def _datetime_to_float_timestamp(dt_obj: dtm.datetime) -> float:
     return dt_obj.timestamp()
 
 
-def to_float_timestamp(t: Union[int, float, dtm.timedelta, dtm.datetime, dtm.time],
-                       reference_timestamp: float = None, tzinfo: pytz.BaseTzInfo = None) -> float:
+def to_float_timestamp(
+    t: Union[int, float, dtm.timedelta, dtm.datetime, dtm.time],
+    reference_timestamp: float = None,
+    tzinfo: pytz.BaseTzInfo = None,
+) -> float:
     """
     Converts a given time object to a float POSIX timestamp.
     Used to convert different time specifications to a common format. The time object
@@ -171,21 +177,27 @@ def to_float_timestamp(t: Union[int, float, dtm.timedelta, dtm.datetime, dtm.tim
     raise TypeError('Unable to convert {} object to timestamp'.format(type(t).__name__))
 
 
-def to_timestamp(dt_obj: Union[int, float, dtm.timedelta, dtm.datetime, dtm.time, None],
-                 reference_timestamp: float = None,
-                 tzinfo: pytz.BaseTzInfo = None) -> Optional[int]:
+def to_timestamp(
+    dt_obj: Union[int, float, dtm.timedelta, dtm.datetime, dtm.time, None],
+    reference_timestamp: float = None,
+    tzinfo: pytz.BaseTzInfo = None,
+) -> Optional[int]:
     """
     Wrapper over :func:`to_float_timestamp` which returns an integer (the float value truncated
     down to the nearest integer).
 
     See the documentation for :func:`to_float_timestamp` for more details.
     """
-    return (int(to_float_timestamp(dt_obj, reference_timestamp, tzinfo))
-            if dt_obj is not None else None)
+    return (
+        int(to_float_timestamp(dt_obj, reference_timestamp, tzinfo))
+        if dt_obj is not None
+        else None
+    )
 
 
-def from_timestamp(unixtime: Optional[int],
-                   tzinfo: dtm.tzinfo = pytz.utc) -> Optional[dtm.datetime]:
+def from_timestamp(
+    unixtime: Optional[int], tzinfo: dtm.tzinfo = pytz.utc
+) -> Optional[dtm.datetime]:
     """
     Converts an (integer) unix timestamp to a timezone aware datetime object.
     :obj:`None`s are left alone (i.e. ``from_timestamp(None)`` is :obj:`None`).
@@ -206,6 +218,7 @@ def from_timestamp(unixtime: Optional[int],
         return dtm.datetime.fromtimestamp(unixtime, tz=tzinfo)
     else:
         return dtm.datetime.utcfromtimestamp(unixtime)
+
 
 # -------- end --------
 
@@ -304,19 +317,17 @@ def create_deep_linked_url(bot_username: str, payload: str = None, group: bool =
         raise ValueError("The deep-linking payload must not exceed 64 characters.")
 
     if not re.match(r'^[A-Za-z0-9_-]+$', payload):
-        raise ValueError("Only the following characters are allowed for deep-linked "
-                         "URLs: A-Z, a-z, 0-9, _ and -")
+        raise ValueError(
+            "Only the following characters are allowed for deep-linked "
+            "URLs: A-Z, a-z, 0-9, _ and -"
+        )
 
     if group:
         key = 'startgroup'
     else:
         key = 'start'
 
-    return '{}?{}={}'.format(
-        base_url,
-        key,
-        payload
-    )
+    return '{}?{}={}'.format(base_url, key, payload)
 
 
 def encode_conversations_to_json(conversations: Dict[str, Dict[Tuple, Any]]) -> str:
@@ -424,6 +435,7 @@ class DefaultValue:
     Args:
         value (:obj:`obj`): The value of the default argument
     """
+
     def __init__(self, value: Any = None):
         self.value = value
 

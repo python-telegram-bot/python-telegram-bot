@@ -67,12 +67,14 @@ class LoginUrl(TelegramObject):
         `Checking authorization <https://core.telegram.org/widgets/login#checking-authorization>`_
     """
 
-    def __init__(self,
-                 url: str,
-                 forward_text: bool = None,
-                 bot_username: str = None,
-                 request_write_access: bool = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        url: str,
+        forward_text: bool = None,
+        bot_username: str = None,
+        request_write_access: bool = None,
+        **kwargs: Any,
+    ):
         # Required
         self.url = url
         # Optional

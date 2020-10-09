@@ -24,9 +24,11 @@ from telegram import InputContactMessageContent, User
 
 @pytest.fixture(scope='class')
 def input_contact_message_content():
-    return InputContactMessageContent(TestInputContactMessageContent.phone_number,
-                                      TestInputContactMessageContent.first_name,
-                                      last_name=TestInputContactMessageContent.last_name)
+    return InputContactMessageContent(
+        TestInputContactMessageContent.phone_number,
+        TestInputContactMessageContent.first_name,
+        last_name=TestInputContactMessageContent.last_name,
+    )
 
 
 class TestInputContactMessageContent:
@@ -43,12 +45,18 @@ class TestInputContactMessageContent:
         input_contact_message_content_dict = input_contact_message_content.to_dict()
 
         assert isinstance(input_contact_message_content_dict, dict)
-        assert (input_contact_message_content_dict['phone_number']
-                == input_contact_message_content.phone_number)
-        assert (input_contact_message_content_dict['first_name']
-                == input_contact_message_content.first_name)
-        assert (input_contact_message_content_dict['last_name']
-                == input_contact_message_content.last_name)
+        assert (
+            input_contact_message_content_dict['phone_number']
+            == input_contact_message_content.phone_number
+        )
+        assert (
+            input_contact_message_content_dict['first_name']
+            == input_contact_message_content.first_name
+        )
+        assert (
+            input_contact_message_content_dict['last_name']
+            == input_contact_message_content.last_name
+        )
 
     def test_equality(self):
         a = InputContactMessageContent('phone', 'first', last_name='last')

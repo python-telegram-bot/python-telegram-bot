@@ -21,6 +21,7 @@
 from telegram import ReplyMarkup, InlineKeyboardButton
 from telegram.utils.types import JSONDict
 from typing import Any, List, Optional, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import Bot
 
@@ -57,8 +58,7 @@ class InlineKeyboardMarkup(ReplyMarkup):
         return data
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict],
-                bot: 'Bot') -> Optional['InlineKeyboardMarkup']:
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['InlineKeyboardMarkup']:
         data = cls.parse_data(data)
 
         if not data:
@@ -91,8 +91,9 @@ class InlineKeyboardMarkup(ReplyMarkup):
         return cls([[button]], **kwargs)
 
     @classmethod
-    def from_row(cls, button_row: List[InlineKeyboardButton],
-                 **kwargs: Any) -> 'InlineKeyboardMarkup':
+    def from_row(
+        cls, button_row: List[InlineKeyboardButton], **kwargs: Any
+    ) -> 'InlineKeyboardMarkup':
         """Shortcut for::
 
             InlineKeyboardMarkup([button_row], **kwargs)
@@ -108,8 +109,9 @@ class InlineKeyboardMarkup(ReplyMarkup):
         return cls([button_row], **kwargs)
 
     @classmethod
-    def from_column(cls, button_column: List[InlineKeyboardButton],
-                    **kwargs: Any) -> 'InlineKeyboardMarkup':
+    def from_column(
+        cls, button_column: List[InlineKeyboardButton], **kwargs: Any
+    ) -> 'InlineKeyboardMarkup':
         """Shortcut for::
 
             InlineKeyboardMarkup([[button] for button in button_column], **kwargs)

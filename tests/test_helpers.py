@@ -32,11 +32,15 @@ from telegram.utils.helpers import _datetime_to_float_timestamp
 
 
 # sample time specification values categorised into absolute / delta / time-of-day
-ABSOLUTE_TIME_SPECS = [dtm.datetime.now(tz=dtm.timezone(dtm.timedelta(hours=-7))),
-                       dtm.datetime.utcnow()]
+ABSOLUTE_TIME_SPECS = [
+    dtm.datetime.now(tz=dtm.timezone(dtm.timedelta(hours=-7))),
+    dtm.datetime.utcnow(),
+]
 DELTA_TIME_SPECS = [dtm.timedelta(hours=3, seconds=42, milliseconds=2), 30, 7.5]
-TIME_OF_DAY_TIME_SPECS = [dtm.time(12, 42, tzinfo=dtm.timezone(dtm.timedelta(hours=-7))),
-                          dtm.time(12, 42)]
+TIME_OF_DAY_TIME_SPECS = [
+    dtm.time(12, 42, tzinfo=dtm.timezone(dtm.timedelta(hours=-7))),
+    dtm.time(12, 42),
+]
 RELATIVE_TIME_SPECS = DELTA_TIME_SPECS + TIME_OF_DAY_TIME_SPECS
 TIME_SPECS = ABSOLUTE_TIME_SPECS + RELATIVE_TIME_SPECS
 
@@ -59,18 +63,21 @@ class TestHelpers:
         test_str = r'mono/pre: `abc` \int (`\some \`stuff)'
         expected_str = 'mono/pre: \\`abc\\` \\\\int (\\`\\\\some \\\\\\`stuff)'
 
-        assert expected_str == helpers.escape_markdown(test_str, version=2,
-                                                       entity_type=MessageEntity.PRE)
-        assert expected_str == helpers.escape_markdown(test_str, version=2,
-                                                       entity_type=MessageEntity.CODE)
+        assert expected_str == helpers.escape_markdown(
+            test_str, version=2, entity_type=MessageEntity.PRE
+        )
+        assert expected_str == helpers.escape_markdown(
+            test_str, version=2, entity_type=MessageEntity.CODE
+        )
 
     def test_escape_markdown_v2_text_link(self):
 
         test_str = 'https://url.containing/funny)cha)\\ra\\)cter\\s'
         expected_str = 'https://url.containing/funny\\)cha\\)\\\\ra\\\\\\)cter\\\\s'
 
-        assert expected_str == helpers.escape_markdown(test_str, version=2,
-                                                       entity_type=MessageEntity.TEXT_LINK)
+        assert expected_str == helpers.escape_markdown(
+            test_str, version=2, entity_type=MessageEntity.TEXT_LINK
+        )
 
     def test_markdown_invalid_version(self):
         with pytest.raises(ValueError):
@@ -80,17 +87,19 @@ class TestHelpers:
         """Conversion from timezone-naive datetime to timestamp.
         Naive datetimes should be assumed to be in UTC.
         """
-        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5)
+        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5)
         assert helpers.to_float_timestamp(datetime) == 1573431976.1
 
     def test_to_float_timestamp_absolute_aware(self, timezone):
         """Conversion from timezone-aware datetime to timestamp"""
         # we're parametrizing this with two different UTC offsets to exclude the possibility
         # of an xpass when the test is run in a timezone with the same UTC offset
-        test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5)
+        test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5)
         datetime = timezone.localize(test_datetime)
-        assert (helpers.to_float_timestamp(datetime)
-                == 1573431976.1 - timezone.utcoffset(test_datetime).total_seconds())
+        assert (
+            helpers.to_float_timestamp(datetime)
+            == 1573431976.1 - timezone.utcoffset(test_datetime).total_seconds()
+        )
 
     def test_to_float_timestamp_absolute_no_reference(self):
         """A reference timestamp is only relevant for relative time specifications"""
@@ -126,15 +135,17 @@ class TestHelpers:
         # first test that naive time is assumed to be utc:
         assert helpers.to_float_timestamp(time_of_day, ref_t) == pytest.approx(ref_t)
         # test that by setting the timezone the timestamp changes accordingly:
-        assert (helpers.to_float_timestamp(aware_time_of_day, ref_t)
-                == pytest.approx(ref_t + (-utc_offset.total_seconds() % (24 * 60 * 60))))
+        assert helpers.to_float_timestamp(aware_time_of_day, ref_t) == pytest.approx(
+            ref_t + (-utc_offset.total_seconds() % (24 * 60 * 60))
+        )
 
     @pytest.mark.parametrize('time_spec', RELATIVE_TIME_SPECS, ids=str)
     def test_to_float_timestamp_default_reference(self, time_spec):
         """The reference timestamp for relative time specifications should default to now"""
         now = time.time()
-        assert (helpers.to_float_timestamp(time_spec)
-                == pytest.approx(helpers.to_float_timestamp(time_spec, reference_timestamp=now)))
+        assert helpers.to_float_timestamp(time_spec) == pytest.approx(
+            helpers.to_float_timestamp(time_spec, reference_timestamp=now)
+        )
 
     def test_to_float_timestamp_error(self):
         with pytest.raises(TypeError, match='Defaults'):
@@ -161,8 +172,12 @@ class TestHelpers:
         # of an xpass when the test is run in a timezone with the same UTC offset
         test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5)
         datetime = timezone.localize(test_datetime)
-        assert (helpers.from_timestamp(
-            1573431976.1 - timezone.utcoffset(test_datetime).total_seconds()) == datetime)
+        assert (
+            helpers.from_timestamp(
+                1573431976.1 - timezone.utcoffset(test_datetime).total_seconds()
+            )
+            == datetime
+        )
 
     def test_create_deep_linked_url(self):
         username = 'JamesTheMock'
@@ -209,8 +224,9 @@ class TestHelpers:
         assert helpers.effective_message_type(test_message) == 'text'
         test_message.text = None
 
-        test_message = build_test_message(sticker=Sticker('sticker_id', 'unique_id',
-                                          50, 50, False))
+        test_message = build_test_message(
+            sticker=Sticker('sticker_id', 'unique_id', 50, 50, False)
+        )
         assert helpers.effective_message_type(test_message) == 'sticker'
         test_message.sticker = None
 

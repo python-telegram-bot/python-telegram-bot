@@ -31,7 +31,7 @@ def _lstrip_str(in_s: str, lstr: str) -> str:
 
     """
     if in_s.startswith(lstr):
-        res = in_s[len(lstr):]
+        res = in_s[len(lstr) :]
     else:
         res = in_s
     return res
@@ -116,10 +116,10 @@ class RetryAfter(TelegramError):
 
 class Conflict(TelegramError):
     """
-        Raised when a long poll or webhook conflicts with another one.
+    Raised when a long poll or webhook conflicts with another one.
 
-        Args:
-            msg (:obj:`str`): The message from telegrams server.
+    Args:
+        msg (:obj:`str`): The message from telegrams server.
 
     """
 

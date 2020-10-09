@@ -25,8 +25,9 @@ from telegram.ext import Updater, CommandHandler, Filters
 # Enable logging
 from telegram.utils import helpers
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+)
 
 logger = logging.getLogger(__name__)
 
@@ -48,8 +49,10 @@ def deep_linked_level_1(update, context):
     """Reached through the CHECK_THIS_OUT payload"""
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.get_me().username, SO_COOL)
-    text = "Awesome, you just accessed hidden functionality! " \
-           " Now let's get back to the private chat."
+    text = (
+        "Awesome, you just accessed hidden functionality! "
+        " Now let's get back to the private chat."
+    )
     keyboard = InlineKeyboardMarkup.from_button(
         InlineKeyboardButton(text='Continue here!', url=url)
     )
@@ -60,16 +63,16 @@ def deep_linked_level_2(update, context):
     """Reached through the SO_COOL payload"""
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.get_me().username, USING_ENTITIES)
-    text = "You can also mask the deep-linked URLs as links: " \
-           "[▶️ CLICK HERE]({}).".format(url)
+    text = "You can also mask the deep-linked URLs as links: " "[▶️ CLICK HERE]({}).".format(url)
     update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 
 def deep_linked_level_3(update, context):
     """Reached through the USING_ENTITIES payload"""
     payload = context.args
-    update.message.reply_text("Congratulations! This is as deep as it gets 👏🏻\n\n"
-                              "The payload was: {}".format(payload))
+    update.message.reply_text(
+        "Congratulations! This is as deep as it gets 👏🏻\n\n" "The payload was: {}".format(payload)
+    )
 
 
 def main():
@@ -90,10 +93,9 @@ def main():
     dp.add_handler(CommandHandler("start", deep_linked_level_2, Filters.regex(SO_COOL)))
 
     # We can also pass on the deep-linking payload
-    dp.add_handler(CommandHandler("start",
-                                  deep_linked_level_3,
-                                  Filters.regex(USING_ENTITIES),
-                                  pass_args=True))
+    dp.add_handler(
+        CommandHandler("start", deep_linked_level_3, Filters.regex(USING_ENTITIES), pass_args=True)
+    )
 
     # Make sure the deep-linking handlers occur *before* the normal /start handler.
     dp.add_handler(CommandHandler("start", start))

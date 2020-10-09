@@ -38,6 +38,7 @@ curtime = time.perf_counter
 
 class DelayQueueError(RuntimeError):
     """Indicates processing errors."""
+
     pass
 
 
@@ -75,17 +76,19 @@ class DelayQueue(threading.Thread):
 
     _instcnt = 0  # instance counter
 
-    def __init__(self,
-                 queue: q.Queue = None,
-                 burst_limit: int = 30,
-                 time_limit_ms: int = 1000,
-                 exc_route: Callable[[Exception], None] = None,
-                 autostart: bool = True,
-                 name: str = None):
+    def __init__(
+        self,
+        queue: q.Queue = None,
+        burst_limit: int = 30,
+        time_limit_ms: int = 1000,
+        exc_route: Callable[[Exception], None] = None,
+        autostart: bool = True,
+        name: str = None,
+    ):
         self._queue = queue if queue is not None else q.Queue()
         self.burst_limit = burst_limit
         self.time_limit = time_limit_ms / 1000
-        self.exc_route = (exc_route if exc_route is not None else self._default_exception_handler)
+        self.exc_route = exc_route if exc_route is not None else self._default_exception_handler
         self.__exit_req = False  # flag to gently exit thread
         self.__class__._instcnt += 1
         if name is None:
@@ -201,24 +204,28 @@ class MessageQueue:
 
     """
 
-    def __init__(self,
-                 all_burst_limit: int = 30,
-                 all_time_limit_ms: int = 1000,
-                 group_burst_limit: int = 20,
-                 group_time_limit_ms: int = 60000,
-                 exc_route: Callable[[Exception], None] = None,
-                 autostart: bool = True):
+    def __init__(
+        self,
+        all_burst_limit: int = 30,
+        all_time_limit_ms: int = 1000,
+        group_burst_limit: int = 20,
+        group_time_limit_ms: int = 60000,
+        exc_route: Callable[[Exception], None] = None,
+        autostart: bool = True,
+    ):
         # create according delay queues, use composition
         self._all_delayq = DelayQueue(
             burst_limit=all_burst_limit,
             time_limit_ms=all_time_limit_ms,
             exc_route=exc_route,
-            autostart=autostart)
+            autostart=autostart,
+        )
         self._group_delayq = DelayQueue(
             burst_limit=group_burst_limit,
             time_limit_ms=group_time_limit_ms,
             exc_route=exc_route,
-            autostart=autostart)
+            autostart=autostart,
+        )
 
     def start(self) -> None:
         """Method is used to manually start the ``MessageQueue`` processing."""
@@ -297,11 +304,12 @@ def queuedmessage(method: Callable) -> Callable:
 
     @functools.wraps(method)
     def wrapped(self: 'Bot', *args: Any, **kwargs: Any) -> Any:
-        queued = kwargs.pop('queued',
-                            self._is_messages_queued_default)  # type: ignore[attr-defined]
+        queued = kwargs.pop(
+            'queued', self._is_messages_queued_default   # type: ignore[attr-defined]
+        )
         isgroup = kwargs.pop('isgroup', False)
         if queued:
-            prom = promise.Promise(method, (self, ) + args, kwargs)
+            prom = promise.Promise(method, (self,) + args, kwargs)
             return self._msg_queue(prom, isgroup)  # type: ignore[attr-defined]
         return method(self, *args, **kwargs)
 

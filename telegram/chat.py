@@ -24,6 +24,7 @@ from .chatpermissions import ChatPermissions
 
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, List, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import Bot, Message, ChatMember
 
@@ -100,23 +101,25 @@ class Chat(TelegramObject):
     CHANNEL: str = 'channel'
     """:obj:`str`: 'channel'"""
 
-    def __init__(self,
-                 id: int,
-                 type: str,
-                 title: str = None,
-                 username: str = None,
-                 first_name: str = None,
-                 last_name: str = None,
-                 bot: 'Bot' = None,
-                 photo: ChatPhoto = None,
-                 description: str = None,
-                 invite_link: str = None,
-                 pinned_message: 'Message' = None,
-                 permissions: ChatPermissions = None,
-                 sticker_set_name: str = None,
-                 can_set_sticker_set: bool = None,
-                 slow_mode_delay: int = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        id: int,
+        type: str,
+        title: str = None,
+        username: str = None,
+        first_name: str = None,
+        last_name: str = None,
+        bot: 'Bot' = None,
+        photo: ChatPhoto = None,
+        description: str = None,
+        invite_link: str = None,
+        pinned_message: 'Message' = None,
+        permissions: ChatPermissions = None,
+        sticker_set_name: str = None,
+        can_set_sticker_set: bool = None,
+        slow_mode_delay: int = None,
+        **kwargs: Any,
+    ):
         # Required
         self.id = int(id)
         self.type = type
@@ -156,6 +159,7 @@ class Chat(TelegramObject):
 
         data['photo'] = ChatPhoto.de_json(data.get('photo'), bot)
         from telegram import Message
+
         data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
         data['permissions'] = ChatPermissions.de_json(data.get('permissions'), bot)
 
@@ -243,7 +247,7 @@ class Chat(TelegramObject):
         Returns:
             :obj:`bool`: If the action was sent successfully.
 
-    """
+        """
         return self.bot.set_chat_permissions(self.id, *args, **kwargs)
 
     def set_administrator_custom_title(self, *args: Any, **kwargs: Any) -> bool:
@@ -254,7 +258,7 @@ class Chat(TelegramObject):
         Returns:
         :obj:`bool`: If the action was sent successfully.
 
-    """
+        """
         return self.bot.set_chat_administrator_custom_title(self.id, *args, **kwargs)
 
     def send_message(self, *args: Any, **kwargs: Any) -> 'Message':

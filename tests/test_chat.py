@@ -25,12 +25,18 @@ from telegram import User
 
 @pytest.fixture(scope='class')
 def chat(bot):
-    return Chat(TestChat.id_, TestChat.title, TestChat.type_, username=TestChat.username,
-                all_members_are_administrators=TestChat.all_members_are_administrators,
-                bot=bot, sticker_set_name=TestChat.sticker_set_name,
-                can_set_sticker_set=TestChat.can_set_sticker_set,
-                permissions=TestChat.permissions,
-                slow_mode_delay=TestChat.slow_mode_delay)
+    return Chat(
+        TestChat.id_,
+        TestChat.title,
+        TestChat.type_,
+        username=TestChat.username,
+        all_members_are_administrators=TestChat.all_members_are_administrators,
+        bot=bot,
+        sticker_set_name=TestChat.sticker_set_name,
+        can_set_sticker_set=TestChat.can_set_sticker_set,
+        permissions=TestChat.permissions,
+        slow_mode_delay=TestChat.slow_mode_delay,
+    )
 
 
 class TestChat:
@@ -58,7 +64,7 @@ class TestChat:
             'sticker_set_name': self.sticker_set_name,
             'can_set_sticker_set': self.can_set_sticker_set,
             'permissions': self.permissions.to_dict(),
-            'slow_mode_delay': self.slow_mode_delay
+            'slow_mode_delay': self.slow_mode_delay,
         }
         chat = Chat.de_json(json_dict, bot)
 

@@ -24,8 +24,18 @@ from telegram import Update
 from .handler import Handler
 
 from telegram.utils.types import HandlerArg
-from typing import Callable, TYPE_CHECKING, Any, Optional, Union, TypeVar, Pattern, Match, Dict, \
-    cast
+from typing import (
+    Callable,
+    TYPE_CHECKING,
+    Any,
+    Optional,
+    Union,
+    TypeVar,
+    Pattern,
+    Match,
+    Dict,
+    cast,
+)
 
 if TYPE_CHECKING:
     from telegram.ext import CallbackContext, Dispatcher
@@ -110,23 +120,26 @@ class CallbackQueryHandler(Handler):
 
     """
 
-    def __init__(self,
-                 callback: Callable[[HandlerArg, 'CallbackContext'], RT],
-                 pass_update_queue: bool = False,
-                 pass_job_queue: bool = False,
-                 pattern: Union[str, Pattern] = None,
-                 pass_groups: bool = False,
-                 pass_groupdict: bool = False,
-                 pass_user_data: bool = False,
-                 pass_chat_data: bool = False,
-                 run_async: bool = False):
+    def __init__(
+        self,
+        callback: Callable[[HandlerArg, 'CallbackContext'], RT],
+        pass_update_queue: bool = False,
+        pass_job_queue: bool = False,
+        pattern: Union[str, Pattern] = None,
+        pass_groups: bool = False,
+        pass_groupdict: bool = False,
+        pass_user_data: bool = False,
+        pass_chat_data: bool = False,
+        run_async: bool = False,
+    ):
         super().__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
             pass_chat_data=pass_chat_data,
-            run_async=run_async)
+            run_async=run_async,
+        )
 
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
@@ -155,10 +168,12 @@ class CallbackQueryHandler(Handler):
                 return True
         return None
 
-    def collect_optional_args(self,
-                              dispatcher: 'Dispatcher',
-                              update: HandlerArg = None,
-                              check_result: Union[bool, Match] = None) -> Dict[str, Any]:
+    def collect_optional_args(
+        self,
+        dispatcher: 'Dispatcher',
+        update: HandlerArg = None,
+        check_result: Union[bool, Match] = None,
+    ) -> Dict[str, Any]:
         optional_args = super().collect_optional_args(dispatcher, update, check_result)
         if self.pattern:
             check_result = cast(Match, check_result)
@@ -168,11 +183,13 @@ class CallbackQueryHandler(Handler):
                 optional_args['groupdict'] = check_result.groupdict()
         return optional_args
 
-    def collect_additional_context(self,
-                                   context: 'CallbackContext',
-                                   update: HandlerArg,
-                                   dispatcher: 'Dispatcher',
-                                   check_result: Union[bool, Match]) -> None:
+    def collect_additional_context(
+        self,
+        context: 'CallbackContext',
+        update: HandlerArg,
+        dispatcher: 'Dispatcher',
+        check_result: Union[bool, Match],
+    ) -> None:
         if self.pattern:
             check_result = cast(Match, check_result)
             context.matches = [check_result]

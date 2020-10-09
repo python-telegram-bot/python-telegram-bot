@@ -64,12 +64,14 @@ class ReplyKeyboardMarkup(ReplyMarkup):
 
     """
 
-    def __init__(self,
-                 keyboard: List[List[Union[str, KeyboardButton]]],
-                 resize_keyboard: bool = False,
-                 one_time_keyboard: bool = False,
-                 selective: bool = False,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        keyboard: List[List[Union[str, KeyboardButton]]],
+        resize_keyboard: bool = False,
+        one_time_keyboard: bool = False,
+        selective: bool = False,
+        **kwargs: Any,
+    ):
         # Required
         self.keyboard = []
         for row in keyboard:
@@ -101,12 +103,14 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         return data
 
     @classmethod
-    def from_button(cls,
-                    button: Union[KeyboardButton, str],
-                    resize_keyboard: bool = False,
-                    one_time_keyboard: bool = False,
-                    selective: bool = False,
-                    **kwargs: Any) -> 'ReplyKeyboardMarkup':
+    def from_button(
+        cls,
+        button: Union[KeyboardButton, str],
+        resize_keyboard: bool = False,
+        one_time_keyboard: bool = False,
+        selective: bool = False,
+        **kwargs: Any,
+    ) -> 'ReplyKeyboardMarkup':
         """Shortcut for::
 
             ReplyKeyboardMarkup([[button]], **kwargs)
@@ -135,19 +139,23 @@ class ReplyKeyboardMarkup(ReplyMarkup):
                 Defaults to :obj:`False`.
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
         """
-        return cls([[button]],
-                   resize_keyboard=resize_keyboard,
-                   one_time_keyboard=one_time_keyboard,
-                   selective=selective,
-                   **kwargs)
+        return cls(
+            [[button]],
+            resize_keyboard=resize_keyboard,
+            one_time_keyboard=one_time_keyboard,
+            selective=selective,
+            **kwargs,
+        )
 
     @classmethod
-    def from_row(cls,
-                 button_row: List[Union[str, KeyboardButton]],
-                 resize_keyboard: bool = False,
-                 one_time_keyboard: bool = False,
-                 selective: bool = False,
-                 **kwargs: Any) -> 'ReplyKeyboardMarkup':
+    def from_row(
+        cls,
+        button_row: List[Union[str, KeyboardButton]],
+        resize_keyboard: bool = False,
+        one_time_keyboard: bool = False,
+        selective: bool = False,
+        **kwargs: Any,
+    ) -> 'ReplyKeyboardMarkup':
         """Shortcut for::
 
             ReplyKeyboardMarkup([button_row], **kwargs)
@@ -177,19 +185,23 @@ class ReplyKeyboardMarkup(ReplyMarkup):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         """
-        return cls([button_row],
-                   resize_keyboard=resize_keyboard,
-                   one_time_keyboard=one_time_keyboard,
-                   selective=selective,
-                   **kwargs)
+        return cls(
+            [button_row],
+            resize_keyboard=resize_keyboard,
+            one_time_keyboard=one_time_keyboard,
+            selective=selective,
+            **kwargs,
+        )
 
     @classmethod
-    def from_column(cls,
-                    button_column: List[Union[str, KeyboardButton]],
-                    resize_keyboard: bool = False,
-                    one_time_keyboard: bool = False,
-                    selective: bool = False,
-                    **kwargs: Any) -> 'ReplyKeyboardMarkup':
+    def from_column(
+        cls,
+        button_column: List[Union[str, KeyboardButton]],
+        resize_keyboard: bool = False,
+        one_time_keyboard: bool = False,
+        selective: bool = False,
+        **kwargs: Any,
+    ) -> 'ReplyKeyboardMarkup':
         """Shortcut for::
 
             ReplyKeyboardMarkup([[button] for button in button_column], **kwargs)
@@ -220,11 +232,13 @@ class ReplyKeyboardMarkup(ReplyMarkup):
 
         """
         button_grid = [[button] for button in button_column]
-        return cls(button_grid,
-                   resize_keyboard=resize_keyboard,
-                   one_time_keyboard=one_time_keyboard,
-                   selective=selective,
-                   **kwargs)
+        return cls(
+            button_grid,
+            resize_keyboard=resize_keyboard,
+            one_time_keyboard=one_time_keyboard,
+            selective=selective,
+            **kwargs,
+        )
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, self.__class__):
@@ -240,7 +254,11 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         return super(ReplyKeyboardMarkup, self).__eq__(other)  # pylint: disable=no-member
 
     def __hash__(self) -> int:
-        return hash((
-            tuple(tuple(button for button in row) for row in self.keyboard),
-            self.resize_keyboard, self.one_time_keyboard, self.selective
-        ))
+        return hash(
+            (
+                tuple(tuple(button for button in row) for row in self.keyboard),
+                self.resize_keyboard,
+                self.one_time_keyboard,
+                self.selective,
+            )
+        )

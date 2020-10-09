@@ -21,6 +21,7 @@
 from telegram import InlineQueryResult
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
 from typing import Any, Union, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
 
@@ -76,20 +77,22 @@ class InlineQueryResultGif(InlineQueryResult):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 gif_url: str,
-                 thumb_url: str,
-                 gif_width: int = None,
-                 gif_height: int = None,
-                 title: str = None,
-                 caption: str = None,
-                 reply_markup: 'ReplyMarkup' = None,
-                 input_message_content: 'InputMessageContent' = None,
-                 gif_duration: int = None,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-                 thumb_mime_type: str = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        id: str,
+        gif_url: str,
+        thumb_url: str,
+        gif_width: int = None,
+        gif_height: int = None,
+        title: str = None,
+        caption: str = None,
+        reply_markup: 'ReplyMarkup' = None,
+        input_message_content: 'InputMessageContent' = None,
+        gif_duration: int = None,
+        parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+        thumb_mime_type: str = None,
+        **kwargs: Any,
+    ):
 
         # Required
         super().__init__('gif', id)

@@ -24,12 +24,14 @@ from telegram import ShippingAddress
 
 @pytest.fixture(scope='class')
 def shipping_address():
-    return ShippingAddress(TestShippingAddress.country_code,
-                           TestShippingAddress.state,
-                           TestShippingAddress.city,
-                           TestShippingAddress.street_line1,
-                           TestShippingAddress.street_line2,
-                           TestShippingAddress.post_code)
+    return ShippingAddress(
+        TestShippingAddress.country_code,
+        TestShippingAddress.state,
+        TestShippingAddress.city,
+        TestShippingAddress.street_line1,
+        TestShippingAddress.street_line2,
+        TestShippingAddress.post_code,
+    )
 
 
 class TestShippingAddress:
@@ -47,7 +49,7 @@ class TestShippingAddress:
             'city': self.city,
             'street_line1': self.street_line1,
             'street_line2': self.street_line2,
-            'post_code': self.post_code
+            'post_code': self.post_code,
         }
         shipping_address = ShippingAddress.de_json(json_dict, bot)
 
@@ -70,22 +72,40 @@ class TestShippingAddress:
         assert shipping_address_dict['post_code'] == shipping_address.post_code
 
     def test_equality(self):
-        a = ShippingAddress(self.country_code, self.state, self.city, self.street_line1,
-                            self.street_line2, self.post_code)
-        b = ShippingAddress(self.country_code, self.state, self.city, self.street_line1,
-                            self.street_line2, self.post_code)
-        d = ShippingAddress('', self.state, self.city, self.street_line1,
-                            self.street_line2, self.post_code)
-        d2 = ShippingAddress(self.country_code, '', self.city, self.street_line1,
-                             self.street_line2, self.post_code)
-        d3 = ShippingAddress(self.country_code, self.state, '', self.street_line1,
-                             self.street_line2, self.post_code)
-        d4 = ShippingAddress(self.country_code, self.state, self.city, '',
-                             self.street_line2, self.post_code)
-        d5 = ShippingAddress(self.country_code, self.state, self.city, self.street_line1,
-                             '', self.post_code)
-        d6 = ShippingAddress(self.country_code, self.state, self.city, self.street_line1,
-                             self.street_line2, '')
+        a = ShippingAddress(
+            self.country_code,
+            self.state,
+            self.city,
+            self.street_line1,
+            self.street_line2,
+            self.post_code,
+        )
+        b = ShippingAddress(
+            self.country_code,
+            self.state,
+            self.city,
+            self.street_line1,
+            self.street_line2,
+            self.post_code,
+        )
+        d = ShippingAddress(
+            '', self.state, self.city, self.street_line1, self.street_line2, self.post_code
+        )
+        d2 = ShippingAddress(
+            self.country_code, '', self.city, self.street_line1, self.street_line2, self.post_code
+        )
+        d3 = ShippingAddress(
+            self.country_code, self.state, '', self.street_line1, self.street_line2, self.post_code
+        )
+        d4 = ShippingAddress(
+            self.country_code, self.state, self.city, '', self.street_line2, self.post_code
+        )
+        d5 = ShippingAddress(
+            self.country_code, self.state, self.city, self.street_line1, '', self.post_code
+        )
+        d6 = ShippingAddress(
+            self.country_code, self.state, self.city, self.street_line1, self.street_line2, ''
+        )
 
         assert a == b
         assert hash(a) == hash(b)

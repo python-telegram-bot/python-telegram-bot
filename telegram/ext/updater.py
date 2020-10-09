@@ -32,7 +32,7 @@ from telegram.error import Unauthorized, InvalidToken, RetryAfter, TimedOut
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import get_signal_name
 from telegram.utils.request import Request
-from telegram.utils.webhookhandler import (WebhookServer, WebhookAppClass)
+from telegram.utils.webhookhandler import WebhookServer, WebhookAppClass
 
 from typing import Callable, Dict, TYPE_CHECKING, Any, List, Union, Tuple, no_type_check, Optional
 
@@ -108,26 +108,30 @@ class Updater:
 
     _request = None
 
-    def __init__(self,
-                 token: str = None,
-                 base_url: str = None,
-                 workers: int = 4,
-                 bot: Bot = None,
-                 private_key: bytes = None,
-                 private_key_password: bytes = None,
-                 user_sig_handler: Callable = None,
-                 request_kwargs: Dict[str, Any] = None,
-                 persistence: 'BasePersistence' = None,
-                 defaults: 'Defaults' = None,
-                 use_context: bool = True,
-                 dispatcher: Dispatcher = None,
-                 base_file_url: str = None):
+    def __init__(
+        self,
+        token: str = None,
+        base_url: str = None,
+        workers: int = 4,
+        bot: Bot = None,
+        private_key: bytes = None,
+        private_key_password: bytes = None,
+        user_sig_handler: Callable = None,
+        request_kwargs: Dict[str, Any] = None,
+        persistence: 'BasePersistence' = None,
+        defaults: 'Defaults' = None,
+        use_context: bool = True,
+        dispatcher: Dispatcher = None,
+        base_file_url: str = None,
+    ):
 
         if defaults and bot:
-            warnings.warn('Passing defaults to an Updater has no effect when a Bot is passed '
-                          'as well. Pass them to the Bot instead.',
-                          TelegramDeprecationWarning,
-                          stacklevel=2)
+            warnings.warn(
+                'Passing defaults to an Updater has no effect when a Bot is passed '
+                'as well. Pass them to the Bot instead.',
+                TelegramDeprecationWarning,
+                stacklevel=2,
+            )
 
         if dispatcher is None:
             if (token is None) and (bot is None):
@@ -156,7 +160,8 @@ class Updater:
                 if bot.request.con_pool_size < con_pool_size:
                     self.logger.warning(
                         'Connection pool of Request object is smaller than optimal value (%s)',
-                        con_pool_size)
+                        con_pool_size,
+                    )
             else:
                 # we need a connection pool the size of:
                 # * for each of the workers
@@ -169,24 +174,28 @@ class Updater:
                 if 'con_pool_size' not in request_kwargs:
                     request_kwargs['con_pool_size'] = con_pool_size
                 self._request = Request(**request_kwargs)
-                self.bot = Bot(token,  # type: ignore[arg-type]
-                               base_url,
-                               base_file_url=base_file_url,
-                               request=self._request,
-                               private_key=private_key,
-                               private_key_password=private_key_password,
-                               defaults=defaults)
+                self.bot = Bot(
+                    token,  # type: ignore[arg-type]
+                    base_url,
+                    base_file_url=base_file_url,
+                    request=self._request,
+                    private_key=private_key,
+                    private_key_password=private_key_password,
+                    defaults=defaults,
+                )
             self.update_queue: Queue = Queue()
             self.job_queue = JobQueue()
             self.__exception_event = Event()
             self.persistence = persistence
-            self.dispatcher = Dispatcher(self.bot,
-                                         self.update_queue,
-                                         job_queue=self.job_queue,
-                                         workers=workers,
-                                         exception_event=self.__exception_event,
-                                         persistence=persistence,
-                                         use_context=use_context)
+            self.dispatcher = Dispatcher(
+                self.bot,
+                self.update_queue,
+                job_queue=self.job_queue,
+                workers=workers,
+                exception_event=self.__exception_event,
+                persistence=persistence,
+                use_context=use_context,
+            )
             self.job_queue.set_dispatcher(self.dispatcher)
         else:
             con_pool_size = dispatcher.workers + 4
@@ -195,7 +204,8 @@ class Updater:
             if self.bot.request.con_pool_size < con_pool_size:
                 self.logger.warning(
                     'Connection pool of Request object is smaller than optimal value (%s)',
-                    con_pool_size)
+                    con_pool_size,
+                )
             self.update_queue = dispatcher.update_queue
             self.__exception_event = dispatcher.exception_event
             self.persistence = dispatcher.persistence
@@ -211,10 +221,12 @@ class Updater:
         self.__threads: List[Thread] = []
 
     def _init_thread(self, target: Callable, name: str, *args: Any, **kwargs: Any) -> None:
-        thr = Thread(target=self._thread_wrapper,
-                     name="Bot:{}:{}".format(self.bot.id, name),
-                     args=(target,) + args,
-                     kwargs=kwargs)
+        thr = Thread(
+            target=self._thread_wrapper,
+            name="Bot:{}:{}".format(self.bot.id, name),
+            args=(target,) + args,
+            kwargs=kwargs,
+        )
         thr.start()
         self.__threads.append(thr)
 
@@ -229,13 +241,15 @@ class Updater:
             raise
         self.logger.debug('{} - ended'.format(thr_name))
 
-    def start_polling(self,
-                      poll_interval: float = 0.0,
-                      timeout: float = 10,
-                      clean: bool = False,
-                      bootstrap_retries: int = -1,
-                      read_latency: float = 2.,
-                      allowed_updates: List[str] = None) -> Optional[Queue]:
+    def start_polling(
+        self,
+        poll_interval: float = 0.0,
+        timeout: float = 10,
+        clean: bool = False,
+        bootstrap_retries: int = -1,
+        read_latency: float = 2.0,
+        allowed_updates: List[str] = None,
+    ) -> Optional[Queue]:
         """Starts polling updates from Telegram.
 
         Args:
@@ -270,9 +284,17 @@ class Updater:
                 dispatcher_ready = Event()
                 polling_ready = Event()
                 self._init_thread(self.dispatcher.start, "dispatcher", ready=dispatcher_ready)
-                self._init_thread(self._start_polling, "updater", poll_interval, timeout,
-                                  read_latency, bootstrap_retries, clean, allowed_updates,
-                                  ready=polling_ready)
+                self._init_thread(
+                    self._start_polling,
+                    "updater",
+                    poll_interval,
+                    timeout,
+                    read_latency,
+                    bootstrap_retries,
+                    clean,
+                    allowed_updates,
+                    ready=polling_ready,
+                )
 
                 self.logger.debug('Waiting for Dispatcher and polling to start')
                 dispatcher_ready.wait()
@@ -282,17 +304,19 @@ class Updater:
                 return self.update_queue
             return None
 
-    def start_webhook(self,
-                      listen: str = '127.0.0.1',
-                      port: int = 80,
-                      url_path: str = '',
-                      cert: str = None,
-                      key: str = None,
-                      clean: bool = False,
-                      bootstrap_retries: int = 0,
-                      webhook_url: str = None,
-                      allowed_updates: List[str] = None,
-                      force_event_loop: bool = False) -> Optional[Queue]:
+    def start_webhook(
+        self,
+        listen: str = '127.0.0.1',
+        port: int = 80,
+        url_path: str = '',
+        cert: str = None,
+        key: str = None,
+        clean: bool = False,
+        bootstrap_retries: int = 0,
+        webhook_url: str = None,
+        allowed_updates: List[str] = None,
+        force_event_loop: bool = False,
+    ) -> Optional[Queue]:
         """
         Starts a small http server to listen for updates via webhook. If cert
         and key are not provided, the webhook will be started directly on
@@ -344,9 +368,21 @@ class Updater:
                 dispatcher_ready = Event()
                 self.job_queue.start()
                 self._init_thread(self.dispatcher.start, "dispatcher", dispatcher_ready)
-                self._init_thread(self._start_webhook, "updater", listen, port, url_path, cert,
-                                  key, bootstrap_retries, clean, webhook_url, allowed_updates,
-                                  ready=webhook_ready, force_event_loop=force_event_loop)
+                self._init_thread(
+                    self._start_webhook,
+                    "updater",
+                    listen,
+                    port,
+                    url_path,
+                    cert,
+                    key,
+                    bootstrap_retries,
+                    clean,
+                    webhook_url,
+                    allowed_updates,
+                    ready=webhook_ready,
+                    force_event_loop=force_event_loop,
+                )
 
                 self.logger.debug('Waiting for Dispatcher and Webhook to start')
                 webhook_ready.wait()
@@ -357,8 +393,16 @@ class Updater:
             return None
 
     @no_type_check
-    def _start_polling(self, poll_interval, timeout, read_latency, bootstrap_retries, clean,
-                       allowed_updates, ready=None):  # pragma: no cover
+    def _start_polling(
+        self,
+        poll_interval,
+        timeout,
+        read_latency,
+        bootstrap_retries,
+        clean,
+        allowed_updates,
+        ready=None,
+    ):  # pragma: no cover
         # Thread target of thread 'updater'. Runs in background, pulls
         # updates from Telegram and inserts them in the update queue of the
         # Dispatcher.
@@ -370,10 +414,12 @@ class Updater:
         self.logger.debug('Bootstrap done')
 
         def polling_action_cb():
-            updates = self.bot.get_updates(self.last_update_id,
-                                           timeout=timeout,
-                                           read_latency=read_latency,
-                                           allowed_updates=allowed_updates)
+            updates = self.bot.get_updates(
+                self.last_update_id,
+                timeout=timeout,
+                read_latency=read_latency,
+                allowed_updates=allowed_updates,
+            )
 
             if updates:
                 if not self.running:
@@ -393,8 +439,9 @@ class Updater:
         if ready is not None:
             ready.set()
 
-        self._network_loop_retry(polling_action_cb, polling_onerr_cb, 'getting Updates',
-                                 poll_interval)
+        self._network_loop_retry(
+            polling_action_cb, polling_onerr_cb, 'getting Updates', poll_interval
+        )
 
     @no_type_check
     def _network_loop_retry(self, action_cb, onerr_cb, description, interval):
@@ -450,8 +497,20 @@ class Updater:
         return current_interval
 
     @no_type_check
-    def _start_webhook(self, listen, port, url_path, cert, key, bootstrap_retries, clean,
-                       webhook_url, allowed_updates, ready=None, force_event_loop=False):
+    def _start_webhook(
+        self,
+        listen,
+        port,
+        url_path,
+        cert,
+        key,
+        bootstrap_retries,
+        clean,
+        webhook_url,
+        allowed_updates,
+        ready=None,
+        force_event_loop=False,
+    ):
         self.logger.debug('Updater thread started (webhook)')
         use_ssl = cert is not None and key is not None
         if not url_path.startswith('/'):
@@ -479,14 +538,18 @@ class Updater:
             if not webhook_url:
                 webhook_url = self._gen_webhook_url(listen, port, url_path)
 
-            self._bootstrap(max_retries=bootstrap_retries,
-                            clean=clean,
-                            webhook_url=webhook_url,
-                            cert=open(cert, 'rb'),
-                            allowed_updates=allowed_updates)
+            self._bootstrap(
+                max_retries=bootstrap_retries,
+                clean=clean,
+                webhook_url=webhook_url,
+                cert=open(cert, 'rb'),
+                allowed_updates=allowed_updates,
+            )
         elif clean:
-            self.logger.warning("cleaning updates is not supported if "
-                                "SSL-termination happens elsewhere; skipping")
+            self.logger.warning(
+                "cleaning updates is not supported if "
+                "SSL-termination happens elsewhere; skipping"
+            )
 
         self.httpd.serve_forever(force_event_loop=force_event_loop, ready=ready)
 
@@ -495,13 +558,9 @@ class Updater:
         return 'https://{listen}:{port}{path}'.format(listen=listen, port=port, path=url_path)
 
     @no_type_check
-    def _bootstrap(self,
-                   max_retries,
-                   clean,
-                   webhook_url,
-                   allowed_updates,
-                   cert=None,
-                   bootstrap_interval=5):
+    def _bootstrap(
+        self, max_retries, clean, webhook_url, allowed_updates, cert=None, bootstrap_interval=5
+    ):
         retries = [0]
 
         def bootstrap_del_webhook():
@@ -516,16 +575,17 @@ class Updater:
             return False
 
         def bootstrap_set_webhook():
-            self.bot.set_webhook(url=webhook_url,
-                                 certificate=cert,
-                                 allowed_updates=allowed_updates)
+            self.bot.set_webhook(
+                url=webhook_url, certificate=cert, allowed_updates=allowed_updates
+            )
             return False
 
         def bootstrap_onerr_cb(exc):
             if not isinstance(exc, Unauthorized) and (max_retries < 0 or retries[0] < max_retries):
                 retries[0] += 1
-                self.logger.warning('Failed bootstrap phase; try=%s max_retries=%s', retries[0],
-                                    max_retries)
+                self.logger.warning(
+                    'Failed bootstrap phase; try=%s max_retries=%s', retries[0], max_retries
+                )
             else:
                 self.logger.error('Failed bootstrap phase after %s retries (%s)', retries[0], exc)
                 raise exc
@@ -535,22 +595,34 @@ class Updater:
         # We also take this chance to delete pre-configured webhook if this is a polling Updater.
         # NOTE: We don't know ahead if a webhook is configured, so we just delete.
         if clean or not webhook_url:
-            self._network_loop_retry(bootstrap_del_webhook, bootstrap_onerr_cb,
-                                     'bootstrap del webhook', bootstrap_interval)
+            self._network_loop_retry(
+                bootstrap_del_webhook,
+                bootstrap_onerr_cb,
+                'bootstrap del webhook',
+                bootstrap_interval,
+            )
             retries[0] = 0
 
         # Clean pending messages, if requested.
         if clean:
-            self._network_loop_retry(bootstrap_clean_updates, bootstrap_onerr_cb,
-                                     'bootstrap clean updates', bootstrap_interval)
+            self._network_loop_retry(
+                bootstrap_clean_updates,
+                bootstrap_onerr_cb,
+                'bootstrap clean updates',
+                bootstrap_interval,
+            )
             retries[0] = 0
             sleep(1)
 
         # Restore/set webhook settings, if needed. Again, we don't know ahead if a webhook is set,
         # so we set it anyhow.
         if webhook_url:
-            self._network_loop_retry(bootstrap_set_webhook, bootstrap_onerr_cb,
-                                     'bootstrap set webhook', bootstrap_interval)
+            self._network_loop_retry(
+                bootstrap_set_webhook,
+                bootstrap_onerr_cb,
+                'bootstrap set webhook',
+                bootstrap_interval,
+            )
 
     def stop(self) -> None:
         """Stops the polling/webhook thread, the dispatcher and the job queue."""
@@ -573,9 +645,11 @@ class Updater:
     @no_type_check
     def _stop_httpd(self) -> None:
         if self.httpd:
-            self.logger.debug('Waiting for current webhook connection to be '
-                              'closed... Send a Telegram message to the bot to exit '
-                              'immediately.')
+            self.logger.debug(
+                'Waiting for current webhook connection to be '
+                'closed... Send a Telegram message to the bot to exit '
+                'immediately.'
+            )
             self.httpd.shutdown()
             self.httpd = None
 
@@ -596,8 +670,9 @@ class Updater:
     def signal_handler(self, signum, frame) -> None:
         self.is_idle = False
         if self.running:
-            self.logger.info('Received signal {} ({}), stopping...'.format(
-                signum, get_signal_name(signum)))
+            self.logger.info(
+                'Received signal {} ({}), stopping...'.format(signum, get_signal_name(signum))
+            )
             if self.persistence:
                 # Update user_data, chat_data and bot_data before flushing
                 self.dispatcher.update_persistence()
@@ -608,6 +683,7 @@ class Updater:
         else:
             self.logger.warning('Exiting immediately!')
             import os
+
             os._exit(1)
 
     def idle(self, stop_signals: Union[List, Tuple] = (SIGINT, SIGTERM, SIGABRT)) -> None:

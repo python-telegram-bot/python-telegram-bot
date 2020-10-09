@@ -27,23 +27,28 @@ import re
 
 @pytest.fixture(scope='function')
 def update():
-    return Update(0, Message(0, datetime.datetime.utcnow(),
-                             Chat(0, 'private'), from_user=User(0, 'Testuser', False),
-                             via_bot=User(0, "Testbot", True)))
+    return Update(
+        0,
+        Message(
+            0,
+            datetime.datetime.utcnow(),
+            Chat(0, 'private'),
+            from_user=User(0, 'Testuser', False),
+            via_bot=User(0, "Testbot", True),
+        ),
+    )
 
 
-@pytest.fixture(scope='function',
-                params=MessageEntity.ALL_TYPES)
+@pytest.fixture(scope='function', params=MessageEntity.ALL_TYPES)
 def message_entity(request):
     return MessageEntity(request.param, 0, 0, url='', user='')
 
 
-@pytest.fixture(scope='class',
-                params=[
-                    {'class': MessageFilter},
-                    {'class': UpdateFilter}
-                ],
-                ids=['MessageFilter', 'UpdateFilter'])
+@pytest.fixture(
+    scope='class',
+    params=[{'class': MessageFilter}, {'class': UpdateFilter}],
+    ids=['MessageFilter', 'UpdateFilter'],
+)
 def base_class(request):
     return request.param['class']
 
@@ -168,8 +173,9 @@ class TestFilters:
     def test_regex_complex_merges(self, update):
         SRE_TYPE = type(re.match("", ""))
         update.message.text = 'test it out'
-        filter = (Filters.regex('test')
-                  & ((Filters.status_update | Filters.forwarded) | Filters.regex('out')))
+        filter = Filters.regex('test') & (
+            (Filters.status_update | Filters.forwarded) | Filters.regex('out')
+        )
         result = filter(update)
         assert result
         assert isinstance(result, dict)
@@ -215,8 +221,9 @@ class TestFilters:
         update.message.text = 'test it out'
         update.message.forward_date = None
         update.message.pinned_message = None
-        filter = ((Filters.regex('test') | Filters.command)
-                  & (Filters.regex('it') | Filters.status_update))
+        filter = (Filters.regex('test') | Filters.command) & (
+            Filters.regex('it') | Filters.status_update
+        )
         result = filter(update)
         assert result
         assert isinstance(result, dict)
@@ -263,7 +270,7 @@ class TestFilters:
         assert result
         assert isinstance(result, bool)
 
-        filter = (~Filters.regex('linked') & Filters.command)
+        filter = ~Filters.regex('linked') & Filters.command
         update.message.text = "it's linked"
         result = filter(update)
         assert not result
@@ -275,7 +282,7 @@ class TestFilters:
         result = filter(update)
         assert not result
 
-        filter = (~Filters.regex('linked') | Filters.command)
+        filter = ~Filters.regex('linked') | Filters.command
         update.message.text = "it's linked"
         update.message.entities = []
         result = filter(update)
@@ -293,8 +300,12 @@ class TestFilters:
         assert result
 
     def test_filters_reply(self, update):
-        another_message = Message(1, datetime.datetime.utcnow(), Chat(0, 'private'),
-                                  from_user=User(1, 'TestOther', False))
+        another_message = Message(
+            1,
+            datetime.datetime.utcnow(),
+            Chat(0, 'private'),
+            from_user=User(1, 'TestOther', False),
+        )
         update.message.text = 'test'
         assert not Filters.reply(update)
         update.message.reply_to_message = another_message
@@ -311,8 +322,9 @@ class TestFilters:
         assert Filters.document(update)
 
     def test_filters_document_type(self, update):
-        update.message.document = Document("file_id", 'unique_id',
-                                           mime_type="application/vnd.android.package-archive")
+        update.message.document = Document(
+            "file_id", 'unique_id', mime_type="application/vnd.android.package-archive"
+        )
         assert Filters.document.apk(update)
         assert Filters.document.application(update)
         assert not Filters.document.doc(update)
@@ -324,8 +336,9 @@ class TestFilters:
         assert not Filters.document.docx(update)
         assert not Filters.document.audio(update)
 
-        update.message.document.mime_type = "application/vnd.openxmlformats-officedocument." \
-                                            "wordprocessingml.document"
+        update.message.document.mime_type = (
+            "application/vnd.openxmlformats-officedocument." "wordprocessingml.document"
+        )
         assert Filters.document.docx(update)
         assert Filters.document.application(update)
         assert not Filters.document.exe(update)
@@ -930,11 +943,13 @@ class TestFilters:
         update.message.forward_date = None
         assert not (Filters.text & (Filters.forwarded | Filters.status_update))(update)
         update.message.pinned_message = True
-        assert (Filters.text & (Filters.forwarded | Filters.status_update)(update))
+        assert Filters.text & (Filters.forwarded | Filters.status_update)(update)
 
-        assert str(Filters.text & (Filters.forwarded | Filters.entity(
-            MessageEntity.MENTION))) == '<Filters.text and <Filters.forwarded or ' \
-                                        'Filters.entity(mention)>>'
+        assert (
+            str(Filters.text & (Filters.forwarded | Filters.entity(MessageEntity.MENTION)))
+            == '<Filters.text and <Filters.forwarded or '
+            'Filters.entity(mention)>>'
+        )
 
     def test_inverted_filters(self, update):
         update.message.text = '/test'

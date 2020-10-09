@@ -42,9 +42,10 @@ from telegram.ext import Updater, Dispatcher, DictPersistence, Defaults
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.webhookhandler import WebhookServer
 
-signalskip = pytest.mark.skipif(sys.platform == 'win32',
-                                reason='Can\'t send signals without stopping '
-                                       'whole process on windows')
+signalskip = pytest.mark.skipif(
+    sys.platform == 'win32',
+    reason='Can\'t send signals without stopping ' 'whole process on windows',
+)
 
 
 ASYNCIO_LOCK = threading.Lock()
@@ -88,10 +89,11 @@ class TestUpdater:
         self.received = update.message.text
         self.cb_handler_called.set()
 
-    @pytest.mark.parametrize(('error',),
-                             argvalues=[(TelegramError('Test Error 2'),),
-                                        (Unauthorized('Test Unauthorized'),)],
-                             ids=('TelegramError', 'Unauthorized'))
+    @pytest.mark.parametrize(
+        ('error',),
+        argvalues=[(TelegramError('Test Error 2'),), (Unauthorized('Test Unauthorized'),)],
+        ids=('TelegramError', 'Unauthorized'),
+    )
     def test_get_updates_normal_err(self, monkeypatch, updater, error):
         def test(*args, **kwargs):
             raise error
@@ -129,14 +131,16 @@ class TestUpdater:
         #       an unhandled exception.
         # TODO: We should have a way to poll Updater status and decide if it's running or not.
         import pprint
-        pprint.pprint([rec.getMessage() for rec in caplog.get_records('call')])
-        assert any('unhandled exception in Bot:{}:updater'.format(updater.bot.id) in
-                   rec.getMessage() for rec in caplog.get_records('call'))
 
-    @pytest.mark.parametrize(('error',),
-                             argvalues=[(RetryAfter(0.01),),
-                                        (TimedOut(),)],
-                             ids=('RetryAfter', 'TimedOut'))
+        pprint.pprint([rec.getMessage() for rec in caplog.get_records('call')])
+        assert any(
+            'unhandled exception in Bot:{}:updater'.format(updater.bot.id) in rec.getMessage()
+            for rec in caplog.get_records('call')
+        )
+
+    @pytest.mark.parametrize(
+        ('error',), argvalues=[(RetryAfter(0.01),), (TimedOut(),)], ids=('RetryAfter', 'TimedOut')
+    )
     def test_get_updates_retries(self, monkeypatch, updater, error):
         event = Event()
 
@@ -167,17 +171,18 @@ class TestUpdater:
 
         ip = '127.0.0.1'
         port = randrange(1024, 49152)  # Select random port
-        updater.start_webhook(
-            ip,
-            port,
-            url_path='TOKEN')
-        sleep(.2)
+        updater.start_webhook(ip, port, url_path='TOKEN')
+        sleep(0.2)
         try:
             # Now, we send an update to the server via urlopen
-            update = Update(1, message=Message(1, None, Chat(1, ''), from_user=User(1, '', False),
-                                               text='Webhook'))
+            update = Update(
+                1,
+                message=Message(
+                    1, None, Chat(1, ''), from_user=User(1, '', False), text='Webhook'
+                ),
+            )
             self._send_webhook_msg(ip, port, update.to_json(), 'TOKEN')
-            sleep(.2)
+            sleep(0.2)
             assert q.get(False) == update
 
             # Returns 404 if path is incorrect
@@ -186,15 +191,16 @@ class TestUpdater:
             assert excinfo.value.code == 404
 
             with pytest.raises(HTTPError) as excinfo:
-                self._send_webhook_msg(ip, port, None, 'webookhandler.py',
-                                       get_method=lambda: 'HEAD')
+                self._send_webhook_msg(
+                    ip, port, None, 'webookhandler.py', get_method=lambda: 'HEAD'
+                )
             assert excinfo.value.code == 404
 
             # Test multiple shutdown() calls
             updater.httpd.shutdown()
         finally:
             updater.httpd.shutdown()
-            sleep(.2)
+            sleep(0.2)
             assert not updater.httpd.is_running
             updater.stop()
 
@@ -212,8 +218,10 @@ class TestUpdater:
             updater.stop()
         assert not caplog.records
 
-    @pytest.mark.skipif(os.name != 'nt' or sys.version_info < (3, 8),
-                        reason='Workaround only relevant on windows with py3.8+')
+    @pytest.mark.skipif(
+        os.name != 'nt' or sys.version_info < (3, 8),
+        reason='Workaround only relevant on windows with py3.8+',
+    )
     def test_start_webhook_ensure_event_loop(self, updater, monkeypatch):
         def serve_forever(self, force_event_loop=False, ready=None):
             with self.server_lock:
@@ -240,12 +248,15 @@ class TestUpdater:
                 bootstrap_retries=0,
                 clean=False,
                 webhook_url=None,
-                allowed_updates=None)
+                allowed_updates=None,
+            )
 
             assert isinstance(asyncio.get_event_loop(), asyncio.SelectorEventLoop)
 
-    @pytest.mark.skipif(os.name != 'nt' or sys.version_info < (3, 8),
-                        reason='Workaround only relevant on windows with py3.8+')
+    @pytest.mark.skipif(
+        os.name != 'nt' or sys.version_info < (3, 8),
+        reason='Workaround only relevant on windows with py3.8+',
+    )
     def test_start_webhook_force_event_loop_false(self, updater, monkeypatch):
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
         monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
@@ -264,10 +275,13 @@ class TestUpdater:
                     bootstrap_retries=0,
                     clean=False,
                     webhook_url=None,
-                    allowed_updates=None)
+                    allowed_updates=None,
+                )
 
-    @pytest.mark.skipif(os.name != 'nt' or sys.version_info < (3, 8),
-                        reason='Workaround only relevant on windows with py3.8+')
+    @pytest.mark.skipif(
+        os.name != 'nt' or sys.version_info < (3, 8),
+        reason='Workaround only relevant on windows with py3.8+',
+    )
     def test_start_webhook_force_event_loop_true(self, updater, monkeypatch):
         def serve_forever(self, force_event_loop=False, ready=None):
             with self.server_lock:
@@ -295,7 +309,8 @@ class TestUpdater:
                 clean=False,
                 webhook_url=None,
                 allowed_updates=None,
-                force_event_loop=True)
+                force_event_loop=True,
+            )
             assert isinstance(asyncio.get_event_loop(), asyncio.ProactorEventLoop)
 
     def test_webhook_ssl(self, monkeypatch, updater):
@@ -314,7 +329,8 @@ class TestUpdater:
                 bootstrap_retries=0,
                 clean=False,
                 webhook_url=None,
-                allowed_updates=None)
+                allowed_updates=None,
+            )
         except TelegramError:
             tg_err = True
         assert tg_err
@@ -328,19 +344,19 @@ class TestUpdater:
         ip = '127.0.0.1'
         port = randrange(1024, 49152)  # Select random port
         updater.start_webhook(ip, port, webhook_url=None)
-        sleep(.2)
+        sleep(0.2)
 
         # Now, we send an update to the server via urlopen
-        update = Update(1, message=Message(1, None, Chat(1, ''), from_user=User(1, '', False),
-                                           text='Webhook 2'))
+        update = Update(
+            1,
+            message=Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Webhook 2'),
+        )
         self._send_webhook_msg(ip, port, update.to_json())
-        sleep(.2)
+        sleep(0.2)
         assert q.get(False) == update
         updater.stop()
 
-    @pytest.mark.parametrize(('error',),
-                             argvalues=[(TelegramError(''),)],
-                             ids=('TelegramError',))
+    @pytest.mark.parametrize(('error',), argvalues=[(TelegramError(''),)], ids=('TelegramError',))
     def test_bootstrap_retries_success(self, monkeypatch, updater, error):
         retries = 2
 
@@ -355,11 +371,11 @@ class TestUpdater:
         updater._bootstrap(retries, False, 'path', None, bootstrap_interval=0)
         assert self.attempts == retries
 
-    @pytest.mark.parametrize(('error', 'attempts'),
-                             argvalues=[(TelegramError(''), 2),
-                                        (Unauthorized(''), 1),
-                                        (InvalidToken(), 1)],
-                             ids=('TelegramError', 'Unauthorized', 'InvalidToken'))
+    @pytest.mark.parametrize(
+        ('error', 'attempts'),
+        argvalues=[(TelegramError(''), 2), (Unauthorized(''), 1), (InvalidToken(), 1)],
+        ids=('TelegramError', 'Unauthorized', 'InvalidToken'),
+    )
     def test_bootstrap_retries_error(self, monkeypatch, updater, error, attempts):
         retries = 1
 
@@ -392,7 +408,7 @@ class TestUpdater:
                 self.offset = int(args[0])
                 return []
 
-            class FakeUpdate():
+            class FakeUpdate:
                 def __init__(self, update_id):
                     self.update_id = update_id
 
@@ -415,16 +431,17 @@ class TestUpdater:
         ip = '127.0.0.1'
         port = randrange(1024, 49152)  # select random port for travis
         thr = Thread(
-            target=updater._start_webhook,
-            args=(ip, port, '', None, None, 0, False, None, None))
+            target=updater._start_webhook, args=(ip, port, '', None, None, 0, False, None, None)
+        )
         thr.start()
 
-        sleep(.2)
+        sleep(0.2)
 
         try:
             with pytest.raises(HTTPError) as excinfo:
-                self._send_webhook_msg(ip, port, '<root><bla>data</bla></root>',
-                                       content_type='application/xml')
+                self._send_webhook_msg(
+                    ip, port, '<root><bla>data</bla></root>', content_type='application/xml'
+                )
             assert excinfo.value.code == 403
 
             with pytest.raises(HTTPError) as excinfo:
@@ -444,15 +461,19 @@ class TestUpdater:
             updater.httpd.shutdown()
             thr.join()
 
-    def _send_webhook_msg(self,
-                          ip,
-                          port,
-                          payload_str,
-                          url_path='',
-                          content_len=-1,
-                          content_type='application/json',
-                          get_method=None):
-        headers = {'content-type': content_type, }
+    def _send_webhook_msg(
+        self,
+        ip,
+        port,
+        payload_str,
+        url_path='',
+        content_len=-1,
+        content_type='application/json',
+        get_method=None,
+    ):
+        headers = {
+            'content-type': content_type,
+        }
 
         if not payload_str:
             content_len = None
@@ -499,7 +520,7 @@ class TestUpdater:
         assert rec.levelname == 'INFO'
 
         # If we get this far, idle() ran through
-        sleep(.5)
+        sleep(0.5)
         assert updater.running is False
 
     @signalskip
@@ -514,7 +535,7 @@ class TestUpdater:
         Thread(target=partial(self.signal_sender, updater=updater)).start()
         updater.idle()
         # If we get this far, idle() ran through
-        sleep(.5)
+        sleep(0.5)
         assert updater.running is False
         assert temp_var['a'] != 0
 

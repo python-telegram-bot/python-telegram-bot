@@ -58,14 +58,16 @@ class MessageEntity(TelegramObject):
 
     """
 
-    def __init__(self,
-                 type: str,
-                 offset: int,
-                 length: int,
-                 url: str = None,
-                 user: User = None,
-                 language: str = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        type: str,
+        offset: int,
+        length: int,
+        url: str = None,
+        user: User = None,
+        language: str = None,
+        **kwargs: Any,
+    ):
         # Required
         self.type = type
         self.offset = offset
@@ -119,7 +121,20 @@ class MessageEntity(TelegramObject):
     STRIKETHROUGH: str = 'strikethrough'
     """:obj:`str`: 'strikethrough'"""
     ALL_TYPES: List[str] = [
-        MENTION, HASHTAG, CASHTAG, PHONE_NUMBER, BOT_COMMAND, URL,
-        EMAIL, BOLD, ITALIC, CODE, PRE, TEXT_LINK, TEXT_MENTION, UNDERLINE, STRIKETHROUGH
+        MENTION,
+        HASHTAG,
+        CASHTAG,
+        PHONE_NUMBER,
+        BOT_COMMAND,
+        URL,
+        EMAIL,
+        BOLD,
+        ITALIC,
+        CODE,
+        PRE,
+        TEXT_LINK,
+        TEXT_MENTION,
+        UNDERLINE,
+        STRIKETHROUGH,
     ]
     """List[:obj:`str`]: List of all the types."""

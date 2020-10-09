@@ -21,6 +21,7 @@
 from telegram import TelegramObject, OrderInfo
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import Bot
 
@@ -60,15 +61,17 @@ class SuccessfulPayment(TelegramObject):
 
     """
 
-    def __init__(self,
-                 currency: str,
-                 total_amount: int,
-                 invoice_payload: str,
-                 telegram_payment_charge_id: str,
-                 provider_payment_charge_id: str,
-                 shipping_option_id: str = None,
-                 order_info: OrderInfo = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        currency: str,
+        total_amount: int,
+        invoice_payload: str,
+        telegram_payment_charge_id: str,
+        provider_payment_charge_id: str,
+        shipping_option_id: str = None,
+        order_info: OrderInfo = None,
+        **kwargs: Any,
+    ):
         self.currency = currency
         self.total_amount = total_amount
         self.invoice_payload = invoice_payload

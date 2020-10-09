@@ -18,8 +18,16 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Update."""
 
-from telegram import (Message, TelegramObject, InlineQuery, ChosenInlineResult,
-                      CallbackQuery, ShippingQuery, PreCheckoutQuery, Poll)
+from telegram import (
+    Message,
+    TelegramObject,
+    InlineQuery,
+    ChosenInlineResult,
+    CallbackQuery,
+    ShippingQuery,
+    PreCheckoutQuery,
+    Poll,
+)
 from telegram.poll import PollAnswer
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, TYPE_CHECKING
@@ -88,20 +96,22 @@ class Update(TelegramObject):
 
     """
 
-    def __init__(self,
-                 update_id: int,
-                 message: Message = None,
-                 edited_message: Message = None,
-                 channel_post: Message = None,
-                 edited_channel_post: Message = None,
-                 inline_query: InlineQuery = None,
-                 chosen_inline_result: ChosenInlineResult = None,
-                 callback_query: CallbackQuery = None,
-                 shipping_query: ShippingQuery = None,
-                 pre_checkout_query: PreCheckoutQuery = None,
-                 poll: Poll = None,
-                 poll_answer: PollAnswer = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        update_id: int,
+        message: Message = None,
+        edited_message: Message = None,
+        channel_post: Message = None,
+        edited_channel_post: Message = None,
+        inline_query: InlineQuery = None,
+        chosen_inline_result: ChosenInlineResult = None,
+        callback_query: CallbackQuery = None,
+        shipping_query: ShippingQuery = None,
+        pre_checkout_query: PreCheckoutQuery = None,
+        poll: Poll = None,
+        poll_answer: PollAnswer = None,
+        **kwargs: Any,
+    ):
         # Required
         self.update_id = int(update_id)
         # Optionals
@@ -239,7 +249,8 @@ class Update(TelegramObject):
         data['edited_message'] = Message.de_json(data.get('edited_message'), bot)
         data['inline_query'] = InlineQuery.de_json(data.get('inline_query'), bot)
         data['chosen_inline_result'] = ChosenInlineResult.de_json(
-            data.get('chosen_inline_result'), bot)
+            data.get('chosen_inline_result'), bot
+        )
         data['callback_query'] = CallbackQuery.de_json(data.get('callback_query'), bot)
         data['shipping_query'] = ShippingQuery.de_json(data.get('shipping_query'), bot)
         data['pre_checkout_query'] = PreCheckoutQuery.de_json(data.get('pre_checkout_query'), bot)

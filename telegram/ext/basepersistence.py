@@ -108,10 +108,12 @@ class BasePersistence(ABC):
         instance.update_bot_data = update_bot_data_replace_bot
         return instance
 
-    def __init__(self,
-                 store_user_data: bool = True,
-                 store_chat_data: bool = True,
-                 store_bot_data: bool = True):
+    def __init__(
+        self,
+        store_user_data: bool = True,
+        store_chat_data: bool = True,
+        store_bot_data: bool = True,
+    ):
         self.store_user_data = store_user_data
         self.store_chat_data = store_chat_data
         self.store_bot_data = store_bot_data
@@ -157,8 +159,11 @@ class BasePersistence(ABC):
             return new_obj
         if hasattr(obj, '__slots__'):
             for attr_name in new_obj.__slots__:
-                setattr(new_obj, attr_name,
-                        cls.replace_bot(cls.replace_bot(getattr(new_obj, attr_name))))
+                setattr(
+                    new_obj,
+                    attr_name,
+                    cls.replace_bot(cls.replace_bot(getattr(new_obj, attr_name))),
+                )
             return new_obj
 
         return obj
@@ -196,14 +201,17 @@ class BasePersistence(ABC):
             return new_obj
         if hasattr(obj, '__slots__'):
             for attr_name in obj.__slots__:
-                setattr(new_obj, attr_name,
-                        self.insert_bot(self.insert_bot(getattr(new_obj, attr_name))))
+                setattr(
+                    new_obj,
+                    attr_name,
+                    self.insert_bot(self.insert_bot(getattr(new_obj, attr_name))),
+                )
             return new_obj
         return obj
 
     @abstractmethod
     def get_user_data(self) -> DefaultDict[int, Dict[Any, Any]]:
-        """"Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
+        """ "Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the user_data if stored, or an empty
         ``defaultdict(dict)``.
 
@@ -213,7 +221,7 @@ class BasePersistence(ABC):
 
     @abstractmethod
     def get_chat_data(self) -> DefaultDict[int, Dict[Any, Any]]:
-        """"Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
+        """ "Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the chat_data if stored, or an empty
         ``defaultdict(dict)``.
 
@@ -223,7 +231,7 @@ class BasePersistence(ABC):
 
     @abstractmethod
     def get_bot_data(self) -> Dict[Any, Any]:
-        """"Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
+        """ "Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the bot_data if stored, or an empty
         :obj:`dict`.
 
@@ -233,7 +241,7 @@ class BasePersistence(ABC):
 
     @abstractmethod
     def get_conversations(self, name: str) -> ConversationDict:
-        """"Will be called by :class:`telegram.ext.Dispatcher` when a
+        """ "Will be called by :class:`telegram.ext.Dispatcher` when a
         :class:`telegram.ext.ConversationHandler` is added if
         :attr:`telegram.ext.ConversationHandler.persistent` is :obj:`True`.
         It should return the conversations for the handler with `name` or an empty :obj:`dict`
@@ -246,9 +254,9 @@ class BasePersistence(ABC):
         """
 
     @abstractmethod
-    def update_conversation(self,
-                            name: str, key: Tuple[int, ...],
-                            new_state: Optional[object]) -> None:
+    def update_conversation(
+        self, name: str, key: Tuple[int, ...], new_state: Optional[object]
+    ) -> None:
         """Will be called when a :attr:`telegram.ext.ConversationHandler.update_state`
         is called. This allows the storage of the new state in the persistence.
 

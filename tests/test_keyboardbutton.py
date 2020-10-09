@@ -25,10 +25,12 @@ from telegram.keyboardbuttonpolltype import KeyboardButtonPollType
 
 @pytest.fixture(scope='class')
 def keyboard_button():
-    return KeyboardButton(TestKeyboardButton.text,
-                          request_location=TestKeyboardButton.request_location,
-                          request_contact=TestKeyboardButton.request_contact,
-                          request_poll=TestKeyboardButton.request_poll)
+    return KeyboardButton(
+        TestKeyboardButton.text,
+        request_location=TestKeyboardButton.request_location,
+        request_contact=TestKeyboardButton.request_contact,
+        request_poll=TestKeyboardButton.request_poll,
+    )
 
 
 class TestKeyboardButton:

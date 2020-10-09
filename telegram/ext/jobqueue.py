@@ -31,6 +31,7 @@ from telegram.ext.callbackcontext import CallbackContext
 
 from typing import TYPE_CHECKING, Union, Callable, Tuple, Optional, List, Any, cast, overload
 from telegram.utils.types import JSONDict
+
 if TYPE_CHECKING:
     from telegram.ext import Dispatcher
     from telegram import Bot
@@ -56,8 +57,9 @@ class JobQueue:
         self._dispatcher: 'Dispatcher' = None  # type: ignore[assignment]
         self.logger = logging.getLogger(self.__class__.__name__)
         self.scheduler = BackgroundScheduler(timezone=pytz.utc)
-        self.scheduler.add_listener(self._update_persistence,
-                                    mask=EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
+        self.scheduler.add_listener(
+            self._update_persistence, mask=EVENT_JOB_EXECUTED | EVENT_JOB_ERROR
+        )
 
         # Dispatch errors and don't log them in the APS logger
         def aps_log_filter(record):  # type: ignore
@@ -82,25 +84,29 @@ class JobQueue:
             self._dispatcher.dispatch_error(None, event.exception)
         # Errors should not stop the thread.
         except Exception:
-            self.logger.exception('An error was raised while processing the job and an '
-                                  'uncaught error was raised while handling the error '
-                                  'with an error_handler.')
+            self.logger.exception(
+                'An error was raised while processing the job and an '
+                'uncaught error was raised while handling the error '
+                'with an error_handler.'
+            )
 
     @overload
     def _parse_time_input(self, time: None, shift_day: bool = False) -> None:
         ...
 
     @overload
-    def _parse_time_input(self,
-                          time: Union[float, int, datetime.timedelta, datetime.datetime,
-                                      datetime.time],
-                          shift_day: bool = False) -> datetime.datetime:
+    def _parse_time_input(
+        self,
+        time: Union[float, int, datetime.timedelta, datetime.datetime, datetime.time],
+        shift_day: bool = False,
+    ) -> datetime.datetime:
         ...
 
-    def _parse_time_input(self,
-                          time: Union[float, int, datetime.timedelta, datetime.datetime,
-                                      datetime.time, None],
-                          shift_day: bool = False) -> Optional[datetime.datetime]:
+    def _parse_time_input(
+        self,
+        time: Union[float, int, datetime.timedelta, datetime.datetime, datetime.time, None],
+        shift_day: bool = False,
+    ) -> Optional[datetime.datetime]:
         if time is None:
             return None
         if isinstance(time, (int, float)):
@@ -109,7 +115,8 @@ class JobQueue:
             return self._tz_now() + time
         if isinstance(time, datetime.time):
             dt = datetime.datetime.combine(
-                datetime.datetime.now(tz=time.tzinfo or self.scheduler.timezone).date(), time)
+                datetime.datetime.now(tz=time.tzinfo or self.scheduler.timezone).date(), time
+            )
             if dt.tzinfo is None:
                 dt = self.scheduler.timezone.localize(dt)
             if shift_day and dt <= datetime.datetime.now(pytz.utc):
@@ -131,12 +138,14 @@ class JobQueue:
             if dispatcher.bot.defaults:
                 self.scheduler.configure(timezone=dispatcher.bot.defaults.tzinfo or pytz.utc)
 
-    def run_once(self,
-                 callback: Callable[['CallbackContext'], None],
-                 when: Union[float, datetime.timedelta, datetime.datetime, datetime.time],
-                 context: object = None,
-                 name: str = None,
-                 job_kwargs: JSONDict = None) -> 'Job':
+    def run_once(
+        self,
+        callback: Callable[['CallbackContext'], None],
+        when: Union[float, datetime.timedelta, datetime.datetime, datetime.time],
+        context: object = None,
+        name: str = None,
+        job_kwargs: JSONDict = None,
+    ) -> 'Job':
         """Creates a new ``Job`` that runs once and adds it to the queue.
 
         Args:
@@ -183,27 +192,29 @@ class JobQueue:
         job = Job(callback, context, name, self)
         dt = self._parse_time_input(when, shift_day=True)
 
-        j = self.scheduler.add_job(callback,
-                                   name=name,
-                                   trigger='date',
-                                   run_date=dt,
-                                   args=self._build_args(job),
-                                   timezone=dt.tzinfo or self.scheduler.timezone,
-                                   **job_kwargs)
+        j = self.scheduler.add_job(
+            callback,
+            name=name,
+            trigger='date',
+            run_date=dt,
+            args=self._build_args(job),
+            timezone=dt.tzinfo or self.scheduler.timezone,
+            **job_kwargs,
+        )
 
         job.job = j
         return job
 
-    def run_repeating(self,
-                      callback: Callable[['CallbackContext'], None],
-                      interval: Union[float, datetime.timedelta],
-                      first: Union[float, datetime.timedelta, datetime.datetime,
-                                   datetime.time] = None,
-                      last: Union[float, datetime.timedelta, datetime.datetime,
-                                  datetime.time] = None,
-                      context: object = None,
-                      name: str = None,
-                      job_kwargs: JSONDict = None) -> 'Job':
+    def run_repeating(
+        self,
+        callback: Callable[['CallbackContext'], None],
+        interval: Union[float, datetime.timedelta],
+        first: Union[float, datetime.timedelta, datetime.datetime, datetime.time] = None,
+        last: Union[float, datetime.timedelta, datetime.datetime, datetime.time] = None,
+        context: object = None,
+        name: str = None,
+        job_kwargs: JSONDict = None,
+    ) -> 'Job':
         """Creates a new ``Job`` that runs at specified intervals and adds it to the queue.
 
         Args:
@@ -277,26 +288,30 @@ class JobQueue:
         if isinstance(interval, datetime.timedelta):
             interval = interval.total_seconds()
 
-        j = self.scheduler.add_job(callback,
-                                   trigger='interval',
-                                   args=self._build_args(job),
-                                   start_date=dt_first,
-                                   end_date=dt_last,
-                                   seconds=interval,
-                                   name=name,
-                                   **job_kwargs)
+        j = self.scheduler.add_job(
+            callback,
+            trigger='interval',
+            args=self._build_args(job),
+            start_date=dt_first,
+            end_date=dt_last,
+            seconds=interval,
+            name=name,
+            **job_kwargs,
+        )
 
         job.job = j
         return job
 
-    def run_monthly(self,
-                    callback: Callable[['CallbackContext'], None],
-                    when: datetime.time,
-                    day: int,
-                    context: object = None,
-                    name: str = None,
-                    day_is_strict: bool = True,
-                    job_kwargs: JSONDict = None) -> 'Job':
+    def run_monthly(
+        self,
+        callback: Callable[['CallbackContext'], None],
+        when: datetime.time,
+        day: int,
+        context: object = None,
+        name: str = None,
+        day_is_strict: bool = True,
+        job_kwargs: JSONDict = None,
+    ) -> 'Job':
         """Creates a new ``Job`` that runs on a monthly basis and adds it to the queue.
 
         Args:
@@ -332,45 +347,55 @@ class JobQueue:
         job = Job(callback, context, name, self)
 
         if day_is_strict:
-            j = self.scheduler.add_job(callback,
-                                       trigger='cron',
-                                       args=self._build_args(job),
-                                       name=name,
-                                       day=day,
-                                       hour=when.hour,
-                                       minute=when.minute,
-                                       second=when.second,
-                                       timezone=when.tzinfo or self.scheduler.timezone,
-                                       **job_kwargs)
+            j = self.scheduler.add_job(
+                callback,
+                trigger='cron',
+                args=self._build_args(job),
+                name=name,
+                day=day,
+                hour=when.hour,
+                minute=when.minute,
+                second=when.second,
+                timezone=when.tzinfo or self.scheduler.timezone,
+                **job_kwargs,
+            )
         else:
-            trigger = OrTrigger([CronTrigger(day=day,
-                                             hour=when.hour,
-                                             minute=when.minute,
-                                             second=when.second,
-                                             timezone=when.tzinfo,
-                                             **job_kwargs),
-                                 CronTrigger(day='last',
-                                             hour=when.hour,
-                                             minute=when.minute,
-                                             second=when.second,
-                                             timezone=when.tzinfo or self.scheduler.timezone,
-                                             **job_kwargs)])
-            j = self.scheduler.add_job(callback,
-                                       trigger=trigger,
-                                       args=self._build_args(job),
-                                       name=name,
-                                       **job_kwargs)
+            trigger = OrTrigger(
+                [
+                    CronTrigger(
+                        day=day,
+                        hour=when.hour,
+                        minute=when.minute,
+                        second=when.second,
+                        timezone=when.tzinfo,
+                        **job_kwargs,
+                    ),
+                    CronTrigger(
+                        day='last',
+                        hour=when.hour,
+                        minute=when.minute,
+                        second=when.second,
+                        timezone=when.tzinfo or self.scheduler.timezone,
+                        **job_kwargs,
+                    ),
+                ]
+            )
+            j = self.scheduler.add_job(
+                callback, trigger=trigger, args=self._build_args(job), name=name, **job_kwargs
+            )
 
         job.job = j
         return job
 
-    def run_daily(self,
-                  callback: Callable[['CallbackContext'], None],
-                  time: datetime.time,
-                  days: Tuple[int, ...] = Days.EVERY_DAY,
-                  context: object = None,
-                  name: str = None,
-                  job_kwargs: JSONDict = None) -> 'Job':
+    def run_daily(
+        self,
+        callback: Callable[['CallbackContext'], None],
+        time: datetime.time,
+        days: Tuple[int, ...] = Days.EVERY_DAY,
+        context: object = None,
+        name: str = None,
+        job_kwargs: JSONDict = None,
+    ) -> 'Job':
         """Creates a new ``Job`` that runs on a daily basis and adds it to the queue.
 
         Args:
@@ -409,25 +434,29 @@ class JobQueue:
         name = name or callback.__name__
         job = Job(callback, context, name, self)
 
-        j = self.scheduler.add_job(callback,
-                                   name=name,
-                                   args=self._build_args(job),
-                                   trigger='cron',
-                                   day_of_week=','.join([str(d) for d in days]),
-                                   hour=time.hour,
-                                   minute=time.minute,
-                                   second=time.second,
-                                   timezone=time.tzinfo or self.scheduler.timezone,
-                                   **job_kwargs)
+        j = self.scheduler.add_job(
+            callback,
+            name=name,
+            args=self._build_args(job),
+            trigger='cron',
+            day_of_week=','.join([str(d) for d in days]),
+            hour=time.hour,
+            minute=time.minute,
+            second=time.second,
+            timezone=time.tzinfo or self.scheduler.timezone,
+            **job_kwargs,
+        )
 
         job.job = j
         return job
 
-    def run_custom(self,
-                   callback: Callable[['CallbackContext'], None],
-                   job_kwargs: JSONDict,
-                   context: object = None,
-                   name: str = None) -> 'Job':
+    def run_custom(
+        self,
+        callback: Callable[['CallbackContext'], None],
+        job_kwargs: JSONDict,
+        context: object = None,
+        name: str = None,
+    ) -> 'Job':
         """Creates a new customly defined ``Job``.
 
         Args:
@@ -453,10 +482,7 @@ class JobQueue:
         name = name or callback.__name__
         job = Job(callback, context, name, self)
 
-        j = self.scheduler.add_job(callback,
-                                   args=self._build_args(job),
-                                   name=name,
-                                   **job_kwargs)
+        j = self.scheduler.add_job(callback, args=self._build_args(job), name=name, **job_kwargs)
 
         job.job = j
         return job
@@ -516,12 +542,14 @@ class Job:
         job (:class:`apscheduler.job.Job`, optional): The APS Job this job is a wrapper for.
     """
 
-    def __init__(self,
-                 callback: Callable[['CallbackContext'], None],
-                 context: object = None,
-                 name: str = None,
-                 job_queue: JobQueue = None,
-                 job: 'Job' = None):
+    def __init__(
+        self,
+        callback: Callable[['CallbackContext'], None],
+        context: object = None,
+        name: str = None,
+        job_queue: JobQueue = None,
+        job: 'Job' = None,
+    ):
 
         self.callback = callback
         self.context = context
@@ -545,9 +573,11 @@ class Job:
                 dispatcher.dispatch_error(None, e)
             # Errors should not stop the thread.
             except Exception:
-                dispatcher.logger.exception('An error was raised while processing the job and an '
-                                            'uncaught error was raised while handling the error '
-                                            'with an error_handler.')
+                dispatcher.logger.exception(
+                    'An error was raised while processing the job and an '
+                    'uncaught error was raised while handling the error '
+                    'with an error_handler.'
+                )
 
     def schedule_removal(self) -> None:
         """

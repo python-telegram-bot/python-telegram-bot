@@ -21,6 +21,7 @@
 from telegram import TelegramObject, User
 from telegram.utils.types import JSONDict
 from typing import Optional, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import Bot
 

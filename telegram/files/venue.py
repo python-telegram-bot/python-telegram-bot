@@ -21,6 +21,7 @@
 from telegram import TelegramObject, Location
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import Bot
 
@@ -50,13 +51,15 @@ class Venue(TelegramObject):
 
     """
 
-    def __init__(self,
-                 location: Location,
-                 title: str,
-                 address: str,
-                 foursquare_id: str = None,
-                 foursquare_type: str = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        location: Location,
+        title: str,
+        address: str,
+        foursquare_id: str = None,
+        foursquare_type: str = None,
+        **kwargs: Any,
+    ):
         # Required
         self.location = location
         self.title = title

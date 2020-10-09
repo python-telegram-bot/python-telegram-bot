@@ -15,8 +15,9 @@ import logging
 from telegram.ext import Updater, MessageHandler, Filters
 
 # Enable logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.DEBUG)
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
+)
 
 logger = logging.getLogger(__name__)
 
@@ -39,18 +40,28 @@ def msg(update, context):
                 print('Phone: ', data.phone_number)
             elif data.type == 'email':
                 print('Email: ', data.email)
-            if data.type in ('personal_details', 'passport', 'driver_license', 'identity_card',
-                             'internal_passport', 'address'):
+            if data.type in (
+                'personal_details',
+                'passport',
+                'driver_license',
+                'identity_card',
+                'internal_passport',
+                'address',
+            ):
                 print(data.type, data.data)
-            if data.type in ('utility_bill', 'bank_statement', 'rental_agreement',
-                             'passport_registration', 'temporary_registration'):
+            if data.type in (
+                'utility_bill',
+                'bank_statement',
+                'rental_agreement',
+                'passport_registration',
+                'temporary_registration',
+            ):
                 print(data.type, len(data.files), 'files')
                 for file in data.files:
                     actual_file = file.get_file()
                     print(actual_file)
                     actual_file.download()
-            if data.type in ('passport', 'driver_license', 'identity_card',
-                             'internal_passport'):
+            if data.type in ('passport', 'driver_license', 'identity_card', 'internal_passport'):
                 if data.front_side:
                     file = data.front_side.get_file()
                     print(data.type, file)
@@ -60,16 +71,22 @@ def msg(update, context):
                     file = data.reverse_side.get_file()
                     print(data.type, file)
                     file.download()
-            if data.type in ('passport', 'driver_license', 'identity_card',
-                             'internal_passport'):
+            if data.type in ('passport', 'driver_license', 'identity_card', 'internal_passport'):
                 if data.selfie:
                     file = data.selfie.get_file()
                     print(data.type, file)
                     file.download()
-            if data.type in ('passport', 'driver_license', 'identity_card',
-                             'internal_passport', 'utility_bill', 'bank_statement',
-                             'rental_agreement', 'passport_registration',
-                             'temporary_registration'):
+            if data.type in (
+                'passport',
+                'driver_license',
+                'identity_card',
+                'internal_passport',
+                'utility_bill',
+                'bank_statement',
+                'rental_agreement',
+                'passport_registration',
+                'temporary_registration',
+            ):
                 print(data.type, len(data.translation), 'translation')
                 for file in data.translation:
                     actual_file = file.get_file()

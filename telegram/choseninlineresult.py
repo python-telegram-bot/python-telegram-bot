@@ -22,6 +22,7 @@
 from telegram import TelegramObject, User, Location
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import Bot
 
@@ -61,13 +62,15 @@ class ChosenInlineResult(TelegramObject):
 
     """
 
-    def __init__(self,
-                 result_id: str,
-                 from_user: User,
-                 query: str,
-                 location: Location = None,
-                 inline_message_id: str = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        result_id: str,
+        from_user: User,
+        query: str,
+        location: Location = None,
+        inline_message_id: str = None,
+        **kwargs: Any,
+    ):
         # Required
         self.result_id = result_id
         self.from_user = from_user

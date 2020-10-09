@@ -24,12 +24,14 @@ from telegram import CallbackQuery, User, Message, Chat, Audio
 
 @pytest.fixture(scope='class', params=['message', 'inline'])
 def callback_query(bot, request):
-    cbq = CallbackQuery(TestCallbackQuery.id_,
-                        TestCallbackQuery.from_user,
-                        TestCallbackQuery.chat_instance,
-                        data=TestCallbackQuery.data,
-                        game_short_name=TestCallbackQuery.game_short_name,
-                        bot=bot)
+    cbq = CallbackQuery(
+        TestCallbackQuery.id_,
+        TestCallbackQuery.from_user,
+        TestCallbackQuery.chat_instance,
+        data=TestCallbackQuery.data,
+        game_short_name=TestCallbackQuery.game_short_name,
+        bot=bot,
+    )
     if request.param == 'message':
         cbq.message = TestCallbackQuery.message
     else:
@@ -47,13 +49,15 @@ class TestCallbackQuery:
     game_short_name = 'the_game'
 
     def test_de_json(self, bot):
-        json_dict = {'id': self.id_,
-                     'from': self.from_user.to_dict(),
-                     'chat_instance': self.chat_instance,
-                     'message': self.message.to_dict(),
-                     'data': self.data,
-                     'inline_message_id': self.inline_message_id,
-                     'game_short_name': self.game_short_name}
+        json_dict = {
+            'id': self.id_,
+            'from': self.from_user.to_dict(),
+            'chat_instance': self.chat_instance,
+            'message': self.message.to_dict(),
+            'data': self.data,
+            'inline_message_id': self.inline_message_id,
+            'game_short_name': self.game_short_name,
+        }
         callback_query = CallbackQuery.de_json(json_dict, bot)
 
         assert callback_query.id == self.id_

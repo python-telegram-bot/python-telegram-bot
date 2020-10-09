@@ -23,9 +23,15 @@ import warnings
 from threading import Lock
 
 from telegram import Update
-from telegram.ext import (Handler, CallbackQueryHandler, InlineQueryHandler,
-                          ChosenInlineResultHandler, CallbackContext, BasePersistence,
-                          DispatcherHandlerStop)
+from telegram.ext import (
+    Handler,
+    CallbackQueryHandler,
+    InlineQueryHandler,
+    ChosenInlineResultHandler,
+    CallbackContext,
+    BasePersistence,
+    DispatcherHandlerStop,
+)
 from telegram.utils.promise import Promise
 
 from telegram.utils.types import ConversationDict, HandlerArg
@@ -37,11 +43,13 @@ CheckUpdateType = Optional[Tuple[Tuple[int, ...], Handler, object]]
 
 
 class _ConversationTimeoutContext:
-    def __init__(self,
-                 conversation_key: Tuple[int, ...],
-                 update: Update,
-                 dispatcher: 'Dispatcher',
-                 callback_context: Optional[CallbackContext]):
+    def __init__(
+        self,
+        conversation_key: Tuple[int, ...],
+        update: Update,
+        dispatcher: 'Dispatcher',
+        callback_context: Optional[CallbackContext],
+    ):
         self.conversation_key = conversation_key
         self.update = update
         self.dispatcher = dispatcher
@@ -160,6 +168,7 @@ class ConversationHandler(Handler):
         ValueError
 
     """
+
     END = -1
     """:obj:`int`: Used as a constant to return when a conversation is ended."""
     TIMEOUT = -2
@@ -168,18 +177,20 @@ class ConversationHandler(Handler):
     """:obj:`int`: Used as a constant to handle state when a conversation is still waiting on the
     previous ``@run_sync`` decorated running handler to finish."""
 
-    def __init__(self,
-                 entry_points: List[Handler],
-                 states: Dict[object, List[Handler]],
-                 fallbacks: List[Handler],
-                 allow_reentry: bool = False,
-                 per_chat: bool = True,
-                 per_user: bool = True,
-                 per_message: bool = False,
-                 conversation_timeout: int = None,
-                 name: str = None,
-                 persistent: bool = False,
-                 map_to_parent: Dict[object, object] = None):
+    def __init__(
+        self,
+        entry_points: List[Handler],
+        states: Dict[object, List[Handler]],
+        fallbacks: List[Handler],
+        allow_reentry: bool = False,
+        per_chat: bool = True,
+        per_user: bool = True,
+        per_message: bool = False,
+        conversation_timeout: int = None,
+        name: str = None,
+        persistent: bool = False,
+        map_to_parent: Dict[object, object] = None,
+    ):
         self.run_async = False
 
         self._entry_points = entry_points
@@ -211,8 +222,10 @@ class ConversationHandler(Handler):
             raise ValueError("'per_user', 'per_chat' and 'per_message' can't all be 'False'")
 
         if self.per_message and not self.per_chat:
-            warnings.warn("If 'per_message=True' is used, 'per_chat=True' should also be used, "
-                          "since message IDs are not globally unique.")
+            warnings.warn(
+                "If 'per_message=True' is used, 'per_chat=True' should also be used, "
+                "since message IDs are not globally unique."
+            )
 
         all_handlers = list()
         all_handlers.extend(entry_points)
@@ -224,22 +237,28 @@ class ConversationHandler(Handler):
         if self.per_message:
             for handler in all_handlers:
                 if not isinstance(handler, CallbackQueryHandler):
-                    warnings.warn("If 'per_message=True', all entry points and state handlers"
-                                  " must be 'CallbackQueryHandler', since no other handlers "
-                                  "have a message context.")
+                    warnings.warn(
+                        "If 'per_message=True', all entry points and state handlers"
+                        " must be 'CallbackQueryHandler', since no other handlers "
+                        "have a message context."
+                    )
                     break
         else:
             for handler in all_handlers:
                 if isinstance(handler, CallbackQueryHandler):
-                    warnings.warn("If 'per_message=False', 'CallbackQueryHandler' will not be "
-                                  "tracked for every message.")
+                    warnings.warn(
+                        "If 'per_message=False', 'CallbackQueryHandler' will not be "
+                        "tracked for every message."
+                    )
                     break
 
         if self.per_chat:
             for handler in all_handlers:
                 if isinstance(handler, (InlineQueryHandler, ChosenInlineResultHandler)):
-                    warnings.warn("If 'per_chat=True', 'InlineQueryHandler' can not be used, "
-                                  "since inline queries have no chat context.")
+                    warnings.warn(
+                        "If 'per_chat=True', 'InlineQueryHandler' can not be used, "
+                        "since inline queries have no chat context."
+                    )
                     break
 
     @property
@@ -304,8 +323,9 @@ class ConversationHandler(Handler):
 
     @conversation_timeout.setter
     def conversation_timeout(self, value: Any) -> NoReturn:
-        raise ValueError('You can not assign a new value to conversation_timeout after '
-                         'initialization.')
+        raise ValueError(
+            'You can not assign a new value to conversation_timeout after ' 'initialization.'
+        )
 
     @property
     def name(self) -> Optional[str]:
@@ -362,8 +382,10 @@ class ConversationHandler(Handler):
             key.append(user.id)
 
         if self.per_message:
-            key.append(update.callback_query.inline_message_id  # type: ignore[union-attr]
-                       or update.callback_query.message.message_id)  # type: ignore[union-attr]
+            key.append(
+                update.callback_query.inline_message_id  # type: ignore[union-attr]
+                or update.callback_query.message.message_id  # type: ignore[union-attr]
+            )
 
         return tuple(key)
 
@@ -380,11 +402,17 @@ class ConversationHandler(Handler):
 
         """
         # Ignore messages in channels
-        if (not isinstance(update, Update)
-                or update.channel_post
-                or self.per_chat and not update.effective_chat
-                or self.per_message and not update.callback_query
-                or update.callback_query and self.per_chat and not update.callback_query.message):
+        if (
+            not isinstance(update, Update)
+            or update.channel_post
+            or self.per_chat
+            and not update.effective_chat
+            or self.per_message
+            and not update.callback_query
+            or update.callback_query
+            and self.per_chat
+            and not update.callback_query.message
+        ):
             return None
 
         key = self._get_key(update)
@@ -438,7 +466,7 @@ class ConversationHandler(Handler):
         if state is not None and not handler:
             handlers = self.states.get(state)
 
-            for candidate in (handlers or []):
+            for candidate in handlers or []:
                 check = candidate.check_update(update)
                 if check is not None and check is not False:
                     handler = candidate
@@ -457,11 +485,13 @@ class ConversationHandler(Handler):
 
         return key, handler, check  # type: ignore[return-value]
 
-    def handle_update(self,  # type: ignore[override]
-                      update: HandlerArg,
-                      dispatcher: 'Dispatcher',
-                      check_result: CheckUpdateType,
-                      context: CallbackContext = None) -> Optional[object]:
+    def handle_update(  # type: ignore[override]
+        self,
+        update: HandlerArg,
+        dispatcher: 'Dispatcher',
+        check_result: CheckUpdateType,
+        context: CallbackContext = None,
+    ) -> Optional[object]:
         """Send the update to the callback for the current state and Handler
 
         Args:
@@ -492,9 +522,12 @@ class ConversationHandler(Handler):
             if self.conversation_timeout and new_state != self.END and dispatcher.job_queue:
                 # Add the new timeout job
                 self.timeout_jobs[conversation_key] = dispatcher.job_queue.run_once(
-                    self._trigger_timeout, self.conversation_timeout,  # type: ignore[arg-type]
-                    context=_ConversationTimeoutContext(conversation_key, update,
-                                                        dispatcher, context))
+                    self._trigger_timeout,  # type: ignore[arg-type]
+                    self.conversation_timeout,
+                    context=_ConversationTimeoutContext(
+                        conversation_key, update, dispatcher, context
+                    ),
+                )
 
         if isinstance(self.map_to_parent, dict) and new_state in self.map_to_parent:
             self.update_state(self.END, conversation_key)
@@ -510,9 +543,7 @@ class ConversationHandler(Handler):
                 raise DispatcherHandlerStop()
         return None
 
-    def update_state(self,
-                     new_state: object,
-                     key: Tuple[int, ...]) -> None:
+    def update_state(self, new_state: object, key: Tuple[int, ...]) -> None:
         if new_state == self.END:
             with self._conversations_lock:
                 if key in self.conversations:
@@ -525,8 +556,9 @@ class ConversationHandler(Handler):
             with self._conversations_lock:
                 self.conversations[key] = (self.conversations.get(key), new_state)
                 if self.persistent and self.persistence and self.name:
-                    self.persistence.update_conversation(self.name, key,
-                                                         (self.conversations.get(key), new_state))
+                    self.persistence.update_conversation(
+                        self.name, key, (self.conversations.get(key), new_state)
+                    )
 
         elif new_state is not None:
             with self._conversations_lock:
@@ -534,9 +566,7 @@ class ConversationHandler(Handler):
                 if self.persistent and self.persistence and self.name:
                     self.persistence.update_conversation(self.name, key, new_state)
 
-    def _trigger_timeout(self,
-                         context: _ConversationTimeoutContext,
-                         job: 'Job' = None) -> None:
+    def _trigger_timeout(self, context: _ConversationTimeoutContext, job: 'Job' = None) -> None:
         self.logger.debug('conversation timeout was triggered!')
 
         # Backward compatibility with bots that do not use CallbackContext
@@ -559,9 +589,12 @@ class ConversationHandler(Handler):
             check = handler.check_update(context.update)
             if check is not None and check is not False:
                 try:
-                    handler.handle_update(context.update, context.dispatcher, check,
-                                          callback_context)
+                    handler.handle_update(
+                        context.update, context.dispatcher, check, callback_context
+                    )
                 except DispatcherHandlerStop:
-                    self.logger.warning('DispatcherHandlerStop in TIMEOUT state of '
-                                        'ConversationHandler has no effect. Ignoring.')
+                    self.logger.warning(
+                        'DispatcherHandlerStop in TIMEOUT state of '
+                        'ConversationHandler has no effect. Ignoring.'
+                    )
         self.update_state(self.END, context.conversation_key)

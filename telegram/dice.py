@@ -48,6 +48,7 @@ class Dice(TelegramObject):
         value (:obj:`int`): Value of the dice. 1-6 for dice and darts, 1-5 for basketball.
         emoji (:obj:`str`): Emoji on which the dice throw animation is based.
     """
+
     def __init__(self, value: int, emoji: str, **kwargs: Any):
         self.value = value
         self.emoji = emoji

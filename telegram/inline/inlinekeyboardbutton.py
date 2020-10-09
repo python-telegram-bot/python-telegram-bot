@@ -20,6 +20,7 @@
 
 from telegram import TelegramObject
 from typing import Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import CallbackGame, LoginUrl
 
@@ -81,16 +82,18 @@ class InlineKeyboardButton(TelegramObject):
 
     """
 
-    def __init__(self,
-                 text: str,
-                 url: str = None,
-                 callback_data: str = None,
-                 switch_inline_query: str = None,
-                 switch_inline_query_current_chat: str = None,
-                 callback_game: 'CallbackGame' = None,
-                 pay: bool = None,
-                 login_url: 'LoginUrl' = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        text: str,
+        url: str = None,
+        callback_data: str = None,
+        switch_inline_query: str = None,
+        switch_inline_query_current_chat: str = None,
+        callback_game: 'CallbackGame' = None,
+        pay: bool = None,
+        login_url: 'LoginUrl' = None,
+        **kwargs: Any,
+    ):
         # Required
         self.text = text
 

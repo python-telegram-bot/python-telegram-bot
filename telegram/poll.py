@@ -22,7 +22,7 @@
 import sys
 import datetime
 
-from telegram import (TelegramObject, User, MessageEntity)
+from telegram import TelegramObject, User, MessageEntity
 from telegram.utils.helpers import to_timestamp, from_timestamp
 from telegram.utils.types import JSONDict
 from typing import Any, Dict, Optional, List, TYPE_CHECKING
@@ -74,6 +74,7 @@ class PollAnswer(TelegramObject):
             May be empty if the user retracted their vote.
 
     """
+
     def __init__(self, poll_id: str, user: User, option_ids: List[int], **kwargs: Any):
         self.poll_id = poll_id
         self.user = user
@@ -141,21 +142,23 @@ class Poll(TelegramObject):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 question: str,
-                 options: List[PollOption],
-                 total_voter_count: int,
-                 is_closed: bool,
-                 is_anonymous: bool,
-                 type: str,
-                 allows_multiple_answers: bool,
-                 correct_option_id: int = None,
-                 explanation: str = None,
-                 explanation_entities: List[MessageEntity] = None,
-                 open_period: int = None,
-                 close_date: datetime.datetime = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        id: str,
+        question: str,
+        options: List[PollOption],
+        total_voter_count: int,
+        is_closed: bool,
+        is_anonymous: bool,
+        type: str,
+        allows_multiple_answers: bool,
+        correct_option_id: int = None,
+        explanation: str = None,
+        explanation_entities: List[MessageEntity] = None,
+        open_period: int = None,
+        close_date: datetime.datetime = None,
+        **kwargs: Any,
+    ):
         self.id = id
         self.question = question
         self.options = options
@@ -218,11 +221,11 @@ class Poll(TelegramObject):
             raise RuntimeError("This Poll has no 'explanation'.")
 
         # Is it a narrow build, if so we don't need to convert
-        if sys.maxunicode == 0xffff:
-            return self.explanation[entity.offset:entity.offset + entity.length]
+        if sys.maxunicode == 0xFFFF:
+            return self.explanation[entity.offset : entity.offset + entity.length]
         else:
             entity_text = self.explanation.encode('utf-16-le')
-            entity_text = entity_text[entity.offset * 2:(entity.offset + entity.length) * 2]
+            entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
 
         return entity_text.decode('utf-16-le')
 
@@ -252,7 +255,8 @@ class Poll(TelegramObject):
 
         return {
             entity: self.parse_explanation_entity(entity)
-            for entity in (self.explanation_entities or []) if entity.type in types
+            for entity in (self.explanation_entities or [])
+            if entity.type in types
         }
 
     REGULAR: str = "regular"

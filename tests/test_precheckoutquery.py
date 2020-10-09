@@ -24,14 +24,16 @@ from telegram import Update, User, PreCheckoutQuery, OrderInfo
 
 @pytest.fixture(scope='class')
 def pre_checkout_query(bot):
-    return PreCheckoutQuery(TestPreCheckoutQuery.id_,
-                            TestPreCheckoutQuery.from_user,
-                            TestPreCheckoutQuery.currency,
-                            TestPreCheckoutQuery.total_amount,
-                            TestPreCheckoutQuery.invoice_payload,
-                            shipping_option_id=TestPreCheckoutQuery.shipping_option_id,
-                            order_info=TestPreCheckoutQuery.order_info,
-                            bot=bot)
+    return PreCheckoutQuery(
+        TestPreCheckoutQuery.id_,
+        TestPreCheckoutQuery.from_user,
+        TestPreCheckoutQuery.currency,
+        TestPreCheckoutQuery.total_amount,
+        TestPreCheckoutQuery.invoice_payload,
+        shipping_option_id=TestPreCheckoutQuery.shipping_option_id,
+        order_info=TestPreCheckoutQuery.order_info,
+        bot=bot,
+    )
 
 
 class TestPreCheckoutQuery:
@@ -51,7 +53,7 @@ class TestPreCheckoutQuery:
             'currency': self.currency,
             'total_amount': self.total_amount,
             'from': self.from_user.to_dict(),
-            'order_info': self.order_info.to_dict()
+            'order_info': self.order_info.to_dict(),
         }
         pre_checkout_query = PreCheckoutQuery.de_json(json_dict, bot)
 
@@ -69,8 +71,9 @@ class TestPreCheckoutQuery:
         assert isinstance(pre_checkout_query_dict, dict)
         assert pre_checkout_query_dict['id'] == pre_checkout_query.id
         assert pre_checkout_query_dict['invoice_payload'] == pre_checkout_query.invoice_payload
-        assert (pre_checkout_query_dict['shipping_option_id']
-                == pre_checkout_query.shipping_option_id)
+        assert (
+            pre_checkout_query_dict['shipping_option_id'] == pre_checkout_query.shipping_option_id
+        )
         assert pre_checkout_query_dict['currency'] == pre_checkout_query.currency
         assert pre_checkout_query_dict['from'] == pre_checkout_query.from_user.to_dict()
         assert pre_checkout_query_dict['order_info'] == pre_checkout_query.order_info.to_dict()
@@ -83,13 +86,16 @@ class TestPreCheckoutQuery:
         assert pre_checkout_query.answer()
 
     def test_equality(self):
-        a = PreCheckoutQuery(self.id_, self.from_user, self.currency, self.total_amount,
-                             self.invoice_payload)
-        b = PreCheckoutQuery(self.id_, self.from_user, self.currency, self.total_amount,
-                             self.invoice_payload)
+        a = PreCheckoutQuery(
+            self.id_, self.from_user, self.currency, self.total_amount, self.invoice_payload
+        )
+        b = PreCheckoutQuery(
+            self.id_, self.from_user, self.currency, self.total_amount, self.invoice_payload
+        )
         c = PreCheckoutQuery(self.id_, None, '', 0, '')
-        d = PreCheckoutQuery(0, self.from_user, self.currency, self.total_amount,
-                             self.invoice_payload)
+        d = PreCheckoutQuery(
+            0, self.from_user, self.currency, self.total_amount, self.invoice_payload
+        )
         e = Update(self.id_)
 
         assert a == b

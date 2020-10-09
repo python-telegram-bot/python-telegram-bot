@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 from telegram import TelegramObject
 from typing import Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import Bot
 
@@ -43,19 +44,21 @@ class PersonalDetails(TelegramObject):
             residence.
     """
 
-    def __init__(self,
-                 first_name: str,
-                 last_name: str,
-                 birth_date: str,
-                 gender: str,
-                 country_code: str,
-                 residence_country_code: str,
-                 first_name_native: str = None,
-                 last_name_native: str = None,
-                 middle_name: str = None,
-                 middle_name_native: str = None,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        first_name: str,
+        last_name: str,
+        birth_date: str,
+        gender: str,
+        country_code: str,
+        residence_country_code: str,
+        first_name_native: str = None,
+        last_name_native: str = None,
+        middle_name: str = None,
+        middle_name_native: str = None,
+        bot: 'Bot' = None,
+        **kwargs: Any,
+    ):
         # Required
         self.first_name = first_name
         self.last_name = last_name
@@ -84,15 +87,17 @@ class ResidentialAddress(TelegramObject):
         post_code (:obj:`str`): Address post code.
     """
 
-    def __init__(self,
-                 street_line1: str,
-                 street_line2: str,
-                 city: str,
-                 state: str,
-                 country_code: str,
-                 post_code: str,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        street_line1: str,
+        street_line2: str,
+        city: str,
+        state: str,
+        country_code: str,
+        post_code: str,
+        bot: 'Bot' = None,
+        **kwargs: Any,
+    ):
         # Required
         self.street_line1 = street_line1
         self.street_line2 = street_line2

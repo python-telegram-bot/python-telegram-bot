@@ -35,6 +35,7 @@ class KeyboardButtonPollType(TelegramObject):
             passed, only regular polls will be allowed. Otherwise, the user will be allowed to
             create a poll of any type.
     """
+
     def __init__(self, type: str = None, **kwargs: Any):
         self.type = type
 

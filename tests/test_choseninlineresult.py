@@ -37,9 +37,7 @@ class TestChosenInlineResult:
     query = 'query text'
 
     def test_de_json_required(self, bot, user):
-        json_dict = {'result_id': self.result_id,
-                     'from': user.to_dict(),
-                     'query': self.query}
+        json_dict = {'result_id': self.result_id, 'from': user.to_dict(), 'query': self.query}
         result = ChosenInlineResult.de_json(json_dict, bot)
 
         assert result.result_id == self.result_id
@@ -48,11 +46,13 @@ class TestChosenInlineResult:
 
     def test_de_json_all(self, bot, user):
         loc = Location(-42.003, 34.004)
-        json_dict = {'result_id': self.result_id,
-                     'from': user.to_dict(),
-                     'query': self.query,
-                     'location': loc.to_dict(),
-                     'inline_message_id': 'a random id'}
+        json_dict = {
+            'result_id': self.result_id,
+            'from': user.to_dict(),
+            'query': self.query,
+            'location': loc.to_dict(),
+            'inline_message_id': 'a random id',
+        }
         result = ChosenInlineResult.de_json(json_dict, bot)
 
         assert result.result_id == self.result_id

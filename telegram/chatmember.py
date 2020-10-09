@@ -24,6 +24,7 @@ from telegram.utils.helpers import to_timestamp, from_timestamp
 
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import Bot
 
@@ -110,6 +111,7 @@ class ChatMember(TelegramObject):
             may add web page previews to his messages.
 
     """
+
     ADMINISTRATOR: str = 'administrator'
     """:obj:`str`: 'administrator'"""
     CREATOR: str = 'creator'
@@ -123,27 +125,29 @@ class ChatMember(TelegramObject):
     RESTRICTED: str = 'restricted'
     """:obj:`str`: 'restricted'"""
 
-    def __init__(self,
-                 user: User,
-                 status: str,
-                 until_date: datetime.datetime = None,
-                 can_be_edited: bool = None,
-                 can_change_info: bool = None,
-                 can_post_messages: bool = None,
-                 can_edit_messages: bool = None,
-                 can_delete_messages: bool = None,
-                 can_invite_users: bool = None,
-                 can_restrict_members: bool = None,
-                 can_pin_messages: bool = None,
-                 can_promote_members: bool = None,
-                 can_send_messages: bool = None,
-                 can_send_media_messages: bool = None,
-                 can_send_polls: bool = None,
-                 can_send_other_messages: bool = None,
-                 can_add_web_page_previews: bool = None,
-                 is_member: bool = None,
-                 custom_title: str = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        user: User,
+        status: str,
+        until_date: datetime.datetime = None,
+        can_be_edited: bool = None,
+        can_change_info: bool = None,
+        can_post_messages: bool = None,
+        can_edit_messages: bool = None,
+        can_delete_messages: bool = None,
+        can_invite_users: bool = None,
+        can_restrict_members: bool = None,
+        can_pin_messages: bool = None,
+        can_promote_members: bool = None,
+        can_send_messages: bool = None,
+        can_send_media_messages: bool = None,
+        can_send_polls: bool = None,
+        can_send_other_messages: bool = None,
+        can_add_web_page_previews: bool = None,
+        is_member: bool = None,
+        custom_title: str = None,
+        **kwargs: Any,
+    ):
         # Required
         self.user = user
         self.status = status

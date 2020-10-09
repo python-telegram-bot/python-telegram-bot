@@ -27,9 +27,19 @@ from time import sleep
 import pytest
 import pytz
 
-from telegram import (Bot, Message, User, Chat, MessageEntity, Update,
-                      InlineQuery, CallbackQuery, ShippingQuery, PreCheckoutQuery,
-                      ChosenInlineResult)
+from telegram import (
+    Bot,
+    Message,
+    User,
+    Chat,
+    MessageEntity,
+    Update,
+    InlineQuery,
+    CallbackQuery,
+    ShippingQuery,
+    PreCheckoutQuery,
+    ChosenInlineResult,
+)
 from telegram.ext import Dispatcher, JobQueue, Updater, MessageFilter, Defaults, UpdateFilter
 from telegram.error import BadRequest
 from tests.bots import get_bot
@@ -197,13 +207,15 @@ def make_message(text, **kwargs):
     :param text: (str) message text
     :return: a (fake) ``telegram.Message``
     """
-    return Message(message_id=1,
-                   from_user=kwargs.pop('user', User(id=1, first_name='', is_bot=False)),
-                   date=kwargs.pop('date', DATE),
-                   chat=kwargs.pop('chat', Chat(id=1, type='')),
-                   text=text,
-                   bot=kwargs.pop('bot', make_bot(get_bot())),
-                   **kwargs)
+    return Message(
+        message_id=1,
+        from_user=kwargs.pop('user', User(id=1, first_name='', is_bot=False)),
+        date=kwargs.pop('date', DATE),
+        chat=kwargs.pop('chat', Chat(id=1, type='')),
+        text=text,
+        bot=kwargs.pop('bot', make_bot(get_bot())),
+        **kwargs,
+    )
 
 
 def make_command_message(text, **kwargs):
@@ -219,9 +231,15 @@ def make_command_message(text, **kwargs):
     """
 
     match = re.search(CMD_PATTERN, text)
-    entities = [MessageEntity(type=MessageEntity.BOT_COMMAND,
-                              offset=match.start(0),
-                              length=len(match.group(0)))] if match else []
+    entities = (
+        [
+            MessageEntity(
+                type=MessageEntity.BOT_COMMAND, offset=match.start(0), length=len(match.group(0))
+            )
+        ]
+        if match
+        else []
+    )
 
     return make_message(text, entities=entities, **kwargs)
 
@@ -253,12 +271,11 @@ def make_command_update(message, edited=False, **kwargs):
     return make_message_update(message, make_command_message, edited, **kwargs)
 
 
-@pytest.fixture(scope='class',
-                params=[
-                    {'class': MessageFilter},
-                    {'class': UpdateFilter}
-                ],
-                ids=['MessageFilter', 'UpdateFilter'])
+@pytest.fixture(
+    scope='class',
+    params=[{'class': MessageFilter}, {'class': UpdateFilter}],
+    ids=['MessageFilter', 'UpdateFilter'],
+)
 def mock_filter(request):
     class MockFilter(request.param['class']):
         def __init__(self):
@@ -280,7 +297,7 @@ def get_false_update_fixture_decorator_params():
         {'chosen_inline_result': ChosenInlineResult('id', User(1, '', False), '')},
         {'shipping_query': ShippingQuery('id', User(1, '', False), '', None)},
         {'pre_checkout_query': PreCheckoutQuery('id', User(1, '', False), '', 0, '')},
-        {'callback_query': CallbackQuery(1, User(1, '', False), 'chat')}
+        {'callback_query': CallbackQuery(1, User(1, '', False), 'chat')},
     ]
     ids = tuple(key for kwargs in params for key in kwargs)
     return {'params': params, 'ids': ids}

@@ -20,6 +20,7 @@
 
 import warnings
 from typing import Callable, TypeVar, Any
+
 RT = TypeVar('RT')
 
 
@@ -34,7 +35,8 @@ def warn_deprecate_obj(old: str, new: str, stacklevel: int = 3) -> None:
     warnings.warn(
         '{} is being deprecated, please use {} from now on.'.format(old, new),
         category=TelegramDeprecationWarning,
-        stacklevel=stacklevel)
+        stacklevel=stacklevel,
+    )
 
 
 def deprecate(func: Callable[..., RT], old: str, new: str) -> Callable[..., RT]:

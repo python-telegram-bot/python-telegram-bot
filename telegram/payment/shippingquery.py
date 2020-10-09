@@ -21,6 +21,7 @@
 from telegram import TelegramObject, User, ShippingAddress
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import Bot
 
@@ -51,13 +52,15 @@ class ShippingQuery(TelegramObject):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 from_user: User,
-                 invoice_payload: str,
-                 shipping_address: ShippingAddress,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        id: str,
+        from_user: User,
+        invoice_payload: str,
+        shipping_address: ShippingAddress,
+        bot: 'Bot' = None,
+        **kwargs: Any,
+    ):
         self.id = id
         self.from_user = from_user
         self.invoice_payload = invoice_payload

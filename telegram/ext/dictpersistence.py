@@ -19,8 +19,11 @@
 """This module contains the DictPersistence class."""
 from copy import deepcopy
 
-from telegram.utils.helpers import decode_user_chat_data_from_json,\
-    decode_conversations_from_json, encode_conversations_to_json
+from telegram.utils.helpers import (
+    decode_user_chat_data_from_json,
+    decode_conversations_from_json,
+    encode_conversations_to_json,
+)
 
 try:
     import ujson as json
@@ -76,17 +79,21 @@ class DictPersistence(BasePersistence):
             conversation on creating this persistence. Default is ``""``.
     """
 
-    def __init__(self,
-                 store_user_data: bool = True,
-                 store_chat_data: bool = True,
-                 store_bot_data: bool = True,
-                 user_data_json: str = '',
-                 chat_data_json: str = '',
-                 bot_data_json: str = '',
-                 conversations_json: str = ''):
-        super().__init__(store_user_data=store_user_data,
-                         store_chat_data=store_chat_data,
-                         store_bot_data=store_bot_data)
+    def __init__(
+        self,
+        store_user_data: bool = True,
+        store_chat_data: bool = True,
+        store_bot_data: bool = True,
+        user_data_json: str = '',
+        chat_data_json: str = '',
+        bot_data_json: str = '',
+        conversations_json: str = '',
+    ):
+        super().__init__(
+            store_user_data=store_user_data,
+            store_chat_data=store_chat_data,
+            store_bot_data=store_bot_data,
+        )
         self._user_data = None
         self._chat_data = None
         self._bot_data = None
@@ -226,9 +233,9 @@ class DictPersistence(BasePersistence):
             self._conversations = {}
         return self.conversations.get(name, {}).copy()  # type: ignore[union-attr]
 
-    def update_conversation(self,
-                            name: str, key: Tuple[int, ...],
-                            new_state: Optional[object]) -> None:
+    def update_conversation(
+        self, name: str, key: Tuple[int, ...], new_state: Optional[object]
+    ) -> None:
         """Will update the conversations for the given handler.
 
         Args:

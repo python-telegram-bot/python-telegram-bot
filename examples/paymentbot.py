@@ -8,13 +8,20 @@ Basic example for a bot that can receive payment from user.
 
 import logging
 
-from telegram import (LabeledPrice, ShippingOption)
-from telegram.ext import (Updater, CommandHandler, MessageHandler,
-                          Filters, PreCheckoutQueryHandler, ShippingQueryHandler)
+from telegram import LabeledPrice, ShippingOption
+from telegram.ext import (
+    Updater,
+    CommandHandler,
+    MessageHandler,
+    Filters,
+    PreCheckoutQueryHandler,
+    ShippingQueryHandler,
+)
 
 # Enable logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+)
 
 logger = logging.getLogger(__name__)
 
@@ -43,10 +50,21 @@ def start_with_shipping_callback(update, context):
 
     # optionally pass need_name=True, need_phone_number=True,
     # need_email=True, need_shipping_address=True, is_flexible=True
-    context.bot.send_invoice(chat_id, title, description, payload,
-                             provider_token, start_parameter, currency, prices,
-                             need_name=True, need_phone_number=True,
-                             need_email=True, need_shipping_address=True, is_flexible=True)
+    context.bot.send_invoice(
+        chat_id,
+        title,
+        description,
+        payload,
+        provider_token,
+        start_parameter,
+        currency,
+        prices,
+        need_name=True,
+        need_phone_number=True,
+        need_email=True,
+        need_shipping_address=True,
+        is_flexible=True,
+    )
 
 
 def start_without_shipping_callback(update, context):
@@ -66,8 +84,9 @@ def start_without_shipping_callback(update, context):
 
     # optionally pass need_name=True, need_phone_number=True,
     # need_email=True, need_shipping_address=True, is_flexible=True
-    context.bot.send_invoice(chat_id, title, description, payload,
-                             provider_token, start_parameter, currency, prices)
+    context.bot.send_invoice(
+        chat_id, title, description, payload, provider_token, start_parameter, currency, prices
+    )
 
 
 def shipping_callback(update, context):

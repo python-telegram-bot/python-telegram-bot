@@ -21,6 +21,7 @@
 from telegram import PhotoSize, TelegramObject
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, List, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import Bot, File
 
@@ -71,19 +72,21 @@ class Sticker(TelegramObject):
 
     """
 
-    def __init__(self,
-                 file_id: str,
-                 file_unique_id: str,
-                 width: int,
-                 height: int,
-                 is_animated: bool,
-                 thumb: PhotoSize = None,
-                 emoji: str = None,
-                 file_size: int = None,
-                 set_name: str = None,
-                 mask_position: 'MaskPosition' = None,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        file_id: str,
+        file_unique_id: str,
+        width: int,
+        height: int,
+        is_animated: bool,
+        thumb: PhotoSize = None,
+        emoji: str = None,
+        file_size: int = None,
+        set_name: str = None,
+        mask_position: 'MaskPosition' = None,
+        bot: 'Bot' = None,
+        **kwargs: Any,
+    ):
         # Required
         self.file_id = str(file_id)
         self.file_unique_id = str(file_unique_id)
@@ -158,15 +161,17 @@ class StickerSet(TelegramObject):
 
     """
 
-    def __init__(self,
-                 name: str,
-                 title: str,
-                 is_animated: bool,
-                 contains_masks: bool,
-                 stickers: List[Sticker],
-                 bot: 'Bot' = None,
-                 thumb: PhotoSize = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        name: str,
+        title: str,
+        is_animated: bool,
+        contains_masks: bool,
+        stickers: List[Sticker],
+        bot: 'Bot' = None,
+        thumb: PhotoSize = None,
+        **kwargs: Any,
+    ):
         self.name = name
         self.title = title
         self.is_animated = is_animated
@@ -227,6 +232,7 @@ class MaskPosition(TelegramObject):
         scale (:obj:`float`): Mask scaling coefficient. For example, 2.0 means double size.
 
     """
+
     FOREHEAD: str = 'forehead'
     """:obj:`str`: 'forehead'"""
     EYES: str = 'eyes'

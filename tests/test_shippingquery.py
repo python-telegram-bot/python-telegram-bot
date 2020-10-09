@@ -24,11 +24,13 @@ from telegram import Update, User, ShippingAddress, ShippingQuery
 
 @pytest.fixture(scope='class')
 def shipping_query(bot):
-    return ShippingQuery(TestShippingQuery.id_,
-                         TestShippingQuery.from_user,
-                         TestShippingQuery.invoice_payload,
-                         TestShippingQuery.shipping_address,
-                         bot=bot)
+    return ShippingQuery(
+        TestShippingQuery.id_,
+        TestShippingQuery.from_user,
+        TestShippingQuery.invoice_payload,
+        TestShippingQuery.shipping_address,
+        bot=bot,
+    )
 
 
 class TestShippingQuery:
@@ -42,7 +44,7 @@ class TestShippingQuery:
             'id': TestShippingQuery.id_,
             'invoice_payload': TestShippingQuery.invoice_payload,
             'from': TestShippingQuery.from_user.to_dict(),
-            'shipping_address': TestShippingQuery.shipping_address.to_dict()
+            'shipping_address': TestShippingQuery.shipping_address.to_dict(),
         }
         shipping_query = ShippingQuery.de_json(json_dict, bot)
 
