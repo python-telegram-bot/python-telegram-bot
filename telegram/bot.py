@@ -38,7 +38,7 @@ from cryptography.hazmat.primitives import serialization
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
                       ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore, StickerSet,
                       PhotoSize, Audio, Document, Sticker, Video, Animation, Voice, VideoNote,
-                      Location, Venue, Contact, InputFile, Poll, BotCommand, ChatAction,
+                      Location, Venue, Contact, InputFile, Poll, BotCommand,
                       InlineQueryResult, InputMedia, PassportElementError, MaskPosition,
                       ChatPermissions, ShippingOption, LabeledPrice, ChatPhoto)
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
@@ -334,7 +334,7 @@ class Bot(TelegramObject):
                      chat_id: Union[int, str],
                      text: str,
                      parse_mode: str = None,
-                     disable_web_page_preview: str = None,
+                     disable_web_page_preview: bool = None,
                      disable_notification: bool = False,
                      reply_to_message_id: Union[int, str] = None,
                      reply_markup: ReplyMarkup = None,
@@ -1550,7 +1550,7 @@ class Bot(TelegramObject):
     @log
     def send_chat_action(self,
                          chat_id: Union[str, int],
-                         action: ChatAction,
+                         action: str,
                          timeout: float = None,
                          api_kwargs: JSONDict = None) -> bool:
         """
@@ -1967,7 +1967,7 @@ class Bot(TelegramObject):
                           message_id: Union[str, int] = None,
                           inline_message_id: Union[str, int] = None,
                           parse_mode: str = None,
-                          disable_web_page_preview: str = None,
+                          disable_web_page_preview: bool = None,
                           reply_markup: ReplyMarkup = None,
                           timeout: float = None,
                           api_kwargs: JSONDict = None) -> Union[Optional[Message], bool]:
