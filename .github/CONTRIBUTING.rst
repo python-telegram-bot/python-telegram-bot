@@ -91,11 +91,13 @@ Here's how to make a one-off code change.
 
      Once the process terminates, you can view the built documentation by opening ``docs/build/html/index.html`` with a browser.
 
-   - For consistency, please conform to `Google Python Style Guide`_ and `Google Python Style Docstrings`_. In addition, code should be formatted consistently with other code around it.
+   - For consistency, please conform to `Google Python Style Guide`_ and `Google Python Style Docstrings`_.
 
    - The following exceptions to the above (Google's) style guides applies:
 
         - Documenting types of global variables and complex types of class members can be done using the Sphinx docstring convention.
+
+   -  In addition, PTB uses the `Black`_ coder formatting. Plugins for Black exist for some `popular editors`_. You can use those instead of manually formatting everything.
 
    - Please ensure that the code you write is well-tested.
 
@@ -189,11 +191,6 @@ Here's how to make a one-off code change.
 Style commandments
 ------------------
 
-Specific commandments
-#####################
-
-- Avoid using "double quotes" where you can reasonably use 'single quotes'.
-
 Assert comparison order
 #######################
 
@@ -255,3 +252,5 @@ break the API classes. For example:
 .. _AUTHORS.rst: ../AUTHORS.rst
 .. _`MyPy`: https://mypy.readthedocs.io/en/stable/index.html
 .. _`here`: https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html
+.. _`Black`: https://black.readthedocs.io/en/stable/index.html
+.. _`popular editors`: https://black.readthedocs.io/en/stable/editor_integration.html
