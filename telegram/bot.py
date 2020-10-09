@@ -430,9 +430,9 @@ class Bot(TelegramObject):
         if disable_web_page_preview:
             data['disable_web_page_preview'] = disable_web_page_preview
 
-        return self._message(
+        return self._message(  # type: ignore[return-value]
             'sendMessage',
-            data,  # type: ignore[return-value]
+            data,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
@@ -527,9 +527,9 @@ class Bot(TelegramObject):
         if message_id:
             data['message_id'] = message_id
 
-        return self._message(
+        return self._message(  # type: ignore[return-value]
             'forwardMessage',
-            data,  # type: ignore[return-value]
+            data,
             disable_notification=disable_notification,
             timeout=timeout,
             api_kwargs=api_kwargs,
@@ -598,9 +598,9 @@ class Bot(TelegramObject):
         if parse_mode:
             data['parse_mode'] = parse_mode
 
-        return self._message(
+        return self._message(  # type: ignore[return-value]
             'sendPhoto',
-            data,  # type: ignore[return-value]
+            data,
             timeout=timeout,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
@@ -701,9 +701,9 @@ class Bot(TelegramObject):
                 thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
 
-        return self._message(
+        return self._message(  # type: ignore[return-value]
             'sendAudio',
-            data,  # type: ignore[return-value]
+            data,
             timeout=timeout,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
@@ -792,10 +792,10 @@ class Bot(TelegramObject):
                 thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
 
-        return self._message(
+        return self._message(  # type: ignore[return-value]
             'sendDocument',
             data,
-            timeout=timeout,  # type: ignore[return-value]
+            timeout=timeout,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
@@ -854,10 +854,10 @@ class Bot(TelegramObject):
 
         data: JSONDict = {'chat_id': chat_id, 'sticker': sticker}
 
-        return self._message(
+        return self._message(  # type: ignore[return-value]
             'sendSticker',
             data,
-            timeout=timeout,  # type: ignore[return-value]
+            timeout=timeout,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
@@ -963,9 +963,9 @@ class Bot(TelegramObject):
                 thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
 
-        return self._message(
+        return self._message(  # type: ignore[return-value]
             'sendVideo',
-            data,  # type: ignore[return-value]
+            data,
             timeout=timeout,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
@@ -1050,10 +1050,10 @@ class Bot(TelegramObject):
                 thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
 
-        return self._message(
+        return self._message(  # type: ignore[return-value]
             'sendVideoNote',
             data,
-            timeout=timeout,  # type: ignore[return-value]
+            timeout=timeout,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
@@ -1150,10 +1150,10 @@ class Bot(TelegramObject):
         if parse_mode:
             data['parse_mode'] = parse_mode
 
-        return self._message(
+        return self._message(  # type: ignore[return-value]
             'sendAnimation',
             data,
-            timeout=timeout,  # type: ignore[return-value]
+            timeout=timeout,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
@@ -1231,10 +1231,10 @@ class Bot(TelegramObject):
         if parse_mode:
             data['parse_mode'] = parse_mode
 
-        return self._message(
+        return self._message(  # type: ignore[return-value]
             'sendVoice',
             data,
-            timeout=timeout,  # type: ignore[return-value]
+            timeout=timeout,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
@@ -1360,10 +1360,10 @@ class Bot(TelegramObject):
         if live_period:
             data['live_period'] = live_period
 
-        return self._message(
+        return self._message(  # type: ignore[return-value]
             'sendLocation',
             data,
-            timeout=timeout,  # type: ignore[return-value]
+            timeout=timeout,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
@@ -1576,10 +1576,10 @@ class Bot(TelegramObject):
         if foursquare_type:
             data['foursquare_type'] = foursquare_type
 
-        return self._message(
+        return self._message(  # type: ignore[return-value]
             'sendVenue',
             data,
-            timeout=timeout,  # type: ignore[return-value]
+            timeout=timeout,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
@@ -1658,10 +1658,10 @@ class Bot(TelegramObject):
         if vcard:
             data['vcard'] = vcard
 
-        return self._message(
+        return self._message(  # type: ignore[return-value]
             'sendContact',
             data,
-            timeout=timeout,  # type: ignore[return-value]
+            timeout=timeout,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
@@ -1708,10 +1708,10 @@ class Bot(TelegramObject):
         """
         data: JSONDict = {'chat_id': chat_id, 'game_short_name': game_short_name}
 
-        return self._message(
+        return self._message(  # type: ignore[return-value]
             'sendGame',
             data,
-            timeout=timeout,  # type: ignore[return-value]
+            timeout=timeout,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
@@ -1905,10 +1905,10 @@ class Bot(TelegramObject):
         if switch_pm_parameter:
             data['switch_pm_parameter'] = switch_pm_parameter
 
-        return self._post(
+        return self._post(  # type: ignore[return-value]
             'answerInlineQuery',
             data,
-            timeout=timeout,  # type: ignore[return-value]
+            timeout=timeout,
             api_kwargs=api_kwargs,
         )
 
@@ -2292,9 +2292,9 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return self._message(
+        return self._message(  # type: ignore[return-value]
             'editMessageCaption',
-            data,  # type: ignore[return-value]
+            data,
             timeout=timeout,
             reply_markup=reply_markup,
             api_kwargs=api_kwargs,
@@ -2358,9 +2358,9 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return self._message(
+        return self._message(  # type: ignore[return-value]
             'editMessageMedia',
-            data,  # type: ignore[return-value]
+            data,
             timeout=timeout,
             reply_markup=reply_markup,
             api_kwargs=api_kwargs,
@@ -2419,9 +2419,9 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return self._message(
+        return self._message(  # type: ignore[return-value]
             'editMessageReplyMarkup',
-            data,  # type: ignore[return-value]
+            data,
             timeout=timeout,
             reply_markup=reply_markup,
             api_kwargs=api_kwargs,
@@ -2907,10 +2907,10 @@ class Bot(TelegramObject):
         if disable_edit_message is not None:
             data['disable_edit_message'] = disable_edit_message
 
-        return self._message(
+        return self._message(  # type: ignore[return-value]
             'setGameScore',
             data,
-            timeout=timeout,  # type: ignore[return-value]
+            timeout=timeout,
             api_kwargs=api_kwargs,
         )
 
@@ -3089,10 +3089,10 @@ class Bot(TelegramObject):
         if send_email_to_provider is not None:
             data['send_email_to_provider'] = send_email_to_provider
 
-        return self._message(
+        return self._message(  # type: ignore[return-value]
             'sendInvoice',
             data,
-            timeout=timeout,  # type: ignore[return-value]
+            timeout=timeout,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
@@ -4176,10 +4176,10 @@ class Bot(TelegramObject):
                 )
             data['close_date'] = close_date
 
-        return self._message(
+        return self._message(  # type: ignore[return-value]
             'sendPoll',
             data,
-            timeout=timeout,  # type: ignore[return-value]
+            timeout=timeout,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
@@ -4279,10 +4279,10 @@ class Bot(TelegramObject):
         if emoji:
             data['emoji'] = emoji
 
-        return self._message(
+        return self._message(  # type: ignore[return-value]
             'sendDice',
             data,
-            timeout=timeout,  # type: ignore[return-value]
+            timeout=timeout,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
