@@ -41,15 +41,10 @@ def error_handler(update: Update, context: CallbackContext):
     # You might need to add some logic to deal with messages longer than the 4096 character limit.
     message = (
         'An exception was raised while handling an update\n'
-        '<pre>update = {}</pre>\n\n'
-        '<pre>context.chat_data = {}</pre>\n\n'
-        '<pre>context.user_data = {}</pre>\n\n'
-        '<pre>{}</pre>'
-    ).format(
-        html.escape(json.dumps(update.to_dict(), indent=2, ensure_ascii=False)),
-        html.escape(str(context.chat_data)),
-        html.escape(str(context.user_data)),
-        html.escape(tb),
+        f'<pre>update = {html.escape(json.dumps(update.to_dict(), indent=2, ensure_ascii=False))}</pre>\n\n'
+        f'<pre>context.chat_data = {html.escape(str(context.chat_data))}</pre>\n\n'
+        f'<pre>context.user_data = {html.escape(str(context.user_data))}</pre>\n\n'
+        f'<pre>{html.escape(tb)}</pre>'
     )
 
     # Finally, send the message
@@ -64,7 +59,7 @@ def bad_command(update: Update, context: CallbackContext):
 def start(update: Update, context: CallbackContext):
     update.effective_message.reply_html(
         'Use /bad_command to cause an error.\n'
-        'Your chat id is <code>{}</code>.'.format(update.effective_chat.id)
+        f'Your chat id is <code>{update.effective_chat.id}</code>.'
     )
 
 

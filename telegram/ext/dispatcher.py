@@ -218,11 +218,11 @@ class Dispatcher:
         return self.__exception_event
 
     def _init_async_threads(self, base_name: str, workers: int) -> None:
-        base_name = '{}_'.format(base_name) if base_name else ''
+        base_name = f"""{base_name}_""" if base_name else ''
 
         for i in range(workers):
             thread = Thread(
-                target=self._pooled, name='Bot:{}:worker:{}{}'.format(self.bot.id, base_name, i)
+                target=self._pooled, name=f"""Bot:{self.bot.id}:worker:{base_name}{i}"""
             )
             self.__async_threads.add(thread)
             thread.start()
@@ -247,7 +247,7 @@ class Dispatcher:
             return cls.__singleton()  # type: ignore[return-value] # pylint: disable=not-callable
         else:
             raise RuntimeError(
-                '{} not initialized or multiple instances exist'.format(cls.__name__)
+                """{cls.__name__} not initialized or multiple instances exist"""
             )
 
     def _pooled(self) -> None:
@@ -401,10 +401,10 @@ class Dispatcher:
             self.__async_queue.put(None)
 
         for i, thr in enumerate(threads):
-            self.logger.debug('Waiting for async thread {}/{} to end'.format(i + 1, total))
+            self.logger.debug("""Waiting for async thread {i+1}/{total} to end""")
             thr.join()
             self.__async_threads.remove(thr)
-            self.logger.debug('async thread {}/{} has ended'.format(i + 1, total))
+            self.logger.debug("""async thread {i+1}/{total} has ended""")
 
     @property
     def has_running_threads(self) -> bool:
@@ -489,14 +489,13 @@ class Dispatcher:
         from .conversationhandler import ConversationHandler
 
         if not isinstance(handler, Handler):
-            raise TypeError('handler is not an instance of {}'.format(Handler.__name__))
+            raise TypeError("""handler is not an instance of {Handler.__name__}""")
         if not isinstance(group, int):
             raise TypeError('group is not int')
         if isinstance(handler, ConversationHandler) and handler.persistent and handler.name:
             if not self.persistence:
                 raise ValueError(
-                    "ConversationHandler {} can not be persistent if dispatcher has no "
-                    "persistence".format(handler.name)
+                    f"""ConversationHandler {handler.name} can not be persistent if dispatcher has no persistence"""
                 )
             handler.persistence = self.persistence
             handler.conversations = self.persistence.get_conversations(handler.name)

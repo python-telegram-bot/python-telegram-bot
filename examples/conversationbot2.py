@@ -40,7 +40,7 @@ def facts_to_str(user_data):
     facts = list()
 
     for key, value in user_data.items():
-        facts.append('{} - {}'.format(key, value))
+        facts.append(f'{key} - {value}')
 
     return "\n".join(facts).join(['\n', '\n'])
 
@@ -59,7 +59,7 @@ def regular_choice(update, context):
     text = update.message.text
     context.user_data['choice'] = text
     update.message.reply_text(
-        'Your {}? Yes, I would love to hear about that!'.format(text.lower())
+        f'Your {text.lower()}? Yes, I would love to hear about that!'
     )
 
     return TYPING_REPLY
@@ -82,8 +82,8 @@ def received_information(update, context):
 
     update.message.reply_text(
         "Neat! Just so you know, this is what you already told me:"
-        "{} You can tell me more, or change your opinion"
-        " on something.".format(facts_to_str(user_data)),
+        f"{facts_to_str(user_data)} You can tell me more, or change your opinion"
+        " on something.",
         reply_markup=markup,
     )
 
@@ -96,7 +96,7 @@ def done(update, context):
         del user_data['choice']
 
     update.message.reply_text(
-        "I learned these facts about you:" "{}" "Until next time!".format(facts_to_str(user_data))
+        f"""I learned these facts about you:" "{facts_to_str(user_data)}" "Until next time!"""
     )
 
     user_data.clear()

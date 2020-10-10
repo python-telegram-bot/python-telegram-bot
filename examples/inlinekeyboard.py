@@ -37,7 +37,7 @@ def button(update, context):
     # Some clients may have trouble otherwise. See https://core.telegram.org/bots/api#callbackquery
     query.answer()
 
-    query.edit_message_text(text="Selected option: {}".format(query.data))
+    query.edit_message_text(text=f"Selected option: {query.data}")
 
 
 def help_command(update, context):

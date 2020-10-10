@@ -190,7 +190,7 @@ class InvertedFilter(UpdateFilter):
         return not bool(self.f(update))
 
     def __repr__(self) -> str:
-        return "<inverted {}>".format(self.f)
+        return f"""<inverted {self.f}>"""
 
 
 class MergedFilter(UpdateFilter):
@@ -265,21 +265,19 @@ class MergedFilter(UpdateFilter):
         return False
 
     def __repr__(self) -> str:
-        return "<{} {} {}>".format(
-            self.base_filter, "and" if self.and_filter else "or", self.and_filter or self.or_filter
-        )
+        return """<{self.base_filter} {"and" if self.and_filter else "or"} { self.and_filter or self.or_filter}>"""
 
 
 class _DiceEmoji(MessageFilter):
     def __init__(self, emoji: str = None, name: str = None):
-        self.name = 'Filters.dice.{}'.format(name) if name else 'Filters.dice'
+        self.name = f"""Filters.dice.{name}""" if name else 'Filters.dice'
         self.emoji = emoji
 
     class _DiceValues(MessageFilter):
         def __init__(self, values: Union[int, List[int]], name: str, emoji: str = None):
             self.values = [values] if isinstance(values, int) else values
             self.emoji = emoji
-            self.name = '{}({})'.format(name, values)
+            self.name = f"""{name}({values})"""
 
         def filter(self, message: Message) -> bool:
             if message.dice and message.dice.value in self.values:
@@ -329,7 +327,7 @@ class Filters:
         class _TextStrings(MessageFilter):
             def __init__(self, strings: List[str]):
                 self.strings = strings
-                self.name = 'Filters.text({})'.format(strings)
+                self.name = """Filters.text({strings})"""
 
             def filter(self, message: Message) -> bool:
                 if message.text:
@@ -381,7 +379,7 @@ class Filters:
         class _CaptionStrings(MessageFilter):
             def __init__(self, strings: List[str]):
                 self.strings = strings
-                self.name = 'Filters.caption({})'.format(strings)
+                self.name = f"""Filters.caption({strings})"""
 
             def filter(self, message: Message) -> bool:
                 if message.caption:
@@ -417,7 +415,7 @@ class Filters:
         class _CommandOnlyStart(MessageFilter):
             def __init__(self, only_start: bool):
                 self.only_start = only_start
-                self.name = 'Filters.command({})'.format(only_start)
+                self.name = f"""Filters.command({only_start})"""
 
             def filter(self, message: Message) -> bool:
                 return bool(
@@ -495,7 +493,7 @@ class Filters:
                 pattern = re.compile(pattern)
             pattern = cast(Pattern, pattern)
             self.pattern: Pattern = pattern
-            self.name = 'Filters.regex({})'.format(self.pattern)
+            self.name = f"""Filters.regex({self.pattern})"""
 
         def filter(self, message: Message) -> Optional[Dict[str, List[Match]]]:
             """"""  # remove method from docs
@@ -546,7 +544,7 @@ class Filters:
                 Args:
                     category (str, optional): category of the media you want to filter"""
                 self.category = category
-                self.name = "Filters.document.category('{}')".format(self.category)
+                self.name = f"""Filters.document.category('{self.category}')"""
 
             def filter(self, message: Message) -> bool:
                 """"""  # remove method from docs
@@ -579,7 +577,7 @@ class Filters:
                 Args:
                     mimetype (str, optional): mime_type of the media you want to filter"""
                 self.mimetype = mimetype
-                self.name = "Filters.document.mime_type('{}')".format(self.mimetype)
+                self.name = f"""Filters.document.mime_type('{self.mimetype}')"""
 
             def filter(self, message: Message) -> bool:
                 """"""  # remove method from docs
@@ -917,7 +915,7 @@ officedocument.wordprocessingml.document")``-
 
         def __init__(self, entity_type: str):
             self.entity_type = entity_type
-            self.name = 'Filters.entity({})'.format(self.entity_type)
+            self.name = f"""Filters.entity({self.entity_type})"""
 
         def filter(self, message: Message) -> bool:
             """"""  # remove method from docs
@@ -939,7 +937,7 @@ officedocument.wordprocessingml.document")``-
 
         def __init__(self, entity_type: str):
             self.entity_type = entity_type
-            self.name = 'Filters.caption_entity({})'.format(self.entity_type)
+            self.name = f"""Filters.caption_entity({self.entity_type})"""
 
         def filter(self, message: Message) -> bool:
             """"""  # remove method from docs
@@ -1594,7 +1592,7 @@ officedocument.wordprocessingml.document")``-
             else:
                 lang = cast(List[str], lang)
                 self.lang = lang
-            self.name = 'Filters.language({})'.format(self.lang)
+            self.name = f"""Filters.language({self.lang})"""
 
         def filter(self, message: Message) -> bool:
             """"""  # remove method from docs

@@ -126,15 +126,13 @@ def show_data(update, context):
         text = ''
         if level == SELF:
             for person in user_data[level]:
-                text += '\nName: {}, Age: {}'.format(person.get(NAME, '-'), person.get(AGE, '-'))
+                text += f"\nName: {person.get(NAME, '-')}, Age: {person.get(AGE, '-')}"
         else:
             male, female = _name_switcher(level)
 
             for person in user_data[level]:
                 gender = female if person[GENDER] == FEMALE else male
-                text += '\n{}: Name: {}, Age: {}'.format(
-                    gender, person.get(NAME, '-'), person.get(AGE, '-')
-                )
+                text += "\n{gender}: Name: {person.get(NAME, '-')}, Age: {person.get(AGE, '-')}"
         return text
 
     ud = context.user_data
@@ -340,7 +338,7 @@ def main():
         states={
             SELECTING_LEVEL: [
                 CallbackQueryHandler(
-                    select_gender, pattern='^{}$|^{}$'.format(str(PARENTS), str(CHILDREN))
+                    select_gender, pattern=f'^{str(PARENTS)}$|^{str(CHILDREN)}$'
                 )
             ],
             SELECTING_GENDER: [description_conv],

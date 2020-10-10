@@ -80,7 +80,7 @@ def _render_part(self: RequestField, name: str, value: str) -> str:
     """
     value = value.replace(u'\\', u'\\\\').replace(u'"', u'\\"')
     value = value.replace(u'\r', u' ').replace(u'\n', u' ')
-    return u'{}="{}"'.format(name, value)
+    return f'{name}="{value}"'
 
 
 RequestField._render_part = _render_part  # type: ignore
@@ -254,7 +254,7 @@ class Request:
         except urllib3.exceptions.HTTPError as error:
             # HTTPError must come last as its the base urllib3 exception class
             # TODO: do something smart here; for now just raise NetworkError
-            raise NetworkError('urllib3 HTTPError {}'.format(error))
+            raise NetworkError(f"""urllib3 HTTPError {error}""")
 
         if 200 <= resp.status <= 299:
             # 200-299 range are HTTP success statuses
@@ -282,7 +282,7 @@ class Request:
         elif resp.status == 502:
             raise NetworkError('Bad Gateway')
         else:
-            raise NetworkError('{} ({})'.format(message, resp.status))
+            raise NetworkError(f"""{message} ({resp.status})""")
 
     def post(self, url: str, data: JSONDict, timeout: float = None) -> Union[JSONDict, bool]:
         """Request an URL.

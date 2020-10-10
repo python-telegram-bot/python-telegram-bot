@@ -39,11 +39,12 @@ def _git_revision() -> Optional[str]:
 def print_ver_info() -> None:
     git_revision = _git_revision()
     print(
-        'python-telegram-bot {}'.format(telegram_ver)
-        + (' ({})'.format(git_revision) if git_revision else '')
+        f"python-telegram-bot {telegram_ver}"
+        + (f" ({git_revision})" if git_revision else '')
     )
-    print('certifi {}'.format(certifi.__version__))  # type: ignore[attr-defined]
-    print('Python {}'.format(sys.version.replace('\n', ' ')))
+    newline = '\n'
+    print(f"certifi {certifi.__version__}") # type: ignore[attr-defined]
+    print(f"Python {sys.version.replace({newline},' ')}")
 
 
 def main() -> None:

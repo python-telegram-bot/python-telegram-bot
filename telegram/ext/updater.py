@@ -223,7 +223,7 @@ class Updater:
     def _init_thread(self, target: Callable, name: str, *args: Any, **kwargs: Any) -> None:
         thr = Thread(
             target=self._thread_wrapper,
-            name="Bot:{}:{}".format(self.bot.id, name),
+            name=f"Bot:{self.bot.id}:{name}",
             args=(target,) + args,
             kwargs=kwargs,
         )
@@ -232,14 +232,14 @@ class Updater:
 
     def _thread_wrapper(self, target: Callable, *args: Any, **kwargs: Any) -> None:
         thr_name = current_thread().name
-        self.logger.debug('{} - started'.format(thr_name))
+        self.logger.debug(f'{thr_name} - started')
         try:
             target(*args, **kwargs)
         except Exception:
             self.__exception_event.set()
             self.logger.exception('unhandled exception in %s', thr_name)
             raise
-        self.logger.debug('{} - ended'.format(thr_name))
+        self.logger.debug(f'{thr_name} - ended')
 
     def start_polling(
         self,
@@ -514,7 +514,7 @@ class Updater:
         self.logger.debug('Updater thread started (webhook)')
         use_ssl = cert is not None and key is not None
         if not url_path.startswith('/'):
-            url_path = '/{}'.format(url_path)
+            url_path = f"""/{url_path}"""
 
         # Create Tornado app instance
         app = WebhookAppClass(url_path, self.bot, self.update_queue)
@@ -555,7 +555,7 @@ class Updater:
 
     @staticmethod
     def _gen_webhook_url(listen: str, port: int, url_path: str) -> str:
-        return 'https://{listen}:{port}{path}'.format(listen=listen, port=port, path=url_path)
+        return f"""https://{listen}:{port}{url_path}"""
 
     @no_type_check
     def _bootstrap(
@@ -661,9 +661,9 @@ class Updater:
     @no_type_check
     def _join_threads(self) -> None:
         for thr in self.__threads:
-            self.logger.debug('Waiting for {} thread to end'.format(thr.name))
+            self.logger.debug(f"""Waiting for {thr.name} thread to end""")
             thr.join()
-            self.logger.debug('{} thread has ended'.format(thr.name))
+            self.logger.debug(f"""{thr.name} thread has ended""")
         self.__threads = []
 
     @no_type_check
@@ -671,7 +671,7 @@ class Updater:
         self.is_idle = False
         if self.running:
             self.logger.info(
-                'Received signal {} ({}), stopping...'.format(signum, get_signal_name(signum))
+                f"""Received signal {signum} ({get_signal_name(signum)}), stopping..."""
             )
             if self.persistence:
                 # Update user_data, chat_data and bot_data before flushing

@@ -63,7 +63,7 @@ def deep_linked_level_2(update, context):
     """Reached through the SO_COOL payload"""
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.get_me().username, USING_ENTITIES)
-    text = "You can also mask the deep-linked URLs as links: " "[▶️ CLICK HERE]({}).".format(url)
+    text = f"""You can also mask the deep-linked URLs as links: " "[▶️ CLICK HERE]({url})."""
     update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 
@@ -71,7 +71,7 @@ def deep_linked_level_3(update, context):
     """Reached through the USING_ENTITIES payload"""
     payload = context.args
     update.message.reply_text(
-        "Congratulations! This is as deep as it gets 👏🏻\n\n" "The payload was: {}".format(payload)
+        f"Congratulations! This is as deep as it gets 👏🏻\n\n" "The payload was: {payload}"
     )
 
 

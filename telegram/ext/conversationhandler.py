@@ -430,7 +430,7 @@ class ConversationHandler(Handler):
                     res = res if res is not None else old_state
                 except Exception as exc:
                     self.logger.exception("Promise function raised exception")
-                    self.logger.exception("{}".format(exc))
+                    self.logger.exception("""{exc}""")
                     res = old_state
                 finally:
                     if res is None and old_state is None:
@@ -446,7 +446,7 @@ class ConversationHandler(Handler):
                         return key, hdlr, check
                 return None
 
-        self.logger.debug('selecting conversation {} with state {}'.format(str(key), str(state)))
+        self.logger.debug("""selecting conversation {str(key)} with state {str(state)}""")
 
         handler = None
 

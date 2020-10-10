@@ -77,9 +77,8 @@ def escape_markdown(text: str, version: int = 1, entity_type: str = None) -> str
             escape_chars = r'_*[]()~`>#+-=|{}.!'
     else:
         raise ValueError('Markdown version must be either 1 or 2!')
-
-    return re.sub('([{}])'.format(re.escape(escape_chars)), r'\\\1', text)
-
+    rawvalue = '\\\1'
+    return re.sub(f"""([{re.escape(escape_chars),{rawvalue},text}])""")
 
 # -------- date/time related helpers --------
 def _datetime_to_float_timestamp(dt_obj: dtm.datetime) -> float:
@@ -173,9 +172,7 @@ def to_float_timestamp(
         return _datetime_to_float_timestamp(t)
     elif isinstance(t, Number):
         return reference_timestamp + t
-
-    raise TypeError('Unable to convert {} object to timestamp'.format(type(t).__name__))
-
+    raise TypeError(f"""Unable to convert {type(t).__name__} object to timestamp""")
 
 def to_timestamp(
     dt_obj: Union[int, float, dtm.timedelta, dtm.datetime, dtm.time, None],
@@ -233,8 +230,7 @@ def mention_html(user_id: int, name: str) -> Optional[str]:
         :obj:`str`: The inline mention for the user as html.
     """
     if isinstance(user_id, int):
-        return u'<a href="tg://user?id={}">{}</a>'.format(user_id, escape(name))
-
+        return f"""<a href="tg://user?id={user_id}">{escape(name)}</a>"""
 
 def mention_markdown(user_id: int, name: str, version: int = 1) -> Optional[str]:
     """
@@ -248,8 +244,7 @@ def mention_markdown(user_id: int, name: str, version: int = 1) -> Optional[str]
         :obj:`str`: The inline mention for the user as markdown.
     """
     if isinstance(user_id, int):
-        return u'[{}](tg://user?id={})'.format(escape_markdown(name, version=version), user_id)
-
+        return f"""[{escape_markdown(name, version=version)}](tg://user?id={user_id})"""
 
 def effective_message_type(entity: 'MessageEntity') -> Optional[str]:
     """
@@ -273,7 +268,7 @@ def effective_message_type(entity: 'MessageEntity') -> Optional[str]:
     elif isinstance(entity, Update):
         message = entity.effective_message
     else:
-        raise TypeError("entity is not Message or Update (got: {})".format(type(entity)))
+        raise TypeError(f"""entity is not Message or Update (got: {type(entity)})""")
 
     for i in Message.MESSAGE_TYPES:
         if getattr(message, i, None):
@@ -308,8 +303,7 @@ def create_deep_linked_url(bot_username: str, payload: str = None, group: bool =
     """
     if bot_username is None or len(bot_username) <= 3:
         raise ValueError("You must provide a valid bot_username.")
-
-    base_url = 'https://t.me/{}'.format(bot_username)
+    base_url = f"""https://t.me/{bot_username}"""
     if not payload:
         return base_url
 
@@ -326,8 +320,7 @@ def create_deep_linked_url(bot_username: str, payload: str = None, group: bool =
         key = 'startgroup'
     else:
         key = 'start'
-
-    return '{}?{}={}'.format(base_url, key, payload)
+    return f"""{base_url}?{key}={payload}"""
 
 
 def encode_conversations_to_json(conversations: Dict[str, Dict[Tuple, Any]]) -> str:
