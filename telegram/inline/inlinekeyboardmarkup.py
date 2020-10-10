@@ -131,7 +131,25 @@ class InlineKeyboardMarkup(ReplyMarkup):
                    from_row: int = None,
                    column: int = None,
                    **kwargs: Any) -> 'InlineKeyboardMarkup':
+        """Convenient method to add :class:`telegram.InlineKeyboardButton` to the specified
+        row and column.
 
+        Args:
+            button (:class:`telegram.InlineKeyboardButton`): The button to be added to the markup
+            from_row (:obj:`int`, optional): Set index to specify the row to add the button.
+                The value should be less than the number of rows. Leave `None` to set the last row
+                as default.
+            column (:obj:`int`, optional): Set index for the button insert location of the row.
+                Leave `None`, to append the button to the row by default.
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :class:`telegram.InlineKeyboardButton`
+
+        Raises:
+            :class:`IndexError`
+
+        """
         row = len(self.inline_keyboard) - 1 if from_row is None else from_row
         if row >= len(self.inline_keyboard) or row < -len(self.inline_keyboard):
             raise IndexError('row index out of range')
@@ -147,6 +165,17 @@ class InlineKeyboardMarkup(ReplyMarkup):
         return self
 
     def add_row(self, index: int = None, **kwargs: Any) -> 'InlineKeyboardMarkup':
+        """Convenient method to add List[:class:`telegram.InlineKeyboardButton`] into
+        a specified location.
+
+        Args:
+            index (:obj:`int`, optional): Set index for the row insert location of the markup.
+                Leave `None`, to append the row to the end of markup.
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :class:`telegram.InlineKeyboardButton`
+        """
         if index is None:
             self.inline_keyboard.append([])
         else:
