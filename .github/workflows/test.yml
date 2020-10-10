@@ -57,13 +57,11 @@ jobs:
         shell: bash --noprofile --norc {0}
 
       - name: Submit coverage
-        run: |
-          if [ "$CODECOV_TOKEN" != "" ]; then
-             codecov -F github -t $CODECOV_TOKEN --name "${{ matrix.os }}-${{ matrix.python-version }}"
-          fi
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        shell: bash
+        uses: codecov/codecov-action@v1.0.13
+        with:
+          env_vars: OS,PYTHON
+          name: ${{ matrix.os }}-${{ matrix.python-version }}
+          fail_ci_if_error: true
   test_official:
     name: test-official
     runs-on: ${{matrix.os}}
