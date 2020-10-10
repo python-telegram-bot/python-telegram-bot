@@ -179,7 +179,12 @@ class InlineKeyboardMarkup(ReplyMarkup):
         if index is None:
             self.inline_keyboard.append([])
         else:
-            self.inline_keyboard.insert(min(max(0, index), len(self.inline_keyboard)), [])
+            if index >= len(self.inline_keyboard):
+                self.inline_keyboard.append([])
+            elif index < -len(self.inline_keyboard):
+                self.inline_keyboard.insert(0, [])
+            else:
+                self.inline_keyboard.insert(index, [])
         return self
 
     def __eq__(self, other: object) -> bool:
