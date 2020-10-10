@@ -44,9 +44,9 @@ class InlineKeyboardMarkup(ReplyMarkup):
 
     """
 
-    def __init__(self, inline_keyboard: List[List[InlineKeyboardButton]], **kwargs: Any):
+    def __init__(self, inline_keyboard: List[List[InlineKeyboardButton]] = None, **kwargs: Any):
         # Required
-        self.inline_keyboard = inline_keyboard
+        self.inline_keyboard = [[]] if inline_keyboard is None else inline_keyboard
 
     def to_dict(self) -> JSONDict:
         data = super().to_dict()
@@ -126,6 +126,54 @@ class InlineKeyboardMarkup(ReplyMarkup):
         """
         button_grid = [[button] for button in button_column]
         return cls(button_grid, **kwargs)
+
+    def add_button(self, button: InlineKeyboardButton,
+                   from_row: int = None,
+                   insert_row: int = None,
+                   insert_column: int = None,
+                   **kwargs: Any) -> 'InlineKeyboardMarkup':
+
+        def interval_value(lower: int, upper: int, value: int) -> int:
+            return min(max(lower, value), upper)
+
+        max_row = len(self.inline_keyboard) - 1
+        if from_row is not None and insert_row is None:
+            if from_row > max_row:
+                raise IndexError('row index out of range')
+            elif insert_column is not None:
+                self.inline_keyboard[
+                    interval_value(lower=0, upper=max_row, value=from_row)
+                ].insert(
+                    interval_value(lower=0, upper=len(self.inline_keyboard[from_row]),
+                                   value=insert_column),
+                    button
+                )
+            else:
+                self.inline_keyboard[
+                    interval_value(lower=0, upper=max_row, value=from_row)
+                ].append(button)
+
+        elif from_row is None and insert_row is not None:
+            self.inline_keyboard.insert(
+                interval_value(lower=0, upper=max_row + 1, value=insert_row),
+                [button]
+            )
+
+        elif from_row is None and insert_row is None:
+            if insert_column is not None:
+                self.inline_keyboard[-1].insert(
+                    interval_value(lower=0, upper=len(self.inline_keyboard[-1]),
+                                   value=insert_column),
+                    button
+                )
+            else:
+                self.inline_keyboard[-1].append(button)
+        else:
+            raise AttributeError(
+                "Arguments 'from_row' and 'row' are not allowed to be passed in at the same time"
+            )
+
+        return self
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, self.__class__):
