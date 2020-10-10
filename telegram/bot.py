@@ -3210,7 +3210,7 @@ class Bot(TelegramObject):
         """
         ok = bool(ok)
 
-        if not ok ^ (error_message is not None):
+        if not (ok ^ (error_message is not None)):  # pylint: disable=C0325
             raise TelegramError(
                 'answerPreCheckoutQuery: If ok is True, there should '
                 'not be error_message; if ok is False, error_message '
