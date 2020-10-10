@@ -273,13 +273,13 @@ class TestBasePersistence:
         with caplog.at_level(logging.ERROR):
             dp.process_update(u)
         rec = caplog.records[-1]
-        assert rec.msg == 'No error handlers are registered, logging exception.'
+        assert rec.getMessage() == 'No error handlers are registered, logging exception.'
         assert rec.levelname == 'ERROR'
         rec = caplog.records[-2]
-        assert rec.msg == 'No error handlers are registered, logging exception.'
+        assert rec.getMessage() == 'No error handlers are registered, logging exception.'
         assert rec.levelname == 'ERROR'
         rec = caplog.records[-3]
-        assert rec.msg == 'No error handlers are registered, logging exception.'
+        assert rec.getMessage() == 'No error handlers are registered, logging exception.'
         assert rec.levelname == 'ERROR'
         m.from_user = user2
         m.chat = chat1
@@ -387,10 +387,10 @@ class TestBasePersistence:
 
         sleep(0.1)
         rec = caplog.records[-1]
-        assert rec.msg == 'No error handlers are registered, logging exception.'
+        assert rec.getMessage() == 'No error handlers are registered, logging exception.'
         assert rec.levelname == 'ERROR'
         rec = caplog.records[-2]
-        assert rec.msg == 'No error handlers are registered, logging exception.'
+        assert rec.getMessage() == 'No error handlers are registered, logging exception.'
         assert rec.levelname == 'ERROR'
         m.from_user = user2
         m.chat = chat1

@@ -136,7 +136,7 @@ class TestDispatcher:
         with caplog.at_level(logging.DEBUG):
             dp.add_error_handler(self.error_handler)
             assert len(caplog.records) == 1
-            assert caplog.records[-1].msg.startswith('The callback is already registered')
+            assert caplog.records[-1].getMessage().startswith('The callback is already registered')
 
     def test_construction_with_bad_persistence(self, caplog, bot):
         class my_per:
@@ -238,7 +238,7 @@ class TestDispatcher:
             dp.update_queue.put(self.message_update)
             sleep(0.1)
             assert len(caplog.records) == 1
-            assert caplog.records[-1].msg.startswith(
+            assert caplog.records[-1].getMessage().startswith(
                 'DispatcherHandlerStop is not supported ' 'with async functions'
             )
 
@@ -253,7 +253,8 @@ class TestDispatcher:
             dp.update_queue.put(self.message_update)
             sleep(0.1)
             assert len(caplog.records) == 1
-            assert caplog.records[-1].msg.startswith('A promise with deactivated error handling')
+            assert caplog.records[-1].getMessage().startswith(
+                'A promise with deactivated error handling')
 
     def test_add_async_handler(self, dp):
         dp.add_handler(
@@ -277,7 +278,7 @@ class TestDispatcher:
             dp.run_async(func)
             sleep(0.1)
             assert len(caplog.records) == 1
-            assert caplog.records[-1].msg.startswith('No error handlers are registered')
+            assert caplog.records[-1].getMessage().startswith('No error handlers are registered')
 
     def test_async_handler_error_handler(self, dp):
         dp.add_handler(MessageHandler(Filters.all, self.callback_raise_error, run_async=True))
@@ -304,7 +305,7 @@ class TestDispatcher:
             dp.update_queue.put(self.message_update)
             sleep(0.1)
             assert len(caplog.records) == 1
-            assert caplog.records[-1].msg.startswith('An uncaught error was raised')
+            assert caplog.records[-1].getMessage().startswith('An uncaught error was raised')
 
         # Make sure that the main loop still runs
         dp.remove_handler(handler)
@@ -322,7 +323,7 @@ class TestDispatcher:
             dp.update_queue.put(self.message_update)
             sleep(0.1)
             assert len(caplog.records) == 1
-            assert caplog.records[-1].msg.startswith('An uncaught error was raised')
+            assert caplog.records[-1].getMessage().startswith('An uncaught error was raised')
 
         # Make sure that the main loop still runs
         dp.remove_handler(handler)
