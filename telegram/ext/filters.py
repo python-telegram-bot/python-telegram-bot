@@ -961,8 +961,17 @@ officedocument.wordprocessingml.document")``-
             return message.chat.type in [Chat.GROUP, Chat.SUPERGROUP]
 
     group = _Group()
-    """Messages sent in a group chat."""
+    """Messages sent in a group or a supergroup chat."""
 
+    class _SuperGroup(MessageFilter):
+        name = 'Filters.supergroup'
+    
+        def filter(self, message: Message) -> bool:
+            return message.chat.type == Chat.SUPERGROUP
+
+    supergroup = _SuperGroup()
+    """Messages sent in a supergroup chat."""
+    
     class user(MessageFilter):
         """Filters messages to allow only those which are from specified user ID(s) or
         username(s).
