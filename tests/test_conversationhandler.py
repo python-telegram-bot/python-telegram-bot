@@ -819,7 +819,7 @@ class TestConversationHandler:
             assert handler.conversations.get((self.group.id, user1.id)) is None
         assert len(caplog.records) == 1
         rec = caplog.records[-1]
-        assert rec.msg.startswith('DispatcherHandlerStop in TIMEOUT')
+        assert rec.getMessage().startswith('DispatcherHandlerStop in TIMEOUT')
 
     def test_conversation_handler_timeout_update_and_context(self, cdp, bot, user1):
         context = None
