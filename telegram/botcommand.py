@@ -18,8 +18,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Bot Command."""
-from telegram import TelegramObject
 from typing import Any
+
+from telegram import TelegramObject
 
 
 class BotCommand(TelegramObject):
@@ -39,7 +40,7 @@ class BotCommand(TelegramObject):
         description (:obj:`str`): Description of the command, 3-256 characters.
     """
 
-    def __init__(self, command: str, description: str, **kwargs: Any):
+    def __init__(self, command: str, description: str, **kwargs: Any):  # pylint: disable=W0613
         self.command = command
         self.description = description
 

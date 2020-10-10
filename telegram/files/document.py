@@ -18,10 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Document."""
 
-from telegram import PhotoSize, TelegramObject
+from typing import TYPE_CHECKING, Any, Optional
 
+from telegram import PhotoSize, TelegramObject
 from telegram.utils.types import JSONDict
-from typing import Any, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from telegram import Bot, File
@@ -62,7 +62,7 @@ class Document(TelegramObject):
     _id_keys = ('file_id',)
 
     def __init__(
-        self,
+        self,  # pylint: disable=W0613
         file_id: str,
         file_unique_id: str,
         thumb: PhotoSize = None,

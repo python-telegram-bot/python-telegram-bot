@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputContactMessageContent."""
 
-from telegram import InputMessageContent
 from typing import Any
+
+from telegram import InputMessageContent
 
 
 class InputContactMessageContent(InputMessageContent):
@@ -46,7 +47,7 @@ class InputContactMessageContent(InputMessageContent):
     """
 
     def __init__(
-        self,
+        self,  # pylint: disable=W0613
         phone_number: str,
         first_name: str,
         last_name: str = None,

@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardButton."""
 
+from typing import TYPE_CHECKING, Any
+
 from telegram import TelegramObject
-from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from telegram import CallbackGame, LoginUrl
@@ -83,7 +84,7 @@ class InlineKeyboardButton(TelegramObject):
     """
 
     def __init__(
-        self,
+        self,  # pylint: disable=W0613
         text: str,
         url: str = None,
         callback_data: str = None,

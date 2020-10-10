@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram LabeledPrice."""
 
-from telegram import TelegramObject
 from typing import Any
+
+from telegram import TelegramObject
 
 
 class LabeledPrice(TelegramObject):
@@ -44,7 +45,7 @@ class LabeledPrice(TelegramObject):
 
     """
 
-    def __init__(self, label: str, amount: int, **kwargs: Any):
+    def __init__(self, label: str, amount: int, **kwargs: Any):  # pylint: disable=W0613
         self.label = label
         self.amount = amount
 

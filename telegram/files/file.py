@@ -17,16 +17,14 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram File."""
+import os
+import urllib.parse as urllib_parse
 from base64 import b64decode
 from os.path import basename
-import os
-
-import urllib.parse as urllib_parse
+from typing import IO, TYPE_CHECKING, Any, Optional, Union
 
 from telegram import TelegramObject
 from telegram.passport.credentials import decrypt
-
-from typing import Any, Optional, IO, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from telegram import Bot, FileCredentials
@@ -70,7 +68,7 @@ class File(TelegramObject):
     """
 
     def __init__(
-        self,
+        self,  # pylint: disable=W0613
         file_id: str,
         file_unique_id: str,
         bot: 'Bot' = None,
@@ -132,22 +130,22 @@ class File(TelegramObject):
                 )
             out.write(buf)
             return out
-        else:
-            if custom_path:
-                filename = custom_path
-            elif self.file_path:
-                filename = basename(self.file_path)
-            else:
-                filename = os.path.join(os.getcwd(), self.file_id)
 
-            buf = self.bot.request.retrieve(url, timeout=timeout)
-            if self._credentials:
-                buf = decrypt(
-                    b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
-                )
-            with open(filename, 'wb') as fobj:
-                fobj.write(buf)
-            return filename
+        if custom_path:
+            filename = custom_path
+        elif self.file_path:
+            filename = basename(self.file_path)
+        else:
+            filename = os.path.join(os.getcwd(), self.file_id)
+
+        buf = self.bot.request.retrieve(url, timeout=timeout)
+        if self._credentials:
+            buf = decrypt(
+                b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
+            )
+        with open(filename, 'wb') as fobj:
+            fobj.write(buf)
+        return filename
 
     def _get_encoded_url(self) -> str:
         """Convert any UTF-8 char in :obj:`File.file_path` into a url encoded ASCII string."""

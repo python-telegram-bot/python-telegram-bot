@@ -19,21 +19,21 @@
 """This module contains the DictPersistence class."""
 from copy import deepcopy
 
+from typing import Any, DefaultDict, Dict, Optional, Tuple
+from collections import defaultdict
+
 from telegram.utils.helpers import (
-    decode_user_chat_data_from_json,
     decode_conversations_from_json,
+    decode_user_chat_data_from_json,
     encode_conversations_to_json,
 )
+from telegram.ext import BasePersistence
+from telegram.utils.types import ConversationDict
 
 try:
     import ujson as json
 except ImportError:
     import json  # type: ignore[no-redef]
-from collections import defaultdict
-from telegram.ext import BasePersistence
-
-from typing import DefaultDict, Dict, Any, Tuple, Optional
-from telegram.utils.types import ConversationDict
 
 
 class DictPersistence(BasePersistence):
@@ -140,8 +140,7 @@ class DictPersistence(BasePersistence):
         """:obj:`str`: The user_data serialized as a JSON-string."""
         if self._user_data_json:
             return self._user_data_json
-        else:
-            return json.dumps(self.user_data)
+        return json.dumps(self.user_data)
 
     @property
     def chat_data(self) -> Optional[DefaultDict[int, Dict]]:
@@ -153,8 +152,7 @@ class DictPersistence(BasePersistence):
         """:obj:`str`: The chat_data serialized as a JSON-string."""
         if self._chat_data_json:
             return self._chat_data_json
-        else:
-            return json.dumps(self.chat_data)
+        return json.dumps(self.chat_data)
 
     @property
     def bot_data(self) -> Optional[Dict]:
@@ -166,8 +164,7 @@ class DictPersistence(BasePersistence):
         """:obj:`str`: The bot_data serialized as a JSON-string."""
         if self._bot_data_json:
             return self._bot_data_json
-        else:
-            return json.dumps(self.bot_data)
+        return json.dumps(self.bot_data)
 
     @property
     def conversations(self) -> Optional[Dict[str, Dict[Tuple, Any]]]:
@@ -179,8 +176,7 @@ class DictPersistence(BasePersistence):
         """:obj:`str`: The conversations serialized as a JSON-string."""
         if self._conversations_json:
             return self._conversations_json
-        else:
-            return encode_conversations_to_json(self.conversations)  # type: ignore[arg-type]
+        return encode_conversations_to_json(self.conversations)  # type: ignore[arg-type]
 
     def get_user_data(self) -> DefaultDict[int, Dict[Any, Any]]:
         """Returns the user_data created from the ``user_data_json`` or an empty

@@ -19,10 +19,10 @@
 """This module contains an object that represents a Telegram Game."""
 
 import sys
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from telegram import MessageEntity, TelegramObject, Animation, PhotoSize
+from telegram import Animation, MessageEntity, PhotoSize, TelegramObject
 from telegram.utils.types import JSONDict
-from typing import List, Any, Dict, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -68,7 +68,7 @@ class Game(TelegramObject):
     """
 
     def __init__(
-        self,
+        self,  # pylint: disable=W0613
         title: str,
         description: str,
         photo: List[PhotoSize],
@@ -135,9 +135,8 @@ class Game(TelegramObject):
         # Is it a narrow build, if so we don't need to convert
         if sys.maxunicode == 0xFFFF:
             return self.text[entity.offset : entity.offset + entity.length]
-        else:
-            entity_text = self.text.encode('utf-16-le')
-            entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
+        entity_text = self.text.encode('utf-16-le')
+        entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
 
         return entity_text.decode('utf-16-le')
 

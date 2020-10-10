@@ -18,9 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram UserProfilePhotos."""
 
+from typing import TYPE_CHECKING, Any, List, Optional
+
 from telegram import PhotoSize, TelegramObject
 from telegram.utils.types import JSONDict
-from typing import Any, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -43,7 +44,9 @@ class UserProfilePhotos(TelegramObject):
 
     """
 
-    def __init__(self, total_count: int, photos: List[List[PhotoSize]], **kwargs: Any):
+    def __init__(
+        self, total_count: int, photos: List[List[PhotoSize]], **kwargs: Any
+    ):  # pylint: disable=W0613
         # Required
         self.total_count = int(total_count)
         self.photos = photos

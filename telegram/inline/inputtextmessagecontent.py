@@ -18,9 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputTextMessageContent."""
 
+from typing import Any, Union
+
 from telegram import InputMessageContent
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
-from typing import Any, Union
 
 
 class InputTextMessageContent(InputMessageContent):
@@ -52,7 +53,7 @@ class InputTextMessageContent(InputMessageContent):
     """
 
     def __init__(
-        self,
+        self,  # pylint: disable=W0613
         message_text: str,
         parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
         disable_web_page_preview: Union[bool, DefaultValue] = DEFAULT_NONE,

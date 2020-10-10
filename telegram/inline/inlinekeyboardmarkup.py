@@ -18,9 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardMarkup."""
 
-from telegram import ReplyMarkup, InlineKeyboardButton
+from typing import TYPE_CHECKING, Any, List, Optional
+
+from telegram import InlineKeyboardButton, ReplyMarkup
 from telegram.utils.types import JSONDict
-from typing import Any, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -44,7 +45,9 @@ class InlineKeyboardMarkup(ReplyMarkup):
 
     """
 
-    def __init__(self, inline_keyboard: List[List[InlineKeyboardButton]], **kwargs: Any):
+    def __init__(
+        self, inline_keyboard: List[List[InlineKeyboardButton]], **kwargs: Any
+    ):  # pylint: disable=W0613
         # Required
         self.inline_keyboard = inline_keyboard
 

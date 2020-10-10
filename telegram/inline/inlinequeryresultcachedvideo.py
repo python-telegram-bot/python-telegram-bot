@@ -18,9 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultCachedVideo."""
 
+from typing import TYPE_CHECKING, Any, Union
+
 from telegram import InlineQueryResult
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
-from typing import Any, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
@@ -69,7 +70,7 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
 
     def __init__(
         self,
-        id: str,
+        id: str,  # pylint: disable=W0622
         video_file_id: str,
         title: str,
         description: str = None,
@@ -77,7 +78,7 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
         reply_markup: 'ReplyMarkup' = None,
         input_message_content: 'InputMessageContent' = None,
         parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-        **kwargs: Any,
+        **kwargs: Any,  # pylint: disable=W0613
     ):
         # Required
         super().__init__('video', id)

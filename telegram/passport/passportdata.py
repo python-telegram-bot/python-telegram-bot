@@ -18,10 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Contains information about Telegram Passport data shared with the bot by the user."""
 
-from telegram import EncryptedCredentials, EncryptedPassportElement, TelegramObject
+from typing import TYPE_CHECKING, Any, List, Optional
 
+from telegram import EncryptedCredentials, EncryptedPassportElement, TelegramObject
 from telegram.utils.types import JSONDict
-from typing import Any, Optional, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from telegram import Bot, Credentials
@@ -52,7 +52,7 @@ class PassportData(TelegramObject):
     """
 
     def __init__(
-        self,
+        self,  # pylint: disable=W0613
         data: List[EncryptedPassportElement],
         credentials: EncryptedCredentials,
         bot: 'Bot' = None,

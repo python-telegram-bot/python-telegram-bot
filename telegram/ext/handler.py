@@ -19,11 +19,11 @@
 """This module contains the base class for handlers as used by the Dispatcher."""
 
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, TypeVar, Union
 
+from telegram import Update
 from telegram.utils.promise import Promise
 from telegram.utils.types import HandlerArg
-from telegram import Update
-from typing import Callable, TYPE_CHECKING, Any, Optional, Union, TypeVar, Dict
 
 if TYPE_CHECKING:
     from telegram.ext import CallbackContext, Dispatcher
@@ -147,16 +147,14 @@ class Handler(ABC):
             self.collect_additional_context(context, update, dispatcher, check_result)
             if self.run_async:
                 return dispatcher.run_async(self.callback, update, context, update=update)
-            else:
-                return self.callback(update, context)
-        else:
-            optional_args = self.collect_optional_args(dispatcher, update, check_result)
-            if self.run_async:
-                return dispatcher.run_async(
-                    self.callback, dispatcher.bot, update, update=update, **optional_args
-                )
-            else:
-                return self.callback(dispatcher.bot, update, **optional_args)  # type: ignore
+            return self.callback(update, context)
+
+        optional_args = self.collect_optional_args(dispatcher, update, check_result)
+        if self.run_async:
+            return dispatcher.run_async(
+                self.callback, dispatcher.bot, update, update=update, **optional_args
+            )
+        return self.callback(dispatcher.bot, update, **optional_args)  # type: ignore
 
     def collect_additional_context(
         self,
@@ -174,10 +172,12 @@ class Handler(ABC):
             check_result: The result (return value) from :attr:`check_update`.
 
         """
-        pass
 
     def collect_optional_args(
-        self, dispatcher: 'Dispatcher', update: HandlerArg = None, check_result: Any = None
+        self,
+        dispatcher: 'Dispatcher',
+        update: HandlerArg = None,
+        check_result: Any = None,  # pylint: disable=W0613
     ) -> Dict[str, Any]:
         """
         Prepares the optional arguments. If the handler has additional optional args,

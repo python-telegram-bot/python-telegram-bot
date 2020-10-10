@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Invoice."""
 
-from telegram import TelegramObject
 from typing import Any
+
+from telegram import TelegramObject
 
 
 class Invoice(TelegramObject):
@@ -53,7 +54,7 @@ class Invoice(TelegramObject):
     """
 
     def __init__(
-        self,
+        self,  # pylint: disable=W0613
         title: str,
         description: str,
         start_parameter: str,

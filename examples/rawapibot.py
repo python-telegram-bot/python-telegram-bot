@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# pylint: disable=W0603
 """Simple Bot to reply to Telegram messages.
 
 This is built on the API wrapper, see rawapibot.py to see the same example built
@@ -7,26 +8,28 @@ on the telegram.ext bot framework.
 This program is dedicated to the public domain under the CC0 license.
 """
 import logging
-import telegram
-from telegram.error import NetworkError, Unauthorized
+from typing import NoReturn
 from time import sleep
 
+import telegram
+from telegram.error import NetworkError, Unauthorized
 
-update_id = None
+
+UPDATE_ID = None
 
 
-def main():
+def main() -> NoReturn:
     """Run the bot."""
-    global update_id
+    global UPDATE_ID
     # Telegram Bot Authorization Token
     bot = telegram.Bot('TOKEN')
 
     # get the first pending update_id, this is so we can skip over it in case
     # we get an "Unauthorized" exception.
     try:
-        update_id = bot.get_updates()[0].update_id
+        UPDATE_ID = bot.get_updates()[0].update_id
     except IndexError:
-        update_id = None
+        UPDATE_ID = None
 
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
@@ -37,15 +40,15 @@ def main():
             sleep(1)
         except Unauthorized:
             # The user has removed or blocked the bot.
-            update_id += 1
+            UPDATE_ID += 1  # type: ignore[operator]
 
 
-def echo(bot):
+def echo(bot: telegram.Bot) -> None:
     """Echo the message the user sent."""
-    global update_id
+    global UPDATE_ID
     # Request updates after the last update_id
-    for update in bot.get_updates(offset=update_id, timeout=10):
-        update_id = update.update_id + 1
+    for update in bot.get_updates(offset=UPDATE_ID, timeout=10):
+        UPDATE_ID = update.update_id + 1
 
         if update.message:  # your bot can receive updates without messages
             # Reply to the message
