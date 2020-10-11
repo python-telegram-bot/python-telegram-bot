@@ -266,7 +266,7 @@ class Bot(TelegramObject):
         result = self._post(endpoint, data, timeout=timeout, api_kwargs=api_kwargs)
 
         if result is True:
-            return result  # type: ignore
+            return result
 
         return Message.de_json(result, self)  # type: ignore[arg-type]
 

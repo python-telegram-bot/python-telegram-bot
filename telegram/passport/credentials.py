@@ -168,7 +168,7 @@ class EncryptedCredentials(TelegramObject):
                 )
             except ValueError as exception:
                 # If decryption fails raise exception
-                raise TelegramDecryptionError(exception)
+                raise TelegramDecryptionError(exception) from exception
         return self._decrypted_secret
 
     @property

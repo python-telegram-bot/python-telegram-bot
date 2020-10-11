@@ -176,8 +176,8 @@ class Request:
                 try:
                     # pylint: disable=C0415
                     from telegram.vendor.ptb_urllib3.urllib3.contrib.socks import SOCKSProxyManager
-                except ImportError:
-                    raise RuntimeError('PySocks is missing')
+                except ImportError as exc:
+                    raise RuntimeError('PySocks is missing') from exc
                 self._con_pool = SOCKSProxyManager(proxy_url, **kwargs)
             else:
                 mgr = urllib3.proxy_from_url(proxy_url, **kwargs)
@@ -208,8 +208,8 @@ class Request:
         decoded_s = json_data.decode('utf-8', 'replace')
         try:
             data = json.loads(decoded_s)
-        except ValueError:
-            raise TelegramError('Invalid server response')
+        except ValueError as exc:
+            raise TelegramError('Invalid server response') from exc
 
         if not data.get('ok'):  # pragma: no cover
             description = data.get('description')
@@ -250,12 +250,12 @@ class Request:
 
         try:
             resp = self._con_pool.request(*args, **kwargs)
-        except urllib3.exceptions.TimeoutError:
-            raise TimedOut()
+        except urllib3.exceptions.TimeoutError as error:
+            raise TimedOut() from error
         except urllib3.exceptions.HTTPError as error:
             # HTTPError must come last as its the base urllib3 exception class
             # TODO: do something smart here; for now just raise NetworkError
-            raise NetworkError('urllib3 HTTPError {}'.format(error))
+            raise NetworkError('urllib3 HTTPError {}'.format(error)) from error
 
         if 200 <= resp.status <= 299:
             # 200-299 range are HTTP success statuses

@@ -110,10 +110,10 @@ class PicklePersistence(BasePersistence):
             self.user_data = defaultdict(dict)
             self.chat_data = defaultdict(dict)
             self.bot_data = {}
-        except pickle.UnpicklingError:
-            raise TypeError("File {} does not contain valid pickle data".format(filename))
-        except Exception:
-            raise TypeError("Something went wrong unpickling {}".format(filename))
+        except pickle.UnpicklingError as exc:
+            raise TypeError("File {} does not contain valid pickle data".format(filename)) from exc
+        except Exception as exc:
+            raise TypeError("Something went wrong unpickling {}".format(filename)) from exc
 
     @staticmethod
     def load_file(filename: str) -> Any:
@@ -122,10 +122,10 @@ class PicklePersistence(BasePersistence):
                 return pickle.load(file)
         except IOError:
             return None
-        except pickle.UnpicklingError:
-            raise TypeError("File {} does not contain valid pickle data".format(filename))
-        except Exception:
-            raise TypeError("Something went wrong unpickling {}".format(filename))
+        except pickle.UnpicklingError as exc:
+            raise TypeError("File {} does not contain valid pickle data".format(filename)) from exc
+        except Exception as exc:
+            raise TypeError("Something went wrong unpickling {}".format(filename)) from exc
 
     def dump_singlefile(self) -> None:
         with open(self.filename, "wb") as file:

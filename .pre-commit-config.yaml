@@ -9,15 +9,15 @@ repos:
     rev: 3.8.1
     hooks:
     -   id: flake8
--   repo: git://github.com/pre-commit/mirrors-pylint
-    rev: v2.5.3
+-   repo: https://github.com/PyCQA/pylint
+    rev: pylint-2.6.0
     hooks:
     -   id: pylint
         files: ^(telegram|examples)/.*\.py$
         args:
         - --rcfile=setup.cfg
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: 'v0.770'
+    rev: v0.790
     hooks:
     -   id: mypy
         files: ^(telegram|examples)/.*\.py$

@@ -252,7 +252,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
                     if button != other.keyboard[idx][jdx]:
                         return False
             return True
-        return super(ReplyKeyboardMarkup, self).__eq__(other)  # pylint: disable=no-member
+        return super().__eq__(other)
 
     def __hash__(self) -> int:
         return hash(

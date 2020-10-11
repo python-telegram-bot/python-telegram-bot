@@ -141,7 +141,7 @@ class InlineKeyboardMarkup(ReplyMarkup):
                     if button != other.inline_keyboard[idx][jdx]:
                         return False
             return True
-        return super(InlineKeyboardMarkup, self).__eq__(other)  # pylint: disable=no-member
+        return super().__eq__(other)
 
     def __hash__(self) -> int:
         return hash(tuple(tuple(button for button in row) for row in self.inline_keyboard))

@@ -106,20 +106,20 @@ class DictPersistence(BasePersistence):
             try:
                 self._user_data = decode_user_chat_data_from_json(user_data_json)
                 self._user_data_json = user_data_json
-            except (ValueError, AttributeError):
-                raise TypeError("Unable to deserialize user_data_json. Not valid JSON")
+            except (ValueError, AttributeError) as exc:
+                raise TypeError("Unable to deserialize user_data_json. Not valid JSON") from exc
         if chat_data_json:
             try:
                 self._chat_data = decode_user_chat_data_from_json(chat_data_json)
                 self._chat_data_json = chat_data_json
-            except (ValueError, AttributeError):
-                raise TypeError("Unable to deserialize chat_data_json. Not valid JSON")
+            except (ValueError, AttributeError) as exc:
+                raise TypeError("Unable to deserialize chat_data_json. Not valid JSON") from exc
         if bot_data_json:
             try:
                 self._bot_data = json.loads(bot_data_json)
                 self._bot_data_json = bot_data_json
-            except (ValueError, AttributeError):
-                raise TypeError("Unable to deserialize bot_data_json. Not valid JSON")
+            except (ValueError, AttributeError) as exc:
+                raise TypeError("Unable to deserialize bot_data_json. Not valid JSON") from exc
             if not isinstance(self._bot_data, dict):
                 raise TypeError("bot_data_json must be serialized dict")
 
@@ -127,8 +127,9 @@ class DictPersistence(BasePersistence):
             try:
                 self._conversations = decode_conversations_from_json(conversations_json)
                 self._conversations_json = conversations_json
-            except (ValueError, AttributeError):
-                raise TypeError("Unable to deserialize conversations_json. Not valid JSON")
+            except (ValueError, AttributeError) as exc:
+                raise TypeError(
+                    "Unable to deserialize conversations_json. Not valid JSON") from exc
 
     @property
     def user_data(self) -> Optional[DefaultDict[int, Dict]]:

@@ -524,8 +524,8 @@ class Updater:
             try:
                 ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
                 ssl_ctx.load_cert_chain(cert, key)
-            except ssl.SSLError:
-                raise TelegramError('Invalid SSL Certificate')
+            except ssl.SSLError as exc:
+                raise TelegramError('Invalid SSL Certificate') from exc
         else:
             ssl_ctx = None
 
