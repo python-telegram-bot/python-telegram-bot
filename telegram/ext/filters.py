@@ -304,6 +304,15 @@ class _DiceEmoji(MessageFilter):
         return False
 
 
+class _ChatType(MessageFilter):
+    def __init__(self, chat_type: str = Chat.PRIVATE):
+        self.chat_type = chat_type
+        self.name = 'Filters.chat_type.{}'.format(chat_type)
+
+    def filter(self, message: Message) -> bool:
+        return message.chat.type == self.chat_type
+
+
 class Filters:
     """Predefined filters for use as the ``filter`` argument of
     :class:`telegram.ext.MessageHandler`.
@@ -965,13 +974,22 @@ officedocument.wordprocessingml.document")``-
 
     class _SuperGroup(MessageFilter):
         name = 'Filters.supergroup'
-    
+
         def filter(self, message: Message) -> bool:
             return message.chat.type == Chat.SUPERGROUP
 
     supergroup = _SuperGroup()
     """Messages sent in a supergroup chat."""
-    
+
+    class _ChatTypes(_ChatType):
+        """Filter using chat type"""
+        channel = _ChatType(Chat.CHANNEL)
+        group = _ChatType(Chat.GROUP)
+        supergroup = _ChatType(Chat.SUPERGROUP)
+        private = _ChatType(Chat.PRIVATE)
+
+    chat_type = _ChatTypes()
+
     class user(MessageFilter):
         """Filters messages to allow only those which are from specified user ID(s) or
         username(s).

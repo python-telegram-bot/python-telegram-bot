@@ -581,6 +581,21 @@ class TestFilters:
         update.message.chat.type = 'supergroup'
         assert Filters.group(update)
 
+    def test_supergroup_filter(self, update):
+        update.message.chat.type = 'group'
+        assert not Filters.supergroup(update)
+        update.message.chat.type = 'supergroup'
+        assert Filters.supergroup(update)
+
+    def test_chat_type_filter(self, update):
+        assert Filters.chat_type.private(update)
+        update.message.chat.type = 'group'
+        assert Filters.chat_type.group(update)
+        update.message.chat.type = 'supergroup'
+        assert Filters.chat_type.supergroup(update)
+        update.message.chat.type = 'channel'
+        assert Filters.chat_type.channel(update)
+
     def test_filters_user_init(self):
         with pytest.raises(RuntimeError, match='in conjunction with'):
             Filters.user(user_id=1, username='user')
