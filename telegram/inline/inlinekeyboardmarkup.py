@@ -144,7 +144,7 @@ class InlineKeyboardMarkup(ReplyMarkup):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            :class:`telegram.InlineKeyboardButton`
+            :class:`telegram.InlineKeyboardMarkup`
 
         Raises:
             :class:`IndexError`
@@ -178,7 +178,7 @@ class InlineKeyboardMarkup(ReplyMarkup):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            :class:`telegram.InlineKeyboardButton`
+            :class:`telegram.InlineKeyboardMarkup`
         """
         row = [] if button_row is None else button_row
         if index is None:
