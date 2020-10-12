@@ -145,6 +145,44 @@ class TestInlineKeyboardMarkup:
         assert len(inline_keyboard_markup) == 3
         assert inline_keyboard_markup[1][0].text == 'button5'
 
+    def test_add_from_markup(self):
+        inline_keyboard_markup = InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton(text='button1', callback_data='data1'),
+                    InlineKeyboardButton(text='button2', callback_data='data2'),
+                ],
+                [
+                    InlineKeyboardButton(text='button3', callback_data='data3')
+                ]
+            ]
+        ).add_from_markup(
+            InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton(text='button4', callback_data='data4'),
+                        InlineKeyboardButton(text='button5', callback_data='data5'),
+                    ]
+                ]
+            )
+        ).add_from_markup(
+            InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton(text='button6', callback_data='data6'),
+                        InlineKeyboardButton(text='button7', callback_data='data7'),
+                    ],
+                    [
+                        InlineKeyboardButton(text='button8', callback_data='data8'),
+                    ]
+                ]
+            ),
+            index=0
+        ).inline_keyboard
+        assert len(inline_keyboard_markup) == 5
+        assert inline_keyboard_markup[0][0].text == 'button6'
+        assert inline_keyboard_markup[-1][0].text == 'button4'
+
     def test_expected_values(self, inline_keyboard_markup):
         assert inline_keyboard_markup.inline_keyboard == self.inline_keyboard
 

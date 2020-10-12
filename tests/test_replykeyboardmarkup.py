@@ -137,6 +137,31 @@ class TestReplyKeyboardMarkup:
         assert len(reply_keyboard_markup) == 3
         assert reply_keyboard_markup[1][0].text == 'button5'
 
+    def test_add_from_markup(self):
+        reply_keyboard_markup = ReplyKeyboardMarkup(
+            [
+                [KeyboardButton(text='button1'), KeyboardButton(text='button2')],
+                [KeyboardButton(text='button3')]
+            ]
+        ).add_from_markup(
+            ReplyKeyboardMarkup(
+                [
+                    [KeyboardButton(text='button4'), KeyboardButton(text='button5')]
+                ]
+            )
+        ).add_from_markup(
+            ReplyKeyboardMarkup(
+                [
+                    [KeyboardButton(text='button6'), KeyboardButton(text='button7')],
+                    [KeyboardButton(text='button8')]
+                ]
+            ),
+            index=0
+        ).keyboard
+        assert len(reply_keyboard_markup) == 5
+        assert reply_keyboard_markup[0][0].text == 'button6'
+        assert reply_keyboard_markup[-1][0].text == 'button4'
+
     def test_expected_values(self, reply_keyboard_markup):
         assert isinstance(reply_keyboard_markup.keyboard, list)
         assert isinstance(reply_keyboard_markup.keyboard[0][0], KeyboardButton)
