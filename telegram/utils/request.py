@@ -56,7 +56,7 @@ except ImportError:  # pragma: no cover
         raise
 
 
-from telegram import InputFile, TelegramError, InputMedia, constants
+from telegram import InputFile, TelegramError, InputMedia
 from telegram.error import (
     Unauthorized,
     NetworkError,
@@ -87,8 +87,7 @@ RequestField._render_part = _render_part  # type: ignore
 
 logging.getLogger('urllib3').setLevel(logging.WARNING)
 
-USER_AGENT = constants.REQUEST_USER_AGENT
-""":const:`telegram.constants.REQUEST_USER_AGENT`"""
+USER_AGENT = 'Python Telegram Bot (https://github.com/python-telegram-bot/python-telegram-bot)'
 
 
 class Request:

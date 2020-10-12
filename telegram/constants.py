@@ -39,7 +39,8 @@ Attributes:
     MAX_MESSAGE_ENTITIES (:obj:`int`): 100 (Beyond this cap telegram will simply ignore further
         formatting styles)
 
-The following constants are attributes of classes:
+The following constants are related to specific classes and are also available
+as attributes of those classes:
 
 :class:`telegram.Chat`:
 
@@ -112,15 +113,6 @@ Attributes:
     POLL_REGULAR (:obj:`str`): 'regular'
     POLL_QUIZ (:obj:`str`): 'quiz'
 
-
-
-:class:`telegram.ext.ConversationHandler`:
-
-Attributes:
-    CONVERSATIONHANDLER_END (:obj:`int`): -1
-    CONVERSATIONHANDLER_TIMEOUT (:obj:`int`): -2
-    CONVERSATIONHANDLER_WAITING (:obj:`int`): -3
-
 :class:`telegram.files.MaskPosition`:
 
 Attributes:
@@ -128,20 +120,6 @@ Attributes:
     STICKER_EYES (:obj:`str`): 'eyes'
     STICKER_MOUTH (:obj:`str`): 'mouth'
     STICKER_CHIN (:obj:`str`): 'chin'
-
-:class:`telegram.ext.BasePersistence`:
-
-Attributes:
-    BASEPERSISTENCE_REPLACED_BOT (:obj:`str`): 'bot_instance_replaced_by_ptb_persistence'
-
-Other constants:
-
-Attributes:
-
-    INPUTFILE_DEFAULT_MIME_TYPE (:obj:`str`): 'application/octet-stream'
-    REQUEST_USER_AGENT (:obj:`str`):Python Telegram Bot  \
-    (https://github.com/python-telegram-bot/python-telegram-bot)
-
 
 """
 from typing import List
@@ -211,16 +189,8 @@ PARSEMODE_HTML: str = 'HTML'
 POLL_REGULAR: str = 'regular'
 POLL_QUIZ: str = 'quiz'
 
-CONVERSATIONHANDLER_END = -1
-CONVERSATIONHANDLER_TIMEOUT = -2
-CONVERSATIONHANDLER_WAITING = -3
 
 STICKER_FOREHEAD: str = 'forehead'
 STICKER_EYES: str = 'eyes'
 STICKER_MOUTH: str = 'mouth'
 STICKER_CHIN: str = 'chin'
-
-BASEPERSISTENCE_REPLACED_BOT = 'bot_instance_replaced_by_ptb_persistence'
-INPUTFILE_DEFAULT_MIME_TYPE = 'application/octet-stream'
-REQUEST_USER_AGENT = 'Python Telegram Bot ' \
-                     '(https://github.com/python-telegram-bot/python-telegram-bot)'

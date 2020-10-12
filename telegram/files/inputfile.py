@@ -24,12 +24,11 @@ import mimetypes
 import os
 from uuid import uuid4
 
-from telegram import TelegramError, constants
+from telegram import TelegramError
 
 from typing import IO, Tuple, Optional
 
-DEFAULT_MIME_TYPE = constants.INPUTFILE_DEFAULT_MIME_TYPE
-""":const:`telegram.constants.INPUTFILE_DEFAULT_MIME_TYPE`"""
+DEFAULT_MIME_TYPE = 'application/octet-stream'
 
 
 class InputFile:
