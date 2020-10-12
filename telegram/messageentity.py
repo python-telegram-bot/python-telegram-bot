@@ -20,7 +20,7 @@
 
 from telegram import User, TelegramObject
 from telegram.utils.types import JSONDict
-from typing import Any, Optional, List, TYPE_CHECKING
+from typing import Any, Optional, List, TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -90,37 +90,37 @@ class MessageEntity(TelegramObject):
 
         return cls(**data)
 
-    MENTION: str = 'mention'
+    MENTION: ClassVar[str] = 'mention'
     """:obj:`str`: 'mention'"""
-    HASHTAG: str = 'hashtag'
+    HASHTAG: ClassVar[str] = 'hashtag'
     """:obj:`str`: 'hashtag'"""
-    CASHTAG: str = 'cashtag'
+    CASHTAG: ClassVar[str] = 'cashtag'
     """:obj:`str`: 'cashtag'"""
-    PHONE_NUMBER: str = 'phone_number'
+    PHONE_NUMBER: ClassVar[str] = 'phone_number'
     """:obj:`str`: 'phone_number'"""
-    BOT_COMMAND: str = 'bot_command'
+    BOT_COMMAND: ClassVar[str] = 'bot_command'
     """:obj:`str`: 'bot_command'"""
-    URL: str = 'url'
+    URL: ClassVar[str] = 'url'
     """:obj:`str`: 'url'"""
-    EMAIL: str = 'email'
+    EMAIL: ClassVar[str] = 'email'
     """:obj:`str`: 'email'"""
-    BOLD: str = 'bold'
+    BOLD: ClassVar[str] = 'bold'
     """:obj:`str`: 'bold'"""
-    ITALIC: str = 'italic'
+    ITALIC: ClassVar[str] = 'italic'
     """:obj:`str`: 'italic'"""
-    CODE: str = 'code'
+    CODE: ClassVar[str] = 'code'
     """:obj:`str`: 'code'"""
-    PRE: str = 'pre'
+    PRE: ClassVar[str] = 'pre'
     """:obj:`str`: 'pre'"""
-    TEXT_LINK: str = 'text_link'
+    TEXT_LINK: ClassVar[str] = 'text_link'
     """:obj:`str`: 'text_link'"""
-    TEXT_MENTION: str = 'text_mention'
+    TEXT_MENTION: ClassVar[str] = 'text_mention'
     """:obj:`str`: 'text_mention'"""
-    UNDERLINE: str = 'underline'
+    UNDERLINE: ClassVar[str] = 'underline'
     """:obj:`str`: 'underline'"""
-    STRIKETHROUGH: str = 'strikethrough'
+    STRIKETHROUGH: ClassVar[str] = 'strikethrough'
     """:obj:`str`: 'strikethrough'"""
-    ALL_TYPES: List[str] = [
+    ALL_TYPES: ClassVar[List[str]] = [
         MENTION,
         HASHTAG,
         CASHTAG,

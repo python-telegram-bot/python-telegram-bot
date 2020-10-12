@@ -23,7 +23,7 @@ from telegram import TelegramObject, ChatPhoto
 from .chatpermissions import ChatPermissions
 
 from telegram.utils.types import JSONDict
-from typing import Any, Optional, List, TYPE_CHECKING
+from typing import Any, Optional, List, TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
     from telegram import Bot, Message, ChatMember
@@ -92,13 +92,13 @@ class Chat(TelegramObject):
 
     """
 
-    PRIVATE: str = 'private'
+    PRIVATE: ClassVar[str] = 'private'
     """:obj:`str`: 'private'"""
-    GROUP: str = 'group'
+    GROUP: ClassVar[str] = 'group'
     """:obj:`str`: 'group'"""
-    SUPERGROUP: str = 'supergroup'
+    SUPERGROUP: ClassVar[str] = 'supergroup'
     """:obj:`str`: 'supergroup'"""
-    CHANNEL: str = 'channel'
+    CHANNEL: ClassVar[str] = 'channel'
     """:obj:`str`: 'channel'"""
 
     def __init__(

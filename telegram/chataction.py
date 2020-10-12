@@ -18,28 +18,29 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatAction."""
+from typing import ClassVar
 
 
 class ChatAction:
     """Helper class to provide constants for different chat actions."""
 
-    FIND_LOCATION: str = 'find_location'
+    FIND_LOCATION: ClassVar[str] = 'find_location'
     """:obj:`str`: 'find_location'"""
-    RECORD_AUDIO: str = 'record_audio'
+    RECORD_AUDIO: ClassVar[str] = 'record_audio'
     """:obj:`str`: 'record_audio'"""
-    RECORD_VIDEO: str = 'record_video'
+    RECORD_VIDEO: ClassVar[str] = 'record_video'
     """:obj:`str`: 'record_video'"""
-    RECORD_VIDEO_NOTE: str = 'record_video_note'
+    RECORD_VIDEO_NOTE: ClassVar[str] = 'record_video_note'
     """:obj:`str`: 'record_video_note'"""
-    TYPING: str = 'typing'
+    TYPING: ClassVar[str] = 'typing'
     """:obj:`str`: 'typing'"""
-    UPLOAD_AUDIO: str = 'upload_audio'
+    UPLOAD_AUDIO: ClassVar[str] = 'upload_audio'
     """:obj:`str`: 'upload_audio'"""
-    UPLOAD_DOCUMENT: str = 'upload_document'
+    UPLOAD_DOCUMENT: ClassVar[str] = 'upload_document'
     """:obj:`str`: 'upload_document'"""
-    UPLOAD_PHOTO: str = 'upload_photo'
+    UPLOAD_PHOTO: ClassVar[str] = 'upload_photo'
     """:obj:`str`: 'upload_photo'"""
-    UPLOAD_VIDEO: str = 'upload_video'
+    UPLOAD_VIDEO: ClassVar[str] = 'upload_video'
     """:obj:`str`: 'upload_video'"""
-    UPLOAD_VIDEO_NOTE: str = 'upload_video_note'
+    UPLOAD_VIDEO_NOTE: ClassVar[str] = 'upload_video_note'
     """:obj:`str`: 'upload_video_note'"""

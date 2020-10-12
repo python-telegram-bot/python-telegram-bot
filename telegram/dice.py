@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Dice."""
 from telegram import TelegramObject
-from typing import Any, List
+from typing import Any, List, ClassVar
 
 
 class Dice(TelegramObject):
@@ -55,12 +55,12 @@ class Dice(TelegramObject):
 
         self._id_attrs = (self.value, self.emoji)
 
-    DICE: str = '🎲'
+    DICE: ClassVar[str] = '🎲'
     """:obj:`str`: '🎲'"""
-    DARTS: str = '🎯'
+    DARTS: ClassVar[str] = '🎯'
     """:obj:`str`: '🎯'"""
     BASKETBALL = '🏀'
     """:obj:`str`: '🏀'"""
-    ALL_EMOJI: List[str] = [DICE, DARTS, BASKETBALL]
+    ALL_EMOJI: ClassVar[List[str]] = [DICE, DARTS, BASKETBALL]
     """List[:obj:`str`]: List of all supported base emoji. Currently :attr:`DICE`,
     :attr:`DARTS` and :attr:`BASKETBALL`."""

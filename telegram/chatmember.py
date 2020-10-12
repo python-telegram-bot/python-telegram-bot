@@ -23,7 +23,7 @@ from telegram import User, TelegramObject
 from telegram.utils.helpers import to_timestamp, from_timestamp
 
 from telegram.utils.types import JSONDict
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, Optional, TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -112,17 +112,17 @@ class ChatMember(TelegramObject):
 
     """
 
-    ADMINISTRATOR: str = 'administrator'
+    ADMINISTRATOR: ClassVar[str] = 'administrator'
     """:obj:`str`: 'administrator'"""
-    CREATOR: str = 'creator'
+    CREATOR: ClassVar[str] = 'creator'
     """:obj:`str`: 'creator'"""
-    KICKED: str = 'kicked'
+    KICKED: ClassVar[str] = 'kicked'
     """:obj:`str`: 'kicked'"""
-    LEFT: str = 'left'
+    LEFT: ClassVar[str] = 'left'
     """:obj:`str`: 'left'"""
-    MEMBER: str = 'member'
+    MEMBER: ClassVar[str] = 'member'
     """:obj:`str`: 'member'"""
-    RESTRICTED: str = 'restricted'
+    RESTRICTED: ClassVar[str] = 'restricted'
     """:obj:`str`: 'restricted'"""
 
     def __init__(
