@@ -73,7 +73,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         **kwargs: Any,
     ):
         # Required
-        self.keyboard = []
+        k = []
         if keyboard is not None:
             for row in keyboard:
                 r = []
@@ -82,7 +82,8 @@ class ReplyKeyboardMarkup(ReplyMarkup):
                         r.append(button)  # telegram.KeyboardButton
                     else:
                         r.append(KeyboardButton(button))  # str
-                self.keyboard.append(r)
+                k.append(r)
+        self.keyboard = [[]] if len(k) == 0 else k
 
         # Optionals
         self.resize_keyboard = bool(resize_keyboard)

@@ -73,18 +73,90 @@ class TestInlineKeyboardMarkup:
         assert len(inline_keyboard_markup[0]) == 1
         assert len(inline_keyboard_markup[1]) == 1
 
+    def test_add_button(self):
+        inline_keyboard_markup = InlineKeyboardMarkup().add_button(
+            InlineKeyboardButton(text='button1', callback_data='data1')
+        ).inline_keyboard
+        assert len(inline_keyboard_markup) == 1
+        assert len(inline_keyboard_markup[0]) == 1
+        inline_keyboard_markup = InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton(text='button2', callback_data='data2'),
+                    InlineKeyboardButton(text='button3', callback_data='data3'),
+                ],
+                [
+                    InlineKeyboardButton(text='button4', callback_data='data4'),
+                    InlineKeyboardButton(text='button5', callback_data='data5'),
+                ],
+                [
+                    InlineKeyboardButton(text='button6', callback_data='data6'),
+                ]
+            ]
+        ).add_button(
+            InlineKeyboardButton(text='button7', callback_data='data7')
+        ).add_button(
+            InlineKeyboardButton(text='button8', callback_data='data8'),
+            from_row=0,
+            column=1
+        ).add_button(
+            InlineKeyboardButton(text='button9', callback_data='data9'),
+            from_row=1,
+            column=-2
+        ).add_button(
+            InlineKeyboardButton(text='button10', callback_data='data10'),
+            from_row=2,
+            column=-100
+        ).add_button(
+            InlineKeyboardButton(text='button11', callback_data='data11'),
+            from_row=2,
+            column=100
+        ).inline_keyboard
+        assert len(inline_keyboard_markup) == 3
+        assert len(inline_keyboard_markup[0]) == 3
+        assert len(inline_keyboard_markup[1]) == 3
+        assert len(inline_keyboard_markup[2]) == 4
+        assert inline_keyboard_markup[2][2].text == 'button7'
+        assert inline_keyboard_markup[0][1].text == 'button8'
+        assert inline_keyboard_markup[1][-3].text == 'button9'
+        assert inline_keyboard_markup[2][0].text == 'button10'
+        assert inline_keyboard_markup[2][-1].text == 'button11'
+
+    def test_add_row(self):
+        inline_keyboard_markup = InlineKeyboardMarkup().add_row().inline_keyboard
+        assert len(inline_keyboard_markup) == 2
+        assert len(inline_keyboard_markup[0]) == 0
+        assert len(inline_keyboard_markup[1]) == 0
+        inline_keyboard_markup = InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton(text='button1', callback_data='data1'),
+                    InlineKeyboardButton(text='button2', callback_data='data2'),
+                ],
+                [
+                    InlineKeyboardButton(text='button3', callback_data='data3'),
+                    InlineKeyboardButton(text='button4', callback_data='data4'),
+                ]
+            ]
+        ).add_row(
+            button_row=[InlineKeyboardButton(text='button5', callback_data='data5')],
+            index=1
+        ).inline_keyboard
+        assert len(inline_keyboard_markup) == 3
+        assert inline_keyboard_markup[1][0].text == 'button5'
+
     def test_expected_values(self, inline_keyboard_markup):
         assert inline_keyboard_markup.inline_keyboard == self.inline_keyboard
 
     def test_expected_values_empty_switch(self, inline_keyboard_markup, bot, monkeypatch):
         def test(
-            url,
-            data,
-            reply_to_message_id=None,
-            disable_notification=None,
-            reply_markup=None,
-            timeout=None,
-            **kwargs,
+                url,
+                data,
+                reply_to_message_id=None,
+                disable_notification=None,
+                reply_markup=None,
+                timeout=None,
+                **kwargs,
         ):
             if reply_markup is not None:
                 if isinstance(reply_markup, ReplyMarkup):

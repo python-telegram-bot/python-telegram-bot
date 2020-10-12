@@ -88,6 +88,55 @@ class TestReplyKeyboardMarkup:
         assert len(reply_keyboard_markup[0]) == 1
         assert len(reply_keyboard_markup[1]) == 1
 
+    def test_add_button(self):
+        reply_keyboard_markup = ReplyKeyboardMarkup().add_button(
+            KeyboardButton(text='button1')
+        ).keyboard
+        assert len(reply_keyboard_markup) == 1
+        assert len(reply_keyboard_markup[0]) == 1
+        reply_keyboard_markup = ReplyKeyboardMarkup(
+            [
+                [KeyboardButton(text='button2'), KeyboardButton(text='button3')],
+                [KeyboardButton(text='button4'), KeyboardButton(text='button5')],
+                [KeyboardButton(text='button6')]
+            ]
+        ).add_button(
+            KeyboardButton(text='button7')
+        ).add_button(
+            KeyboardButton(text='button8'), from_row=0, column=1
+        ).add_button(
+            KeyboardButton(text='button9'), from_row=1, column=-2
+        ).add_button(
+            KeyboardButton(text='button10'), from_row=2, column=-100
+        ).add_button(
+            KeyboardButton(text='button11'), column=100
+        ).keyboard
+        assert len(reply_keyboard_markup) == 3
+        assert len(reply_keyboard_markup[0]) == 3
+        assert len(reply_keyboard_markup[1]) == 3
+        assert len(reply_keyboard_markup[2]) == 4
+        assert reply_keyboard_markup[2][2].text == 'button7'
+        assert reply_keyboard_markup[0][1].text == 'button8'
+        assert reply_keyboard_markup[1][-3].text == 'button9'
+        assert reply_keyboard_markup[2][0].text == 'button10'
+        assert reply_keyboard_markup[2][-1].text == 'button11'
+
+    def test_add_row(self):
+        reply_keyboard_markup = ReplyKeyboardMarkup().add_row().keyboard
+        assert len(reply_keyboard_markup) == 2
+        assert len(reply_keyboard_markup[0]) == 0
+        assert len(reply_keyboard_markup[1]) == 0
+        reply_keyboard_markup = ReplyKeyboardMarkup(
+            [
+                [KeyboardButton(text='button1'), KeyboardButton(text='button2')],
+                [KeyboardButton(text='button3'), KeyboardButton(text='button4')]
+            ]
+        ).add_row(
+            button_row=[KeyboardButton(text='button5')], index=1
+        ).keyboard
+        assert len(reply_keyboard_markup) == 3
+        assert reply_keyboard_markup[1][0].text == 'button5'
+
     def test_expected_values(self, reply_keyboard_markup):
         assert isinstance(reply_keyboard_markup.keyboard, list)
         assert isinstance(reply_keyboard_markup.keyboard[0][0], KeyboardButton)
