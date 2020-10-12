@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represents stickers."""
 
-from telegram import PhotoSize, TelegramObject
+from telegram import PhotoSize, TelegramObject, constants
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, List, TYPE_CHECKING
 
@@ -233,14 +233,14 @@ class MaskPosition(TelegramObject):
 
     """
 
-    FOREHEAD: str = 'forehead'
-    """:obj:`str`: 'forehead'"""
-    EYES: str = 'eyes'
-    """:obj:`str`: 'eyes'"""
-    MOUTH: str = 'mouth'
-    """:obj:`str`: 'mouth'"""
-    CHIN: str = 'chin'
-    """:obj:`str`: 'chin'"""
+    FOREHEAD: str = constants.STICKER_FOREHEAD
+    """:const:`telegram.constants.STICKER_FOREHEAD`"""
+    EYES: str = constants.STICKER_EYES
+    """:const:`telegram.constants.STICKER_EYES`"""
+    MOUTH: str = constants.STICKER_MOUTH
+    """:const:`telegram.constants.STICKER_MOUTH`"""
+    CHIN: str = constants.STICKER_CHIN
+    """:const:`telegram.constants.STICKER_CHIN`"""
 
     def __init__(self, point: str, x_shift: float, y_shift: float, scale: float, **kwargs: Any):
         self.point = point

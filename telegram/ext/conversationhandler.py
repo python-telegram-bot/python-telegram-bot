@@ -22,7 +22,7 @@ import logging
 import warnings
 from threading import Lock
 
-from telegram import Update
+from telegram import Update, constants
 from telegram.ext import (
     Handler,
     CallbackQueryHandler,
@@ -168,13 +168,15 @@ class ConversationHandler(Handler):
         ValueError
 
     """
-
-    END = -1
-    """:obj:`int`: Used as a constant to return when a conversation is ended."""
-    TIMEOUT = -2
-    """:obj:`int`: Used as a constant to handle state when a conversation is timed out."""
-    WAITING = -3
-    """:obj:`int`: Used as a constant to handle state when a conversation is still waiting on the
+    END = constants.CONVERSATIONHANDLER_END
+    """:const:`telegram.constants.CONVERSATIONHANDLER_END`\n
+    Used as a constant to return when a conversation is ended."""
+    TIMEOUT = constants.CONVERSATIONHANDLER_TIMEOUT
+    """:const:`telegram.constants.CONVERSATIONHANDLER_TIMEOUT`\n
+    Used as a constant to handle state when a conversation is timed out."""
+    WAITING = constants.CONVERSATIONHANDLER_WAITING
+    """:const:`telegram.constants.CONVERSATIONHANDLER_WAITING`\n
+    Used as a constant to handle state when a conversation is still waiting on the
     previous ``@run_sync`` decorated running handler to finish."""
 
     def __init__(

@@ -22,7 +22,7 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from copy import copy
 
-from telegram import Bot
+from telegram import Bot, constants
 
 from typing import DefaultDict, Dict, Any, Tuple, Optional, cast
 from telegram.utils.types import ConversationDict
@@ -302,5 +302,6 @@ class BasePersistence(ABC):
         """
         pass
 
-    REPLACED_BOT = 'bot_instance_replaced_by_ptb_persistence'
-    """:obj:`str`: Placeholder for :class:`telegram.Bot` instances replaced in saved data."""
+    REPLACED_BOT = constants.BASEPERSISTENCE_REPLACED_BOT
+    """:const:`telegram.constants.BASEPERSISTENCE_REPLACED_BOT`\n
+    Placeholder for :class:`telegram.Bot` instances replaced in saved data."""
