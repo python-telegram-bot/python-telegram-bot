@@ -164,11 +164,15 @@ class InlineKeyboardMarkup(ReplyMarkup):
                 self.inline_keyboard[row].insert(column, button)
         return self
 
-    def add_row(self, index: int = None, **kwargs: Any) -> 'InlineKeyboardMarkup':
+    def add_row(
+            self, button_row: List[InlineKeyboardButton] = None, index: int = None, **kwargs: Any
+    ) -> 'InlineKeyboardMarkup':
         """Convenient method to add List[:class:`telegram.InlineKeyboardButton`] into
         a specified location.
 
         Args:
+            button_row: (List[:class:`telegram.InlineKeyboardButton`]): The button to add to the
+                markup
             index (:obj:`int`, optional): Set index for the row insert location of the markup.
                 Leave `None`, to append the row to the end of markup.
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
@@ -176,15 +180,16 @@ class InlineKeyboardMarkup(ReplyMarkup):
         Returns:
             :class:`telegram.InlineKeyboardButton`
         """
+        row = [] if button_row is None else button_row
         if index is None:
-            self.inline_keyboard.append([])
+            self.inline_keyboard.append(row)
         else:
             if index >= len(self.inline_keyboard):
-                self.inline_keyboard.append([])
+                self.inline_keyboard.append(row)
             elif index < -len(self.inline_keyboard):
-                self.inline_keyboard.insert(0, [])
+                self.inline_keyboard.insert(0, row)
             else:
-                self.inline_keyboard.insert(index, [])
+                self.inline_keyboard.insert(index, row)
         return self
 
     def __eq__(self, other: object) -> bool:
