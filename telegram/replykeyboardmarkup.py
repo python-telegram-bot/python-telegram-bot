@@ -66,7 +66,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
 
     def __init__(
         self,
-        keyboard: List[List[Union[str, KeyboardButton]]],
+        keyboard: List[List[Union[str, KeyboardButton]]] = None,
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
@@ -74,14 +74,15 @@ class ReplyKeyboardMarkup(ReplyMarkup):
     ):
         # Required
         self.keyboard = []
-        for row in keyboard:
-            r = []
-            for button in row:
-                if isinstance(button, KeyboardButton):
-                    r.append(button)  # telegram.KeyboardButton
-                else:
-                    r.append(KeyboardButton(button))  # str
-            self.keyboard.append(r)
+        if keyboard is not None:
+            for row in keyboard:
+                r = []
+                for button in row:
+                    if isinstance(button, KeyboardButton):
+                        r.append(button)  # telegram.KeyboardButton
+                    else:
+                        r.append(KeyboardButton(button))  # str
+                self.keyboard.append(r)
 
         # Optionals
         self.resize_keyboard = bool(resize_keyboard)
@@ -239,6 +240,86 @@ class ReplyKeyboardMarkup(ReplyMarkup):
             selective=selective,
             **kwargs,
         )
+
+    def add_button(
+            self,
+            button: Union[KeyboardButton, str],
+            from_row: int = None,
+            column: int = None,
+            **kwargs: Any,
+    ) -> 'ReplyKeyboardMarkup':
+        """Convenient method to add :class:`telegram.KeyboardButton` to the specified
+        row and column.
+
+        Args:
+            button (:class:`telegram.KeyboardButton` | :obj:`str`): The button to be added to
+                the markup
+            from_row (:obj:`int`, optional): Set index to specify the row to add the button.
+                The value should be included in the row indexes. Leave `None` to set the last row
+                as default.
+            column (:obj:`int`, optional): Set index for the button insert location of the row.
+                Leave `None`, to append the button to the row by default.
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :class:`telegram.ReplyKeyboardMarkup`
+
+        Raises:
+            :class:`IndexError`
+
+        """
+        button = button if isinstance(button, KeyboardButton) else KeyboardButton(button)
+        row = len(self.keyboard) - 1 if from_row is None else from_row
+        if row >= len(self.keyboard) or row < -len(self.keyboard):
+            raise IndexError('row index out of range')
+        if column is None:
+            self.keyboard[row].append(button)
+        else:
+            if column >= len(self.keyboard[row]):
+                self.keyboard[row].append(button)
+            elif column < -len(self.keyboard[row]):
+                self.keyboard[row].insert(0, button)
+            else:
+                self.keyboard[row].insert(column, button)
+        return self
+
+    def add_row(
+            self,
+            button_row: List[Union[str, KeyboardButton]] = None,
+            index: int = None,
+            **kwargs: Any
+    ) -> 'ReplyKeyboardMarkup':
+        """Convenient method to add List[:class:`telegram.KeyboardButton` | :obj:`str`] into
+        a specified location.
+
+        Args:
+            button_row: (List[:class:`telegram.KeyboardButton` | :obj:`str`]): The button to
+                add to the markup
+            index (:obj:`int`, optional): Set index for the row insert location of the markup.
+                Leave `None`, to append the row to the end of markup.
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :class:`telegram.ReplyKeyboardMarkup`
+        """
+        row = []
+        if button_row is not None:
+            for button in button_row:
+                if isinstance(button, KeyboardButton):
+                    row.append(button)
+                else:
+                    row.append(KeyboardButton(button))
+
+        if index is None:
+            self.keyboard.append(row)
+        else:
+            if index >= len(self.keyboard):
+                self.keyboard.append(row)
+            elif index < -len(self.keyboard):
+                self.keyboard.insert(0, row)
+            else:
+                self.keyboard.insert(index, row)
+        return self
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, self.__class__):
