@@ -120,21 +120,6 @@ class MessageEntity(TelegramObject):
     """:const:`telegram.constants.MESSAGEENTITY_UNDERLINE`"""
     STRIKETHROUGH: str = constants.MESSAGEENTITY_STRIKETHROUGH
     """:const:`telegram.constants.MESSAGEENTITY_STRIKETHROUGH`"""
-    ALL_TYPES: List[str] = [
-        MENTION,
-        HASHTAG,
-        CASHTAG,
-        PHONE_NUMBER,
-        BOT_COMMAND,
-        URL,
-        EMAIL,
-        BOLD,
-        ITALIC,
-        CODE,
-        PRE,
-        TEXT_LINK,
-        TEXT_MENTION,
-        UNDERLINE,
-        STRIKETHROUGH,
-    ]
-    """List[:obj:`str`]: List of all the types."""
+    ALL_TYPES: List[str] = constants.MESSAGEENTITY_ALL_TYPES
+    """:const:`telegram.constants.MESSAGEENTITY_ALL_TYPES`\n
+    List of all the types"""

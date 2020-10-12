@@ -168,6 +168,7 @@ class ConversationHandler(Handler):
         ValueError
 
     """
+
     END = -1
     """:obj:`int`: Used as a constant to return when a conversation is ended."""
     TIMEOUT = -2

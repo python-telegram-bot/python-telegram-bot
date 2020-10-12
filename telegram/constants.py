@@ -80,6 +80,7 @@ Attributes:
     DICE_DICE (:obj:`str`): '🎲'
     DICE_DARTS (:obj:`str`): '🎯'
     DICE_BASKETBALL (:obj:`str`): '🏀'
+    DICE_ALL_EMOJI (List[:obj:`str`]): List of all supported base emoji.
 
 :class:`telegram.MessageEntity`:
 
@@ -99,6 +100,7 @@ Attributes:
     MESSAGEENTITY_TEXT_MENTION (:obj:`str`): 'text_mention'
     MESSAGEENTITY_UNDERLINE (:obj:`str`): 'underline'
     MESSAGEENTITY_STRIKETHROUGH (:obj:`str`): 'strikethrough'
+    MESSAGEENTITY_ALL_TYPES (List[:obj:`str`]): List of all the types of message entity.
 
 :class:`telegram.ParseMode`:
 
@@ -165,6 +167,7 @@ CHATMEMBER_RESTRICTED: str = 'restricted'
 DICE_DICE: str = '🎲'
 DICE_DARTS: str = '🎯'
 DICE_BASKETBALL: str = '🏀'
+DICE_ALL_EMOJI: List[str] = [DICE_DICE, DICE_DARTS, DICE_BASKETBALL]
 
 MESSAGEENTITY_MENTION: str = 'mention'
 MESSAGEENTITY_HASHTAG: str = 'hashtag'
@@ -181,6 +184,23 @@ MESSAGEENTITY_TEXT_LINK: str = 'text_link'
 MESSAGEENTITY_TEXT_MENTION: str = 'text_mention'
 MESSAGEENTITY_UNDERLINE: str = 'underline'
 MESSAGEENTITY_STRIKETHROUGH: str = 'strikethrough'
+MESSAGEENTITY_ALL_TYPES: List[str] = [
+        MESSAGEENTITY_MENTION,
+        MESSAGEENTITY_HASHTAG,
+        MESSAGEENTITY_CASHTAG,
+        MESSAGEENTITY_PHONE_NUMBER,
+        MESSAGEENTITY_BOT_COMMAND,
+        MESSAGEENTITY_URL,
+        MESSAGEENTITY_EMAIL,
+        MESSAGEENTITY_BOLD,
+        MESSAGEENTITY_ITALIC,
+        MESSAGEENTITY_CODE,
+        MESSAGEENTITY_PRE,
+        MESSAGEENTITY_TEXT_LINK,
+        MESSAGEENTITY_TEXT_MENTION,
+        MESSAGEENTITY_UNDERLINE,
+        MESSAGEENTITY_STRIKETHROUGH,
+]
 
 PARSEMODE_MARKDOWN: str = 'Markdown'
 PARSEMODE_MARKDOWN_V2: str = 'MarkdownV2'
