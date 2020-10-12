@@ -294,8 +294,8 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         a specified location.
 
         Args:
-            button_row: (List[:class:`telegram.KeyboardButton` | :obj:`str`]): The button to
-                add to the markup
+            button_row: (List[:class:`telegram.KeyboardButton` | :obj:`str`], optional): The
+                button to add to the markup
             index (:obj:`int`, optional): Set index for the row insert location of the markup.
                 Leave `None`, to append the row to the end of markup.
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
@@ -320,6 +320,39 @@ class ReplyKeyboardMarkup(ReplyMarkup):
                 self.keyboard.insert(0, row)
             else:
                 self.keyboard.insert(index, row)
+        return self
+
+    def add_from_markup(
+            self,
+            markup: 'ReplyKeyboardMarkup',
+            index: int = None,
+            **kwargs: Any
+    ) -> 'ReplyKeyboardMarkup':
+        """Convenient method to add :class:`telegram.ReplyKeyboardMarkup` to current markup
+
+        Args:
+            markup (:class:`telegram.InlineKeyboardMarkup`): Add :class:`ReplyKeyboardMarkup`
+                to current markup.
+            index (:obj:`int`, optional):  Set index for the markup insert location of the
+                current markup. Leave `None`, to append the markup to the end.
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :class:`telegram.ReplyKeyboardMarkup`
+        """
+        if index is None:
+            self.keyboard += markup.keyboard
+        else:
+            if index >= len(self.keyboard):
+                self.keyboard += markup.keyboard
+            elif index < -len(self.keyboard):
+                self.keyboard = \
+                    markup.keyboard + self.keyboard
+            else:
+                self.keyboard = \
+                    self.keyboard[0:index] \
+                    + markup.keyboard \
+                    + self.keyboard[index:len(self.keyboard)]
         return self
 
     def __eq__(self, other: object) -> bool:
