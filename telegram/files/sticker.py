@@ -20,7 +20,7 @@
 
 from typing import TYPE_CHECKING, Any, List, Optional
 
-from telegram import PhotoSize, TelegramObject
+from telegram import PhotoSize, TelegramObject, constants
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -234,14 +234,14 @@ class MaskPosition(TelegramObject):
 
     """
 
-    FOREHEAD: str = 'forehead'
-    """:obj:`str`: 'forehead'"""
-    EYES: str = 'eyes'
-    """:obj:`str`: 'eyes'"""
-    MOUTH: str = 'mouth'
-    """:obj:`str`: 'mouth'"""
-    CHIN: str = 'chin'
-    """:obj:`str`: 'chin'"""
+    FOREHEAD: str = constants.STICKER_FOREHEAD
+    """:const:`telegram.constants.STICKER_FOREHEAD`"""
+    EYES: str = constants.STICKER_EYES
+    """:const:`telegram.constants.STICKER_EYES`"""
+    MOUTH: str = constants.STICKER_MOUTH
+    """:const:`telegram.constants.STICKER_MOUTH`"""
+    CHIN: str = constants.STICKER_CHIN
+    """:const:`telegram.constants.STICKER_CHIN`"""
 
     def __init__(
         self, point: str, x_shift: float, y_shift: float, scale: float, **kwargs: Any

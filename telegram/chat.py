@@ -21,7 +21,7 @@
 
 from typing import TYPE_CHECKING, Any, List, Optional
 
-from telegram import ChatPhoto, TelegramObject
+from telegram import ChatPhoto, TelegramObject, constants
 from telegram.utils.types import JSONDict
 
 from .chatpermissions import ChatPermissions
@@ -93,14 +93,14 @@ class Chat(TelegramObject):
 
     """
 
-    PRIVATE: str = 'private'
-    """:obj:`str`: 'private'"""
-    GROUP: str = 'group'
-    """:obj:`str`: 'group'"""
-    SUPERGROUP: str = 'supergroup'
-    """:obj:`str`: 'supergroup'"""
-    CHANNEL: str = 'channel'
-    """:obj:`str`: 'channel'"""
+    PRIVATE: str = constants.CHAT_PRIVATE
+    """:const:`telegram.constants.CHAT_PRIVATE`"""
+    GROUP: str = constants.CHAT_GROUP
+    """:const:`telegram.constants.CHAT_GROUP`"""
+    SUPERGROUP: str = constants.CHAT_SUPERGROUP
+    """:const:`telegram.constants.CHAT_SUPERGROUP`"""
+    CHANNEL: str = constants.CHAT_CHANNEL
+    """:const:`telegram.constants.CHAT_CHANNEL`"""
 
     def __init__(
         self,  # pylint: disable=W0613
