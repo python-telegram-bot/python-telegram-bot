@@ -62,5 +62,4 @@ class Dice(TelegramObject):
     BASKETBALL: str = constants.DICE_BASKETBALL
     """:const:`telegram.constants.DICE_BASKETBALL`"""
     ALL_EMOJI: List[str] = constants.DICE_ALL_EMOJI
-    """:const:`telegram.constants.DICE_ALL_EMOJI`\n
-    List of all supported base emoji"""
+    """:const:`telegram.constants.DICE_ALL_EMOJI`"""
