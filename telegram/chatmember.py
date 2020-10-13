@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram ChatMember."""
 import datetime
 
-from telegram import User, TelegramObject
+from telegram import User, TelegramObject, constants
 from telegram.utils.helpers import to_timestamp, from_timestamp
 
 from telegram.utils.types import JSONDict
@@ -111,19 +111,18 @@ class ChatMember(TelegramObject):
             may add web page previews to his messages.
 
     """
-
-    ADMINISTRATOR: ClassVar[str] = 'administrator'
-    """:obj:`str`: 'administrator'"""
-    CREATOR: ClassVar[str] = 'creator'
-    """:obj:`str`: 'creator'"""
-    KICKED: ClassVar[str] = 'kicked'
-    """:obj:`str`: 'kicked'"""
-    LEFT: ClassVar[str] = 'left'
-    """:obj:`str`: 'left'"""
-    MEMBER: ClassVar[str] = 'member'
-    """:obj:`str`: 'member'"""
-    RESTRICTED: ClassVar[str] = 'restricted'
-    """:obj:`str`: 'restricted'"""
+    ADMINISTRATOR: ClassVar[str] = constants.CHATMEMBER_ADMINISTRATOR
+    """:const:`telegram.constants.CHATMEMBER_ADMINISTRATOR`"""
+    CREATOR: ClassVar[str] = constants.CHATMEMBER_CREATOR
+    """:const:`telegram.constants.CHATMEMBER_CREATOR`"""
+    KICKED: ClassVar[str] = constants.CHATMEMBER_KICKED
+    """:const:`telegram.constants.CHATMEMBER_KICKED`"""
+    LEFT: ClassVar[str] = constants.CHATMEMBER_LEFT
+    """:const:`telegram.constants.CHATMEMBER_LEFT`"""
+    MEMBER: ClassVar[str] = constants.CHATMEMBER_MEMBER
+    """:const:`telegram.constants.CHATMEMBER_MEMBER`"""
+    RESTRICTED: ClassVar[str] = constants.CHATMEMBER_RESTRICTED
+    """:const:`telegram.constants.CHATMEMBER_RESTRICTED`"""
 
     def __init__(
         self,
