@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Dice."""
-from telegram import TelegramObject
+from telegram import TelegramObject, constants
 from typing import Any, List
 
 
@@ -55,12 +55,11 @@ class Dice(TelegramObject):
 
         self._id_attrs = (self.value, self.emoji)
 
-    DICE: str = '🎲'
-    """:obj:`str`: '🎲'"""
-    DARTS: str = '🎯'
-    """:obj:`str`: '🎯'"""
-    BASKETBALL = '🏀'
-    """:obj:`str`: '🏀'"""
-    ALL_EMOJI: List[str] = [DICE, DARTS, BASKETBALL]
-    """List[:obj:`str`]: List of all supported base emoji. Currently :attr:`DICE`,
-    :attr:`DARTS` and :attr:`BASKETBALL`."""
+    DICE: str = constants.DICE_DICE
+    """:const:`telegram.constants.DICE_DICE`"""
+    DARTS: str = constants.DICE_DARTS
+    """:const:`telegram.constants.DICE_DARTS`"""
+    BASKETBALL: str = constants.DICE_BASKETBALL
+    """:const:`telegram.constants.DICE_BASKETBALL`"""
+    ALL_EMOJI: List[str] = constants.DICE_ALL_EMOJI
+    """:const:`telegram.constants.DICE_ALL_EMOJI`"""

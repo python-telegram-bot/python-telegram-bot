@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram MessageEntity."""
 
-from telegram import User, TelegramObject
+from telegram import User, TelegramObject, constants
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, List, TYPE_CHECKING
 
@@ -90,51 +90,36 @@ class MessageEntity(TelegramObject):
 
         return cls(**data)
 
-    MENTION: str = 'mention'
-    """:obj:`str`: 'mention'"""
-    HASHTAG: str = 'hashtag'
-    """:obj:`str`: 'hashtag'"""
-    CASHTAG: str = 'cashtag'
-    """:obj:`str`: 'cashtag'"""
-    PHONE_NUMBER: str = 'phone_number'
-    """:obj:`str`: 'phone_number'"""
-    BOT_COMMAND: str = 'bot_command'
-    """:obj:`str`: 'bot_command'"""
-    URL: str = 'url'
-    """:obj:`str`: 'url'"""
-    EMAIL: str = 'email'
-    """:obj:`str`: 'email'"""
-    BOLD: str = 'bold'
-    """:obj:`str`: 'bold'"""
-    ITALIC: str = 'italic'
-    """:obj:`str`: 'italic'"""
-    CODE: str = 'code'
-    """:obj:`str`: 'code'"""
-    PRE: str = 'pre'
-    """:obj:`str`: 'pre'"""
-    TEXT_LINK: str = 'text_link'
-    """:obj:`str`: 'text_link'"""
-    TEXT_MENTION: str = 'text_mention'
-    """:obj:`str`: 'text_mention'"""
-    UNDERLINE: str = 'underline'
-    """:obj:`str`: 'underline'"""
-    STRIKETHROUGH: str = 'strikethrough'
-    """:obj:`str`: 'strikethrough'"""
-    ALL_TYPES: List[str] = [
-        MENTION,
-        HASHTAG,
-        CASHTAG,
-        PHONE_NUMBER,
-        BOT_COMMAND,
-        URL,
-        EMAIL,
-        BOLD,
-        ITALIC,
-        CODE,
-        PRE,
-        TEXT_LINK,
-        TEXT_MENTION,
-        UNDERLINE,
-        STRIKETHROUGH,
-    ]
-    """List[:obj:`str`]: List of all the types."""
+    MENTION: str = constants.MESSAGEENTITY_MENTION
+    """:const:`telegram.constants.MESSAGEENTITY_MENTION`"""
+    HASHTAG: str = constants.MESSAGEENTITY_HASHTAG
+    """:const:`telegram.constants.MESSAGEENTITY_HASHTAG`"""
+    CASHTAG: str = constants.MESSAGEENTITY_CASHTAG
+    """:const:`telegram.constants.MESSAGEENTITY_CASHTAG`"""
+    PHONE_NUMBER: str = constants.MESSAGEENTITY_PHONE_NUMBER
+    """:const:`telegram.constants.MESSAGEENTITY_PHONE_NUMBER`"""
+    BOT_COMMAND: str = constants.MESSAGEENTITY_BOT_COMMAND
+    """:const:`telegram.constants.MESSAGEENTITY_BOT_COMMAND`"""
+    URL: str = constants.MESSAGEENTITY_URL
+    """:const:`telegram.constants.MESSAGEENTITY_URL`"""
+    EMAIL: str = constants.MESSAGEENTITY_EMAIL
+    """:const:`telegram.constants.MESSAGEENTITY_EMAIL`"""
+    BOLD: str = constants.MESSAGEENTITY_BOLD
+    """:const:`telegram.constants.MESSAGEENTITY_BOLD`"""
+    ITALIC: str = constants.MESSAGEENTITY_ITALIC
+    """:const:`telegram.constants.MESSAGEENTITY_ITALIC`"""
+    CODE: str = constants.MESSAGEENTITY_CODE
+    """:const:`telegram.constants.MESSAGEENTITY_CODE`"""
+    PRE: str = constants.MESSAGEENTITY_PRE
+    """:const:`telegram.constants.MESSAGEENTITY_PRE`"""
+    TEXT_LINK: str = constants.MESSAGEENTITY_TEXT_LINK
+    """:const:`telegram.constants.MESSAGEENTITY_TEXT_LINK`"""
+    TEXT_MENTION: str = constants.MESSAGEENTITY_TEXT_MENTION
+    """:const:`telegram.constants.MESSAGEENTITY_TEXT_MENTION`"""
+    UNDERLINE: str = constants.MESSAGEENTITY_UNDERLINE
+    """:const:`telegram.constants.MESSAGEENTITY_UNDERLINE`"""
+    STRIKETHROUGH: str = constants.MESSAGEENTITY_STRIKETHROUGH
+    """:const:`telegram.constants.MESSAGEENTITY_STRIKETHROUGH`"""
+    ALL_TYPES: List[str] = constants.MESSAGEENTITY_ALL_TYPES
+    """:const:`telegram.constants.MESSAGEENTITY_ALL_TYPES`\n
+    List of all the types"""
