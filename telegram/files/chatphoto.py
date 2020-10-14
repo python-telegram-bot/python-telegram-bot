@@ -20,6 +20,7 @@
 from telegram import TelegramObject
 
 from typing import Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import Bot, File
 
@@ -61,13 +62,15 @@ class ChatPhoto(TelegramObject):
 
     """
 
-    def __init__(self,
-                 small_file_id: str,
-                 small_file_unique_id: str,
-                 big_file_id: str,
-                 big_file_unique_id: str,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        small_file_id: str,
+        small_file_unique_id: str,
+        big_file_id: str,
+        big_file_unique_id: str,
+        bot: 'Bot' = None,
+        **kwargs: Any,
+    ):
         self.small_file_id = small_file_id
         self.small_file_unique_id = small_file_unique_id
         self.big_file_id = big_file_id
@@ -75,7 +78,10 @@ class ChatPhoto(TelegramObject):
 
         self.bot = bot
 
-        self._id_attrs = (self.small_file_unique_id, self.big_file_unique_id,)
+        self._id_attrs = (
+            self.small_file_unique_id,
+            self.big_file_unique_id,
+        )
 
     def get_small_file(self, timeout: int = None, **kwargs: Any) -> 'File':
         """Convenience wrapper over :attr:`telegram.Bot.get_file` for getting the

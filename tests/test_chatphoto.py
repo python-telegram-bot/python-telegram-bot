@@ -139,12 +139,21 @@ class TestChatPhoto:
         assert chat_photo.get_big_file()
 
     def test_equality(self):
-        a = ChatPhoto(self.chatphoto_small_file_id, self.chatphoto_big_file_id,
-                      self.chatphoto_small_file_unique_id, self.chatphoto_big_file_unique_id)
-        b = ChatPhoto(self.chatphoto_small_file_id, self.chatphoto_big_file_id,
-                      self.chatphoto_small_file_unique_id, self.chatphoto_big_file_unique_id)
-        c = ChatPhoto('', '', self.chatphoto_small_file_unique_id,
-                      self.chatphoto_big_file_unique_id)
+        a = ChatPhoto(
+            self.chatphoto_small_file_id,
+            self.chatphoto_big_file_id,
+            self.chatphoto_small_file_unique_id,
+            self.chatphoto_big_file_unique_id,
+        )
+        b = ChatPhoto(
+            self.chatphoto_small_file_id,
+            self.chatphoto_big_file_id,
+            self.chatphoto_small_file_unique_id,
+            self.chatphoto_big_file_unique_id,
+        )
+        c = ChatPhoto(
+            '', '', self.chatphoto_small_file_unique_id, self.chatphoto_big_file_unique_id
+        )
         d = ChatPhoto('', '', 0, 0)
         e = Voice(self.chatphoto_small_file_id, self.chatphoto_small_file_unique_id, 0)
 

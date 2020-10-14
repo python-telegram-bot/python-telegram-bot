@@ -57,15 +57,14 @@ class InputFile:
 
         if filename:
             self.filename = filename
-        elif (hasattr(obj, 'name') and not isinstance(obj.name, int)):
+        elif hasattr(obj, 'name') and not isinstance(obj.name, int):
             self.filename = os.path.basename(obj.name)
 
         try:
             self.mimetype = self.is_image(self.input_file_content)
         except TelegramError:
             if self.filename:
-                self.mimetype = mimetypes.guess_type(
-                    self.filename)[0] or DEFAULT_MIME_TYPE
+                self.mimetype = mimetypes.guess_type(self.filename)[0] or DEFAULT_MIME_TYPE
             else:
                 self.mimetype = DEFAULT_MIME_TYPE
         if not self.filename:

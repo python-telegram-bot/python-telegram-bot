@@ -43,18 +43,30 @@ except ImportError:  # pragma: no cover
         from urllib3.connection import HTTPConnection  # type: ignore[no-redef]
         from urllib3.util.timeout import Timeout  # type: ignore[no-redef]
         from urllib3.fields import RequestField  # type: ignore[no-redef]
-        warnings.warn('python-telegram-bot is using upstream urllib3. This is allowed but not '
-                      'supported by python-telegram-bot maintainers.')
+
+        warnings.warn(
+            'python-telegram-bot is using upstream urllib3. This is allowed but not '
+            'supported by python-telegram-bot maintainers.'
+        )
     except ImportError:
         warnings.warn(
             "python-telegram-bot wasn't properly installed. Please refer to README.rst on "
-            "how to properly install.")
+            "how to properly install."
+        )
         raise
 
 
-from telegram import (InputFile, TelegramError, InputMedia)
-from telegram.error import (Unauthorized, NetworkError, TimedOut, BadRequest, ChatMigrated,
-                            RetryAfter, InvalidToken, Conflict)
+from telegram import InputFile, TelegramError, InputMedia
+from telegram.error import (
+    Unauthorized,
+    NetworkError,
+    TimedOut,
+    BadRequest,
+    ChatMigrated,
+    RetryAfter,
+    InvalidToken,
+    Conflict,
+)
 
 from telegram.utils.types import JSONDict
 from typing import Any, Union
@@ -98,28 +110,34 @@ class Request:
 
     """
 
-    def __init__(self,
-                 con_pool_size: int = 1,
-                 proxy_url: str = None,
-                 urllib3_proxy_kwargs: JSONDict = None,
-                 connect_timeout: float = 5.,
-                 read_timeout: float = 5.):
+    def __init__(
+        self,
+        con_pool_size: int = 1,
+        proxy_url: str = None,
+        urllib3_proxy_kwargs: JSONDict = None,
+        connect_timeout: float = 5.0,
+        read_timeout: float = 5.0,
+    ):
         if urllib3_proxy_kwargs is None:
             urllib3_proxy_kwargs = dict()
 
         self._connect_timeout = connect_timeout
 
         sockopts = HTTPConnection.default_socket_options + [
-            (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)]
+            (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+        ]
 
         # TODO: Support other platforms like mac and windows.
         if 'linux' in sys.platform:
-            sockopts.append((socket.IPPROTO_TCP,
-                             socket.TCP_KEEPIDLE, 120))  # pylint: disable=no-member
-            sockopts.append((socket.IPPROTO_TCP,
-                             socket.TCP_KEEPINTVL, 30))  # pylint: disable=no-member
-            sockopts.append((socket.IPPROTO_TCP,
-                             socket.TCP_KEEPCNT, 8))  # pylint: disable=no-member
+            sockopts.append(
+                (socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 120)
+            )  # pylint: disable=no-member
+            sockopts.append(
+                (socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 30)
+            )  # pylint: disable=no-member
+            sockopts.append(
+                (socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 8)
+            )  # pylint: disable=no-member
 
         self._con_pool_size = con_pool_size
 
@@ -128,8 +146,8 @@ class Request:
             cert_reqs='CERT_REQUIRED',
             ca_certs=certifi.where(),
             socket_options=sockopts,
-            timeout=urllib3.Timeout(
-                connect=self._connect_timeout, read=read_timeout, total=None))
+            timeout=urllib3.Timeout(connect=self._connect_timeout, read=read_timeout, total=None),
+        )
 
         # Set a proxy according to the following order:
         # * proxy defined in proxy_url (+ urllib3_proxy_kwargs)
@@ -140,9 +158,12 @@ class Request:
         if not proxy_url:
             proxy_url = os.environ.get('HTTPS_PROXY') or os.environ.get('https_proxy')
 
-        self._con_pool: Union[urllib3.PoolManager, appengine.AppEngineManager,
-                              'SOCKSProxyManager',  # noqa: F821
-                              urllib3.ProxyManager] = None  # type: ignore
+        self._con_pool: Union[
+            urllib3.PoolManager,
+            appengine.AppEngineManager,
+            'SOCKSProxyManager',  # noqa: F821
+            urllib3.ProxyManager,
+        ] = None  # type: ignore
         if not proxy_url:
             if appengine.is_appengine_sandbox():
                 # Use URLFetch service if running in App Engine
@@ -253,18 +274,17 @@ class Request:
         elif resp.status == 409:
             raise Conflict(message)
         elif resp.status == 413:
-            raise NetworkError('File too large. Check telegram api limits '
-                               'https://core.telegram.org/bots/api#senddocument')
+            raise NetworkError(
+                'File too large. Check telegram api limits '
+                'https://core.telegram.org/bots/api#senddocument'
+            )
 
         elif resp.status == 502:
             raise NetworkError('Bad Gateway')
         else:
             raise NetworkError('{} ({})'.format(message, resp.status))
 
-    def post(self,
-             url: str,
-             data: JSONDict,
-             timeout: float = None) -> Union[JSONDict, bool]:
+    def post(self, url: str, data: JSONDict, timeout: float = None) -> Union[JSONDict, bool]:
         """Request an URL.
 
         Args:
@@ -322,10 +342,13 @@ class Request:
         if files:
             result = self._request_wrapper('POST', url, fields=data, **urlopen_kwargs)
         else:
-            result = self._request_wrapper('POST', url,
-                                           body=json.dumps(data).encode('utf-8'),
-                                           headers={'Content-Type': 'application/json'},
-                                           **urlopen_kwargs)
+            result = self._request_wrapper(
+                'POST',
+                url,
+                body=json.dumps(data).encode('utf-8'),
+                headers={'Content-Type': 'application/json'},
+                **urlopen_kwargs,
+            )
 
         return self._parse(result)
 

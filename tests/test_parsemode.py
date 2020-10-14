@@ -24,22 +24,24 @@ from telegram import ParseMode
 
 class TestParseMode:
     markdown_text = '*bold* _italic_ [link](http://google.com) [name](tg://user?id=123456789).'
-    html_text = ('<b>bold</b> <i>italic</i> <a href="http://google.com">link</a> '
-                 '<a href="tg://user?id=123456789">name</a>.')
+    html_text = (
+        '<b>bold</b> <i>italic</i> <a href="http://google.com">link</a> '
+        '<a href="tg://user?id=123456789">name</a>.'
+    )
     formatted_text_formatted = u'bold italic link name.'
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_message_with_parse_mode_markdown(self, bot, chat_id):
-        message = bot.send_message(chat_id=chat_id, text=self.markdown_text,
-                                   parse_mode=ParseMode.MARKDOWN)
+        message = bot.send_message(
+            chat_id=chat_id, text=self.markdown_text, parse_mode=ParseMode.MARKDOWN
+        )
 
         assert message.text == self.formatted_text_formatted
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_message_with_parse_mode_html(self, bot, chat_id):
-        message = bot.send_message(chat_id=chat_id, text=self.html_text,
-                                   parse_mode=ParseMode.HTML)
+        message = bot.send_message(chat_id=chat_id, text=self.html_text, parse_mode=ParseMode.HTML)
 
         assert message.text == self.formatted_text_formatted

@@ -23,6 +23,7 @@ import sys
 from telegram import MessageEntity, TelegramObject, Animation, PhotoSize
 from telegram.utils.types import JSONDict
 from typing import List, Any, Dict, Optional, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import Bot
 
@@ -66,14 +67,16 @@ class Game(TelegramObject):
 
     """
 
-    def __init__(self,
-                 title: str,
-                 description: str,
-                 photo: List[PhotoSize],
-                 text: str = None,
-                 text_entities: List[MessageEntity] = None,
-                 animation: Animation = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        title: str,
+        description: str,
+        photo: List[PhotoSize],
+        text: str = None,
+        text_entities: List[MessageEntity] = None,
+        animation: Animation = None,
+        **kwargs: Any,
+    ):
         # Required
         self.title = title
         self.description = description
@@ -130,11 +133,11 @@ class Game(TelegramObject):
             raise RuntimeError("This Game has no 'text'.")
 
         # Is it a narrow build, if so we don't need to convert
-        if sys.maxunicode == 0xffff:
-            return self.text[entity.offset:entity.offset + entity.length]
+        if sys.maxunicode == 0xFFFF:
+            return self.text[entity.offset : entity.offset + entity.length]
         else:
             entity_text = self.text.encode('utf-16-le')
-            entity_text = entity_text[entity.offset * 2:(entity.offset + entity.length) * 2]
+            entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
 
         return entity_text.decode('utf-16-le')
 
@@ -164,7 +167,8 @@ class Game(TelegramObject):
 
         return {
             entity: self.parse_text_entity(entity)
-            for entity in (self.text_entities or []) if entity.type in types
+            for entity in (self.text_entities or [])
+            if entity.type in types
         }
 
     def __hash__(self) -> int:

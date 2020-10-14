@@ -74,18 +74,21 @@ class TypeHandler(Handler):
 
     """
 
-    def __init__(self,
-                 type: Type,
-                 callback: Callable[[Any, 'CallbackContext'], RT],
-                 strict: bool = False,
-                 pass_update_queue: bool = False,
-                 pass_job_queue: bool = False,
-                 run_async: bool = False):
+    def __init__(
+        self,
+        type: Type,
+        callback: Callable[[Any, 'CallbackContext'], RT],
+        strict: bool = False,
+        pass_update_queue: bool = False,
+        pass_job_queue: bool = False,
+        run_async: bool = False,
+    ):
         super().__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
-            run_async=run_async)
+            run_async=run_async,
+        )
         self.type = type
         self.strict = strict
 

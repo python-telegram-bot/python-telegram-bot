@@ -13,8 +13,9 @@ import traceback
 from telegram import Update, ParseMode
 from telegram.ext import Updater, CallbackContext, CommandHandler
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+)
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +49,7 @@ def error_handler(update: Update, context: CallbackContext):
         html.escape(json.dumps(update.to_dict(), indent=2, ensure_ascii=False)),
         html.escape(str(context.chat_data)),
         html.escape(str(context.user_data)),
-        html.escape(tb)
+        html.escape(tb),
     )
 
     # Finally, send the message
@@ -61,9 +62,10 @@ def bad_command(update: Update, context: CallbackContext):
 
 
 def start(update: Update, context: CallbackContext):
-    update.effective_message.reply_html('Use /bad_command to cause an error.\n'
-                                        'Your chat id is <code>{}</code>.'
-                                        .format(update.effective_chat.id))
+    update.effective_message.reply_html(
+        'Use /bad_command to cause an error.\n'
+        'Your chat id is <code>{}</code>.'.format(update.effective_chat.id)
+    )
 
 
 def main():

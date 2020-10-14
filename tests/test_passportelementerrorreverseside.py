@@ -24,9 +24,11 @@ from telegram import PassportElementErrorReverseSide, PassportElementErrorSelfie
 
 @pytest.fixture(scope='class')
 def passport_element_error_reverse_side():
-    return PassportElementErrorReverseSide(TestPassportElementErrorReverseSide.type_,
-                                           TestPassportElementErrorReverseSide.file_hash,
-                                           TestPassportElementErrorReverseSide.message)
+    return PassportElementErrorReverseSide(
+        TestPassportElementErrorReverseSide.type_,
+        TestPassportElementErrorReverseSide.file_hash,
+        TestPassportElementErrorReverseSide.message,
+    )
 
 
 class TestPassportElementErrorReverseSide:
@@ -45,14 +47,22 @@ class TestPassportElementErrorReverseSide:
         passport_element_error_reverse_side_dict = passport_element_error_reverse_side.to_dict()
 
         assert isinstance(passport_element_error_reverse_side_dict, dict)
-        assert (passport_element_error_reverse_side_dict['source']
-                == passport_element_error_reverse_side.source)
-        assert (passport_element_error_reverse_side_dict['type']
-                == passport_element_error_reverse_side.type)
-        assert (passport_element_error_reverse_side_dict['file_hash']
-                == passport_element_error_reverse_side.file_hash)
-        assert (passport_element_error_reverse_side_dict['message']
-                == passport_element_error_reverse_side.message)
+        assert (
+            passport_element_error_reverse_side_dict['source']
+            == passport_element_error_reverse_side.source
+        )
+        assert (
+            passport_element_error_reverse_side_dict['type']
+            == passport_element_error_reverse_side.type
+        )
+        assert (
+            passport_element_error_reverse_side_dict['file_hash']
+            == passport_element_error_reverse_side.file_hash
+        )
+        assert (
+            passport_element_error_reverse_side_dict['message']
+            == passport_element_error_reverse_side.message
+        )
 
     def test_equality(self):
         a = PassportElementErrorReverseSide(self.type_, self.file_hash, self.message)

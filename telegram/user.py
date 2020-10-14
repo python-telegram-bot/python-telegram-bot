@@ -67,18 +67,20 @@ class User(TelegramObject):
 
     """
 
-    def __init__(self,
-                 id: int,
-                 first_name: str,
-                 is_bot: bool,
-                 last_name: str = None,
-                 username: str = None,
-                 language_code: str = None,
-                 can_join_groups: bool = None,
-                 can_read_all_group_messages: bool = None,
-                 supports_inline_queries: bool = None,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        id: int,
+        first_name: str,
+        is_bot: bool,
+        last_name: str = None,
+        username: str = None,
+        language_code: str = None,
+        can_join_groups: bool = None,
+        can_read_all_group_messages: bool = None,
+        supports_inline_queries: bool = None,
+        bot: 'Bot' = None,
+        **kwargs: Any,
+    ):
         # Required
         self.id = int(id)
         self.first_name = first_name

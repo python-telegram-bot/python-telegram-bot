@@ -23,8 +23,9 @@ import logging
 from telegram.ext import Updater, CommandHandler
 
 # Enable logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+)
 
 logger = logging.getLogger(__name__)
 
@@ -90,10 +91,9 @@ def main():
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", start))
-    dp.add_handler(CommandHandler("set", set_timer,
-                                  pass_args=True,
-                                  pass_job_queue=True,
-                                  pass_chat_data=True))
+    dp.add_handler(
+        CommandHandler("set", set_timer, pass_args=True, pass_job_queue=True, pass_chat_data=True)
+    )
     dp.add_handler(CommandHandler("unset", unset, pass_chat_data=True))
 
     # Start the Bot

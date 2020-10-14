@@ -21,6 +21,7 @@ from queue import Queue
 from typing import Dict, Any, Tuple, TYPE_CHECKING, Optional, Match, List, NoReturn, Union
 
 from telegram import Update
+
 if TYPE_CHECKING:
     from telegram import Bot
     from telegram.ext import Dispatcher, Job, JobQueue
@@ -91,8 +92,9 @@ class CallbackContext:
             dispatcher (:class:`telegram.ext.Dispatcher`):
         """
         if not dispatcher.use_context:
-            raise ValueError('CallbackContext should not be used with a non context aware '
-                             'dispatcher!')
+            raise ValueError(
+                'CallbackContext should not be used with a non context aware ' 'dispatcher!'
+            )
         self._dispatcher = dispatcher
         self._bot_data = dispatcher.bot_data
         self._chat_data: Optional[Dict[Any, Any]] = None
@@ -115,8 +117,9 @@ class CallbackContext:
 
     @bot_data.setter
     def bot_data(self, value: Any) -> NoReturn:
-        raise AttributeError("You can not assign a new value to bot_data, see "
-                             "https://git.io/fjxKe")
+        raise AttributeError(
+            "You can not assign a new value to bot_data, see " "https://git.io/fjxKe"
+        )
 
     @property
     def chat_data(self) -> Optional[Dict]:
@@ -124,8 +127,9 @@ class CallbackContext:
 
     @chat_data.setter
     def chat_data(self, value: Any) -> NoReturn:
-        raise AttributeError("You can not assign a new value to chat_data, see "
-                             "https://git.io/fjxKe")
+        raise AttributeError(
+            "You can not assign a new value to chat_data, see " "https://git.io/fjxKe"
+        )
 
     @property
     def user_data(self) -> Optional[Dict]:
@@ -133,16 +137,19 @@ class CallbackContext:
 
     @user_data.setter
     def user_data(self, value: Any) -> NoReturn:
-        raise AttributeError("You can not assign a new value to user_data, see "
-                             "https://git.io/fjxKe")
+        raise AttributeError(
+            "You can not assign a new value to user_data, see " "https://git.io/fjxKe"
+        )
 
     @classmethod
-    def from_error(cls,
-                   update: object,
-                   error: Exception,
-                   dispatcher: 'Dispatcher',
-                   async_args: Union[List, Tuple] = None,
-                   async_kwargs: Dict[str, Any] = None) -> 'CallbackContext':
+    def from_error(
+        cls,
+        update: object,
+        error: Exception,
+        dispatcher: 'Dispatcher',
+        async_args: Union[List, Tuple] = None,
+        async_kwargs: Dict[str, Any] = None,
+    ) -> 'CallbackContext':
         self = cls.from_update(update, dispatcher)
         self.error = error
         self.async_args = async_args

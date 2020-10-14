@@ -18,28 +18,29 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatAction."""
+from telegram import constants
 
 
 class ChatAction:
     """Helper class to provide constants for different chat actions."""
 
-    FIND_LOCATION: str = 'find_location'
-    """:obj:`str`: 'find_location'"""
-    RECORD_AUDIO: str = 'record_audio'
-    """:obj:`str`: 'record_audio'"""
-    RECORD_VIDEO: str = 'record_video'
-    """:obj:`str`: 'record_video'"""
-    RECORD_VIDEO_NOTE: str = 'record_video_note'
-    """:obj:`str`: 'record_video_note'"""
-    TYPING: str = 'typing'
-    """:obj:`str`: 'typing'"""
-    UPLOAD_AUDIO: str = 'upload_audio'
-    """:obj:`str`: 'upload_audio'"""
-    UPLOAD_DOCUMENT: str = 'upload_document'
-    """:obj:`str`: 'upload_document'"""
-    UPLOAD_PHOTO: str = 'upload_photo'
-    """:obj:`str`: 'upload_photo'"""
-    UPLOAD_VIDEO: str = 'upload_video'
-    """:obj:`str`: 'upload_video'"""
-    UPLOAD_VIDEO_NOTE: str = 'upload_video_note'
-    """:obj:`str`: 'upload_video_note'"""
+    FIND_LOCATION: str = constants.CHATACTION_FIND_LOCATION
+    """:const:`telegram.constants.CHATACTION_FIND_LOCATION`"""
+    RECORD_AUDIO: str = constants.CHATACTION_RECORD_AUDIO
+    """:const:`telegram.constants.CHATACTION_RECORD_AUDIO`"""
+    RECORD_VIDEO: str = constants.CHATACTION_RECORD_VIDEO
+    """:const:`telegram.constants.CHATACTION_RECORD_VIDEO`"""
+    RECORD_VIDEO_NOTE: str = constants.CHATACTION_RECORD_VIDEO_NOTE
+    """:const:`telegram.constants.CHATACTION_RECORD_VIDEO_NOTE`"""
+    TYPING: str = constants.CHATACTION_TYPING
+    """:const:`telegram.constants.CHATACTION_TYPING`"""
+    UPLOAD_AUDIO: str = constants.CHATACTION_UPLOAD_AUDIO
+    """:const:`telegram.constants.CHATACTION_UPLOAD_AUDIO`"""
+    UPLOAD_DOCUMENT: str = constants.CHATACTION_UPLOAD_DOCUMENT
+    """:const:`telegram.constants.CHATACTION_UPLOAD_DOCUMENT`"""
+    UPLOAD_PHOTO: str = constants.CHATACTION_UPLOAD_PHOTO
+    """:const:`telegram.constants.CHATACTION_UPLOAD_PHOTO`"""
+    UPLOAD_VIDEO: str = constants.CHATACTION_UPLOAD_VIDEO
+    """:const:`telegram.constants.CHATACTION_UPLOAD_VIDEO`"""
+    UPLOAD_VIDEO_NOTE: str = constants.CHATACTION_UPLOAD_VIDEO_NOTE
+    """:const:`telegram.constants.CHATACTION_UPLOAD_VIDEO_NOTE`"""

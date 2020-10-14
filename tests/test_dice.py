@@ -22,8 +22,7 @@ import pytest
 from telegram import Dice, BotCommand
 
 
-@pytest.fixture(scope="class",
-                params=Dice.ALL_EMOJI)
+@pytest.fixture(scope="class", params=Dice.ALL_EMOJI)
 def dice(request):
     return Dice(value=5, emoji=request.param)
 

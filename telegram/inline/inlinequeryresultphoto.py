@@ -21,6 +21,7 @@
 from telegram import InlineQueryResult
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
 from typing import Any, Union, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
 
@@ -73,26 +74,28 @@ class InlineQueryResultPhoto(InlineQueryResult):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 photo_url: str,
-                 thumb_url: str,
-                 photo_width: int = None,
-                 photo_height: int = None,
-                 title: str = None,
-                 description: str = None,
-                 caption: str = None,
-                 reply_markup: 'ReplyMarkup' = None,
-                 input_message_content: 'InputMessageContent' = None,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        id: str,
+        photo_url: str,
+        thumb_url: str,
+        photo_width: int = None,
+        photo_height: int = None,
+        title: str = None,
+        description: str = None,
+        caption: str = None,
+        reply_markup: 'ReplyMarkup' = None,
+        input_message_content: 'InputMessageContent' = None,
+        parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+        **kwargs: Any,
+    ):
         # Required
         super().__init__('photo', id)
         self.photo_url = photo_url
         self.thumb_url = thumb_url
 
         # Optionals
-        self.photo_width = int(photo_width)if photo_width is not None else None
+        self.photo_width = int(photo_width) if photo_width is not None else None
         self.photo_height = int(photo_height) if photo_height is not None else None
         self.title = title
         self.description = description

@@ -22,6 +22,7 @@
 from telegram import TelegramObject, User, Location
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import Bot
 
@@ -57,14 +58,16 @@ class InlineQuery(TelegramObject):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 from_user: User,
-                 query: str,
-                 offset: str,
-                 location: Location = None,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        id: str,
+        from_user: User,
+        query: str,
+        offset: str,
+        location: Location = None,
+        bot: 'Bot' = None,
+        **kwargs: Any,
+    ):
         # Required
         self.id = id
         self.from_user = from_user
@@ -125,8 +128,5 @@ class InlineQuery(TelegramObject):
 
         """
         return self.bot.answer_inline_query(
-            self.id,
-            *args,
-            current_offset=self.offset if auto_pagination else None,
-            **kwargs
+            self.id, *args, current_offset=self.offset if auto_pagination else None, **kwargs
         )

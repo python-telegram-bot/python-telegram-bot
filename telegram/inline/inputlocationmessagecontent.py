@@ -23,6 +23,7 @@ from typing import Any
 
 
 class InputLocationMessageContent(InputMessageContent):
+    # fmt: off
     """
     Represents the content of a location message to be sent as the result of an inline query.
 
@@ -43,6 +44,7 @@ class InputLocationMessageContent(InputMessageContent):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
+    # fmt: on
 
     def __init__(self, latitude: float, longitude: float, live_period: int = None, **kwargs: Any):
         # Required

@@ -59,21 +59,25 @@ class TestInputFile:
         assert InputFile(BytesIO(b'blah'), filename='tg.mp3').mimetype == 'audio/mpeg'
 
         # Test fallback
-        assert (InputFile(BytesIO(b'blah'), filename='tg.notaproperext').mimetype
-                == 'application/octet-stream')
+        assert (
+            InputFile(BytesIO(b'blah'), filename='tg.notaproperext').mimetype
+            == 'application/octet-stream'
+        )
         assert InputFile(BytesIO(b'blah')).mimetype == 'application/octet-stream'
 
     def test_filenames(self):
         assert InputFile(open('tests/data/telegram.jpg', 'rb')).filename == 'telegram.jpg'
-        assert InputFile(open('tests/data/telegram.jpg', 'rb'),
-                         filename='blah').filename == 'blah'
-        assert InputFile(open('tests/data/telegram.jpg', 'rb'),
-                         filename='blah.jpg').filename == 'blah.jpg'
+        assert InputFile(open('tests/data/telegram.jpg', 'rb'), filename='blah').filename == 'blah'
+        assert (
+            InputFile(open('tests/data/telegram.jpg', 'rb'), filename='blah.jpg').filename
+            == 'blah.jpg'
+        )
         assert InputFile(open('tests/data/telegram', 'rb')).filename == 'telegram'
-        assert InputFile(open('tests/data/telegram', 'rb'),
-                         filename='blah').filename == 'blah'
-        assert InputFile(open('tests/data/telegram', 'rb'),
-                         filename='blah.jpg').filename == 'blah.jpg'
+        assert InputFile(open('tests/data/telegram', 'rb'), filename='blah').filename == 'blah'
+        assert (
+            InputFile(open('tests/data/telegram', 'rb'), filename='blah.jpg').filename
+            == 'blah.jpg'
+        )
 
         class MockedFileobject:
             # A open(?, 'rb') without a .name
@@ -84,13 +88,22 @@ class TestInputFile:
                 return self.f.read()
 
         assert InputFile(MockedFileobject('tests/data/telegram.jpg')).filename == 'image.jpeg'
-        assert InputFile(MockedFileobject('tests/data/telegram.jpg'),
-                         filename='blah').filename == 'blah'
-        assert InputFile(MockedFileobject('tests/data/telegram.jpg'),
-                         filename='blah.jpg').filename == 'blah.jpg'
-        assert InputFile(
-            MockedFileobject('tests/data/telegram')).filename == 'application.octet-stream'
-        assert InputFile(MockedFileobject('tests/data/telegram'),
-                         filename='blah').filename == 'blah'
-        assert InputFile(MockedFileobject('tests/data/telegram'),
-                         filename='blah.jpg').filename == 'blah.jpg'
+        assert (
+            InputFile(MockedFileobject('tests/data/telegram.jpg'), filename='blah').filename
+            == 'blah'
+        )
+        assert (
+            InputFile(MockedFileobject('tests/data/telegram.jpg'), filename='blah.jpg').filename
+            == 'blah.jpg'
+        )
+        assert (
+            InputFile(MockedFileobject('tests/data/telegram')).filename
+            == 'application.octet-stream'
+        )
+        assert (
+            InputFile(MockedFileobject('tests/data/telegram'), filename='blah').filename == 'blah'
+        )
+        assert (
+            InputFile(MockedFileobject('tests/data/telegram'), filename='blah.jpg').filename
+            == 'blah.jpg'
+        )

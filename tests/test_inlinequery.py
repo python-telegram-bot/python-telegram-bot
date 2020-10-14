@@ -24,8 +24,14 @@ from telegram import User, Location, InlineQuery, Update
 
 @pytest.fixture(scope='class')
 def inline_query(bot):
-    return InlineQuery(TestInlineQuery.id_, TestInlineQuery.from_user, TestInlineQuery.query,
-                       TestInlineQuery.offset, location=TestInlineQuery.location, bot=bot)
+    return InlineQuery(
+        TestInlineQuery.id_,
+        TestInlineQuery.from_user,
+        TestInlineQuery.query,
+        TestInlineQuery.offset,
+        location=TestInlineQuery.location,
+        bot=bot,
+    )
 
 
 class TestInlineQuery:
@@ -41,7 +47,7 @@ class TestInlineQuery:
             'from': self.from_user.to_dict(),
             'query': self.query,
             'offset': self.offset,
-            'location': self.location.to_dict()
+            'location': self.location.to_dict(),
         }
         inline_query_json = InlineQuery.de_json(json_dict, bot)
 

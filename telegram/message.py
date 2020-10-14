@@ -22,14 +22,36 @@ import sys
 import datetime
 from html import escape
 
-from telegram import (Animation, Audio, Contact, Document, Chat, Location, PhotoSize, Sticker,
-                      TelegramObject, User, Video, Voice, Venue, MessageEntity, Game, Invoice,
-                      SuccessfulPayment, VideoNote, PassportData, Poll, InlineKeyboardMarkup, Dice)
+from telegram import (
+    Animation,
+    Audio,
+    Contact,
+    Document,
+    Chat,
+    Location,
+    PhotoSize,
+    Sticker,
+    TelegramObject,
+    User,
+    Video,
+    Voice,
+    Venue,
+    MessageEntity,
+    Game,
+    Invoice,
+    SuccessfulPayment,
+    VideoNote,
+    PassportData,
+    Poll,
+    InlineKeyboardMarkup,
+    Dice,
+)
 from telegram import ParseMode
 from telegram.utils.helpers import escape_markdown, to_timestamp, from_timestamp
 
 from telegram.utils.types import JSONDict
 from typing import Any, List, Dict, Optional, Union, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import Bot, InputMedia, GameHighScore
 
@@ -37,6 +59,7 @@ _UNDEFINED = object()
 
 
 class Message(TelegramObject):
+    # fmt: off
     """This object represents a message.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -232,70 +255,98 @@ class Message(TelegramObject):
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
 
     """
+    # fmt: on
 
     _effective_attachment = _UNDEFINED
 
-    ATTACHMENT_TYPES = ['audio', 'game', 'animation', 'document', 'photo', 'sticker', 'video',
-                        'voice', 'video_note', 'contact', 'location', 'venue', 'invoice',
-                        'successful_payment']
-    MESSAGE_TYPES = ['text', 'new_chat_members', 'left_chat_member', 'new_chat_title',
-                     'new_chat_photo', 'delete_chat_photo', 'group_chat_created',
-                     'supergroup_chat_created', 'channel_chat_created', 'migrate_to_chat_id',
-                     'migrate_from_chat_id', 'pinned_message', 'poll', 'dice',
-                     'passport_data'] + ATTACHMENT_TYPES
+    ATTACHMENT_TYPES = [
+        'audio',
+        'game',
+        'animation',
+        'document',
+        'photo',
+        'sticker',
+        'video',
+        'voice',
+        'video_note',
+        'contact',
+        'location',
+        'venue',
+        'invoice',
+        'successful_payment',
+    ]
+    MESSAGE_TYPES = [
+        'text',
+        'new_chat_members',
+        'left_chat_member',
+        'new_chat_title',
+        'new_chat_photo',
+        'delete_chat_photo',
+        'group_chat_created',
+        'supergroup_chat_created',
+        'channel_chat_created',
+        'migrate_to_chat_id',
+        'migrate_from_chat_id',
+        'pinned_message',
+        'poll',
+        'dice',
+        'passport_data',
+    ] + ATTACHMENT_TYPES
 
-    def __init__(self,
-                 message_id: int,
-                 date: datetime.datetime,
-                 chat: Chat,
-                 from_user: User = None,
-                 forward_from: User = None,
-                 forward_from_chat: Chat = None,
-                 forward_from_message_id: int = None,
-                 forward_date: datetime.datetime = None,
-                 reply_to_message: 'Message' = None,
-                 edit_date: datetime.datetime = None,
-                 text: str = None,
-                 entities: List[MessageEntity] = None,
-                 caption_entities: List[MessageEntity] = None,
-                 audio: Audio = None,
-                 document: Document = None,
-                 game: Game = None,
-                 photo: List[PhotoSize] = None,
-                 sticker: Sticker = None,
-                 video: Video = None,
-                 voice: Voice = None,
-                 video_note: VideoNote = None,
-                 new_chat_members: List[User] = None,
-                 caption: str = None,
-                 contact: Contact = None,
-                 location: Location = None,
-                 venue: Venue = None,
-                 left_chat_member: User = None,
-                 new_chat_title: str = None,
-                 new_chat_photo: List[PhotoSize] = None,
-                 delete_chat_photo: bool = False,
-                 group_chat_created: bool = False,
-                 supergroup_chat_created: bool = False,
-                 channel_chat_created: bool = False,
-                 migrate_to_chat_id: int = None,
-                 migrate_from_chat_id: int = None,
-                 pinned_message: 'Message' = None,
-                 invoice: Invoice = None,
-                 successful_payment: SuccessfulPayment = None,
-                 forward_signature: str = None,
-                 author_signature: str = None,
-                 media_group_id: str = None,
-                 connected_website: str = None,
-                 animation: Animation = None,
-                 passport_data: PassportData = None,
-                 poll: Poll = None,
-                 forward_sender_name: str = None,
-                 reply_markup: InlineKeyboardMarkup = None,
-                 bot: 'Bot' = None,
-                 dice: Dice = None,
-                 via_bot: User = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        message_id: int,
+        date: datetime.datetime,
+        chat: Chat,
+        from_user: User = None,
+        forward_from: User = None,
+        forward_from_chat: Chat = None,
+        forward_from_message_id: int = None,
+        forward_date: datetime.datetime = None,
+        reply_to_message: 'Message' = None,
+        edit_date: datetime.datetime = None,
+        text: str = None,
+        entities: List[MessageEntity] = None,
+        caption_entities: List[MessageEntity] = None,
+        audio: Audio = None,
+        document: Document = None,
+        game: Game = None,
+        photo: List[PhotoSize] = None,
+        sticker: Sticker = None,
+        video: Video = None,
+        voice: Voice = None,
+        video_note: VideoNote = None,
+        new_chat_members: List[User] = None,
+        caption: str = None,
+        contact: Contact = None,
+        location: Location = None,
+        venue: Venue = None,
+        left_chat_member: User = None,
+        new_chat_title: str = None,
+        new_chat_photo: List[PhotoSize] = None,
+        delete_chat_photo: bool = False,
+        group_chat_created: bool = False,
+        supergroup_chat_created: bool = False,
+        channel_chat_created: bool = False,
+        migrate_to_chat_id: int = None,
+        migrate_from_chat_id: int = None,
+        pinned_message: 'Message' = None,
+        invoice: Invoice = None,
+        successful_payment: SuccessfulPayment = None,
+        forward_signature: str = None,
+        author_signature: str = None,
+        media_group_id: str = None,
+        connected_website: str = None,
+        animation: Animation = None,
+        passport_data: PassportData = None,
+        poll: Poll = None,
+        forward_sender_name: str = None,
+        reply_markup: InlineKeyboardMarkup = None,
+        bot: 'Bot' = None,
+        dice: Dice = None,
+        via_bot: User = None,
+        **kwargs: Any,
+    ):
         # Required
         self.message_id = int(message_id)
         self.from_user = from_user
@@ -413,9 +464,24 @@ class Message(TelegramObject):
         return cls(bot=bot, **data)
 
     @property
-    def effective_attachment(self) -> Union[Contact, Document, Animation, Game, Invoice, Location,
-                                            List[PhotoSize], Sticker, SuccessfulPayment, Venue,
-                                            Video, VideoNote, Voice, None]:
+    def effective_attachment(
+        self,
+    ) -> Union[
+        Contact,
+        Document,
+        Animation,
+        Game,
+        Invoice,
+        Location,
+        List[PhotoSize],
+        Sticker,
+        SuccessfulPayment,
+        Venue,
+        Video,
+        VideoNote,
+        Voice,
+        None,
+    ]:
         """
         :class:`telegram.Audio`
             or :class:`telegram.Contact`
@@ -856,11 +922,8 @@ class Message(TelegramObject):
 
         """
         return self.bot.forward_message(
-            chat_id=chat_id,
-            from_chat_id=self.chat_id,
-            message_id=self.message_id,
-            *args,
-            **kwargs)
+            chat_id=chat_id, from_chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs
+        )
 
     def edit_text(self, *args: Any, **kwargs: Any) -> Union['Message', bool]:
         """Shortcut for::
@@ -881,7 +944,8 @@ class Message(TelegramObject):
 
         """
         return self.bot.edit_message_text(
-            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs
+        )
 
     def edit_caption(self, *args: Any, **kwargs: Any) -> Union['Message', bool]:
         """Shortcut for::
@@ -902,7 +966,8 @@ class Message(TelegramObject):
 
         """
         return self.bot.edit_message_caption(
-            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs
+        )
 
     def edit_media(self, media: 'InputMedia', *args: Any, **kwargs: Any) -> Union['Message', bool]:
         """Shortcut for::
@@ -923,7 +988,8 @@ class Message(TelegramObject):
 
         """
         return self.bot.edit_message_media(
-            chat_id=self.chat_id, message_id=self.message_id, media=media, *args, **kwargs)
+            chat_id=self.chat_id, message_id=self.message_id, media=media, *args, **kwargs
+        )
 
     def edit_reply_markup(self, *args: Any, **kwargs: Any) -> Union['Message', bool]:
         """Shortcut for::
@@ -943,7 +1009,8 @@ class Message(TelegramObject):
             edited Message is returned, otherwise ``True`` is returned.
         """
         return self.bot.edit_message_reply_markup(
-            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs
+        )
 
     def edit_live_location(self, *args: Any, **kwargs: Any) -> Union['Message', bool]:
         """Shortcut for::
@@ -963,7 +1030,8 @@ class Message(TelegramObject):
             edited Message is returned, otherwise :obj:`True` is returned.
         """
         return self.bot.edit_message_live_location(
-            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs
+        )
 
     def stop_live_location(self, *args: Any, **kwargs: Any) -> Union['Message', bool]:
         """Shortcut for::
@@ -983,7 +1051,8 @@ class Message(TelegramObject):
             edited Message is returned, otherwise :obj:`True` is returned.
         """
         return self.bot.stop_message_live_location(
-            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs
+        )
 
     def set_game_score(self, *args: Any, **kwargs: Any) -> Union['Message', bool]:
         """Shortcut for::
@@ -1003,7 +1072,8 @@ class Message(TelegramObject):
             edited Message is returned, otherwise :obj:`True` is returned.
         """
         return self.bot.set_game_score(
-            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs
+        )
 
     def get_game_high_scores(self, *args: Any, **kwargs: Any) -> List['GameHighScore']:
         """Shortcut for::
@@ -1022,7 +1092,8 @@ class Message(TelegramObject):
             List[:class:`telegram.GameHighScore`]
         """
         return self.bot.get_game_high_scores(
-            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs
+        )
 
     def delete(self, *args: Any, **kwargs: Any) -> bool:
         """Shortcut for::
@@ -1037,7 +1108,8 @@ class Message(TelegramObject):
 
         """
         return self.bot.delete_message(
-            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs
+        )
 
     def stop_poll(self, *args: Any, **kwargs: Any) -> Poll:
         """Shortcut for::
@@ -1053,7 +1125,8 @@ class Message(TelegramObject):
 
         """
         return self.bot.stop_poll(
-            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs
+        )
 
     def pin(self, *args: Any, **kwargs: Any) -> bool:
         """Shortcut for::
@@ -1068,7 +1141,8 @@ class Message(TelegramObject):
 
         """
         return self.bot.pin_chat_message(
-            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs
+        )
 
     def parse_entity(self, entity: MessageEntity) -> str:
         """Returns the text from a given :class:`telegram.MessageEntity`.
@@ -1093,11 +1167,11 @@ class Message(TelegramObject):
             raise RuntimeError("This Message has no 'text'.")
 
         # Is it a narrow build, if so we don't need to convert
-        if sys.maxunicode == 0xffff:
-            return self.text[entity.offset:entity.offset + entity.length]
+        if sys.maxunicode == 0xFFFF:
+            return self.text[entity.offset : entity.offset + entity.length]
         else:
             entity_text = self.text.encode('utf-16-le')
-            entity_text = entity_text[entity.offset * 2:(entity.offset + entity.length) * 2]
+            entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
 
             return entity_text.decode('utf-16-le')
 
@@ -1124,11 +1198,11 @@ class Message(TelegramObject):
             raise RuntimeError("This Message has no 'caption'.")
 
         # Is it a narrow build, if so we don't need to convert
-        if sys.maxunicode == 0xffff:
-            return self.caption[entity.offset:entity.offset + entity.length]
+        if sys.maxunicode == 0xFFFF:
+            return self.caption[entity.offset : entity.offset + entity.length]
         else:
             entity_text = self.caption.encode('utf-16-le')
-            entity_text = entity_text[entity.offset * 2:(entity.offset + entity.length) * 2]
+            entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
 
             return entity_text.decode('utf-16-le')
 
@@ -1160,7 +1234,8 @@ class Message(TelegramObject):
 
         return {
             entity: self.parse_entity(entity)
-            for entity in (self.entities or []) if entity.type in types
+            for entity in (self.entities or [])
+            if entity.type in types
         }
 
     def parse_caption_entities(self, types: List[str] = None) -> Dict[MessageEntity, str]:
@@ -1191,18 +1266,21 @@ class Message(TelegramObject):
 
         return {
             entity: self.parse_caption_entity(entity)
-            for entity in (self.caption_entities or []) if entity.type in types
+            for entity in (self.caption_entities or [])
+            if entity.type in types
         }
 
     @staticmethod
-    def _parse_html(message_text: Optional[str],
-                    entities: Dict[MessageEntity, str],
-                    urled: bool = False,
-                    offset: int = 0) -> Optional[str]:
+    def _parse_html(
+        message_text: Optional[str],
+        entities: Dict[MessageEntity, str],
+        urled: bool = False,
+        offset: int = 0,
+    ) -> Optional[str]:
         if message_text is None:
             return None
 
-        if not sys.maxunicode == 0xffff:
+        if not sys.maxunicode == 0xFFFF:
             message_text = message_text.encode('utf-16-le')  # type: ignore
 
         html_text = ''
@@ -1215,7 +1293,8 @@ class Message(TelegramObject):
             if entity not in parsed_entities:
                 nested_entities = {
                     e: t
-                    for (e, t) in sorted_entities if e.offset >= entity.offset
+                    for (e, t) in sorted_entities
+                    if e.offset >= entity.offset
                     and e.offset + e.length <= entity.offset + entity.length
                     and e != entity
                 }
@@ -1224,8 +1303,9 @@ class Message(TelegramObject):
                 text = escape(text)
 
                 if nested_entities:
-                    text = Message._parse_html(text, nested_entities,
-                                               urled=urled, offset=entity.offset)
+                    text = Message._parse_html(
+                        text, nested_entities, urled=urled, offset=entity.offset
+                    )
 
                 if entity.type == MessageEntity.TEXT_LINK:
                     insert = '<a href="{}">{}</a>'.format(entity.url, text)
@@ -1241,8 +1321,9 @@ class Message(TelegramObject):
                     insert = '<code>' + text + '</code>'
                 elif entity.type == MessageEntity.PRE:
                     if entity.language:
-                        insert = '<pre><code class="{}">{}</code></pre>'.format(entity.language,
-                                                                                text)
+                        insert = '<pre><code class="{}">{}</code></pre>'.format(
+                            entity.language, text
+                        )
                     else:
                         insert = '<pre>' + text + '</pre>'
                 elif entity.type == MessageEntity.UNDERLINE:
@@ -1253,34 +1334,44 @@ class Message(TelegramObject):
                     insert = text
 
                 if offset == 0:
-                    if sys.maxunicode == 0xffff:
-                        html_text += escape(message_text[last_offset:entity.offset
-                                                         - offset]) + insert
+                    if sys.maxunicode == 0xFFFF:
+                        html_text += (
+                            escape(message_text[last_offset : entity.offset - offset]) + insert
+                        )
                     else:
-                        html_text += escape(message_text[  # type: ignore
-                            last_offset * 2:(entity.offset - offset) * 2].decode('utf-16-le')
-                        ) + insert
+                        html_text += (
+                            escape(
+                                message_text[  # type: ignore
+                                    last_offset * 2 : (entity.offset - offset) * 2
+                                ].decode('utf-16-le')
+                            )
+                            + insert
+                        )
                 else:
-                    if sys.maxunicode == 0xffff:
-                        html_text += message_text[last_offset:entity.offset - offset] + insert
+                    if sys.maxunicode == 0xFFFF:
+                        html_text += message_text[last_offset : entity.offset - offset] + insert
                     else:
-                        html_text += message_text[  # type: ignore
-                            last_offset * 2:(entity.offset - offset) * 2
-                        ].decode('utf-16-le') + insert
+                        html_text += (
+                            message_text[  # type: ignore
+                                last_offset * 2 : (entity.offset - offset) * 2
+                            ].decode('utf-16-le')
+                            + insert
+                        )
 
                 last_offset = entity.offset - offset + entity.length
 
         if offset == 0:
-            if sys.maxunicode == 0xffff:
+            if sys.maxunicode == 0xFFFF:
                 html_text += escape(message_text[last_offset:])
             else:
                 html_text += escape(
-                    message_text[last_offset * 2:].decode('utf-16-le'))  # type: ignore
+                    message_text[last_offset * 2 :].decode('utf-16-le')  # type: ignore
+                )
         else:
-            if sys.maxunicode == 0xffff:
+            if sys.maxunicode == 0xFFFF:
                 html_text += message_text[last_offset:]
             else:
-                html_text += message_text[last_offset * 2:].decode('utf-16-le')  # type: ignore
+                html_text += message_text[last_offset * 2 :].decode('utf-16-le')  # type: ignore
 
         return html_text
 
@@ -1339,17 +1430,19 @@ class Message(TelegramObject):
         return self._parse_html(self.caption, self.parse_caption_entities(), urled=True)
 
     @staticmethod
-    def _parse_markdown(message_text: Optional[str],
-                        entities: Dict[MessageEntity, str],
-                        urled: bool = False,
-                        version: int = 1,
-                        offset: int = 0) -> Optional[str]:
+    def _parse_markdown(
+        message_text: Optional[str],
+        entities: Dict[MessageEntity, str],
+        urled: bool = False,
+        version: int = 1,
+        offset: int = 0,
+    ) -> Optional[str]:
         version = int(version)
 
         if message_text is None:
             return None
 
-        if not sys.maxunicode == 0xffff:
+        if not sys.maxunicode == 0xFFFF:
             message_text = message_text.encode('utf-16-le')  # type: ignore
 
         markdown_text = ''
@@ -1362,7 +1455,8 @@ class Message(TelegramObject):
             if entity not in parsed_entities:
                 nested_entities = {
                     e: t
-                    for (e, t) in sorted_entities if e.offset >= entity.offset
+                    for (e, t) in sorted_entities
+                    if e.offset >= entity.offset
                     and e.offset + e.length <= entity.offset + entity.length
                     and e != entity
                 }
@@ -1373,20 +1467,22 @@ class Message(TelegramObject):
 
                 if nested_entities:
                     if version < 2:
-                        raise ValueError('Nested entities are not supported for Markdown '
-                                         'version 1')
+                        raise ValueError(
+                            'Nested entities are not supported for Markdown ' 'version 1'
+                        )
 
-                    text = Message._parse_markdown(text, nested_entities,
-                                                   urled=urled, offset=entity.offset,
-                                                   version=version)
+                    text = Message._parse_markdown(
+                        text, nested_entities, urled=urled, offset=entity.offset, version=version
+                    )
 
                 if entity.type == MessageEntity.TEXT_LINK:
                     if version == 1:
                         url = entity.url
                     else:
                         # Links need special escaping. Also can't have entities nested within
-                        url = escape_markdown(entity.url, version=version,
-                                              entity_type=MessageEntity.TEXT_LINK)
+                        url = escape_markdown(
+                            entity.url, version=version, entity_type=MessageEntity.TEXT_LINK
+                        )
                     insert = '[{}]({})'.format(text, url)
                 elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
                     insert = '[{}](tg://user?id={})'.format(text, entity.user.id)
@@ -1402,12 +1498,18 @@ class Message(TelegramObject):
                     insert = '_' + text + '_'
                 elif entity.type == MessageEntity.CODE:
                     # Monospace needs special escaping. Also can't have entities nested within
-                    insert = '`' + escape_markdown(orig_text, version=version,
-                                                   entity_type=MessageEntity.CODE) + '`'
+                    insert = (
+                        '`'
+                        + escape_markdown(
+                            orig_text, version=version, entity_type=MessageEntity.CODE
+                        )
+                        + '`'
+                    )
                 elif entity.type == MessageEntity.PRE:
                     # Monospace needs special escaping. Also can't have entities nested within
-                    code = escape_markdown(orig_text, version=version,
-                                           entity_type=MessageEntity.PRE)
+                    code = escape_markdown(
+                        orig_text, version=version, entity_type=MessageEntity.PRE
+                    )
                     if entity.language:
                         prefix = '```' + entity.language + '\n'
                     else:
@@ -1418,50 +1520,66 @@ class Message(TelegramObject):
                     insert = prefix + code + '```'
                 elif entity.type == MessageEntity.UNDERLINE:
                     if version == 1:
-                        raise ValueError('Underline entities are not supported for Markdown '
-                                         'version 1')
+                        raise ValueError(
+                            'Underline entities are not supported for Markdown ' 'version 1'
+                        )
                     insert = '__' + text + '__'
                 elif entity.type == MessageEntity.STRIKETHROUGH:
                     if version == 1:
-                        raise ValueError('Strikethrough entities are not supported for Markdown '
-                                         'version 1')
+                        raise ValueError(
+                            'Strikethrough entities are not supported for Markdown ' 'version 1'
+                        )
                     insert = '~' + text + '~'
                 else:
                     insert = text
 
                 if offset == 0:
-                    if sys.maxunicode == 0xffff:
-                        markdown_text += escape_markdown(message_text[last_offset:entity.offset
-                                                                      - offset],
-                                                         version=version) + insert
+                    if sys.maxunicode == 0xFFFF:
+                        markdown_text += (
+                            escape_markdown(
+                                message_text[last_offset : entity.offset - offset], version=version
+                            )
+                            + insert
+                        )
                     else:
-                        markdown_text += escape_markdown(
-                            message_text[  # type: ignore
-                                last_offset * 2: (entity.offset - offset) * 2
-                            ].decode('utf-16-le'),
-                            version=version) + insert
+                        markdown_text += (
+                            escape_markdown(
+                                message_text[  # type: ignore
+                                    last_offset * 2 : (entity.offset - offset) * 2
+                                ].decode('utf-16-le'),
+                                version=version,
+                            )
+                            + insert
+                        )
                 else:
-                    if sys.maxunicode == 0xffff:
-                        markdown_text += message_text[last_offset:entity.offset - offset] + insert
+                    if sys.maxunicode == 0xFFFF:
+                        markdown_text += (
+                            message_text[last_offset : entity.offset - offset] + insert
+                        )
                     else:
-                        markdown_text += message_text[  # type: ignore
-                            last_offset * 2:(entity.offset - offset) * 2
-                        ].decode('utf-16-le') + insert
+                        markdown_text += (
+                            message_text[  # type: ignore
+                                last_offset * 2 : (entity.offset - offset) * 2
+                            ].decode('utf-16-le')
+                            + insert
+                        )
 
                 last_offset = entity.offset - offset + entity.length
 
         if offset == 0:
-            if sys.maxunicode == 0xffff:
+            if sys.maxunicode == 0xFFFF:
                 markdown_text += escape_markdown(message_text[last_offset:], version=version)
             else:
                 markdown_text += escape_markdown(
-                    message_text[last_offset * 2:] .decode('utf-16-le'),  # type: ignore
-                    version=version)
+                    message_text[last_offset * 2 :].decode('utf-16-le'),  # type: ignore
+                    version=version,
+                )
         else:
-            if sys.maxunicode == 0xffff:
+            if sys.maxunicode == 0xFFFF:
                 markdown_text += message_text[last_offset:]
             else:
-                markdown_text += message_text[last_offset * 2:].decode('utf-16-le')  # type: ignore
+                markdown_text += message_text[last_offset * 2 :].decode(  # type: ignore
+                    'utf-16-le')
 
         return markdown_text
 
@@ -1559,8 +1677,9 @@ class Message(TelegramObject):
             :obj:`str`: Message caption with caption entities formatted as Markdown.
 
         """
-        return self._parse_markdown(self.caption, self.parse_caption_entities(),
-                                    urled=False, version=2)
+        return self._parse_markdown(
+            self.caption, self.parse_caption_entities(), urled=False, version=2
+        )
 
     @property
     def caption_markdown_urled(self) -> str:
@@ -1592,5 +1711,6 @@ class Message(TelegramObject):
             :obj:`str`: Message caption with caption entities formatted as Markdown.
 
         """
-        return self._parse_markdown(self.caption, self.parse_caption_entities(),
-                                    urled=True, version=2)
+        return self._parse_markdown(
+            self.caption, self.parse_caption_entities(), urled=True, version=2
+        )

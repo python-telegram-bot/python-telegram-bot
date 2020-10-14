@@ -21,6 +21,7 @@
 from telegram import InlineQueryResult
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
 from typing import Any, Union, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
 
@@ -76,20 +77,22 @@ class InlineQueryResultDocument(InlineQueryResult):
 
     """
 
-    def __init__(self,
-                 id: str,
-                 document_url: str,
-                 title: str,
-                 mime_type: str,
-                 caption: str = None,
-                 description: str = None,
-                 reply_markup: 'ReplyMarkup' = None,
-                 input_message_content: 'InputMessageContent' = None,
-                 thumb_url: str = None,
-                 thumb_width: int = None,
-                 thumb_height: int = None,
-                 parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        id: str,
+        document_url: str,
+        title: str,
+        mime_type: str,
+        caption: str = None,
+        description: str = None,
+        reply_markup: 'ReplyMarkup' = None,
+        input_message_content: 'InputMessageContent' = None,
+        thumb_url: str = None,
+        thumb_width: int = None,
+        thumb_height: int = None,
+        parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+        **kwargs: Any,
+    ):
         # Required
         super().__init__('document', id)
         self.document_url = document_url

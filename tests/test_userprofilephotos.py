@@ -24,19 +24,16 @@ class TestUserProfilePhotos:
     photos = [
         [
             PhotoSize('file_id1', 'file_un_id1', 512, 512),
-            PhotoSize('file_id2', 'file_un_id1', 512, 512)
+            PhotoSize('file_id2', 'file_un_id1', 512, 512),
         ],
         [
             PhotoSize('file_id3', 'file_un_id3', 512, 512),
-            PhotoSize('file_id4', 'file_un_id4', 512, 512)
-        ]
+            PhotoSize('file_id4', 'file_un_id4', 512, 512),
+        ],
     ]
 
     def test_de_json(self, bot):
-        json_dict = {
-            'total_count': 2,
-            'photos': [[y.to_dict() for y in x] for x in self.photos]
-        }
+        json_dict = {'total_count': 2, 'photos': [[y.to_dict() for y in x] for x in self.photos]}
         user_profile_photos = UserProfilePhotos.de_json(json_dict, bot)
         assert user_profile_photos.total_count == self.total_count
         assert user_profile_photos.photos == self.photos

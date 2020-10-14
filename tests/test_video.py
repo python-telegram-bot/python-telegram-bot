@@ -80,10 +80,18 @@ class TestVideo:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_all_args(self, bot, chat_id, video_file, video, thumb_file):
-        message = bot.send_video(chat_id, video_file, duration=self.duration,
-                                 caption=self.caption, supports_streaming=self.supports_streaming,
-                                 disable_notification=False, width=video.width,
-                                 height=video.height, parse_mode='Markdown', thumb=thumb_file)
+        message = bot.send_video(
+            chat_id,
+            video_file,
+            duration=self.duration,
+            caption=self.caption,
+            supports_streaming=self.supports_streaming,
+            disable_notification=False,
+            width=video.width,
+            height=video.height,
+            parse_mode='Markdown',
+            thumb=thumb_file,
+        )
 
         assert isinstance(message.video, Video)
         assert isinstance(message.video.file_id, str)
@@ -173,8 +181,9 @@ class TestVideo:
     def test_send_video_default_parse_mode_2(self, default_bot, chat_id, video):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_video(chat_id, video, caption=test_markdown_string,
-                                         parse_mode=None)
+        message = default_bot.send_video(
+            chat_id, video, caption=test_markdown_string, parse_mode=None
+        )
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
@@ -184,8 +193,9 @@ class TestVideo:
     def test_send_video_default_parse_mode_3(self, default_bot, chat_id, video):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_video(chat_id, video, caption=test_markdown_string,
-                                         parse_mode='HTML')
+        message = default_bot.send_video(
+            chat_id, video, caption=test_markdown_string, parse_mode='HTML'
+        )
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
@@ -197,7 +207,7 @@ class TestVideo:
             'height': self.height,
             'duration': self.duration,
             'mime_type': self.mime_type,
-            'file_size': self.file_size
+            'file_size': self.file_size,
         }
         json_video = Video.de_json(json_dict, bot)
 

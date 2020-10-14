@@ -24,9 +24,9 @@ from telegram import GameHighScore, User
 
 @pytest.fixture(scope='class')
 def game_highscore():
-    return GameHighScore(TestGameHighScore.position,
-                         TestGameHighScore.user,
-                         TestGameHighScore.score)
+    return GameHighScore(
+        TestGameHighScore.position, TestGameHighScore.user, TestGameHighScore.score
+    )
 
 
 class TestGameHighScore:
@@ -35,9 +35,7 @@ class TestGameHighScore:
     score = 42
 
     def test_de_json(self, bot):
-        json_dict = {'position': self.position,
-                     'user': self.user.to_dict(),
-                     'score': self.score}
+        json_dict = {'position': self.position, 'user': self.user.to_dict(), 'score': self.score}
         highscore = GameHighScore.de_json(json_dict, bot)
 
         assert highscore.position == self.position

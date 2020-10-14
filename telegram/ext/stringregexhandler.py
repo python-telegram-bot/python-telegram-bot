@@ -24,6 +24,7 @@ from .handler import Handler
 
 from typing import Callable, TYPE_CHECKING, Optional, TypeVar, Match, Dict, Any, Union, Pattern
 from telegram.utils.types import HandlerArg
+
 if TYPE_CHECKING:
     from telegram.ext import CallbackContext, Dispatcher
 
@@ -90,19 +91,22 @@ class StringRegexHandler(Handler):
 
     """
 
-    def __init__(self,
-                 pattern: Union[str, Pattern],
-                 callback: Callable[[HandlerArg, 'CallbackContext'], RT],
-                 pass_groups: bool = False,
-                 pass_groupdict: bool = False,
-                 pass_update_queue: bool = False,
-                 pass_job_queue: bool = False,
-                 run_async: bool = False):
+    def __init__(
+        self,
+        pattern: Union[str, Pattern],
+        callback: Callable[[HandlerArg, 'CallbackContext'], RT],
+        pass_groups: bool = False,
+        pass_groupdict: bool = False,
+        pass_update_queue: bool = False,
+        pass_job_queue: bool = False,
+        run_async: bool = False,
+    ):
         super().__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
-            run_async=run_async)
+            run_async=run_async,
+        )
 
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
@@ -127,10 +131,12 @@ class StringRegexHandler(Handler):
                 return match
         return None
 
-    def collect_optional_args(self,
-                              dispatcher: 'Dispatcher',
-                              update: HandlerArg = None,
-                              check_result: Optional[Match] = None) -> Dict[str, Any]:
+    def collect_optional_args(
+        self,
+        dispatcher: 'Dispatcher',
+        update: HandlerArg = None,
+        check_result: Optional[Match] = None,
+    ) -> Dict[str, Any]:
         optional_args = super().collect_optional_args(dispatcher, update, check_result)
         if self.pattern:
             if self.pass_groups and check_result:
@@ -139,10 +145,12 @@ class StringRegexHandler(Handler):
                 optional_args['groupdict'] = check_result.groupdict()
         return optional_args
 
-    def collect_additional_context(self,
-                                   context: 'CallbackContext',
-                                   update: HandlerArg,
-                                   dispatcher: 'Dispatcher',
-                                   check_result: Optional[Match]) -> None:
+    def collect_additional_context(
+        self,
+        context: 'CallbackContext',
+        update: HandlerArg,
+        dispatcher: 'Dispatcher',
+        check_result: Optional[Match],
+    ) -> None:
         if self.pattern and check_result:
             context.matches = [check_result]

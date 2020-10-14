@@ -68,9 +68,15 @@ class TestDocument:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_all_args(self, bot, chat_id, document_file, document, thumb_file):
-        message = bot.send_document(chat_id, document=document_file, caption=self.caption,
-                                    disable_notification=False, filename='telegram_custom.png',
-                                    parse_mode='Markdown', thumb=thumb_file)
+        message = bot.send_document(
+            chat_id,
+            document=document_file,
+            caption=self.caption,
+            disable_notification=False,
+            filename='telegram_custom.png',
+            parse_mode='Markdown',
+            thumb=thumb_file,
+        )
 
         assert isinstance(message.document, Document)
         assert isinstance(message.document.file_id, str)
@@ -150,8 +156,9 @@ class TestDocument:
     def test_send_document_default_parse_mode_2(self, default_bot, chat_id, document):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_document(chat_id, document, caption=test_markdown_string,
-                                            parse_mode=None)
+        message = default_bot.send_document(
+            chat_id, document, caption=test_markdown_string, parse_mode=None
+        )
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
@@ -161,8 +168,9 @@ class TestDocument:
     def test_send_document_default_parse_mode_3(self, default_bot, chat_id, document):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_document(chat_id, document, caption=test_markdown_string,
-                                            parse_mode='HTML')
+        message = default_bot.send_document(
+            chat_id, document, caption=test_markdown_string, parse_mode='HTML'
+        )
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
@@ -173,7 +181,7 @@ class TestDocument:
             'thumb': document.thumb.to_dict(),
             'file_name': self.file_name,
             'mime_type': self.mime_type,
-            'file_size': self.file_size
+            'file_size': self.file_size,
         }
         test_document = Document.de_json(json_dict, bot)
 

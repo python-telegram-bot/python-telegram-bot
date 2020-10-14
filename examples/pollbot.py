@@ -9,30 +9,56 @@ one the user sends the bot
 """
 import logging
 
-from telegram import (Poll, ParseMode, KeyboardButton, KeyboardButtonPollType,
-                      ReplyKeyboardMarkup, ReplyKeyboardRemove)
-from telegram.ext import (Updater, CommandHandler, PollAnswerHandler, PollHandler, MessageHandler,
-                          Filters)
+from telegram import (
+    Poll,
+    ParseMode,
+    KeyboardButton,
+    KeyboardButtonPollType,
+    ReplyKeyboardMarkup,
+    ReplyKeyboardRemove,
+)
+from telegram.ext import (
+    Updater,
+    CommandHandler,
+    PollAnswerHandler,
+    PollHandler,
+    MessageHandler,
+    Filters,
+)
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+)
 logger = logging.getLogger(__name__)
 
 
 def start(update, context):
     """Inform user about what this bot can do"""
-    update.message.reply_text('Please select /poll to get a Poll, /quiz to get a Quiz or /preview'
-                              ' to generate a preview for your poll')
+    update.message.reply_text(
+        'Please select /poll to get a Poll, /quiz to get a Quiz or /preview'
+        ' to generate a preview for your poll'
+    )
 
 
 def poll(update, context):
     """Sends a predefined poll"""
     questions = ["Good", "Really good", "Fantastic", "Great"]
-    message = context.bot.send_poll(update.effective_chat.id, "How are you?", questions,
-                                    is_anonymous=False, allows_multiple_answers=True)
+    message = context.bot.send_poll(
+        update.effective_chat.id,
+        "How are you?",
+        questions,
+        is_anonymous=False,
+        allows_multiple_answers=True,
+    )
     # Save some info about the poll the bot_data for later use in receive_poll_answer
-    payload = {message.poll.id: {"questions": questions, "message_id": message.message_id,
-                                 "chat_id": update.effective_chat.id, "answers": 0}}
+    payload = {
+        message.poll.id: {
+            "questions": questions,
+            "message_id": message.message_id,
+            "chat_id": update.effective_chat.id,
+            "answers": 0,
+        }
+    }
     context.bot_data.update(payload)
 
 
@@ -52,25 +78,29 @@ def receive_poll_answer(update, context):
             answer_string += questions[question_id] + " and "
         else:
             answer_string += questions[question_id]
-    context.bot.send_message(context.bot_data[poll_id]["chat_id"],
-                             "{} feels {}!".format(update.effective_user.mention_html(),
-                                                   answer_string),
-                             parse_mode=ParseMode.HTML)
+    context.bot.send_message(
+        context.bot_data[poll_id]["chat_id"],
+        "{} feels {}!".format(update.effective_user.mention_html(), answer_string),
+        parse_mode=ParseMode.HTML,
+    )
     context.bot_data[poll_id]["answers"] += 1
     # Close poll after three participants voted
     if context.bot_data[poll_id]["answers"] == 3:
-        context.bot.stop_poll(context.bot_data[poll_id]["chat_id"],
-                              context.bot_data[poll_id]["message_id"])
+        context.bot.stop_poll(
+            context.bot_data[poll_id]["chat_id"], context.bot_data[poll_id]["message_id"]
+        )
 
 
 def quiz(update, context):
     """Send a predefined poll"""
     questions = ["1", "2", "4", "20"]
-    message = update.effective_message.reply_poll("How many eggs do you need for a cake?",
-                                                  questions, type=Poll.QUIZ, correct_option_id=2)
+    message = update.effective_message.reply_poll(
+        "How many eggs do you need for a cake?", questions, type=Poll.QUIZ, correct_option_id=2
+    )
     # Save some info about the poll the bot_data for later use in receive_quiz_answer
-    payload = {message.poll.id: {"chat_id": update.effective_chat.id,
-                                 "message_id": message.message_id}}
+    payload = {
+        message.poll.id: {"chat_id": update.effective_chat.id, "message_id": message.message_id}
+    }
     context.bot_data.update(payload)
 
 
@@ -94,9 +124,9 @@ def preview(update, context):
     button = [[KeyboardButton("Press me!", request_poll=KeyboardButtonPollType())]]
     message = "Press the button to let the bot generate a preview for your poll"
     # using one_time_keyboard to hide the keyboard
-    update.effective_message.reply_text(message,
-                                        reply_markup=ReplyKeyboardMarkup(button,
-                                                                         one_time_keyboard=True))
+    update.effective_message.reply_text(
+        message, reply_markup=ReplyKeyboardMarkup(button, one_time_keyboard=True)
+    )
 
 
 def receive_poll(update, context):
@@ -109,14 +139,13 @@ def receive_poll(update, context):
         options=[o.text for o in actual_poll.options],
         # with is_closed true, the poll/quiz is immediately closed
         is_closed=True,
-        reply_markup=ReplyKeyboardRemove()
+        reply_markup=ReplyKeyboardRemove(),
     )
 
 
 def help_handler(update, context):
     """Display a help message"""
-    update.message.reply_text("Use /quiz, /poll or /preview to test this "
-                              "bot.")
+    update.message.reply_text("Use /quiz, /poll or /preview to test this " "bot.")
 
 
 def main():

@@ -24,8 +24,12 @@ from telegram import Contact, Voice
 
 @pytest.fixture(scope='class')
 def contact():
-    return Contact(TestContact.phone_number, TestContact.first_name, TestContact.last_name,
-                   TestContact.user_id)
+    return Contact(
+        TestContact.phone_number,
+        TestContact.first_name,
+        TestContact.last_name,
+        TestContact.user_id,
+    )
 
 
 class TestContact:
@@ -42,8 +46,12 @@ class TestContact:
         assert contact.first_name == self.first_name
 
     def test_de_json_all(self, bot):
-        json_dict = {'phone_number': self.phone_number, 'first_name': self.first_name,
-                     'last_name': self.last_name, 'user_id': self.user_id}
+        json_dict = {
+            'phone_number': self.phone_number,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'user_id': self.user_id,
+        }
         contact = Contact.de_json(json_dict, bot)
 
         assert contact.phone_number == self.phone_number

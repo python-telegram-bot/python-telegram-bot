@@ -35,8 +35,9 @@ def animation_file():
 @pytest.fixture(scope='class')
 def animation(bot, chat_id):
     with open('tests/data/game.gif', 'rb') as f:
-        return bot.send_animation(chat_id, animation=f, timeout=50,
-                                  thumb=open('tests/data/thumb.jpg', 'rb')).animation
+        return bot.send_animation(
+            chat_id, animation=f, timeout=50, thumb=open('tests/data/thumb.jpg', 'rb')
+        ).animation
 
 
 class TestAnimation:
@@ -69,10 +70,17 @@ class TestAnimation:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_all_args(self, bot, chat_id, animation_file, animation, thumb_file):
-        message = bot.send_animation(chat_id, animation_file, duration=self.duration,
-                                     width=self.width, height=self.height, caption=self.caption,
-                                     parse_mode='Markdown', disable_notification=False,
-                                     thumb=thumb_file)
+        message = bot.send_animation(
+            chat_id,
+            animation_file,
+            duration=self.duration,
+            width=self.width,
+            height=self.height,
+            caption=self.caption,
+            parse_mode='Markdown',
+            disable_notification=False,
+            thumb=thumb_file,
+        )
 
         assert isinstance(message.animation, Animation)
         assert isinstance(message.animation.file_id, str)
@@ -101,8 +109,9 @@ class TestAnimation:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_animation_url_file(self, bot, chat_id, animation):
-        message = bot.send_animation(chat_id=chat_id, animation=self.animation_file_url,
-                                     caption=self.caption)
+        message = bot.send_animation(
+            chat_id=chat_id, animation=self.animation_file_url, caption=self.caption
+        )
 
         assert message.caption == self.caption
 
@@ -134,8 +143,9 @@ class TestAnimation:
     def test_send_animation_default_parse_mode_2(self, default_bot, chat_id, animation_file):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_animation(chat_id, animation_file, caption=test_markdown_string,
-                                             parse_mode=None)
+        message = default_bot.send_animation(
+            chat_id, animation_file, caption=test_markdown_string, parse_mode=None
+        )
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
@@ -145,8 +155,9 @@ class TestAnimation:
     def test_send_animation_default_parse_mode_3(self, default_bot, chat_id, animation_file):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_animation(chat_id, animation_file, caption=test_markdown_string,
-                                             parse_mode='HTML')
+        message = default_bot.send_animation(
+            chat_id, animation_file, caption=test_markdown_string, parse_mode='HTML'
+        )
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
@@ -175,7 +186,7 @@ class TestAnimation:
             'thumb': animation.thumb.to_dict(),
             'file_name': self.file_name,
             'mime_type': self.mime_type,
-            'file_size': self.file_size
+            'file_size': self.file_size,
         }
         animation = Animation.de_json(json_dict, bot)
         assert animation.file_id == self.animation_file_id
@@ -225,10 +236,14 @@ class TestAnimation:
         assert animation.get_file()
 
     def test_equality(self):
-        a = Animation(self.animation_file_id, self.animation_file_unique_id,
-                      self.height, self.width, self.duration)
-        b = Animation('', self.animation_file_unique_id,
-                      self.height, self.width, self.duration)
+        a = Animation(
+            self.animation_file_id,
+            self.animation_file_unique_id,
+            self.height,
+            self.width,
+            self.duration,
+        )
+        b = Animation('', self.animation_file_unique_id, self.height, self.width, self.duration)
         d = Animation('', '', 0, 0, 0)
         e = Voice(self.animation_file_id, self.animation_file_unique_id, 0)
 

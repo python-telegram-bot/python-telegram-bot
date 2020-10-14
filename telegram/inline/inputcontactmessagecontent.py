@@ -45,12 +45,14 @@ class InputContactMessageContent(InputMessageContent):
 
     """
 
-    def __init__(self,
-                 phone_number: str,
-                 first_name: str,
-                 last_name: str = None,
-                 vcard: str = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        phone_number: str,
+        first_name: str,
+        last_name: str = None,
+        vcard: str = None,
+        **kwargs: Any,
+    ):
         # Required
         self.phone_number = phone_number
         self.first_name = first_name

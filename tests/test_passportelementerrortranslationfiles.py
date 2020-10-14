@@ -27,7 +27,8 @@ def passport_element_error_translation_files():
     return PassportElementErrorTranslationFiles(
         TestPassportElementErrorTranslationFiles.type_,
         TestPassportElementErrorTranslationFiles.file_hashes,
-        TestPassportElementErrorTranslationFiles.message)
+        TestPassportElementErrorTranslationFiles.message,
+    )
 
 
 class TestPassportElementErrorTranslationFiles:
@@ -44,18 +45,27 @@ class TestPassportElementErrorTranslationFiles:
         assert passport_element_error_translation_files.message == self.message
 
     def test_to_dict(self, passport_element_error_translation_files):
-        passport_element_error_translation_files_dict = \
+        passport_element_error_translation_files_dict = (
             passport_element_error_translation_files.to_dict()
+        )
 
         assert isinstance(passport_element_error_translation_files_dict, dict)
-        assert (passport_element_error_translation_files_dict['source']
-                == passport_element_error_translation_files.source)
-        assert (passport_element_error_translation_files_dict['type']
-                == passport_element_error_translation_files.type)
-        assert (passport_element_error_translation_files_dict['file_hashes']
-                == passport_element_error_translation_files.file_hashes)
-        assert (passport_element_error_translation_files_dict['message']
-                == passport_element_error_translation_files.message)
+        assert (
+            passport_element_error_translation_files_dict['source']
+            == passport_element_error_translation_files.source
+        )
+        assert (
+            passport_element_error_translation_files_dict['type']
+            == passport_element_error_translation_files.type
+        )
+        assert (
+            passport_element_error_translation_files_dict['file_hashes']
+            == passport_element_error_translation_files.file_hashes
+        )
+        assert (
+            passport_element_error_translation_files_dict['message']
+            == passport_element_error_translation_files.message
+        )
 
     def test_equality(self):
         a = PassportElementErrorTranslationFiles(self.type_, self.file_hashes, self.message)

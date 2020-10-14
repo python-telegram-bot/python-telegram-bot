@@ -22,6 +22,7 @@ from .handler import Handler
 
 from telegram.utils.types import HandlerArg
 from typing import Callable, TYPE_CHECKING, Any, Optional, TypeVar, Dict, List
+
 if TYPE_CHECKING:
     from telegram.ext import CallbackContext, Dispatcher
 
@@ -80,18 +81,21 @@ class StringCommandHandler(Handler):
 
     """
 
-    def __init__(self,
-                 command: str,
-                 callback: Callable[[HandlerArg, 'CallbackContext'], RT],
-                 pass_args: bool = False,
-                 pass_update_queue: bool = False,
-                 pass_job_queue: bool = False,
-                 run_async: bool = False):
+    def __init__(
+        self,
+        command: str,
+        callback: Callable[[HandlerArg, 'CallbackContext'], RT],
+        pass_args: bool = False,
+        pass_update_queue: bool = False,
+        pass_job_queue: bool = False,
+        run_async: bool = False,
+    ):
         super().__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
-            run_async=run_async)
+            run_async=run_async,
+        )
         self.command = command
         self.pass_args = pass_args
 
@@ -111,18 +115,22 @@ class StringCommandHandler(Handler):
                 return args[1:]
         return None
 
-    def collect_optional_args(self,
-                              dispatcher: 'Dispatcher',
-                              update: HandlerArg = None,
-                              check_result: Optional[List[str]] = None) -> Dict[str, Any]:
+    def collect_optional_args(
+        self,
+        dispatcher: 'Dispatcher',
+        update: HandlerArg = None,
+        check_result: Optional[List[str]] = None,
+    ) -> Dict[str, Any]:
         optional_args = super().collect_optional_args(dispatcher, update, check_result)
         if self.pass_args:
             optional_args['args'] = check_result
         return optional_args
 
-    def collect_additional_context(self,
-                                   context: 'CallbackContext',
-                                   update: HandlerArg,
-                                   dispatcher: 'Dispatcher',
-                                   check_result: Optional[List[str]]) -> None:
+    def collect_additional_context(
+        self,
+        context: 'CallbackContext',
+        update: HandlerArg,
+        dispatcher: 'Dispatcher',
+        check_result: Optional[List[str]],
+    ) -> None:
         context.args = check_result

@@ -38,6 +38,7 @@ class BotCommand(TelegramObject):
             English letters, digits and underscores.
         description (:obj:`str`): Description of the command, 3-256 characters.
     """
+
     def __init__(self, command: str, description: str, **kwargs: Any):
         self.command = command
         self.description = description

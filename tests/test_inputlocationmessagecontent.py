@@ -24,9 +24,11 @@ from telegram import InputLocationMessageContent, Location
 
 @pytest.fixture(scope='class')
 def input_location_message_content():
-    return InputLocationMessageContent(TestInputLocationMessageContent.latitude,
-                                       TestInputLocationMessageContent.longitude,
-                                       live_period=TestInputLocationMessageContent.live_period)
+    return InputLocationMessageContent(
+        TestInputLocationMessageContent.latitude,
+        TestInputLocationMessageContent.longitude,
+        live_period=TestInputLocationMessageContent.live_period,
+    )
 
 
 class TestInputLocationMessageContent:
@@ -43,12 +45,18 @@ class TestInputLocationMessageContent:
         input_location_message_content_dict = input_location_message_content.to_dict()
 
         assert isinstance(input_location_message_content_dict, dict)
-        assert (input_location_message_content_dict['latitude']
-                == input_location_message_content.latitude)
-        assert (input_location_message_content_dict['longitude']
-                == input_location_message_content.longitude)
-        assert (input_location_message_content_dict['live_period']
-                == input_location_message_content.live_period)
+        assert (
+            input_location_message_content_dict['latitude']
+            == input_location_message_content.latitude
+        )
+        assert (
+            input_location_message_content_dict['longitude']
+            == input_location_message_content.longitude
+        )
+        assert (
+            input_location_message_content_dict['live_period']
+            == input_location_message_content.live_period
+        )
 
     def test_equality(self):
         a = InputLocationMessageContent(123, 456, 70)

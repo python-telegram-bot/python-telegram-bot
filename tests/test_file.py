@@ -28,18 +28,21 @@ from telegram import File, TelegramError, Voice
 
 @pytest.fixture(scope='class')
 def file(bot):
-    return File(TestFile.file_id,
-                TestFile.file_unique_id,
-                file_path=TestFile.file_path,
-                file_size=TestFile.file_size,
-                bot=bot)
+    return File(
+        TestFile.file_id,
+        TestFile.file_unique_id,
+        file_path=TestFile.file_path,
+        file_size=TestFile.file_size,
+        bot=bot,
+    )
 
 
 class TestFile:
     file_id = 'NOTVALIDDOESNOTMATTER'
     file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
     file_path = (
-        u'https://api.org/file/bot133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0/document/file_3')
+        u'https://api.org/file/bot133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0/document/file_3'
+    )
     file_size = 28232
     file_content = u'Saint-Saëns'.encode('utf-8')  # Intentionally contains unicode chars.
 
@@ -48,7 +51,7 @@ class TestFile:
             'file_id': self.file_id,
             'file_unique_id': self.file_unique_id,
             'file_path': self.file_path,
-            'file_size': self.file_size
+            'file_size': self.file_size,
         }
         new_file = File.de_json(json_dict, bot)
 
@@ -110,7 +113,7 @@ class TestFile:
         monkeypatch.setattr('telegram.utils.request.Request.retrieve', test)
         out_file = file.download()
 
-        assert out_file[-len(file.file_id):] == file.file_id
+        assert out_file[-len(file.file_id) :] == file.file_id
         try:
             with open(out_file, 'rb') as fobj:
                 assert fobj.read() == self.file_content
@@ -143,8 +146,8 @@ class TestFile:
         buf2 = buf[:]
         buf3 = file.download_as_bytearray(buf=buf2)
         assert buf3 is buf2
-        assert buf2[len(buf):] == buf
-        assert buf2[:len(buf)] == buf
+        assert buf2[len(buf) :] == buf
+        assert buf2[: len(buf)] == buf
 
     def test_equality(self, bot):
         a = File(self.file_id, self.file_unique_id, bot)

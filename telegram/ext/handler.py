@@ -24,6 +24,7 @@ from telegram.utils.promise import Promise
 from telegram.utils.types import HandlerArg
 from telegram import Update
 from typing import Callable, TYPE_CHECKING, Any, Optional, Union, TypeVar, Dict
+
 if TYPE_CHECKING:
     from telegram.ext import CallbackContext, Dispatcher
 
@@ -87,13 +88,16 @@ class Handler(ABC):
             Defaults to :obj:`False`.
 
     """
-    def __init__(self,
-                 callback: Callable[[HandlerArg, 'CallbackContext'], RT],
-                 pass_update_queue: bool = False,
-                 pass_job_queue: bool = False,
-                 pass_user_data: bool = False,
-                 pass_chat_data: bool = False,
-                 run_async: bool = False):
+
+    def __init__(
+        self,
+        callback: Callable[[HandlerArg, 'CallbackContext'], RT],
+        pass_update_queue: bool = False,
+        pass_job_queue: bool = False,
+        pass_user_data: bool = False,
+        pass_chat_data: bool = False,
+        run_async: bool = False,
+    ):
         self.callback: Callable[[HandlerArg, 'CallbackContext'], RT] = callback
         self.pass_update_queue = pass_update_queue
         self.pass_job_queue = pass_job_queue
@@ -117,11 +121,13 @@ class Handler(ABC):
 
         """
 
-    def handle_update(self,
-                      update: HandlerArg,
-                      dispatcher: 'Dispatcher',
-                      check_result: object,
-                      context: 'CallbackContext' = None) -> Union[RT, Promise]:
+    def handle_update(
+        self,
+        update: HandlerArg,
+        dispatcher: 'Dispatcher',
+        check_result: object,
+        context: 'CallbackContext' = None,
+    ) -> Union[RT, Promise]:
         """
         This method is called if it was determined that an update should indeed
         be handled by this instance. Calls :attr:`callback` along with its respectful
@@ -146,16 +152,19 @@ class Handler(ABC):
         else:
             optional_args = self.collect_optional_args(dispatcher, update, check_result)
             if self.run_async:
-                return dispatcher.run_async(self.callback, dispatcher.bot, update, update=update,
-                                            **optional_args)
+                return dispatcher.run_async(
+                    self.callback, dispatcher.bot, update, update=update, **optional_args
+                )
             else:
                 return self.callback(dispatcher.bot, update, **optional_args)  # type: ignore
 
-    def collect_additional_context(self,
-                                   context: 'CallbackContext',
-                                   update: HandlerArg,
-                                   dispatcher: 'Dispatcher',
-                                   check_result: Any) -> None:
+    def collect_additional_context(
+        self,
+        context: 'CallbackContext',
+        update: HandlerArg,
+        dispatcher: 'Dispatcher',
+        check_result: Any,
+    ) -> None:
         """Prepares additional arguments for the context. Override if needed.
 
         Args:
@@ -167,10 +176,9 @@ class Handler(ABC):
         """
         pass
 
-    def collect_optional_args(self,
-                              dispatcher: 'Dispatcher',
-                              update: HandlerArg = None,
-                              check_result: Any = None) -> Dict[str, Any]:
+    def collect_optional_args(
+        self, dispatcher: 'Dispatcher', update: HandlerArg = None, check_result: Any = None
+    ) -> Dict[str, Any]:
         """
         Prepares the optional arguments. If the handler has additional optional args,
         it should subclass this method, but remember to call this super method.
@@ -193,10 +201,12 @@ class Handler(ABC):
         if self.pass_user_data and isinstance(update, Update):
             user = update.effective_user
             optional_args['user_data'] = dispatcher.user_data[
-                user.id if user else None]  # type: ignore[index]
+                user.id if user else None  # type: ignore[index]
+            ]
         if self.pass_chat_data and isinstance(update, Update):
             chat = update.effective_chat
             optional_args['chat_data'] = dispatcher.chat_data[
-                chat.id if chat else None]  # type: ignore[index]
+                chat.id if chat else None  # type: ignore[index]
+            ]
 
         return optional_args

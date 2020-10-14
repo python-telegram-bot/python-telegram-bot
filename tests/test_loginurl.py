@@ -24,9 +24,12 @@ from telegram import LoginUrl
 
 @pytest.fixture(scope='class')
 def login_url():
-    return LoginUrl(url=TestLoginUrl.url, forward_text=TestLoginUrl.forward_text,
-                    bot_username=TestLoginUrl.bot_username,
-                    request_write_access=TestLoginUrl.request_write_access)
+    return LoginUrl(
+        url=TestLoginUrl.url,
+        forward_text=TestLoginUrl.forward_text,
+        bot_username=TestLoginUrl.bot_username,
+        request_write_access=TestLoginUrl.request_write_access,
+    )
 
 
 class TestLoginUrl:

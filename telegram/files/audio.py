@@ -22,6 +22,7 @@ from telegram import TelegramObject, PhotoSize
 
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import Bot, File
 
@@ -65,17 +66,19 @@ class Audio(TelegramObject):
 
     """
 
-    def __init__(self,
-                 file_id: str,
-                 file_unique_id: str,
-                 duration: int,
-                 performer: str = None,
-                 title: str = None,
-                 mime_type: str = None,
-                 file_size: int = None,
-                 thumb: PhotoSize = None,
-                 bot: 'Bot' = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        file_id: str,
+        file_unique_id: str,
+        duration: int,
+        performer: str = None,
+        title: str = None,
+        mime_type: str = None,
+        file_size: int = None,
+        thumb: PhotoSize = None,
+        bot: 'Bot' = None,
+        **kwargs: Any,
+    ):
         # Required
         self.file_id = str(file_id)
         self.file_unique_id = str(file_unique_id)

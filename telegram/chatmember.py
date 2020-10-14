@@ -19,11 +19,12 @@
 """This module contains an object that represents a Telegram ChatMember."""
 import datetime
 
-from telegram import User, TelegramObject
+from telegram import User, TelegramObject, constants
 from telegram.utils.helpers import to_timestamp, from_timestamp
 
 from telegram.utils.types import JSONDict
 from typing import Any, Optional, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from telegram import Bot
 
@@ -110,40 +111,42 @@ class ChatMember(TelegramObject):
             may add web page previews to his messages.
 
     """
-    ADMINISTRATOR: str = 'administrator'
-    """:obj:`str`: 'administrator'"""
-    CREATOR: str = 'creator'
-    """:obj:`str`: 'creator'"""
-    KICKED: str = 'kicked'
-    """:obj:`str`: 'kicked'"""
-    LEFT: str = 'left'
-    """:obj:`str`: 'left'"""
-    MEMBER: str = 'member'
-    """:obj:`str`: 'member'"""
-    RESTRICTED: str = 'restricted'
-    """:obj:`str`: 'restricted'"""
+    ADMINISTRATOR: str = constants.CHATMEMBER_ADMINISTRATOR
+    """:const:`telegram.constants.CHATMEMBER_ADMINISTRATOR`"""
+    CREATOR: str = constants.CHATMEMBER_CREATOR
+    """:const:`telegram.constants.CHATMEMBER_CREATOR`"""
+    KICKED: str = constants.CHATMEMBER_KICKED
+    """:const:`telegram.constants.CHATMEMBER_KICKED`"""
+    LEFT: str = constants.CHATMEMBER_LEFT
+    """:const:`telegram.constants.CHATMEMBER_LEFT`"""
+    MEMBER: str = constants.CHATMEMBER_MEMBER
+    """:const:`telegram.constants.CHATMEMBER_MEMBER`"""
+    RESTRICTED: str = constants.CHATMEMBER_RESTRICTED
+    """:const:`telegram.constants.CHATMEMBER_RESTRICTED`"""
 
-    def __init__(self,
-                 user: User,
-                 status: str,
-                 until_date: datetime.datetime = None,
-                 can_be_edited: bool = None,
-                 can_change_info: bool = None,
-                 can_post_messages: bool = None,
-                 can_edit_messages: bool = None,
-                 can_delete_messages: bool = None,
-                 can_invite_users: bool = None,
-                 can_restrict_members: bool = None,
-                 can_pin_messages: bool = None,
-                 can_promote_members: bool = None,
-                 can_send_messages: bool = None,
-                 can_send_media_messages: bool = None,
-                 can_send_polls: bool = None,
-                 can_send_other_messages: bool = None,
-                 can_add_web_page_previews: bool = None,
-                 is_member: bool = None,
-                 custom_title: str = None,
-                 **kwargs: Any):
+    def __init__(
+        self,
+        user: User,
+        status: str,
+        until_date: datetime.datetime = None,
+        can_be_edited: bool = None,
+        can_change_info: bool = None,
+        can_post_messages: bool = None,
+        can_edit_messages: bool = None,
+        can_delete_messages: bool = None,
+        can_invite_users: bool = None,
+        can_restrict_members: bool = None,
+        can_pin_messages: bool = None,
+        can_promote_members: bool = None,
+        can_send_messages: bool = None,
+        can_send_media_messages: bool = None,
+        can_send_polls: bool = None,
+        can_send_other_messages: bool = None,
+        can_add_web_page_previews: bool = None,
+        is_member: bool = None,
+        custom_title: str = None,
+        **kwargs: Any,
+    ):
         # Required
         self.user = user
         self.status = status
