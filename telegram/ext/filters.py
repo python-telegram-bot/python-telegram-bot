@@ -304,15 +304,6 @@ class _DiceEmoji(MessageFilter):
         return False
 
 
-class _ChatType(MessageFilter):
-    def __init__(self, chat_type: str = Chat.PRIVATE):
-        self.chat_type = chat_type
-        self.name = 'Filters.chat_type.{}'.format(chat_type)
-
-    def filter(self, message: Message) -> bool:
-        return message.chat.type == self.chat_type
-
-
 class Filters:
     """Predefined filters for use as the ``filter`` argument of
     :class:`telegram.ext.MessageHandler`.
@@ -972,23 +963,58 @@ officedocument.wordprocessingml.document")``-
     group = _Group()
     """Messages sent in a group or a supergroup chat."""
 
-    class _SuperGroup(MessageFilter):
-        name = 'Filters.supergroup'
+    class _ChatType(MessageFilter):
+        name = 'Filters.chat_type'
+
+        class _Channel(MessageFilter):
+            name = 'Filters.chat_type.channel'
+
+            def filter(self, message: Message) -> bool:
+                return message.chat.type == Chat.CHANNEL
+
+        channel = _Channel()
+
+        class _Group(MessageFilter):
+            name = 'Filters.chat_type.group'
+
+            def filter(self, message: Message) -> bool:
+                return message.chat.type == Chat.GROUP
+
+        group = _Group()
+
+        class _SuperGroup(MessageFilter):
+            name = 'Filters.chat_type.supergroup'
+
+            def filter(self, message: Message) -> bool:
+                return message.chat.type == Chat.SUPERGROUP
+
+        supergroup = _SuperGroup()
+
+        class _Private(MessageFilter):
+            name = 'Filters.chat_type.private'
+
+            def filter(self, message: Message) -> bool:
+                return message.chat.type == Chat.PRIVATE
+
+        private = _Private()
 
         def filter(self, message: Message) -> bool:
-            return message.chat.type == Chat.SUPERGROUP
+            return bool(message.chat.type)
 
-    supergroup = _SuperGroup()
-    """Messages sent in a supergroup chat."""
+    chat_type = _ChatType()
+    """Subset for filtering the type of chat.
 
-    class _ChatTypes(_ChatType):
-        """Filter using chat type"""
-        channel = _ChatType(Chat.CHANNEL)
-        group = _ChatType(Chat.GROUP)
-        supergroup = _ChatType(Chat.SUPERGROUP)
-        private = _ChatType(Chat.PRIVATE)
+    Examples:
+        Use these filters like: ``Filters.chat_type.channel`` or
+        ``Filters.chat_type.supergroup`` etc. Or use just ``Filters.chat_type`` for all
+        chat types.
 
-    chat_type = _ChatTypes()
+    Attributes:
+        channel: Updates from channel
+        group: Updates from group
+        supergroup: Updates from supergroup
+        private: Updates sent in private chat
+    """
 
     class user(MessageFilter):
         """Filters messages to allow only those which are from specified user ID(s) or
