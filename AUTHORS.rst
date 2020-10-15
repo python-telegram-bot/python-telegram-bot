@@ -83,6 +83,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `sooyhwang <https://github.com/sooyhwang>`_
 - `syntx <https://github.com/syntx>`_
 - `thodnev <https://github.com/thodnev>`_
+- `Timur Kushukov <https://github.com/timqsh>`_
 - `Trainer Jono <https://github.com/Tr-Jono>`_
 - `Valentijn <https://github.com/Faalentijn>`_
 - `voider1 <https://github.com/voider1>`_
