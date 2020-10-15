@@ -19,7 +19,7 @@
 
 import pytest
 
-from telegram import Chat, ChatAction, ChatPermissions
+from telegram import Chat, ChatAction, ChatPermissions, constants
 from telegram import User
 
 
@@ -94,6 +94,16 @@ class TestChat:
         assert chat.link == 'https://t.me/{}'.format(chat.username)
         chat.username = None
         assert chat.link is None
+
+    def test_anonymous_admin(self, chat):
+        assert chat.is_anonymous_admin is False
+        chat.id = constants.ANONYMOUS_ADMIN_ID
+        assert chat.is_anonymous_admin
+
+    def test_service_chat(self, chat):
+        assert chat.is_service_chat is False
+        chat.id = constants.SERVICE_CHAT_ID
+        assert chat.is_service_chat
 
     def test_send_action(self, monkeypatch, chat):
         def test(*args, **kwargs):

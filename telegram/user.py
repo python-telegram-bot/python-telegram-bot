@@ -49,10 +49,6 @@ class User(TelegramObject):
         supports_inline_queries (:obj:`str`): Optional. :obj:`True`, if the bot supports inline
             queries. Returned only in :attr:`telegram.Bot.get_me` requests.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
-        is_anonymous_admin (:obj:`bool`): :obj:`True`, if this user is an anonymous admin.
-            Undocumented behavior.
-        is_channel_forwarder_service (:obj:`bool`): :obj:`True`, if this user is a channel
-        forwarder service. Undocumented behavior.
 
     Args:
         id (:obj:`int`): Unique identifier for this user or bot.
@@ -97,9 +93,6 @@ class User(TelegramObject):
         self.can_read_all_group_messages = can_read_all_group_messages
         self.supports_inline_queries = supports_inline_queries
         self.bot = bot
-        self.is_anonymous_admin = True if self.id == constants.ANONYMOUS_ADMIN_ID else False
-        self.is_channel_forwarder_service = (
-            True if self.id == constants.CHANNEL_FORWARDER_SERVICE_ID else False)
 
         self._id_attrs = (self.id,)
 
@@ -128,6 +121,20 @@ class User(TelegramObject):
         if self.username:
             return "https://t.me/{}".format(self.username)
         return None
+
+    @property
+    def is_anonymous_admin(self) -> bool:
+        """:obj:`bool`: :obj:`True`, if this user is an anonymous admin.
+            This behaviour is undocumented and might be changed by Telegram."""
+
+        return self.id == constants.ANONYMOUS_ADMIN_ID
+
+    @property
+    def is_service_chat(self) -> bool:
+        """:obj:`bool`: :obj:`True`, if this user is the telegram service.
+            This behaviour is undocumented and might be changed by Telegram."""
+
+        return self.id == constants.SERVICE_CHAT_ID
 
     def get_profile_photos(self, *args: Any, **kwargs: Any) -> 'UserProfilePhotos':
         """
