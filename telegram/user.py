@@ -49,10 +49,10 @@ class User(TelegramObject):
         supports_inline_queries (:obj:`str`): Optional. :obj:`True`, if the bot supports inline
             queries. Returned only in :attr:`telegram.Bot.get_me` requests.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
-        is_anonymous_admin (:obj:`bool`): :obj:`True`, if this user is a anonymous admin.
+        is_anonymous_admin (:obj:`bool`): :obj:`True`, if this user is an anonymous admin.
             Undocumented behavior.
-        is_channel_forwarder_service (:obj:`bool`): :obj:`True`, if this user is channel forwarder
-            service. Undocumented behavior.
+        is_channel_forwarder_service (:obj:`bool`): :obj:`True`, if this user is a channel
+        forwarder service. Undocumented behavior.
 
     Args:
         id (:obj:`int`): Unique identifier for this user or bot.
