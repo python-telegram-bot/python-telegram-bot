@@ -171,8 +171,14 @@ class BasePersistence(ABC):
             memo[id(obj)] = new_immutable
             return new_immutable
 
-        new_obj = copy(obj)
-        memo[id(obj)] = new_obj
+        try:
+            new_obj = copy(obj)
+            memo[id(obj)] = new_obj
+        except TypeError as exc:
+            if 'cannot pickle' in str(exc):
+                memo[id(obj)] = obj
+                return obj
+
         if isinstance(obj, (dict, defaultdict)):
             new_obj = cast(dict, new_obj)
             new_obj.clear()
@@ -239,8 +245,14 @@ class BasePersistence(ABC):
             memo[id(obj)] = new_immutable
             return new_immutable
 
-        new_obj = copy(obj)
-        memo[id(obj)] = new_obj
+        try:
+            new_obj = copy(obj)
+            memo[id(obj)] = new_obj
+        except TypeError as exc:
+            if 'cannot pickle' in str(exc):
+                memo[id(obj)] = obj
+                return obj
+
         if isinstance(obj, (dict, defaultdict)):
             new_obj = cast(dict, new_obj)
             new_obj.clear()
