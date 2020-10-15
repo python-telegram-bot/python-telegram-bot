@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram User."""
 
-from telegram import TelegramObject
+from telegram import TelegramObject, constants
 from telegram.utils.helpers import mention_html as util_mention_html
 from telegram.utils.helpers import mention_markdown as util_mention_markdown
 
@@ -49,6 +49,10 @@ class User(TelegramObject):
         supports_inline_queries (:obj:`str`): Optional. :obj:`True`, if the bot supports inline
             queries. Returned only in :attr:`telegram.Bot.get_me` requests.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+        is_anonymous_admin (:obj:`bool`): :obj:`True`, if this user is a anonymous admin.
+            Undocumented behavior.
+        is_channel_forwarder_service (:obj:`bool`): :obj:`True`, if this user is channel forwarder
+            service. Undocumented behavior.
 
     Args:
         id (:obj:`int`): Unique identifier for this user or bot.
@@ -93,6 +97,9 @@ class User(TelegramObject):
         self.can_read_all_group_messages = can_read_all_group_messages
         self.supports_inline_queries = supports_inline_queries
         self.bot = bot
+        self.is_anonymous_admin = True if self.id == constants.ANONYMOUS_ADMIN_ID else False
+        self.is_channel_forwarder_service = (
+            True if self.id == constants.CHANNEL_FORWARDER_SERVICE_ID else False)
 
         self._id_attrs = (self.id,)
 
