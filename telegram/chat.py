@@ -159,7 +159,7 @@ class Chat(TelegramObject):
 
     @property
     def is_service_chat(self) -> bool:
-        """:obj:`bool`: :obj:`True`, if it is chat with the telegram service.
+        """:obj:`bool`: :obj:`True`, if this chat is the Telegram service chat.
             This behaviour is undocumented and might be changed by Telegram. """
 
         return self.id == constants.SERVICE_CHAT_ID
