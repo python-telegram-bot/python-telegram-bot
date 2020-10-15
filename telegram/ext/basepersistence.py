@@ -133,7 +133,7 @@ class BasePersistence(ABC):
         Replaces all instances of :class:`telegram.Bot` that occur within the passed object with
         :attr:`REPLACED_BOT`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
         ``frozenset``, ``dict``, ``defaultdict`` and objects that have a ``__dict__`` or
-        ``__slot__`` attribute.
+        ``__slot__`` attribute, excluding objects that can't be copied with `copy.copy`.
 
         Args:
             obj (:obj:`object`): The object
@@ -205,7 +205,7 @@ class BasePersistence(ABC):
         Replaces all instances of :attr:`REPLACED_BOT` that occur within the passed object with
         :attr:`bot`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
         ``frozenset``, ``dict``, ``defaultdict`` and objects that have a ``__dict__`` or
-        ``__slot__`` attribute.
+        ``__slot__`` attribute, excluding objects that can't be copied with `copy.copy`.
 
         Args:
             obj (:obj:`object`): The object
