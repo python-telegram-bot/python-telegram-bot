@@ -24,7 +24,7 @@ from copy import copy
 
 from telegram import Bot
 
-from typing import DefaultDict, Dict, Any, Tuple, Optional, cast
+from typing import DefaultDict, Dict, Any, Tuple, Optional, cast, List, Set
 from telegram.utils.types import ConversationDict
 
 
@@ -141,28 +141,54 @@ class BasePersistence(ABC):
         Returns:
             :obj:`obj`: Copy of the object with Bot instances replaced.
         """
+        return cls._replace_bot(obj)
+
+    @classmethod
+    def _replace_bot(cls, obj: object, memo: Dict[int, object] = None) -> object:
+        if memo is None:
+            memo = {}
+
+        if id(obj) in memo:
+            return memo[id(obj)]
+
         if isinstance(obj, Bot):
+            memo[id(obj)] = cls.REPLACED_BOT
             return cls.REPLACED_BOT
-        if isinstance(obj, (list, tuple, set, frozenset)):
-            return obj.__class__(cls.replace_bot(item) for item in obj)
+        if isinstance(obj, list):
+            new_lst: List[Any] = []
+            memo[id(obj)] = new_lst
+            for item in obj:
+                new_lst.append(cls._replace_bot(item, memo))
+            return new_lst
+        if isinstance(obj, set):
+            new_set: Set[Any] = set()
+            memo[id(obj)] = new_set
+            for item in obj:
+                new_set.add(cls._replace_bot(item, memo))
+            return new_set
+        if isinstance(obj, (tuple, frozenset)):
+            new_immutable = obj.__class__(cls._replace_bot(item, memo) for item in obj)
+            memo[id(obj)] = new_immutable
+            return new_immutable
 
         new_obj = copy(obj)
+        memo[id(obj)] = new_obj
         if isinstance(obj, (dict, defaultdict)):
             new_obj = cast(dict, new_obj)
             new_obj.clear()
             for k, v in obj.items():
-                new_obj[cls.replace_bot(k)] = cls.replace_bot(v)
+                new_obj[cls._replace_bot(k, memo)] = cls._replace_bot(v, memo)
             return new_obj
         if hasattr(obj, '__dict__'):
             for attr_name, attr in new_obj.__dict__.items():
-                setattr(new_obj, attr_name, cls.replace_bot(attr))
+                setattr(new_obj, attr_name, cls._replace_bot(attr, memo))
             return new_obj
         if hasattr(obj, '__slots__'):
             for attr_name in new_obj.__slots__:
                 setattr(
                     new_obj,
                     attr_name,
-                    cls.replace_bot(cls.replace_bot(getattr(new_obj, attr_name))),
+                    cls._replace_bot(getattr(new_obj, attr_name), memo),
                 )
             return new_obj
 
@@ -181,30 +207,56 @@ class BasePersistence(ABC):
         Returns:
             :obj:`obj`: Copy of the object with Bot instances inserted.
         """
+        return self._insert_bot(obj)
+
+    def _insert_bot(self, obj: object, memo: Dict[int, object] = None) -> object:
+        if memo is None:
+            memo = {}
+
+        if id(obj) in memo:
+            return memo[id(obj)]
+
         if isinstance(obj, Bot):
+            memo[id(obj)] = self.bot
             return self.bot
-        if obj == self.REPLACED_BOT:
+        if isinstance(obj, str) and obj == self.REPLACED_BOT:
+            memo[id(obj)] = self.bot
             return self.bot
-        if isinstance(obj, (list, tuple, set, frozenset)):
-            return obj.__class__(self.insert_bot(item) for item in obj)
+        if isinstance(obj, list):
+            new_lst: List[Any] = []
+            memo[id(obj)] = new_lst
+            for item in obj:
+                new_lst.append(self._insert_bot(item, memo))
+            return new_lst
+        if isinstance(obj, set):
+            new_set: Set[Any] = set()
+            memo[id(obj)] = new_set
+            for item in obj:
+                new_set.add(self._insert_bot(item, memo))
+            return new_set
+        if isinstance(obj, (tuple, frozenset)):
+            new_immutable = obj.__class__(self._insert_bot(item, memo) for item in obj)
+            memo[id(obj)] = new_immutable
+            return new_immutable
 
         new_obj = copy(obj)
+        memo[id(obj)] = new_obj
         if isinstance(obj, (dict, defaultdict)):
             new_obj = cast(dict, new_obj)
             new_obj.clear()
             for k, v in obj.items():
-                new_obj[self.insert_bot(k)] = self.insert_bot(v)
+                new_obj[self._insert_bot(k, memo)] = self._insert_bot(v, memo)
             return new_obj
         if hasattr(obj, '__dict__'):
             for attr_name, attr in new_obj.__dict__.items():
-                setattr(new_obj, attr_name, self.insert_bot(attr))
+                setattr(new_obj, attr_name, self._insert_bot(attr, memo))
             return new_obj
         if hasattr(obj, '__slots__'):
             for attr_name in obj.__slots__:
                 setattr(
                     new_obj,
                     attr_name,
-                    self.insert_bot(self.insert_bot(getattr(new_obj, attr_name))),
+                    self._insert_bot(getattr(new_obj, attr_name), memo),
                 )
             return new_obj
         return obj
