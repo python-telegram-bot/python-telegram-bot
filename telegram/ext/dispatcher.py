@@ -44,7 +44,7 @@ if TYPE_CHECKING:
     from telegram import Bot
     from telegram.ext import JobQueue
 
-DEFAULT_GROUP = 0
+DEFAULT_GROUP: int = 0
 
 
 def run_async(

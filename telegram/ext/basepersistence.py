@@ -24,7 +24,7 @@ from copy import copy
 
 from telegram import Bot
 
-from typing import DefaultDict, Dict, Any, Tuple, Optional, cast
+from typing import DefaultDict, Dict, Any, Tuple, Optional, cast, ClassVar
 from telegram.utils.types import ConversationDict
 
 
@@ -302,5 +302,5 @@ class BasePersistence(ABC):
         """
         pass
 
-    REPLACED_BOT = 'bot_instance_replaced_by_ptb_persistence'
+    REPLACED_BOT: ClassVar[str] = 'bot_instance_replaced_by_ptb_persistence'
     """:obj:`str`: Placeholder for :class:`telegram.Bot` instances replaced in saved data."""

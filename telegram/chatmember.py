@@ -23,7 +23,7 @@ from telegram import User, TelegramObject, constants
 from telegram.utils.helpers import to_timestamp, from_timestamp
 
 from telegram.utils.types import JSONDict
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, Optional, TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -111,17 +111,17 @@ class ChatMember(TelegramObject):
             may add web page previews to his messages.
 
     """
-    ADMINISTRATOR: str = constants.CHATMEMBER_ADMINISTRATOR
+    ADMINISTRATOR: ClassVar[str] = constants.CHATMEMBER_ADMINISTRATOR
     """:const:`telegram.constants.CHATMEMBER_ADMINISTRATOR`"""
-    CREATOR: str = constants.CHATMEMBER_CREATOR
+    CREATOR: ClassVar[str] = constants.CHATMEMBER_CREATOR
     """:const:`telegram.constants.CHATMEMBER_CREATOR`"""
-    KICKED: str = constants.CHATMEMBER_KICKED
+    KICKED: ClassVar[str] = constants.CHATMEMBER_KICKED
     """:const:`telegram.constants.CHATMEMBER_KICKED`"""
-    LEFT: str = constants.CHATMEMBER_LEFT
+    LEFT: ClassVar[str] = constants.CHATMEMBER_LEFT
     """:const:`telegram.constants.CHATMEMBER_LEFT`"""
-    MEMBER: str = constants.CHATMEMBER_MEMBER
+    MEMBER: ClassVar[str] = constants.CHATMEMBER_MEMBER
     """:const:`telegram.constants.CHATMEMBER_MEMBER`"""
-    RESTRICTED: str = constants.CHATMEMBER_RESTRICTED
+    RESTRICTED: ClassVar[str] = constants.CHATMEMBER_RESTRICTED
     """:const:`telegram.constants.CHATMEMBER_RESTRICTED`"""
 
     def __init__(
