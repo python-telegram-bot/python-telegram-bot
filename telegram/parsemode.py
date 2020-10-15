@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Message Parse Modes."""
+from typing import ClassVar
 
 from telegram import constants
 
@@ -25,14 +26,14 @@ from telegram import constants
 class ParseMode:
     """This object represents a Telegram Message Parse Modes."""
 
-    MARKDOWN: str = constants.PARSEMODE_MARKDOWN
+    MARKDOWN: ClassVar[str] = constants.PARSEMODE_MARKDOWN
     """:const:`telegram.constants.PARSEMODE_MARKDOWN`\n
 
     Note:
         :attr:`MARKDOWN` is a legacy mode, retained by Telegram for backward compatibility.
         You should use :attr:`MARKDOWN_V2` instead.
     """
-    MARKDOWN_V2: str = constants.PARSEMODE_MARKDOWN_V2
+    MARKDOWN_V2: ClassVar[str] = constants.PARSEMODE_MARKDOWN_V2
     """:const:`telegram.constants.PARSEMODE_MARKDOWN_V2`"""
-    HTML: str = constants.PARSEMODE_HTML
+    HTML: ClassVar[str] = constants.PARSEMODE_HTML
     """:const:`telegram.constants.PARSEMODE_HTML`"""
