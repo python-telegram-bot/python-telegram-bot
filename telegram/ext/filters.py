@@ -25,7 +25,7 @@ from threading import Lock
 
 from telegram import Chat, Update, MessageEntity, Message
 
-from typing import Optional, Dict, Union, List, Pattern, Match, cast, Set, FrozenSet
+from typing import Optional, Dict, Union, List, Pattern, Match, cast, Set, FrozenSet, Tuple
 
 __all__ = [
     'Filters',
@@ -276,7 +276,7 @@ class _DiceEmoji(MessageFilter):
         self.emoji = emoji
 
     class _DiceValues(MessageFilter):
-        def __init__(self, values: Union[int, List[int]], name: str, emoji: str = None):
+        def __init__(self, values: Union[int, List[int], Tuple[int]], name: str, emoji: str = None):
             self.values = [values] if isinstance(values, int) else values
             self.emoji = emoji
             self.name = '{}({})'.format(name, values)
@@ -289,7 +289,7 @@ class _DiceEmoji(MessageFilter):
             return False
 
     def __call__(  # type: ignore[override]
-        self, update: Union[Update, List[int]]
+        self, update: Union[Update, List[int], Tuple[int]]
     ) -> Union[bool, '_DiceValues']:
         if isinstance(update, Update):
             return self.filter(update.effective_message)
@@ -337,7 +337,7 @@ class Filters:
                 return False
 
         def __call__(  # type: ignore[override]
-            self, update: Union[Update, List[str]]
+            self, update: Union[Update, List[str], Tuple[str]]
         ) -> Union[bool, '_TextStrings']:
             if isinstance(update, Update):
                 return self.filter(update.effective_message)
@@ -389,7 +389,7 @@ class Filters:
                 return False
 
         def __call__(  # type: ignore[override]
-            self, update: Union[Update, List[str]]
+            self, update: Union[Update, List[str], Tuple[str]]
         ) -> Union[bool, '_CaptionStrings']:
             if isinstance(update, Update):
                 return self.filter(update.effective_message)
@@ -1000,8 +1000,8 @@ officedocument.wordprocessingml.document")``-
 
         def __init__(
             self,
-            user_id: Union[int, List[int]] = None,
-            username: Union[str, List[str]] = None,
+            user_id: Union[int, List[int], Tuple[int]] = None,
+            username: Union[str, List[str], Tuple[str]] = None,
             allow_empty: bool = False,
         ):
             self.allow_empty = allow_empty
@@ -1014,7 +1014,7 @@ officedocument.wordprocessingml.document")``-
             self._set_usernames(username)
 
         @staticmethod
-        def _parse_user_id(user_id: Union[int, List[int]]) -> Set[int]:
+        def _parse_user_id(user_id: Union[int, List[int], Tuple[int]]) -> Set[int]:
             if user_id is None:
                 return set()
             if isinstance(user_id, int):
@@ -1022,14 +1022,14 @@ officedocument.wordprocessingml.document")``-
             return set(user_id)
 
         @staticmethod
-        def _parse_username(username: Union[str, List[str]]) -> Set[str]:
+        def _parse_username(username: Union[str, List[str], Tuple[str]]) -> Set[str]:
             if username is None:
                 return set()
             if isinstance(username, str):
                 return {username[1:] if username.startswith('@') else username}
             return {user[1:] if user.startswith('@') else user for user in username}
 
-        def _set_user_ids(self, user_id: Union[int, List[int]]) -> None:
+        def _set_user_ids(self, user_id: Union[int, List[int], Tuple[int]]) -> None:
             with self.__lock:
                 if user_id and self._usernames:
                     raise RuntimeError(
@@ -1037,7 +1037,7 @@ officedocument.wordprocessingml.document")``-
                     )
                 self._user_ids = self._parse_user_id(user_id)
 
-        def _set_usernames(self, username: Union[str, List[str]]) -> None:
+        def _set_usernames(self, username: Union[str, List[str], Tuple[str]]) -> None:
             with self.__lock:
                 if username and self._user_ids:
                     raise RuntimeError(
@@ -1051,7 +1051,7 @@ officedocument.wordprocessingml.document")``-
                 return frozenset(self._user_ids)
 
         @user_ids.setter
-        def user_ids(self, user_id: Union[int, List[int]]) -> None:
+        def user_ids(self, user_id: Union[int, List[int], Tuple[int]]) -> None:
             self._set_user_ids(user_id)
 
         @property
@@ -1060,10 +1060,10 @@ officedocument.wordprocessingml.document")``-
                 return frozenset(self._usernames)
 
         @usernames.setter
-        def usernames(self, username: Union[str, List[str]]) -> None:
+        def usernames(self, username: Union[str, List[str], Tuple[str]]) -> None:
             self._set_usernames(username)
 
-        def add_usernames(self, username: Union[str, List[str]]) -> None:
+        def add_usernames(self, username: Union[str, List[str], Tuple[str]]) -> None:
             """
             Add one or more users to the allowed usernames.
 
@@ -1080,7 +1080,7 @@ officedocument.wordprocessingml.document")``-
                 parsed_username = self._parse_username(username)
                 self._usernames |= parsed_username
 
-        def add_user_ids(self, user_id: Union[int, List[int]]) -> None:
+        def add_user_ids(self, user_id: Union[int, List[int], Tuple[int]]) -> None:
             """
             Add one or more users to the allowed user ids.
 
@@ -1098,7 +1098,7 @@ officedocument.wordprocessingml.document")``-
 
                 self._user_ids |= parsed_user_id
 
-        def remove_usernames(self, username: Union[str, List[str]]) -> None:
+        def remove_usernames(self, username: Union[str, List[str], Tuple[str]]) -> None:
             """
             Remove one or more users from allowed usernames.
 
@@ -1115,7 +1115,7 @@ officedocument.wordprocessingml.document")``-
                 parsed_username = self._parse_username(username)
                 self._usernames -= parsed_username
 
-        def remove_user_ids(self, user_id: Union[int, List[int]]) -> None:
+        def remove_user_ids(self, user_id: Union[int, List[int], Tuple[int]]) -> None:
             """
             Remove one or more users from allowed user ids.
 
@@ -1179,8 +1179,8 @@ officedocument.wordprocessingml.document")``-
 
         def __init__(
             self,
-            bot_id: Union[int, List[int]] = None,
-            username: Union[str, List[str]] = None,
+            bot_id: Union[int, List[int], Tuple[int]] = None,
+            username: Union[str, List[str], Tuple[str]] = None,
             allow_empty: bool = False,
         ):
             self.allow_empty = allow_empty
@@ -1193,7 +1193,7 @@ officedocument.wordprocessingml.document")``-
             self._set_usernames(username)
 
         @staticmethod
-        def _parse_bot_id(bot_id: Union[int, List[int]]) -> Set[int]:
+        def _parse_bot_id(bot_id: Union[int, List[int], Tuple[int]]) -> Set[int]:
             if bot_id is None:
                 return set()
             if isinstance(bot_id, int):
@@ -1201,14 +1201,14 @@ officedocument.wordprocessingml.document")``-
             return set(bot_id)
 
         @staticmethod
-        def _parse_username(username: Union[str, List[str]]) -> Set[str]:
+        def _parse_username(username: Union[str, List[str], Tuple[str]]) -> Set[str]:
             if username is None:
                 return set()
             if isinstance(username, str):
                 return {username[1:] if username.startswith('@') else username}
             return {bot[1:] if bot.startswith('@') else bot for bot in username}
 
-        def _set_bot_ids(self, bot_id: Union[int, List[int]]) -> None:
+        def _set_bot_ids(self, bot_id: Union[int, List[int], Tuple[int]]) -> None:
             with self.__lock:
                 if bot_id and self._usernames:
                     raise RuntimeError(
@@ -1216,7 +1216,7 @@ officedocument.wordprocessingml.document")``-
                     )
                 self._bot_ids = self._parse_bot_id(bot_id)
 
-        def _set_usernames(self, username: Union[str, List[str]]) -> None:
+        def _set_usernames(self, username: Union[str, List[str], Tuple[str]]) -> None:
             with self.__lock:
                 if username and self._bot_ids:
                     raise RuntimeError(
@@ -1230,7 +1230,7 @@ officedocument.wordprocessingml.document")``-
                 return frozenset(self._bot_ids)
 
         @bot_ids.setter
-        def bot_ids(self, bot_id: Union[int, List[int]]) -> None:
+        def bot_ids(self, bot_id: Union[int, List[int], Tuple[int]]) -> None:
             self._set_bot_ids(bot_id)
 
         @property
@@ -1239,10 +1239,10 @@ officedocument.wordprocessingml.document")``-
                 return frozenset(self._usernames)
 
         @usernames.setter
-        def usernames(self, username: Union[str, List[str]]) -> None:
+        def usernames(self, username: Union[str, List[str], Tuple[str]]) -> None:
             self._set_usernames(username)
 
-        def add_usernames(self, username: Union[str, List[str]]) -> None:
+        def add_usernames(self, username: Union[str, List[str], Tuple[str]]) -> None:
             """
             Add one or more users to the allowed usernames.
 
@@ -1259,7 +1259,7 @@ officedocument.wordprocessingml.document")``-
                 parsed_username = self._parse_username(username)
                 self._usernames |= parsed_username
 
-        def add_bot_ids(self, bot_id: Union[int, List[int]]) -> None:
+        def add_bot_ids(self, bot_id: Union[int, List[int], Tuple[int]]) -> None:
             """
 
             Add one or more users to the allowed user ids.
@@ -1278,7 +1278,7 @@ officedocument.wordprocessingml.document")``-
 
                 self._bot_ids |= parsed_bot_id
 
-        def remove_usernames(self, username: Union[str, List[str]]) -> None:
+        def remove_usernames(self, username: Union[str, List[str], Tuple[str]]) -> None:
             """
             Remove one or more users from allowed usernames.
 
@@ -1295,7 +1295,7 @@ officedocument.wordprocessingml.document")``-
                 parsed_username = self._parse_username(username)
                 self._usernames -= parsed_username
 
-        def remove_bot_ids(self, bot_id: Union[int, List[int]]) -> None:
+        def remove_bot_ids(self, bot_id: Union[int, List[int], Tuple[int]]) -> None:
             """
             Remove one or more users from allowed user ids.
 
@@ -1359,8 +1359,8 @@ officedocument.wordprocessingml.document")``-
 
         def __init__(
             self,
-            chat_id: Union[int, List[int]] = None,
-            username: Union[str, List[str]] = None,
+            chat_id: Union[int, List[int], Tuple[int]] = None,
+            username: Union[str, List[str], Tuple[str]] = None,
             allow_empty: bool = False,
         ):
             self.allow_empty = allow_empty
@@ -1373,7 +1373,7 @@ officedocument.wordprocessingml.document")``-
             self._set_usernames(username)
 
         @staticmethod
-        def _parse_chat_id(chat_id: Union[int, List[int]]) -> Set[int]:
+        def _parse_chat_id(chat_id: Union[int, List[int], Tuple[int]]) -> Set[int]:
             if chat_id is None:
                 return set()
             if isinstance(chat_id, int):
@@ -1381,14 +1381,14 @@ officedocument.wordprocessingml.document")``-
             return set(chat_id)
 
         @staticmethod
-        def _parse_username(username: Union[str, List[str]]) -> Set[str]:
+        def _parse_username(username: Union[str, List[str], Tuple[str]]) -> Set[str]:
             if username is None:
                 return set()
             if isinstance(username, str):
                 return {username[1:] if username.startswith('@') else username}
             return {chat[1:] if chat.startswith('@') else chat for chat in username}
 
-        def _set_chat_ids(self, chat_id: Union[int, List[int]]) -> None:
+        def _set_chat_ids(self, chat_id: Union[int, List[int], Tuple[int]]) -> None:
             with self.__lock:
                 if chat_id and self._usernames:
                     raise RuntimeError(
@@ -1396,7 +1396,7 @@ officedocument.wordprocessingml.document")``-
                     )
                 self._chat_ids = self._parse_chat_id(chat_id)
 
-        def _set_usernames(self, username: Union[str, List[str]]) -> None:
+        def _set_usernames(self, username: Union[str, List[str], Tuple[str]]) -> None:
             with self.__lock:
                 if username and self._chat_ids:
                     raise RuntimeError(
@@ -1410,7 +1410,7 @@ officedocument.wordprocessingml.document")``-
                 return frozenset(self._chat_ids)
 
         @chat_ids.setter
-        def chat_ids(self, chat_id: Union[int, List[int]]) -> None:
+        def chat_ids(self, chat_id: Union[int, List[int], Tuple[int]]) -> None:
             self._set_chat_ids(chat_id)
 
         @property
@@ -1419,10 +1419,10 @@ officedocument.wordprocessingml.document")``-
                 return frozenset(self._usernames)
 
         @usernames.setter
-        def usernames(self, username: Union[str, List[str]]) -> None:
+        def usernames(self, username: Union[str, List[str], Tuple[str]]) -> None:
             self._set_usernames(username)
 
-        def add_usernames(self, username: Union[str, List[str]]) -> None:
+        def add_usernames(self, username: Union[str, List[str], Tuple[str]]) -> None:
             """
             Add one or more chats to the allowed usernames.
 
@@ -1439,7 +1439,7 @@ officedocument.wordprocessingml.document")``-
                 parsed_username = self._parse_username(username)
                 self._usernames |= parsed_username
 
-        def add_chat_ids(self, chat_id: Union[int, List[int]]) -> None:
+        def add_chat_ids(self, chat_id: Union[int, List[int], Tuple[int]]) -> None:
             """
             Add one or more chats to the allowed chat ids.
 
@@ -1457,7 +1457,7 @@ officedocument.wordprocessingml.document")``-
 
                 self._chat_ids |= parsed_chat_id
 
-        def remove_usernames(self, username: Union[str, List[str]]) -> None:
+        def remove_usernames(self, username: Union[str, List[str], Tuple[str]]) -> None:
             """
             Remove one or more chats from allowed usernames.
 
@@ -1474,7 +1474,7 @@ officedocument.wordprocessingml.document")``-
                 parsed_username = self._parse_username(username)
                 self._usernames -= parsed_username
 
-        def remove_chat_ids(self, chat_id: Union[int, List[int]]) -> None:
+        def remove_chat_ids(self, chat_id: Union[int, List[int], Tuple[int]]) -> None:
             """
             Remove one or more chats from allowed chat ids.
 
@@ -1587,12 +1587,15 @@ officedocument.wordprocessingml.document")``-
 
         """
 
-        def __init__(self, lang: Union[str, List[str]]):
+        def __init__(self, lang: Union[str, List[str], Tuple[str]]):
             if isinstance(lang, str):
                 lang = cast(str, lang)
                 self.lang = [lang]
-            else:
+            elif isinstance(lang, List[str]):
                 lang = cast(List[str], lang)
+                self.lang = lang
+            else:
+                lang = cast(Tuple[str], lang)
                 self.lang = lang
             self.name = 'Filters.language({})'.format(self.lang)
 
