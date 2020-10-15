@@ -152,7 +152,7 @@ class Chat(TelegramObject):
 
     @property
     def is_anonymous_admin(self) -> bool:
-        """:obj:`bool`: :obj:`True`, if it is chat with an anonymous admin.
+        """:obj:`bool`: :obj:`True`, if this chat is with is the bot representing anonymous admins.
             This behaviour is undocumented and might be changed by Telegram. """
 
         return self.id == constants.ANONYMOUS_ADMIN_ID
