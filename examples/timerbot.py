@@ -45,11 +45,11 @@ def alarm(context):
 def remove_job_if_exists(name, context):
     """Remove job with given name. Returns whether job was removed."""
     current_jobs = context.job_queue.get_jobs_by_name(name)
-    job_removed = False
+    if not current_jobs:
+        return False
     for job in current_jobs:
         job.schedule_removal()
-        job_removed = True
-    return job_removed
+    return True
 
 
 def set_timer(update, context):
@@ -78,7 +78,7 @@ def unset(update, context):
     """Remove the job if the user changed their mind."""
     chat_id = update.message.chat_id
     job_removed = remove_job_if_exists(str(chat_id), context)
-    text = 'Timer successfully unset!' if job_removed else 'You have no active timer'
+    text = 'Timer successfully cancelled!' if job_removed else 'You have no active timer.'
     update.message.reply_text(text)
 
 
