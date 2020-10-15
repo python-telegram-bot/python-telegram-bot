@@ -132,7 +132,7 @@ class CommandHandler(Handler):
 
     def __init__(
         self,
-        command: Union[str, List[str]],
+        command: Union[str, List[str], Tuple[str]],
         callback: Callable[[HandlerArg, 'CallbackContext'], RT],
         filters: BaseFilter = None,
         allow_edited: bool = None,
@@ -340,8 +340,8 @@ class PrefixHandler(CommandHandler):
 
     def __init__(
         self,
-        prefix: Union[str, List[str]],
-        command: Union[str, List[str]],
+        prefix: Union[str, List[str], Tuple[str]],
+        command: Union[str, List[str], Tuple[str]],
         callback: Callable[[HandlerArg, 'CallbackContext'], RT],
         filters: BaseFilter = None,
         pass_args: bool = False,
@@ -384,7 +384,7 @@ class PrefixHandler(CommandHandler):
         return self._prefix
 
     @prefix.setter
-    def prefix(self, prefix: Union[str, List[str]]) -> None:
+    def prefix(self, prefix: Union[str, List[str], Tuple[str]]) -> None:
         if isinstance(prefix, str):
             self._prefix = [prefix.lower()]
         else:
@@ -402,7 +402,7 @@ class PrefixHandler(CommandHandler):
         return self._command
 
     @command.setter
-    def command(self, command: Union[str, List[str]]) -> None:
+    def command(self, command: Union[str, List[str], Tuple[str]]) -> None:
         if isinstance(command, str):
             self._command = [command.lower()]
         else:
