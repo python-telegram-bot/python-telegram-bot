@@ -21,7 +21,7 @@
 import datetime
 import sys
 from html import escape
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, ClassVar
 
 from telegram import (
     Animation,
@@ -258,7 +258,7 @@ class Message(TelegramObject):
 
     _effective_attachment = _UNDEFINED
 
-    ATTACHMENT_TYPES = [
+    ATTACHMENT_TYPES: ClassVar[List[str]] = [
         'audio',
         'game',
         'animation',
@@ -274,7 +274,7 @@ class Message(TelegramObject):
         'invoice',
         'successful_payment',
     ]
-    MESSAGE_TYPES = [
+    MESSAGE_TYPES: ClassVar[List[str]] = [
         'text',
         'new_chat_members',
         'left_chat_member',

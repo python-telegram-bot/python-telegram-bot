@@ -683,6 +683,7 @@ class Updater:
             self.logger.warning('Exiting immediately!')
             # pylint: disable=C0415,W0212
             import os
+
             os._exit(1)
 
     def idle(self, stop_signals: Union[List, Tuple] = (SIGINT, SIGTERM, SIGABRT)) -> None:

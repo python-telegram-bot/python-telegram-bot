@@ -32,6 +32,7 @@ from typing import TYPE_CHECKING, Any, DefaultDict, Dict, Optional, Tuple, Union
 import pytz  # pylint: disable=E0401
 
 from telegram.utils.types import JSONDict
+
 if TYPE_CHECKING:
     from telegram import MessageEntity
 

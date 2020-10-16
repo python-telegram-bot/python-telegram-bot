@@ -41,7 +41,7 @@ if TYPE_CHECKING:
     from telegram import Bot
     from telegram.ext import JobQueue
 
-DEFAULT_GROUP = 0
+DEFAULT_GROUP: int = 0
 
 
 def run_async(
@@ -242,9 +242,7 @@ class Dispatcher:
         """
         if cls.__singleton is not None:
             return cls.__singleton()  # type: ignore[return-value] # pylint: disable=not-callable
-        raise RuntimeError(
-            '{} not initialized or multiple instances exist'.format(cls.__name__)
-        )
+        raise RuntimeError('{} not initialized or multiple instances exist'.format(cls.__name__))
 
     def _pooled(self) -> None:
         thr_name = current_thread().getName()
@@ -590,7 +588,7 @@ class Dispatcher:
     def add_error_handler(
         self,
         callback: Callable[[Any, CallbackContext], None],
-        run_async: bool = False  # pylint: disable=W0621
+        run_async: bool = False,  # pylint: disable=W0621
     ) -> None:
         """Registers an error handler in the Dispatcher. This handler will receive every error
         which happens in your bot.

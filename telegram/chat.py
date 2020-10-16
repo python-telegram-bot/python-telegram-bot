@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Chat."""
 
-from typing import TYPE_CHECKING, Any, List, Optional
+from typing import TYPE_CHECKING, Any, List, Optional, ClassVar
 
 from telegram import ChatPhoto, TelegramObject, constants
 from telegram.utils.types import JSONDict
@@ -93,13 +93,13 @@ class Chat(TelegramObject):
 
     """
 
-    PRIVATE: str = constants.CHAT_PRIVATE
+    PRIVATE: ClassVar[str] = constants.CHAT_PRIVATE
     """:const:`telegram.constants.CHAT_PRIVATE`"""
-    GROUP: str = constants.CHAT_GROUP
+    GROUP: ClassVar[str] = constants.CHAT_GROUP
     """:const:`telegram.constants.CHAT_GROUP`"""
-    SUPERGROUP: str = constants.CHAT_SUPERGROUP
+    SUPERGROUP: ClassVar[str] = constants.CHAT_SUPERGROUP
     """:const:`telegram.constants.CHAT_SUPERGROUP`"""
-    CHANNEL: str = constants.CHAT_CHANNEL
+    CHANNEL: ClassVar[str] = constants.CHAT_CHANNEL
     """:const:`telegram.constants.CHAT_CHANNEL`"""
 
     def __init__(

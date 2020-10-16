@@ -21,9 +21,10 @@
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from copy import copy
-from typing import Any, DefaultDict, Dict, Optional, Tuple, cast
+from typing import Any, DefaultDict, Dict, Optional, Tuple, cast, ClassVar
 
 from telegram import Bot
+
 from telegram.utils.types import ConversationDict
 
 
@@ -300,5 +301,5 @@ class BasePersistence(ABC):
         is not of any importance just pass will be sufficient.
         """
 
-    REPLACED_BOT = 'bot_instance_replaced_by_ptb_persistence'
+    REPLACED_BOT: ClassVar[str] = 'bot_instance_replaced_by_ptb_persistence'
     """:obj:`str`: Placeholder for :class:`telegram.Bot` instances replaced in saved data."""

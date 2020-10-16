@@ -129,7 +129,8 @@ class DictPersistence(BasePersistence):
                 self._conversations_json = conversations_json
             except (ValueError, AttributeError) as exc:
                 raise TypeError(
-                    "Unable to deserialize conversations_json. Not valid JSON") from exc
+                    "Unable to deserialize conversations_json. Not valid JSON"
+                ) from exc
 
     @property
     def user_data(self) -> Optional[DefaultDict[int, Dict]]:

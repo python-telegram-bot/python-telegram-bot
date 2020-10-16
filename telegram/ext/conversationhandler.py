@@ -22,7 +22,7 @@
 import logging
 import warnings
 from threading import Lock
-from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Tuple, cast
+from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Tuple, cast, ClassVar
 
 from telegram import Update
 from telegram.ext import (
@@ -169,11 +169,11 @@ class ConversationHandler(Handler):
 
     """
 
-    END = -1
+    END: ClassVar[int] = -1
     """:obj:`int`: Used as a constant to return when a conversation is ended."""
-    TIMEOUT = -2
+    TIMEOUT: ClassVar[int] = -2
     """:obj:`int`: Used as a constant to handle state when a conversation is timed out."""
-    WAITING = -3
+    WAITING: ClassVar[int] = -3
     """:obj:`int`: Used as a constant to handle state when a conversation is still waiting on the
     previous ``@run_sync`` decorated running handler to finish."""
     # pylint: disable=W0231

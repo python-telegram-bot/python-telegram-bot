@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatMember."""
 import datetime
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any, Optional, ClassVar
 
 from telegram import TelegramObject, User, constants
 from telegram.utils.helpers import from_timestamp, to_timestamp
@@ -110,17 +110,18 @@ class ChatMember(TelegramObject):
             may add web page previews to his messages.
 
     """
-    ADMINISTRATOR: str = constants.CHATMEMBER_ADMINISTRATOR
+
+    ADMINISTRATOR: ClassVar[str] = constants.CHATMEMBER_ADMINISTRATOR
     """:const:`telegram.constants.CHATMEMBER_ADMINISTRATOR`"""
-    CREATOR: str = constants.CHATMEMBER_CREATOR
+    CREATOR: ClassVar[str] = constants.CHATMEMBER_CREATOR
     """:const:`telegram.constants.CHATMEMBER_CREATOR`"""
-    KICKED: str = constants.CHATMEMBER_KICKED
+    KICKED: ClassVar[str] = constants.CHATMEMBER_KICKED
     """:const:`telegram.constants.CHATMEMBER_KICKED`"""
-    LEFT: str = constants.CHATMEMBER_LEFT
+    LEFT: ClassVar[str] = constants.CHATMEMBER_LEFT
     """:const:`telegram.constants.CHATMEMBER_LEFT`"""
-    MEMBER: str = constants.CHATMEMBER_MEMBER
+    MEMBER: ClassVar[str] = constants.CHATMEMBER_MEMBER
     """:const:`telegram.constants.CHATMEMBER_MEMBER`"""
-    RESTRICTED: str = constants.CHATMEMBER_RESTRICTED
+    RESTRICTED: ClassVar[str] = constants.CHATMEMBER_RESTRICTED
     """:const:`telegram.constants.CHATMEMBER_RESTRICTED`"""
 
     def __init__(
