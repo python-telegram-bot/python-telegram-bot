@@ -149,7 +149,7 @@ class BasePersistence(ABC):
         try:
             new_obj = copy(obj)
         except TypeError as exc:
-            if 'cannot pickle' in str(exc):
+            if 'pickle' in str(exc):
                 return obj
             raise exc
 
@@ -197,7 +197,7 @@ class BasePersistence(ABC):
         try:
             new_obj = copy(obj)
         except TypeError as exc:
-            if 'cannot pickle' in str(exc):
+            if 'pickle' in str(exc):
                 return obj
             raise exc
 

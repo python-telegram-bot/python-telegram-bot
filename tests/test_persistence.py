@@ -555,6 +555,10 @@ class TestBasePersistence:
         persistence = bot_persistence
         persistence.set_bot(bot)
 
+        class CustomClass:
+            def __copy__(self):
+                raise TypeError('UnhandledException')
+
         lock = Lock()
 
         persistence.update_bot_data({1: lock})
@@ -567,6 +571,23 @@ class TestBasePersistence:
         assert persistence.get_bot_data()[1] is lock
         assert persistence.get_chat_data()[123][1] is lock
         assert persistence.get_user_data()[123][1] is lock
+
+        with pytest.raises(TypeError, match='UnhandledException'):
+            persistence.update_bot_data({2: CustomClass()})
+        with pytest.raises(TypeError, match='UnhandledException'):
+            persistence.update_chat_data(456, {2: CustomClass()})
+        with pytest.raises(TypeError, match='UnhandledException'):
+            persistence.update_user_data(456, {2: CustomClass()})
+
+        persistence.bot_data[2] = CustomClass()
+        persistence.chat_data[456][2] = CustomClass()
+        persistence.user_data[456][2] = CustomClass()
+        with pytest.raises(TypeError, match='UnhandledException'):
+            persistence.get_bot_data()
+        with pytest.raises(TypeError, match='UnhandledException'):
+            persistence.get_user_data()
+        with pytest.raises(TypeError, match='UnhandledException'):
+            persistence.get_chat_data()
 
 
 @pytest.fixture(scope='function')
