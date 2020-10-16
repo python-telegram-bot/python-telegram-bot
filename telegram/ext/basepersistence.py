@@ -133,7 +133,7 @@ class BasePersistence(ABC):
         Replaces all instances of :class:`telegram.Bot` that occur within the passed object with
         :attr:`REPLACED_BOT`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
         ``frozenset``, ``dict``, ``defaultdict`` and objects that have a ``__dict__`` or
-        ``__slot__`` attribute.
+        ``__slot__`` attribute, excluding objects that can't be copied with `copy.copy`.
 
         Args:
             obj (:obj:`object`): The object
@@ -146,7 +146,13 @@ class BasePersistence(ABC):
         if isinstance(obj, (list, tuple, set, frozenset)):
             return obj.__class__(cls.replace_bot(item) for item in obj)
 
-        new_obj = copy(obj)
+        try:
+            new_obj = copy(obj)
+        except TypeError as exc:
+            if 'cannot pickle' in str(exc):
+                return obj
+            raise exc
+
         if isinstance(obj, (dict, defaultdict)):
             new_obj = cast(dict, new_obj)
             new_obj.clear()
@@ -173,7 +179,7 @@ class BasePersistence(ABC):
         Replaces all instances of :attr:`REPLACED_BOT` that occur within the passed object with
         :attr:`bot`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
         ``frozenset``, ``dict``, ``defaultdict`` and objects that have a ``__dict__`` or
-        ``__slot__`` attribute.
+        ``__slot__`` attribute, excluding objects that can't be copied with `copy.copy`.
 
         Args:
             obj (:obj:`object`): The object
@@ -188,7 +194,13 @@ class BasePersistence(ABC):
         if isinstance(obj, (list, tuple, set, frozenset)):
             return obj.__class__(self.insert_bot(item) for item in obj)
 
-        new_obj = copy(obj)
+        try:
+            new_obj = copy(obj)
+        except TypeError as exc:
+            if 'cannot pickle' in str(exc):
+                return obj
+            raise exc
+
         if isinstance(obj, (dict, defaultdict)):
             new_obj = cast(dict, new_obj)
             new_obj.clear()
