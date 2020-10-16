@@ -25,7 +25,7 @@ import datetime
 from telegram import TelegramObject, User, MessageEntity, constants
 from telegram.utils.helpers import to_timestamp, from_timestamp
 from telegram.utils.types import JSONDict
-from typing import Any, Dict, Optional, List, TYPE_CHECKING
+from typing import Any, Dict, Optional, List, TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -259,7 +259,7 @@ class Poll(TelegramObject):
             if entity.type in types
         }
 
-    REGULAR: str = constants.POLL_REGULAR
+    REGULAR: ClassVar[str] = constants.POLL_REGULAR
     """:const:`telegram.constants.POLL_REGULAR`"""
-    QUIZ: str = constants.POLL_QUIZ
+    QUIZ: ClassVar[str] = constants.POLL_QUIZ
     """:const:`telegram.constants.POLL_QUIZ`"""

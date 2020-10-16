@@ -20,7 +20,7 @@
 
 from telegram import User, TelegramObject, constants
 from telegram.utils.types import JSONDict
-from typing import Any, Optional, List, TYPE_CHECKING
+from typing import Any, Optional, List, TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -90,36 +90,36 @@ class MessageEntity(TelegramObject):
 
         return cls(**data)
 
-    MENTION: str = constants.MESSAGEENTITY_MENTION
+    MENTION: ClassVar[str] = constants.MESSAGEENTITY_MENTION
     """:const:`telegram.constants.MESSAGEENTITY_MENTION`"""
-    HASHTAG: str = constants.MESSAGEENTITY_HASHTAG
+    HASHTAG: ClassVar[str] = constants.MESSAGEENTITY_HASHTAG
     """:const:`telegram.constants.MESSAGEENTITY_HASHTAG`"""
-    CASHTAG: str = constants.MESSAGEENTITY_CASHTAG
+    CASHTAG: ClassVar[str] = constants.MESSAGEENTITY_CASHTAG
     """:const:`telegram.constants.MESSAGEENTITY_CASHTAG`"""
-    PHONE_NUMBER: str = constants.MESSAGEENTITY_PHONE_NUMBER
+    PHONE_NUMBER: ClassVar[str] = constants.MESSAGEENTITY_PHONE_NUMBER
     """:const:`telegram.constants.MESSAGEENTITY_PHONE_NUMBER`"""
-    BOT_COMMAND: str = constants.MESSAGEENTITY_BOT_COMMAND
+    BOT_COMMAND: ClassVar[str] = constants.MESSAGEENTITY_BOT_COMMAND
     """:const:`telegram.constants.MESSAGEENTITY_BOT_COMMAND`"""
-    URL: str = constants.MESSAGEENTITY_URL
+    URL: ClassVar[str] = constants.MESSAGEENTITY_URL
     """:const:`telegram.constants.MESSAGEENTITY_URL`"""
-    EMAIL: str = constants.MESSAGEENTITY_EMAIL
+    EMAIL: ClassVar[str] = constants.MESSAGEENTITY_EMAIL
     """:const:`telegram.constants.MESSAGEENTITY_EMAIL`"""
-    BOLD: str = constants.MESSAGEENTITY_BOLD
+    BOLD: ClassVar[str] = constants.MESSAGEENTITY_BOLD
     """:const:`telegram.constants.MESSAGEENTITY_BOLD`"""
-    ITALIC: str = constants.MESSAGEENTITY_ITALIC
+    ITALIC: ClassVar[str] = constants.MESSAGEENTITY_ITALIC
     """:const:`telegram.constants.MESSAGEENTITY_ITALIC`"""
-    CODE: str = constants.MESSAGEENTITY_CODE
+    CODE: ClassVar[str] = constants.MESSAGEENTITY_CODE
     """:const:`telegram.constants.MESSAGEENTITY_CODE`"""
-    PRE: str = constants.MESSAGEENTITY_PRE
+    PRE: ClassVar[str] = constants.MESSAGEENTITY_PRE
     """:const:`telegram.constants.MESSAGEENTITY_PRE`"""
-    TEXT_LINK: str = constants.MESSAGEENTITY_TEXT_LINK
+    TEXT_LINK: ClassVar[str] = constants.MESSAGEENTITY_TEXT_LINK
     """:const:`telegram.constants.MESSAGEENTITY_TEXT_LINK`"""
-    TEXT_MENTION: str = constants.MESSAGEENTITY_TEXT_MENTION
+    TEXT_MENTION: ClassVar[str] = constants.MESSAGEENTITY_TEXT_MENTION
     """:const:`telegram.constants.MESSAGEENTITY_TEXT_MENTION`"""
-    UNDERLINE: str = constants.MESSAGEENTITY_UNDERLINE
+    UNDERLINE: ClassVar[str] = constants.MESSAGEENTITY_UNDERLINE
     """:const:`telegram.constants.MESSAGEENTITY_UNDERLINE`"""
-    STRIKETHROUGH: str = constants.MESSAGEENTITY_STRIKETHROUGH
+    STRIKETHROUGH: ClassVar[str] = constants.MESSAGEENTITY_STRIKETHROUGH
     """:const:`telegram.constants.MESSAGEENTITY_STRIKETHROUGH`"""
-    ALL_TYPES: List[str] = constants.MESSAGEENTITY_ALL_TYPES
+    ALL_TYPES: ClassVar[List[str]] = constants.MESSAGEENTITY_ALL_TYPES
     """:const:`telegram.constants.MESSAGEENTITY_ALL_TYPES`\n
     List of all the types"""
