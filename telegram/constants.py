@@ -38,7 +38,7 @@ The following constant have been found by experimentation:
 Attributes:
     MAX_MESSAGE_ENTITIES (:obj:`int`): 100 (Beyond this cap telegram will simply ignore further
         formatting styles)
-    ANONYMOUS_ADMIN_ID (:obj:`int`): ``1087968824``
+    ANONYMOUS_ADMIN_ID (:obj:`int`): ``1087968824`` (User id in groups for anonymous admin)
     SERVICE_CHAT_ID (:obj:`int`): ``777000`` (Telegram service chat, that also acts as sender of
         channel posts forwarded to discussion groups)
 
