@@ -3,9 +3,9 @@
    :target: https://python-telegram-bot.org
    :alt: python-telegram-bot Logo
 
-We have made you a wrapper you can't refuse
+We have made you a wrapper that you can't refuse
 
-We have a vibrant community of developers helping each other in our `Telegram group <https://telegram.me/pythontelegrambotgroup>`_. Join us!
+We have a vibrant community of developers who helping each other in our `Telegram group <https://telegram.me/pythontelegrambotgroup>`_.Do Join us!
 
 *Stay tuned for library updates and new releases on our* `Telegram Channel <https://telegram.me/pythontelegrambotchannel>`_.
 
@@ -81,7 +81,7 @@ Table of contents
 - `License`_
 
 ============
-Introduction
+Introduction:
 ============
 
 This library provides a pure Python interface for the
@@ -96,7 +96,7 @@ make the development of bots easy and straightforward. These classes are contain
 Telegram API support
 ====================
 
-All types and methods of the Telegram Bot API **4.8** are supported.
+All types and methods of the Telegram Bot API **4.8** are fully supported.
 
 ==========
 Installing
@@ -162,7 +162,7 @@ This library uses the ``logging`` module. To set up logging to standard output, 
 
 at the beginning of your script.
 
-You can also use logs in your application by calling ``logging.getLogger()`` and setting the log level you want:
+You can also use the logs in your application by calling ``logging.getLogger()`` and setting the log level you want:
 
 .. code:: python
 
