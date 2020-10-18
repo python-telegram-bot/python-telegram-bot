@@ -150,6 +150,21 @@ class Chat(TelegramObject):
             return "https://t.me/{}".format(self.username)
         return None
 
+    @property
+    def is_anonymous_admin(self) -> bool:
+        """:obj:`bool`: Convenience property. Returns :obj:`True`, if this chat is with is the bot
+        representing anonymous admins. This behaviour is undocumented and might be changed
+        by Telegram. """
+
+        return self.id == constants.ANONYMOUS_ADMIN_ID
+
+    @property
+    def is_service_chat(self) -> bool:
+        """:obj:`bool`: Convenience property. Returns :obj:`True`, if this chat is the Telegram
+        service chat. This behaviour is undocumented and might be changed by Telegram. """
+
+        return self.id == constants.SERVICE_CHAT_ID
+
     @classmethod
     def de_json(cls, data: JSONDict, bot: 'Bot') -> Optional['Chat']:
         data = cls.parse_data(data)
