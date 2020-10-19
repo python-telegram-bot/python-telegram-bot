@@ -603,6 +603,33 @@ class Filters:
         xml = mime_type('application/xml')
         zip = mime_type('application/zip')
 
+        class file_ending(MessageFilter):
+            """ This filter filters documents by their file ending/extension
+
+            Note:
+                This Filter only filters by the file ending/extension of the document,
+                    it doesn't check the validity of document.
+                The user can manipulate the mime-type of a message and
+                    send media with wrong types that don't fit to this handler.
+
+            Example:
+                ``Filters.document.file_ending('jpg')`` filters all files with extension .jpg
+            """
+
+            def __init__(self, file_ending: Optional[str]):
+                """Initialize the category you want to filter
+
+                Args:
+                    file_ending (str, optional): file ending of the media you want to filter"""
+                self.file_ending = file_ending
+                self.name = "Filters.document.file_ending('{}')".format(self.file_ending)
+
+            def filter(self, message : Message) -> bool:
+                """"""  # remove method from docs
+                if message.document:
+                    return message.document.file_name.endswith(self.file_ending)
+                return False
+
         def filter(self, message: Message) -> bool:
             return bool(message.document)
 
