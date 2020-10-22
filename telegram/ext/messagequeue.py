@@ -305,7 +305,7 @@ def queuedmessage(method: Callable) -> Callable:
     @functools.wraps(method)
     def wrapped(self: 'Bot', *args: Any, **kwargs: Any) -> Any:
         queued = kwargs.pop(
-            'queued', self._is_messages_queued_default   # type: ignore[attr-defined]
+            'queued', self._is_messages_queued_default  # type: ignore[attr-defined]
         )
         isgroup = kwargs.pop('isgroup', False)
         if queued:

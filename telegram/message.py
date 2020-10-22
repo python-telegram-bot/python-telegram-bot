@@ -1579,7 +1579,8 @@ class Message(TelegramObject):
                 markdown_text += message_text[last_offset:]
             else:
                 markdown_text += message_text[last_offset * 2 :].decode(  # type: ignore
-                    'utf-16-le')
+                    'utf-16-le'
+                )
 
         return markdown_text
 
