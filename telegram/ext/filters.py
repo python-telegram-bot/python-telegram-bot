@@ -603,31 +603,31 @@ class Filters:
         xml = mime_type('application/xml')
         zip = mime_type('application/zip')
 
-        class file_ending(MessageFilter):
+        class file_extension(MessageFilter):
             """ This filter filters documents by their file ending/extension
 
             Note:
                 This Filter only filters by the file ending/extension of the document,
                     it doesn't check the validity of document.
-                The user can manipulate the mime-type of a message and
+                The user can manipulate the file extension of a document and
                     send media with wrong types that don't fit to this handler.
 
             Example:
-                ``Filters.document.file_ending('jpg')`` filters all files with extension .jpg
+                ``Filters.document.file_extension('jpg')`` filters all files with extension ``.jpg``
             """
 
-            def __init__(self, file_ending: Optional[str]):
-                """Initialize the category you want to filter
+            def __init__(self, file_extension: Optional[str]):
+                """Initialize the extension you want to filter
 
                 Args:
-                    file_ending (str, optional): file ending of the media you want to filter"""
-                self.file_ending = file_ending
-                self.name = "Filters.document.file_ending('{}')".format(self.file_ending)
+                    file_extension (str, optional): file extension of the media you want to filter"""
+                self.file_extension = file_extension
+                self.name = f"Filters.document.file_extenision('{self.file_extension}')"
 
             def filter(self, message : Message) -> bool:
                 """"""  # remove method from docs
                 if message.document:
-                    return message.document.file_name.endswith(self.file_ending)
+                    return message.document.file_name.endswith(self.file_extension)
                 return False
 
         def filter(self, message: Message) -> bool:
