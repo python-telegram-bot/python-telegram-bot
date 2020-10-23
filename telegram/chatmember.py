@@ -111,6 +111,7 @@ class ChatMember(TelegramObject):
             may add web page previews to his messages.
 
     """
+
     ADMINISTRATOR: ClassVar[str] = constants.CHATMEMBER_ADMINISTRATOR
     """:const:`telegram.constants.CHATMEMBER_ADMINISTRATOR`"""
     CREATOR: ClassVar[str] = constants.CHATMEMBER_CREATOR
