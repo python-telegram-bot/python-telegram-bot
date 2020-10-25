@@ -25,7 +25,8 @@ from telegram.ext import (
     MessageHandler,
     Filters,
     ConversationHandler,
-    CallbackQueryHandler, CallbackContext,
+    CallbackQueryHandler,
+    CallbackContext,
 )
 
 # Enable logging

@@ -17,7 +17,8 @@ from telegram import (
     KeyboardButton,
     KeyboardButtonPollType,
     ReplyKeyboardMarkup,
-    ReplyKeyboardRemove, Update,
+    ReplyKeyboardRemove,
+    Update,
 )
 from telegram.ext import (
     Updater,
@@ -25,7 +26,8 @@ from telegram.ext import (
     PollAnswerHandler,
     PollHandler,
     MessageHandler,
-    Filters, CallbackContext,
+    Filters,
+    CallbackContext,
 )
 
 logging.basicConfig(

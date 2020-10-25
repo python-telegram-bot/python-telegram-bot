@@ -20,8 +20,14 @@ import logging
 from typing import Dict
 
 from telegram import ReplyKeyboardMarkup, Update
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, \
-    CallbackContext
+from telegram.ext import (
+    Updater,
+    CommandHandler,
+    MessageHandler,
+    Filters,
+    ConversationHandler,
+    CallbackContext,
+)
 
 # Enable logging
 logging.basicConfig(

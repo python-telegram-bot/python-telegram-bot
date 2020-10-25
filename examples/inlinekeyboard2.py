@@ -18,8 +18,13 @@ Press Ctrl-C on the command line to stop the bot.
 """
 import logging
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, ConversationHandler, \
-    CallbackContext
+from telegram.ext import (
+    Updater,
+    CommandHandler,
+    CallbackQueryHandler,
+    ConversationHandler,
+    CallbackContext,
+)
 
 # Enable logging
 logging.basicConfig(

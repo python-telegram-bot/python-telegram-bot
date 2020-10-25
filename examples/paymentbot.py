@@ -17,7 +17,8 @@ from telegram.ext import (
     MessageHandler,
     Filters,
     PreCheckoutQueryHandler,
-    ShippingQueryHandler, CallbackContext,
+    ShippingQueryHandler,
+    CallbackContext,
 )
 
 # Enable logging

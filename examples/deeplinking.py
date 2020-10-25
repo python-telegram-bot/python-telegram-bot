@@ -91,7 +91,8 @@ def main():
 
     # Register a deep-linking handler
     dispatcher.add_handler(
-        CommandHandler("start", deep_linked_level_1, Filters.regex(CHECK_THIS_OUT)))
+        CommandHandler("start", deep_linked_level_1, Filters.regex(CHECK_THIS_OUT))
+    )
 
     # This one works with a textual link instead of an URL
     dispatcher.add_handler(CommandHandler("start", deep_linked_level_2, Filters.regex(SO_COOL)))
