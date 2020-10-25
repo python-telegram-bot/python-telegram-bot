@@ -20,6 +20,8 @@
 
 import logging
 from threading import Event
+
+from telegram import InputFile
 from telegram.utils.types import JSONDict, HandlerArg
 from typing import Callable, List, Tuple, Optional, Union, TypeVar
 
@@ -60,9 +62,20 @@ class Promise:
         update: HandlerArg = None,
         error_handling: bool = True,
     ):
-        self.pooled_function = pooled_function
-        self.args = args
+
+        parsed_args = []
+        for arg in args:
+            if InputFile.is_file(arg):
+                parsed_args.append(InputFile(arg))
+            else:
+                parsed_args.append(arg)
+        self.args = tuple(parsed_args)
         self.kwargs = kwargs
+        for key, value in self.kwargs.items():
+            if InputFile.is_file(value):
+                self.kwargs[key] = InputFile(value)
+
+        self.pooled_function = pooled_function
         self.update = update
         self.error_handling = error_handling
         self.done = Event()

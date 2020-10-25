@@ -20,14 +20,15 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/]
 """A throughput-limiting message processor for Telegram bots."""
-from telegram.utils import promise
 
 import functools
 import time
 import threading
 import queue as q
 
-from typing import Callable, Any, TYPE_CHECKING, List, NoReturn
+from typing import Callable, Any, TYPE_CHECKING, List, NoReturn, ClassVar, Dict
+
+from telegram.utils.promise import Promise
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -107,7 +108,7 @@ class DelayQueue(threading.Thread):
 
         times: List[float] = []  # used to store each callable processing time
         while True:
-            item = self._queue.get()
+            promise = self._queue.get()
             if self.__exit_req:
                 return  # shutdown thread
             # delay routine
@@ -124,11 +125,9 @@ class DelayQueue(threading.Thread):
             if len(times) >= self.burst_limit:  # if throughput limit was hit
                 time.sleep(times[1] - t_delta)
             # finally process one
-            try:
-                func, args, kwargs = item
-                func(*args, **kwargs)
-            except Exception as exc:  # re-route any exceptions
-                self.exc_route(exc)  # to prevent thread exit
+            promise.run()
+            if promise.exception:
+                self.exc_route(promise.exception)  # re-route any exceptions
 
     def stop(self, timeout: float = None) -> None:
         """Used to gently stop processor and shutdown its thread.
@@ -156,7 +155,7 @@ class DelayQueue(threading.Thread):
 
         raise exc
 
-    def __call__(self, func: Callable, *args: Any, **kwargs: Any) -> None:
+    def process(self, func: Callable, args: Any, kwargs: Any) -> Promise:
         """Used to process callbacks in throughput-limiting thread through queue.
 
         Args:
@@ -169,7 +168,9 @@ class DelayQueue(threading.Thread):
 
         if not self.is_alive() or self.__exit_req:
             raise DelayQueueError('Could not process callback in stopped thread')
-        self._queue.put((func, args, kwargs))
+        promise = Promise(func, args, kwargs)
+        self._queue.put(promise)
+        return promise
 
 
 # The most straightforward way to implement this is to use 2 sequential delay
@@ -184,6 +185,9 @@ class MessageQueue:
     Contains two ``DelayQueue``, for group and for all messages, interconnected in delay chain.
     Callables are processed through *group* ``DelayQueue``, then through *all* ``DelayQueue`` for
     group-type messages. For non-group messages, only the *all* ``DelayQueue`` is used.
+
+    Attributes:
+        running (:obj:`bool`): Whether this message queue has started it's delay queues or not.
 
     Args:
         all_burst_limit (:obj:`int`, optional): Number of maximum *all-type* callbacks to process
@@ -213,61 +217,48 @@ class MessageQueue:
         exc_route: Callable[[Exception], None] = None,
         autostart: bool = True,
     ):
-        # create according delay queues, use composition
-        self._all_delayq = DelayQueue(
-            burst_limit=all_burst_limit,
-            time_limit_ms=all_time_limit_ms,
-            exc_route=exc_route,
-            autostart=autostart,
-        )
-        self._group_delayq = DelayQueue(
-            burst_limit=group_burst_limit,
-            time_limit_ms=group_time_limit_ms,
-            exc_route=exc_route,
-            autostart=autostart,
-        )
+        self.running = False
+        self._delay_queues: Dict[str, DelayQueue] = {
+            self.DEFAULT_QUEUE: DelayQueue(
+                burst_limit=all_burst_limit,
+                time_limit_ms=all_time_limit_ms,
+                exc_route=exc_route,
+                autostart=autostart,
+            ),
+            self.GROUP_QUEUE: DelayQueue(
+                burst_limit=group_burst_limit,
+                time_limit_ms=group_time_limit_ms,
+                exc_route=exc_route,
+                autostart=autostart,
+            ),
+        }
 
     def start(self) -> None:
         """Method is used to manually start the ``MessageQueue`` processing."""
-        self._all_delayq.start()
-        self._group_delayq.start()
+        for dq in self._delay_queues.values():
+            dq.start()
 
     def stop(self, timeout: float = None) -> None:
-        self._group_delayq.stop(timeout=timeout)
-        self._all_delayq.stop(timeout=timeout)
+        for dq in self._delay_queues.values():
+            dq.stop()
 
     stop.__doc__ = DelayQueue.stop.__doc__ or ''  # reuse docstring if any
 
-    def __call__(self, promise: Callable, is_group_msg: bool = False) -> Callable:
+    def process(self, func: Callable, delay_queue: str, *args: Any, **kwargs: Any) -> Promise:
         """
         Processes callables in throughput-limiting queues to avoid hitting limits (specified with
         :attr:`burst_limit` and :attr:`time_limit`.
 
-        Args:
-            promise (:obj:`callable`): Mainly the ``telegram.utils.promise.Promise`` (see Notes for
-                other callables), that is processed in delay queues.
-            is_group_msg (:obj:`bool`, optional): Defines whether ``promise`` would be processed in
-                group*+*all* ``DelayQueue``s (if set to :obj:`True`), or only through *all*
-                ``DelayQueue`` (if set to :obj:`False`), resulting in needed delays to avoid
-                hitting specified limits. Defaults to :obj:`False`.
-
-        Note:
-            Method is designed to accept ``telegram.utils.promise.Promise`` as ``promise``
-            argument, but other callables could be used too. For example, lambdas or simple
-            functions could be used to wrap original func to be called with needed args. In that
-            case, be sure that either wrapper func does not raise outside exceptions or the proper
-            :attr:`exc_route` handler is provided.
-
         Returns:
-            :obj:`callable`: Used as ``promise`` argument.
+            :class:`telegram.ext.Promise`.
 
         """
+        return self._delay_queues[delay_queue].process(func, args, kwargs)
 
-        if not is_group_msg:  # ignore middle group delay
-            self._all_delayq(promise)
-        else:  # use middle group delay
-            self._group_delayq(self._all_delayq, promise)
-        return promise
+    DEFAULT_QUEUE: ClassVar[str] = 'default_delay_queue'
+    """:obj:`str`: The default delay queue."""
+    GROUP_QUEUE: ClassVar[str] = 'group_delay_queue'
+    """:obj:`str`: The default delay queue for group requests."""
 
 
 def queuedmessage(method: Callable) -> Callable:
@@ -307,10 +298,15 @@ def queuedmessage(method: Callable) -> Callable:
         queued = kwargs.pop(
             'queued', self._is_messages_queued_default  # type: ignore[attr-defined]
         )
-        isgroup = kwargs.pop('isgroup', False)
+        is_group = kwargs.pop('isgroup', False)
         if queued:
-            prom = promise.Promise(method, (self,) + args, kwargs)
-            return self._msg_queue(prom, isgroup)  # type: ignore[attr-defined]
+            if not is_group:
+                return self._msg_queue.process(  # type: ignore[attr-defined]
+                    method, MessageQueue.DEFAULT_QUEUE, self, *args, **kwargs
+                )
+            return self._msg_queue.process(  # type: ignore[attr-defined]
+                method, MessageQueue.GROUP_QUEUE, self, *args, **kwargs
+            )
         return method(self, *args, **kwargs)
 
     return wrapped

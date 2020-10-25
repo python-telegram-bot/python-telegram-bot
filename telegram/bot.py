@@ -92,7 +92,7 @@ from typing import (
 )
 
 if TYPE_CHECKING:
-    from telegram.ext import Defaults
+    from telegram.ext import Defaults, MessageQueue
 
 RT = TypeVar('RT')
 
@@ -101,10 +101,10 @@ def info(func: Callable[..., RT]) -> Callable[..., RT]:
     @functools.wraps(func)
     def decorator(self: 'Bot', *args: Any, **kwargs: Any) -> RT:
         if not self.bot:
-            self.get_me()
+            self.get_me(delay_queue=None)
 
         if self._commands is None:
-            self.get_my_commands()
+            self.get_my_commands(delay_queue=None)
 
         result = func(self, *args, **kwargs)
         return result
@@ -125,6 +125,50 @@ def log(func: Callable[..., RT], *args: Any, **kwargs: Any) -> Callable[..., RT]
     return decorate(func, decorator)
 
 
+def mq(func: Callable[..., RT], *args: Any, **kwargs: Any) -> Callable[..., RT]:
+    def decorator(self: Union[Callable, Bot], *args: Any, **kwargs: Any) -> RT:
+        if callable(self):
+            self = cast('Bot', args[0])
+
+        if not self.message_queue or not self.message_queue.running:
+            return func(*args, **kwargs)
+
+        delay_queue = kwargs.pop('delay_queue', None)
+        if not delay_queue:
+            return func(*args, **kwargs)
+
+        if delay_queue == self.message_queue.DEFAULT_QUEUE:
+            # For default queue, check if we're in a group setting or not
+            arg_spec = inspect.getfullargspec(func)
+            chat_id: Union[str, int] = ''
+            if 'chat_id' in kwargs:
+                chat_id = kwargs['chat_id']
+            elif 'chat_id' in arg_spec.args:
+                idx = arg_spec.args.index('chat_id')
+                chat_id = args[idx]
+
+            if not chat_id:
+                is_group = False
+            elif isinstance(chat_id, str) and chat_id.startswith('@'):
+                is_group = True
+            else:
+                try:
+                    is_group = int(chat_id) < 0
+                except ValueError:
+                    is_group = False
+
+            queue = self.message_queue.GROUP_QUEUE if is_group else delay_queue
+            return self.message_queue.process(  # type: ignore[return-value]
+                func, queue, self, *args, **kwargs
+            )
+
+        return self.message_queue.process(  # type: ignore[return-value]
+            func, delay_queue, self, *args, **kwargs
+        )
+
+    return decorate(func, decorator)
+
+
 class Bot(TelegramObject):
     """This object represents a Telegram Bot.
 
@@ -138,12 +182,19 @@ class Bot(TelegramObject):
         private_key_password (:obj:`bytes`, optional): Password for above private key.
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
             be used if not set explicitly in the bot methods.
+        message_queue (:class:`telegram.ext.MessageQueue`, optional): A message queue to pass
+            requests through in order to avoid flood limits.
 
     Note:
-        Most bot methods have the argument ``api_kwargs`` which allows to pass arbitrary keywords
-        to the Telegram API. This can be used to access new features of the API before they were
-        incorporated into PTB. However, this is not guaranteed to work, i.e. it will fail for
-        passing files.
+        * Most bot methods have the argument ``api_kwargs`` which allows to pass arbitrary keywords
+          to the Telegram API. This can be used to access new features of the API before they were
+          incorporated into PTB. However, this is not guaranteed to work, i.e. it will fail for
+          passing files.
+        * Most bot methods have the argument ``delay_queue`` which allows you to pass the request
+          to the specified delay queue of the :attr:`message_queue`. This will have an effect only,
+          if the :class:`telegram.ext.MessageQueue` is set and running. When passing a request
+          through the :attr:`message_queue`, the bot method will return a
+          :class:`telegram.utils.Promise` instead of the documented return value.
 
     """
 
@@ -172,6 +223,9 @@ class Bot(TelegramObject):
                 for kwarg_name in needs_default
                 if (getattr(defaults, kwarg_name) is not DEFAULT_NONE)
             }
+            # ... do some special casing for delay_queue because that may depend on the method
+            if 'delay_queue' in default_kwargs:
+                default_kwargs['delay_queue'] = defaults.delay_queue_per_method[method_name]
             # ... apply the defaults using a partial
             if default_kwargs:
                 setattr(instance, method_name, functools.partial(method, **default_kwargs))
@@ -187,11 +241,12 @@ class Bot(TelegramObject):
         private_key: bytes = None,
         private_key_password: bytes = None,
         defaults: 'Defaults' = None,
+        message_queue: 'MessageQueue' = None,
     ):
         self.token = self._validate_token(token)
 
-        # Gather default
         self.defaults = defaults
+        self.message_queue = message_queue
 
         if base_url is None:
             base_url = 'https://api.telegram.org/bot'
@@ -354,7 +409,10 @@ class Bot(TelegramObject):
         return '@{}'.format(self.username)
 
     @log
-    def get_me(self, timeout: int = None, api_kwargs: JSONDict = None) -> Optional[User]:
+    @mq
+    def get_me(
+        self, timeout: int = None, api_kwargs: JSONDict = None, delay_queue: str = None
+    ) -> Optional[User]:
         """A simple method for testing your bot's auth token. Requires no parameters.
 
         Args:
@@ -363,6 +421,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.User`: A :class:`telegram.User` instance representing that bot if the
@@ -379,6 +439,7 @@ class Bot(TelegramObject):
         return self.bot
 
     @log
+    @mq
     def send_message(
         self,
         chat_id: Union[int, str],
@@ -390,6 +451,7 @@ class Bot(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Optional[Message]:
         """Use this method to send text messages.
 
@@ -415,6 +477,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Message`: On success, the sent message is returned.
@@ -441,12 +505,14 @@ class Bot(TelegramObject):
         )
 
     @log
+    @mq
     def delete_message(
         self,
         chat_id: Union[str, int],
         message_id: Union[str, int],
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """
         Use this method to delete a message, including service messages, with the following
@@ -471,6 +537,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -486,6 +554,7 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def forward_message(
         self,
         chat_id: Union[int, str],
@@ -494,6 +563,7 @@ class Bot(TelegramObject):
         disable_notification: bool = False,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Optional[Message]:
         """Use this method to forward messages of any kind.
 
@@ -510,6 +580,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -536,6 +608,7 @@ class Bot(TelegramObject):
         )
 
     @log
+    @mq
     def send_photo(
         self,
         chat_id: int,
@@ -547,6 +620,7 @@ class Bot(TelegramObject):
         timeout: float = 20,
         parse_mode: str = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Optional[Message]:
         """Use this method to send photos.
 
@@ -577,6 +651,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -609,6 +685,7 @@ class Bot(TelegramObject):
         )
 
     @log
+    @mq
     def send_audio(
         self,
         chat_id: Union[int, str],
@@ -624,6 +701,7 @@ class Bot(TelegramObject):
         parse_mode: str = None,
         thumb: FileLike = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Optional[Message]:
         """
         Use this method to send audio files, if you want Telegram clients to display them in the
@@ -669,6 +747,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -712,6 +792,7 @@ class Bot(TelegramObject):
         )
 
     @log
+    @mq
     def send_document(
         self,
         chat_id: Union[int, str],
@@ -725,6 +806,7 @@ class Bot(TelegramObject):
         parse_mode: str = None,
         thumb: FileLike = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Optional[Message]:
         """
         Use this method to send general files.
@@ -766,6 +848,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -803,6 +887,7 @@ class Bot(TelegramObject):
         )
 
     @log
+    @mq
     def send_sticker(
         self,
         chat_id: Union[int, str],
@@ -812,6 +897,7 @@ class Bot(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: float = 20,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Optional[Message]:
         """
         Use this method to send static .WEBP or animated .TGS stickers.
@@ -838,6 +924,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -865,6 +953,7 @@ class Bot(TelegramObject):
         )
 
     @log
+    @mq
     def send_video(
         self,
         chat_id: Union[int, str],
@@ -881,6 +970,7 @@ class Bot(TelegramObject):
         supports_streaming: bool = None,
         thumb: FileLike = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Optional[Message]:
         """
         Use this method to send video files, Telegram clients support mp4 videos
@@ -929,6 +1019,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -974,6 +1066,7 @@ class Bot(TelegramObject):
         )
 
     @log
+    @mq
     def send_video_note(
         self,
         chat_id: Union[int, str],
@@ -986,6 +1079,7 @@ class Bot(TelegramObject):
         timeout: float = 20,
         thumb: FileLike = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Optional[Message]:
         """
         As of v.4.0, Telegram clients support rounded square mp4 videos of up to 1 minute long.
@@ -1024,6 +1118,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -1061,6 +1157,7 @@ class Bot(TelegramObject):
         )
 
     @log
+    @mq
     def send_animation(
         self,
         chat_id: Union[int, str],
@@ -1076,6 +1173,7 @@ class Bot(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: float = 20,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Optional[Message]:
         """
         Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound).
@@ -1118,6 +1216,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -1161,6 +1261,7 @@ class Bot(TelegramObject):
         )
 
     @log
+    @mq
     def send_voice(
         self,
         chat_id: Union[int, str],
@@ -1173,6 +1274,7 @@ class Bot(TelegramObject):
         timeout: float = 20,
         parse_mode: str = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Optional[Message]:
         """
         Use this method to send audio files, if you want Telegram clients to display the file
@@ -1208,6 +1310,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -1242,6 +1346,7 @@ class Bot(TelegramObject):
         )
 
     @log
+    @mq
     def send_media_group(
         self,
         chat_id: Union[int, str],
@@ -1250,6 +1355,7 @@ class Bot(TelegramObject):
         reply_to_message_id: Union[int, str] = None,
         timeout: float = 20,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> List[Optional[Message]]:
         """Use this method to send a group of photos or videos as an album.
 
@@ -1265,6 +1371,8 @@ class Bot(TelegramObject):
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             List[:class:`telegram.Message`]: An array of the sent Messages.
@@ -1295,6 +1403,7 @@ class Bot(TelegramObject):
         return [Message.de_json(res, self) for res in result]  # type: ignore
 
     @log
+    @mq
     def send_location(
         self,
         chat_id: Union[int, str],
@@ -1307,6 +1416,7 @@ class Bot(TelegramObject):
         location: Location = None,
         live_period: int = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Optional[Message]:
         """Use this method to send point on the map.
 
@@ -1333,6 +1443,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -1371,6 +1483,7 @@ class Bot(TelegramObject):
         )
 
     @log
+    @mq
     def edit_message_live_location(
         self,
         chat_id: Union[str, int] = None,
@@ -1382,6 +1495,7 @@ class Bot(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Union[Optional[Message], bool]:
         """Use this method to edit live location messages sent by the bot or via the bot
         (for inline bots). A location can be edited until its :attr:`live_period` expires or
@@ -1408,6 +1522,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -1444,6 +1560,7 @@ class Bot(TelegramObject):
         )
 
     @log
+    @mq
     def stop_message_live_location(
         self,
         chat_id: Union[str, int] = None,
@@ -1452,6 +1569,7 @@ class Bot(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Union[Optional[Message], bool]:
         """Use this method to stop updating a live location message sent by the bot or via the bot
         (for inline bots) before live_period expires.
@@ -1471,6 +1589,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -1494,6 +1614,7 @@ class Bot(TelegramObject):
         )
 
     @log
+    @mq
     def send_venue(
         self,
         chat_id: Union[int, str],
@@ -1509,6 +1630,7 @@ class Bot(TelegramObject):
         venue: Venue = None,
         foursquare_type: str = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Optional[Message]:
         """Use this method to send information about a venue.
 
@@ -1541,6 +1663,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -1587,6 +1711,7 @@ class Bot(TelegramObject):
         )
 
     @log
+    @mq
     def send_contact(
         self,
         chat_id: Union[int, str],
@@ -1600,6 +1725,7 @@ class Bot(TelegramObject):
         contact: Contact = None,
         vcard: str = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Optional[Message]:
         """Use this method to send phone contacts.
 
@@ -1628,6 +1754,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -1669,6 +1797,7 @@ class Bot(TelegramObject):
         )
 
     @log
+    @mq
     def send_game(
         self,
         chat_id: Union[int, str],
@@ -1678,6 +1807,7 @@ class Bot(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Optional[Message]:
         """Use this method to send a game.
 
@@ -1698,6 +1828,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -1719,12 +1851,14 @@ class Bot(TelegramObject):
         )
 
     @log
+    @mq
     def send_chat_action(
         self,
         chat_id: Union[str, int],
         action: str,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """
         Use this method when you need to tell the user that something is happening on the bot's
@@ -1743,6 +1877,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`bool`:  On success, :obj:`True` is returned.
@@ -1758,6 +1894,7 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def answer_inline_query(
         self,
         inline_query_id: str,
@@ -1770,6 +1907,7 @@ class Bot(TelegramObject):
         timeout: float = None,
         current_offset: str = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """
         Use this method to send answers to an inline query. No more than 50 results per query are
@@ -1811,6 +1949,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Example:
             An inline bot that sends YouTube videos can ask the user to connect the bot to their
@@ -1913,6 +2053,7 @@ class Bot(TelegramObject):
         )
 
     @log
+    @mq
     def get_user_profile_photos(
         self,
         user_id: Union[str, int],
@@ -1920,6 +2061,7 @@ class Bot(TelegramObject):
         limit: int = 100,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Optional[UserProfilePhotos]:
         """Use this method to get a list of profile pictures for a user.
 
@@ -1934,6 +2076,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.UserProfilePhotos`
@@ -1954,6 +2098,7 @@ class Bot(TelegramObject):
         return UserProfilePhotos.de_json(result, self)  # type: ignore
 
     @log
+    @mq
     def get_file(
         self,
         file_id: Union[
@@ -1961,6 +2106,7 @@ class Bot(TelegramObject):
         ],
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> File:
         """
         Use this method to get basic info about a file and prepare it for downloading. For the
@@ -1987,6 +2133,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.File`
@@ -2012,6 +2160,7 @@ class Bot(TelegramObject):
         return File.de_json(result, self)  # type: ignore
 
     @log
+    @mq
     def kick_chat_member(
         self,
         chat_id: Union[str, int],
@@ -2019,6 +2168,7 @@ class Bot(TelegramObject):
         timeout: float = None,
         until_date: Union[int, datetime] = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """
         Use this method to kick a user from a group or a supergroup or a channel. In the case of
@@ -2040,6 +2190,8 @@ class Bot(TelegramObject):
                 bot will be used.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`bool` On success, :obj:`True` is returned.
@@ -2062,12 +2214,14 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def unban_chat_member(
         self,
         chat_id: Union[str, int],
         user_id: Union[str, int],
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """Use this method to unban a previously kicked user in a supergroup or channel.
 
@@ -2083,6 +2237,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`bool` On success, :obj:`True` is returned.
@@ -2098,6 +2254,7 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def answer_callback_query(
         self,
         callback_query_id: str,
@@ -2107,6 +2264,7 @@ class Bot(TelegramObject):
         cache_time: int = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """
         Use this method to send answers to callback queries sent from inline keyboards. The answer
@@ -2137,6 +2295,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`bool` On success, :obj:`True` is returned.
@@ -2161,6 +2321,7 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def edit_message_text(
         self,
         text: str,
@@ -2172,6 +2333,7 @@ class Bot(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Union[Optional[Message], bool]:
         """
         Use this method to edit text and game messages sent by the bot or via the bot (for inline
@@ -2198,6 +2360,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -2229,6 +2393,7 @@ class Bot(TelegramObject):
         )
 
     @log
+    @mq
     def edit_message_caption(
         self,
         chat_id: Union[str, int] = None,
@@ -2239,6 +2404,7 @@ class Bot(TelegramObject):
         timeout: float = None,
         parse_mode: str = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Union[Message, bool]:
         """
         Use this method to edit captions of messages sent by the bot or via the bot
@@ -2264,6 +2430,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -2301,6 +2469,7 @@ class Bot(TelegramObject):
         )
 
     @log
+    @mq
     def edit_message_media(
         self,
         chat_id: Union[str, int] = None,
@@ -2310,6 +2479,7 @@ class Bot(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Union[Message, bool]:
         """
         Use this method to edit animation, audio, document, photo, or video messages. If a
@@ -2334,6 +2504,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -2367,6 +2539,7 @@ class Bot(TelegramObject):
         )
 
     @log
+    @mq
     def edit_message_reply_markup(
         self,
         chat_id: Union[str, int] = None,
@@ -2375,6 +2548,7 @@ class Bot(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Union[Message, bool]:
         """
         Use this method to edit only the reply markup of messages sent by the bot or via the bot
@@ -2395,6 +2569,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -2428,6 +2604,7 @@ class Bot(TelegramObject):
         )
 
     @log
+    @mq
     def get_updates(
         self,
         offset: int = None,
@@ -2436,6 +2613,7 @@ class Bot(TelegramObject):
         read_latency: float = 2.0,
         allowed_updates: List[str] = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> List[Update]:
         """Use this method to receive incoming updates using long polling.
 
@@ -2462,6 +2640,8 @@ class Bot(TelegramObject):
                 updates may be received for a short period of time.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Note:
             1. This method will not work if an outgoing webhook is set up.
@@ -2617,8 +2797,13 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def leave_chat(
-        self, chat_id: Union[str, int], timeout: float = None, api_kwargs: JSONDict = None
+        self,
+        chat_id: Union[str, int],
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """Use this method for your bot to leave a group, supergroup or channel.
 
@@ -2630,6 +2815,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`bool` On success, :obj:`True` is returned.
@@ -2645,8 +2832,13 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def get_chat(
-        self, chat_id: Union[str, int], timeout: float = None, api_kwargs: JSONDict = None
+        self,
+        chat_id: Union[str, int],
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Chat:
         """
         Use this method to get up to date information about the chat (current name of the user for
@@ -2660,6 +2852,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Chat`
@@ -2678,8 +2872,13 @@ class Bot(TelegramObject):
         return Chat.de_json(result, self)  # type: ignore
 
     @log
+    @mq
     def get_chat_administrators(
-        self, chat_id: Union[str, int], timeout: float = None, api_kwargs: JSONDict = None
+        self,
+        chat_id: Union[str, int],
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> List[ChatMember]:
         """
         Use this method to get a list of administrators in a chat.
@@ -2692,6 +2891,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             List[:class:`telegram.ChatMember`]: On success, returns a list of ``ChatMember``
@@ -2710,8 +2911,13 @@ class Bot(TelegramObject):
         return [ChatMember.de_json(x, self) for x in result]  # type: ignore
 
     @log
+    @mq
     def get_chat_members_count(
-        self, chat_id: Union[str, int], timeout: float = None, api_kwargs: JSONDict = None
+        self,
+        chat_id: Union[str, int],
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> int:
         """Use this method to get the number of members in a chat.
 
@@ -2723,6 +2929,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`int`: Number of members in the chat.
@@ -2738,12 +2946,14 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def get_chat_member(
         self,
         chat_id: Union[str, int],
         user_id: Union[str, int],
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> ChatMember:
         """Use this method to get information about a member of a chat.
 
@@ -2756,6 +2966,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.ChatMember`
@@ -2771,12 +2983,14 @@ class Bot(TelegramObject):
         return ChatMember.de_json(result, self)  # type: ignore
 
     @log
+    @mq
     def set_chat_sticker_set(
         self,
         chat_id: Union[str, int],
         sticker_set_name: str,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """Use this method to set a new group sticker set for a supergroup.
         The bot must be an administrator in the chat for this to work and must have the appropriate
@@ -2793,6 +3007,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -2804,8 +3020,13 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def delete_chat_sticker_set(
-        self, chat_id: Union[str, int], timeout: float = None, api_kwargs: JSONDict = None
+        self,
+        chat_id: Union[str, int],
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """Use this method to delete a group sticker set from a supergroup. The bot must be an
         administrator in the chat for this to work and must have the appropriate admin rights.
@@ -2820,6 +3041,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
              :obj:`bool`: On success, :obj:`True` is returned.
@@ -2830,6 +3053,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
+    @log
     def get_webhook_info(self, timeout: float = None, api_kwargs: JSONDict = None) -> WebhookInfo:
         """Use this method to get current webhook status. Requires no parameters.
 
@@ -2851,6 +3075,7 @@ class Bot(TelegramObject):
         return WebhookInfo.de_json(result, self)  # type: ignore
 
     @log
+    @mq
     def set_game_score(
         self,
         user_id: Union[int, str],
@@ -2862,6 +3087,7 @@ class Bot(TelegramObject):
         disable_edit_message: bool = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Union[Message, bool]:
         """
         Use this method to set the score of the specified user in a game.
@@ -2884,6 +3110,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Message`: The edited message, or if the message wasn't sent by the bot
@@ -2915,6 +3143,7 @@ class Bot(TelegramObject):
         )
 
     @log
+    @mq
     def get_game_high_scores(
         self,
         user_id: Union[int, str],
@@ -2923,6 +3152,7 @@ class Bot(TelegramObject):
         inline_message_id: Union[str, int] = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> List[GameHighScore]:
         """
         Use this method to get data for high score tables. Will return the score of the specified
@@ -2941,6 +3171,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             List[:class:`telegram.GameHighScore`]
@@ -2963,6 +3195,7 @@ class Bot(TelegramObject):
         return [GameHighScore.de_json(hs, self) for hs in result]  # type: ignore
 
     @log
+    @mq
     def send_invoice(
         self,
         chat_id: Union[int, str],
@@ -2990,6 +3223,7 @@ class Bot(TelegramObject):
         send_email_to_provider: bool = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Message:
         """Use this method to send invoices.
 
@@ -3043,6 +3277,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -3100,6 +3336,7 @@ class Bot(TelegramObject):
         )
 
     @log
+    @mq
     def answer_shipping_query(
         self,
         shipping_query_id: str,
@@ -3108,6 +3345,7 @@ class Bot(TelegramObject):
         error_message: str = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """
         If you sent an invoice requesting a shipping address and the parameter is_flexible was
@@ -3130,6 +3368,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3165,6 +3405,7 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def answer_pre_checkout_query(
         self,
         pre_checkout_query_id: str,
@@ -3172,6 +3413,7 @@ class Bot(TelegramObject):
         error_message: str = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """
         Once the user has confirmed their payment and shipping details, the Bot API sends the final
@@ -3197,6 +3439,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3224,6 +3468,7 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def restrict_chat_member(
         self,
         chat_id: Union[str, int],
@@ -3232,6 +3477,7 @@ class Bot(TelegramObject):
         until_date: Union[int, datetime] = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """
         Use this method to restrict a user in a supergroup. The bot must be an administrator in
@@ -3260,6 +3506,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3285,6 +3533,7 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def promote_chat_member(
         self,
         chat_id: Union[str, int],
@@ -3299,6 +3548,7 @@ class Bot(TelegramObject):
         can_promote_members: bool = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """
         Use this method to promote or demote a user in a supergroup or a channel. The bot must be
@@ -3332,6 +3582,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3364,12 +3616,14 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def set_chat_permissions(
         self,
         chat_id: Union[str, int],
         permissions: ChatPermissions,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """
         Use this method to set default chat permissions for all members. The bot must be an
@@ -3385,6 +3639,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3400,6 +3656,7 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def set_chat_administrator_custom_title(
         self,
         chat_id: Union[int, str],
@@ -3407,6 +3664,7 @@ class Bot(TelegramObject):
         custom_title: str,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """
         Use this method to set a custom title for administrators promoted by the bot in a
@@ -3423,6 +3681,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3440,8 +3700,13 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def export_chat_invite_link(
-        self, chat_id: Union[str, int], timeout: float = None, api_kwargs: JSONDict = None
+        self,
+        chat_id: Union[str, int],
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> str:
         """
         Use this method to generate a new invite link for a chat; any previously generated link
@@ -3456,6 +3721,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`str`: New invite link on success.
@@ -3471,12 +3738,14 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def set_chat_photo(
         self,
         chat_id: Union[str, int],
         photo: FileLike,
         timeout: float = 20,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """Use this method to set a new profile photo for the chat.
 
@@ -3492,6 +3761,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3511,8 +3782,13 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def delete_chat_photo(
-        self, chat_id: Union[str, int], timeout: float = None, api_kwargs: JSONDict = None
+        self,
+        chat_id: Union[str, int],
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """
         Use this method to delete a chat photo. Photos can't be changed for private chats. The bot
@@ -3527,6 +3803,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3542,12 +3820,14 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def set_chat_title(
         self,
         chat_id: Union[str, int],
         title: str,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """
         Use this method to change the title of a chat. Titles can't be changed for private chats.
@@ -3563,6 +3843,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3578,12 +3860,14 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def set_chat_description(
         self,
         chat_id: Union[str, int],
         description: str,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """
         Use this method to change the description of a group, a supergroup or a channel. The bot
@@ -3599,6 +3883,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3614,6 +3900,7 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def pin_chat_message(
         self,
         chat_id: Union[str, int],
@@ -3621,6 +3908,7 @@ class Bot(TelegramObject):
         disable_notification: bool = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """
         Use this method to pin a message in a group, a supergroup, or a channel.
@@ -3640,6 +3928,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3658,8 +3948,13 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def unpin_chat_message(
-        self, chat_id: Union[str, int], timeout: float = None, api_kwargs: JSONDict = None
+        self,
+        chat_id: Union[str, int],
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """
         Use this method to unpin a message in a group, a supergroup, or a channel.
@@ -3675,6 +3970,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3690,8 +3987,13 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def get_sticker_set(
-        self, name: str, timeout: float = None, api_kwargs: JSONDict = None
+        self,
+        name: str,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> StickerSet:
         """Use this method to get a sticker set.
 
@@ -3702,6 +4004,8 @@ class Bot(TelegramObject):
                 creation of the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.StickerSet`
@@ -3717,12 +4021,14 @@ class Bot(TelegramObject):
         return StickerSet.de_json(result, self)  # type: ignore
 
     @log
+    @mq
     def upload_sticker_file(
         self,
         user_id: Union[str, int],
         png_sticker: Union[str, FileLike],
         timeout: float = 20,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> File:
         """
         Use this method to upload a .png file with a sticker for later use in
@@ -3743,6 +4049,8 @@ class Bot(TelegramObject):
                 creation of the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.File`: On success, the uploaded File is returned.
@@ -3761,6 +4069,7 @@ class Bot(TelegramObject):
         return File.de_json(result, self)  # type: ignore
 
     @log
+    @mq
     def create_new_sticker_set(
         self,
         user_id: Union[str, int],
@@ -3773,6 +4082,7 @@ class Bot(TelegramObject):
         timeout: float = 20,
         tgs_sticker: Union[str, FileLike] = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """
         Use this method to create new sticker set owned by a user.
@@ -3816,6 +4126,8 @@ class Bot(TelegramObject):
                 creation of the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3848,6 +4160,7 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def add_sticker_to_set(
         self,
         user_id: Union[str, int],
@@ -3858,6 +4171,7 @@ class Bot(TelegramObject):
         timeout: float = 20,
         tgs_sticker: Union[str, FileLike] = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """
         Use this method to add a new sticker to a set created by the bot.
@@ -3895,6 +4209,8 @@ class Bot(TelegramObject):
                 creation of the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3925,8 +4241,14 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def set_sticker_position_in_set(
-        self, sticker: str, position: int, timeout: float = None, api_kwargs: JSONDict = None
+        self,
+        sticker: str,
+        position: int,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """Use this method to move a sticker in a set created by the bot to a specific position.
 
@@ -3938,6 +4260,8 @@ class Bot(TelegramObject):
                 creation of the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3955,8 +4279,13 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def delete_sticker_from_set(
-        self, sticker: str, timeout: float = None, api_kwargs: JSONDict = None
+        self,
+        sticker: str,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """Use this method to delete a sticker from a set created by the bot.
 
@@ -3967,6 +4296,8 @@ class Bot(TelegramObject):
                 creation of the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3982,6 +4313,7 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def set_sticker_set_thumb(
         self,
         name: str,
@@ -3989,6 +4321,7 @@ class Bot(TelegramObject):
         thumb: FileLike = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """Use this method to set the thumbnail of a sticker set. Animated thumbnails can be set
         for animated sticker sets only.
@@ -4012,6 +4345,8 @@ class Bot(TelegramObject):
                 creation of the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -4032,12 +4367,14 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def set_passport_data_errors(
         self,
         user_id: Union[str, int],
         errors: List[PassportElementError],
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """
         Informs a user that some of the Telegram Passport elements they provided contains errors.
@@ -4058,6 +4395,8 @@ class Bot(TelegramObject):
                 creation of the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -4073,6 +4412,7 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    @mq
     def send_poll(
         self,
         chat_id: Union[int, str],
@@ -4092,6 +4432,7 @@ class Bot(TelegramObject):
         open_period: int = None,
         close_date: Union[int, datetime] = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Message:
         """
         Use this method to send a native poll.
@@ -4137,6 +4478,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -4187,6 +4530,7 @@ class Bot(TelegramObject):
         )
 
     @log
+    @mq
     def stop_poll(
         self,
         chat_id: Union[int, str],
@@ -4194,6 +4538,7 @@ class Bot(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Poll:
         """
         Use this method to stop a poll which was sent by the bot.
@@ -4209,6 +4554,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Poll`: On success, the stopped Poll with the final results is
@@ -4233,6 +4580,7 @@ class Bot(TelegramObject):
         return Poll.de_json(result, self)  # type: ignore
 
     @log
+    @mq
     def send_dice(
         self,
         chat_id: Union[int, str],
@@ -4242,6 +4590,7 @@ class Bot(TelegramObject):
         timeout: float = None,
         emoji: str = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> Message:
         """
         Use this method to send an animated emoji, which will have a random value. On success, the
@@ -4264,6 +4613,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -4290,8 +4641,9 @@ class Bot(TelegramObject):
         )
 
     @log
+    @mq
     def get_my_commands(
-        self, timeout: float = None, api_kwargs: JSONDict = None
+        self, timeout: float = None, api_kwargs: JSONDict = None, delay_queue: str = None
     ) -> List[BotCommand]:
         """
         Use this method to get the current list of the bot's commands.
@@ -4302,6 +4654,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             List[:class:`telegram.BotCommand]`: On success, the commands set for the bot
@@ -4317,11 +4671,13 @@ class Bot(TelegramObject):
         return self._commands
 
     @log
+    @mq
     def set_my_commands(
         self,
         commands: List[Union[BotCommand, Tuple[str, str]]],
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        delay_queue: str = None,
     ) -> bool:
         """
         Use this method to change the list of the bot's commands.
@@ -4335,6 +4691,8 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            delay_queue (:obj:`str`, optional): The name of the delay queue to pass this request
+                through. Defaults to :obj:`None`.
 
         Returns:
             :obj:`True`: On success

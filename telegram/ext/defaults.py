@@ -17,8 +17,10 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class Defaults, which allows to pass default values to Updater."""
+from collections import defaultdict
+
 import pytz
-from typing import Union, Optional, Any, NoReturn
+from typing import Union, Optional, Any, NoReturn, Dict, DefaultDict
 
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
 
@@ -41,6 +43,12 @@ class Defaults:
             be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
         tzinfo (:obj:`tzinfo`): A timezone to be used for all date(time) objects appearing
             throughout PTB.
+        delay_queue (:obj:`str`, optional): A :class:`telegram.ext.DelayQueue` the bots
+            :class:`telegram.ext.MessageQueue` should use.
+        delay_queue_per_method (Dict[:obj:`str`, :obj:`str`], optional): A dictionary specifying
+            for each bot method a :class:`telegram.ext.DelayQueue` the bots
+            :class:`telegram.ext.MessageQueue` should use. Methods not specified here will use
+            :attr:`delay_queue`.
 
     Parameters:
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
@@ -59,6 +67,12 @@ class Defaults:
             appearing throughout PTB, i.e. if a timezone naive date(time) object is passed
             somewhere, it will be assumed to be in ``tzinfo``. Must be a timezone provided by the
             ``pytz`` module. Defaults to UTC.
+        delay_queue (:obj:`str`, optional): A :class:`telegram.ext.DelayQueue` the bots
+            :class:`telegram.ext.MessageQueue` should use. Defaults to :obj:`None`.
+        delay_queue_per_method (Dict[:obj:`str`, :obj:`str`], optional): A dictionary specifying
+            for each bot method a :class:`telegram.ext.DelayQueue` the bots
+            :class:`telegram.ext.MessageQueue` should use. Methods not specified here will use
+            :attr:`delay_queue`. Defaults to :obj:`None`.
     """
 
     def __init__(
@@ -71,6 +85,8 @@ class Defaults:
         timeout: Union[float, DefaultValue] = DEFAULT_NONE,
         quote: bool = None,
         tzinfo: pytz.BaseTzInfo = pytz.utc,
+        delay_queue: str = None,
+        delay_queue_per_method: Dict[str, Optional[str]] = None,
     ):
         self._parse_mode = parse_mode
         self._disable_notification = disable_notification
@@ -78,6 +94,10 @@ class Defaults:
         self._timeout = timeout
         self._quote = quote
         self._tzinfo = tzinfo
+        self._delay_queue = delay_queue
+        self._delay_queue_per_method = defaultdict(
+            lambda: self.delay_queue, delay_queue_per_method or {}
+        )
 
     @property
     def parse_mode(self) -> Optional[str]:
@@ -145,6 +165,28 @@ class Defaults:
             "not have any effect."
         )
 
+    @property
+    def delay_queue(self) -> Optional[str]:
+        return self._delay_queue
+
+    @delay_queue.setter
+    def delay_queue(self, value: Any) -> NoReturn:
+        raise AttributeError(
+            "You can not assign a new value to defaults after because it would "
+            "not have any effect."
+        )
+
+    @property
+    def delay_queue_per_method(self) -> DefaultDict[str, Optional[str]]:
+        return self._delay_queue_per_method
+
+    @delay_queue_per_method.setter
+    def delay_queue_per_method(self, value: Any) -> NoReturn:
+        raise AttributeError(
+            "You can not assign a new value to defaults after because it would "
+            "not have any effect."
+        )
+
     def __hash__(self) -> int:
         return hash(
             (
@@ -154,6 +196,8 @@ class Defaults:
                 self._timeout,
                 self._quote,
                 self._tzinfo,
+                self._delay_queue,
+                ((key, value) for key, value in self._delay_queue_per_method),
             )
         )
 

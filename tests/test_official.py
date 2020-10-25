@@ -36,6 +36,7 @@ IGNORED_PARAMETERS = {
     'timeout',
     'bot',
     'api_kwargs',
+    'delay_queue',
 }
 
 

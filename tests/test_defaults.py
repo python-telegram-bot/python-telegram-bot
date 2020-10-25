@@ -39,6 +39,10 @@ class TestDefault:
             defaults.quote = True
         with pytest.raises(AttributeError):
             defaults.tzinfo = True
+        with pytest.raises(AttributeError):
+            defaults.delay_queue = True
+        with pytest.raises(AttributeError):
+            defaults.delay_queue_per_method = True
 
     def test_equality(self):
         a = Defaults(parse_mode='HTML', quote=True)
