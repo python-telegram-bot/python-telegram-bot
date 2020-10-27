@@ -126,7 +126,7 @@ def log(func: Callable[..., RT], *args: Any, **kwargs: Any) -> Callable[..., RT]
 
 
 def mq(func: Callable[..., RT], *args: Any, **kwargs: Any) -> Callable[..., RT]:
-    def decorator(self: Union[Callable, Bot], *args: Any, **kwargs: Any) -> RT:
+    def decorator(self: Union[Callable, 'Bot'], *args: Any, **kwargs: Any) -> RT:
         if callable(self):
             self = cast('Bot', args[0])
 
