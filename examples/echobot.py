@@ -25,6 +25,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 import telegram.message
 import telegram.chat
 import datetime
+import time
 # from telethon.tl.functions.messages import GetHistoryRequest
 
 from telethon.tl.functions.channels import GetMessagesRequest
@@ -33,7 +34,8 @@ from telethon.tl.functions.channels import GetMessagesRequest
 # print(obj)
 obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
 # get name by username id
-print(obj.get_chat_member('@namtestgroup',1034090550).user.username)
+
+print(obj.get_chat_member('@namtestgroup',1034090550).user.username) # viettelnguyen
 # print(obj.get_chat('@namtestgroup'))
 '''
 sec=GetMessagesRequest('@namtestgroup',id=[42])
@@ -44,6 +46,7 @@ obj1=Message('-1001192378669',from_user='hoai97nambot',date=datetime.datetime(20
 print(obj1.text_html)
 
 '''
+
 # obj2=GetHistoryRequest('@namtestgroup', offset_id=None,offset_date=None,add_offset=None,limit=10,\
 #     max_id=None, min_id=None, hash='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
 # print(obj2)
@@ -53,8 +56,8 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 # BotInlineMessageText("hello")
-a=get_mes()[-1]
-st='📸 '+ a[a.find('](')+2:a.find('))')]
+a=get_mes()
+# st='📸 '+ a[a.find('](')+2:a.find('))')]
 ad='🔥 Get more likes & comments by joining our other groups👇 \n \
 ❤️Happy engaging❤️ \n \
 🚀Viral Network🚀'
@@ -83,8 +86,12 @@ def list(update, context):
 def help_command(update, context):
     """Send a message when the command /help is issued."""
     # update.message.reply_text('Help!'+ str(update.message.from_user.username))
-    update.message.reply_text(str(update))
-#
+    update.message.reply_text(str(update.message.message_id) +'-'+ update.message.from_user.username+'-'\
+        +str(update.message.from_user.id))
+    time.sleep(3)
+    auto_delete_message(update.message.message_id)
+
+
 #===========================================================================================
 def check_condition_messtopost(link):
     try:
@@ -95,7 +102,7 @@ def check_condition_messtopost(link):
     except(...):
         auto_send_message('your type is not right format')
 #==========================================================================================
-def echo(update, context):
+def echo(update, context): # important info in this function
     """Echo the user message."""
     a=update.message
     print(type(a))
@@ -106,6 +113,22 @@ def auto_send_message(st):
     obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
     
     obj.send_message('@namtestgroup',st, disable_web_page_preview=True,reply_markup=reply_markup)
+
+
+# this scripts used for testing 👤entrepreneurs_club01 ✅
+
+for i in range(10):
+    me='👤 '+a[i][0]+ ' ✅ '+'Dx10 '+ a[i][1]
+    auto_send_message(me)
+#
+def auto_delete_message(mess_id):
+    obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
+    try:
+        obj.delete_message('@innertest',mess_id)
+    except:
+        print('message haven\'t been deleted yet')
+
+
 def post_ad(ad):
     import time
     while True:
@@ -122,8 +145,7 @@ def main():
     # obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
     # st='📸 '+ a[-1]
     # obj.send_message('@innertest',st, reply_markup=reply_markup)
-    for i in range(30):
-        auto_send_message(st)
+
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
@@ -146,3 +168,4 @@ def main():
 if __name__ == '__main__':
     main()
     # post_ad(ad)
+    
