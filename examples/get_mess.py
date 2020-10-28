@@ -22,8 +22,8 @@ def get_mes():
     client.connect()
     mess=[]
     i=1
-    for message in client.iter_messages('[Dx5] BoostGram | L+C',10,filter=InputMessagesFilterUrl):
-        print(type(message.text), message.text)
+    for message in client.iter_messages('Followers Fx30',10,filter=InputMessagesFilterUrl):
+        print(message.text)
         mess.append('{}. '.format(i) + (message.text).split(" ")[-1])
         i+=1
     return mess
@@ -53,3 +53,11 @@ while True:
     client.send_message('Testbot2',a[0])
     time.sleep(15*60)
 '''
+a=get_mes()[8]
+
+print('-------------------------')
+t='@'+a[6:a.find(']')]
+# client.send_message('Testbot2',t)
+# client.send_message('Testbot2',a[a.find('](')+2:a.find('))')])
+print(a[6:a.find(']')])
+print(a[a.find('](')+2:a.find('))')])

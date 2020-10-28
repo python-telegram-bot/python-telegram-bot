@@ -53,8 +53,8 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 # BotInlineMessageText("hello")
-a=get_mes()
-st='📸 '+ a[-1]
+a=get_mes()[-1]
+st='📸 '+ a[a.find('](')+2:a.find('))')]
 ad='🔥 Get more likes & comments by joining our other groups👇 \n \
 ❤️Happy engaging❤️ \n \
 🚀Viral Network🚀'
@@ -84,6 +84,8 @@ def help_command(update, context):
     """Send a message when the command /help is issued."""
     # update.message.reply_text('Help!'+ str(update.message.from_user.username))
     update.message.reply_text(str(update))
+#
+#===========================================================================================
 def check_condition_messtopost(link):
     try:
         if link[:4] == 'dx30':
@@ -92,7 +94,7 @@ def check_condition_messtopost(link):
             auto_send_message('your type is not right format')
     except(...):
         auto_send_message('your type is not right format')
-
+#==========================================================================================
 def echo(update, context):
     """Echo the user message."""
     a=update.message
@@ -120,7 +122,8 @@ def main():
     # obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
     # st='📸 '+ a[-1]
     # obj.send_message('@innertest',st, reply_markup=reply_markup)
-    # auto_send_message()
+    for i in range(30):
+        auto_send_message(st)
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
