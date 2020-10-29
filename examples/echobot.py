@@ -19,7 +19,7 @@ import logging
 from telethon.tl.types import BotInlineResult
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-from get_mess import get_mes
+from get_mess import get_mes, get_mes2
 from telegram.bot import *
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 import telegram.message
@@ -57,6 +57,13 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 # BotInlineMessageText("hello")
 a=get_mes()
+print('***************************')
+container=[]
+count=1
+for i in range(10):
+    container.append('{}. [{}]({})'.format(count,a[i][0],a[i][1]))
+    count+=1
+
 # st='📸 '+ a[a.find('](')+2:a.find('))')]
 ad='🔥 Get more likes & comments by joining our other groups👇 \n \
 ❤️Happy engaging❤️ \n \
@@ -69,13 +76,22 @@ keyboard = [[InlineKeyboardButton("✅   Rules   ✅", url='https://t.me/nam97ho
 
 reply_markup = InlineKeyboardMarkup(keyboard)
 
+list_markup = [[InlineKeyboardButton("🚀 Dx10 Follow chain 🚀", url='https://t.me/hoai97nambot')]]
+reply_markup1 = InlineKeyboardMarkup(list_markup)
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
 def start(update, context):
     """Send a message when the command /start is issued."""
-    update.message.reply_text('Hi!')
-    b='\n'.join(a)
-    update.message.reply_text(b,disable_web_page_preview=True)
+    # ts='@'+update.message.from_user.username
+    # update.message.reply_text('Hi!')
+    # obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
+    # obj.send_message('@hoai97nambot','container[0]',parse_mode='Markdown',disable_web_page_preview=True,reply_markup=reply_markup1)
+    m=''
+    for i in container:
+        m=m+ '\n'+i
+    send_to_destination(update.message.from_user.id,m)
+        
+    # update.message.reply_text(a,disable_web_page_preview=True),
 '''
 def list(update, context):
     """Send a message when the command /start is issued."""
@@ -95,8 +111,8 @@ def help_command(update, context):
 #===========================================================================================
 def check_condition_messtopost(link):
     try:
-        if link[:4] == 'dx30':
-            auto_send_message(st)
+        if link[:4] == 'dx10' or link[:4] == 'Dx10':
+            pass
         else:
             auto_send_message('your type is not right format')
     except(...):
@@ -106,25 +122,48 @@ def echo(update, context): # important info in this function
     """Echo the user message."""
     a=update.message
     print(type(a))
-    check_condition_messtopost(update.message.text)
-    update.message.reply_text(update.message.text)
+    # check_condition_messtopost(update.message.text)
+    tele_usr='@'+ update.message.from_user.username
+    bot_push_message(update.message.text,tele_usr)
+    # update.message.reply_text(update.message.text)
+    time.sleep(5)
+    auto_delete_message(update.message.message_id)
+   
+def send_to_destination(des,mess):
+    # destination='@innertest'
+    obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
+    
+    obj.send_message(des,mess,parse_mode='Markdown',disable_web_page_preview=True,reply_markup=reply_markup1)
 
 def auto_send_message(st):
     obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
     
-    obj.send_message('@namtestgroup',st, disable_web_page_preview=True,reply_markup=reply_markup)
+    obj.send_message('@namtestgroup',st,parse_mode='Markdown',disable_web_page_preview=True,reply_markup=reply_markup)
+
+def bot_push_message(link, user):
+    #trim input link
+    if link[-1] =='/':
+        link=link[:-1]
+    obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
+    sub_link = link[link.find('com/')+4:-1]
+    me='👤 '+user+ ' ✅ '+' Dx10 [{}]({})'.format(sub_link,link[5:])
+    print(me)
+    obj.send_message('@namtestgroup',me, parse_mode='Markdown',disable_web_page_preview=True,reply_markup=reply_markup)
 
 
 # this scripts used for testing 👤entrepreneurs_club01 ✅
 
 for i in range(10):
-    me='👤 '+a[i][0]+ ' ✅ '+'Dx10 '+ a[i][1]
-    auto_send_message(me)
+    wrap=a[i][1]
+    insta_name=wrap[wrap.find('com/')+4:-2]
+    me='👤 '+a[i][0]+ ' ✅ '+' Dx10 [{}]({})'.format(insta_name,a[i][1])
+    print(me)
+    # auto_send_message(me)
 #
 def auto_delete_message(mess_id):
     obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
     try:
-        obj.delete_message('@innertest',mess_id)
+        obj.delete_message('@namtestgroup',mess_id)
     except:
         print('message haven\'t been deleted yet')
 
@@ -136,6 +175,12 @@ def post_ad(ad):
         obj.send_message('@namtestgroup',ad, disable_web_page_preview=True)
         time.sleep(5*60)
 
+def extract_usr(a):
+    lit=[]
+    for i in a:
+        c=i[1]
+        lit.append(c[c.find('com/')+4:])
+    return lit
 def main():
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
