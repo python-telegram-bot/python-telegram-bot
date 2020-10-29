@@ -961,7 +961,7 @@ officedocument.wordprocessingml.document")``-
 
     private = _Private()
     """
-    Messages sent in a group or a supergroup chat.
+    Messages sent in a private chat.
 
     Note:
         DEPRECATED. Use
@@ -973,7 +973,7 @@ officedocument.wordprocessingml.document")``-
 
         def filter(self, message: Message) -> bool:
             warnings.warn(
-                'Filters.private is deprecated. Use Filters.chat_type.groups instead.',
+                'Filters.group is deprecated. Use Filters.chat_type.groups instead.',
                 TelegramDeprecationWarning,
                 stacklevel=2,
             )
