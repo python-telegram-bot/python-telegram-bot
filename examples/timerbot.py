@@ -42,6 +42,16 @@ def alarm(context):
     context.bot.send_message(job.context, text='Beep!')
 
 
+def remove_job_if_exists(name, context):
+    """Remove job with given name. Returns whether job was removed."""
+    current_jobs = context.job_queue.get_jobs_by_name(name)
+    if not current_jobs:
+        return False
+    for job in current_jobs:
+        job.schedule_removal()
+    return True
+
+
 def set_timer(update, context):
     """Add a job to the queue."""
     chat_id = update.message.chat_id
@@ -52,14 +62,13 @@ def set_timer(update, context):
             update.message.reply_text('Sorry we can not go back to future!')
             return
 
-        # Add job to queue and stop current one if there is a timer already
-        if 'job' in context.chat_data:
-            old_job = context.chat_data['job']
-            old_job.schedule_removal()
-        new_job = context.job_queue.run_once(alarm, due, context=chat_id)
-        context.chat_data['job'] = new_job
+        job_removed = remove_job_if_exists(str(chat_id), context)
+        context.job_queue.run_once(alarm, due, context=chat_id, name=str(chat_id))
 
-        update.message.reply_text('Timer successfully set!')
+        text = 'Timer successfully set!'
+        if job_removed:
+            text += ' Old one was removed.'
+        update.message.reply_text(text)
 
     except (IndexError, ValueError):
         update.message.reply_text('Usage: /set <seconds>')
@@ -67,15 +76,10 @@ def set_timer(update, context):
 
 def unset(update, context):
     """Remove the job if the user changed their mind."""
-    if 'job' not in context.chat_data:
-        update.message.reply_text('You have no active timer')
-        return
-
-    job = context.chat_data['job']
-    job.schedule_removal()
-    del context.chat_data['job']
-
-    update.message.reply_text('Timer successfully unset!')
+    chat_id = update.message.chat_id
+    job_removed = remove_job_if_exists(str(chat_id), context)
+    text = 'Timer successfully cancelled!' if job_removed else 'You have no active timer.'
+    update.message.reply_text(text)
 
 
 def main():
@@ -91,10 +95,8 @@ def main():
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", start))
-    dp.add_handler(
-        CommandHandler("set", set_timer, pass_args=True, pass_job_queue=True, pass_chat_data=True)
-    )
-    dp.add_handler(CommandHandler("unset", unset, pass_chat_data=True))
+    dp.add_handler(CommandHandler("set", set_timer))
+    dp.add_handler(CommandHandler("unset", unset))
 
     # Start the Bot
     updater.start_polling()

@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram User."""
 
-from telegram import TelegramObject
+from telegram import TelegramObject, constants
 from telegram.utils.helpers import mention_html as util_mention_html
 from telegram.utils.helpers import mention_markdown as util_mention_markdown
 
@@ -121,6 +121,20 @@ class User(TelegramObject):
         if self.username:
             return "https://t.me/{}".format(self.username)
         return None
+
+    @property
+    def is_anonymous_admin(self) -> bool:
+        """:obj:`bool`: Convenience property. Returns :obj:`True`, if this user is
+        an anonymous admin. This behaviour is undocumented and might be changed by Telegram."""
+
+        return self.id == constants.ANONYMOUS_ADMIN_ID
+
+    @property
+    def is_service_chat(self) -> bool:
+        """:obj:`bool`: Convenience property. Returns :obj:`True`, if this user is
+        the telegram service. This behaviour is undocumented and might be changed by Telegram."""
+
+        return self.id == constants.SERVICE_CHAT_ID
 
     def get_profile_photos(self, *args: Any, **kwargs: Any) -> 'UserProfilePhotos':
         """

@@ -19,11 +19,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Chat."""
 
-from telegram import TelegramObject, ChatPhoto
+from telegram import TelegramObject, ChatPhoto, constants
 from .chatpermissions import ChatPermissions
 
 from telegram.utils.types import JSONDict
-from typing import Any, Optional, List, TYPE_CHECKING
+from typing import Any, Optional, List, TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
     from telegram import Bot, Message, ChatMember
@@ -92,14 +92,14 @@ class Chat(TelegramObject):
 
     """
 
-    PRIVATE: str = 'private'
-    """:obj:`str`: 'private'"""
-    GROUP: str = 'group'
-    """:obj:`str`: 'group'"""
-    SUPERGROUP: str = 'supergroup'
-    """:obj:`str`: 'supergroup'"""
-    CHANNEL: str = 'channel'
-    """:obj:`str`: 'channel'"""
+    PRIVATE: ClassVar[str] = constants.CHAT_PRIVATE
+    """:const:`telegram.constants.CHAT_PRIVATE`"""
+    GROUP: ClassVar[str] = constants.CHAT_GROUP
+    """:const:`telegram.constants.CHAT_GROUP`"""
+    SUPERGROUP: ClassVar[str] = constants.CHAT_SUPERGROUP
+    """:const:`telegram.constants.CHAT_SUPERGROUP`"""
+    CHANNEL: ClassVar[str] = constants.CHAT_CHANNEL
+    """:const:`telegram.constants.CHAT_CHANNEL`"""
 
     def __init__(
         self,
@@ -149,6 +149,21 @@ class Chat(TelegramObject):
         if self.username:
             return "https://t.me/{}".format(self.username)
         return None
+
+    @property
+    def is_anonymous_admin(self) -> bool:
+        """:obj:`bool`: Convenience property. Returns :obj:`True`, if this chat is with is the bot
+        representing anonymous admins. This behaviour is undocumented and might be changed
+        by Telegram."""
+
+        return self.id == constants.ANONYMOUS_ADMIN_ID
+
+    @property
+    def is_service_chat(self) -> bool:
+        """:obj:`bool`: Convenience property. Returns :obj:`True`, if this chat is the Telegram
+        service chat. This behaviour is undocumented and might be changed by Telegram."""
+
+        return self.id == constants.SERVICE_CHAT_ID
 
     @classmethod
     def de_json(cls, data: JSONDict, bot: 'Bot') -> Optional['Chat']:

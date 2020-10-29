@@ -50,7 +50,7 @@ from telegram import ParseMode
 from telegram.utils.helpers import escape_markdown, to_timestamp, from_timestamp
 
 from telegram.utils.types import JSONDict
-from typing import Any, List, Dict, Optional, Union, TYPE_CHECKING
+from typing import Any, List, Dict, Optional, Union, TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
     from telegram import Bot, InputMedia, GameHighScore
@@ -259,7 +259,7 @@ class Message(TelegramObject):
 
     _effective_attachment = _UNDEFINED
 
-    ATTACHMENT_TYPES = [
+    ATTACHMENT_TYPES: ClassVar[List[str]] = [
         'audio',
         'game',
         'animation',
@@ -275,7 +275,7 @@ class Message(TelegramObject):
         'invoice',
         'successful_payment',
     ]
-    MESSAGE_TYPES = [
+    MESSAGE_TYPES: ClassVar[List[str]] = [
         'text',
         'new_chat_members',
         'left_chat_member',
@@ -1579,7 +1579,8 @@ class Message(TelegramObject):
                 markdown_text += message_text[last_offset:]
             else:
                 markdown_text += message_text[last_offset * 2 :].decode(  # type: ignore
-                    'utf-16-le')
+                    'utf-16-le'
+                )
 
         return markdown_text
 

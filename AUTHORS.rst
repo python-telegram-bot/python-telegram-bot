@@ -2,9 +2,12 @@ Credits
 =======
 
 ``python-telegram-bot`` was originally created by
-`Leandro Toledo <https://github.com/leandrotoledo>`_ and is now maintained by
+`Leandro Toledo <https://github.com/leandrotoledo>`_ and is now maintained by `Hinrich Mahler <https://github.com/Bibo-Joshi>`_.
+Emeritus maintainers include
 `Jannes Höke <https://github.com/jh0ker>`_ (`@jh0ker <https://t.me/jh0ker>`_ on Telegram),
-`Noam Meltzer <https://github.com/tsnoam>`_, `Pieter Schutz <https://github.com/eldinnie>`_, `Jasmin Bom <https://github.com/jsmnbom>`_ and `Hinrich Mahler <https://github.com/Bibo-Joshi>`_.
+`Noam Meltzer <https://github.com/tsnoam>`_, `Pieter Schutz <https://github.com/eldinnie>`_ and `Jasmin Bom <https://github.com/jsmnbom>`_.
+
+The maintainers are actively supported by `Poolitzer <https://github.com/Poolitzer>`_ in terms of development and community liaison.
 
 We're vendoring urllib3 as part of ``python-telegram-bot`` which is distributed under the MIT
 license. For more info, full credits & license terms, the sources can be found here:
@@ -63,6 +66,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Mischa Krüger <https://github.com/Makman2>`_
 - `naveenvhegde <https://github.com/naveenvhegde>`_
 - `neurrone <https://github.com/neurrone>`_
+- `NikitaPirate <https://github.com/NikitaPirate>`_
 - `njittam <https://github.com/njittam>`_
 - `Noam Meltzer <https://github.com/tsnoam>`_
 - `Oleg Shlyazhko <https://github.com/ollmer>`_
@@ -83,6 +87,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `sooyhwang <https://github.com/sooyhwang>`_
 - `syntx <https://github.com/syntx>`_
 - `thodnev <https://github.com/thodnev>`_
+- `Timur Kushukov <https://github.com/timqsh>`_
 - `Trainer Jono <https://github.com/Tr-Jono>`_
 - `Valentijn <https://github.com/Faalentijn>`_
 - `voider1 <https://github.com/voider1>`_
