@@ -16,17 +16,29 @@ if not client.is_user_authorized():
 for dialog in client.iter_dialogs():
     pass
 ##    print(dialog.name, 'has ID', dialog.id)
-
+# get message and extract from other groups
 def get_mes():   
     client.connect()
     mess=[]
-    i=1
-    for message in client.iter_messages('Followers Fx30',10,filter=InputMessagesFilterUrl):
+    for message in client.iter_messages('Testbot2',10,filter=InputMessagesFilterUrl):
         m=[]
-        # print(message.text.split(" ")[-1])
+        print(message.text.split(" ")[-1])
         tmp=message.text.split(" ")[-1]
-        m.append(tmp[2:tmp.find(']')])
+        m.append(tmp[1:tmp.find('](')])
         m.append(tmp[tmp.find('](')+2:tmp.find('))')])
+        mess.append(m)
+    return mess
+
+#get messages from my group
+def get_mes2():   
+    client.connect()
+    mess=[]
+    for message in client.iter_messages('Testbot2',10,filter=InputMessagesFilterUrl):
+        m=[]
+        print(message.text)
+        tmp=message.text.split(" ")
+        m.append(tmp[1])
+        m.append(tmp[4])
         mess.append(m)
     return mess
 def get_new_mes():
@@ -45,22 +57,18 @@ def return_list():
         print(i)
 
 # get_chat_mem()
-'''
-return_list()
-import time
-while True:
-    
-    a=get_mes()
-    b='.\n'+a[0]+'\n.'
-    client.send_message('Testbot2',a[0])
-    time.sleep(15*60)
-'''
-print(get_mes()[1][1])
 
+# print(get_mes2())
 print('-------------------------')
 # t='@'+a[6:a.find(']')]
 # # client.send_message('Testbot2',t)
 # # client.send_message('Testbot2',a[a.find('](')+2:a.find('))')])
 # print(a[6:a.find(']')])
 # print(a[a.find('](')+2:a.find('))')])
-
+print(get_mes())
+a=get_mes()
+lit=[]
+for i in a:
+    c=i[1]
+    lit.append(c[c.find('com/')+4:])
+print(lit)
