@@ -592,13 +592,15 @@ class TestFilters:
             Filters.group(update)
 
     @pytest.mark.parametrize(
-        ('chat_type, results'), [
+        ('chat_type, results'),
+        [
             (None, (False, False, False, False, False, False)),
             (Chat.PRIVATE, (True, True, False, False, False, False)),
             (Chat.GROUP, (True, False, True, False, True, False)),
             (Chat.SUPERGROUP, (True, False, False, True, True, False)),
             (Chat.CHANNEL, (True, False, False, False, False, True)),
-        ])
+        ],
+    )
     def test_filters_chat_types(self, update, chat_type, results):
         update.message.chat.type = chat_type
         assert Filters.chat_type(update) is results[0]
