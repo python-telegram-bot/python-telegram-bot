@@ -158,11 +158,11 @@ def mq(func: Callable[..., RT], *args: Any, **kwargs: Any) -> Callable[..., RT]:
                     is_group = False
 
             queue = self.message_queue.GROUP_QUEUE if is_group else delay_queue
-            return self.message_queue.process(  # type: ignore[return-value]
+            return self.message_queue.put(  # type: ignore[return-value]
                 func, queue, self, *args, **kwargs
             )
 
-        return self.message_queue.process(  # type: ignore[return-value]
+        return self.message_queue.put(  # type: ignore[return-value]
             func, delay_queue, self, *args, **kwargs
         )
 

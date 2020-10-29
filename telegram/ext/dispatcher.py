@@ -264,35 +264,38 @@ class Dispatcher:
 
             promise.run()
 
-            if not promise.exception:
-                self.update_persistence(update=promise.update)
-                continue
+            self.post_process_promise(promise)
 
-            if isinstance(promise.exception, DispatcherHandlerStop):
-                self.logger.warning(
-                    'DispatcherHandlerStop is not supported with async functions; func: %s',
-                    promise.pooled_function.__name__,
-                )
-                continue
+    def post_process_promise(self, promise: Promise) -> None:
+        if not promise.exception:
+            self.update_persistence(update=promise.update)
+            return
 
-            # Avoid infinite recursion of error handlers.
-            if promise.pooled_function in self.error_handlers:
-                self.logger.error('An uncaught error was raised while handling the error.')
-                continue
+        if isinstance(promise.exception, DispatcherHandlerStop):
+            self.logger.warning(
+                'DispatcherHandlerStop is not supported with async functions; func: %s',
+                promise.pooled_function.__name__,
+            )
+            return
 
-            # Don't perform error handling for a `Promise` with deactivated error handling. This
-            # should happen only via the deprecated `@run_async` decorator or `Promises` created
-            # within error handlers
-            if not promise.error_handling:
-                self.logger.error('A promise with deactivated error handling raised an error.')
-                continue
+        # Avoid infinite recursion of error handlers.
+        if promise.pooled_function in self.error_handlers:
+            self.logger.error('An uncaught error was raised while handling the error.')
+            return
 
-            # If we arrive here, an exception happened in the promise and was neither
-            # DispatcherHandlerStop nor raised by an error handler. So we can and must handle it
-            try:
-                self.dispatch_error(promise.update, promise.exception, promise=promise)
-            except Exception:
-                self.logger.exception('An uncaught error was raised while handling the error.')
+        # Don't perform error handling for a `Promise` with deactivated error handling. This
+        # should happen only via the deprecated `@run_async` decorator or `Promises` created
+        # within error handlers
+        if not promise.error_handling:
+            self.logger.error('A promise with deactivated error handling raised an error.')
+            return
+
+        # If we arrive here, an exception happened in the promise and was neither
+        # DispatcherHandlerStop nor raised by an error handler. So we can and must handle it
+        try:
+            self.dispatch_error(promise.update, promise.exception, promise=promise)
+        except Exception:
+            self.logger.exception('An uncaught error was raised while handling the error.')
 
     def run_async(
         self, func: Callable[..., Any], *args: Any, update: HandlerArg = None, **kwargs: Any
