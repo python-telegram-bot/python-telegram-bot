@@ -26,6 +26,8 @@ import telegram.message
 import telegram.chat
 import datetime
 import time
+
+from check_follow import check_follow_yet
 # from telethon.tl.functions.messages import GetHistoryRequest
 
 from telethon.tl.functions.channels import GetMessagesRequest
@@ -69,14 +71,14 @@ ad='🔥 Get more likes & comments by joining our other groups👇 \n \
 ❤️Happy engaging❤️ \n \
 🚀Viral Network🚀'
 ##print(a[0])
-keyboard = [[InlineKeyboardButton("✅   Rules   ✅", url='https://t.me/nam97hoai', callback_data='1'),
+keyboard = [[InlineKeyboardButton("✅   Rules   ✅", url='https://t.me/johntendo', callback_data='1'),
                  InlineKeyboardButton("📄   List    📄", url='https://t.me/hoai97nambot',callback_data='2')],
 
-                [InlineKeyboardButton("💎   Premium User    💎", url='https://t.me/hoai97nambot', callback_data='3')]]
+                [InlineKeyboardButton("💎   Premium User    💎", url='https://t.me/johntendo', callback_data='3')]]
 
 reply_markup = InlineKeyboardMarkup(keyboard)
 
-list_markup = [[InlineKeyboardButton("🚀 Dx10 Follow chain 🚀", url='https://t.me/hoai97nambot')]]
+list_markup = [[InlineKeyboardButton("🚀 Dx10 Follow chain 🚀", url='https://t.me/namtestgroup')]]
 reply_markup1 = InlineKeyboardMarkup(list_markup)
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
@@ -120,15 +122,18 @@ def check_condition_messtopost(link):
 #==========================================================================================
 def echo(update, context): # important info in this function
     """Echo the user message."""
-    a=update.message
-    print(type(a))
-    # check_condition_messtopost(update.message.text)
-    tele_usr='@'+ update.message.from_user.username
-    bot_push_message(update.message.text,tele_usr)
-    # update.message.reply_text(update.message.text)
-    time.sleep(5)
-    auto_delete_message(update.message.message_id)
-   
+    a=update.message.text
+    
+    if a[:4] == 'dx10' or a[:4] == 'Dx10':
+        # check_condition_messtopost(update.message.text)
+        if check_follow_yet(extract_usr):
+            tele_usr='@'+ update.message.from_user.username
+            bot_push_message(update.message.text,tele_usr)
+            # update.message.reply_text(update.message.text)
+            time.sleep(5)
+            auto_delete_message(update.message.message_id)
+    else:
+        auto_delete_message(update.message.message_id)
 def send_to_destination(des,mess):
     # destination='@innertest'
     obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
