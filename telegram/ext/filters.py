@@ -19,6 +19,7 @@
 """This module contains the Filters for use with the MessageHandler class."""
 
 import re
+import warnings
 
 from abc import ABC, abstractmethod
 from threading import Lock
@@ -35,6 +36,8 @@ __all__ = [
     'InvertedFilter',
     'MergedFilter',
 ]
+
+from telegram.utils.deprecate import TelegramDeprecationWarning
 
 
 class BaseFilter(ABC):
@@ -949,19 +952,103 @@ officedocument.wordprocessingml.document")``-
         name = 'Filters.private'
 
         def filter(self, message: Message) -> bool:
+            warnings.warn(
+                'Filters.private is deprecated. Use Filters.chat_type.private instead.',
+                TelegramDeprecationWarning,
+                stacklevel=2,
+            )
             return message.chat.type == Chat.PRIVATE
 
     private = _Private()
-    """Messages sent in a private chat."""
+    """
+    Messages sent in a private chat.
+
+    Note:
+        DEPRECATED. Use
+        :attr:`telegram.ext.Filters.chat_type.private` instead.
+    """
 
     class _Group(MessageFilter):
         name = 'Filters.group'
 
         def filter(self, message: Message) -> bool:
+            warnings.warn(
+                'Filters.group is deprecated. Use Filters.chat_type.groups instead.',
+                TelegramDeprecationWarning,
+                stacklevel=2,
+            )
             return message.chat.type in [Chat.GROUP, Chat.SUPERGROUP]
 
     group = _Group()
-    """Messages sent in a group chat."""
+    """
+    Messages sent in a group or a supergroup chat.
+
+    Note:
+        DEPRECATED. Use
+        :attr:`telegram.ext.Filters.chat_type.groups` instead.
+    """
+
+    class _ChatType(MessageFilter):
+        name = 'Filters.chat_type'
+
+        class _Channel(MessageFilter):
+            name = 'Filters.chat_type.channel'
+
+            def filter(self, message: Message) -> bool:
+                return message.chat.type == Chat.CHANNEL
+
+        channel = _Channel()
+
+        class _Group(MessageFilter):
+            name = 'Filters.chat_type.group'
+
+            def filter(self, message: Message) -> bool:
+                return message.chat.type == Chat.GROUP
+
+        group = _Group()
+
+        class _SuperGroup(MessageFilter):
+            name = 'Filters.chat_type.supergroup'
+
+            def filter(self, message: Message) -> bool:
+                return message.chat.type == Chat.SUPERGROUP
+
+        supergroup = _SuperGroup()
+
+        class _Groups(MessageFilter):
+            name = 'Filters.chat_type.groups'
+
+            def filter(self, message: Message) -> bool:
+                return message.chat.type in [Chat.GROUP, Chat.SUPERGROUP]
+
+        groups = _Groups()
+
+        class _Private(MessageFilter):
+            name = 'Filters.chat_type.private'
+
+            def filter(self, message: Message) -> bool:
+                return message.chat.type == Chat.PRIVATE
+
+        private = _Private()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.chat.type)
+
+    chat_type = _ChatType()
+    """Subset for filtering the type of chat.
+
+    Examples:
+        Use these filters like: ``Filters.chat_type.channel`` or
+        ``Filters.chat_type.supergroup`` etc. Or use just ``Filters.chat_type`` for all
+        chat types.
+
+    Attributes:
+        channel: Updates from channel
+        group: Updates from group
+        supergroup: Updates from supergroup
+        groups: Updates from group *or* supergroup
+        private: Updates sent in private chat
+    """
 
     class user(MessageFilter):
         """Filters messages to allow only those which are from specified user ID(s) or
