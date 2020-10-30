@@ -506,6 +506,10 @@ class Filters:
                 match = self.pattern.search(message.text)
                 if match:
                     return {'matches': [match]}
+            elif message.caption:
+                match = self.pattern.search(message.caption)
+                if match:
+                    return {'matches': [match]}
             return {}
 
     class _Reply(MessageFilter):
