@@ -63,7 +63,7 @@ def check_follow_yet(list1):
         return 1
     else:   
         print('inacceptable !!! check step-2')
-        tmp2=set(check_follower(list1))
+        tmp2=set(check_follower_step2(list1))
         if len(tmp2) == 1:
             print('acceptable')
             return 1
