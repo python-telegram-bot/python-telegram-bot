@@ -43,6 +43,16 @@ def get_latest_follower(list_1):
         latest_follower_list.append(API.LastJson['users'][0]['username'])
     return latest_follower_list
 
+def check_follower_step2(list_1):
+    check_in=[]
+    for i in list_1:
+        API.searchUsername(i)
+        # print(API.LastJson['user']['pk'])
+        uid=API.LastJson['user']['pk']
+        #get user followings
+        API.getUserFollowers(uid)
+        check_in.append(str(API.LastJson['users']).find(i))
+    return check_in
 # list 1 is target user given to user who call '/list' command
 def check_follow_yet(list1): 
     tmp = get_latest_follower(list1)
@@ -52,6 +62,10 @@ def check_follow_yet(list1):
         print('acceptable')
         return 1
     else:   
-        print('inacceptable')
-        return 0
+        print('inacceptable !!! check step-2')
+        tmp2=set(check_follower(list1))
+        if len(tmp2) == 1:
+            print('acceptable')
+            return 1
+    return 0
 
