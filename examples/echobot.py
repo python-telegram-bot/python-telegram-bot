@@ -130,7 +130,7 @@ def echo(update, context): # important info in this function
         a=a[:-1]
     if a[:4] == 'dx10' or a[:4] == 'Dx10':
         # check_condition_messtopost(update.message.text)
-        if check_follow_yet(extract_usr) and check_profile_link(a):
+        if check_follow_yet(extract_usr(a) and check_profile_link(a):
             tele_usr='@'+ update.message.from_user.username
             bot_push_message(update.message.text,tele_usr)
             # update.message.reply_text(update.message.text)
