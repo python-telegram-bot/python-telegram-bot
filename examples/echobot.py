@@ -32,13 +32,16 @@ from check_follow import check_follow_yet
 
 from telethon.tl.functions.channels import GetMessagesRequest
 
-# obj=telegram.Message('@namtestgroup',from_user=None,date=datetime.datetime.date,chat=telegram.chat.Chat)
-# print(obj)
+#obj=telegram.Message(-1001192378669,from_user=None,date=datetime.datetime.date,chat=telegram.chat.Chat)
+#print(obj)
 obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
 # get name by username id
 
-print(obj.get_chat_member('@namtestgroup',1034090550).user.username) # viettelnguyen
-# print(obj.get_chat('@namtestgroup'))
+print(obj.get_chat_member('@namtestgroup',1098222229).user.username) # viettelnguyen
+print(obj.get_chat_member('@namtestgroup',1098222229))
+
+print('.........................................................')
+#auto_delete_message('1098222229') #delete warning from bot
 '''
 sec=GetMessagesRequest('@namtestgroup',id=[42])
 print('getMessageRequest -',sec)
@@ -126,14 +129,17 @@ def echo(update, context): # important info in this function
     
     if a[:4] == 'dx10' or a[:4] == 'Dx10':
         # check_condition_messtopost(update.message.text)
-        if check_follow_yet(extract_usr):
+        if check_follow_yet(extract_usr) and check_profile_link(a):
             tele_usr='@'+ update.message.from_user.username
             bot_push_message(update.message.text,tele_usr)
             # update.message.reply_text(update.message.text)
             time.sleep(5)
             auto_delete_message(update.message.message_id)
     else:
+        update.message.reply_text('Wrong syntax !!!\n Please check again or read our rules')
+    
         auto_delete_message(update.message.message_id)
+        auto_delete_message(update.message.message_id+1)
 def send_to_destination(des,mess):
     # destination='@innertest'
     obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
@@ -186,6 +192,12 @@ def extract_usr(a):
         c=i[1]
         lit.append(c[c.find('com/')+4:])
     return lit
+
+def check_profile_link(link):
+    if link[31:32] != 'p' and link.find('https://www.instagram.com/'):
+        return 0
+    return 1
+    
 def main():
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
@@ -218,4 +230,3 @@ def main():
 if __name__ == '__main__':
     main()
     # post_ad(ad)
-    
