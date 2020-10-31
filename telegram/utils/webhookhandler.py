@@ -25,7 +25,7 @@ import sys
 from queue import Queue
 from ssl import SSLContext
 from threading import Event, Lock
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Optional
 
 import tornado.web
 from tornado import httputil
@@ -51,7 +51,7 @@ class WebhookServer:
         self.http_server = HTTPServer(webhook_app, ssl_options=ssl_ctx)
         self.listen = listen
         self.port = port
-        self.loop = None
+        self.loop: Optional[IOLoop] = None
         self.logger = logging.getLogger(__name__)
         self.is_running = False
         self.server_lock = Lock()
@@ -68,7 +68,7 @@ class WebhookServer:
             if ready is not None:
                 ready.set()
 
-            self.loop.start()  # type: ignore
+            self.loop.start()
             self.logger.debug('Webhook Server stopped.')
             self.is_running = False
 
@@ -122,7 +122,8 @@ class WebhookServer:
                 and hasattr(asyncio, 'WindowsProactorEventLoopPolicy')
                 and (
                     isinstance(
-                        asyncio.get_event_loop_policy(), asyncio.WindowsProactorEventLoopPolicy
+                        asyncio.get_event_loop_policy(),
+                        asyncio.WindowsProactorEventLoopPolicy,  # pylint: disable=E1101
                     )
                 )
             ):  # pylint: disable=E1101
@@ -139,15 +140,16 @@ class WebhookAppClass(tornado.web.Application):
     def __init__(self, webhook_path: str, bot: 'Bot', update_queue: Queue):
         self.shared_objects = {"bot": bot, "update_queue": update_queue}
         handlers = [(r"{}/?".format(webhook_path), WebhookHandler, self.shared_objects)]  # noqa
-        tornado.web.Application.__init__(self, handlers)
+        tornado.web.Application.__init__(self, handlers)  # type: ignore[arg-type]
 
     def log_request(self, handler: tornado.web.RequestHandler) -> None:
         pass
 
 
 # WebhookHandler, process webhook calls
+# pylint: disable=W0223
 class WebhookHandler(tornado.web.RequestHandler):
-    SUPPORTED_METHODS = ["POST"]
+    SUPPORTED_METHODS = ["POST"]  # type: ignore[assignment]
 
     def __init__(
         self,
