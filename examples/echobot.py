@@ -197,8 +197,8 @@ def extract_usr(a):
 
 def check_profile_link(link):
     if link.find('https://www.instagram.com/') and check_profile(link[31:]):
-        return 0
-    return 1
+        return 1
+    return 0
     
 def main():
     """Start the bot."""
