@@ -387,8 +387,10 @@ class PrefixHandler(CommandHandler):
     def prefix(self, prefix: Union[str, List[str], Tuple[str]]) -> None:
         if isinstance(prefix, str):
             self._prefix = [prefix.lower()]
-        else:
+        elif isinstance(prefix, list):
             self._prefix = prefix
+        else:
+            self._prefix = list(prefix)
         self._build_commands()
 
     @property  # type: ignore[override]
@@ -405,8 +407,10 @@ class PrefixHandler(CommandHandler):
     def command(self, command: Union[str, List[str], Tuple[str]]) -> None:
         if isinstance(command, str):
             self._command = [command.lower()]
-        else:
+        elif isinstance(command, list):
             self._command = command
+        else:
+            self._command = list(command)
         self._build_commands()
 
     def _build_commands(self) -> None:

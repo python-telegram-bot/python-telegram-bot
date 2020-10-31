@@ -24,7 +24,19 @@ import warnings
 
 from abc import ABC, abstractmethod
 from threading import Lock
-from typing import Dict, FrozenSet, List, Match, Optional, Pattern, Set, Tuple, Union, cast
+from typing import (
+    Dict,
+    FrozenSet,
+    Iterable,
+    List,
+    Match,
+    Optional,
+    Pattern,
+    Set,
+    Tuple,
+    Union,
+    cast,
+)
 
 from telegram import Chat, Message, MessageEntity, Update
 
@@ -280,7 +292,12 @@ class _DiceEmoji(MessageFilter):
         self.emoji = emoji
 
     class _DiceValues(MessageFilter):
-        def __init__(self, values: Union[int, List[int], Tuple[int]], name: str, emoji: str = None):
+        def __init__(
+            self,
+            values: Union[int, List[int], Tuple[int]],
+            name: str,
+            emoji: str = None,
+        ):
             self.values = [values] if isinstance(values, int) else values
             self.emoji = emoji
             self.name = '{}({})'.format(name, values)
@@ -330,8 +347,8 @@ class Filters:
         name = 'Filters.text'
 
         class _TextStrings(MessageFilter):
-            def __init__(self, strings: List[str]):
-                self.strings = strings
+            def __init__(self, strings: Iterable[str]):
+                self.strings = list(strings)
                 self.name = 'Filters.text({})'.format(strings)
 
             def filter(self, message: Message) -> bool:
@@ -381,8 +398,8 @@ class Filters:
         name = 'Filters.caption'
 
         class _CaptionStrings(MessageFilter):
-            def __init__(self, strings: List[str]):
-                self.strings = strings
+            def __init__(self, strings: Union[List[str], Tuple[str]]):
+                self.strings = list(strings)
                 self.name = 'Filters.caption({})'.format(strings)
 
             def filter(self, message: Message) -> bool:
@@ -1665,29 +1682,25 @@ officedocument.wordprocessingml.document")``-
             ``MessageHandler(Filters.language("en"), callback_method)``
 
         Args:
-            lang (:obj:`str` | List[:obj:`str`]): Which language code(s) to allow through. This
+            lang (:obj:`str` | Iterable[:obj:`str`]): Which language code(s) to allow through. This
                 will be matched using ``.startswith`` meaning that 'en' will match both 'en_US'
                 and 'en_GB'.
 
         """
 
-        def __init__(self, lang: Union[str, List[str], Tuple[str]]):
+        def __init__(self, lang: Union[str, Iterable[str]]):
             if isinstance(lang, str):
-                lang = cast(str, lang)
                 self.lang = [lang]
-            elif isinstance(lang, List[str]):
-                lang = cast(List[str], lang)
-                self.lang = lang
             else:
-                lang = cast(Tuple[str], lang)
+                lang = list(lang)
                 self.lang = lang
-            self.name = 'Filters.language({})'.format(self.lang)
+            self.name = 'Filters.language({})'.format(lang)
 
         def filter(self, message: Message) -> bool:
             """"""  # remove method from docs
             return bool(
                 message.from_user.language_code
-                and any([message.from_user.language_code.startswith(x) for x in self.lang])
+                and any(message.from_user.language_code.startswith(x) for x in self.lang)
             )
 
     class _UpdateType(UpdateFilter):
