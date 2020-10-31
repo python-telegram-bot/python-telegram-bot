@@ -70,7 +70,7 @@ class Defaults:
         # default values for timeout (None and 20s)
         timeout: Union[float, DefaultValue] = DEFAULT_NONE,
         quote: bool = None,
-        tzinfo: pytz.BaseTzInfo = pytz.utc,
+        tzinfo: pytz.tzinfo.BaseTzInfo = pytz.utc,
     ):
         self._parse_mode = parse_mode
         self._disable_notification = disable_notification

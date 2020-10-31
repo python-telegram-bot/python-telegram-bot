@@ -95,7 +95,7 @@ def _datetime_to_float_timestamp(dt_obj: dtm.datetime) -> float:
 def to_float_timestamp(
     t: Union[int, float, dtm.timedelta, dtm.datetime, dtm.time],
     reference_timestamp: float = None,
-    tzinfo: pytz.BaseTzInfo = None,
+    tzinfo: pytz.tzinfo.BaseTzInfo = None,
 ) -> float:
     """
     Converts a given time object to a float POSIX timestamp.
@@ -180,7 +180,7 @@ def to_float_timestamp(
 def to_timestamp(
     dt_obj: Union[int, float, dtm.timedelta, dtm.datetime, dtm.time, None],
     reference_timestamp: float = None,
-    tzinfo: pytz.BaseTzInfo = None,
+    tzinfo: pytz.tzinfo.BaseTzInfo = None,
 ) -> Optional[int]:
     """
     Wrapper over :func:`to_float_timestamp` which returns an integer (the float value truncated
