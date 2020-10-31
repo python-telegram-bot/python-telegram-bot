@@ -126,7 +126,8 @@ def check_condition_messtopost(link):
 def echo(update, context): # important info in this function
     """Echo the user message."""
     a=update.message.text
-    
+    if a[-1]=='/':
+        a=a[:-1]
     if a[:4] == 'dx10' or a[:4] == 'Dx10':
         # check_condition_messtopost(update.message.text)
         if check_follow_yet(extract_usr) and check_profile_link(a):
@@ -194,7 +195,7 @@ def extract_usr(a):
     return lit
 
 def check_profile_link(link):
-    if link[31:32] != 'p' and link.find('https://www.instagram.com/'):
+    if link.find('https://www.instagram.com/') and check_profile(link[31:]):
         return 0
     return 1
     
