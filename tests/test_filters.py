@@ -24,6 +24,8 @@ from telegram import Message, User, Chat, MessageEntity, Document, Update, Dice
 from telegram.ext import Filters, BaseFilter, MessageFilter, UpdateFilter
 import re
 
+from telegram.utils.deprecate import TelegramDeprecationWarning
+
 
 @pytest.fixture(scope='function')
 def update():
@@ -574,12 +576,39 @@ class TestFilters:
         update.message.chat.type = 'group'
         assert not Filters.private(update)
 
+    def test_private_filter_deprecation(self, update):
+        with pytest.warns(TelegramDeprecationWarning):
+            Filters.private(update)
+
     def test_group_filter(self, update):
         assert not Filters.group(update)
         update.message.chat.type = 'group'
         assert Filters.group(update)
         update.message.chat.type = 'supergroup'
         assert Filters.group(update)
+
+    def test_group_filter_deprecation(self, update):
+        with pytest.warns(TelegramDeprecationWarning):
+            Filters.group(update)
+
+    @pytest.mark.parametrize(
+        ('chat_type, results'),
+        [
+            (None, (False, False, False, False, False, False)),
+            (Chat.PRIVATE, (True, True, False, False, False, False)),
+            (Chat.GROUP, (True, False, True, False, True, False)),
+            (Chat.SUPERGROUP, (True, False, False, True, True, False)),
+            (Chat.CHANNEL, (True, False, False, False, False, True)),
+        ],
+    )
+    def test_filters_chat_types(self, update, chat_type, results):
+        update.message.chat.type = chat_type
+        assert Filters.chat_type(update) is results[0]
+        assert Filters.chat_type.private(update) is results[1]
+        assert Filters.chat_type.group(update) is results[2]
+        assert Filters.chat_type.supergroup(update) is results[3]
+        assert Filters.chat_type.groups(update) is results[4]
+        assert Filters.chat_type.channel(update) is results[5]
 
     def test_filters_user_init(self):
         with pytest.raises(RuntimeError, match='in conjunction with'):
