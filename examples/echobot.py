@@ -136,6 +136,7 @@ def echo(update, context): # important info in this function
             # update.message.reply_text(update.message.text)
             time.sleep(5)
             auto_delete_message(update.message.message_id)
+#else: check following reasons: 1. no enough follow\n2. input link with non-exist profile\n3. wrong syntax
     else:
         update.message.reply_text('Wrong syntax !!!\n Please check again or read our rules')
     
