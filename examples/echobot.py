@@ -158,7 +158,7 @@ def bot_push_message(link, user):
     if link[-1] =='/':
         link=link[:-1]
     obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
-    sub_link = link[link.find('com/')+4:-1]
+    sub_link = link[link.find('com/')+4:]
     me='👤 '+user+ ' ✅ '+' Dx10 [{}]({})'.format(sub_link,link[5:])
     print(me)
     obj.send_message('@namtestgroup',me, parse_mode='Markdown',disable_web_page_preview=True,reply_markup=reply_markup)
