@@ -68,4 +68,3 @@ def check_follow_yet(list1):
             print('acceptable')
             return 1
     return 0
-
