@@ -19,14 +19,14 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram User."""
 
+from typing import TYPE_CHECKING, Any, List, Optional
+
 from telegram import TelegramObject, constants
 from telegram.utils.helpers import mention_html as util_mention_html
 from telegram.utils.helpers import mention_markdown as util_mention_markdown
 
-from typing import Any, Optional, TYPE_CHECKING, List
-
 if TYPE_CHECKING:
-    from telegram import Bot, UserProfilePhotos, Message
+    from telegram import Bot, Message, UserProfilePhotos
 
 
 class User(TelegramObject):
@@ -68,7 +68,7 @@ class User(TelegramObject):
     """
 
     def __init__(
-        self,
+        self,  # pylint: disable=W0613
         id: int,
         first_name: str,
         is_bot: bool,

@@ -18,9 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram OrderInfo."""
 
-from telegram import TelegramObject, ShippingAddress
+from typing import TYPE_CHECKING, Any, Optional
+
+from telegram import ShippingAddress, TelegramObject
 from telegram.utils.types import JSONDict
-from typing import Any, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -49,7 +50,7 @@ class OrderInfo(TelegramObject):
     """
 
     def __init__(
-        self,
+        self,  # pylint: disable=W0613
         name: str = None,
         phone_number: str = None,
         email: str = None,

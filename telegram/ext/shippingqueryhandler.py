@@ -19,9 +19,9 @@
 """This module contains the ShippingQueryHandler class."""
 
 from telegram import Update
-from .handler import Handler
-
 from telegram.utils.types import HandlerArg
+
+from .handler import Handler
 
 
 class ShippingQueryHandler(Handler):

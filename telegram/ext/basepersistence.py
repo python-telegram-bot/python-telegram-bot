@@ -21,10 +21,10 @@
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from copy import copy
+from typing import Any, DefaultDict, Dict, Optional, Tuple, cast, ClassVar
 
 from telegram import Bot
 
-from typing import DefaultDict, Dict, Any, Tuple, Optional, cast, ClassVar
 from telegram.utils.types import ConversationDict
 
 
@@ -73,7 +73,7 @@ class BasePersistence(ABC):
             persistence class. Default is :obj:`True` .
     """
 
-    def __new__(cls, *args: Any, **kwargs: Any) -> 'BasePersistence':
+    def __new__(cls, *args: Any, **kwargs: Any) -> 'BasePersistence':  # pylint: disable=W0613
         instance = super().__new__(cls)
         get_user_data = instance.get_user_data
         get_chat_data = instance.get_chat_data
@@ -150,8 +150,8 @@ class BasePersistence(ABC):
         if isinstance(obj, (dict, defaultdict)):
             new_obj = cast(dict, new_obj)
             new_obj.clear()
-            for k, v in obj.items():
-                new_obj[cls.replace_bot(k)] = cls.replace_bot(v)
+            for k, val in obj.items():
+                new_obj[cls.replace_bot(k)] = cls.replace_bot(val)
             return new_obj
         if hasattr(obj, '__dict__'):
             for attr_name, attr in new_obj.__dict__.items():
@@ -168,7 +168,7 @@ class BasePersistence(ABC):
 
         return obj
 
-    def insert_bot(self, obj: object) -> object:
+    def insert_bot(self, obj: object) -> object:  # pylint: disable=R0911
         """
         Replaces all instances of :attr:`REPLACED_BOT` that occur within the passed object with
         :attr:`bot`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
@@ -192,8 +192,8 @@ class BasePersistence(ABC):
         if isinstance(obj, (dict, defaultdict)):
             new_obj = cast(dict, new_obj)
             new_obj.clear()
-            for k, v in obj.items():
-                new_obj[self.insert_bot(k)] = self.insert_bot(v)
+            for k, val in obj.items():
+                new_obj[self.insert_bot(k)] = self.insert_bot(val)
             return new_obj
         if hasattr(obj, '__dict__'):
             for attr_name, attr in new_obj.__dict__.items():
@@ -300,7 +300,6 @@ class BasePersistence(ABC):
         persistence a chance to finish up saving or close a database connection gracefully. If this
         is not of any importance just pass will be sufficient.
         """
-        pass
 
     REPLACED_BOT: ClassVar[str] = 'bot_instance_replaced_by_ptb_persistence'
     """:obj:`str`: Placeholder for :class:`telegram.Bot` instances replaced in saved data."""

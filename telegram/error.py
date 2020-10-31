@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+# pylint: disable=C0115
 """This module contains an object that represents Telegram errors."""
 from typing import Tuple
 
@@ -122,9 +123,6 @@ class Conflict(TelegramError):
         msg (:obj:`str`): The message from telegrams server.
 
     """
-
-    def __init__(self, msg: str):
-        super().__init__(msg)
 
     def __reduce__(self) -> Tuple[type, Tuple[str]]:
         return self.__class__, (self.message,)

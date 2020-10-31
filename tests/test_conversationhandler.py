@@ -568,12 +568,14 @@ class TestConversationHandler:
         assert len(handler.conversations) == 0
 
     def test_end_on_first_message_async(self, dp, bot, user1):
-        start_end_async = lambda bot, update: dp.run_async(  # noqa: E731
-            self.start_end, bot, update
-        )
-
         handler = ConversationHandler(
-            entry_points=[CommandHandler('start', start_end_async)], states={}, fallbacks=[]
+            entry_points=[
+                CommandHandler(
+                    'start', lambda bot, update: dp.run_async(self.start_end, bot, update)
+                )
+            ],
+            states={},
+            fallbacks=[],
         )
         dp.add_handler(handler)
 
@@ -647,12 +649,14 @@ class TestConversationHandler:
         assert len(handler.conversations) == 0
 
     def test_none_on_first_message_async(self, dp, bot, user1):
-        start_none_async = lambda bot, update: dp.run_async(  # noqa: E731
-            self.start_none, bot, update
-        )
-
         handler = ConversationHandler(
-            entry_points=[CommandHandler('start', start_none_async)], states={}, fallbacks=[]
+            entry_points=[
+                CommandHandler(
+                    'start', lambda bot, update: dp.run_async(self.start_none, bot, update)
+                )
+            ],
+            states={},
+            fallbacks=[],
         )
         dp.add_handler(handler)
 
@@ -815,7 +819,7 @@ class TestConversationHandler:
             assert handler.conversations.get((self.group.id, user1.id)) is None
         assert len(caplog.records) == 1
         rec = caplog.records[-1]
-        assert rec.msg.startswith('DispatcherHandlerStop in TIMEOUT')
+        assert rec.getMessage().startswith('DispatcherHandlerStop in TIMEOUT')
 
     def test_conversation_handler_timeout_update_and_context(self, cdp, bot, user1):
         context = None

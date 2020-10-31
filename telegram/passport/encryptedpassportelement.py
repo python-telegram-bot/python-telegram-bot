@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram EncryptedPassportElement."""
 from base64 import b64decode
+from typing import TYPE_CHECKING, Any, List, Optional
 
 from telegram import (
     IdDocumentData,
@@ -27,9 +28,7 @@ from telegram import (
     TelegramObject,
 )
 from telegram.passport.credentials import decrypt_json
-
 from telegram.utils.types import JSONDict
-from typing import List, Any, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from telegram import Bot, Credentials
@@ -49,7 +48,8 @@ class EncryptedPassportElement(TelegramObject):
             "identity_card", "internal_passport", "address", "utility_bill", "bank_statement",
             "rental_agreement", "passport_registration", "temporary_registration", "phone_number",
             "email".
-        data (:class:`telegram.PersonalDetails` or :class:`telegram.IdDocument` or :class:`telegram.ResidentialAddress` or :obj:`str`):
+        data (:class:`telegram.PersonalDetails` | :class:`telegram.IdDocument` | \
+            :class:`telegram.ResidentialAddress` | :obj:`str`):
             Optional. Decrypted or encrypted data, available for "personal_details", "passport",
             "driver_license", "identity_card", "identity_passport" and "address" types.
         phone_number (:obj:`str`): Optional. User's verified phone number, available only for
@@ -82,7 +82,8 @@ class EncryptedPassportElement(TelegramObject):
             "identity_card", "internal_passport", "address", "utility_bill", "bank_statement",
             "rental_agreement", "passport_registration", "temporary_registration", "phone_number",
             "email".
-        data (:class:`telegram.PersonalDetails` or :class:`telegram.IdDocument` or :class:`telegram.ResidentialAddress` or :obj:`str`, optional):
+        data (:class:`telegram.PersonalDetails` | :class:`telegram.IdDocument` | \
+            :class:`telegram.ResidentialAddress` | :obj:`str`, optional):
             Decrypted or encrypted data, available for "personal_details", "passport",
             "driver_license", "identity_card", "identity_passport" and "address" types.
         phone_number (:obj:`str`, optional): User's verified phone number, available only for
@@ -117,8 +118,8 @@ class EncryptedPassportElement(TelegramObject):
     """
 
     def __init__(
-        self,
-        type: str,
+        self,  # pylint: disable=W0613
+        type: str,  # pylint: disable=W0622
         data: PersonalDetails = None,
         phone_number: str = None,
         email: str = None,
@@ -127,9 +128,9 @@ class EncryptedPassportElement(TelegramObject):
         reverse_side: PassportFile = None,
         selfie: PassportFile = None,
         translation: List[PassportFile] = None,
-        hash: str = None,
+        hash: str = None,  # pylint: disable=W0622
         bot: 'Bot' = None,
-        credentials: 'Credentials' = None,
+        credentials: 'Credentials' = None,  # pylint: disable=W0613
         **kwargs: Any,
     ):
         # Required

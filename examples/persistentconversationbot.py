@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# pylint: disable=W0613, C0116, C0103
+# type: ignore[union-attr]
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -14,7 +16,9 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 
-from telegram import ReplyKeyboardMarkup
+import logging
+
+from telegram import ReplyKeyboardMarkup, Update
 from telegram.ext import (
     Updater,
     CommandHandler,
@@ -22,9 +26,9 @@ from telegram.ext import (
     Filters,
     ConversationHandler,
     PicklePersistence,
+    CallbackContext,
 )
 
-import logging
 
 # Enable logging
 logging.basicConfig(
@@ -52,7 +56,7 @@ def facts_to_str(user_data):
     return "\n".join(facts).join(['\n', '\n'])
 
 
-def start(update, context):
+def start(update: Update, context: CallbackContext) -> None:
     reply_text = "Hi! My name is Doctor Botter."
     if context.user_data:
         reply_text += (
@@ -70,7 +74,7 @@ def start(update, context):
     return CHOOSING
 
 
-def regular_choice(update, context):
+def regular_choice(update: Update, context: CallbackContext) -> None:
     text = update.message.text.lower()
     context.user_data['choice'] = text
     if context.user_data.get(text):
@@ -84,7 +88,7 @@ def regular_choice(update, context):
     return TYPING_REPLY
 
 
-def custom_choice(update, context):
+def custom_choice(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(
         'Alright, please send me the category first, ' 'for example "Most impressive skill"'
     )
@@ -92,7 +96,7 @@ def custom_choice(update, context):
     return TYPING_CHOICE
 
 
-def received_information(update, context):
+def received_information(update: Update, context: CallbackContext) -> None:
     text = update.message.text
     category = context.user_data['choice']
     context.user_data[category] = text.lower()
@@ -109,13 +113,13 @@ def received_information(update, context):
     return CHOOSING
 
 
-def show_data(update, context):
+def show_data(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(
         "This is what you already told me:" "{}".format(facts_to_str(context.user_data))
     )
 
 
-def done(update, context):
+def done(update: Update, context: CallbackContext) -> None:
     if 'choice' in context.user_data:
         del context.user_data['choice']
 

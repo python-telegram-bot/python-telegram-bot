@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# pylint: disable=W0613, C0116
+# type: ignore[union-attr]
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -16,8 +18,15 @@ bot.
 
 import logging
 
-from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
+from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
+from telegram.ext import (
+    Updater,
+    CommandHandler,
+    MessageHandler,
+    Filters,
+    ConversationHandler,
+    CallbackContext,
+)
 
 # Enable logging
 logging.basicConfig(
@@ -29,7 +38,7 @@ logger = logging.getLogger(__name__)
 GENDER, PHOTO, LOCATION, BIO = range(4)
 
 
-def start(update, context):
+def start(update: Update, context: CallbackContext) -> int:
     reply_keyboard = [['Boy', 'Girl', 'Other']]
 
     update.message.reply_text(
@@ -42,7 +51,7 @@ def start(update, context):
     return GENDER
 
 
-def gender(update, context):
+def gender(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     logger.info("Gender of %s: %s", user.first_name, update.message.text)
     update.message.reply_text(
@@ -54,7 +63,7 @@ def gender(update, context):
     return PHOTO
 
 
-def photo(update, context):
+def photo(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     photo_file = update.message.photo[-1].get_file()
     photo_file.download('user_photo.jpg')
@@ -66,7 +75,7 @@ def photo(update, context):
     return LOCATION
 
 
-def skip_photo(update, context):
+def skip_photo(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     logger.info("User %s did not send a photo.", user.first_name)
     update.message.reply_text(
@@ -76,7 +85,7 @@ def skip_photo(update, context):
     return LOCATION
 
 
-def location(update, context):
+def location(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     user_location = update.message.location
     logger.info(
@@ -89,7 +98,7 @@ def location(update, context):
     return BIO
 
 
-def skip_location(update, context):
+def skip_location(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     logger.info("User %s did not send a location.", user.first_name)
     update.message.reply_text(
@@ -99,7 +108,7 @@ def skip_location(update, context):
     return BIO
 
 
-def bio(update, context):
+def bio(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     logger.info("Bio of %s: %s", user.first_name, update.message.text)
     update.message.reply_text('Thank you! I hope we can talk again some day.')
@@ -107,7 +116,7 @@ def bio(update, context):
     return ConversationHandler.END
 
 
-def cancel(update, context):
+def cancel(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)
     update.message.reply_text(
@@ -117,14 +126,14 @@ def cancel(update, context):
     return ConversationHandler.END
 
 
-def main():
+def main() -> None:
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
     updater = Updater("TOKEN", use_context=True)
 
     # Get the dispatcher to register handlers
-    dp = updater.dispatcher
+    dispatcher = updater.dispatcher
 
     # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
     conv_handler = ConversationHandler(
@@ -141,7 +150,7 @@ def main():
         fallbacks=[CommandHandler('cancel', cancel)],
     )
 
-    dp.add_handler(conv_handler)
+    dispatcher.add_handler(conv_handler)
 
     # Start the Bot
     updater.start_polling()

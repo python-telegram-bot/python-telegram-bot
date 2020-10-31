@@ -16,29 +16,32 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+# pylint: disable=E0401, C0114
+
 import asyncio
+import logging
 import os
 import sys
-import logging
+from queue import Queue
+from ssl import SSLContext
+from threading import Event, Lock
+from typing import TYPE_CHECKING, Any, Optional
+
+import tornado.web
+from tornado import httputil
+from tornado.httpserver import HTTPServer
+from tornado.ioloop import IOLoop
+
 from telegram import Update
-from threading import Lock, Event
+from telegram.utils.types import JSONDict
+
+if TYPE_CHECKING:
+    from telegram import Bot
 
 try:
     import ujson as json
 except ImportError:
     import json  # type: ignore[no-redef]
-from tornado.httpserver import HTTPServer
-from tornado.ioloop import IOLoop
-import tornado.web
-
-from ssl import SSLContext
-from queue import Queue
-from telegram.utils.types import JSONDict
-from typing import Any, TYPE_CHECKING
-from tornado import httputil
-
-if TYPE_CHECKING:
-    from telegram import Bot
 
 
 class WebhookServer:
@@ -48,7 +51,7 @@ class WebhookServer:
         self.http_server = HTTPServer(webhook_app, ssl_options=ssl_ctx)
         self.listen = listen
         self.port = port
-        self.loop = None
+        self.loop: Optional[IOLoop] = None
         self.logger = logging.getLogger(__name__)
         self.is_running = False
         self.server_lock = Lock()
@@ -65,7 +68,7 @@ class WebhookServer:
             if ready is not None:
                 ready.set()
 
-            self.loop.start()  # type: ignore
+            self.loop.start()
             self.logger.debug('Webhook Server stopped.')
             self.is_running = False
 
@@ -74,10 +77,9 @@ class WebhookServer:
             if not self.is_running:
                 self.logger.warning('Webhook Server already stopped.')
                 return
-            else:
-                self.loop.add_callback(self.loop.stop)  # type: ignore
+            self.loop.add_callback(self.loop.stop)  # type: ignore
 
-    def handle_error(self, request: Any, client_address: str) -> None:
+    def handle_error(self, request: Any, client_address: str) -> None:  # pylint: disable=W0613
         """Handle an error gracefully."""
         self.logger.debug(
             'Exception happened during processing of request from %s',
@@ -120,7 +122,8 @@ class WebhookServer:
                 and hasattr(asyncio, 'WindowsProactorEventLoopPolicy')
                 and (
                     isinstance(
-                        asyncio.get_event_loop_policy(), asyncio.WindowsProactorEventLoopPolicy
+                        asyncio.get_event_loop_policy(),
+                        asyncio.WindowsProactorEventLoopPolicy,  # pylint: disable=E1101
                     )
                 )
             ):  # pylint: disable=E1101
@@ -144,6 +147,7 @@ class WebhookAppClass(tornado.web.Application):
 
 
 # WebhookHandler, process webhook calls
+# pylint: disable=W0223
 class WebhookHandler(tornado.web.RequestHandler):
     SUPPORTED_METHODS = ["POST"]
 
@@ -157,6 +161,7 @@ class WebhookHandler(tornado.web.RequestHandler):
         self.logger = logging.getLogger(__name__)
 
     def initialize(self, bot: 'Bot', update_queue: Queue) -> None:
+        # pylint: disable=W0201
         self.bot = bot
         self.update_queue = update_queue
 
@@ -169,10 +174,10 @@ class WebhookHandler(tornado.web.RequestHandler):
         json_string = self.request.body.decode()
         data = json.loads(json_string)
         self.set_status(200)
-        self.logger.debug('Webhook received data: ' + json_string)
+        self.logger.debug('Webhook received data: %s', json_string)
         update = Update.de_json(data, self.bot)
         if update:
-            self.logger.debug('Received Update with ID %d on Webhook' % update.update_id)
+            self.logger.debug('Received Update with ID %d on Webhook', update.update_id)
             self.update_queue.put(update)
 
     def _validate_post(self) -> None:
@@ -196,6 +201,8 @@ class WebhookHandler(tornado.web.RequestHandler):
         """
         super().write_error(status_code, **kwargs)
         self.logger.debug(
-            "{} - - {}".format(self.request.remote_ip, "Exception in WebhookHandler"),
+            "%s - - %s",
+            self.request.remote_ip,
+            "Exception in WebhookHandler",
             exc_info=kwargs['exc_info'],
         )

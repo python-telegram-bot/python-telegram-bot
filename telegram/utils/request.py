@@ -28,21 +28,23 @@ try:
 except ImportError:
     import json  # type: ignore[no-redef]
 
-import certifi
+from typing import Any, Union
+
+import certifi  # pylint: disable=E0401
 
 try:
     import telegram.vendor.ptb_urllib3.urllib3 as urllib3
     import telegram.vendor.ptb_urllib3.urllib3.contrib.appengine as appengine
     from telegram.vendor.ptb_urllib3.urllib3.connection import HTTPConnection
-    from telegram.vendor.ptb_urllib3.urllib3.util.timeout import Timeout
     from telegram.vendor.ptb_urllib3.urllib3.fields import RequestField
+    from telegram.vendor.ptb_urllib3.urllib3.util.timeout import Timeout
 except ImportError:  # pragma: no cover
     try:
         import urllib3  # type: ignore[no-redef]
         import urllib3.contrib.appengine as appengine  # type: ignore[no-redef]
         from urllib3.connection import HTTPConnection  # type: ignore[no-redef]
-        from urllib3.util.timeout import Timeout  # type: ignore[no-redef]
         from urllib3.fields import RequestField  # type: ignore[no-redef]
+        from urllib3.util.timeout import Timeout  # type: ignore[no-redef]
 
         warnings.warn(
             'python-telegram-bot is using upstream urllib3. This is allowed but not '
@@ -55,24 +57,22 @@ except ImportError:  # pragma: no cover
         )
         raise
 
-
-from telegram import InputFile, TelegramError, InputMedia
+# pylint: disable=C0412
+from telegram import InputFile, InputMedia, TelegramError
 from telegram.error import (
-    Unauthorized,
-    NetworkError,
-    TimedOut,
     BadRequest,
     ChatMigrated,
-    RetryAfter,
-    InvalidToken,
     Conflict,
+    InvalidToken,
+    NetworkError,
+    RetryAfter,
+    TimedOut,
+    Unauthorized,
 )
-
 from telegram.utils.types import JSONDict
-from typing import Any, Union
 
 
-def _render_part(self: RequestField, name: str, value: str) -> str:
+def _render_part(self: RequestField, name: str, value: str) -> str:  # pylint: disable=W0613
     """
     Monkey patch urllib3.urllib3.fields.RequestField to make it *not* support RFC2231 compliant
     Content-Disposition headers since telegram servers don't understand it. Instead just escape
@@ -83,7 +83,7 @@ def _render_part(self: RequestField, name: str, value: str) -> str:
     return u'{}="{}"'.format(name, value)
 
 
-RequestField._render_part = _render_part  # type: ignore
+RequestField._render_part = _render_part  # type: ignore  # pylint: disable=W0212
 
 logging.getLogger('urllib3').setLevel(logging.WARNING)
 
@@ -174,9 +174,10 @@ class Request:
             kwargs.update(urllib3_proxy_kwargs)
             if proxy_url.startswith('socks'):
                 try:
+                    # pylint: disable=C0415
                     from telegram.vendor.ptb_urllib3.urllib3.contrib.socks import SOCKSProxyManager
-                except ImportError:
-                    raise RuntimeError('PySocks is missing')
+                except ImportError as exc:
+                    raise RuntimeError('PySocks is missing') from exc
                 self._con_pool = SOCKSProxyManager(proxy_url, **kwargs)
             else:
                 mgr = urllib3.proxy_from_url(proxy_url, **kwargs)
@@ -207,8 +208,8 @@ class Request:
         decoded_s = json_data.decode('utf-8', 'replace')
         try:
             data = json.loads(decoded_s)
-        except ValueError:
-            raise TelegramError('Invalid server response')
+        except ValueError as exc:
+            raise TelegramError('Invalid server response') from exc
 
         if not data.get('ok'):  # pragma: no cover
             description = data.get('description')
@@ -249,12 +250,12 @@ class Request:
 
         try:
             resp = self._con_pool.request(*args, **kwargs)
-        except urllib3.exceptions.TimeoutError:
-            raise TimedOut()
+        except urllib3.exceptions.TimeoutError as error:
+            raise TimedOut() from error
         except urllib3.exceptions.HTTPError as error:
             # HTTPError must come last as its the base urllib3 exception class
             # TODO: do something smart here; for now just raise NetworkError
-            raise NetworkError('urllib3 HTTPError {}'.format(error))
+            raise NetworkError('urllib3 HTTPError {}'.format(error)) from error
 
         if 200 <= resp.status <= 299:
             # 200-299 range are HTTP success statuses
@@ -267,22 +268,20 @@ class Request:
 
         if resp.status in (401, 403):
             raise Unauthorized(message)
-        elif resp.status == 400:
+        if resp.status == 400:
             raise BadRequest(message)
-        elif resp.status == 404:
+        if resp.status == 404:
             raise InvalidToken()
-        elif resp.status == 409:
+        if resp.status == 409:
             raise Conflict(message)
-        elif resp.status == 413:
+        if resp.status == 413:
             raise NetworkError(
                 'File too large. Check telegram api limits '
                 'https://core.telegram.org/bots/api#senddocument'
             )
-
-        elif resp.status == 502:
+        if resp.status == 502:
             raise NetworkError('Bad Gateway')
-        else:
-            raise NetworkError('{} ({})'.format(message, resp.status))
+        raise NetworkError('{} ({})'.format(message, resp.status))
 
     def post(self, url: str, data: JSONDict, timeout: float = None) -> Union[JSONDict, bool]:
         """Request an URL.
@@ -309,6 +308,7 @@ class Request:
         # Are we uploading files?
         files = False
 
+        # pylint: disable=R1702
         for key, val in data.copy().items():
             if isinstance(val, InputFile):
                 # Convert the InputFile to urllib3 field format
@@ -327,14 +327,14 @@ class Request:
                 else:
                     # Attach and set val to attached name for all
                     media = []
-                    for m in val:
-                        media_dict = m.to_dict()
+                    for med in val:
+                        media_dict = med.to_dict()
                         media.append(media_dict)
-                        if isinstance(m.media, InputFile):
-                            data[m.media.attach] = m.media.field_tuple
+                        if isinstance(med.media, InputFile):
+                            data[med.media.attach] = med.media.field_tuple
                             # if the file has a thumb, we also need to attach it to the data
                             if "thumb" in media_dict:
-                                data[m.thumb.attach] = m.thumb.field_tuple
+                                data[med.thumb.attach] = med.thumb.field_tuple
                     data[key] = json.dumps(media)
                 files = True
 

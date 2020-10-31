@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# pylint: disable=W0613, C0116
+# type: ignore[union-attr]
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -20,7 +22,8 @@ bot.
 
 import logging
 
-from telegram.ext import Updater, CommandHandler
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, CallbackContext
 
 # Enable logging
 logging.basicConfig(
@@ -32,7 +35,7 @@ logger = logging.getLogger(__name__)
 
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
-def start(update, context):
+def start(update: Update, context: CallbackContext) -> None:
     update.message.reply_text('Hi! Use /set <seconds> to set a timer')
 
 
@@ -52,7 +55,7 @@ def remove_job_if_exists(name, context):
     return True
 
 
-def set_timer(update, context):
+def set_timer(update: Update, context: CallbackContext) -> None:
     """Add a job to the queue."""
     chat_id = update.message.chat_id
     try:
@@ -74,7 +77,7 @@ def set_timer(update, context):
         update.message.reply_text('Usage: /set <seconds>')
 
 
-def unset(update, context):
+def unset(update: Update, context: CallbackContext) -> None:
     """Remove the job if the user changed their mind."""
     chat_id = update.message.chat_id
     job_removed = remove_job_if_exists(str(chat_id), context)
@@ -90,13 +93,13 @@ def main():
     updater = Updater("TOKEN", use_context=True)
 
     # Get the dispatcher to register handlers
-    dp = updater.dispatcher
+    dispatcher = updater.dispatcher
 
     # on different commands - answer in Telegram
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("help", start))
-    dp.add_handler(CommandHandler("set", set_timer))
-    dp.add_handler(CommandHandler("unset", unset))
+    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(CommandHandler("help", start))
+    dispatcher.add_handler(CommandHandler("set", set_timer))
+    dispatcher.add_handler(CommandHandler("unset", unset))
 
     # Start the Bot
     updater.start_polling()

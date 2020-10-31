@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# pylint: disable=W0613, C0116
+# type: ignore[union-attr]
+# This program is dedicated to the public domain under the CC0 license.
+
 """Simple inline keyboard bot with multiple CallbackQueryHandlers.
 
 This Bot uses the Updater class to handle the bot.
@@ -12,9 +16,15 @@ ConversationHandler.
 Send /start to initiate the conversation.
 Press Ctrl-C on the command line to stop the bot.
 """
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, ConversationHandler
 import logging
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram.ext import (
+    Updater,
+    CommandHandler,
+    CallbackQueryHandler,
+    ConversationHandler,
+    CallbackContext,
+)
 
 # Enable logging
 logging.basicConfig(
@@ -29,7 +39,7 @@ FIRST, SECOND = range(2)
 ONE, TWO, THREE, FOUR = range(4)
 
 
-def start(update, context):
+def start(update: Update, context: CallbackContext) -> None:
     """Send message on `/start`."""
     # Get user that sent /start and log his name
     user = update.message.from_user
@@ -51,7 +61,7 @@ def start(update, context):
     return FIRST
 
 
-def start_over(update, context):
+def start_over(update: Update, context: CallbackContext) -> None:
     """Prompt same text & keyboard as `start` does but not as new message"""
     # Get CallbackQuery from Update
     query = update.callback_query
@@ -72,7 +82,7 @@ def start_over(update, context):
     return FIRST
 
 
-def one(update, context):
+def one(update: Update, context: CallbackContext) -> None:
     """Show new choice of buttons"""
     query = update.callback_query
     query.answer()
@@ -89,7 +99,7 @@ def one(update, context):
     return FIRST
 
 
-def two(update, context):
+def two(update: Update, context: CallbackContext) -> None:
     """Show new choice of buttons"""
     query = update.callback_query
     query.answer()
@@ -106,7 +116,7 @@ def two(update, context):
     return FIRST
 
 
-def three(update, context):
+def three(update: Update, context: CallbackContext) -> None:
     """Show new choice of buttons"""
     query = update.callback_query
     query.answer()
@@ -124,7 +134,7 @@ def three(update, context):
     return SECOND
 
 
-def four(update, context):
+def four(update: Update, context: CallbackContext) -> None:
     """Show new choice of buttons"""
     query = update.callback_query
     query.answer()
@@ -141,7 +151,7 @@ def four(update, context):
     return FIRST
 
 
-def end(update, context):
+def end(update: Update, context: CallbackContext) -> None:
     """Returns `ConversationHandler.END`, which tells the
     ConversationHandler that the conversation is over"""
     query = update.callback_query
@@ -155,7 +165,7 @@ def main():
     updater = Updater("TOKEN", use_context=True)
 
     # Get the dispatcher to register handlers
-    dp = updater.dispatcher
+    dispatcher = updater.dispatcher
 
     # Setup conversation handler with the states FIRST and SECOND
     # Use the pattern parameter to pass CallbackQueries with specific
@@ -182,7 +192,7 @@ def main():
 
     # Add ConversationHandler to dispatcher that will be used for handling
     # updates
-    dp.add_handler(conv_handler)
+    dispatcher.add_handler(conv_handler)
 
     # Start the Bot
     updater.start_polling()

@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultArticle."""
 
+from typing import TYPE_CHECKING, Any
+
 from telegram import InlineQueryResult
-from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
@@ -64,7 +65,7 @@ class InlineQueryResultArticle(InlineQueryResult):
 
     def __init__(
         self,
-        id: str,
+        id: str,  # pylint: disable=W0622
         title: str,
         input_message_content: 'InputMessageContent',
         reply_markup: 'ReplyMarkup' = None,
@@ -74,7 +75,7 @@ class InlineQueryResultArticle(InlineQueryResult):
         thumb_url: str = None,
         thumb_width: int = None,
         thumb_height: int = None,
-        **kwargs: Any,
+        **kwargs: Any,  # pylint: disable=W0613
     ):
 
         # Required

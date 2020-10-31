@@ -19,21 +19,21 @@
 """This module contains the DictPersistence class."""
 from copy import deepcopy
 
+from typing import Any, DefaultDict, Dict, Optional, Tuple
+from collections import defaultdict
+
 from telegram.utils.helpers import (
-    decode_user_chat_data_from_json,
     decode_conversations_from_json,
+    decode_user_chat_data_from_json,
     encode_conversations_to_json,
 )
+from telegram.ext import BasePersistence
+from telegram.utils.types import ConversationDict
 
 try:
     import ujson as json
 except ImportError:
     import json  # type: ignore[no-redef]
-from collections import defaultdict
-from telegram.ext import BasePersistence
-
-from typing import DefaultDict, Dict, Any, Tuple, Optional
-from telegram.utils.types import ConversationDict
 
 
 class DictPersistence(BasePersistence):
@@ -106,20 +106,20 @@ class DictPersistence(BasePersistence):
             try:
                 self._user_data = decode_user_chat_data_from_json(user_data_json)
                 self._user_data_json = user_data_json
-            except (ValueError, AttributeError):
-                raise TypeError("Unable to deserialize user_data_json. Not valid JSON")
+            except (ValueError, AttributeError) as exc:
+                raise TypeError("Unable to deserialize user_data_json. Not valid JSON") from exc
         if chat_data_json:
             try:
                 self._chat_data = decode_user_chat_data_from_json(chat_data_json)
                 self._chat_data_json = chat_data_json
-            except (ValueError, AttributeError):
-                raise TypeError("Unable to deserialize chat_data_json. Not valid JSON")
+            except (ValueError, AttributeError) as exc:
+                raise TypeError("Unable to deserialize chat_data_json. Not valid JSON") from exc
         if bot_data_json:
             try:
                 self._bot_data = json.loads(bot_data_json)
                 self._bot_data_json = bot_data_json
-            except (ValueError, AttributeError):
-                raise TypeError("Unable to deserialize bot_data_json. Not valid JSON")
+            except (ValueError, AttributeError) as exc:
+                raise TypeError("Unable to deserialize bot_data_json. Not valid JSON") from exc
             if not isinstance(self._bot_data, dict):
                 raise TypeError("bot_data_json must be serialized dict")
 
@@ -127,8 +127,10 @@ class DictPersistence(BasePersistence):
             try:
                 self._conversations = decode_conversations_from_json(conversations_json)
                 self._conversations_json = conversations_json
-            except (ValueError, AttributeError):
-                raise TypeError("Unable to deserialize conversations_json. Not valid JSON")
+            except (ValueError, AttributeError) as exc:
+                raise TypeError(
+                    "Unable to deserialize conversations_json. Not valid JSON"
+                ) from exc
 
     @property
     def user_data(self) -> Optional[DefaultDict[int, Dict]]:
@@ -140,8 +142,7 @@ class DictPersistence(BasePersistence):
         """:obj:`str`: The user_data serialized as a JSON-string."""
         if self._user_data_json:
             return self._user_data_json
-        else:
-            return json.dumps(self.user_data)
+        return json.dumps(self.user_data)
 
     @property
     def chat_data(self) -> Optional[DefaultDict[int, Dict]]:
@@ -153,8 +154,7 @@ class DictPersistence(BasePersistence):
         """:obj:`str`: The chat_data serialized as a JSON-string."""
         if self._chat_data_json:
             return self._chat_data_json
-        else:
-            return json.dumps(self.chat_data)
+        return json.dumps(self.chat_data)
 
     @property
     def bot_data(self) -> Optional[Dict]:
@@ -166,8 +166,7 @@ class DictPersistence(BasePersistence):
         """:obj:`str`: The bot_data serialized as a JSON-string."""
         if self._bot_data_json:
             return self._bot_data_json
-        else:
-            return json.dumps(self.bot_data)
+        return json.dumps(self.bot_data)
 
     @property
     def conversations(self) -> Optional[Dict[str, Dict[Tuple, Any]]]:
@@ -179,8 +178,7 @@ class DictPersistence(BasePersistence):
         """:obj:`str`: The conversations serialized as a JSON-string."""
         if self._conversations_json:
             return self._conversations_json
-        else:
-            return encode_conversations_to_json(self.conversations)  # type: ignore[arg-type]
+        return encode_conversations_to_json(self.conversations)  # type: ignore[arg-type]
 
     def get_user_data(self) -> DefaultDict[int, Dict[Any, Any]]:
         """Returns the user_data created from the ``user_data_json`` or an empty

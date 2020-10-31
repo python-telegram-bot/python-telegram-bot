@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# pylint: disable=W0613, C0116
+# type: ignore[union-attr]
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -12,7 +14,8 @@ See https://git.io/fAvYd for how to use Telegram Passport properly with python-t
 """
 import logging
 
-from telegram.ext import Updater, MessageHandler, Filters
+from telegram import Update
+from telegram.ext import Updater, MessageHandler, Filters, CallbackContext
 
 # Enable logging
 logging.basicConfig(
@@ -22,7 +25,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def msg(update, context):
+def msg(update: Update, context: CallbackContext) -> None:
     # If we received any passport data
     passport_data = update.message.passport_data
     if passport_data:
@@ -100,10 +103,10 @@ def main():
     updater = Updater("TOKEN", private_key=open('private.key', 'rb').read())
 
     # Get the dispatcher to register handlers
-    dp = updater.dispatcher
+    dispatcher = updater.dispatcher
 
     # On messages that include passport data call msg
-    dp.add_handler(MessageHandler(Filters.passport_data, msg))
+    dispatcher.add_handler(MessageHandler(Filters.passport_data, msg))
 
     # Start the Bot
     updater.start_polling()

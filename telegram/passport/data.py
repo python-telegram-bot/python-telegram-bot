@@ -16,8 +16,10 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+# pylint: disable=C0114
+from typing import TYPE_CHECKING, Any
+
 from telegram import TelegramObject
-from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -45,7 +47,7 @@ class PersonalDetails(TelegramObject):
     """
 
     def __init__(
-        self,
+        self,  # pylint: disable=W0613
         first_name: str,
         last_name: str,
         birth_date: str,
@@ -88,7 +90,7 @@ class ResidentialAddress(TelegramObject):
     """
 
     def __init__(
-        self,
+        self,  # pylint: disable=W0613
         street_line1: str,
         street_line2: str,
         city: str,
@@ -118,7 +120,9 @@ class IdDocumentData(TelegramObject):
         expiry_date (:obj:`str`): Optional. Date of expiry, in DD.MM.YYYY format.
     """
 
-    def __init__(self, document_no: str, expiry_date: str, bot: 'Bot' = None, **kwargs: Any):
+    def __init__(
+        self, document_no: str, expiry_date: str, bot: 'Bot' = None, **kwargs: Any
+    ):  # pylint: disable=W0613
         self.document_no = document_no
         self.expiry_date = expiry_date
 

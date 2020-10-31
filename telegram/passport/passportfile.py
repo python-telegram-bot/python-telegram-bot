@@ -18,9 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Encrypted PassportFile."""
 
+from typing import TYPE_CHECKING, Any, List, Optional
+
 from telegram import TelegramObject
 from telegram.utils.types import JSONDict
-from typing import Any, Optional, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from telegram import Bot, File, FileCredentials
@@ -57,7 +58,7 @@ class PassportFile(TelegramObject):
     """
 
     def __init__(
-        self,
+        self,  # pylint: disable=W0613
         file_id: str,
         file_unique_id: str,
         file_date: int,

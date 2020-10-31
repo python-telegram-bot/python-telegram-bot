@@ -18,9 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ShippingQuery."""
 
-from telegram import TelegramObject, User, ShippingAddress
+from typing import TYPE_CHECKING, Any, Optional
+
+from telegram import ShippingAddress, TelegramObject, User
 from telegram.utils.types import JSONDict
-from typing import Any, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -53,15 +54,15 @@ class ShippingQuery(TelegramObject):
     """
 
     def __init__(
-        self,
-        id: str,
+        self,  # pylint: disable=W0613
+        id: str,  # pylint: disable=W0622
         from_user: User,
         invoice_payload: str,
         shipping_address: ShippingAddress,
         bot: 'Bot' = None,
         **kwargs: Any,
     ):
-        self.id = id
+        self.id = id  # pylint: disable=C0103
         self.from_user = from_user
         self.invoice_payload = invoice_payload
         self.shipping_address = shipping_address

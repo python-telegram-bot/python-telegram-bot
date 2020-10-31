@@ -19,15 +19,14 @@
 # TODO: Remove allow_edited
 """This module contains the MessageHandler class."""
 import warnings
-
-from telegram.utils.deprecate import TelegramDeprecationWarning
+from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, TypeVar, Union
 
 from telegram import Update
-from telegram.ext import Filters, BaseFilter
-from .handler import Handler
-
+from telegram.ext import BaseFilter, Filters
+from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.types import HandlerArg
-from typing import Callable, TYPE_CHECKING, Any, Optional, Union, TypeVar, Dict
+
+from .handler import Handler
 
 if TYPE_CHECKING:
     from telegram.ext import CallbackContext, Dispatcher
