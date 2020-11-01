@@ -1,18 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# This program is dedicated to the public domain under the CC0 license.
+# This program is inherited from public repositories.
 
 """
-Simple Bot to reply to Telegram messages.
+Bot to reply to Telegram messages.
 
-First, a few handler functions are defined. Then, those functions are passed to
-the Dispatcher and registered at their respective places.
-Then, the bot is started and runs until we press Ctrl-C on the command line.
-
-Usage:
-Basic Echobot example, repeats messages.
-Press Ctrl-C on the command line or send a signal to the process to stop the
-bot.
+Manage follow engagement processes
+Checking conditions from user before post on engagement group
+Interact to telegram API to get latest link as requirement for comming up posts
 """
 from telethon.tl.types import BotInlineMessageText
 import logging
@@ -28,23 +23,9 @@ import datetime
 import time
 from check_follow import check_follow_yet, check_profile
 
-# from telethon.tl.functions.messages import GetHistoryRequest
-
-from telethon.tl.functions.channels import GetMessagesRequest
-
-#obj=telegram.Message(-1001192378669,from_user=None,date=datetime.datetime.date,chat=telegram.chat.Chat)
-#print(obj)
 obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
-# get name by username id
-#print(obj.edit_message_text('@namtestgroup',1))
-#print(obj.get_chat_member('@namtestgroup',1098222229).user.username) # viettelnguyen
-#print(obj.get_chat_member('@namtestgroup',1098222229))
 
-#print('.........................................................')
 #auto_delete_message('1098222229') #delete warning from bot
-
-#sec=GetMessagesRequest('@namtestgroup',id=[3,1,2])
-#print('getMessageRequest -',sec)
 
 def get_links_from_file(get_username=False):
     try:
@@ -59,9 +40,6 @@ def get_links_from_file(get_username=False):
         else:
             clean.append(i[:-1])      
     return clean
-
-
-obj1=Message(1,from_user='testbot',date=datetime.datetime(2020,10,31),chat='Testbot2')
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -78,15 +56,11 @@ def get_list():
         count+=1
     return container
 
-def get_user():
-    a=get_mes()
-    return a
-# st='📸 '+ a[a.find('](')+2:a.find('))')]
 ad='🔥 Get more likes & comments by joining our other groups👇 \n \
 ❤️Happy engaging❤️ \n \
 🚀Viral Network🚀'
-##print(a[0])
-keyboard = [[InlineKeyboardButton("✅   Rules   ✅", url='https://t.me/johntendo', callback_data='1'),
+
+keyboard = [[InlineKeyboardButton("✅   Rules   ✅", url='https://t.me/hoai97nambot', callback_data='1'),
                  InlineKeyboardButton("📄   List    📄", url='https://t.me/hoai97nambot',callback_data='2')],
 
                 [InlineKeyboardButton("💎   Premium User    💎", url='https://t.me/johntendo', callback_data='3')]]
@@ -99,47 +73,34 @@ reply_markup1 = InlineKeyboardMarkup(list_markup)
 # context. Error handlers also receive the raised TelegramError object in error.
 def start(update, context):
     """Send a message when the command /start is issued."""
-    # ts='@'+update.message.from_user.username
-    # update.message.reply_text('Hi!')
-    # obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
-    # obj.send_message('@hoai97nambot','container[0]',parse_mode='Markdown',disable_web_page_preview=True,reply_markup=reply_markup1)
     m=''
     k=get_list()
     for i in k:
         m=m+ '\n'+i
-    send_to_destination(update.message.from_user.id,m)
-        
-    # update.message.reply_text(a,disable_web_page_preview=True),
+    send_to_destination(update.message.from_user.id, m)    
+
 
 def help_command(update, context):
-    """Send a message when the command /help is issued."""
-    # update.message.reply_text('Help!'+ str(update.message.from_user.username))
-    update.message.reply_text(str(update.message.message_id) +'-'+ update.message.from_user.username+'-'\
+    """Send a message when the command /help is issued."""   
+    update.message.reply_text(str(update.message.message_id) +'-'+ \
+        update.message.from_user.username+'-'\
         +str(update.message.from_user.id))
     time.sleep(3)
     auto_delete_message(update.message.message_id)
 
-
 #===========================================================================================
-def check_condition_messtopost(link):
-    try:
-        if link[:4] == 'dx10' or link[:4] == 'Dx10':
-            pass
-        else:
-            auto_send_message('your type is not right format')
-    except(...):
-        auto_send_message('your type is not right format')
+
 #==========================================================================================
 def echo(update, context): # important info in this function
     """Echo the user message."""
-    aa=update.message.text
+    aa=update.message.text # get typed link
    
     if aa[:4] == 'dx10' or aa[:4] == 'Dx10':
-        # check_condition_messtopost(update.message.text)
+        # check bunch of of conditions
         if get_and_extract() and check_profile_link(aa):
             tele_usr='@'+ update.message.from_user.username
             bot_push_message(aa,tele_usr)
-            # update.message.reply_text(update.message.text)
+            # tidy user's message
             time.sleep(5)
             auto_delete_message(update.message.message_id)
         else:
@@ -150,24 +111,24 @@ def echo(update, context): # important info in this function
             auto_delete_message(update.message.message_id)
             time.sleep(5)
             auto_delete_message(update.message.message_id+1)
+    # auto drop functions
     elif check_profile_link(aa) and aa[:4]=='drop':
         bot_push_message(aa,'Auto Drop')   
         auto_delete_message(update.message.message_id)     
     else:
-        update.message.reply_text('Wrong syntax !!!\n Please check again or read our rules',reply_markup=reply_markup1)
-    
+        update.message.reply_text('Wrong syntax !!!\n Please check again or read our rules',reply_markup=reply_markup1) 
         auto_delete_message(update.message.message_id)
         time.sleep(3)
         auto_delete_message(update.message.message_id+1)
+
 def send_to_destination(des,mess):
-    # destination='@innertest'
+    # destination = chat name with @:format
+    # use to send toward user 
     obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
-    
     obj.send_message(des,mess,parse_mode='Markdown',disable_web_page_preview=True,reply_markup=reply_markup1)
 
 def auto_send_message(st):
     obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
-    
     obj.send_message('@namtestgroup',st,parse_mode='Markdown',disable_web_page_preview=True,reply_markup=reply_markup)
 
 def bot_push_message(link, user):
@@ -179,8 +140,6 @@ def bot_push_message(link, user):
     me='👤 '+user+ ' ✅ '+' Dx10 [{}]({})'.format(sub_link,link[5:])
     print(me)
     obj.send_message('@namtestgroup',me, parse_mode='Markdown',disable_web_page_preview=True,reply_markup=reply_markup)
-
-
 # this scripts used for testing 👤entrepreneurs_club01 ✅
 
 def auto_delete_message(mess_id):
@@ -190,14 +149,6 @@ def auto_delete_message(mess_id):
     except:
         print('message haven\'t been deleted yet')
 
-
-def post_ad(ad):
-    import time
-    while True:
-        obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')  
-        obj.send_message('@namtestgroup',ad, disable_web_page_preview=True)
-        time.sleep(5*60)
-
 def extract_usr(a):
     # get username from instagram url
     lit=[]
@@ -205,16 +156,19 @@ def extract_usr(a):
         c=i[1]
         lit.append(c[c.find('com/')+4:])
     return lit
+
 def get_and_extract():
     lit=get_links_from_file(get_username=True)
     r=check_follow_yet(lit)
     return r
+
 def check_repost(usrname_in_repost_link):
     # check if a link  is able to repost
     sample = get_links_from_file(get_username=True)
     if usrname_in_repost_link in sample:
         return 0
     return 1
+
 def check_profile_link(link):
     # check valid instagram url from user
     if link.find('https://www.instagram.com/') and check_profile(link[31:]):
@@ -259,4 +213,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    # post_ad(ad)
