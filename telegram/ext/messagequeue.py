@@ -22,20 +22,20 @@
 """A throughput-limiting message processor for Telegram bots."""
 
 import functools
+import logging
 import queue as q
 import threading
 import time
+import warnings
 
 from typing import Callable, Any, TYPE_CHECKING, List, NoReturn, ClassVar, Dict, Optional
 
+from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.promise import Promise
 
 if TYPE_CHECKING:
     from telegram import Bot
     from telegram.ext import Dispatcher
-
-# We need to count < 1s intervals, so the most accurate timer is needed
-curtime = time.perf_counter
 
 
 class DelayQueueError(RuntimeError):
@@ -51,9 +51,9 @@ class DelayQueue(threading.Thread):
         burst_limit (:obj:`int`): Number of maximum callbacks to process per time-window.
         time_limit (:obj:`int`): Defines width of time-window used when each processing limit is
             calculated.
-        exc_route (:obj:`callable`): A callable, accepting 1 positional argument; used to route
-            exceptions from processor thread to main thread;
         name (:obj:`str`): Thread's name.
+        error_handler (:obj:`callable`): Optional. A callable, accepting 1 positional argument.
+            Used to route exceptions from processor thread to main thread.
         dispatcher (:class:`telegram.ext.Disptacher`): Optional. The dispatcher to use for error
             handling.
 
@@ -67,11 +67,12 @@ class DelayQueue(threading.Thread):
             defined by :attr:`time_limit_ms`. Defaults to 30.
         time_limit_ms (:obj:`int`, optional): Defines width of time-window used when each
             processing limit is calculated. Defaults to 1000.
-        exc_route (:obj:`callable`, optional): A callable, accepting 1 positional argument; used to
-            route exceptions from processor thread to main thread; is called on `Exception`
+        error_handler (:obj:`callable`, optional): A callable, accepting 1 positional argument.
+            Used to route exceptions from processor thread to main thread. Is called on `Exception`
             subclass exceptions. If not provided, exceptions are routed through dummy handler,
             which re-raises them. If :attr:`dispatcher` is set, error handling will *always* be
             done by the dispatcher.
+        exc_route (:obj:`callable`, optional): Deprecated alias of :attr:`error_handler`.
         autostart (:obj:`bool`, optional): If :obj:`True`, processor is started immediately after
             object's creation; if :obj:`False`, should be started manually by `start` method.
             Defaults to :obj:`True`.
@@ -91,13 +92,24 @@ class DelayQueue(threading.Thread):
         autostart: bool = True,
         name: str = None,
         parent: 'DelayQueue' = None,
+        error_handler: Callable[[Exception], None] = None,
     ):
+        self.logger = logging.getLogger(__name__)
         self._queue = queue if queue is not None else q.Queue()
         self.burst_limit = burst_limit
         self.time_limit = time_limit_ms / 1000
-        self.exc_route = exc_route if exc_route else self._default_exception_handler
         self.parent = parent
         self.dispatcher: Optional['Dispatcher'] = None
+
+        if not (bool(exc_route) ^ bool(error_handler)):  # pylint: disable=C0325
+            raise RuntimeError('Only one of exc_route or error_handler can be passed.')
+        if exc_route:
+            warnings.warn(
+                'The exc_route argument is deprecated. Use error_handler instead.',
+                TelegramDeprecationWarning,
+                stacklevel=2,
+            )
+        self.exc_route = exc_route or error_handler or self._default_exception_handler
 
         self.__exit_req = False  # flag to gently exit thread
         self.__class__.INSTANCE_COUNT += 1
@@ -119,20 +131,17 @@ class DelayQueue(threading.Thread):
         self.dispatcher = dispatcher
 
     def run(self) -> None:
-        """
-        Do not use the method except for unthreaded testing purposes, the method normally is
-        automatically called by autostart argument.
-
-        """
-
         times: List[float] = []  # used to store each callable processing time
+
         while True:
             promise = self._queue.get()
             if self.__exit_req:
                 return  # shutdown thread
+
             # delay routine
             now = time.perf_counter()
             t_delta = now - self.time_limit  # calculate early to improve perf.
+
             if times and t_delta > times[-1]:
                 # if last call was before the limit time-window
                 # used to impr. perf. in long-interval calls case
@@ -143,11 +152,14 @@ class DelayQueue(threading.Thread):
                 times.append(now)
             if len(times) >= self.burst_limit:  # if throughput limit was hit
                 time.sleep(times[1] - t_delta)
+
             # finally process one
             if self.parent:
+                # put through parent, if specified
                 self.parent.put(promise)
             else:
                 promise.run()
+                # error handling
                 if self.dispatcher:
                     self.dispatcher.post_process_promise(promise)
                 elif promise.exception:
@@ -167,16 +179,12 @@ class DelayQueue(threading.Thread):
 
         self.__exit_req = True  # gently request
         self._queue.put(None)  # put something to unfreeze if frozen
+        self.logger.debug('Waiting for DelayQueue %s to shut down.', self.name)
         super().join(timeout=timeout)
+        self.logger.debug('DelayQueue %s shut down.', self.name)
 
     @staticmethod
     def _default_exception_handler(exc: Exception) -> NoReturn:
-        """
-        Dummy exception handler which re-raises exception in thread. Could be possibly overwritten
-        by subclasses.
-
-        """
-
         raise exc
 
     def put(
@@ -205,18 +213,11 @@ class DelayQueue(threading.Thread):
         return promise
 
 
-# The most straightforward way to implement this is to use 2 sequential delay
-# queues, like on classic delay chain schematics in electronics.
-# So, message path is:
-# msg --> group delay if group msg, else no delay --> normal msg delay --> out
-# This way OS threading scheduler cares of timings accuracy.
-# (see time.time, time.clock, time.perf_counter, time.sleep @ docs.python.org)
 class MessageQueue:
     """
     Implements callback processing with proper delays to avoid hitting Telegram's message limits.
-    Contains two ``DelayQueue``, for group and for all messages, interconnected in delay chain.
-    Callables are processed through *group* ``DelayQueue``, then through *all* ``DelayQueue`` for
-    group-type messages. For non-group messages, only the *all* ``DelayQueue`` is used.
+    By default contains two :class:`telegram.ext.DelayQueue` instances, for general requests and
+    group requests where the default delay queue is the parent of the group requests one.
 
     Attributes:
         running (:obj:`bool`): Whether this message queue has started it's delay queues or not.
@@ -232,13 +233,14 @@ class MessageQueue:
             process per time-window defined by :attr:`group_time_limit_ms`. Defaults to 20.
         group_time_limit_ms (:obj:`int`, optional): Defines width of *group-type* time-window used
             when each processing limit is calculated. Defaults to 60000 ms.
-        exc_route (:obj:`callable`, optional): A callable, accepting one positional argument; used
-            to route exceptions from processor threads to main thread; is called on ``Exception``
+        error_handler (:obj:`callable`, optional): A callable, accepting 1 positional argument.
+            Used to route exceptions from processor thread to main thread. Is called on `Exception`
             subclass exceptions. If not provided, exceptions are routed through dummy handler,
-            which re-raises them.
-        autostart (:obj:`bool`, optional): If :obj:`True`, processors are started immediately after
-            object's creation; if :obj:`False`, should be started manually by :attr:`start` method.
-            Defaults to :obj:`True`.
+            which re-raises them. If :attr:`dispatcher` is set, error handling will *always* be
+            done by the dispatcher.
+        exc_route (:obj:`callable`, optional): Deprecated alias of :attr:`error_handler`.
+        autostart (:obj:`bool`, optional): If :obj:`True`, both default delay queues are started
+            immediately after object's creation. Defaults to :obj:`True`.
 
     """
 
@@ -250,14 +252,26 @@ class MessageQueue:
         group_time_limit_ms: int = 60000,
         exc_route: Callable[[Exception], None] = None,
         autostart: bool = True,
+        error_handler: Callable[[Exception], None] = None,
     ):
+        self.logger = logging.getLogger(__name__)
         self.running = False
         self.dispatcher: Optional['Dispatcher'] = None
+
+        if not (bool(exc_route) ^ bool(error_handler)):  # pylint: disable=C0325
+            raise RuntimeError('Only one of exc_route or error_handler can be passed.')
+        if exc_route:
+            warnings.warn(
+                'The exc_route argument is deprecated. Use error_handler instead.',
+                TelegramDeprecationWarning,
+                stacklevel=2,
+            )
+
         self._delay_queues: Dict[str, DelayQueue] = {
             self.DEFAULT_QUEUE: DelayQueue(
                 burst_limit=all_burst_limit,
                 time_limit_ms=all_time_limit_ms,
-                exc_route=exc_route,
+                error_handler=exc_route or error_handler,
                 autostart=autostart,
                 name=self.DEFAULT_QUEUE,
             )
@@ -265,7 +279,7 @@ class MessageQueue:
         self._delay_queues[self.GROUP_QUEUE] = DelayQueue(
             burst_limit=group_burst_limit,
             time_limit_ms=group_time_limit_ms,
-            exc_route=exc_route,
+            error_handler=exc_route or error_handler,
             autostart=autostart,
             name=self.GROUP_QUEUE,
             parent=self._delay_queues[self.DEFAULT_QUEUE],
@@ -318,8 +332,13 @@ class MessageQueue:
 
     def put(self, func: Callable, delay_queue: str, *args: Any, **kwargs: Any) -> Promise:
         """
-        Processes callables in throughput-limiting queues to avoid hitting limits (specified with
-        :attr:`burst_limit` and :attr:`time_limit`.
+        Processes callables in throughput-limiting queues to avoid hitting limits.
+
+        Args:
+            func (:obj:`callable`): The callable to process
+            delay_queue (:obj:`str`): The name of the :class:`telegram.ext.DelayQueue` to use.
+            *args (:obj:`tuple`, optional): Arguments to ``func``.
+            **kwargs (:obj:`dict`, optional): Keyword arguments to ``func``.
 
         Returns:
             :class:`telegram.ext.Promise`.

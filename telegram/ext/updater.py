@@ -29,7 +29,7 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, Un
 
 from telegram import Bot, TelegramError
 from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized
-from telegram.ext import Dispatcher, JobQueue
+from telegram.ext import Dispatcher, JobQueue, MessageQueue
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import get_signal_name
 from telegram.utils.request import Request
@@ -94,6 +94,8 @@ class Updater:
             used).
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
             be used if not set explicitly in the bot methods.
+        message_queue (:class:`telegram.ext.MessageQueue`, optional): A message queue to use with
+            the bot. Will be started automatically and the dispatcher will be set.
 
     Note:
         * You must supply either a :attr:`bot` or a :attr:`token` argument.
@@ -122,6 +124,7 @@ class Updater:
         use_context: bool = True,
         dispatcher: Dispatcher = None,
         base_file_url: str = None,
+        message_queue: MessageQueue = None,
     ):
 
         if defaults and bot:
@@ -181,6 +184,7 @@ class Updater:
                     private_key=private_key,
                     private_key_password=private_key_password,
                     defaults=defaults,
+                    message_queue=message_queue,
                 )
             self.update_queue: Queue = Queue()
             self.job_queue = JobQueue()
@@ -196,6 +200,10 @@ class Updater:
                 use_context=use_context,
             )
             self.job_queue.set_dispatcher(self.dispatcher)
+            if self.bot.message_queue:
+                self.bot.message_queue.set_dispatcher(self.dispatcher)
+                if not self.bot.message_queue.running:
+                    self.bot.message_queue.start()
         else:
             con_pool_size = dispatcher.workers + 4
 
@@ -634,6 +642,7 @@ class Updater:
                 self.running = False
 
                 self._stop_httpd()
+                self._stop_message_queue()
                 self._stop_dispatcher()
                 self._join_threads()
 
@@ -656,6 +665,11 @@ class Updater:
     def _stop_dispatcher(self) -> None:
         self.logger.debug('Requesting Dispatcher to stop...')
         self.dispatcher.stop()
+
+    def _stop_message_queue(self) -> None:
+        if self.bot.message_queue:
+            self.logger.debug('Requesting MessageQueue to stop...')
+            self.bot.message_queue.stop()
 
     @no_type_check
     def _join_threads(self) -> None:
