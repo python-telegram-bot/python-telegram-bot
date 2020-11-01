@@ -22,9 +22,9 @@
 """A throughput-limiting message processor for Telegram bots."""
 
 import functools
-import time
-import threading
 import queue as q
+import threading
+import time
 
 from typing import Callable, Any, TYPE_CHECKING, List, NoReturn, ClassVar, Dict, Optional
 
@@ -40,8 +40,6 @@ curtime = time.perf_counter
 
 class DelayQueueError(RuntimeError):
     """Indicates processing errors."""
-
-    pass
 
 
 class DelayQueue(threading.Thread):
@@ -304,8 +302,8 @@ class MessageQueue:
 
     def start(self) -> None:
         """Starts the all :class:`telegram.ext.DelayQueue` registered for this message queue."""
-        for dq in self._delay_queues.values():
-            dq.start()
+        for delay_queue in self._delay_queues.values():
+            delay_queue.start()
 
     def stop(self, timeout: float = None) -> None:
         """
@@ -315,8 +313,8 @@ class MessageQueue:
             timeout (:obj:`float`, optional): The timeout to pass to
                 :meth:`telegram.ext.DelayQueue.stop`.
         """
-        for dq in self._delay_queues.values():
-            dq.stop(timeout)
+        for delay_queue in self._delay_queues.values():
+            delay_queue.stop(timeout)
 
     def put(self, func: Callable, delay_queue: str, *args: Any, **kwargs: Any) -> Promise:
         """
@@ -378,6 +376,7 @@ def queuedmessage(method: Callable) -> Callable:
 
     @functools.wraps(method)
     def wrapped(self: 'Bot', *args: Any, **kwargs: Any) -> Any:
+        # pylint: disable=W0212
         queued = kwargs.pop(
             'queued', self._is_messages_queued_default  # type: ignore[attr-defined]
         )

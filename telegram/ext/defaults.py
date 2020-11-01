@@ -16,11 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+# pylint: disable=R0201, E0401
 """This module contains the class Defaults, which allows to pass default values to Updater."""
 from collections import defaultdict
+from typing import Union, Optional, Any, NoReturn, Dict, DefaultDict
 
 import pytz
-from typing import Union, Optional, Any, NoReturn, Dict, DefaultDict
 
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
 
@@ -95,7 +96,7 @@ class Defaults:
         self._quote = quote
         self._tzinfo = tzinfo
         self._delay_queue = delay_queue
-        self._delay_queue_per_method = defaultdict(
+        self._delay_queue_per_method: DefaultDict[str, Optional[str]] = defaultdict(
             lambda: self.delay_queue, delay_queue_per_method or {}
         )
 
@@ -197,7 +198,7 @@ class Defaults:
                 self._quote,
                 self._tzinfo,
                 self._delay_queue,
-                ((key, value) for key, value in self._delay_queue_per_method),
+                ((key, value) for key, value in self._delay_queue_per_method.items()),
             )
         )
 

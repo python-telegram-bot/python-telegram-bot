@@ -18,9 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Venue."""
 
-from telegram import TelegramObject, Location
+from typing import TYPE_CHECKING, Any, Optional
+
+from telegram import Location, TelegramObject
 from telegram.utils.types import JSONDict
-from typing import Any, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -52,7 +53,7 @@ class Venue(TelegramObject):
     """
 
     def __init__(
-        self,
+        self,  # pylint: disable=W0613
         location: Location,
         title: str,
         address: str,

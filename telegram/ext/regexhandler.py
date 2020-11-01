@@ -20,13 +20,11 @@
 """This module contains the RegexHandler class."""
 
 import warnings
+from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, Pattern, TypeVar, Union
 
+from telegram.ext import Filters, MessageHandler
 from telegram.utils.deprecate import TelegramDeprecationWarning
-
-from telegram.ext import MessageHandler, Filters
-
 from telegram.utils.types import HandlerArg
-from typing import Callable, TYPE_CHECKING, Any, Optional, Union, TypeVar, Dict, Pattern
 
 if TYPE_CHECKING:
     from telegram.ext import CallbackContext, Dispatcher
@@ -119,7 +117,7 @@ class RegexHandler(MessageHandler):
         pass_job_queue: bool = False,
         pass_user_data: bool = False,
         pass_chat_data: bool = False,
-        allow_edited: bool = False,
+        allow_edited: bool = False,  # pylint: disable=W0613
         message_updates: bool = True,
         channel_post_updates: bool = False,
         edited_updates: bool = False,

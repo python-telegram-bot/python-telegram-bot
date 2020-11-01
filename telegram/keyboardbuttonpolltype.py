@@ -18,8 +18,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a type of a Telegram Poll."""
-from telegram import TelegramObject
 from typing import Any
+
+from telegram import TelegramObject
 
 
 class KeyboardButtonPollType(TelegramObject):
@@ -36,7 +37,7 @@ class KeyboardButtonPollType(TelegramObject):
             create a poll of any type.
     """
 
-    def __init__(self, type: str = None, **kwargs: Any):
+    def __init__(self, type: str = None, **kwargs: Any):  # pylint: disable=W0613, W0622
         self.type = type
 
         self._id_attrs = (self.type,)

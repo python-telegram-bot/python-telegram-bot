@@ -16,9 +16,10 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+# pylint: disable=R0201
 """This module contains the CallbackContext class."""
 from queue import Queue
-from typing import Dict, Any, Tuple, TYPE_CHECKING, Optional, Match, List, NoReturn, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Match, NoReturn, Optional, Tuple, Union
 
 from telegram import Update
 
@@ -165,9 +166,9 @@ class CallbackContext:
             user = update.effective_user
 
             if chat:
-                self._chat_data = dispatcher.chat_data[chat.id]
+                self._chat_data = dispatcher.chat_data[chat.id]  # pylint: disable=W0212
             if user:
-                self._user_data = dispatcher.user_data[user.id]
+                self._user_data = dispatcher.user_data[user.id]  # pylint: disable=W0212
         return self
 
     @classmethod

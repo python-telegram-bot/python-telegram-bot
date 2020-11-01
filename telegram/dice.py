@@ -18,8 +18,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Dice."""
-from telegram import TelegramObject, constants
 from typing import Any, List, ClassVar
+
+from telegram import TelegramObject, constants
 
 
 class Dice(TelegramObject):
@@ -49,7 +50,7 @@ class Dice(TelegramObject):
         emoji (:obj:`str`): Emoji on which the dice throw animation is based.
     """
 
-    def __init__(self, value: int, emoji: str, **kwargs: Any):
+    def __init__(self, value: int, emoji: str, **kwargs: Any):  # pylint: disable=W0613
         self.value = value
         self.emoji = emoji
 

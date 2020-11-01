@@ -19,15 +19,14 @@
 """This module contains the CommandHandler and PrefixHandler classes."""
 import re
 import warnings
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, TypeVar, Union
 
-from telegram.ext import Filters, BaseFilter
+from telegram import MessageEntity, Update
+from telegram.ext import BaseFilter, Filters
 from telegram.utils.deprecate import TelegramDeprecationWarning
-
-from telegram import Update, MessageEntity
-from .handler import Handler
-
 from telegram.utils.types import HandlerArg
-from typing import Callable, TYPE_CHECKING, Any, Optional, Union, TypeVar, Dict, List, Tuple
+
+from .handler import Handler
 
 if TYPE_CHECKING:
     from telegram.ext import CallbackContext, Dispatcher
@@ -212,8 +211,7 @@ class CommandHandler(Handler):
                 filter_result = self.filters(update)
                 if filter_result:
                     return args, filter_result
-                else:
-                    return False
+                return False
         return None
 
     def collect_optional_args(
@@ -270,9 +268,6 @@ class PrefixHandler(CommandHandler):
     use ~``Filters.update.edited_message``.
 
     Attributes:
-        prefix (:obj:`str` | List[:obj:`str`]): The prefix(es) that will precede :attr:`command`.
-        command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
-            should listen for.
         callback (:obj:`callable`): The callback function for this handler.
         filters (:class:`telegram.ext.BaseFilter`): Optional. Only allow updates with these
             Filters.
@@ -380,6 +375,12 @@ class PrefixHandler(CommandHandler):
 
     @property
     def prefix(self) -> List[str]:
+        """
+        The prefixes that will precede :attr:`command`.
+
+        Returns:
+            List[:obj:`str`]
+        """
         return self._prefix
 
     @prefix.setter
@@ -392,6 +393,12 @@ class PrefixHandler(CommandHandler):
 
     @property  # type: ignore[override]
     def command(self) -> List[str]:  # type: ignore[override]
+        """
+        The list of commands this handler should listen for.
+
+        Returns:
+            List[:obj:`str`]
+        """
         return self._command
 
     @command.setter
@@ -427,8 +434,7 @@ class PrefixHandler(CommandHandler):
                 filter_result = self.filters(update)
                 if filter_result:
                     return text_list[1:], filter_result
-                else:
-                    return False
+                return False
         return None
 
     def collect_additional_context(

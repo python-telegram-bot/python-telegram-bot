@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=R0902,R0912,R0913
+# pylint: disable=R0902,R0913
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2020
@@ -19,9 +19,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineQuery."""
 
-from telegram import TelegramObject, User, Location
+from typing import TYPE_CHECKING, Any, Optional
+
+from telegram import Location, TelegramObject, User
 from telegram.utils.types import JSONDict
-from typing import Any, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -59,8 +60,8 @@ class InlineQuery(TelegramObject):
     """
 
     def __init__(
-        self,
-        id: str,
+        self,  # pylint: disable=W0613
+        id: str,  # pylint: disable=W0622
         from_user: User,
         query: str,
         offset: str,
@@ -69,7 +70,7 @@ class InlineQuery(TelegramObject):
         **kwargs: Any,
     ):
         # Required
-        self.id = id
+        self.id = id  # pylint: disable=C0103
         self.from_user = from_user
         self.query = query
         self.offset = offset

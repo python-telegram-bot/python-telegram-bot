@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatPhoto."""
-from telegram import TelegramObject
+from typing import TYPE_CHECKING, Any
 
-from typing import Any, TYPE_CHECKING
+from telegram import TelegramObject
 
 if TYPE_CHECKING:
     from telegram import Bot, File
@@ -63,7 +63,7 @@ class ChatPhoto(TelegramObject):
     """
 
     def __init__(
-        self,
+        self,  # pylint: disable=W0613
         small_file_id: str,
         small_file_unique_id: str,
         big_file_id: str,

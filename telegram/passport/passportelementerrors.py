@@ -16,10 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+# pylint: disable=W0622
 """This module contains the classes that represent Telegram PassportElementError."""
 
-from telegram import TelegramObject
 from typing import Any
+
+from telegram import TelegramObject
 
 
 class PassportElementError(TelegramObject):
@@ -40,7 +42,9 @@ class PassportElementError(TelegramObject):
 
     """
 
-    def __init__(self, source: str, type: str, message: str, **kwargs: Any):
+    def __init__(
+        self, source: str, type: str, message: str, **kwargs: Any
+    ):  # pylint: disable=W0613
         # Required
         self.source = str(source)
         self.type = str(type)
@@ -77,7 +81,9 @@ class PassportElementErrorDataField(PassportElementError):
 
     """
 
-    def __init__(self, type: str, field_name: str, data_hash: str, message: str, **kwargs: Any):
+    def __init__(
+        self, type: str, field_name: str, data_hash: str, message: str, **kwargs: Any
+    ):  # pylint: disable=W0613
         # Required
         super().__init__('data', type, message)
         self.field_name = field_name
@@ -112,7 +118,9 @@ class PassportElementErrorFile(PassportElementError):
 
     """
 
-    def __init__(self, type: str, file_hash: str, message: str, **kwargs: Any):
+    def __init__(
+        self, type: str, file_hash: str, message: str, **kwargs: Any
+    ):  # pylint: disable=W0613
         # Required
         super().__init__('file', type, message)
         self.file_hash = file_hash
@@ -146,14 +154,14 @@ class PassportElementErrorFiles(PassportElementError):
 
     """
 
-    def __init__(self, type: str, file_hashes: str, message: str, **kwargs: Any):
+    def __init__(
+        self, type: str, file_hashes: str, message: str, **kwargs: Any
+    ):  # pylint: disable=W0613
         # Required
         super().__init__('files', type, message)
         self.file_hashes = file_hashes
 
-        self._id_attrs = (self.source, self.type, self.message) + tuple(
-            [file_hash for file_hash in file_hashes]
-        )
+        self._id_attrs = (self.source, self.type, self.message) + tuple(file_hashes)
 
 
 class PassportElementErrorFrontSide(PassportElementError):
@@ -182,7 +190,9 @@ class PassportElementErrorFrontSide(PassportElementError):
 
     """
 
-    def __init__(self, type: str, file_hash: str, message: str, **kwargs: Any):
+    def __init__(
+        self, type: str, file_hash: str, message: str, **kwargs: Any
+    ):  # pylint: disable=W0613
         # Required
         super().__init__('front_side', type, message)
         self.file_hash = file_hash
@@ -216,7 +226,9 @@ class PassportElementErrorReverseSide(PassportElementError):
 
     """
 
-    def __init__(self, type: str, file_hash: str, message: str, **kwargs: Any):
+    def __init__(
+        self, type: str, file_hash: str, message: str, **kwargs: Any
+    ):  # pylint: disable=W0613
         # Required
         super().__init__('reverse_side', type, message)
         self.file_hash = file_hash
@@ -248,7 +260,9 @@ class PassportElementErrorSelfie(PassportElementError):
 
     """
 
-    def __init__(self, type: str, file_hash: str, message: str, **kwargs: Any):
+    def __init__(
+        self, type: str, file_hash: str, message: str, **kwargs: Any
+    ):  # pylint: disable=W0613
         # Required
         super().__init__('selfie', type, message)
         self.file_hash = file_hash
@@ -284,7 +298,9 @@ class PassportElementErrorTranslationFile(PassportElementError):
 
     """
 
-    def __init__(self, type: str, file_hash: str, message: str, **kwargs: Any):
+    def __init__(
+        self, type: str, file_hash: str, message: str, **kwargs: Any
+    ):  # pylint: disable=W0613
         # Required
         super().__init__('translation_file', type, message)
         self.file_hash = file_hash
@@ -320,14 +336,14 @@ class PassportElementErrorTranslationFiles(PassportElementError):
 
     """
 
-    def __init__(self, type: str, file_hashes: str, message: str, **kwargs: Any):
+    def __init__(
+        self, type: str, file_hashes: str, message: str, **kwargs: Any
+    ):  # pylint: disable=W0613
         # Required
         super().__init__('translation_files', type, message)
         self.file_hashes = file_hashes
 
-        self._id_attrs = (self.source, self.type, self.message) + tuple(
-            [file_hash for file_hash in file_hashes]
-        )
+        self._id_attrs = (self.source, self.type, self.message) + tuple(file_hashes)
 
 
 class PassportElementErrorUnspecified(PassportElementError):
@@ -352,7 +368,9 @@ class PassportElementErrorUnspecified(PassportElementError):
 
     """
 
-    def __init__(self, type: str, element_hash: str, message: str, **kwargs: Any):
+    def __init__(
+        self, type: str, element_hash: str, message: str, **kwargs: Any
+    ):  # pylint: disable=W0613
         # Required
         super().__init__('unspecified', type, message)
         self.element_hash = element_hash

@@ -16,10 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+# pylint: disable=W0622
 """This module contains the classes that represent Telegram InlineQueryResult."""
 
-from telegram import TelegramObject
 from typing import Any
+
+from telegram import TelegramObject
 
 
 class InlineQueryResult(TelegramObject):
@@ -39,10 +41,10 @@ class InlineQueryResult(TelegramObject):
 
     """
 
-    def __init__(self, type: str, id: str, **kwargs: Any):
+    def __init__(self, type: str, id: str, **kwargs: Any):  # pylint: disable=W0613
         # Required
         self.type = str(type)
-        self.id = str(id)
+        self.id = str(id)  # pylint: disable=C0103
 
         self._id_attrs = (self.id,)
 

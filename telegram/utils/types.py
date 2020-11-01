@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains custom typing aliases."""
-from typing import Union, Any, Dict, TYPE_CHECKING, IO, Tuple, Optional
+from typing import IO, TYPE_CHECKING, Any, Dict, Optional, Tuple, Union
 
 if TYPE_CHECKING:
     from telegram import InputFile, Update

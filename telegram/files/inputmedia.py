@@ -18,11 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram InputMedia Objects."""
 
-from telegram import TelegramObject, InputFile, PhotoSize, Animation, Video, Audio, Document
+from typing import IO, Union, cast
+
+from telegram import Animation, Audio, Document, InputFile, PhotoSize, TelegramObject, Video
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
-
-from typing import Union, IO, cast
-
 from telegram.utils.types import FileLike
 
 
@@ -34,8 +33,6 @@ class InputMedia(TelegramObject):
     :class:`telegram.InputMediaVideo` for detailed use.
 
     """
-
-    pass
 
 
 class InputMediaAnimation(InputMedia):

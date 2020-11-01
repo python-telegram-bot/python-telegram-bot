@@ -18,11 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultContact."""
 
+from typing import TYPE_CHECKING, Any
+
 from telegram import InlineQueryResult
-from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from telegram import ReplyMarkup, InputMessageContent
+    from telegram import InputMessageContent, ReplyMarkup
 
 
 class InlineQueryResultContact(InlineQueryResult):
@@ -67,7 +68,7 @@ class InlineQueryResultContact(InlineQueryResult):
 
     def __init__(
         self,
-        id: str,
+        id: str,  # pylint: disable=W0622
         phone_number: str,
         first_name: str,
         last_name: str = None,
@@ -77,7 +78,7 @@ class InlineQueryResultContact(InlineQueryResult):
         thumb_width: int = None,
         thumb_height: int = None,
         vcard: str = None,
-        **kwargs: Any,
+        **kwargs: Any,  # pylint: disable=W0613
     ):
         # Required
         super().__init__('contact', id)

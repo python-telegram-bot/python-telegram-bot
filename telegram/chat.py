@@ -19,14 +19,15 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Chat."""
 
-from telegram import TelegramObject, ChatPhoto, constants
+from typing import TYPE_CHECKING, Any, List, Optional, ClassVar
+
+from telegram import ChatPhoto, TelegramObject, constants
+from telegram.utils.types import JSONDict
+
 from .chatpermissions import ChatPermissions
 
-from telegram.utils.types import JSONDict
-from typing import Any, Optional, List, TYPE_CHECKING, ClassVar
-
 if TYPE_CHECKING:
-    from telegram import Bot, Message, ChatMember
+    from telegram import Bot, ChatMember, Message
 
 
 class Chat(TelegramObject):
@@ -102,7 +103,7 @@ class Chat(TelegramObject):
     """:const:`telegram.constants.CHAT_CHANNEL`"""
 
     def __init__(
-        self,
+        self,  # pylint: disable=W0613
         id: int,
         type: str,
         title: str = None,
@@ -173,7 +174,7 @@ class Chat(TelegramObject):
             return None
 
         data['photo'] = ChatPhoto.de_json(data.get('photo'), bot)
-        from telegram import Message
+        from telegram import Message  # pylint: disable=C0415
 
         data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
         data['permissions'] = ChatPermissions.de_json(data.get('permissions'), bot)

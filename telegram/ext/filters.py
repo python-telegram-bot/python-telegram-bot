@@ -16,16 +16,17 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+# pylint: disable=C0112, C0103, W0221
 """This module contains the Filters for use with the MessageHandler class."""
 
 import re
+import warnings
 
 from abc import ABC, abstractmethod
 from threading import Lock
+from typing import Dict, FrozenSet, List, Match, Optional, Pattern, Set, Union, cast
 
-from telegram import Chat, Update, MessageEntity, Message
-
-from typing import Optional, Dict, Union, List, Pattern, Match, cast, Set, FrozenSet
+from telegram import Chat, Message, MessageEntity, Update
 
 __all__ = [
     'Filters',
@@ -35,6 +36,8 @@ __all__ = [
     'InvertedFilter',
     'MergedFilter',
 ]
+
+from telegram.utils.deprecate import TelegramDeprecationWarning
 
 
 class BaseFilter(ABC):
@@ -220,7 +223,8 @@ class MergedFilter(UpdateFilter):
         if self.or_filter and not isinstance(self.and_filter, bool) and self.or_filter.data_filter:
             self.data_filter = True
 
-    def _merge(self, base_output: Union[bool, Dict], comp_output: Union[bool, Dict]) -> Dict:
+    @staticmethod
+    def _merge(base_output: Union[bool, Dict], comp_output: Union[bool, Dict]) -> Dict:
         base = base_output if isinstance(base_output, dict) else {}
         comp = comp_output if isinstance(comp_output, dict) else {}
         for k in comp.keys():
@@ -236,7 +240,7 @@ class MergedFilter(UpdateFilter):
                 base[k] = comp_value
         return base
 
-    def filter(self, update: Update) -> Union[bool, Dict]:
+    def filter(self, update: Update) -> Union[bool, Dict]:  # pylint: disable=R0911
         base_output = self.base_filter(update)
         # We need to check if the filters are data filters and if so return the merged data.
         # If it's not a data filter or an or_filter but no matches return bool
@@ -256,12 +260,12 @@ class MergedFilter(UpdateFilter):
                 if self.data_filter:
                     return base_output
                 return True
-            else:
-                comp_output = self.or_filter(update)
-                if comp_output:
-                    if self.data_filter:
-                        return comp_output
-                    return True
+
+            comp_output = self.or_filter(update)
+            if comp_output:
+                if self.data_filter:
+                    return comp_output
+                return True
         return False
 
     def __repr__(self) -> str:
@@ -293,8 +297,7 @@ class _DiceEmoji(MessageFilter):
     ) -> Union[bool, '_DiceValues']:
         if isinstance(update, Update):
             return self.filter(update.effective_message)
-        else:
-            return self._DiceValues(update, self.name, emoji=self.emoji)
+        return self._DiceValues(update, self.name, emoji=self.emoji)
 
     def filter(self, message: Message) -> bool:
         if bool(message.dice):
@@ -341,8 +344,7 @@ class Filters:
         ) -> Union[bool, '_TextStrings']:
             if isinstance(update, Update):
                 return self.filter(update.effective_message)
-            else:
-                return self._TextStrings(update)
+            return self._TextStrings(update)
 
         def filter(self, message: Message) -> bool:
             return bool(message.text)
@@ -393,8 +395,7 @@ class Filters:
         ) -> Union[bool, '_CaptionStrings']:
             if isinstance(update, Update):
                 return self.filter(update.effective_message)
-            else:
-                return self._CaptionStrings(update)
+            return self._CaptionStrings(update)
 
         def filter(self, message: Message) -> bool:
             return bool(message.caption)
@@ -430,8 +431,7 @@ class Filters:
         ) -> Union[bool, '_CommandOnlyStart']:
             if isinstance(update, Update):
                 return self.filter(update.effective_message)
-            else:
-                return self._CommandOnlyStart(update)
+            return self._CommandOnlyStart(update)
 
         def filter(self, message: Message) -> bool:
             return bool(
@@ -949,19 +949,103 @@ officedocument.wordprocessingml.document")``-
         name = 'Filters.private'
 
         def filter(self, message: Message) -> bool:
+            warnings.warn(
+                'Filters.private is deprecated. Use Filters.chat_type.private instead.',
+                TelegramDeprecationWarning,
+                stacklevel=2,
+            )
             return message.chat.type == Chat.PRIVATE
 
     private = _Private()
-    """Messages sent in a private chat."""
+    """
+    Messages sent in a private chat.
+
+    Note:
+        DEPRECATED. Use
+        :attr:`telegram.ext.Filters.chat_type.private` instead.
+    """
 
     class _Group(MessageFilter):
         name = 'Filters.group'
 
         def filter(self, message: Message) -> bool:
+            warnings.warn(
+                'Filters.group is deprecated. Use Filters.chat_type.groups instead.',
+                TelegramDeprecationWarning,
+                stacklevel=2,
+            )
             return message.chat.type in [Chat.GROUP, Chat.SUPERGROUP]
 
     group = _Group()
-    """Messages sent in a group chat."""
+    """
+    Messages sent in a group or a supergroup chat.
+
+    Note:
+        DEPRECATED. Use
+        :attr:`telegram.ext.Filters.chat_type.groups` instead.
+    """
+
+    class _ChatType(MessageFilter):
+        name = 'Filters.chat_type'
+
+        class _Channel(MessageFilter):
+            name = 'Filters.chat_type.channel'
+
+            def filter(self, message: Message) -> bool:
+                return message.chat.type == Chat.CHANNEL
+
+        channel = _Channel()
+
+        class _Group(MessageFilter):
+            name = 'Filters.chat_type.group'
+
+            def filter(self, message: Message) -> bool:
+                return message.chat.type == Chat.GROUP
+
+        group = _Group()
+
+        class _SuperGroup(MessageFilter):
+            name = 'Filters.chat_type.supergroup'
+
+            def filter(self, message: Message) -> bool:
+                return message.chat.type == Chat.SUPERGROUP
+
+        supergroup = _SuperGroup()
+
+        class _Groups(MessageFilter):
+            name = 'Filters.chat_type.groups'
+
+            def filter(self, message: Message) -> bool:
+                return message.chat.type in [Chat.GROUP, Chat.SUPERGROUP]
+
+        groups = _Groups()
+
+        class _Private(MessageFilter):
+            name = 'Filters.chat_type.private'
+
+            def filter(self, message: Message) -> bool:
+                return message.chat.type == Chat.PRIVATE
+
+        private = _Private()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.chat.type)
+
+    chat_type = _ChatType()
+    """Subset for filtering the type of chat.
+
+    Examples:
+        Use these filters like: ``Filters.chat_type.channel`` or
+        ``Filters.chat_type.supergroup`` etc. Or use just ``Filters.chat_type`` for all
+        chat types.
+
+    Attributes:
+        channel: Updates from channel
+        group: Updates from group
+        supergroup: Updates from supergroup
+        groups: Updates from group *or* supergroup
+        private: Updates sent in private chat
+    """
 
     class user(MessageFilter):
         """Filters messages to allow only those which are from specified user ID(s) or

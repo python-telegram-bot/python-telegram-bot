@@ -18,22 +18,23 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Update."""
 
+from typing import TYPE_CHECKING, Any, Optional
+
 from telegram import (
-    Message,
-    TelegramObject,
-    InlineQuery,
-    ChosenInlineResult,
     CallbackQuery,
-    ShippingQuery,
-    PreCheckoutQuery,
+    ChosenInlineResult,
+    InlineQuery,
+    Message,
     Poll,
+    PreCheckoutQuery,
+    ShippingQuery,
+    TelegramObject,
 )
 from telegram.poll import PollAnswer
 from telegram.utils.types import JSONDict
-from typing import Any, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from telegram import Bot, User, Chat  # noqa
+    from telegram import Bot, Chat, User  # noqa
 
 
 class Update(TelegramObject):
@@ -97,7 +98,7 @@ class Update(TelegramObject):
     """
 
     def __init__(
-        self,
+        self,  # pylint: disable=W0613
         update_id: int,
         message: Message = None,
         edited_message: Message = None,

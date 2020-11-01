@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ShippingAddress."""
 
-from telegram import TelegramObject
 from typing import Any
+
+from telegram import TelegramObject
 
 
 class ShippingAddress(TelegramObject):
@@ -49,7 +50,7 @@ class ShippingAddress(TelegramObject):
     """
 
     def __init__(
-        self,
+        self,  # pylint: disable=W0613
         country_code: str,
         state: str,
         city: str,

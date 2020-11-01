@@ -18,9 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram MessageEntity."""
 
-from telegram import User, TelegramObject, constants
+from typing import TYPE_CHECKING, Any, List, Optional, ClassVar
+
+from telegram import TelegramObject, User, constants
 from telegram.utils.types import JSONDict
-from typing import Any, Optional, List, TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -59,8 +60,8 @@ class MessageEntity(TelegramObject):
     """
 
     def __init__(
-        self,
-        type: str,
+        self,  # pylint: disable=W0613
+        type: str,  # pylint: disable=W0622
         offset: int,
         length: int,
         url: str = None,

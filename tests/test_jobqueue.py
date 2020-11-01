@@ -306,9 +306,17 @@ class TestJobQueue:
         time_of_day = expected_reschedule_time.time().replace(tzinfo=timezone)
 
         day = now.day
-        expected_reschedule_time = timezone.normalize(
-            expected_reschedule_time + dtm.timedelta(calendar.monthrange(now.year, now.month)[1])
-        )
+        this_months_days = calendar.monthrange(now.year, now.month)[1]
+        if now.month == 12:
+            next_months_days = calendar.monthrange(now.year + 1, 1)[1]
+        else:
+            next_months_days = calendar.monthrange(now.year, now.month + 1)[1]
+
+        expected_reschedule_time += dtm.timedelta(this_months_days)
+        if next_months_days < this_months_days:
+            expected_reschedule_time += dtm.timedelta(next_months_days)
+
+        expected_reschedule_time = timezone.normalize(expected_reschedule_time)
         # Adjust the hour for the special case that between now and next month a DST switch happens
         expected_reschedule_time += dtm.timedelta(
             hours=time_of_day.hour - expected_reschedule_time.hour
@@ -473,16 +481,16 @@ class TestJobQueue:
         sleep(0.1)
         assert len(caplog.records) == 1
         rec = caplog.records[-1]
-        assert 'processing the job' in rec.msg
-        assert 'uncaught error was raised while handling' in rec.msg
+        assert 'processing the job' in rec.getMessage()
+        assert 'uncaught error was raised while handling' in rec.getMessage()
         caplog.clear()
 
         with caplog.at_level(logging.ERROR):
             job.run(dp)
         assert len(caplog.records) == 1
         rec = caplog.records[-1]
-        assert 'processing the job' in rec.msg
-        assert 'uncaught error was raised while handling' in rec.msg
+        assert 'processing the job' in rec.getMessage()
+        assert 'uncaught error was raised while handling' in rec.getMessage()
         caplog.clear()
 
         # Remove handler
@@ -494,11 +502,11 @@ class TestJobQueue:
         sleep(0.1)
         assert len(caplog.records) == 1
         rec = caplog.records[-1]
-        assert 'No error handlers are registered' in rec.msg
+        assert 'No error handlers are registered' in rec.getMessage()
         caplog.clear()
 
         with caplog.at_level(logging.ERROR):
             job.run(dp)
         assert len(caplog.records) == 1
         rec = caplog.records[-1]
-        assert 'No error handlers are registered' in rec.msg
+        assert 'No error handlers are registered' in rec.getMessage()

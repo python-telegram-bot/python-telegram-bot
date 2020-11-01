@@ -1,11 +1,10 @@
 .DEFAULT_GOAL := help
-.PHONY: clean pep257 pep8 yapf lint test install
+.PHONY: clean pep8 black lint test install
 
 PYLINT          := pylint
 PYTEST          := pytest
-PEP257          := pep257
 PEP8            := flake8
-YAPF            := yapf
+BLACK           := black
 MYPY            := mypy
 PIP             := pip
 
@@ -15,22 +14,20 @@ clean:
 	find . -name '*.pyc' -exec rm -f {} \;
 	find . -name '*.pyo' -exec rm -f {} \;
 	find . -name '*~' -exec rm -f {} \;
-	find . -regex "./telegram.\(mp3\|mp4\|ogg\|png\|webp\)" -exec rm {} \;
-
-pep257:
-	$(PEP257) telegram
+	find . -regex "./telegram[0-9]*.\(jpg\|mp3\|mp4\|ogg\|png\|webp\)" -exec rm {} \;
 
 pep8:
-	$(PEP8) telegram
+	$(PEP8) telegram tests examples
 
-yapf:
-	$(YAPF) -r telegram
+black:
+	$(BLACK) .
 
 lint:
-	$(PYLINT) -E telegram --disable=no-name-in-module,import-error
+	$(PYLINT) --rcfile=setup.cfg telegram examples
 
 mypy:
 	$(MYPY) -p telegram
+	$(MYPY) examples
 
 test:
 	$(PYTEST) -v
@@ -41,18 +38,16 @@ install:
 help:
 	@echo "Available targets:"
 	@echo "- clean       Clean up the source directory"
-	@echo "- pep257      Check docstring style with pep257"
 	@echo "- pep8        Check style with flake8"
 	@echo "- lint        Check style with pylint"
-	@echo "- yapf        Check style with yapf"
+	@echo "- black       Check style with black"
 	@echo "- mypy        Check type hinting with mypy"
 	@echo "- test        Run tests using pytest"
 	@echo
 	@echo "Available variables:"
 	@echo "- PYLINT      default: $(PYLINT)"
 	@echo "- PYTEST      default: $(PYTEST)"
-	@echo "- PEP257      default: $(PEP257)"
 	@echo "- PEP8        default: $(PEP8)"
-	@echo "- YAPF        default: $(YAPF)"
+	@echo "- BLACK       default: $(BLACK)"
 	@echo "- MYPY        default: $(MYPY)"
 	@echo "- PIP         default: $(PIP)"

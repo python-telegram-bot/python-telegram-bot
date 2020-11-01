@@ -23,9 +23,9 @@ except ImportError:
     import json  # type: ignore[no-redef]
 
 import warnings
+from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Type, TypeVar
 
 from telegram.utils.types import JSONDict
-from typing import Tuple, Any, Optional, Type, TypeVar, TYPE_CHECKING, List
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -36,7 +36,7 @@ TO = TypeVar('TO', bound='TelegramObject', covariant=True)
 class TelegramObject:
     """Base class for most telegram objects."""
 
-    # def __init__(self, *args: Any, **kwargs: Any):
+    # def __init__(self, *args: Any, **kwargs: Any):  # pylint: disable=W0613
     #     pass
 
     _id_attrs: Tuple[Any, ...] = ()
@@ -62,8 +62,7 @@ class TelegramObject:
 
         if cls == TelegramObject:
             return cls()
-        else:
-            return cls(bot=bot, **data)  # type: ignore[call-arg]
+        return cls(bot=bot, **data)  # type: ignore[call-arg]
 
     @classmethod
     def de_list(cls: Type[TO], data: Optional[List[JSONDict]], bot: 'Bot') -> List[Optional[TO]]:
