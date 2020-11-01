@@ -1,1 +1,1 @@
-include LICENSE LICENSE.lesser Makefile requirements.txt
+include LICENSE LICENSE.lesser Makefile requirements.txt py.typed
