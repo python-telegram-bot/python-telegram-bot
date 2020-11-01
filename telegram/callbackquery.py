@@ -368,3 +368,24 @@ class CallbackQuery(TelegramObject):
         return self.bot.get_game_high_scores(
             chat_id=self.message.chat_id, message_id=self.message.message_id, *args, **kwargs
         )
+
+    def delete_message(self, *args: Any, **kwargs: Any) -> Union[Message, bool]:
+        """Shortcut for::
+
+            bot.delete_message(
+                chat_id=update.callback_query.message.chat_id,
+                message_id=update.callback_query.message.message_id,
+                *args,
+                **kwargs
+            )
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.delete_message(
+            chat_id=self.message.chat_id,
+            message_id=self.message.message_id,
+            *args,
+            **kwargs,
+        )
