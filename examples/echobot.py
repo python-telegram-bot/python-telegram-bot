@@ -19,15 +19,15 @@ import logging
 from telethon.tl.types import BotInlineResult
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-from get_mess import get_mes, get_mes2
+from get_mess import get_mes
 from telegram.bot import *
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 import telegram.message
 import telegram.chat
 import datetime
 import time
+from check_follow import check_follow_yet, check_profile
 
-from check_follow import check_follow_yet
 # from telethon.tl.functions.messages import GetHistoryRequest
 
 from telethon.tl.functions.channels import GetMessagesRequest
@@ -36,39 +36,51 @@ from telethon.tl.functions.channels import GetMessagesRequest
 #print(obj)
 obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
 # get name by username id
+#print(obj.edit_message_text('@namtestgroup',1))
+#print(obj.get_chat_member('@namtestgroup',1098222229).user.username) # viettelnguyen
+#print(obj.get_chat_member('@namtestgroup',1098222229))
 
-print(obj.get_chat_member('@namtestgroup',1098222229).user.username) # viettelnguyen
-print(obj.get_chat_member('@namtestgroup',1098222229))
-
-print('.........................................................')
+#print('.........................................................')
 #auto_delete_message('1098222229') #delete warning from bot
-'''
-sec=GetMessagesRequest('@namtestgroup',id=[42])
-print('getMessageRequest -',sec)
+
+#sec=GetMessagesRequest('@namtestgroup',id=[3,1,2])
+#print('getMessageRequest -',sec)
+
+def get_links_from_file(get_username=False):
+    try:
+        with open('user.txt','r') as f:
+            lines=f.readlines() #include '\n' (newline)
+    except:
+        print('can not open links file')
+    clean=[]
+    for i in lines:
+        if get_username == True:
+            clean.append(i[i.find('com/')+4:-1])
+        else:
+            clean.append(i[:-1])      
+    return clean
 
 
-obj1=Message('-1001192378669',from_user='hoai97nambot',date=datetime.datetime(2020,10,1),chat='namtestgroup')
-print(obj1.text_html)
+obj1=Message(1,from_user='testbot',date=datetime.datetime(2020,10,31),chat='Testbot2')
 
-'''
-
-# obj2=GetHistoryRequest('@namtestgroup', offset_id=None,offset_date=None,add_offset=None,limit=10,\
-#     max_id=None, min_id=None, hash='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
-# print(obj2)
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 # BotInlineMessageText("hello")
-a=get_mes()
-print('***************************')
-container=[]
-count=1
-for i in range(10):
-    container.append('{}. [{}]({})'.format(count,a[i][0],a[i][1]))
-    count+=1
+def get_list():  
+    a=get_links_from_file()
+    container=[]
+    count=1
+    for i in a:
+        container.append('{}. [{}]({})'.format(count,i[i.find('com/')+4:],i))
+        count+=1
+    return container
 
+def get_user():
+    a=get_mes()
+    return a
 # st='📸 '+ a[a.find('](')+2:a.find('))')]
 ad='🔥 Get more likes & comments by joining our other groups👇 \n \
 ❤️Happy engaging❤️ \n \
@@ -92,18 +104,13 @@ def start(update, context):
     # obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
     # obj.send_message('@hoai97nambot','container[0]',parse_mode='Markdown',disable_web_page_preview=True,reply_markup=reply_markup1)
     m=''
-    for i in container:
+    k=get_list()
+    for i in k:
         m=m+ '\n'+i
     send_to_destination(update.message.from_user.id,m)
         
     # update.message.reply_text(a,disable_web_page_preview=True),
-'''
-def list(update, context):
-    """Send a message when the command /start is issued."""
-##    a=get_mes()
-##    print(a)
-    update.message.reply_text('a')
-    '''
+
 def help_command(update, context):
     """Send a message when the command /help is issued."""
     # update.message.reply_text('Help!'+ str(update.message.from_user.username))
@@ -125,22 +132,32 @@ def check_condition_messtopost(link):
 #==========================================================================================
 def echo(update, context): # important info in this function
     """Echo the user message."""
-    a=update.message.text
-    if a[-1]=='/':
-        a=a[:-1]
-    if a[:4] == 'dx10' or a[:4] == 'Dx10':
+    aa=update.message.text
+   
+    if aa[:4] == 'dx10' or aa[:4] == 'Dx10':
         # check_condition_messtopost(update.message.text)
-        if check_follow_yet(extract_usr(a) and check_profile_link(a):
+        if get_and_extract() and check_profile_link(aa):
             tele_usr='@'+ update.message.from_user.username
-            bot_push_message(update.message.text,tele_usr)
+            bot_push_message(aa,tele_usr)
             # update.message.reply_text(update.message.text)
             time.sleep(5)
             auto_delete_message(update.message.message_id)
-#else: check following reasons: 1. no enough follow\n2. input link with non-exist profile\n3. wrong syntax
+        else:
+            update.message.reply_text('Please check following reasons: \
+                ✅ No enough follow \n \
+                ✅ Input link with non-exist profile \n \
+                ✅ Wrong syntax',reply_markup=reply_markup1)
+            auto_delete_message(update.message.message_id)
+            time.sleep(5)
+            auto_delete_message(update.message.message_id+1)
+    elif check_profile_link(aa) and aa[:4]=='drop':
+        bot_push_message(aa,'Auto Drop')   
+        auto_delete_message(update.message.message_id)     
     else:
-        update.message.reply_text('Wrong syntax !!!\n Please check again or read our rules')
+        update.message.reply_text('Wrong syntax !!!\n Please check again or read our rules',reply_markup=reply_markup1)
     
         auto_delete_message(update.message.message_id)
+        time.sleep(3)
         auto_delete_message(update.message.message_id+1)
 def send_to_destination(des,mess):
     # destination='@innertest'
@@ -166,13 +183,6 @@ def bot_push_message(link, user):
 
 # this scripts used for testing 👤entrepreneurs_club01 ✅
 
-for i in range(10):
-    wrap=a[i][1]
-    insta_name=wrap[wrap.find('com/')+4:-2]
-    me='👤 '+a[i][0]+ ' ✅ '+' Dx10 [{}]({})'.format(insta_name,a[i][1])
-    print(me)
-    # auto_send_message(me)
-#
 def auto_delete_message(mess_id):
     obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
     try:
@@ -189,17 +199,37 @@ def post_ad(ad):
         time.sleep(5*60)
 
 def extract_usr(a):
+    # get username from instagram url
     lit=[]
     for i in a:
         c=i[1]
         lit.append(c[c.find('com/')+4:])
     return lit
-
+def get_and_extract():
+    lit=get_links_from_file(get_username=True)
+    r=check_follow_yet(lit)
+    return r
+def check_repost(usrname_in_repost_link):
+    # check if a link  is able to repost
+    sample = get_links_from_file(get_username=True)
+    if usrname_in_repost_link in sample:
+        return 0
+    return 1
 def check_profile_link(link):
+    # check valid instagram url from user
     if link.find('https://www.instagram.com/') and check_profile(link[31:]):
         return 1
     return 0
-    
+
+def send_notify(content,mess_id):
+    obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
+    try:
+        obj.send_message('@namtestgroup',content)
+        time.sleep(5)
+        obj.delete_message('@namtestgroup',mess_id)
+    except:
+        print('message haven\'t been sent/deleted yet')
+        
 def main():
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
@@ -209,14 +239,13 @@ def main():
     # obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
     # st='📸 '+ a[-1]
     # obj.send_message('@innertest',st, reply_markup=reply_markup)
-
+   
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help_command))
-
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
     # Start the Bot
@@ -227,7 +256,6 @@ def main():
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
     
-
 
 if __name__ == '__main__':
     main()
