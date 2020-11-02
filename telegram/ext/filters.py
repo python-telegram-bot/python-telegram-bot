@@ -625,11 +625,13 @@ class Filters:
                     filters files with extension ``".Dockerfile"`` minding the case.
             """
 
-            def __init__(self, file_extension: Optional[str], *, case_sensitive: bool = False):
+            def __init__(
+                self, file_extension: Optional[str] = None, *, case_sensitive: bool = False
+            ):
                 """Initialize the extension you want to filter.
 
                 Args:
-                    file_extension (:obj:`str` | :obj:`None`):
+                    file_extension (:obj:`str`, optional):
                         media file extension you want to filter.
                     case_sensitive (:obj:bool, optional):
                         pass :obj:`True` to make the filter case sensitive.
@@ -638,7 +640,7 @@ class Filters:
                 self.is_case_sensitive = case_sensitive
                 if file_extension is None:
                     self.file_extension = None
-                    self.name = "Filters.document.file_extension(None)"
+                    self.name = "Filters.document.file_extension()"
                 elif case_sensitive:
                     self.file_extension = f".{file_extension}"
                     self.name = (
@@ -647,7 +649,7 @@ class Filters:
                     )
                 else:
                     self.file_extension = f".{file_extension}".lower()
-                    self.name = f"Filters.document.file_extension({self.file_extension!r})"
+                    self.name = f"Filters.document.file_extension({file_extension.lower()!r})"
 
             def filter(self, message: Message) -> bool:
                 """"""  # remove method from docs
