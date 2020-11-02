@@ -604,7 +604,7 @@ class Filters:
         zip = mime_type('application/zip')
 
         class file_extension(MessageFilter):
-            """ This filter filters documents by their file ending/extension
+            """This filter filters documents by their file ending/extension.
 
             Note:
                 This Filter only filters by the file ending/extension of the document,
@@ -613,22 +613,30 @@ class Filters:
                     send media with wrong types that don't fit to this handler.
 
             Example:
-                ``Filters.document.file_extension('jpg')`` filters all files with extension ``.jpg``
+                ``Filters.document.file_extension('jpg')`` filters files with extension ``.jpg``.
             """
 
             def __init__(self, file_extension: Optional[str]):
-                """Initialize the extension you want to filter
+                """Initialize the extension you want to filter.
 
                 Args:
-                    file_extension (str, optional): file extension of the media you want to filter"""
-                self.file_extension = file_extension
-                self.name = f"Filters.document.file_extenision('{self.file_extension}')"
+                    file_extension (str, optional): media file extension you want to filter.
+                """
+                if file_extension is None:
+                    self.file_extension = file_extension
+                elif file_extension.startswith("."):
+                    self.file_extension = file_extension
+                else:
+                    self.file_extension = f".{file_extension}"
+                self.name = f"Filters.document.file_extension({self.file_extension!r})"
 
-            def filter(self, message : Message) -> bool:
+            def filter(self, message: Message) -> bool:
                 """"""  # remove method from docs
-                if message.document:
-                    return message.document.file_name.endswith(self.file_extension)
-                return False
+                if message.document is None:
+                    return False
+                if self.file_extension is None:
+                    return True
+                return message.document.file_name.endswith(self.file_extension)
 
         def filter(self, message: Message) -> bool:
             return bool(message.document)

@@ -424,19 +424,44 @@ class TestFilters:
         update.message.document.mime_type = "application/x-sh"
         assert Filters.document.category("application/")(update)
         assert Filters.document.mime_type("application/x-sh")(update)
- 
-        update.message.document.file_name = "file.docx"
-        assert Filters.document.file_extension('docx')(update)
-        assert not Filters.document.file_extension('pdf')(update)
-        
+
+    def test_filters_file_extension(self, update):
+        update.message.document = Document(
+            "file_id",
+            "unique_id",
+            file_name="file.jpg",
+            mime_type="image/jpeg",
+        )
+        assert Filters.document.file_extension("jpg")(update)
+        assert Filters.document.file_extension(".jpg")(update)
+        assert Filters.document.file_extension(None)(update)
+        assert not Filters.document.file_extension("jpeg")(update)
+        assert not Filters.document.file_extension("e.jpg")(update)
+        assert not Filters.document.file_extension("file.jpg")(update)
+        assert not Filters.document.file_extension("")(update)
+
         update.message.document.file_name = "file.tar.gz"
-        assert Filters.document.file_extension('tar.gz')(update)
-        assert not Filters.document.file_extension('zip')(update)
-        
-        update.message.document.file_name = "file.png"
-        assert Filters.document.file_extension('png')(update)
-        assert not Filters.document.file_extension('jpeg')(update)
-        
+        assert Filters.document.file_extension("tar.gz")(update)
+        assert Filters.document.file_extension("gz")(update)
+        assert not Filters.document.file_extension("tgz")(update)
+        assert not Filters.document.file_extension("jpg")(update)
+
+        update.message.document.file_name = "file.docx"
+        assert Filters.document.file_extension("docx")(update)
+        assert not Filters.document.file_extension("doc")(update)
+        assert not Filters.document.file_extension("ocx")(update)
+
+        update.message.document.file_name = "file"
+        assert Filters.document.file_extension(None)(update)
+        assert not Filters.document.file_extension("")(update)
+        assert not Filters.document.file_extension("file")(update)
+
+        update.message.document.file_name = "file."
+        assert Filters.document.file_extension("")(update)
+
+        update.message.document = None
+        assert not Filters.document.file_extension("jpg")(update)
+
     def test_filters_animation(self, update):
         assert not Filters.animation(update)
         update.message.animation = 'test'
