@@ -22,8 +22,13 @@ import telegram.chat
 import datetime
 import time
 from check_follow import check_follow_yet, check_profile
+# declare constant
 
-obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
+TOKEN = '1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4'
+GROUP = '@follownetwork30'
+FILE = 'user.txt'
+GROUP_TYPE = 'Dx30'
+
 
 #auto_delete_message('1098222229') #delete warning from bot
 
@@ -67,7 +72,7 @@ keyboard = [[InlineKeyboardButton("✅   Rules   ✅", url='https://t.me/hoai97n
 
 reply_markup = InlineKeyboardMarkup(keyboard)
 
-list_markup = [[InlineKeyboardButton("🚀 Dx10 Follow chain 🚀", url='https://t.me/namtestgroup')]]
+list_markup = [[InlineKeyboardButton("🚀 Dx30 Follow chain 🚀", url='https://t.me/follownetwork30')]]
 reply_markup1 = InlineKeyboardMarkup(list_markup)
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
@@ -77,7 +82,8 @@ def start(update, context):
     k=get_list()
     for i in k:
         m=m+ '\n'+i
-    send_to_destination(update.message.from_user.id, m)    
+    send_to_destination(update.message.from_user.id, m)
+    auto_delete_message(update.message.message_id)    
 
 
 def help_command(update, context):
@@ -95,9 +101,9 @@ def echo(update, context): # important info in this function
     """Echo the user message."""
     aa=update.message.text # get typed link
    
-    if aa[:4] == 'dx10' or aa[:4] == 'Dx10':
+    if aa[:4] == 'dx30' or aa[:4] == 'Dx30':
         # check bunch of of conditions
-        if get_and_extract() and check_profile_link(aa):
+        if get_and_extract() and check_profile_link(aa) and check_repost(aa[31:]):
             tele_usr='@'+ update.message.from_user.username
             bot_push_message(aa,tele_usr)
             # tidy user's message
@@ -112,7 +118,7 @@ def echo(update, context): # important info in this function
             time.sleep(5)
             auto_delete_message(update.message.message_id+1)
     # auto drop functions
-    elif check_profile_link(aa) and aa[:4]=='drop':
+    elif check_profile_link(aa) and aa[:4]=='drop' and check_repost(aa[31:]):
         bot_push_message(aa,'Auto Drop')   
         auto_delete_message(update.message.message_id)     
     else:
@@ -124,28 +130,28 @@ def echo(update, context): # important info in this function
 def send_to_destination(des,mess):
     # destination = chat name with @:format
     # use to send toward user 
-    obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
+    obj=Bot(token=TOKEN)
     obj.send_message(des,mess,parse_mode='Markdown',disable_web_page_preview=True,reply_markup=reply_markup1)
 
 def auto_send_message(st):
-    obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
-    obj.send_message('@namtestgroup',st,parse_mode='Markdown',disable_web_page_preview=True,reply_markup=reply_markup)
+    obj=Bot(token=TOKEN)
+    obj.send_message(GROUP,st,parse_mode='Markdown',disable_web_page_preview=True,reply_markup=reply_markup)
 
 def bot_push_message(link, user):
     #trim input link
     if link[-1] =='/':
         link=link[:-1]
-    obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
+    obj=Bot(token=TOKEN)
     sub_link = link[link.find('com/')+4:]
-    me='👤 '+user+ ' ✅ '+' Dx10 [{}]({})'.format(sub_link,link[5:])
+    me='👤 '+user+ ' ✅ '+' Dx30 [{}]({})'.format(sub_link,link[5:])
     print(me)
-    obj.send_message('@namtestgroup',me, parse_mode='Markdown',disable_web_page_preview=True,reply_markup=reply_markup)
+    obj.send_message(GROUP,me, parse_mode='Markdown',disable_web_page_preview=True,reply_markup=reply_markup)
 # this scripts used for testing 👤entrepreneurs_club01 ✅
 
 def auto_delete_message(mess_id):
-    obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
+    obj=Bot(token=TOKEN)
     try:
-        obj.delete_message('@namtestgroup',mess_id)
+        obj.delete_message(GROUP,mess_id)
     except:
         print('message haven\'t been deleted yet')
 
@@ -176,11 +182,11 @@ def check_profile_link(link):
     return 0
 
 def send_notify(content,mess_id):
-    obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
+    obj=Bot(token=TOKEN)
     try:
-        obj.send_message('@namtestgroup',content)
+        obj.send_message(GROUP,content)
         time.sleep(5)
-        obj.delete_message('@namtestgroup',mess_id)
+        obj.delete_message(GROUP,mess_id)
     except:
         print('message haven\'t been sent/deleted yet')
         
@@ -189,7 +195,7 @@ def main():
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
-    updater = Updater("1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4", use_context=True)
+    updater = Updater(TOKEN, use_context=True)
     # obj=Bot(token='1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4')
     # st='📸 '+ a[-1]
     # obj.send_message('@innertest',st, reply_markup=reply_markup)
