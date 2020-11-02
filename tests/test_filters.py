@@ -468,6 +468,11 @@ class TestFilters:
 
         update.message.document.file_name = "file.JPG"
         assert Filters.document.file_extension("jpg")(update)
+        assert not Filters.document.file_extension("jpg", case_sensitive=True)(update)
+
+        update.message.document.file_name = "file.Dockerfile"
+        assert Filters.document.file_extension("Dockerfile", case_sensitive=True)(update)
+        assert not Filters.document.file_extension("DOCKERFILE", case_sensitive=True)(update)
 
         update.message.document = None
         assert not Filters.document.file_extension("jpg")(update)

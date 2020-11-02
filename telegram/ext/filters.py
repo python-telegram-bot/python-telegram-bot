@@ -607,32 +607,47 @@ class Filters:
             """This filter filters documents by their file ending/extension.
 
             Note:
-                This Filter only filters by the file ending/extension of the document,
+                * This Filter only filters by the file ending/extension of the document,
                     it doesn't check the validity of document.
-                The user can manipulate the file extension of a document and
+                * The user can manipulate the file extension of a document and
                     send media with wrong types that don't fit to this handler.
+                * Case insensitive by default,
+                    you may change it with the flag ``case_sensitive=True``.
+                * Extension should be passed without leading dot
+                    unless it's a part of the extension.
 
             Example:
                 ``Filters.document.file_extension("jpg")``
                     filters files with extension ``".jpg"``.
                 ``Filters.document.file_extension(".jpg")``
                     filters files with extension ``"..jpg"``.
+                ``Filters.document.file_extension("Dockerfile", case_sensitive=True)``
+                    filters files with extension ``".Dockerfile"`` minding the case.
             """
 
-            def __init__(self, file_extension: Optional[str]):
+            def __init__(self, file_extension: Optional[str], *, case_sensitive: bool = False):
                 """Initialize the extension you want to filter.
 
                 Args:
-                    file_extension (str, optional):
+                    file_extension (:obj:`str` | :obj:`None`):
                         media file extension you want to filter.
-                        Argument should be passed without leading dot
-                        unless it's a part of the extension.
+                    case_sensitive (:obj:bool, optional):
+                        pass :obj:`True` to make the filter case sensitive.
+                        Default: :obj:`False`.
                 """
+                self.is_case_sensitive = case_sensitive
                 if file_extension is None:
-                    self.file_extension = file_extension
+                    self.file_extension = None
+                    self.name = "Filters.document.file_extension(None)"
+                elif case_sensitive:
+                    self.file_extension = f".{file_extension}"
+                    self.name = (
+                        f"Filters.document.file_extension({file_extension!r},"
+                        " case_sensitive=True)"
+                    )
                 else:
                     self.file_extension = f".{file_extension}".lower()
-                self.name = f"Filters.document.file_extension({file_extension!r})"
+                    self.name = f"Filters.document.file_extension({self.file_extension!r})"
 
             def filter(self, message: Message) -> bool:
                 """"""  # remove method from docs
@@ -640,7 +655,11 @@ class Filters:
                     return False
                 if self.file_extension is None:
                     return True
-                return message.document.file_name.lower().endswith(self.file_extension)
+                if self.is_case_sensitive:
+                    filename = message.document.file_name
+                else:
+                    filename = message.document.file_name.lower()
+                return filename.endswith(self.file_extension)
 
         def filter(self, message: Message) -> bool:
             return bool(message.document)
