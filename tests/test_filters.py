@@ -433,12 +433,14 @@ class TestFilters:
             mime_type="image/jpeg",
         )
         assert Filters.document.file_extension("jpg")(update)
+        assert Filters.document.file_extension("JPG")(update)
         assert Filters.document.file_extension(None)(update)
         assert not Filters.document.file_extension(".jpg")(update)
         assert not Filters.document.file_extension("jpeg")(update)
         assert not Filters.document.file_extension("e.jpg")(update)
         assert not Filters.document.file_extension("file.jpg")(update)
         assert not Filters.document.file_extension("")(update)
+        assert not Filters.document.file_extension("None")(update)
 
         update.message.document.file_name = "file.tar.gz"
         assert Filters.document.file_extension("tar.gz")(update)
@@ -463,6 +465,9 @@ class TestFilters:
 
         update.message.document.file_name = "file."
         assert Filters.document.file_extension("")(update)
+
+        update.message.document.file_name = "file.JPG"
+        assert Filters.document.file_extension("jpg")(update)
 
         update.message.document = None
         assert not Filters.document.file_extension("jpg")(update)

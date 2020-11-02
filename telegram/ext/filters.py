@@ -631,7 +631,7 @@ class Filters:
                 if file_extension is None:
                     self.file_extension = file_extension
                 else:
-                    self.file_extension = f".{file_extension}"
+                    self.file_extension = f".{file_extension}".lower()
                 self.name = f"Filters.document.file_extension({file_extension!r})"
 
             def filter(self, message: Message) -> bool:
@@ -640,7 +640,7 @@ class Filters:
                     return False
                 if self.file_extension is None:
                     return True
-                return message.document.file_name.endswith(self.file_extension)
+                return message.document.file_name.lower().endswith(self.file_extension)
 
         def filter(self, message: Message) -> bool:
             return bool(message.document)
