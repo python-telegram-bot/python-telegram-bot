@@ -613,22 +613,26 @@ class Filters:
                     send media with wrong types that don't fit to this handler.
 
             Example:
-                ``Filters.document.file_extension('jpg')`` filters files with extension ``.jpg``.
+                ``Filters.document.file_extension("jpg")``
+                    filters files with extension ``".jpg"``.
+                ``Filters.document.file_extension(".jpg")``
+                    filters files with extension ``"..jpg"``.
             """
 
             def __init__(self, file_extension: Optional[str]):
                 """Initialize the extension you want to filter.
 
                 Args:
-                    file_extension (str, optional): media file extension you want to filter.
+                    file_extension (str, optional):
+                        media file extension you want to filter.
+                        Argument should be passed without leading dot
+                        unless it's a part of the extension.
                 """
                 if file_extension is None:
                     self.file_extension = file_extension
-                elif file_extension.startswith("."):
-                    self.file_extension = file_extension
                 else:
                     self.file_extension = f".{file_extension}"
-                self.name = f"Filters.document.file_extension({self.file_extension!r})"
+                self.name = f"Filters.document.file_extension({file_extension!r})"
 
             def filter(self, message: Message) -> bool:
                 """"""  # remove method from docs

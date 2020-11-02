@@ -433,8 +433,8 @@ class TestFilters:
             mime_type="image/jpeg",
         )
         assert Filters.document.file_extension("jpg")(update)
-        assert Filters.document.file_extension(".jpg")(update)
         assert Filters.document.file_extension(None)(update)
+        assert not Filters.document.file_extension(".jpg")(update)
         assert not Filters.document.file_extension("jpeg")(update)
         assert not Filters.document.file_extension("e.jpg")(update)
         assert not Filters.document.file_extension("file.jpg")(update)
@@ -445,6 +445,11 @@ class TestFilters:
         assert Filters.document.file_extension("gz")(update)
         assert not Filters.document.file_extension("tgz")(update)
         assert not Filters.document.file_extension("jpg")(update)
+
+        update.message.document.file_name = "file..jpg"
+        assert Filters.document.file_extension("jpg")(update)
+        assert Filters.document.file_extension(".jpg")(update)
+        assert not Filters.document.file_extension("..jpg")(update)
 
         update.message.document.file_name = "file.docx"
         assert Filters.document.file_extension("docx")(update)
