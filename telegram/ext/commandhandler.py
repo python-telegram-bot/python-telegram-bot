@@ -24,7 +24,7 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, Ty
 from telegram import MessageEntity, Update
 from telegram.ext import BaseFilter, Filters
 from telegram.utils.deprecate import TelegramDeprecationWarning
-from telegram.utils.types import HandlerArg
+from telegram.utils.types import HandlerArg, SLT
 
 from .handler import Handler
 
@@ -49,7 +49,7 @@ class CommandHandler(Handler):
         :class:`telegram.ext.CommandHandler` does *not* handle (edited) channel posts.
 
     Attributes:
-        command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
+        command (SLT[:obj:`str`]): The command or list of commands this handler
             should listen for. Limitations are the same as described here
             https://core.telegram.org/bots#commands
         callback (:obj:`callable`): The callback function for this handler.
@@ -83,7 +83,7 @@ class CommandHandler(Handler):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
+        command (SLT[:obj:`str`]): The command or list of commands this handler
             should listen for. Limitations are the same as described here
             https://core.telegram.org/bots#commands
         callback (:obj:`callable`): The callback function for this handler. Will be called when
@@ -132,7 +132,7 @@ class CommandHandler(Handler):
 
     def __init__(
         self,
-        command: Union[str, List[str], Tuple[str]],
+        command: SLT[str],
         callback: Callable[[HandlerArg, 'CallbackContext'], RT],
         filters: BaseFilter = None,
         allow_edited: bool = None,
@@ -297,8 +297,8 @@ class PrefixHandler(CommandHandler):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        prefix (:obj:`str` | List[:obj:`str`]): The prefix(es) that will precede :attr:`command`.
-        command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
+        prefix (SLT[:obj:`str`]): The prefix(es) that will precede :attr:`command`.
+        command (SLT[:obj:`str`]): The command or list of commands this handler
             should listen for.
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
@@ -340,8 +340,8 @@ class PrefixHandler(CommandHandler):
 
     def __init__(
         self,
-        prefix: Union[str, List[str], Tuple[str]],
-        command: Union[str, List[str], Tuple[str]],
+        prefix: SLT[str],
+        command: SLT[str],
         callback: Callable[[HandlerArg, 'CallbackContext'], RT],
         filters: BaseFilter = None,
         pass_args: bool = False,
@@ -384,7 +384,7 @@ class PrefixHandler(CommandHandler):
         return self._prefix
 
     @prefix.setter
-    def prefix(self, prefix: Union[str, List[str], Tuple[str]]) -> None:
+    def prefix(self, prefix: SLT[str]) -> None:
         if isinstance(prefix, str):
             self._prefix = [prefix.lower()]
         elif isinstance(prefix, list):
@@ -404,7 +404,7 @@ class PrefixHandler(CommandHandler):
         return self._command
 
     @command.setter
-    def command(self, command: Union[str, List[str], Tuple[str]]) -> None:
+    def command(self, command: SLT[str]) -> None:
         if isinstance(command, str):
             self._command = [command.lower()]
         elif isinstance(command, list):

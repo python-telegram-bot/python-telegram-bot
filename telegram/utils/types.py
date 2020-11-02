@@ -17,10 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains custom typing aliases."""
-from typing import IO, TYPE_CHECKING, Any, Dict, Optional, Tuple, Union
+from typing import IO, TYPE_CHECKING, Any, Dict, List, Optional, Tuple, TypeVar, Union
 
 if TYPE_CHECKING:
     from telegram import InputFile, Update
+
+RT = TypeVar("RT")
 
 FileLike = Union[IO, 'InputFile']
 """Either an open file handler or in :class:`telegram.InputFile`."""
@@ -33,3 +35,6 @@ HandlerArg = Union[str, 'Update']
 
 ConversationDict = Dict[Tuple[int, ...], Optional[object]]
 """Dicts as maintained by the :class:`telegram.ext.ConversationHandler`."""
+
+SLT = Union[RT, List[RT], Tuple[RT, ...]]
+"""Single instance or list/tuple of instances."""
