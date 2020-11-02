@@ -39,6 +39,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Eugene Lisitsky <https://github.com/lisitsky>`_
 - `Eugenio Panadero <https://github.com/azogue>`_
 - `Evan Haberecht <https://github.com/habereet>`_
+- `Evgeny Denisov <https://github.com/eIGato>`_
 - `evgfilim1 <https://github.com/evgfilim1>`_
 - `franciscod <https://github.com/franciscod>`_
 - `gamgi <https://github.com/gamgi>`_
