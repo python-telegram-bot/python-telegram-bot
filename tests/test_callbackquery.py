@@ -34,6 +34,7 @@ def callback_query(bot, request):
     )
     if request.param == 'message':
         cbq.message = TestCallbackQuery.message
+        cbq.message.bot = bot
     else:
         cbq.inline_message_id = TestCallbackQuery.inline_message_id
     return cbq
