@@ -481,11 +481,14 @@ class TestFilters:
             file_name="file.jpg",
             mime_type="image/jpeg",
         )
-        assert Filters.document.file_extension(None)(update)
-        assert not Filters.document.file_extension("None")(update)
+        assert not Filters.document.file_extension(None)(update)
 
         update.message.document.file_name = "file"
         assert Filters.document.file_extension(None)(update)
+        assert not Filters.document.file_extension("None")(update)
+
+        update.message.document.file_name = "file."
+        assert not Filters.document.file_extension(None)(update)
 
         update.message.document = None
         assert not Filters.document.file_extension(None)(update)
@@ -525,8 +528,9 @@ class TestFilters:
             "Filters.document.file_extension('.jpg')"
         )
         assert Filters.document.file_extension("").name == "Filters.document.file_extension('')"
-        assert Filters.document.file_extension().name == "Filters.document.file_extension()"
-        assert Filters.document.file_extension(None).name == "Filters.document.file_extension()"
+        assert (
+            Filters.document.file_extension(None).name == "Filters.document.file_extension(None)"
+        )
 
     def test_filters_animation(self, update):
         assert not Filters.animation(update)

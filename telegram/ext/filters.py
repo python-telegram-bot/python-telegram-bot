@@ -615,6 +615,8 @@ class Filters:
                     you may change it with the flag ``case_sensitive=True``.
                 * Extension should be passed without leading dot
                     unless it's a part of the extension.
+                * Pass :obj:`None` to filter files with no extension,
+                    even empty one. E.g. without a dot in the filename.
 
             Example:
                 ``Filters.document.file_extension("jpg")``
@@ -625,13 +627,11 @@ class Filters:
                     filters files with extension ``".Dockerfile"`` minding the case.
             """
 
-            def __init__(
-                self, file_extension: Optional[str] = None, *, case_sensitive: bool = False
-            ):
+            def __init__(self, file_extension: Optional[str], *, case_sensitive: bool = False):
                 """Initialize the extension you want to filter.
 
                 Args:
-                    file_extension (:obj:`str`, optional):
+                    file_extension (:obj:`str` | :obj:`None`):
                         media file extension you want to filter.
                     case_sensitive (:obj:bool, optional):
                         pass :obj:`True` to make the filter case sensitive.
@@ -640,7 +640,7 @@ class Filters:
                 self.is_case_sensitive = case_sensitive
                 if file_extension is None:
                     self.file_extension = None
-                    self.name = "Filters.document.file_extension()"
+                    self.name = "Filters.document.file_extension(None)"
                 elif case_sensitive:
                     self.file_extension = f".{file_extension}"
                     self.name = (
@@ -656,7 +656,7 @@ class Filters:
                 if message.document is None:
                     return False
                 if self.file_extension is None:
-                    return True
+                    return "." not in message.document.file_name
                 if self.is_case_sensitive:
                     filename = message.document.file_name
                 else:
