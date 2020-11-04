@@ -18,12 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatMember."""
 import datetime
+from typing import TYPE_CHECKING, Any, Optional, ClassVar
 
-from telegram import User, TelegramObject, constants
-from telegram.utils.helpers import to_timestamp, from_timestamp
-
+from telegram import TelegramObject, User, constants
+from telegram.utils.helpers import from_timestamp, to_timestamp
 from telegram.utils.types import JSONDict
-from typing import Any, Optional, TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -126,7 +125,7 @@ class ChatMember(TelegramObject):
     """:const:`telegram.constants.CHATMEMBER_RESTRICTED`"""
 
     def __init__(
-        self,
+        self,  # pylint: disable=W0613
         user: User,
         status: str,
         until_date: datetime.datetime = None,

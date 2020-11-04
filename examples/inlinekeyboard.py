@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# pylint: disable=W0613, C0116
+# type: ignore[union-attr]
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -7,8 +9,8 @@ Basic example for a bot that uses inline keyboards.
 """
 import logging
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, CallbackContext
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
@@ -16,7 +18,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def start(update, context):
+def start(update: Update, context: CallbackContext) -> None:
     keyboard = [
         [
             InlineKeyboardButton("Option 1", callback_data='1'),
@@ -30,7 +32,7 @@ def start(update, context):
     update.message.reply_text('Please choose:', reply_markup=reply_markup)
 
 
-def button(update, context):
+def button(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
 
     # CallbackQueries need to be answered, even if no notification to the user is needed
@@ -40,7 +42,7 @@ def button(update, context):
     query.edit_message_text(text="Selected option: {}".format(query.data))
 
 
-def help_command(update, context):
+def help_command(update: Update, context: CallbackContext) -> None:
     update.message.reply_text("Use /start to test this bot.")
 
 

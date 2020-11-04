@@ -18,9 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ShippingOption."""
 
+from typing import TYPE_CHECKING, Any, List
+
 from telegram import TelegramObject
 from telegram.utils.types import JSONDict
-from typing import List, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from telegram import LabeledPrice  # noqa
@@ -45,8 +46,14 @@ class ShippingOption(TelegramObject):
 
     """
 
-    def __init__(self, id: str, title: str, prices: List['LabeledPrice'], **kwargs: Any):
-        self.id = id
+    def __init__(
+        self,  # pylint: disable=W0613
+        id: str,  # pylint: disable=W0622
+        title: str,
+        prices: List['LabeledPrice'],
+        **kwargs: Any,
+    ):
+        self.id = id  # pylint: disable=C0103
         self.title = title
         self.prices = prices
 

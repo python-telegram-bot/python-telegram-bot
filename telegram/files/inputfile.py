@@ -22,11 +22,10 @@
 import imghdr
 import mimetypes
 import os
+from typing import IO, Optional, Tuple
 from uuid import uuid4
 
 from telegram import TelegramError
-
-from typing import IO, Tuple, Optional
 
 DEFAULT_MIME_TYPE = 'application/octet-stream'
 

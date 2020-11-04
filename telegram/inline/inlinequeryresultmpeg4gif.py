@@ -18,9 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultMpeg4Gif."""
 
+from typing import TYPE_CHECKING, Any, Union
+
 from telegram import InlineQueryResult
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
-from typing import Any, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
@@ -79,7 +80,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
 
     def __init__(
         self,
-        id: str,
+        id: str,  # pylint: disable=W0622
         mpeg4_url: str,
         thumb_url: str,
         mpeg4_width: int = None,
@@ -91,7 +92,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         mpeg4_duration: int = None,
         parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
         thumb_mime_type: str = None,
-        **kwargs: Any,
+        **kwargs: Any,  # pylint: disable=W0613
     ):
 
         # Required

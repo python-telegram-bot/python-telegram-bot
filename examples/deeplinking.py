@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# pylint: disable=W0613, C0116
+# type: ignore[union-attr]
+# This program is dedicated to the public domain under the CC0 license.
 
 """Bot that explains Telegram's "Deep Linking Parameters" functionality.
 
@@ -19,8 +22,8 @@ bot.
 
 import logging
 
-from telegram import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton
-from telegram.ext import Updater, CommandHandler, Filters
+from telegram import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton, Update
+from telegram.ext import Updater, CommandHandler, Filters, CallbackContext
 
 # Enable logging
 from telegram.utils import helpers
@@ -37,7 +40,7 @@ USING_ENTITIES = 'using-entities-here'
 SO_COOL = 'so-cool'
 
 
-def start(update, context):
+def start(update: Update, context: CallbackContext) -> None:
     """Send a deep-linked URL when the command /start is issued."""
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.get_me().username, CHECK_THIS_OUT, group=True)
@@ -45,7 +48,7 @@ def start(update, context):
     update.message.reply_text(text)
 
 
-def deep_linked_level_1(update, context):
+def deep_linked_level_1(update: Update, context: CallbackContext) -> None:
     """Reached through the CHECK_THIS_OUT payload"""
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.get_me().username, SO_COOL)
@@ -59,7 +62,7 @@ def deep_linked_level_1(update, context):
     update.message.reply_text(text, reply_markup=keyboard)
 
 
-def deep_linked_level_2(update, context):
+def deep_linked_level_2(update: Update, context: CallbackContext) -> None:
     """Reached through the SO_COOL payload"""
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.get_me().username, USING_ENTITIES)
@@ -67,7 +70,7 @@ def deep_linked_level_2(update, context):
     update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 
-def deep_linked_level_3(update, context):
+def deep_linked_level_3(update: Update, context: CallbackContext) -> None:
     """Reached through the USING_ENTITIES payload"""
     payload = context.args
     update.message.reply_text(
@@ -81,24 +84,26 @@ def main():
     updater = Updater("TOKEN", use_context=True)
 
     # Get the dispatcher to register handlers
-    dp = updater.dispatcher
+    dispatcher = updater.dispatcher
 
     # More info on what deep linking actually is (read this first if it's unclear to you):
     # https://core.telegram.org/bots#deep-linking
 
     # Register a deep-linking handler
-    dp.add_handler(CommandHandler("start", deep_linked_level_1, Filters.regex(CHECK_THIS_OUT)))
+    dispatcher.add_handler(
+        CommandHandler("start", deep_linked_level_1, Filters.regex(CHECK_THIS_OUT))
+    )
 
     # This one works with a textual link instead of an URL
-    dp.add_handler(CommandHandler("start", deep_linked_level_2, Filters.regex(SO_COOL)))
+    dispatcher.add_handler(CommandHandler("start", deep_linked_level_2, Filters.regex(SO_COOL)))
 
     # We can also pass on the deep-linking payload
-    dp.add_handler(
+    dispatcher.add_handler(
         CommandHandler("start", deep_linked_level_3, Filters.regex(USING_ENTITIES), pass_args=True)
     )
 
     # Make sure the deep-linking handlers occur *before* the normal /start handler.
-    dp.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(CommandHandler("start", start))
 
     # Start the Bot
     updater.start_polling()

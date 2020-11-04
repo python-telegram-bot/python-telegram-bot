@@ -19,11 +19,11 @@
 """This module contains the StringRegexHandler class."""
 
 import re
+from typing import TYPE_CHECKING, Any, Callable, Dict, Match, Optional, Pattern, TypeVar, Union
+
+from telegram.utils.types import HandlerArg
 
 from .handler import Handler
-
-from typing import Callable, TYPE_CHECKING, Optional, TypeVar, Match, Dict, Any, Union, Pattern
-from telegram.utils.types import HandlerArg
 
 if TYPE_CHECKING:
     from telegram.ext import CallbackContext, Dispatcher

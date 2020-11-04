@@ -18,9 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represents stickers."""
 
+from typing import TYPE_CHECKING, Any, List, Optional, ClassVar
+
 from telegram import PhotoSize, TelegramObject, constants
 from telegram.utils.types import JSONDict
-from typing import Any, Optional, List, TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
     from telegram import Bot, File
@@ -73,7 +74,7 @@ class Sticker(TelegramObject):
     """
 
     def __init__(
-        self,
+        self,  # pylint: disable=W0613
         file_id: str,
         file_unique_id: str,
         width: int,
@@ -162,13 +163,13 @@ class StickerSet(TelegramObject):
     """
 
     def __init__(
-        self,
+        self,  # pylint: disable=W0613
         name: str,
         title: str,
         is_animated: bool,
         contains_masks: bool,
         stickers: List[Sticker],
-        bot: 'Bot' = None,
+        bot: 'Bot' = None,  # pylint: disable=W0613
         thumb: PhotoSize = None,
         **kwargs: Any,
     ):
@@ -242,7 +243,9 @@ class MaskPosition(TelegramObject):
     CHIN: ClassVar[str] = constants.STICKER_CHIN
     """:const:`telegram.constants.STICKER_CHIN`"""
 
-    def __init__(self, point: str, x_shift: float, y_shift: float, scale: float, **kwargs: Any):
+    def __init__(
+        self, point: str, x_shift: float, y_shift: float, scale: float, **kwargs: Any
+    ):  # pylint: disable=W0613
         self.point = point
         self.x_shift = x_shift
         self.y_shift = y_shift

@@ -21,23 +21,20 @@
 import logging
 import warnings
 import weakref
-from functools import wraps
-from threading import Thread, Lock, Event, current_thread, BoundedSemaphore
-from time import sleep
-from uuid import uuid4
 from collections import defaultdict
-
-from queue import Queue, Empty
+from functools import wraps
+from queue import Empty, Queue
+from threading import BoundedSemaphore, Event, Lock, Thread, current_thread
+from time import sleep
+from typing import TYPE_CHECKING, Any, Callable, DefaultDict, Dict, List, Optional, Set, Union
+from uuid import uuid4
 
 from telegram import TelegramError, Update
-from telegram.ext.handler import Handler
+from telegram.ext import BasePersistence
 from telegram.ext.callbackcontext import CallbackContext
+from telegram.ext.handler import Handler
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.promise import Promise
-from telegram.ext import BasePersistence
-
-from typing import Any, Callable, TYPE_CHECKING, Optional, Union, DefaultDict, Dict, List, Set
-
 from telegram.utils.types import HandlerArg
 
 if TYPE_CHECKING:
@@ -74,7 +71,7 @@ def run_async(
             TelegramDeprecationWarning,
             stacklevel=2,
         )
-        return Dispatcher.get_instance()._run_async(
+        return Dispatcher.get_instance()._run_async(  # pylint: disable=W0212
             func, *args, update=None, error_handling=False, **kwargs
         )
 
@@ -245,10 +242,7 @@ class Dispatcher:
         """
         if cls.__singleton is not None:
             return cls.__singleton()  # type: ignore[return-value] # pylint: disable=not-callable
-        else:
-            raise RuntimeError(
-                '{} not initialized or multiple instances exist'.format(cls.__name__)
-            )
+        raise RuntimeError('{} not initialized or multiple instances exist'.format(cls.__name__))
 
     def _pooled(self) -> None:
         thr_name = current_thread().getName()
@@ -328,7 +322,7 @@ class Dispatcher:
         *args: Any,
         update: HandlerArg = None,
         error_handling: bool = True,
-        **kwargs: Any,
+        **kwargs: Any,  # pylint: disable=W0613
     ) -> Promise:
         # TODO: Remove error_handling parameter once we drop the @run_async decorator
         promise = Promise(func, args, kwargs, update=update, error_handling=error_handling)
@@ -371,12 +365,12 @@ class Dispatcher:
                 if self.__stop_event.is_set():
                     self.logger.debug('orderly stopping')
                     break
-                elif self.__exception_event.is_set():
+                if self.__exception_event.is_set():
                     self.logger.critical('stopping due to exception in another thread')
                     break
                 continue
 
-            self.logger.debug('Processing Update: %s' % update)
+            self.logger.debug('Processing Update: %s', update)
             self.process_update(update)
             self.update_queue.task_done()
 
@@ -401,10 +395,10 @@ class Dispatcher:
             self.__async_queue.put(None)
 
         for i, thr in enumerate(threads):
-            self.logger.debug('Waiting for async thread {}/{} to end'.format(i + 1, total))
+            self.logger.debug('Waiting for async thread %s/%s to end', i + 1, total)
             thr.join()
             self.__async_threads.remove(thr)
-            self.logger.debug('async thread {}/{} has ended'.format(i + 1, total))
+            self.logger.debug('async thread %s/%s has ended', i + 1, total)
 
     @property
     def has_running_threads(self) -> bool:
@@ -450,9 +444,9 @@ class Dispatcher:
                 break
 
             # Dispatch any error.
-            except Exception as e:
+            except Exception as exc:
                 try:
-                    self.dispatch_error(update, e)
+                    self.dispatch_error(update, exc)
                 except DispatcherHandlerStop:
                     self.logger.debug('Error handler stopped further handlers')
                     break
@@ -486,7 +480,7 @@ class Dispatcher:
 
         """
         # Unfortunately due to circular imports this has to be here
-        from .conversationhandler import ConversationHandler
+        from .conversationhandler import ConversationHandler  # pylint: disable=C0415
 
         if not isinstance(handler, Handler):
             raise TypeError('handler is not an instance of {}'.format(Handler.__name__))
@@ -552,9 +546,9 @@ class Dispatcher:
             if self.persistence.store_bot_data:
                 try:
                     self.persistence.update_bot_data(self.bot_data)
-                except Exception as e:
+                except Exception as exc:
                     try:
-                        self.dispatch_error(update, e)
+                        self.dispatch_error(update, exc)
                     except Exception:
                         message = (
                             'Saving bot data raised an error and an '
@@ -566,9 +560,9 @@ class Dispatcher:
                 for chat_id in chat_ids:
                     try:
                         self.persistence.update_chat_data(chat_id, self.chat_data[chat_id])
-                    except Exception as e:
+                    except Exception as exc:
                         try:
-                            self.dispatch_error(update, e)
+                            self.dispatch_error(update, exc)
                         except Exception:
                             message = (
                                 'Saving chat data raised an error and an '
@@ -580,9 +574,9 @@ class Dispatcher:
                 for user_id in user_ids:
                     try:
                         self.persistence.update_user_data(user_id, self.user_data[user_id])
-                    except Exception as e:
+                    except Exception as exc:
                         try:
-                            self.dispatch_error(update, e)
+                            self.dispatch_error(update, exc)
                         except Exception:
                             message = (
                                 'Saving user data raised an error and an '
@@ -592,7 +586,9 @@ class Dispatcher:
                             self.logger.exception(message)
 
     def add_error_handler(
-        self, callback: Callable[[Any, CallbackContext], None], run_async: bool = False
+        self,
+        callback: Callable[[Any, CallbackContext], None],
+        run_async: bool = False,  # pylint: disable=W0621
     ) -> None:
         """Registers an error handler in the Dispatcher. This handler will receive every error
         which happens in your bot.
@@ -647,7 +643,7 @@ class Dispatcher:
         async_kwargs = None if not promise else promise.kwargs
 
         if self.error_handlers:
-            for callback, run_async in self.error_handlers.items():
+            for callback, run_async in self.error_handlers.items():  # pylint: disable=W0621
                 if self.use_context:
                     context = CallbackContext.from_error(
                         update, error, self, async_args=async_args, async_kwargs=async_kwargs

@@ -19,13 +19,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Poll."""
 
-import sys
 import datetime
+import sys
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, ClassVar
 
-from telegram import TelegramObject, User, MessageEntity, constants
-from telegram.utils.helpers import to_timestamp, from_timestamp
+from telegram import MessageEntity, TelegramObject, User, constants
+from telegram.utils.helpers import from_timestamp, to_timestamp
 from telegram.utils.types import JSONDict
-from typing import Any, Dict, Optional, List, TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -48,7 +48,7 @@ class PollOption(TelegramObject):
 
     """
 
-    def __init__(self, text: str, voter_count: int, **kwargs: Any):
+    def __init__(self, text: str, voter_count: int, **kwargs: Any):  # pylint: disable=W0613
         self.text = text
         self.voter_count = voter_count
 
@@ -75,7 +75,9 @@ class PollAnswer(TelegramObject):
 
     """
 
-    def __init__(self, poll_id: str, user: User, option_ids: List[int], **kwargs: Any):
+    def __init__(
+        self, poll_id: str, user: User, option_ids: List[int], **kwargs: Any
+    ):  # pylint: disable=W0613
         self.poll_id = poll_id
         self.user = user
         self.option_ids = option_ids
@@ -143,14 +145,14 @@ class Poll(TelegramObject):
     """
 
     def __init__(
-        self,
-        id: str,
+        self,  # pylint: disable=W0613
+        id: str,  # pylint: disable=W0622
         question: str,
         options: List[PollOption],
         total_voter_count: int,
         is_closed: bool,
         is_anonymous: bool,
-        type: str,
+        type: str,  # pylint: disable=W0622
         allows_multiple_answers: bool,
         correct_option_id: int = None,
         explanation: str = None,
@@ -159,7 +161,7 @@ class Poll(TelegramObject):
         close_date: datetime.datetime = None,
         **kwargs: Any,
     ):
-        self.id = id
+        self.id = id  # pylint: disable=C0103
         self.question = question
         self.options = options
         self.total_voter_count = total_voter_count
@@ -223,9 +225,8 @@ class Poll(TelegramObject):
         # Is it a narrow build, if so we don't need to convert
         if sys.maxunicode == 0xFFFF:
             return self.explanation[entity.offset : entity.offset + entity.length]
-        else:
-            entity_text = self.explanation.encode('utf-16-le')
-            entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
+        entity_text = self.explanation.encode('utf-16-le')
+        entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
 
         return entity_text.decode('utf-16-le')
 

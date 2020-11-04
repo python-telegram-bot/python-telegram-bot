@@ -20,14 +20,13 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/]
 """A throughput-limiting message processor for Telegram bots."""
-from telegram.utils import promise
-
 import functools
-import time
-import threading
 import queue as q
+import threading
+import time
+from typing import TYPE_CHECKING, Any, Callable, List, NoReturn
 
-from typing import Callable, Any, TYPE_CHECKING, List, NoReturn
+from telegram.utils.promise import Promise
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -38,8 +37,6 @@ curtime = time.perf_counter
 
 class DelayQueueError(RuntimeError):
     """Indicates processing errors."""
-
-    pass
 
 
 class DelayQueue(threading.Thread):
@@ -304,12 +301,13 @@ def queuedmessage(method: Callable) -> Callable:
 
     @functools.wraps(method)
     def wrapped(self: 'Bot', *args: Any, **kwargs: Any) -> Any:
+        # pylint: disable=W0212
         queued = kwargs.pop(
             'queued', self._is_messages_queued_default  # type: ignore[attr-defined]
         )
         isgroup = kwargs.pop('isgroup', False)
         if queued:
-            prom = promise.Promise(method, (self,) + args, kwargs)
+            prom = Promise(method, (self,) + args, kwargs)
             return self._msg_queue(prom, isgroup)  # type: ignore[attr-defined]
         return method(self, *args, **kwargs)
 

@@ -16,25 +16,25 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+# pylint: disable=E0401
 """This module contains the classes JobQueue and Job."""
 
 import datetime
 import logging
-import pytz
+from typing import TYPE_CHECKING, Any, Callable, List, Optional, Tuple, Union, cast, overload
 
+import pytz
+from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED, JobEvent
 from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.combining import OrTrigger
-from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR, JobEvent
+from apscheduler.triggers.cron import CronTrigger
 
 from telegram.ext.callbackcontext import CallbackContext
-
-from typing import TYPE_CHECKING, Union, Callable, Tuple, Optional, List, Any, cast, overload
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
-    from telegram.ext import Dispatcher
     from telegram import Bot
+    from telegram.ext import Dispatcher
 
 
 class Days:
@@ -76,7 +76,7 @@ class JobQueue:
     def _tz_now(self) -> datetime.datetime:
         return datetime.datetime.now(self.scheduler.timezone)
 
-    def _update_persistence(self, event: JobEvent) -> None:
+    def _update_persistence(self, event: JobEvent) -> None:  # pylint: disable=W0613
         self._dispatcher.update_persistence()
 
     def _dispatch_error(self, event: JobEvent) -> None:
@@ -114,14 +114,14 @@ class JobQueue:
         if isinstance(time, datetime.timedelta):
             return self._tz_now() + time
         if isinstance(time, datetime.time):
-            dt = datetime.datetime.combine(
+            date_time = datetime.datetime.combine(
                 datetime.datetime.now(tz=time.tzinfo or self.scheduler.timezone).date(), time
             )
-            if dt.tzinfo is None:
-                dt = self.scheduler.timezone.localize(dt)
-            if shift_day and dt <= datetime.datetime.now(pytz.utc):
-                dt += datetime.timedelta(days=1)
-            return dt
+            if date_time.tzinfo is None:
+                date_time = self.scheduler.timezone.localize(date_time)
+            if shift_day and date_time <= datetime.datetime.now(pytz.utc):
+                date_time += datetime.timedelta(days=1)
+            return date_time
         # isinstance(time, datetime.datetime):
         return time
 
@@ -190,15 +190,15 @@ class JobQueue:
 
         name = name or callback.__name__
         job = Job(callback, context, name, self)
-        dt = self._parse_time_input(when, shift_day=True)
+        date_time = self._parse_time_input(when, shift_day=True)
 
         j = self.scheduler.add_job(
             callback,
             name=name,
             trigger='date',
-            run_date=dt,
+            run_date=date_time,
             args=self._build_args(job),
-            timezone=dt.tzinfo or self.scheduler.timezone,
+            timezone=date_time.tzinfo or self.scheduler.timezone,
             **job_kwargs,
         )
 
@@ -568,9 +568,9 @@ class Job:
                 self.callback(CallbackContext.from_job(self, dispatcher))
             else:
                 self.callback(dispatcher.bot, self)  # type: ignore[arg-type,call-arg]
-        except Exception as e:
+        except Exception as exc:
             try:
-                dispatcher.dispatch_error(None, e)
+                dispatcher.dispatch_error(None, exc)
             # Errors should not stop the thread.
             except Exception:
                 dispatcher.logger.exception(

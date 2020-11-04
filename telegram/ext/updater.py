@@ -21,20 +21,19 @@
 import logging
 import ssl
 import warnings
-from threading import Thread, Lock, current_thread, Event
-from time import sleep
-from signal import signal, SIGINT, SIGTERM, SIGABRT
 from queue import Queue
+from signal import SIGABRT, SIGINT, SIGTERM, signal
+from threading import Event, Lock, Thread, current_thread
+from time import sleep
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, Union, no_type_check
 
 from telegram import Bot, TelegramError
+from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized
 from telegram.ext import Dispatcher, JobQueue
-from telegram.error import Unauthorized, InvalidToken, RetryAfter, TimedOut
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import get_signal_name
 from telegram.utils.request import Request
-from telegram.utils.webhookhandler import WebhookServer, WebhookAppClass
-
-from typing import Callable, Dict, TYPE_CHECKING, Any, List, Union, Tuple, no_type_check, Optional
+from telegram.utils.webhookhandler import WebhookAppClass, WebhookServer
 
 if TYPE_CHECKING:
     from telegram.ext import BasePersistence, Defaults
@@ -232,14 +231,14 @@ class Updater:
 
     def _thread_wrapper(self, target: Callable, *args: Any, **kwargs: Any) -> None:
         thr_name = current_thread().name
-        self.logger.debug('{} - started'.format(thr_name))
+        self.logger.debug('%s - started', thr_name)
         try:
             target(*args, **kwargs)
         except Exception:
             self.__exception_event.set()
             self.logger.exception('unhandled exception in %s', thr_name)
             raise
-        self.logger.debug('{} - ended'.format(thr_name))
+        self.logger.debug('%s - ended', thr_name)
 
     def start_polling(
         self,
@@ -465,9 +464,9 @@ class Updater:
             try:
                 if not action_cb():
                     break
-            except RetryAfter as e:
-                self.logger.info('%s', e)
-                cur_interval = 0.5 + e.retry_after
+            except RetryAfter as exc:
+                self.logger.info('%s', exc)
+                cur_interval = 0.5 + exc.retry_after
             except TimedOut as toe:
                 self.logger.debug('Timed out %s: %s', description, toe)
                 # If failure is due to timeout, we should retry asap.
@@ -475,9 +474,9 @@ class Updater:
             except InvalidToken as pex:
                 self.logger.error('Invalid token; aborting')
                 raise pex
-            except TelegramError as te:
-                self.logger.error('Error while %s: %s', description, te)
-                onerr_cb(te)
+            except TelegramError as telegram_exc:
+                self.logger.error('Error while %s: %s', description, telegram_exc)
+                onerr_cb(telegram_exc)
                 cur_interval = self._increase_poll_interval(cur_interval)
             else:
                 cur_interval = interval
@@ -525,8 +524,8 @@ class Updater:
             try:
                 ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
                 ssl_ctx.load_cert_chain(cert, key)
-            except ssl.SSLError:
-                raise TelegramError('Invalid SSL Certificate')
+            except ssl.SSLError as exc:
+                raise TelegramError('Invalid SSL Certificate') from exc
         else:
             ssl_ctx = None
 
@@ -661,9 +660,9 @@ class Updater:
     @no_type_check
     def _join_threads(self) -> None:
         for thr in self.__threads:
-            self.logger.debug('Waiting for {} thread to end'.format(thr.name))
+            self.logger.debug('Waiting for %s thread to end', thr.name)
             thr.join()
-            self.logger.debug('{} thread has ended'.format(thr.name))
+            self.logger.debug('%s thread has ended', thr.name)
         self.__threads = []
 
     @no_type_check
@@ -671,7 +670,7 @@ class Updater:
         self.is_idle = False
         if self.running:
             self.logger.info(
-                'Received signal {} ({}), stopping...'.format(signum, get_signal_name(signum))
+                'Received signal %s (%s), stopping...', signum, get_signal_name(signum)
             )
             if self.persistence:
                 # Update user_data, chat_data and bot_data before flushing
@@ -682,6 +681,7 @@ class Updater:
                 self.user_sig_handler(signum, frame)
         else:
             self.logger.warning('Exiting immediately!')
+            # pylint: disable=C0415,W0212
             import os
 
             os._exit(1)

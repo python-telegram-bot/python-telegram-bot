@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Location."""
 
-from telegram import TelegramObject
 from typing import Any
+
+from telegram import TelegramObject
 
 
 class Location(TelegramObject):
@@ -39,7 +40,7 @@ class Location(TelegramObject):
 
     """
 
-    def __init__(self, longitude: float, latitude: float, **kwargs: Any):
+    def __init__(self, longitude: float, latitude: float, **kwargs: Any):  # pylint: disable=W0613
         # Required
         self.longitude = float(longitude)
         self.latitude = float(latitude)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=R0902,R0912,R0913
+# pylint: disable=R0902,R0913
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2020
@@ -18,42 +18,41 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Message."""
-import sys
 import datetime
+import sys
 from html import escape
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, ClassVar
 
 from telegram import (
     Animation,
     Audio,
-    Contact,
-    Document,
     Chat,
+    Contact,
+    Dice,
+    Document,
+    Game,
+    InlineKeyboardMarkup,
+    Invoice,
     Location,
+    MessageEntity,
+    ParseMode,
+    PassportData,
     PhotoSize,
+    Poll,
     Sticker,
+    SuccessfulPayment,
     TelegramObject,
     User,
-    Video,
-    Voice,
     Venue,
-    MessageEntity,
-    Game,
-    Invoice,
-    SuccessfulPayment,
+    Video,
     VideoNote,
-    PassportData,
-    Poll,
-    InlineKeyboardMarkup,
-    Dice,
+    Voice,
 )
-from telegram import ParseMode
-from telegram.utils.helpers import escape_markdown, to_timestamp, from_timestamp
-
+from telegram.utils.helpers import escape_markdown, from_timestamp, to_timestamp
 from telegram.utils.types import JSONDict
-from typing import Any, List, Dict, Optional, Union, TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
-    from telegram import Bot, InputMedia, GameHighScore
+    from telegram import Bot, GameHighScore, InputMedia
 
 _UNDEFINED = object()
 
@@ -294,7 +293,7 @@ class Message(TelegramObject):
     ] + ATTACHMENT_TYPES
 
     def __init__(
-        self,
+        self,  # pylint: disable=W0613
         message_id: int,
         date: datetime.datetime,
         chat: Chat,
@@ -512,10 +511,10 @@ class Message(TelegramObject):
 
         return self._effective_attachment  # type: ignore
 
-    def __getitem__(self, item: str) -> Any:
+    def __getitem__(self, item: str) -> Any:  # pylint: disable=R1710
         if item in self.__dict__.keys():
             return self.__dict__[item]
-        elif item == 'chat_id':
+        if item == 'chat_id':
             return self.chat.id
 
     def to_dict(self) -> JSONDict:
@@ -1169,11 +1168,10 @@ class Message(TelegramObject):
         # Is it a narrow build, if so we don't need to convert
         if sys.maxunicode == 0xFFFF:
             return self.text[entity.offset : entity.offset + entity.length]
-        else:
-            entity_text = self.text.encode('utf-16-le')
-            entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
 
-            return entity_text.decode('utf-16-le')
+        entity_text = self.text.encode('utf-16-le')
+        entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
+        return entity_text.decode('utf-16-le')
 
     def parse_caption_entity(self, entity: MessageEntity) -> str:
         """Returns the text from a given :class:`telegram.MessageEntity`.
@@ -1200,11 +1198,10 @@ class Message(TelegramObject):
         # Is it a narrow build, if so we don't need to convert
         if sys.maxunicode == 0xFFFF:
             return self.caption[entity.offset : entity.offset + entity.length]
-        else:
-            entity_text = self.caption.encode('utf-16-le')
-            entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
 
-            return entity_text.decode('utf-16-le')
+        entity_text = self.caption.encode('utf-16-le')
+        entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
+        return entity_text.decode('utf-16-le')
 
     def parse_entities(self, types: List[str] = None) -> Dict[MessageEntity, str]:
         """
@@ -1280,7 +1277,7 @@ class Message(TelegramObject):
         if message_text is None:
             return None
 
-        if not sys.maxunicode == 0xFFFF:
+        if sys.maxunicode != 0xFFFF:
             message_text = message_text.encode('utf-16-le')  # type: ignore
 
         html_text = ''
@@ -1298,7 +1295,7 @@ class Message(TelegramObject):
                     and e.offset + e.length <= entity.offset + entity.length
                     and e != entity
                 }
-                parsed_entities.extend([e for e in nested_entities.keys()])
+                parsed_entities.extend(list(nested_entities.keys()))
 
                 text = escape(text)
 
@@ -1442,7 +1439,7 @@ class Message(TelegramObject):
         if message_text is None:
             return None
 
-        if not sys.maxunicode == 0xFFFF:
+        if sys.maxunicode != 0xFFFF:
             message_text = message_text.encode('utf-16-le')  # type: ignore
 
         markdown_text = ''
@@ -1460,7 +1457,7 @@ class Message(TelegramObject):
                     and e.offset + e.length <= entity.offset + entity.length
                     and e != entity
                 }
-                parsed_entities.extend([e for e in nested_entities.keys()])
+                parsed_entities.extend(list(nested_entities.keys()))
 
                 orig_text = text
                 text = escape_markdown(text, version=version)

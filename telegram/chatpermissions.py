@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatPermission."""
 
-from telegram import TelegramObject
 from typing import Any
+
+from telegram import TelegramObject
 
 
 class ChatPermissions(TelegramObject):
@@ -78,7 +79,7 @@ class ChatPermissions(TelegramObject):
     """
 
     def __init__(
-        self,
+        self,  # pylint: disable=W0613
         can_send_messages: bool = None,
         can_send_media_messages: bool = None,
         can_send_polls: bool = None,

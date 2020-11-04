@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputLocationMessageContent."""
 
-from telegram import InputMessageContent
 from typing import Any
+
+from telegram import InputMessageContent
 
 
 class InputLocationMessageContent(InputMessageContent):
@@ -46,7 +47,9 @@ class InputLocationMessageContent(InputMessageContent):
     """
     # fmt: on
 
-    def __init__(self, latitude: float, longitude: float, live_period: int = None, **kwargs: Any):
+    def __init__(
+        self, latitude: float, longitude: float, live_period: int = None, **kwargs: Any
+    ):  # pylint: disable=W0613
         # Required
         self.latitude = latitude
         self.longitude = longitude
