@@ -24,19 +24,7 @@ import warnings
 
 from abc import ABC, abstractmethod
 from threading import Lock
-from typing import (
-    Dict,
-    FrozenSet,
-    Iterable,
-    List,
-    Match,
-    Optional,
-    Pattern,
-    Set,
-    Tuple,
-    Union,
-    cast,
-)
+from typing import Dict, FrozenSet, List, Match, Optional, Pattern, Set, Tuple, Union, cast
 
 from telegram import Chat, Message, MessageEntity, Update
 
@@ -348,7 +336,7 @@ class Filters:
         name = 'Filters.text'
 
         class _TextStrings(MessageFilter):
-            def __init__(self, strings: Iterable[str]):
+            def __init__(self, strings: Union[List[str], Tuple[str]]):
                 self.strings = list(strings)
                 self.name = 'Filters.text({})'.format(strings)
 
@@ -1088,10 +1076,10 @@ officedocument.wordprocessingml.document")``-
                 is specified in :attr:`user_ids` and :attr:`usernames`.
 
         Args:
-            user_id(SLT[:obj:`int`], optional): Which user ID(s) to allow
-                through.
-            username(SLT[:obj:`str`], optional): Which username(s) to allow
-                through. Leading '@'s in usernames will be discarded.
+            user_id(:class:`telegram.utils.types.SLT`[:obj:`int`], optional):
+                Which user ID(s) to allow through.
+            username(:class:`telegram.utils.types.SLT`[:obj:`str`], optional):
+                Which username(s) to allow through. Leading '@'s in usernames will be discarded.
             allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
                 is specified in :attr:`user_ids` and :attr:`usernames`. Defaults to :obj:`False`
 
@@ -1170,8 +1158,9 @@ officedocument.wordprocessingml.document")``-
             Add one or more users to the allowed usernames.
 
             Args:
-                username(SLT[:obj:`str`], optional): Which username(s) to allow
-                    through. Leading '@'s in usernames will be discarded.
+                username(:class:`telegram.utils.types.SLT`[:obj:`str`], optional):
+                    Which username(s) to allow through.
+                    Leading '@'s in usernames will be discarded.
             """
             with self.__lock:
                 if self._user_ids:
@@ -1187,8 +1176,8 @@ officedocument.wordprocessingml.document")``-
             Add one or more users to the allowed user ids.
 
             Args:
-                user_id(SLT[:obj:`int`], optional): Which user ID(s) to allow
-                    through.
+                user_id(:class:`telegram.utils.types.SLT`[:obj:`int`], optional):
+                    Which user ID(s) to allow through.
             """
             with self.__lock:
                 if self._usernames:
@@ -1205,8 +1194,9 @@ officedocument.wordprocessingml.document")``-
             Remove one or more users from allowed usernames.
 
             Args:
-                username(SLT[:obj:`str`], optional): Which username(s) to disallow
-                    through. Leading '@'s in usernames will be discarded.
+                username(:class:`telegram.utils.types.SLT`[:obj:`str`], optional):
+                    Which username(s) to disallow through.
+                    Leading '@'s in usernames will be discarded.
             """
             with self.__lock:
                 if self._user_ids:
@@ -1222,8 +1212,8 @@ officedocument.wordprocessingml.document")``-
             Remove one or more users from allowed user ids.
 
             Args:
-                user_id(SLT[:obj:`int`], optional): Which user ID(s) to disallow
-                    through.
+                user_id(:class:`telegram.utils.types.SLT`[:obj:`int`], optional):
+                    Which user ID(s) to disallow through.
             """
             with self.__lock:
                 if self._usernames:
@@ -1268,10 +1258,10 @@ officedocument.wordprocessingml.document")``-
                 is specified in :attr:`bot_ids` and :attr:`usernames`.
 
         Args:
-            bot_id(SLT[:obj:`int`], optional): Which bot ID(s) to allow
-                through.
-            username(SLT[:obj:`str`], optional): Which username(s) to allow
-                through. Leading '@'s in usernames will be discarded.
+            bot_id(:class:`telegram.utils.types.SLT`[:obj:`int`], optional):
+                Which bot ID(s) to allow through.
+            username(:class:`telegram.utils.types.SLT`[:obj:`str`], optional):
+                Which username(s) to allow through. Leading '@'s in usernames will be discarded.
             allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
                 is specified in :attr:`bot_ids` and :attr:`usernames`. Defaults to :obj:`False`
 
@@ -1349,8 +1339,9 @@ officedocument.wordprocessingml.document")``-
             Add one or more users to the allowed usernames.
 
             Args:
-                username(SLT[:obj:`str`], optional): Which username(s) to allow
-                    through. Leading '@'s in usernames will be discarded.
+                username(:class:`telegram.utils.types.SLT`[:obj:`str`], optional):
+                    Which username(s) to allow through.
+                    Leading '@'s in usernames will be discarded.
             """
             with self.__lock:
                 if self._bot_ids:
@@ -1367,8 +1358,8 @@ officedocument.wordprocessingml.document")``-
             Add one or more users to the allowed user ids.
 
             Args:
-                bot_id(SLT[:obj:`int`], optional): Which bot ID(s) to allow
-                    through.
+                bot_id(:class:`telegram.utils.types.SLT`[:obj:`int`], optional):
+                    Which bot ID(s) to allow through.
             """
             with self.__lock:
                 if self._usernames:
@@ -1385,8 +1376,9 @@ officedocument.wordprocessingml.document")``-
             Remove one or more users from allowed usernames.
 
             Args:
-                username(SLT[:obj:`str`], optional): Which username(s) to disallow
-                    through. Leading '@'s in usernames will be discarded.
+                username(:class:`telegram.utils.types.SLT`[:obj:`str`], optional):
+                    Which username(s) to disallow through.
+                    Leading '@'s in usernames will be discarded.
             """
             with self.__lock:
                 if self._bot_ids:
@@ -1402,8 +1394,8 @@ officedocument.wordprocessingml.document")``-
             Remove one or more users from allowed user ids.
 
             Args:
-                bot_id(SLT[:obj:`int`], optional): Which bot ID(s) to disallow
-                    through.
+                bot_id(:class:`telegram.utils.types.SLT`[:obj:`int`], optional):
+                    Which bot ID(s) to disallow through.
             """
             with self.__lock:
                 if self._usernames:
@@ -1447,10 +1439,11 @@ officedocument.wordprocessingml.document")``-
                 is specified in :attr:`chat_ids` and :attr:`usernames`.
 
         Args:
-            chat_id(SLT[:obj:`int`], optional): Which chat ID(s) to allow
-                through.
-            username(SLT[:obj:`str`], optional): Which username(s) to allow
-                through. Leading `'@'` s in usernames will be discarded.
+            chat_id(:class:`telegram.utils.types.SLT`[:obj:`int`], optional):
+                Which chat ID(s) to allow through.
+            username(:class:`telegram.utils.types.SLT`[:obj:`str`], optional):
+                Which username(s) to allow through.
+                Leading `'@'` s in usernames will be discarded.
             allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
                 is specified in :attr:`chat_ids` and :attr:`usernames`. Defaults to :obj:`False`
 
@@ -1529,8 +1522,9 @@ officedocument.wordprocessingml.document")``-
             Add one or more chats to the allowed usernames.
 
             Args:
-                username(SLT[:obj:`str`], optional): Which username(s) to allow
-                    through. Leading `'@'` s in usernames will be discarded.
+                username(:class:`telegram.utils.types.SLT`[:obj:`str`], optional):
+                    Which username(s) to allow through.
+                    Leading `'@'` s in usernames will be discarded.
             """
             with self.__lock:
                 if self._chat_ids:
@@ -1546,8 +1540,8 @@ officedocument.wordprocessingml.document")``-
             Add one or more chats to the allowed chat ids.
 
             Args:
-                chat_id(SLT[:obj:`int`], optional): Which chat ID(s) to allow
-                    through.
+                chat_id(:class:`telegram.utils.types.SLT`[:obj:`int`], optional):
+                    Which chat ID(s) to allow through.
             """
             with self.__lock:
                 if self._usernames:
@@ -1564,8 +1558,9 @@ officedocument.wordprocessingml.document")``-
             Remove one or more chats from allowed usernames.
 
             Args:
-                username(SLT[:obj:`str`], optional): Which username(s) to disallow
-                    through. Leading '@'s in usernames will be discarded.
+                username(:class:`telegram.utils.types.SLT`[:obj:`str`], optional):
+                    Which username(s) to disallow through.
+                    Leading '@'s in usernames will be discarded.
             """
             with self.__lock:
                 if self._chat_ids:
@@ -1581,8 +1576,8 @@ officedocument.wordprocessingml.document")``-
             Remove one or more chats from allowed chat ids.
 
             Args:
-                chat_id(SLT[:obj:`int`], optional): Which chat ID(s) to disallow
-                    through.
+                chat_id(:class:`telegram.utils.types.SLT`[:obj:`int`], optional):
+                    Which chat ID(s) to disallow through.
             """
             with self.__lock:
                 if self._usernames:
@@ -1656,8 +1651,8 @@ officedocument.wordprocessingml.document")``-
         ``MessageHandler(Filters.dice([5, 6]), callback_method)``.
 
     Args:
-        update (SLT[:obj:`int`], optional): Which values to allow. If not
-            specified, will allow any dice message.
+        update (:class:`telegram.utils.types.SLT`[:obj:`int`], optional):
+            Which values to allow. If not specified, will allow any dice message.
 
     Note:
         Dice messages don't have text. If you want to filter either text or dice messages, use
@@ -1683,9 +1678,10 @@ officedocument.wordprocessingml.document")``-
             ``MessageHandler(Filters.language("en"), callback_method)``
 
         Args:
-            lang (SLT[:obj:`str`]): Which language code(s) to allow through. This
-                will be matched using ``.startswith`` meaning that 'en' will match both 'en_US'
-                and 'en_GB'.
+            lang (:class:`telegram.utils.types.SLT`[:obj:`str`]):
+                Which language code(s) to allow through.
+                This will be matched using ``.startswith`` meaning that
+                'en' will match both 'en_US' and 'en_GB'.
 
         """
 
@@ -1700,7 +1696,7 @@ officedocument.wordprocessingml.document")``-
             """"""  # remove method from docs
             return bool(
                 message.from_user.language_code
-                and any(message.from_user.language_code.startswith(x) for x in self.lang)
+                and any([message.from_user.language_code.startswith(x) for x in self.lang])
             )
 
     class _UpdateType(UpdateFilter):

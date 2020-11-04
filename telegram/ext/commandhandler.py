@@ -49,9 +49,9 @@ class CommandHandler(Handler):
         :class:`telegram.ext.CommandHandler` does *not* handle (edited) channel posts.
 
     Attributes:
-        command (SLT[:obj:`str`]): The command or list of commands this handler
-            should listen for. Limitations are the same as described here
-            https://core.telegram.org/bots#commands
+        command (:class:`telegram.utils.types.SLT`[:obj:`str`]):
+            The command or list of commands this handler should listen for.
+            Limitations are the same as described here https://core.telegram.org/bots#commands
         callback (:obj:`callable`): The callback function for this handler.
         filters (:class:`telegram.ext.BaseFilter`): Optional. Only allow updates with these
             Filters.
@@ -83,9 +83,9 @@ class CommandHandler(Handler):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        command (SLT[:obj:`str`]): The command or list of commands this handler
-            should listen for. Limitations are the same as described here
-            https://core.telegram.org/bots#commands
+        command (:class:`telegram.utils.types.SLT`[:obj:`str`]):
+            The command or list of commands this handler should listen for.
+            Limitations are the same as described here https://core.telegram.org/bots#commands
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
             Callback signature for context based API:
@@ -297,9 +297,10 @@ class PrefixHandler(CommandHandler):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        prefix (SLT[:obj:`str`]): The prefix(es) that will precede :attr:`command`.
-        command (SLT[:obj:`str`]): The command or list of commands this handler
-            should listen for.
+        prefix (:class:`telegram.utils.types.SLT`[:obj:`str`]):
+            The prefix(es) that will precede :attr:`command`.
+        command (:class:`telegram.utils.types.SLT`[:obj:`str`]):
+            The command or list of commands this handler should listen for.
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
             Callback signature for context based API:
