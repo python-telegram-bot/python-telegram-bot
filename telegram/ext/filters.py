@@ -627,7 +627,7 @@ class Filters:
                     filters files with extension ``".Dockerfile"`` minding the case.
             """
 
-            def __init__(self, file_extension: Optional[str], *, case_sensitive: bool = False):
+            def __init__(self, file_extension: Optional[str], case_sensitive: bool = False):
                 """Initialize the extension you want to filter.
 
                 Args:
