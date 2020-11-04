@@ -328,37 +328,29 @@ class TestFilters:
     def test_filters_caption_regex_multiple(self, update):
         SRE_TYPE = type(re.match("", ""))
         update.message.caption = '/start deep-linked param'
-        result = (
-            Filters.caption_regex('deep')
-            & Filters.caption_regex(r'linked param')
-        )(update)
+        result = (Filters.caption_regex('deep') & Filters.caption_regex(r'linked param'))(update)
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
         assert all([type(res) == SRE_TYPE for res in matches])
-        result = (
-            Filters.caption_regex('deep')
-            | Filters.caption_regex(r'linked param')
-        )(update)
+        result = (Filters.caption_regex('deep') | Filters.caption_regex(r'linked param'))(update)
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
         assert all([type(res) == SRE_TYPE for res in matches])
-        result = (
-            Filters.caption_regex('not int')
-            | Filters.caption_regex(r'linked param')
-        )(update)
+        result = (Filters.caption_regex('not int') | Filters.caption_regex(r'linked param'))(
+            update
+        )
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
         assert all([type(res) == SRE_TYPE for res in matches])
-        result = (
-            Filters.caption_regex('not int')
-            & Filters.caption_regex(r'linked param')
-        )(update)
+        result = (Filters.caption_regex('not int') & Filters.caption_regex(r'linked param'))(
+            update
+        )
         assert not result
 
     def test_filters_merged_with_caption_regex(self, update):

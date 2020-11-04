@@ -508,7 +508,7 @@ class Filters:
                     return {'matches': [match]}
             return {}
 
-    class caption_regex (MessageFilter):
+    class caption_regex(MessageFilter):
         data_filter = True
 
         def __init__(self, pattern: Union[str, Pattern]):
