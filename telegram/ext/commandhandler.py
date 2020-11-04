@@ -385,13 +385,11 @@ class PrefixHandler(CommandHandler):
         return self._prefix
 
     @prefix.setter
-    def prefix(self, prefix: SLT[str]) -> None:
+    def prefix(self, prefix: Union[str, List[str]]) -> None:
         if isinstance(prefix, str):
             self._prefix = [prefix.lower()]
-        elif isinstance(prefix, list):
-            self._prefix = prefix
         else:
-            self._prefix = list(prefix)
+            self._prefix = prefix
         self._build_commands()
 
     @property  # type: ignore[override]
@@ -405,13 +403,11 @@ class PrefixHandler(CommandHandler):
         return self._command
 
     @command.setter
-    def command(self, command: SLT[str]) -> None:
+    def command(self, command: Union[str, List[str]]) -> None:
         if isinstance(command, str):
             self._command = [command.lower()]
-        elif isinstance(command, list):
-            self._command = command
         else:
-            self._command = list(command)
+            self._command = command
         self._build_commands()
 
     def _build_commands(self) -> None:

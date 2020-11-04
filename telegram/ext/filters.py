@@ -287,7 +287,7 @@ class _DiceEmoji(MessageFilter):
             name: str,
             emoji: str = None,
         ):
-            self.values = [values] if isinstance(values, int) else list(values)
+            self.values = [values] if isinstance(values, int) else values
             self.emoji = emoji
             self.name = '{}({})'.format(name, values)
 
@@ -337,7 +337,7 @@ class Filters:
 
         class _TextStrings(MessageFilter):
             def __init__(self, strings: Union[List[str], Tuple[str]]):
-                self.strings = list(strings)
+                self.strings = strings
                 self.name = 'Filters.text({})'.format(strings)
 
             def filter(self, message: Message) -> bool:
@@ -388,7 +388,7 @@ class Filters:
 
         class _CaptionStrings(MessageFilter):
             def __init__(self, strings: Union[List[str], Tuple[str]]):
-                self.strings = list(strings)
+                self.strings = strings
                 self.name = 'Filters.caption({})'.format(strings)
 
             def filter(self, message: Message) -> bool:
@@ -1687,9 +1687,11 @@ officedocument.wordprocessingml.document")``-
 
         def __init__(self, lang: SLT[str]):
             if isinstance(lang, str):
+                lang = cast(str, lang)
                 self.lang = [lang]
             else:
-                self.lang = list(lang)
+                lang = cast(List[str], lang)
+                self.lang = lang
             self.name = 'Filters.language({})'.format(self.lang)
 
         def filter(self, message: Message) -> bool:
