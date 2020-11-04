@@ -509,6 +509,23 @@ class Filters:
             return {}
 
     class caption_regex(MessageFilter):
+        """
+        Filters updates by searching for an occurrence of ``pattern`` in the message caption.
+
+        This filter works similarly to :class:`Filters.regex`, with the only exception being that
+        it applies to the message caption instead of the text.
+
+        Examples:
+            Use ``MessageHandler(Filters.photo & Filters.caption_regex(r'help'), callback)``
+            to capture all photos with caption containing the word 'help'.
+
+        Note:
+            This filter will not work on simple text messages, but only on media with caption.
+
+        Args:
+            pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
+        """
+
         data_filter = True
 
         def __init__(self, pattern: Union[str, Pattern]):
@@ -519,6 +536,7 @@ class Filters:
             self.name = 'Filters.caption_regex ({})'.format(self.pattern)
 
         def filter(self, message: Message) -> Optional[Dict[str, List[Match]]]:
+            """"""  # remove method from docs
             if message.caption:
                 match = self.pattern.search(message.caption)
                 if match:
