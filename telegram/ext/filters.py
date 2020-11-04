@@ -506,11 +506,25 @@ class Filters:
                 match = self.pattern.search(message.text)
                 if match:
                     return {'matches': [match]}
-            elif message.caption:
+            return {}
+
+    class caption_regex (MessageFilter):
+        data_filter = True
+
+        def __init__(self, pattern: Union[str, Pattern]):
+            if isinstance(pattern, str):
+                pattern = re.compile(pattern)
+            pattern = cast(Pattern, pattern)
+            self.pattern: Pattern = pattern
+            self.name = 'Filters.caption_regex ({})'.format(self.pattern)
+
+        def filter(self, message: Message) -> Optional[Dict[str, List[Match]]]:
+            if message.caption:
                 match = self.pattern.search(message.caption)
                 if match:
                     return {'matches': [match]}
             return {}
+
 
     class _Reply(MessageFilter):
         name = 'Filters.reply'
