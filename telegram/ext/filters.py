@@ -525,7 +525,6 @@ class Filters:
                     return {'matches': [match]}
             return {}
 
-
     class _Reply(MessageFilter):
         name = 'Filters.reply'
 
