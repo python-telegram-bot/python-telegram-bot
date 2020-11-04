@@ -1076,9 +1076,9 @@ officedocument.wordprocessingml.document")``-
                 is specified in :attr:`user_ids` and :attr:`usernames`.
 
         Args:
-            user_id(:class:`telegram.utils.types.SLT`[:obj:`int`], optional):
+            user_id(:class:`telegram.utils.types.SLT[int]`, optional):
                 Which user ID(s) to allow through.
-            username(:class:`telegram.utils.types.SLT`[:obj:`str`], optional):
+            username(:class:`telegram.utils.types.SLT[str]`, optional):
                 Which username(s) to allow through. Leading '@'s in usernames will be discarded.
             allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
                 is specified in :attr:`user_ids` and :attr:`usernames`. Defaults to :obj:`False`
@@ -1158,7 +1158,7 @@ officedocument.wordprocessingml.document")``-
             Add one or more users to the allowed usernames.
 
             Args:
-                username(:class:`telegram.utils.types.SLT`[:obj:`str`], optional):
+                username(:class:`telegram.utils.types.SLT[str]`, optional):
                     Which username(s) to allow through.
                     Leading '@'s in usernames will be discarded.
             """
@@ -1176,7 +1176,7 @@ officedocument.wordprocessingml.document")``-
             Add one or more users to the allowed user ids.
 
             Args:
-                user_id(:class:`telegram.utils.types.SLT`[:obj:`int`], optional):
+                user_id(:class:`telegram.utils.types.SLT[int]`, optional):
                     Which user ID(s) to allow through.
             """
             with self.__lock:
@@ -1194,7 +1194,7 @@ officedocument.wordprocessingml.document")``-
             Remove one or more users from allowed usernames.
 
             Args:
-                username(:class:`telegram.utils.types.SLT`[:obj:`str`], optional):
+                username(:class:`telegram.utils.types.SLT[str]`, optional):
                     Which username(s) to disallow through.
                     Leading '@'s in usernames will be discarded.
             """
@@ -1212,7 +1212,7 @@ officedocument.wordprocessingml.document")``-
             Remove one or more users from allowed user ids.
 
             Args:
-                user_id(:class:`telegram.utils.types.SLT`[:obj:`int`], optional):
+                user_id(:class:`telegram.utils.types.SLT[int]`, optional):
                     Which user ID(s) to disallow through.
             """
             with self.__lock:
@@ -1258,9 +1258,9 @@ officedocument.wordprocessingml.document")``-
                 is specified in :attr:`bot_ids` and :attr:`usernames`.
 
         Args:
-            bot_id(:class:`telegram.utils.types.SLT`[:obj:`int`], optional):
+            bot_id(:class:`telegram.utils.types.SLT[int]`, optional):
                 Which bot ID(s) to allow through.
-            username(:class:`telegram.utils.types.SLT`[:obj:`str`], optional):
+            username(:class:`telegram.utils.types.SLT[str]`, optional):
                 Which username(s) to allow through. Leading '@'s in usernames will be discarded.
             allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
                 is specified in :attr:`bot_ids` and :attr:`usernames`. Defaults to :obj:`False`
@@ -1339,7 +1339,7 @@ officedocument.wordprocessingml.document")``-
             Add one or more users to the allowed usernames.
 
             Args:
-                username(:class:`telegram.utils.types.SLT`[:obj:`str`], optional):
+                username(:class:`telegram.utils.types.SLT[str]`, optional):
                     Which username(s) to allow through.
                     Leading '@'s in usernames will be discarded.
             """
@@ -1358,7 +1358,7 @@ officedocument.wordprocessingml.document")``-
             Add one or more users to the allowed user ids.
 
             Args:
-                bot_id(:class:`telegram.utils.types.SLT`[:obj:`int`], optional):
+                bot_id(:class:`telegram.utils.types.SLT[int]`, optional):
                     Which bot ID(s) to allow through.
             """
             with self.__lock:
@@ -1376,7 +1376,7 @@ officedocument.wordprocessingml.document")``-
             Remove one or more users from allowed usernames.
 
             Args:
-                username(:class:`telegram.utils.types.SLT`[:obj:`str`], optional):
+                username(:class:`telegram.utils.types.SLT[str]`, optional):
                     Which username(s) to disallow through.
                     Leading '@'s in usernames will be discarded.
             """
@@ -1394,7 +1394,7 @@ officedocument.wordprocessingml.document")``-
             Remove one or more users from allowed user ids.
 
             Args:
-                bot_id(:class:`telegram.utils.types.SLT`[:obj:`int`], optional):
+                bot_id(:class:`telegram.utils.types.SLT[int]`, optional):
                     Which bot ID(s) to disallow through.
             """
             with self.__lock:
@@ -1439,9 +1439,9 @@ officedocument.wordprocessingml.document")``-
                 is specified in :attr:`chat_ids` and :attr:`usernames`.
 
         Args:
-            chat_id(:class:`telegram.utils.types.SLT`[:obj:`int`], optional):
+            chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
                 Which chat ID(s) to allow through.
-            username(:class:`telegram.utils.types.SLT`[:obj:`str`], optional):
+            username(:class:`telegram.utils.types.SLT[str]`, optional):
                 Which username(s) to allow through.
                 Leading `'@'` s in usernames will be discarded.
             allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
@@ -1522,7 +1522,7 @@ officedocument.wordprocessingml.document")``-
             Add one or more chats to the allowed usernames.
 
             Args:
-                username(:class:`telegram.utils.types.SLT`[:obj:`str`], optional):
+                username(:class:`telegram.utils.types.SLT[str]`, optional):
                     Which username(s) to allow through.
                     Leading `'@'` s in usernames will be discarded.
             """
@@ -1540,7 +1540,7 @@ officedocument.wordprocessingml.document")``-
             Add one or more chats to the allowed chat ids.
 
             Args:
-                chat_id(:class:`telegram.utils.types.SLT`[:obj:`int`], optional):
+                chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
                     Which chat ID(s) to allow through.
             """
             with self.__lock:
@@ -1558,7 +1558,7 @@ officedocument.wordprocessingml.document")``-
             Remove one or more chats from allowed usernames.
 
             Args:
-                username(:class:`telegram.utils.types.SLT`[:obj:`str`], optional):
+                username(:class:`telegram.utils.types.SLT[str]`, optional):
                     Which username(s) to disallow through.
                     Leading '@'s in usernames will be discarded.
             """
@@ -1576,7 +1576,7 @@ officedocument.wordprocessingml.document")``-
             Remove one or more chats from allowed chat ids.
 
             Args:
-                chat_id(:class:`telegram.utils.types.SLT`[:obj:`int`], optional):
+                chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
                     Which chat ID(s) to disallow through.
             """
             with self.__lock:
@@ -1651,7 +1651,7 @@ officedocument.wordprocessingml.document")``-
         ``MessageHandler(Filters.dice([5, 6]), callback_method)``.
 
     Args:
-        update (:class:`telegram.utils.types.SLT`[:obj:`int`], optional):
+        update (:class:`telegram.utils.types.SLT[int]`, optional):
             Which values to allow. If not specified, will allow any dice message.
 
     Note:
@@ -1678,7 +1678,7 @@ officedocument.wordprocessingml.document")``-
             ``MessageHandler(Filters.language("en"), callback_method)``
 
         Args:
-            lang (:class:`telegram.utils.types.SLT`[:obj:`str`]):
+            lang (:class:`telegram.utils.types.SLT[str]`):
                 Which language code(s) to allow through.
                 This will be matched using ``.startswith`` meaning that
                 'en' will match both 'en_US' and 'en_GB'.
