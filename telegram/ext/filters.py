@@ -35,6 +35,7 @@ __all__ = [
     'UpdateFilter',
     'InvertedFilter',
     'MergedFilter',
+    'XORFilter',
 ]
 
 from telegram.utils.deprecate import TelegramDeprecationWarning
