@@ -616,7 +616,7 @@ class Filters:
                 * Extension should be passed without leading dot
                     unless it's a part of the extension.
                 * Pass :obj:`None` to filter files with no extension,
-                    even empty one. E.g. without a dot in the filename.
+                    i.e. without a dot in the filename.
 
             Example:
                 ``Filters.document.file_extension("jpg")``
