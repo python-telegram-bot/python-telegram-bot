@@ -131,9 +131,7 @@ class EncryptedCredentials(TelegramObject):
 
     """
 
-    def __init__(
-        self, data: str, hash: str, secret: str, bot: 'Bot' = None, **kwargs: Any
-    ):  # pylint: disable=W0613
+    def __init__(self, data: str, hash: str, secret: str, bot: 'Bot' = None, **_kwargs: Any):
         # Required
         self.data = data
         self.hash = hash
@@ -197,9 +195,7 @@ class Credentials(TelegramObject):
         nonce (:obj:`str`): Bot-specified nonce
     """
 
-    def __init__(
-        self, secure_data: 'SecureData', nonce: str, bot: 'Bot' = None, **kwargs: Any
-    ):  # pylint: disable=W0613
+    def __init__(self, secure_data: 'SecureData', nonce: str, bot: 'Bot' = None, **_kwargs: Any):
         # Required
         self.secure_data = secure_data
         self.nonce = nonce
@@ -247,7 +243,7 @@ class SecureData(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         personal_details: 'SecureValue' = None,
         passport: 'SecureValue' = None,
         internal_passport: 'SecureValue' = None,
@@ -260,7 +256,7 @@ class SecureData(TelegramObject):
         passport_registration: 'SecureValue' = None,
         temporary_registration: 'SecureValue' = None,
         bot: 'Bot' = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Optionals
         self.temporary_registration = temporary_registration
@@ -331,7 +327,7 @@ class SecureValue(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         data: 'DataCredentials' = None,
         front_side: 'FileCredentials' = None,
         reverse_side: 'FileCredentials' = None,
@@ -339,7 +335,7 @@ class SecureValue(TelegramObject):
         files: List['FileCredentials'] = None,
         translation: List['FileCredentials'] = None,
         bot: 'Bot' = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         self.data = data
         self.front_side = front_side
@@ -378,9 +374,7 @@ class SecureValue(TelegramObject):
 class _CredentialsBase(TelegramObject):
     """Base class for DataCredentials and FileCredentials."""
 
-    def __init__(
-        self, hash: str, secret: str, bot: 'Bot' = None, **kwargs: Any
-    ):  # pylint: disable=W0613
+    def __init__(self, hash: str, secret: str, bot: 'Bot' = None, **_kwargs: Any):
         self.hash = hash
         self.secret = secret
 
@@ -405,8 +399,8 @@ class DataCredentials(_CredentialsBase):
         secret (:obj:`str`): Secret of encrypted data
     """
 
-    def __init__(self, data_hash: str, secret: str, **kwargs: Any):  # pylint: disable=W0613
-        super().__init__(data_hash, secret, **kwargs)
+    def __init__(self, data_hash: str, secret: str, **_kwargs: Any):
+        super().__init__(data_hash, secret, **_kwargs)
 
     def to_dict(self) -> JSONDict:
         data = super().to_dict()
@@ -431,8 +425,8 @@ class FileCredentials(_CredentialsBase):
         secret (:obj:`str`): Secret of encrypted file
     """
 
-    def __init__(self, file_hash: str, secret: str, **kwargs: Any):  # pylint: disable=W0613
-        super().__init__(file_hash, secret, **kwargs)
+    def __init__(self, file_hash: str, secret: str, **_kwargs: Any):
+        super().__init__(file_hash, secret, **_kwargs)
 
     def to_dict(self) -> JSONDict:
         data = super().to_dict()

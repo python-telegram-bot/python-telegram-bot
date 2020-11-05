@@ -67,7 +67,7 @@ class PreCheckoutQuery(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         id: str,  # pylint: disable=W0622
         from_user: User,
         currency: str,
@@ -76,7 +76,7 @@ class PreCheckoutQuery(TelegramObject):
         shipping_option_id: str = None,
         order_info: OrderInfo = None,
         bot: 'Bot' = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         self.id = id  # pylint: disable=C0103
         self.from_user = from_user

@@ -48,7 +48,7 @@ class PollOption(TelegramObject):
 
     """
 
-    def __init__(self, text: str, voter_count: int, **kwargs: Any):  # pylint: disable=W0613
+    def __init__(self, text: str, voter_count: int, **_kwargs: Any):
         self.text = text
         self.voter_count = voter_count
 
@@ -75,9 +75,7 @@ class PollAnswer(TelegramObject):
 
     """
 
-    def __init__(
-        self, poll_id: str, user: User, option_ids: List[int], **kwargs: Any
-    ):  # pylint: disable=W0613
+    def __init__(self, poll_id: str, user: User, option_ids: List[int], **_kwargs: Any):
         self.poll_id = poll_id
         self.user = user
         self.option_ids = option_ids
@@ -145,7 +143,7 @@ class Poll(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         id: str,  # pylint: disable=W0622
         question: str,
         options: List[PollOption],
@@ -159,7 +157,7 @@ class Poll(TelegramObject):
         explanation_entities: List[MessageEntity] = None,
         open_period: int = None,
         close_date: datetime.datetime = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         self.id = id  # pylint: disable=C0103
         self.question = question

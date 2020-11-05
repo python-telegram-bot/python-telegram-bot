@@ -50,9 +50,7 @@ class ForceReply(ReplyMarkup):
 
     """
 
-    def __init__(
-        self, force_reply: bool = True, selective: bool = False, **kwargs: Any
-    ):  # pylint: disable=W0613
+    def __init__(self, force_reply: bool = True, selective: bool = False, **_kwargs: Any):
         # Required
         self.force_reply = bool(force_reply)
         # Optionals

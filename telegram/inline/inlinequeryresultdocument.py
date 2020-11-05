@@ -92,7 +92,7 @@ class InlineQueryResultDocument(InlineQueryResult):
         thumb_width: int = None,
         thumb_height: int = None,
         parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-        **kwargs: Any,  # pylint: disable=W0613
+        **_kwargs: Any,
     ):
         # Required
         super().__init__('document', id)

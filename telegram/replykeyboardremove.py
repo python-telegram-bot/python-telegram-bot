@@ -55,7 +55,7 @@ class ReplyKeyboardRemove(ReplyMarkup):
 
     """
 
-    def __init__(self, selective: bool = False, **kwargs: Any):  # pylint: disable=W0613
+    def __init__(self, selective: bool = False, **_kwargs: Any):
         # Required
         self.remove_keyboard = True
         # Optionals

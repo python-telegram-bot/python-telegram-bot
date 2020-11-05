@@ -47,7 +47,7 @@ class PersonalDetails(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         first_name: str,
         last_name: str,
         birth_date: str,
@@ -59,7 +59,7 @@ class PersonalDetails(TelegramObject):
         middle_name: str = None,
         middle_name_native: str = None,
         bot: 'Bot' = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.first_name = first_name
@@ -90,7 +90,7 @@ class ResidentialAddress(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         street_line1: str,
         street_line2: str,
         city: str,
@@ -98,7 +98,7 @@ class ResidentialAddress(TelegramObject):
         country_code: str,
         post_code: str,
         bot: 'Bot' = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.street_line1 = street_line1
@@ -120,9 +120,7 @@ class IdDocumentData(TelegramObject):
         expiry_date (:obj:`str`): Optional. Date of expiry, in DD.MM.YYYY format.
     """
 
-    def __init__(
-        self, document_no: str, expiry_date: str, bot: 'Bot' = None, **kwargs: Any
-    ):  # pylint: disable=W0613
+    def __init__(self, document_no: str, expiry_date: str, bot: 'Bot' = None, **_kwargs: Any):
         self.document_no = document_no
         self.expiry_date = expiry_date
 
