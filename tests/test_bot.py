@@ -922,7 +922,12 @@ class TestBot:
         url = 'https://python-telegram-bot.org/test/webhook'
         max_connections = 7
         allowed_updates = ['message']
-        bot.set_webhook(url, max_connections=max_connections, allowed_updates=allowed_updates)
+        bot.set_webhook(
+            url,
+            max_connections=max_connections,
+            allowed_updates=allowed_updates,
+            ip_address='127.0.0.1',
+        )
         time.sleep(2)
         live_info = bot.get_webhook_info()
         time.sleep(6)
@@ -933,6 +938,19 @@ class TestBot:
         assert live_info.url == url
         assert live_info.max_connections == max_connections
         assert live_info.allowed_updates == allowed_updates
+        assert live_info.ip_address == '127.0.0.1'
+
+    @pytest.mark.parametrize('drop_pending_updates', [True, False])
+    def test_set_webhook_delete_webhook_drop_pending_updates(
+        self, bot, drop_pending_updates, monkeypatch
+    ):
+        def assertion(url, data, *args, **kwargs):
+            return bool(data.get('drop_pending_updates')) == drop_pending_updates
+
+        monkeypatch.setattr(bot.request, 'post', assertion)
+
+        assert bot.set_webhook(drop_pending_updates=drop_pending_updates)
+        assert bot.delete_webhook(drop_pending_updates=drop_pending_updates)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

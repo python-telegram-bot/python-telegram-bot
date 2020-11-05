@@ -2521,6 +2521,8 @@ class Bot(TelegramObject):
         max_connections: int = 40,
         allowed_updates: List[str] = None,
         api_kwargs: JSONDict = None,
+        ip_address: str = None,
+        drop_pending_updates: bool = None,
     ) -> bool:
         """
         Use this method to specify a url and receive incoming updates via an outgoing webhook.
@@ -2541,6 +2543,8 @@ class Bot(TelegramObject):
             certificate (:obj:`filelike`): Upload your public key certificate so that the root
                 certificate in use can be checked. See our self-signed guide for details.
                 (https://goo.gl/rw7w6Y)
+            ip_address (:obj:`str`, optional): The fixed IP address which will be used to send
+                webhook requests instead of the IP address resolved through DNS.
             max_connections (:obj:`int`, optional): Maximum allowed number of simultaneous HTTPS
                 connections to the webhook for update delivery, 1-100. Defaults to 40. Use lower
                 values to limit the load on your bot's server, and higher values to increase your
@@ -2553,6 +2557,8 @@ class Bot(TelegramObject):
                 specified, the previous setting will be used. Please note that this parameter
                 doesn't affect updates created before the call to the set_webhook, so unwanted
                 updates may be received for a short period of time.
+            drop_pending_updates (:obj:`bool`, optional): Pass :obj:`True` to drop all pending
+                updates.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -2592,18 +2598,26 @@ class Bot(TelegramObject):
             data['max_connections'] = max_connections
         if allowed_updates is not None:
             data['allowed_updates'] = allowed_updates
+        if ip_address:
+            data['ip_address'] = ip_address
+        if drop_pending_updates:
+            data['drop_pending_updates'] = drop_pending_updates
 
         result = self._post('setWebhook', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
     @log
-    def delete_webhook(self, timeout: float = None, api_kwargs: JSONDict = None) -> bool:
+    def delete_webhook(
+        self, timeout: float = None, api_kwargs: JSONDict = None, drop_pending_updates: bool = None
+    ) -> bool:
         """
         Use this method to remove webhook integration if you decide to switch back to
         getUpdates. Requires no parameters.
 
         Args:
+            drop_pending_updates(:obj:`bool`, optional): Pass :obj:`True`: to drop all pending
+                updates.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -2617,7 +2631,12 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        result = self._post('deleteWebhook', None, timeout=timeout, api_kwargs=api_kwargs)
+        data = {}
+
+        if drop_pending_updates:
+            data['drop_pending_updates'] = drop_pending_updates
+
+        result = self._post('deleteWebhook', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
