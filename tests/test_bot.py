@@ -1379,3 +1379,21 @@ class TestBot:
             assert bc[0].description == 'descr1'
             assert bc[1].command == 'cmd2'
             assert bc[1].description == 'descr2'
+
+    def test_log_out(self, monkeypatch, bot):
+        # We don't actually make a request as to not break the test setup
+        def assertion(url, data, *args, **kwargs):
+            return data == {} and url.split('/')[-1] == 'logOut'
+
+        monkeypatch.setattr(bot.request, 'post', assertion)
+
+        assert bot.log_out()
+
+    def test_close(self, monkeypatch, bot):
+        # We don't actually make a request as to not break the test setup
+        def assertion(url, data, *args, **kwargs):
+            return data == {} and url.split('/')[-1] == 'close'
+
+        monkeypatch.setattr(bot.request, 'post', assertion)
+
+        assert bot.close()

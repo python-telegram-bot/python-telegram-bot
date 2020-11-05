@@ -4358,6 +4358,41 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
+    @log
+    def log_out(self) -> bool:
+        """
+        Use this method to log out from the cloud Bot API server before launching the bot locally.
+        You *must* log out the bot before running it locally, otherwise there is no guarantee that
+        the bot will receive updates. After a successful call, you can immediately log in on a
+        local server, but will not be able to log in back to the cloud Bot API server for 10
+        minutes.
+
+        Returns:
+            :obj:`True`: On success
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        return self._post('logOut')  # type: ignore[return-value]
+
+    @log
+    def close(self) -> bool:
+        """
+        Use this method to close the bot instance before moving it from one local server to
+        another. You need to delete the webhook before calling this method to ensure that the bot
+        isn't launched again after server restart. The method will return error 429 in the first
+        10 minutes after the bot is launched.
+
+        Returns:
+            :obj:`True`: On success
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        return self._post('close')  # type: ignore[return-value]
+
     def to_dict(self) -> JSONDict:
         data: JSONDict = {'id': self.id, 'username': self.username, 'first_name': self.first_name}
 
@@ -4507,3 +4542,5 @@ class Bot(TelegramObject):
     """Alias for :attr:`get_my_commands`"""
     setMyCommands = set_my_commands
     """Alias for :attr:`set_my_commands`"""
+    logOut = log_out
+    """Alias for :attr:`log_out`"""
