@@ -40,7 +40,7 @@ class Location(TelegramObject):
 
     """
 
-    def __init__(self, longitude: float, latitude: float, **kwargs: Any):  # pylint: disable=W0613
+    def __init__(self, longitude: float, latitude: float, **_kwargs: Any):
         # Required
         self.longitude = float(longitude)
         self.latitude = float(latitude)

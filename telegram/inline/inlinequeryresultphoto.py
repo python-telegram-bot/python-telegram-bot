@@ -88,7 +88,7 @@ class InlineQueryResultPhoto(InlineQueryResult):
         reply_markup: 'ReplyMarkup' = None,
         input_message_content: 'InputMessageContent' = None,
         parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-        **kwargs: Any,  # pylint: disable=W0613
+        **_kwargs: Any,
     ):
         # Required
         super().__init__('photo', id)

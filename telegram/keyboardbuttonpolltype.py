@@ -37,7 +37,7 @@ class KeyboardButtonPollType(TelegramObject):
             create a poll of any type.
     """
 
-    def __init__(self, type: str = None, **kwargs: Any):  # pylint: disable=W0613, W0622
+    def __init__(self, type: str = None, **_kwargs: Any):  # pylint: disable=W0622
         self.type = type
 
         self._id_attrs = (self.type,)

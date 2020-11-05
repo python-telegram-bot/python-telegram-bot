@@ -60,14 +60,14 @@ class InlineQuery(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         id: str,  # pylint: disable=W0622
         from_user: User,
         query: str,
         offset: str,
         location: Location = None,
         bot: 'Bot' = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.id = id  # pylint: disable=C0103

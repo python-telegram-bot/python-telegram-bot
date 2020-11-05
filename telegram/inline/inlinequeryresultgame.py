@@ -50,7 +50,7 @@ class InlineQueryResultGame(InlineQueryResult):
         id: str,  # pylint: disable=W0622
         game_short_name: str,
         reply_markup: 'ReplyMarkup' = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         super().__init__('game', id)

@@ -293,7 +293,7 @@ class Message(TelegramObject):
     ] + ATTACHMENT_TYPES
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         message_id: int,
         date: datetime.datetime,
         chat: Chat,
@@ -344,7 +344,7 @@ class Message(TelegramObject):
         bot: 'Bot' = None,
         dice: Dice = None,
         via_bot: User = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.message_id = int(message_id)

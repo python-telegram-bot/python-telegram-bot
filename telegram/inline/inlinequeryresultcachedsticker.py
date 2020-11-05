@@ -58,7 +58,7 @@ class InlineQueryResultCachedSticker(InlineQueryResult):
         sticker_file_id: str,
         reply_markup: 'ReplyMarkup' = None,
         input_message_content: 'InputMessageContent' = None,
-        **kwargs: Any,  # pylint: disable=W0613
+        **_kwargs: Any,
     ):
         # Required
         super().__init__('sticker', id)

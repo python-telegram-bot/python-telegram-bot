@@ -125,7 +125,7 @@ class ChatMember(TelegramObject):
     """:const:`telegram.constants.CHATMEMBER_RESTRICTED`"""
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         user: User,
         status: str,
         until_date: datetime.datetime = None,
@@ -145,7 +145,7 @@ class ChatMember(TelegramObject):
         can_add_web_page_previews: bool = None,
         is_member: bool = None,
         custom_title: str = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.user = user

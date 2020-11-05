@@ -52,11 +52,11 @@ class PassportData(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         data: List[EncryptedPassportElement],
         credentials: EncryptedCredentials,
         bot: 'Bot' = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         self.data = data
         self.credentials = credentials

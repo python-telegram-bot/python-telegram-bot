@@ -80,7 +80,7 @@ class CallbackQuery(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         id: str,  # pylint: disable=W0622
         from_user: User,
         chat_instance: str,
@@ -89,7 +89,7 @@ class CallbackQuery(TelegramObject):
         inline_message_id: str = None,
         game_short_name: str = None,
         bot: 'Bot' = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.id = id  # pylint: disable=C0103

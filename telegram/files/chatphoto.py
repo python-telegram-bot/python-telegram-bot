@@ -63,13 +63,13 @@ class ChatPhoto(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         small_file_id: str,
         small_file_unique_id: str,
         big_file_id: str,
         big_file_unique_id: str,
         bot: 'Bot' = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         self.small_file_id = small_file_id
         self.small_file_unique_id = small_file_unique_id

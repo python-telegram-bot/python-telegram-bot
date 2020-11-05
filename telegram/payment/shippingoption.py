@@ -47,11 +47,11 @@ class ShippingOption(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         id: str,  # pylint: disable=W0622
         title: str,
         prices: List['LabeledPrice'],
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         self.id = id  # pylint: disable=C0103
         self.title = title

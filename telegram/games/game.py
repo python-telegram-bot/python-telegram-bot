@@ -68,14 +68,14 @@ class Game(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         title: str,
         description: str,
         photo: List[PhotoSize],
         text: str = None,
         text_entities: List[MessageEntity] = None,
         animation: Animation = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.title = title
