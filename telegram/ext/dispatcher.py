@@ -322,7 +322,7 @@ class Dispatcher:
         *args: Any,
         update: HandlerArg = None,
         error_handling: bool = True,
-        **kwargs: Any,  # pylint: disable=W0613
+        **kwargs: Any,
     ) -> Promise:
         # TODO: Remove error_handling parameter once we drop the @run_async decorator
         promise = Promise(func, args, kwargs, update=update, error_handling=error_handling)

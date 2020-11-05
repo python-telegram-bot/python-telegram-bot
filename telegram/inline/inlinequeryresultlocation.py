@@ -78,7 +78,7 @@ class InlineQueryResultLocation(InlineQueryResult):
         thumb_url: str = None,
         thumb_width: int = None,
         thumb_height: int = None,
-        **kwargs: Any,  # pylint: disable=W0613
+        **_kwargs: Any,
     ):
         # Required
         super().__init__('location', id)

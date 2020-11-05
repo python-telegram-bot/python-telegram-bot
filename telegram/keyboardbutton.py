@@ -62,12 +62,12 @@ class KeyboardButton(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         text: str,
         request_contact: bool = None,
         request_location: bool = None,
         request_poll: bool = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.text = text

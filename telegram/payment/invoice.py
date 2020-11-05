@@ -54,13 +54,13 @@ class Invoice(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         title: str,
         description: str,
         start_parameter: str,
         currency: str,
         total_amount: int,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         self.title = title
         self.description = description

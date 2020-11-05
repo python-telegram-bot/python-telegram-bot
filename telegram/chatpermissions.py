@@ -79,7 +79,7 @@ class ChatPermissions(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         can_send_messages: bool = None,
         can_send_media_messages: bool = None,
         can_send_polls: bool = None,
@@ -88,7 +88,7 @@ class ChatPermissions(TelegramObject):
         can_change_info: bool = None,
         can_invite_users: bool = None,
         can_pin_messages: bool = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.can_send_messages = can_send_messages

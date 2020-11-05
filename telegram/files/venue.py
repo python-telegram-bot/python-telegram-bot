@@ -53,13 +53,13 @@ class Venue(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         location: Location,
         title: str,
         address: str,
         foursquare_id: str = None,
         foursquare_type: str = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.location = location
