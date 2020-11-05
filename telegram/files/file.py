@@ -68,13 +68,13 @@ class File(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         file_id: str,
         file_unique_id: str,
         bot: 'Bot' = None,
         file_size: int = None,
         file_path: str = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.file_id = str(file_id)

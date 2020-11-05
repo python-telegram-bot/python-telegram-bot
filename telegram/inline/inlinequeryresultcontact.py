@@ -78,7 +78,7 @@ class InlineQueryResultContact(InlineQueryResult):
         thumb_width: int = None,
         thumb_height: int = None,
         vcard: str = None,
-        **kwargs: Any,  # pylint: disable=W0613
+        **_kwargs: Any,
     ):
         # Required
         super().__init__('contact', id)

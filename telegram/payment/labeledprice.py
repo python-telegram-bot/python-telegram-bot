@@ -45,7 +45,7 @@ class LabeledPrice(TelegramObject):
 
     """
 
-    def __init__(self, label: str, amount: int, **kwargs: Any):  # pylint: disable=W0613
+    def __init__(self, label: str, amount: int, **_kwargs: Any):
         self.label = label
         self.amount = amount
 

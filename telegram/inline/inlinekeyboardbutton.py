@@ -84,7 +84,7 @@ class InlineKeyboardButton(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         text: str,
         url: str = None,
         callback_data: str = None,
@@ -93,7 +93,7 @@ class InlineKeyboardButton(TelegramObject):
         callback_game: 'CallbackGame' = None,
         pay: bool = None,
         login_url: 'LoginUrl' = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.text = text

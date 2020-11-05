@@ -45,9 +45,7 @@ class InlineKeyboardMarkup(ReplyMarkup):
 
     """
 
-    def __init__(
-        self, inline_keyboard: List[List[InlineKeyboardButton]], **kwargs: Any
-    ):  # pylint: disable=W0613
+    def __init__(self, inline_keyboard: List[List[InlineKeyboardButton]], **_kwargs: Any):
         # Required
         self.inline_keyboard = inline_keyboard
 

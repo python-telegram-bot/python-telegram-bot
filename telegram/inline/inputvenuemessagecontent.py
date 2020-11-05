@@ -54,14 +54,14 @@ class InputVenueMessageContent(InputMessageContent):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         latitude: float,
         longitude: float,
         title: str,
         address: str,
         foursquare_id: str = None,
         foursquare_type: str = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.latitude = latitude

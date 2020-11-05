@@ -40,7 +40,7 @@ class BotCommand(TelegramObject):
         description (:obj:`str`): Description of the command, 3-256 characters.
     """
 
-    def __init__(self, command: str, description: str, **kwargs: Any):  # pylint: disable=W0613
+    def __init__(self, command: str, description: str, **_kwargs: Any):
         self.command = command
         self.description = description
 

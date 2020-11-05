@@ -103,7 +103,7 @@ class Chat(TelegramObject):
     """:const:`telegram.constants.CHAT_CHANNEL`"""
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         id: int,
         type: str,
         title: str = None,
@@ -119,7 +119,7 @@ class Chat(TelegramObject):
         sticker_set_name: str = None,
         can_set_sticker_set: bool = None,
         slow_mode_delay: int = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.id = int(id)
@@ -130,7 +130,7 @@ class Chat(TelegramObject):
         self.first_name = first_name
         self.last_name = last_name
         # TODO: Remove (also from tests), when Telegram drops this completely
-        self.all_members_are_administrators = kwargs.get('all_members_are_administrators')
+        self.all_members_are_administrators = _kwargs.get('all_members_are_administrators')
         self.photo = photo
         self.description = description
         self.invite_link = invite_link

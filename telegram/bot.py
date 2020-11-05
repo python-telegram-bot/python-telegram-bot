@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# pylint: disable=E0611,E0213,E1102,C0103,E1101,W0613,R0913,R0904
+# pylint: disable=E0611,E0213,E1102,C0103,E1101,R0913,R0904
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2020
@@ -114,10 +114,12 @@ def info(func: Callable[..., RT]) -> Callable[..., RT]:
     return decorator
 
 
-def log(func: Callable[..., RT], *args: Any, **kwargs: Any) -> Callable[..., RT]:
+def log(
+    func: Callable[..., RT], *args: Any, **kwargs: Any  # pylint: disable=W0613
+) -> Callable[..., RT]:
     logger = logging.getLogger(func.__module__)
 
-    def decorator(self: 'Bot', *args: Any, **kwargs: Any) -> RT:
+    def decorator(self: 'Bot', *args: Any, **kwargs: Any) -> RT:  # pylint: disable=W0613
         logger.debug('Entering: %s', func.__name__)
         result = func(*args, **kwargs)
         logger.debug(result)
@@ -149,7 +151,7 @@ class Bot(TelegramObject):
 
     """
 
-    def __new__(cls, *args: Any, **kwargs: Any) -> 'Bot':
+    def __new__(cls, *args: Any, **kwargs: Any) -> 'Bot':  # pylint: disable=W0613
         # Get default values from kwargs
         defaults = kwargs.get('defaults')
 

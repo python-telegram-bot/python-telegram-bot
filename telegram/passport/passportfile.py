@@ -58,14 +58,14 @@ class PassportFile(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         file_id: str,
         file_unique_id: str,
         file_date: int,
         file_size: int = None,
         bot: 'Bot' = None,
         credentials: 'FileCredentials' = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.file_id = file_id

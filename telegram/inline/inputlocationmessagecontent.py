@@ -47,9 +47,7 @@ class InputLocationMessageContent(InputMessageContent):
     """
     # fmt: on
 
-    def __init__(
-        self, latitude: float, longitude: float, live_period: int = None, **kwargs: Any
-    ):  # pylint: disable=W0613
+    def __init__(self, latitude: float, longitude: float, live_period: int = None, **_kwargs: Any):
         # Required
         self.latitude = latitude
         self.longitude = longitude
