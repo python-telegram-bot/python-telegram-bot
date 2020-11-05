@@ -34,6 +34,7 @@ def callback_query(bot, request):
     )
     if request.param == 'message':
         cbq.message = TestCallbackQuery.message
+        cbq.message.bot = bot
     else:
         cbq.inline_message_id = TestCallbackQuery.inline_message_id
     return cbq
@@ -209,6 +210,18 @@ class TestCallbackQuery:
         monkeypatch.setattr(callback_query.bot, 'get_game_high_scores', test)
         assert callback_query.get_game_high_scores(user_id=1)
         assert callback_query.get_game_high_scores(1)
+
+    def test_delete_message(self, monkeypatch, callback_query):
+        if callback_query.inline_message_id:
+            pytest.skip("Can't delete inline messages")
+
+        def make_assertion(*args, **kwargs):
+            id_ = kwargs['chat_id'] == callback_query.message.chat_id
+            message = kwargs['message_id'] == callback_query.message.message_id
+            return id_ and message
+
+        monkeypatch.setattr(callback_query.bot, 'delete_message', make_assertion)
+        assert callback_query.delete_message()
 
     def test_equality(self):
         a = CallbackQuery(self.id_, self.from_user, 'chat')
