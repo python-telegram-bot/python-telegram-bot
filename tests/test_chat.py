@@ -19,7 +19,7 @@
 
 import pytest
 
-from telegram import Chat, ChatAction, ChatPermissions, constants
+from telegram import Chat, ChatAction, ChatPermissions, constants, ChatLocation, Location
 from telegram import User
 
 
@@ -36,6 +36,9 @@ def chat(bot):
         can_set_sticker_set=TestChat.can_set_sticker_set,
         permissions=TestChat.permissions,
         slow_mode_delay=TestChat.slow_mode_delay,
+        bio=TestChat.bio,
+        linked_chat_id=TestChat.linked_chat_id,
+        location=TestChat.location,
     )
 
 
@@ -53,6 +56,9 @@ class TestChat:
         can_invite_users=True,
     )
     slow_mode_delay = 30
+    bio = "I'm a Barbie Girl in a Barbie World"
+    linked_chat_id = 11880
+    location = ChatLocation(Location(123, 456), 'Barbie World')
 
     def test_de_json(self, bot):
         json_dict = {
@@ -65,6 +71,9 @@ class TestChat:
             'can_set_sticker_set': self.can_set_sticker_set,
             'permissions': self.permissions.to_dict(),
             'slow_mode_delay': self.slow_mode_delay,
+            'bio': self.bio,
+            'linked_chat_id': self.linked_chat_id,
+            'location': self.location.to_dict(),
         }
         chat = Chat.de_json(json_dict, bot)
 
@@ -77,6 +86,10 @@ class TestChat:
         assert chat.can_set_sticker_set == self.can_set_sticker_set
         assert chat.permissions == self.permissions
         assert chat.slow_mode_delay == self.slow_mode_delay
+        assert chat.bio == self.bio
+        assert chat.linked_chat_id == self.linked_chat_id
+        assert chat.location.location == self.location.location
+        assert chat.location.address == self.location.address
 
     def test_to_dict(self, chat):
         chat_dict = chat.to_dict()
@@ -89,6 +102,9 @@ class TestChat:
         assert chat_dict['all_members_are_administrators'] == chat.all_members_are_administrators
         assert chat_dict['permissions'] == chat.permissions.to_dict()
         assert chat_dict['slow_mode_delay'] == chat.slow_mode_delay
+        assert chat_dict['bio'] == chat.bio
+        assert chat_dict['linked_chat_id'] == chat.linked_chat_id
+        assert chat_dict['location'] == chat.location.to_dict()
 
     def test_link(self, chat):
         assert chat.link == 'https://t.me/{}'.format(chat.username)
