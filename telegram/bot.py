@@ -3658,9 +3658,9 @@ class Bot(TelegramObject):
         if disable_notification is not None:
             data['disable_notification'] = disable_notification
 
-        return self._post(
+        return self._post(  # type: ignore[return-value]
             'pinChatMessage', data, timeout=timeout, api_kwargs=api_kwargs
-        )  # type: ignore[return-value]
+        )
 
     @log
     def unpin_chat_message(
@@ -3699,9 +3699,9 @@ class Bot(TelegramObject):
         if message_id is not None:
             data['message_id'] = message_id
 
-        return self._post(
+        return self._post(  # type: ignore[return-value]
             'unpinChatMessage', data, timeout=timeout, api_kwargs=api_kwargs
-        )  # type: ignore[return-value]
+        )
 
     @log
     def unpin_all_chat_messages(
@@ -3735,9 +3735,9 @@ class Bot(TelegramObject):
 
         data: JSONDict = {'chat_id': chat_id}
 
-        return self._post(
+        return self._post(  # type: ignore[return-value]
             'unpinAllChatMessages', data, timeout=timeout, api_kwargs=api_kwargs
-        )  # type: ignore[return-value]
+        )
 
     @log
     def get_sticker_set(
