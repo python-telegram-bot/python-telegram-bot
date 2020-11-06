@@ -336,6 +336,9 @@ class InputMediaDocument(InputMedia):
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
         thumb (:class:`telegram.InputFile`): Optional. Thumbnail of the file to send.
+        disable_content_type_detection (:obj:`bool`): Optional. Disables automatic server-side
+            content type detection for files uploaded using multipart/form-data. Always true, if
+            the document is sent as part of an album.
 
     Args:
         media (:obj:`str` | `filelike object` | :class:`telegram.Document`): File to send. Pass a
@@ -352,6 +355,9 @@ class InputMediaDocument(InputMedia):
             in JPEG format and less than 200 kB in size. A thumbnail's width and height should
             not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
             Thumbnails can't be reused and can be only uploaded as a new file.
+        disable_content_type_detection (:obj:`bool`, optional): Disables automatic server-side
+            content type detection for files uploaded using multipart/form-data. Always true, if
+            the document is sent as part of an album.
     """
 
     def __init__(
@@ -360,6 +366,7 @@ class InputMediaDocument(InputMedia):
         thumb: FileLike = None,
         caption: str = None,
         parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+        disable_content_type_detection: bool = None,
     ):
         self.type = 'document'
 
@@ -381,3 +388,4 @@ class InputMediaDocument(InputMedia):
         if caption:
             self.caption = caption
         self.parse_mode = parse_mode
+        self.disable_content_type_detection = disable_content_type_detection
