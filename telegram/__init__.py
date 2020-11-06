@@ -23,6 +23,7 @@ from .botcommand import BotCommand
 from .user import User
 from .files.chatphoto import ChatPhoto
 from .chat import Chat
+from .chatlocation import ChatLocation
 from .chatmember import ChatMember
 from .chatpermissions import ChatPermissions
 from .files.photosize import PhotoSize
@@ -189,6 +190,7 @@ __all__ = [
     'InputTextMessageContent',
     'InputVenueMessageContent',
     'Location',
+    'ChatLocation',
     'EncryptedCredentials',
     'PassportFile',
     'EncryptedPassportElement',
