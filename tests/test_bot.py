@@ -1263,15 +1263,22 @@ class TestBot:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_pin_and_unpin_message(self, bot, super_group_id):
-        message = bot.send_message(super_group_id, text="test_pin_message")
+        message1 = bot.send_message(super_group_id, text="test_pin_message_1")
+        message2 = bot.send_message(super_group_id, text="test_pin_message_2")
+        message3 = bot.send_message(super_group_id, text="test_pin_message_3")
+
         assert bot.pin_chat_message(
-            chat_id=super_group_id, message_id=message.message_id, disable_notification=True
+            chat_id=super_group_id, message_id=message1.message_id, disable_notification=True
         )
+        message2.pin()
+        message3.pin()
 
         chat = bot.get_chat(super_group_id)
-        assert chat.pinned_message == message
+        assert chat.pinned_message == message3
 
-        assert bot.unpinChatMessage(super_group_id)
+        assert bot.unpinChatMessage(super_group_id, message2.message_id)
+
+        assert bot.unpin_all_chat_messages(super_group_id)
 
     # get_sticker_set, upload_sticker_file, create_new_sticker_set, add_sticker_to_set,
     # set_sticker_position_in_set and delete_sticker_from_set are tested in the

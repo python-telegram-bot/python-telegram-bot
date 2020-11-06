@@ -1143,6 +1143,22 @@ class Message(TelegramObject):
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs
         )
 
+    def unpin(self, *args: Any, **kwargs: Any) -> bool:
+        """Shortcut for::
+
+             bot.unpin_chat_message(chat_id=message.chat_id,
+                                    message_id=message.message_id,
+                                    *args,
+                                    **kwargs)
+
+        Returns:
+            :obj:`True`: On success.
+
+        """
+        return self.bot.unpin_chat_message(
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs
+        )
+
     def parse_entity(self, entity: MessageEntity) -> str:
         """Returns the text from a given :class:`telegram.MessageEntity`.
 

@@ -3628,10 +3628,10 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
     ) -> bool:
         """
-        Use this method to pin a message in a group, a supergroup, or a channel.
-        The bot must be an administrator in the chat for this to work and must have the
-        ‘can_pin_messages’ admin right in the supergroup or ‘can_edit_messages’ admin right
-        in the channel.
+        Use this method to add a message to the list of pinned messages in a chat. If the
+        chat is not a private chat, the bot must be an administrator in the chat for this to work
+        and must have the ``can_pin_messages`` admin right in a supergroup or ``can_edit_messages``
+        admin right in a channel.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -3664,13 +3664,57 @@ class Bot(TelegramObject):
 
     @log
     def unpin_chat_message(
-        self, chat_id: Union[str, int], timeout: float = None, api_kwargs: JSONDict = None
+        self,
+        chat_id: Union[str, int],
+        message_id: Union[str, int] = None,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
     ) -> bool:
         """
-        Use this method to unpin a message in a group, a supergroup, or a channel.
-        The bot must be an administrator in the chat for this to work and must have the
-        ``can_pin_messages`` admin right in the supergroup or ``can_edit_messages`` admin right
-        in the channel.
+        Use this method to remove a message from the list of pinned messages in a chat. If the
+        chat is not a private chat, the bot must be an administrator in the chat for this to work
+        and must have the ``can_pin_messages`` admin right in a supergroup or ``can_edit_messages``
+        admin right in a channel.
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            message_id (:obj:`int`, optional): Identifier of a message to unpin. If not specified,
+                the most recent pinned message (by sending date) will be unpinned.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        data: JSONDict = {'chat_id': chat_id}
+
+        if message_id is not None:
+            data['message_id'] = message_id
+
+        result = self._post('unpinChatMessage', data, timeout=timeout, api_kwargs=api_kwargs)
+
+        return result  # type: ignore[return-value]
+
+    @log
+    def unpin_all_chat_messages(
+        self,
+        chat_id: Union[str, int],
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to remove a message from the list of pinned messages in a chat. If the
+        chat is not a private chat, the bot must be an administrator in the chat for this
+        to work and must have the ``can_pin_messages`` admin right in a supergroup or
+        ``can_edit_messages`` admin right in a channel.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -3688,9 +3732,10 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
+
         data: JSONDict = {'chat_id': chat_id}
 
-        result = self._post('unpinChatMessage', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post('unpinAllChatMessages', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -4483,6 +4528,8 @@ class Bot(TelegramObject):
     """Alias for :attr:`pin_chat_message`"""
     unpinChatMessage = unpin_chat_message
     """Alias for :attr:`unpin_chat_message`"""
+    unpinAllChatMessages = unpin_all_chat_messages
+    """Alias for :attr:`unpin_all_chat_messages`"""
     getStickerSet = get_sticker_set
     """Alias for :attr:`get_sticker_set`"""
     uploadStickerFile = upload_sticker_file
