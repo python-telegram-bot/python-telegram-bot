@@ -45,6 +45,7 @@ class TestVideo:
     file_size = 326534
     mime_type = 'video/mp4'
     supports_streaming = True
+    file_name = 'telegram.mp4'
 
     thumb_width = 180
     thumb_height = 320
@@ -108,6 +109,8 @@ class TestVideo:
         assert message.video.thumb.file_size == self.thumb_file_size
         assert message.video.thumb.width == self.thumb_width
         assert message.video.thumb.height == self.thumb_height
+
+        assert message.video.file_name == self.file_name
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -208,6 +211,7 @@ class TestVideo:
             'duration': self.duration,
             'mime_type': self.mime_type,
             'file_size': self.file_size,
+            'file_name': self.file_name,
         }
         json_video = Video.de_json(json_dict, bot)
 
@@ -218,6 +222,7 @@ class TestVideo:
         assert json_video.duration == self.duration
         assert json_video.mime_type == self.mime_type
         assert json_video.file_size == self.file_size
+        assert json_video.file_name == self.file_name
 
     def test_to_dict(self, video):
         video_dict = video.to_dict()
@@ -230,6 +235,7 @@ class TestVideo:
         assert video_dict['duration'] == video.duration
         assert video_dict['mime_type'] == video.mime_type
         assert video_dict['file_size'] == video.file_size
+        assert video_dict['file_name'] == video.file_name
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

@@ -44,6 +44,7 @@ class TestAudio:
     caption = 'Test *audio*'
     performer = 'Leandro Toledo'
     title = 'Teste'
+    file_name = 'telegram.mp3'
     duration = 3
     # audio_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.mp3'
     # Shortened link, the above one is cached with the wrong duration.
@@ -99,6 +100,7 @@ class TestAudio:
         assert message.audio.duration == self.duration
         assert message.audio.performer == self.performer
         assert message.audio.title == self.title
+        assert message.audio.file_name == self.file_name
         assert message.audio.mime_type == self.mime_type
         assert message.audio.file_size == self.file_size
         assert message.audio.thumb.file_size == self.thumb_file_size
@@ -192,6 +194,7 @@ class TestAudio:
             'duration': self.duration,
             'performer': self.performer,
             'title': self.title,
+            'file_name': self.file_name,
             'caption': self.caption,
             'mime_type': self.mime_type,
             'file_size': self.file_size,
@@ -204,6 +207,7 @@ class TestAudio:
         assert json_audio.duration == self.duration
         assert json_audio.performer == self.performer
         assert json_audio.title == self.title
+        assert json_audio.file_name == self.file_name
         assert json_audio.mime_type == self.mime_type
         assert json_audio.file_size == self.file_size
         assert json_audio.thumb == audio.thumb
@@ -217,6 +221,7 @@ class TestAudio:
         assert audio_dict['duration'] == audio.duration
         assert audio_dict['mime_type'] == audio.mime_type
         assert audio_dict['file_size'] == audio.file_size
+        assert audio_dict['file_name'] == audio.file_name
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
