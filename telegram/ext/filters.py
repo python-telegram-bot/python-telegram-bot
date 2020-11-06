@@ -721,6 +721,29 @@ officedocument.wordprocessingml.document")``-
         wav: Same as ``Filters.document.mime_type("audio/x-wav")``-
         xml: Same as ``Filters.document.mime_type("application/xml")``-
         zip: Same as ``Filters.document.mime_type("application/zip")``-
+        file_extension: This filter filters documents by their file ending/extension.
+
+            Note:
+                * This Filter only filters by the file ending/extension of the document,
+                    it doesn't check the validity of document.
+                * The user can manipulate the file extension of a document and
+                    send media with wrong types that don't fit to this handler.
+                * Case insensitive by default,
+                    you may change this with the flag ``case_sensitive=True``.
+                * Extension should be passed without leading dot
+                    unless it's a part of the extension.
+                * Pass :obj:`None` to filter files with no extension,
+                    i.e. without a dot in the filename.
+
+            Example:
+                ``Filters.document.file_extension("jpg")``
+                    filters files with extension ``".jpg"``.
+                ``Filters.document.file_extension(".jpg")``
+                    filters files with extension ``"..jpg"``.
+                ``Filters.document.file_extension("Dockerfile", case_sensitive=True)``
+                    filters files with extension ``".Dockerfile"`` minding the case.
+                ``Filters.document.file_extension(None)``
+                    filters files without a dot in the filename.
     """
 
     class _Animation(MessageFilter):
