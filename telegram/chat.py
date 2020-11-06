@@ -277,15 +277,15 @@ class Chat(TelegramObject):
         """
         return self.bot.set_chat_administrator_custom_title(self.id, *args, **kwargs)
 
-    def unpin_all_chat_messages(self, *args: Any, **kwargs: Any) -> bool:
+    def unpin_all_messages(self, *args: Any, **kwargs: Any) -> bool:
         """Shortcut for::
 
-             bot.unpin_all_chat_messages(chat_id=message.chat_id,
+             bot.unpin_all_chat_messages(chat_id=update.effective_chat.id,
                                          *args,
                                          **kwargs)
 
         Returns:
-            :obj:`True`: On success.
+            :obj:`bool`: On success, :obj:`True` is returned.
 
         """
         return self.bot.unpin_all_chat_messages(chat_id=self.id, *args, **kwargs)

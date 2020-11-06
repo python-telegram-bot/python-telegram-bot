@@ -3638,8 +3638,8 @@ class Bot(TelegramObject):
                 of the target channel (in the format @channelusername).
             message_id (:obj:`int`): Identifier of a message to pin.
             disable_notification (:obj:`bool`, optional): Pass :obj:`True`, if it is not necessary
-                to send a notification to all group members about the new pinned message.
-                Notifications are always disabled in channels.
+                to send a notification to all chat members about the new pinned message.
+                Notifications are always disabled in channels and private chats.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -3658,17 +3658,17 @@ class Bot(TelegramObject):
         if disable_notification is not None:
             data['disable_notification'] = disable_notification
 
-        result = self._post('pinChatMessage', data, timeout=timeout, api_kwargs=api_kwargs)
-
-        return result  # type: ignore[return-value]
+        return self._post(
+            'pinChatMessage', data, timeout=timeout, api_kwargs=api_kwargs
+        )  # type: ignore[return-value]
 
     @log
     def unpin_chat_message(
         self,
         chat_id: Union[str, int],
-        message_id: Union[str, int] = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        message_id: Union[str, int] = None,
     ) -> bool:
         """
         Use this method to remove a message from the list of pinned messages in a chat. If the
@@ -3699,9 +3699,9 @@ class Bot(TelegramObject):
         if message_id is not None:
             data['message_id'] = message_id
 
-        result = self._post('unpinChatMessage', data, timeout=timeout, api_kwargs=api_kwargs)
-
-        return result  # type: ignore[return-value]
+        return self._post(
+            'unpinChatMessage', data, timeout=timeout, api_kwargs=api_kwargs
+        )  # type: ignore[return-value]
 
     @log
     def unpin_all_chat_messages(
@@ -3735,9 +3735,9 @@ class Bot(TelegramObject):
 
         data: JSONDict = {'chat_id': chat_id}
 
-        result = self._post('unpinAllChatMessages', data, timeout=timeout, api_kwargs=api_kwargs)
-
-        return result  # type: ignore[return-value]
+        return self._post(
+            'unpinAllChatMessages', data, timeout=timeout, api_kwargs=api_kwargs
+        )  # type: ignore[return-value]
 
     @log
     def get_sticker_set(

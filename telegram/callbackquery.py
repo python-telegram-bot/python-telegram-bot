@@ -325,3 +325,29 @@ class CallbackQuery(TelegramObject):
 
         """
         return self.message.delete(*args, **kwargs)
+
+    def pin_message(self, *args: Any, **kwargs: Any) -> bool:
+        """Shortcut for::
+
+             bot.pin_chat_message(chat_id=update.callback_query.message.chat_id,
+                                  *args,
+                                  **kwargs)
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.pin_chat_message(self.message.chat_id, *args, **kwargs)
+
+    def unpin_message(self, *args: Any, **kwargs: Any) -> bool:
+        """Shortcut for::
+
+             bot.unpin_chat_message(chat_id=update.callback_query.message.chat_id,
+                                    *args,
+                                    **kwargs)
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.unpin_chat_message(self.message.chat_id, *args, **kwargs)

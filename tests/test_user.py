@@ -144,6 +144,27 @@ class TestUser:
         monkeypatch.setattr(user.bot, 'get_user_profile_photos', test)
         assert user.get_profile_photos()
 
+    def test_pin_message(self, monkeypatch, user):
+        def make_assertion(*args, **kwargs):
+            return args[0] == user.id
+
+        monkeypatch.setattr(user.bot, 'pin_chat_message', make_assertion)
+        assert user.pin_message()
+
+    def test_unpin_message(self, monkeypatch, user):
+        def make_assertion(*args, **kwargs):
+            return args[0] == user.id
+
+        monkeypatch.setattr(user.bot, 'unpin_chat_message', make_assertion)
+        assert user.unpin_message()
+
+    def test_unpin_all_messages(self, monkeypatch, user):
+        def make_assertion(*args, **kwargs):
+            return args[0] == user.id
+
+        monkeypatch.setattr(user.bot, 'unpin_all_chat_messages', make_assertion)
+        assert user.unpin_all_messages()
+
     def test_instance_method_send_message(self, monkeypatch, user):
         def test(*args, **kwargs):
             return args[0] == user.id and args[1] == 'test'

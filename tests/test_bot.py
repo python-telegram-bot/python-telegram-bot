@@ -1270,13 +1270,19 @@ class TestBot:
         assert bot.pin_chat_message(
             chat_id=super_group_id, message_id=message1.message_id, disable_notification=True
         )
-        message2.pin()
-        message3.pin()
+
+        bot.pin_chat_message(
+            chat_id=super_group_id, message_id=message2.message_id, disable_notification=True
+        )
+        bot.pin_chat_message(
+            chat_id=super_group_id, message_id=message3.message_id, disable_notification=True
+        )
 
         chat = bot.get_chat(super_group_id)
         assert chat.pinned_message == message3
 
         assert bot.unpinChatMessage(super_group_id, message2.message_id)
+        assert bot.unpin_chat_message(super_group_id)
 
         assert bot.unpin_all_chat_messages(super_group_id)
 

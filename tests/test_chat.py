@@ -183,12 +183,12 @@ class TestChat:
         monkeypatch.setattr('telegram.Bot.set_chat_administrator_custom_title', test)
         assert chat.set_administrator_custom_title(42, 'custom_title')
 
-    def test_unpin_all_chat_messages(self, monkeypatch, chat):
-        def test(*args, **kwargs):
+    def test_unpin_all_messages(self, monkeypatch, chat):
+        def make_assertion(*args, **kwargs):
             return kwargs['chat_id'] == chat.id
 
-        monkeypatch.setattr(chat.bot, 'unpin_all_chat_messages', test)
-        assert chat.unpin_all_chat_messages()
+        monkeypatch.setattr(chat.bot, 'unpin_all_chat_messages', make_assertion)
+        assert chat.unpin_all_messages()
 
     def test_instance_method_send_message(self, monkeypatch, chat):
         def test(*args, **kwargs):

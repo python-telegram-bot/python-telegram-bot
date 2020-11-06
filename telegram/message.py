@@ -1136,7 +1136,7 @@ class Message(TelegramObject):
                                   **kwargs)
 
         Returns:
-            :obj:`True`: On success.
+            :obj:`bool`: On success, :obj:`True` is returned.
 
         """
         return self.bot.pin_chat_message(
@@ -1152,7 +1152,7 @@ class Message(TelegramObject):
                                     **kwargs)
 
         Returns:
-            :obj:`True`: On success.
+            :obj:`bool`: On success, :obj:`True` is returned.
 
         """
         return self.bot.unpin_chat_message(
