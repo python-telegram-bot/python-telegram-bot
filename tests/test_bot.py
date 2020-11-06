@@ -707,15 +707,17 @@ class TestBot:
         assert tz_bot.kick_chat_member(2, 32, until_date=until_timestamp)
 
     # TODO: Needs improvement.
-    def test_unban_chat_member(self, monkeypatch, bot):
-        def test(url, data, *args, **kwargs):
+    @pytest.mark.parametrize('only_if_banned', [True, False, None])
+    def test_unban_chat_member(self, monkeypatch, bot, only_if_banned):
+        def make_assertion(url, data, *args, **kwargs):
             chat_id = data['chat_id'] == 2
             user_id = data['user_id'] == 32
-            return chat_id and user_id
+            o_i_b = data.get('only_if_banned', None) == only_if_banned
+            return chat_id and user_id and o_i_b
 
-        monkeypatch.setattr(bot.request, 'post', test)
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
 
-        assert bot.unban_chat_member(2, 32)
+        assert bot.unban_chat_member(2, 32, only_if_banned=only_if_banned)
 
     def test_set_chat_permissions(self, monkeypatch, bot, chat_permissions):
         def test(url, data, *args, **kwargs):

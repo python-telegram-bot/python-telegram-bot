@@ -2073,16 +2073,21 @@ class Bot(TelegramObject):
         user_id: Union[str, int],
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        only_if_banned: bool = None,
     ) -> bool:
         """Use this method to unban a previously kicked user in a supergroup or channel.
 
-        The user will not return to the group automatically, but will be able to join via link,
-        etc. The bot must be an administrator in the group for this to work.
+        The user will *not* return to the group or channel automatically, but will be able to join
+        via link, etc. The bot must be an administrator for this to work. By default, this method
+        guarantees that after the call the user is not a member of the chat, but will be able to
+        join it. So if the user is a member of the chat they will also be *removed* from the chat.
+        If you don't want this, use the parameter :attr:`only_if_banned`.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
             user_id (:obj:`int`): Unique identifier of the target user.
+            only_if_banned (:obj:`bool`, optional): Do nothing if the user is not banned.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -2097,6 +2102,9 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {'chat_id': chat_id, 'user_id': user_id}
+
+        if only_if_banned is not None:
+            data['only_if_banned'] = only_if_banned
 
         result = self._post('unbanChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
 

@@ -155,14 +155,16 @@ class TestChat:
         monkeypatch.setattr(chat.bot, 'kick_chat_member', test)
         assert chat.kick_member(42, until_date=43)
 
-    def test_unban_member(self, monkeypatch, chat):
-        def test(*args, **kwargs):
+    @pytest.mark.parametrize('only_if_banned', [True, False, None])
+    def test_unban_member(self, monkeypatch, chat, only_if_banned):
+        def make_assertion(*args, **kwargs):
             chat_id = args[0] == chat.id
             user_id = args[1] == 42
-            return chat_id and user_id
+            o_i_b = kwargs.get('only_if_banned', None) == only_if_banned
+            return chat_id and user_id and o_i_b
 
-        monkeypatch.setattr(chat.bot, 'unban_chat_member', test)
-        assert chat.unban_member(42)
+        monkeypatch.setattr(chat.bot, 'unban_chat_member', make_assertion)
+        assert chat.unban_member(42, only_if_banned=only_if_banned)
 
     def test_set_permissions(self, monkeypatch, chat):
         def test(*args, **kwargs):
