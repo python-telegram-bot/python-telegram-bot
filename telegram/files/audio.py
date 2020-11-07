@@ -42,6 +42,7 @@ class Audio(TelegramObject):
         performer (:obj:`str`): Optional. Performer of the audio as defined by sender or by audio
             tags.
         title (:obj:`str`): Optional. Title of the audio as defined by sender or by audio tags.
+        file_name (:obj:`str`): Optional. Original filename as defined by sender.
         mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
         file_size (:obj:`int`): Optional. File size.
         thumb (:class:`telegram.PhotoSize`): Optional. Thumbnail of the album cover to
@@ -57,6 +58,7 @@ class Audio(TelegramObject):
         performer (:obj:`str`, optional): Performer of the audio as defined by sender or by audio
             tags.
         title (:obj:`str`, optional): Title of the audio as defined by sender or by audio tags.
+        file_name (:obj:`str`, optional): Original filename as defined by sender.
         mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
         file_size (:obj:`int`, optional): File size.
         thumb (:class:`telegram.PhotoSize`, optional): Thumbnail of the album cover to
@@ -77,6 +79,7 @@ class Audio(TelegramObject):
         file_size: int = None,
         thumb: PhotoSize = None,
         bot: 'Bot' = None,
+        file_name: str = None,
         **_kwargs: Any,
     ):
         # Required
@@ -86,6 +89,7 @@ class Audio(TelegramObject):
         # Optionals
         self.performer = performer
         self.title = title
+        self.file_name = file_name
         self.mime_type = mime_type
         self.file_size = file_size
         self.thumb = thumb

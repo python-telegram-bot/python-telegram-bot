@@ -24,7 +24,19 @@ import warnings
 
 from abc import ABC, abstractmethod
 from threading import Lock
-from typing import Dict, FrozenSet, List, Match, Optional, Pattern, Set, Union, cast
+from typing import (
+    Dict,
+    FrozenSet,
+    List,
+    Match,
+    Optional,
+    Pattern,
+    Set,
+    Tuple,
+    Union,
+    cast,
+    NoReturn,
+)
 
 from telegram import Chat, Message, MessageEntity, Update
 
@@ -35,9 +47,11 @@ __all__ = [
     'UpdateFilter',
     'InvertedFilter',
     'MergedFilter',
+    'XORFilter',
 ]
 
 from telegram.utils.deprecate import TelegramDeprecationWarning
+from telegram.utils.types import SLT
 
 
 class BaseFilter(ABC):
@@ -52,6 +66,10 @@ class BaseFilter(ABC):
     Or:
 
         >>> (Filters.audio | Filters.video)
+
+    Exclusive Or:
+
+        >>> (Filters.regex('To Be') ^ Filters.regex('Not To Be'))
 
     Not:
 
@@ -92,7 +110,7 @@ class BaseFilter(ABC):
             (depends on the handler).
     """
 
-    name = None
+    _name = None
     data_filter = False
 
     @abstractmethod
@@ -105,8 +123,19 @@ class BaseFilter(ABC):
     def __or__(self, other: 'BaseFilter') -> 'BaseFilter':
         return MergedFilter(self, or_filter=other)
 
+    def __xor__(self, other: 'BaseFilter') -> 'BaseFilter':
+        return XORFilter(self, other)
+
     def __invert__(self) -> 'BaseFilter':
         return InvertedFilter(self)
+
+    @property
+    def name(self) -> Optional[str]:
+        return self._name
+
+    @name.setter
+    def name(self, name: Optional[str]) -> None:
+        self._name = name
 
     def __repr__(self) -> str:
         # We do this here instead of in a __init__ so filter don't have to call __init__ or super()
@@ -192,8 +221,13 @@ class InvertedFilter(UpdateFilter):
     def filter(self, update: Update) -> bool:
         return not bool(self.f(update))
 
-    def __repr__(self) -> str:
+    @property
+    def name(self) -> str:
         return "<inverted {}>".format(self.f)
+
+    @name.setter
+    def name(self, name: str) -> NoReturn:
+        raise RuntimeError('Cannot set name for InvertedFilter')
 
 
 class MergedFilter(UpdateFilter):
@@ -268,10 +302,42 @@ class MergedFilter(UpdateFilter):
                 return True
         return False
 
-    def __repr__(self) -> str:
+    @property
+    def name(self) -> str:
         return "<{} {} {}>".format(
             self.base_filter, "and" if self.and_filter else "or", self.and_filter or self.or_filter
         )
+
+    @name.setter
+    def name(self, name: str) -> NoReturn:
+        raise RuntimeError('Cannot set name for MergedFilter')
+
+
+class XORFilter(UpdateFilter):
+    """Convenience filter acting as wrapper for :class:`MergedFilter` representing the an XOR gate
+    for two filters
+
+    Args:
+        base_filter: Filter 1 of the merged filter.
+        xor_filter: Filter 2 of the merged filter.
+
+    """
+
+    def __init__(self, base_filter: BaseFilter, xor_filter: BaseFilter):
+        self.base_filter = base_filter
+        self.xor_filter = xor_filter
+        self.merged_filter = (base_filter & ~xor_filter) | (~base_filter & xor_filter)
+
+    def filter(self, update: Update) -> Optional[Union[bool, Dict]]:
+        return self.merged_filter(update)
+
+    @property
+    def name(self) -> str:
+        return f'<{self.base_filter} xor {self.xor_filter}>'
+
+    @name.setter
+    def name(self, name: str) -> NoReturn:
+        raise RuntimeError('Cannot set name for XORFilter')
 
 
 class _DiceEmoji(MessageFilter):
@@ -280,7 +346,12 @@ class _DiceEmoji(MessageFilter):
         self.emoji = emoji
 
     class _DiceValues(MessageFilter):
-        def __init__(self, values: Union[int, List[int]], name: str, emoji: str = None):
+        def __init__(
+            self,
+            values: SLT[int],
+            name: str,
+            emoji: str = None,
+        ):
             self.values = [values] if isinstance(values, int) else values
             self.emoji = emoji
             self.name = '{}({})'.format(name, values)
@@ -293,7 +364,7 @@ class _DiceEmoji(MessageFilter):
             return False
 
     def __call__(  # type: ignore[override]
-        self, update: Union[Update, List[int]]
+        self, update: Union[Update, List[int], Tuple[int]]
     ) -> Union[bool, '_DiceValues']:
         if isinstance(update, Update):
             return self.filter(update.effective_message)
@@ -330,7 +401,7 @@ class Filters:
         name = 'Filters.text'
 
         class _TextStrings(MessageFilter):
-            def __init__(self, strings: List[str]):
+            def __init__(self, strings: Union[List[str], Tuple[str]]):
                 self.strings = strings
                 self.name = 'Filters.text({})'.format(strings)
 
@@ -340,7 +411,7 @@ class Filters:
                 return False
 
         def __call__(  # type: ignore[override]
-            self, update: Union[Update, List[str]]
+            self, update: Union[Update, List[str], Tuple[str]]
         ) -> Union[bool, '_TextStrings']:
             if isinstance(update, Update):
                 return self.filter(update.effective_message)
@@ -381,7 +452,7 @@ class Filters:
         name = 'Filters.caption'
 
         class _CaptionStrings(MessageFilter):
-            def __init__(self, strings: List[str]):
+            def __init__(self, strings: Union[List[str], Tuple[str]]):
                 self.strings = strings
                 self.name = 'Filters.caption({})'.format(strings)
 
@@ -391,7 +462,7 @@ class Filters:
                 return False
 
         def __call__(  # type: ignore[override]
-            self, update: Union[Update, List[str]]
+            self, update: Union[Update, List[str], Tuple[str]]
         ) -> Union[bool, '_CaptionStrings']:
             if isinstance(update, Update):
                 return self.filter(update.effective_message)
@@ -638,6 +709,68 @@ class Filters:
         xml = mime_type('application/xml')
         zip = mime_type('application/zip')
 
+        class file_extension(MessageFilter):
+            """This filter filters documents by their file ending/extension.
+
+            Note:
+                * This Filter only filters by the file ending/extension of the document,
+                  it doesn't check the validity of document.
+                * The user can manipulate the file extension of a document and
+                  send media with wrong types that don't fit to this handler.
+                * Case insensitive by default,
+                  you may change this with the flag ``case_sensitive=True``.
+                * Extension should be passed without leading dot
+                  unless it's a part of the extension.
+                * Pass :obj:`None` to filter files with no extension,
+                  i.e. without a dot in the filename.
+
+            Example:
+                * ``Filters.document.file_extension("jpg")``
+                  filters files with extension ``".jpg"``.
+                * ``Filters.document.file_extension(".jpg")``
+                  filters files with extension ``"..jpg"``.
+                * ``Filters.document.file_extension("Dockerfile", case_sensitive=True)``
+                  filters files with extension ``".Dockerfile"`` minding the case.
+                * ``Filters.document.file_extension(None)``
+                  filters files without a dot in the filename.
+            """
+
+            def __init__(self, file_extension: Optional[str], case_sensitive: bool = False):
+                """Initialize the extension you want to filter.
+
+                Args:
+                    file_extension (:obj:`str` | :obj:`None`):
+                        media file extension you want to filter.
+                    case_sensitive (:obj:bool, optional):
+                        pass :obj:`True` to make the filter case sensitive.
+                        Default: :obj:`False`.
+                """
+                self.is_case_sensitive = case_sensitive
+                if file_extension is None:
+                    self.file_extension = None
+                    self.name = "Filters.document.file_extension(None)"
+                elif case_sensitive:
+                    self.file_extension = f".{file_extension}"
+                    self.name = (
+                        f"Filters.document.file_extension({file_extension!r},"
+                        " case_sensitive=True)"
+                    )
+                else:
+                    self.file_extension = f".{file_extension}".lower()
+                    self.name = f"Filters.document.file_extension({file_extension.lower()!r})"
+
+            def filter(self, message: Message) -> bool:
+                """"""  # remove method from docs
+                if message.document is None:
+                    return False
+                if self.file_extension is None:
+                    return "." not in message.document.file_name
+                if self.is_case_sensitive:
+                    filename = message.document.file_name
+                else:
+                    filename = message.document.file_name.lower()
+                return filename.endswith(self.file_extension)
+
         def filter(self, message: Message) -> bool:
             return bool(message.document)
 
@@ -694,6 +827,29 @@ officedocument.wordprocessingml.document")``-
         wav: Same as ``Filters.document.mime_type("audio/x-wav")``-
         xml: Same as ``Filters.document.mime_type("application/xml")``-
         zip: Same as ``Filters.document.mime_type("application/zip")``-
+        file_extension: This filter filters documents by their file ending/extension.
+
+            Note:
+                * This Filter only filters by the file ending/extension of the document,
+                  it doesn't check the validity of document.
+                * The user can manipulate the file extension of a document and
+                  send media with wrong types that don't fit to this handler.
+                * Case insensitive by default,
+                  you may change this with the flag ``case_sensitive=True``.
+                * Extension should be passed without leading dot
+                  unless it's a part of the extension.
+                * Pass :obj:`None` to filter files with no extension,
+                  i.e. without a dot in the filename.
+
+            Example:
+                * ``Filters.document.file_extension("jpg")``
+                  filters files with extension ``".jpg"``.
+                * ``Filters.document.file_extension(".jpg")``
+                  filters files with extension ``"..jpg"``.
+                * ``Filters.document.file_extension("Dockerfile", case_sensitive=True)``
+                  filters files with extension ``".Dockerfile"`` minding the case.
+                * ``Filters.document.file_extension(None)``
+                  filters files without a dot in the filename.
     """
 
     class _Animation(MessageFilter):
@@ -1105,10 +1261,10 @@ officedocument.wordprocessingml.document")``-
                 is specified in :attr:`user_ids` and :attr:`usernames`.
 
         Args:
-            user_id(:obj:`int` | List[:obj:`int`], optional): Which user ID(s) to allow
-                through.
-            username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow
-                through. Leading '@'s in usernames will be discarded.
+            user_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                Which user ID(s) to allow through.
+            username(:class:`telegram.utils.types.SLT[str]`, optional):
+                Which username(s) to allow through. Leading '@'s in usernames will be discarded.
             allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
                 is specified in :attr:`user_ids` and :attr:`usernames`. Defaults to :obj:`False`
 
@@ -1119,8 +1275,8 @@ officedocument.wordprocessingml.document")``-
 
         def __init__(
             self,
-            user_id: Union[int, List[int]] = None,
-            username: Union[str, List[str]] = None,
+            user_id: SLT[int] = None,
+            username: SLT[str] = None,
             allow_empty: bool = False,
         ):
             self.allow_empty = allow_empty
@@ -1133,7 +1289,7 @@ officedocument.wordprocessingml.document")``-
             self._set_usernames(username)
 
         @staticmethod
-        def _parse_user_id(user_id: Union[int, List[int]]) -> Set[int]:
+        def _parse_user_id(user_id: SLT[int]) -> Set[int]:
             if user_id is None:
                 return set()
             if isinstance(user_id, int):
@@ -1141,14 +1297,14 @@ officedocument.wordprocessingml.document")``-
             return set(user_id)
 
         @staticmethod
-        def _parse_username(username: Union[str, List[str]]) -> Set[str]:
+        def _parse_username(username: SLT[str]) -> Set[str]:
             if username is None:
                 return set()
             if isinstance(username, str):
                 return {username[1:] if username.startswith('@') else username}
             return {user[1:] if user.startswith('@') else user for user in username}
 
-        def _set_user_ids(self, user_id: Union[int, List[int]]) -> None:
+        def _set_user_ids(self, user_id: SLT[int]) -> None:
             with self.__lock:
                 if user_id and self._usernames:
                     raise RuntimeError(
@@ -1156,7 +1312,7 @@ officedocument.wordprocessingml.document")``-
                     )
                 self._user_ids = self._parse_user_id(user_id)
 
-        def _set_usernames(self, username: Union[str, List[str]]) -> None:
+        def _set_usernames(self, username: SLT[str]) -> None:
             with self.__lock:
                 if username and self._user_ids:
                     raise RuntimeError(
@@ -1170,7 +1326,7 @@ officedocument.wordprocessingml.document")``-
                 return frozenset(self._user_ids)
 
         @user_ids.setter
-        def user_ids(self, user_id: Union[int, List[int]]) -> None:
+        def user_ids(self, user_id: SLT[int]) -> None:
             self._set_user_ids(user_id)
 
         @property
@@ -1179,16 +1335,17 @@ officedocument.wordprocessingml.document")``-
                 return frozenset(self._usernames)
 
         @usernames.setter
-        def usernames(self, username: Union[str, List[str]]) -> None:
+        def usernames(self, username: SLT[str]) -> None:
             self._set_usernames(username)
 
-        def add_usernames(self, username: Union[str, List[str]]) -> None:
+        def add_usernames(self, username: SLT[str]) -> None:
             """
             Add one or more users to the allowed usernames.
 
             Args:
-                username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow
-                    through. Leading '@'s in usernames will be discarded.
+                username(:class:`telegram.utils.types.SLT[str]`, optional):
+                    Which username(s) to allow through.
+                    Leading '@'s in usernames will be discarded.
             """
             with self.__lock:
                 if self._user_ids:
@@ -1199,13 +1356,13 @@ officedocument.wordprocessingml.document")``-
                 parsed_username = self._parse_username(username)
                 self._usernames |= parsed_username
 
-        def add_user_ids(self, user_id: Union[int, List[int]]) -> None:
+        def add_user_ids(self, user_id: SLT[int]) -> None:
             """
             Add one or more users to the allowed user ids.
 
             Args:
-                user_id(:obj:`int` | List[:obj:`int`], optional): Which user ID(s) to allow
-                    through.
+                user_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                    Which user ID(s) to allow through.
             """
             with self.__lock:
                 if self._usernames:
@@ -1217,13 +1374,14 @@ officedocument.wordprocessingml.document")``-
 
                 self._user_ids |= parsed_user_id
 
-        def remove_usernames(self, username: Union[str, List[str]]) -> None:
+        def remove_usernames(self, username: SLT[str]) -> None:
             """
             Remove one or more users from allowed usernames.
 
             Args:
-                username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to disallow
-                    through. Leading '@'s in usernames will be discarded.
+                username(:class:`telegram.utils.types.SLT[str]`, optional):
+                    Which username(s) to disallow through.
+                    Leading '@'s in usernames will be discarded.
             """
             with self.__lock:
                 if self._user_ids:
@@ -1234,13 +1392,13 @@ officedocument.wordprocessingml.document")``-
                 parsed_username = self._parse_username(username)
                 self._usernames -= parsed_username
 
-        def remove_user_ids(self, user_id: Union[int, List[int]]) -> None:
+        def remove_user_ids(self, user_id: SLT[int]) -> None:
             """
             Remove one or more users from allowed user ids.
 
             Args:
-                user_id(:obj:`int` | List[:obj:`int`], optional): Which user ID(s) to disallow
-                    through.
+                user_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                    Which user ID(s) to disallow through.
             """
             with self.__lock:
                 if self._usernames:
@@ -1261,6 +1419,14 @@ officedocument.wordprocessingml.document")``-
                     )
                 return self.allow_empty
             return False
+
+        @property
+        def name(self) -> str:
+            return f'Filters.user({", ".join(str(s) for s in (self.usernames or self.user_ids))})'
+
+        @name.setter
+        def name(self, name: str) -> NoReturn:
+            raise RuntimeError('Cannot set name for Filters.user')
 
     class via_bot(MessageFilter):
         """Filters messages to allow only those which are from specified via_bot ID(s) or
@@ -1285,10 +1451,10 @@ officedocument.wordprocessingml.document")``-
                 is specified in :attr:`bot_ids` and :attr:`usernames`.
 
         Args:
-            bot_id(:obj:`int` | List[:obj:`int`], optional): Which bot ID(s) to allow
-                through.
-            username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow
-                through. Leading '@'s in usernames will be discarded.
+            bot_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                Which bot ID(s) to allow through.
+            username(:class:`telegram.utils.types.SLT[str]`, optional):
+                Which username(s) to allow through. Leading '@'s in usernames will be discarded.
             allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
                 is specified in :attr:`bot_ids` and :attr:`usernames`. Defaults to :obj:`False`
 
@@ -1298,8 +1464,8 @@ officedocument.wordprocessingml.document")``-
 
         def __init__(
             self,
-            bot_id: Union[int, List[int]] = None,
-            username: Union[str, List[str]] = None,
+            bot_id: SLT[int] = None,
+            username: SLT[str] = None,
             allow_empty: bool = False,
         ):
             self.allow_empty = allow_empty
@@ -1312,7 +1478,7 @@ officedocument.wordprocessingml.document")``-
             self._set_usernames(username)
 
         @staticmethod
-        def _parse_bot_id(bot_id: Union[int, List[int]]) -> Set[int]:
+        def _parse_bot_id(bot_id: SLT[int]) -> Set[int]:
             if bot_id is None:
                 return set()
             if isinstance(bot_id, int):
@@ -1320,14 +1486,14 @@ officedocument.wordprocessingml.document")``-
             return set(bot_id)
 
         @staticmethod
-        def _parse_username(username: Union[str, List[str]]) -> Set[str]:
+        def _parse_username(username: SLT[str]) -> Set[str]:
             if username is None:
                 return set()
             if isinstance(username, str):
                 return {username[1:] if username.startswith('@') else username}
             return {bot[1:] if bot.startswith('@') else bot for bot in username}
 
-        def _set_bot_ids(self, bot_id: Union[int, List[int]]) -> None:
+        def _set_bot_ids(self, bot_id: SLT[int]) -> None:
             with self.__lock:
                 if bot_id and self._usernames:
                     raise RuntimeError(
@@ -1335,7 +1501,7 @@ officedocument.wordprocessingml.document")``-
                     )
                 self._bot_ids = self._parse_bot_id(bot_id)
 
-        def _set_usernames(self, username: Union[str, List[str]]) -> None:
+        def _set_usernames(self, username: SLT[str]) -> None:
             with self.__lock:
                 if username and self._bot_ids:
                     raise RuntimeError(
@@ -1349,7 +1515,7 @@ officedocument.wordprocessingml.document")``-
                 return frozenset(self._bot_ids)
 
         @bot_ids.setter
-        def bot_ids(self, bot_id: Union[int, List[int]]) -> None:
+        def bot_ids(self, bot_id: SLT[int]) -> None:
             self._set_bot_ids(bot_id)
 
         @property
@@ -1358,16 +1524,17 @@ officedocument.wordprocessingml.document")``-
                 return frozenset(self._usernames)
 
         @usernames.setter
-        def usernames(self, username: Union[str, List[str]]) -> None:
+        def usernames(self, username: SLT[str]) -> None:
             self._set_usernames(username)
 
-        def add_usernames(self, username: Union[str, List[str]]) -> None:
+        def add_usernames(self, username: SLT[str]) -> None:
             """
             Add one or more users to the allowed usernames.
 
             Args:
-                username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow
-                    through. Leading '@'s in usernames will be discarded.
+                username(:class:`telegram.utils.types.SLT[str]`, optional):
+                    Which username(s) to allow through.
+                    Leading '@'s in usernames will be discarded.
             """
             with self.__lock:
                 if self._bot_ids:
@@ -1378,14 +1545,14 @@ officedocument.wordprocessingml.document")``-
                 parsed_username = self._parse_username(username)
                 self._usernames |= parsed_username
 
-        def add_bot_ids(self, bot_id: Union[int, List[int]]) -> None:
+        def add_bot_ids(self, bot_id: SLT[int]) -> None:
             """
 
             Add one or more users to the allowed user ids.
 
             Args:
-                bot_id(:obj:`int` | List[:obj:`int`], optional): Which bot ID(s) to allow
-                    through.
+                bot_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                    Which bot ID(s) to allow through.
             """
             with self.__lock:
                 if self._usernames:
@@ -1397,13 +1564,14 @@ officedocument.wordprocessingml.document")``-
 
                 self._bot_ids |= parsed_bot_id
 
-        def remove_usernames(self, username: Union[str, List[str]]) -> None:
+        def remove_usernames(self, username: SLT[str]) -> None:
             """
             Remove one or more users from allowed usernames.
 
             Args:
-                username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to disallow
-                    through. Leading '@'s in usernames will be discarded.
+                username(:class:`telegram.utils.types.SLT[str]`, optional):
+                    Which username(s) to disallow through.
+                    Leading '@'s in usernames will be discarded.
             """
             with self.__lock:
                 if self._bot_ids:
@@ -1414,13 +1582,13 @@ officedocument.wordprocessingml.document")``-
                 parsed_username = self._parse_username(username)
                 self._usernames -= parsed_username
 
-        def remove_bot_ids(self, bot_id: Union[int, List[int]]) -> None:
+        def remove_bot_ids(self, bot_id: SLT[int]) -> None:
             """
             Remove one or more users from allowed user ids.
 
             Args:
-                bot_id(:obj:`int` | List[:obj:`int`], optional): Which bot ID(s) to disallow
-                    through.
+                bot_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                    Which bot ID(s) to disallow through.
             """
             with self.__lock:
                 if self._usernames:
@@ -1441,6 +1609,15 @@ officedocument.wordprocessingml.document")``-
                     )
                 return self.allow_empty
             return False
+
+        @property
+        def name(self) -> str:
+            entries = [str(s) for s in (self.usernames or self.bot_ids)]
+            return f'Filters.via_bot({", ".join(entries)})'
+
+        @name.setter
+        def name(self, name: str) -> NoReturn:
+            raise RuntimeError('Cannot set name for Filters.via_bot')
 
     class chat(MessageFilter):
         """Filters messages to allow only those which are from a specified chat ID or username.
@@ -1464,10 +1641,11 @@ officedocument.wordprocessingml.document")``-
                 is specified in :attr:`chat_ids` and :attr:`usernames`.
 
         Args:
-            chat_id(:obj:`int` | List[:obj:`int`], optional): Which chat ID(s) to allow
-                through.
-            username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow
-                through. Leading `'@'` s in usernames will be discarded.
+            chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                Which chat ID(s) to allow through.
+            username(:class:`telegram.utils.types.SLT[str]`, optional):
+                Which username(s) to allow through.
+                Leading `'@'` s in usernames will be discarded.
             allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
                 is specified in :attr:`chat_ids` and :attr:`usernames`. Defaults to :obj:`False`
 
@@ -1478,8 +1656,8 @@ officedocument.wordprocessingml.document")``-
 
         def __init__(
             self,
-            chat_id: Union[int, List[int]] = None,
-            username: Union[str, List[str]] = None,
+            chat_id: SLT[int] = None,
+            username: SLT[str] = None,
             allow_empty: bool = False,
         ):
             self.allow_empty = allow_empty
@@ -1492,7 +1670,7 @@ officedocument.wordprocessingml.document")``-
             self._set_usernames(username)
 
         @staticmethod
-        def _parse_chat_id(chat_id: Union[int, List[int]]) -> Set[int]:
+        def _parse_chat_id(chat_id: SLT[int]) -> Set[int]:
             if chat_id is None:
                 return set()
             if isinstance(chat_id, int):
@@ -1500,14 +1678,14 @@ officedocument.wordprocessingml.document")``-
             return set(chat_id)
 
         @staticmethod
-        def _parse_username(username: Union[str, List[str]]) -> Set[str]:
+        def _parse_username(username: SLT[str]) -> Set[str]:
             if username is None:
                 return set()
             if isinstance(username, str):
                 return {username[1:] if username.startswith('@') else username}
             return {chat[1:] if chat.startswith('@') else chat for chat in username}
 
-        def _set_chat_ids(self, chat_id: Union[int, List[int]]) -> None:
+        def _set_chat_ids(self, chat_id: SLT[int]) -> None:
             with self.__lock:
                 if chat_id and self._usernames:
                     raise RuntimeError(
@@ -1515,7 +1693,7 @@ officedocument.wordprocessingml.document")``-
                     )
                 self._chat_ids = self._parse_chat_id(chat_id)
 
-        def _set_usernames(self, username: Union[str, List[str]]) -> None:
+        def _set_usernames(self, username: SLT[str]) -> None:
             with self.__lock:
                 if username and self._chat_ids:
                     raise RuntimeError(
@@ -1529,7 +1707,7 @@ officedocument.wordprocessingml.document")``-
                 return frozenset(self._chat_ids)
 
         @chat_ids.setter
-        def chat_ids(self, chat_id: Union[int, List[int]]) -> None:
+        def chat_ids(self, chat_id: SLT[int]) -> None:
             self._set_chat_ids(chat_id)
 
         @property
@@ -1538,16 +1716,17 @@ officedocument.wordprocessingml.document")``-
                 return frozenset(self._usernames)
 
         @usernames.setter
-        def usernames(self, username: Union[str, List[str]]) -> None:
+        def usernames(self, username: SLT[str]) -> None:
             self._set_usernames(username)
 
-        def add_usernames(self, username: Union[str, List[str]]) -> None:
+        def add_usernames(self, username: SLT[str]) -> None:
             """
             Add one or more chats to the allowed usernames.
 
             Args:
-                username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow
-                    through. Leading `'@'` s in usernames will be discarded.
+                username(:class:`telegram.utils.types.SLT[str]`, optional):
+                    Which username(s) to allow through.
+                    Leading `'@'` s in usernames will be discarded.
             """
             with self.__lock:
                 if self._chat_ids:
@@ -1558,13 +1737,13 @@ officedocument.wordprocessingml.document")``-
                 parsed_username = self._parse_username(username)
                 self._usernames |= parsed_username
 
-        def add_chat_ids(self, chat_id: Union[int, List[int]]) -> None:
+        def add_chat_ids(self, chat_id: SLT[int]) -> None:
             """
             Add one or more chats to the allowed chat ids.
 
             Args:
-                chat_id(:obj:`int` | List[:obj:`int`], optional): Which chat ID(s) to allow
-                    through.
+                chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                    Which chat ID(s) to allow through.
             """
             with self.__lock:
                 if self._usernames:
@@ -1576,13 +1755,14 @@ officedocument.wordprocessingml.document")``-
 
                 self._chat_ids |= parsed_chat_id
 
-        def remove_usernames(self, username: Union[str, List[str]]) -> None:
+        def remove_usernames(self, username: SLT[str]) -> None:
             """
             Remove one or more chats from allowed usernames.
 
             Args:
-                username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to disallow
-                    through. Leading '@'s in usernames will be discarded.
+                username(:class:`telegram.utils.types.SLT[str]`, optional):
+                    Which username(s) to disallow through.
+                    Leading '@'s in usernames will be discarded.
             """
             with self.__lock:
                 if self._chat_ids:
@@ -1593,13 +1773,13 @@ officedocument.wordprocessingml.document")``-
                 parsed_username = self._parse_username(username)
                 self._usernames -= parsed_username
 
-        def remove_chat_ids(self, chat_id: Union[int, List[int]]) -> None:
+        def remove_chat_ids(self, chat_id: SLT[int]) -> None:
             """
             Remove one or more chats from allowed chat ids.
 
             Args:
-                chat_id(:obj:`int` | List[:obj:`int`], optional): Which chat ID(s) to disallow
-                    through.
+                chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                    Which chat ID(s) to disallow through.
             """
             with self.__lock:
                 if self._usernames:
@@ -1618,6 +1798,14 @@ officedocument.wordprocessingml.document")``-
                     return bool(message.chat.username and message.chat.username in self.usernames)
                 return self.allow_empty
             return False
+
+        @property
+        def name(self) -> str:
+            return f'Filters.chat({", ".join(str(s) for s in (self.usernames or self.chat_ids))})'
+
+        @name.setter
+        def name(self, name: str) -> NoReturn:
+            raise RuntimeError('Cannot set name for Filters.chat')
 
     class _Invoice(MessageFilter):
         name = 'Filters.invoice'
@@ -1659,6 +1847,8 @@ officedocument.wordprocessingml.document")``-
         dice = _DiceEmoji('🎲', 'dice')
         darts = _DiceEmoji('🎯', 'darts')
         basketball = _DiceEmoji('🏀', 'basketball')
+        football = _DiceEmoji('⚽')
+        slot_machine = _DiceEmoji('🎰')
 
     dice = _Dice()
     """Dice Messages. If an integer or a list of integers is passed, it filters messages to only
@@ -1673,8 +1863,8 @@ officedocument.wordprocessingml.document")``-
         ``MessageHandler(Filters.dice([5, 6]), callback_method)``.
 
     Args:
-        update (:obj:`int` | List[:obj:`int`], optional): Which values to allow. If not
-            specified, will allow any dice message.
+        update (:class:`telegram.utils.types.SLT[int]`, optional):
+            Which values to allow. If not specified, will allow any dice message.
 
     Note:
         Dice messages don't have text. If you want to filter either text or dice messages, use
@@ -1686,6 +1876,10 @@ officedocument.wordprocessingml.document")``-
         darts: Dice messages with the emoji 🎯. Passing a list of integers is supported just as for
             :attr:`Filters.dice`.
         basketball: Dice messages with the emoji 🏀. Passing a list of integers is supported just
+            as for :attr:`Filters.dice`.
+        football: Dice messages with the emoji ⚽. Passing a list of integers is supported just
+            as for :attr:`Filters.dice`.
+        slot_machine: Dice messages with the emoji 🎰. Passing a list of integers is supported just
             as for :attr:`Filters.dice`.
     """
 
@@ -1700,13 +1894,14 @@ officedocument.wordprocessingml.document")``-
             ``MessageHandler(Filters.language("en"), callback_method)``
 
         Args:
-            lang (:obj:`str` | List[:obj:`str`]): Which language code(s) to allow through. This
-                will be matched using ``.startswith`` meaning that 'en' will match both 'en_US'
-                and 'en_GB'.
+            lang (:class:`telegram.utils.types.SLT[str]`):
+                Which language code(s) to allow through.
+                This will be matched using ``.startswith`` meaning that
+                'en' will match both 'en_US' and 'en_GB'.
 
         """
 
-        def __init__(self, lang: Union[str, List[str]]):
+        def __init__(self, lang: SLT[str]):
             if isinstance(lang, str):
                 lang = cast(str, lang)
                 self.lang = [lang]

@@ -1216,6 +1216,7 @@ class TestBot:
             assert bot.promote_chat_member(
                 channel_id,
                 95205500,
+                is_anonymous=True,
                 can_change_info=True,
                 can_post_messages=True,
                 can_edit_messages=True,
