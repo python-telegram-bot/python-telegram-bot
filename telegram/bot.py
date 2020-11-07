@@ -1523,13 +1523,18 @@ class Bot(TelegramObject):
         venue: Venue = None,
         foursquare_type: str = None,
         api_kwargs: JSONDict = None,
+        google_place_id: str = None,
+        google_place_type: str = None,
     ) -> Optional[Message]:
         """Use this method to send information about a venue.
 
         Note:
-            You can either supply :obj:`venue`, or :obj:`latitude`, :obj:`longitude`,
-            :obj:`title` and :obj:`address` and optionally :obj:`foursquare_id` and optionally
-            :obj:`foursquare_type`.
+            * You can either supply :obj:`venue`, or :obj:`latitude`, :obj:`longitude`,
+              :obj:`title` and :obj:`address` and optionally :obj:`foursquare_id` and
+              :obj:`foursquare_type` or optionally :obj:`google_place_id` and
+              :obj:`google_place_type`.
+            * Foursquare details and Google Pace details are mutually exclusive. However, this
+              behaviour is undocumented and might be changed by Telegram.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -1542,6 +1547,10 @@ class Bot(TelegramObject):
             foursquare_type (:obj:`str`, optional): Foursquare type of the venue, if known.
                 (For example, "arts_entertainment/default", "arts_entertainment/aquarium" or
                 "food/icecream".)
+            google_place_id (:obj:`str`, optional): Google Places identifier of the venue.
+            google_place_type (:obj:`str`, optional): Google Places type of the venue. (See
+                `supported types \
+                <https://developers.google.com/places/web-service/supported_types>`_.)
             venue (:class:`telegram.Venue`, optional): The venue to send.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
@@ -1576,6 +1585,8 @@ class Bot(TelegramObject):
             title = venue.title
             foursquare_id = venue.foursquare_id
             foursquare_type = venue.foursquare_type
+            google_place_id = venue.google_place_id
+            google_place_type = venue.google_place_type
 
         data: JSONDict = {
             'chat_id': chat_id,
@@ -1589,6 +1600,10 @@ class Bot(TelegramObject):
             data['foursquare_id'] = foursquare_id
         if foursquare_type:
             data['foursquare_type'] = foursquare_type
+        if google_place_id:
+            data['google_place_id'] = google_place_id
+        if google_place_type:
+            data['google_place_type'] = google_place_type
 
         return self._message(  # type: ignore[return-value]
             'sendVenue',

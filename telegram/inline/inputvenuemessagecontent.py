@@ -30,6 +30,10 @@ class InputVenueMessageContent(InputMessageContent):
     considered equal, if their :attr:`latitude`, :attr:`longitude` and :attr:`title`
     are equal.
 
+    Note:
+      Foursquare details and Google Pace details are mutually exclusive. However, this
+      behaviour is undocumented and might be changed by Telegram.
+
     Attributes:
         latitude (:obj:`float`): Latitude of the location in degrees.
         longitude (:obj:`float`): Longitude of the location in degrees.
@@ -37,8 +41,8 @@ class InputVenueMessageContent(InputMessageContent):
         address (:obj:`str`): Address of the venue.
         foursquare_id (:obj:`str`): Optional. Foursquare identifier of the venue, if known.
         foursquare_type (:obj:`str`): Optional. Foursquare type of the venue, if known.
-            (For example, "arts_entertainment/default", "arts_entertainment/aquarium" or
-            "food/icecream".)
+        google_place_id (:obj:`str`): Optional. Google Places identifier of the venue.
+        google_place_type (:obj:`str`): Optional. Google Places type of the venue.
 
     Args:
         latitude (:obj:`float`): Latitude of the location in degrees.
@@ -49,6 +53,9 @@ class InputVenueMessageContent(InputMessageContent):
         foursquare_type (:obj:`str`, optional): Foursquare type of the venue, if known.
             (For example, "arts_entertainment/default", "arts_entertainment/aquarium" or
             "food/icecream".)
+        google_place_id (:obj:`str`, optional): Google Places identifier of the venue.
+        google_place_type (:obj:`str`, optional): Google Places type of the venue. (See
+            `supported types <https://developers.google.com/places/web-service/supported_types>`_.)
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
@@ -61,6 +68,8 @@ class InputVenueMessageContent(InputMessageContent):
         address: str,
         foursquare_id: str = None,
         foursquare_type: str = None,
+        google_place_id: str = None,
+        google_place_type: str = None,
         **_kwargs: Any,
     ):
         # Required
@@ -71,6 +80,8 @@ class InputVenueMessageContent(InputMessageContent):
         # Optionals
         self.foursquare_id = foursquare_id
         self.foursquare_type = foursquare_type
+        self.google_place_id = google_place_id
+        self.google_place_type = google_place_type
 
         self._id_attrs = (
             self.latitude,

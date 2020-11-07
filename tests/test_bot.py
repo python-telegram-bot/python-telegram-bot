@@ -193,6 +193,9 @@ class TestBot:
         address = 'address'
         foursquare_id = 'foursquare id'
         foursquare_type = 'foursquare type'
+        google_place_id = 'google_place id'
+        google_place_type = 'google_place type'
+
         message = bot.send_venue(
             chat_id=chat_id,
             title=title,
@@ -210,6 +213,28 @@ class TestBot:
         assert message.venue.location.longitude == longitude
         assert message.venue.foursquare_id == foursquare_id
         assert message.venue.foursquare_type == foursquare_type
+        assert message.venue.google_place_id is None
+        assert message.venue.google_place_type is None
+
+        message = bot.send_venue(
+            chat_id=chat_id,
+            title=title,
+            address=address,
+            latitude=latitude,
+            longitude=longitude,
+            google_place_id=google_place_id,
+            google_place_type=google_place_type,
+        )
+
+        assert message.venue
+        assert message.venue.title == title
+        assert message.venue.address == address
+        assert message.venue.location.latitude == latitude
+        assert message.venue.location.longitude == longitude
+        assert message.venue.google_place_id == google_place_id
+        assert message.venue.google_place_type == google_place_type
+        assert message.venue.foursquare_id is None
+        assert message.venue.foursquare_type is None
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

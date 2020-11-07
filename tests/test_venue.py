@@ -30,6 +30,8 @@ def venue():
         TestVenue.address,
         foursquare_id=TestVenue.foursquare_id,
         foursquare_type=TestVenue.foursquare_type,
+        google_place_id=TestVenue.google_place_id,
+        google_place_type=TestVenue.google_place_type,
     )
 
 
@@ -39,6 +41,8 @@ class TestVenue:
     address = 'address'
     foursquare_id = 'foursquare id'
     foursquare_type = 'foursquare type'
+    google_place_id = 'google place id'
+    google_place_type = 'google place type'
 
     def test_de_json(self, bot):
         json_dict = {
@@ -47,6 +51,8 @@ class TestVenue:
             'address': TestVenue.address,
             'foursquare_id': TestVenue.foursquare_id,
             'foursquare_type': TestVenue.foursquare_type,
+            'google_place_id': TestVenue.google_place_id,
+            'google_place_type': TestVenue.google_place_type,
         }
         venue = Venue.de_json(json_dict, bot)
 
@@ -55,6 +61,8 @@ class TestVenue:
         assert venue.address == self.address
         assert venue.foursquare_id == self.foursquare_id
         assert venue.foursquare_type == self.foursquare_type
+        assert venue.google_place_id == self.google_place_id
+        assert venue.google_place_type == self.google_place_type
 
     def test_send_with_venue(self, monkeypatch, bot, chat_id, venue):
         def test(url, data, **kwargs):
@@ -65,6 +73,8 @@ class TestVenue:
                 and data['address'] == self.address
                 and data['foursquare_id'] == self.foursquare_id
                 and data['foursquare_type'] == self.foursquare_type
+                and data['google_place_id'] == self.google_place_id
+                and data['google_place_type'] == self.google_place_type
             )
 
         monkeypatch.setattr(bot.request, 'post', test)
@@ -84,6 +94,8 @@ class TestVenue:
         assert venue_dict['address'] == venue.address
         assert venue_dict['foursquare_id'] == venue.foursquare_id
         assert venue_dict['foursquare_type'] == venue.foursquare_type
+        assert venue_dict['google_place_id'] == venue.google_place_id
+        assert venue_dict['google_place_type'] == venue.google_place_type
 
     def test_equality(self):
         a = Venue(Location(0, 0), self.title, self.address)
