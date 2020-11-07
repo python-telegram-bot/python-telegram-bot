@@ -71,7 +71,7 @@ class Location(TelegramObject):
         self.latitude = float(latitude)
 
         # Optionals
-        self.horizontal_accuracy = horizontal_accuracy
+        self.horizontal_accuracy = float(horizontal_accuracy) if horizontal_accuracy else None
         self.live_period = int(live_period) if live_period else None
         self.heading = int(heading) if heading else None
         self.proximity_alert_radius = (
