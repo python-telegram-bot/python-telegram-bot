@@ -45,6 +45,10 @@ class Dice(TelegramObject):
         3 indicates that the goal was missed. However, this behaviour is undocumented and might
         be changed by Telegram.
 
+        If :attr:`emoji` is "🎰", each value corresponds to a unique combination of symbols, which
+        can be found at our `wiki <https://git.io/JkeC6>`_. However, this behaviour is undocumented
+        and might be changed by Telegram.
+
     Attributes:
         value (:obj:`int`): Value of the dice.
         emoji (:obj:`str`): Emoji on which the dice throw animation is based.
