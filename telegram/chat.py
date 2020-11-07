@@ -277,6 +277,32 @@ class Chat(TelegramObject):
         """
         return self.bot.set_chat_administrator_custom_title(self.id, *args, **kwargs)
 
+    def pin_message(self, *args: Any, **kwargs: Any) -> bool:
+        """Shortcut for::
+
+             bot.pin_chat_message(chat_id=update.effective_chat.id,
+                                  *args,
+                                  **kwargs)
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.pin_chat_message(self.id, *args, **kwargs)
+
+    def unpin_message(self, *args: Any, **kwargs: Any) -> bool:
+        """Shortcut for::
+
+             bot.unpin_chat_message(chat_id=update.effective_chat.id,
+                                    *args,
+                                    **kwargs)
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.unpin_chat_message(self.id, *args, **kwargs)
+
     def unpin_all_messages(self, *args: Any, **kwargs: Any) -> bool:
         """Shortcut for::
 

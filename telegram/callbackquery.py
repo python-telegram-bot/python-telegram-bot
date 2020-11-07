@@ -337,7 +337,7 @@ class CallbackQuery(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.pin_chat_message(self.message.chat_id, *args, **kwargs)
+        return self.message.pin(*args, **kwargs)
 
     def unpin_message(self, *args: Any, **kwargs: Any) -> bool:
         """Shortcut for::
@@ -350,4 +350,4 @@ class CallbackQuery(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.unpin_chat_message(self.message.chat_id, *args, **kwargs)
+        return self.message.unpin(*args, **kwargs)
