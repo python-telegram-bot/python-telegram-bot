@@ -1327,7 +1327,7 @@ class Bot(TelegramObject):
             longitude (:obj:`float`, optional): Longitude of location.
             location (:class:`telegram.Location`, optional): The location to send.
             horizontal_accuracy (:obj:`int`, optional): The radius of uncertainty for the location,
-                measured in meters; 0-1500
+                measured in meters; 0-1500.
             live_period (:obj:`int`, optional): Period in seconds for which the location will be
                 updated, should be between 60 and 86400.
             heading (:obj:`int`, optional): For live locations, a direction in which the user is
@@ -1425,7 +1425,7 @@ class Bot(TelegramObject):
             longitude (:obj:`float`, optional): Longitude of location.
             location (:class:`telegram.Location`, optional): The location to send.
             horizontal_accuracy (:obj:`float`, optional): The radius of uncertainty for the
-                location, measured in meters; 0-1500
+                location, measured in meters; 0-1500.
             heading (:obj:`int`, optional): Direction in which the user is moving, in degrees. Must
                 be between 1 and 360 if specified.
             proximity_alert_radius (:obj:`int`, optional): Maximum distance for proximity alerts
