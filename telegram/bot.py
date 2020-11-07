@@ -85,6 +85,10 @@ from telegram import (
     VideoNote,
     Voice,
     WebhookInfo,
+    InputMediaAudio,
+    InputMediaDocument,
+    InputMediaPhoto,
+    InputMediaVideo,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import InvalidToken, TelegramError
@@ -1249,7 +1253,7 @@ class Bot(TelegramObject):
     def send_media_group(
         self,
         chat_id: Union[int, str],
-        media: List[InputMedia],
+        media: List[Union[InputMediaAudio, InputMediaDocument, InputMediaPhoto, InputMediaVideo]],
         disable_notification: bool = None,
         reply_to_message_id: Union[int, str] = None,
         timeout: float = 20,
@@ -1260,8 +1264,9 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
-            media (List[:class:`telegram.InputMedia`]): An array describing photos and videos to be
-                sent, must include 2–10 items.
+            media (List[:class:`telegram.InputMediaAudio`, :class:`telegram.InputMediaDocument`, \
+                :class:`telegram.InputMediaPhoto`, :class:`telegram.InputMediaVideo`]): An array
+                describing messages to be sent, must include 2–10 items.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
@@ -2896,7 +2901,7 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`: If the new score is not greater than the user's
-            current score in the chat and force is :obj:`False`.
+                current score in the chat and force is :obj:`False`.
 
         """
         data: JSONDict = {'user_id': user_id, 'score': score}
