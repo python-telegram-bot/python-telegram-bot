@@ -157,6 +157,7 @@ def message(bot):
         {'quote': True},
         {'dice': Dice(4, '🎲')},
         {'via_bot': User(9, 'A_Bot', True)},
+        {'sender_chat': Chat(-123, 'discussion_channel')},
     ],
     ids=[
         'forwarded_user',
@@ -200,6 +201,7 @@ def message(bot):
         'default_quote',
         'dice',
         'via_bot',
+        'sender_chat',
     ],
 )
 def message_params(bot, request):

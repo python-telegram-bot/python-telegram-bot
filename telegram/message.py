@@ -70,6 +70,10 @@ class Message(TelegramObject):
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
         from_user (:class:`telegram.User`): Optional. Sender.
+        sender_chat (:class:`telegram.Chat`): Optional. Sender of the message, sent on behalf of a
+            chat. The channel itself for channel messages. The supergroup itself for messages from
+            anonymous group administrators. The linked channel for messages automatically forwarded
+            to the discussion group.
         date (:class:`datetime.datetime`): Date the message was sent.
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
         forward_from (:class:`telegram.User`): Optional. Sender of the original message.
@@ -134,8 +138,8 @@ class Message(TelegramObject):
             forwarded from channels.
         forward_sender_name	(:obj:`str`): Optional. Sender's name for messages forwarded from users
             who disallow adding a link to their account in forwarded messages.
-        author_signature (:obj:`str`): Optional. Signature of the post author for messages
-            in channels.
+        author_signature (:obj:`str`): Optional. Signature of the post author for messages in
+            channels, or the custom title of an anonymous group administrator.
         passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data.
         poll (:class:`telegram.Poll`): Optional. Message is a native poll,
             information about the poll.
@@ -149,6 +153,10 @@ class Message(TelegramObject):
         message_id (:obj:`int`): Unique message identifier inside this chat.
         from_user (:class:`telegram.User`, optional): Sender, empty for messages sent
             to channels.
+        sender_chat (:class:`telegram.Chat`, optional): Sender of the message, sent on behalf of a
+            chat. The channel itself for channel messages. The supergroup itself for messages from
+            anonymous group administrators. The linked channel for messages automatically forwarded
+            to the discussion group.
         date (:class:`datetime.datetime`): Date the message was sent in Unix time. Converted to
             :class:`datetime.datetime`.
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
@@ -242,8 +250,8 @@ class Message(TelegramObject):
             has logged in.
         forward_signature (:obj:`str`, optional): For messages forwarded from channels, signature
             of the post author if present.
-        author_signature (:obj:`str`, optional): Signature of the post author for messages
-            in channels.
+        author_signature (:obj:`str`, optional):  Signature of the post author for messages in
+            channels, or the custom title of an anonymous group administrator.
         passport_data (:class:`telegram.PassportData`, optional): Telegram Passport data.
         poll (:class:`telegram.Poll`, optional): Message is a native poll,
             information about the poll.
@@ -344,14 +352,16 @@ class Message(TelegramObject):
         bot: 'Bot' = None,
         dice: Dice = None,
         via_bot: User = None,
+        sender_chat: Chat = None,
         **_kwargs: Any,
     ):
         # Required
         self.message_id = int(message_id)
+        # Optionals
         self.from_user = from_user
+        self.sender_chat = sender_chat
         self.date = date
         self.chat = chat
-        # Optionals
         self.forward_from = forward_from
         self.forward_from_chat = forward_from_chat
         self.forward_date = forward_date
@@ -427,6 +437,7 @@ class Message(TelegramObject):
             return None
 
         data['from_user'] = User.de_json(data.get('from'), bot)
+        data['sender_chat'] = Chat.de_json(data.get('sender_chat'), bot)
         data['date'] = from_timestamp(data['date'])
         data['chat'] = Chat.de_json(data.get('chat'), bot)
         data['entities'] = MessageEntity.de_list(data.get('entities'), bot)
