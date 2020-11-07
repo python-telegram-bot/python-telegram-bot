@@ -56,7 +56,7 @@ class BaseFilter(ABC):
 
     Exclusive Or:
 
-        >>> (Filters.entity(MessageEntity.URL) | Filters.entity(MessageEntity.TEXT_LINK))
+        >>> (Filters.regex('To Be') ^ Filters.regex('Not To Be'))
 
     Not:
 
