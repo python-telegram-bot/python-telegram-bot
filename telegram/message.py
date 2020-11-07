@@ -297,7 +297,7 @@ class Message(TelegramObject):
         'poll',
         'dice',
         'passport_data',
-        'pro',
+        'proximity_alert_triggered',
     ] + ATTACHMENT_TYPES
 
     def __init__(
