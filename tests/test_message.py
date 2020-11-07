@@ -44,6 +44,7 @@ from telegram import (
     ParseMode,
     Poll,
     PollOption,
+    ProximityAlertTriggered,
     Dice,
 )
 from telegram.ext import Defaults
@@ -157,6 +158,11 @@ def message(bot):
         {'quote': True},
         {'dice': Dice(4, '🎲')},
         {'via_bot': User(9, 'A_Bot', True)},
+        {
+            'proximity_alert_triggered': ProximityAlertTriggered(
+                User(1, 'John', False), User(2, 'Doe', False), 42
+            )
+        },
     ],
     ids=[
         'forwarded_user',
@@ -200,6 +206,7 @@ def message(bot):
         'default_quote',
         'dice',
         'via_bot',
+        'proximity_alert_triggered',
     ],
 )
 def message_params(bot, request):

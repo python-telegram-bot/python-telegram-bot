@@ -874,6 +874,15 @@ officedocument.wordprocessingml.document")``-
         connected_website = _ConnectedWebsite()
         """Messages that contain :attr:`telegram.Message.connected_website`."""
 
+        class _ProximityAlertTriggered(MessageFilter):
+            name = 'Filters.status_update.proximity_alert_triggered'
+
+            def filter(self, message: Message) -> bool:
+                return bool(message.proximity_alert_triggered)
+
+        proximity_alert_triggered = _ProximityAlertTriggered()
+        """Messages that contain :attr:`telegram.Message.proximity_alert_triggered`."""
+
         name = 'Filters.status_update'
 
         def filter(self, message: Update) -> bool:
@@ -887,6 +896,7 @@ officedocument.wordprocessingml.document")``-
                 or self.migrate(message)
                 or self.pinned_message(message)
                 or self.connected_website(message)
+                or self.proximity_alert_triggered(message)
             )
 
     status_update = _StatusUpdate()
@@ -901,6 +911,8 @@ officedocument.wordprocessingml.document")``-
             :attr:`telegram.Message.group_chat_created`,
             :attr:`telegram.Message.supergroup_chat_created` or
             :attr:`telegram.Message.channel_chat_created`.
+        connected_website: Messages that contain
+            :attr:`telegram.Message.connected_website`.
         delete_chat_photo: Messages that contain
             :attr:`telegram.Message.delete_chat_photo`.
         left_chat_member: Messages that contain
@@ -916,6 +928,8 @@ officedocument.wordprocessingml.document")``-
             :attr:`telegram.Message.new_chat_title`.
         pinned_message: Messages that contain
             :attr:`telegram.Message.pinned_message`.
+        proximity_alert_triggered: Messages that contain
+            :attr:`telegram.Message.proximity_alert_triggered`.
     """
 
     class _Forwarded(MessageFilter):

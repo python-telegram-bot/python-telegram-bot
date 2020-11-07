@@ -47,6 +47,7 @@ from telegram import (
     Video,
     VideoNote,
     Voice,
+    ProximityAlertTriggered,
 )
 from telegram.utils.helpers import escape_markdown, from_timestamp, to_timestamp
 from telegram.utils.types import JSONDict
@@ -141,6 +142,9 @@ class Message(TelegramObject):
             information about the poll.
         dice (:class:`telegram.Dice`): Optional. Message is a dice.
         via_bot (:class:`telegram.User`): Optional. Bot through which the message was sent.
+        proximity_alert_triggered (:class:`telegram.ProximityAlertTriggered`): Optional. Service
+            message. A user in the chat triggered another user's proximity alert while sharing
+            Live Location.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
@@ -249,6 +253,9 @@ class Message(TelegramObject):
             information about the poll.
         dice (:class:`telegram.Dice`, optional): Message is a dice with random value from 1 to 6.
         via_bot (:class:`telegram.User`, optional): Message was sent through an inline bot.
+        proximity_alert_triggered (:class:`telegram.ProximityAlertTriggered`, optional): Service
+            message. A user in the chat triggered another user's proximity alert while sharing
+            Live Location.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. ``login_url`` buttons are represented as ordinary url buttons.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
@@ -290,6 +297,7 @@ class Message(TelegramObject):
         'poll',
         'dice',
         'passport_data',
+        'pro',
     ] + ATTACHMENT_TYPES
 
     def __init__(
@@ -344,6 +352,7 @@ class Message(TelegramObject):
         bot: 'Bot' = None,
         dice: Dice = None,
         via_bot: User = None,
+        proximity_alert_triggered: ProximityAlertTriggered = None,
         **_kwargs: Any,
     ):
         # Required
@@ -396,6 +405,7 @@ class Message(TelegramObject):
         self.poll = poll
         self.dice = dice
         self.via_bot = via_bot
+        self.proximity_alert_triggered = proximity_alert_triggered
         self.reply_markup = reply_markup
         self.bot = bot
 
@@ -458,6 +468,9 @@ class Message(TelegramObject):
         data['poll'] = Poll.de_json(data.get('poll'), bot)
         data['dice'] = Dice.de_json(data.get('dice'), bot)
         data['via_bot'] = User.de_json(data.get('via_bot'), bot)
+        data['proximity_alert_triggered'] = ProximityAlertTriggered.de_json(
+            data.get('proximity_alert_triggered'), bot
+        )
         data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
 
         return cls(bot=bot, **data)

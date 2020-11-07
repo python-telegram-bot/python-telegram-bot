@@ -53,6 +53,7 @@ from .messageentity import MessageEntity
 from .games.game import Game
 from .poll import Poll, PollOption, PollAnswer
 from .loginurl import LoginUrl
+from .proximityalerttriggered import ProximityAlertTriggered
 from .games.callbackgame import CallbackGame
 from .payment.shippingaddress import ShippingAddress
 from .payment.orderinfo import OrderInfo
@@ -189,6 +190,7 @@ __all__ = [
     'InputTextMessageContent',
     'InputVenueMessageContent',
     'Location',
+    'ProximityAlertTriggered',
     'EncryptedCredentials',
     'PassportFile',
     'EncryptedPassportElement',
