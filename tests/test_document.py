@@ -129,13 +129,23 @@ class TestDocument:
 
         assert message.document == document
 
-    def test_send_with_document(self, monkeypatch, bot, chat_id, document):
-        def test(url, data, **kwargs):
-            return data['document'] == document.file_id
+    @pytest.mark.parametrize('disable_content_type_detection', [True, False, None])
+    def test_send_with_document(
+        self, monkeypatch, bot, chat_id, document, disable_content_type_detection
+    ):
+        def make_assertion(url, data, **kwargs):
+            type_detection = (
+                data.get('disable_content_type_detection') == disable_content_type_detection
+            )
+            return data['document'] == document.file_id and type_detection
 
-        monkeypatch.setattr(bot.request, 'post', test)
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
 
-        message = bot.send_document(document=document, chat_id=chat_id)
+        message = bot.send_document(
+            document=document,
+            chat_id=chat_id,
+            disable_content_type_detection=disable_content_type_detection,
+        )
 
         assert message
 
