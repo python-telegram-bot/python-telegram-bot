@@ -34,6 +34,8 @@ class TestDefault:
         with pytest.raises(AttributeError):
             defaults.disable_web_page_preview = True
         with pytest.raises(AttributeError):
+            defaults.allow_sending_without_reply = True
+        with pytest.raises(AttributeError):
             defaults.timeout = True
         with pytest.raises(AttributeError):
             defaults.quote = True

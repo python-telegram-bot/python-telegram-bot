@@ -425,6 +425,48 @@ class TestBot:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    @pytest.mark.parametrize(
+        'default_bot,custom',
+        [
+            ({'allow_sending_without_reply': True}, None),
+            ({'allow_sending_without_reply': False}, None),
+            ({'allow_sending_without_reply': False}, True),
+        ],
+        indirect=['default_bot'],
+    )
+    def test_send_poll_default_allow_sending_without_reply(self, default_bot, chat_id, custom):
+        question = 'Is this a test?'
+        answers = ['Yes', 'No', 'Maybe']
+        reply_to_message = default_bot.send_message(chat_id, 'test')
+        reply_to_message.delete()
+        if custom is not None:
+            message = default_bot.send_poll(
+                chat_id,
+                question=question,
+                options=answers,
+                allow_sending_without_reply=custom,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert message.reply_to_message is None
+        elif default_bot.defaults.allow_sending_without_reply:
+            message = default_bot.send_poll(
+                chat_id,
+                question=question,
+                options=answers,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert message.reply_to_message is None
+        else:
+            with pytest.raises(BadRequest, match='message not found'):
+                default_bot.send_poll(
+                    chat_id,
+                    question=question,
+                    options=answers,
+                    reply_to_message_id=reply_to_message.message_id,
+                )
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('emoji', Dice.ALL_EMOJI + [None])
     def test_send_dice(self, bot, chat_id, emoji):
         message = bot.send_dice(chat_id, emoji=emoji)
@@ -434,6 +476,37 @@ class TestBot:
             assert message.dice.emoji == Dice.DICE
         else:
             assert message.dice.emoji == emoji
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize(
+        'default_bot,custom',
+        [
+            ({'allow_sending_without_reply': True}, None),
+            ({'allow_sending_without_reply': False}, None),
+            ({'allow_sending_without_reply': False}, True),
+        ],
+        indirect=['default_bot'],
+    )
+    def test_send_dice_default_allow_sending_without_reply(self, default_bot, chat_id, custom):
+        reply_to_message = default_bot.send_message(chat_id, 'test')
+        reply_to_message.delete()
+        if custom is not None:
+            message = default_bot.send_dice(
+                chat_id,
+                allow_sending_without_reply=custom,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert message.reply_to_message is None
+        elif default_bot.defaults.allow_sending_without_reply:
+            message = default_bot.send_dice(
+                chat_id,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert message.reply_to_message is None
+        else:
+            with pytest.raises(BadRequest, match='message not found'):
+                default_bot.send_dice(chat_id, reply_to_message_id=reply_to_message.message_id)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -1000,6 +1073,42 @@ class TestBot:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    @pytest.mark.parametrize(
+        'default_bot,custom',
+        [
+            ({'allow_sending_without_reply': True}, None),
+            ({'allow_sending_without_reply': False}, None),
+            ({'allow_sending_without_reply': False}, True),
+        ],
+        indirect=['default_bot'],
+    )
+    def test_send_game_default_allow_sending_without_reply(self, default_bot, chat_id, custom):
+        game_short_name = 'test_game'
+        reply_to_message = default_bot.send_message(chat_id, 'test')
+        reply_to_message.delete()
+        if custom is not None:
+            message = default_bot.send_game(
+                chat_id,
+                game_short_name,
+                allow_sending_without_reply=custom,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert message.reply_to_message is None
+        elif default_bot.defaults.allow_sending_without_reply:
+            message = default_bot.send_game(
+                chat_id,
+                game_short_name,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert message.reply_to_message is None
+        else:
+            with pytest.raises(BadRequest, match='message not found'):
+                default_bot.send_game(
+                    chat_id, game_short_name, reply_to_message_id=reply_to_message.message_id
+                )
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     def test_set_game_score_1(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
 
@@ -1341,6 +1450,39 @@ class TestBot:
         message = default_bot.send_message(chat_id, test_markdown_string, parse_mode='HTML')
         assert message.text == test_markdown_string
         assert message.text_markdown == escape_markdown(test_markdown_string)
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize(
+        'default_bot,custom',
+        [
+            ({'allow_sending_without_reply': True}, None),
+            ({'allow_sending_without_reply': False}, None),
+            ({'allow_sending_without_reply': False}, True),
+        ],
+        indirect=['default_bot'],
+    )
+    def test_send_message_default_allow_sending_without_reply(self, default_bot, chat_id, custom):
+        reply_to_message = default_bot.send_message(chat_id, 'test')
+        reply_to_message.delete()
+        if custom is not None:
+            message = default_bot.send_message(
+                chat_id,
+                'test',
+                allow_sending_without_reply=custom,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert message.reply_to_message is None
+        elif default_bot.defaults.allow_sending_without_reply:
+            message = default_bot.send_message(
+                chat_id, 'test', reply_to_message_id=reply_to_message.message_id
+            )
+            assert message.reply_to_message is None
+        else:
+            with pytest.raises(BadRequest, match='message not found'):
+                default_bot.send_message(
+                    chat_id, 'test', reply_to_message_id=reply_to_message.message_id
+                )
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

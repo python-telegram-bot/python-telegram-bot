@@ -246,6 +246,7 @@ class Bot(TelegramObject):
         reply_to_message_id: Union[str, int] = None,
         disable_notification: bool = None,
         reply_markup: ReplyMarkup = None,
+        allow_sending_without_reply: bool = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
     ) -> Union[bool, Message, None]:
@@ -254,6 +255,9 @@ class Bot(TelegramObject):
 
         if disable_notification is not None:
             data['disable_notification'] = disable_notification
+
+        if allow_sending_without_reply is not None:
+            data['allow_sending_without_reply'] = allow_sending_without_reply
 
         if reply_markup is not None:
             if isinstance(reply_markup, ReplyMarkup):
@@ -398,6 +402,7 @@ class Bot(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
     ) -> Optional[Message]:
         """Use this method to send text messages.
 
@@ -415,6 +420,8 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
                 A JSON-serialized object for an inline keyboard, custom reply keyboard,
                 instructions to remove reply keyboard or to force a reply from the user.
@@ -444,6 +451,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             timeout=timeout,
             api_kwargs=api_kwargs,
         )
@@ -555,6 +563,7 @@ class Bot(TelegramObject):
         timeout: float = 20,
         parse_mode: str = None,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
     ) -> Optional[Message]:
         """Use this method to send photos.
 
@@ -579,6 +588,8 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
@@ -613,6 +624,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -632,6 +644,7 @@ class Bot(TelegramObject):
         parse_mode: str = None,
         thumb: FileLike = None,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
     ) -> Optional[Message]:
         """
         Use this method to send audio files, if you want Telegram clients to display them in the
@@ -666,6 +679,8 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
@@ -716,6 +731,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -734,6 +750,7 @@ class Bot(TelegramObject):
         thumb: FileLike = None,
         api_kwargs: JSONDict = None,
         disable_content_type_detection: bool = None,
+        allow_sending_without_reply: bool = None,
     ) -> Optional[Message]:
         """
         Use this method to send general files.
@@ -766,6 +783,8 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
@@ -812,6 +831,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -825,6 +845,7 @@ class Bot(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: float = 20,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
     ) -> Optional[Message]:
         """
         Use this method to send static .WEBP or animated .TGS stickers.
@@ -845,6 +866,8 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
@@ -874,6 +897,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -894,6 +918,7 @@ class Bot(TelegramObject):
         supports_streaming: bool = None,
         thumb: FileLike = None,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
     ) -> Optional[Message]:
         """
         Use this method to send video files, Telegram clients support mp4 videos
@@ -931,6 +956,8 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
@@ -983,6 +1010,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -999,6 +1027,7 @@ class Bot(TelegramObject):
         timeout: float = 20,
         thumb: FileLike = None,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
     ) -> Optional[Message]:
         """
         As of v.4.0, Telegram clients support rounded square mp4 videos of up to 1 minute long.
@@ -1026,6 +1055,8 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard,
                 instructions to remove reply keyboard or to force a reply from the user.
@@ -1070,6 +1101,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -1089,6 +1121,7 @@ class Bot(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: float = 20,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
     ) -> Optional[Message]:
         """
         Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound).
@@ -1125,6 +1158,8 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
@@ -1170,6 +1205,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -1186,6 +1222,7 @@ class Bot(TelegramObject):
         timeout: float = 20,
         parse_mode: str = None,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
     ) -> Optional[Message]:
         """
         Use this method to send audio files, if you want Telegram clients to display the file
@@ -1215,6 +1252,8 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard,
                 instructions to remove reply keyboard or to force a reply from the user.
@@ -1251,6 +1290,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -1263,6 +1303,7 @@ class Bot(TelegramObject):
         reply_to_message_id: Union[int, str] = None,
         timeout: float = 20,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
     ) -> List[Optional[Message]]:
         """Use this method to send a group of photos or videos as an album.
 
@@ -1276,6 +1317,8 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
@@ -1299,6 +1342,8 @@ class Bot(TelegramObject):
             data['reply_to_message_id'] = reply_to_message_id
         if disable_notification:
             data['disable_notification'] = disable_notification
+        if allow_sending_without_reply is not None:
+            data['allow_sending_without_reply'] = allow_sending_without_reply
 
         result = self._post('sendMediaGroup', data, timeout=timeout, api_kwargs=api_kwargs)
 
@@ -1321,6 +1366,7 @@ class Bot(TelegramObject):
         location: Location = None,
         live_period: int = None,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
     ) -> Optional[Message]:
         """Use this method to send point on the map.
 
@@ -1339,6 +1385,8 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                     original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard,
                 instructions to remove reply keyboard or to force a reply from the user.
@@ -1381,6 +1429,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -1523,6 +1572,7 @@ class Bot(TelegramObject):
         venue: Venue = None,
         foursquare_type: str = None,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
     ) -> Optional[Message]:
         """Use this method to send information about a venue.
 
@@ -1547,6 +1597,8 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
@@ -1597,6 +1649,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -1614,6 +1667,7 @@ class Bot(TelegramObject):
         contact: Contact = None,
         vcard: str = None,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
     ) -> Optional[Message]:
         """Use this method to send phone contacts.
 
@@ -1634,6 +1688,8 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
@@ -1679,6 +1735,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -1692,6 +1749,7 @@ class Bot(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
     ) -> Optional[Message]:
         """Use this method to send a game.
 
@@ -1704,6 +1762,8 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
                 object for a new inline keyboard. If empty, one ‘Play game_title’ button will be
                 shown. If not empty, the first button must launch the game.
@@ -1729,6 +1789,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -3005,6 +3066,7 @@ class Bot(TelegramObject):
         send_email_to_provider: bool = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
     ) -> Message:
         """Use this method to send invoices.
 
@@ -3050,6 +3112,8 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
                 object for an inline keyboard. If empty, one 'Pay total price' button will be
                 shown. If not empty, the first button must be a Pay button.
@@ -3111,6 +3175,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -4107,6 +4172,7 @@ class Bot(TelegramObject):
         open_period: int = None,
         close_date: Union[int, datetime] = None,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
     ) -> Message:
         """
         Use this method to send a native poll.
@@ -4144,6 +4210,8 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
@@ -4198,6 +4266,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -4257,6 +4326,7 @@ class Bot(TelegramObject):
         timeout: float = None,
         emoji: str = None,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
     ) -> Message:
         """
         Use this method to send an animated emoji, which will have a random value. On success, the
@@ -4271,6 +4341,8 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
@@ -4301,6 +4373,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
