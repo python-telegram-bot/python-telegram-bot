@@ -329,7 +329,7 @@ class CallbackQuery(TelegramObject):
     def pin_message(self, *args: Any, **kwargs: Any) -> bool:
         """Shortcut for::
 
-             bot.pin_chat_message(chat_id=update.callback_query.message.chat_id,
+             bot.pin_chat_message(chat_id=message.chat_id,
                                   *args,
                                   **kwargs)
 
@@ -342,7 +342,7 @@ class CallbackQuery(TelegramObject):
     def unpin_message(self, *args: Any, **kwargs: Any) -> bool:
         """Shortcut for::
 
-             bot.unpin_chat_message(chat_id=update.callback_query.message.chat_id,
+             bot.unpin_chat_message(chat_id=message.chat_id,
                                     *args,
                                     **kwargs)
 
