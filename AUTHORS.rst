@@ -79,6 +79,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Paul Larsen <https://github.com/PaulSonOfLars>`_
 - `Pieter Schutz <https://github.com/eldinnie>`_
 - `Poolitzer <https://github.com/Poolitzer>`_
+- `Pranjalya Tiwari <https://github.com/Pranjalya>`_
 - `Rahiel Kasim <https://github.com/rahiel>`_
 - `Riko Naka <https://github.com/rikonaka>`_
 - `Rizlas <https://github.com/rizlas>`_
