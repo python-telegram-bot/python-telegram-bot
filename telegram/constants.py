@@ -83,6 +83,8 @@ Attributes:
     DICE_DICE (:obj:`str`): '🎲'
     DICE_DARTS (:obj:`str`): '🎯'
     DICE_BASKETBALL (:obj:`str`): '🏀'
+    DICE_FOOTBALL (:obj:`str`): '⚽'
+    DICE_SLOT_MACHINE (:obj:`str`): = '🎰'
     DICE_ALL_EMOJI (List[:obj:`str`]): List of all supported base emoji.
 
 :class:`telegram.MessageEntity`:
@@ -172,7 +174,15 @@ CHATMEMBER_RESTRICTED: str = 'restricted'
 DICE_DICE: str = '🎲'
 DICE_DARTS: str = '🎯'
 DICE_BASKETBALL: str = '🏀'
-DICE_ALL_EMOJI: List[str] = [DICE_DICE, DICE_DARTS, DICE_BASKETBALL]
+DICE_FOOTBALL: str = '⚽'
+DICE_SLOT_MACHINE: str = '🎰'
+DICE_ALL_EMOJI: List[str] = [
+    DICE_DICE,
+    DICE_DARTS,
+    DICE_BASKETBALL,
+    DICE_FOOTBALL,
+    DICE_SLOT_MACHINE,
+]
 
 MESSAGEENTITY_MENTION: str = 'mention'
 MESSAGEENTITY_HASHTAG: str = 'hashtag'
