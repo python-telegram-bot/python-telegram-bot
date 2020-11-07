@@ -79,7 +79,7 @@ class Chat(TelegramObject):
         last_name(:obj:`str`, optional): Last name of the other party in a private chat.
         photo (:class:`telegram.ChatPhoto`, optional): Chat photo.
             Returned only in :meth:`telegram.Bot.get_chat`.
-        bio (:obj:`str`): Optional. Bio of the other party in a private chat. Returned only in
+        bio (:obj:`str`, optional): Bio of the other party in a private chat. Returned only in
             :meth:`telegram.Bot.get_chat`.
         description (:obj:`str`, optional): Description, for groups, supergroups and channel chats.
             Returned only in :meth:`telegram.Bot.get_chat`.
@@ -89,7 +89,7 @@ class Chat(TelegramObject):
             in :meth:`telegram.Bot.get_chat`.
         pinned_message (:class:`telegram.Message`, optional): Pinned message, for groups,
             supergroups and channels. Returned only in :meth:`telegram.Bot.get_chat`.
-        permissions (:class:`telegram.ChatPermissions`): Optional. Default chat member permissions,
+        permissions (:class:`telegram.ChatPermissions`, optional): Default chat member permissions,
             for groups and supergroups. Returned only in :meth:`telegram.Bot.get_chat`.
         slow_mode_delay (:obj:`int`, optional): For supergroups, the minimum allowed delay between
             consecutive messages sent by each unprivileged user.
@@ -99,10 +99,10 @@ class Chat(TelegramObject):
             Returned only in :meth:`telegram.Bot.get_chat`.
         can_set_sticker_set (:obj:`bool`, optional): :obj:`True`, if the bot can change group the
             sticker set. Returned only in :meth:`telegram.Bot.get_chat`.
-        linked_chat_id (:obj:`int`): Optional. Unique identifier for the linked chat, i.e. the
+        linked_chat_id (:obj:`int`, optional): Unique identifier for the linked chat, i.e. the
             discussion group identifier for a channel and vice versa; for supergroups and channel
             chats. Returned only in :meth:`telegram.Bot.get_chat`.
-        location (:class:`telegram.ChatLocation`): Optional. For supergroups, the location to which
+        location (:class:`telegram.ChatLocation`, optional): For supergroups, the location to which
             the supergroup is connected. Returned only in :meth:`telegram.Bot.get_chat`.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
