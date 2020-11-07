@@ -76,7 +76,7 @@ class ChatMember(TelegramObject):
             'member', 'restricted', 'left' or 'kicked'.
         custom_title (:obj:`str`, optional): Owner and administrators only.
             Custom title for this user.
-        is_anonymous (:obj:`bool`, optoinal): Owner and administrators only. :obj:`True`, if the
+        is_anonymous (:obj:`bool`, optional): Owner and administrators only. :obj:`True`, if the
             user's presence in the chat is hidden.
         until_date (:class:`datetime.datetime`, optional): Restricted and kicked only. Date when
             restrictions will be lifted for this user.
