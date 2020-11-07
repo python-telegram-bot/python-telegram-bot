@@ -1127,6 +1127,20 @@ class TestFilters:
         assert not Filters.dice.darts(update)
         assert not Filters.dice.basketball([4])(update)
 
+        update.message.dice = Dice(5, '⚽')
+        assert Filters.dice.football(update)
+        assert Filters.dice.football([4, 5])(update)
+        assert not Filters.dice.dice(update)
+        assert not Filters.dice.darts(update)
+        assert not Filters.dice.football([4])(update)
+
+        update.message.dice = Dice(5, '🎰')
+        assert Filters.dice.slot_machine(update)
+        assert Filters.dice.slot_machine([4, 5])(update)
+        assert not Filters.dice.dice(update)
+        assert not Filters.dice.darts(update)
+        assert not Filters.dice.slot_machine([4])(update)
+
     def test_language_filter_single(self, update):
         update.message.from_user.language_code = 'en_US'
         assert (Filters.language('en_US'))(update)
