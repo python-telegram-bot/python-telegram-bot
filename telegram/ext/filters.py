@@ -24,7 +24,19 @@ import warnings
 
 from abc import ABC, abstractmethod
 from threading import Lock
-from typing import Dict, FrozenSet, List, Match, Optional, Pattern, Set, Tuple, Union, cast
+from typing import (
+    Dict,
+    FrozenSet,
+    List,
+    Match,
+    Optional,
+    Pattern,
+    Set,
+    Tuple,
+    Union,
+    cast,
+    NoReturn,
+)
 
 from telegram import Chat, Message, MessageEntity, Update
 
@@ -35,6 +47,7 @@ __all__ = [
     'UpdateFilter',
     'InvertedFilter',
     'MergedFilter',
+    'XORFilter',
 ]
 
 from telegram.utils.deprecate import TelegramDeprecationWarning
@@ -53,6 +66,10 @@ class BaseFilter(ABC):
     Or:
 
         >>> (Filters.audio | Filters.video)
+
+    Exclusive Or:
+
+        >>> (Filters.regex('To Be') ^ Filters.regex('Not To Be'))
 
     Not:
 
@@ -93,7 +110,7 @@ class BaseFilter(ABC):
             (depends on the handler).
     """
 
-    name = None
+    _name = None
     data_filter = False
 
     @abstractmethod
@@ -106,8 +123,19 @@ class BaseFilter(ABC):
     def __or__(self, other: 'BaseFilter') -> 'BaseFilter':
         return MergedFilter(self, or_filter=other)
 
+    def __xor__(self, other: 'BaseFilter') -> 'BaseFilter':
+        return XORFilter(self, other)
+
     def __invert__(self) -> 'BaseFilter':
         return InvertedFilter(self)
+
+    @property
+    def name(self) -> Optional[str]:
+        return self._name
+
+    @name.setter
+    def name(self, name: Optional[str]) -> None:
+        self._name = name
 
     def __repr__(self) -> str:
         # We do this here instead of in a __init__ so filter don't have to call __init__ or super()
@@ -193,8 +221,13 @@ class InvertedFilter(UpdateFilter):
     def filter(self, update: Update) -> bool:
         return not bool(self.f(update))
 
-    def __repr__(self) -> str:
+    @property
+    def name(self) -> str:
         return "<inverted {}>".format(self.f)
+
+    @name.setter
+    def name(self, name: str) -> NoReturn:
+        raise RuntimeError('Cannot set name for InvertedFilter')
 
 
 class MergedFilter(UpdateFilter):
@@ -269,10 +302,42 @@ class MergedFilter(UpdateFilter):
                 return True
         return False
 
-    def __repr__(self) -> str:
+    @property
+    def name(self) -> str:
         return "<{} {} {}>".format(
             self.base_filter, "and" if self.and_filter else "or", self.and_filter or self.or_filter
         )
+
+    @name.setter
+    def name(self, name: str) -> NoReturn:
+        raise RuntimeError('Cannot set name for MergedFilter')
+
+
+class XORFilter(UpdateFilter):
+    """Convenience filter acting as wrapper for :class:`MergedFilter` representing the an XOR gate
+    for two filters
+
+    Args:
+        base_filter: Filter 1 of the merged filter.
+        xor_filter: Filter 2 of the merged filter.
+
+    """
+
+    def __init__(self, base_filter: BaseFilter, xor_filter: BaseFilter):
+        self.base_filter = base_filter
+        self.xor_filter = xor_filter
+        self.merged_filter = (base_filter & ~xor_filter) | (~base_filter & xor_filter)
+
+    def filter(self, update: Update) -> Optional[Union[bool, Dict]]:
+        return self.merged_filter(update)
+
+    @property
+    def name(self) -> str:
+        return f'<{self.base_filter} xor {self.xor_filter}>'
+
+    @name.setter
+    def name(self, name: str) -> NoReturn:
+        raise RuntimeError('Cannot set name for XORFilter')
 
 
 class _DiceEmoji(MessageFilter):
@@ -1355,6 +1420,14 @@ officedocument.wordprocessingml.document")``-
                 return self.allow_empty
             return False
 
+        @property
+        def name(self) -> str:
+            return f'Filters.user({", ".join(str(s) for s in (self.usernames or self.user_ids))})'
+
+        @name.setter
+        def name(self, name: str) -> NoReturn:
+            raise RuntimeError('Cannot set name for Filters.user')
+
     class via_bot(MessageFilter):
         """Filters messages to allow only those which are from specified via_bot ID(s) or
         username(s).
@@ -1537,6 +1610,15 @@ officedocument.wordprocessingml.document")``-
                 return self.allow_empty
             return False
 
+        @property
+        def name(self) -> str:
+            entries = [str(s) for s in (self.usernames or self.bot_ids)]
+            return f'Filters.via_bot({", ".join(entries)})'
+
+        @name.setter
+        def name(self, name: str) -> NoReturn:
+            raise RuntimeError('Cannot set name for Filters.via_bot')
+
     class chat(MessageFilter):
         """Filters messages to allow only those which are from a specified chat ID or username.
 
@@ -1716,6 +1798,14 @@ officedocument.wordprocessingml.document")``-
                     return bool(message.chat.username and message.chat.username in self.usernames)
                 return self.allow_empty
             return False
+
+        @property
+        def name(self) -> str:
+            return f'Filters.chat({", ".join(str(s) for s in (self.usernames or self.chat_ids))})'
+
+        @name.setter
+        def name(self, name: str) -> NoReturn:
+            raise RuntimeError('Cannot set name for Filters.chat')
 
     class _Invoice(MessageFilter):
         name = 'Filters.invoice'
