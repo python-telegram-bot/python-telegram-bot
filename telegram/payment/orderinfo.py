@@ -50,12 +50,12 @@ class OrderInfo(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         name: str = None,
         phone_number: str = None,
         email: str = None,
         shipping_address: str = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         self.name = name
         self.phone_number = phone_number

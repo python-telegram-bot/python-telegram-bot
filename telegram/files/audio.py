@@ -67,7 +67,7 @@ class Audio(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         file_id: str,
         file_unique_id: str,
         duration: int,
@@ -77,7 +77,7 @@ class Audio(TelegramObject):
         file_size: int = None,
         thumb: PhotoSize = None,
         bot: 'Bot' = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.file_id = str(file_id)

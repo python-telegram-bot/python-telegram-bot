@@ -47,12 +47,12 @@ class InputContactMessageContent(InputMessageContent):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         phone_number: str,
         first_name: str,
         last_name: str = None,
         vcard: str = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.phone_number = phone_number

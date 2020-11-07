@@ -74,7 +74,7 @@ class Sticker(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         file_id: str,
         file_unique_id: str,
         width: int,
@@ -86,7 +86,7 @@ class Sticker(TelegramObject):
         set_name: str = None,
         mask_position: 'MaskPosition' = None,
         bot: 'Bot' = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.file_id = str(file_id)
@@ -163,15 +163,14 @@ class StickerSet(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         name: str,
         title: str,
         is_animated: bool,
         contains_masks: bool,
         stickers: List[Sticker],
-        bot: 'Bot' = None,  # pylint: disable=W0613
         thumb: PhotoSize = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         self.name = name
         self.title = title
@@ -243,9 +242,7 @@ class MaskPosition(TelegramObject):
     CHIN: ClassVar[str] = constants.STICKER_CHIN
     """:const:`telegram.constants.STICKER_CHIN`"""
 
-    def __init__(
-        self, point: str, x_shift: float, y_shift: float, scale: float, **kwargs: Any
-    ):  # pylint: disable=W0613
+    def __init__(self, point: str, x_shift: float, y_shift: float, scale: float, **_kwargs: Any):
         self.point = point
         self.x_shift = x_shift
         self.y_shift = y_shift

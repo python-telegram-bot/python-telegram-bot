@@ -68,7 +68,7 @@ class User(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         id: int,
         first_name: str,
         is_bot: bool,
@@ -79,7 +79,7 @@ class User(TelegramObject):
         can_read_all_group_messages: bool = None,
         supports_inline_queries: bool = None,
         bot: 'Bot' = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.id = int(id)

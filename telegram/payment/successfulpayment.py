@@ -63,7 +63,7 @@ class SuccessfulPayment(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         currency: str,
         total_amount: int,
         invoice_payload: str,
@@ -71,7 +71,7 @@ class SuccessfulPayment(TelegramObject):
         provider_payment_charge_id: str,
         shipping_option_id: str = None,
         order_info: OrderInfo = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         self.currency = currency
         self.total_amount = total_amount

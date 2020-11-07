@@ -62,7 +62,7 @@ class Document(TelegramObject):
     _id_keys = ('file_id',)
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         file_id: str,
         file_unique_id: str,
         thumb: PhotoSize = None,
@@ -70,7 +70,7 @@ class Document(TelegramObject):
         mime_type: str = None,
         file_size: int = None,
         bot: 'Bot' = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.file_id = str(file_id)

@@ -98,7 +98,7 @@ class Update(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         update_id: int,
         message: Message = None,
         edited_message: Message = None,
@@ -111,7 +111,7 @@ class Update(TelegramObject):
         pre_checkout_query: PreCheckoutQuery = None,
         poll: Poll = None,
         poll_answer: PollAnswer = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.update_id = int(update_id)

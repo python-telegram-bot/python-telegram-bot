@@ -69,12 +69,12 @@ class LoginUrl(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         url: str,
         forward_text: bool = None,
         bot_username: str = None,
         request_write_access: bool = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.url = url

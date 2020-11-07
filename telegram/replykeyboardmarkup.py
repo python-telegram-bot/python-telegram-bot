@@ -66,12 +66,12 @@ class ReplyKeyboardMarkup(ReplyMarkup):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         keyboard: List[List[Union[str, KeyboardButton]]],
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.keyboard = []
@@ -110,7 +110,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
-        **kwargs: Any,  # pylint: disable=W0613
+        **kwargs: Any,
     ) -> 'ReplyKeyboardMarkup':
         """Shortcut for::
 
@@ -155,7 +155,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
-        **kwargs: Any,  # pylint: disable=W0613
+        **kwargs: Any,
     ) -> 'ReplyKeyboardMarkup':
         """Shortcut for::
 
@@ -201,7 +201,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
-        **kwargs: Any,  # pylint: disable=W0613
+        **kwargs: Any,
     ) -> 'ReplyKeyboardMarkup':
         """Shortcut for::
 
