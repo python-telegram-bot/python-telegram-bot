@@ -39,11 +39,11 @@ class PollOption(TelegramObject):
     considered equal, if their :attr:`text` and :attr:`voter_count` are equal.
 
     Attributes:
-        text (:obj:`str`): Option text, 1-100 characters.
+        text (:obj:`str`): Option text, 1-300 characters.
         voter_count (:obj:`int`): Number of users that voted for this option.
 
     Args:
-        text (:obj:`str`): Option text, 1-100 characters.
+        text (:obj:`str`): Option text, 1-300 characters.
         voter_count (:obj:`int`): Number of users that voted for this option.
 
     """
@@ -262,3 +262,5 @@ class Poll(TelegramObject):
     """:const:`telegram.constants.POLL_REGULAR`"""
     QUIZ: ClassVar[str] = constants.POLL_QUIZ
     """:const:`telegram.constants.POLL_QUIZ`"""
+    POLL_QUESTION_LENGTH: ClassVar[int] = constants.POLL_QUESTION_LENGTH
+    """:const:`telegram.constants.POLL_QUESTION_LENGTH`"""

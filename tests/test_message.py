@@ -944,6 +944,30 @@ class TestMessage:
         assert message.forward(123456, disable_notification=True)
         assert not message.forward(635241)
 
+    @pytest.mark.test
+    def test_copy(self, monkeypatch, message):
+        keyboard = [[1, 2]]
+
+        def test(*args, **kwargs):
+            chat_id = kwargs['chat_id'] == 123456
+            from_chat = kwargs['from_chat_id'] == message.chat_id
+            message_id = kwargs['message_id'] == message.message_id
+            if kwargs.get('disable_notification'):
+                notification = kwargs['disable_notification'] is True
+            else:
+                notification = True
+            if kwargs.get('reply_markup'):
+                reply_markup = kwargs['reply_markup'] is keyboard
+            else:
+                reply_markup = True
+            return chat_id and from_chat and message_id and notification and reply_markup
+
+        monkeypatch.setattr(message.bot, 'copy_message', test)
+        assert message.copy(123456)
+        assert message.copy(123456, disable_notification=True)
+        assert message.copy(123456, reply_markup=keyboard)
+        assert not message.copy(635241)
+
     def test_edit_text(self, monkeypatch, message):
         def test(*args, **kwargs):
             chat_id = kwargs['chat_id'] == message.chat_id

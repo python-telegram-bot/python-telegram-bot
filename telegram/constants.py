@@ -119,6 +119,7 @@ Attributes:
 Attributes:
     POLL_REGULAR (:obj:`str`): 'regular'
     POLL_QUIZ (:obj:`str`): 'quiz'
+    POLL_QUESTION_LENGTH (:obj:`int`): 300
 
 :class:`telegram.files.MaskPosition`:
 
@@ -223,7 +224,7 @@ PARSEMODE_HTML: str = 'HTML'
 
 POLL_REGULAR: str = 'regular'
 POLL_QUIZ: str = 'quiz'
-
+POLL_QUESTION_LENGTH: int = 300
 
 STICKER_FOREHEAD: str = 'forehead'
 STICKER_EYES: str = 'eyes'

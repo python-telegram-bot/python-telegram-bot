@@ -1379,3 +1379,29 @@ class TestBot:
             assert bc[0].description == 'descr1'
             assert bc[1].command == 'cmd2'
             assert bc[1].description == 'descr2'
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_copy_message(self, monkeypatch, bot, chat_id, media_message):
+        keyboard = [[InlineKeyboardButton(text="test", callback_data="test2")]]
+
+        def post(url, data, timeout):
+            assert data["chat_id"] == chat_id
+            assert data["from_chat_id"] == chat_id
+            assert data["message_id"] == media_message.message_id
+            assert data["caption"] == "<b>Test</b>"
+            assert data["parse_mode"] == ParseMode.HTML
+            assert data["reply_to_message_id"] == media_message.message_id
+            assert data["reply_markup"] == keyboard
+            return data
+
+        monkeypatch.setattr(bot.request, 'post', post)
+        bot.copy_message(
+            chat_id,
+            from_chat_id=chat_id,
+            message_id=media_message.message_id,
+            caption="<b>Test</b>",
+            parse_mode=ParseMode.HTML,
+            reply_to_message_id=media_message.message_id,
+            reply_markup=keyboard,
+        )

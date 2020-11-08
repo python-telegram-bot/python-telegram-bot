@@ -50,6 +50,7 @@ from .files.inputfile import InputFile
 from .files.file import File
 from .parsemode import ParseMode
 from .messageentity import MessageEntity
+from .messageid import MessageId
 from .games.game import Game
 from .poll import Poll, PollOption, PollAnswer
 from .loginurl import LoginUrl
@@ -268,4 +269,5 @@ __all__ = [
     'KeyboardButtonPollType',
     'Dice',
     'BotCommand',
+    'MessageId',
 ]
