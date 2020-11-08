@@ -25,6 +25,7 @@ from telegram import (
     InlineQueryResultVideo,
     InlineKeyboardMarkup,
     InlineQueryResultVoice,
+    MessageEntity,
 )
 
 
@@ -41,6 +42,7 @@ def inline_query_result_video():
         video_duration=TestInlineQueryResultVideo.video_duration,
         caption=TestInlineQueryResultVideo.caption,
         parse_mode=TestInlineQueryResultVideo.parse_mode,
+        caption_entities=TestInlineQueryResultVideo.caption_entities,
         description=TestInlineQueryResultVideo.description,
         input_message_content=TestInlineQueryResultVideo.input_message_content,
         reply_markup=TestInlineQueryResultVideo.reply_markup,
@@ -59,6 +61,7 @@ class TestInlineQueryResultVideo:
     title = 'title'
     caption = 'caption'
     parse_mode = 'Markdown'
+    caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     description = 'description'
     input_message_content = InputTextMessageContent('input_message_content')
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
@@ -76,6 +79,7 @@ class TestInlineQueryResultVideo:
         assert inline_query_result_video.description == self.description
         assert inline_query_result_video.caption == self.caption
         assert inline_query_result_video.parse_mode == self.parse_mode
+        assert inline_query_result_video.caption_entities == self.caption_entities
         assert (
             inline_query_result_video.input_message_content.to_dict()
             == self.input_message_content.to_dict()
@@ -108,6 +112,9 @@ class TestInlineQueryResultVideo:
         )
         assert inline_query_result_video_dict['caption'] == inline_query_result_video.caption
         assert inline_query_result_video_dict['parse_mode'] == inline_query_result_video.parse_mode
+        assert inline_query_result_video_dict['caption_entities'] == [
+            ce.to_dict() for ce in inline_query_result_video.caption_entities
+        ]
         assert (
             inline_query_result_video_dict['input_message_content']
             == inline_query_result_video.input_message_content.to_dict()
