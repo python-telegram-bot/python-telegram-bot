@@ -21,7 +21,7 @@ import os
 import pytest
 from flaky import flaky
 
-from telegram import PhotoSize, Animation, Voice, TelegramError
+from telegram import PhotoSize, Animation, Voice, TelegramError, MessageEntity
 from telegram.utils.helpers import escape_markdown
 
 
@@ -125,6 +125,22 @@ class TestAnimation:
         assert message.animation.file_name == animation.file_name
         assert message.animation.mime_type == animation.mime_type
         assert message.animation.file_size == animation.file_size
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_animation_caption_entities(self, bot, chat_id, animation):
+        test_string = 'Italic Bold Code'
+        entities = [
+            MessageEntity(MessageEntity.ITALIC, 0, 6),
+            MessageEntity(MessageEntity.ITALIC, 7, 4),
+            MessageEntity(MessageEntity.ITALIC, 12, 4),
+        ]
+        message = bot.send_animation(
+            chat_id, animation, caption=test_string, caption_entities=entities
+        )
+
+        assert message.caption == test_string
+        assert message.caption_entities == entities
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

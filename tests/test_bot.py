@@ -374,6 +374,28 @@ class TestBot:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    def test_send_poll_explanation_entities(self, bot, chat_id):
+        test_string = 'Italic Bold Code'
+        entities = [
+            MessageEntity(MessageEntity.ITALIC, 0, 6),
+            MessageEntity(MessageEntity.ITALIC, 7, 4),
+            MessageEntity(MessageEntity.ITALIC, 12, 4),
+        ]
+        message = bot.send_poll(
+            chat_id,
+            'question',
+            options=['a', 'b'],
+            correct_option_id=0,
+            type=Poll.QUIZ,
+            explanation=test_string,
+            explanation_entities=entities,
+        )
+
+        assert message.poll.explanation == test_string
+        assert message.poll.explanation_entities == entities
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_poll_default_parse_mode(self, default_bot, super_group_id):
         explanation = 'Italic Bold Code'
@@ -770,6 +792,25 @@ class TestBot:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    def test_edit_message_text_entities(self, bot, message):
+        test_string = 'Italic Bold Code'
+        entities = [
+            MessageEntity(MessageEntity.ITALIC, 0, 6),
+            MessageEntity(MessageEntity.ITALIC, 7, 4),
+            MessageEntity(MessageEntity.ITALIC, 12, 4),
+        ]
+        message = bot.edit_message_text(
+            text=test_string,
+            chat_id=message.chat_id,
+            message_id=message.message_id,
+            entities=entities,
+        )
+
+        assert message.text == test_string
+        assert message.entities == entities
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_edit_message_text_default_parse_mode(self, default_bot, message):
         test_string = 'Italic Bold Code'
@@ -824,6 +865,25 @@ class TestBot:
         )
 
         assert message.caption == 'new_caption'
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_edit_message_caption_entities(self, bot, media_message):
+        test_string = 'Italic Bold Code'
+        entities = [
+            MessageEntity(MessageEntity.ITALIC, 0, 6),
+            MessageEntity(MessageEntity.ITALIC, 7, 4),
+            MessageEntity(MessageEntity.ITALIC, 12, 4),
+        ]
+        message = bot.edit_message_caption(
+            caption=test_string,
+            chat_id=media_message.chat_id,
+            message_id=media_message.message_id,
+            caption_entities=entities,
+        )
+
+        assert message.caption == test_string
+        assert message.caption_entities == entities
 
     # edit_message_media is tested in test_inputmedia
 
@@ -1323,6 +1383,19 @@ class TestBot:
         # Test file uploading
         with pytest.raises(OkException):
             bot.send_photo(chat_id, open('tests/data/telegram.jpg', 'rb'))
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_message_entities(self, bot, chat_id):
+        test_string = 'Italic Bold Code'
+        entities = [
+            MessageEntity(MessageEntity.ITALIC, 0, 6),
+            MessageEntity(MessageEntity.ITALIC, 7, 4),
+            MessageEntity(MessageEntity.ITALIC, 12, 4),
+        ]
+        message = bot.send_message(chat_id=chat_id, text=test_string, entities=entities)
+        assert message.text == test_string
+        assert message.entities == entities
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

@@ -21,7 +21,7 @@ import os
 import pytest
 from flaky import flaky
 
-from telegram import Document, PhotoSize, TelegramError, Voice
+from telegram import Document, PhotoSize, TelegramError, Voice, MessageEntity
 from telegram.utils.helpers import escape_markdown
 
 
@@ -148,6 +148,22 @@ class TestDocument:
         )
 
         assert message
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_document_caption_entities(self, bot, chat_id, document):
+        test_string = 'Italic Bold Code'
+        entities = [
+            MessageEntity(MessageEntity.ITALIC, 0, 6),
+            MessageEntity(MessageEntity.ITALIC, 7, 4),
+            MessageEntity(MessageEntity.ITALIC, 12, 4),
+        ]
+        message = bot.send_document(
+            chat_id, document, caption=test_string, caption_entities=entities
+        )
+
+        assert message.caption == test_string
+        assert message.caption_entities == entities
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

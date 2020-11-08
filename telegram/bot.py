@@ -89,6 +89,7 @@ from telegram import (
     InputMediaDocument,
     InputMediaPhoto,
     InputMediaVideo,
+    MessageEntity,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import InvalidToken, TelegramError
@@ -398,6 +399,7 @@ class Bot(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
     ) -> Optional[Message]:
         """Use this method to send text messages.
 
@@ -409,6 +411,8 @@ class Bot(TelegramObject):
             parse_mode (:obj:`str`): Send Markdown or HTML, if you want Telegram apps to show bold,
                 italic, fixed-width text or inline URLs in your bot's message. See the constants in
                 :class:`telegram.ParseMode` for the available modes.
+            entities (List[:class:`telegram.MessageEntity`], optional): List of special entities
+                that appear in message text, which can be specified instead of :attr:`parse_mode`.
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
                 this message.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
@@ -435,6 +439,8 @@ class Bot(TelegramObject):
 
         if parse_mode:
             data['parse_mode'] = parse_mode
+        if entities:
+            data['entities'] = [me.to_dict() for me in entities]
         if disable_web_page_preview:
             data['disable_web_page_preview'] = disable_web_page_preview
 
@@ -555,6 +561,7 @@ class Bot(TelegramObject):
         timeout: float = 20,
         parse_mode: str = None,
         api_kwargs: JSONDict = None,
+        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
     ) -> Optional[Message]:
         """Use this method to send photos.
 
@@ -575,6 +582,9 @@ class Bot(TelegramObject):
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
                 constants in :class:`telegram.ParseMode` for the available modes.
+            caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
+                entities that appear in message text, which can be specified instead of
+                :attr:`parse_mode`.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
@@ -605,6 +615,8 @@ class Bot(TelegramObject):
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
+        if caption_entities:
+            data['caption_entities'] = [me.to_dict() for me in caption_entities]
 
         return self._message(  # type: ignore[return-value]
             'sendPhoto',
@@ -632,6 +644,7 @@ class Bot(TelegramObject):
         parse_mode: str = None,
         thumb: FileLike = None,
         api_kwargs: JSONDict = None,
+        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
     ) -> Optional[Message]:
         """
         Use this method to send audio files, if you want Telegram clients to display them in the
@@ -659,6 +672,9 @@ class Bot(TelegramObject):
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
                 constants in :class:`telegram.ParseMode` for the available modes.
+            caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
+                entities that appear in message text, which can be specified instead of
+                :attr:`parse_mode`.
             duration (:obj:`int`, optional): Duration of sent audio in seconds.
             performer (:obj:`str`, optional): Performer.
             title (:obj:`str`, optional): Track name.
@@ -703,6 +719,8 @@ class Bot(TelegramObject):
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
+        if caption_entities:
+            data['caption_entities'] = [me.to_dict() for me in caption_entities]
         if thumb:
             if InputFile.is_file(thumb):
                 thumb = cast(IO, thumb)
@@ -734,6 +752,7 @@ class Bot(TelegramObject):
         thumb: FileLike = None,
         api_kwargs: JSONDict = None,
         disable_content_type_detection: bool = None,
+        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
     ) -> Optional[Message]:
         """
         Use this method to send general files.
@@ -762,6 +781,9 @@ class Bot(TelegramObject):
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
                 constants in :class:`telegram.ParseMode` for the available modes.
+            caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
+                entities that appear in message text, which can be specified instead of
+                :attr:`parse_mode`.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
@@ -797,6 +819,8 @@ class Bot(TelegramObject):
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
+        if caption_entities:
+            data['caption_entities'] = [me.to_dict() for me in caption_entities]
         if disable_content_type_detection is not None:
             data['disable_content_type_detection'] = disable_content_type_detection
         if thumb:
@@ -894,6 +918,7 @@ class Bot(TelegramObject):
         supports_streaming: bool = None,
         thumb: FileLike = None,
         api_kwargs: JSONDict = None,
+        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
     ) -> Optional[Message]:
         """
         Use this method to send video files, Telegram clients support mp4 videos
@@ -925,6 +950,9 @@ class Bot(TelegramObject):
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
                 constants in :class:`telegram.ParseMode` for the available modes.
+            caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
+                entities that appear in message text, which can be specified instead of
+                :attr:`parse_mode`.
             supports_streaming (:obj:`bool`, optional): Pass :obj:`True`, if the uploaded video is
                 suitable for streaming.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
@@ -964,6 +992,8 @@ class Bot(TelegramObject):
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
+        if caption_entities:
+            data['caption_entities'] = [me.to_dict() for me in caption_entities]
         if supports_streaming:
             data['supports_streaming'] = supports_streaming
         if width:
@@ -1089,6 +1119,7 @@ class Bot(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: float = 20,
         api_kwargs: JSONDict = None,
+        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
     ) -> Optional[Message]:
         """
         Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound).
@@ -1121,6 +1152,9 @@ class Bot(TelegramObject):
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
                 constants in :class:`telegram.ParseMode` for the available modes.
+            caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
+                entities that appear in message text, which can be specified instead of
+                :attr:`parse_mode`.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
@@ -1162,6 +1196,8 @@ class Bot(TelegramObject):
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
+        if caption_entities:
+            data['caption_entities'] = [me.to_dict() for me in caption_entities]
 
         return self._message(  # type: ignore[return-value]
             'sendAnimation',
@@ -1186,6 +1222,7 @@ class Bot(TelegramObject):
         timeout: float = 20,
         parse_mode: str = None,
         api_kwargs: JSONDict = None,
+        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
     ) -> Optional[Message]:
         """
         Use this method to send audio files, if you want Telegram clients to display the file
@@ -1210,6 +1247,9 @@ class Bot(TelegramObject):
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
                 constants in :class:`telegram.ParseMode` for the available modes.
+            caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
+                entities that appear in message text, which can be specified instead of
+                :attr:`parse_mode`.
             duration (:obj:`int`, optional): Duration of the voice message in seconds.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
@@ -1243,6 +1283,8 @@ class Bot(TelegramObject):
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
+        if caption_entities:
+            data['caption_entities'] = [me.to_dict() for me in caption_entities]
 
         return self._message(  # type: ignore[return-value]
             'sendVoice',
@@ -2187,6 +2229,7 @@ class Bot(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
     ) -> Union[Optional[Message], bool]:
         """
         Use this method to edit text and game messages sent by the bot or via the bot (for inline
@@ -2204,6 +2247,8 @@ class Bot(TelegramObject):
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in your bot's message. See the
                 constants in :class:`telegram.ParseMode` for the available modes.
+            entities (List[:class:`telegram.MessageEntity`], optional): List of special entities
+                that appear in message text, which can be specified instead of :attr:`parse_mode`.
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
                 this message.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
@@ -2232,6 +2277,8 @@ class Bot(TelegramObject):
             data['inline_message_id'] = inline_message_id
         if parse_mode:
             data['parse_mode'] = parse_mode
+        if entities:
+            data['entities'] = [me.to_dict() for me in entities]
         if disable_web_page_preview:
             data['disable_web_page_preview'] = disable_web_page_preview
 
@@ -2254,6 +2301,7 @@ class Bot(TelegramObject):
         timeout: float = None,
         parse_mode: str = None,
         api_kwargs: JSONDict = None,
+        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
     ) -> Union[Message, bool]:
         """
         Use this method to edit captions of messages sent by the bot or via the bot
@@ -2272,6 +2320,9 @@ class Bot(TelegramObject):
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
                 constants in :class:`telegram.ParseMode` for the available modes.
+            caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
+                entities that appear in message text, which can be specified instead of
+                :attr:`parse_mode`.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
                 object for an inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -2300,6 +2351,8 @@ class Bot(TelegramObject):
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
+        if caption_entities:
+            data['caption_entities'] = [me.to_dict() for me in caption_entities]
         if chat_id:
             data['chat_id'] = chat_id
         if message_id:
@@ -4112,6 +4165,7 @@ class Bot(TelegramObject):
         open_period: int = None,
         close_date: Union[int, datetime] = None,
         api_kwargs: JSONDict = None,
+        explanation_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
     ) -> Message:
         """
         Use this method to send a native poll.
@@ -4135,6 +4189,9 @@ class Bot(TelegramObject):
             explanation_parse_mode (:obj:`str`, optional): Mode for parsing entities in the
                 explanation. See the constants in :class:`telegram.ParseMode` for the available
                 modes.
+            explanation_entities (List[:class:`telegram.MessageEntity`], optional): List of special
+                entities that appear in message text, which can be specified instead of
+                :attr:`parse_mode`.
             open_period (:obj:`int`, optional): Amount of time in seconds the poll will be active
                 after creation, 5-600. Can't be used together with :attr:`close_date`.
             close_date (:obj:`int` | :obj:`datetime.datetime`, optional): Point in time (Unix
@@ -4187,6 +4244,8 @@ class Bot(TelegramObject):
             data['explanation'] = explanation
         if explanation_parse_mode:
             data['explanation_parse_mode'] = explanation_parse_mode
+        if explanation_entities:
+            data['explanation_entities'] = [me.to_dict() for me in explanation_entities]
         if open_period:
             data['open_period'] = open_period
         if close_date:
