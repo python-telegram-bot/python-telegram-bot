@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the BasePersistence class."""
-
+import warnings
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from copy import copy
@@ -148,10 +148,15 @@ class BasePersistence(ABC):
 
         try:
             new_obj = copy(obj)
-        except TypeError as exc:
-            if 'pickle' in str(exc):
-                return obj
-            raise exc
+        except Exception:
+            warnings.warn(
+                'BasePersistence.replace_bot caught an error while trying to copy an object. '
+                'Objects that can not be copied will be assumed to not contain a telegram.Bot '
+                'instance and will not be handled further. See the docs of '
+                'BasePersistence.replace_bot for more information.',
+                RuntimeWarning,
+            )
+            return obj
 
         if isinstance(obj, (dict, defaultdict)):
             new_obj = cast(dict, new_obj)
@@ -196,10 +201,15 @@ class BasePersistence(ABC):
 
         try:
             new_obj = copy(obj)
-        except TypeError as exc:
-            if 'pickle' in str(exc):
-                return obj
-            raise exc
+        except Exception:
+            warnings.warn(
+                'BasePersistence.insert_bot caught an error while trying to copy an object. '
+                'Objects that can not be copied will be assumed to not contain a telegram.Bot '
+                'instance and will not be handled further. See the docs of '
+                'BasePersistence.insert_bot for more information.',
+                RuntimeWarning,
+            )
+            return obj
 
         if isinstance(obj, (dict, defaultdict)):
             new_obj = cast(dict, new_obj)
@@ -219,6 +229,7 @@ class BasePersistence(ABC):
                     self.insert_bot(self.insert_bot(getattr(new_obj, attr_name))),
                 )
             return new_obj
+
         return obj
 
     @abstractmethod

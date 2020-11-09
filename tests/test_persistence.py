@@ -475,7 +475,6 @@ class TestBasePersistence:
         assert 'An uncaught error was raised while processing the update' not in caplog.text
 
     def test_bot_replace_insert_bot(self, bot, bot_persistence):
-
         class CustomSlottedClass:
             __slots__ = ('bot',)
 
@@ -513,8 +512,6 @@ class TestBasePersistence:
 
             def __eq__(self, other):
                 if isinstance(other, CustomClass):
-                    # print(self.__dict__)
-                    # print(other.__dict__)
                     return (
                         self.bot is other.bot
                         and self.slotted_object == other.slotted_object
@@ -550,7 +547,7 @@ class TestBasePersistence:
         assert persistence.get_user_data()[123][1] == cc
         assert persistence.get_user_data()[123][1].bot is bot
 
-    def test_bot_replace_insert_bot_unpickable_objects(self, bot, bot_persistence):
+    def test_bot_replace_insert_bot_unpickable_objects(self, bot, bot_persistence, recwarn):
         """Here check that unpickable objects are just returned verbatim."""
         persistence = bot_persistence
         persistence.set_bot(bot)
@@ -572,22 +569,26 @@ class TestBasePersistence:
         assert persistence.get_chat_data()[123][1] is lock
         assert persistence.get_user_data()[123][1] is lock
 
-        with pytest.raises(TypeError, match='UnhandledException'):
-            persistence.update_bot_data({2: CustomClass()})
-        with pytest.raises(TypeError, match='UnhandledException'):
-            persistence.update_chat_data(456, {2: CustomClass()})
-        with pytest.raises(TypeError, match='UnhandledException'):
-            persistence.update_user_data(456, {2: CustomClass()})
+        cc = CustomClass()
 
-        persistence.bot_data[2] = CustomClass()
-        persistence.chat_data[456][2] = CustomClass()
-        persistence.user_data[456][2] = CustomClass()
-        with pytest.raises(TypeError, match='UnhandledException'):
-            persistence.get_bot_data()
-        with pytest.raises(TypeError, match='UnhandledException'):
-            persistence.get_user_data()
-        with pytest.raises(TypeError, match='UnhandledException'):
-            persistence.get_chat_data()
+        persistence.update_bot_data({1: cc})
+        assert persistence.bot_data[1] is cc
+        persistence.update_chat_data(123, {1: cc})
+        assert persistence.chat_data[123][1] is cc
+        persistence.update_user_data(123, {1: cc})
+        assert persistence.user_data[123][1] is cc
+
+        assert persistence.get_bot_data()[1] is cc
+        assert persistence.get_chat_data()[123][1] is cc
+        assert persistence.get_user_data()[123][1] is cc
+
+        assert len(recwarn) == 2
+        assert str(recwarn[0].message).startswith(
+            "BasePersistence.replace_bot caught an error while trying to copy an object."
+        )
+        assert str(recwarn[1].message).startswith(
+            "BasePersistence.insert_bot caught an error while trying to copy an object."
+        )
 
 
 @pytest.fixture(scope='function')
