@@ -84,6 +84,8 @@ class ConversationHandler(Handler):
     the conversation ends immediately after the execution of this callback function.
     To end the conversation, the callback function must return :attr:`END` or ``-1``. To
     handle the conversation timeout, use handler :attr:`TIMEOUT` or ``-2``.
+    Finally, :class:`telegram.ext.DispatcherHandlerStop` can be used in conversations as described
+    in the corresponding documentation.
 
     Note:
         In each of the described collections of handlers, a handler may in turn be a
