@@ -128,7 +128,7 @@ class BasePersistence(ABC):
         self.bot = bot
 
     @classmethod
-    def replace_bot(cls, obj: object) -> object:
+    def replace_bot(cls, obj: object) -> object:  # pylint: disable=R0911
         """
         Replaces all instances of :class:`telegram.Bot` that occur within the passed object with
         :attr:`REPLACED_BOT`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
