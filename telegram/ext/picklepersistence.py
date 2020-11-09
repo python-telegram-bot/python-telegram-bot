@@ -20,10 +20,9 @@
 import pickle
 from collections import defaultdict
 from copy import deepcopy
+from typing import Any, DefaultDict, Dict, Optional, Tuple
 
 from telegram.ext import BasePersistence
-
-from typing import DefaultDict, Dict, Any, Tuple, Optional
 from telegram.utils.types import ConversationDict
 
 
@@ -99,8 +98,8 @@ class PicklePersistence(BasePersistence):
     def load_singlefile(self) -> None:
         try:
             filename = self.filename
-            with open(self.filename, "rb") as f:
-                data = pickle.load(f)
+            with open(self.filename, "rb") as file:
+                data = pickle.load(file)
                 self.user_data = defaultdict(dict, data['user_data'])
                 self.chat_data = defaultdict(dict, data['chat_data'])
                 # For backwards compatibility with files not containing bot data
@@ -111,35 +110,37 @@ class PicklePersistence(BasePersistence):
             self.user_data = defaultdict(dict)
             self.chat_data = defaultdict(dict)
             self.bot_data = {}
-        except pickle.UnpicklingError:
-            raise TypeError("File {} does not contain valid pickle data".format(filename))
-        except Exception:
-            raise TypeError("Something went wrong unpickling {}".format(filename))
+        except pickle.UnpicklingError as exc:
+            raise TypeError("File {} does not contain valid pickle data".format(filename)) from exc
+        except Exception as exc:
+            raise TypeError("Something went wrong unpickling {}".format(filename)) from exc
 
-    def load_file(self, filename: str) -> Any:
+    @staticmethod
+    def load_file(filename: str) -> Any:
         try:
-            with open(filename, "rb") as f:
-                return pickle.load(f)
+            with open(filename, "rb") as file:
+                return pickle.load(file)
         except IOError:
             return None
-        except pickle.UnpicklingError:
-            raise TypeError("File {} does not contain valid pickle data".format(filename))
-        except Exception:
-            raise TypeError("Something went wrong unpickling {}".format(filename))
+        except pickle.UnpicklingError as exc:
+            raise TypeError("File {} does not contain valid pickle data".format(filename)) from exc
+        except Exception as exc:
+            raise TypeError("Something went wrong unpickling {}".format(filename)) from exc
 
     def dump_singlefile(self) -> None:
-        with open(self.filename, "wb") as f:
+        with open(self.filename, "wb") as file:
             data = {
                 'conversations': self.conversations,
                 'user_data': self.user_data,
                 'chat_data': self.chat_data,
                 'bot_data': self.bot_data,
             }
-            pickle.dump(data, f)
+            pickle.dump(data, file)
 
-    def dump_file(self, filename: str, data: Any) -> None:
-        with open(filename, "wb") as f:
-            pickle.dump(data, f)
+    @staticmethod
+    def dump_file(filename: str, data: Any) -> None:
+        with open(filename, "wb") as file:
+            pickle.dump(data, file)
 
     def get_user_data(self) -> DefaultDict[int, Dict[Any, Any]]:
         """Returns the user_data from the pickle file if it exists or an empty :obj:`defaultdict`.

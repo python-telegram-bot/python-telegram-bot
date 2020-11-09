@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatPermission."""
 
-from telegram import TelegramObject
 from typing import Any
+
+from telegram import TelegramObject
 
 
 class ChatPermissions(TelegramObject):
@@ -87,7 +88,7 @@ class ChatPermissions(TelegramObject):
         can_change_info: bool = None,
         can_invite_users: bool = None,
         can_pin_messages: bool = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.can_send_messages = can_send_messages

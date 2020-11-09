@@ -18,12 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatMember."""
 import datetime
+from typing import TYPE_CHECKING, Any, Optional, ClassVar
 
-from telegram import User, TelegramObject, constants
-from telegram.utils.helpers import to_timestamp, from_timestamp
-
+from telegram import TelegramObject, User, constants
+from telegram.utils.helpers import from_timestamp, to_timestamp
 from telegram.utils.types import JSONDict
-from typing import Any, Optional, TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -111,6 +110,7 @@ class ChatMember(TelegramObject):
             may add web page previews to his messages.
 
     """
+
     ADMINISTRATOR: ClassVar[str] = constants.CHATMEMBER_ADMINISTRATOR
     """:const:`telegram.constants.CHATMEMBER_ADMINISTRATOR`"""
     CREATOR: ClassVar[str] = constants.CHATMEMBER_CREATOR
@@ -145,7 +145,7 @@ class ChatMember(TelegramObject):
         can_add_web_page_previews: bool = None,
         is_member: bool = None,
         custom_title: str = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.user = user

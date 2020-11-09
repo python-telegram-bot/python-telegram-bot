@@ -18,10 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Audio."""
 
-from telegram import TelegramObject, PhotoSize
+from typing import TYPE_CHECKING, Any, Optional
 
+from telegram import PhotoSize, TelegramObject
 from telegram.utils.types import JSONDict
-from typing import Any, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from telegram import Bot, File
@@ -77,7 +77,7 @@ class Audio(TelegramObject):
         file_size: int = None,
         thumb: PhotoSize = None,
         bot: 'Bot' = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.file_id = str(file_id)

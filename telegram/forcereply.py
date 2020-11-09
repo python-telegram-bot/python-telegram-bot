@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ForceReply."""
 
-from telegram import ReplyMarkup
 from typing import Any
+
+from telegram import ReplyMarkup
 
 
 class ForceReply(ReplyMarkup):
@@ -49,7 +50,7 @@ class ForceReply(ReplyMarkup):
 
     """
 
-    def __init__(self, force_reply: bool = True, selective: bool = False, **kwargs: Any):
+    def __init__(self, force_reply: bool = True, selective: bool = False, **_kwargs: Any):
         # Required
         self.force_reply = bool(force_reply)
         # Optionals

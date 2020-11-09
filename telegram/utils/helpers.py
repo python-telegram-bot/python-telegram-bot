@@ -22,23 +22,25 @@ import datetime as dtm  # dtm = "DateTime Module"
 import re
 import signal
 import time
+
 from collections import defaultdict
 from html import escape
 from numbers import Number
 
-import pytz
+from typing import TYPE_CHECKING, Any, DefaultDict, Dict, Optional, Tuple, Union
+
+import pytz  # pylint: disable=E0401
+
+from telegram.utils.types import JSONDict
+
+if TYPE_CHECKING:
+    from telegram import MessageEntity
 
 try:
     import ujson as json
 except ImportError:
     import json  # type: ignore[no-redef]
 
-
-from telegram.utils.types import JSONDict
-from typing import Union, Any, Optional, Dict, DefaultDict, Tuple, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from telegram import MessageEntity
 
 # From https://stackoverflow.com/questions/2549939/get-signal-names-from-numbers-in-python
 _signames = {
@@ -69,7 +71,7 @@ def escape_markdown(text: str, version: int = 1, entity_type: str = None) -> str
     if int(version) == 1:
         escape_chars = r'_*`['
     elif int(version) == 2:
-        if entity_type == 'pre' or entity_type == 'code':
+        if entity_type in ['pre', 'code']:
             escape_chars = r'\`'
         elif entity_type == 'text_link':
             escape_chars = r'\)'
@@ -93,7 +95,7 @@ def _datetime_to_float_timestamp(dt_obj: dtm.datetime) -> float:
 
 
 def to_float_timestamp(
-    t: Union[int, float, dtm.timedelta, dtm.datetime, dtm.time],
+    time_object: Union[int, float, dtm.timedelta, dtm.datetime, dtm.time],
     reference_timestamp: float = None,
     tzinfo: pytz.BaseTzInfo = None,
 ) -> float:
@@ -105,7 +107,7 @@ def to_float_timestamp(
     to be in UTC, if ``bot`` is not passed or ``bot.defaults`` is :obj:`None`.
 
     Args:
-        t (int | float | datetime.timedelta | datetime.datetime | datetime.time):
+        time_object (int | float | datetime.timedelta | datetime.datetime | datetime.time):
             Time value to convert. The semantics of this parameter will depend on its type:
 
             * :obj:`int` or :obj:`float` will be interpreted as "seconds from ``reference_t``"
@@ -143,23 +145,25 @@ def to_float_timestamp(
 
     if reference_timestamp is None:
         reference_timestamp = time.time()
-    elif isinstance(t, dtm.datetime):
+    elif isinstance(time_object, dtm.datetime):
         raise ValueError('t is an (absolute) datetime while reference_timestamp is not None')
 
-    if isinstance(t, dtm.timedelta):
-        return reference_timestamp + t.total_seconds()
-    elif isinstance(t, (int, float)):
-        return reference_timestamp + t
+    if isinstance(time_object, dtm.timedelta):
+        return reference_timestamp + time_object.total_seconds()
+    if isinstance(time_object, (int, float)):
+        return reference_timestamp + time_object
 
     if tzinfo is None:
         tzinfo = pytz.utc
 
-    if isinstance(t, dtm.time):
-        reference_dt = dtm.datetime.fromtimestamp(reference_timestamp, tz=t.tzinfo or tzinfo)
+    if isinstance(time_object, dtm.time):
+        reference_dt = dtm.datetime.fromtimestamp(
+            reference_timestamp, tz=time_object.tzinfo or tzinfo
+        )
         reference_date = reference_dt.date()
         reference_time = reference_dt.timetz()
 
-        aware_datetime = dtm.datetime.combine(reference_date, t)
+        aware_datetime = dtm.datetime.combine(reference_date, time_object)
         if aware_datetime.tzinfo is None:
             aware_datetime = tzinfo.localize(aware_datetime)
 
@@ -167,14 +171,14 @@ def to_float_timestamp(
         if reference_time > aware_datetime.timetz():
             aware_datetime += dtm.timedelta(days=1)
         return _datetime_to_float_timestamp(aware_datetime)
-    elif isinstance(t, dtm.datetime):
-        if t.tzinfo is None:
-            t = tzinfo.localize(t)
-        return _datetime_to_float_timestamp(t)
-    elif isinstance(t, Number):
-        return reference_timestamp + t
+    if isinstance(time_object, dtm.datetime):
+        if time_object.tzinfo is None:
+            time_object = tzinfo.localize(time_object)
+        return _datetime_to_float_timestamp(time_object)
+    if isinstance(time_object, Number):
+        return reference_timestamp + time_object
 
-    raise TypeError('Unable to convert {} object to timestamp'.format(type(t).__name__))
+    raise TypeError('Unable to convert {} object to timestamp'.format(type(time_object).__name__))
 
 
 def to_timestamp(
@@ -216,14 +220,13 @@ def from_timestamp(
 
     if tzinfo is not None:
         return dtm.datetime.fromtimestamp(unixtime, tz=tzinfo)
-    else:
-        return dtm.datetime.utcfromtimestamp(unixtime)
+    return dtm.datetime.utcfromtimestamp(unixtime)
 
 
 # -------- end --------
 
 
-def mention_html(user_id: int, name: str) -> Optional[str]:
+def mention_html(user_id: Union[int, str], name: str) -> str:
     """
     Args:
         user_id (:obj:`int`) The user's id which you want to mention.
@@ -232,11 +235,10 @@ def mention_html(user_id: int, name: str) -> Optional[str]:
     Returns:
         :obj:`str`: The inline mention for the user as html.
     """
-    if isinstance(user_id, int):
-        return u'<a href="tg://user?id={}">{}</a>'.format(user_id, escape(name))
+    return u'<a href="tg://user?id={}">{}</a>'.format(user_id, escape(name))
 
 
-def mention_markdown(user_id: int, name: str, version: int = 1) -> Optional[str]:
+def mention_markdown(user_id: Union[int, str], name: str, version: int = 1) -> str:
     """
     Args:
         user_id (:obj:`int`) The user's id which you want to mention.
@@ -247,8 +249,7 @@ def mention_markdown(user_id: int, name: str, version: int = 1) -> Optional[str]
     Returns:
         :obj:`str`: The inline mention for the user as markdown.
     """
-    if isinstance(user_id, int):
-        return u'[{}](tg://user?id={})'.format(escape_markdown(name, version=version), user_id)
+    return u'[{}](tg://user?id={})'.format(escape_markdown(name, version=version), user_id)
 
 
 def effective_message_type(entity: 'MessageEntity') -> Optional[str]:
@@ -265,8 +266,7 @@ def effective_message_type(entity: 'MessageEntity') -> Optional[str]:
     """
 
     # Importing on file-level yields cyclic Import Errors
-    from telegram import Message
-    from telegram import Update
+    from telegram import Message, Update  # pylint: disable=C0415
 
     if isinstance(entity, Message):
         message = entity

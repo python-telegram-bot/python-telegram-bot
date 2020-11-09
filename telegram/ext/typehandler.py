@@ -18,10 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the TypeHandler class."""
 
+from typing import TYPE_CHECKING, Any, Callable, Type, TypeVar
+
 from .handler import Handler
-
-
-from typing import Callable, TYPE_CHECKING, TypeVar, Type, Any
 
 if TYPE_CHECKING:
     from telegram.ext import CallbackContext
@@ -76,7 +75,7 @@ class TypeHandler(Handler):
 
     def __init__(
         self,
-        type: Type,
+        type: Type,  # pylint: disable=W0622
         callback: Callable[[Any, 'CallbackContext'], RT],
         strict: bool = False,
         pass_update_queue: bool = False,
@@ -104,5 +103,4 @@ class TypeHandler(Handler):
         """
         if not self.strict:
             return isinstance(update, self.type)
-        else:
-            return type(update) is self.type
+        return type(update) is self.type  # pylint: disable=C0123

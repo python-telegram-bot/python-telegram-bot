@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram WebhookInfo."""
 
-from telegram import TelegramObject
 from typing import Any, List
+
+from telegram import TelegramObject
 
 
 class WebhookInfo(TelegramObject):
@@ -68,7 +69,7 @@ class WebhookInfo(TelegramObject):
         last_error_message: str = None,
         max_connections: int = None,
         allowed_updates: List[str] = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.url = url

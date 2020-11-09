@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ShippingAddress."""
 
-from telegram import TelegramObject
 from typing import Any
+
+from telegram import TelegramObject
 
 
 class ShippingAddress(TelegramObject):
@@ -56,7 +57,7 @@ class ShippingAddress(TelegramObject):
         street_line1: str,
         street_line2: str,
         post_code: str,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         self.country_code = country_code
         self.state = state

@@ -18,9 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represents stickers."""
 
+from typing import TYPE_CHECKING, Any, List, Optional, ClassVar
+
 from telegram import PhotoSize, TelegramObject, constants
 from telegram.utils.types import JSONDict
-from typing import Any, Optional, List, TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
     from telegram import Bot, File
@@ -85,7 +86,7 @@ class Sticker(TelegramObject):
         set_name: str = None,
         mask_position: 'MaskPosition' = None,
         bot: 'Bot' = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.file_id = str(file_id)
@@ -168,9 +169,8 @@ class StickerSet(TelegramObject):
         is_animated: bool,
         contains_masks: bool,
         stickers: List[Sticker],
-        bot: 'Bot' = None,
         thumb: PhotoSize = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         self.name = name
         self.title = title
@@ -242,7 +242,7 @@ class MaskPosition(TelegramObject):
     CHIN: ClassVar[str] = constants.STICKER_CHIN
     """:const:`telegram.constants.STICKER_CHIN`"""
 
-    def __init__(self, point: str, x_shift: float, y_shift: float, scale: float, **kwargs: Any):
+    def __init__(self, point: str, x_shift: float, y_shift: float, scale: float, **_kwargs: Any):
         self.point = point
         self.x_shift = x_shift
         self.y_shift = y_shift

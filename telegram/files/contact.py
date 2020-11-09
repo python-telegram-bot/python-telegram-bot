@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Contact."""
 
-from telegram import TelegramObject
 from typing import Any
+
+from telegram import TelegramObject
 
 
 class Contact(TelegramObject):
@@ -52,7 +53,7 @@ class Contact(TelegramObject):
         last_name: str = None,
         user_id: int = None,
         vcard: str = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.phone_number = str(phone_number)

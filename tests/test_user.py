@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import Update, User
+from telegram import Update, User, constants
 from telegram.utils.helpers import escape_markdown
 
 
@@ -126,6 +126,16 @@ class TestUser:
         assert user.link == 'https://t.me/{}'.format(user.username)
         user.username = None
         assert user.link is None
+
+    def test_anonymous_admin(self, user):
+        assert user.is_anonymous_admin is False
+        user.id = constants.ANONYMOUS_ADMIN_ID
+        assert user.is_anonymous_admin
+
+    def test_service_chat(self, user):
+        assert user.is_service_chat is False
+        user.id = constants.SERVICE_CHAT_ID
+        assert user.is_service_chat
 
     def test_get_profile_photos(self, monkeypatch, user):
         def test(*args, **kwargs):

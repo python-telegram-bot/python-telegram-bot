@@ -16,14 +16,15 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+# pylint: disable=W0622
 """This module contains an object that represents a Telegram CallbackQuery"""
-from telegram import TelegramObject, Message, User
+from typing import TYPE_CHECKING, Any, List, Optional, Union
 
+from telegram import Message, TelegramObject, User
 from telegram.utils.types import JSONDict
-from typing import Optional, Any, Union, TYPE_CHECKING, List
 
 if TYPE_CHECKING:
-    from telegram import Bot, InlineKeyboardMarkup, GameHighScore
+    from telegram import Bot, GameHighScore, InlineKeyboardMarkup
 
 
 class CallbackQuery(TelegramObject):
@@ -80,7 +81,7 @@ class CallbackQuery(TelegramObject):
 
     def __init__(
         self,
-        id: str,
+        id: str,  # pylint: disable=W0622
         from_user: User,
         chat_instance: str,
         message: Message = None,
@@ -88,10 +89,10 @@ class CallbackQuery(TelegramObject):
         inline_message_id: str = None,
         game_short_name: str = None,
         bot: 'Bot' = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
-        self.id = id
+        self.id = id  # pylint: disable=C0103
         self.from_user = from_user
         self.chat_instance = chat_instance
         # Optionals
@@ -130,9 +131,7 @@ class CallbackQuery(TelegramObject):
     def edit_message_text(self, text: str, *args: Any, **kwargs: Any) -> Union[Message, bool]:
         """Shortcut for either::
 
-            bot.edit_message_text(text, chat_id=update.callback_query.message.chat_id,
-                                message_id=update.callback_query.message.message_id,
-                                *args, **kwargs)
+            update.callback_query.message.edit_text(text, *args, **kwargs)
 
         or::
 
@@ -148,24 +147,14 @@ class CallbackQuery(TelegramObject):
             return self.bot.edit_message_text(
                 text, inline_message_id=self.inline_message_id, *args, **kwargs
             )
-        else:
-            return self.bot.edit_message_text(
-                text,
-                chat_id=self.message.chat_id,
-                message_id=self.message.message_id,
-                *args,
-                **kwargs,
-            )
+        return self.message.edit_text(text, *args, **kwargs)
 
     def edit_message_caption(
         self, caption: str, *args: Any, **kwargs: Any
     ) -> Union[Message, bool]:
         """Shortcut for either::
 
-            bot.edit_message_caption(caption=caption,
-                                   chat_id=update.callback_query.message.chat_id,
-                                   message_id=update.callback_query.message.message_id,
-                                   *args, **kwargs)
+            update.callback_query.message.edit_caption(caption, *args, **kwargs)
 
         or::
 
@@ -182,30 +171,27 @@ class CallbackQuery(TelegramObject):
             return self.bot.edit_message_caption(
                 caption=caption, inline_message_id=self.inline_message_id, *args, **kwargs
             )
-        else:
-            return self.bot.edit_message_caption(
-                caption=caption,
-                chat_id=self.message.chat_id,
-                message_id=self.message.message_id,
-                *args,
-                **kwargs,
-            )
+        return self.message.edit_caption(caption=caption, *args, **kwargs)
 
     def edit_message_reply_markup(
         self, reply_markup: 'InlineKeyboardMarkup', *args: Any, **kwargs: Any
     ) -> Union[Message, bool]:
         """Shortcut for either::
 
-            bot.edit_message_reply_markup(chat_id=update.callback_query.message.chat_id,
-                                          message_id=update.callback_query.message.message_id,
-                                          reply_markup=reply_markup,
-                                          *args, **kwargs)
+            update.callback_query.message.edit_reply_markup(
+                reply_markup=reply_markup,
+                *args,
+                **kwargs
+            )
 
         or::
 
-            bot.edit_message_reply_markup(inline_message_id=update.callback_query.inline_message_id,
-                                        reply_markup=reply_markup,
-                                       *args, **kwargs)
+            bot.edit_message_reply_markup
+                inline_message_id=update.callback_query.inline_message_id,
+                reply_markup=reply_markup,
+                *args,
+                **kwargs
+            )
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -219,27 +205,16 @@ class CallbackQuery(TelegramObject):
                 *args,
                 **kwargs,
             )
-        else:
-            return self.bot.edit_message_reply_markup(
-                reply_markup=reply_markup,
-                chat_id=self.message.chat_id,
-                message_id=self.message.message_id,
-                *args,
-                **kwargs,
-            )
+        return self.message.edit_reply_markup(reply_markup=reply_markup, *args, **kwargs)
 
     def edit_message_media(self, *args: Any, **kwargs: Any) -> Union[Message, bool]:
         """Shortcut for either::
 
-            bot.edit_message_media(chat_id=update.callback_query.message.chat_id,
-                                   message_id=update.callback_query.message.message_id,
-                                   media=media,
-                                   *args, **kwargs)
+            update.callback_query.message.edit_media(*args, **kwargs)
 
         or::
 
             bot.edit_message_media(inline_message_id=update.callback_query.inline_message_id,
-                                   media=media,
                                    *args, **kwargs)
 
         Returns:
@@ -251,24 +226,17 @@ class CallbackQuery(TelegramObject):
             return self.bot.edit_message_media(
                 inline_message_id=self.inline_message_id, *args, **kwargs
             )
-        else:
-            return self.bot.edit_message_media(
-                chat_id=self.message.chat_id, message_id=self.message.message_id, *args, **kwargs
-            )
+        return self.message.edit_media(*args, **kwargs)
 
     def edit_message_live_location(self, *args: Any, **kwargs: Any) -> Union[Message, bool]:
         """Shortcut for either::
 
-            bot.edit_message_live_location(chat_id=update.callback_query.message.chat_id,
-                                           message_id=update.callback_query.message.message_id,
-                                           reply_markup=reply_markup,
-                                           *args, **kwargs)
+            update.callback_query.message.edit_live_location(*args, **kwargs)
 
         or::
 
             bot.edit_message_live_location(
                 inline_message_id=update.callback_query.inline_message_id,
-                reply_markup=reply_markup,
                 *args, **kwargs
             )
 
@@ -281,24 +249,17 @@ class CallbackQuery(TelegramObject):
             return self.bot.edit_message_live_location(
                 inline_message_id=self.inline_message_id, *args, **kwargs
             )
-        else:
-            return self.bot.edit_message_live_location(
-                chat_id=self.message.chat_id, message_id=self.message.message_id, *args, **kwargs
-            )
+        return self.message.edit_live_location(*args, **kwargs)
 
     def stop_message_live_location(self, *args: Any, **kwargs: Any) -> Union[Message, bool]:
         """Shortcut for either::
 
-            bot.stop_message_live_location(chat_id=update.callback_query.message.chat_id,
-                                           message_id=update.callback_query.message.message_id,
-                                           reply_markup=reply_markup,
-                                           *args, **kwargs)
+            update.callback_query.message.stop_live_location(*args, **kwargs)
 
         or::
 
             bot.stop_message_live_location(
                 inline_message_id=update.callback_query.inline_message_id,
-                reply_markup=reply_markup,
                 *args, **kwargs
             )
 
@@ -311,23 +272,16 @@ class CallbackQuery(TelegramObject):
             return self.bot.stop_message_live_location(
                 inline_message_id=self.inline_message_id, *args, **kwargs
             )
-        else:
-            return self.bot.stop_message_live_location(
-                chat_id=self.message.chat_id, message_id=self.message.message_id, *args, **kwargs
-            )
+        return self.message.stop_live_location(*args, **kwargs)
 
     def set_game_score(self, *args: Any, **kwargs: Any) -> Union[Message, bool]:
         """Shortcut for either::
 
-            bot.set_game_score(chat_id=update.callback_query.message.chat_id,
-                               message_id=update.callback_query.message.message_id,
-                               reply_markup=reply_markup,
-                               *args, **kwargs)
+           update.callback_query.message.set_game_score(*args, **kwargs)
 
         or::
 
             bot.set_game_score(inline_message_id=update.callback_query.inline_message_id,
-                               reply_markup=reply_markup,
                                *args, **kwargs)
 
         Returns:
@@ -339,23 +293,16 @@ class CallbackQuery(TelegramObject):
             return self.bot.set_game_score(
                 inline_message_id=self.inline_message_id, *args, **kwargs
             )
-        else:
-            return self.bot.set_game_score(
-                chat_id=self.message.chat_id, message_id=self.message.message_id, *args, **kwargs
-            )
+        return self.message.set_game_score(*args, **kwargs)
 
     def get_game_high_scores(self, *args: Any, **kwargs: Any) -> List['GameHighScore']:
         """Shortcut for either::
 
-            bot.get_game_high_scores(chat_id=update.callback_query.message.chat_id,
-                                     message_id=update.callback_query.message.message_id,
-                                     reply_markup=reply_markup,
-                                     *args, **kwargs)
+            update.callback_query.message.get_game_high_score(*args, **kwargs)
 
         or::
 
             bot.get_game_high_scores(inline_message_id=update.callback_query.inline_message_id,
-                                     reply_markup=reply_markup,
                                      *args, **kwargs)
 
         Returns:
@@ -366,7 +313,15 @@ class CallbackQuery(TelegramObject):
             return self.bot.get_game_high_scores(
                 inline_message_id=self.inline_message_id, *args, **kwargs
             )
-        else:
-            return self.bot.get_game_high_scores(
-                chat_id=self.message.chat_id, message_id=self.message.message_id, *args, **kwargs
-            )
+        return self.message.get_game_high_scores(*args, **kwargs)
+
+    def delete_message(self, *args: Any, **kwargs: Any) -> Union[Message, bool]:
+        """Shortcut for::
+
+            update.callback_query.message.delete(*args, **kwargs)
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.message.delete(*args, **kwargs)

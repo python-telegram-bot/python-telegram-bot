@@ -512,11 +512,11 @@ class TestUpdater:
             updater.idle()
 
         rec = caplog.records[-2]
-        assert rec.msg.startswith('Received signal {}'.format(signal.SIGTERM))
+        assert rec.getMessage().startswith('Received signal {}'.format(signal.SIGTERM))
         assert rec.levelname == 'INFO'
 
         rec = caplog.records[-1]
-        assert rec.msg.startswith('Scheduler has been shut down')
+        assert rec.getMessage().startswith('Scheduler has been shut down')
         assert rec.levelname == 'INFO'
 
         # If we get this far, idle() ran through

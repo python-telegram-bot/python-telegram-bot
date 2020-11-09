@@ -18,10 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the StringCommandHandler class."""
 
-from .handler import Handler
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, TypeVar
 
 from telegram.utils.types import HandlerArg
-from typing import Callable, TYPE_CHECKING, Any, Optional, TypeVar, Dict, List
+
+from .handler import Handler
 
 if TYPE_CHECKING:
     from telegram.ext import CallbackContext, Dispatcher

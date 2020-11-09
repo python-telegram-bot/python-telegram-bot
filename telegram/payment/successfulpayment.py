@@ -18,9 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram SuccessfulPayment."""
 
-from telegram import TelegramObject, OrderInfo
+from typing import TYPE_CHECKING, Any, Optional
+
+from telegram import OrderInfo, TelegramObject
 from telegram.utils.types import JSONDict
-from typing import Any, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -70,7 +71,7 @@ class SuccessfulPayment(TelegramObject):
         provider_payment_charge_id: str,
         shipping_option_id: str = None,
         order_info: OrderInfo = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         self.currency = currency
         self.total_amount = total_amount

@@ -19,15 +19,14 @@
 """This module contains the CommandHandler and PrefixHandler classes."""
 import re
 import warnings
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, TypeVar, Union
 
-from telegram.ext import Filters, BaseFilter
+from telegram import MessageEntity, Update
+from telegram.ext import BaseFilter, Filters
 from telegram.utils.deprecate import TelegramDeprecationWarning
+from telegram.utils.types import HandlerArg, SLT
 
-from telegram import Update, MessageEntity
 from .handler import Handler
-
-from telegram.utils.types import HandlerArg
-from typing import Callable, TYPE_CHECKING, Any, Optional, Union, TypeVar, Dict, List, Tuple
 
 if TYPE_CHECKING:
     from telegram.ext import CallbackContext, Dispatcher
@@ -50,9 +49,9 @@ class CommandHandler(Handler):
         :class:`telegram.ext.CommandHandler` does *not* handle (edited) channel posts.
 
     Attributes:
-        command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
-            should listen for. Limitations are the same as described here
-            https://core.telegram.org/bots#commands
+        command (:class:`telegram.utils.types.SLT[str]`):
+            The command or list of commands this handler should listen for.
+            Limitations are the same as described here https://core.telegram.org/bots#commands
         callback (:obj:`callable`): The callback function for this handler.
         filters (:class:`telegram.ext.BaseFilter`): Optional. Only allow updates with these
             Filters.
@@ -84,9 +83,9 @@ class CommandHandler(Handler):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
-            should listen for. Limitations are the same as described here
-            https://core.telegram.org/bots#commands
+        command (:class:`telegram.utils.types.SLT[str]`):
+            The command or list of commands this handler should listen for.
+            Limitations are the same as described here https://core.telegram.org/bots#commands
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
             Callback signature for context based API:
@@ -133,7 +132,7 @@ class CommandHandler(Handler):
 
     def __init__(
         self,
-        command: Union[str, List[str]],
+        command: SLT[str],
         callback: Callable[[HandlerArg, 'CallbackContext'], RT],
         filters: BaseFilter = None,
         allow_edited: bool = None,
@@ -212,8 +211,7 @@ class CommandHandler(Handler):
                 filter_result = self.filters(update)
                 if filter_result:
                     return args, filter_result
-                else:
-                    return False
+                return False
         return None
 
     def collect_optional_args(
@@ -270,9 +268,6 @@ class PrefixHandler(CommandHandler):
     use ~``Filters.update.edited_message``.
 
     Attributes:
-        prefix (:obj:`str` | List[:obj:`str`]): The prefix(es) that will precede :attr:`command`.
-        command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
-            should listen for.
         callback (:obj:`callable`): The callback function for this handler.
         filters (:class:`telegram.ext.BaseFilter`): Optional. Only allow updates with these
             Filters.
@@ -302,9 +297,10 @@ class PrefixHandler(CommandHandler):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        prefix (:obj:`str` | List[:obj:`str`]): The prefix(es) that will precede :attr:`command`.
-        command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
-            should listen for.
+        prefix (:class:`telegram.utils.types.SLT[str]`):
+            The prefix(es) that will precede :attr:`command`.
+        command (:class:`telegram.utils.types.SLT[str]`):
+            The command or list of commands this handler should listen for.
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
             Callback signature for context based API:
@@ -345,8 +341,8 @@ class PrefixHandler(CommandHandler):
 
     def __init__(
         self,
-        prefix: Union[str, List[str]],
-        command: Union[str, List[str]],
+        prefix: SLT[str],
+        command: SLT[str],
         callback: Callable[[HandlerArg, 'CallbackContext'], RT],
         filters: BaseFilter = None,
         pass_args: bool = False,
@@ -380,6 +376,12 @@ class PrefixHandler(CommandHandler):
 
     @property
     def prefix(self) -> List[str]:
+        """
+        The prefixes that will precede :attr:`command`.
+
+        Returns:
+            List[:obj:`str`]
+        """
         return self._prefix
 
     @prefix.setter
@@ -392,6 +394,12 @@ class PrefixHandler(CommandHandler):
 
     @property  # type: ignore[override]
     def command(self) -> List[str]:  # type: ignore[override]
+        """
+        The list of commands this handler should listen for.
+
+        Returns:
+            List[:obj:`str`]
+        """
         return self._command
 
     @command.setter
@@ -427,8 +435,7 @@ class PrefixHandler(CommandHandler):
                 filter_result = self.filters(update)
                 if filter_result:
                     return text_list[1:], filter_result
-                else:
-                    return False
+                return False
         return None
 
     def collect_additional_context(

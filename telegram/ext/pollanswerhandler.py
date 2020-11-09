@@ -16,11 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+"""This module contains the PollAnswerHandler class."""
 
 from telegram import Update
-from .handler import Handler
-
 from telegram.utils.types import HandlerArg
+
+from .handler import Handler
 
 
 class PollAnswerHandler(Handler):

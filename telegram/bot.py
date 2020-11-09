@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# pylint: disable=E0611,E0213,E1102,C0103,E1101,W0613,R0913,R0904
+# pylint: disable=E0611,E0213,E1102,C0103,E1101,R0913,R0904
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2020
@@ -18,10 +18,27 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+# pylint: disable=E0401
 """This module contains an object that represents a Telegram Bot."""
 
 import functools
 import inspect
+import logging
+from datetime import datetime
+
+from typing import (
+    IO,
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    List,
+    Optional,
+    Tuple,
+    TypeVar,
+    Union,
+    cast,
+    no_type_check,
+)
 
 from decorator import decorate
 
@@ -29,67 +46,51 @@ try:
     import ujson as json
 except ImportError:
     import json  # type: ignore[no-redef]  # noqa: F723
-import logging
-from datetime import datetime
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 
 from telegram import (
-    User,
-    Message,
-    Update,
+    Animation,
+    Audio,
+    BotCommand,
     Chat,
     ChatMember,
-    UserProfilePhotos,
-    File,
-    ReplyMarkup,
-    TelegramObject,
-    WebhookInfo,
-    GameHighScore,
-    StickerSet,
-    PhotoSize,
-    Audio,
-    Document,
-    Sticker,
-    Video,
-    Animation,
-    Voice,
-    VideoNote,
-    Location,
-    Venue,
-    Contact,
-    InputFile,
-    Poll,
-    BotCommand,
-    InlineQueryResult,
-    InputMedia,
-    PassportElementError,
-    MaskPosition,
     ChatPermissions,
-    ShippingOption,
-    LabeledPrice,
     ChatPhoto,
+    Contact,
+    Document,
+    File,
+    GameHighScore,
+    InlineQueryResult,
+    InputFile,
+    InputMedia,
+    LabeledPrice,
+    Location,
+    MaskPosition,
+    Message,
+    PassportElementError,
+    PhotoSize,
+    Poll,
+    ReplyMarkup,
+    ShippingOption,
+    Sticker,
+    StickerSet,
+    TelegramObject,
+    Update,
+    User,
+    UserProfilePhotos,
+    Venue,
+    Video,
+    VideoNote,
+    Voice,
+    WebhookInfo,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import InvalidToken, TelegramError
-from telegram.utils.helpers import to_timestamp, DEFAULT_NONE, DefaultValue
+from telegram.utils.helpers import DEFAULT_NONE, DefaultValue, to_timestamp
 from telegram.utils.request import Request
-from telegram.utils.types import JSONDict, FileLike
-
-from typing import (
-    Any,
-    Callable,
-    Optional,
-    TypeVar,
-    Union,
-    TYPE_CHECKING,
-    List,
-    Tuple,
-    no_type_check,
-    IO,
-    cast,
-)
+from telegram.utils.types import FileLike, JSONDict
 
 if TYPE_CHECKING:
     from telegram.ext import Defaults
@@ -98,6 +99,7 @@ RT = TypeVar('RT')
 
 
 def info(func: Callable[..., RT]) -> Callable[..., RT]:
+    # pylint: disable=W0212
     @functools.wraps(func)
     def decorator(self: 'Bot', *args: Any, **kwargs: Any) -> RT:
         if not self.bot:
@@ -112,10 +114,12 @@ def info(func: Callable[..., RT]) -> Callable[..., RT]:
     return decorator
 
 
-def log(func: Callable[..., RT], *args: Any, **kwargs: Any) -> Callable[..., RT]:
+def log(
+    func: Callable[..., RT], *args: Any, **kwargs: Any  # pylint: disable=W0613
+) -> Callable[..., RT]:
     logger = logging.getLogger(func.__module__)
 
-    def decorator(self: 'Bot', *args: Any, **kwargs: Any) -> RT:
+    def decorator(self: 'Bot', *args: Any, **kwargs: Any) -> RT:  # pylint: disable=W0613
         logger.debug('Entering: %s', func.__name__)
         result = func(*args, **kwargs)
         logger.debug(result)
@@ -147,7 +151,7 @@ class Bot(TelegramObject):
 
     """
 
-    def __new__(cls, *args: Any, **kwargs: Any) -> 'Bot':
+    def __new__(cls, *args: Any, **kwargs: Any) -> 'Bot':  # pylint: disable=W0613
         # Get default values from kwargs
         defaults = kwargs.get('defaults')
 
@@ -264,7 +268,7 @@ class Bot(TelegramObject):
         result = self._post(endpoint, data, timeout=timeout, api_kwargs=api_kwargs)
 
         if result is True:
-            return result  # type: ignore
+            return result
 
         return Message.de_json(result, self)  # type: ignore[arg-type]
 
@@ -1346,7 +1350,7 @@ class Bot(TelegramObject):
                 "Either location or latitude and longitude must be passed as" "argument."
             )
 
-        if not ((latitude is not None or longitude is not None) ^ bool(location)):
+        if not (latitude is not None or longitude is not None) ^ bool(location):
             raise ValueError(
                 "Either location or latitude and longitude must be passed as" "argument. Not both."
             )
@@ -1417,7 +1421,7 @@ class Bot(TelegramObject):
             raise ValueError(
                 "Either location or latitude and longitude must be passed as" "argument."
             )
-        if not ((latitude is not None or longitude is not None) ^ bool(location)):
+        if not (latitude is not None or longitude is not None) ^ bool(location):
             raise ValueError(
                 "Either location or latitude and longitude must be passed as" "argument. Not both."
             )
@@ -1831,6 +1835,7 @@ class Bot(TelegramObject):
 
         @no_type_check
         def _set_defaults(res):
+            # pylint: disable=W0212
             if res._has_parse_mode and res.parse_mode == DEFAULT_NONE:
                 if self.defaults:
                     res.parse_mode = self.defaults.parse_mode
@@ -3207,7 +3212,7 @@ class Bot(TelegramObject):
         """
         ok = bool(ok)
 
-        if not (ok ^ (error_message is not None)):
+        if not (ok ^ (error_message is not None)):  # pylint: disable=C0325
             raise TelegramError(
                 'answerPreCheckoutQuery: If ok is True, there should '
                 'not be error_message; if ok is False, error_message '
@@ -4079,7 +4084,7 @@ class Bot(TelegramObject):
         question: str,
         options: List[str],
         is_anonymous: bool = True,
-        type: str = Poll.REGULAR,
+        type: str = Poll.REGULAR,  # pylint: disable=W0622
         allows_multiple_answers: bool = False,
         correct_option_id: int = None,
         is_closed: bool = None,

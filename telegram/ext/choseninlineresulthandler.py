@@ -18,11 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the ChosenInlineResultHandler class."""
 
-from telegram import Update
-from .handler import Handler
+from typing import Optional, TypeVar, Union
 
+from telegram import Update
 from telegram.utils.types import HandlerArg
-from typing import Optional, Union, TypeVar
+
+from .handler import Handler
 
 RT = TypeVar('RT')
 

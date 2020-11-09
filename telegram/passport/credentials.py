@@ -16,22 +16,24 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+# pylint: disable=C0114, E0401, W0622
 try:
     import ujson as json
 except ImportError:
     import json  # type: ignore[no-redef]
+
 from base64 import b64decode
+from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Union, no_type_check
 
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric.padding import OAEP, MGF1
+from cryptography.hazmat.primitives.asymmetric.padding import MGF1, OAEP
 from cryptography.hazmat.primitives.ciphers import Cipher
 from cryptography.hazmat.primitives.ciphers.algorithms import AES
 from cryptography.hazmat.primitives.ciphers.modes import CBC
-from cryptography.hazmat.primitives.hashes import SHA512, SHA256, Hash, SHA1
+from cryptography.hazmat.primitives.hashes import SHA1, SHA256, SHA512, Hash
 
-from telegram import TelegramObject, TelegramError
+from telegram import TelegramError, TelegramObject
 from telegram.utils.types import JSONDict
-from typing import Union, Any, Optional, TYPE_CHECKING, List, no_type_check, Tuple
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -77,9 +79,9 @@ def decrypt(secret, hash, data):
     digest.update(secret + hash)
     secret_hash_hash = digest.finalize()
     # First 32 chars is our key, next 16 is the initialisation vector
-    key, iv = secret_hash_hash[:32], secret_hash_hash[32 : 32 + 16]
+    key, init_vector = secret_hash_hash[:32], secret_hash_hash[32 : 32 + 16]
     # Init a AES-CBC cipher and decrypt the data
-    cipher = Cipher(AES(key), CBC(iv), backend=default_backend())
+    cipher = Cipher(AES(key), CBC(init_vector), backend=default_backend())
     decryptor = cipher.decryptor()
     data = decryptor.update(data) + decryptor.finalize()
     # Calculate SHA256 hash of the decrypted data
@@ -129,7 +131,7 @@ class EncryptedCredentials(TelegramObject):
 
     """
 
-    def __init__(self, data: str, hash: str, secret: str, bot: 'Bot' = None, **kwargs: Any):
+    def __init__(self, data: str, hash: str, secret: str, bot: 'Bot' = None, **_kwargs: Any):
         # Required
         self.data = data
         self.hash = hash
@@ -162,9 +164,9 @@ class EncryptedCredentials(TelegramObject):
                     b64decode(self.secret),
                     OAEP(mgf=MGF1(algorithm=SHA1()), algorithm=SHA1(), label=None),
                 )
-            except ValueError as e:
+            except ValueError as exception:
                 # If decryption fails raise exception
-                raise TelegramDecryptionError(e)
+                raise TelegramDecryptionError(exception) from exception
         return self._decrypted_secret
 
     @property
@@ -193,7 +195,7 @@ class Credentials(TelegramObject):
         nonce (:obj:`str`): Bot-specified nonce
     """
 
-    def __init__(self, secure_data: 'SecureData', nonce: str, bot: 'Bot' = None, **kwargs: Any):
+    def __init__(self, secure_data: 'SecureData', nonce: str, bot: 'Bot' = None, **_kwargs: Any):
         # Required
         self.secure_data = secure_data
         self.nonce = nonce
@@ -254,7 +256,7 @@ class SecureData(TelegramObject):
         passport_registration: 'SecureValue' = None,
         temporary_registration: 'SecureValue' = None,
         bot: 'Bot' = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Optionals
         self.temporary_registration = temporary_registration
@@ -333,7 +335,7 @@ class SecureValue(TelegramObject):
         files: List['FileCredentials'] = None,
         translation: List['FileCredentials'] = None,
         bot: 'Bot' = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         self.data = data
         self.front_side = front_side
@@ -372,7 +374,7 @@ class SecureValue(TelegramObject):
 class _CredentialsBase(TelegramObject):
     """Base class for DataCredentials and FileCredentials."""
 
-    def __init__(self, hash: str, secret: str, bot: 'Bot' = None, **kwargs: Any):
+    def __init__(self, hash: str, secret: str, bot: 'Bot' = None, **_kwargs: Any):
         self.hash = hash
         self.secret = secret
 
@@ -397,8 +399,8 @@ class DataCredentials(_CredentialsBase):
         secret (:obj:`str`): Secret of encrypted data
     """
 
-    def __init__(self, data_hash: str, secret: str, **kwargs: Any):
-        super().__init__(data_hash, secret, **kwargs)
+    def __init__(self, data_hash: str, secret: str, **_kwargs: Any):
+        super().__init__(data_hash, secret, **_kwargs)
 
     def to_dict(self) -> JSONDict:
         data = super().to_dict()
@@ -423,8 +425,8 @@ class FileCredentials(_CredentialsBase):
         secret (:obj:`str`): Secret of encrypted file
     """
 
-    def __init__(self, file_hash: str, secret: str, **kwargs: Any):
-        super().__init__(file_hash, secret, **kwargs)
+    def __init__(self, file_hash: str, secret: str, **_kwargs: Any):
+        super().__init__(file_hash, secret, **_kwargs)
 
     def to_dict(self) -> JSONDict:
         data = super().to_dict()

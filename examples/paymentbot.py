@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# pylint: disable=W0613, C0116
+# type: ignore[union-attr]
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -8,7 +10,7 @@ Basic example for a bot that can receive payment from user.
 
 import logging
 
-from telegram import LabeledPrice, ShippingOption
+from telegram import LabeledPrice, ShippingOption, Update
 from telegram.ext import (
     Updater,
     CommandHandler,
@@ -16,6 +18,7 @@ from telegram.ext import (
     Filters,
     PreCheckoutQueryHandler,
     ShippingQueryHandler,
+    CallbackContext,
 )
 
 # Enable logging
@@ -26,13 +29,13 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def start_callback(update, context):
+def start_callback(update: Update, context: CallbackContext) -> None:
     msg = "Use /shipping to get an invoice for shipping-payment, "
     msg += "or /noshipping for an invoice without shipping."
     update.message.reply_text(msg)
 
 
-def start_with_shipping_callback(update, context):
+def start_with_shipping_callback(update: Update, context: CallbackContext) -> None:
     chat_id = update.message.chat_id
     title = "Payment Example"
     description = "Payment Example using python-telegram-bot"
@@ -67,7 +70,7 @@ def start_with_shipping_callback(update, context):
     )
 
 
-def start_without_shipping_callback(update, context):
+def start_without_shipping_callback(update: Update, context: CallbackContext) -> None:
     chat_id = update.message.chat_id
     title = "Payment Example"
     description = "Payment Example using python-telegram-bot"
@@ -89,25 +92,25 @@ def start_without_shipping_callback(update, context):
     )
 
 
-def shipping_callback(update, context):
+def shipping_callback(update: Update, context: CallbackContext) -> None:
     query = update.shipping_query
     # check the payload, is this from your bot?
     if query.invoice_payload != 'Custom-Payload':
         # answer False pre_checkout_query
         query.answer(ok=False, error_message="Something went wrong...")
         return
-    else:
-        options = list()
-        # a single LabeledPrice
-        options.append(ShippingOption('1', 'Shipping Option A', [LabeledPrice('A', 100)]))
-        # an array of LabeledPrice objects
-        price_list = [LabeledPrice('B1', 150), LabeledPrice('B2', 200)]
-        options.append(ShippingOption('2', 'Shipping Option B', price_list))
-        query.answer(ok=True, shipping_options=options)
+
+    options = list()
+    # a single LabeledPrice
+    options.append(ShippingOption('1', 'Shipping Option A', [LabeledPrice('A', 100)]))
+    # an array of LabeledPrice objects
+    price_list = [LabeledPrice('B1', 150), LabeledPrice('B2', 200)]
+    options.append(ShippingOption('2', 'Shipping Option B', price_list))
+    query.answer(ok=True, shipping_options=options)
 
 
 # after (optional) shipping, it's the pre-checkout
-def precheckout_callback(update, context):
+def precheckout_callback(update: Update, context: CallbackContext) -> None:
     query = update.pre_checkout_query
     # check the payload, is this from your bot?
     if query.invoice_payload != 'Custom-Payload':
@@ -118,7 +121,7 @@ def precheckout_callback(update, context):
 
 
 # finally, after contacting the payment provider...
-def successful_payment_callback(update, context):
+def successful_payment_callback(update: Update, context: CallbackContext) -> None:
     # do something after successfully receiving payment?
     update.message.reply_text("Thank you for your payment!")
 
@@ -130,23 +133,23 @@ def main():
     updater = Updater("TOKEN", use_context=True)
 
     # Get the dispatcher to register handlers
-    dp = updater.dispatcher
+    dispatcher = updater.dispatcher
 
     # simple start function
-    dp.add_handler(CommandHandler("start", start_callback))
+    dispatcher.add_handler(CommandHandler("start", start_callback))
 
     # Add command handler to start the payment invoice
-    dp.add_handler(CommandHandler("shipping", start_with_shipping_callback))
-    dp.add_handler(CommandHandler("noshipping", start_without_shipping_callback))
+    dispatcher.add_handler(CommandHandler("shipping", start_with_shipping_callback))
+    dispatcher.add_handler(CommandHandler("noshipping", start_without_shipping_callback))
 
     # Optional handler if your product requires shipping
-    dp.add_handler(ShippingQueryHandler(shipping_callback))
+    dispatcher.add_handler(ShippingQueryHandler(shipping_callback))
 
     # Pre-checkout handler to final check
-    dp.add_handler(PreCheckoutQueryHandler(precheckout_callback))
+    dispatcher.add_handler(PreCheckoutQueryHandler(precheckout_callback))
 
     # Success! Notify your user!
-    dp.add_handler(MessageHandler(Filters.successful_payment, successful_payment_callback))
+    dispatcher.add_handler(MessageHandler(Filters.successful_payment, successful_payment_callback))
 
     # Start the Bot
     updater.start_polling()

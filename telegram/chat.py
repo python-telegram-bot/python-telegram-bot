@@ -19,14 +19,15 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Chat."""
 
-from telegram import TelegramObject, ChatPhoto, constants
+from typing import TYPE_CHECKING, Any, List, Optional, ClassVar
+
+from telegram import ChatPhoto, TelegramObject, constants
+from telegram.utils.types import JSONDict
+
 from .chatpermissions import ChatPermissions
 
-from telegram.utils.types import JSONDict
-from typing import Any, Optional, List, TYPE_CHECKING, ClassVar
-
 if TYPE_CHECKING:
-    from telegram import Bot, Message, ChatMember
+    from telegram import Bot, ChatMember, Message
 
 
 class Chat(TelegramObject):
@@ -118,7 +119,7 @@ class Chat(TelegramObject):
         sticker_set_name: str = None,
         can_set_sticker_set: bool = None,
         slow_mode_delay: int = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.id = int(id)
@@ -129,7 +130,7 @@ class Chat(TelegramObject):
         self.first_name = first_name
         self.last_name = last_name
         # TODO: Remove (also from tests), when Telegram drops this completely
-        self.all_members_are_administrators = kwargs.get('all_members_are_administrators')
+        self.all_members_are_administrators = _kwargs.get('all_members_are_administrators')
         self.photo = photo
         self.description = description
         self.invite_link = invite_link
@@ -150,6 +151,21 @@ class Chat(TelegramObject):
             return "https://t.me/{}".format(self.username)
         return None
 
+    @property
+    def is_anonymous_admin(self) -> bool:
+        """:obj:`bool`: Convenience property. Returns :obj:`True`, if this chat is with is the bot
+        representing anonymous admins. This behaviour is undocumented and might be changed
+        by Telegram."""
+
+        return self.id == constants.ANONYMOUS_ADMIN_ID
+
+    @property
+    def is_service_chat(self) -> bool:
+        """:obj:`bool`: Convenience property. Returns :obj:`True`, if this chat is the Telegram
+        service chat. This behaviour is undocumented and might be changed by Telegram."""
+
+        return self.id == constants.SERVICE_CHAT_ID
+
     @classmethod
     def de_json(cls, data: JSONDict, bot: 'Bot') -> Optional['Chat']:
         data = cls.parse_data(data)
@@ -158,7 +174,7 @@ class Chat(TelegramObject):
             return None
 
         data['photo'] = ChatPhoto.de_json(data.get('photo'), bot)
-        from telegram import Message
+        from telegram import Message  # pylint: disable=C0415
 
         data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
         data['permissions'] = ChatPermissions.de_json(data.get('permissions'), bot)

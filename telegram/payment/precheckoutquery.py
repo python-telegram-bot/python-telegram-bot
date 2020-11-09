@@ -18,9 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram PreCheckoutQuery."""
 
-from telegram import TelegramObject, User, OrderInfo
+from typing import TYPE_CHECKING, Any, Optional
+
+from telegram import OrderInfo, TelegramObject, User
 from telegram.utils.types import JSONDict
-from typing import Any, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -67,7 +68,7 @@ class PreCheckoutQuery(TelegramObject):
 
     def __init__(
         self,
-        id: str,
+        id: str,  # pylint: disable=W0622
         from_user: User,
         currency: str,
         total_amount: int,
@@ -75,9 +76,9 @@ class PreCheckoutQuery(TelegramObject):
         shipping_option_id: str = None,
         order_info: OrderInfo = None,
         bot: 'Bot' = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
-        self.id = id
+        self.id = id  # pylint: disable=C0103
         self.from_user = from_user
         self.currency = currency
         self.total_amount = total_amount

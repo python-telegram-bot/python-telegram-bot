@@ -16,26 +16,26 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+# pylint: disable=R0201
 """This module contains the ConversationHandler."""
 
 import logging
 import warnings
 from threading import Lock
+from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Tuple, cast, ClassVar
 
 from telegram import Update
 from telegram.ext import (
-    Handler,
-    CallbackQueryHandler,
-    InlineQueryHandler,
-    ChosenInlineResultHandler,
-    CallbackContext,
     BasePersistence,
+    CallbackContext,
+    CallbackQueryHandler,
+    ChosenInlineResultHandler,
     DispatcherHandlerStop,
+    Handler,
+    InlineQueryHandler,
 )
 from telegram.utils.promise import Promise
-
 from telegram.utils.types import ConversationDict, HandlerArg
-from typing import Dict, Any, List, Optional, Tuple, TYPE_CHECKING, cast, NoReturn, ClassVar
 
 if TYPE_CHECKING:
     from telegram.ext import Dispatcher, Job
@@ -176,7 +176,7 @@ class ConversationHandler(Handler):
     WAITING: ClassVar[int] = -3
     """:obj:`int`: Used as a constant to handle state when a conversation is still waiting on the
     previous ``@run_sync`` decorated running handler to finish."""
-
+    # pylint: disable=W0231
     def __init__(
         self,
         entry_points: List[Handler],
@@ -389,7 +389,7 @@ class ConversationHandler(Handler):
 
         return tuple(key)
 
-    def check_update(self, update: HandlerArg) -> CheckUpdateType:
+    def check_update(self, update: HandlerArg) -> CheckUpdateType:  # pylint: disable=R0911
         """
         Determines whether an update should be handled by this conversationhandler, and if so in
         which state the conversation currently is.
@@ -401,18 +401,16 @@ class ConversationHandler(Handler):
             :obj:`bool`
 
         """
+        if not isinstance(update, Update):
+            return None
         # Ignore messages in channels
-        if (
-            not isinstance(update, Update)
-            or update.channel_post
-            or self.per_chat
-            and not update.effective_chat
-            or self.per_message
-            and not update.callback_query
-            or update.callback_query
-            and self.per_chat
-            and not update.callback_query.message
-        ):
+        if update.channel_post:
+            return None
+        if self.per_chat and not update.effective_chat:
+            return None
+        if self.per_message and not update.callback_query:
+            return None
+        if update.callback_query and self.per_chat and not update.callback_query.message:
             return None
 
         key = self._get_key(update)
@@ -430,7 +428,7 @@ class ConversationHandler(Handler):
                     res = res if res is not None else old_state
                 except Exception as exc:
                     self.logger.exception("Promise function raised exception")
-                    self.logger.exception("{}".format(exc))
+                    self.logger.exception("%s", exc)
                     res = old_state
                 finally:
                     if res is None and old_state is None:
@@ -446,7 +444,7 @@ class ConversationHandler(Handler):
                         return key, hdlr, check
                 return None
 
-        self.logger.debug('selecting conversation {} with state {}'.format(str(key), str(state)))
+        self.logger.debug('selecting conversation %s with state %s', str(key), str(state))
 
         handler = None
 
@@ -515,8 +513,8 @@ class ConversationHandler(Handler):
                 timeout_job.schedule_removal()
         try:
             new_state = handler.handle_update(update, dispatcher, check_result, context)
-        except DispatcherHandlerStop as e:
-            new_state = e.state
+        except DispatcherHandlerStop as exception:
+            new_state = exception.state
             raise_dp_handler_stop = True
         with self._timeout_jobs_lock:
             if self.conversation_timeout and new_state != self.END and dispatcher.job_queue:
@@ -533,14 +531,13 @@ class ConversationHandler(Handler):
             self.update_state(self.END, conversation_key)
             if raise_dp_handler_stop:
                 raise DispatcherHandlerStop(self.map_to_parent.get(new_state))
-            else:
-                return self.map_to_parent.get(new_state)
-        else:
-            self.update_state(new_state, conversation_key)
-            if raise_dp_handler_stop:
-                # Don't pass the new state here. If we're in a nested conversation, the parent is
-                # expecting None as return value.
-                raise DispatcherHandlerStop()
+            return self.map_to_parent.get(new_state)
+
+        self.update_state(new_state, conversation_key)
+        if raise_dp_handler_stop:
+            # Don't pass the new state here. If we're in a nested conversation, the parent is
+            # expecting None as return value.
+            raise DispatcherHandlerStop()
         return None
 
     def update_state(self, new_state: object, key: Tuple[int, ...]) -> None:

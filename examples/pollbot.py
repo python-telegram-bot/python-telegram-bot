@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# pylint: disable=W0613, C0116
+# type: ignore[union-attr]
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -16,6 +18,7 @@ from telegram import (
     KeyboardButtonPollType,
     ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
+    Update,
 )
 from telegram.ext import (
     Updater,
@@ -24,6 +27,7 @@ from telegram.ext import (
     PollHandler,
     MessageHandler,
     Filters,
+    CallbackContext,
 )
 
 logging.basicConfig(
@@ -32,7 +36,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def start(update, context):
+def start(update: Update, context: CallbackContext) -> None:
     """Inform user about what this bot can do"""
     update.message.reply_text(
         'Please select /poll to get a Poll, /quiz to get a Quiz or /preview'
@@ -40,7 +44,7 @@ def start(update, context):
     )
 
 
-def poll(update, context):
+def poll(update: Update, context: CallbackContext) -> None:
     """Sends a predefined poll"""
     questions = ["Good", "Really good", "Fantastic", "Great"]
     message = context.bot.send_poll(
@@ -62,7 +66,7 @@ def poll(update, context):
     context.bot_data.update(payload)
 
 
-def receive_poll_answer(update, context):
+def receive_poll_answer(update: Update, context: CallbackContext) -> None:
     """Summarize a users poll vote"""
     answer = update.poll_answer
     poll_id = answer.poll_id
@@ -91,7 +95,7 @@ def receive_poll_answer(update, context):
         )
 
 
-def quiz(update, context):
+def quiz(update: Update, context: CallbackContext) -> None:
     """Send a predefined poll"""
     questions = ["1", "2", "4", "20"]
     message = update.effective_message.reply_poll(
@@ -104,7 +108,7 @@ def quiz(update, context):
     context.bot_data.update(payload)
 
 
-def receive_quiz_answer(update, context):
+def receive_quiz_answer(update: Update, context: CallbackContext) -> None:
     """Close quiz after three participants took it"""
     # the bot can receive closed poll updates we don't care about
     if update.poll.is_closed:
@@ -118,7 +122,7 @@ def receive_quiz_answer(update, context):
         context.bot.stop_poll(quiz_data["chat_id"], quiz_data["message_id"])
 
 
-def preview(update, context):
+def preview(update: Update, context: CallbackContext) -> None:
     """Ask user to create a poll and display a preview of it"""
     # using this without a type lets the user chooses what he wants (quiz or poll)
     button = [[KeyboardButton("Press me!", request_poll=KeyboardButtonPollType())]]
@@ -129,7 +133,7 @@ def preview(update, context):
     )
 
 
-def receive_poll(update, context):
+def receive_poll(update: Update, context: CallbackContext) -> None:
     """On receiving polls, reply to it by a closed poll copying the received poll"""
     actual_poll = update.effective_message.poll
     # Only need to set the question and options, since all other parameters don't matter for
@@ -143,25 +147,25 @@ def receive_poll(update, context):
     )
 
 
-def help_handler(update, context):
+def help_handler(update: Update, context: CallbackContext) -> None:
     """Display a help message"""
     update.message.reply_text("Use /quiz, /poll or /preview to test this " "bot.")
 
 
-def main():
+def main() -> None:
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
     updater = Updater("TOKEN", use_context=True)
-    dp = updater.dispatcher
-    dp.add_handler(CommandHandler('start', start))
-    dp.add_handler(CommandHandler('poll', poll))
-    dp.add_handler(PollAnswerHandler(receive_poll_answer))
-    dp.add_handler(CommandHandler('quiz', quiz))
-    dp.add_handler(PollHandler(receive_quiz_answer))
-    dp.add_handler(CommandHandler('preview', preview))
-    dp.add_handler(MessageHandler(Filters.poll, receive_poll))
-    dp.add_handler(CommandHandler('help', help_handler))
+    dispatcher = updater.dispatcher
+    dispatcher.add_handler(CommandHandler('start', start))
+    dispatcher.add_handler(CommandHandler('poll', poll))
+    dispatcher.add_handler(PollAnswerHandler(receive_poll_answer))
+    dispatcher.add_handler(CommandHandler('quiz', quiz))
+    dispatcher.add_handler(PollHandler(receive_quiz_answer))
+    dispatcher.add_handler(CommandHandler('preview', preview))
+    dispatcher.add_handler(MessageHandler(Filters.poll, receive_poll))
+    dispatcher.add_handler(CommandHandler('help', help_handler))
 
     # Start the Bot
     updater.start_polling()
