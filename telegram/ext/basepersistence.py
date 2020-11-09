@@ -194,7 +194,7 @@ class BasePersistence(ABC):
         """
         if isinstance(obj, Bot):
             return self.bot
-        if obj == self.REPLACED_BOT:
+        if isinstance(obj, str) and obj == self.REPLACED_BOT:
             return self.bot
         if isinstance(obj, (list, tuple, set, frozenset)):
             return obj.__class__(self.insert_bot(item) for item in obj)

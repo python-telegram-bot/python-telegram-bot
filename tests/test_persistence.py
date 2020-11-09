@@ -590,6 +590,34 @@ class TestBasePersistence:
             "BasePersistence.insert_bot caught an error while trying to copy an object."
         )
 
+    def test_bot_replace_insert_bot_objects_with_faulty_equality(self, bot, bot_persistence):
+        """Here check that trying to compare obj == self.REPLACED_BOT doesn't lead to problems."""
+        persistence = bot_persistence
+        persistence.set_bot(bot)
+
+        class CustomClass:
+            def __init__(self, data):
+                self.data = data
+
+            def __eq__(self, other):
+                raise RuntimeError("Can't be compared")
+
+        cc = CustomClass({1: bot, 2: 'foo'})
+        expected = {1: BasePersistence.REPLACED_BOT, 2: 'foo'}
+
+        persistence.update_bot_data({1: cc})
+        assert persistence.bot_data[1].data == expected
+        persistence.update_chat_data(123, {1: cc})
+        assert persistence.chat_data[123][1].data == expected
+        persistence.update_user_data(123, {1: cc})
+        assert persistence.user_data[123][1].data == expected
+
+        expected = {1: bot, 2: 'foo'}
+
+        assert persistence.get_bot_data()[1].data == expected
+        assert persistence.get_chat_data()[123][1].data == expected
+        assert persistence.get_user_data()[123][1].data == expected
+
 
 @pytest.fixture(scope='function')
 def pickle_persistence():
