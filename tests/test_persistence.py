@@ -584,10 +584,10 @@ class TestBasePersistence:
 
         assert len(recwarn) == 2
         assert str(recwarn[0].message).startswith(
-            "BasePersistence.replace_bot caught an error while trying to copy an object."
+            "BasePersistence.replace_bot does not handle objects that can not be copied."
         )
         assert str(recwarn[1].message).startswith(
-            "BasePersistence.insert_bot caught an error while trying to copy an object."
+            "BasePersistence.insert_bot does not handle objects that can not be copied."
         )
 
     def test_bot_replace_insert_bot_objects_with_faulty_equality(self, bot, bot_persistence):

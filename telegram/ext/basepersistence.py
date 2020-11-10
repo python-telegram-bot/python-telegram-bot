@@ -150,10 +150,8 @@ class BasePersistence(ABC):
             new_obj = copy(obj)
         except Exception:
             warnings.warn(
-                'BasePersistence.replace_bot caught an error while trying to copy an object. '
-                'Objects that can not be copied will be assumed to not contain a telegram.Bot '
-                'instance and will not be handled further. See the docs of '
-                'BasePersistence.replace_bot for more information.',
+                'BasePersistence.replace_bot does not handle objects that can not be copied. See '
+                'the docs of BasePersistence.replace_bot for more information.',
                 RuntimeWarning,
             )
             return obj
@@ -203,10 +201,8 @@ class BasePersistence(ABC):
             new_obj = copy(obj)
         except Exception:
             warnings.warn(
-                'BasePersistence.insert_bot caught an error while trying to copy an object. '
-                'Objects that can not be copied will be assumed to not contain a telegram.Bot '
-                'instance and will not be handled further. See the docs of '
-                'BasePersistence.insert_bot for more information.',
+                'BasePersistence.insert_bot does not handle objects that can not be copied. See '
+                'the docs of BasePersistence.insert_bot for more information.',
                 RuntimeWarning,
             )
             return obj
