@@ -26,8 +26,6 @@ import os
 from typing import IO, Optional, Tuple
 from uuid import uuid4
 
-from telegram import TelegramError
-
 DEFAULT_MIME_TYPE = 'application/octet-stream'
 logger = logging.getLogger(__name__)
 
@@ -61,9 +59,10 @@ class InputFile:
         elif hasattr(obj, 'name') and not isinstance(obj.name, int):
             self.filename = os.path.basename(obj.name)
 
-        try:
-            self.mimetype = self.is_image(self.input_file_content)
-        except TelegramError:
+        image_mime_type = self.is_image(self.input_file_content)
+        if image_mime_type:
+            self.mimetype = image_mime_type
+        else:
             if self.filename:
                 self.mimetype = mimetypes.guess_type(self.filename)[0] or DEFAULT_MIME_TYPE
             else:
@@ -76,26 +75,27 @@ class InputFile:
         return self.filename, self.input_file_content, self.mimetype
 
     @staticmethod
-    def is_image(stream: bytes) -> str:
+    def is_image(stream: bytes) -> Optional[str]:
         """Check if the content file is an image by analyzing its headers.
 
         Args:
             stream (:obj:`bytes`): A byte stream representing the content of a file.
 
         Returns:
-            :obj:`str`: The str mime-type of an image.
+            :obj:`str` | :obj:`None`: The mime-type of an image, if the input is an image, and
+            :obj:`None` else.
 
         """
         try:
             image = imghdr.what(None, stream)
             if image:
                 return 'image/%s' % image
-            raise TelegramError('Could not parse file content')
-        except Exception as exc:
+            return None
+        except Exception:
             logger.debug(
                 "Could not parse file content. Assuming that file is not an image.", exc_info=True
             )
-            raise TelegramError('Could not parse file content') from exc
+            return None
 
     @staticmethod
     def is_file(obj: object) -> bool:
