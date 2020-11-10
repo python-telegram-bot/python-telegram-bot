@@ -2530,6 +2530,8 @@ class Bot(TelegramObject):
         max_connections: int = 40,
         allowed_updates: List[str] = None,
         api_kwargs: JSONDict = None,
+        ip_address: str = None,
+        drop_pending_updates: bool = None,
     ) -> bool:
         """
         Use this method to specify a url and receive incoming updates via an outgoing webhook.
@@ -2550,6 +2552,8 @@ class Bot(TelegramObject):
             certificate (:obj:`filelike`): Upload your public key certificate so that the root
                 certificate in use can be checked. See our self-signed guide for details.
                 (https://goo.gl/rw7w6Y)
+            ip_address (:obj:`str`, optional): The fixed IP address which will be used to send
+                webhook requests instead of the IP address resolved through DNS.
             max_connections (:obj:`int`, optional): Maximum allowed number of simultaneous HTTPS
                 connections to the webhook for update delivery, 1-100. Defaults to 40. Use lower
                 values to limit the load on your bot's server, and higher values to increase your
@@ -2562,6 +2566,8 @@ class Bot(TelegramObject):
                 specified, the previous setting will be used. Please note that this parameter
                 doesn't affect updates created before the call to the set_webhook, so unwanted
                 updates may be received for a short period of time.
+            drop_pending_updates (:obj:`bool`, optional): Pass :obj:`True` to drop all pending
+                updates.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -2601,18 +2607,26 @@ class Bot(TelegramObject):
             data['max_connections'] = max_connections
         if allowed_updates is not None:
             data['allowed_updates'] = allowed_updates
+        if ip_address:
+            data['ip_address'] = ip_address
+        if drop_pending_updates:
+            data['drop_pending_updates'] = drop_pending_updates
 
         result = self._post('setWebhook', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
     @log
-    def delete_webhook(self, timeout: float = None, api_kwargs: JSONDict = None) -> bool:
+    def delete_webhook(
+        self, timeout: float = None, api_kwargs: JSONDict = None, drop_pending_updates: bool = None
+    ) -> bool:
         """
         Use this method to remove webhook integration if you decide to switch back to
         getUpdates. Requires no parameters.
 
         Args:
+            drop_pending_updates(:obj:`bool`, optional): Pass :obj:`True`: to drop all pending
+                updates.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -2626,7 +2640,12 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        result = self._post('deleteWebhook', None, timeout=timeout, api_kwargs=api_kwargs)
+        data = {}
+
+        if drop_pending_updates:
+            data['drop_pending_updates'] = drop_pending_updates
+
+        result = self._post('deleteWebhook', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -4375,6 +4394,41 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
+    @log
+    def log_out(self) -> bool:
+        """
+        Use this method to log out from the cloud Bot API server before launching the bot locally.
+        You *must* log out the bot before running it locally, otherwise there is no guarantee that
+        the bot will receive updates. After a successful call, you can immediately log in on a
+        local server, but will not be able to log in back to the cloud Bot API server for 10
+        minutes.
+
+        Returns:
+            :obj:`True`: On success
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        return self._post('logOut')  # type: ignore[return-value]
+
+    @log
+    def close(self) -> bool:
+        """
+        Use this method to close the bot instance before moving it from one local server to
+        another. You need to delete the webhook before calling this method to ensure that the bot
+        isn't launched again after server restart. The method will return error 429 in the first
+        10 minutes after the bot is launched.
+
+        Returns:
+            :obj:`True`: On success
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        return self._post('close')  # type: ignore[return-value]
+
     def to_dict(self) -> JSONDict:
         data: JSONDict = {'id': self.id, 'username': self.username, 'first_name': self.first_name}
 
@@ -4524,3 +4578,5 @@ class Bot(TelegramObject):
     """Alias for :attr:`get_my_commands`"""
     setMyCommands = set_my_commands
     """Alias for :attr:`set_my_commands`"""
+    logOut = log_out
+    """Alias for :attr:`log_out`"""
