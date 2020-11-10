@@ -85,6 +85,7 @@ from telegram import (
     VideoNote,
     Voice,
     WebhookInfo,
+    InlineKeyboardMarkup,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import InvalidToken, TelegramError
@@ -1383,7 +1384,7 @@ class Bot(TelegramObject):
         latitude: float = None,
         longitude: float = None,
         location: Location = None,
-        reply_markup: ReplyMarkup = None,
+        reply_markup: InlineKeyboardMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
     ) -> Union[Optional[Message], bool]:
@@ -1453,7 +1454,7 @@ class Bot(TelegramObject):
         chat_id: Union[str, int] = None,
         message_id: Union[str, int] = None,
         inline_message_id: Union[str, int] = None,
-        reply_markup: ReplyMarkup = None,
+        reply_markup: InlineKeyboardMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
     ) -> Union[Optional[Message], bool]:
@@ -1679,7 +1680,7 @@ class Bot(TelegramObject):
         game_short_name: str,
         disable_notification: bool = False,
         reply_to_message_id: Union[int, str] = None,
-        reply_markup: ReplyMarkup = None,
+        reply_markup: InlineKeyboardMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
     ) -> Optional[Message]:
@@ -2174,7 +2175,7 @@ class Bot(TelegramObject):
         inline_message_id: Union[str, int] = None,
         parse_mode: str = None,
         disable_web_page_preview: bool = None,
-        reply_markup: ReplyMarkup = None,
+        reply_markup: InlineKeyboardMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
     ) -> Union[Optional[Message], bool]:
@@ -2240,7 +2241,7 @@ class Bot(TelegramObject):
         message_id: Union[str, int] = None,
         inline_message_id: Union[str, int] = None,
         caption: str = None,
-        reply_markup: ReplyMarkup = None,
+        reply_markup: InlineKeyboardMarkup = None,
         timeout: float = None,
         parse_mode: str = None,
         api_kwargs: JSONDict = None,
@@ -2312,7 +2313,7 @@ class Bot(TelegramObject):
         message_id: Union[str, int] = None,
         inline_message_id: Union[str, int] = None,
         media: InputMedia = None,
-        reply_markup: ReplyMarkup = None,
+        reply_markup: InlineKeyboardMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
     ) -> Union[Message, bool]:
@@ -2377,7 +2378,7 @@ class Bot(TelegramObject):
         chat_id: Union[str, int] = None,
         message_id: Union[str, int] = None,
         inline_message_id: Union[str, int] = None,
-        reply_markup: ReplyMarkup = None,
+        reply_markup: Optional[InlineKeyboardMarkup] = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
     ) -> Union[Message, bool]:
@@ -2989,7 +2990,7 @@ class Bot(TelegramObject):
         is_flexible: bool = None,
         disable_notification: bool = False,
         reply_to_message_id: Union[int, str] = None,
-        reply_markup: ReplyMarkup = None,
+        reply_markup: InlineKeyboardMarkup = None,
         provider_data: Union[str, object] = None,
         send_phone_number_to_provider: bool = None,
         send_email_to_provider: bool = None,
@@ -4196,7 +4197,7 @@ class Bot(TelegramObject):
         self,
         chat_id: Union[int, str],
         message_id: Union[int, str],
-        reply_markup: ReplyMarkup = None,
+        reply_markup: InlineKeyboardMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
     ) -> Poll:
