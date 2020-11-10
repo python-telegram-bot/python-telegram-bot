@@ -77,8 +77,8 @@ class Message(TelegramObject):
         date (:class:`datetime.datetime`): Date the message was sent.
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
         forward_from (:class:`telegram.User`): Optional. Sender of the original message.
-        forward_from_chat (:class:`telegram.Chat`): Optional. Information about the original
-            channel.
+        forward_from_chat (:class:`telegram.Chat`): Optional. For messages forwarded from channels
+            or from anonymous administrators, information about the original sender chat.
         forward_from_message_id (:obj:`int`): Optional. Identifier of the original message in the
             channel.
         forward_date (:class:`datetime.datetime`): Optional. Date the original message was sent.
@@ -162,8 +162,8 @@ class Message(TelegramObject):
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
         forward_from (:class:`telegram.User`, optional): For forwarded messages, sender of
             the original message.
-        forward_from_chat (:class:`telegram.Chat`, optional): For messages forwarded from a
-            channel, information about the original channel.
+        forward_from_chat (:class:`telegram.Chat`, optional): For messages forwarded from channels
+            or from anonymous administrators, information about the original sender chat.
         forward_from_message_id (:obj:`int`, optional): For forwarded channel posts, identifier of
             the original message in the channel.
         forward_sender_name	(:obj:`str`, optional): Sender's name for messages forwarded from users

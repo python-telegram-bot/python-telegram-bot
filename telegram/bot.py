@@ -1424,8 +1424,8 @@ class Bot(TelegramObject):
                 Telegram API.
 
         Returns:
-            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise :obj:`True` is returned.
+            :class:`telegram.Message`: On success, if edited message is not an inline message, the
+            edited message is returned, otherwise :obj:`True` is returned.
         """
         if not (all([latitude, longitude]) or location):
             raise ValueError(
@@ -2189,8 +2189,7 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
     ) -> Union[Optional[Message], bool]:
         """
-        Use this method to edit text and game messages sent by the bot or via the bot (for inline
-        bots).
+        Use this method to edit text and game messages.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
@@ -2215,8 +2214,8 @@ class Bot(TelegramObject):
                 Telegram API.
 
         Returns:
-            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise :obj:`True` is returned.
+            :class:`telegram.Message`: On success, if edited message is not an inline message, the
+            edited message is returned, otherwise :obj:`True` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2256,8 +2255,7 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
     ) -> Union[Message, bool]:
         """
-        Use this method to edit captions of messages sent by the bot or via the bot
-        (for inline bots).
+        Use this method to edit captions of messages.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
@@ -2281,8 +2279,8 @@ class Bot(TelegramObject):
                 Telegram API.
 
         Returns:
-            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise :obj:`True` is returned.
+            :class:`telegram.Message`: On success, if edited message is not an inline message, the
+            edited message is returned, otherwise :obj:`True` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2327,10 +2325,11 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
     ) -> Union[Message, bool]:
         """
-        Use this method to edit animation, audio, document, photo, or video messages. If a
-        message is a part of a message album, then it can be edited only to a photo or a video.
-        Otherwise, message type can be changed arbitrarily. When inline message is edited,
-        new file can't be uploaded. Use previously uploaded file via its file_id or specify a URL.
+        Use this method to edit animation, audio, document, photo, or video messages. If a message
+        is part of a message album, then it can be edited only to an audio for audio albums, only
+        to a document for document albums and to a photo or a video otherwise. When an inline
+        message is edited, a new file can't be uploaded. Use a previously uploaded file via its
+        ``file_id`` or specify a URL.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
@@ -2412,8 +2411,8 @@ class Bot(TelegramObject):
                 Telegram API.
 
         Returns:
-            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise :obj:`True` is returned.
+            :class:`telegram.Message`: On success, if edited message is not an inline message, the
+            edited message is returned, otherwise :obj:`True` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
