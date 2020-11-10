@@ -17,6 +17,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import logging
 import os
 import subprocess
 import sys
@@ -48,7 +49,7 @@ class TestInputFile:
             # to kill it.
             pass
 
-    def test_mimetypes(self):
+    def test_mimetypes(self, caplog):
         # Only test a few to make sure logic works okay
         assert InputFile(open('tests/data/telegram.jpg', 'rb')).mimetype == 'image/jpeg'
         assert InputFile(open('tests/data/telegram.webp', 'rb')).mimetype == 'image/webp'
@@ -64,6 +65,13 @@ class TestInputFile:
             == 'application/octet-stream'
         )
         assert InputFile(BytesIO(b'blah')).mimetype == 'application/octet-stream'
+
+        # Test string file
+        with caplog.at_level(logging.DEBUG):
+            assert InputFile(open('tests/data/text_file.txt', 'r')).mimetype == 'text/plain'
+
+            assert len(caplog.records) == 1
+            assert caplog.records[0].getMessage().startswith('Could not parse file content')
 
     def test_filenames(self):
         assert InputFile(open('tests/data/telegram.jpg', 'rb')).filename == 'telegram.jpg'

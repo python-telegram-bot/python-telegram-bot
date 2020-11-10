@@ -20,6 +20,7 @@
 """This module contains an object that represents a Telegram InputFile."""
 
 import imghdr
+import logging
 import mimetypes
 import os
 from typing import IO, Optional, Tuple
@@ -84,11 +85,17 @@ class InputFile:
             :obj:`str`: The str mime-type of an image.
 
         """
-        image = imghdr.what(None, stream)
-        if image:
-            return 'image/%s' % image
-
-        raise TelegramError('Could not parse file content')
+        try:
+            image = imghdr.what(None, stream)
+            if image:
+                return 'image/%s' % image
+            raise TelegramError('Could not parse file content')
+        except Exception as exc:
+            logger = logging.getLogger(__name__)
+            logger.debug(
+                "Could not parse file content. Assuming that file is not an image.", exc_info=True
+            )
+            raise TelegramError('Could not parse file content') from exc
 
     @staticmethod
     def is_file(obj: object) -> bool:
