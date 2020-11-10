@@ -29,6 +29,7 @@ from uuid import uuid4
 from telegram import TelegramError
 
 DEFAULT_MIME_TYPE = 'application/octet-stream'
+logger = logging.getLogger(__name__)
 
 
 class InputFile:
@@ -91,7 +92,6 @@ class InputFile:
                 return 'image/%s' % image
             raise TelegramError('Could not parse file content')
         except Exception as exc:
-            logger = logging.getLogger(__name__)
             logger.debug(
                 "Could not parse file content. Assuming that file is not an image.", exc_info=True
             )
