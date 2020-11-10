@@ -330,6 +330,7 @@ class CallbackQuery(TelegramObject):
         """Shortcut for::
 
              bot.pin_chat_message(chat_id=message.chat_id,
+                                  message_id=message.message_id,
                                   *args,
                                   **kwargs)
 
@@ -343,6 +344,7 @@ class CallbackQuery(TelegramObject):
         """Shortcut for::
 
              bot.unpin_chat_message(chat_id=message.chat_id,
+                                    message_id=message.message_id,
                                     *args,
                                     **kwargs)
 
