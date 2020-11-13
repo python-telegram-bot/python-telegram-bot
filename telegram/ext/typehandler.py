@@ -19,6 +19,7 @@
 """This module contains the TypeHandler class."""
 
 from typing import TYPE_CHECKING, Any, Callable, Type, TypeVar
+from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 from .handler import Handler
 
@@ -80,7 +81,7 @@ class TypeHandler(Handler):
         strict: bool = False,
         pass_update_queue: bool = False,
         pass_job_queue: bool = False,
-        run_async: bool = False,
+        run_async: DefaultValue = DEFAULT_FALSE,
     ):
         super().__init__(
             callback,
