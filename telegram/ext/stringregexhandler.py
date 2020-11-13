@@ -100,7 +100,7 @@ class StringRegexHandler(Handler):
         pass_groupdict: bool = False,
         pass_update_queue: bool = False,
         pass_job_queue: bool = False,
-        run_async: DefaultValue = DEFAULT_FALSE,
+        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
         super().__init__(
             callback,

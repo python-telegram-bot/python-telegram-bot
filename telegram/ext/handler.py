@@ -97,7 +97,7 @@ class Handler(ABC):
         pass_job_queue: bool = False,
         pass_user_data: bool = False,
         pass_chat_data: bool = False,
-        run_async: DefaultValue = DEFAULT_FALSE,
+        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
         self.callback: Callable[[HandlerArg, 'CallbackContext'], RT] = callback
         self.pass_update_queue = pass_update_queue
@@ -144,19 +144,19 @@ class Handler(ABC):
                 the dispatcher.
 
         """
-        should_run_async = self.run_async
+        run_async = self.run_async
         if self.run_async is DEFAULT_FALSE and dispatcher.bot.defaults:
             if dispatcher.bot.defaults.run_async:
-                should_run_async = True
+                run_async = True
 
         if context:
             self.collect_additional_context(context, update, dispatcher, check_result)
-            if should_run_async:
+            if run_async:
                 return dispatcher.run_async(self.callback, update, context, update=update)
             return self.callback(update, context)
 
         optional_args = self.collect_optional_args(dispatcher, update, check_result)
-        if should_run_async:
+        if run_async:
             return dispatcher.run_async(
                 self.callback, dispatcher.bot, update, update=update, **optional_args
             )

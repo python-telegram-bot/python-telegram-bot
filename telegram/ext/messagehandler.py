@@ -132,7 +132,7 @@ class MessageHandler(Handler):
         message_updates: bool = None,
         channel_post_updates: bool = None,
         edited_updates: bool = None,
-        run_async: DefaultValue = DEFAULT_FALSE,
+        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
 
         super().__init__(

@@ -142,7 +142,7 @@ class CommandHandler(Handler):
         pass_job_queue: bool = False,
         pass_user_data: bool = False,
         pass_chat_data: bool = False,
-        run_async: DefaultValue = DEFAULT_FALSE,
+        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
         super().__init__(
             callback,
@@ -351,7 +351,7 @@ class PrefixHandler(CommandHandler):
         pass_job_queue: bool = False,
         pass_user_data: bool = False,
         pass_chat_data: bool = False,
-        run_async: DefaultValue = DEFAULT_FALSE,
+        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
 
         self._prefix: List[str] = list()

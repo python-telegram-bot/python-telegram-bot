@@ -36,7 +36,6 @@ from telegram.ext import (
 )
 from telegram.utils.promise import Promise
 from telegram.utils.types import ConversationDict, HandlerArg
-from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 if TYPE_CHECKING:
     from telegram.ext import Dispatcher, Job
@@ -192,7 +191,7 @@ class ConversationHandler(Handler):
         persistent: bool = False,
         map_to_parent: Dict[object, object] = None,
     ):
-        self.run_async: DefaultValue = DEFAULT_FALSE
+        self.run_async: bool = False
 
         self._entry_points = entry_points
         self._states = states

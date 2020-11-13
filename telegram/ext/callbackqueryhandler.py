@@ -131,7 +131,7 @@ class CallbackQueryHandler(Handler):
         pass_groupdict: bool = False,
         pass_user_data: bool = False,
         pass_chat_data: bool = False,
-        run_async: DefaultValue = DEFAULT_FALSE,
+        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
         super().__init__(
             callback,
