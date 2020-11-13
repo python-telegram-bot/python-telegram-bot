@@ -46,8 +46,8 @@ class Chat(TelegramObject):
         photo (:class:`telegram.ChatPhoto`): Optional. Chat photo.
         description (:obj:`str`): Optional. Description, for groups, supergroups and channel chats.
         invite_link (:obj:`str`): Optional. Chat invite link, for supergroups and channel chats.
-        pinned_message (:class:`telegram.Message`): Optional. Pinned message, for supergroups.
-            Returned only in :meth:`telegram.Bot.get_chat`.
+        pinned_message (:class:`telegram.Message`): Optional. The most recent pinned message
+            (by sending date). Returned only in :meth:`telegram.Bot.get_chat`.
         permissions (:class:`telegram.ChatPermissions`): Optional. Default chat member permissions,
             for groups and supergroups. Returned only in :meth:`telegram.Bot.get_chat`.
         slow_mode_delay (:obj:`int`): Optional. For supergroups, the minimum allowed delay between
@@ -77,8 +77,8 @@ class Chat(TelegramObject):
             chats. Each administrator in a chat generates their own invite links, so the bot must
             first generate the link using ``export_chat_invite_link()``. Returned only
             in :meth:`telegram.Bot.get_chat`.
-        pinned_message (:class:`telegram.Message`, optional): Pinned message, for groups,
-            supergroups and channels. Returned only in :meth:`telegram.Bot.get_chat`.
+        pinned_message (:class:`telegram.Message`, optional): The most recent pinned message
+            (by sending date). Returned only in :meth:`telegram.Bot.get_chat`.
         permissions (:class:`telegram.ChatPermissions`): Optional. Default chat member permissions,
             for groups and supergroups. Returned only in :meth:`telegram.Bot.get_chat`.
         slow_mode_delay (:obj:`int`, optional): For supergroups, the minimum allowed delay between
@@ -261,6 +261,45 @@ class Chat(TelegramObject):
 
         """
         return self.bot.set_chat_administrator_custom_title(self.id, *args, **kwargs)
+
+    def pin_message(self, *args: Any, **kwargs: Any) -> bool:
+        """Shortcut for::
+
+             bot.pin_chat_message(chat_id=update.effective_chat.id,
+                                  *args,
+                                  **kwargs)
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.pin_chat_message(self.id, *args, **kwargs)
+
+    def unpin_message(self, *args: Any, **kwargs: Any) -> bool:
+        """Shortcut for::
+
+             bot.unpin_chat_message(chat_id=update.effective_chat.id,
+                                    *args,
+                                    **kwargs)
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.unpin_chat_message(self.id, *args, **kwargs)
+
+    def unpin_all_messages(self, *args: Any, **kwargs: Any) -> bool:
+        """Shortcut for::
+
+             bot.unpin_all_chat_messages(chat_id=update.effective_chat.id,
+                                         *args,
+                                         **kwargs)
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.unpin_all_chat_messages(chat_id=self.id, *args, **kwargs)
 
     def send_message(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::

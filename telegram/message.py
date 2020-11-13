@@ -1147,10 +1147,26 @@ class Message(TelegramObject):
                                   **kwargs)
 
         Returns:
-            :obj:`True`: On success.
+            :obj:`bool`: On success, :obj:`True` is returned.
 
         """
         return self.bot.pin_chat_message(
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs
+        )
+
+    def unpin(self, *args: Any, **kwargs: Any) -> bool:
+        """Shortcut for::
+
+             bot.unpin_chat_message(chat_id=message.chat_id,
+                                    message_id=message.message_id,
+                                    *args,
+                                    **kwargs)
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.unpin_chat_message(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs
         )
 

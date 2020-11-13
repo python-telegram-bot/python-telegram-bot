@@ -1046,13 +1046,22 @@ class TestMessage:
         assert message.stop_poll()
 
     def test_pin(self, monkeypatch, message):
-        def test(*args, **kwargs):
+        def make_assertion(*args, **kwargs):
             chat_id = kwargs['chat_id'] == message.chat_id
             message_id = kwargs['message_id'] == message.message_id
             return chat_id and message_id
 
-        monkeypatch.setattr(message.bot, 'pin_chat_message', test)
+        monkeypatch.setattr(message.bot, 'pin_chat_message', make_assertion)
         assert message.pin()
+
+    def test_unpin(self, monkeypatch, message):
+        def make_assertion(*args, **kwargs):
+            chat_id = kwargs['chat_id'] == message.chat_id
+            message_id = kwargs['message_id'] == message.message_id
+            return chat_id and message_id
+
+        monkeypatch.setattr(message.bot, 'unpin_chat_message', make_assertion)
+        assert message.unpin()
 
     def test_default_quote(self, message):
         message.bot.defaults = Defaults()
