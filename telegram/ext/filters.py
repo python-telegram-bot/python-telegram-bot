@@ -1667,12 +1667,12 @@ officedocument.wordprocessingml.document")``-
               ``@anonymous``, use
               ``MessageHandler(Filters.sender_chat(username='anonymous'), callback_method)``.
             * To filter for messages forwarded from *any* channel, use
-              ``MessageHandler(Filters.sender_chat.channel, callback_method)``
+              ``MessageHandler(Filters.sender_chat.channel, callback_method)``.
             * To filter for messages of anonymous admins in *any* super group, use
-              ``MessageHandler(Filters.sender_chat.super_group, callback_method)``
+              ``MessageHandler(Filters.sender_chat.super_group, callback_method)``.
 
         Warning:
-            :attr:`chat_ids` will give a *copy* of the saved chat ids as :class:`frozenset`. This
+            :attr:`chat_ids` will return a *copy* of the saved chat ids as :class:`frozenset`. This
             is to ensure thread safety. To add/remove a chat, you should use :meth:`add_usernames`,
             :meth:`add_chat_ids`, :meth:`remove_usernames` and :meth:`remove_chat_ids`. Only update
             the entire set by ``filter.chat_ids/usernames = new_set``, if you are entirely sure
