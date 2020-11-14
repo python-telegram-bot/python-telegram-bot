@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the BasePersistence class."""
-
+import warnings
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from copy import copy
@@ -128,12 +128,12 @@ class BasePersistence(ABC):
         self.bot = bot
 
     @classmethod
-    def replace_bot(cls, obj: object) -> object:
+    def replace_bot(cls, obj: object) -> object:  # pylint: disable=R0911
         """
         Replaces all instances of :class:`telegram.Bot` that occur within the passed object with
         :attr:`REPLACED_BOT`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
         ``frozenset``, ``dict``, ``defaultdict`` and objects that have a ``__dict__`` or
-        ``__slot__`` attribute.
+        ``__slot__`` attribute, excluding objects that can't be copied with `copy.copy`.
 
         Args:
             obj (:obj:`object`): The object
@@ -146,7 +146,16 @@ class BasePersistence(ABC):
         if isinstance(obj, (list, tuple, set, frozenset)):
             return obj.__class__(cls.replace_bot(item) for item in obj)
 
-        new_obj = copy(obj)
+        try:
+            new_obj = copy(obj)
+        except Exception:
+            warnings.warn(
+                'BasePersistence.replace_bot does not handle objects that can not be copied. See '
+                'the docs of BasePersistence.replace_bot for more information.',
+                RuntimeWarning,
+            )
+            return obj
+
         if isinstance(obj, (dict, defaultdict)):
             new_obj = cast(dict, new_obj)
             new_obj.clear()
@@ -173,7 +182,7 @@ class BasePersistence(ABC):
         Replaces all instances of :attr:`REPLACED_BOT` that occur within the passed object with
         :attr:`bot`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
         ``frozenset``, ``dict``, ``defaultdict`` and objects that have a ``__dict__`` or
-        ``__slot__`` attribute.
+        ``__slot__`` attribute, excluding objects that can't be copied with `copy.copy`.
 
         Args:
             obj (:obj:`object`): The object
@@ -183,12 +192,21 @@ class BasePersistence(ABC):
         """
         if isinstance(obj, Bot):
             return self.bot
-        if obj == self.REPLACED_BOT:
+        if isinstance(obj, str) and obj == self.REPLACED_BOT:
             return self.bot
         if isinstance(obj, (list, tuple, set, frozenset)):
             return obj.__class__(self.insert_bot(item) for item in obj)
 
-        new_obj = copy(obj)
+        try:
+            new_obj = copy(obj)
+        except Exception:
+            warnings.warn(
+                'BasePersistence.insert_bot does not handle objects that can not be copied. See '
+                'the docs of BasePersistence.insert_bot for more information.',
+                RuntimeWarning,
+            )
+            return obj
+
         if isinstance(obj, (dict, defaultdict)):
             new_obj = cast(dict, new_obj)
             new_obj.clear()
@@ -207,6 +225,7 @@ class BasePersistence(ABC):
                     self.insert_bot(self.insert_bot(getattr(new_obj, attr_name))),
                 )
             return new_obj
+
         return obj
 
     @abstractmethod

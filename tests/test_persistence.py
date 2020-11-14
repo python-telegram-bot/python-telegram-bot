@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import signal
+from threading import Lock
 
 from telegram.utils.helpers import encode_conversations_to_json
 
@@ -86,6 +87,42 @@ def base_persistence():
             raise NotImplementedError
 
     return OwnPersistence(store_chat_data=True, store_user_data=True, store_bot_data=True)
+
+
+@pytest.fixture(scope="function")
+def bot_persistence():
+    class BotPersistence(BasePersistence):
+        def __init__(self):
+            super().__init__()
+            self.bot_data = None
+            self.chat_data = defaultdict(dict)
+            self.user_data = defaultdict(dict)
+
+        def get_bot_data(self):
+            return self.bot_data
+
+        def get_chat_data(self):
+            return self.chat_data
+
+        def get_user_data(self):
+            return self.user_data
+
+        def get_conversations(self, name):
+            raise NotImplementedError
+
+        def update_bot_data(self, data):
+            self.bot_data = data
+
+        def update_chat_data(self, chat_id, data):
+            self.chat_data[chat_id] = data
+
+        def update_user_data(self, user_id, data):
+            self.user_data[user_id] = data
+
+        def update_conversation(self, name, key, new_state):
+            raise NotImplementedError
+
+    return BotPersistence()
 
 
 @pytest.fixture(scope="function")
@@ -437,38 +474,7 @@ class TestBasePersistence:
             dp.process_update(MyUpdate())
         assert 'An uncaught error was raised while processing the update' not in caplog.text
 
-    def test_bot_replace_insert_bot(self, bot):
-        class BotPersistence(BasePersistence):
-            def __init__(self):
-                super().__init__()
-                self.bot_data = None
-                self.chat_data = defaultdict(dict)
-                self.user_data = defaultdict(dict)
-
-            def get_bot_data(self):
-                return self.bot_data
-
-            def get_chat_data(self):
-                return self.chat_data
-
-            def get_user_data(self):
-                return self.user_data
-
-            def get_conversations(self, name):
-                raise NotImplementedError
-
-            def update_bot_data(self, data):
-                self.bot_data = data
-
-            def update_chat_data(self, chat_id, data):
-                self.chat_data[chat_id] = data
-
-            def update_user_data(self, user_id, data):
-                self.user_data[user_id] = data
-
-            def update_conversation(self, name, key, new_state):
-                raise NotImplementedError
-
+    def test_bot_replace_insert_bot(self, bot, bot_persistence):
         class CustomSlottedClass:
             __slots__ = ('bot',)
 
@@ -506,8 +512,6 @@ class TestBasePersistence:
 
             def __eq__(self, other):
                 if isinstance(other, CustomClass):
-                    # print(self.__dict__)
-                    # print(other.__dict__)
                     return (
                         self.bot is other.bot
                         and self.slotted_object == other.slotted_object
@@ -520,7 +524,7 @@ class TestBasePersistence:
                     )
                 return False
 
-        persistence = BotPersistence()
+        persistence = bot_persistence
         persistence.set_bot(bot)
         cc = CustomClass()
 
@@ -542,6 +546,77 @@ class TestBasePersistence:
         assert persistence.get_chat_data()[123][1].bot is bot
         assert persistence.get_user_data()[123][1] == cc
         assert persistence.get_user_data()[123][1].bot is bot
+
+    def test_bot_replace_insert_bot_unpickable_objects(self, bot, bot_persistence, recwarn):
+        """Here check that unpickable objects are just returned verbatim."""
+        persistence = bot_persistence
+        persistence.set_bot(bot)
+
+        class CustomClass:
+            def __copy__(self):
+                raise TypeError('UnhandledException')
+
+        lock = Lock()
+
+        persistence.update_bot_data({1: lock})
+        assert persistence.bot_data[1] is lock
+        persistence.update_chat_data(123, {1: lock})
+        assert persistence.chat_data[123][1] is lock
+        persistence.update_user_data(123, {1: lock})
+        assert persistence.user_data[123][1] is lock
+
+        assert persistence.get_bot_data()[1] is lock
+        assert persistence.get_chat_data()[123][1] is lock
+        assert persistence.get_user_data()[123][1] is lock
+
+        cc = CustomClass()
+
+        persistence.update_bot_data({1: cc})
+        assert persistence.bot_data[1] is cc
+        persistence.update_chat_data(123, {1: cc})
+        assert persistence.chat_data[123][1] is cc
+        persistence.update_user_data(123, {1: cc})
+        assert persistence.user_data[123][1] is cc
+
+        assert persistence.get_bot_data()[1] is cc
+        assert persistence.get_chat_data()[123][1] is cc
+        assert persistence.get_user_data()[123][1] is cc
+
+        assert len(recwarn) == 2
+        assert str(recwarn[0].message).startswith(
+            "BasePersistence.replace_bot does not handle objects that can not be copied."
+        )
+        assert str(recwarn[1].message).startswith(
+            "BasePersistence.insert_bot does not handle objects that can not be copied."
+        )
+
+    def test_bot_replace_insert_bot_objects_with_faulty_equality(self, bot, bot_persistence):
+        """Here check that trying to compare obj == self.REPLACED_BOT doesn't lead to problems."""
+        persistence = bot_persistence
+        persistence.set_bot(bot)
+
+        class CustomClass:
+            def __init__(self, data):
+                self.data = data
+
+            def __eq__(self, other):
+                raise RuntimeError("Can't be compared")
+
+        cc = CustomClass({1: bot, 2: 'foo'})
+        expected = {1: BasePersistence.REPLACED_BOT, 2: 'foo'}
+
+        persistence.update_bot_data({1: cc})
+        assert persistence.bot_data[1].data == expected
+        persistence.update_chat_data(123, {1: cc})
+        assert persistence.chat_data[123][1].data == expected
+        persistence.update_user_data(123, {1: cc})
+        assert persistence.user_data[123][1].data == expected
+
+        expected = {1: bot, 2: 'foo'}
+
+        assert persistence.get_bot_data()[1].data == expected
+        assert persistence.get_chat_data()[123][1].data == expected
+        assert persistence.get_user_data()[123][1].data == expected
 
 
 @pytest.fixture(scope='function')
