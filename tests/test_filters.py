@@ -632,6 +632,113 @@ class TestFilters:
         assert Filters.document.category("application/")(update)
         assert Filters.document.mime_type("application/x-sh")(update)
 
+    def test_filters_file_extension_basic(self, update):
+        update.message.document = Document(
+            "file_id",
+            "unique_id",
+            file_name="file.jpg",
+            mime_type="image/jpeg",
+        )
+        assert Filters.document.file_extension("jpg")(update)
+        assert not Filters.document.file_extension("jpeg")(update)
+        assert not Filters.document.file_extension("file.jpg")(update)
+
+        update.message.document.file_name = "file.tar.gz"
+        assert Filters.document.file_extension("tar.gz")(update)
+        assert Filters.document.file_extension("gz")(update)
+        assert not Filters.document.file_extension("tgz")(update)
+        assert not Filters.document.file_extension("jpg")(update)
+
+        update.message.document = None
+        assert not Filters.document.file_extension("jpg")(update)
+
+    def test_filters_file_extension_minds_dots(self, update):
+        update.message.document = Document(
+            "file_id",
+            "unique_id",
+            file_name="file.jpg",
+            mime_type="image/jpeg",
+        )
+        assert not Filters.document.file_extension(".jpg")(update)
+        assert not Filters.document.file_extension("e.jpg")(update)
+        assert not Filters.document.file_extension("file.jpg")(update)
+        assert not Filters.document.file_extension("")(update)
+
+        update.message.document.file_name = "file..jpg"
+        assert Filters.document.file_extension("jpg")(update)
+        assert Filters.document.file_extension(".jpg")(update)
+        assert not Filters.document.file_extension("..jpg")(update)
+
+        update.message.document.file_name = "file.docx"
+        assert Filters.document.file_extension("docx")(update)
+        assert not Filters.document.file_extension("doc")(update)
+        assert not Filters.document.file_extension("ocx")(update)
+
+        update.message.document.file_name = "file"
+        assert not Filters.document.file_extension("")(update)
+        assert not Filters.document.file_extension("file")(update)
+
+        update.message.document.file_name = "file."
+        assert Filters.document.file_extension("")(update)
+
+    def test_filters_file_extension_none_arg(self, update):
+        update.message.document = Document(
+            "file_id",
+            "unique_id",
+            file_name="file.jpg",
+            mime_type="image/jpeg",
+        )
+        assert not Filters.document.file_extension(None)(update)
+
+        update.message.document.file_name = "file"
+        assert Filters.document.file_extension(None)(update)
+        assert not Filters.document.file_extension("None")(update)
+
+        update.message.document.file_name = "file."
+        assert not Filters.document.file_extension(None)(update)
+
+        update.message.document = None
+        assert not Filters.document.file_extension(None)(update)
+
+    def test_filters_file_extension_case_sensitivity(self, update):
+        update.message.document = Document(
+            "file_id",
+            "unique_id",
+            file_name="file.jpg",
+            mime_type="image/jpeg",
+        )
+        assert Filters.document.file_extension("JPG")(update)
+        assert Filters.document.file_extension("jpG")(update)
+
+        update.message.document.file_name = "file.JPG"
+        assert Filters.document.file_extension("jpg")(update)
+        assert not Filters.document.file_extension("jpg", case_sensitive=True)(update)
+
+        update.message.document.file_name = "file.Dockerfile"
+        assert Filters.document.file_extension("Dockerfile", case_sensitive=True)(update)
+        assert not Filters.document.file_extension("DOCKERFILE", case_sensitive=True)(update)
+
+    def test_filters_file_extension_name(self):
+        assert Filters.document.file_extension("jpg").name == (
+            "Filters.document.file_extension('jpg')"
+        )
+        assert Filters.document.file_extension("JPG").name == (
+            "Filters.document.file_extension('jpg')"
+        )
+        assert Filters.document.file_extension("jpg", case_sensitive=True).name == (
+            "Filters.document.file_extension('jpg', case_sensitive=True)"
+        )
+        assert Filters.document.file_extension("JPG", case_sensitive=True).name == (
+            "Filters.document.file_extension('JPG', case_sensitive=True)"
+        )
+        assert Filters.document.file_extension(".jpg").name == (
+            "Filters.document.file_extension('.jpg')"
+        )
+        assert Filters.document.file_extension("").name == "Filters.document.file_extension('')"
+        assert (
+            Filters.document.file_extension(None).name == "Filters.document.file_extension(None)"
+        )
+
     def test_filters_animation(self, update):
         assert not Filters.animation(update)
         update.message.animation = 'test'
@@ -947,6 +1054,22 @@ class TestFilters:
             update.message.from_user.username = user
             assert not f(update)
 
+    def test_filters_user_repr(self):
+        f = Filters.user([1, 2])
+        assert str(f) == 'Filters.user(1, 2)'
+        f.remove_user_ids(1)
+        f.remove_user_ids(2)
+        assert str(f) == 'Filters.user()'
+        f.add_usernames('@foobar')
+        assert str(f) == 'Filters.user(foobar)'
+        f.add_usernames('@barfoo')
+        assert str(f).startswith('Filters.user(')
+        # we don't know th exact order
+        assert 'barfoo' in str(f) and 'foobar' in str(f)
+
+        with pytest.raises(RuntimeError, match='Cannot set name'):
+            f.name = 'foo'
+
     def test_filters_chat_init(self):
         with pytest.raises(RuntimeError, match='in conjunction with'):
             Filters.chat(chat_id=1, username='chat')
@@ -1072,6 +1195,22 @@ class TestFilters:
             update.message.chat.username = chat
             assert not f(update)
 
+    def test_filters_chat_repr(self):
+        f = Filters.chat([1, 2])
+        assert str(f) == 'Filters.chat(1, 2)'
+        f.remove_chat_ids(1)
+        f.remove_chat_ids(2)
+        assert str(f) == 'Filters.chat()'
+        f.add_usernames('@foobar')
+        assert str(f) == 'Filters.chat(foobar)'
+        f.add_usernames('@barfoo')
+        assert str(f).startswith('Filters.chat(')
+        # we don't know th exact order
+        assert 'barfoo' in str(f) and 'foobar' in str(f)
+
+        with pytest.raises(RuntimeError, match='Cannot set name'):
+            f.name = 'foo'
+
     def test_filters_invoice(self, update):
         assert not Filters.invoice(update)
         update.message.invoice = 'test'
@@ -1131,6 +1270,20 @@ class TestFilters:
         assert not Filters.dice.dice(update)
         assert not Filters.dice.darts(update)
         assert not Filters.dice.basketball([4])(update)
+
+        update.message.dice = Dice(5, '⚽')
+        assert Filters.dice.football(update)
+        assert Filters.dice.football([4, 5])(update)
+        assert not Filters.dice.dice(update)
+        assert not Filters.dice.darts(update)
+        assert not Filters.dice.football([4])(update)
+
+        update.message.dice = Dice(5, '🎰')
+        assert Filters.dice.slot_machine(update)
+        assert Filters.dice.slot_machine([4, 5])(update)
+        assert not Filters.dice.dice(update)
+        assert not Filters.dice.darts(update)
+        assert not Filters.dice.slot_machine([4])(update)
 
     def test_language_filter_single(self, update):
         update.message.from_user.language_code = 'en_US'
@@ -1192,6 +1345,63 @@ class TestFilters:
             'Filters.entity(mention)>>'
         )
 
+    def test_xor_filters(self, update):
+        update.message.text = 'test'
+        update.effective_user.id = 123
+        assert not (Filters.text ^ Filters.user(123))(update)
+        update.message.text = None
+        update.effective_user.id = 1234
+        assert not (Filters.text ^ Filters.user(123))(update)
+        update.message.text = 'test'
+        assert (Filters.text ^ Filters.user(123))(update)
+        update.message.text = None
+        update.effective_user.id = 123
+        assert (Filters.text ^ Filters.user(123))(update)
+
+    def test_xor_filters_repr(self, update):
+        assert str(Filters.text ^ Filters.user(123)) == '<Filters.text xor Filters.user(123)>'
+        with pytest.raises(RuntimeError, match='Cannot set name'):
+            (Filters.text ^ Filters.user(123)).name = 'foo'
+
+    def test_and_xor_filters(self, update):
+        update.message.text = 'test'
+        update.message.forward_date = datetime.datetime.utcnow()
+        assert (Filters.forwarded & (Filters.text ^ Filters.user(123)))(update)
+        update.message.text = None
+        update.effective_user.id = 123
+        assert (Filters.forwarded & (Filters.text ^ Filters.user(123)))(update)
+        update.message.text = 'test'
+        assert not (Filters.forwarded & (Filters.text ^ Filters.user(123)))(update)
+        update.message.forward_date = None
+        update.message.text = None
+        update.effective_user.id = 123
+        assert not (Filters.forwarded & (Filters.text ^ Filters.user(123)))(update)
+        update.message.text = 'test'
+        update.effective_user.id = 456
+        assert not (Filters.forwarded & (Filters.text ^ Filters.user(123)))(update)
+
+        assert (
+            str(Filters.forwarded & (Filters.text ^ Filters.user(123)))
+            == '<Filters.forwarded and <Filters.text xor '
+            'Filters.user(123)>>'
+        )
+
+    def test_xor_regex_filters(self, update):
+        SRE_TYPE = type(re.match("", ""))
+        update.message.text = 'test'
+        update.message.forward_date = datetime.datetime.utcnow()
+        assert not (Filters.forwarded ^ Filters.regex('^test$'))(update)
+        update.message.forward_date = None
+        result = (Filters.forwarded ^ Filters.regex('^test$'))(update)
+        assert result
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert type(matches[0]) is SRE_TYPE
+        update.message.forward_date = datetime.datetime.utcnow()
+        update.message.text = None
+        assert (Filters.forwarded ^ Filters.regex('^test$'))(update) is True
+
     def test_inverted_filters(self, update):
         update.message.text = '/test'
         update.message.entities = [MessageEntity(MessageEntity.BOT_COMMAND, 0, 5)]
@@ -1201,6 +1411,11 @@ class TestFilters:
         update.message.entities = []
         assert not Filters.command(update)
         assert (~Filters.command)(update)
+
+    def test_inverted_filters_repr(self, update):
+        assert str(~Filters.text) == '<inverted Filters.text>'
+        with pytest.raises(RuntimeError, match='Cannot set name'):
+            (~Filters.text).name = 'foo'
 
     def test_inverted_and_filters(self, update):
         update.message.text = '/test'
@@ -1295,6 +1510,10 @@ class TestFilters:
         update.message.text = 'test'
         update.message.entities = []
         (Filters.command & raising_filter)(update)
+
+    def test_merged_filters_repr(self, update):
+        with pytest.raises(RuntimeError, match='Cannot set name'):
+            (Filters.text & Filters.photo).name = 'foo'
 
     def test_merged_short_circuit_or(self, update, base_class):
         update.message.text = 'test'
@@ -1485,3 +1704,19 @@ class TestFilters:
         for user in users:
             update.message.via_bot.username = user
             assert not f(update)
+
+    def test_filters_via_bot_repr(self):
+        f = Filters.via_bot([1, 2])
+        assert str(f) == 'Filters.via_bot(1, 2)'
+        f.remove_bot_ids(1)
+        f.remove_bot_ids(2)
+        assert str(f) == 'Filters.via_bot()'
+        f.add_usernames('@foobar')
+        assert str(f) == 'Filters.via_bot(foobar)'
+        f.add_usernames('@barfoo')
+        assert str(f).startswith('Filters.via_bot(')
+        # we don't know th exact order
+        assert 'barfoo' in str(f) and 'foobar' in str(f)
+
+        with pytest.raises(RuntimeError, match='Cannot set name'):
+            f.name = 'foo'

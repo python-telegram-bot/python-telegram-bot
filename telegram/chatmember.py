@@ -38,6 +38,8 @@ class ChatMember(TelegramObject):
         user (:class:`telegram.User`): Information about the user.
         status (:obj:`str`): The member's status in the chat.
         custom_title (:obj:`str`): Optional. Custom title for owner and administrators.
+        is_anonymous (:obj:`bool`): Optional. :obj:`True`, if the user's presence in the chat is
+            hidden.
         until_date (:class:`datetime.datetime`): Optional. Date when restrictions will be lifted
             for this user.
         can_be_edited (:obj:`bool`): Optional. If the bot is allowed to edit administrator
@@ -74,6 +76,8 @@ class ChatMember(TelegramObject):
             'member', 'restricted', 'left' or 'kicked'.
         custom_title (:obj:`str`, optional): Owner and administrators only.
             Custom title for this user.
+        is_anonymous (:obj:`bool`, optional): Owner and administrators only. :obj:`True`, if the
+            user's presence in the chat is hidden.
         until_date (:class:`datetime.datetime`, optional): Restricted and kicked only. Date when
             restrictions will be lifted for this user.
         can_be_edited (:obj:`bool`, optional): Administrators only. :obj:`True`, if the bot is
@@ -145,12 +149,16 @@ class ChatMember(TelegramObject):
         can_add_web_page_previews: bool = None,
         is_member: bool = None,
         custom_title: str = None,
+        is_anonymous: bool = None,
         **_kwargs: Any,
     ):
         # Required
         self.user = user
         self.status = status
+
+        # Optionals
         self.custom_title = custom_title
+        self.is_anonymous = is_anonymous
         self.until_date = until_date
         self.can_be_edited = can_be_edited
         self.can_change_info = can_change_info

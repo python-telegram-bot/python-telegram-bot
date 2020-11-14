@@ -42,6 +42,7 @@ class Video(TelegramObject):
         height (:obj:`int`): Video height as defined by sender.
         duration (:obj:`int`): Duration of the video in seconds as defined by sender.
         thumb (:class:`telegram.PhotoSize`): Optional. Video thumbnail.
+        file_name (:obj:`str`): Optional. Original filename as defined by sender.
         mime_type (:obj:`str`): Optional. Mime type of a file as defined by sender.
         file_size (:obj:`int`): Optional. File size.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
@@ -56,6 +57,7 @@ class Video(TelegramObject):
         height (:obj:`int`): Video height as defined by sender.
         duration (:obj:`int`): Duration of the video in seconds as defined by sender.
         thumb (:class:`telegram.PhotoSize`, optional): Video thumbnail.
+        file_name (:obj:`str`, optional): Original filename as defined by sender.
         mime_type (:obj:`str`, optional): Mime type of a file as defined by sender.
         file_size (:obj:`int`, optional): File size.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
@@ -74,6 +76,7 @@ class Video(TelegramObject):
         mime_type: str = None,
         file_size: int = None,
         bot: 'Bot' = None,
+        file_name: str = None,
         **_kwargs: Any,
     ):
         # Required
@@ -84,6 +87,7 @@ class Video(TelegramObject):
         self.duration = int(duration)
         # Optionals
         self.thumb = thumb
+        self.file_name = file_name
         self.mime_type = mime_type
         self.file_size = file_size
         self.bot = bot

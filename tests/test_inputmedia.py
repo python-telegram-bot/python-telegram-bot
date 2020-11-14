@@ -102,6 +102,7 @@ def input_media_document(class_thumb_file):
         caption=TestInputMediaDocument.caption,
         thumb=class_thumb_file,
         parse_mode=TestInputMediaDocument.parse_mode,
+        disable_content_type_detection=TestInputMediaDocument.disable_content_type_detection,
     )
 
 
@@ -282,12 +283,17 @@ class TestInputMediaDocument:
     media = "NOTAREALFILEID"
     caption = "My Caption"
     parse_mode = 'HTML'
+    disable_content_type_detection = True
 
     def test_expected_values(self, input_media_document):
         assert input_media_document.type == self.type_
         assert input_media_document.media == self.media
         assert input_media_document.caption == self.caption
         assert input_media_document.parse_mode == self.parse_mode
+        assert (
+            input_media_document.disable_content_type_detection
+            == self.disable_content_type_detection
+        )
         assert isinstance(input_media_document.thumb, InputFile)
 
     def test_to_dict(self, input_media_document):
@@ -296,6 +302,10 @@ class TestInputMediaDocument:
         assert input_media_document_dict['media'] == input_media_document.media
         assert input_media_document_dict['caption'] == input_media_document.caption
         assert input_media_document_dict['parse_mode'] == input_media_document.parse_mode
+        assert (
+            input_media_document['disable_content_type_detection']
+            == input_media_document.disable_content_type_detection
+        )
 
     def test_with_document(self, document):  # noqa: F811
         # fixture found in test_document
