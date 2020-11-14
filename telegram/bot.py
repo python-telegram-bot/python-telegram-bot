@@ -1321,6 +1321,9 @@ class Bot(TelegramObject):
         location: Location = None,
         live_period: int = None,
         api_kwargs: JSONDict = None,
+        horizontal_accuracy: float = None,
+        heading: int = None,
+        proximity_alert_radius: int = None,
     ) -> Optional[Message]:
         """Use this method to send point on the map.
 
@@ -1333,8 +1336,15 @@ class Bot(TelegramObject):
             latitude (:obj:`float`, optional): Latitude of location.
             longitude (:obj:`float`, optional): Longitude of location.
             location (:class:`telegram.Location`, optional): The location to send.
+            horizontal_accuracy (:obj:`int`, optional): The radius of uncertainty for the location,
+                measured in meters; 0-1500.
             live_period (:obj:`int`, optional): Period in seconds for which the location will be
                 updated, should be between 60 and 86400.
+            heading (:obj:`int`, optional): For live locations, a direction in which the user is
+                moving, in degrees. Must be between 1 and 360 if specified.
+            proximity_alert_radius (:obj:`int`, optional): For live locations, a maximum distance
+                for proximity alerts about approaching another chat member, in meters. Must be
+                between 1 and 100000 if specified.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
@@ -1373,6 +1383,12 @@ class Bot(TelegramObject):
 
         if live_period:
             data['live_period'] = live_period
+        if horizontal_accuracy:
+            data['horizontal_accuracy'] = horizontal_accuracy
+        if heading:
+            data['heading'] = heading
+        if proximity_alert_radius:
+            data['proximity_alert_radius'] = proximity_alert_radius
 
         return self._message(  # type: ignore[return-value]
             'sendLocation',
@@ -1396,6 +1412,9 @@ class Bot(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        horizontal_accuracy: float = None,
+        heading: int = None,
+        proximity_alert_radius: int = None,
     ) -> Union[Optional[Message], bool]:
         """Use this method to edit live location messages sent by the bot or via the bot
         (for inline bots). A location can be edited until its :attr:`live_period` expires or
@@ -1415,6 +1434,13 @@ class Bot(TelegramObject):
             latitude (:obj:`float`, optional): Latitude of location.
             longitude (:obj:`float`, optional): Longitude of location.
             location (:class:`telegram.Location`, optional): The location to send.
+            horizontal_accuracy (:obj:`float`, optional): The radius of uncertainty for the
+                location, measured in meters; 0-1500.
+            heading (:obj:`int`, optional): Direction in which the user is moving, in degrees. Must
+                be between 1 and 360 if specified.
+            proximity_alert_radius (:obj:`int`, optional): Maximum distance for proximity alerts
+                about approaching another chat member, in meters. Must be between 1 and 100000 if
+                specified.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
                 object for a new inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -1448,6 +1474,12 @@ class Bot(TelegramObject):
             data['message_id'] = message_id
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
+        if horizontal_accuracy:
+            data['horizontal_accuracy'] = horizontal_accuracy
+        if heading:
+            data['heading'] = heading
+        if proximity_alert_radius:
+            data['proximity_alert_radius'] = proximity_alert_radius
 
         return self._message(
             'editMessageLiveLocation',
