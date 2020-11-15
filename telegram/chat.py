@@ -25,6 +25,7 @@ from telegram import ChatPhoto, TelegramObject, constants
 from telegram.utils.types import JSONDict
 
 from .chatpermissions import ChatPermissions
+from .chatlocation import ChatLocation
 
 if TYPE_CHECKING:
     from telegram import Bot, ChatMember, Message
@@ -44,6 +45,8 @@ class Chat(TelegramObject):
         first_name (:obj:`str`): Optional. First name of the other party in a private chat.
         last_name (:obj:`str`): Optional. Last name of the other party in a private chat.
         photo (:class:`telegram.ChatPhoto`): Optional. Chat photo.
+        bio (:obj:`str`): Optional. Bio of the other party in a private chat. Returned only in
+            :meth:`telegram.Bot.get_chat`.
         description (:obj:`str`): Optional. Description, for groups, supergroups and channel chats.
         invite_link (:obj:`str`): Optional. Chat invite link, for supergroups and channel chats.
         pinned_message (:class:`telegram.Message`): Optional. The most recent pinned message
@@ -56,6 +59,11 @@ class Chat(TelegramObject):
         sticker_set_name (:obj:`str`): Optional. For supergroups, name of Group sticker set.
         can_set_sticker_set (:obj:`bool`): Optional. :obj:`True`, if the bot can change group the
             sticker set.
+        linked_chat_id (:obj:`int`): Optional. Unique identifier for the linked chat, i.e. the
+            discussion group identifier for a channel and vice versa; for supergroups and channel
+            chats. Returned only in :meth:`telegram.Bot.get_chat`.
+        location (:class:`telegram.ChatLocation`): Optional. For supergroups, the location to which
+            the supergroup is connected. Returned only in :meth:`telegram.Bot.get_chat`.
 
     Args:
         id (:obj:`int`): Unique identifier for this chat. This number may be greater than 32 bits
@@ -71,6 +79,8 @@ class Chat(TelegramObject):
         last_name(:obj:`str`, optional): Last name of the other party in a private chat.
         photo (:class:`telegram.ChatPhoto`, optional): Chat photo.
             Returned only in :meth:`telegram.Bot.get_chat`.
+        bio (:obj:`str`, optional): Bio of the other party in a private chat. Returned only in
+            :meth:`telegram.Bot.get_chat`.
         description (:obj:`str`, optional): Description, for groups, supergroups and channel chats.
             Returned only in :meth:`telegram.Bot.get_chat`.
         invite_link (:obj:`str`, optional): Chat invite link, for groups, supergroups and channel
@@ -89,6 +99,11 @@ class Chat(TelegramObject):
             Returned only in :meth:`telegram.Bot.get_chat`.
         can_set_sticker_set (:obj:`bool`, optional): :obj:`True`, if the bot can change group the
             sticker set. Returned only in :meth:`telegram.Bot.get_chat`.
+        linked_chat_id (:obj:`int`, optional): Unique identifier for the linked chat, i.e. the
+            discussion group identifier for a channel and vice versa; for supergroups and channel
+            chats. Returned only in :meth:`telegram.Bot.get_chat`.
+        location (:class:`telegram.ChatLocation`, optional): For supergroups, the location to which
+            the supergroup is connected. Returned only in :meth:`telegram.Bot.get_chat`.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
@@ -119,6 +134,9 @@ class Chat(TelegramObject):
         sticker_set_name: str = None,
         can_set_sticker_set: bool = None,
         slow_mode_delay: int = None,
+        bio: str = None,
+        linked_chat_id: int = None,
+        location: ChatLocation = None,
         **_kwargs: Any,
     ):
         # Required
@@ -132,6 +150,7 @@ class Chat(TelegramObject):
         # TODO: Remove (also from tests), when Telegram drops this completely
         self.all_members_are_administrators = _kwargs.get('all_members_are_administrators')
         self.photo = photo
+        self.bio = bio
         self.description = description
         self.invite_link = invite_link
         self.pinned_message = pinned_message
@@ -139,6 +158,8 @@ class Chat(TelegramObject):
         self.slow_mode_delay = slow_mode_delay
         self.sticker_set_name = sticker_set_name
         self.can_set_sticker_set = can_set_sticker_set
+        self.linked_chat_id = linked_chat_id
+        self.location = location
 
         self.bot = bot
         self._id_attrs = (self.id,)
@@ -163,6 +184,7 @@ class Chat(TelegramObject):
 
         data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
         data['permissions'] = ChatPermissions.de_json(data.get('permissions'), bot)
+        data['location'] = ChatLocation.de_json(data.get('location'), bot)
 
         return cls(bot=bot, **data)
 
