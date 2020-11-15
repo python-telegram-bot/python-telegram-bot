@@ -924,7 +924,12 @@ class TestBot:
         url = 'https://python-telegram-bot.org/test/webhook'
         max_connections = 7
         allowed_updates = ['message']
-        bot.set_webhook(url, max_connections=max_connections, allowed_updates=allowed_updates)
+        bot.set_webhook(
+            url,
+            max_connections=max_connections,
+            allowed_updates=allowed_updates,
+            ip_address='127.0.0.1',
+        )
         time.sleep(2)
         live_info = bot.get_webhook_info()
         time.sleep(6)
@@ -935,6 +940,19 @@ class TestBot:
         assert live_info.url == url
         assert live_info.max_connections == max_connections
         assert live_info.allowed_updates == allowed_updates
+        assert live_info.ip_address == '127.0.0.1'
+
+    @pytest.mark.parametrize('drop_pending_updates', [True, False])
+    def test_set_webhook_delete_webhook_drop_pending_updates(
+        self, bot, drop_pending_updates, monkeypatch
+    ):
+        def assertion(url, data, *args, **kwargs):
+            return bool(data.get('drop_pending_updates')) == drop_pending_updates
+
+        monkeypatch.setattr(bot.request, 'post', assertion)
+
+        assert bot.set_webhook(drop_pending_updates=drop_pending_updates)
+        assert bot.delete_webhook(drop_pending_updates=drop_pending_updates)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -1266,15 +1284,28 @@ class TestBot:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_pin_and_unpin_message(self, bot, super_group_id):
-        message = bot.send_message(super_group_id, text="test_pin_message")
+        message1 = bot.send_message(super_group_id, text="test_pin_message_1")
+        message2 = bot.send_message(super_group_id, text="test_pin_message_2")
+        message3 = bot.send_message(super_group_id, text="test_pin_message_3")
+
         assert bot.pin_chat_message(
-            chat_id=super_group_id, message_id=message.message_id, disable_notification=True
+            chat_id=super_group_id, message_id=message1.message_id, disable_notification=True
+        )
+
+        bot.pin_chat_message(
+            chat_id=super_group_id, message_id=message2.message_id, disable_notification=True
+        )
+        bot.pin_chat_message(
+            chat_id=super_group_id, message_id=message3.message_id, disable_notification=True
         )
 
         chat = bot.get_chat(super_group_id)
-        assert chat.pinned_message == message
+        assert chat.pinned_message == message3
 
-        assert bot.unpinChatMessage(super_group_id)
+        assert bot.unpin_chat_message(super_group_id, message_id=message2.message_id)
+        assert bot.unpin_chat_message(super_group_id)
+
+        assert bot.unpin_all_chat_messages(super_group_id)
 
     # get_sticker_set, upload_sticker_file, create_new_sticker_set, add_sticker_to_set,
     # set_sticker_position_in_set and delete_sticker_from_set are tested in the
@@ -1382,3 +1413,21 @@ class TestBot:
             assert bc[0].description == 'descr1'
             assert bc[1].command == 'cmd2'
             assert bc[1].description == 'descr2'
+
+    def test_log_out(self, monkeypatch, bot):
+        # We don't actually make a request as to not break the test setup
+        def assertion(url, data, *args, **kwargs):
+            return data == {} and url.split('/')[-1] == 'logOut'
+
+        monkeypatch.setattr(bot.request, 'post', assertion)
+
+        assert bot.log_out()
+
+    def test_close(self, monkeypatch, bot):
+        # We don't actually make a request as to not break the test setup
+        def assertion(url, data, *args, **kwargs):
+            return data == {} and url.split('/')[-1] == 'close'
+
+        monkeypatch.setattr(bot.request, 'post', assertion)
+
+        assert bot.close()

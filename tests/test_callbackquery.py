@@ -223,6 +223,34 @@ class TestCallbackQuery:
         monkeypatch.setattr(callback_query.bot, 'delete_message', make_assertion)
         assert callback_query.delete_message()
 
+    def test_pin_message(self, monkeypatch, callback_query):
+        if callback_query.inline_message_id:
+            pytest.skip("Can't pin inline messages")
+
+        def make_assertion(*args, **kwargs):
+            _id = callback_query.message.chat_id
+            try:
+                return kwargs['chat_id'] == _id
+            except KeyError:
+                return args[0] == _id
+
+        monkeypatch.setattr(callback_query.bot, 'pin_chat_message', make_assertion)
+        assert callback_query.pin_message()
+
+    def test_unpin_message(self, monkeypatch, callback_query):
+        if callback_query.inline_message_id:
+            pytest.skip("Can't unpin inline messages")
+
+        def make_assertion(*args, **kwargs):
+            _id = callback_query.message.chat_id
+            try:
+                return kwargs['chat_id'] == _id
+            except KeyError:
+                return args[0] == _id
+
+        monkeypatch.setattr(callback_query.bot, 'unpin_chat_message', make_assertion)
+        assert callback_query.unpin_message()
+
     def test_equality(self):
         a = CallbackQuery(self.id_, self.from_user, 'chat')
         b = CallbackQuery(self.id_, self.from_user, 'chat')
