@@ -174,6 +174,18 @@ class TestDispatcher:
 
         assert self.count == 1
 
+    def test_default_run_async(self, run_async_bot, dp):
+        def test_callback(*args, **kwargs):
+            return "running asynchronously"
+
+        if run_async_bot.defaults.run_async:
+            result = dp.run_async(test_callback)
+        else:
+            result = None
+
+        assert run_async_bot.defaults.run_async
+        assert result is not None
+
     def test_run_async_multiple(self, bot, dp, dp2):
         def get_dispatcher_name(q):
             q.put(current_thread().name)
