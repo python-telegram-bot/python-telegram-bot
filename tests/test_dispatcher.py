@@ -174,17 +174,14 @@ class TestDispatcher:
 
         assert self.count == 1
 
-    def test_default_run_async(self, run_async_bot, dp):
+    def test_default_run_async(self, monkeypatch, dp):
         def test_callback(*args, **kwargs):
-            return "running asynchronously"
+            self.received = "running async"
 
-        if run_async_bot.defaults.run_async:
-            result = dp.run_async(test_callback)
-        else:
-            result = None
-
-        assert run_async_bot.defaults.run_async
-        assert result is not None
+        dp.add_handler(MessageHandler(Filters.all, test_callback))
+        monkeypatch.setattr(dp, 'run_async', test_callback)
+        dp.process_update(self.message_update)
+        assert self.received == "running async"
 
     def test_run_async_multiple(self, bot, dp, dp2):
         def get_dispatcher_name(q):
