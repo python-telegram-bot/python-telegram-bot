@@ -191,7 +191,7 @@ class ConversationHandler(Handler):
         persistent: bool = False,
         map_to_parent: Dict[object, object] = None,
     ):
-        self.run_async: bool = False
+        self.run_async = False
 
         self._entry_points = entry_points
         self._states = states

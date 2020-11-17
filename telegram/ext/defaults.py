@@ -44,7 +44,7 @@ class Defaults:
         tzinfo (:obj:`tzinfo`): A timezone to be used for all date(time) objects appearing
             throughout PTB.
         run_async (:obj:`bool`): Optional. Default setting for the ``run_async`` parameter of
-            handlers registered through :meth:`Dispatcher.add_handler`.
+            handlers and error handlers registered through :meth:`Dispatcher.add_handler`.
 
     Parameters:
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
@@ -64,7 +64,8 @@ class Defaults:
             somewhere, it will be assumed to be in ``tzinfo``. Must be a timezone provided by the
             ``pytz`` module. Defaults to UTC.
         run_async (:obj:`bool`, optional): Default setting for the ``run_async`` parameter of
-            handlers registered through :meth:`Dispatcher.add_handler`. Defaults to :obj:`False`.
+            handlers and error handlers registered through :meth:`Dispatcher.add_handler`.
+            Defaults to :obj:`False`.
     """
 
     def __init__(
@@ -77,7 +78,7 @@ class Defaults:
         timeout: Union[float, DefaultValue] = DEFAULT_NONE,
         quote: bool = None,
         tzinfo: pytz.BaseTzInfo = pytz.utc,
-        run_async: bool = False
+        run_async: bool = False,
     ):
         self._parse_mode = parse_mode
         self._disable_notification = disable_notification
@@ -159,8 +160,10 @@ class Defaults:
 
     @run_async.setter
     def run_async(self, value: Any) -> NoReturn:
-        raise AttributeError("You can not assign a new value to defaults after because it would "
-                             "not have any effect.")
+        raise AttributeError(
+            "You can not assign a new value to defaults after because it would "
+            "not have any effect."
+        )
 
     def __hash__(self) -> int:
         return hash(
