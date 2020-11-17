@@ -1383,7 +1383,9 @@ class TestBot:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_copy_message(self, monkeypatch, bot, chat_id, media_message):
-        keyboard = [[InlineKeyboardButton(text="test", callback_data="test2")]]
+        keyboard = InlineKeyboardMarkup(
+            [[InlineKeyboardButton(text="test", callback_data="test2")]]
+        )
 
         def post(url, data, timeout):
             assert data["chat_id"] == chat_id
@@ -1405,3 +1407,65 @@ class TestBot:
             reply_to_message_id=media_message.message_id,
             reply_markup=keyboard,
         )
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_copy_message_without_reply(self, bot, chat_id, media_message):
+        keyboard = InlineKeyboardMarkup(
+            [[InlineKeyboardButton(text="test", callback_data="test2")]]
+        )
+
+        returned = bot.copy_message(
+            chat_id,
+            from_chat_id=chat_id,
+            message_id=media_message.message_id,
+            caption="<b>Test</b>",
+            parse_mode=ParseMode.HTML,
+            reply_to_message_id=media_message.message_id,
+            reply_markup=keyboard,
+        )
+        # we send a temp message which replies to the returned message id in order to get a
+        # message object
+        temp_message = bot.send_message(chat_id, "test", reply_to_message_id=returned.message_id)
+        message = temp_message.reply_to_message
+        assert message.chat_id == int(chat_id)
+        assert message.caption == "Test"
+        assert len(message.caption_entities) == 1
+        assert message.reply_markup == keyboard
+
+    """#TODO: Add to test
+        ({'allow_sending_without_reply': True}, None),
+        ({'allow_sending_without_reply': False}, None),
+        ({'allow_sending_without_reply': False}, True),
+    """
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize(
+        'default_bot,custom',
+        [
+            ({'parse_mode': ParseMode.HTML}, None),
+            ({'parse_mode': False}, None),
+            ({'parse_mode': False}, True),
+        ],
+        indirect=['default_bot'],
+    )
+    def test_copy_message_with_default(self, default_bot, chat_id, media_message, custom):
+        returned = default_bot.copy_message(
+            chat_id,
+            from_chat_id=chat_id,
+            message_id=media_message.message_id,
+            caption="<b>Test</b>",
+        )
+        # we send a temp message which replies to the returned message id in order to get a
+        # message object
+        temp_message = default_bot.send_message(
+            chat_id, "test", reply_to_message_id=returned.message_id
+        )
+        message = temp_message.reply_to_message
+        if custom is not None:
+            assert len(message.caption_entities) == 0
+        elif default_bot.defaults.parse_mode:
+            assert len(message.caption_entities) == 1
+        else:
+            assert len(message.caption_entities) == 0

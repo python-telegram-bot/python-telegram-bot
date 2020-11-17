@@ -27,7 +27,7 @@ from telegram.utils.types import JSONDict
 from .chatpermissions import ChatPermissions
 
 if TYPE_CHECKING:
-    from telegram import Bot, ChatMember, Message
+    from telegram import Bot, ChatMember, Message, MessageId
 
 
 class Chat(TelegramObject):
@@ -477,3 +477,25 @@ class Chat(TelegramObject):
 
         """
         return self.bot.send_poll(self.id, *args, **kwargs)
+
+    def send_copy(self, *args: Any, **kwargs: Any) -> 'MessageId':
+        """Shortcut for::
+
+            bot.copy_message(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.copy_message(chat_id=self.id, *args, **kwargs)
+
+    def copy_message(self, *args: Any, **kwargs: Any) -> 'MessageId':
+        """Shortcut for::
+
+            bot.copy_message(from_chat_id=update.effective_chat.id, *args, **kwargs)
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.copy_message(from_chat_id=self.id, *args, **kwargs)

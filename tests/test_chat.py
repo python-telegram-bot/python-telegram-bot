@@ -302,6 +302,24 @@ class TestChat:
         monkeypatch.setattr(chat.bot, 'send_poll', test)
         assert chat.send_poll('test_poll')
 
+    def test_instance_method_send_copy(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            assert args[0] == 'test_copy'
+            assert kwargs['chat_id'] == chat.id
+            return args
+
+        monkeypatch.setattr(chat.bot, 'copy_message', test)
+        assert chat.send_copy('test_copy')
+
+    def test_instance_method_copy_message(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            assert args[0] == 'test_copy'
+            assert kwargs['from_chat_id'] == chat.id
+            return args
+
+        monkeypatch.setattr(chat.bot, 'copy_message', test)
+        assert chat.copy_message('test_copy')
+
     def test_equality(self):
         a = Chat(self.id_, self.title, self.type_)
         b = Chat(self.id_, self.title, self.type_)

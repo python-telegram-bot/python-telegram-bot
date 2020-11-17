@@ -224,7 +224,8 @@ PARSEMODE_HTML: str = 'HTML'
 
 POLL_REGULAR: str = 'regular'
 POLL_QUIZ: str = 'quiz'
-POLL_QUESTION_LENGTH: int = 300
+MAX_POLL_QUESTION_LENGTH: int = 300
+MAX_POLL_OPTION_LENGTH: int = 100
 
 STICKER_FOREHEAD: str = 'forehead'
 STICKER_EYES: str = 'eyes'

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=R0903
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2020
@@ -17,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a type of a Telegram Poll."""
+"""This module contains an object that represents an instance of a Telegram MessageId."""
 from typing import Any
 
 from telegram import TelegramObject

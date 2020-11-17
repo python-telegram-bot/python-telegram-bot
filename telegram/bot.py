@@ -96,7 +96,7 @@ from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import InvalidToken, TelegramError
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue, to_timestamp
 from telegram.utils.request import Request
-from telegram.utils.types import FileLike, JSONDict, SLT
+from telegram.utils.types import FileLike, JSONDict
 
 if TYPE_CHECKING:
     from telegram.ext import Defaults
@@ -4381,7 +4381,7 @@ class Bot(TelegramObject):
         message_id: Union[str, int],
         caption: str = None,
         parse_mode: str = None,
-        caption_entities: SLT[MessageEntity] = None,
+        caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
         disable_notification: bool = False,
         reply_to_message_id: Union[int, str] = None,
         allow_sending_without_reply: bool = False,

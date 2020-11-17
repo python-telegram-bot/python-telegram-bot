@@ -26,7 +26,7 @@ from telegram.utils.helpers import mention_html as util_mention_html
 from telegram.utils.helpers import mention_markdown as util_mention_markdown
 
 if TYPE_CHECKING:
-    from telegram import Bot, Message, UserProfilePhotos
+    from telegram import Bot, Message, UserProfilePhotos, MessageId
 
 
 class User(TelegramObject):
@@ -389,3 +389,25 @@ class User(TelegramObject):
 
         """
         return self.bot.send_poll(self.id, *args, **kwargs)
+
+    def send_copy(self, *args: Any, **kwargs: Any) -> 'MessageId':
+        """Shortcut for::
+
+            bot.copy_message(chat_id=update.effective_user.id, *args, **kwargs)
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.copy_message(chat_id=self.id, *args, **kwargs)
+
+    def copy_message(self, *args: Any, **kwargs: Any) -> 'MessageId':
+        """Shortcut for::
+
+            bot.copy_message(from_chat_id=update.effective_user.id, *args, **kwargs)
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.copy_message(from_chat_id=self.id, *args, **kwargs)

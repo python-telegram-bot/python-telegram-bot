@@ -24,7 +24,7 @@ from telegram import Message, TelegramObject, User
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
-    from telegram import Bot, GameHighScore, InlineKeyboardMarkup
+    from telegram import Bot, GameHighScore, InlineKeyboardMarkup, MessageId
 
 
 class CallbackQuery(TelegramObject):
@@ -325,3 +325,19 @@ class CallbackQuery(TelegramObject):
 
         """
         return self.message.delete(*args, **kwargs)
+
+    def copy(self, chat_id: int, *args: Any, **kwargs: Any) -> 'MessageId':
+        """Shortcut for::
+
+            update.callback_query.message.copy(
+                chat_id,
+                from_chat_id=update.message.chat_id,
+                message_id=update.message.message_id,
+                *args,
+                **kwargs)
+
+        Returns:
+            :class:`telegram.MessageId`: On success, returns the MessageId of the sent message.
+
+        """
+        return self.message.copy(chat_id, *args, **kwargs)
