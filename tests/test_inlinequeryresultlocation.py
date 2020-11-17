@@ -41,6 +41,9 @@ def inline_query_result_location():
         thumb_height=TestInlineQueryResultLocation.thumb_height,
         input_message_content=TestInlineQueryResultLocation.input_message_content,
         reply_markup=TestInlineQueryResultLocation.reply_markup,
+        horizontal_accuracy=TestInlineQueryResultLocation.horizontal_accuracy,
+        heading=TestInlineQueryResultLocation.heading,
+        proximity_alert_radius=TestInlineQueryResultLocation.proximity_alert_radius,
     )
 
 
@@ -50,7 +53,10 @@ class TestInlineQueryResultLocation:
     latitude = 0.0
     longitude = 1.0
     title = 'title'
+    horizontal_accuracy = 999
     live_period = 70
+    heading = 90
+    proximity_alert_radius = 1000
     thumb_url = 'thumb url'
     thumb_width = 10
     thumb_height = 15
@@ -72,6 +78,9 @@ class TestInlineQueryResultLocation:
             == self.input_message_content.to_dict()
         )
         assert inline_query_result_location.reply_markup.to_dict() == self.reply_markup.to_dict()
+        assert inline_query_result_location.heading == self.heading
+        assert inline_query_result_location.horizontal_accuracy == self.horizontal_accuracy
+        assert inline_query_result_location.proximity_alert_radius == self.proximity_alert_radius
 
     def test_to_dict(self, inline_query_result_location):
         inline_query_result_location_dict = inline_query_result_location.to_dict()
@@ -110,6 +119,15 @@ class TestInlineQueryResultLocation:
         assert (
             inline_query_result_location_dict['reply_markup']
             == inline_query_result_location.reply_markup.to_dict()
+        )
+        assert (
+            inline_query_result_location_dict['horizontal_accuracy']
+            == inline_query_result_location.horizontal_accuracy
+        )
+        assert inline_query_result_location_dict['heading'] == inline_query_result_location.heading
+        assert (
+            inline_query_result_location_dict['proximity_alert_radius']
+            == inline_query_result_location.proximity_alert_radius
         )
 
     def test_equality(self):

@@ -1366,6 +1366,9 @@ class Bot(TelegramObject):
         location: Location = None,
         live_period: int = None,
         api_kwargs: JSONDict = None,
+        horizontal_accuracy: float = None,
+        heading: int = None,
+        proximity_alert_radius: int = None,
         allow_sending_without_reply: bool = None,
     ) -> Optional[Message]:
         """Use this method to send point on the map.
@@ -1379,8 +1382,15 @@ class Bot(TelegramObject):
             latitude (:obj:`float`, optional): Latitude of location.
             longitude (:obj:`float`, optional): Longitude of location.
             location (:class:`telegram.Location`, optional): The location to send.
+            horizontal_accuracy (:obj:`int`, optional): The radius of uncertainty for the location,
+                measured in meters; 0-1500.
             live_period (:obj:`int`, optional): Period in seconds for which the location will be
                 updated, should be between 60 and 86400.
+            heading (:obj:`int`, optional): For live locations, a direction in which the user is
+                moving, in degrees. Must be between 1 and 360 if specified.
+            proximity_alert_radius (:obj:`int`, optional): For live locations, a maximum distance
+                for proximity alerts about approaching another chat member, in meters. Must be
+                between 1 and 100000 if specified.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
@@ -1421,6 +1431,12 @@ class Bot(TelegramObject):
 
         if live_period:
             data['live_period'] = live_period
+        if horizontal_accuracy:
+            data['horizontal_accuracy'] = horizontal_accuracy
+        if heading:
+            data['heading'] = heading
+        if proximity_alert_radius:
+            data['proximity_alert_radius'] = proximity_alert_radius
 
         return self._message(  # type: ignore[return-value]
             'sendLocation',
@@ -1445,6 +1461,9 @@ class Bot(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        horizontal_accuracy: float = None,
+        heading: int = None,
+        proximity_alert_radius: int = None,
     ) -> Union[Optional[Message], bool]:
         """Use this method to edit live location messages sent by the bot or via the bot
         (for inline bots). A location can be edited until its :attr:`live_period` expires or
@@ -1464,6 +1483,13 @@ class Bot(TelegramObject):
             latitude (:obj:`float`, optional): Latitude of location.
             longitude (:obj:`float`, optional): Longitude of location.
             location (:class:`telegram.Location`, optional): The location to send.
+            horizontal_accuracy (:obj:`float`, optional): The radius of uncertainty for the
+                location, measured in meters; 0-1500.
+            heading (:obj:`int`, optional): Direction in which the user is moving, in degrees. Must
+                be between 1 and 360 if specified.
+            proximity_alert_radius (:obj:`int`, optional): Maximum distance for proximity alerts
+                about approaching another chat member, in meters. Must be between 1 and 100000 if
+                specified.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
                 object for a new inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -1473,8 +1499,8 @@ class Bot(TelegramObject):
                 Telegram API.
 
         Returns:
-            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise :obj:`True` is returned.
+            :class:`telegram.Message`: On success, if edited message is not an inline message, the
+            edited message is returned, otherwise :obj:`True` is returned.
         """
         if not (all([latitude, longitude]) or location):
             raise ValueError(
@@ -1497,6 +1523,12 @@ class Bot(TelegramObject):
             data['message_id'] = message_id
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
+        if horizontal_accuracy:
+            data['horizontal_accuracy'] = horizontal_accuracy
+        if heading:
+            data['heading'] = heading
+        if proximity_alert_radius:
+            data['proximity_alert_radius'] = proximity_alert_radius
 
         return self._message(
             'editMessageLiveLocation',
@@ -2144,16 +2176,21 @@ class Bot(TelegramObject):
         user_id: Union[str, int],
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        only_if_banned: bool = None,
     ) -> bool:
         """Use this method to unban a previously kicked user in a supergroup or channel.
 
-        The user will not return to the group automatically, but will be able to join via link,
-        etc. The bot must be an administrator in the group for this to work.
+        The user will *not* return to the group or channel automatically, but will be able to join
+        via link, etc. The bot must be an administrator for this to work. By default, this method
+        guarantees that after the call the user is not a member of the chat, but will be able to
+        join it. So if the user is a member of the chat they will also be *removed* from the chat.
+        If you don't want this, use the parameter :attr:`only_if_banned`.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
             user_id (:obj:`int`): Unique identifier of the target user.
+            only_if_banned (:obj:`bool`, optional): Do nothing if the user is not banned.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -2168,6 +2205,9 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {'chat_id': chat_id, 'user_id': user_id}
+
+        if only_if_banned is not None:
+            data['only_if_banned'] = only_if_banned
 
         result = self._post('unbanChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
 
@@ -2250,8 +2290,7 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
     ) -> Union[Optional[Message], bool]:
         """
-        Use this method to edit text and game messages sent by the bot or via the bot (for inline
-        bots).
+        Use this method to edit text and game messages.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
@@ -2276,8 +2315,8 @@ class Bot(TelegramObject):
                 Telegram API.
 
         Returns:
-            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise :obj:`True` is returned.
+            :class:`telegram.Message`: On success, if edited message is not an inline message, the
+            edited message is returned, otherwise :obj:`True` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2317,8 +2356,7 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
     ) -> Union[Message, bool]:
         """
-        Use this method to edit captions of messages sent by the bot or via the bot
-        (for inline bots).
+        Use this method to edit captions of messages.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
@@ -2342,8 +2380,8 @@ class Bot(TelegramObject):
                 Telegram API.
 
         Returns:
-            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise :obj:`True` is returned.
+            :class:`telegram.Message`: On success, if edited message is not an inline message, the
+            edited message is returned, otherwise :obj:`True` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2388,10 +2426,11 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
     ) -> Union[Message, bool]:
         """
-        Use this method to edit animation, audio, document, photo, or video messages. If a
-        message is a part of a message album, then it can be edited only to a photo or a video.
-        Otherwise, message type can be changed arbitrarily. When inline message is edited,
-        new file can't be uploaded. Use previously uploaded file via its file_id or specify a URL.
+        Use this method to edit animation, audio, document, photo, or video messages. If a message
+        is part of a message album, then it can be edited only to an audio for audio albums, only
+        to a document for document albums and to a photo or a video otherwise. When an inline
+        message is edited, a new file can't be uploaded. Use a previously uploaded file via its
+        ``file_id`` or specify a URL.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
@@ -2473,8 +2512,8 @@ class Bot(TelegramObject):
                 Telegram API.
 
         Returns:
-            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise :obj:`True` is returned.
+            :class:`telegram.Message`: On success, if edited message is not an inline message, the
+            edited message is returned, otherwise :obj:`True` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2592,6 +2631,8 @@ class Bot(TelegramObject):
         max_connections: int = 40,
         allowed_updates: List[str] = None,
         api_kwargs: JSONDict = None,
+        ip_address: str = None,
+        drop_pending_updates: bool = None,
     ) -> bool:
         """
         Use this method to specify a url and receive incoming updates via an outgoing webhook.
@@ -2612,6 +2653,8 @@ class Bot(TelegramObject):
             certificate (:obj:`filelike`): Upload your public key certificate so that the root
                 certificate in use can be checked. See our self-signed guide for details.
                 (https://goo.gl/rw7w6Y)
+            ip_address (:obj:`str`, optional): The fixed IP address which will be used to send
+                webhook requests instead of the IP address resolved through DNS.
             max_connections (:obj:`int`, optional): Maximum allowed number of simultaneous HTTPS
                 connections to the webhook for update delivery, 1-100. Defaults to 40. Use lower
                 values to limit the load on your bot's server, and higher values to increase your
@@ -2624,6 +2667,8 @@ class Bot(TelegramObject):
                 specified, the previous setting will be used. Please note that this parameter
                 doesn't affect updates created before the call to the set_webhook, so unwanted
                 updates may be received for a short period of time.
+            drop_pending_updates (:obj:`bool`, optional): Pass :obj:`True` to drop all pending
+                updates.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -2663,18 +2708,26 @@ class Bot(TelegramObject):
             data['max_connections'] = max_connections
         if allowed_updates is not None:
             data['allowed_updates'] = allowed_updates
+        if ip_address:
+            data['ip_address'] = ip_address
+        if drop_pending_updates:
+            data['drop_pending_updates'] = drop_pending_updates
 
         result = self._post('setWebhook', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
     @log
-    def delete_webhook(self, timeout: float = None, api_kwargs: JSONDict = None) -> bool:
+    def delete_webhook(
+        self, timeout: float = None, api_kwargs: JSONDict = None, drop_pending_updates: bool = None
+    ) -> bool:
         """
         Use this method to remove webhook integration if you decide to switch back to
         getUpdates. Requires no parameters.
 
         Args:
+            drop_pending_updates(:obj:`bool`, optional): Pass :obj:`True`: to drop all pending
+                updates.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -2688,7 +2741,12 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        result = self._post('deleteWebhook', None, timeout=timeout, api_kwargs=api_kwargs)
+        data = {}
+
+        if drop_pending_updates:
+            data['drop_pending_updates'] = drop_pending_updates
+
+        result = self._post('deleteWebhook', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -3379,6 +3437,7 @@ class Bot(TelegramObject):
         can_promote_members: bool = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        is_anonymous: bool = None,
     ) -> bool:
         """
         Use this method to promote or demote a user in a supergroup or a channel. The bot must be
@@ -3389,6 +3448,8 @@ class Bot(TelegramObject):
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target supergroup (in the format @supergroupusername).
             user_id (:obj:`int`): Unique identifier of the target user.
+            is_anonymous (:obj:`bool`, optional): Pass :obj:`True`, if the administrator's presence
+                in the chat is hidden.
             can_change_info (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 change chat title, photo and other settings.
             can_post_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
@@ -3422,6 +3483,8 @@ class Bot(TelegramObject):
         """
         data: JSONDict = {'chat_id': chat_id, 'user_id': user_id}
 
+        if is_anonymous is not None:
+            data['is_anonymous'] = is_anonymous
         if can_change_info is not None:
             data['can_change_info'] = can_change_info
         if can_post_messages is not None:
@@ -3703,18 +3766,18 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
     ) -> bool:
         """
-        Use this method to pin a message in a group, a supergroup, or a channel.
-        The bot must be an administrator in the chat for this to work and must have the
-        ‘can_pin_messages’ admin right in the supergroup or ‘can_edit_messages’ admin right
-        in the channel.
+        Use this method to add a message to the list of pinned messages in a chat. If the
+        chat is not a private chat, the bot must be an administrator in the chat for this to work
+        and must have the ``can_pin_messages`` admin right in a supergroup or ``can_edit_messages``
+        admin right in a channel.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
             message_id (:obj:`int`): Identifier of a message to pin.
             disable_notification (:obj:`bool`, optional): Pass :obj:`True`, if it is not necessary
-                to send a notification to all group members about the new pinned message.
-                Notifications are always disabled in channels.
+                to send a notification to all chat members about the new pinned message.
+                Notifications are always disabled in channels and private chats.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -3733,19 +3796,63 @@ class Bot(TelegramObject):
         if disable_notification is not None:
             data['disable_notification'] = disable_notification
 
-        result = self._post('pinChatMessage', data, timeout=timeout, api_kwargs=api_kwargs)
-
-        return result  # type: ignore[return-value]
+        return self._post(  # type: ignore[return-value]
+            'pinChatMessage', data, timeout=timeout, api_kwargs=api_kwargs
+        )
 
     @log
     def unpin_chat_message(
-        self, chat_id: Union[str, int], timeout: float = None, api_kwargs: JSONDict = None
+        self,
+        chat_id: Union[str, int],
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+        message_id: Union[str, int] = None,
     ) -> bool:
         """
-        Use this method to unpin a message in a group, a supergroup, or a channel.
-        The bot must be an administrator in the chat for this to work and must have the
-        ``can_pin_messages`` admin right in the supergroup or ``can_edit_messages`` admin right
-        in the channel.
+        Use this method to remove a message from the list of pinned messages in a chat. If the
+        chat is not a private chat, the bot must be an administrator in the chat for this to work
+        and must have the ``can_pin_messages`` admin right in a supergroup or ``can_edit_messages``
+        admin right in a channel.
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            message_id (:obj:`int`, optional): Identifier of a message to unpin. If not specified,
+                the most recent pinned message (by sending date) will be unpinned.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        data: JSONDict = {'chat_id': chat_id}
+
+        if message_id is not None:
+            data['message_id'] = message_id
+
+        return self._post(  # type: ignore[return-value]
+            'unpinChatMessage', data, timeout=timeout, api_kwargs=api_kwargs
+        )
+
+    @log
+    def unpin_all_chat_messages(
+        self,
+        chat_id: Union[str, int],
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to clear the list of pinned messages in a chat. If the
+        chat is not a private chat, the bot must be an administrator in the chat for this
+        to work and must have the ``can_pin_messages`` admin right in a supergroup or
+        ``can_edit_messages`` admin right in a channel.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -3763,11 +3870,12 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
+
         data: JSONDict = {'chat_id': chat_id}
 
-        result = self._post('unpinChatMessage', data, timeout=timeout, api_kwargs=api_kwargs)
-
-        return result  # type: ignore[return-value]
+        return self._post(  # type: ignore[return-value]
+            'unpinAllChatMessages', data, timeout=timeout, api_kwargs=api_kwargs
+        )
 
     @log
     def get_sticker_set(
@@ -4335,8 +4443,9 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target private chat.
             emoji (:obj:`str`, optional): Emoji on which the dice throw animation is based.
-                Currently, must be one of “🎲”, “🎯” or “🏀”. Dice can have values 1-6 for “🎲” and
-                “🎯”, and values 1-5 for “🏀” . Defaults to “🎲”
+                Currently, must be one of “🎲”, “🎯”, “🏀”, “⚽”, or “🎰”. Dice can have values 1-6
+                for “🎲” and “🎯”, values 1-5 for “🏀” and “⚽”, and values 1-64 for “🎰”. Defaults
+                to “🎲”.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
@@ -4442,6 +4551,41 @@ class Bot(TelegramObject):
         self._commands = cmds
 
         return result  # type: ignore[return-value]
+
+    @log
+    def log_out(self) -> bool:
+        """
+        Use this method to log out from the cloud Bot API server before launching the bot locally.
+        You *must* log out the bot before running it locally, otherwise there is no guarantee that
+        the bot will receive updates. After a successful call, you can immediately log in on a
+        local server, but will not be able to log in back to the cloud Bot API server for 10
+        minutes.
+
+        Returns:
+            :obj:`True`: On success
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        return self._post('logOut')  # type: ignore[return-value]
+
+    @log
+    def close(self) -> bool:
+        """
+        Use this method to close the bot instance before moving it from one local server to
+        another. You need to delete the webhook before calling this method to ensure that the bot
+        isn't launched again after server restart. The method will return error 429 in the first
+        10 minutes after the bot is launched.
+
+        Returns:
+            :obj:`True`: On success
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        return self._post('close')  # type: ignore[return-value]
 
     def to_dict(self) -> JSONDict:
         data: JSONDict = {'id': self.id, 'username': self.username, 'first_name': self.first_name}
@@ -4566,6 +4710,8 @@ class Bot(TelegramObject):
     """Alias for :attr:`pin_chat_message`"""
     unpinChatMessage = unpin_chat_message
     """Alias for :attr:`unpin_chat_message`"""
+    unpinAllChatMessages = unpin_all_chat_messages
+    """Alias for :attr:`unpin_all_chat_messages`"""
     getStickerSet = get_sticker_set
     """Alias for :attr:`get_sticker_set`"""
     uploadStickerFile = upload_sticker_file
@@ -4592,3 +4738,5 @@ class Bot(TelegramObject):
     """Alias for :attr:`get_my_commands`"""
     setMyCommands = set_my_commands
     """Alias for :attr:`set_my_commands`"""
+    logOut = log_out
+    """Alias for :attr:`log_out`"""
