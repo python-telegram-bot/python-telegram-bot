@@ -92,6 +92,7 @@ def tz_bot(timezone, bot_info):
         DEFAULT_BOTS[defaults] = default_bot
         return default_bot
 
+
 @pytest.fixture(scope='function')
 def run_async_bot(bot_info):
     defaults = Defaults(run_async=True)
