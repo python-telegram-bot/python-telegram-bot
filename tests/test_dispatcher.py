@@ -175,6 +175,24 @@ class TestDispatcher:
 
         assert self.count == 1
 
+    def test_default_run_async_error_handler(self, dp, monkeypatch):
+        def mock_async_err_handler(*args, **kwargs):
+            self.count = 5
+
+        # set defaults value to dp.bot
+        dp.bot.defaults = Defaults(run_async=True)
+
+        dp.add_handler(MessageHandler(Filters.all, self.callback_raise_error))
+        dp.add_error_handler(self.error_handler)
+        monkeypatch.setattr(dp, 'run_async', mock_async_err_handler)
+
+        dp.process_update(self.message_update)
+
+        # reset dp.bot.defaults values
+        dp.bot.defaults = None
+
+        assert self.count == 5
+
     def test_default_run_async(self, monkeypatch, dp):
         def mock_run_async(*args, **kwargs):
             self.recived = "running async"
