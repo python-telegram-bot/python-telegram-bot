@@ -34,6 +34,7 @@ from typing import (
 
 from telegram import Update
 from telegram.utils.types import HandlerArg
+from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 from .handler import Handler
 
@@ -130,7 +131,7 @@ class CallbackQueryHandler(Handler):
         pass_groupdict: bool = False,
         pass_user_data: bool = False,
         pass_chat_data: bool = False,
-        run_async: bool = False,
+        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
         super().__init__(
             callback,

@@ -18,9 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the StringCommandHandler class."""
 
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, TypeVar, Union
 
 from telegram.utils.types import HandlerArg
+from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 from .handler import Handler
 
@@ -89,7 +90,7 @@ class StringCommandHandler(Handler):
         pass_args: bool = False,
         pass_update_queue: bool = False,
         pass_job_queue: bool = False,
-        run_async: bool = False,
+        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
         super().__init__(
             callback,
