@@ -27,6 +27,7 @@ from telegram import TelegramError, Message, User, Chat, Update, Bot, MessageEnt
 from telegram.ext import (
     MessageHandler,
     Filters,
+    Defaults,
     CommandHandler,
     CallbackContext,
     JobQueue,
@@ -175,13 +176,20 @@ class TestDispatcher:
         assert self.count == 1
 
     def test_default_run_async(self, monkeypatch, dp):
-        def test_callback(*args, **kwargs):
-            self.received = "running async"
+        def mock_run_async(*args, **kwargs):
+            self.recived = "running async"
 
-        dp.add_handler(MessageHandler(Filters.all, test_callback))
-        monkeypatch.setattr(dp, 'run_async', test_callback)
+        # set defaults value to dp.bot
+        dp.bot.defaults = Defaults(run_async=True)
+
+        dp.add_handler(MessageHandler(Filters.all, lambda u, c: None))
+        monkeypatch.setattr(dp, 'run_async', mock_run_async)
+
         dp.process_update(self.message_update)
-        assert self.received == "running async"
+        # now reset the dp.bot.defaults value.
+        dp.bot.defaults = None
+
+        assert self.recived == "running async"
 
     def test_run_async_multiple(self, bot, dp, dp2):
         def get_dispatcher_name(q):
