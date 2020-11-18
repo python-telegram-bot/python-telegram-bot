@@ -271,7 +271,7 @@ def effective_message_type(entity: Union['Message', 'Update']) -> Optional[str]:
     if isinstance(entity, Message):
         message = entity
     elif isinstance(entity, Update):
-        message = entity.effective_message
+        message = entity.effective_message  # type: ignore[assignment]
     else:
         raise TypeError("entity is not Message or Update (got: {})".format(type(entity)))
 
