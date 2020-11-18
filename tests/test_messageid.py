@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 import pytest
-from telegram import MessageId
+from telegram import MessageId, User
 
 
 @pytest.fixture(scope="class")
@@ -45,9 +45,13 @@ class TestMessageId:
         a = MessageId(message_id=1)
         b = MessageId(message_id=1)
         c = MessageId(message_id=2)
+        d = User(id=1, first_name='name', is_bot=False)
 
         assert a == b
         assert hash(a) == hash(b)
 
         assert a != c
         assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)

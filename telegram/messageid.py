@@ -32,7 +32,7 @@ class MessageId(TelegramObject):
         message_id (:obj:`int`): Unique message identifier
     """
 
-    def __init__(self, message_id: int, **_kwargs: Any):  # pylint: disable=W0622
-        self.message_id = message_id
+    def __init__(self, message_id: int, **_kwargs: Any):
+        self.message_id = int(message_id)
 
         self._id_attrs = (self.message_id,)

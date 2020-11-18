@@ -119,7 +119,8 @@ Attributes:
 Attributes:
     POLL_REGULAR (:obj:`str`): 'regular'
     POLL_QUIZ (:obj:`str`): 'quiz'
-    POLL_QUESTION_LENGTH (:obj:`int`): 300
+    MAX_POLL_QUESTION_LENGTH (:obj:`int`): 300
+    MAX_POLL_OPTION_LENGTH (:obj:`int`): 100
 
 :class:`telegram.files.MaskPosition`:
 

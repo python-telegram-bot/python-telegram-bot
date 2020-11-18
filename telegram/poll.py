@@ -54,7 +54,7 @@ class PollOption(TelegramObject):
 
         self._id_attrs = (self.text, self.voter_count)
 
-    MAX_POLL_OPTION_LENGTH: ClassVar[int] = constants.MAX_POLL_OPTION_LENGTH
+    MAX_LENGTH: ClassVar[int] = constants.MAX_POLL_OPTION_LENGTH
     """:const:`telegram.constants.POLL_QUESTION_LENGTH`"""
 
 
@@ -265,5 +265,7 @@ class Poll(TelegramObject):
     """:const:`telegram.constants.POLL_REGULAR`"""
     QUIZ: ClassVar[str] = constants.POLL_QUIZ
     """:const:`telegram.constants.POLL_QUIZ`"""
-    MAX_POLL_QUESTION_LENGTH: ClassVar[int] = constants.MAX_POLL_QUESTION_LENGTH
+    MAX_QUESTION_LENGTH: ClassVar[int] = constants.MAX_POLL_QUESTION_LENGTH
+    """:const:`telegram.constants.POLL_QUESTION_LENGTH`"""
+    MAX_OPTION_LENGTH: ClassVar[int] = constants.MAX_POLL_OPTION_LENGTH
     """:const:`telegram.constants.POLL_QUESTION_LENGTH`"""
