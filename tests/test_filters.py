@@ -956,11 +956,13 @@ class TestFilters:
 
     def test_filters_user_change_id(self, update):
         f = Filters.user(user_id=1)
+        assert f.user_ids == {1}
         update.message.from_user.id = 1
         assert f(update)
         update.message.from_user.id = 2
         assert not f(update)
         f.user_ids = 2
+        assert f.user_ids == {2}
         assert f(update)
 
         with pytest.raises(RuntimeError, match='username in conjunction'):
@@ -1097,11 +1099,13 @@ class TestFilters:
 
     def test_filters_chat_change_id(self, update):
         f = Filters.chat(chat_id=1)
+        assert f.chat_ids == {1}
         update.message.chat.id = 1
         assert f(update)
         update.message.chat.id = 2
         assert not f(update)
         f.chat_ids = 2
+        assert f.chat_ids == {2}
         assert f(update)
 
         with pytest.raises(RuntimeError, match='username in conjunction'):
@@ -1238,11 +1242,13 @@ class TestFilters:
 
     def test_filters_sender_chat_change_id(self, update):
         f = Filters.sender_chat(chat_id=1)
+        assert f.chat_ids == {1}
         update.message.sender_chat.id = 1
         assert f(update)
         update.message.sender_chat.id = 2
         assert not f(update)
         f.chat_ids = 2
+        assert f.chat_ids == {2}
         assert f(update)
 
         with pytest.raises(RuntimeError, match='username in conjunction'):
@@ -1768,11 +1774,13 @@ class TestFilters:
 
     def test_filters_via_bot_change_id(self, update):
         f = Filters.via_bot(bot_id=3)
+        assert f.bot_ids == {3}
         update.message.via_bot.id = 3
         assert f(update)
         update.message.via_bot.id = 2
         assert not f(update)
         f.bot_ids = 2
+        assert f.bot_ids == {2}
         assert f(update)
 
         with pytest.raises(RuntimeError, match='username in conjunction'):
