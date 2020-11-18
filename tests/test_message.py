@@ -44,6 +44,7 @@ from telegram import (
     ParseMode,
     Poll,
     PollOption,
+    ProximityAlertTriggered,
     Dice,
 )
 from telegram.ext import Defaults
@@ -157,6 +158,12 @@ def message(bot):
         {'quote': True},
         {'dice': Dice(4, '🎲')},
         {'via_bot': User(9, 'A_Bot', True)},
+        {
+            'proximity_alert_triggered': ProximityAlertTriggered(
+                User(1, 'John', False), User(2, 'Doe', False), 42
+            )
+        },
+        {'sender_chat': Chat(-123, 'discussion_channel')},
     ],
     ids=[
         'forwarded_user',
@@ -200,6 +207,8 @@ def message(bot):
         'default_quote',
         'dice',
         'via_bot',
+        'proximity_alert_triggered',
+        'sender_chat',
     ],
 )
 def message_params(bot, request):
@@ -1090,13 +1099,22 @@ class TestMessage:
         assert message.stop_poll()
 
     def test_pin(self, monkeypatch, message):
-        def test(*args, **kwargs):
+        def make_assertion(*args, **kwargs):
             chat_id = kwargs['chat_id'] == message.chat_id
             message_id = kwargs['message_id'] == message.message_id
             return chat_id and message_id
 
-        monkeypatch.setattr(message.bot, 'pin_chat_message', test)
+        monkeypatch.setattr(message.bot, 'pin_chat_message', make_assertion)
         assert message.pin()
+
+    def test_unpin(self, monkeypatch, message):
+        def make_assertion(*args, **kwargs):
+            chat_id = kwargs['chat_id'] == message.chat_id
+            message_id = kwargs['message_id'] == message.message_id
+            return chat_id and message_id
+
+        monkeypatch.setattr(message.bot, 'unpin_chat_message', make_assertion)
+        assert message.unpin()
 
     def test_default_quote(self, message):
         message.bot.defaults = Defaults()
