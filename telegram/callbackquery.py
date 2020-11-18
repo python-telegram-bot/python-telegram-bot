@@ -354,7 +354,7 @@ class CallbackQuery(TelegramObject):
         """
         return self.message.unpin(*args, **kwargs)
 
-    def copy(self, chat_id: int, *args: Any, **kwargs: Any) -> 'MessageId':
+    def copy_message(self, chat_id: int, *args: Any, **kwargs: Any) -> 'MessageId':
         """Shortcut for::
 
             update.callback_query.message.copy(

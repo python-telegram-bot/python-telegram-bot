@@ -1588,7 +1588,7 @@ class TestBot:
             assert data["caption"] == "<b>Test</b>"
             assert data["parse_mode"] == ParseMode.HTML
             assert data["reply_to_message_id"] == media_message.message_id
-            assert data["reply_markup"] == keyboard
+            assert data["reply_markup"] == keyboard.to_dict()
             return data
 
         monkeypatch.setattr(bot.request, 'post', post)
