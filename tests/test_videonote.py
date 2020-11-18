@@ -22,6 +22,7 @@ import pytest
 from flaky import flaky
 
 from telegram import VideoNote, TelegramError, Voice, PhotoSize
+from telegram.error import BadRequest
 
 
 @pytest.fixture(scope='function')
@@ -148,6 +149,41 @@ class TestVideoNote:
         assert video_note_dict['length'] == video_note.length
         assert video_note_dict['duration'] == video_note.duration
         assert video_note_dict['file_size'] == video_note.file_size
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize(
+        'default_bot,custom',
+        [
+            ({'allow_sending_without_reply': True}, None),
+            ({'allow_sending_without_reply': False}, None),
+            ({'allow_sending_without_reply': False}, True),
+        ],
+        indirect=['default_bot'],
+    )
+    def test_send_video_note_default_allow_sending_without_reply(
+        self, default_bot, chat_id, video_note, custom
+    ):
+        reply_to_message = default_bot.send_message(chat_id, 'test')
+        reply_to_message.delete()
+        if custom is not None:
+            message = default_bot.send_video_note(
+                chat_id,
+                video_note,
+                allow_sending_without_reply=custom,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert message.reply_to_message is None
+        elif default_bot.defaults.allow_sending_without_reply:
+            message = default_bot.send_video_note(
+                chat_id, video_note, reply_to_message_id=reply_to_message.message_id
+            )
+            assert message.reply_to_message is None
+        else:
+            with pytest.raises(BadRequest, match='message not found'):
+                default_bot.send_video_note(
+                    chat_id, video_note, reply_to_message_id=reply_to_message.message_id
+                )
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
