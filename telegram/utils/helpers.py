@@ -34,7 +34,7 @@ import pytz  # pylint: disable=E0401
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
-    from telegram import MessageEntity
+    from telegram import Message, Update
 
 try:
     import ujson as json
@@ -252,7 +252,7 @@ def mention_markdown(user_id: Union[int, str], name: str, version: int = 1) -> s
     return u'[{}](tg://user?id={})'.format(escape_markdown(name, version=version), user_id)
 
 
-def effective_message_type(entity: 'MessageEntity') -> Optional[str]:
+def effective_message_type(entity: Union['Message', 'Update']) -> Optional[str]:
     """
     Extracts the type of message as a string identifier from a :class:`telegram.Message` or a
     :class:`telegram.Update`.
