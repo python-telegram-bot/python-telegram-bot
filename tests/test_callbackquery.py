@@ -262,7 +262,7 @@ class TestCallbackQuery:
             return id_ and message and chat_id
 
         monkeypatch.setattr(callback_query.bot, 'copy_message', make_assertion)
-        assert callback_query.copy(1)
+        assert callback_query.copy_message(1)
 
     def test_equality(self):
         a = CallbackQuery(self.id_, self.from_user, 'chat')
