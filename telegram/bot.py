@@ -69,6 +69,8 @@ from telegram import (
     Location,
     MaskPosition,
     Message,
+    MessageEntity,
+    MessageId,
     PassportElementError,
     PhotoSize,
     Poll,
@@ -4587,6 +4589,89 @@ class Bot(TelegramObject):
         """
         return self._post('close')  # type: ignore[return-value]
 
+    @log
+    def copy_message(
+        self,
+        chat_id: Union[int, str],
+        from_chat_id: Union[str, int],
+        message_id: Union[str, int],
+        caption: str = None,
+        parse_mode: str = None,
+        caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
+        disable_notification: bool = False,
+        reply_to_message_id: Union[int, str] = None,
+        allow_sending_without_reply: bool = False,
+        reply_markup: ReplyMarkup = None,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+    ) -> Optional[MessageId]:
+        """
+        Use this method to copy messages of any kind. The method is analogous to the method
+        forwardMessages, but the copied message doesn't have a link to the original message.
+        Returns the MessageId of the sent message on success.
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            from_chat_id (:obj:`int` | :obj:`str`): Unique identifier for the chat where the
+                original message was sent (or channel username in the format @channelusername).
+            message_id (:obj:`int`): Message identifier in the chat specified in from_chat_id.
+            caption (:obj:`str`, optional): New caption for media, 0-1024 characters after
+                entities parsing. If not specified, the original caption is kept.
+            parse_mode (:obj:`str`, optional): Mode for parsing entities in the new caption. See
+                the constants in :class:`telegram.ParseMode` for the available modes.
+            caption_entities (:class:`telegram.utils.types.SLT[MessageEntity]`): List of special
+                entities that appear in the new caption, which can be specified instead of
+                parse_mode
+            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
+                receive a notification with no sound.
+            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
+                original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
+                A JSON-serialized object for an inline keyboard, custom reply keyboard,
+                instructions to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :class:`telegram.MessageId`: On success
+
+        Raises:
+            :class:`telegram.TelegramError`
+        """
+        data: JSONDict = {
+            'chat_id': chat_id,
+            'from_chat_id': from_chat_id,
+            'message_id': message_id,
+        }
+        if caption:
+            data['caption'] = caption
+        if parse_mode:
+            data['parse_mode'] = parse_mode
+        if caption_entities:
+            data['caption_entities'] = caption_entities
+        if disable_notification:
+            data['disable_notification'] = disable_notification
+        if reply_to_message_id:
+            data['reply_to_message_id'] = reply_to_message_id
+        if allow_sending_without_reply:
+            data['allow_sending_without_reply'] = allow_sending_without_reply
+        if reply_markup:
+            if isinstance(reply_markup, ReplyMarkup):
+                # We need to_json() instead of to_dict() here, because reply_markups may be
+                # attached to media messages, which aren't json dumped by utils.request
+                data['reply_markup'] = reply_markup.to_json()
+            else:
+                data['reply_markup'] = reply_markup
+
+        result = self._post('copyMessage', data, timeout=timeout, api_kwargs=api_kwargs)
+        return MessageId.de_json(result, self)  # type: ignore
+
     def to_dict(self) -> JSONDict:
         data: JSONDict = {'id': self.id, 'username': self.username, 'first_name': self.first_name}
 
@@ -4740,3 +4825,5 @@ class Bot(TelegramObject):
     """Alias for :attr:`set_my_commands`"""
     logOut = log_out
     """Alias for :attr:`log_out`"""
+    copyMessage = copy_message
+    """Alias for :attr:`copy_message`"""

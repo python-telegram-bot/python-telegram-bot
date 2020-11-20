@@ -1573,3 +1573,105 @@ class TestBot:
         monkeypatch.setattr(bot.request, 'post', assertion)
 
         assert bot.close()
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_copy_message(self, monkeypatch, bot, chat_id, media_message):
+        keyboard = InlineKeyboardMarkup(
+            [[InlineKeyboardButton(text="test", callback_data="test2")]]
+        )
+
+        def post(url, data, timeout):
+            assert data["chat_id"] == chat_id
+            assert data["from_chat_id"] == chat_id
+            assert data["message_id"] == media_message.message_id
+            assert data["caption"] == "<b>Test</b>"
+            assert data["parse_mode"] == ParseMode.HTML
+            assert data["reply_to_message_id"] == media_message.message_id
+            assert data["reply_markup"] == keyboard.to_json()
+            return data
+
+        monkeypatch.setattr(bot.request, 'post', post)
+        bot.copy_message(
+            chat_id,
+            from_chat_id=chat_id,
+            message_id=media_message.message_id,
+            caption="<b>Test</b>",
+            parse_mode=ParseMode.HTML,
+            reply_to_message_id=media_message.message_id,
+            reply_markup=keyboard,
+        )
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_copy_message_without_reply(self, bot, chat_id, media_message):
+        keyboard = InlineKeyboardMarkup(
+            [[InlineKeyboardButton(text="test", callback_data="test2")]]
+        )
+
+        returned = bot.copy_message(
+            chat_id,
+            from_chat_id=chat_id,
+            message_id=media_message.message_id,
+            caption="<b>Test</b>",
+            parse_mode=ParseMode.HTML,
+            reply_to_message_id=media_message.message_id,
+            reply_markup=keyboard,
+        )
+        # we send a temp message which replies to the returned message id in order to get a
+        # message object
+        temp_message = bot.send_message(chat_id, "test", reply_to_message_id=returned.message_id)
+        message = temp_message.reply_to_message
+        assert message.chat_id == int(chat_id)
+        assert message.caption == "Test"
+        assert len(message.caption_entities) == 1
+        assert message.reply_markup == keyboard
+
+    """#TODO: Add to test
+        ({'allow_sending_without_reply': True}, None),
+        ({'allow_sending_without_reply': False}, None),
+        ({'allow_sending_without_reply': False}, True),
+    """
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize(
+        'default_bot',
+        [
+            ({'parse_mode': ParseMode.HTML, 'allow_sending_without_reply': True}),
+            ({'parse_mode': False, 'allow_sending_without_reply': True}),
+            ({'parse_mode': False, 'allow_sending_without_reply': False}),
+        ],
+        indirect=['default_bot'],
+    )
+    def test_copy_message_with_default(self, default_bot, chat_id, media_message):
+        reply_to_message = default_bot.send_message(chat_id, 'test')
+        reply_to_message.delete()
+        if not default_bot.defaults.allow_sending_without_reply:
+            with pytest.raises(BadRequest, match='Reply message not found'):
+                default_bot.copy_message(
+                    chat_id,
+                    from_chat_id=chat_id,
+                    message_id=media_message.message_id,
+                    caption="<b>Test</b>",
+                    reply_to_message_id=reply_to_message.message_id,
+                )
+            return
+        else:
+            returned = default_bot.copy_message(
+                chat_id,
+                from_chat_id=chat_id,
+                message_id=media_message.message_id,
+                caption="<b>Test</b>",
+                reply_to_message_id=reply_to_message.message_id,
+            )
+        # we send a temp message which replies to the returned message id in order to get a
+        # message object
+        temp_message = default_bot.send_message(
+            chat_id, "test", reply_to_message_id=returned.message_id
+        )
+        message = temp_message.reply_to_message
+        if default_bot.defaults.parse_mode:
+            assert len(message.caption_entities) == 1
+        else:
+            assert len(message.caption_entities) == 0

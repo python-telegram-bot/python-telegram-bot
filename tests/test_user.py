@@ -281,6 +281,24 @@ class TestUser:
         monkeypatch.setattr(user.bot, 'send_poll', test)
         assert user.send_poll('test_poll')
 
+    def test_instance_method_send_copy(self, monkeypatch, user):
+        def test(*args, **kwargs):
+            assert args[0] == 'test_copy'
+            assert kwargs['chat_id'] == user.id
+            return args
+
+        monkeypatch.setattr(user.bot, 'copy_message', test)
+        assert user.send_copy('test_copy')
+
+    def test_instance_method_copy_message(self, monkeypatch, user):
+        def test(*args, **kwargs):
+            assert args[0] == 'test_copy'
+            assert kwargs['from_chat_id'] == user.id
+            return args
+
+        monkeypatch.setattr(user.bot, 'copy_message', test)
+        assert user.copy_message('test_copy')
+
     def test_mention_html(self, user):
         expected = u'<a href="tg://user?id={}">{}</a>'
 

@@ -53,7 +53,7 @@ from telegram.utils.helpers import escape_markdown, from_timestamp, to_timestamp
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
-    from telegram import Bot, GameHighScore, InputMedia
+    from telegram import Bot, GameHighScore, InputMedia, MessageId
 
 _UNDEFINED = object()
 
@@ -946,6 +946,42 @@ class Message(TelegramObject):
         """
         return self.bot.forward_message(
             chat_id=chat_id, from_chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs
+        )
+
+    def copy(self, chat_id: int, *args: Any, **kwargs: Any) -> 'MessageId':
+        """Shortcut for::
+
+            bot.copy_message(chat_id=chat_id,
+                             from_chat_id=update.message.chat_id,
+                             message_id=update.message.message_id,
+                             *args,
+                             **kwargs)
+
+        Returns:
+            :class:`telegram.MessageId`: On success, returns the MessageId of the sent message.
+
+        """
+        return self.bot.copy_message(
+            chat_id=chat_id, from_chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs
+        )
+
+    def reply_copy(
+        self, from_chat_id: int, message_id: int, *args: Any, **kwargs: Any
+    ) -> 'MessageId':
+        """Shortcut for::
+
+            bot.copy_message(chat_id=message.chat.id,
+                             from_chat_id=from_chat_id,
+                             message_id=message_id,
+                             *args,
+                             **kwargs)
+
+        Returns:
+            :class:`telegram.MessageId`: On success, returns the MessageId of the sent message.
+
+        """
+        return self.bot.copy_message(
+            chat_id=self.chat_id, from_chat_id=from_chat_id, message_id=message_id, *args, **kwargs
         )
 
     def edit_text(self, *args: Any, **kwargs: Any) -> Union['Message', bool]:
