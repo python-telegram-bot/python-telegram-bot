@@ -143,7 +143,7 @@ class BasePersistence(ABC):
         return cls._replace_bot(obj, {})
 
     @classmethod
-    def _replace_bot(cls, obj: object, memo: Dict[id, Any]) -> object:  # pylint: disable=R0911
+    def _replace_bot(cls, obj: object, memo: Dict[int, Any]) -> object:  # pylint: disable=R0911
         obj_id = id(obj)
         if obj_id in memo:
             return memo[obj_id]
@@ -151,18 +151,18 @@ class BasePersistence(ABC):
         if isinstance(obj, Bot):
             memo[obj_id] = cls.REPLACED_BOT
             return cls.REPLACED_BOT
-        if isinstance(obj, (list, set, frozenset)):
+        if isinstance(obj, (list, set)):
             # We copy the iterable here for thread safety, i.e. make sure the object we iterate
             # over doesn't change its length during the iteration
             temp_iterable = obj.copy()
-            new_obj = obj.__class__(cls._replace_bot(item, memo) for item in temp_iterable)
-            memo[obj_id] = new_obj
-            return new_obj
-        if isinstance(obj, tuple):
-            # tuples are immutable so we don't need to worry about thread safety
-            new_obj = tuple(cls._replace_bot(item, memo) for item in obj)
-            memo[obj_id] = new_obj
-            return new_obj
+            new_iterable = obj.__class__(cls._replace_bot(item, memo) for item in temp_iterable)
+            memo[obj_id] = new_iterable
+            return new_iterable
+        if isinstance(obj, (tuple, frozenset)):
+            # tuples and frozensets are immutable so we don't need to worry about thread safety
+            new_immutable = obj.__class__(cls._replace_bot(item, memo) for item in obj)
+            memo[obj_id] = new_immutable
+            return new_immutable
 
         try:
             new_obj = copy(obj)
@@ -231,18 +231,18 @@ class BasePersistence(ABC):
         if isinstance(obj, str) and obj == self.REPLACED_BOT:
             memo[obj_id] = self.bot
             return self.bot
-        if isinstance(obj, (list, set, frozenset)):
+        if isinstance(obj, (list, set)):
             # We copy the iterable here for thread safety, i.e. make sure the object we iterate
             # over doesn't change its length during the iteration
             temp_iterable = obj.copy()
-            new_obj = obj.__class__(self._insert_bot(item, memo) for item in temp_iterable)
-            memo[obj_id] = new_obj
-            return new_obj
-        if isinstance(obj, tuple):
-            # tuples are immutable so we don't need to worry about thread safety
-            new_obj = tuple(self._insert_bot(item, memo) for item in obj)
-            memo[obj_id] = new_obj
-            return new_obj
+            new_iterable = obj.__class__(self._insert_bot(item, memo) for item in temp_iterable)
+            memo[obj_id] = new_iterable
+            return new_iterable
+        if isinstance(obj, (tuple, frozenset)):
+            # tuples and frozensets are immutable so we don't need to worry about thread safety
+            new_immutable = obj.__class__(self._insert_bot(item, memo) for item in obj)
+            memo[obj_id] = new_immutable
+            return new_immutable
 
         try:
             new_obj = copy(obj)
