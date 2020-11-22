@@ -101,8 +101,8 @@ class DelayQueue(threading.Thread):
         self.parent = parent
         self.dispatcher: Optional['Dispatcher'] = None
 
-        if not (bool(exc_route) ^ bool(error_handler)):  # pylint: disable=C0325
-            raise RuntimeError('Only one of exc_route or error_handler can be passed.')
+        if exc_route and error_handler:
+            raise ValueError('Only one of exc_route or error_handler can be passed.')
         if exc_route:
             warnings.warn(
                 'The exc_route argument is deprecated. Use error_handler instead.',
@@ -201,7 +201,7 @@ class DelayQueue(threading.Thread):
             promise (:class:`telegram.utils.Promise`, optional): A promise.
 
         """
-        if not bool(promise) ^ all([func, args, kwargs]):
+        if not bool(promise) ^ all(v is not None for v in [func, args, kwargs]):
             raise ValueError('You must pass either a promise or all all func, args, kwargs.')
 
         if not self.is_alive() or self.__exit_req:
@@ -254,12 +254,11 @@ class MessageQueue:
         autostart: bool = True,
         error_handler: Callable[[Exception], None] = None,
     ):
-        self.logger = logging.getLogger(__name__)
-        self.running = False
+        self.running = autostart
         self.dispatcher: Optional['Dispatcher'] = None
 
-        if not (bool(exc_route) ^ bool(error_handler)):  # pylint: disable=C0325
-            raise RuntimeError('Only one of exc_route or error_handler can be passed.')
+        if exc_route and error_handler:
+            raise ValueError('Only one of exc_route or error_handler can be passed.')
         if exc_route:
             warnings.warn(
                 'The exc_route argument is deprecated. Use error_handler instead.',
@@ -297,7 +296,7 @@ class MessageQueue:
         self._delay_queues[delay_queue.name] = delay_queue
         if self.dispatcher:
             delay_queue.set_dispatcher(self.dispatcher)
-        if self.running:
+        if self.running and not delay_queue.is_alive():
             delay_queue.start()
 
     def remove_delay_queue(self, name: str, timeout: float = None) -> None:
@@ -311,13 +310,14 @@ class MessageQueue:
                 :meth:`telegram.ext.DelayQueue.stop`.
         """
         delay_queue = self._delay_queues.pop(name)
-        if self.running:
+        if self.running and delay_queue.is_alive():
             delay_queue.stop(timeout)
 
     def start(self) -> None:
         """Starts the all :class:`telegram.ext.DelayQueue` registered for this message queue."""
         for delay_queue in self._delay_queues.values():
             delay_queue.start()
+        self.running = True
 
     def stop(self, timeout: float = None) -> None:
         """

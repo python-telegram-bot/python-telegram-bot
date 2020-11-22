@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Extensions over the Telegram Bot API to facilitate bot making"""
 
+from .messagequeue import MessageQueue, DelayQueue, DelayQueueError
 from .basepersistence import BasePersistence
 from .picklepersistence import PicklePersistence
 from .dictpersistence import DictPersistence
@@ -39,8 +40,6 @@ from .typehandler import TypeHandler
 from .conversationhandler import ConversationHandler
 from .precheckoutqueryhandler import PreCheckoutQueryHandler
 from .shippingqueryhandler import ShippingQueryHandler
-from .messagequeue import MessageQueue
-from .messagequeue import DelayQueue
 from .pollanswerhandler import PollAnswerHandler
 from .pollhandler import PollHandler
 from .defaults import Defaults
@@ -69,6 +68,7 @@ __all__ = (
     'ShippingQueryHandler',
     'MessageQueue',
     'DelayQueue',
+    'DelayQueueError',
     'DispatcherHandlerStop',
     'run_async',
     'CallbackContext',
