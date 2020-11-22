@@ -618,6 +618,57 @@ class TestBasePersistence:
         assert persistence.get_chat_data()[123][1].data == expected
         assert persistence.get_user_data()[123][1].data == expected
 
+    @pytest.mark.filterwarnings('ignore:BasePersistence')
+    def test_replace_insert_bot_item_identity(self, bot, bot_persistence):
+        persistence = bot_persistence
+        persistence.set_bot(bot)
+
+        class CustomSlottedClass:
+            __slots__ = ('value',)
+
+            def __init__(self):
+                self.value = 5
+
+        class CustomClass:
+            pass
+
+        slot_object = CustomSlottedClass()
+        dict_object = CustomClass()
+        lock = Lock()
+        list_ = [slot_object, dict_object, lock]
+        tuple_ = (1, 2, 3)
+        dict_ = {1: slot_object, 2: dict_object}
+
+        data = {
+            'bot_1': bot,
+            'bot_2': bot,
+            'list_1': list_,
+            'list_2': list_,
+            'tuple_1': tuple_,
+            'tuple_2': tuple_,
+            'dict_1': dict_,
+            'dict_2': dict_,
+        }
+
+        def make_assertion(data_):
+            return (
+                data_['bot_1'] is data_['bot_2']
+                and data_['list_1'] is data_['list_2']
+                and data_['list_1'][0] is data_['list_2'][0]
+                and data_['list_1'][1] is data_['list_2'][1]
+                and data_['list_1'][2] is data_['list_2'][2]
+                and data_['tuple_1'] is data_['tuple_2']
+                and data_['dict_1'] is data_['dict_2']
+                and data_['dict_1'][1] is data_['dict_2'][1]
+                and data_['dict_1'][1] is data_['list_1'][0]
+                and data_['dict_1'][2] is data_['list_1'][1]
+                and data_['dict_1'][2] is data_['dict_2'][2]
+            )
+
+        persistence.update_bot_data(data)
+        assert make_assertion(persistence.bot_data)
+        assert make_assertion(persistence.get_bot_data())
+
 
 @pytest.fixture(scope='function')
 def pickle_persistence():
