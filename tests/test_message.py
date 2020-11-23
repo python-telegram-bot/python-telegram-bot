@@ -579,9 +579,7 @@ class TestMessage:
     def test_link_with_username(self, message, type):
         message.chat.username = 'username'
         message.chat.type = type
-        assert message.link == 'https://t.me/{}/{}'.format(
-            message.chat.username, message.message_id
-        )
+        assert message.link == f'https://t.me/{message.chat.username}/{message.message_id}'
 
     @pytest.mark.parametrize(
         'type, id', argvalues=[(Chat.CHANNEL, -1003), (Chat.SUPERGROUP, -1003)]
@@ -591,7 +589,7 @@ class TestMessage:
         message.chat.id = id
         message.chat.type = type
         # The leading - for group ids/ -100 for supergroup ids isn't supposed to be in the link
-        assert message.link == 'https://t.me/c/{}/{}'.format(3, message.message_id)
+        assert message.link == f'https://t.me/c/{3}/{message.message_id}'
 
     @pytest.mark.parametrize('id, username', argvalues=[(None, 'username'), (-3, None)])
     def test_link_private_chats(self, message, id, username):

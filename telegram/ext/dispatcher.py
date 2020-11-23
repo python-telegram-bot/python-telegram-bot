@@ -216,12 +216,10 @@ class Dispatcher:
         return self.__exception_event
 
     def _init_async_threads(self, base_name: str, workers: int) -> None:
-        base_name = '{}_'.format(base_name) if base_name else ''
+        base_name = f'{base_name}_' if base_name else ''
 
         for i in range(workers):
-            thread = Thread(
-                target=self._pooled, name='Bot:{}:worker:{}{}'.format(self.bot.id, base_name, i)
-            )
+            thread = Thread(target=self._pooled, name=f'Bot:{self.bot.id}:worker:{base_name}{i}')
             self.__async_threads.add(thread)
             thread.start()
 
@@ -243,7 +241,7 @@ class Dispatcher:
         """
         if cls.__singleton is not None:
             return cls.__singleton()  # type: ignore[return-value] # pylint: disable=not-callable
-        raise RuntimeError('{} not initialized or multiple instances exist'.format(cls.__name__))
+        raise RuntimeError(f'{cls.__name__} not initialized or multiple instances exist')
 
     def _pooled(self) -> None:
         thr_name = current_thread().getName()
@@ -484,14 +482,14 @@ class Dispatcher:
         from .conversationhandler import ConversationHandler  # pylint: disable=C0415
 
         if not isinstance(handler, Handler):
-            raise TypeError('handler is not an instance of {}'.format(Handler.__name__))
+            raise TypeError(f'handler is not an instance of {Handler.__name__}')
         if not isinstance(group, int):
             raise TypeError('group is not int')
         if isinstance(handler, ConversationHandler) and handler.persistent and handler.name:
             if not self.persistence:
                 raise ValueError(
-                    "ConversationHandler {} can not be persistent if dispatcher has no "
-                    "persistence".format(handler.name)
+                    f"ConversationHandler {handler.name} can not be persistent if dispatcher has "
+                    f"no persistence"
                 )
             handler.persistence = self.persistence
             handler.conversations = self.persistence.get_conversations(handler.name)

@@ -93,7 +93,7 @@ class ChatMigrated(TelegramError):
     """
 
     def __init__(self, new_chat_id: int):
-        super().__init__('Group migrated to supergroup. New chat id: {}'.format(new_chat_id))
+        super().__init__(f'Group migrated to supergroup. New chat id: {new_chat_id}')
         self.new_chat_id = new_chat_id
 
     def __reduce__(self) -> Tuple[type, Tuple[int]]:  # type: ignore[override]
@@ -108,7 +108,7 @@ class RetryAfter(TelegramError):
     """
 
     def __init__(self, retry_after: int):
-        super().__init__('Flood control exceeded. Retry in {} seconds'.format(float(retry_after)))
+        super().__init__(f'Flood control exceeded. Retry in {float(retry_after)} seconds')
         self.retry_after = float(retry_after)
 
     def __reduce__(self) -> Tuple[type, Tuple[float]]:  # type: ignore[override]

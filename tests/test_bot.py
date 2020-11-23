@@ -141,7 +141,7 @@ class TestBot:
         assert get_me_bot.can_join_groups == bot.can_join_groups
         assert get_me_bot.can_read_all_group_messages == bot.can_read_all_group_messages
         assert get_me_bot.supports_inline_queries == bot.supports_inline_queries
-        assert 'https://t.me/{}'.format(get_me_bot.username) == bot.link
+        assert f'https://t.me/{get_me_bot.username}' == bot.link
         assert commands == bot.commands
 
     @flaky(3, 1)
@@ -949,7 +949,7 @@ class TestBot:
         chat = bot.get_chat(super_group_id)
 
         assert chat.type == 'supergroup'
-        assert chat.title == '>>> telegram.Bot(test) @{}'.format(bot.username)
+        assert chat.title == f'>>> telegram.Bot(test) @{bot.username}'
         assert chat.id == int(super_group_id)
 
     @flaky(3, 1)

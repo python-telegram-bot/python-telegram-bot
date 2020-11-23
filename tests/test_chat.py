@@ -91,7 +91,7 @@ class TestChat:
         assert chat_dict['slow_mode_delay'] == chat.slow_mode_delay
 
     def test_link(self, chat):
-        assert chat.link == 'https://t.me/{}'.format(chat.username)
+        assert chat.link == f'https://t.me/{chat.username}'
         chat.username = None
         assert chat.link is None
 
