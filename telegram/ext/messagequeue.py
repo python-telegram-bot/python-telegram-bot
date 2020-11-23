@@ -395,6 +395,13 @@ def queuedmessage(method: Callable) -> Callable:
 
     @functools.wraps(method)
     def wrapped(self: 'Bot', *args: Any, **kwargs: Any) -> Any:
+        warnings.warn(
+            'The @queuedmessage decorator is deprecated. Use the `delay_queue` parameter of'
+            'the various bot methods instead.',
+            TelegramDeprecationWarning,
+            stacklevel=2,
+        )
+
         # pylint: disable=W0212
         queued = kwargs.pop(
             'queued', self._is_messages_queued_default  # type: ignore[attr-defined]
