@@ -101,7 +101,7 @@ class User(TelegramObject):
         """:obj:`str`: Convenience property. If available, returns the user's :attr:`username`
         prefixed with "@". If :attr:`username` is not available, returns :attr:`full_name`."""
         if self.username:
-            return '@{}'.format(self.username)
+            return f'@{self.username}'
         return self.full_name
 
     @property
@@ -119,7 +119,7 @@ class User(TelegramObject):
         of the user."""
 
         if self.username:
-            return "https://t.me/{}".format(self.username)
+            return f"https://t.me/{self.username}"
         return None
 
     @property

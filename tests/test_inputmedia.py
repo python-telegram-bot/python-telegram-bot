@@ -350,7 +350,7 @@ class TestSendMediaGroup:
             video_check = data[input_video.media.attach] == input_video.media.field_tuple
             thumb_check = data[input_video.thumb.attach] == input_video.thumb.field_tuple
             result = video_check and thumb_check
-            raise (Exception('Test was {}'.format('successful' if result else 'failing')))
+            raise Exception(f"Test was {'successful' if result else 'failing'}")
 
         monkeypatch.setattr('telegram.utils.request.Request._request_wrapper', test)
         input_video = InputMediaVideo(video_file, thumb=photo_file)

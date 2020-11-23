@@ -678,7 +678,7 @@ class TestDispatcher:
         thread_names = [thread.name for thread in getattr(dp2, '_Dispatcher__async_threads')]
         print(thread_names)
         for thread_name in thread_names:
-            assert thread_name.startswith("Bot:{}:worker:".format(dp2.bot.id))
+            assert thread_name.startswith(f"Bot:{dp2.bot.id}:worker:")
 
     def test_non_context_deprecation(self, dp):
         with pytest.warns(TelegramDeprecationWarning):

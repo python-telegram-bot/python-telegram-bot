@@ -111,9 +111,9 @@ class PicklePersistence(BasePersistence):
             self.chat_data = defaultdict(dict)
             self.bot_data = {}
         except pickle.UnpicklingError as exc:
-            raise TypeError("File {} does not contain valid pickle data".format(filename)) from exc
+            raise TypeError(f"File {filename} does not contain valid pickle data") from exc
         except Exception as exc:
-            raise TypeError("Something went wrong unpickling {}".format(filename)) from exc
+            raise TypeError(f"Something went wrong unpickling {filename}") from exc
 
     @staticmethod
     def load_file(filename: str) -> Any:
@@ -123,9 +123,9 @@ class PicklePersistence(BasePersistence):
         except IOError:
             return None
         except pickle.UnpicklingError as exc:
-            raise TypeError("File {} does not contain valid pickle data".format(filename)) from exc
+            raise TypeError(f"File {filename} does not contain valid pickle data") from exc
         except Exception as exc:
-            raise TypeError("Something went wrong unpickling {}".format(filename)) from exc
+            raise TypeError(f"Something went wrong unpickling {filename}") from exc
 
     def dump_singlefile(self) -> None:
         with open(self.filename, "wb") as file:
@@ -151,7 +151,7 @@ class PicklePersistence(BasePersistence):
         if self.user_data:
             pass
         elif not self.single_file:
-            filename = "{}_user_data".format(self.filename)
+            filename = f"{self.filename}_user_data"
             data = self.load_file(filename)
             if not data:
                 data = defaultdict(dict)
@@ -171,7 +171,7 @@ class PicklePersistence(BasePersistence):
         if self.chat_data:
             pass
         elif not self.single_file:
-            filename = "{}_chat_data".format(self.filename)
+            filename = f"{self.filename}_chat_data"
             data = self.load_file(filename)
             if not data:
                 data = defaultdict(dict)
@@ -191,7 +191,7 @@ class PicklePersistence(BasePersistence):
         if self.bot_data:
             pass
         elif not self.single_file:
-            filename = "{}_bot_data".format(self.filename)
+            filename = f"{self.filename}_bot_data"
             data = self.load_file(filename)
             if not data:
                 data = {}
@@ -212,7 +212,7 @@ class PicklePersistence(BasePersistence):
         if self.conversations:
             pass
         elif not self.single_file:
-            filename = "{}_conversations".format(self.filename)
+            filename = f"{self.filename}_conversations"
             data = self.load_file(filename)
             if not data:
                 data = {name: {}}
@@ -239,7 +239,7 @@ class PicklePersistence(BasePersistence):
         self.conversations[name][key] = new_state
         if not self.on_flush:
             if not self.single_file:
-                filename = "{}_conversations".format(self.filename)
+                filename = f"{self.filename}_conversations"
                 self.dump_file(filename, self.conversations)
             else:
                 self.dump_singlefile()
@@ -258,7 +258,7 @@ class PicklePersistence(BasePersistence):
         self.user_data[user_id] = data
         if not self.on_flush:
             if not self.single_file:
-                filename = "{}_user_data".format(self.filename)
+                filename = f"{self.filename}_user_data"
                 self.dump_file(filename, self.user_data)
             else:
                 self.dump_singlefile()
@@ -277,7 +277,7 @@ class PicklePersistence(BasePersistence):
         self.chat_data[chat_id] = data
         if not self.on_flush:
             if not self.single_file:
-                filename = "{}_chat_data".format(self.filename)
+                filename = f"{self.filename}_chat_data"
                 self.dump_file(filename, self.chat_data)
             else:
                 self.dump_singlefile()
@@ -293,7 +293,7 @@ class PicklePersistence(BasePersistence):
         self.bot_data = data.copy()
         if not self.on_flush:
             if not self.single_file:
-                filename = "{}_bot_data".format(self.filename)
+                filename = f"{self.filename}_bot_data"
                 self.dump_file(filename, self.bot_data)
             else:
                 self.dump_singlefile()
@@ -305,10 +305,10 @@ class PicklePersistence(BasePersistence):
                 self.dump_singlefile()
         else:
             if self.user_data:
-                self.dump_file("{}_user_data".format(self.filename), self.user_data)
+                self.dump_file(f"{self.filename}_user_data", self.user_data)
             if self.chat_data:
-                self.dump_file("{}_chat_data".format(self.filename), self.chat_data)
+                self.dump_file(f"{self.filename}_chat_data", self.chat_data)
             if self.bot_data:
-                self.dump_file("{}_bot_data".format(self.filename), self.bot_data)
+                self.dump_file(f"{self.filename}_bot_data", self.bot_data)
             if self.conversations:
-                self.dump_file("{}_conversations".format(self.filename), self.conversations)
+                self.dump_file(f"{self.filename}_conversations", self.conversations)

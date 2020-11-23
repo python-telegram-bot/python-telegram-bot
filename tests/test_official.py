@@ -68,9 +68,7 @@ def check_method(h4):
     checked = []
     for parameter in table:
         param = sig.parameters.get(parameter[0])
-        assert param is not None, "Parameter {} not found in {}".format(
-            parameter[0], method.__name__
-        )
+        assert param is not None, f"Parameter {parameter[0]} not found in {method.__name__}"
         # TODO: Check type via docstring
         # TODO: Check if optional or required
         checked.append(parameter[0])
@@ -117,7 +115,7 @@ def check_object(h4):
             continue
 
         param = sig.parameters.get(field)
-        assert param is not None, "Attribute {} not found in {}".format(field, obj.__name__)
+        assert param is not None, f"Attribute {field} not found in {obj.__name__}"
         # TODO: Check type via docstring
         # TODO: Check if optional or required
         checked.append(field)

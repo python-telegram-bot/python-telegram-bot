@@ -183,16 +183,16 @@ class TestHelpers:
         username = 'JamesTheMock'
 
         payload = "hello"
-        expected = "https://t.me/{}?start={}".format(username, payload)
+        expected = f"https://t.me/{username}?start={payload}"
         actual = helpers.create_deep_linked_url(username, payload)
         assert expected == actual
 
-        expected = "https://t.me/{}?startgroup={}".format(username, payload)
+        expected = f"https://t.me/{username}?startgroup={payload}"
         actual = helpers.create_deep_linked_url(username, payload, group=True)
         assert expected == actual
 
         payload = ""
-        expected = "https://t.me/{}".format(username)
+        expected = f"https://t.me/{username}"
         assert expected == helpers.create_deep_linked_url(username)
         assert expected == helpers.create_deep_linked_url(username, payload)
         payload = None

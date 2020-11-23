@@ -278,7 +278,7 @@ class TestConversationHandler:
             assert list(value.keys())[0] == attr
         else:
             assert getattr(ch, attr) == attr
-        with pytest.raises(ValueError, match='You can not assign a new value to {}'.format(attr)):
+        with pytest.raises(ValueError, match=f'You can not assign a new value to {attr}'):
             setattr(ch, attr, True)
 
     def test_immutable_per_message(self):
