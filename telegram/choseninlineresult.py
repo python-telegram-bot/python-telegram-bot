@@ -64,13 +64,13 @@ class ChosenInlineResult(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         result_id: str,
         from_user: User,
         query: str,
         location: Location = None,
         inline_message_id: str = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.result_id = result_id

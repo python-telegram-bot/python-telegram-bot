@@ -25,6 +25,7 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, Pattern, TypeVa
 from telegram.ext import Filters, MessageHandler
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.types import HandlerArg
+from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 if TYPE_CHECKING:
     from telegram.ext import CallbackContext, Dispatcher
@@ -121,7 +122,7 @@ class RegexHandler(MessageHandler):
         message_updates: bool = True,
         channel_post_updates: bool = False,
         edited_updates: bool = False,
-        run_async: bool = False,
+        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
         warnings.warn(
             'RegexHandler is deprecated. See https://git.io/fxJuV for more info',

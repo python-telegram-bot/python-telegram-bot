@@ -445,3 +445,6 @@ class DefaultValue:
 
 DEFAULT_NONE: DefaultValue = DefaultValue(None)
 """:class:`DefaultValue`: Default `None`"""
+
+DEFAULT_FALSE: DefaultValue = DefaultValue(False)
+""":class:`DefaultValue`: Default `False`"""

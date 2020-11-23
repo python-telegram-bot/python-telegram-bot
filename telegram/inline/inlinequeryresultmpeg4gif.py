@@ -92,7 +92,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         mpeg4_duration: int = None,
         parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
         thumb_mime_type: str = None,
-        **kwargs: Any,  # pylint: disable=W0613
+        **_kwargs: Any,
     ):
 
         # Required

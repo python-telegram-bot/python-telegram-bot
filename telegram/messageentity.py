@@ -60,14 +60,14 @@ class MessageEntity(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         type: str,  # pylint: disable=W0622
         offset: int,
         length: int,
         url: str = None,
         user: User = None,
         language: str = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.type = type

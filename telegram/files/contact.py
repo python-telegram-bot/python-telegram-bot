@@ -47,13 +47,13 @@ class Contact(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         phone_number: str,
         first_name: str,
         last_name: str = None,
         user_id: int = None,
         vcard: str = None,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.phone_number = str(phone_number)

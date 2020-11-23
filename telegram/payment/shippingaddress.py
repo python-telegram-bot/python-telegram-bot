@@ -50,14 +50,14 @@ class ShippingAddress(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         country_code: str,
         state: str,
         city: str,
         street_line1: str,
         street_line2: str,
         post_code: str,
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         self.country_code = country_code
         self.state = state

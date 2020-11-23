@@ -44,6 +44,9 @@ class Defaults:
             be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
         tzinfo (:obj:`tzinfo`): A timezone to be used for all date(time) objects appearing
             throughout PTB.
+        run_async (:obj:`bool`): Optional. Default setting for the ``run_async`` parameter of
+            handlers and error handlers registered through :meth:`Dispatcher.add_handler` and
+            :meth:`Dispatcher.add_error_handler`.
         delay_queue (:obj:`str`, optional): A :class:`telegram.ext.DelayQueue` the bots
             :class:`telegram.ext.MessageQueue` should use.
         delay_queue_per_method (Dict[:obj:`str`, :obj:`str`], optional): A dictionary specifying
@@ -68,6 +71,9 @@ class Defaults:
             appearing throughout PTB, i.e. if a timezone naive date(time) object is passed
             somewhere, it will be assumed to be in ``tzinfo``. Must be a timezone provided by the
             ``pytz`` module. Defaults to UTC.
+        run_async (:obj:`bool`, optional): Default setting for the ``run_async`` parameter of
+            handlers and error handlers registered through :meth:`Dispatcher.add_handler` and
+            :meth:`Dispatcher.add_error_handler`. Defaults to :obj:`False`.
         delay_queue (:obj:`str`, optional): A :class:`telegram.ext.DelayQueue` the bots
             :class:`telegram.ext.MessageQueue` should use. Defaults to :obj:`None`.
         delay_queue_per_method (Dict[:obj:`str`, :obj:`str`], optional): A dictionary specifying
@@ -86,6 +92,7 @@ class Defaults:
         timeout: Union[float, DefaultValue] = DEFAULT_NONE,
         quote: bool = None,
         tzinfo: pytz.BaseTzInfo = pytz.utc,
+        run_async: bool = False,
         delay_queue: str = None,
         delay_queue_per_method: Dict[str, Optional[str]] = None,
     ):
@@ -95,6 +102,7 @@ class Defaults:
         self._timeout = timeout
         self._quote = quote
         self._tzinfo = tzinfo
+        self._run_async = run_async
         self._delay_queue = delay_queue
         self._delay_queue_per_method: DefaultDict[str, Optional[str]] = defaultdict(
             lambda: self.delay_queue, delay_queue_per_method or {}
@@ -167,6 +175,17 @@ class Defaults:
         )
 
     @property
+    def run_async(self) -> Optional[bool]:
+        return self._run_async
+
+    @run_async.setter
+    def run_async(self, value: Any) -> NoReturn:
+        raise AttributeError(
+            "You can not assign a new value to defaults after because it would "
+            "not have any effect."
+        )
+
+    @property
     def delay_queue(self) -> Optional[str]:
         return self._delay_queue
 
@@ -197,6 +216,7 @@ class Defaults:
                 self._timeout,
                 self._quote,
                 self._tzinfo,
+                self._run_async,
                 self._delay_queue,
                 ((key, value) for key, value in self._delay_queue_per_method.items()),
             )

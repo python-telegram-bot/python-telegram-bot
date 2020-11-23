@@ -36,6 +36,7 @@ from telegram.ext.handler import Handler
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.promise import Promise
 from telegram.utils.types import HandlerArg
+from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -191,7 +192,7 @@ class Dispatcher:
         """Dict[:obj:`int`, List[:class:`telegram.ext.Handler`]]: Holds the handlers per group."""
         self.groups: List[int] = []
         """List[:obj:`int`]: A list with all groups."""
-        self.error_handlers: Dict[Callable, bool] = {}
+        self.error_handlers: Dict[Callable, Union[bool, DefaultValue]] = {}
         """Dict[:obj:`callable`, :obj:`bool`]: A dict, where the keys are error handlers and the
         values indicate whether they are to be run asynchronously."""
 
@@ -325,7 +326,7 @@ class Dispatcher:
         *args: Any,
         update: HandlerArg = None,
         error_handling: bool = True,
-        **kwargs: Any,  # pylint: disable=W0613
+        **kwargs: Any,
     ) -> Promise:
         # TODO: Remove error_handling parameter once we drop the @run_async decorator
         promise = Promise(func, args, kwargs, update=update, error_handling=error_handling)
@@ -591,7 +592,7 @@ class Dispatcher:
     def add_error_handler(
         self,
         callback: Callable[[Any, CallbackContext], None],
-        run_async: bool = False,  # pylint: disable=W0621
+        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,  # pylint: disable=W0621
     ) -> None:
         """Registers an error handler in the Dispatcher. This handler will receive every error
         which happens in your bot.
@@ -619,6 +620,11 @@ class Dispatcher:
         if callback in self.error_handlers:
             self.logger.debug('The callback is already registered as an error handler. Ignoring.')
             return
+
+        if run_async is DEFAULT_FALSE and self.bot.defaults:
+            if self.bot.defaults.run_async:
+                run_async = True
+
         self.error_handlers[callback] = run_async
 
     def remove_error_handler(self, callback: Callable[[Any, CallbackContext], None]) -> None:

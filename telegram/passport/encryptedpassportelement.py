@@ -118,7 +118,7 @@ class EncryptedPassportElement(TelegramObject):
     """
 
     def __init__(
-        self,  # pylint: disable=W0613
+        self,
         type: str,  # pylint: disable=W0622
         data: PersonalDetails = None,
         phone_number: str = None,
@@ -131,7 +131,7 @@ class EncryptedPassportElement(TelegramObject):
         hash: str = None,  # pylint: disable=W0622
         bot: 'Bot' = None,
         credentials: 'Credentials' = None,  # pylint: disable=W0613
-        **kwargs: Any,
+        **_kwargs: Any,
     ):
         # Required
         self.type = type

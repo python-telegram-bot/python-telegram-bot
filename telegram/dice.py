@@ -50,7 +50,7 @@ class Dice(TelegramObject):
         emoji (:obj:`str`): Emoji on which the dice throw animation is based.
     """
 
-    def __init__(self, value: int, emoji: str, **kwargs: Any):  # pylint: disable=W0613
+    def __init__(self, value: int, emoji: str, **_kwargs: Any):
         self.value = value
         self.emoji = emoji
 
