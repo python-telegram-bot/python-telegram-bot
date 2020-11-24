@@ -26,6 +26,7 @@ import time
 from collections import defaultdict
 from html import escape
 from numbers import Number
+from pathlib import Path
 
 from typing import TYPE_CHECKING, Any, DefaultDict, Dict, Optional, Tuple, Union
 
@@ -53,6 +54,15 @@ _signames = {
 def get_signal_name(signum: int) -> str:
     """Returns the signal name of the given signal number."""
     return _signames[signum]
+
+
+def local_check(file_path: str) -> bool:
+    """Checks if a given file path exists on the local system"""
+    if str(file_path).startswith('file://'):
+        return True
+    if Path(file_path).exists():
+        return True
+    return False
 
 
 def escape_markdown(text: str, version: int = 1, entity_type: str = None) -> str:

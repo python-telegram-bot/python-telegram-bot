@@ -94,7 +94,7 @@ from telegram import (
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import InvalidToken, TelegramError
-from telegram.utils.helpers import DEFAULT_NONE, DefaultValue, to_timestamp
+from telegram.utils.helpers import DEFAULT_NONE, DefaultValue, to_timestamp, local_check
 from telegram.utils.request import Request
 from telegram.utils.types import FileLike, JSONDict
 
@@ -2114,10 +2114,11 @@ class Bot(TelegramObject):
 
         result = self._post('getFile', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        if result.get('file_path'):  # type: ignore
-            result['file_path'] = '{}/{}'.format(  # type: ignore
-                self.base_file_url, result['file_path']  # type: ignore
-            )
+        if not local_check(result.get('file_path')):  # type: ignore
+            if result.get('file_path'):  # type: ignore
+                result['file_path'] = '{}/{}'.format(  # type: ignore
+                    self.base_file_url, result['file_path']  # type: ignore
+                )
 
         return File.de_json(result, self)  # type: ignore
 

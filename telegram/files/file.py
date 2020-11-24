@@ -25,6 +25,7 @@ from typing import IO, TYPE_CHECKING, Any, Optional, Union
 
 from telegram import TelegramObject
 from telegram.passport.credentials import decrypt
+from telegram.utils.helpers import local_check
 
 if TYPE_CHECKING:
     from telegram import Bot, FileCredentials
@@ -119,15 +120,23 @@ class File(TelegramObject):
         if custom_path is not None and out is not None:
             raise ValueError('custom_path and out are mutually exclusive')
 
-        # Convert any UTF-8 char into a url encoded ASCII string.
-        url = self._get_encoded_url()
+        local_file = local_check(self.file_path)
+
+        if local_file:
+            url = self.file_path
+        else:
+            # Convert any UTF-8 char into a url encoded ASCII string.
+            url = self._get_encoded_url()
 
         if out:
-            buf = self.bot.request.retrieve(url)
-            if self._credentials:
-                buf = decrypt(
-                    b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
-                )
+            if local_file:
+                buf = open(url, "rb").read()
+            else:
+                buf = self.bot.request.retrieve(url)
+                if self._credentials:
+                    buf = decrypt(
+                        b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
+                    )
             out.write(buf)
             return out
 
@@ -138,11 +147,14 @@ class File(TelegramObject):
         else:
             filename = os.path.join(os.getcwd(), self.file_id)
 
-        buf = self.bot.request.retrieve(url, timeout=timeout)
-        if self._credentials:
-            buf = decrypt(
-                b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
-            )
+        if local_file:
+            buf = open(url, "rb").read()
+        else:
+            buf = self.bot.request.retrieve(url, timeout=timeout)
+            if self._credentials:
+                buf = decrypt(
+                    b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
+                )
         with open(filename, 'wb') as fobj:
             fobj.write(buf)
         return filename
@@ -169,8 +181,10 @@ class File(TelegramObject):
         """
         if buf is None:
             buf = bytearray()
-
-        buf.extend(self.bot.request.retrieve(self._get_encoded_url()))
+        if local_check(self.file_path):
+            buf.extend(open(self.file_path, "rb").read())
+        else:
+            buf.extend(self.bot.request.retrieve(self._get_encoded_url()))
         return buf
 
     def set_credentials(self, credentials: 'FileCredentials') -> None:
