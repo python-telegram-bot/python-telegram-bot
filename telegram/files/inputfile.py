@@ -89,7 +89,7 @@ class InputFile:
         try:
             image = imghdr.what(None, stream)
             if image:
-                return 'image/%s' % image
+                return f'image/{image}'
             return None
         except Exception:
             logger.debug(
