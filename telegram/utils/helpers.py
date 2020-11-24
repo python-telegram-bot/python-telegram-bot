@@ -56,13 +56,25 @@ def get_signal_name(signum: int) -> str:
     return _signames[signum]
 
 
-def local_check(file_path: str) -> bool:
-    """Checks if a given file path exists on the local system"""
-    if str(file_path).startswith('file://'):
-        return True
-    if Path(file_path).exists():
-        return True
-    return False
+def is_local_file(string: Optional[str], absolute: bool = True) -> bool:
+    """
+    Checks if a given string is a file on local system.
+
+    Args:
+        string (:obj:`str`): The string to check.
+        absolute (:obj:`bool`): Optional. Whether to allow only absolute paths. Defaults to
+            :obj:`True`.
+    """
+    if string is None:
+        return False
+
+    path = Path(string)
+    try:
+        if path.exists() and path.is_file():
+            return path.is_absolute() if absolute else True
+        return False
+    except Exception:
+        return False
 
 
 def escape_markdown(text: str, version: int = 1, entity_type: str = None) -> str:

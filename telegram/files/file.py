@@ -25,7 +25,7 @@ from typing import IO, TYPE_CHECKING, Any, Optional, Union
 
 from telegram import TelegramObject
 from telegram.passport.credentials import decrypt
-from telegram.utils.helpers import local_check
+from telegram.utils.helpers import is_local_file
 
 if TYPE_CHECKING:
     from telegram import Bot, FileCredentials
@@ -99,7 +99,10 @@ class File(TelegramObject):
         the ``out.write`` method.
 
         Note:
-            :attr:`custom_path` and :attr:`out` are mutually exclusive.
+            * :attr:`custom_path` and :attr:`out` are mutually exclusive.
+            * If neither :attr:`custom_path` nor :attr:`out` is provided and :attr:`file_path` is
+              the path of a local file (as is the case for local Bot API Servers running in the
+              local mode), this method will just return the path.
 
         Args:
             custom_path (:obj:`str`, optional): Custom path.
@@ -111,7 +114,7 @@ class File(TelegramObject):
 
         Returns:
             :obj:`str` | :obj:`io.BufferedWriter`: The same object as :attr:`out` if specified.
-            Otherwise, returns the filename downloaded to.
+            Otherwise, returns the filename downloaded to or the file path of the local file.
 
         Raises:
             ValueError: If both :attr:`custom_path` and :attr:`out` are passed.
@@ -120,7 +123,7 @@ class File(TelegramObject):
         if custom_path is not None and out is not None:
             raise ValueError('custom_path and out are mutually exclusive')
 
-        local_file = local_check(self.file_path)
+        local_file = is_local_file(self.file_path)
 
         if local_file:
             url = self.file_path
@@ -142,6 +145,8 @@ class File(TelegramObject):
 
         if custom_path:
             filename = custom_path
+        elif local_file:
+            return self.file_path
         elif self.file_path:
             filename = basename(self.file_path)
         else:
@@ -181,7 +186,7 @@ class File(TelegramObject):
         """
         if buf is None:
             buf = bytearray()
-        if local_check(self.file_path):
+        if is_local_file(self.file_path):
             buf.extend(open(self.file_path, "rb").read())
         else:
             buf.extend(self.bot.request.retrieve(self._get_encoded_url()))

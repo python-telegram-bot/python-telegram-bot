@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import time
 import datetime as dtm
+from pathlib import Path
 
 import pytest
 
@@ -258,3 +259,21 @@ class TestHelpers:
         expected = r'[the\_name](tg://user?id=1)'
 
         assert expected == helpers.mention_markdown(1, 'the_name')
+
+    @pytest.mark.parametrize(
+        'string,absolute,expected',
+        [
+            ('tests/data/game.gif', False, True),
+            ('tests/data', False, False),
+            ('tests/data/game.gif', True, False),
+            ('tests/data', True, False),
+            (str(Path.cwd() / 'tests' / 'data' / 'game.gif'), True, True),
+            (str(Path.cwd() / 'tests' / 'data'), True, False),
+            ('https:/api.org/file/botTOKEN/document/file_3', True, False),
+            ('https:/api.org/file/botTOKEN/document/file_3', False, False),
+            (None, True, False),
+            (None, False, False),
+        ],
+    )
+    def test_is_local_file(self, string, absolute, expected):
+        assert helpers.is_local_file(string, absolute) == expected
