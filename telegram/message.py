@@ -415,8 +415,8 @@ class Message(TelegramObject):
                 to_link = self.chat.username
             else:
                 # Get rid of leading -100 for supergroups
-                to_link = "c/{}".format(str(self.chat.id)[4:])
-            return "https://t.me/{}/{}".format(to_link, self.message_id)
+                to_link = f"c/{str(self.chat.id)[4:]}"
+            return f"https://t.me/{to_link}/{self.message_id}"
         return None
 
     @classmethod
@@ -1305,11 +1305,11 @@ class Message(TelegramObject):
                     )
 
                 if entity.type == MessageEntity.TEXT_LINK:
-                    insert = '<a href="{}">{}</a>'.format(entity.url, text)
+                    insert = f'<a href="{entity.url}">{text}</a>'
                 elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
-                    insert = '<a href="tg://user?id={}">{}</a>'.format(entity.user.id, text)
+                    insert = f'<a href="tg://user?id={entity.user.id}">{text}</a>'
                 elif entity.type == MessageEntity.URL and urled:
-                    insert = '<a href="{0}">{0}</a>'.format(text)
+                    insert = f'<a href="{text}">{text}</a>'
                 elif entity.type == MessageEntity.BOLD:
                     insert = '<b>' + text + '</b>'
                 elif entity.type == MessageEntity.ITALIC:
@@ -1318,9 +1318,7 @@ class Message(TelegramObject):
                     insert = '<code>' + text + '</code>'
                 elif entity.type == MessageEntity.PRE:
                     if entity.language:
-                        insert = '<pre><code class="{}">{}</code></pre>'.format(
-                            entity.language, text
-                        )
+                        insert = f'<pre><code class="{entity.language}">{text}</code></pre>'
                     else:
                         insert = '<pre>' + text + '</pre>'
                 elif entity.type == MessageEntity.UNDERLINE:
@@ -1480,15 +1478,15 @@ class Message(TelegramObject):
                         url = escape_markdown(
                             entity.url, version=version, entity_type=MessageEntity.TEXT_LINK
                         )
-                    insert = '[{}]({})'.format(text, url)
+                    insert = f'[{text}]({url})'
                 elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
-                    insert = '[{}](tg://user?id={})'.format(text, entity.user.id)
+                    insert = f'[{text}](tg://user?id={entity.user.id})'
                 elif entity.type == MessageEntity.URL and urled:
                     if version == 1:
                         link = orig_text
                     else:
                         link = text
-                    insert = '[{}]({})'.format(link, orig_text)
+                    insert = f'[{link}]({orig_text})'
                 elif entity.type == MessageEntity.BOLD:
                     insert = '*' + text + '*'
                 elif entity.type == MessageEntity.ITALIC:

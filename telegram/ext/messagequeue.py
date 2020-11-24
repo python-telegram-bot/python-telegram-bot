@@ -115,7 +115,7 @@ class DelayQueue(threading.Thread):
         self.__class__.INSTANCE_COUNT += 1
 
         if name is None:
-            name = '{}-{}'.format('DelayQueue', self.INSTANCE_COUNT)
+            name = f'{self.__class__.__name__}-{self.__class__._instcnt}'
         super().__init__(name=name)
 
         if autostart:  # immediately start processing

@@ -51,7 +51,7 @@ def facts_to_str(user_data):
     facts = list()
 
     for key, value in user_data.items():
-        facts.append('{} - {}'.format(key, value))
+        facts.append(f'{key} - {value}')
 
     return "\n".join(facts).join(['\n', '\n'])
 
@@ -60,9 +60,8 @@ def start(update: Update, context: CallbackContext) -> None:
     reply_text = "Hi! My name is Doctor Botter."
     if context.user_data:
         reply_text += (
-            " You already told me your {}. Why don't you tell me something more "
-            "about yourself? Or change anything I "
-            "already know.".format(", ".join(context.user_data.keys()))
+            f" You already told me your {', '.join(context.user_data.keys())}. Why don't you "
+            f"tell me something more about yourself? Or change anything I already know."
         )
     else:
         reply_text += (
@@ -78,11 +77,11 @@ def regular_choice(update: Update, context: CallbackContext) -> None:
     text = update.message.text.lower()
     context.user_data['choice'] = text
     if context.user_data.get(text):
-        reply_text = 'Your {}, I already know the following ' 'about that: {}'.format(
-            text, context.user_data[text]
+        reply_text = (
+            f'Your {text}, I already know the following about that: {context.user_data[text]}'
         )
     else:
-        reply_text = 'Your {}? Yes, I would love to hear about that!'.format(text)
+        reply_text = f'Your {text}? Yes, I would love to hear about that!'
     update.message.reply_text(reply_text)
 
     return TYPING_REPLY
@@ -104,9 +103,9 @@ def received_information(update: Update, context: CallbackContext) -> None:
 
     update.message.reply_text(
         "Neat! Just so you know, this is what you already told me:"
-        "{}"
+        f"{facts_to_str(context.user_data)}"
         "You can tell me more, or change your opinion on "
-        "something.".format(facts_to_str(context.user_data)),
+        "something.",
         reply_markup=markup,
     )
 
@@ -115,7 +114,7 @@ def received_information(update: Update, context: CallbackContext) -> None:
 
 def show_data(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(
-        "This is what you already told me:" "{}".format(facts_to_str(context.user_data))
+        f"This is what you already told me: {facts_to_str(context.user_data)}"
     )
 
 
@@ -124,9 +123,7 @@ def done(update: Update, context: CallbackContext) -> None:
         del context.user_data['choice']
 
     update.message.reply_text(
-        "I learned these facts about you:"
-        "{}"
-        "Until next time!".format(facts_to_str(context.user_data))
+        "I learned these facts about you:" f"{facts_to_str(context.user_data)}" "Until next time!"
     )
     return ConversationHandler.END
 

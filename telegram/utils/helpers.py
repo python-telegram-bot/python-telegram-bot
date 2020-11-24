@@ -80,7 +80,7 @@ def escape_markdown(text: str, version: int = 1, entity_type: str = None) -> str
     else:
         raise ValueError('Markdown version must be either 1 or 2!')
 
-    return re.sub('([{}])'.format(re.escape(escape_chars)), r'\\\1', text)
+    return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
 
 
 # -------- date/time related helpers --------
@@ -178,7 +178,7 @@ def to_float_timestamp(
     if isinstance(time_object, Number):
         return reference_timestamp + time_object
 
-    raise TypeError('Unable to convert {} object to timestamp'.format(type(time_object).__name__))
+    raise TypeError(f'Unable to convert {type(time_object).__name__} object to timestamp')
 
 
 def to_timestamp(
@@ -273,7 +273,7 @@ def effective_message_type(entity: 'MessageEntity') -> Optional[str]:
     elif isinstance(entity, Update):
         message = entity.effective_message
     else:
-        raise TypeError("entity is not Message or Update (got: {})".format(type(entity)))
+        raise TypeError(f"entity is not Message or Update (got: {type(entity)})")
 
     for i in Message.MESSAGE_TYPES:
         if getattr(message, i, None):
@@ -309,7 +309,7 @@ def create_deep_linked_url(bot_username: str, payload: str = None, group: bool =
     if bot_username is None or len(bot_username) <= 3:
         raise ValueError("You must provide a valid bot_username.")
 
-    base_url = 'https://t.me/{}'.format(bot_username)
+    base_url = f'https://t.me/{bot_username}'
     if not payload:
         return base_url
 
@@ -327,7 +327,7 @@ def create_deep_linked_url(bot_username: str, payload: str = None, group: bool =
     else:
         key = 'start'
 
-    return '{}?{}={}'.format(base_url, key, payload)
+    return f'{base_url}?{key}={payload}'
 
 
 def encode_conversations_to_json(conversations: Dict[str, Dict[Tuple, Any]]) -> str:

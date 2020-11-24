@@ -258,7 +258,7 @@ class TestSticker:
 
 @pytest.fixture(scope='function')
 def sticker_set(bot):
-    ss = bot.get_sticker_set('test_by_{}'.format(bot.username))
+    ss = bot.get_sticker_set(f'test_by_{bot.username}')
     if len(ss.stickers) > 100:
         try:
             for i in range(1, 50):
@@ -270,7 +270,7 @@ def sticker_set(bot):
 
 @pytest.fixture(scope='function')
 def animated_sticker_set(bot):
-    ss = bot.get_sticker_set('animated_test_by_{}'.format(bot.username))
+    ss = bot.get_sticker_set(f'animated_test_by_{bot.username}')
     if len(ss.stickers) > 100:
         try:
             for i in range(1, 50):
@@ -295,7 +295,7 @@ class TestStickerSet:
     name = 'NOTAREALNAME'
 
     def test_de_json(self, bot, sticker):
-        name = 'test_by_{}'.format(bot.username)
+        name = f'test_by_{bot.username}'
         json_dict = {
             'name': name,
             'title': self.title,
@@ -320,12 +320,12 @@ class TestStickerSet:
             file = bot.upload_sticker_file(95205500, f)
         assert file
         assert bot.add_sticker_to_set(
-            chat_id, 'test_by_{}'.format(bot.username), png_sticker=file.file_id, emojis='😄'
+            chat_id, f'test_by_{bot.username}', png_sticker=file.file_id, emojis='😄'
         )
         # Also test with file input and mask
         assert bot.add_sticker_to_set(
             chat_id,
-            'test_by_{}'.format(bot.username),
+            f'test_by_{bot.username}',
             png_sticker=sticker_file,
             emojis='😄',
             mask_position=MaskPosition(MaskPosition.EYES, -1, 1, 2),
@@ -336,7 +336,7 @@ class TestStickerSet:
     def test_bot_methods_1_tgs(self, bot, chat_id):
         assert bot.add_sticker_to_set(
             chat_id,
-            'animated_test_by_{}'.format(bot.username),
+            f'animated_test_by_{bot.username}',
             tgs_sticker=open('tests/data/telegram_animated_sticker.tgs', 'rb'),
             emojis='😄',
         )
@@ -368,7 +368,7 @@ class TestStickerSet:
     def test_bot_methods_3_png(self, bot, chat_id, sticker_set_thumb_file):
         sleep(1)
         assert bot.set_sticker_set_thumb(
-            'test_by_{}'.format(bot.username), chat_id, sticker_set_thumb_file
+            f'test_by_{bot.username}', chat_id, sticker_set_thumb_file
         )
 
     @flaky(10, 1)
@@ -376,13 +376,11 @@ class TestStickerSet:
     def test_bot_methods_3_tgs(self, bot, chat_id, animated_sticker_file, animated_sticker_set):
         sleep(1)
         assert bot.set_sticker_set_thumb(
-            'animated_test_by_{}'.format(bot.username), chat_id, animated_sticker_file
+            f'animated_test_by_{bot.username}', chat_id, animated_sticker_file
         )
         file_id = animated_sticker_set.stickers[-1].file_id
         # also test with file input and mask
-        assert bot.set_sticker_set_thumb(
-            'animated_test_by_{}'.format(bot.username), chat_id, file_id
-        )
+        assert bot.set_sticker_set_thumb(f'animated_test_by_{bot.username}', chat_id, file_id)
 
     @flaky(10, 1)
     @pytest.mark.timeout(10)

@@ -288,9 +288,7 @@ class Bot(TelegramObject):
             else:
                 data = api_kwargs
 
-        return self.request.post(
-            '{}/{}'.format(self.base_url, endpoint), data=data, timeout=timeout
-        )
+        return self.request.post(f'{self.base_url}/{endpoint}', data=data, timeout=timeout)
 
     def _message(
         self,
@@ -378,7 +376,7 @@ class Bot(TelegramObject):
     def link(self) -> str:
         """:obj:`str`: Convenience property. Returns the t.me link of the bot."""
 
-        return "https://t.me/{}".format(self.username)
+        return f"https://t.me/{self.username}"
 
     @property  # type: ignore
     @info
@@ -412,7 +410,7 @@ class Bot(TelegramObject):
     def name(self) -> str:
         """:obj:`str`: Bot's @username."""
 
-        return '@{}'.format(self.username)
+        return f'@{self.username}'
 
     @log
     @mq
@@ -2160,9 +2158,7 @@ class Bot(TelegramObject):
         result = self._post('getFile', data, timeout=timeout, api_kwargs=api_kwargs)
 
         if result.get('file_path'):  # type: ignore
-            result['file_path'] = '{}/{}'.format(  # type: ignore
-                self.base_file_url, result['file_path']  # type: ignore
-            )
+            result['file_path'] = f'{self.base_file_url}/{result["file_path"]}'  # type: ignore
 
         return File.de_json(result, self)  # type: ignore
 
