@@ -62,11 +62,11 @@ class InputFile:
         image_mime_type = self.is_image(self.input_file_content)
         if image_mime_type:
             self.mimetype = image_mime_type
+        elif self.filename:
+            self.mimetype = mimetypes.guess_type(self.filename)[0] or DEFAULT_MIME_TYPE
         else:
-            if self.filename:
-                self.mimetype = mimetypes.guess_type(self.filename)[0] or DEFAULT_MIME_TYPE
-            else:
-                self.mimetype = DEFAULT_MIME_TYPE
+            self.mimetype = DEFAULT_MIME_TYPE
+
         if not self.filename:
             self.filename = self.mimetype.replace('/', '.')
 
@@ -82,7 +82,7 @@ class InputFile:
             stream (:obj:`bytes`): A byte stream representing the content of a file.
 
         Returns:
-            :obj:`str` | :obj:`None`: The mime-type of an image, if the input is an image, and
+            :obj:`str` | :obj:`None`: The mime-type of an image, if the input is an image, or
             :obj:`None` else.
 
         """
