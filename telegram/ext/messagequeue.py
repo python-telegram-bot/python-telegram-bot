@@ -115,7 +115,7 @@ class DelayQueue(threading.Thread):
         self.__class__.INSTANCE_COUNT += 1
 
         if name is None:
-            name = f'{self.__class__.__name__}-{self.__class__._instcnt}'
+            name = f'{self.__class__.__name__}-{self.__class__.INSTANCE_COUNT}'
         super().__init__(name=name)
 
         if autostart:  # immediately start processing
@@ -156,7 +156,7 @@ class DelayQueue(threading.Thread):
             # finally process one
             if self.parent:
                 # put through parent, if specified
-                self.parent.put(promise)
+                self.parent.put(promise=promise)
             else:
                 promise.run()
                 # error handling

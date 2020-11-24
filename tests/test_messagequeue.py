@@ -20,7 +20,9 @@ from time import sleep, perf_counter
 
 import pytest
 
+from telegram import Bot
 from telegram.ext import MessageQueue, DelayQueue, DelayQueueError
+from telegram.ext.messagequeue import queuedmessage
 
 
 class TestDelayQueue:
@@ -78,7 +80,7 @@ class TestDelayQueue:
                 (self.N * self.burst_limit / (1000 * self.time_limit_ms)) + start_time + 20
             )
             while not delay_queue._queue.empty() and perf_counter() < app_end_time:
-                sleep(1)
+                sleep(0.5)
             assert delay_queue._queue.empty() is True  # check loop exit condition
 
             delay_queue.stop()
@@ -125,7 +127,7 @@ class TestDelayQueue:
         delay_queue = DelayQueue()
         try:
             delay_queue.put(self.callback_raises_exception, [], {})
-            sleep(1)
+            sleep(0.5)
             assert self.test_flag
         finally:
             delay_queue.stop()
@@ -139,7 +141,7 @@ class TestDelayQueue:
         delay_queue = DelayQueue(exc_route=exc_route)
         try:
             delay_queue.put(self.callback_raises_exception, [], {})
-            sleep(1)
+            sleep(0.5)
             assert self.test_flag
         finally:
             delay_queue.stop()
@@ -155,14 +157,14 @@ class TestDelayQueue:
         delay_queue.set_dispatcher(cdp)
         try:
             delay_queue.put(self.callback_raises_exception, [], {})
-            sleep(1)
+            sleep(0.5)
             assert self.test_flag
         finally:
             delay_queue.stop()
 
     def test_parent(self, monkeypatch):
         def put(*args, **kwargs):
-            self.test_flag = True
+            self.test_flag = bool(kwargs.pop('promise', False))
 
         parent = DelayQueue(name='parent')
         monkeypatch.setattr(parent, 'put', put)
@@ -170,7 +172,7 @@ class TestDelayQueue:
         delay_queue = DelayQueue(parent=parent)
         try:
             delay_queue.put(self.call, [], {})
-            sleep(1)
+            sleep(0.5)
             assert self.test_flag
         finally:
             parent.stop()
@@ -275,10 +277,77 @@ class TestMessageQueue:
 
         try:
             message_queue.put(self.call, MessageQueue.GROUP_QUEUE, 1, kwarg='foo')
-            sleep(1)
+            sleep(0.5)
             assert self.test_flag is True
             # make sure that group queue was called, too
             assert group_flag is True
         finally:
             message_queue._delay_queues[MessageQueue.GROUP_QUEUE].put = original_put
             message_queue.stop()
+
+
+@pytest.fixture(scope='function')
+def mq_bot(bot, monkeypatch):
+    class MQBot(Bot):
+        def __init__(self, *args, **kwargs):
+            self.test = None
+            self.default_count = 0
+            self.group_count = 0
+            super().__init__(*args, **kwargs)
+            # below 2 attributes should be provided for decorator usage
+            self._is_messages_queued_default = True
+            self._msg_queue = MessageQueue()
+
+        @queuedmessage
+        def test_method(self, input, *args, **kwargs):
+            self.test = input
+
+    bot = MQBot(token=bot.token)
+
+    orig_default_put = bot._msg_queue._delay_queues[MessageQueue.DEFAULT_QUEUE].put
+    orig_group_put = bot._msg_queue._delay_queues[MessageQueue.GROUP_QUEUE].put
+
+    def step_default_counter(*args, **kwargs):
+        orig_default_put(*args, **kwargs)
+        bot.default_count += 1
+
+    def step_group_counter(*args, **kwargs):
+        orig_group_put(*args, **kwargs)
+        bot.group_count += 1
+
+    monkeypatch.setattr(
+        bot._msg_queue._delay_queues[MessageQueue.DEFAULT_QUEUE], 'put', step_default_counter
+    )
+    monkeypatch.setattr(
+        bot._msg_queue._delay_queues[MessageQueue.GROUP_QUEUE], 'put', step_group_counter
+    )
+    yield bot
+    bot._msg_queue.stop()
+
+
+class TestDecorator:
+    def test_queued_kwarg(self, mq_bot):
+        mq_bot.test_method('received', queued=False)
+        sleep(0.5)
+        assert mq_bot.default_count == 0
+        assert mq_bot.group_count == 0
+        assert mq_bot.test == 'received'
+
+        mq_bot.test_method('received1')
+        sleep(0.5)
+        assert mq_bot.default_count == 1
+        assert mq_bot.group_count == 0
+        assert mq_bot.test == 'received1'
+
+    def test_isgroup_kwarg(self, mq_bot):
+        mq_bot.test_method('received', isgroup=False)
+        sleep(0.5)
+        assert mq_bot.default_count == 1
+        assert mq_bot.group_count == 0
+        assert mq_bot.test == 'received'
+
+        mq_bot.test_method('received1', isgroup=True)
+        sleep(0.5)
+        assert mq_bot.default_count == 2
+        assert mq_bot.group_count == 1
+        assert mq_bot.test == 'received1'
