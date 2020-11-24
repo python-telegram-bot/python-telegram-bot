@@ -37,6 +37,7 @@ telegram package
     telegram.location
     telegram.loginurl
     telegram.message
+    telegram.messageid
     telegram.messageentity
     telegram.parsemode
     telegram.photosize

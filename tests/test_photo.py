@@ -23,6 +23,7 @@ import pytest
 from flaky import flaky
 
 from telegram import Sticker, TelegramError, PhotoSize, InputFile, MessageEntity
+from telegram.error import BadRequest
 from telegram.utils.helpers import escape_markdown
 from tests.conftest import expect_bad_request
 
@@ -216,6 +217,41 @@ class TestPhoto:
         )
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize(
+        'default_bot,custom',
+        [
+            ({'allow_sending_without_reply': True}, None),
+            ({'allow_sending_without_reply': False}, None),
+            ({'allow_sending_without_reply': False}, True),
+        ],
+        indirect=['default_bot'],
+    )
+    def test_send_photo_default_allow_sending_without_reply(
+        self, default_bot, chat_id, photo_file, thumb, photo, custom
+    ):
+        reply_to_message = default_bot.send_message(chat_id, 'test')
+        reply_to_message.delete()
+        if custom is not None:
+            message = default_bot.send_photo(
+                chat_id,
+                photo_file,
+                allow_sending_without_reply=custom,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert message.reply_to_message is None
+        elif default_bot.defaults.allow_sending_without_reply:
+            message = default_bot.send_photo(
+                chat_id, photo_file, reply_to_message_id=reply_to_message.message_id
+            )
+            assert message.reply_to_message is None
+        else:
+            with pytest.raises(BadRequest, match='message not found'):
+                default_bot.send_photo(
+                    chat_id, photo_file, reply_to_message_id=reply_to_message.message_id
+                )
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

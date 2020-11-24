@@ -31,6 +31,7 @@ from telegram import (
 )
 
 # noinspection PyUnresolvedReferences
+from telegram.error import BadRequest
 from .test_animation import animation, animation_file  # noqa: F401
 
 # noinspection PyUnresolvedReferences
@@ -427,6 +428,41 @@ class TestSendMediaGroup:
         assert len(messages) == 2
         assert all([isinstance(mes, Message) for mes in messages])
         assert all([mes.media_group_id == messages[0].media_group_id for mes in messages])
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize(
+        'default_bot,custom',
+        [
+            ({'allow_sending_without_reply': True}, None),
+            ({'allow_sending_without_reply': False}, None),
+            ({'allow_sending_without_reply': False}, True),
+        ],
+        indirect=['default_bot'],
+    )
+    def test_send_media_group_default_allow_sending_without_reply(
+        self, default_bot, chat_id, media_group, custom
+    ):
+        reply_to_message = default_bot.send_message(chat_id, 'test')
+        reply_to_message.delete()
+        if custom is not None:
+            messages = default_bot.send_media_group(
+                chat_id,
+                media_group,
+                allow_sending_without_reply=custom,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert [m.reply_to_message is None for m in messages]
+        elif default_bot.defaults.allow_sending_without_reply:
+            messages = default_bot.send_media_group(
+                chat_id, media_group, reply_to_message_id=reply_to_message.message_id
+            )
+            assert [m.reply_to_message is None for m in messages]
+        else:
+            with pytest.raises(BadRequest, match='message not found'):
+                default_bot.send_media_group(
+                    chat_id, media_group, reply_to_message_id=reply_to_message.message_id
+                )
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

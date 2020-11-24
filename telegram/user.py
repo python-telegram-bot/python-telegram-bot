@@ -26,7 +26,7 @@ from telegram.utils.helpers import mention_html as util_mention_html
 from telegram.utils.helpers import mention_markdown as util_mention_markdown
 
 if TYPE_CHECKING:
-    from telegram import Bot, Message, UserProfilePhotos
+    from telegram import Bot, Message, UserProfilePhotos, MessageId
 
 
 class User(TelegramObject):
@@ -174,6 +174,45 @@ class User(TelegramObject):
         if name:
             return util_mention_html(self.id, name)
         return util_mention_html(self.id, self.full_name)
+
+    def pin_message(self, *args: Any, **kwargs: Any) -> bool:
+        """Shortcut for::
+
+             bot.pin_chat_message(chat_id=update.effective_user.id,
+                                  *args,
+                                  **kwargs)
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.pin_chat_message(self.id, *args, **kwargs)
+
+    def unpin_message(self, *args: Any, **kwargs: Any) -> bool:
+        """Shortcut for::
+
+             bot.unpin_chat_message(chat_id=update.effective_user.id,
+                                    *args,
+                                    **kwargs)
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.unpin_chat_message(self.id, *args, **kwargs)
+
+    def unpin_all_messages(self, *args: Any, **kwargs: Any) -> bool:
+        """Shortcut for::
+
+             bot.unpin_all_chat_messages(chat_id=update.effective_user.id,
+                                         *args,
+                                         **kwargs)
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.unpin_all_chat_messages(self.id, *args, **kwargs)
 
     def send_message(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
@@ -375,3 +414,25 @@ class User(TelegramObject):
 
         """
         return self.bot.send_poll(self.id, *args, **kwargs)
+
+    def send_copy(self, *args: Any, **kwargs: Any) -> 'MessageId':
+        """Shortcut for::
+
+            bot.copy_message(chat_id=update.effective_user.id, *args, **kwargs)
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.copy_message(chat_id=self.id, *args, **kwargs)
+
+    def copy_message(self, *args: Any, **kwargs: Any) -> 'MessageId':
+        """Shortcut for::
+
+            bot.copy_message(from_chat_id=update.effective_user.id, *args, **kwargs)
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.copy_message(from_chat_id=self.id, *args, **kwargs)
