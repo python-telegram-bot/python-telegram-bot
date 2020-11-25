@@ -22,7 +22,7 @@ from pathlib import Path
 
 import pytest
 
-from telegram import Sticker
+from telegram import Sticker, InputFile, Animation
 from telegram import Update
 from telegram import User
 from telegram import MessageEntity
@@ -277,3 +277,47 @@ class TestHelpers:
     )
     def test_is_local_file(self, string, absolute, expected):
         assert helpers.is_local_file(string, absolute) == expected
+
+    @pytest.mark.parametrize(
+        'string,expected',
+        [
+            ('tests/data/game.gif', 'file://' + str(Path.cwd() / 'tests' / 'data' / 'game.gif')),
+            ('tests/data', 'tests/data'),
+            ('file://foobar', 'file://foobar'),
+            (
+                str(Path.cwd() / 'tests' / 'data' / 'game.gif'),
+                'file://' + str(Path.cwd() / 'tests' / 'data' / 'game.gif'),
+            ),
+            (str(Path.cwd() / 'tests' / 'data'), str(Path.cwd() / 'tests' / 'data')),
+            (
+                'https:/api.org/file/botTOKEN/document/file_3',
+                'https:/api.org/file/botTOKEN/document/file_3',
+            ),
+        ],
+    )
+    def test_parse_file_input_string(self, string, expected):
+        assert helpers.parse_file_input(string) == expected
+
+    def test_parse_file_input_file_like(self):
+        with open('tests/data/game.gif', 'rb') as file:
+            parsed = helpers.parse_file_input(file)
+
+        assert isinstance(parsed, InputFile)
+        assert not parsed.attach
+        assert parsed.filename == 'game.gif'
+
+        with open('tests/data/game.gif', 'rb') as file:
+            parsed = helpers.parse_file_input(file, attach=True, filename='test_file')
+
+        assert isinstance(parsed, InputFile)
+        assert parsed.attach
+        assert parsed.filename == 'test_file'
+
+    def test_parse_file_input_tg_object(self):
+        animation = Animation('file_id', 'unique_id', 1, 1, 1)
+        assert helpers.parse_file_input(animation, Animation) == 'file_id'
+        assert helpers.parse_file_input(animation, MessageEntity) is animation
+
+    @pytest.mark.parametrize('obj', [{1: 2}, [1, 2], (1, 2)])
+    def test_parse_file_input_other(self, obj):
+        assert helpers.parse_file_input(obj) is obj

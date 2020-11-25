@@ -18,6 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 import os
+from pathlib import Path
+
 import pytest
 from flaky import flaky
 
@@ -161,6 +163,20 @@ class TestAnimation:
         )
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
+
+    def test_send_animation_local_files(self, monkeypatch, bot, chat_id):
+        # For just test that the correct paths are passed as we have no local bot API set up
+        test_flag = False
+        expected = 'file://' + str(Path.cwd() / 'tests/data/telegram.jpg')
+        file = 'tests/data/telegram.jpg'
+
+        def make_assertion(_, data, *args, **kwargs):
+            nonlocal test_flag
+            test_flag = data.get('animation') == expected and data.get('thumb') == expected
+
+        monkeypatch.setattr(bot, '_post', make_assertion)
+        bot.send_animation(chat_id, file, thumb=file)
+        assert test_flag
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

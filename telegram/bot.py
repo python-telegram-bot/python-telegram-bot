@@ -36,7 +36,6 @@ from typing import (
     Tuple,
     TypeVar,
     Union,
-    cast,
     no_type_check,
 )
 
@@ -63,7 +62,6 @@ from telegram import (
     File,
     GameHighScore,
     InlineQueryResult,
-    InputFile,
     InputMedia,
     LabeledPrice,
     Location,
@@ -94,7 +92,13 @@ from telegram import (
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import InvalidToken, TelegramError
-from telegram.utils.helpers import DEFAULT_NONE, DefaultValue, to_timestamp, is_local_file
+from telegram.utils.helpers import (
+    DEFAULT_NONE,
+    DefaultValue,
+    to_timestamp,
+    is_local_file,
+    parse_file_input,
+)
 from telegram.utils.request import Request
 from telegram.utils.types import FileLike, JSONDict
 
@@ -606,13 +610,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        if isinstance(photo, PhotoSize):
-            photo = photo.file_id
-        elif InputFile.is_file(photo):
-            photo = cast(IO, photo)
-            photo = InputFile(photo)  # type: ignore[assignment]
-
-        data: JSONDict = {'chat_id': chat_id, 'photo': photo}
+        data: JSONDict = {'chat_id': chat_id, 'photo': parse_file_input(photo, PhotoSize)}
 
         if caption:
             data['caption'] = caption
@@ -702,13 +700,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        if isinstance(audio, Audio):
-            audio = audio.file_id
-        elif InputFile.is_file(audio):
-            audio = cast(IO, audio)
-            audio = InputFile(audio)
-
-        data: JSONDict = {'chat_id': chat_id, 'audio': audio}
+        data: JSONDict = {'chat_id': chat_id, 'audio': parse_file_input(audio, Audio)}
 
         if duration:
             data['duration'] = duration
@@ -721,10 +713,7 @@ class Bot(TelegramObject):
         if parse_mode:
             data['parse_mode'] = parse_mode
         if thumb:
-            if InputFile.is_file(thumb):
-                thumb = cast(IO, thumb)
-                thumb = InputFile(thumb, attach=True)
-            data['thumb'] = thumb
+            data['thumb'] = parse_file_input(thumb, attach=True)
 
         return self._message(  # type: ignore[return-value]
             'sendAudio',
@@ -806,13 +795,10 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        if isinstance(document, Document):
-            document = document.file_id
-        elif InputFile.is_file(document):
-            document = cast(IO, document)
-            document = InputFile(document, filename=filename)
-
-        data: JSONDict = {'chat_id': chat_id, 'document': document}
+        data: JSONDict = {
+            'chat_id': chat_id,
+            'document': parse_file_input(document, Document, filename=filename),
+        }
 
         if caption:
             data['caption'] = caption
@@ -821,10 +807,7 @@ class Bot(TelegramObject):
         if disable_content_type_detection is not None:
             data['disable_content_type_detection'] = disable_content_type_detection
         if thumb:
-            if InputFile.is_file(thumb):
-                thumb = cast(IO, thumb)
-                thumb = InputFile(thumb, attach=True)
-            data['thumb'] = thumb
+            data['thumb'] = parse_file_input(thumb, attach=True)
 
         return self._message(  # type: ignore[return-value]
             'sendDocument',
@@ -884,13 +867,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        if isinstance(sticker, Sticker):
-            sticker = sticker.file_id
-        elif InputFile.is_file(sticker):
-            sticker = cast(IO, sticker)
-            sticker = InputFile(sticker)
-
-        data: JSONDict = {'chat_id': chat_id, 'sticker': sticker}
+        data: JSONDict = {'chat_id': chat_id, 'sticker': parse_file_input(sticker, Sticker)}
 
         return self._message(  # type: ignore[return-value]
             'sendSticker',
@@ -979,13 +956,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        if isinstance(video, Video):
-            video = video.file_id
-        elif InputFile.is_file(video):
-            video = cast(IO, video)
-            video = InputFile(video)
-
-        data: JSONDict = {'chat_id': chat_id, 'video': video}
+        data: JSONDict = {'chat_id': chat_id, 'video': parse_file_input(video, Video)}
 
         if duration:
             data['duration'] = duration
@@ -1000,10 +971,7 @@ class Bot(TelegramObject):
         if height:
             data['height'] = height
         if thumb:
-            if InputFile.is_file(thumb):
-                thumb = cast(IO, thumb)
-                thumb = InputFile(thumb, attach=True)
-            data['thumb'] = thumb
+            data['thumb'] = parse_file_input(thumb, attach=True)
 
         return self._message(  # type: ignore[return-value]
             'sendVideo',
@@ -1078,23 +1046,17 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        if isinstance(video_note, VideoNote):
-            video_note = video_note.file_id
-        elif InputFile.is_file(video_note):
-            video_note = cast(IO, video_note)
-            video_note = InputFile(video_note)
-
-        data: JSONDict = {'chat_id': chat_id, 'video_note': video_note}
+        data: JSONDict = {
+            'chat_id': chat_id,
+            'video_note': parse_file_input(video_note, VideoNote),
+        }
 
         if duration is not None:
             data['duration'] = duration
         if length is not None:
             data['length'] = length
         if thumb:
-            if InputFile.is_file(thumb):
-                thumb = cast(IO, thumb)
-                thumb = InputFile(thumb, attach=True)
-            data['thumb'] = thumb
+            data['thumb'] = parse_file_input(thumb, attach=True)
 
         return self._message(  # type: ignore[return-value]
             'sendVideoNote',
@@ -1176,13 +1138,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        if isinstance(animation, Animation):
-            animation = animation.file_id
-        elif InputFile.is_file(animation):
-            animation = cast(IO, animation)
-            animation = InputFile(animation)
-
-        data: JSONDict = {'chat_id': chat_id, 'animation': animation}
+        data: JSONDict = {'chat_id': chat_id, 'animation': parse_file_input(animation, Animation)}
 
         if duration:
             data['duration'] = duration
@@ -1191,10 +1147,7 @@ class Bot(TelegramObject):
         if height:
             data['height'] = height
         if thumb:
-            if InputFile.is_file(thumb):
-                thumb = cast(IO, thumb)
-                thumb = InputFile(thumb, attach=True)
-            data['thumb'] = thumb
+            data['thumb'] = parse_file_input(thumb, attach=True)
         if caption:
             data['caption'] = caption
         if parse_mode:
@@ -1270,13 +1223,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        if isinstance(voice, Voice):
-            voice = voice.file_id
-        elif InputFile.is_file(voice):
-            voice = cast(IO, voice)
-            voice = InputFile(voice)
-
-        data: JSONDict = {'chat_id': chat_id, 'voice': voice}
+        data: JSONDict = {'chat_id': chat_id, 'voice': parse_file_input(voice, Voice)}
 
         if duration:
             data['duration'] = duration
@@ -2704,10 +2651,7 @@ class Bot(TelegramObject):
         if url is not None:
             data['url'] = url
         if certificate:
-            if InputFile.is_file(certificate):
-                certificate = cast(IO, certificate)
-                certificate = InputFile(certificate)
-            data['certificate'] = certificate
+            data['certificate'] = parse_file_input(certificate)
         if max_connections is not None:
             data['max_connections'] = max_connections
         if allowed_updates is not None:
@@ -3647,11 +3591,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        if InputFile.is_file(photo):
-            photo = cast(IO, photo)
-            photo = InputFile(photo)
-
-        data: JSONDict = {'chat_id': chat_id, 'photo': photo}
+        data: JSONDict = {'chat_id': chat_id, 'photo': parse_file_input(photo)}
 
         result = self._post('setChatPhoto', data, timeout=timeout, api_kwargs=api_kwargs)
 
@@ -3943,10 +3883,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        if InputFile.is_file(png_sticker):
-            png_sticker = InputFile(png_sticker)  # type: ignore[assignment,arg-type]
-
-        data: JSONDict = {'user_id': user_id, 'png_sticker': png_sticker}
+        data: JSONDict = {'user_id': user_id, 'png_sticker': parse_file_input(png_sticker)}
 
         result = self._post('uploadStickerFile', data, timeout=timeout, api_kwargs=api_kwargs)
 
@@ -4016,18 +3953,12 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        if InputFile.is_file(png_sticker):
-            png_sticker = InputFile(png_sticker)  # type: ignore[assignment,arg-type]
-
-        if InputFile.is_file(tgs_sticker):
-            tgs_sticker = InputFile(tgs_sticker)  # type: ignore[assignment,arg-type]
-
         data: JSONDict = {'user_id': user_id, 'name': name, 'title': title, 'emojis': emojis}
 
         if png_sticker is not None:
-            data['png_sticker'] = png_sticker
+            data['png_sticker'] = parse_file_input(png_sticker)
         if tgs_sticker is not None:
-            data['tgs_sticker'] = tgs_sticker
+            data['tgs_sticker'] = parse_file_input(tgs_sticker)
         if contains_masks is not None:
             data['contains_masks'] = contains_masks
         if mask_position is not None:
@@ -4095,18 +4026,12 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        if InputFile.is_file(png_sticker):
-            png_sticker = InputFile(png_sticker)  # type: ignore[assignment,arg-type]
-
-        if InputFile.is_file(tgs_sticker):
-            tgs_sticker = InputFile(tgs_sticker)  # type: ignore[assignment,arg-type]
-
         data: JSONDict = {'user_id': user_id, 'name': name, 'emojis': emojis}
 
         if png_sticker is not None:
-            data['png_sticker'] = png_sticker
+            data['png_sticker'] = parse_file_input(png_sticker)
         if tgs_sticker is not None:
-            data['tgs_sticker'] = tgs_sticker
+            data['tgs_sticker'] = parse_file_input(tgs_sticker)
         if mask_position is not None:
             # We need to_json() instead of to_dict() here, because we're sending a media
             # message here, which isn't json dumped by utils.request
@@ -4212,12 +4137,10 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
+        data: JSONDict = {'name': name, 'user_id': user_id}
 
-        if InputFile.is_file(thumb):
-            thumb = cast(IO, thumb)
-            thumb = InputFile(thumb)
-
-        data: JSONDict = {'name': name, 'user_id': user_id, 'thumb': thumb}
+        if thumb is not None:
+            data['thumb'] = parse_file_input(thumb)
 
         result = self._post('setStickerSetThumb', data, timeout=timeout, api_kwargs=api_kwargs)
 

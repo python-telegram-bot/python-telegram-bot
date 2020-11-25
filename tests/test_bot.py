@@ -1389,6 +1389,20 @@ class TestBot:
         with open('tests/data/telegram_test_channel.jpg', 'rb') as f:
             expect_bad_request(func, 'Type of file mismatch', 'Telegram did not accept the file.')
 
+    def test_set_chat_photo_local_files(self, monkeypatch, bot, chat_id):
+        # For just test that the correct paths are passed as we have no local bot API set up
+        test_flag = False
+        expected = 'file://' + str(Path.cwd() / 'tests/data/telegram.jpg')
+        file = 'tests/data/telegram.jpg'
+
+        def make_assertion(_, data, *args, **kwargs):
+            nonlocal test_flag
+            test_flag = data.get('photo') == expected
+
+        monkeypatch.setattr(bot, '_post', make_assertion)
+        bot.set_chat_photo(chat_id, file)
+        assert test_flag
+
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_delete_chat_photo(self, bot, channel_id):

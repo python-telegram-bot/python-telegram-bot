@@ -18,10 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram InputMedia Objects."""
 
-from typing import IO, Union, cast
+from typing import Union
 
 from telegram import Animation, Audio, Document, InputFile, PhotoSize, TelegramObject, Video
-from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
+from telegram.utils.helpers import DEFAULT_NONE, DefaultValue, parse_file_input
 from telegram.utils.types import FileLike
 
 
@@ -77,7 +77,7 @@ class InputMediaAnimation(InputMedia):
     def __init__(
         self,
         media: Union[str, FileLike, Animation],
-        thumb: FileLike = None,
+        thumb: Union[str, FileLike] = None,
         caption: str = None,
         parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
         width: int = None,
@@ -91,18 +91,11 @@ class InputMediaAnimation(InputMedia):
             self.width = media.width
             self.height = media.height
             self.duration = media.duration
-        elif InputFile.is_file(media):
-            media = cast(IO, media)
-            self.media = InputFile(media, attach=True)
         else:
-            self.media = media  # type: ignore[assignment]
+            self.media = parse_file_input(media, attach=True)
 
         if thumb:
-            if InputFile.is_file(thumb):
-                thumb = cast(IO, thumb)
-                self.thumb = InputFile(thumb, attach=True)
-            else:
-                self.thumb = thumb  # type: ignore[assignment]
+            self.thumb = parse_file_input(thumb, attach=True)
 
         if caption:
             self.caption = caption
@@ -143,14 +136,7 @@ class InputMediaPhoto(InputMedia):
         parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
     ):
         self.type = 'photo'
-
-        if isinstance(media, PhotoSize):
-            self.media: Union[str, InputFile] = media.file_id
-        elif InputFile.is_file(media):
-            media = cast(IO, media)
-            self.media = InputFile(media, attach=True)
-        else:
-            self.media = media  # type: ignore[assignment]
+        self.media = parse_file_input(media, PhotoSize, attach=True)
 
         if caption:
             self.caption = caption
@@ -211,7 +197,7 @@ class InputMediaVideo(InputMedia):
         duration: int = None,
         supports_streaming: bool = None,
         parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-        thumb: FileLike = None,
+        thumb: Union[str, FileLike] = None,
     ):
         self.type = 'video'
 
@@ -220,18 +206,11 @@ class InputMediaVideo(InputMedia):
             self.width = media.width
             self.height = media.height
             self.duration = media.duration
-        elif InputFile.is_file(media):
-            media = cast(IO, media)
-            self.media = InputFile(media, attach=True)
         else:
-            self.media = media  # type: ignore[assignment]
+            self.media = parse_file_input(media, attach=True)
 
         if thumb:
-            if InputFile.is_file(thumb):
-                thumb = cast(IO, thumb)
-                self.thumb = InputFile(thumb, attach=True)
-            else:
-                self.thumb = thumb  # type: ignore[assignment]
+            self.thumb = parse_file_input(thumb, attach=True)
 
         if caption:
             self.caption = caption
@@ -289,7 +268,7 @@ class InputMediaAudio(InputMedia):
     def __init__(
         self,
         media: Union[str, FileLike, Audio],
-        thumb: FileLike = None,
+        thumb: Union[str, FileLike] = None,
         caption: str = None,
         parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
         duration: int = None,
@@ -303,18 +282,11 @@ class InputMediaAudio(InputMedia):
             self.duration = media.duration
             self.performer = media.performer
             self.title = media.title
-        elif InputFile.is_file(media):
-            media = cast(IO, media)
-            self.media = InputFile(media, attach=True)
         else:
-            self.media = media  # type: ignore[assignment]
+            self.media = parse_file_input(media, attach=True)
 
         if thumb:
-            if InputFile.is_file(thumb):
-                thumb = cast(IO, thumb)
-                self.thumb = InputFile(thumb, attach=True)
-            else:
-                self.thumb = thumb  # type: ignore[assignment]
+            self.thumb = parse_file_input(thumb, attach=True)
 
         if caption:
             self.caption = caption
@@ -363,27 +335,16 @@ class InputMediaDocument(InputMedia):
     def __init__(
         self,
         media: Union[str, FileLike, Document],
-        thumb: FileLike = None,
+        thumb: Union[str, FileLike] = None,
         caption: str = None,
         parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
         disable_content_type_detection: bool = None,
     ):
         self.type = 'document'
-
-        if isinstance(media, Document):
-            self.media: Union[str, InputFile] = media.file_id
-        elif InputFile.is_file(media):
-            media = cast(IO, media)
-            self.media = InputFile(media, attach=True)
-        else:
-            self.media = media  # type: ignore[assignment]
+        self.media = parse_file_input(media, Document, attach=True)
 
         if thumb:
-            if InputFile.is_file(thumb):
-                thumb = cast(IO, thumb)
-                self.thumb = InputFile(thumb, attach=True)
-            else:
-                self.thumb = thumb  # type: ignore[assignment]
+            self.thumb = parse_file_input(thumb, attach=True)
 
         if caption:
             self.caption = caption
