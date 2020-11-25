@@ -22,7 +22,7 @@ from typing import Union
 
 from telegram import Animation, Audio, Document, InputFile, PhotoSize, TelegramObject, Video
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue, parse_file_input
-from telegram.utils.types import FileLike
+from telegram.utils.types import FileInput
 
 
 class InputMedia(TelegramObject):
@@ -50,11 +50,13 @@ class InputMediaAnimation(InputMedia):
 
 
     Args:
-        media (:obj:`str` | `filelike object` | :class:`telegram.Animation`): File to send. Pass a
+        media (:obj:`str` | `filelike object` | :class:`pathlib.Path` | \
+            :class:`telegram.Animation`): File to send. Pass a
             file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP
             URL for Telegram to get a file from the Internet. Lastly you can pass an existing
             :class:`telegram.Animation` object to send.
-        thumb (`filelike object`, optional): Thumbnail of the file sent; can be ignored if
+        thumb (`filelike object` | :class:`pathlib.Path`, optional): Thumbnail of the file sent;
+            can be ignored if
             thumbnail generation for the file is supported server-side. The thumbnail should be
             in JPEG format and less than 200 kB in size. A thumbnail's width and height should
             not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
@@ -76,8 +78,8 @@ class InputMediaAnimation(InputMedia):
 
     def __init__(
         self,
-        media: Union[str, FileLike, Animation],
-        thumb: Union[str, FileLike] = None,
+        media: Union[FileInput, Animation],
+        thumb: FileInput = None,
         caption: str = None,
         parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
         width: int = None,
@@ -118,7 +120,8 @@ class InputMediaPhoto(InputMedia):
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
 
     Args:
-        media (:obj:`str` | `filelike object` | :class:`telegram.PhotoSize`): File to send. Pass a
+        media (:obj:`str` | `filelike object` | :class:`pathlib.Path` | \
+            :class:`telegram.PhotoSize`): File to send. Pass a
             file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP
             URL for Telegram to get a file from the Internet. Lastly you can pass an existing
             :class:`telegram.PhotoSize` object to send.
@@ -131,7 +134,7 @@ class InputMediaPhoto(InputMedia):
 
     def __init__(
         self,
-        media: Union[str, FileLike, PhotoSize],
+        media: Union[FileInput, PhotoSize],
         caption: str = None,
         parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
     ):
@@ -159,7 +162,8 @@ class InputMediaVideo(InputMedia):
         thumb (:class:`telegram.InputFile`): Optional. Thumbnail of the file to send.
 
     Args:
-        media (:obj:`str` | `filelike object` | :class:`telegram.Video`): File to send. Pass a
+        media (:obj:`str` | `filelike object` | :class:`pathlib.Path` | :class:`telegram.Video`):
+            File to send. Pass a
             file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP
             URL for Telegram to get a file from the Internet. Lastly you can pass an existing
             :class:`telegram.Video` object to send.
@@ -173,7 +177,8 @@ class InputMediaVideo(InputMedia):
         duration (:obj:`int`, optional): Video duration.
         supports_streaming (:obj:`bool`, optional): Pass :obj:`True`, if the uploaded video is
             suitable for streaming.
-        thumb (`filelike object`, optional): Thumbnail of the file sent; can be ignored if
+        thumb (`filelike object` | :class:`pathlib.Path`, optional): Thumbnail of the file sent;
+            can be ignored if
             thumbnail generation for the file is supported server-side. The thumbnail should be
             in JPEG format and less than 200 kB in size. A thumbnail's width and height should
             not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
@@ -190,14 +195,14 @@ class InputMediaVideo(InputMedia):
 
     def __init__(
         self,
-        media: Union[str, FileLike, Video],
+        media: Union[FileInput, Video],
         caption: str = None,
         width: int = None,
         height: int = None,
         duration: int = None,
         supports_streaming: bool = None,
         parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-        thumb: Union[str, FileLike] = None,
+        thumb: FileInput = None,
     ):
         self.type = 'video'
 
@@ -240,7 +245,8 @@ class InputMediaAudio(InputMedia):
         thumb (:class:`telegram.InputFile`): Optional. Thumbnail of the file to send.
 
     Args:
-        media (:obj:`str` | `filelike object` | :class:`telegram.Audio`): File to send. Pass a
+        media (:obj:`str` | `filelike object` | :class:`pathlib.Path` | :class:`telegram.Audio`):
+            File to send. Pass a
             file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP
             URL for Telegram to get a file from the Internet. Lastly you can pass an existing
             :class:`telegram.Audio` object to send.
@@ -253,7 +259,8 @@ class InputMediaAudio(InputMedia):
         performer (:obj:`str`, optional): Performer of the audio as defined by sender or by audio
             tags.
         title (:obj:`str`, optional): Title of the audio as defined by sender or by audio tags.
-        thumb (`filelike object`, optional): Thumbnail of the file sent; can be ignored if
+        thumb (`filelike object` | :class:`pathlib.Path`, optional): Thumbnail of the file sent;
+            can be ignored if
             thumbnail generation for the file is supported server-side. The thumbnail should be
             in JPEG format and less than 200 kB in size. A thumbnail's width and height should
             not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
@@ -267,8 +274,8 @@ class InputMediaAudio(InputMedia):
 
     def __init__(
         self,
-        media: Union[str, FileLike, Audio],
-        thumb: Union[str, FileLike] = None,
+        media: Union[FileInput, Audio],
+        thumb: FileInput = None,
         caption: str = None,
         parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
         duration: int = None,
@@ -313,7 +320,8 @@ class InputMediaDocument(InputMedia):
             the document is sent as part of an album.
 
     Args:
-        media (:obj:`str` | `filelike object` | :class:`telegram.Document`): File to send. Pass a
+        media (:obj:`str` | `filelike object` | :class:`pathlib.Path` | \
+            :class:`telegram.Document`): File to send. Pass a
             file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP
             URL for Telegram to get a file from the Internet. Lastly you can pass an existing
             :class:`telegram.Document` object to send.
@@ -322,7 +330,8 @@ class InputMediaDocument(InputMedia):
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
-        thumb (`filelike object`, optional): Thumbnail of the file sent; can be ignored if
+        thumb (`filelike object` | :class:`pathlib.Path`, optional): Thumbnail of the file sent;
+            can be ignored if
             thumbnail generation for the file is supported server-side. The thumbnail should be
             in JPEG format and less than 200 kB in size. A thumbnail's width and height should
             not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
@@ -334,8 +343,8 @@ class InputMediaDocument(InputMedia):
 
     def __init__(
         self,
-        media: Union[str, FileLike, Document],
-        thumb: Union[str, FileLike] = None,
+        media: Union[FileInput, Document],
+        thumb: FileInput = None,
         caption: str = None,
         parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
         disable_content_type_detection: bool = None,

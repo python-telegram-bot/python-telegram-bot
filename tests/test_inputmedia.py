@@ -162,8 +162,8 @@ class TestInputMediaVideo:
         input_media_video = InputMediaVideo(
             'tests/data/telegram.mp4', thumb='tests/data/telegram.jpg'
         )
-        assert input_media_video.media == 'file://' + str(Path.cwd() / 'tests/data/telegram.mp4')
-        assert input_media_video.thumb == 'file://' + str(Path.cwd() / 'tests/data/telegram.jpg')
+        assert input_media_video.media == f"file://{Path.cwd() / 'tests/data/telegram.mp4'}"
+        assert input_media_video.thumb == f"file://{Path.cwd() / 'tests/data/telegram.jpg'}"
 
 
 class TestInputMediaPhoto:
@@ -201,7 +201,7 @@ class TestInputMediaPhoto:
 
     def test_with_local_files(self):
         input_media_photo = InputMediaPhoto('tests/data/telegram.mp4')
-        assert input_media_photo.media == 'file://' + str(Path.cwd() / 'tests/data/telegram.mp4')
+        assert input_media_photo.media == f"file://{Path.cwd() / 'tests/data/telegram.mp4'}"
 
 
 class TestInputMediaAnimation:
@@ -306,8 +306,8 @@ class TestInputMediaAudio:
         input_media_audio = InputMediaAudio(
             'tests/data/telegram.mp4', thumb='tests/data/telegram.jpg'
         )
-        assert input_media_audio.media == 'file://' + str(Path.cwd() / 'tests/data/telegram.mp4')
-        assert input_media_audio.thumb == 'file://' + str(Path.cwd() / 'tests/data/telegram.jpg')
+        assert input_media_audio.media == f"file://{Path.cwd() / 'tests/data/telegram.mp4'}"
+        assert input_media_audio.thumb == f"file://{Path.cwd() / 'tests/data/telegram.jpg'}"
 
 
 class TestInputMediaDocument:

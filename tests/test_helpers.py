@@ -269,6 +269,8 @@ class TestHelpers:
             ('tests/data', True, False),
             (str(Path.cwd() / 'tests' / 'data' / 'game.gif'), True, True),
             (str(Path.cwd() / 'tests' / 'data'), True, False),
+            (Path.cwd() / 'tests' / 'data' / 'game.gif', True, True),
+            (Path.cwd() / 'tests' / 'data', True, False),
             ('https:/api.org/file/botTOKEN/document/file_3', True, False),
             ('https:/api.org/file/botTOKEN/document/file_3', False, False),
             (None, True, False),
@@ -281,14 +283,19 @@ class TestHelpers:
     @pytest.mark.parametrize(
         'string,expected',
         [
-            ('tests/data/game.gif', 'file://' + str(Path.cwd() / 'tests' / 'data' / 'game.gif')),
+            ('tests/data/game.gif', f"file://{Path.cwd() / 'tests' / 'data' / 'game.gif'}"),
             ('tests/data', 'tests/data'),
             ('file://foobar', 'file://foobar'),
             (
                 str(Path.cwd() / 'tests' / 'data' / 'game.gif'),
-                'file://' + str(Path.cwd() / 'tests' / 'data' / 'game.gif'),
+                f"file://{Path.cwd() / 'tests' / 'data' / 'game.gif'}",
             ),
             (str(Path.cwd() / 'tests' / 'data'), str(Path.cwd() / 'tests' / 'data')),
+            (
+                Path.cwd() / 'tests' / 'data' / 'game.gif',
+                f"file://{Path.cwd() / 'tests' / 'data' / 'game.gif'}",
+            ),
+            (Path.cwd() / 'tests' / 'data', Path.cwd() / 'tests' / 'data'),
             (
                 'https:/api.org/file/botTOKEN/document/file_3',
                 'https:/api.org/file/botTOKEN/document/file_3',
