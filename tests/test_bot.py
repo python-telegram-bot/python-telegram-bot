@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import logging
 import time
 import datetime as dtm
 from platform import python_implementation
@@ -45,7 +46,9 @@ from telegram import (
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
+from telegram.ext import MessageQueue, DelayQueue
 from telegram.utils.helpers import from_timestamp, escape_markdown, to_timestamp
+from telegram.utils.promise import Promise
 from tests.conftest import expect_bad_request
 
 BASE_TIME = time.time()
@@ -91,6 +94,15 @@ def inline_results_callback(page=None):
 @pytest.fixture(scope='class')
 def inline_results():
     return inline_results_callback()
+
+
+@pytest.fixture(scope='function')
+def mq_bot(bot, monkeypatch):
+    bot.message_queue = MessageQueue()
+    bot.message_queue.add_delay_queue(DelayQueue(name='custom_dq'))
+    yield bot
+    bot.message_queue.stop()
+    bot.message_queue = None
 
 
 class TestBot:
@@ -1379,3 +1391,72 @@ class TestBot:
             assert bc[0].description == 'descr1'
             assert bc[1].command == 'cmd2'
             assert bc[1].description == 'descr2'
+
+    @pytest.mark.parametrize(
+        'chat_id,expected',
+        [
+            ('123', 'default'),
+            (123, 'default'),
+            ('-123', 'group'),
+            (-123, 'group'),
+            ('@supergroup', 'group'),
+            ('foobar', 'default'),
+        ],
+    )
+    def test_message_queue_group_chat_detection(
+        self, mq_bot, monkeypatch, chat_id, expected, caplog
+    ):
+        def _post(*args, **kwargs):
+            pass
+
+        monkeypatch.setattr(mq_bot, '_post', _post)
+        with caplog.at_level(logging.DEBUG):
+            result = mq_bot.send_message(chat_id, 'text', delay_queue=MessageQueue.DEFAULT_QUEUE)
+            assert isinstance(result, Promise)
+            assert len(caplog.records) == 4
+            assert expected in caplog.records[1].getMessage()
+
+        with caplog.at_level(logging.DEBUG):
+            result = mq_bot.send_message(
+                text='text', chat_id=chat_id, delay_queue=MessageQueue.DEFAULT_QUEUE
+            )
+            assert isinstance(result, Promise)
+            assert len(caplog.records) == 8
+            assert expected in caplog.records[5].getMessage()
+
+        with caplog.at_level(logging.DEBUG):
+            assert isinstance(mq_bot.get_me(delay_queue=MessageQueue.DEFAULT_QUEUE), Promise)
+            assert len(caplog.records) == 12
+            assert 'default' in caplog.records[9].getMessage()
+
+    def test_stopped_message_queue(self, mq_bot, caplog):
+        mq_bot.message_queue.stop()
+        with caplog.at_level(logging.DEBUG):
+            result = mq_bot.get_me(delay_queue=MessageQueue.DEFAULT_QUEUE)
+            assert not isinstance(result, Promise)
+            assert len(caplog.records) >= 2
+            assert 'Ignoring call to MessageQueue' in caplog.records[1].getMessage()
+
+    def test_no_message_queue(self, bot, caplog):
+        with caplog.at_level(logging.DEBUG):
+            result = bot.get_me(delay_queue=MessageQueue.DEFAULT_QUEUE)
+            assert not isinstance(result, Promise)
+            assert len(caplog.records) >= 2
+            assert 'Ignoring call to MessageQueue' in caplog.records[1].getMessage()
+
+    def test_message_queue_custom_delay_queue(self, chat_id, mq_bot, monkeypatch):
+        test_flag = False
+        orig_put = mq_bot.message_queue._delay_queues['custom_dq'].put
+
+        def put(*args, **kwargs):
+            nonlocal test_flag
+            test_flag = True
+            return orig_put(*args, **kwargs)
+
+        result = mq_bot.send_message(chat_id, 'general kenobi')
+        assert not isinstance(result, Promise)
+
+        monkeypatch.setattr(mq_bot.message_queue._delay_queues['custom_dq'], 'put', put)
+        result = mq_bot.send_message(chat_id, 'hello there', delay_queue='custom_dq')
+        assert isinstance(result, Promise)
+        assert test_flag

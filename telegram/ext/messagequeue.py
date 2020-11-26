@@ -329,6 +329,7 @@ class MessageQueue:
         """
         for delay_queue in self._delay_queues.values():
             delay_queue.stop(timeout)
+        self.running = False
 
     def put(self, func: Callable, delay_queue: str, *args: Any, **kwargs: Any) -> Promise:
         """

@@ -114,12 +114,10 @@ def info(func: Callable[..., RT]) -> Callable[..., RT]:
     return decorator
 
 
-def log(
-    func: Callable[..., RT], *args: Any, **kwargs: Any  # pylint: disable=W0613
-) -> Callable[..., RT]:
+def log(func: Callable[..., RT]) -> Callable[..., RT]:
     logger = logging.getLogger(func.__module__)
 
-    def decorator(self: 'Bot', *args: Any, **kwargs: Any) -> RT:  # pylint: disable=W0613
+    def decorator(_: Callable, *args: Any, **kwargs: Any) -> RT:  # pylint: disable=W0613
         logger.debug('Entering: %s', func.__name__)
         result = func(*args, **kwargs)
         logger.debug(result)
@@ -129,27 +127,29 @@ def log(
     return decorate(func, decorator)
 
 
-def mq(
-    func: Callable[..., RT], *args: Any, **kwargs: Any  # pylint: disable=W0613
-) -> Callable[..., RT]:
-    def decorator(self: Union[Callable, 'Bot'], *args: Any, **kwargs: Any) -> RT:
-        if callable(self):
-            self = cast('Bot', args[0])
+def mq(func: Callable[..., RT]) -> Callable[..., RT]:
+    logger = logging.getLogger(func.__module__)
+
+    def decorator(_: Callable, *args: Any, **kwargs: Any) -> RT:
+        self = cast('Bot', args[0])
+        arg_spec = inspect.getfullargspec(func)
+        idx = arg_spec.args.index('delay_queue')
+        delay_queue = args[idx]
 
         if not self.message_queue or not self.message_queue.running:
+            if delay_queue:
+                logger.warning(
+                    'Ignoring call to MessageQueue, because it is either not set or not running.'
+                )
             return func(*args, **kwargs)
 
-        delay_queue = kwargs.pop('delay_queue', None)
         if not delay_queue:
             return func(*args, **kwargs)
 
         if delay_queue == self.message_queue.DEFAULT_QUEUE:
             # For default queue, check if we're in a group setting or not
-            arg_spec = inspect.getfullargspec(func)
             chat_id: Union[str, int] = ''
-            if 'chat_id' in kwargs:
-                chat_id = kwargs['chat_id']
-            elif 'chat_id' in arg_spec.args:
+            if 'chat_id' in arg_spec.args:
                 idx = arg_spec.args.index('chat_id')
                 chat_id = args[idx]
 
@@ -163,13 +163,19 @@ def mq(
                 except ValueError:
                     is_group = False
 
+            logger.debug(
+                'Processing MessageQueue call with chat id %s through the %s queue.',
+                chat_id,
+                'group' if is_group else 'default',
+            )
+
             queue = self.message_queue.GROUP_QUEUE if is_group else delay_queue
             return self.message_queue.put(  # type: ignore[return-value]
-                func, queue, self, *args, **kwargs
+                func, queue, *args, **kwargs
             )
 
         return self.message_queue.put(  # type: ignore[return-value]
-            func, delay_queue, self, *args, **kwargs
+            func, delay_queue, *args, **kwargs
         )
 
     return decorate(func, decorator)
