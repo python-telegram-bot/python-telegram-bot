@@ -32,6 +32,7 @@ from typing import Callable, Any, TYPE_CHECKING, List, NoReturn, ClassVar, Dict,
 
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.promise import Promise
+from telegram import constants
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -64,7 +65,8 @@ class DelayQueue(threading.Thread):
             requests through that delay queue after they were processed by this queue. Defaults to
             :obj:`None`.
         burst_limit (:obj:`int`, optional): Number of maximum callbacks to process per time-window
-            defined by :attr:`time_limit_ms`. Defaults to 30.
+            defined by :attr:`time_limit_ms`. Defaults to
+            :attr:`telegram.constants.MAX_MESSAGES_PER_SECOND`.
         time_limit_ms (:obj:`int`, optional): Defines width of time-window used when each
             processing limit is calculated. Defaults to 1000.
         error_handler (:obj:`callable`, optional): A callable, accepting 1 positional argument.
@@ -86,7 +88,7 @@ class DelayQueue(threading.Thread):
     def __init__(
         self,
         queue: q.Queue = None,
-        burst_limit: int = 30,
+        burst_limit: int = constants.MAX_MESSAGES_PER_SECOND,
         time_limit_ms: int = 1000,
         exc_route: Callable[[Exception], None] = None,
         autostart: bool = True,
@@ -226,11 +228,13 @@ class MessageQueue:
 
     Args:
         all_burst_limit (:obj:`int`, optional): Number of maximum *all-type* callbacks to process
-            per time-window defined by :attr:`all_time_limit_ms`. Defaults to 30.
+            per time-window defined by :attr:`all_time_limit_ms`. Defaults to
+            :attr:`telegram.constants.MAX_MESSAGES_PER_SECOND`.
         all_time_limit_ms (:obj:`int`, optional): Defines width of *all-type* time-window used when
             each processing limit is calculated. Defaults to 1000 ms.
         group_burst_limit (:obj:`int`, optional): Number of maximum *group-type* callbacks to
-            process per time-window defined by :attr:`group_time_limit_ms`. Defaults to 20.
+            process per time-window defined by :attr:`group_time_limit_ms`. Defaults to
+            :attr:`telegram.constants.MAX_MESSAGES_PER_MINUTE_PER_GROUP`.
         group_time_limit_ms (:obj:`int`, optional): Defines width of *group-type* time-window used
             when each processing limit is calculated. Defaults to 60000 ms.
         error_handler (:obj:`callable`, optional): A callable, accepting 1 positional argument.
@@ -246,9 +250,9 @@ class MessageQueue:
 
     def __init__(
         self,
-        all_burst_limit: int = 30,
+        all_burst_limit: int = constants.MAX_MESSAGES_PER_SECOND,
         all_time_limit_ms: int = 1000,
-        group_burst_limit: int = 20,
+        group_burst_limit: int = constants.MAX_MESSAGES_PER_MINUTE_PER_GROUP,
         group_time_limit_ms: int = 60000,
         exc_route: Callable[[Exception], None] = None,
         autostart: bool = True,
