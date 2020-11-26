@@ -315,9 +315,9 @@ class MessageQueue:
 
     def start(self) -> None:
         """Starts the all :class:`telegram.ext.DelayQueue` registered for this message queue."""
+        self.running = True
         for delay_queue in self._delay_queues.values():
             delay_queue.start()
-        self.running = True
 
     def stop(self, timeout: float = None) -> None:
         """
@@ -327,9 +327,9 @@ class MessageQueue:
             timeout (:obj:`float`, optional): The timeout to pass to
                 :meth:`telegram.ext.DelayQueue.stop`.
         """
+        self.running = False
         for delay_queue in self._delay_queues.values():
             delay_queue.stop(timeout)
-        self.running = False
 
     def put(self, func: Callable, delay_queue: str, *args: Any, **kwargs: Any) -> Promise:
         """

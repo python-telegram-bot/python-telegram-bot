@@ -38,13 +38,13 @@ import pytest
 
 from telegram import TelegramError, Message, User, Chat, Update, Bot
 from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter
-from telegram.ext import Updater, Dispatcher, DictPersistence, Defaults
+from telegram.ext import Updater, Dispatcher, DictPersistence, Defaults, MessageQueue
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.webhookhandler import WebhookServer
 
 signalskip = pytest.mark.skipif(
     sys.platform == 'win32',
-    reason='Can\'t send signals without stopping ' 'whole process on windows',
+    reason='Can\'t send signals without stopping whole process on windows',
 )
 
 
@@ -583,3 +583,15 @@ class TestUpdater:
     def test_defaults_warning(self, bot):
         with pytest.warns(TelegramDeprecationWarning, match='no effect when a Bot is passed'):
             Updater(bot=bot, defaults=Defaults())
+
+    def test_message_queue(self, bot, caplog):
+        updater = Updater(bot.token, message_queue=MessageQueue())
+        updater.running = True
+        try:
+            assert updater.bot.message_queue.dispatcher is updater.dispatcher
+            with caplog.at_level(logging.DEBUG):
+                updater.stop()
+            assert caplog.records[1].getMessage() == 'Requesting MessageQueue to stop...'
+            assert not updater.bot.message_queue.running
+        finally:
+            updater.stop()
