@@ -595,3 +595,15 @@ class TestUpdater:
             assert not updater.bot.message_queue.running
         finally:
             updater.stop()
+
+        updater = Updater(bot.token, message_queue=MessageQueue(autostart=False))
+        updater.running = True
+        try:
+            assert updater.bot.message_queue.running
+            assert updater.bot.message_queue.dispatcher is updater.dispatcher
+            with caplog.at_level(logging.DEBUG):
+                updater.stop()
+            assert caplog.records[1].getMessage() == 'Requesting MessageQueue to stop...'
+            assert not updater.bot.message_queue.running
+        finally:
+            updater.stop()

@@ -1460,3 +1460,15 @@ class TestBot:
         result = mq_bot.send_message(chat_id, 'hello there', delay_queue='custom_dq')
         assert isinstance(result, Promise)
         assert test_flag
+
+    @pytest.mark.timeout(10)
+    def test_message_queue_context_manager(self, mq_bot, chat_id):
+        with open('tests/data/telegram.gif', 'rb') as document:
+            with open('tests/data/telegram.jpg', 'rb') as thumb:
+                promise = mq_bot.send_document(
+                    chat_id, document, thumb=thumb, delay_queue=MessageQueue.DEFAULT_QUEUE
+                )
+
+        message = promise.result()
+        assert message.document
+        assert message.document.thumb
