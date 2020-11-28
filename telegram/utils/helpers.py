@@ -56,23 +56,19 @@ def get_signal_name(signum: int) -> str:
     return _signames[signum]
 
 
-def is_local_file(obj: Optional[Union[str, Path]], absolute: bool = True) -> bool:
+def is_local_file(obj: Optional[Union[str, Path]]) -> bool:
     """
     Checks if a given string is a file on local system.
 
     Args:
         obj (:obj:`str`): The string to check.
-        absolute (:obj:`bool`): Optional. Whether to allow only absolute paths. Defaults to
-            :obj:`True`.
     """
     if obj is None:
         return False
 
-    path = Path(obj) if isinstance(obj, str) else obj
+    path = Path(obj)
     try:
-        if path.exists() and path.is_file():
-            return path.is_absolute() if absolute else True
-        return False
+        return path.is_file()
     except Exception:
         return False
 
@@ -114,9 +110,7 @@ def parse_file_input(
     if isinstance(file_input, str) and file_input.startswith('file://'):
         return file_input
     if isinstance(file_input, (str, Path)):
-        if is_local_file(file_input, absolute=True):
-            out = f'file://{file_input}'
-        elif is_local_file(file_input, absolute=False):
+        if is_local_file(file_input):
             out = f'file://{Path(file_input).absolute()}'
         else:
             out = file_input  # type: ignore[assignment]

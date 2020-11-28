@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram File."""
 import os
+import shutil
 import urllib.parse as urllib_parse
 from base64 import b64decode
 from os.path import basename
@@ -144,6 +145,10 @@ class File(TelegramObject):
             out.write(buf)
             return out
 
+        if custom_path and local_file:
+            shutil.copyfile(self.file_path, custom_path)
+            return custom_path
+
         if custom_path:
             filename = custom_path
         elif local_file:
@@ -153,15 +158,11 @@ class File(TelegramObject):
         else:
             filename = os.path.join(os.getcwd(), self.file_id)
 
-        if local_file:
-            with open(url, 'rb') as file:
-                buf = file.read()
-        else:
-            buf = self.bot.request.retrieve(url, timeout=timeout)
-            if self._credentials:
-                buf = decrypt(
-                    b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
-                )
+        buf = self.bot.request.retrieve(url, timeout=timeout)
+        if self._credentials:
+            buf = decrypt(
+                b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
+            )
         with open(filename, 'wb') as fobj:
             fobj.write(buf)
         return filename

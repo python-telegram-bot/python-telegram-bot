@@ -261,24 +261,20 @@ class TestHelpers:
         assert expected == helpers.mention_markdown(1, 'the_name')
 
     @pytest.mark.parametrize(
-        'string,absolute,expected',
+        'string,expected',
         [
-            ('tests/data/game.gif', False, True),
-            ('tests/data', False, False),
-            ('tests/data/game.gif', True, False),
-            ('tests/data', True, False),
-            (str(Path.cwd() / 'tests' / 'data' / 'game.gif'), True, True),
-            (str(Path.cwd() / 'tests' / 'data'), True, False),
-            (Path.cwd() / 'tests' / 'data' / 'game.gif', True, True),
-            (Path.cwd() / 'tests' / 'data', True, False),
-            ('https:/api.org/file/botTOKEN/document/file_3', True, False),
-            ('https:/api.org/file/botTOKEN/document/file_3', False, False),
-            (None, True, False),
-            (None, False, False),
+            ('tests/data/game.gif', True),
+            ('tests/data', False),
+            (str(Path.cwd() / 'tests' / 'data' / 'game.gif'), True),
+            (str(Path.cwd() / 'tests' / 'data'), False),
+            (Path.cwd() / 'tests' / 'data' / 'game.gif', True),
+            (Path.cwd() / 'tests' / 'data', False),
+            ('https:/api.org/file/botTOKEN/document/file_3', False),
+            (None, False),
         ],
     )
-    def test_is_local_file(self, string, absolute, expected):
-        assert helpers.is_local_file(string, absolute) == expected
+    def test_is_local_file(self, string, expected):
+        assert helpers.is_local_file(string) == expected
 
     @pytest.mark.parametrize(
         'string,expected',
