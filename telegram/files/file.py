@@ -153,11 +153,15 @@ class File(TelegramObject):
         else:
             filename = os.path.join(os.getcwd(), self.file_id)
 
-        buf = self.bot.request.retrieve(url, timeout=timeout)
-        if self._credentials:
-            buf = decrypt(
-                b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
-            )
+        if local_file:
+            with open(url, 'rb') as file:
+                buf = file.read()
+        else:
+            buf = self.bot.request.retrieve(url, timeout=timeout)
+            if self._credentials:
+                buf = decrypt(
+                    b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
+                )
         with open(filename, 'wb') as fobj:
             fobj.write(buf)
         return filename
