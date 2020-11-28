@@ -133,7 +133,8 @@ class File(TelegramObject):
 
         if out:
             if local_file:
-                buf = open(url, "rb").read()
+                with open(url, 'rb') as file:
+                    buf = file.read()
             else:
                 buf = self.bot.request.retrieve(url)
                 if self._credentials:
@@ -152,14 +153,11 @@ class File(TelegramObject):
         else:
             filename = os.path.join(os.getcwd(), self.file_id)
 
-        if local_file:
-            buf = open(url, "rb").read()
-        else:
-            buf = self.bot.request.retrieve(url, timeout=timeout)
-            if self._credentials:
-                buf = decrypt(
-                    b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
-                )
+        buf = self.bot.request.retrieve(url, timeout=timeout)
+        if self._credentials:
+            buf = decrypt(
+                b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
+            )
         with open(filename, 'wb') as fobj:
             fobj.write(buf)
         return filename
@@ -187,7 +185,8 @@ class File(TelegramObject):
         if buf is None:
             buf = bytearray()
         if is_local_file(self.file_path):
-            buf.extend(open(self.file_path, "rb").read())
+            with open(self.file_path, "rb") as file:
+                buf.extend(file.read())
         else:
             buf.extend(self.bot.request.retrieve(self._get_encoded_url()))
         return buf
