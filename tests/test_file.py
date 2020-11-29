@@ -87,6 +87,10 @@ class TestFile:
         with pytest.raises(TelegramError):
             bot.get_file(file_id='')
 
+    def test_download_mutuall_exclusive(self, file):
+        with pytest.raises(ValueError, match='custom_path and out are mutually exclusive'):
+            file.download('custom_path', 'out')
+
     def test_download(self, monkeypatch, file):
         def test(*args, **kwargs):
             return self.file_content

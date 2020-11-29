@@ -1706,7 +1706,8 @@ class TestBot:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_copy_message(self, monkeypatch, bot, chat_id, media_message):
+    @pytest.mark.parametrize('json_keyboard', [True, False])
+    def test_copy_message(self, monkeypatch, bot, chat_id, media_message, json_keyboard):
         keyboard = InlineKeyboardMarkup(
             [[InlineKeyboardButton(text="test", callback_data="test2")]]
         )
@@ -1719,6 +1720,8 @@ class TestBot:
             assert data["parse_mode"] == ParseMode.HTML
             assert data["reply_to_message_id"] == media_message.message_id
             assert data["reply_markup"] == keyboard.to_json()
+            assert data["disable_notification"] is True
+            assert data["caption_entities"] == [MessageEntity(MessageEntity.BOLD, 0, 4)]
             return data
 
         monkeypatch.setattr(bot.request, 'post', post)
@@ -1727,9 +1730,11 @@ class TestBot:
             from_chat_id=chat_id,
             message_id=media_message.message_id,
             caption="<b>Test</b>",
+            caption_entities=[MessageEntity(MessageEntity.BOLD, 0, 4)],
             parse_mode=ParseMode.HTML,
             reply_to_message_id=media_message.message_id,
-            reply_markup=keyboard,
+            reply_markup=keyboard.to_json() if json_keyboard else keyboard,
+            disable_notification=True,
         )
 
     @flaky(3, 1)
@@ -1756,12 +1761,6 @@ class TestBot:
         assert message.caption == "Test"
         assert len(message.caption_entities) == 1
         assert message.reply_markup == keyboard
-
-    """#TODO: Add to test
-        ({'allow_sending_without_reply': True}, None),
-        ({'allow_sending_without_reply': False}, None),
-        ({'allow_sending_without_reply': False}, True),
-    """
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
