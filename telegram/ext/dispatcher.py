@@ -36,6 +36,7 @@ from telegram.ext.handler import Handler
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.promise import Promise
 from telegram.utils.types import HandlerArg
+from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -191,7 +192,7 @@ class Dispatcher:
         """Dict[:obj:`int`, List[:class:`telegram.ext.Handler`]]: Holds the handlers per group."""
         self.groups: List[int] = []
         """List[:obj:`int`]: A list with all groups."""
-        self.error_handlers: Dict[Callable, bool] = {}
+        self.error_handlers: Dict[Callable, Union[bool, DefaultValue]] = {}
         """Dict[:obj:`callable`, :obj:`bool`]: A dict, where the keys are error handlers and the
         values indicate whether they are to be run asynchronously."""
 
@@ -215,12 +216,10 @@ class Dispatcher:
         return self.__exception_event
 
     def _init_async_threads(self, base_name: str, workers: int) -> None:
-        base_name = '{}_'.format(base_name) if base_name else ''
+        base_name = f'{base_name}_' if base_name else ''
 
         for i in range(workers):
-            thread = Thread(
-                target=self._pooled, name='Bot:{}:worker:{}{}'.format(self.bot.id, base_name, i)
-            )
+            thread = Thread(target=self._pooled, name=f'Bot:{self.bot.id}:worker:{base_name}{i}')
             self.__async_threads.add(thread)
             thread.start()
 
@@ -242,7 +241,7 @@ class Dispatcher:
         """
         if cls.__singleton is not None:
             return cls.__singleton()  # type: ignore[return-value] # pylint: disable=not-callable
-        raise RuntimeError('{} not initialized or multiple instances exist'.format(cls.__name__))
+        raise RuntimeError(f'{cls.__name__} not initialized or multiple instances exist')
 
     def _pooled(self) -> None:
         thr_name = current_thread().getName()
@@ -483,14 +482,14 @@ class Dispatcher:
         from .conversationhandler import ConversationHandler  # pylint: disable=C0415
 
         if not isinstance(handler, Handler):
-            raise TypeError('handler is not an instance of {}'.format(Handler.__name__))
+            raise TypeError(f'handler is not an instance of {Handler.__name__}')
         if not isinstance(group, int):
             raise TypeError('group is not int')
         if isinstance(handler, ConversationHandler) and handler.persistent and handler.name:
             if not self.persistence:
                 raise ValueError(
-                    "ConversationHandler {} can not be persistent if dispatcher has no "
-                    "persistence".format(handler.name)
+                    f"ConversationHandler {handler.name} can not be persistent if dispatcher has "
+                    f"no persistence"
                 )
             handler.persistence = self.persistence
             handler.conversations = self.persistence.get_conversations(handler.name)
@@ -588,7 +587,7 @@ class Dispatcher:
     def add_error_handler(
         self,
         callback: Callable[[Any, CallbackContext], None],
-        run_async: bool = False,  # pylint: disable=W0621
+        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,  # pylint: disable=W0621
     ) -> None:
         """Registers an error handler in the Dispatcher. This handler will receive every error
         which happens in your bot.
@@ -616,6 +615,11 @@ class Dispatcher:
         if callback in self.error_handlers:
             self.logger.debug('The callback is already registered as an error handler. Ignoring.')
             return
+
+        if run_async is DEFAULT_FALSE and self.bot.defaults:
+            if self.bot.defaults.run_async:
+                run_async = True
+
         self.error_handlers[callback] = run_async
 
     def remove_error_handler(self, callback: Callable[[Any, CallbackContext], None]) -> None:

@@ -22,6 +22,7 @@ import re
 from typing import TYPE_CHECKING, Any, Callable, Dict, Match, Optional, Pattern, TypeVar, Union
 
 from telegram.utils.types import HandlerArg
+from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 from .handler import Handler
 
@@ -99,7 +100,7 @@ class StringRegexHandler(Handler):
         pass_groupdict: bool = False,
         pass_update_queue: bool = False,
         pass_job_queue: bool = False,
-        run_async: bool = False,
+        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
         super().__init__(
             callback,

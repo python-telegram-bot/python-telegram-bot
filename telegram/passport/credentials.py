@@ -45,7 +45,7 @@ class TelegramDecryptionError(TelegramError):
     """
 
     def __init__(self, message: Union[str, Exception]):
-        super().__init__("TelegramDecryptionError: {}".format(message))
+        super().__init__(f"TelegramDecryptionError: {message}")
         self._msg = str(message)
 
     def __reduce__(self) -> Tuple[type, Tuple[str]]:
@@ -91,7 +91,7 @@ def decrypt(secret, hash, data):
     # If the newly calculated hash did not match the one telegram gave us
     if data_hash != hash:
         # Raise a error that is caught inside telegram.PassportData and transformed into a warning
-        raise TelegramDecryptionError("Hashes are not equal! {} != {}".format(data_hash, hash))
+        raise TelegramDecryptionError(f"Hashes are not equal! {data_hash} != {hash}")
     # Return data without padding
     return data[data[0] :]
 

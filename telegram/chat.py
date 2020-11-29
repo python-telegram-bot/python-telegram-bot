@@ -169,7 +169,7 @@ class Chat(TelegramObject):
         """:obj:`str`: Convenience property. If the chat has a :attr:`username`, returns a t.me
         link of the chat."""
         if self.username:
-            return "https://t.me/{}".format(self.username)
+            return f"https://t.me/{self.username}"
         return None
 
     @classmethod

@@ -336,6 +336,6 @@ def expect_bad_request(func, message, reason):
         return func()
     except BadRequest as e:
         if message in str(e):
-            pytest.xfail('{}. {}'.format(reason, e))
+            pytest.xfail(f'{reason}. {e}')
         else:
             raise e

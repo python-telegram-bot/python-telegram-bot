@@ -33,7 +33,7 @@ class TelegramDeprecationWarning(Warning):
 
 def warn_deprecate_obj(old: str, new: str, stacklevel: int = 3) -> None:
     warnings.warn(
-        '{} is being deprecated, please use {} from now on.'.format(old, new),
+        f'{old} is being deprecated, please use {new} from now on.',
         category=TelegramDeprecationWarning,
         stacklevel=stacklevel,
     )

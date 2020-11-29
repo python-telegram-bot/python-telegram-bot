@@ -26,7 +26,7 @@ def terminal_summary_wrapper(original, plugin_name):
     text = fold_plugins[plugin_name]
 
     def pytest_terminal_summary(terminalreporter):
-        terminalreporter.write('##[group] {}\n'.format(text))
+        terminalreporter.write(f'##[group] {text}\n')
         original(terminalreporter)
         terminalreporter.write('##[endgroup]')
 
@@ -68,7 +68,7 @@ def pytest_runtest_protocol(item, nextitem):
 
     if previous_name is None or previous_name != name:
         previous_name = name
-        terminal.write('\n##[group] {}'.format(name))
+        terminal.write(f'\n##[group] {name}')
 
     yield
 

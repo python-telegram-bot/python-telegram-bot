@@ -222,7 +222,7 @@ class Updater:
     def _init_thread(self, target: Callable, name: str, *args: Any, **kwargs: Any) -> None:
         thr = Thread(
             target=self._thread_wrapper,
-            name="Bot:{}:{}".format(self.bot.id, name),
+            name=f"Bot:{self.bot.id}:{name}",
             args=(target,) + args,
             kwargs=kwargs,
         )
@@ -513,7 +513,7 @@ class Updater:
         self.logger.debug('Updater thread started (webhook)')
         use_ssl = cert is not None and key is not None
         if not url_path.startswith('/'):
-            url_path = '/{}'.format(url_path)
+            url_path = f'/{url_path}'
 
         # Create Tornado app instance
         app = WebhookAppClass(url_path, self.bot, self.update_queue)
@@ -554,7 +554,7 @@ class Updater:
 
     @staticmethod
     def _gen_webhook_url(listen: str, port: int, url_path: str) -> str:
-        return 'https://{listen}:{port}{path}'.format(listen=listen, port=port, path=url_path)
+        return f'https://{listen}:{port}{url_path}'
 
     @no_type_check
     def _bootstrap(

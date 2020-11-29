@@ -27,6 +27,7 @@ from telegram import TelegramError, Message, User, Chat, Update, Bot, MessageEnt
 from telegram.ext import (
     MessageHandler,
     Filters,
+    Defaults,
     CommandHandler,
     CallbackContext,
     JobQueue,
@@ -173,6 +174,45 @@ class TestDispatcher:
         sleep(0.1)
 
         assert self.count == 1
+
+    @pytest.mark.parametrize(['run_async', 'expected_output'], [(True, 5), (False, 0)])
+    def test_default_run_async_error_handler(self, dp, monkeypatch, run_async, expected_output):
+        def mock_async_err_handler(*args, **kwargs):
+            self.count = 5
+
+        # set defaults value to dp.bot
+        dp.bot.defaults = Defaults(run_async=run_async)
+        try:
+            dp.add_handler(MessageHandler(Filters.all, self.callback_raise_error))
+            dp.add_error_handler(self.error_handler)
+
+            monkeypatch.setattr(dp, 'run_async', mock_async_err_handler)
+            dp.process_update(self.message_update)
+
+            assert self.count == expected_output
+
+        finally:
+            # reset dp.bot.defaults values
+            dp.bot.defaults = None
+
+    @pytest.mark.parametrize(
+        ['run_async', 'expected_output'], [(True, 'running async'), (False, None)]
+    )
+    def test_default_run_async(self, monkeypatch, dp, run_async, expected_output):
+        def mock_run_async(*args, **kwargs):
+            self.received = 'running async'
+
+        # set defaults value to dp.bot
+        dp.bot.defaults = Defaults(run_async=run_async)
+        try:
+            dp.add_handler(MessageHandler(Filters.all, lambda u, c: None))
+            monkeypatch.setattr(dp, 'run_async', mock_run_async)
+            dp.process_update(self.message_update)
+            assert self.received == expected_output
+
+        finally:
+            # reset defaults value
+            dp.bot.defaults = None
 
     def test_run_async_multiple(self, bot, dp, dp2):
         def get_dispatcher_name(q):
@@ -638,7 +678,7 @@ class TestDispatcher:
         thread_names = [thread.name for thread in getattr(dp2, '_Dispatcher__async_threads')]
         print(thread_names)
         for thread_name in thread_names:
-            assert thread_name.startswith("Bot:{}:worker:".format(dp2.bot.id))
+            assert thread_name.startswith(f"Bot:{dp2.bot.id}:worker:")
 
     def test_non_context_deprecation(self, dp):
         with pytest.warns(TelegramDeprecationWarning):
