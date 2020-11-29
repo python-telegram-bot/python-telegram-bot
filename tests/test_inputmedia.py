@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+from pathlib import Path
+
 import pytest
 from flaky import flaky
 
@@ -167,6 +169,13 @@ class TestInputMediaVideo:
         assert isinstance(input_media_video.media, InputFile)
         assert input_media_video.caption == "test 3"
 
+    def test_with_local_files(self):
+        input_media_video = InputMediaVideo(
+            'tests/data/telegram.mp4', thumb='tests/data/telegram.jpg'
+        )
+        assert input_media_video.media == f"file://{Path.cwd() / 'tests/data/telegram.mp4'}"
+        assert input_media_video.thumb == f"file://{Path.cwd() / 'tests/data/telegram.jpg'}"
+
 
 class TestInputMediaPhoto:
     type_ = "photo"
@@ -205,6 +214,10 @@ class TestInputMediaPhoto:
         assert input_media_photo.type == self.type_
         assert isinstance(input_media_photo.media, InputFile)
         assert input_media_photo.caption == "test 2"
+
+    def test_with_local_files(self):
+        input_media_photo = InputMediaPhoto('tests/data/telegram.mp4')
+        assert input_media_photo.media == f"file://{Path.cwd() / 'tests/data/telegram.mp4'}"
 
 
 class TestInputMediaAnimation:
@@ -251,6 +264,17 @@ class TestInputMediaAnimation:
         assert input_media_animation.type == self.type_
         assert isinstance(input_media_animation.media, InputFile)
         assert input_media_animation.caption == "test 2"
+
+    def test_with_local_files(self):
+        input_media_animation = InputMediaAnimation(
+            'tests/data/telegram.mp4', thumb='tests/data/telegram.jpg'
+        )
+        assert input_media_animation.media == 'file://' + str(
+            Path.cwd() / 'tests/data/telegram.mp4'
+        )
+        assert input_media_animation.thumb == 'file://' + str(
+            Path.cwd() / 'tests/data/telegram.jpg'
+        )
 
 
 class TestInputMediaAudio:
@@ -304,6 +328,13 @@ class TestInputMediaAudio:
         assert isinstance(input_media_audio.media, InputFile)
         assert input_media_audio.caption == "test 3"
 
+    def test_with_local_files(self):
+        input_media_audio = InputMediaAudio(
+            'tests/data/telegram.mp4', thumb='tests/data/telegram.jpg'
+        )
+        assert input_media_audio.media == f"file://{Path.cwd() / 'tests/data/telegram.mp4'}"
+        assert input_media_audio.thumb == f"file://{Path.cwd() / 'tests/data/telegram.jpg'}"
+
 
 class TestInputMediaDocument:
     type_ = "document"
@@ -352,6 +383,17 @@ class TestInputMediaDocument:
         assert input_media_document.type == self.type_
         assert isinstance(input_media_document.media, InputFile)
         assert input_media_document.caption == "test 3"
+
+    def test_with_local_files(self):
+        input_media_document = InputMediaDocument(
+            'tests/data/telegram.mp4', thumb='tests/data/telegram.jpg'
+        )
+        assert input_media_document.media == 'file://' + str(
+            Path.cwd() / 'tests/data/telegram.mp4'
+        )
+        assert input_media_document.thumb == 'file://' + str(
+            Path.cwd() / 'tests/data/telegram.jpg'
+        )
 
 
 @pytest.fixture(scope='function')  # noqa: F811

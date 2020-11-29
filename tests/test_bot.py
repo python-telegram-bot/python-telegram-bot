@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import time
 import datetime as dtm
+from pathlib import Path
 from platform import python_implementation
 
 import pytest
@@ -794,6 +795,23 @@ class TestBot:
         assert user_profile_photos.photos[0][0].file_size == 5403
 
     # get_file is tested multiple times in the test_*media* modules.
+    # Here we only test the behaviour for bot apis in local mode
+    def test_get_file_local_mode(self, bot, monkeypatch):
+        path = str(Path.cwd() / 'tests' / 'data' / 'game.gif')
+
+        def _post(*args, **kwargs):
+            return {
+                'file_id': None,
+                'file_unique_id': None,
+                'file_size': None,
+                'file_path': path,
+            }
+
+        monkeypatch.setattr(bot, '_post', _post)
+
+        resulting_path = bot.get_file('file_id').file_path
+        assert bot.token not in resulting_path
+        assert resulting_path == path
 
     # TODO: Needs improvement. No feasable way to test until bots can add members.
     def test_kick_chat_member(self, monkeypatch, bot):
@@ -1455,6 +1473,20 @@ class TestBot:
 
         with open('tests/data/telegram_test_channel.jpg', 'rb') as f:
             expect_bad_request(func, 'Type of file mismatch', 'Telegram did not accept the file.')
+
+    def test_set_chat_photo_local_files(self, monkeypatch, bot, chat_id):
+        # For just test that the correct paths are passed as we have no local bot API set up
+        test_flag = False
+        expected = f"file://{Path.cwd() / 'tests/data/telegram.jpg'}"
+        file = 'tests/data/telegram.jpg'
+
+        def make_assertion(_, data, *args, **kwargs):
+            nonlocal test_flag
+            test_flag = data.get('photo') == expected
+
+        monkeypatch.setattr(bot, '_post', make_assertion)
+        bot.set_chat_photo(chat_id, file)
+        assert test_flag
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
