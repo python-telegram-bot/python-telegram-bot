@@ -32,6 +32,10 @@ class InlineQueryResultVenue(InlineQueryResult):
     use :attr:`input_message_content` to send a message with the specified content instead of the
     venue.
 
+    Note:
+      Foursquare details and Google Pace details are mutually exclusive. However, this
+      behaviour is undocumented and might be changed by Telegram.
+
     Attributes:
         type (:obj:`str`): 'venue'.
         id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
@@ -41,8 +45,8 @@ class InlineQueryResultVenue(InlineQueryResult):
         address (:obj:`str`): Address of the venue.
         foursquare_id (:obj:`str`): Optional. Foursquare identifier of the venue if known.
         foursquare_type (:obj:`str`): Optional. Foursquare type of the venue, if known.
-            (For example, "arts_entertainment/default", "arts_entertainment/aquarium" or
-            "food/icecream".)
+        google_place_id (:obj:`str`): Optional. Google Places identifier of the venue.
+        google_place_type (:obj:`str`): Optional. Google Places type of the venue.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
@@ -61,6 +65,9 @@ class InlineQueryResultVenue(InlineQueryResult):
         foursquare_type (:obj:`str`, optional): Foursquare type of the venue, if known.
             (For example, "arts_entertainment/default", "arts_entertainment/aquarium" or
             "food/icecream".)
+        google_place_id (:obj:`str`, optional): Google Places identifier of the venue.
+        google_place_type (:obj:`str`, optional): Google Places type of the venue. (See
+            `supported types <https://developers.google.com/places/web-service/supported_types>`_.)
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
@@ -86,6 +93,8 @@ class InlineQueryResultVenue(InlineQueryResult):
         thumb_url: str = None,
         thumb_width: int = None,
         thumb_height: int = None,
+        google_place_id: str = None,
+        google_place_type: str = None,
         **_kwargs: Any,
     ):
 
@@ -99,6 +108,8 @@ class InlineQueryResultVenue(InlineQueryResult):
         # Optional
         self.foursquare_id = foursquare_id
         self.foursquare_type = foursquare_type
+        self.google_place_id = google_place_id
+        self.google_place_type = google_place_type
         self.reply_markup = reply_markup
         self.input_message_content = input_message_content
         self.thumb_url = thumb_url

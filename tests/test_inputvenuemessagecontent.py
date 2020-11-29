@@ -31,6 +31,8 @@ def input_venue_message_content():
         TestInputVenueMessageContent.address,
         foursquare_id=TestInputVenueMessageContent.foursquare_id,
         foursquare_type=TestInputVenueMessageContent.foursquare_type,
+        google_place_id=TestInputVenueMessageContent.google_place_id,
+        google_place_type=TestInputVenueMessageContent.google_place_type,
     )
 
 
@@ -41,6 +43,8 @@ class TestInputVenueMessageContent:
     address = 'address'
     foursquare_id = 'foursquare id'
     foursquare_type = 'foursquare type'
+    google_place_id = 'google place id'
+    google_place_type = 'google place type'
 
     def test_expected_values(self, input_venue_message_content):
         assert input_venue_message_content.longitude == self.longitude
@@ -49,6 +53,8 @@ class TestInputVenueMessageContent:
         assert input_venue_message_content.address == self.address
         assert input_venue_message_content.foursquare_id == self.foursquare_id
         assert input_venue_message_content.foursquare_type == self.foursquare_type
+        assert input_venue_message_content.google_place_id == self.google_place_id
+        assert input_venue_message_content.google_place_type == self.google_place_type
 
     def test_to_dict(self, input_venue_message_content):
         input_venue_message_content_dict = input_venue_message_content.to_dict()
@@ -67,6 +73,14 @@ class TestInputVenueMessageContent:
         assert (
             input_venue_message_content_dict['foursquare_type']
             == input_venue_message_content.foursquare_type
+        )
+        assert (
+            input_venue_message_content_dict['google_place_id']
+            == input_venue_message_content.google_place_id
+        )
+        assert (
+            input_venue_message_content_dict['google_place_type']
+            == input_venue_message_content.google_place_type
         )
 
     def test_equality(self):
