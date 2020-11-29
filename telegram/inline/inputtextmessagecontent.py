@@ -38,7 +38,7 @@ class InputTextMessageContent(InputMessageContent):
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in your bot's message. See the constants
             in :class:`telegram.ParseMode` for the available modes.
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
+        entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
             entities that appear in the caption, which can be specified instead of
             :attr:`parse_mode`.
         disable_web_page_preview (:obj:`bool`): Optional. Disables link previews for links in the
@@ -50,7 +50,7 @@ class InputTextMessageContent(InputMessageContent):
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in your bot's message. See the constants
             in :class:`telegram.ParseMode` for the available modes.
-        caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
+        entities (List[:class:`telegram.MessageEntity`], optional): List of special
             entities that appear in the caption, which can be specified instead of
             :attr:`parse_mode`.
         disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in the
@@ -64,14 +64,14 @@ class InputTextMessageContent(InputMessageContent):
         message_text: str,
         parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
         disable_web_page_preview: Union[bool, DefaultValue] = DEFAULT_NONE,
-        caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
+        entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
         **_kwargs: Any,
     ):
         # Required
         self.message_text = message_text
         # Optionals
         self.parse_mode = parse_mode
-        self.caption_entities = caption_entities
+        self.entities = entities
         self.disable_web_page_preview = disable_web_page_preview
 
         self._id_attrs = (self.message_text,)
@@ -79,7 +79,7 @@ class InputTextMessageContent(InputMessageContent):
     def to_dict(self) -> JSONDict:
         data = super().to_dict()
 
-        if self.caption_entities:
-            data['caption_entities'] = [ce.to_dict() for ce in self.caption_entities]
+        if self.entities:
+            data['entities'] = [ce.to_dict() for ce in self.entities]
 
         return data

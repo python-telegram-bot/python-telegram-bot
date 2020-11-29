@@ -28,6 +28,7 @@ def input_location_message_content():
         TestInputLocationMessageContent.latitude,
         TestInputLocationMessageContent.longitude,
         live_period=TestInputLocationMessageContent.live_period,
+        horizontal_accuracy=TestInputLocationMessageContent.horizontal_accuracy,
         heading=TestInputLocationMessageContent.heading,
         proximity_alert_radius=TestInputLocationMessageContent.proximity_alert_radius,
     )
@@ -37,6 +38,7 @@ class TestInputLocationMessageContent:
     latitude = -23.691288
     longitude = -46.788279
     live_period = 80
+    horizontal_accuracy = 50.5
     heading = 90
     proximity_alert_radius = 999
 
@@ -44,6 +46,7 @@ class TestInputLocationMessageContent:
         assert input_location_message_content.longitude == self.longitude
         assert input_location_message_content.latitude == self.latitude
         assert input_location_message_content.live_period == self.live_period
+        assert input_location_message_content.horizontal_accuracy == self.horizontal_accuracy
         assert input_location_message_content.heading == self.heading
         assert input_location_message_content.proximity_alert_radius == self.proximity_alert_radius
 
@@ -62,6 +65,10 @@ class TestInputLocationMessageContent:
         assert (
             input_location_message_content_dict['live_period']
             == input_location_message_content.live_period
+        )
+        assert (
+            input_location_message_content_dict['horizontal_accuracy']
+            == input_location_message_content.horizontal_accuracy
         )
         assert (
             input_location_message_content_dict['heading']
