@@ -498,11 +498,14 @@ class JobQueue:
             self.scheduler.shutdown()
 
     def jobs(self) -> Tuple['Job', ...]:
-        """Returns a tuple of all jobs that are currently in the ``JobQueue``."""
+        """
+        Returns a tuple of all *pending/scheduled* jobs that are currently in the ``JobQueue``.
+        """
         return tuple(Job.from_aps_job(job, self) for job in self.scheduler.get_jobs())
 
     def get_jobs_by_name(self, name: str) -> Tuple['Job', ...]:
-        """Returns a tuple of jobs with the given name that are currently in the ``JobQueue``"""
+        """Returns a tuple of all *pending/scheduled* jobs with the given name that are currently
+        in the ``JobQueue``"""
         return tuple(job for job in self.jobs() if job.name == name)
 
 

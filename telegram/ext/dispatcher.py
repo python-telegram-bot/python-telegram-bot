@@ -67,8 +67,8 @@ def run_async(
     @wraps(func)
     def async_func(*args: Any, **kwargs: Any) -> Any:
         warnings.warn(
-            'The @run_async decorator is deprecated. Use the `run_async` parameter of'
-            '`Dispatcher.add_handler` or `Dispatcher.run_async` instead.',
+            'The @run_async decorator is deprecated. Use the `run_async` parameter of '
+            'your Handler or `Dispatcher.run_async` instead.',
             TelegramDeprecationWarning,
             stacklevel=2,
         )
