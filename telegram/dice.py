@@ -41,7 +41,7 @@ class Dice(TelegramObject):
         3 indicates that the basket was missed. However, this behaviour is undocumented and might
         be changed by Telegram.
 
-        If :attr:`emoji` is "⚽", a value of 3 to 5 currently scores a goal, while a value of 1 to
+        If :attr:`emoji` is "⚽", a value of 4 to 5 currently scores a goal, while a value of 1 to
         3 indicates that the goal was missed. However, this behaviour is undocumented and might
         be changed by Telegram.
 
