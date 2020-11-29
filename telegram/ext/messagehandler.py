@@ -25,6 +25,7 @@ from telegram import Update
 from telegram.ext import BaseFilter, Filters
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.types import HandlerArg
+from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 from .handler import Handler
 
@@ -131,7 +132,7 @@ class MessageHandler(Handler):
         message_updates: bool = None,
         channel_post_updates: bool = None,
         edited_updates: bool = None,
-        run_async: bool = False,
+        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
 
         super().__init__(

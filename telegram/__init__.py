@@ -23,6 +23,7 @@ from .botcommand import BotCommand
 from .user import User
 from .files.chatphoto import ChatPhoto
 from .chat import Chat
+from .chatlocation import ChatLocation
 from .chatmember import ChatMember
 from .chatpermissions import ChatPermissions
 from .files.photosize import PhotoSize
@@ -50,9 +51,11 @@ from .files.inputfile import InputFile
 from .files.file import File
 from .parsemode import ParseMode
 from .messageentity import MessageEntity
+from .messageid import MessageId
 from .games.game import Game
 from .poll import Poll, PollOption, PollAnswer
 from .loginurl import LoginUrl
+from .proximityalerttriggered import ProximityAlertTriggered
 from .games.callbackgame import CallbackGame
 from .payment.shippingaddress import ShippingAddress
 from .payment.orderinfo import OrderInfo
@@ -189,6 +192,8 @@ __all__ = [
     'InputTextMessageContent',
     'InputVenueMessageContent',
     'Location',
+    'ChatLocation',
+    'ProximityAlertTriggered',
     'EncryptedCredentials',
     'PassportFile',
     'EncryptedPassportElement',
@@ -268,4 +273,5 @@ __all__ = [
     'KeyboardButtonPollType',
     'Dice',
     'BotCommand',
+    'MessageId',
 ]

@@ -17,9 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the BasePersistence class."""
-
+import warnings
 from abc import ABC, abstractmethod
-from collections import defaultdict
 from copy import copy
 from typing import Any, DefaultDict, Dict, Optional, Tuple, cast, ClassVar
 
@@ -133,7 +132,7 @@ class BasePersistence(ABC):
         Replaces all instances of :class:`telegram.Bot` that occur within the passed object with
         :attr:`REPLACED_BOT`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
         ``frozenset``, ``dict``, ``defaultdict`` and objects that have a ``__dict__`` or
-        ``__slot__`` attribute.
+        ``__slot__`` attribute, excluding objects that can't be copied with `copy.copy`.
 
         Args:
             obj (:obj:`object`): The object
@@ -141,39 +140,77 @@ class BasePersistence(ABC):
         Returns:
             :obj:`obj`: Copy of the object with Bot instances replaced.
         """
-        if isinstance(obj, Bot):
-            return cls.REPLACED_BOT
-        if isinstance(obj, (list, tuple, set, frozenset)):
-            return obj.__class__(cls.replace_bot(item) for item in obj)
+        return cls._replace_bot(obj, {})
 
-        new_obj = copy(obj)
-        if isinstance(obj, (dict, defaultdict)):
+    @classmethod
+    def _replace_bot(cls, obj: object, memo: Dict[int, Any]) -> object:  # pylint: disable=R0911
+        obj_id = id(obj)
+        if obj_id in memo:
+            return memo[obj_id]
+
+        if isinstance(obj, Bot):
+            memo[obj_id] = cls.REPLACED_BOT
+            return cls.REPLACED_BOT
+        if isinstance(obj, (list, set)):
+            # We copy the iterable here for thread safety, i.e. make sure the object we iterate
+            # over doesn't change its length during the iteration
+            temp_iterable = obj.copy()
+            new_iterable = obj.__class__(cls._replace_bot(item, memo) for item in temp_iterable)
+            memo[obj_id] = new_iterable
+            return new_iterable
+        if isinstance(obj, (tuple, frozenset)):
+            # tuples and frozensets are immutable so we don't need to worry about thread safety
+            new_immutable = obj.__class__(cls._replace_bot(item, memo) for item in obj)
+            memo[obj_id] = new_immutable
+            return new_immutable
+
+        try:
+            new_obj = copy(obj)
+            memo[obj_id] = new_obj
+        except Exception:
+            warnings.warn(
+                'BasePersistence.replace_bot does not handle objects that can not be copied. See '
+                'the docs of BasePersistence.replace_bot for more information.',
+                RuntimeWarning,
+            )
+            memo[obj_id] = obj
+            return obj
+
+        if isinstance(obj, dict):
+            # We handle dicts via copy(obj) so we don't have to make a
+            # difference between dict and defaultdict
             new_obj = cast(dict, new_obj)
+            # We can't iterate over obj.items() due to thread safety, i.e. the dicts length may
+            # change during the iteration
+            temp_dict = new_obj.copy()
             new_obj.clear()
-            for k, val in obj.items():
-                new_obj[cls.replace_bot(k)] = cls.replace_bot(val)
+            for k, val in temp_dict.items():
+                new_obj[cls._replace_bot(k, memo)] = cls._replace_bot(val, memo)
+            memo[obj_id] = new_obj
             return new_obj
         if hasattr(obj, '__dict__'):
             for attr_name, attr in new_obj.__dict__.items():
-                setattr(new_obj, attr_name, cls.replace_bot(attr))
+                setattr(new_obj, attr_name, cls._replace_bot(attr, memo))
+            memo[obj_id] = new_obj
             return new_obj
         if hasattr(obj, '__slots__'):
             for attr_name in new_obj.__slots__:
                 setattr(
                     new_obj,
                     attr_name,
-                    cls.replace_bot(cls.replace_bot(getattr(new_obj, attr_name))),
+                    cls._replace_bot(cls._replace_bot(getattr(new_obj, attr_name), memo), memo),
                 )
+            memo[obj_id] = new_obj
             return new_obj
 
         return obj
 
-    def insert_bot(self, obj: object) -> object:  # pylint: disable=R0911
+    def insert_bot(self, obj: object) -> object:
         """
         Replaces all instances of :attr:`REPLACED_BOT` that occur within the passed object with
         :attr:`bot`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
         ``frozenset``, ``dict``, ``defaultdict`` and objects that have a ``__dict__`` or
-        ``__slot__`` attribute.
+        ``__slot__`` attribute, excluding objects that can't be copied with `copy.copy`.
 
         Args:
             obj (:obj:`object`): The object
@@ -181,32 +218,70 @@ class BasePersistence(ABC):
         Returns:
             :obj:`obj`: Copy of the object with Bot instances inserted.
         """
-        if isinstance(obj, Bot):
-            return self.bot
-        if obj == self.REPLACED_BOT:
-            return self.bot
-        if isinstance(obj, (list, tuple, set, frozenset)):
-            return obj.__class__(self.insert_bot(item) for item in obj)
+        return self._insert_bot(obj, {})
 
-        new_obj = copy(obj)
-        if isinstance(obj, (dict, defaultdict)):
+    def _insert_bot(self, obj: object, memo: Dict[int, Any]) -> object:  # pylint: disable=R0911
+        obj_id = id(obj)
+        if obj_id in memo:
+            return memo[obj_id]
+
+        if isinstance(obj, Bot):
+            memo[obj_id] = self.bot
+            return self.bot
+        if isinstance(obj, str) and obj == self.REPLACED_BOT:
+            memo[obj_id] = self.bot
+            return self.bot
+        if isinstance(obj, (list, set)):
+            # We copy the iterable here for thread safety, i.e. make sure the object we iterate
+            # over doesn't change its length during the iteration
+            temp_iterable = obj.copy()
+            new_iterable = obj.__class__(self._insert_bot(item, memo) for item in temp_iterable)
+            memo[obj_id] = new_iterable
+            return new_iterable
+        if isinstance(obj, (tuple, frozenset)):
+            # tuples and frozensets are immutable so we don't need to worry about thread safety
+            new_immutable = obj.__class__(self._insert_bot(item, memo) for item in obj)
+            memo[obj_id] = new_immutable
+            return new_immutable
+
+        try:
+            new_obj = copy(obj)
+        except Exception:
+            warnings.warn(
+                'BasePersistence.insert_bot does not handle objects that can not be copied. See '
+                'the docs of BasePersistence.insert_bot for more information.',
+                RuntimeWarning,
+            )
+            memo[obj_id] = obj
+            return obj
+
+        if isinstance(obj, dict):
+            # We handle dicts via copy(obj) so we don't have to make a
+            # difference between dict and defaultdict
             new_obj = cast(dict, new_obj)
+            # We can't iterate over obj.items() due to thread safety, i.e. the dicts length may
+            # change during the iteration
+            temp_dict = new_obj.copy()
             new_obj.clear()
-            for k, val in obj.items():
-                new_obj[self.insert_bot(k)] = self.insert_bot(val)
+            for k, val in temp_dict.items():
+                new_obj[self._insert_bot(k, memo)] = self._insert_bot(val, memo)
+            memo[obj_id] = new_obj
             return new_obj
         if hasattr(obj, '__dict__'):
             for attr_name, attr in new_obj.__dict__.items():
-                setattr(new_obj, attr_name, self.insert_bot(attr))
+                setattr(new_obj, attr_name, self._insert_bot(attr, memo))
+            memo[obj_id] = new_obj
             return new_obj
         if hasattr(obj, '__slots__'):
             for attr_name in obj.__slots__:
                 setattr(
                     new_obj,
                     attr_name,
-                    self.insert_bot(self.insert_bot(getattr(new_obj, attr_name))),
+                    self._insert_bot(self._insert_bot(getattr(new_obj, attr_name), memo), memo),
                 )
+            memo[obj_id] = new_obj
             return new_obj
+
         return obj
 
     @abstractmethod

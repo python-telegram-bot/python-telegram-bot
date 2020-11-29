@@ -52,14 +52,14 @@ def inlinequery(update: Update, context: CallbackContext) -> None:
             id=uuid4(),
             title="Bold",
             input_message_content=InputTextMessageContent(
-                "*{}*".format(escape_markdown(query)), parse_mode=ParseMode.MARKDOWN
+                f"*{escape_markdown(query)}*", parse_mode=ParseMode.MARKDOWN
             ),
         ),
         InlineQueryResultArticle(
             id=uuid4(),
             title="Italic",
             input_message_content=InputTextMessageContent(
-                "_{}_".format(escape_markdown(query)), parse_mode=ParseMode.MARKDOWN
+                f"_{escape_markdown(query)}_", parse_mode=ParseMode.MARKDOWN
             ),
         ),
     ]

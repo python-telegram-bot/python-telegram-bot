@@ -50,7 +50,7 @@ def facts_to_str(user_data: Dict[str, str]) -> str:
     facts = list()
 
     for key, value in user_data.items():
-        facts.append('{} - {}'.format(key, value))
+        facts.append(f'{key} - {value}')
 
     return "\n".join(facts).join(['\n', '\n'])
 
@@ -68,9 +68,7 @@ def start(update: Update, context: CallbackContext) -> int:
 def regular_choice(update: Update, context: CallbackContext) -> int:
     text = update.message.text
     context.user_data['choice'] = text
-    update.message.reply_text(
-        'Your {}? Yes, I would love to hear about that!'.format(text.lower())
-    )
+    update.message.reply_text(f'Your {text.lower()}? Yes, I would love to hear about that!')
 
     return TYPING_REPLY
 
@@ -92,8 +90,8 @@ def received_information(update: Update, context: CallbackContext) -> int:
 
     update.message.reply_text(
         "Neat! Just so you know, this is what you already told me:"
-        "{} You can tell me more, or change your opinion"
-        " on something.".format(facts_to_str(user_data)),
+        f"{facts_to_str(user_data)} You can tell me more, or change your opinion"
+        " on something.",
         reply_markup=markup,
     )
 
@@ -106,7 +104,7 @@ def done(update: Update, context: CallbackContext) -> int:
         del user_data['choice']
 
     update.message.reply_text(
-        "I learned these facts about you:" "{}" "Until next time!".format(facts_to_str(user_data))
+        f"I learned these facts about you: {facts_to_str(user_data)} Until next time!"
     )
 
     user_data.clear()

@@ -37,6 +37,7 @@ def update():
             Chat(0, 'private'),
             from_user=User(0, 'Testuser', False),
             via_bot=User(0, "Testbot", True),
+            sender_chat=Chat(0, 'Channel'),
         ),
     )
 
@@ -847,6 +848,11 @@ class TestFilters:
         assert Filters.status_update.connected_website(update)
         update.message.connected_website = None
 
+        update.message.proximity_alert_triggered = 'alert'
+        assert Filters.status_update(update)
+        assert Filters.status_update.proximity_alert_triggered(update)
+        update.message.proximity_alert_triggered = None
+
     def test_filters_forwarded(self, update):
         assert not Filters.forwarded(update)
         update.message.forward_date = datetime.datetime.utcnow()
@@ -955,11 +961,13 @@ class TestFilters:
 
     def test_filters_user_change_id(self, update):
         f = Filters.user(user_id=1)
+        assert f.user_ids == {1}
         update.message.from_user.id = 1
         assert f(update)
         update.message.from_user.id = 2
         assert not f(update)
         f.user_ids = 2
+        assert f.user_ids == {2}
         assert f(update)
 
         with pytest.raises(RuntimeError, match='username in conjunction'):
@@ -1096,11 +1104,13 @@ class TestFilters:
 
     def test_filters_chat_change_id(self, update):
         f = Filters.chat(chat_id=1)
+        assert f.chat_ids == {1}
         update.message.chat.id = 1
         assert f(update)
         update.message.chat.id = 2
         assert not f(update)
         f.chat_ids = 2
+        assert f.chat_ids == {2}
         assert f(update)
 
         with pytest.raises(RuntimeError, match='username in conjunction'):
@@ -1206,6 +1216,169 @@ class TestFilters:
         with pytest.raises(RuntimeError, match='Cannot set name'):
             f.name = 'foo'
 
+    def test_filters_sender_chat_init(self):
+        with pytest.raises(RuntimeError, match='in conjunction with'):
+            Filters.sender_chat(chat_id=1, username='chat')
+
+    def test_filters_sender_chat_allow_empty(self, update):
+        assert not Filters.sender_chat()(update)
+        assert Filters.sender_chat(allow_empty=True)(update)
+
+    def test_filters_sender_chat_id(self, update):
+        assert not Filters.sender_chat(chat_id=1)(update)
+        update.message.sender_chat.id = 1
+        assert Filters.sender_chat(chat_id=1)(update)
+        update.message.sender_chat.id = 2
+        assert Filters.sender_chat(chat_id=[1, 2])(update)
+        assert not Filters.sender_chat(chat_id=[3, 4])(update)
+        update.message.sender_chat = None
+        assert not Filters.sender_chat(chat_id=[3, 4])(update)
+
+    def test_filters_sender_chat_username(self, update):
+        assert not Filters.sender_chat(username='chat')(update)
+        assert not Filters.sender_chat(username='Testchat')(update)
+        update.message.sender_chat.username = 'chat@'
+        assert Filters.sender_chat(username='@chat@')(update)
+        assert Filters.sender_chat(username='chat@')(update)
+        assert Filters.sender_chat(username=['chat1', 'chat@', 'chat2'])(update)
+        assert not Filters.sender_chat(username=['@username', '@chat_2'])(update)
+        update.message.sender_chat = None
+        assert not Filters.sender_chat(username=['@username', '@chat_2'])(update)
+
+    def test_filters_sender_chat_change_id(self, update):
+        f = Filters.sender_chat(chat_id=1)
+        assert f.chat_ids == {1}
+        update.message.sender_chat.id = 1
+        assert f(update)
+        update.message.sender_chat.id = 2
+        assert not f(update)
+        f.chat_ids = 2
+        assert f.chat_ids == {2}
+        assert f(update)
+
+        with pytest.raises(RuntimeError, match='username in conjunction'):
+            f.usernames = 'chat'
+
+    def test_filters_sender_chat_change_username(self, update):
+        f = Filters.sender_chat(username='chat')
+        update.message.sender_chat.username = 'chat'
+        assert f(update)
+        update.message.sender_chat.username = 'User'
+        assert not f(update)
+        f.usernames = 'User'
+        assert f(update)
+
+        with pytest.raises(RuntimeError, match='chat_id in conjunction'):
+            f.chat_ids = 1
+
+    def test_filters_sender_chat_add_sender_chat_by_name(self, update):
+        chats = ['chat_a', 'chat_b', 'chat_c']
+        f = Filters.sender_chat()
+
+        for chat in chats:
+            update.message.sender_chat.username = chat
+            assert not f(update)
+
+        f.add_usernames('chat_a')
+        f.add_usernames(['chat_b', 'chat_c'])
+
+        for chat in chats:
+            update.message.sender_chat.username = chat
+            assert f(update)
+
+        with pytest.raises(RuntimeError, match='chat_id in conjunction'):
+            f.add_chat_ids(1)
+
+    def test_filters_sender_chat_add_sender_chat_by_id(self, update):
+        chats = [1, 2, 3]
+        f = Filters.sender_chat()
+
+        for chat in chats:
+            update.message.sender_chat.id = chat
+            assert not f(update)
+
+        f.add_chat_ids(1)
+        f.add_chat_ids([2, 3])
+
+        for chat in chats:
+            update.message.sender_chat.username = chat
+            assert f(update)
+
+        with pytest.raises(RuntimeError, match='username in conjunction'):
+            f.add_usernames('chat')
+
+    def test_filters_sender_chat_remove_sender_chat_by_name(self, update):
+        chats = ['chat_a', 'chat_b', 'chat_c']
+        f = Filters.sender_chat(username=chats)
+
+        with pytest.raises(RuntimeError, match='chat_id in conjunction'):
+            f.remove_chat_ids(1)
+
+        for chat in chats:
+            update.message.sender_chat.username = chat
+            assert f(update)
+
+        f.remove_usernames('chat_a')
+        f.remove_usernames(['chat_b', 'chat_c'])
+
+        for chat in chats:
+            update.message.sender_chat.username = chat
+            assert not f(update)
+
+    def test_filters_sender_chat_remove_sender_chat_by_id(self, update):
+        chats = [1, 2, 3]
+        f = Filters.sender_chat(chat_id=chats)
+
+        with pytest.raises(RuntimeError, match='username in conjunction'):
+            f.remove_usernames('chat')
+
+        for chat in chats:
+            update.message.sender_chat.id = chat
+            assert f(update)
+
+        f.remove_chat_ids(1)
+        f.remove_chat_ids([2, 3])
+
+        for chat in chats:
+            update.message.sender_chat.username = chat
+            assert not f(update)
+
+    def test_filters_sender_chat_repr(self):
+        f = Filters.sender_chat([1, 2])
+        assert str(f) == 'Filters.sender_chat(1, 2)'
+        f.remove_chat_ids(1)
+        f.remove_chat_ids(2)
+        assert str(f) == 'Filters.sender_chat()'
+        f.add_usernames('@foobar')
+        assert str(f) == 'Filters.sender_chat(foobar)'
+        f.add_usernames('@barfoo')
+        assert str(f).startswith('Filters.sender_chat(')
+        # we don't know th exact order
+        assert 'barfoo' in str(f) and 'foobar' in str(f)
+
+        with pytest.raises(RuntimeError, match='Cannot set name'):
+            f.name = 'foo'
+
+    def test_filters_sender_chat_super_group(self, update):
+        update.message.sender_chat.type = Chat.PRIVATE
+        assert not Filters.sender_chat.super_group(update)
+        update.message.sender_chat.type = Chat.CHANNEL
+        assert not Filters.sender_chat.super_group(update)
+        update.message.sender_chat.type = Chat.SUPERGROUP
+        assert Filters.sender_chat.super_group(update)
+        update.message.sender_chat = None
+        assert not Filters.sender_chat.super_group(update)
+
+    def test_filters_sender_chat_channel(self, update):
+        update.message.sender_chat.type = Chat.PRIVATE
+        assert not Filters.sender_chat.channel(update)
+        update.message.sender_chat.type = Chat.SUPERGROUP
+        assert not Filters.sender_chat.channel(update)
+        update.message.sender_chat.type = Chat.CHANNEL
+        assert Filters.sender_chat.channel(update)
+        update.message.sender_chat = None
+        assert not Filters.sender_chat.channel(update)
+
     def test_filters_invoice(self, update):
         assert not Filters.invoice(update)
         update.message.invoice = 'test'
@@ -1265,6 +1438,20 @@ class TestFilters:
         assert not Filters.dice.dice(update)
         assert not Filters.dice.darts(update)
         assert not Filters.dice.basketball([4])(update)
+
+        update.message.dice = Dice(5, '⚽')
+        assert Filters.dice.football(update)
+        assert Filters.dice.football([4, 5])(update)
+        assert not Filters.dice.dice(update)
+        assert not Filters.dice.darts(update)
+        assert not Filters.dice.football([4])(update)
+
+        update.message.dice = Dice(5, '🎰')
+        assert Filters.dice.slot_machine(update)
+        assert Filters.dice.slot_machine([4, 5])(update)
+        assert not Filters.dice.dice(update)
+        assert not Filters.dice.darts(update)
+        assert not Filters.dice.slot_machine([4])(update)
 
     def test_language_filter_single(self, update):
         update.message.from_user.language_code = 'en_US'
@@ -1592,11 +1779,13 @@ class TestFilters:
 
     def test_filters_via_bot_change_id(self, update):
         f = Filters.via_bot(bot_id=3)
+        assert f.bot_ids == {3}
         update.message.via_bot.id = 3
         assert f(update)
         update.message.via_bot.id = 2
         assert not f(update)
         f.bot_ids = 2
+        assert f.bot_ids == {2}
         assert f(update)
 
         with pytest.raises(RuntimeError, match='username in conjunction'):

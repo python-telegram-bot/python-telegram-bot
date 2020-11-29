@@ -17,11 +17,13 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import os
+from pathlib import Path
 
 import pytest
 from flaky import flaky
 
-from telegram import Audio, Voice, TelegramError
+from telegram import Audio, Voice, TelegramError, MessageEntity
+from telegram.error import BadRequest
 from telegram.utils.helpers import escape_markdown
 
 
@@ -129,6 +131,22 @@ class TestVoice:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    def test_send_voice_caption_entities(self, bot, chat_id, voice_file):
+        test_string = 'Italic Bold Code'
+        entities = [
+            MessageEntity(MessageEntity.ITALIC, 0, 6),
+            MessageEntity(MessageEntity.ITALIC, 7, 4),
+            MessageEntity(MessageEntity.ITALIC, 12, 4),
+        ]
+        message = bot.send_voice(
+            chat_id, voice_file, caption=test_string, caption_entities=entities
+        )
+
+        assert message.caption == test_string
+        assert message.caption_entities == entities
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_voice_default_parse_mode_1(self, default_bot, chat_id, voice):
         test_string = 'Italic Bold Code'
@@ -161,6 +179,55 @@ class TestVoice:
         )
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
+
+    def test_send_voice_local_files(self, monkeypatch, bot, chat_id):
+        # For just test that the correct paths are passed as we have no local bot API set up
+        test_flag = False
+        expected = f"file://{Path.cwd() / 'tests/data/telegram.jpg'}"
+        file = 'tests/data/telegram.jpg'
+
+        def make_assertion(_, data, *args, **kwargs):
+            nonlocal test_flag
+            test_flag = data.get('voice') == expected
+
+        monkeypatch.setattr(bot, '_post', make_assertion)
+        bot.send_voice(chat_id, file)
+        assert test_flag
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize(
+        'default_bot,custom',
+        [
+            ({'allow_sending_without_reply': True}, None),
+            ({'allow_sending_without_reply': False}, None),
+            ({'allow_sending_without_reply': False}, True),
+        ],
+        indirect=['default_bot'],
+    )
+    def test_send_voice_default_allow_sending_without_reply(
+        self, default_bot, chat_id, voice, custom
+    ):
+        reply_to_message = default_bot.send_message(chat_id, 'test')
+        reply_to_message.delete()
+        if custom is not None:
+            message = default_bot.send_voice(
+                chat_id,
+                voice,
+                allow_sending_without_reply=custom,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert message.reply_to_message is None
+        elif default_bot.defaults.allow_sending_without_reply:
+            message = default_bot.send_voice(
+                chat_id, voice, reply_to_message_id=reply_to_message.message_id
+            )
+            assert message.reply_to_message is None
+        else:
+            with pytest.raises(BadRequest, match='message not found'):
+                default_bot.send_voice(
+                    chat_id, voice, reply_to_message_id=reply_to_message.message_id
+                )
 
     def test_de_json(self, bot):
         json_dict = {

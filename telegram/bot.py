@@ -36,7 +36,6 @@ from typing import (
     Tuple,
     TypeVar,
     Union,
-    cast,
     no_type_check,
 )
 
@@ -63,12 +62,13 @@ from telegram import (
     File,
     GameHighScore,
     InlineQueryResult,
-    InputFile,
     InputMedia,
     LabeledPrice,
     Location,
     MaskPosition,
     Message,
+    MessageEntity,
+    MessageId,
     PassportElementError,
     PhotoSize,
     Poll,
@@ -85,13 +85,23 @@ from telegram import (
     VideoNote,
     Voice,
     WebhookInfo,
+    InputMediaAudio,
+    InputMediaDocument,
+    InputMediaPhoto,
+    InputMediaVideo,
     InlineKeyboardMarkup,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import InvalidToken, TelegramError
-from telegram.utils.helpers import DEFAULT_NONE, DefaultValue, to_timestamp
+from telegram.utils.helpers import (
+    DEFAULT_NONE,
+    DefaultValue,
+    to_timestamp,
+    is_local_file,
+    parse_file_input,
+)
 from telegram.utils.request import Request
-from telegram.utils.types import FileLike, JSONDict
+from telegram.utils.types import FileInput, JSONDict
 
 if TYPE_CHECKING:
     from telegram.ext import Defaults
@@ -232,9 +242,7 @@ class Bot(TelegramObject):
             else:
                 data = api_kwargs
 
-        return self.request.post(
-            '{}/{}'.format(self.base_url, endpoint), data=data, timeout=timeout
-        )
+        return self.request.post(f'{self.base_url}/{endpoint}', data=data, timeout=timeout)
 
     def _message(
         self,
@@ -243,6 +251,7 @@ class Bot(TelegramObject):
         reply_to_message_id: Union[str, int] = None,
         disable_notification: bool = None,
         reply_markup: ReplyMarkup = None,
+        allow_sending_without_reply: bool = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
     ) -> Union[bool, Message, None]:
@@ -251,6 +260,9 @@ class Bot(TelegramObject):
 
         if disable_notification is not None:
             data['disable_notification'] = disable_notification
+
+        if allow_sending_without_reply is not None:
+            data['allow_sending_without_reply'] = allow_sending_without_reply
 
         if reply_markup is not None:
             if isinstance(reply_markup, ReplyMarkup):
@@ -322,7 +334,7 @@ class Bot(TelegramObject):
     def link(self) -> str:
         """:obj:`str`: Convenience property. Returns the t.me link of the bot."""
 
-        return "https://t.me/{}".format(self.username)
+        return f"https://t.me/{self.username}"
 
     @property  # type: ignore
     @info
@@ -356,7 +368,7 @@ class Bot(TelegramObject):
     def name(self) -> str:
         """:obj:`str`: Bot's @username."""
 
-        return '@{}'.format(self.username)
+        return f'@{self.username}'
 
     @log
     def get_me(self, timeout: int = None, api_kwargs: JSONDict = None) -> Optional[User]:
@@ -395,6 +407,8 @@ class Bot(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
+        entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
     ) -> Optional[Message]:
         """Use this method to send text messages.
 
@@ -406,12 +420,16 @@ class Bot(TelegramObject):
             parse_mode (:obj:`str`): Send Markdown or HTML, if you want Telegram apps to show bold,
                 italic, fixed-width text or inline URLs in your bot's message. See the constants in
                 :class:`telegram.ParseMode` for the available modes.
+            entities (List[:class:`telegram.MessageEntity`], optional): List of special entities
+                that appear in message text, which can be specified instead of :attr:`parse_mode`.
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
                 this message.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
                 A JSON-serialized object for an inline keyboard, custom reply keyboard,
                 instructions to remove reply keyboard or to force a reply from the user.
@@ -432,6 +450,8 @@ class Bot(TelegramObject):
 
         if parse_mode:
             data['parse_mode'] = parse_mode
+        if entities:
+            data['entities'] = [me.to_dict() for me in entities]
         if disable_web_page_preview:
             data['disable_web_page_preview'] = disable_web_page_preview
 
@@ -441,6 +461,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             timeout=timeout,
             api_kwargs=api_kwargs,
         )
@@ -552,6 +573,8 @@ class Bot(TelegramObject):
         timeout: float = 20,
         parse_mode: str = None,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
+        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
     ) -> Optional[Message]:
         """Use this method to send photos.
 
@@ -562,7 +585,8 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
-            photo (:obj:`str` | `filelike object` | :class:`telegram.PhotoSize`): Photo to send.
+            photo (:obj:`str` | `filelike object` | :class:`pathlib.Path` | \
+                :class:`telegram.PhotoSize`): Photo to send.
                 Pass a file_id as String to send a photo that exists on the Telegram servers
                 (recommended), pass an HTTP URL as a String for Telegram to get a photo from the
                 Internet, or upload a new photo using multipart/form-data. Lastly you can pass
@@ -572,10 +596,15 @@ class Bot(TelegramObject):
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
                 constants in :class:`telegram.ParseMode` for the available modes.
+            caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
+                entities that appear in message text, which can be specified instead of
+                :attr:`parse_mode`.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
@@ -590,18 +619,14 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        if isinstance(photo, PhotoSize):
-            photo = photo.file_id
-        elif InputFile.is_file(photo):
-            photo = cast(IO, photo)
-            photo = InputFile(photo)  # type: ignore[assignment]
-
-        data: JSONDict = {'chat_id': chat_id, 'photo': photo}
+        data: JSONDict = {'chat_id': chat_id, 'photo': parse_file_input(photo, PhotoSize)}
 
         if caption:
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
+        if caption_entities:
+            data['caption_entities'] = [me.to_dict() for me in caption_entities]
 
         return self._message(  # type: ignore[return-value]
             'sendPhoto',
@@ -610,6 +635,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -617,7 +643,7 @@ class Bot(TelegramObject):
     def send_audio(
         self,
         chat_id: Union[int, str],
-        audio: Union[str, Audio, FileLike],
+        audio: Union[FileInput, Audio],
         duration: int = None,
         performer: str = None,
         title: str = None,
@@ -627,8 +653,10 @@ class Bot(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: float = 20,
         parse_mode: str = None,
-        thumb: FileLike = None,
+        thumb: FileInput = None,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
+        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
     ) -> Optional[Message]:
         """
         Use this method to send audio files, if you want Telegram clients to display them in the
@@ -646,7 +674,8 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
-            audio (:obj:`str` | `filelike object` | :class:`telegram.Audio`): Audio file to send.
+            audio (:obj:`str` | `filelike object` | :class:`pathlib.Path` | \
+                :class:`telegram.Audio`): Audio file to send.
                 Pass a file_id as String to send an audio file that exists on the Telegram servers
                 (recommended), pass an HTTP URL as a String for Telegram to get an audio file from
                 the Internet, or upload a new one using multipart/form-data. Lastly you can pass
@@ -656,6 +685,9 @@ class Bot(TelegramObject):
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
                 constants in :class:`telegram.ParseMode` for the available modes.
+            caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
+                entities that appear in message text, which can be specified instead of
+                :attr:`parse_mode`.
             duration (:obj:`int`, optional): Duration of sent audio in seconds.
             performer (:obj:`str`, optional): Performer.
             title (:obj:`str`, optional): Track name.
@@ -663,10 +695,13 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            thumb (`filelike object`, optional): Thumbnail of the file sent; can be ignored if
+            thumb (`filelike object` | :class:`pathlib.Path`, optional): Thumbnail of the file
+                sent; can be ignored if
                 thumbnail generation for the file is supported server-side. The thumbnail should be
                 in JPEG format and less than 200 kB in size. A thumbnail's width and height should
                 not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
@@ -682,13 +717,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        if isinstance(audio, Audio):
-            audio = audio.file_id
-        elif InputFile.is_file(audio):
-            audio = cast(IO, audio)
-            audio = InputFile(audio)
-
-        data: JSONDict = {'chat_id': chat_id, 'audio': audio}
+        data: JSONDict = {'chat_id': chat_id, 'audio': parse_file_input(audio, Audio)}
 
         if duration:
             data['duration'] = duration
@@ -700,11 +729,10 @@ class Bot(TelegramObject):
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
+        if caption_entities:
+            data['caption_entities'] = [me.to_dict() for me in caption_entities]
         if thumb:
-            if InputFile.is_file(thumb):
-                thumb = cast(IO, thumb)
-                thumb = InputFile(thumb, attach=True)
-            data['thumb'] = thumb
+            data['thumb'] = parse_file_input(thumb, attach=True)
 
         return self._message(  # type: ignore[return-value]
             'sendAudio',
@@ -713,6 +741,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -720,7 +749,7 @@ class Bot(TelegramObject):
     def send_document(
         self,
         chat_id: Union[int, str],
-        document: Union[str, Document, FileLike],
+        document: Union[FileInput, Document],
         filename: str = None,
         caption: str = None,
         disable_notification: bool = False,
@@ -728,8 +757,11 @@ class Bot(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: float = 20,
         parse_mode: str = None,
-        thumb: FileLike = None,
+        thumb: FileInput = None,
         api_kwargs: JSONDict = None,
+        disable_content_type_detection: bool = None,
+        allow_sending_without_reply: bool = None,
+        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
     ) -> Optional[Message]:
         """
         Use this method to send general files.
@@ -744,7 +776,8 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
-            document (:obj:`str` | `filelike object` | :class:`telegram.Document`): File to send.
+            document (:obj:`str` | `filelike object` | :class:`pathlib.Path` | \
+                :class:`telegram.Document`): File to send.
                 Pass a file_id as String to send a file that exists on the Telegram servers
                 (recommended), pass an HTTP URL as a String for Telegram to get a file from the
                 Internet, or upload a new one using multipart/form-data. Lastly you can pass
@@ -753,17 +786,25 @@ class Bot(TelegramObject):
                 when you send file generated by temp module, for example). Undocumented.
             caption (:obj:`str`, optional): Document caption (may also be used when resending
                 documents by file_id), 0-1024 characters after entities parsing.
+            disable_content_type_detection (:obj:`bool`, optional): Disables automatic server-side
+                content type detection for files uploaded using multipart/form-data.
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
                 constants in :class:`telegram.ParseMode` for the available modes.
+            caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
+                entities that appear in message text, which can be specified instead of
+                :attr:`parse_mode`.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            thumb (`filelike object`, optional): Thumbnail of the file sent; can be ignored if
+            thumb (`filelike object` | :class:`pathlib.Path`, optional): Thumbnail of the file
+                sent; can be ignored if
                 thumbnail generation for the file is supported server-side. The thumbnail should be
                 in JPEG format and less than 200 kB in size. A thumbnail's width and height should
                 not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
@@ -779,23 +820,21 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        if isinstance(document, Document):
-            document = document.file_id
-        elif InputFile.is_file(document):
-            document = cast(IO, document)
-            document = InputFile(document, filename=filename)
-
-        data: JSONDict = {'chat_id': chat_id, 'document': document}
+        data: JSONDict = {
+            'chat_id': chat_id,
+            'document': parse_file_input(document, Document, filename=filename),
+        }
 
         if caption:
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
+        if caption_entities:
+            data['caption_entities'] = [me.to_dict() for me in caption_entities]
+        if disable_content_type_detection is not None:
+            data['disable_content_type_detection'] = disable_content_type_detection
         if thumb:
-            if InputFile.is_file(thumb):
-                thumb = cast(IO, thumb)
-                thumb = InputFile(thumb, attach=True)
-            data['thumb'] = thumb
+            data['thumb'] = parse_file_input(thumb, attach=True)
 
         return self._message(  # type: ignore[return-value]
             'sendDocument',
@@ -804,6 +843,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -811,12 +851,13 @@ class Bot(TelegramObject):
     def send_sticker(
         self,
         chat_id: Union[int, str],
-        sticker: Union[str, Sticker, FileLike],
+        sticker: Union[FileInput, Sticker],
         disable_notification: bool = False,
         reply_to_message_id: Union[int, str] = None,
         reply_markup: ReplyMarkup = None,
         timeout: float = 20,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
     ) -> Optional[Message]:
         """
         Use this method to send static .WEBP or animated .TGS stickers.
@@ -828,7 +869,8 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
-            sticker (:obj:`str` | `filelike object` :class:`telegram.Sticker`): Sticker to send.
+            sticker (:obj:`str` | `filelike object` | :class:`pathlib.Path` | \
+                :class:`telegram.Sticker`): Sticker to send.
                 Pass a file_id as String to send a file that exists on the Telegram servers
                 (recommended), pass an HTTP URL as a String for Telegram to get a .webp file from
                 the Internet, or upload a new one using multipart/form-data. Lastly you can pass
@@ -837,6 +879,8 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
@@ -851,13 +895,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        if isinstance(sticker, Sticker):
-            sticker = sticker.file_id
-        elif InputFile.is_file(sticker):
-            sticker = cast(IO, sticker)
-            sticker = InputFile(sticker)
-
-        data: JSONDict = {'chat_id': chat_id, 'sticker': sticker}
+        data: JSONDict = {'chat_id': chat_id, 'sticker': parse_file_input(sticker, Sticker)}
 
         return self._message(  # type: ignore[return-value]
             'sendSticker',
@@ -866,6 +904,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -873,7 +912,7 @@ class Bot(TelegramObject):
     def send_video(
         self,
         chat_id: Union[int, str],
-        video: Union[str, Video, FileLike],
+        video: Union[FileInput, Video],
         duration: int = None,
         caption: str = None,
         disable_notification: bool = False,
@@ -884,8 +923,10 @@ class Bot(TelegramObject):
         height: int = None,
         parse_mode: str = None,
         supports_streaming: bool = None,
-        thumb: FileLike = None,
+        thumb: FileInput = None,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
+        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
     ) -> Optional[Message]:
         """
         Use this method to send video files, Telegram clients support mp4 videos
@@ -904,7 +945,8 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
-            video (:obj:`str` | `filelike object` | :class:`telegram.Video`): Video file to send.
+            video (:obj:`str` | `filelike object` | :class:`pathlib.Path` | \
+                :class:`telegram.Video`): Video file to send.
                 Pass a file_id as String to send an video file that exists on the Telegram servers
                 (recommended), pass an HTTP URL as a String for Telegram to get an video file from
                 the Internet, or upload a new one using multipart/form-data. Lastly you can pass
@@ -917,16 +959,22 @@ class Bot(TelegramObject):
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
                 constants in :class:`telegram.ParseMode` for the available modes.
+            caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
+                entities that appear in message text, which can be specified instead of
+                :attr:`parse_mode`.
             supports_streaming (:obj:`bool`, optional): Pass :obj:`True`, if the uploaded video is
                 suitable for streaming.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            thumb (`filelike object`, optional): Thumbnail of the file sent; can be ignored if
+            thumb (`filelike object` | :class:`pathlib.Path`, optional): Thumbnail of the file
+                sent; can be ignored if
                 thumbnail generation for the file is supported server-side. The thumbnail should be
                 in JPEG format and less than 200 kB in size. A thumbnail's width and height should
                 not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
@@ -942,13 +990,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        if isinstance(video, Video):
-            video = video.file_id
-        elif InputFile.is_file(video):
-            video = cast(IO, video)
-            video = InputFile(video)
-
-        data: JSONDict = {'chat_id': chat_id, 'video': video}
+        data: JSONDict = {'chat_id': chat_id, 'video': parse_file_input(video, Video)}
 
         if duration:
             data['duration'] = duration
@@ -956,6 +998,8 @@ class Bot(TelegramObject):
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
+        if caption_entities:
+            data['caption_entities'] = [me.to_dict() for me in caption_entities]
         if supports_streaming:
             data['supports_streaming'] = supports_streaming
         if width:
@@ -963,10 +1007,7 @@ class Bot(TelegramObject):
         if height:
             data['height'] = height
         if thumb:
-            if InputFile.is_file(thumb):
-                thumb = cast(IO, thumb)
-                thumb = InputFile(thumb, attach=True)
-            data['thumb'] = thumb
+            data['thumb'] = parse_file_input(thumb, attach=True)
 
         return self._message(  # type: ignore[return-value]
             'sendVideo',
@@ -975,6 +1016,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -982,15 +1024,16 @@ class Bot(TelegramObject):
     def send_video_note(
         self,
         chat_id: Union[int, str],
-        video_note: Union[str, FileLike, VideoNote],
+        video_note: Union[FileInput, VideoNote],
         duration: int = None,
         length: int = None,
         disable_notification: bool = False,
         reply_to_message_id: Union[int, str] = None,
         reply_markup: ReplyMarkup = None,
         timeout: float = 20,
-        thumb: FileLike = None,
+        thumb: FileInput = None,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
     ) -> Optional[Message]:
         """
         As of v.4.0, Telegram clients support rounded square mp4 videos of up to 1 minute long.
@@ -1006,7 +1049,8 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
-            video_note (:obj:`str` | `filelike object` | :class:`telegram.VideoNote`): Video note
+            video_note (:obj:`str` | `filelike object` | :class:`pathlib.Path` | \
+                :class:`telegram.VideoNote`): Video note
                 to send. Pass a file_id as String to send a video note that exists on the Telegram
                 servers (recommended) or upload a new video using multipart/form-data. Or you can
                 pass an existing :class:`telegram.VideoNote` object to send. Sending video notes by
@@ -1018,10 +1062,13 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard,
                 instructions to remove reply keyboard or to force a reply from the user.
-            thumb (`filelike object`, optional): Thumbnail of the file sent; can be ignored if
+            thumb (`filelike object` | :class:`pathlib.Path`, optional): Thumbnail of the file
+                sent; can be ignored if
                 thumbnail generation for the file is supported server-side. The thumbnail should be
                 in JPEG format and less than 200 kB in size. A thumbnail's width and height should
                 not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
@@ -1037,23 +1084,17 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        if isinstance(video_note, VideoNote):
-            video_note = video_note.file_id
-        elif InputFile.is_file(video_note):
-            video_note = cast(IO, video_note)
-            video_note = InputFile(video_note)
-
-        data: JSONDict = {'chat_id': chat_id, 'video_note': video_note}
+        data: JSONDict = {
+            'chat_id': chat_id,
+            'video_note': parse_file_input(video_note, VideoNote),
+        }
 
         if duration is not None:
             data['duration'] = duration
         if length is not None:
             data['length'] = length
         if thumb:
-            if InputFile.is_file(thumb):
-                thumb = cast(IO, thumb)
-                thumb = InputFile(thumb, attach=True)
-            data['thumb'] = thumb
+            data['thumb'] = parse_file_input(thumb, attach=True)
 
         return self._message(  # type: ignore[return-value]
             'sendVideoNote',
@@ -1062,6 +1103,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -1069,11 +1111,11 @@ class Bot(TelegramObject):
     def send_animation(
         self,
         chat_id: Union[int, str],
-        animation: Union[str, FileLike, Animation],
+        animation: Union[FileInput, Animation],
         duration: int = None,
         width: int = None,
         height: int = None,
-        thumb: FileLike = None,
+        thumb: FileInput = None,
         caption: str = None,
         parse_mode: str = None,
         disable_notification: bool = False,
@@ -1081,6 +1123,8 @@ class Bot(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: float = 20,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
+        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
     ) -> Optional[Message]:
         """
         Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound).
@@ -1095,7 +1139,8 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
-            animation (:obj:`str` | `filelike object` | :class:`telegram.Animation`): Animation to
+            animation (:obj:`str` | `filelike object` | :class:`pathlib.Path` | \
+                :class:`telegram.Animation`): Animation to
                 send. Pass a file_id as String to send an animation that exists on the Telegram
                 servers (recommended), pass an HTTP URL as a String for Telegram to get an
                 animation from the Internet, or upload a new animation using multipart/form-data.
@@ -1103,7 +1148,8 @@ class Bot(TelegramObject):
             duration (:obj:`int`, optional): Duration of sent animation in seconds.
             width (:obj:`int`, optional): Animation width.
             height (:obj:`int`, optional): Animation height.
-            thumb (`filelike object`, optional): Thumbnail of the file sent; can be ignored if
+            thumb (`filelike object` | :class:`pathlib.Path`, optional): Thumbnail of the file
+                sent; can be ignored if
                 thumbnail generation for the file is supported server-side. The thumbnail should be
                 in JPEG format and less than 200 kB in size. A thumbnail's width and height should
                 not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
@@ -1113,10 +1159,15 @@ class Bot(TelegramObject):
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
                 constants in :class:`telegram.ParseMode` for the available modes.
+            caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
+                entities that appear in message text, which can be specified instead of
+                :attr:`parse_mode`.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
@@ -1131,13 +1182,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        if isinstance(animation, Animation):
-            animation = animation.file_id
-        elif InputFile.is_file(animation):
-            animation = cast(IO, animation)
-            animation = InputFile(animation)
-
-        data: JSONDict = {'chat_id': chat_id, 'animation': animation}
+        data: JSONDict = {'chat_id': chat_id, 'animation': parse_file_input(animation, Animation)}
 
         if duration:
             data['duration'] = duration
@@ -1146,14 +1191,13 @@ class Bot(TelegramObject):
         if height:
             data['height'] = height
         if thumb:
-            if InputFile.is_file(thumb):
-                thumb = cast(IO, thumb)
-                thumb = InputFile(thumb, attach=True)
-            data['thumb'] = thumb
+            data['thumb'] = parse_file_input(thumb, attach=True)
         if caption:
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
+        if caption_entities:
+            data['caption_entities'] = [me.to_dict() for me in caption_entities]
 
         return self._message(  # type: ignore[return-value]
             'sendAnimation',
@@ -1162,6 +1206,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -1169,7 +1214,7 @@ class Bot(TelegramObject):
     def send_voice(
         self,
         chat_id: Union[int, str],
-        voice: Union[str, FileLike, Voice],
+        voice: Union[FileInput, Voice],
         duration: int = None,
         caption: str = None,
         disable_notification: bool = False,
@@ -1178,6 +1223,8 @@ class Bot(TelegramObject):
         timeout: float = 20,
         parse_mode: str = None,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
+        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
     ) -> Optional[Message]:
         """
         Use this method to send audio files, if you want Telegram clients to display the file
@@ -1192,7 +1239,8 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
-            voice (:obj:`str` | `filelike object` | :class:`telegram.Voice`): Voice file to send.
+            voice (:obj:`str` | `filelike object` | :class:`pathlib.Path` | \
+                :class:`telegram.Voice`): Voice file to send.
                 Pass a file_id as String to send an voice file that exists on the Telegram servers
                 (recommended), pass an HTTP URL as a String for Telegram to get an voice file from
                 the Internet, or upload a new one using multipart/form-data. Lastly you can pass
@@ -1202,11 +1250,16 @@ class Bot(TelegramObject):
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
                 constants in :class:`telegram.ParseMode` for the available modes.
+            caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
+                entities that appear in message text, which can be specified instead of
+                :attr:`parse_mode`.
             duration (:obj:`int`, optional): Duration of the voice message in seconds.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard,
                 instructions to remove reply keyboard or to force a reply from the user.
@@ -1221,13 +1274,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        if isinstance(voice, Voice):
-            voice = voice.file_id
-        elif InputFile.is_file(voice):
-            voice = cast(IO, voice)
-            voice = InputFile(voice)
-
-        data: JSONDict = {'chat_id': chat_id, 'voice': voice}
+        data: JSONDict = {'chat_id': chat_id, 'voice': parse_file_input(voice, Voice)}
 
         if duration:
             data['duration'] = duration
@@ -1235,6 +1282,8 @@ class Bot(TelegramObject):
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
+        if caption_entities:
+            data['caption_entities'] = [me.to_dict() for me in caption_entities]
 
         return self._message(  # type: ignore[return-value]
             'sendVoice',
@@ -1243,6 +1292,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -1250,23 +1300,27 @@ class Bot(TelegramObject):
     def send_media_group(
         self,
         chat_id: Union[int, str],
-        media: List[InputMedia],
+        media: List[Union[InputMediaAudio, InputMediaDocument, InputMediaPhoto, InputMediaVideo]],
         disable_notification: bool = None,
         reply_to_message_id: Union[int, str] = None,
         timeout: float = 20,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
     ) -> List[Optional[Message]]:
         """Use this method to send a group of photos or videos as an album.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
-            media (List[:class:`telegram.InputMedia`]): An array describing photos and videos to be
-                sent, must include 2–10 items.
+            media (List[:class:`telegram.InputMediaAudio`, :class:`telegram.InputMediaDocument`, \
+                :class:`telegram.InputMediaPhoto`, :class:`telegram.InputMediaVideo`]): An array
+                describing messages to be sent, must include 2–10 items.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
@@ -1290,6 +1344,8 @@ class Bot(TelegramObject):
             data['reply_to_message_id'] = reply_to_message_id
         if disable_notification:
             data['disable_notification'] = disable_notification
+        if allow_sending_without_reply is not None:
+            data['allow_sending_without_reply'] = allow_sending_without_reply
 
         result = self._post('sendMediaGroup', data, timeout=timeout, api_kwargs=api_kwargs)
 
@@ -1312,6 +1368,10 @@ class Bot(TelegramObject):
         location: Location = None,
         live_period: int = None,
         api_kwargs: JSONDict = None,
+        horizontal_accuracy: float = None,
+        heading: int = None,
+        proximity_alert_radius: int = None,
+        allow_sending_without_reply: bool = None,
     ) -> Optional[Message]:
         """Use this method to send point on the map.
 
@@ -1324,12 +1384,21 @@ class Bot(TelegramObject):
             latitude (:obj:`float`, optional): Latitude of location.
             longitude (:obj:`float`, optional): Longitude of location.
             location (:class:`telegram.Location`, optional): The location to send.
+            horizontal_accuracy (:obj:`int`, optional): The radius of uncertainty for the location,
+                measured in meters; 0-1500.
             live_period (:obj:`int`, optional): Period in seconds for which the location will be
                 updated, should be between 60 and 86400.
+            heading (:obj:`int`, optional): For live locations, a direction in which the user is
+                moving, in degrees. Must be between 1 and 360 if specified.
+            proximity_alert_radius (:obj:`int`, optional): For live locations, a maximum distance
+                for proximity alerts about approaching another chat member, in meters. Must be
+                between 1 and 100000 if specified.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                     original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard,
                 instructions to remove reply keyboard or to force a reply from the user.
@@ -1364,6 +1433,12 @@ class Bot(TelegramObject):
 
         if live_period:
             data['live_period'] = live_period
+        if horizontal_accuracy:
+            data['horizontal_accuracy'] = horizontal_accuracy
+        if heading:
+            data['heading'] = heading
+        if proximity_alert_radius:
+            data['proximity_alert_radius'] = proximity_alert_radius
 
         return self._message(  # type: ignore[return-value]
             'sendLocation',
@@ -1372,6 +1447,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -1387,6 +1463,9 @@ class Bot(TelegramObject):
         reply_markup: InlineKeyboardMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        horizontal_accuracy: float = None,
+        heading: int = None,
+        proximity_alert_radius: int = None,
     ) -> Union[Optional[Message], bool]:
         """Use this method to edit live location messages sent by the bot or via the bot
         (for inline bots). A location can be edited until its :attr:`live_period` expires or
@@ -1406,6 +1485,13 @@ class Bot(TelegramObject):
             latitude (:obj:`float`, optional): Latitude of location.
             longitude (:obj:`float`, optional): Longitude of location.
             location (:class:`telegram.Location`, optional): The location to send.
+            horizontal_accuracy (:obj:`float`, optional): The radius of uncertainty for the
+                location, measured in meters; 0-1500.
+            heading (:obj:`int`, optional): Direction in which the user is moving, in degrees. Must
+                be between 1 and 360 if specified.
+            proximity_alert_radius (:obj:`int`, optional): Maximum distance for proximity alerts
+                about approaching another chat member, in meters. Must be between 1 and 100000 if
+                specified.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
                 object for a new inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -1415,8 +1501,8 @@ class Bot(TelegramObject):
                 Telegram API.
 
         Returns:
-            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise :obj:`True` is returned.
+            :class:`telegram.Message`: On success, if edited message is not an inline message, the
+            edited message is returned, otherwise :obj:`True` is returned.
         """
         if not (all([latitude, longitude]) or location):
             raise ValueError(
@@ -1439,6 +1525,12 @@ class Bot(TelegramObject):
             data['message_id'] = message_id
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
+        if horizontal_accuracy:
+            data['horizontal_accuracy'] = horizontal_accuracy
+        if heading:
+            data['heading'] = heading
+        if proximity_alert_radius:
+            data['proximity_alert_radius'] = proximity_alert_radius
 
         return self._message(
             'editMessageLiveLocation',
@@ -1514,13 +1606,19 @@ class Bot(TelegramObject):
         venue: Venue = None,
         foursquare_type: str = None,
         api_kwargs: JSONDict = None,
+        google_place_id: str = None,
+        google_place_type: str = None,
+        allow_sending_without_reply: bool = None,
     ) -> Optional[Message]:
         """Use this method to send information about a venue.
 
         Note:
-            You can either supply :obj:`venue`, or :obj:`latitude`, :obj:`longitude`,
-            :obj:`title` and :obj:`address` and optionally :obj:`foursquare_id` and optionally
-            :obj:`foursquare_type`.
+            * You can either supply :obj:`venue`, or :obj:`latitude`, :obj:`longitude`,
+              :obj:`title` and :obj:`address` and optionally :obj:`foursquare_id` and
+              :obj:`foursquare_type` or optionally :obj:`google_place_id` and
+              :obj:`google_place_type`.
+            * Foursquare details and Google Pace details are mutually exclusive. However, this
+              behaviour is undocumented and might be changed by Telegram.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -1533,11 +1631,17 @@ class Bot(TelegramObject):
             foursquare_type (:obj:`str`, optional): Foursquare type of the venue, if known.
                 (For example, "arts_entertainment/default", "arts_entertainment/aquarium" or
                 "food/icecream".)
+            google_place_id (:obj:`str`, optional): Google Places identifier of the venue.
+            google_place_type (:obj:`str`, optional): Google Places type of the venue. (See
+                `supported types \
+                <https://developers.google.com/places/web-service/supported_types>`_.)
             venue (:class:`telegram.Venue`, optional): The venue to send.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
@@ -1567,6 +1671,8 @@ class Bot(TelegramObject):
             title = venue.title
             foursquare_id = venue.foursquare_id
             foursquare_type = venue.foursquare_type
+            google_place_id = venue.google_place_id
+            google_place_type = venue.google_place_type
 
         data: JSONDict = {
             'chat_id': chat_id,
@@ -1580,6 +1686,10 @@ class Bot(TelegramObject):
             data['foursquare_id'] = foursquare_id
         if foursquare_type:
             data['foursquare_type'] = foursquare_type
+        if google_place_id:
+            data['google_place_id'] = google_place_id
+        if google_place_type:
+            data['google_place_type'] = google_place_type
 
         return self._message(  # type: ignore[return-value]
             'sendVenue',
@@ -1588,6 +1698,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -1605,6 +1716,7 @@ class Bot(TelegramObject):
         contact: Contact = None,
         vcard: str = None,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
     ) -> Optional[Message]:
         """Use this method to send phone contacts.
 
@@ -1625,6 +1737,8 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
@@ -1670,6 +1784,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -1683,6 +1798,7 @@ class Bot(TelegramObject):
         reply_markup: InlineKeyboardMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
     ) -> Optional[Message]:
         """Use this method to send a game.
 
@@ -1695,6 +1811,8 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
                 object for a new inline keyboard. If empty, one ‘Play game_title’ button will be
                 shown. If not empty, the first button must launch the game.
@@ -1720,6 +1838,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -2010,9 +2129,11 @@ class Bot(TelegramObject):
 
         result = self._post('getFile', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        if result.get('file_path'):  # type: ignore
-            result['file_path'] = '{}/{}'.format(  # type: ignore
-                self.base_file_url, result['file_path']  # type: ignore
+        if result.get('file_path') and not is_local_file(  # type: ignore[union-attr]
+            result['file_path']  # type: ignore[index]
+        ):
+            result['file_path'] = '{}/{}'.format(  # type: ignore[index]
+                self.base_file_url, result['file_path']  # type: ignore[index]
             )
 
         return File.de_json(result, self)  # type: ignore
@@ -2074,16 +2195,21 @@ class Bot(TelegramObject):
         user_id: Union[str, int],
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        only_if_banned: bool = None,
     ) -> bool:
         """Use this method to unban a previously kicked user in a supergroup or channel.
 
-        The user will not return to the group automatically, but will be able to join via link,
-        etc. The bot must be an administrator in the group for this to work.
+        The user will *not* return to the group or channel automatically, but will be able to join
+        via link, etc. The bot must be an administrator for this to work. By default, this method
+        guarantees that after the call the user is not a member of the chat, but will be able to
+        join it. So if the user is a member of the chat they will also be *removed* from the chat.
+        If you don't want this, use the parameter :attr:`only_if_banned`.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
             user_id (:obj:`int`): Unique identifier of the target user.
+            only_if_banned (:obj:`bool`, optional): Do nothing if the user is not banned.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -2098,6 +2224,9 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {'chat_id': chat_id, 'user_id': user_id}
+
+        if only_if_banned is not None:
+            data['only_if_banned'] = only_if_banned
 
         result = self._post('unbanChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
 
@@ -2178,10 +2307,10 @@ class Bot(TelegramObject):
         reply_markup: InlineKeyboardMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
     ) -> Union[Optional[Message], bool]:
         """
-        Use this method to edit text and game messages sent by the bot or via the bot (for inline
-        bots).
+        Use this method to edit text and game messages.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
@@ -2195,6 +2324,8 @@ class Bot(TelegramObject):
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in your bot's message. See the
                 constants in :class:`telegram.ParseMode` for the available modes.
+            entities (List[:class:`telegram.MessageEntity`], optional): List of special entities
+                that appear in message text, which can be specified instead of :attr:`parse_mode`.
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
                 this message.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
@@ -2206,8 +2337,8 @@ class Bot(TelegramObject):
                 Telegram API.
 
         Returns:
-            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise :obj:`True` is returned.
+            :class:`telegram.Message`: On success, if edited message is not an inline message, the
+            edited message is returned, otherwise :obj:`True` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2223,6 +2354,8 @@ class Bot(TelegramObject):
             data['inline_message_id'] = inline_message_id
         if parse_mode:
             data['parse_mode'] = parse_mode
+        if entities:
+            data['entities'] = [me.to_dict() for me in entities]
         if disable_web_page_preview:
             data['disable_web_page_preview'] = disable_web_page_preview
 
@@ -2245,10 +2378,10 @@ class Bot(TelegramObject):
         timeout: float = None,
         parse_mode: str = None,
         api_kwargs: JSONDict = None,
+        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
     ) -> Union[Message, bool]:
         """
-        Use this method to edit captions of messages sent by the bot or via the bot
-        (for inline bots).
+        Use this method to edit captions of messages.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
@@ -2263,6 +2396,9 @@ class Bot(TelegramObject):
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
                 constants in :class:`telegram.ParseMode` for the available modes.
+            caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
+                entities that appear in message text, which can be specified instead of
+                :attr:`parse_mode`.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
                 object for an inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -2272,8 +2408,8 @@ class Bot(TelegramObject):
                 Telegram API.
 
         Returns:
-            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise :obj:`True` is returned.
+            :class:`telegram.Message`: On success, if edited message is not an inline message, the
+            edited message is returned, otherwise :obj:`True` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2291,6 +2427,8 @@ class Bot(TelegramObject):
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
+        if caption_entities:
+            data['caption_entities'] = [me.to_dict() for me in caption_entities]
         if chat_id:
             data['chat_id'] = chat_id
         if message_id:
@@ -2318,10 +2456,11 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
     ) -> Union[Message, bool]:
         """
-        Use this method to edit animation, audio, document, photo, or video messages. If a
-        message is a part of a message album, then it can be edited only to a photo or a video.
-        Otherwise, message type can be changed arbitrarily. When inline message is edited,
-        new file can't be uploaded. Use previously uploaded file via its file_id or specify a URL.
+        Use this method to edit animation, audio, document, photo, or video messages. If a message
+        is part of a message album, then it can be edited only to an audio for audio albums, only
+        to a document for document albums and to a photo or a video otherwise. When an inline
+        message is edited, a new file can't be uploaded. Use a previously uploaded file via its
+        ``file_id`` or specify a URL.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
@@ -2403,8 +2542,8 @@ class Bot(TelegramObject):
                 Telegram API.
 
         Returns:
-            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise :obj:`True` is returned.
+            :class:`telegram.Message`: On success, if edited message is not an inline message, the
+            edited message is returned, otherwise :obj:`True` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2517,11 +2656,13 @@ class Bot(TelegramObject):
     def set_webhook(
         self,
         url: str = None,
-        certificate: FileLike = None,
+        certificate: FileInput = None,
         timeout: float = None,
         max_connections: int = 40,
         allowed_updates: List[str] = None,
         api_kwargs: JSONDict = None,
+        ip_address: str = None,
+        drop_pending_updates: bool = None,
     ) -> bool:
         """
         Use this method to specify a url and receive incoming updates via an outgoing webhook.
@@ -2542,6 +2683,8 @@ class Bot(TelegramObject):
             certificate (:obj:`filelike`): Upload your public key certificate so that the root
                 certificate in use can be checked. See our self-signed guide for details.
                 (https://goo.gl/rw7w6Y)
+            ip_address (:obj:`str`, optional): The fixed IP address which will be used to send
+                webhook requests instead of the IP address resolved through DNS.
             max_connections (:obj:`int`, optional): Maximum allowed number of simultaneous HTTPS
                 connections to the webhook for update delivery, 1-100. Defaults to 40. Use lower
                 values to limit the load on your bot's server, and higher values to increase your
@@ -2554,6 +2697,8 @@ class Bot(TelegramObject):
                 specified, the previous setting will be used. Please note that this parameter
                 doesn't affect updates created before the call to the set_webhook, so unwanted
                 updates may be received for a short period of time.
+            drop_pending_updates (:obj:`bool`, optional): Pass :obj:`True` to drop all pending
+                updates.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -2585,26 +2730,31 @@ class Bot(TelegramObject):
         if url is not None:
             data['url'] = url
         if certificate:
-            if InputFile.is_file(certificate):
-                certificate = cast(IO, certificate)
-                certificate = InputFile(certificate)
-            data['certificate'] = certificate
+            data['certificate'] = parse_file_input(certificate)
         if max_connections is not None:
             data['max_connections'] = max_connections
         if allowed_updates is not None:
             data['allowed_updates'] = allowed_updates
+        if ip_address:
+            data['ip_address'] = ip_address
+        if drop_pending_updates:
+            data['drop_pending_updates'] = drop_pending_updates
 
         result = self._post('setWebhook', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
     @log
-    def delete_webhook(self, timeout: float = None, api_kwargs: JSONDict = None) -> bool:
+    def delete_webhook(
+        self, timeout: float = None, api_kwargs: JSONDict = None, drop_pending_updates: bool = None
+    ) -> bool:
         """
         Use this method to remove webhook integration if you decide to switch back to
         getUpdates. Requires no parameters.
 
         Args:
+            drop_pending_updates(:obj:`bool`, optional): Pass :obj:`True`: to drop all pending
+                updates.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -2618,7 +2768,12 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        result = self._post('deleteWebhook', None, timeout=timeout, api_kwargs=api_kwargs)
+        data = {}
+
+        if drop_pending_updates:
+            data['drop_pending_updates'] = drop_pending_updates
+
+        result = self._post('deleteWebhook', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -2897,7 +3052,7 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`: If the new score is not greater than the user's
-            current score in the chat and force is :obj:`False`.
+                current score in the chat and force is :obj:`False`.
 
         """
         data: JSONDict = {'user_id': user_id, 'score': score}
@@ -2996,6 +3151,7 @@ class Bot(TelegramObject):
         send_email_to_provider: bool = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
     ) -> Message:
         """Use this method to send invoices.
 
@@ -3041,6 +3197,8 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
                 object for an inline keyboard. If empty, one 'Pay total price' button will be
                 shown. If not empty, the first button must be a Pay button.
@@ -3102,6 +3260,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -3305,6 +3464,7 @@ class Bot(TelegramObject):
         can_promote_members: bool = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
+        is_anonymous: bool = None,
     ) -> bool:
         """
         Use this method to promote or demote a user in a supergroup or a channel. The bot must be
@@ -3315,6 +3475,8 @@ class Bot(TelegramObject):
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target supergroup (in the format @supergroupusername).
             user_id (:obj:`int`): Unique identifier of the target user.
+            is_anonymous (:obj:`bool`, optional): Pass :obj:`True`, if the administrator's presence
+                in the chat is hidden.
             can_change_info (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 change chat title, photo and other settings.
             can_post_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
@@ -3348,6 +3510,8 @@ class Bot(TelegramObject):
         """
         data: JSONDict = {'chat_id': chat_id, 'user_id': user_id}
 
+        if is_anonymous is not None:
+            data['is_anonymous'] = is_anonymous
         if can_change_info is not None:
             data['can_change_info'] = can_change_info
         if can_post_messages is not None:
@@ -3480,7 +3644,7 @@ class Bot(TelegramObject):
     def set_chat_photo(
         self,
         chat_id: Union[str, int],
-        photo: FileLike,
+        photo: FileInput,
         timeout: float = 20,
         api_kwargs: JSONDict = None,
     ) -> bool:
@@ -3492,7 +3656,7 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
-            photo (`filelike object`): New chat photo.
+            photo (`filelike object` | :class:`pathlib.Path`): New chat photo.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -3506,11 +3670,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        if InputFile.is_file(photo):
-            photo = cast(IO, photo)
-            photo = InputFile(photo)
-
-        data: JSONDict = {'chat_id': chat_id, 'photo': photo}
+        data: JSONDict = {'chat_id': chat_id, 'photo': parse_file_input(photo)}
 
         result = self._post('setChatPhoto', data, timeout=timeout, api_kwargs=api_kwargs)
 
@@ -3629,18 +3789,18 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
     ) -> bool:
         """
-        Use this method to pin a message in a group, a supergroup, or a channel.
-        The bot must be an administrator in the chat for this to work and must have the
-        ‘can_pin_messages’ admin right in the supergroup or ‘can_edit_messages’ admin right
-        in the channel.
+        Use this method to add a message to the list of pinned messages in a chat. If the
+        chat is not a private chat, the bot must be an administrator in the chat for this to work
+        and must have the ``can_pin_messages`` admin right in a supergroup or ``can_edit_messages``
+        admin right in a channel.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
             message_id (:obj:`int`): Identifier of a message to pin.
             disable_notification (:obj:`bool`, optional): Pass :obj:`True`, if it is not necessary
-                to send a notification to all group members about the new pinned message.
-                Notifications are always disabled in channels.
+                to send a notification to all chat members about the new pinned message.
+                Notifications are always disabled in channels and private chats.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -3659,19 +3819,63 @@ class Bot(TelegramObject):
         if disable_notification is not None:
             data['disable_notification'] = disable_notification
 
-        result = self._post('pinChatMessage', data, timeout=timeout, api_kwargs=api_kwargs)
-
-        return result  # type: ignore[return-value]
+        return self._post(  # type: ignore[return-value]
+            'pinChatMessage', data, timeout=timeout, api_kwargs=api_kwargs
+        )
 
     @log
     def unpin_chat_message(
-        self, chat_id: Union[str, int], timeout: float = None, api_kwargs: JSONDict = None
+        self,
+        chat_id: Union[str, int],
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+        message_id: Union[str, int] = None,
     ) -> bool:
         """
-        Use this method to unpin a message in a group, a supergroup, or a channel.
-        The bot must be an administrator in the chat for this to work and must have the
-        ``can_pin_messages`` admin right in the supergroup or ``can_edit_messages`` admin right
-        in the channel.
+        Use this method to remove a message from the list of pinned messages in a chat. If the
+        chat is not a private chat, the bot must be an administrator in the chat for this to work
+        and must have the ``can_pin_messages`` admin right in a supergroup or ``can_edit_messages``
+        admin right in a channel.
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            message_id (:obj:`int`, optional): Identifier of a message to unpin. If not specified,
+                the most recent pinned message (by sending date) will be unpinned.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        data: JSONDict = {'chat_id': chat_id}
+
+        if message_id is not None:
+            data['message_id'] = message_id
+
+        return self._post(  # type: ignore[return-value]
+            'unpinChatMessage', data, timeout=timeout, api_kwargs=api_kwargs
+        )
+
+    @log
+    def unpin_all_chat_messages(
+        self,
+        chat_id: Union[str, int],
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to clear the list of pinned messages in a chat. If the
+        chat is not a private chat, the bot must be an administrator in the chat for this
+        to work and must have the ``can_pin_messages`` admin right in a supergroup or
+        ``can_edit_messages`` admin right in a channel.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -3689,11 +3893,12 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
+
         data: JSONDict = {'chat_id': chat_id}
 
-        result = self._post('unpinChatMessage', data, timeout=timeout, api_kwargs=api_kwargs)
-
-        return result  # type: ignore[return-value]
+        return self._post(  # type: ignore[return-value]
+            'unpinAllChatMessages', data, timeout=timeout, api_kwargs=api_kwargs
+        )
 
     @log
     def get_sticker_set(
@@ -3726,7 +3931,7 @@ class Bot(TelegramObject):
     def upload_sticker_file(
         self,
         user_id: Union[str, int],
-        png_sticker: Union[str, FileLike],
+        png_sticker: FileInput,
         timeout: float = 20,
         api_kwargs: JSONDict = None,
     ) -> File:
@@ -3741,7 +3946,8 @@ class Bot(TelegramObject):
 
         Args:
             user_id (:obj:`int`): User identifier of sticker file owner.
-            png_sticker (:obj:`str` | `filelike object`): Png image with the sticker,
+            png_sticker (:obj:`str` | `filelike object` | :class:`pathlib.Path`): Png image with
+                the sticker,
                 must be up to 512 kilobytes in size, dimensions must not exceed 512px,
                 and either width or height must be exactly 512px.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -3757,10 +3963,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        if InputFile.is_file(png_sticker):
-            png_sticker = InputFile(png_sticker)  # type: ignore[assignment,arg-type]
-
-        data: JSONDict = {'user_id': user_id, 'png_sticker': png_sticker}
+        data: JSONDict = {'user_id': user_id, 'png_sticker': parse_file_input(png_sticker)}
 
         result = self._post('uploadStickerFile', data, timeout=timeout, api_kwargs=api_kwargs)
 
@@ -3773,11 +3976,11 @@ class Bot(TelegramObject):
         name: str,
         title: str,
         emojis: str,
-        png_sticker: Union[str, FileLike] = None,
+        png_sticker: FileInput = None,
         contains_masks: bool = None,
         mask_position: MaskPosition = None,
         timeout: float = 20,
-        tgs_sticker: Union[str, FileLike] = None,
+        tgs_sticker: FileInput = None,
         api_kwargs: JSONDict = None,
     ) -> bool:
         """
@@ -3802,13 +4005,15 @@ class Bot(TelegramObject):
                 must end in "_by_<bot username>". <bot_username> is case insensitive.
                 1-64 characters.
             title (:obj:`str`): Sticker set title, 1-64 characters.
-            png_sticker (:obj:`str` | `filelike object`, optional): Png image with the sticker,
+            png_sticker (:obj:`str` | `filelike object` | :class:`pathlib.Path`, optional): Png
+                image with the sticker,
                 must be up to 512 kilobytes in size, dimensions must not exceed 512px,
                 and either width or height must be exactly 512px. Pass a file_id as a String to
                 send a file that already exists on the Telegram servers, pass an HTTP URL as a
                 String for Telegram to get a file from the Internet, or upload a new one
                 using multipart/form-data.
-            tgs_sticker (:obj:`str` | `filelike object`, optional): TGS animation with the sticker,
+            tgs_sticker (:obj:`str` | `filelike object` | :class:`pathlib.Path`, optional): TGS
+                animation with the sticker,
                 uploaded using multipart/form-data. See
                 https://core.telegram.org/animated_stickers#technical-requirements for technical
                 requirements.
@@ -3830,18 +4035,12 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        if InputFile.is_file(png_sticker):
-            png_sticker = InputFile(png_sticker)  # type: ignore[assignment,arg-type]
-
-        if InputFile.is_file(tgs_sticker):
-            tgs_sticker = InputFile(tgs_sticker)  # type: ignore[assignment,arg-type]
-
         data: JSONDict = {'user_id': user_id, 'name': name, 'title': title, 'emojis': emojis}
 
         if png_sticker is not None:
-            data['png_sticker'] = png_sticker
+            data['png_sticker'] = parse_file_input(png_sticker)
         if tgs_sticker is not None:
-            data['tgs_sticker'] = tgs_sticker
+            data['tgs_sticker'] = parse_file_input(tgs_sticker)
         if contains_masks is not None:
             data['contains_masks'] = contains_masks
         if mask_position is not None:
@@ -3859,10 +4058,10 @@ class Bot(TelegramObject):
         user_id: Union[str, int],
         name: str,
         emojis: str,
-        png_sticker: Union[str, FileLike] = None,
+        png_sticker: FileInput = None,
         mask_position: MaskPosition = None,
         timeout: float = 20,
-        tgs_sticker: Union[str, FileLike] = None,
+        tgs_sticker: FileInput = None,
         api_kwargs: JSONDict = None,
     ) -> bool:
         """
@@ -3883,13 +4082,15 @@ class Bot(TelegramObject):
         Args:
             user_id (:obj:`int`): User identifier of created sticker set owner.
             name (:obj:`str`): Sticker set name.
-            png_sticker (:obj:`str` | `filelike object`, optional): PNG image with the sticker,
+            png_sticker (:obj:`str` | `filelike object` | :class:`pathlib.Path`, optional): PNG
+                image with the sticker,
                 must be up to 512 kilobytes in size, dimensions must not exceed 512px,
                 and either width or height must be exactly 512px. Pass a file_id as a String to
                 send a file that already exists on the Telegram servers, pass an HTTP URL as a
                 String for Telegram to get a file from the Internet, or upload a new one
                 using multipart/form-data.
-            tgs_sticker (:obj:`str` | `filelike object`, optional): TGS animation with the sticker,
+            tgs_sticker (:obj:`str` | `filelike object` | :class:`pathlib.Path`, optional): TGS
+                animation with the sticker,
                 uploaded using multipart/form-data. See
                 https://core.telegram.org/animated_stickers#technical-requirements for technical
                 requirements.
@@ -3909,18 +4110,12 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        if InputFile.is_file(png_sticker):
-            png_sticker = InputFile(png_sticker)  # type: ignore[assignment,arg-type]
-
-        if InputFile.is_file(tgs_sticker):
-            tgs_sticker = InputFile(tgs_sticker)  # type: ignore[assignment,arg-type]
-
         data: JSONDict = {'user_id': user_id, 'name': name, 'emojis': emojis}
 
         if png_sticker is not None:
-            data['png_sticker'] = png_sticker
+            data['png_sticker'] = parse_file_input(png_sticker)
         if tgs_sticker is not None:
-            data['tgs_sticker'] = tgs_sticker
+            data['tgs_sticker'] = parse_file_input(tgs_sticker)
         if mask_position is not None:
             # We need to_json() instead of to_dict() here, because we're sending a media
             # message here, which isn't json dumped by utils.request
@@ -3992,7 +4187,7 @@ class Bot(TelegramObject):
         self,
         name: str,
         user_id: Union[str, int],
-        thumb: FileLike = None,
+        thumb: FileInput = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
     ) -> bool:
@@ -4005,7 +4200,8 @@ class Bot(TelegramObject):
         Args:
             name (:obj:`str`): Sticker set name
             user_id (:obj:`int`): User identifier of created sticker set owner.
-            thumb (:obj:`str` | `filelike object`, optional): A PNG image with the thumbnail, must
+            thumb (:obj:`str` | `filelike object` | :class:`pathlib.Path`, optional): A PNG image
+                with the thumbnail, must
                 be up to 128 kilobytes in size and have width and height exactly 100px, or a TGS
                 animation with the thumbnail up to 32 kilobytes in size; see
                 https://core.telegram.org/animated_stickers#technical-requirements for animated
@@ -4026,12 +4222,10 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
+        data: JSONDict = {'name': name, 'user_id': user_id}
 
-        if InputFile.is_file(thumb):
-            thumb = cast(IO, thumb)
-            thumb = InputFile(thumb)
-
-        data: JSONDict = {'name': name, 'user_id': user_id, 'thumb': thumb}
+        if thumb is not None:
+            data['thumb'] = parse_file_input(thumb)
 
         result = self._post('setStickerSetThumb', data, timeout=timeout, api_kwargs=api_kwargs)
 
@@ -4098,6 +4292,8 @@ class Bot(TelegramObject):
         open_period: int = None,
         close_date: Union[int, datetime] = None,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
+        explanation_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
     ) -> Message:
         """
         Use this method to send a native poll.
@@ -4121,6 +4317,9 @@ class Bot(TelegramObject):
             explanation_parse_mode (:obj:`str`, optional): Mode for parsing entities in the
                 explanation. See the constants in :class:`telegram.ParseMode` for the available
                 modes.
+            explanation_entities (List[:class:`telegram.MessageEntity`], optional): List of special
+                entities that appear in message text, which can be specified instead of
+                :attr:`parse_mode`.
             open_period (:obj:`int`, optional): Amount of time in seconds the poll will be active
                 after creation, 5-600. Can't be used together with :attr:`close_date`.
             close_date (:obj:`int` | :obj:`datetime.datetime`, optional): Point in time (Unix
@@ -4135,6 +4334,8 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
@@ -4173,6 +4374,8 @@ class Bot(TelegramObject):
             data['explanation'] = explanation
         if explanation_parse_mode:
             data['explanation_parse_mode'] = explanation_parse_mode
+        if explanation_entities:
+            data['explanation_entities'] = [me.to_dict() for me in explanation_entities]
         if open_period:
             data['open_period'] = open_period
         if close_date:
@@ -4189,6 +4392,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -4248,6 +4452,7 @@ class Bot(TelegramObject):
         timeout: float = None,
         emoji: str = None,
         api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
     ) -> Message:
         """
         Use this method to send an animated emoji, which will have a random value. On success, the
@@ -4256,12 +4461,15 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target private chat.
             emoji (:obj:`str`, optional): Emoji on which the dice throw animation is based.
-                Currently, must be one of “🎲”, “🎯” or “🏀”. Dice can have values 1-6 for “🎲” and
-                “🎯”, and values 1-5 for “🏀” . Defaults to “🎲”
+                Currently, must be one of “🎲”, “🎯”, “🏀”, “⚽”, or “🎰”. Dice can have values 1-6
+                for “🎲” and “🎯”, values 1-5 for “🏀” and “⚽”, and values 1-64 for “🎰”. Defaults
+                to “🎲”.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
@@ -4292,6 +4500,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
         )
 
@@ -4360,6 +4569,124 @@ class Bot(TelegramObject):
         self._commands = cmds
 
         return result  # type: ignore[return-value]
+
+    @log
+    def log_out(self) -> bool:
+        """
+        Use this method to log out from the cloud Bot API server before launching the bot locally.
+        You *must* log out the bot before running it locally, otherwise there is no guarantee that
+        the bot will receive updates. After a successful call, you can immediately log in on a
+        local server, but will not be able to log in back to the cloud Bot API server for 10
+        minutes.
+
+        Returns:
+            :obj:`True`: On success
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        return self._post('logOut')  # type: ignore[return-value]
+
+    @log
+    def close(self) -> bool:
+        """
+        Use this method to close the bot instance before moving it from one local server to
+        another. You need to delete the webhook before calling this method to ensure that the bot
+        isn't launched again after server restart. The method will return error 429 in the first
+        10 minutes after the bot is launched.
+
+        Returns:
+            :obj:`True`: On success
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        return self._post('close')  # type: ignore[return-value]
+
+    @log
+    def copy_message(
+        self,
+        chat_id: Union[int, str],
+        from_chat_id: Union[str, int],
+        message_id: Union[str, int],
+        caption: str = None,
+        parse_mode: str = None,
+        caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
+        disable_notification: bool = False,
+        reply_to_message_id: Union[int, str] = None,
+        allow_sending_without_reply: bool = False,
+        reply_markup: ReplyMarkup = None,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+    ) -> Optional[MessageId]:
+        """
+        Use this method to copy messages of any kind. The method is analogous to the method
+        forwardMessages, but the copied message doesn't have a link to the original message.
+        Returns the MessageId of the sent message on success.
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            from_chat_id (:obj:`int` | :obj:`str`): Unique identifier for the chat where the
+                original message was sent (or channel username in the format @channelusername).
+            message_id (:obj:`int`): Message identifier in the chat specified in from_chat_id.
+            caption (:obj:`str`, optional): New caption for media, 0-1024 characters after
+                entities parsing. If not specified, the original caption is kept.
+            parse_mode (:obj:`str`, optional): Mode for parsing entities in the new caption. See
+                the constants in :class:`telegram.ParseMode` for the available modes.
+            caption_entities (:class:`telegram.utils.types.SLT[MessageEntity]`): List of special
+                entities that appear in the new caption, which can be specified instead of
+                parse_mode
+            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
+                receive a notification with no sound.
+            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
+                original message.
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
+                A JSON-serialized object for an inline keyboard, custom reply keyboard,
+                instructions to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :class:`telegram.MessageId`: On success
+
+        Raises:
+            :class:`telegram.TelegramError`
+        """
+        data: JSONDict = {
+            'chat_id': chat_id,
+            'from_chat_id': from_chat_id,
+            'message_id': message_id,
+        }
+        if caption:
+            data['caption'] = caption
+        if parse_mode:
+            data['parse_mode'] = parse_mode
+        if caption_entities:
+            data['caption_entities'] = caption_entities
+        if disable_notification:
+            data['disable_notification'] = disable_notification
+        if reply_to_message_id:
+            data['reply_to_message_id'] = reply_to_message_id
+        if allow_sending_without_reply:
+            data['allow_sending_without_reply'] = allow_sending_without_reply
+        if reply_markup:
+            if isinstance(reply_markup, ReplyMarkup):
+                # We need to_json() instead of to_dict() here, because reply_markups may be
+                # attached to media messages, which aren't json dumped by utils.request
+                data['reply_markup'] = reply_markup.to_json()
+            else:
+                data['reply_markup'] = reply_markup
+
+        result = self._post('copyMessage', data, timeout=timeout, api_kwargs=api_kwargs)
+        return MessageId.de_json(result, self)  # type: ignore
 
     def to_dict(self) -> JSONDict:
         data: JSONDict = {'id': self.id, 'username': self.username, 'first_name': self.first_name}
@@ -4484,6 +4811,8 @@ class Bot(TelegramObject):
     """Alias for :attr:`pin_chat_message`"""
     unpinChatMessage = unpin_chat_message
     """Alias for :attr:`unpin_chat_message`"""
+    unpinAllChatMessages = unpin_all_chat_messages
+    """Alias for :attr:`unpin_all_chat_messages`"""
     getStickerSet = get_sticker_set
     """Alias for :attr:`get_sticker_set`"""
     uploadStickerFile = upload_sticker_file
@@ -4510,3 +4839,7 @@ class Bot(TelegramObject):
     """Alias for :attr:`get_my_commands`"""
     setMyCommands = set_my_commands
     """Alias for :attr:`set_my_commands`"""
+    logOut = log_out
+    """Alias for :attr:`log_out`"""
+    copyMessage = copy_message
+    """Alias for :attr:`copy_message`"""

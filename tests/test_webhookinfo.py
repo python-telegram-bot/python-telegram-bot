@@ -29,6 +29,7 @@ def webhook_info():
         url=TestWebhookInfo.url,
         has_custom_certificate=TestWebhookInfo.has_custom_certificate,
         pending_update_count=TestWebhookInfo.pending_update_count,
+        ip_address=TestWebhookInfo.ip_address,
         last_error_date=TestWebhookInfo.last_error_date,
         max_connections=TestWebhookInfo.max_connections,
         allowed_updates=TestWebhookInfo.allowed_updates,
@@ -39,6 +40,7 @@ class TestWebhookInfo(object):
     url = "http://www.google.com"
     has_custom_certificate = False
     pending_update_count = 5
+    ip_address = '127.0.0.1'
     last_error_date = time.time()
     max_connections = 42
     allowed_updates = ['type1', 'type2']
@@ -52,6 +54,7 @@ class TestWebhookInfo(object):
         assert webhook_info_dict['last_error_date'] == self.last_error_date
         assert webhook_info_dict['max_connections'] == self.max_connections
         assert webhook_info_dict['allowed_updates'] == self.allowed_updates
+        assert webhook_info_dict['ip_address'] == self.ip_address
 
     def test_equality(self):
         a = WebhookInfo(

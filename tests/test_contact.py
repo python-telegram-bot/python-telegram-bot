@@ -18,8 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 import pytest
+from flaky import flaky
 
 from telegram import Contact, Voice
+from telegram.error import BadRequest
 
 
 @pytest.fixture(scope='class')
@@ -69,6 +71,41 @@ class TestContact:
         monkeypatch.setattr(bot.request, 'post', test)
         message = bot.send_contact(contact=contact, chat_id=chat_id)
         assert message
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize(
+        'default_bot,custom',
+        [
+            ({'allow_sending_without_reply': True}, None),
+            ({'allow_sending_without_reply': False}, None),
+            ({'allow_sending_without_reply': False}, True),
+        ],
+        indirect=['default_bot'],
+    )
+    def test_send_contact_default_allow_sending_without_reply(
+        self, default_bot, chat_id, contact, custom
+    ):
+        reply_to_message = default_bot.send_message(chat_id, 'test')
+        reply_to_message.delete()
+        if custom is not None:
+            message = default_bot.send_contact(
+                chat_id,
+                contact=contact,
+                allow_sending_without_reply=custom,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert message.reply_to_message is None
+        elif default_bot.defaults.allow_sending_without_reply:
+            message = default_bot.send_contact(
+                chat_id, contact=contact, reply_to_message_id=reply_to_message.message_id
+            )
+            assert message.reply_to_message is None
+        else:
+            with pytest.raises(BadRequest, match='message not found'):
+                default_bot.send_contact(
+                    chat_id, contact=contact, reply_to_message_id=reply_to_message.message_id
+                )
 
     def test_send_contact_without_required(self, bot, chat_id):
         with pytest.raises(ValueError, match='Either contact or phone_number and first_name'):

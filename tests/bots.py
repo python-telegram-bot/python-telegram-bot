@@ -87,7 +87,7 @@ def patient_request_wrapper(*args, **kwargs):
     try:
         return original_request_wrapper(*args, **kwargs)
     except RetryAfter as e:
-        pytest.xfail('Not waiting for flood control: {}'.format(e))
+        pytest.xfail(f'Not waiting for flood control: {e}')
 
 
 Request._request_wrapper = patient_request_wrapper

@@ -158,7 +158,7 @@ class TestCommandHandler(BaseTest):
     def ch_callback_args(self, bot, update, args):
         if update.message.text == self.CMD:
             self.test_flag = len(args) == 0
-        elif update.message.text == '{}@{}'.format(self.CMD, bot.username):
+        elif update.message.text == f'{self.CMD}@{bot.username}':
             self.test_flag = len(args) == 0
         else:
             self.test_flag = args == ['one', 'two']
@@ -175,8 +175,8 @@ class TestCommandHandler(BaseTest):
 
         assert self.response(dp, make_command_update(command))
         assert not is_match(handler, make_command_update(command[1:]))
-        assert not is_match(handler, make_command_update('/not{}'.format(command[1:])))
-        assert not is_match(handler, make_command_update('not {} at start'.format(command)))
+        assert not is_match(handler, make_command_update(f'/not{command[1:]}'))
+        assert not is_match(handler, make_command_update(f'not {command} at start'))
 
     @pytest.mark.parametrize(
         'cmd',
@@ -227,7 +227,7 @@ class TestCommandHandler(BaseTest):
         """Test the passing of arguments alongside a command"""
         handler = self.make_default_handler(self.ch_callback_args, pass_args=True)
         dp.add_handler(handler)
-        at_command = '{}@{}'.format(command, bot.username)
+        at_command = f'{command}@{bot.username}'
         assert self.response(dp, make_command_update(command))
         assert self.response(dp, make_command_update(command + ' one two'))
         assert self.response(dp, make_command_update(at_command, bot=bot))
@@ -344,7 +344,7 @@ class TestPrefixHandler(BaseTest):
         assert self.response(dp, make_message_update(text))
         assert not is_match(handler, make_message_update(command))
         assert not is_match(handler, make_message_update(prefix + 'notacommand'))
-        assert not is_match(handler, make_command_update('not {} at start'.format(text)))
+        assert not is_match(handler, make_command_update(f'not {text} at start'))
 
     def test_single_multi_prefixes_commands(self, prefixes, commands, prefix_message_update):
         """Test various combinations of prefixes and commands"""

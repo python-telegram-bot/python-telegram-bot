@@ -84,7 +84,7 @@ def receive_poll_answer(update: Update, context: CallbackContext) -> None:
             answer_string += questions[question_id]
     context.bot.send_message(
         context.bot_data[poll_id]["chat_id"],
-        "{} feels {}!".format(update.effective_user.mention_html(), answer_string),
+        f"{update.effective_user.mention_html()} feels {answer_string}!",
         parse_mode=ParseMode.HTML,
     )
     context.bot_data[poll_id]["answers"] += 1

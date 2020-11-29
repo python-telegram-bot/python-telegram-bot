@@ -44,6 +44,7 @@ from telegram import (
     ParseMode,
     Poll,
     PollOption,
+    ProximityAlertTriggered,
     Dice,
 )
 from telegram.ext import Defaults
@@ -157,6 +158,12 @@ def message(bot):
         {'quote': True},
         {'dice': Dice(4, '🎲')},
         {'via_bot': User(9, 'A_Bot', True)},
+        {
+            'proximity_alert_triggered': ProximityAlertTriggered(
+                User(1, 'John', False), User(2, 'Doe', False), 42
+            )
+        },
+        {'sender_chat': Chat(-123, 'discussion_channel')},
     ],
     ids=[
         'forwarded_user',
@@ -200,6 +207,8 @@ def message(bot):
         'default_quote',
         'dice',
         'via_bot',
+        'proximity_alert_triggered',
+        'sender_chat',
     ],
 )
 def message_params(bot, request):
@@ -579,9 +588,7 @@ class TestMessage:
     def test_link_with_username(self, message, type):
         message.chat.username = 'username'
         message.chat.type = type
-        assert message.link == 'https://t.me/{}/{}'.format(
-            message.chat.username, message.message_id
-        )
+        assert message.link == f'https://t.me/{message.chat.username}/{message.message_id}'
 
     @pytest.mark.parametrize(
         'type, id', argvalues=[(Chat.CHANNEL, -1003), (Chat.SUPERGROUP, -1003)]
@@ -591,7 +598,7 @@ class TestMessage:
         message.chat.id = id
         message.chat.type = type
         # The leading - for group ids/ -100 for supergroup ids isn't supposed to be in the link
-        assert message.link == 'https://t.me/c/{}/{}'.format(3, message.message_id)
+        assert message.link == f'https://t.me/c/{3}/{message.message_id}'
 
     @pytest.mark.parametrize('id, username', argvalues=[(None, 'username'), (-3, None)])
     def test_link_private_chats(self, message, id, username):
@@ -944,6 +951,52 @@ class TestMessage:
         assert message.forward(123456, disable_notification=True)
         assert not message.forward(635241)
 
+    def test_copy(self, monkeypatch, message):
+        keyboard = [[1, 2]]
+
+        def test(*args, **kwargs):
+            chat_id = kwargs['chat_id'] == 123456
+            from_chat = kwargs['from_chat_id'] == message.chat_id
+            message_id = kwargs['message_id'] == message.message_id
+            if kwargs.get('disable_notification'):
+                notification = kwargs['disable_notification'] is True
+            else:
+                notification = True
+            if kwargs.get('reply_markup'):
+                reply_markup = kwargs['reply_markup'] is keyboard
+            else:
+                reply_markup = True
+            return chat_id and from_chat and message_id and notification and reply_markup
+
+        monkeypatch.setattr(message.bot, 'copy_message', test)
+        assert message.copy(123456)
+        assert message.copy(123456, disable_notification=True)
+        assert message.copy(123456, reply_markup=keyboard)
+        assert not message.copy(635241)
+
+    @pytest.mark.pfff
+    def test_reply_copy(self, monkeypatch, message):
+        keyboard = [[1, 2]]
+
+        def test(*args, **kwargs):
+            chat_id = kwargs['from_chat_id'] == 123456
+            from_chat = kwargs['chat_id'] == message.chat_id
+            message_id = kwargs['message_id'] == 456789
+            if kwargs.get('disable_notification'):
+                notification = kwargs['disable_notification'] is True
+            else:
+                notification = True
+            if kwargs.get('reply_markup'):
+                reply_markup = kwargs['reply_markup'] is keyboard
+            else:
+                reply_markup = True
+            return chat_id and from_chat and message_id and notification and reply_markup
+
+        monkeypatch.setattr(message.bot, 'copy_message', test)
+        assert message.reply_copy(123456, 456789)
+        assert message.reply_copy(123456, 456789, disable_notification=True)
+        assert message.reply_copy(123456, 456789, reply_markup=keyboard)
+
     def test_edit_text(self, monkeypatch, message):
         def test(*args, **kwargs):
             chat_id = kwargs['chat_id'] == message.chat_id
@@ -1044,13 +1097,22 @@ class TestMessage:
         assert message.stop_poll()
 
     def test_pin(self, monkeypatch, message):
-        def test(*args, **kwargs):
+        def make_assertion(*args, **kwargs):
             chat_id = kwargs['chat_id'] == message.chat_id
             message_id = kwargs['message_id'] == message.message_id
             return chat_id and message_id
 
-        monkeypatch.setattr(message.bot, 'pin_chat_message', test)
+        monkeypatch.setattr(message.bot, 'pin_chat_message', make_assertion)
         assert message.pin()
+
+    def test_unpin(self, monkeypatch, message):
+        def make_assertion(*args, **kwargs):
+            chat_id = kwargs['chat_id'] == message.chat_id
+            message_id = kwargs['message_id'] == message.message_id
+            return chat_id and message_id
+
+        monkeypatch.setattr(message.bot, 'unpin_chat_message', make_assertion)
+        assert message.unpin()
 
     def test_default_quote(self, message):
         message.bot.defaults = Defaults()

@@ -134,7 +134,7 @@ class TestUpdater:
 
         pprint.pprint([rec.getMessage() for rec in caplog.get_records('call')])
         assert any(
-            'unhandled exception in Bot:{}:updater'.format(updater.bot.id) in rec.getMessage()
+            f'unhandled exception in Bot:{updater.bot.id}:updater' in rec.getMessage()
             for rec in caplog.get_records('call')
         )
 
@@ -487,7 +487,7 @@ class TestUpdater:
         if content_len is not None:
             headers['content-length'] = str(content_len)
 
-        url = 'http://{ip}:{port}/{path}'.format(ip=ip, port=port, path=url_path)
+        url = f'http://{ip}:{port}/{url_path}'
 
         req = Request(url, data=payload, headers=headers)
 
@@ -512,7 +512,7 @@ class TestUpdater:
             updater.idle()
 
         rec = caplog.records[-2]
-        assert rec.getMessage().startswith('Received signal {}'.format(signal.SIGTERM))
+        assert rec.getMessage().startswith(f'Received signal {signal.SIGTERM}')
         assert rec.levelname == 'INFO'
 
         rec = caplog.records[-1]

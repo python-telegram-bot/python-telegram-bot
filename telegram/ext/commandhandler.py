@@ -25,6 +25,7 @@ from telegram import MessageEntity, Update
 from telegram.ext import BaseFilter, Filters
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.types import HandlerArg, SLT
+from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 from .handler import Handler
 
@@ -141,7 +142,7 @@ class CommandHandler(Handler):
         pass_job_queue: bool = False,
         pass_user_data: bool = False,
         pass_chat_data: bool = False,
-        run_async: bool = False,
+        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
         super().__init__(
             callback,
@@ -350,7 +351,7 @@ class PrefixHandler(CommandHandler):
         pass_job_queue: bool = False,
         pass_user_data: bool = False,
         pass_chat_data: bool = False,
-        run_async: bool = False,
+        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
 
         self._prefix: List[str] = list()
