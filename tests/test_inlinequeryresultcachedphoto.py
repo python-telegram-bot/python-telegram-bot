@@ -25,6 +25,7 @@ from telegram import (
     InlineKeyboardButton,
     InlineQueryResultCachedVoice,
     InlineKeyboardMarkup,
+    MessageEntity,
 )
 
 
@@ -37,6 +38,7 @@ def inline_query_result_cached_photo():
         description=TestInlineQueryResultCachedPhoto.description,
         caption=TestInlineQueryResultCachedPhoto.caption,
         parse_mode=TestInlineQueryResultCachedPhoto.parse_mode,
+        caption_entities=TestInlineQueryResultCachedPhoto.caption_entities,
         input_message_content=TestInlineQueryResultCachedPhoto.input_message_content,
         reply_markup=TestInlineQueryResultCachedPhoto.reply_markup,
     )
@@ -50,6 +52,7 @@ class TestInlineQueryResultCachedPhoto:
     description = 'description'
     caption = 'caption'
     parse_mode = 'HTML'
+    caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     input_message_content = InputTextMessageContent('input_message_content')
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
@@ -61,6 +64,7 @@ class TestInlineQueryResultCachedPhoto:
         assert inline_query_result_cached_photo.description == self.description
         assert inline_query_result_cached_photo.caption == self.caption
         assert inline_query_result_cached_photo.parse_mode == self.parse_mode
+        assert inline_query_result_cached_photo.caption_entities == self.caption_entities
         assert (
             inline_query_result_cached_photo.input_message_content.to_dict()
             == self.input_message_content.to_dict()
@@ -97,6 +101,9 @@ class TestInlineQueryResultCachedPhoto:
             inline_query_result_cached_photo_dict['parse_mode']
             == inline_query_result_cached_photo.parse_mode
         )
+        assert inline_query_result_cached_photo_dict['caption_entities'] == [
+            ce.to_dict() for ce in inline_query_result_cached_photo.caption_entities
+        ]
         assert (
             inline_query_result_cached_photo_dict['input_message_content']
             == inline_query_result_cached_photo.input_message_content.to_dict()

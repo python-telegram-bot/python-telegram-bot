@@ -19,9 +19,9 @@
 # pylint: disable=W0622
 """This module contains the classes that represent Telegram InlineQueryResultGif."""
 
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any, Union, Tuple, List
 
-from telegram import InlineQueryResult
+from telegram import InlineQueryResult, MessageEntity
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
 
 if TYPE_CHECKING:
@@ -50,6 +50,9 @@ class InlineQueryResultGif(InlineQueryResult):
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
+        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
+            entities that appear in the caption, which can be specified instead of
+            :attr:`parse_mode`.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
@@ -71,6 +74,9 @@ class InlineQueryResultGif(InlineQueryResult):
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
+        caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
+            entities that appear in the caption, which can be specified instead of
+            :attr:`parse_mode`.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
@@ -93,6 +99,7 @@ class InlineQueryResultGif(InlineQueryResult):
         gif_duration: int = None,
         parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
         thumb_mime_type: str = None,
+        caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
         **_kwargs: Any,
     ):
 
@@ -108,6 +115,7 @@ class InlineQueryResultGif(InlineQueryResult):
         self.title = title
         self.caption = caption
         self.parse_mode = parse_mode
+        self.caption_entities = caption_entities
         self.reply_markup = reply_markup
         self.input_message_content = input_message_content
         self.thumb_mime_type = thumb_mime_type

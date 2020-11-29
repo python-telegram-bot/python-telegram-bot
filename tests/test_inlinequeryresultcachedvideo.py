@@ -25,6 +25,7 @@ from telegram import (
     InputTextMessageContent,
     InlineQueryResultCachedVideo,
     InlineQueryResultCachedVoice,
+    MessageEntity,
 )
 
 
@@ -36,6 +37,7 @@ def inline_query_result_cached_video():
         TestInlineQueryResultCachedVideo.title,
         caption=TestInlineQueryResultCachedVideo.caption,
         parse_mode=TestInlineQueryResultCachedVideo.parse_mode,
+        caption_entities=TestInlineQueryResultCachedVideo.caption_entities,
         description=TestInlineQueryResultCachedVideo.description,
         input_message_content=TestInlineQueryResultCachedVideo.input_message_content,
         reply_markup=TestInlineQueryResultCachedVideo.reply_markup,
@@ -49,6 +51,7 @@ class TestInlineQueryResultCachedVideo:
     title = 'title'
     caption = 'caption'
     parse_mode = 'Markdown'
+    caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     description = 'description'
     input_message_content = InputTextMessageContent('input_message_content')
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
@@ -61,6 +64,7 @@ class TestInlineQueryResultCachedVideo:
         assert inline_query_result_cached_video.description == self.description
         assert inline_query_result_cached_video.caption == self.caption
         assert inline_query_result_cached_video.parse_mode == self.parse_mode
+        assert inline_query_result_cached_video.caption_entities == self.caption_entities
         assert (
             inline_query_result_cached_video.input_message_content.to_dict()
             == self.input_message_content.to_dict()
@@ -97,6 +101,9 @@ class TestInlineQueryResultCachedVideo:
             inline_query_result_cached_video_dict['parse_mode']
             == inline_query_result_cached_video.parse_mode
         )
+        assert inline_query_result_cached_video_dict['caption_entities'] == [
+            ce.to_dict() for ce in inline_query_result_cached_video.caption_entities
+        ]
         assert (
             inline_query_result_cached_video_dict['input_message_content']
             == inline_query_result_cached_video.input_message_content.to_dict()

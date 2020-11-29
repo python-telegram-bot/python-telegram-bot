@@ -25,6 +25,7 @@ from telegram import (
     InlineKeyboardMarkup,
     InputTextMessageContent,
     InlineQueryResultCachedVoice,
+    MessageEntity,
 )
 
 
@@ -36,6 +37,7 @@ def inline_query_result_cached_document():
         TestInlineQueryResultCachedDocument.document_file_id,
         caption=TestInlineQueryResultCachedDocument.caption,
         parse_mode=TestInlineQueryResultCachedDocument.parse_mode,
+        caption_entities=TestInlineQueryResultCachedDocument.caption_entities,
         description=TestInlineQueryResultCachedDocument.description,
         input_message_content=TestInlineQueryResultCachedDocument.input_message_content,
         reply_markup=TestInlineQueryResultCachedDocument.reply_markup,
@@ -49,6 +51,7 @@ class TestInlineQueryResultCachedDocument:
     title = 'title'
     caption = 'caption'
     parse_mode = 'Markdown'
+    caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     description = 'description'
     input_message_content = InputTextMessageContent('input_message_content')
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
@@ -60,6 +63,7 @@ class TestInlineQueryResultCachedDocument:
         assert inline_query_result_cached_document.title == self.title
         assert inline_query_result_cached_document.caption == self.caption
         assert inline_query_result_cached_document.parse_mode == self.parse_mode
+        assert inline_query_result_cached_document.caption_entities == self.caption_entities
         assert inline_query_result_cached_document.description == self.description
         assert (
             inline_query_result_cached_document.input_message_content.to_dict()
@@ -98,6 +102,9 @@ class TestInlineQueryResultCachedDocument:
             inline_query_result_cached_document_dict['parse_mode']
             == inline_query_result_cached_document.parse_mode
         )
+        assert inline_query_result_cached_document_dict['caption_entities'] == [
+            ce.to_dict() for ce in inline_query_result_cached_document.caption_entities
+        ]
         assert (
             inline_query_result_cached_document_dict['description']
             == inline_query_result_cached_document.description

@@ -25,6 +25,7 @@ from telegram import (
     InputTextMessageContent,
     InlineKeyboardMarkup,
     InlineQueryResultCachedVoice,
+    MessageEntity,
 )
 
 
@@ -36,6 +37,7 @@ def inline_query_result_cached_mpeg4_gif():
         title=TestInlineQueryResultCachedMpeg4Gif.title,
         caption=TestInlineQueryResultCachedMpeg4Gif.caption,
         parse_mode=TestInlineQueryResultCachedMpeg4Gif.parse_mode,
+        caption_entities=TestInlineQueryResultCachedMpeg4Gif.caption_entities,
         input_message_content=TestInlineQueryResultCachedMpeg4Gif.input_message_content,
         reply_markup=TestInlineQueryResultCachedMpeg4Gif.reply_markup,
     )
@@ -48,6 +50,7 @@ class TestInlineQueryResultCachedMpeg4Gif:
     title = 'title'
     caption = 'caption'
     parse_mode = 'Markdown'
+    caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     input_message_content = InputTextMessageContent('input_message_content')
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
@@ -58,6 +61,7 @@ class TestInlineQueryResultCachedMpeg4Gif:
         assert inline_query_result_cached_mpeg4_gif.title == self.title
         assert inline_query_result_cached_mpeg4_gif.caption == self.caption
         assert inline_query_result_cached_mpeg4_gif.parse_mode == self.parse_mode
+        assert inline_query_result_cached_mpeg4_gif.caption_entities == self.caption_entities
         assert (
             inline_query_result_cached_mpeg4_gif.input_message_content.to_dict()
             == self.input_message_content.to_dict()
@@ -95,6 +99,9 @@ class TestInlineQueryResultCachedMpeg4Gif:
             inline_query_result_cached_mpeg4_gif_dict['parse_mode']
             == inline_query_result_cached_mpeg4_gif.parse_mode
         )
+        assert inline_query_result_cached_mpeg4_gif_dict['caption_entities'] == [
+            ce.to_dict() for ce in inline_query_result_cached_mpeg4_gif.caption_entities
+        ]
         assert (
             inline_query_result_cached_mpeg4_gif_dict['input_message_content']
             == inline_query_result_cached_mpeg4_gif.input_message_content.to_dict()
