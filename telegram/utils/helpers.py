@@ -85,7 +85,7 @@ def parse_file_input(
     * For string input, if the input is an absolute path of a local file,
       adds the ``file://`` prefix. If the input is a relative path of a local file, computes the
       absolute path and adds the ``file://`` prefix. Returns the input unchanged, otherwise.
-    * :class:`pathlib.Path` objects are treated similarly as strings.
+    * :class:`pathlib.Path` objects are treated the same way as strings.
     * For IO input, returns an :class:`telegram.InputFile`.
     * If :attr:`tg_type` is specified and the input is of that type, returns the ``file_id``
       attribute.
