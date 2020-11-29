@@ -25,6 +25,7 @@ from telegram import (
     InlineKeyboardMarkup,
     InlineQueryResultPhoto,
     InlineQueryResultVoice,
+    MessageEntity,
 )
 
 
@@ -40,6 +41,7 @@ def inline_query_result_photo():
         description=TestInlineQueryResultPhoto.description,
         caption=TestInlineQueryResultPhoto.caption,
         parse_mode=TestInlineQueryResultPhoto.parse_mode,
+        caption_entities=TestInlineQueryResultPhoto.caption_entities,
         input_message_content=TestInlineQueryResultPhoto.input_message_content,
         reply_markup=TestInlineQueryResultPhoto.reply_markup,
     )
@@ -56,6 +58,8 @@ class TestInlineQueryResultPhoto:
     description = 'description'
     caption = 'caption'
     parse_mode = 'HTML'
+    caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
+
     input_message_content = InputTextMessageContent('input_message_content')
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
@@ -70,6 +74,7 @@ class TestInlineQueryResultPhoto:
         assert inline_query_result_photo.description == self.description
         assert inline_query_result_photo.caption == self.caption
         assert inline_query_result_photo.parse_mode == self.parse_mode
+        assert inline_query_result_photo.caption_entities == self.caption_entities
         assert (
             inline_query_result_photo.input_message_content.to_dict()
             == self.input_message_content.to_dict()
@@ -97,6 +102,9 @@ class TestInlineQueryResultPhoto:
         )
         assert inline_query_result_photo_dict['caption'] == inline_query_result_photo.caption
         assert inline_query_result_photo_dict['parse_mode'] == inline_query_result_photo.parse_mode
+        assert inline_query_result_photo_dict['caption_entities'] == [
+            ce.to_dict() for ce in inline_query_result_photo.caption_entities
+        ]
         assert (
             inline_query_result_photo_dict['input_message_content']
             == inline_query_result_photo.input_message_content.to_dict()

@@ -17,13 +17,18 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains custom typing aliases."""
+from pathlib import Path
 from typing import IO, TYPE_CHECKING, Any, Dict, List, Optional, Tuple, TypeVar, Union
 
 if TYPE_CHECKING:
     from telegram import InputFile, Update
 
 FileLike = Union[IO, 'InputFile']
-"""Either an open file handler or in :class:`telegram.InputFile`."""
+"""Either an open file handler or a :class:`telegram.InputFile`."""
+
+FileInput = Union[str, FileLike, Path]
+"""Valid input for passing files to Telegram. Either a file id as string, a file like object or
+a local file path as string or :class:`pathlib.Path`."""
 
 JSONDict = Dict[str, Any]
 """Dictionary containing response from Telegram or data to send to the API."""

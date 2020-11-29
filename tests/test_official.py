@@ -30,7 +30,7 @@ IGNORED_OBJECTS = ('ResponseParameters', 'CallbackGame')
 IGNORED_PARAMETERS = {
     'self',
     'args',
-    'kwargs',
+    '_kwargs',
     'read_latency',
     'network_delay',
     'timeout',

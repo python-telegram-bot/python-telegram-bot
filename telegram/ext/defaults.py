@@ -35,6 +35,8 @@ class Defaults:
             receive a notification with no sound.
         disable_web_page_preview (:obj:`bool`): Optional. Disables link previews for links in this
             message.
+        allow_sending_without_reply (:obj:`bool`): Optional. Pass :obj:`True`, if the message
+            should be sent even if the specified replied-to message is not found.
         timeout (:obj:`int` | :obj:`float`): Optional. If this value is specified, use it as the
             read timeout from the server (instead of the one specified during creation of the
             connection pool).
@@ -54,6 +56,8 @@ class Defaults:
             receive a notification with no sound.
         disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in this
             message.
+        allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+            should be sent even if the specified replied-to message is not found.
         timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as the
             read timeout from the server (instead of the one specified during creation of the
             connection pool).
@@ -80,10 +84,12 @@ class Defaults:
         quote: bool = None,
         tzinfo: pytz.BaseTzInfo = pytz.utc,
         run_async: bool = False,
+        allow_sending_without_reply: bool = None,
     ):
         self._parse_mode = parse_mode
         self._disable_notification = disable_notification
         self._disable_web_page_preview = disable_web_page_preview
+        self._allow_sending_without_reply = allow_sending_without_reply
         self._timeout = timeout
         self._quote = quote
         self._tzinfo = tzinfo
@@ -117,6 +123,17 @@ class Defaults:
 
     @disable_web_page_preview.setter
     def disable_web_page_preview(self, value: Any) -> NoReturn:
+        raise AttributeError(
+            "You can not assign a new value to defaults after because it would "
+            "not have any effect."
+        )
+
+    @property
+    def allow_sending_without_reply(self) -> Optional[bool]:
+        return self._allow_sending_without_reply
+
+    @allow_sending_without_reply.setter
+    def allow_sending_without_reply(self, value: Any) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to defaults after because it would "
             "not have any effect."
@@ -172,6 +189,7 @@ class Defaults:
                 self._parse_mode,
                 self._disable_notification,
                 self._disable_web_page_preview,
+                self._allow_sending_without_reply,
                 self._timeout,
                 self._quote,
                 self._tzinfo,

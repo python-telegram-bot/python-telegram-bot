@@ -337,6 +337,10 @@ class Request:
                                 data[med.thumb.attach] = med.thumb.field_tuple
                     data[key] = json.dumps(media)
                 files = True
+            elif isinstance(val, list):
+                # In case we're sending files, we need to json-dump lists manually
+                # As we can't know if that's the case, we just json-dump here
+                data[key] = json.dumps(val)
 
         # Use multipart upload if we're uploading files, otherwise use JSON
         if files:

@@ -54,6 +54,9 @@ class PollOption(TelegramObject):
 
         self._id_attrs = (self.text, self.voter_count)
 
+    MAX_LENGTH: ClassVar[int] = constants.MAX_POLL_OPTION_LENGTH
+    """:const:`telegram.constants.MAX_POLL_OPTION_LENGTH`"""
+
 
 class PollAnswer(TelegramObject):
     """
@@ -103,7 +106,7 @@ class Poll(TelegramObject):
 
     Attributes:
         id (:obj:`str`): Unique poll identifier.
-        question (:obj:`str`): Poll question, 1-255 characters.
+        question (:obj:`str`): Poll question, 1-300 characters.
         options (List[:class:`PollOption`]): List of poll options.
         total_voter_count (:obj:`int`): Total number of users that voted in the poll.
         is_closed (:obj:`bool`): :obj:`True`, if the poll is closed.
@@ -122,7 +125,7 @@ class Poll(TelegramObject):
 
     Args:
         id (:obj:`str`): Unique poll identifier.
-        question (:obj:`str`): Poll question, 1-255 characters.
+        question (:obj:`str`): Poll question, 1-300 characters.
         options (List[:class:`PollOption`]): List of poll options.
         is_closed (:obj:`bool`): :obj:`True`, if the poll is closed.
         is_anonymous (:obj:`bool`): :obj:`True`, if the poll is anonymous.
@@ -262,3 +265,7 @@ class Poll(TelegramObject):
     """:const:`telegram.constants.POLL_REGULAR`"""
     QUIZ: ClassVar[str] = constants.POLL_QUIZ
     """:const:`telegram.constants.POLL_QUIZ`"""
+    MAX_QUESTION_LENGTH: ClassVar[int] = constants.MAX_POLL_QUESTION_LENGTH
+    """:const:`telegram.constants.MAX_POLL_QUESTION_LENGTH`"""
+    MAX_OPTION_LENGTH: ClassVar[int] = constants.MAX_POLL_OPTION_LENGTH
+    """:const:`telegram.constants.MAX_POLL_OPTION_LENGTH`"""

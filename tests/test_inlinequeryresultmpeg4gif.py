@@ -25,6 +25,7 @@ from telegram import (
     InlineQueryResultVoice,
     InlineKeyboardMarkup,
     InputTextMessageContent,
+    MessageEntity,
 )
 
 
@@ -40,6 +41,7 @@ def inline_query_result_mpeg4_gif():
         title=TestInlineQueryResultMpeg4Gif.title,
         caption=TestInlineQueryResultMpeg4Gif.caption,
         parse_mode=TestInlineQueryResultMpeg4Gif.parse_mode,
+        caption_entities=TestInlineQueryResultMpeg4Gif.caption_entities,
         input_message_content=TestInlineQueryResultMpeg4Gif.input_message_content,
         reply_markup=TestInlineQueryResultMpeg4Gif.reply_markup,
         thumb_mime_type=TestInlineQueryResultMpeg4Gif.thumb_mime_type,
@@ -58,6 +60,7 @@ class TestInlineQueryResultMpeg4Gif:
     title = 'title'
     caption = 'caption'
     parse_mode = 'Markdown'
+    caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     input_message_content = InputTextMessageContent('input_message_content')
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
@@ -73,6 +76,7 @@ class TestInlineQueryResultMpeg4Gif:
         assert inline_query_result_mpeg4_gif.title == self.title
         assert inline_query_result_mpeg4_gif.caption == self.caption
         assert inline_query_result_mpeg4_gif.parse_mode == self.parse_mode
+        assert inline_query_result_mpeg4_gif.caption_entities == self.caption_entities
         assert (
             inline_query_result_mpeg4_gif.input_message_content.to_dict()
             == self.input_message_content.to_dict()
@@ -117,6 +121,9 @@ class TestInlineQueryResultMpeg4Gif:
             inline_query_result_mpeg4_gif_dict['parse_mode']
             == inline_query_result_mpeg4_gif.parse_mode
         )
+        assert inline_query_result_mpeg4_gif_dict['caption_entities'] == [
+            ce.to_dict() for ce in inline_query_result_mpeg4_gif.caption_entities
+        ]
         assert (
             inline_query_result_mpeg4_gif_dict['input_message_content']
             == inline_query_result_mpeg4_gif.input_message_content.to_dict()

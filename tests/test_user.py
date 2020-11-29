@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import Update, User, constants
+from telegram import Update, User
 from telegram.utils.helpers import escape_markdown
 
 
@@ -127,22 +127,33 @@ class TestUser:
         user.username = None
         assert user.link is None
 
-    def test_anonymous_admin(self, user):
-        assert user.is_anonymous_admin is False
-        user.id = constants.ANONYMOUS_ADMIN_ID
-        assert user.is_anonymous_admin
-
-    def test_service_chat(self, user):
-        assert user.is_service_chat is False
-        user.id = constants.SERVICE_CHAT_ID
-        assert user.is_service_chat
-
     def test_get_profile_photos(self, monkeypatch, user):
         def test(*args, **kwargs):
             return args[0] == user.id
 
         monkeypatch.setattr(user.bot, 'get_user_profile_photos', test)
         assert user.get_profile_photos()
+
+    def test_pin_message(self, monkeypatch, user):
+        def make_assertion(*args, **kwargs):
+            return args[0] == user.id
+
+        monkeypatch.setattr(user.bot, 'pin_chat_message', make_assertion)
+        assert user.pin_message()
+
+    def test_unpin_message(self, monkeypatch, user):
+        def make_assertion(*args, **kwargs):
+            return args[0] == user.id
+
+        monkeypatch.setattr(user.bot, 'unpin_chat_message', make_assertion)
+        assert user.unpin_message()
+
+    def test_unpin_all_messages(self, monkeypatch, user):
+        def make_assertion(*args, **kwargs):
+            return args[0] == user.id
+
+        monkeypatch.setattr(user.bot, 'unpin_all_chat_messages', make_assertion)
+        assert user.unpin_all_messages()
 
     def test_instance_method_send_message(self, monkeypatch, user):
         def test(*args, **kwargs):
@@ -269,6 +280,24 @@ class TestUser:
 
         monkeypatch.setattr(user.bot, 'send_poll', test)
         assert user.send_poll('test_poll')
+
+    def test_instance_method_send_copy(self, monkeypatch, user):
+        def test(*args, **kwargs):
+            assert args[0] == 'test_copy'
+            assert kwargs['chat_id'] == user.id
+            return args
+
+        monkeypatch.setattr(user.bot, 'copy_message', test)
+        assert user.send_copy('test_copy')
+
+    def test_instance_method_copy_message(self, monkeypatch, user):
+        def test(*args, **kwargs):
+            assert args[0] == 'test_copy'
+            assert kwargs['from_chat_id'] == user.id
+            return args
+
+        monkeypatch.setattr(user.bot, 'copy_message', test)
+        assert user.copy_message('test_copy')
 
     def test_mention_html(self, user):
         expected = u'<a href="tg://user?id={}">{}</a>'

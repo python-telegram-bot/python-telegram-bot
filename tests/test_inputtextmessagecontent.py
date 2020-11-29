@@ -19,7 +19,7 @@
 
 import pytest
 
-from telegram import InputTextMessageContent, ParseMode
+from telegram import InputTextMessageContent, ParseMode, MessageEntity
 
 
 @pytest.fixture(scope='class')
@@ -27,6 +27,7 @@ def input_text_message_content():
     return InputTextMessageContent(
         TestInputTextMessageContent.message_text,
         parse_mode=TestInputTextMessageContent.parse_mode,
+        entities=TestInputTextMessageContent.entities,
         disable_web_page_preview=TestInputTextMessageContent.disable_web_page_preview,
     )
 
@@ -34,12 +35,14 @@ def input_text_message_content():
 class TestInputTextMessageContent:
     message_text = '*message text*'
     parse_mode = ParseMode.MARKDOWN
+    entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     disable_web_page_preview = True
 
     def test_expected_values(self, input_text_message_content):
         assert input_text_message_content.parse_mode == self.parse_mode
         assert input_text_message_content.message_text == self.message_text
         assert input_text_message_content.disable_web_page_preview == self.disable_web_page_preview
+        assert input_text_message_content.entities == self.entities
 
     def test_to_dict(self, input_text_message_content):
         input_text_message_content_dict = input_text_message_content.to_dict()
@@ -52,6 +55,9 @@ class TestInputTextMessageContent:
         assert (
             input_text_message_content_dict['parse_mode'] == input_text_message_content.parse_mode
         )
+        assert input_text_message_content_dict['entities'] == [
+            ce.to_dict() for ce in input_text_message_content.entities
+        ]
         assert (
             input_text_message_content_dict['disable_web_page_preview']
             == input_text_message_content.disable_web_page_preview

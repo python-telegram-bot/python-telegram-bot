@@ -25,6 +25,7 @@ from telegram import (
     InlineQueryResultGif,
     InlineQueryResultVoice,
     InlineKeyboardMarkup,
+    MessageEntity,
 )
 
 
@@ -40,6 +41,7 @@ def inline_query_result_gif():
         title=TestInlineQueryResultGif.title,
         caption=TestInlineQueryResultGif.caption,
         parse_mode=TestInlineQueryResultGif.parse_mode,
+        caption_entities=TestInlineQueryResultGif.caption_entities,
         input_message_content=TestInlineQueryResultGif.input_message_content,
         reply_markup=TestInlineQueryResultGif.reply_markup,
         thumb_mime_type=TestInlineQueryResultGif.thumb_mime_type,
@@ -58,6 +60,7 @@ class TestInlineQueryResultGif:
     title = 'title'
     caption = 'caption'
     parse_mode = 'HTML'
+    caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     input_message_content = InputTextMessageContent('input_message_content')
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
@@ -73,6 +76,7 @@ class TestInlineQueryResultGif:
         assert inline_query_result_gif.title == self.title
         assert inline_query_result_gif.caption == self.caption
         assert inline_query_result_gif.parse_mode == self.parse_mode
+        assert inline_query_result_gif.caption_entities == self.caption_entities
         assert (
             inline_query_result_gif.input_message_content.to_dict()
             == self.input_message_content.to_dict()
@@ -97,6 +101,9 @@ class TestInlineQueryResultGif:
         assert inline_query_result_gif_dict['title'] == inline_query_result_gif.title
         assert inline_query_result_gif_dict['caption'] == inline_query_result_gif.caption
         assert inline_query_result_gif_dict['parse_mode'] == inline_query_result_gif.parse_mode
+        assert inline_query_result_gif_dict['caption_entities'] == [
+            ce.to_dict() for ce in inline_query_result_gif.caption_entities
+        ]
         assert (
             inline_query_result_gif_dict['input_message_content']
             == inline_query_result_gif.input_message_content.to_dict()

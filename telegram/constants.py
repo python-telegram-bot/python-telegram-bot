@@ -83,6 +83,8 @@ Attributes:
     DICE_DICE (:obj:`str`): '🎲'
     DICE_DARTS (:obj:`str`): '🎯'
     DICE_BASKETBALL (:obj:`str`): '🏀'
+    DICE_FOOTBALL (:obj:`str`): '⚽'
+    DICE_SLOT_MACHINE (:obj:`str`): '🎰'
     DICE_ALL_EMOJI (List[:obj:`str`]): List of all supported base emoji.
 
 :class:`telegram.MessageEntity`:
@@ -117,6 +119,8 @@ Attributes:
 Attributes:
     POLL_REGULAR (:obj:`str`): 'regular'
     POLL_QUIZ (:obj:`str`): 'quiz'
+    MAX_POLL_QUESTION_LENGTH (:obj:`int`): 300
+    MAX_POLL_OPTION_LENGTH (:obj:`int`): 100
 
 :class:`telegram.files.MaskPosition`:
 
@@ -172,7 +176,15 @@ CHATMEMBER_RESTRICTED: str = 'restricted'
 DICE_DICE: str = '🎲'
 DICE_DARTS: str = '🎯'
 DICE_BASKETBALL: str = '🏀'
-DICE_ALL_EMOJI: List[str] = [DICE_DICE, DICE_DARTS, DICE_BASKETBALL]
+DICE_FOOTBALL: str = '⚽'
+DICE_SLOT_MACHINE: str = '🎰'
+DICE_ALL_EMOJI: List[str] = [
+    DICE_DICE,
+    DICE_DARTS,
+    DICE_BASKETBALL,
+    DICE_FOOTBALL,
+    DICE_SLOT_MACHINE,
+]
 
 MESSAGEENTITY_MENTION: str = 'mention'
 MESSAGEENTITY_HASHTAG: str = 'hashtag'
@@ -213,7 +225,8 @@ PARSEMODE_HTML: str = 'HTML'
 
 POLL_REGULAR: str = 'regular'
 POLL_QUIZ: str = 'quiz'
-
+MAX_POLL_QUESTION_LENGTH: int = 300
+MAX_POLL_OPTION_LENGTH: int = 100
 
 STICKER_FOREHEAD: str = 'forehead'
 STICKER_EYES: str = 'eyes'

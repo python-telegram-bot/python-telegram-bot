@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import time
 import datetime as dtm
+from pathlib import Path
 from platform import python_implementation
 
 import pytest
@@ -193,6 +194,9 @@ class TestBot:
         address = 'address'
         foursquare_id = 'foursquare id'
         foursquare_type = 'foursquare type'
+        google_place_id = 'google_place id'
+        google_place_type = 'google_place type'
+
         message = bot.send_venue(
             chat_id=chat_id,
             title=title,
@@ -210,6 +214,28 @@ class TestBot:
         assert message.venue.location.longitude == longitude
         assert message.venue.foursquare_id == foursquare_id
         assert message.venue.foursquare_type == foursquare_type
+        assert message.venue.google_place_id is None
+        assert message.venue.google_place_type is None
+
+        message = bot.send_venue(
+            chat_id=chat_id,
+            title=title,
+            address=address,
+            latitude=latitude,
+            longitude=longitude,
+            google_place_id=google_place_id,
+            google_place_type=google_place_type,
+        )
+
+        assert message.venue
+        assert message.venue.title == title
+        assert message.venue.address == address
+        assert message.venue.location.latitude == latitude
+        assert message.venue.location.longitude == longitude
+        assert message.venue.google_place_id == google_place_id
+        assert message.venue.google_place_type == google_place_type
+        assert message.venue.foursquare_id is None
+        assert message.venue.foursquare_type is None
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -374,6 +400,28 @@ class TestBot:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    def test_send_poll_explanation_entities(self, bot, chat_id):
+        test_string = 'Italic Bold Code'
+        entities = [
+            MessageEntity(MessageEntity.ITALIC, 0, 6),
+            MessageEntity(MessageEntity.ITALIC, 7, 4),
+            MessageEntity(MessageEntity.ITALIC, 12, 4),
+        ]
+        message = bot.send_poll(
+            chat_id,
+            'question',
+            options=['a', 'b'],
+            correct_option_id=0,
+            type=Poll.QUIZ,
+            explanation=test_string,
+            explanation_entities=entities,
+        )
+
+        assert message.poll.explanation == test_string
+        assert message.poll.explanation_entities == entities
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_poll_default_parse_mode(self, default_bot, super_group_id):
         explanation = 'Italic Bold Code'
@@ -425,6 +473,48 @@ class TestBot:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    @pytest.mark.parametrize(
+        'default_bot,custom',
+        [
+            ({'allow_sending_without_reply': True}, None),
+            ({'allow_sending_without_reply': False}, None),
+            ({'allow_sending_without_reply': False}, True),
+        ],
+        indirect=['default_bot'],
+    )
+    def test_send_poll_default_allow_sending_without_reply(self, default_bot, chat_id, custom):
+        question = 'Is this a test?'
+        answers = ['Yes', 'No', 'Maybe']
+        reply_to_message = default_bot.send_message(chat_id, 'test')
+        reply_to_message.delete()
+        if custom is not None:
+            message = default_bot.send_poll(
+                chat_id,
+                question=question,
+                options=answers,
+                allow_sending_without_reply=custom,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert message.reply_to_message is None
+        elif default_bot.defaults.allow_sending_without_reply:
+            message = default_bot.send_poll(
+                chat_id,
+                question=question,
+                options=answers,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert message.reply_to_message is None
+        else:
+            with pytest.raises(BadRequest, match='message not found'):
+                default_bot.send_poll(
+                    chat_id,
+                    question=question,
+                    options=answers,
+                    reply_to_message_id=reply_to_message.message_id,
+                )
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('emoji', Dice.ALL_EMOJI + [None])
     def test_send_dice(self, bot, chat_id, emoji):
         message = bot.send_dice(chat_id, emoji=emoji)
@@ -434,6 +524,37 @@ class TestBot:
             assert message.dice.emoji == Dice.DICE
         else:
             assert message.dice.emoji == emoji
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize(
+        'default_bot,custom',
+        [
+            ({'allow_sending_without_reply': True}, None),
+            ({'allow_sending_without_reply': False}, None),
+            ({'allow_sending_without_reply': False}, True),
+        ],
+        indirect=['default_bot'],
+    )
+    def test_send_dice_default_allow_sending_without_reply(self, default_bot, chat_id, custom):
+        reply_to_message = default_bot.send_message(chat_id, 'test')
+        reply_to_message.delete()
+        if custom is not None:
+            message = default_bot.send_dice(
+                chat_id,
+                allow_sending_without_reply=custom,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert message.reply_to_message is None
+        elif default_bot.defaults.allow_sending_without_reply:
+            message = default_bot.send_dice(
+                chat_id,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert message.reply_to_message is None
+        else:
+            with pytest.raises(BadRequest, match='message not found'):
+                default_bot.send_dice(chat_id, reply_to_message_id=reply_to_message.message_id)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -674,6 +795,23 @@ class TestBot:
         assert user_profile_photos.photos[0][0].file_size == 5403
 
     # get_file is tested multiple times in the test_*media* modules.
+    # Here we only test the behaviour for bot apis in local mode
+    def test_get_file_local_mode(self, bot, monkeypatch):
+        path = str(Path.cwd() / 'tests' / 'data' / 'game.gif')
+
+        def _post(*args, **kwargs):
+            return {
+                'file_id': None,
+                'file_unique_id': None,
+                'file_size': None,
+                'file_path': path,
+            }
+
+        monkeypatch.setattr(bot, '_post', _post)
+
+        resulting_path = bot.get_file('file_id').file_path
+        assert bot.token not in resulting_path
+        assert resulting_path == path
 
     # TODO: Needs improvement. No feasable way to test until bots can add members.
     def test_kick_chat_member(self, monkeypatch, bot):
@@ -707,15 +845,17 @@ class TestBot:
         assert tz_bot.kick_chat_member(2, 32, until_date=until_timestamp)
 
     # TODO: Needs improvement.
-    def test_unban_chat_member(self, monkeypatch, bot):
-        def test(url, data, *args, **kwargs):
+    @pytest.mark.parametrize('only_if_banned', [True, False, None])
+    def test_unban_chat_member(self, monkeypatch, bot, only_if_banned):
+        def make_assertion(url, data, *args, **kwargs):
             chat_id = data['chat_id'] == 2
             user_id = data['user_id'] == 32
-            return chat_id and user_id
+            o_i_b = data.get('only_if_banned', None) == only_if_banned
+            return chat_id and user_id and o_i_b
 
-        monkeypatch.setattr(bot.request, 'post', test)
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
 
-        assert bot.unban_chat_member(2, 32)
+        assert bot.unban_chat_member(2, 32, only_if_banned=only_if_banned)
 
     def test_set_chat_permissions(self, monkeypatch, bot, chat_permissions):
         def test(url, data, *args, **kwargs):
@@ -767,6 +907,25 @@ class TestBot:
         )
 
         assert message.text == 'new_text'
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_edit_message_text_entities(self, bot, message):
+        test_string = 'Italic Bold Code'
+        entities = [
+            MessageEntity(MessageEntity.ITALIC, 0, 6),
+            MessageEntity(MessageEntity.ITALIC, 7, 4),
+            MessageEntity(MessageEntity.ITALIC, 12, 4),
+        ]
+        message = bot.edit_message_text(
+            text=test_string,
+            chat_id=message.chat_id,
+            message_id=message.message_id,
+            entities=entities,
+        )
+
+        assert message.text == test_string
+        assert message.entities == entities
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -824,6 +983,25 @@ class TestBot:
         )
 
         assert message.caption == 'new_caption'
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_edit_message_caption_entities(self, bot, media_message):
+        test_string = 'Italic Bold Code'
+        entities = [
+            MessageEntity(MessageEntity.ITALIC, 0, 6),
+            MessageEntity(MessageEntity.ITALIC, 7, 4),
+            MessageEntity(MessageEntity.ITALIC, 12, 4),
+        ]
+        message = bot.edit_message_caption(
+            caption=test_string,
+            chat_id=media_message.chat_id,
+            message_id=media_message.message_id,
+            caption_entities=entities,
+        )
+
+        assert message.caption == test_string
+        assert message.caption_entities == entities
 
     # edit_message_media is tested in test_inputmedia
 
@@ -922,7 +1100,12 @@ class TestBot:
         url = 'https://python-telegram-bot.org/test/webhook'
         max_connections = 7
         allowed_updates = ['message']
-        bot.set_webhook(url, max_connections=max_connections, allowed_updates=allowed_updates)
+        bot.set_webhook(
+            url,
+            max_connections=max_connections,
+            allowed_updates=allowed_updates,
+            ip_address='127.0.0.1',
+        )
         time.sleep(2)
         live_info = bot.get_webhook_info()
         time.sleep(6)
@@ -933,6 +1116,19 @@ class TestBot:
         assert live_info.url == url
         assert live_info.max_connections == max_connections
         assert live_info.allowed_updates == allowed_updates
+        assert live_info.ip_address == '127.0.0.1'
+
+    @pytest.mark.parametrize('drop_pending_updates', [True, False])
+    def test_set_webhook_delete_webhook_drop_pending_updates(
+        self, bot, drop_pending_updates, monkeypatch
+    ):
+        def assertion(url, data, *args, **kwargs):
+            return bool(data.get('drop_pending_updates')) == drop_pending_updates
+
+        monkeypatch.setattr(bot.request, 'post', assertion)
+
+        assert bot.set_webhook(drop_pending_updates=drop_pending_updates)
+        assert bot.delete_webhook(drop_pending_updates=drop_pending_updates)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -997,6 +1193,42 @@ class TestBot:
         )
         assert message.game.animation.file_id != ''
         assert message.game.photo[0].file_size == 851
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize(
+        'default_bot,custom',
+        [
+            ({'allow_sending_without_reply': True}, None),
+            ({'allow_sending_without_reply': False}, None),
+            ({'allow_sending_without_reply': False}, True),
+        ],
+        indirect=['default_bot'],
+    )
+    def test_send_game_default_allow_sending_without_reply(self, default_bot, chat_id, custom):
+        game_short_name = 'test_game'
+        reply_to_message = default_bot.send_message(chat_id, 'test')
+        reply_to_message.delete()
+        if custom is not None:
+            message = default_bot.send_game(
+                chat_id,
+                game_short_name,
+                allow_sending_without_reply=custom,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert message.reply_to_message is None
+        elif default_bot.defaults.allow_sending_without_reply:
+            message = default_bot.send_game(
+                chat_id,
+                game_short_name,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert message.reply_to_message is None
+        else:
+            with pytest.raises(BadRequest, match='message not found'):
+                default_bot.send_game(
+                    chat_id, game_short_name, reply_to_message_id=reply_to_message.message_id
+                )
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -1214,6 +1446,7 @@ class TestBot:
             assert bot.promote_chat_member(
                 channel_id,
                 95205500,
+                is_anonymous=True,
                 can_change_info=True,
                 can_post_messages=True,
                 can_edit_messages=True,
@@ -1241,6 +1474,20 @@ class TestBot:
         with open('tests/data/telegram_test_channel.jpg', 'rb') as f:
             expect_bad_request(func, 'Type of file mismatch', 'Telegram did not accept the file.')
 
+    def test_set_chat_photo_local_files(self, monkeypatch, bot, chat_id):
+        # For just test that the correct paths are passed as we have no local bot API set up
+        test_flag = False
+        expected = f"file://{Path.cwd() / 'tests/data/telegram.jpg'}"
+        file = 'tests/data/telegram.jpg'
+
+        def make_assertion(_, data, *args, **kwargs):
+            nonlocal test_flag
+            test_flag = data.get('photo') == expected
+
+        monkeypatch.setattr(bot, '_post', make_assertion)
+        bot.set_chat_photo(chat_id, file)
+        assert test_flag
+
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_delete_chat_photo(self, bot, channel_id):
@@ -1263,15 +1510,28 @@ class TestBot:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_pin_and_unpin_message(self, bot, super_group_id):
-        message = bot.send_message(super_group_id, text="test_pin_message")
+        message1 = bot.send_message(super_group_id, text="test_pin_message_1")
+        message2 = bot.send_message(super_group_id, text="test_pin_message_2")
+        message3 = bot.send_message(super_group_id, text="test_pin_message_3")
+
         assert bot.pin_chat_message(
-            chat_id=super_group_id, message_id=message.message_id, disable_notification=True
+            chat_id=super_group_id, message_id=message1.message_id, disable_notification=True
+        )
+
+        bot.pin_chat_message(
+            chat_id=super_group_id, message_id=message2.message_id, disable_notification=True
+        )
+        bot.pin_chat_message(
+            chat_id=super_group_id, message_id=message3.message_id, disable_notification=True
         )
 
         chat = bot.get_chat(super_group_id)
-        assert chat.pinned_message == message
+        assert chat.pinned_message == message3
 
-        assert bot.unpinChatMessage(super_group_id)
+        assert bot.unpin_chat_message(super_group_id, message_id=message2.message_id)
+        assert bot.unpin_chat_message(super_group_id)
+
+        assert bot.unpin_all_chat_messages(super_group_id)
 
     # get_sticker_set, upload_sticker_file, create_new_sticker_set, add_sticker_to_set,
     # set_sticker_position_in_set and delete_sticker_from_set are tested in the
@@ -1325,6 +1585,19 @@ class TestBot:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    def test_send_message_entities(self, bot, chat_id):
+        test_string = 'Italic Bold Code'
+        entities = [
+            MessageEntity(MessageEntity.ITALIC, 0, 6),
+            MessageEntity(MessageEntity.ITALIC, 7, 4),
+            MessageEntity(MessageEntity.ITALIC, 12, 4),
+        ]
+        message = bot.send_message(chat_id=chat_id, text=test_string, entities=entities)
+        assert message.text == test_string
+        assert message.entities == entities
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_message_default_parse_mode(self, default_bot, chat_id):
         test_string = 'Italic Bold Code'
@@ -1341,6 +1614,39 @@ class TestBot:
         message = default_bot.send_message(chat_id, test_markdown_string, parse_mode='HTML')
         assert message.text == test_markdown_string
         assert message.text_markdown == escape_markdown(test_markdown_string)
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize(
+        'default_bot,custom',
+        [
+            ({'allow_sending_without_reply': True}, None),
+            ({'allow_sending_without_reply': False}, None),
+            ({'allow_sending_without_reply': False}, True),
+        ],
+        indirect=['default_bot'],
+    )
+    def test_send_message_default_allow_sending_without_reply(self, default_bot, chat_id, custom):
+        reply_to_message = default_bot.send_message(chat_id, 'test')
+        reply_to_message.delete()
+        if custom is not None:
+            message = default_bot.send_message(
+                chat_id,
+                'test',
+                allow_sending_without_reply=custom,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert message.reply_to_message is None
+        elif default_bot.defaults.allow_sending_without_reply:
+            message = default_bot.send_message(
+                chat_id, 'test', reply_to_message_id=reply_to_message.message_id
+            )
+            assert message.reply_to_message is None
+        else:
+            with pytest.raises(BadRequest, match='message not found'):
+                default_bot.send_message(
+                    chat_id, 'test', reply_to_message_id=reply_to_message.message_id
+                )
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -1379,3 +1685,122 @@ class TestBot:
             assert bc[0].description == 'descr1'
             assert bc[1].command == 'cmd2'
             assert bc[1].description == 'descr2'
+
+    def test_log_out(self, monkeypatch, bot):
+        # We don't actually make a request as to not break the test setup
+        def assertion(url, data, *args, **kwargs):
+            return data == {} and url.split('/')[-1] == 'logOut'
+
+        monkeypatch.setattr(bot.request, 'post', assertion)
+
+        assert bot.log_out()
+
+    def test_close(self, monkeypatch, bot):
+        # We don't actually make a request as to not break the test setup
+        def assertion(url, data, *args, **kwargs):
+            return data == {} and url.split('/')[-1] == 'close'
+
+        monkeypatch.setattr(bot.request, 'post', assertion)
+
+        assert bot.close()
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize('json_keyboard', [True, False])
+    def test_copy_message(self, monkeypatch, bot, chat_id, media_message, json_keyboard):
+        keyboard = InlineKeyboardMarkup(
+            [[InlineKeyboardButton(text="test", callback_data="test2")]]
+        )
+
+        def post(url, data, timeout):
+            assert data["chat_id"] == chat_id
+            assert data["from_chat_id"] == chat_id
+            assert data["message_id"] == media_message.message_id
+            assert data["caption"] == "<b>Test</b>"
+            assert data["parse_mode"] == ParseMode.HTML
+            assert data["reply_to_message_id"] == media_message.message_id
+            assert data["reply_markup"] == keyboard.to_json()
+            assert data["disable_notification"] is True
+            assert data["caption_entities"] == [MessageEntity(MessageEntity.BOLD, 0, 4)]
+            return data
+
+        monkeypatch.setattr(bot.request, 'post', post)
+        bot.copy_message(
+            chat_id,
+            from_chat_id=chat_id,
+            message_id=media_message.message_id,
+            caption="<b>Test</b>",
+            caption_entities=[MessageEntity(MessageEntity.BOLD, 0, 4)],
+            parse_mode=ParseMode.HTML,
+            reply_to_message_id=media_message.message_id,
+            reply_markup=keyboard.to_json() if json_keyboard else keyboard,
+            disable_notification=True,
+        )
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_copy_message_without_reply(self, bot, chat_id, media_message):
+        keyboard = InlineKeyboardMarkup(
+            [[InlineKeyboardButton(text="test", callback_data="test2")]]
+        )
+
+        returned = bot.copy_message(
+            chat_id,
+            from_chat_id=chat_id,
+            message_id=media_message.message_id,
+            caption="<b>Test</b>",
+            parse_mode=ParseMode.HTML,
+            reply_to_message_id=media_message.message_id,
+            reply_markup=keyboard,
+        )
+        # we send a temp message which replies to the returned message id in order to get a
+        # message object
+        temp_message = bot.send_message(chat_id, "test", reply_to_message_id=returned.message_id)
+        message = temp_message.reply_to_message
+        assert message.chat_id == int(chat_id)
+        assert message.caption == "Test"
+        assert len(message.caption_entities) == 1
+        assert message.reply_markup == keyboard
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize(
+        'default_bot',
+        [
+            ({'parse_mode': ParseMode.HTML, 'allow_sending_without_reply': True}),
+            ({'parse_mode': False, 'allow_sending_without_reply': True}),
+            ({'parse_mode': False, 'allow_sending_without_reply': False}),
+        ],
+        indirect=['default_bot'],
+    )
+    def test_copy_message_with_default(self, default_bot, chat_id, media_message):
+        reply_to_message = default_bot.send_message(chat_id, 'test')
+        reply_to_message.delete()
+        if not default_bot.defaults.allow_sending_without_reply:
+            with pytest.raises(BadRequest, match='Reply message not found'):
+                default_bot.copy_message(
+                    chat_id,
+                    from_chat_id=chat_id,
+                    message_id=media_message.message_id,
+                    caption="<b>Test</b>",
+                    reply_to_message_id=reply_to_message.message_id,
+                )
+            return
+        else:
+            returned = default_bot.copy_message(
+                chat_id,
+                from_chat_id=chat_id,
+                message_id=media_message.message_id,
+                caption="<b>Test</b>",
+                reply_to_message_id=reply_to_message.message_id,
+            )
+        # we send a temp message which replies to the returned message id in order to get a
+        # message object
+        temp_message = default_bot.send_message(
+            chat_id, "test", reply_to_message_id=returned.message_id
+        )
+        message = temp_message.reply_to_message
+        if default_bot.defaults.parse_mode:
+            assert len(message.caption_entities) == 1
+        else:
+            assert len(message.caption_entities) == 0

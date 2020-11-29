@@ -19,7 +19,7 @@
 
 import pytest
 
-from telegram import Chat, ChatAction, ChatPermissions, constants
+from telegram import Chat, ChatAction, ChatPermissions, ChatLocation, Location
 from telegram import User
 
 
@@ -36,6 +36,9 @@ def chat(bot):
         can_set_sticker_set=TestChat.can_set_sticker_set,
         permissions=TestChat.permissions,
         slow_mode_delay=TestChat.slow_mode_delay,
+        bio=TestChat.bio,
+        linked_chat_id=TestChat.linked_chat_id,
+        location=TestChat.location,
     )
 
 
@@ -53,6 +56,9 @@ class TestChat:
         can_invite_users=True,
     )
     slow_mode_delay = 30
+    bio = "I'm a Barbie Girl in a Barbie World"
+    linked_chat_id = 11880
+    location = ChatLocation(Location(123, 456), 'Barbie World')
 
     def test_de_json(self, bot):
         json_dict = {
@@ -65,6 +71,9 @@ class TestChat:
             'can_set_sticker_set': self.can_set_sticker_set,
             'permissions': self.permissions.to_dict(),
             'slow_mode_delay': self.slow_mode_delay,
+            'bio': self.bio,
+            'linked_chat_id': self.linked_chat_id,
+            'location': self.location.to_dict(),
         }
         chat = Chat.de_json(json_dict, bot)
 
@@ -77,6 +86,10 @@ class TestChat:
         assert chat.can_set_sticker_set == self.can_set_sticker_set
         assert chat.permissions == self.permissions
         assert chat.slow_mode_delay == self.slow_mode_delay
+        assert chat.bio == self.bio
+        assert chat.linked_chat_id == self.linked_chat_id
+        assert chat.location.location == self.location.location
+        assert chat.location.address == self.location.address
 
     def test_to_dict(self, chat):
         chat_dict = chat.to_dict()
@@ -89,21 +102,14 @@ class TestChat:
         assert chat_dict['all_members_are_administrators'] == chat.all_members_are_administrators
         assert chat_dict['permissions'] == chat.permissions.to_dict()
         assert chat_dict['slow_mode_delay'] == chat.slow_mode_delay
+        assert chat_dict['bio'] == chat.bio
+        assert chat_dict['linked_chat_id'] == chat.linked_chat_id
+        assert chat_dict['location'] == chat.location.to_dict()
 
     def test_link(self, chat):
         assert chat.link == f'https://t.me/{chat.username}'
         chat.username = None
         assert chat.link is None
-
-    def test_anonymous_admin(self, chat):
-        assert chat.is_anonymous_admin is False
-        chat.id = constants.ANONYMOUS_ADMIN_ID
-        assert chat.is_anonymous_admin
-
-    def test_service_chat(self, chat):
-        assert chat.is_service_chat is False
-        chat.id = constants.SERVICE_CHAT_ID
-        assert chat.is_service_chat
 
     def test_send_action(self, monkeypatch, chat):
         def test(*args, **kwargs):
@@ -155,14 +161,16 @@ class TestChat:
         monkeypatch.setattr(chat.bot, 'kick_chat_member', test)
         assert chat.kick_member(42, until_date=43)
 
-    def test_unban_member(self, monkeypatch, chat):
-        def test(*args, **kwargs):
+    @pytest.mark.parametrize('only_if_banned', [True, False, None])
+    def test_unban_member(self, monkeypatch, chat, only_if_banned):
+        def make_assertion(*args, **kwargs):
             chat_id = args[0] == chat.id
             user_id = args[1] == 42
-            return chat_id and user_id
+            o_i_b = kwargs.get('only_if_banned', None) == only_if_banned
+            return chat_id and user_id and o_i_b
 
-        monkeypatch.setattr(chat.bot, 'unban_chat_member', test)
-        assert chat.unban_member(42)
+        monkeypatch.setattr(chat.bot, 'unban_chat_member', make_assertion)
+        assert chat.unban_member(42, only_if_banned=only_if_banned)
 
     def test_set_permissions(self, monkeypatch, chat):
         def test(*args, **kwargs):
@@ -182,6 +190,36 @@ class TestChat:
 
         monkeypatch.setattr('telegram.Bot.set_chat_administrator_custom_title', test)
         assert chat.set_administrator_custom_title(42, 'custom_title')
+
+    def test_pin_message(self, monkeypatch, chat):
+        def make_assertion(*args, **kwargs):
+            try:
+                return kwargs['chat_id'] == chat.id
+            except KeyError:
+                return args[0] == chat.id
+
+        monkeypatch.setattr(chat.bot, 'pin_chat_message', make_assertion)
+        assert chat.pin_message()
+
+    def test_unpin_message(self, monkeypatch, chat):
+        def make_assertion(*args, **kwargs):
+            try:
+                return kwargs['chat_id'] == chat.id
+            except KeyError:
+                return args[0] == chat.id
+
+        monkeypatch.setattr(chat.bot, 'unpin_chat_message', make_assertion)
+        assert chat.unpin_message()
+
+    def test_unpin_all_messages(self, monkeypatch, chat):
+        def make_assertion(*args, **kwargs):
+            try:
+                return kwargs['chat_id'] == chat.id
+            except KeyError:
+                return args[0] == chat.id
+
+        monkeypatch.setattr(chat.bot, 'unpin_all_chat_messages', make_assertion)
+        assert chat.unpin_all_messages()
 
     def test_instance_method_send_message(self, monkeypatch, chat):
         def test(*args, **kwargs):
@@ -301,6 +339,24 @@ class TestChat:
 
         monkeypatch.setattr(chat.bot, 'send_poll', test)
         assert chat.send_poll('test_poll')
+
+    def test_instance_method_send_copy(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            assert args[0] == 'test_copy'
+            assert kwargs['chat_id'] == chat.id
+            return args
+
+        monkeypatch.setattr(chat.bot, 'copy_message', test)
+        assert chat.send_copy('test_copy')
+
+    def test_instance_method_copy_message(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            assert args[0] == 'test_copy'
+            assert kwargs['from_chat_id'] == chat.id
+            return args
+
+        monkeypatch.setattr(chat.bot, 'copy_message', test)
+        assert chat.copy_message('test_copy')
 
     def test_equality(self):
         a = Chat(self.id_, self.title, self.type_)

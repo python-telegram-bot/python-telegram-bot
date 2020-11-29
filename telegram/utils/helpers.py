@@ -26,15 +26,16 @@ import time
 from collections import defaultdict
 from html import escape
 from numbers import Number
+from pathlib import Path
 
-from typing import TYPE_CHECKING, Any, DefaultDict, Dict, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, DefaultDict, Dict, Optional, Tuple, Union, Type, cast, IO
 
 import pytz  # pylint: disable=E0401
 
-from telegram.utils.types import JSONDict
+from telegram.utils.types import JSONDict, FileInput
 
 if TYPE_CHECKING:
-    from telegram import MessageEntity
+    from telegram import MessageEntity, TelegramObject, InputFile
 
 try:
     import ujson as json
@@ -53,6 +54,73 @@ _signames = {
 def get_signal_name(signum: int) -> str:
     """Returns the signal name of the given signal number."""
     return _signames[signum]
+
+
+def is_local_file(obj: Optional[Union[str, Path]]) -> bool:
+    """
+    Checks if a given string is a file on local system.
+
+    Args:
+        obj (:obj:`str`): The string to check.
+    """
+    if obj is None:
+        return False
+
+    path = Path(obj)
+    try:
+        return path.is_file()
+    except Exception:
+        return False
+
+
+def parse_file_input(
+    file_input: Union[FileInput, 'TelegramObject'],
+    tg_type: Type['TelegramObject'] = None,
+    attach: bool = None,
+    filename: str = None,
+) -> Union[str, 'InputFile', Any]:
+    """
+    Parses input for sending files:
+
+    * For string input, if the input is an absolute path of a local file,
+      adds the ``file://`` prefix. If the input is a relative path of a local file, computes the
+      absolute path and adds the ``file://`` prefix. Returns the input unchanged, otherwise.
+    * :class:`pathlib.Path` objects are treated the same way as strings.
+    * For IO input, returns an :class:`telegram.InputFile`.
+    * If :attr:`tg_type` is specified and the input is of that type, returns the ``file_id``
+      attribute.
+
+    Args:
+        file_input (:obj:`str` | `filelike object` | Telegram media object): The input to parse.
+        tg_type (:obj:`type`, optional): The Telegram media type the input can be. E.g.
+            :class:`telegram.Animation`.
+        attach (:obj:`bool`, optional): Whether this file should be send as one file or is part of
+            a collection of files. Only relevant in case an :class:`telegram.InputFile` is
+            returned.
+        filename (:obj:`str`, optional): The filename. Only relevant in case an
+            :class:`telegram.InputFile` is returned.
+
+    Returns:
+        :obj:`str` | :class:`telegram.InputFile` | :obj:`object`: The parsed input or the untouched
+            :attr:`file_input`, in case it's no valid file input.
+    """
+    # Importing on file-level yields cyclic Import Errors
+    from telegram import InputFile  # pylint: disable=C0415
+
+    if isinstance(file_input, str) and file_input.startswith('file://'):
+        return file_input
+    if isinstance(file_input, (str, Path)):
+        if is_local_file(file_input):
+            out = f'file://{Path(file_input).absolute()}'
+        else:
+            out = file_input  # type: ignore[assignment]
+        return out
+    if InputFile.is_file(file_input):
+        file_input = cast(IO, file_input)
+        return InputFile(file_input, attach=attach, filename=filename)
+    if tg_type and isinstance(file_input, tg_type):
+        return file_input.file_id  # type: ignore[attr-defined]
+    return file_input
 
 
 def escape_markdown(text: str, version: int = 1, entity_type: str = None) -> str:

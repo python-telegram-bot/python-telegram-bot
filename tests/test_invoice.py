@@ -21,6 +21,7 @@ import pytest
 from flaky import flaky
 
 from telegram import LabeledPrice, Invoice
+from telegram.error import BadRequest
 
 
 @pytest.fixture(scope='class')
@@ -146,6 +147,63 @@ class TestInvoice:
             self.prices,
             provider_data={'test_data': 123456789},
         )
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize(
+        'default_bot,custom',
+        [
+            ({'allow_sending_without_reply': True}, None),
+            ({'allow_sending_without_reply': False}, None),
+            ({'allow_sending_without_reply': False}, True),
+        ],
+        indirect=['default_bot'],
+    )
+    def test_send_invoice_default_allow_sending_without_reply(
+        self, default_bot, chat_id, custom, provider_token
+    ):
+        reply_to_message = default_bot.send_message(chat_id, 'test')
+        reply_to_message.delete()
+        if custom is not None:
+            message = default_bot.send_invoice(
+                chat_id,
+                self.title,
+                self.description,
+                self.payload,
+                provider_token,
+                self.start_parameter,
+                self.currency,
+                self.prices,
+                allow_sending_without_reply=custom,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert message.reply_to_message is None
+        elif default_bot.defaults.allow_sending_without_reply:
+            message = default_bot.send_invoice(
+                chat_id,
+                self.title,
+                self.description,
+                self.payload,
+                provider_token,
+                self.start_parameter,
+                self.currency,
+                self.prices,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert message.reply_to_message is None
+        else:
+            with pytest.raises(BadRequest, match='message not found'):
+                default_bot.send_invoice(
+                    chat_id,
+                    self.title,
+                    self.description,
+                    self.payload,
+                    provider_token,
+                    self.start_parameter,
+                    self.currency,
+                    self.prices,
+                    reply_to_message_id=reply_to_message.message_id,
+                )
 
     def test_equality(self):
         a = Invoice('invoice', 'desc', 'start', 'EUR', 7)
