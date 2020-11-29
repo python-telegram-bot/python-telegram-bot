@@ -22,7 +22,7 @@ from pathlib import Path
 import pytest
 from flaky import flaky
 
-from telegram import Video, TelegramError, Voice, PhotoSize
+from telegram import Video, TelegramError, Voice, PhotoSize, MessageEntity
 from telegram.error import BadRequest
 from telegram.utils.helpers import escape_markdown
 
@@ -153,6 +153,20 @@ class TestVideo:
         assert message.video.thumb.file_size == 645  # same
 
         assert message.caption == self.caption
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_video_caption_entities(self, bot, chat_id, video):
+        test_string = 'Italic Bold Code'
+        entities = [
+            MessageEntity(MessageEntity.ITALIC, 0, 6),
+            MessageEntity(MessageEntity.ITALIC, 7, 4),
+            MessageEntity(MessageEntity.ITALIC, 12, 4),
+        ]
+        message = bot.send_video(chat_id, video, caption=test_string, caption_entities=entities)
+
+        assert message.caption == test_string
+        assert message.caption_entities == entities
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

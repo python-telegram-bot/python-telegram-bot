@@ -13,6 +13,7 @@ telegram package
     telegram.callbackquery
     telegram.chat
     telegram.chataction
+    telegram.chatlocation
     telegram.chatmember
     telegram.chatpermissions
     telegram.chatphoto
@@ -44,6 +45,7 @@ telegram package
     telegram.poll
     telegram.pollanswer
     telegram.polloption
+    telegram.proximityalerttriggered
     telegram.replykeyboardremove
     telegram.replykeyboardmarkup
     telegram.replymarkup

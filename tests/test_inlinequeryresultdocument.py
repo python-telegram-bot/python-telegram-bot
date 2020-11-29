@@ -25,6 +25,7 @@ from telegram import (
     InlineQueryResultDocument,
     InlineKeyboardMarkup,
     InlineQueryResultVoice,
+    MessageEntity,
 )
 
 
@@ -37,6 +38,7 @@ def inline_query_result_document():
         TestInlineQueryResultDocument.mime_type,
         caption=TestInlineQueryResultDocument.caption,
         parse_mode=TestInlineQueryResultDocument.parse_mode,
+        caption_entities=TestInlineQueryResultDocument.caption_entities,
         description=TestInlineQueryResultDocument.description,
         thumb_url=TestInlineQueryResultDocument.thumb_url,
         thumb_width=TestInlineQueryResultDocument.thumb_width,
@@ -53,6 +55,7 @@ class TestInlineQueryResultDocument:
     title = 'title'
     caption = 'caption'
     parse_mode = 'Markdown'
+    caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     mime_type = 'mime type'
     description = 'description'
     thumb_url = 'thumb url'
@@ -68,6 +71,7 @@ class TestInlineQueryResultDocument:
         assert inline_query_result_document.title == self.title
         assert inline_query_result_document.caption == self.caption
         assert inline_query_result_document.parse_mode == self.parse_mode
+        assert inline_query_result_document.caption_entities == self.caption_entities
         assert inline_query_result_document.mime_type == self.mime_type
         assert inline_query_result_document.description == self.description
         assert inline_query_result_document.thumb_url == self.thumb_url
@@ -95,6 +99,9 @@ class TestInlineQueryResultDocument:
             inline_query_result_document_dict['parse_mode']
             == inline_query_result_document.parse_mode
         )
+        assert inline_query_result_document_dict['caption_entities'] == [
+            ce.to_dict() for ce in inline_query_result_document.caption_entities
+        ]
         assert (
             inline_query_result_document_dict['mime_type']
             == inline_query_result_document.mime_type

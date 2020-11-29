@@ -22,7 +22,7 @@ from pathlib import Path
 import pytest
 from flaky import flaky
 
-from telegram import Audio, TelegramError, Voice
+from telegram import Audio, TelegramError, Voice, MessageEntity
 from telegram.utils.helpers import escape_markdown
 
 
@@ -152,6 +152,20 @@ class TestAudio:
         monkeypatch.setattr(bot.request, 'post', test)
         message = bot.send_audio(audio=audio, chat_id=chat_id)
         assert message
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_audio_caption_entities(self, bot, chat_id, audio):
+        test_string = 'Italic Bold Code'
+        entities = [
+            MessageEntity(MessageEntity.ITALIC, 0, 6),
+            MessageEntity(MessageEntity.ITALIC, 7, 4),
+            MessageEntity(MessageEntity.ITALIC, 12, 4),
+        ]
+        message = bot.send_audio(chat_id, audio, caption=test_string, caption_entities=entities)
+
+        assert message.caption == test_string
+        assert message.caption_entities == entities
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

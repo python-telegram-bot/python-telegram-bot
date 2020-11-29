@@ -25,6 +25,7 @@ from telegram import (
     InlineQueryResultAudio,
     InputTextMessageContent,
     InlineQueryResultVoice,
+    MessageEntity,
 )
 
 
@@ -38,6 +39,7 @@ def inline_query_result_audio():
         audio_duration=TestInlineQueryResultAudio.audio_duration,
         caption=TestInlineQueryResultAudio.caption,
         parse_mode=TestInlineQueryResultAudio.parse_mode,
+        caption_entities=TestInlineQueryResultAudio.caption_entities,
         input_message_content=TestInlineQueryResultAudio.input_message_content,
         reply_markup=TestInlineQueryResultAudio.reply_markup,
     )
@@ -52,6 +54,7 @@ class TestInlineQueryResultAudio:
     audio_duration = 'audio_duration'
     caption = 'caption'
     parse_mode = 'Markdown'
+    caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     input_message_content = InputTextMessageContent('input_message_content')
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
@@ -64,6 +67,7 @@ class TestInlineQueryResultAudio:
         assert inline_query_result_audio.audio_duration == self.audio_duration
         assert inline_query_result_audio.caption == self.caption
         assert inline_query_result_audio.parse_mode == self.parse_mode
+        assert inline_query_result_audio.caption_entities == self.caption_entities
         assert (
             inline_query_result_audio.input_message_content.to_dict()
             == self.input_message_content.to_dict()
@@ -85,6 +89,9 @@ class TestInlineQueryResultAudio:
         )
         assert inline_query_result_audio_dict['caption'] == inline_query_result_audio.caption
         assert inline_query_result_audio_dict['parse_mode'] == inline_query_result_audio.parse_mode
+        assert inline_query_result_audio_dict['caption_entities'] == [
+            ce.to_dict() for ce in inline_query_result_audio.caption_entities
+        ]
         assert (
             inline_query_result_audio_dict['input_message_content']
             == inline_query_result_audio.input_message_content.to_dict()
