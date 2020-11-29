@@ -102,7 +102,7 @@ class File(TelegramObject):
         Note:
             * :attr:`custom_path` and :attr:`out` are mutually exclusive.
             * If neither :attr:`custom_path` nor :attr:`out` is provided and :attr:`file_path` is
-              the path of a local file (as is the case for local Bot API Servers running in the
+              the path of a local file (which is the case when a Bot API Server is running in
               local mode), this method will just return the path.
 
         Args:
