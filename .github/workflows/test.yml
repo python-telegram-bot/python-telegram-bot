@@ -3,7 +3,6 @@ on:
   pull_request:
     branches:
       - master
-      - api-5.0-master
   schedule:
     - cron: 7 3 * * *
   push:
