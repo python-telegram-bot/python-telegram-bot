@@ -38,7 +38,7 @@ from typing import (
     NoReturn,
 )
 
-from telegram import Chat, Message, MessageEntity, Update
+from telegram import Chat, Message, MessageEntity, Update, User
 
 __all__ = [
     'Filters',
@@ -69,7 +69,7 @@ class BaseFilter(ABC):
 
     Exclusive Or:
 
-        >>> (Filters.regex('To Be') ^ Filters.regex('Not To Be'))
+        >>> (Filters.regex('To Be') ^ Filters.regex('Not 2B'))
 
     Not:
 
@@ -1031,6 +1031,15 @@ officedocument.wordprocessingml.document")``-
         connected_website = _ConnectedWebsite()
         """Messages that contain :attr:`telegram.Message.connected_website`."""
 
+        class _ProximityAlertTriggered(MessageFilter):
+            name = 'Filters.status_update.proximity_alert_triggered'
+
+            def filter(self, message: Message) -> bool:
+                return bool(message.proximity_alert_triggered)
+
+        proximity_alert_triggered = _ProximityAlertTriggered()
+        """Messages that contain :attr:`telegram.Message.proximity_alert_triggered`."""
+
         name = 'Filters.status_update'
 
         def filter(self, message: Update) -> bool:
@@ -1044,6 +1053,7 @@ officedocument.wordprocessingml.document")``-
                 or self.migrate(message)
                 or self.pinned_message(message)
                 or self.connected_website(message)
+                or self.proximity_alert_triggered(message)
             )
 
     status_update = _StatusUpdate()
@@ -1058,6 +1068,8 @@ officedocument.wordprocessingml.document")``-
             :attr:`telegram.Message.group_chat_created`,
             :attr:`telegram.Message.supergroup_chat_created` or
             :attr:`telegram.Message.channel_chat_created`.
+        connected_website: Messages that contain
+            :attr:`telegram.Message.connected_website`.
         delete_chat_photo: Messages that contain
             :attr:`telegram.Message.delete_chat_photo`.
         left_chat_member: Messages that contain
@@ -1073,6 +1085,8 @@ officedocument.wordprocessingml.document")``-
             :attr:`telegram.Message.new_chat_title`.
         pinned_message: Messages that contain
             :attr:`telegram.Message.pinned_message`.
+        proximity_alert_triggered: Messages that contain
+            :attr:`telegram.Message.proximity_alert_triggered`.
     """
 
     class _Forwarded(MessageFilter):
@@ -1239,7 +1253,148 @@ officedocument.wordprocessingml.document")``-
         private: Updates sent in private chat
     """
 
-    class user(MessageFilter):
+    class _ChatUserBaseFilter(MessageFilter):
+        def __init__(
+            self,
+            chat_id: SLT[int] = None,
+            username: SLT[str] = None,
+            allow_empty: bool = False,
+        ):
+            self.chat_id_name = 'chat_id'
+            self.username_name = 'username'
+            self.allow_empty = allow_empty
+            self.__lock = Lock()
+
+            self._chat_ids: Set[int] = set()
+            self._usernames: Set[str] = set()
+
+            self._set_chat_ids(chat_id)
+            self._set_usernames(username)
+
+        @abstractmethod
+        def get_chat_or_user(self, message: Message) -> Union[Chat, User, None]:
+            pass
+
+        @staticmethod
+        def _parse_chat_id(chat_id: SLT[int]) -> Set[int]:
+            if chat_id is None:
+                return set()
+            if isinstance(chat_id, int):
+                return {chat_id}
+            return set(chat_id)
+
+        @staticmethod
+        def _parse_username(username: SLT[str]) -> Set[str]:
+            if username is None:
+                return set()
+            if isinstance(username, str):
+                return {username[1:] if username.startswith('@') else username}
+            return {chat[1:] if chat.startswith('@') else chat for chat in username}
+
+        def _set_chat_ids(self, chat_id: SLT[int]) -> None:
+            with self.__lock:
+                if chat_id and self._usernames:
+                    raise RuntimeError(
+                        f"Can't set {self.chat_id_name} in conjunction with (already set) "
+                        f"{self.username_name}s."
+                    )
+                self._chat_ids = self._parse_chat_id(chat_id)
+
+        def _set_usernames(self, username: SLT[str]) -> None:
+            with self.__lock:
+                if username and self._chat_ids:
+                    raise RuntimeError(
+                        f"Can't set {self.username_name} in conjunction with (already set) "
+                        f"{self.chat_id_name}s."
+                    )
+                self._usernames = self._parse_username(username)
+
+        @property
+        def chat_ids(self) -> FrozenSet[int]:
+            with self.__lock:
+                return frozenset(self._chat_ids)
+
+        @chat_ids.setter
+        def chat_ids(self, chat_id: SLT[int]) -> None:
+            self._set_chat_ids(chat_id)
+
+        @property
+        def usernames(self) -> FrozenSet[str]:
+            with self.__lock:
+                return frozenset(self._usernames)
+
+        @usernames.setter
+        def usernames(self, username: SLT[str]) -> None:
+            self._set_usernames(username)
+
+        def add_usernames(self, username: SLT[str]) -> None:
+            with self.__lock:
+                if self._chat_ids:
+                    raise RuntimeError(
+                        f"Can't set {self.username_name} in conjunction with (already set) "
+                        f"{self.chat_id_name}s."
+                    )
+
+                parsed_username = self._parse_username(username)
+                self._usernames |= parsed_username
+
+        def add_chat_ids(self, chat_id: SLT[int]) -> None:
+            with self.__lock:
+                if self._usernames:
+                    raise RuntimeError(
+                        f"Can't set {self.chat_id_name} in conjunction with (already set) "
+                        f"{self.username_name}s."
+                    )
+
+                parsed_chat_id = self._parse_chat_id(chat_id)
+
+                self._chat_ids |= parsed_chat_id
+
+        def remove_usernames(self, username: SLT[str]) -> None:
+            with self.__lock:
+                if self._chat_ids:
+                    raise RuntimeError(
+                        f"Can't set {self.username_name} in conjunction with (already set) "
+                        f"{self.chat_id_name}s."
+                    )
+
+                parsed_username = self._parse_username(username)
+                self._usernames -= parsed_username
+
+        def remove_chat_ids(self, chat_id: SLT[int]) -> None:
+            with self.__lock:
+                if self._usernames:
+                    raise RuntimeError(
+                        f"Can't set {self.chat_id_name} in conjunction with (already set) "
+                        f"{self.username_name}s."
+                    )
+                parsed_chat_id = self._parse_chat_id(chat_id)
+                self._chat_ids -= parsed_chat_id
+
+        def filter(self, message: Message) -> bool:
+            """"""  # remove method from docs
+            chat_or_user = self.get_chat_or_user(message)
+            if chat_or_user:
+                if self.chat_ids:
+                    return chat_or_user.id in self.chat_ids
+                if self.usernames:
+                    return bool(chat_or_user.username and chat_or_user.username in self.usernames)
+                return self.allow_empty
+            return False
+
+        @property
+        def name(self) -> str:
+            return (
+                f'Filters.{self.__class__.__name__}('
+                f'{", ".join(str(s) for s in (self.usernames or self.chat_ids))})'
+            )
+
+        @name.setter
+        def name(self, name: str) -> NoReturn:
+            raise RuntimeError(f'Cannot set name for Filters.{self.__class__.__name__}')
+
+    class user(_ChatUserBaseFilter):
+        # pylint: disable=W0235
         """Filters messages to allow only those which are from specified user ID(s) or
         username(s).
 
@@ -1280,64 +1435,19 @@ officedocument.wordprocessingml.document")``-
             username: SLT[str] = None,
             allow_empty: bool = False,
         ):
-            self.allow_empty = allow_empty
-            self.__lock = Lock()
+            super().__init__(chat_id=user_id, username=username, allow_empty=allow_empty)
+            self.chat_id_name = 'user_id'
 
-            self._user_ids: Set[int] = set()
-            self._usernames: Set[str] = set()
-
-            self._set_user_ids(user_id)
-            self._set_usernames(username)
-
-        @staticmethod
-        def _parse_user_id(user_id: SLT[int]) -> Set[int]:
-            if user_id is None:
-                return set()
-            if isinstance(user_id, int):
-                return {user_id}
-            return set(user_id)
-
-        @staticmethod
-        def _parse_username(username: SLT[str]) -> Set[str]:
-            if username is None:
-                return set()
-            if isinstance(username, str):
-                return {username[1:] if username.startswith('@') else username}
-            return {user[1:] if user.startswith('@') else user for user in username}
-
-        def _set_user_ids(self, user_id: SLT[int]) -> None:
-            with self.__lock:
-                if user_id and self._usernames:
-                    raise RuntimeError(
-                        "Can't set user_id in conjunction with (already set) " "usernames."
-                    )
-                self._user_ids = self._parse_user_id(user_id)
-
-        def _set_usernames(self, username: SLT[str]) -> None:
-            with self.__lock:
-                if username and self._user_ids:
-                    raise RuntimeError(
-                        "Can't set username in conjunction with (already set) " "user_ids."
-                    )
-                self._usernames = self._parse_username(username)
+        def get_chat_or_user(self, message: Message) -> Optional[User]:
+            return message.from_user
 
         @property
         def user_ids(self) -> FrozenSet[int]:
-            with self.__lock:
-                return frozenset(self._user_ids)
+            return self.chat_ids
 
         @user_ids.setter
         def user_ids(self, user_id: SLT[int]) -> None:
-            self._set_user_ids(user_id)
-
-        @property
-        def usernames(self) -> FrozenSet[str]:
-            with self.__lock:
-                return frozenset(self._usernames)
-
-        @usernames.setter
-        def usernames(self, username: SLT[str]) -> None:
-            self._set_usernames(username)
+            self.chat_ids = user_id  # type: ignore[assignment]
 
         def add_usernames(self, username: SLT[str]) -> None:
             """
@@ -1348,14 +1458,7 @@ officedocument.wordprocessingml.document")``-
                     Which username(s) to allow through.
                     Leading '@'s in usernames will be discarded.
             """
-            with self.__lock:
-                if self._user_ids:
-                    raise RuntimeError(
-                        "Can't set username in conjunction with (already set) " "user_ids."
-                    )
-
-                parsed_username = self._parse_username(username)
-                self._usernames |= parsed_username
+            return super().add_usernames(username)
 
         def add_user_ids(self, user_id: SLT[int]) -> None:
             """
@@ -1365,15 +1468,7 @@ officedocument.wordprocessingml.document")``-
                 user_id(:class:`telegram.utils.types.SLT[int]`, optional):
                     Which user ID(s) to allow through.
             """
-            with self.__lock:
-                if self._usernames:
-                    raise RuntimeError(
-                        "Can't set user_id in conjunction with (already set) " "usernames."
-                    )
-
-                parsed_user_id = self._parse_user_id(user_id)
-
-                self._user_ids |= parsed_user_id
+            return super().add_chat_ids(user_id)
 
         def remove_usernames(self, username: SLT[str]) -> None:
             """
@@ -1384,14 +1479,7 @@ officedocument.wordprocessingml.document")``-
                     Which username(s) to disallow through.
                     Leading '@'s in usernames will be discarded.
             """
-            with self.__lock:
-                if self._user_ids:
-                    raise RuntimeError(
-                        "Can't set username in conjunction with (already set) " "user_ids."
-                    )
-
-                parsed_username = self._parse_username(username)
-                self._usernames -= parsed_username
+            return super().remove_usernames(username)
 
         def remove_user_ids(self, user_id: SLT[int]) -> None:
             """
@@ -1401,35 +1489,10 @@ officedocument.wordprocessingml.document")``-
                 user_id(:class:`telegram.utils.types.SLT[int]`, optional):
                     Which user ID(s) to disallow through.
             """
-            with self.__lock:
-                if self._usernames:
-                    raise RuntimeError(
-                        "Can't set user_id in conjunction with (already set) " "usernames."
-                    )
-                parsed_user_id = self._parse_user_id(user_id)
-                self._user_ids -= parsed_user_id
+            return super().remove_chat_ids(user_id)
 
-        def filter(self, message: Message) -> bool:
-            """"""  # remove method from docs
-            if message.from_user:
-                if self.user_ids:
-                    return message.from_user.id in self.user_ids
-                if self.usernames:
-                    return bool(
-                        message.from_user.username and message.from_user.username in self.usernames
-                    )
-                return self.allow_empty
-            return False
-
-        @property
-        def name(self) -> str:
-            return f'Filters.user({", ".join(str(s) for s in (self.usernames or self.user_ids))})'
-
-        @name.setter
-        def name(self, name: str) -> NoReturn:
-            raise RuntimeError('Cannot set name for Filters.user')
-
-    class via_bot(MessageFilter):
+    class via_bot(_ChatUserBaseFilter):
+        # pylint: disable=W0235
         """Filters messages to allow only those which are from specified via_bot ID(s) or
         username(s).
 
@@ -1469,64 +1532,19 @@ officedocument.wordprocessingml.document")``-
             username: SLT[str] = None,
             allow_empty: bool = False,
         ):
-            self.allow_empty = allow_empty
-            self.__lock = Lock()
+            super().__init__(chat_id=bot_id, username=username, allow_empty=allow_empty)
+            self.chat_id_name = 'bot_id'
 
-            self._bot_ids: Set[int] = set()
-            self._usernames: Set[str] = set()
-
-            self._set_bot_ids(bot_id)
-            self._set_usernames(username)
-
-        @staticmethod
-        def _parse_bot_id(bot_id: SLT[int]) -> Set[int]:
-            if bot_id is None:
-                return set()
-            if isinstance(bot_id, int):
-                return {bot_id}
-            return set(bot_id)
-
-        @staticmethod
-        def _parse_username(username: SLT[str]) -> Set[str]:
-            if username is None:
-                return set()
-            if isinstance(username, str):
-                return {username[1:] if username.startswith('@') else username}
-            return {bot[1:] if bot.startswith('@') else bot for bot in username}
-
-        def _set_bot_ids(self, bot_id: SLT[int]) -> None:
-            with self.__lock:
-                if bot_id and self._usernames:
-                    raise RuntimeError(
-                        "Can't set bot_id in conjunction with (already set) " "usernames."
-                    )
-                self._bot_ids = self._parse_bot_id(bot_id)
-
-        def _set_usernames(self, username: SLT[str]) -> None:
-            with self.__lock:
-                if username and self._bot_ids:
-                    raise RuntimeError(
-                        "Can't set username in conjunction with (already set) " "bot_ids."
-                    )
-                self._usernames = self._parse_username(username)
+        def get_chat_or_user(self, message: Message) -> Optional[User]:
+            return message.via_bot
 
         @property
         def bot_ids(self) -> FrozenSet[int]:
-            with self.__lock:
-                return frozenset(self._bot_ids)
+            return self.chat_ids
 
         @bot_ids.setter
         def bot_ids(self, bot_id: SLT[int]) -> None:
-            self._set_bot_ids(bot_id)
-
-        @property
-        def usernames(self) -> FrozenSet[str]:
-            with self.__lock:
-                return frozenset(self._usernames)
-
-        @usernames.setter
-        def usernames(self, username: SLT[str]) -> None:
-            self._set_usernames(username)
+            self.chat_ids = bot_id  # type: ignore[assignment]
 
         def add_usernames(self, username: SLT[str]) -> None:
             """
@@ -1537,14 +1555,7 @@ officedocument.wordprocessingml.document")``-
                     Which username(s) to allow through.
                     Leading '@'s in usernames will be discarded.
             """
-            with self.__lock:
-                if self._bot_ids:
-                    raise RuntimeError(
-                        "Can't set username in conjunction with (already set) " "bot_ids."
-                    )
-
-                parsed_username = self._parse_username(username)
-                self._usernames |= parsed_username
+            return super().add_usernames(username)
 
         def add_bot_ids(self, bot_id: SLT[int]) -> None:
             """
@@ -1555,15 +1566,7 @@ officedocument.wordprocessingml.document")``-
                 bot_id(:class:`telegram.utils.types.SLT[int]`, optional):
                     Which bot ID(s) to allow through.
             """
-            with self.__lock:
-                if self._usernames:
-                    raise RuntimeError(
-                        "Can't set bot_id in conjunction with (already set) " "usernames."
-                    )
-
-                parsed_bot_id = self._parse_bot_id(bot_id)
-
-                self._bot_ids |= parsed_bot_id
+            return super().add_chat_ids(bot_id)
 
         def remove_usernames(self, username: SLT[str]) -> None:
             """
@@ -1574,14 +1577,7 @@ officedocument.wordprocessingml.document")``-
                     Which username(s) to disallow through.
                     Leading '@'s in usernames will be discarded.
             """
-            with self.__lock:
-                if self._bot_ids:
-                    raise RuntimeError(
-                        "Can't set username in conjunction with (already set) " "bot_ids."
-                    )
-
-                parsed_username = self._parse_username(username)
-                self._usernames -= parsed_username
+            return super().remove_usernames(username)
 
         def remove_bot_ids(self, bot_id: SLT[int]) -> None:
             """
@@ -1591,36 +1587,10 @@ officedocument.wordprocessingml.document")``-
                 bot_id(:class:`telegram.utils.types.SLT[int]`, optional):
                     Which bot ID(s) to disallow through.
             """
-            with self.__lock:
-                if self._usernames:
-                    raise RuntimeError(
-                        "Can't set bot_id in conjunction with (already set) " "usernames."
-                    )
-                parsed_bot_id = self._parse_bot_id(bot_id)
-                self._bot_ids -= parsed_bot_id
+            return super().remove_chat_ids(bot_id)
 
-        def filter(self, message: Message) -> bool:
-            """"""  # remove method from docs
-            if message.via_bot:
-                if self.bot_ids:
-                    return message.via_bot.id in self.bot_ids
-                if self.usernames:
-                    return bool(
-                        message.via_bot.username and message.via_bot.username in self.usernames
-                    )
-                return self.allow_empty
-            return False
-
-        @property
-        def name(self) -> str:
-            entries = [str(s) for s in (self.usernames or self.bot_ids)]
-            return f'Filters.via_bot({", ".join(entries)})'
-
-        @name.setter
-        def name(self, name: str) -> NoReturn:
-            raise RuntimeError('Cannot set name for Filters.via_bot')
-
-    class chat(MessageFilter):
+    class chat(_ChatUserBaseFilter):
+        # pylint: disable=W0235
         """Filters messages to allow only those which are from a specified chat ID or username.
 
         Examples:
@@ -1655,70 +1625,8 @@ officedocument.wordprocessingml.document")``-
 
         """
 
-        def __init__(
-            self,
-            chat_id: SLT[int] = None,
-            username: SLT[str] = None,
-            allow_empty: bool = False,
-        ):
-            self.allow_empty = allow_empty
-            self.__lock = Lock()
-
-            self._chat_ids: Set[int] = set()
-            self._usernames: Set[str] = set()
-
-            self._set_chat_ids(chat_id)
-            self._set_usernames(username)
-
-        @staticmethod
-        def _parse_chat_id(chat_id: SLT[int]) -> Set[int]:
-            if chat_id is None:
-                return set()
-            if isinstance(chat_id, int):
-                return {chat_id}
-            return set(chat_id)
-
-        @staticmethod
-        def _parse_username(username: SLT[str]) -> Set[str]:
-            if username is None:
-                return set()
-            if isinstance(username, str):
-                return {username[1:] if username.startswith('@') else username}
-            return {chat[1:] if chat.startswith('@') else chat for chat in username}
-
-        def _set_chat_ids(self, chat_id: SLT[int]) -> None:
-            with self.__lock:
-                if chat_id and self._usernames:
-                    raise RuntimeError(
-                        "Can't set chat_id in conjunction with (already set) " "usernames."
-                    )
-                self._chat_ids = self._parse_chat_id(chat_id)
-
-        def _set_usernames(self, username: SLT[str]) -> None:
-            with self.__lock:
-                if username and self._chat_ids:
-                    raise RuntimeError(
-                        "Can't set username in conjunction with (already set) " "chat_ids."
-                    )
-                self._usernames = self._parse_username(username)
-
-        @property
-        def chat_ids(self) -> FrozenSet[int]:
-            with self.__lock:
-                return frozenset(self._chat_ids)
-
-        @chat_ids.setter
-        def chat_ids(self, chat_id: SLT[int]) -> None:
-            self._set_chat_ids(chat_id)
-
-        @property
-        def usernames(self) -> FrozenSet[str]:
-            with self.__lock:
-                return frozenset(self._usernames)
-
-        @usernames.setter
-        def usernames(self, username: SLT[str]) -> None:
-            self._set_usernames(username)
+        def get_chat_or_user(self, message: Message) -> Optional[Chat]:
+            return message.chat
 
         def add_usernames(self, username: SLT[str]) -> None:
             """
@@ -1729,14 +1637,7 @@ officedocument.wordprocessingml.document")``-
                     Which username(s) to allow through.
                     Leading `'@'` s in usernames will be discarded.
             """
-            with self.__lock:
-                if self._chat_ids:
-                    raise RuntimeError(
-                        "Can't set username in conjunction with (already set) " "chat_ids."
-                    )
-
-                parsed_username = self._parse_username(username)
-                self._usernames |= parsed_username
+            return super().add_usernames(username)
 
         def add_chat_ids(self, chat_id: SLT[int]) -> None:
             """
@@ -1746,15 +1647,7 @@ officedocument.wordprocessingml.document")``-
                 chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
                     Which chat ID(s) to allow through.
             """
-            with self.__lock:
-                if self._usernames:
-                    raise RuntimeError(
-                        "Can't set chat_id in conjunction with (already set) " "usernames."
-                    )
-
-                parsed_chat_id = self._parse_chat_id(chat_id)
-
-                self._chat_ids |= parsed_chat_id
+            return super().add_chat_ids(chat_id)
 
         def remove_usernames(self, username: SLT[str]) -> None:
             """
@@ -1765,14 +1658,7 @@ officedocument.wordprocessingml.document")``-
                     Which username(s) to disallow through.
                     Leading '@'s in usernames will be discarded.
             """
-            with self.__lock:
-                if self._chat_ids:
-                    raise RuntimeError(
-                        "Can't set username in conjunction with (already set) " "chat_ids."
-                    )
-
-                parsed_username = self._parse_username(username)
-                self._usernames -= parsed_username
+            return super().remove_usernames(username)
 
         def remove_chat_ids(self, chat_id: SLT[int]) -> None:
             """
@@ -1782,31 +1668,121 @@ officedocument.wordprocessingml.document")``-
                 chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
                     Which chat ID(s) to disallow through.
             """
-            with self.__lock:
-                if self._usernames:
-                    raise RuntimeError(
-                        "Can't set chat_id in conjunction with (already set) " "usernames."
-                    )
-                parsed_chat_id = self._parse_chat_id(chat_id)
-                self._chat_ids -= parsed_chat_id
+            return super().remove_chat_ids(chat_id)
 
-        def filter(self, message: Message) -> bool:
-            """"""  # remove method from docs
-            if message.chat:
-                if self.chat_ids:
-                    return message.chat.id in self.chat_ids
-                if self.usernames:
-                    return bool(message.chat.username and message.chat.username in self.usernames)
-                return self.allow_empty
-            return False
+    class sender_chat(_ChatUserBaseFilter):
+        # pylint: disable=W0235
+        """Filters messages to allow only those which are from a specified sender chats chat ID or
+        username.
 
-        @property
-        def name(self) -> str:
-            return f'Filters.chat({", ".join(str(s) for s in (self.usernames or self.chat_ids))})'
+        Examples:
+            * To filter for messages forwarded from a channel with ID ``-1234``, use
+              ``MessageHandler(Filters.sender_chat(-1234), callback_method)``.
+            * To filter for messages of anonymous admins in a super group with username
+              ``@anonymous``, use
+              ``MessageHandler(Filters.sender_chat(username='anonymous'), callback_method)``.
+            * To filter for messages forwarded from *any* channel, use
+              ``MessageHandler(Filters.sender_chat.channel, callback_method)``.
+            * To filter for messages of anonymous admins in *any* super group, use
+              ``MessageHandler(Filters.sender_chat.super_group, callback_method)``.
 
-        @name.setter
-        def name(self, name: str) -> NoReturn:
-            raise RuntimeError('Cannot set name for Filters.chat')
+        Warning:
+            :attr:`chat_ids` will return a *copy* of the saved chat ids as :class:`frozenset`. This
+            is to ensure thread safety. To add/remove a chat, you should use :meth:`add_usernames`,
+            :meth:`add_chat_ids`, :meth:`remove_usernames` and :meth:`remove_chat_ids`. Only update
+            the entire set by ``filter.chat_ids/usernames = new_set``, if you are entirely sure
+            that it is not causing race conditions, as this will complete replace the current set
+            of allowed chats.
+
+        Attributes:
+            chat_ids(set(:obj:`int`), optional): Which sender chat chat ID(s) to allow through.
+            usernames(set(:obj:`str`), optional): Which sender chat username(s) (without leading
+                '@') to allow through.
+            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no sender
+                chat is specified in :attr:`chat_ids` and :attr:`usernames`.
+            super_group: Messages whose sender chat is a super group.
+
+                Examples:
+                    ``Filters.sender_chat.supergroup``
+            channel: Messages whose sender chat is a channel.
+
+                Examples:
+                    ``Filters.sender_chat.channel``
+
+        Args:
+            chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                Which sender chat chat ID(s) to allow through.
+            username(:class:`telegram.utils.types.SLT[str]`, optional):
+                Which sender chat sername(s) to allow through.
+                Leading `'@'` s in usernames will be discarded.
+            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no sender
+                chat is specified in :attr:`chat_ids` and :attr:`usernames`. Defaults to
+                :obj:`False`
+
+        Raises:
+            RuntimeError: If chat_id and username are both present.
+
+        """
+
+        def get_chat_or_user(self, message: Message) -> Optional[Chat]:
+            return message.sender_chat
+
+        def add_usernames(self, username: SLT[str]) -> None:
+            """
+            Add one or more sender chats to the allowed usernames.
+
+            Args:
+                username(:class:`telegram.utils.types.SLT[str]`, optional):
+                    Which sender chat username(s) to allow through.
+                    Leading `'@'` s in usernames will be discarded.
+            """
+            return super().add_usernames(username)
+
+        def add_chat_ids(self, chat_id: SLT[int]) -> None:
+            """
+            Add one or more sender chats to the allowed chat ids.
+
+            Args:
+                chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                    Which sender chat ID(s) to allow through.
+            """
+            return super().add_chat_ids(chat_id)
+
+        def remove_usernames(self, username: SLT[str]) -> None:
+            """
+            Remove one or more sender chats from allowed usernames.
+
+            Args:
+                username(:class:`telegram.utils.types.SLT[str]`, optional):
+                    Which sender chat username(s) to disallow through.
+                    Leading '@'s in usernames will be discarded.
+            """
+            return super().remove_usernames(username)
+
+        def remove_chat_ids(self, chat_id: SLT[int]) -> None:
+            """
+            Remove one or more sender chats from allowed chat ids.
+
+            Args:
+                chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                    Which sender chat ID(s) to disallow through.
+            """
+            return super().remove_chat_ids(chat_id)
+
+        class _SuperGroup(MessageFilter):
+            def filter(self, message: Message) -> bool:
+                if message.sender_chat:
+                    return message.sender_chat.type == Chat.SUPERGROUP
+                return False
+
+        class _Channel(MessageFilter):
+            def filter(self, message: Message) -> bool:
+                if message.sender_chat:
+                    return message.sender_chat.type == Chat.CHANNEL
+                return False
+
+        super_group = _SuperGroup()
+        channel = _Channel()
 
     class _Invoice(MessageFilter):
         name = 'Filters.invoice'
@@ -1848,6 +1824,8 @@ officedocument.wordprocessingml.document")``-
         dice = _DiceEmoji('🎲', 'dice')
         darts = _DiceEmoji('🎯', 'darts')
         basketball = _DiceEmoji('🏀', 'basketball')
+        football = _DiceEmoji('⚽')
+        slot_machine = _DiceEmoji('🎰')
 
     dice = _Dice()
     """Dice Messages. If an integer or a list of integers is passed, it filters messages to only
@@ -1875,6 +1853,10 @@ officedocument.wordprocessingml.document")``-
         darts: Dice messages with the emoji 🎯. Passing a list of integers is supported just as for
             :attr:`Filters.dice`.
         basketball: Dice messages with the emoji 🏀. Passing a list of integers is supported just
+            as for :attr:`Filters.dice`.
+        football: Dice messages with the emoji ⚽. Passing a list of integers is supported just
+            as for :attr:`Filters.dice`.
+        slot_machine: Dice messages with the emoji 🎰. Passing a list of integers is supported just
             as for :attr:`Filters.dice`.
     """
 

@@ -25,9 +25,10 @@ from telegram import ChatPhoto, TelegramObject, constants
 from telegram.utils.types import JSONDict
 
 from .chatpermissions import ChatPermissions
+from .chatlocation import ChatLocation
 
 if TYPE_CHECKING:
-    from telegram import Bot, ChatMember, Message
+    from telegram import Bot, ChatMember, Message, MessageId
 
 
 class Chat(TelegramObject):
@@ -44,10 +45,12 @@ class Chat(TelegramObject):
         first_name (:obj:`str`): Optional. First name of the other party in a private chat.
         last_name (:obj:`str`): Optional. Last name of the other party in a private chat.
         photo (:class:`telegram.ChatPhoto`): Optional. Chat photo.
+        bio (:obj:`str`): Optional. Bio of the other party in a private chat. Returned only in
+            :meth:`telegram.Bot.get_chat`.
         description (:obj:`str`): Optional. Description, for groups, supergroups and channel chats.
         invite_link (:obj:`str`): Optional. Chat invite link, for supergroups and channel chats.
-        pinned_message (:class:`telegram.Message`): Optional. Pinned message, for supergroups.
-            Returned only in :meth:`telegram.Bot.get_chat`.
+        pinned_message (:class:`telegram.Message`): Optional. The most recent pinned message
+            (by sending date). Returned only in :meth:`telegram.Bot.get_chat`.
         permissions (:class:`telegram.ChatPermissions`): Optional. Default chat member permissions,
             for groups and supergroups. Returned only in :meth:`telegram.Bot.get_chat`.
         slow_mode_delay (:obj:`int`): Optional. For supergroups, the minimum allowed delay between
@@ -56,6 +59,11 @@ class Chat(TelegramObject):
         sticker_set_name (:obj:`str`): Optional. For supergroups, name of Group sticker set.
         can_set_sticker_set (:obj:`bool`): Optional. :obj:`True`, if the bot can change group the
             sticker set.
+        linked_chat_id (:obj:`int`): Optional. Unique identifier for the linked chat, i.e. the
+            discussion group identifier for a channel and vice versa; for supergroups and channel
+            chats. Returned only in :meth:`telegram.Bot.get_chat`.
+        location (:class:`telegram.ChatLocation`): Optional. For supergroups, the location to which
+            the supergroup is connected. Returned only in :meth:`telegram.Bot.get_chat`.
 
     Args:
         id (:obj:`int`): Unique identifier for this chat. This number may be greater than 32 bits
@@ -71,14 +79,16 @@ class Chat(TelegramObject):
         last_name(:obj:`str`, optional): Last name of the other party in a private chat.
         photo (:class:`telegram.ChatPhoto`, optional): Chat photo.
             Returned only in :meth:`telegram.Bot.get_chat`.
+        bio (:obj:`str`, optional): Bio of the other party in a private chat. Returned only in
+            :meth:`telegram.Bot.get_chat`.
         description (:obj:`str`, optional): Description, for groups, supergroups and channel chats.
             Returned only in :meth:`telegram.Bot.get_chat`.
         invite_link (:obj:`str`, optional): Chat invite link, for groups, supergroups and channel
             chats. Each administrator in a chat generates their own invite links, so the bot must
             first generate the link using ``export_chat_invite_link()``. Returned only
             in :meth:`telegram.Bot.get_chat`.
-        pinned_message (:class:`telegram.Message`, optional): Pinned message, for groups,
-            supergroups and channels. Returned only in :meth:`telegram.Bot.get_chat`.
+        pinned_message (:class:`telegram.Message`, optional): The most recent pinned message
+            (by sending date). Returned only in :meth:`telegram.Bot.get_chat`.
         permissions (:class:`telegram.ChatPermissions`): Optional. Default chat member permissions,
             for groups and supergroups. Returned only in :meth:`telegram.Bot.get_chat`.
         slow_mode_delay (:obj:`int`, optional): For supergroups, the minimum allowed delay between
@@ -89,6 +99,11 @@ class Chat(TelegramObject):
             Returned only in :meth:`telegram.Bot.get_chat`.
         can_set_sticker_set (:obj:`bool`, optional): :obj:`True`, if the bot can change group the
             sticker set. Returned only in :meth:`telegram.Bot.get_chat`.
+        linked_chat_id (:obj:`int`, optional): Unique identifier for the linked chat, i.e. the
+            discussion group identifier for a channel and vice versa; for supergroups and channel
+            chats. Returned only in :meth:`telegram.Bot.get_chat`.
+        location (:class:`telegram.ChatLocation`, optional): For supergroups, the location to which
+            the supergroup is connected. Returned only in :meth:`telegram.Bot.get_chat`.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
@@ -119,6 +134,9 @@ class Chat(TelegramObject):
         sticker_set_name: str = None,
         can_set_sticker_set: bool = None,
         slow_mode_delay: int = None,
+        bio: str = None,
+        linked_chat_id: int = None,
+        location: ChatLocation = None,
         **_kwargs: Any,
     ):
         # Required
@@ -132,6 +150,7 @@ class Chat(TelegramObject):
         # TODO: Remove (also from tests), when Telegram drops this completely
         self.all_members_are_administrators = _kwargs.get('all_members_are_administrators')
         self.photo = photo
+        self.bio = bio
         self.description = description
         self.invite_link = invite_link
         self.pinned_message = pinned_message
@@ -139,6 +158,8 @@ class Chat(TelegramObject):
         self.slow_mode_delay = slow_mode_delay
         self.sticker_set_name = sticker_set_name
         self.can_set_sticker_set = can_set_sticker_set
+        self.linked_chat_id = linked_chat_id
+        self.location = location
 
         self.bot = bot
         self._id_attrs = (self.id,)
@@ -150,21 +171,6 @@ class Chat(TelegramObject):
         if self.username:
             return f"https://t.me/{self.username}"
         return None
-
-    @property
-    def is_anonymous_admin(self) -> bool:
-        """:obj:`bool`: Convenience property. Returns :obj:`True`, if this chat is with is the bot
-        representing anonymous admins. This behaviour is undocumented and might be changed
-        by Telegram."""
-
-        return self.id == constants.ANONYMOUS_ADMIN_ID
-
-    @property
-    def is_service_chat(self) -> bool:
-        """:obj:`bool`: Convenience property. Returns :obj:`True`, if this chat is the Telegram
-        service chat. This behaviour is undocumented and might be changed by Telegram."""
-
-        return self.id == constants.SERVICE_CHAT_ID
 
     @classmethod
     def de_json(cls, data: JSONDict, bot: 'Bot') -> Optional['Chat']:
@@ -178,6 +184,7 @@ class Chat(TelegramObject):
 
         data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
         data['permissions'] = ChatPermissions.de_json(data.get('permissions'), bot)
+        data['location'] = ChatLocation.de_json(data.get('location'), bot)
 
         return cls(bot=bot, **data)
 
@@ -276,6 +283,45 @@ class Chat(TelegramObject):
 
         """
         return self.bot.set_chat_administrator_custom_title(self.id, *args, **kwargs)
+
+    def pin_message(self, *args: Any, **kwargs: Any) -> bool:
+        """Shortcut for::
+
+             bot.pin_chat_message(chat_id=update.effective_chat.id,
+                                  *args,
+                                  **kwargs)
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.pin_chat_message(self.id, *args, **kwargs)
+
+    def unpin_message(self, *args: Any, **kwargs: Any) -> bool:
+        """Shortcut for::
+
+             bot.unpin_chat_message(chat_id=update.effective_chat.id,
+                                    *args,
+                                    **kwargs)
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.unpin_chat_message(self.id, *args, **kwargs)
+
+    def unpin_all_messages(self, *args: Any, **kwargs: Any) -> bool:
+        """Shortcut for::
+
+             bot.unpin_all_chat_messages(chat_id=update.effective_chat.id,
+                                         *args,
+                                         **kwargs)
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.unpin_all_chat_messages(chat_id=self.id, *args, **kwargs)
 
     def send_message(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::
@@ -477,3 +523,25 @@ class Chat(TelegramObject):
 
         """
         return self.bot.send_poll(self.id, *args, **kwargs)
+
+    def send_copy(self, *args: Any, **kwargs: Any) -> 'MessageId':
+        """Shortcut for::
+
+            bot.copy_message(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.copy_message(chat_id=self.id, *args, **kwargs)
+
+    def copy_message(self, *args: Any, **kwargs: Any) -> 'MessageId':
+        """Shortcut for::
+
+            bot.copy_message(from_chat_id=update.effective_chat.id, *args, **kwargs)
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.copy_message(from_chat_id=self.id, *args, **kwargs)

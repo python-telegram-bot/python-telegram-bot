@@ -47,12 +47,13 @@ from telegram import (
     Video,
     VideoNote,
     Voice,
+    ProximityAlertTriggered,
 )
 from telegram.utils.helpers import escape_markdown, from_timestamp, to_timestamp
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
-    from telegram import Bot, GameHighScore, InputMedia
+    from telegram import Bot, GameHighScore, InputMedia, MessageId
 
 _UNDEFINED = object()
 
@@ -70,11 +71,15 @@ class Message(TelegramObject):
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
         from_user (:class:`telegram.User`): Optional. Sender.
+        sender_chat (:class:`telegram.Chat`): Optional. Sender of the message, sent on behalf of a
+            chat. The channel itself for channel messages. The supergroup itself for messages from
+            anonymous group administrators. The linked channel for messages automatically forwarded
+            to the discussion group.
         date (:class:`datetime.datetime`): Date the message was sent.
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
         forward_from (:class:`telegram.User`): Optional. Sender of the original message.
-        forward_from_chat (:class:`telegram.Chat`): Optional. Information about the original
-            channel.
+        forward_from_chat (:class:`telegram.Chat`): Optional. For messages forwarded from channels
+            or from anonymous administrators, information about the original sender chat.
         forward_from_message_id (:obj:`int`): Optional. Identifier of the original message in the
             channel.
         forward_date (:class:`datetime.datetime`): Optional. Date the original message was sent.
@@ -134,13 +139,16 @@ class Message(TelegramObject):
             forwarded from channels.
         forward_sender_name	(:obj:`str`): Optional. Sender's name for messages forwarded from users
             who disallow adding a link to their account in forwarded messages.
-        author_signature (:obj:`str`): Optional. Signature of the post author for messages
-            in channels.
+        author_signature (:obj:`str`): Optional. Signature of the post author for messages in
+            channels, or the custom title of an anonymous group administrator.
         passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data.
         poll (:class:`telegram.Poll`): Optional. Message is a native poll,
             information about the poll.
         dice (:class:`telegram.Dice`): Optional. Message is a dice.
         via_bot (:class:`telegram.User`): Optional. Bot through which the message was sent.
+        proximity_alert_triggered (:class:`telegram.ProximityAlertTriggered`): Optional. Service
+            message. A user in the chat triggered another user's proximity alert while sharing
+            Live Location.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
@@ -149,13 +157,17 @@ class Message(TelegramObject):
         message_id (:obj:`int`): Unique message identifier inside this chat.
         from_user (:class:`telegram.User`, optional): Sender, empty for messages sent
             to channels.
+        sender_chat (:class:`telegram.Chat`, optional): Sender of the message, sent on behalf of a
+            chat. The channel itself for channel messages. The supergroup itself for messages from
+            anonymous group administrators. The linked channel for messages automatically forwarded
+            to the discussion group.
         date (:class:`datetime.datetime`): Date the message was sent in Unix time. Converted to
             :class:`datetime.datetime`.
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
         forward_from (:class:`telegram.User`, optional): For forwarded messages, sender of
             the original message.
-        forward_from_chat (:class:`telegram.Chat`, optional): For messages forwarded from a
-            channel, information about the original channel.
+        forward_from_chat (:class:`telegram.Chat`, optional): For messages forwarded from channels
+            or from anonymous administrators, information about the original sender chat.
         forward_from_message_id (:obj:`int`, optional): For forwarded channel posts, identifier of
             the original message in the channel.
         forward_sender_name	(:obj:`str`, optional): Sender's name for messages forwarded from users
@@ -242,13 +254,16 @@ class Message(TelegramObject):
             has logged in.
         forward_signature (:obj:`str`, optional): For messages forwarded from channels, signature
             of the post author if present.
-        author_signature (:obj:`str`, optional): Signature of the post author for messages
-            in channels.
+        author_signature (:obj:`str`, optional):  Signature of the post author for messages in
+            channels, or the custom title of an anonymous group administrator.
         passport_data (:class:`telegram.PassportData`, optional): Telegram Passport data.
         poll (:class:`telegram.Poll`, optional): Message is a native poll,
             information about the poll.
         dice (:class:`telegram.Dice`, optional): Message is a dice with random value from 1 to 6.
         via_bot (:class:`telegram.User`, optional): Message was sent through an inline bot.
+        proximity_alert_triggered (:class:`telegram.ProximityAlertTriggered`, optional): Service
+            message. A user in the chat triggered another user's proximity alert while sharing
+            Live Location.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. ``login_url`` buttons are represented as ordinary url buttons.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
@@ -290,6 +305,7 @@ class Message(TelegramObject):
         'poll',
         'dice',
         'passport_data',
+        'proximity_alert_triggered',
     ] + ATTACHMENT_TYPES
 
     def __init__(
@@ -344,14 +360,17 @@ class Message(TelegramObject):
         bot: 'Bot' = None,
         dice: Dice = None,
         via_bot: User = None,
+        proximity_alert_triggered: ProximityAlertTriggered = None,
+        sender_chat: Chat = None,
         **_kwargs: Any,
     ):
         # Required
         self.message_id = int(message_id)
+        # Optionals
         self.from_user = from_user
+        self.sender_chat = sender_chat
         self.date = date
         self.chat = chat
-        # Optionals
         self.forward_from = forward_from
         self.forward_from_chat = forward_from_chat
         self.forward_date = forward_date
@@ -396,6 +415,7 @@ class Message(TelegramObject):
         self.poll = poll
         self.dice = dice
         self.via_bot = via_bot
+        self.proximity_alert_triggered = proximity_alert_triggered
         self.reply_markup = reply_markup
         self.bot = bot
 
@@ -427,6 +447,7 @@ class Message(TelegramObject):
             return None
 
         data['from_user'] = User.de_json(data.get('from'), bot)
+        data['sender_chat'] = Chat.de_json(data.get('sender_chat'), bot)
         data['date'] = from_timestamp(data['date'])
         data['chat'] = Chat.de_json(data.get('chat'), bot)
         data['entities'] = MessageEntity.de_list(data.get('entities'), bot)
@@ -458,6 +479,9 @@ class Message(TelegramObject):
         data['poll'] = Poll.de_json(data.get('poll'), bot)
         data['dice'] = Dice.de_json(data.get('dice'), bot)
         data['via_bot'] = User.de_json(data.get('via_bot'), bot)
+        data['proximity_alert_triggered'] = ProximityAlertTriggered.de_json(
+            data.get('proximity_alert_triggered'), bot
+        )
         data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
 
         return cls(bot=bot, **data)
@@ -924,6 +948,42 @@ class Message(TelegramObject):
             chat_id=chat_id, from_chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs
         )
 
+    def copy(self, chat_id: int, *args: Any, **kwargs: Any) -> 'MessageId':
+        """Shortcut for::
+
+            bot.copy_message(chat_id=chat_id,
+                             from_chat_id=update.message.chat_id,
+                             message_id=update.message.message_id,
+                             *args,
+                             **kwargs)
+
+        Returns:
+            :class:`telegram.MessageId`: On success, returns the MessageId of the sent message.
+
+        """
+        return self.bot.copy_message(
+            chat_id=chat_id, from_chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs
+        )
+
+    def reply_copy(
+        self, from_chat_id: int, message_id: int, *args: Any, **kwargs: Any
+    ) -> 'MessageId':
+        """Shortcut for::
+
+            bot.copy_message(chat_id=message.chat.id,
+                             from_chat_id=from_chat_id,
+                             message_id=message_id,
+                             *args,
+                             **kwargs)
+
+        Returns:
+            :class:`telegram.MessageId`: On success, returns the MessageId of the sent message.
+
+        """
+        return self.bot.copy_message(
+            chat_id=self.chat_id, from_chat_id=from_chat_id, message_id=message_id, *args, **kwargs
+        )
+
     def edit_text(self, *args: Any, **kwargs: Any) -> Union['Message', bool]:
         """Shortcut for::
 
@@ -1136,10 +1196,26 @@ class Message(TelegramObject):
                                   **kwargs)
 
         Returns:
-            :obj:`True`: On success.
+            :obj:`bool`: On success, :obj:`True` is returned.
 
         """
         return self.bot.pin_chat_message(
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs
+        )
+
+    def unpin(self, *args: Any, **kwargs: Any) -> bool:
+        """Shortcut for::
+
+             bot.unpin_chat_message(chat_id=message.chat_id,
+                                    message_id=message.message_id,
+                                    *args,
+                                    **kwargs)
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.unpin_chat_message(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs
         )
 

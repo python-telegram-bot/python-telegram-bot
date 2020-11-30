@@ -34,23 +34,52 @@ class InputLocationMessageContent(InputMessageContent):
     Attributes:
         latitude (:obj:`float`): Latitude of the location in degrees.
         longitude (:obj:`float`): Longitude of the location in degrees.
+        horizontal_accuracy (:obj:`float`): Optional. The radius of uncertainty for the location,
+            measured in meters.
         live_period	(:obj:`int`): Optional. Period in seconds for which the location can be
             updated.
+        heading (:obj:`int`): Optional. For live locations, a direction in which the user is
+            moving, in degrees.
+        proximity_alert_radius (:obj:`int`): Optional. For live locations, a maximum distance for
+            proximity alerts about approaching another chat member, in meters.
 
     Args:
         latitude (:obj:`float`): Latitude of the location in degrees.
         longitude (:obj:`float`): Longitude of the location in degrees.
+        horizontal_accuracy (:obj:`float`, optional): The radius of uncertainty for the location,
+            measured in meters; 0-1500.
         live_period	(:obj:`int`, optional): Period in seconds for which the location can be
             updated, should be between 60 and 86400.
+        heading (:obj:`int`, optional): For live locations, a direction in which the user is
+            moving, in degrees. Must be between 1 and 360 if specified.
+        proximity_alert_radius (:obj:`int`, optional): For live locations, a maximum distance for
+            proximity alerts about approaching another chat member, in meters. Must be between 1
+            and 100000 if specified.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
     # fmt: on
 
-    def __init__(self, latitude: float, longitude: float, live_period: int = None, **_kwargs: Any):
+    def __init__(
+        self,
+        latitude: float,
+        longitude: float,
+        live_period: int = None,
+        horizontal_accuracy: float = None,
+        heading: int = None,
+        proximity_alert_radius: int = None,
+        **_kwargs: Any,
+    ):
         # Required
         self.latitude = latitude
         self.longitude = longitude
-        self.live_period = live_period
+
+        # Optionals
+        self.live_period = int(live_period) if live_period else None
+        self.horizontal_accuracy = float(horizontal_accuracy) if horizontal_accuracy else None
+        self.heading = int(heading) if heading else None
+        self.proximity_alert_radius = (
+            int(proximity_alert_radius) if proximity_alert_radius else None
+        )
 
         self._id_attrs = (self.latitude, self.longitude)

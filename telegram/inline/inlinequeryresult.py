@@ -22,6 +22,7 @@
 from typing import Any
 
 from telegram import TelegramObject
+from telegram.utils.types import JSONDict
 
 
 class InlineQueryResult(TelegramObject):
@@ -55,3 +56,17 @@ class InlineQueryResult(TelegramObject):
     @property
     def _has_input_message_content(self) -> bool:
         return hasattr(self, 'input_message_content')
+
+    def to_dict(self) -> JSONDict:
+        data = super().to_dict()
+
+        # pylint: disable=E1101
+        if (
+            hasattr(self, 'caption_entities')
+            and self.caption_entities  # type: ignore[attr-defined]
+        ):
+            data['caption_entities'] = [
+                ce.to_dict() for ce in self.caption_entities  # type: ignore[attr-defined]
+            ]
+
+        return data
