@@ -316,6 +316,21 @@ class TestHelpers:
         assert parsed.attach
         assert parsed.filename == 'test_file'
 
+    def test_parse_file_input_bytes(self):
+        with open('tests/data/text_file.txt', 'rb') as file:
+            parsed = helpers.parse_file_input(file.read())
+
+        assert isinstance(parsed, InputFile)
+        assert not parsed.attach
+        assert parsed.filename == 'application.octet-stream'
+
+        with open('tests/data/text_file.txt', 'rb') as file:
+            parsed = helpers.parse_file_input(file.read(), attach=True, filename='test_file')
+
+        assert isinstance(parsed, InputFile)
+        assert parsed.attach
+        assert parsed.filename == 'test_file'
+
     def test_parse_file_input_tg_object(self):
         animation = Animation('file_id', 'unique_id', 1, 1, 1)
         assert helpers.parse_file_input(animation, Animation) == 'file_id'

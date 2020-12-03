@@ -450,16 +450,22 @@ class TestSendMediaGroup:
         self, bot, chat_id, video_file, photo_file, animation_file  # noqa: F811
     ):  # noqa: F811
         def func():
-            return bot.send_media_group(
-                chat_id, [InputMediaVideo(video_file), InputMediaPhoto(photo_file)]
-            )
+            with open('tests/data/telegram.jpg', 'rb') as file:
+                return bot.send_media_group(
+                    chat_id,
+                    [
+                        InputMediaVideo(video_file),
+                        InputMediaPhoto(photo_file),
+                        InputMediaPhoto(file.read()),
+                    ],
+                )
 
         messages = expect_bad_request(
             func, 'Type of file mismatch', 'Telegram did not accept the file.'
         )
 
         assert isinstance(messages, list)
-        assert len(messages) == 2
+        assert len(messages) == 3
         assert all([isinstance(mes, Message) for mes in messages])
         assert all([mes.media_group_id == messages[0].media_group_id for mes in messages])
 

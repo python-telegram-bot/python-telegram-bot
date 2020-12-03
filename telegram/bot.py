@@ -585,7 +585,7 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
-            photo (:obj:`str` | `filelike object` | :class:`pathlib.Path` | \
+            photo (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.PhotoSize`): Photo to send.
                 Pass a file_id as String to send a photo that exists on the Telegram servers
                 (recommended), pass an HTTP URL as a String for Telegram to get a photo from the
@@ -674,7 +674,7 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
-            audio (:obj:`str` | `filelike object` | :class:`pathlib.Path` | \
+            audio (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Audio`): Audio file to send.
                 Pass a file_id as String to send an audio file that exists on the Telegram servers
                 (recommended), pass an HTTP URL as a String for Telegram to get an audio file from
@@ -700,8 +700,8 @@ class Bot(TelegramObject):
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            thumb (`filelike object` | :class:`pathlib.Path`, optional): Thumbnail of the file
-                sent; can be ignored if
+            thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
+                of the file sent; can be ignored if
                 thumbnail generation for the file is supported server-side. The thumbnail should be
                 in JPEG format and less than 200 kB in size. A thumbnail's width and height should
                 not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
@@ -776,7 +776,7 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
-            document (:obj:`str` | `filelike object` | :class:`pathlib.Path` | \
+            document (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Document`): File to send.
                 Pass a file_id as String to send a file that exists on the Telegram servers
                 (recommended), pass an HTTP URL as a String for Telegram to get a file from the
@@ -803,8 +803,8 @@ class Bot(TelegramObject):
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            thumb (`filelike object` | :class:`pathlib.Path`, optional): Thumbnail of the file
-                sent; can be ignored if
+            thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
+                of the file sent; can be ignored if
                 thumbnail generation for the file is supported server-side. The thumbnail should be
                 in JPEG format and less than 200 kB in size. A thumbnail's width and height should
                 not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
@@ -869,7 +869,7 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
-            sticker (:obj:`str` | `filelike object` | :class:`pathlib.Path` | \
+            sticker (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Sticker`): Sticker to send.
                 Pass a file_id as String to send a file that exists on the Telegram servers
                 (recommended), pass an HTTP URL as a String for Telegram to get a .webp file from
@@ -945,7 +945,7 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
-            video (:obj:`str` | `filelike object` | :class:`pathlib.Path` | \
+            video (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Video`): Video file to send.
                 Pass a file_id as String to send an video file that exists on the Telegram servers
                 (recommended), pass an HTTP URL as a String for Telegram to get an video file from
@@ -973,8 +973,8 @@ class Bot(TelegramObject):
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            thumb (`filelike object` | :class:`pathlib.Path`, optional): Thumbnail of the file
-                sent; can be ignored if
+            thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
+                of the file sent; can be ignored if
                 thumbnail generation for the file is supported server-side. The thumbnail should be
                 in JPEG format and less than 200 kB in size. A thumbnail's width and height should
                 not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
@@ -1049,7 +1049,7 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
-            video_note (:obj:`str` | `filelike object` | :class:`pathlib.Path` | \
+            video_note (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.VideoNote`): Video note
                 to send. Pass a file_id as String to send a video note that exists on the Telegram
                 servers (recommended) or upload a new video using multipart/form-data. Or you can
@@ -1067,8 +1067,8 @@ class Bot(TelegramObject):
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard,
                 instructions to remove reply keyboard or to force a reply from the user.
-            thumb (`filelike object` | :class:`pathlib.Path`, optional): Thumbnail of the file
-                sent; can be ignored if
+            thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
+                of the file sent; can be ignored if
                 thumbnail generation for the file is supported server-side. The thumbnail should be
                 in JPEG format and less than 200 kB in size. A thumbnail's width and height should
                 not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
@@ -1139,7 +1139,7 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
-            animation (:obj:`str` | `filelike object` | :class:`pathlib.Path` | \
+            animation (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Animation`): Animation to
                 send. Pass a file_id as String to send an animation that exists on the Telegram
                 servers (recommended), pass an HTTP URL as a String for Telegram to get an
@@ -1148,8 +1148,8 @@ class Bot(TelegramObject):
             duration (:obj:`int`, optional): Duration of sent animation in seconds.
             width (:obj:`int`, optional): Animation width.
             height (:obj:`int`, optional): Animation height.
-            thumb (`filelike object` | :class:`pathlib.Path`, optional): Thumbnail of the file
-                sent; can be ignored if
+            thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
+                of the file sent; can be ignored if
                 thumbnail generation for the file is supported server-side. The thumbnail should be
                 in JPEG format and less than 200 kB in size. A thumbnail's width and height should
                 not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
@@ -1239,7 +1239,7 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
-            voice (:obj:`str` | `filelike object` | :class:`pathlib.Path` | \
+            voice (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Voice`): Voice file to send.
                 Pass a file_id as String to send an voice file that exists on the Telegram servers
                 (recommended), pass an HTTP URL as a String for Telegram to get an voice file from
@@ -3656,7 +3656,7 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
-            photo (`filelike object` | :class:`pathlib.Path`): New chat photo.
+            photo (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`): New chat photo.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -3946,8 +3946,8 @@ class Bot(TelegramObject):
 
         Args:
             user_id (:obj:`int`): User identifier of sticker file owner.
-            png_sticker (:obj:`str` | `filelike object` | :class:`pathlib.Path`): Png image with
-                the sticker,
+            png_sticker (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path`):
+                Png image with the sticker,
                 must be up to 512 kilobytes in size, dimensions must not exceed 512px,
                 and either width or height must be exactly 512px.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -4005,15 +4005,15 @@ class Bot(TelegramObject):
                 must end in "_by_<bot username>". <bot_username> is case insensitive.
                 1-64 characters.
             title (:obj:`str`): Sticker set title, 1-64 characters.
-            png_sticker (:obj:`str` | `filelike object` | :class:`pathlib.Path`, optional): Png
-                image with the sticker,
+            png_sticker (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path`, \
+                optional): Png image with the sticker,
                 must be up to 512 kilobytes in size, dimensions must not exceed 512px,
                 and either width or height must be exactly 512px. Pass a file_id as a String to
                 send a file that already exists on the Telegram servers, pass an HTTP URL as a
                 String for Telegram to get a file from the Internet, or upload a new one
                 using multipart/form-data.
-            tgs_sticker (:obj:`str` | `filelike object` | :class:`pathlib.Path`, optional): TGS
-                animation with the sticker,
+            tgs_sticker (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path`, \
+                optional): TGS animation with the sticker,
                 uploaded using multipart/form-data. See
                 https://core.telegram.org/animated_stickers#technical-requirements for technical
                 requirements.
@@ -4082,15 +4082,15 @@ class Bot(TelegramObject):
         Args:
             user_id (:obj:`int`): User identifier of created sticker set owner.
             name (:obj:`str`): Sticker set name.
-            png_sticker (:obj:`str` | `filelike object` | :class:`pathlib.Path`, optional): PNG
-                image with the sticker,
+            png_sticker (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path`, \
+                optional): PNG image with the sticker,
                 must be up to 512 kilobytes in size, dimensions must not exceed 512px,
                 and either width or height must be exactly 512px. Pass a file_id as a String to
                 send a file that already exists on the Telegram servers, pass an HTTP URL as a
                 String for Telegram to get a file from the Internet, or upload a new one
                 using multipart/form-data.
-            tgs_sticker (:obj:`str` | `filelike object` | :class:`pathlib.Path`, optional): TGS
-                animation with the sticker,
+            tgs_sticker (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path`, \
+                optional): TGS animation with the sticker,
                 uploaded using multipart/form-data. See
                 https://core.telegram.org/animated_stickers#technical-requirements for technical
                 requirements.
@@ -4200,8 +4200,8 @@ class Bot(TelegramObject):
         Args:
             name (:obj:`str`): Sticker set name
             user_id (:obj:`int`): User identifier of created sticker set owner.
-            thumb (:obj:`str` | `filelike object` | :class:`pathlib.Path`, optional): A PNG image
-                with the thumbnail, must
+            thumb (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path`, \
+                optional): A PNG image with the thumbnail, must
                 be up to 128 kilobytes in size and have width and height exactly 100px, or a TGS
                 animation with the thumbnail up to 32 kilobytes in size; see
                 https://core.telegram.org/animated_stickers#technical-requirements for animated

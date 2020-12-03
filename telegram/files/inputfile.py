@@ -39,7 +39,8 @@ class InputFile:
         attach (:obj:`str`): Optional. Attach id for sending multiple files.
 
     Args:
-        obj (:obj:`File handler` | :obj:`bytes`): An open file descriptor.
+        obj (:obj:`File handler` | :obj:`bytes`): An open file descriptor or the files content as
+            bytes.
         filename (:obj:`str`, optional): Filename for this InputFile.
         attach (:obj:`bool`, optional): Whether this should be send as one file or is part of a
             collection of files.
@@ -102,8 +103,6 @@ class InputFile:
 
     @staticmethod
     def is_file(obj: object) -> bool:
-        if isinstance(obj, bytes):
-            return True
         return hasattr(obj, 'read')
 
     def to_dict(self) -> Optional[str]:

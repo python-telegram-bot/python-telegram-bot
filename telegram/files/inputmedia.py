@@ -73,13 +73,13 @@ class InputMediaAnimation(InputMedia):
 
 
     Args:
-        media (:obj:`str` | `filelike object` | :class:`pathlib.Path` | \
+        media (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
             :class:`telegram.Animation`): File to send. Pass a
             file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP
             URL for Telegram to get a file from the Internet. Lastly you can pass an existing
             :class:`telegram.Animation` object to send.
-        thumb (`filelike object` | :class:`pathlib.Path`, optional): Thumbnail of the file sent;
-            can be ignored if
+        thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail of
+            the file sent; can be ignored if
             thumbnail generation for the file is supported server-side. The thumbnail should be
             in JPEG format and less than 200 kB in size. A thumbnail's width and height should
             not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
@@ -149,7 +149,7 @@ class InputMediaPhoto(InputMedia):
             entities that appear in the caption.
 
     Args:
-        media (:obj:`str` | `filelike object` | :class:`pathlib.Path` | \
+        media (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
             :class:`telegram.PhotoSize`): File to send. Pass a
             file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP
             URL for Telegram to get a file from the Internet. Lastly you can pass an existing
@@ -197,8 +197,8 @@ class InputMediaVideo(InputMedia):
         thumb (:class:`telegram.InputFile`): Optional. Thumbnail of the file to send.
 
     Args:
-        media (:obj:`str` | `filelike object` | :class:`pathlib.Path` | :class:`telegram.Video`):
-            File to send. Pass a
+        media (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
+            :class:`telegram.Video`): File to send. Pass a
             file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP
             URL for Telegram to get a file from the Internet. Lastly you can pass an existing
             :class:`telegram.Video` object to send.
@@ -214,8 +214,8 @@ class InputMediaVideo(InputMedia):
         duration (:obj:`int`, optional): Video duration.
         supports_streaming (:obj:`bool`, optional): Pass :obj:`True`, if the uploaded video is
             suitable for streaming.
-        thumb (`filelike object` | :class:`pathlib.Path`, optional): Thumbnail of the file sent;
-            can be ignored if
+        thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail of
+            the file sent; can be ignored if
             thumbnail generation for the file is supported server-side. The thumbnail should be
             in JPEG format and less than 200 kB in size. A thumbnail's width and height should
             not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
@@ -286,7 +286,8 @@ class InputMediaAudio(InputMedia):
         thumb (:class:`telegram.InputFile`): Optional. Thumbnail of the file to send.
 
     Args:
-        media (:obj:`str` | `filelike object` | :class:`pathlib.Path` | :class:`telegram.Audio`):
+        media (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
+            :class:`telegram.Audio`):
             File to send. Pass a
             file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP
             URL for Telegram to get a file from the Internet. Lastly you can pass an existing
@@ -302,8 +303,8 @@ class InputMediaAudio(InputMedia):
         performer (:obj:`str`, optional): Performer of the audio as defined by sender or by audio
             tags.
         title (:obj:`str`, optional): Title of the audio as defined by sender or by audio tags.
-        thumb (`filelike object` | :class:`pathlib.Path`, optional): Thumbnail of the file sent;
-            can be ignored if
+        thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail of
+            the file sent; can be ignored if
             thumbnail generation for the file is supported server-side. The thumbnail should be
             in JPEG format and less than 200 kB in size. A thumbnail's width and height should
             not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
@@ -367,7 +368,7 @@ class InputMediaDocument(InputMedia):
             the document is sent as part of an album.
 
     Args:
-        media (:obj:`str` | `filelike object` | :class:`pathlib.Path` | \
+        media (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
             :class:`telegram.Document`): File to send. Pass a
             file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP
             URL for Telegram to get a file from the Internet. Lastly you can pass an existing
@@ -379,8 +380,8 @@ class InputMediaDocument(InputMedia):
             in :class:`telegram.ParseMode` for the available modes.
         caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
             entities that appear in the caption, which can be specified instead of parse_mode.
-        thumb (`filelike object` | :class:`pathlib.Path`, optional): Thumbnail of the file sent;
-            can be ignored if
+        thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail of
+            the file sent; can be ignored if
             thumbnail generation for the file is supported server-side. The thumbnail should be
             in JPEG format and less than 200 kB in size. A thumbnail's width and height should
             not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
