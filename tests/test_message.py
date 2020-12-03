@@ -990,12 +990,20 @@ class TestMessage:
                 reply_markup = kwargs['reply_markup'] is keyboard
             else:
                 reply_markup = True
-            return chat_id and from_chat and message_id and notification and reply_markup
+            if kwargs.get('reply_to_message_id'):
+                reply = kwargs['reply_to_message_id'] == message.message_id
+            else:
+                reply = True
+            return chat_id and from_chat and message_id and notification and reply_markup and reply
 
         monkeypatch.setattr(message.bot, 'copy_message', test)
         assert message.reply_copy(123456, 456789)
         assert message.reply_copy(123456, 456789, disable_notification=True)
         assert message.reply_copy(123456, 456789, reply_markup=keyboard)
+        assert message.reply_copy(123456, 456789, quote=True)
+        assert message.reply_copy(
+            123456, 456789, quote=True, reply_to_message_id=message.message_id
+        )
 
     def test_edit_text(self, monkeypatch, message):
         def test(*args, **kwargs):

@@ -980,6 +980,7 @@ class Message(TelegramObject):
             :class:`telegram.MessageId`: On success, returns the MessageId of the sent message.
 
         """
+        self._quote(kwargs)
         return self.bot.copy_message(
             chat_id=self.chat_id, from_chat_id=from_chat_id, message_id=message_id, *args, **kwargs
         )
