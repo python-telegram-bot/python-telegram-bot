@@ -976,6 +976,12 @@ class Message(TelegramObject):
                              *args,
                              **kwargs)
 
+        Keyword Args:
+            quote (:obj:`bool`, optional): If set to :obj:`True`, the copy is sent as an actual
+                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
+                this parameter will be ignored. Default: :obj:`True` in group chats and
+                :obj:`False` in private chats.
+
         Returns:
             :class:`telegram.MessageId`: On success, returns the MessageId of the sent message.
 
