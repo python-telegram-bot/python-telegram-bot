@@ -111,7 +111,7 @@ def parse_file_input(
         return file_input
     if isinstance(file_input, (str, Path)):
         if is_local_file(file_input):
-            out = f'file://{Path(file_input).absolute()}'
+            out = Path(file_input).absolute().as_uri()
         else:
             out = file_input  # type: ignore[assignment]
         return out
