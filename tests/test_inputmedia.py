@@ -173,8 +173,8 @@ class TestInputMediaVideo:
         input_media_video = InputMediaVideo(
             'tests/data/telegram.mp4', thumb='tests/data/telegram.jpg'
         )
-        assert input_media_video.media == f"file://{Path.cwd() / 'tests/data/telegram.mp4'}"
-        assert input_media_video.thumb == f"file://{Path.cwd() / 'tests/data/telegram.jpg'}"
+        assert input_media_video.media == (Path.cwd() / 'tests/data/telegram.mp4/').as_uri()
+        assert input_media_video.thumb == (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
 
 
 class TestInputMediaPhoto:
@@ -217,7 +217,7 @@ class TestInputMediaPhoto:
 
     def test_with_local_files(self):
         input_media_photo = InputMediaPhoto('tests/data/telegram.mp4')
-        assert input_media_photo.media == f"file://{Path.cwd() / 'tests/data/telegram.mp4'}"
+        assert input_media_photo.media == (Path.cwd() / 'tests/data/telegram.mp4/').as_uri()
 
 
 class TestInputMediaAnimation:
@@ -269,12 +269,8 @@ class TestInputMediaAnimation:
         input_media_animation = InputMediaAnimation(
             'tests/data/telegram.mp4', thumb='tests/data/telegram.jpg'
         )
-        assert input_media_animation.media == 'file://' + str(
-            Path.cwd() / 'tests/data/telegram.mp4'
-        )
-        assert input_media_animation.thumb == 'file://' + str(
-            Path.cwd() / 'tests/data/telegram.jpg'
-        )
+        assert input_media_animation.media == (Path.cwd() / 'tests/data/telegram.mp4').as_uri()
+        assert input_media_animation.thumb == (Path.cwd() / 'tests/data/telegram.jpg').as_uri()
 
 
 class TestInputMediaAudio:
@@ -332,8 +328,8 @@ class TestInputMediaAudio:
         input_media_audio = InputMediaAudio(
             'tests/data/telegram.mp4', thumb='tests/data/telegram.jpg'
         )
-        assert input_media_audio.media == f"file://{Path.cwd() / 'tests/data/telegram.mp4'}"
-        assert input_media_audio.thumb == f"file://{Path.cwd() / 'tests/data/telegram.jpg'}"
+        assert input_media_audio.media == (Path.cwd() / 'tests/data/telegram.mp4/').as_uri()
+        assert input_media_audio.thumb == (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
 
 
 class TestInputMediaDocument:
@@ -388,12 +384,8 @@ class TestInputMediaDocument:
         input_media_document = InputMediaDocument(
             'tests/data/telegram.mp4', thumb='tests/data/telegram.jpg'
         )
-        assert input_media_document.media == 'file://' + str(
-            Path.cwd() / 'tests/data/telegram.mp4'
-        )
-        assert input_media_document.thumb == 'file://' + str(
-            Path.cwd() / 'tests/data/telegram.jpg'
-        )
+        assert input_media_document.media == (Path.cwd() / 'tests/data/telegram.mp4').as_uri()
+        assert input_media_document.thumb == (Path.cwd() / 'tests/data/telegram.jpg').as_uri()
 
 
 @pytest.fixture(scope='function')  # noqa: F811

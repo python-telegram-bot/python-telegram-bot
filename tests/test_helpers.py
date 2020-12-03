@@ -279,17 +279,17 @@ class TestHelpers:
     @pytest.mark.parametrize(
         'string,expected',
         [
-            ('tests/data/game.gif', f"file://{Path.cwd() / 'tests' / 'data' / 'game.gif'}"),
+            ('tests/data/game.gif', (Path.cwd() / 'tests' / 'data' / 'game.gif').as_uri()),
             ('tests/data', 'tests/data'),
             ('file://foobar', 'file://foobar'),
             (
                 str(Path.cwd() / 'tests' / 'data' / 'game.gif'),
-                f"file://{Path.cwd() / 'tests' / 'data' / 'game.gif'}",
+                (Path.cwd() / 'tests' / 'data' / 'game.gif').as_uri(),
             ),
             (str(Path.cwd() / 'tests' / 'data'), str(Path.cwd() / 'tests' / 'data')),
             (
                 Path.cwd() / 'tests' / 'data' / 'game.gif',
-                f"file://{Path.cwd() / 'tests' / 'data' / 'game.gif'}",
+                (Path.cwd() / 'tests' / 'data' / 'game.gif').as_uri(),
             ),
             (Path.cwd() / 'tests' / 'data', Path.cwd() / 'tests' / 'data'),
             (
