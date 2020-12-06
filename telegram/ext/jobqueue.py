@@ -409,7 +409,7 @@ class JobQueue:
             time (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
                 (``time.tzinfo``) is :obj:`None`, the default timezone of the bot will be used.
             days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should
-                run. Defaults to ``EVERY_DAY``
+                run (where ``0-6`` correspond to monday - sunday). Defaults to ``EVERY_DAY``
             context (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through ``job.context`` in the callback. Defaults to :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
