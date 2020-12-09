@@ -17,12 +17,14 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime
+import inspect
 import os
 import re
 from collections import defaultdict
 from queue import Queue
 from threading import Thread, Event
 from time import sleep
+from typing import Callable, List
 
 import pytest
 import pytz
@@ -339,3 +341,39 @@ def expect_bad_request(func, message, reason):
             pytest.xfail(f'{reason}. {e}')
         else:
             raise e
+
+
+def check_shortcut_signature(
+    shortcut: Callable,
+    bot_method: Callable,
+    shortcut_kwargs: List[str],
+    additional_kwargs: List[str],
+) -> bool:
+    """
+    Checks that the signature of a shortcut matches the signature of the underlying bot method.
+
+    Args:
+        shortcut: The shortcut, e.g. :meth:`telegram.Message.reply_text`
+        bot_method: The bot method, e.g. :meth:`telegram.Bot.send_message`
+        shortcut_kwargs: The kwargs passed by the shortcut directly, e.g. ``chat_id``
+        additional_kwargs: Additional kwargs of the shortcut that the bot method doesn't have, e.g.
+            ``quote``.
+
+    Returns:
+        :obj:`bool`: Whether or not the signature matches.
+    """
+    shortcut_arg_spec = inspect.getfullargspec(shortcut)
+    effective_shortcut_args = set(shortcut_arg_spec.args).difference(additional_kwargs)
+    effective_shortcut_args.discard('self')
+
+    bot_arg_spec = inspect.getfullargspec(bot_method)
+    expected_args = set(bot_arg_spec.args).difference(shortcut_kwargs)
+    expected_args.discard('self')
+
+    args_check = expected_args == effective_shortcut_args
+    annotation_check = all(
+        bot_arg_spec.annotations[kwarg] == shortcut_arg_spec.annotations[kwarg]
+        for kwarg in effective_shortcut_args
+    )
+
+    return args_check and annotation_check

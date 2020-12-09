@@ -21,7 +21,7 @@
 import datetime
 import sys
 from html import escape
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, ClassVar
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, ClassVar, Tuple
 
 from telegram import (
     Animation,
@@ -48,8 +48,14 @@ from telegram import (
     VideoNote,
     Voice,
     ProximityAlertTriggered,
+    ReplyMarkup,
 )
-from telegram.utils.helpers import escape_markdown, from_timestamp, to_timestamp
+from telegram.utils.helpers import (
+    escape_markdown,
+    from_timestamp,
+    to_timestamp,
+    get_shortcut_kwargs,
+)
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -584,10 +590,47 @@ class Message(TelegramObject):
             if (default_quote is None and self.chat.type != Chat.PRIVATE) or default_quote:
                 kwargs['reply_to_message_id'] = self.message_id
 
-    def reply_text(self, *args: Any, **kwargs: Any) -> 'Message':
+    def _new_quote(
+        self, quote: Optional[bool], reply_to_message_id: Optional[Union[int, str]]
+    ) -> Optional[Union[int, str]]:
+        """Modify kwargs for replying with or without quoting."""
+        if reply_to_message_id is not None:
+            return reply_to_message_id
+
+        if quote is not None:
+            if quote:
+                return self.message_id
+
+        else:
+            if self.bot.defaults:
+                default_quote = self.bot.defaults.quote
+            else:
+                default_quote = None
+            if (default_quote is None and self.chat.type != Chat.PRIVATE) or default_quote:
+                return self.message_id
+
+        return None
+
+    def reply_text(
+        self,
+        text: str,
+        parse_mode: str = None,
+        disable_web_page_preview: bool = None,
+        disable_notification: bool = False,
+        reply_to_message_id: Union[int, str] = None,
+        reply_markup: ReplyMarkup = None,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
+        entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        quote: bool = None,
+    ) -> Optional['Message']:
+        # pylint: disable=unused-argument
         """Shortcut for::
 
             bot.send_message(update.message.chat_id, *args, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
         Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
@@ -599,8 +642,8 @@ class Message(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        self._quote(kwargs)
-        return self.bot.send_message(self.chat_id, *args, **kwargs)
+        reply_to_message_id = self._new_quote(quote, reply_to_message_id)
+        return self.bot.send_message(chat_id=self.chat_id, **get_shortcut_kwargs(locals()))
 
     def reply_markdown(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::

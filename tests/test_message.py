@@ -46,8 +46,10 @@ from telegram import (
     PollOption,
     ProximityAlertTriggered,
     Dice,
+    Bot,
 )
 from telegram.ext import Defaults
+from tests.conftest import check_shortcut_signature
 from tests.test_passport import RAW_PASSPORT_DATA
 
 
@@ -635,16 +637,20 @@ class TestMessage:
         assert message_params.effective_attachment == item
 
     def test_reply_text(self, monkeypatch, message):
-        def test(*args, **kwargs):
-            id_ = args[0] == message.chat_id
-            text = args[1] == 'test'
+        def make_assertion(*_, **kwargs):
+            id_ = kwargs['chat_id'] == message.chat_id
+            text = kwargs['text'] == 'test'
             if kwargs.get('reply_to_message_id') is not None:
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
             return id_ and text and reply
 
-        monkeypatch.setattr(message.bot, 'send_message', test)
+        assert check_shortcut_signature(
+            Message.reply_text, Bot.send_message, ['chat_id'], ['quote']
+        )
+
+        monkeypatch.setattr(message.bot, 'send_message', make_assertion)
         assert message.reply_text('test')
         assert message.reply_text('test', quote=True)
         assert message.reply_text('test', reply_to_message_id=message.message_id, quote=True)

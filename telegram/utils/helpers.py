@@ -460,6 +460,18 @@ def decode_user_chat_data_from_json(data: str) -> DefaultDict[int, Dict[Any, Any
     return tmp
 
 
+def get_shortcut_kwargs(locals_dict: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Simple helper to pass the arguments of shortcuts to the underlying bot method. Use as e.g.::
+
+        self.bot.send_message(chat_id=self.chat_id, **get_shortcut_kwargs(locals()))
+
+    Args:
+        locals_dict: The output of ``locals()``
+    """
+    return {key: value for key, value in locals_dict.items() if key != 'self'}
+
+
 class DefaultValue:
     """Wrapper for immutable default arguments that allows to check, if the default value was set
     explicitly. Usage::
