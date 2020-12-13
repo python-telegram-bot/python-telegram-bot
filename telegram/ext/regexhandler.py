@@ -22,9 +22,9 @@
 import warnings
 from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, Pattern, TypeVar, Union
 
+from telegram import Update
 from telegram.ext import Filters, MessageHandler
 from telegram.utils.deprecate import TelegramDeprecationWarning
-from telegram.utils.types import HandlerArg
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 if TYPE_CHECKING:
@@ -111,7 +111,7 @@ class RegexHandler(MessageHandler):
     def __init__(
         self,
         pattern: Union[str, Pattern],
-        callback: Callable[[HandlerArg, 'CallbackContext'], RT],
+        callback: Callable[[Update, 'CallbackContext'], RT],
         pass_groups: bool = False,
         pass_groupdict: bool = False,
         pass_update_queue: bool = False,
@@ -147,7 +147,7 @@ class RegexHandler(MessageHandler):
     def collect_optional_args(
         self,
         dispatcher: 'Dispatcher',
-        update: HandlerArg = None,
+        update: Update = None,
         check_result: Optional[Union[bool, Dict[str, Any]]] = None,
     ) -> Dict[str, Any]:
         optional_args = super().collect_optional_args(dispatcher, update, check_result)
