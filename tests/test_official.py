@@ -76,8 +76,19 @@ def check_method(h4):
     ignored = IGNORED_PARAMETERS.copy()
     if name == 'getUpdates':
         ignored -= {'timeout'}  # Has it's own timeout parameter that we do wanna check for
-    elif name == 'sendDocument':
-        ignored |= {'filename'}  # Undocumented
+    elif name in (
+        f'send{media_type}'
+        for media_type in [
+            'Animation',
+            'Audio',
+            'Document',
+            'Photo',
+            'Video',
+            'VideoNote',
+            'Voice',
+        ]
+    ):
+        ignored |= {'filename'}  # Convenience parameter
     elif name == 'setGameScore':
         ignored |= {'edit_message'}  # TODO: Now deprecated, so no longer in telegrams docs
     elif name == 'sendContact':
@@ -131,8 +142,8 @@ def check_object(h4):
         ignored |= {'credentials'}
     elif name == 'PassportElementError':
         ignored |= {'message', 'type', 'source'}
-    elif name == 'Message':
-        ignored |= {'default_quote'}
+    elif name.startswith('InputMedia'):
+        ignored |= {'filename'}  # Convenience parameter
 
     assert (sig.parameters.keys() ^ checked) - ignored == set()
 
