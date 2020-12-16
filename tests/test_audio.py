@@ -110,6 +110,16 @@ class TestAudio:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    def test_send_audio_custom_filename(self, bot, chat_id, audio_file, monkeypatch):
+        def make_assertion(url, data, **kwargs):
+            return data['audio'].filename == 'custom_filename'
+
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+
+        assert bot.send_audio(chat_id, audio_file, filename='custom_filename')
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     def test_get_and_download(self, bot, audio):
         new_file = bot.get_file(audio.file_id)
 

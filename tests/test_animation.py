@@ -98,6 +98,16 @@ class TestAnimation:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    def test_send_animation_custom_filename(self, bot, chat_id, animation_file, monkeypatch):
+        def make_assertion(url, data, **kwargs):
+            return data['animation'].filename == 'custom_filename'
+
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+
+        assert bot.send_animation(chat_id, animation_file, filename='custom_filename')
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     def test_get_and_download(self, bot, animation):
         new_file = bot.get_file(animation.file_id)
 
