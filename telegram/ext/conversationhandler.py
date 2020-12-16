@@ -35,7 +35,7 @@ from telegram.ext import (
     InlineQueryHandler,
 )
 from telegram.utils.promise import Promise
-from telegram.utils.types import ConversationDict, HandlerArg
+from telegram.utils.types import ConversationDict
 
 if TYPE_CHECKING:
     from telegram.ext import Dispatcher, Job
@@ -56,7 +56,7 @@ class _ConversationTimeoutContext:
         self.callback_context = callback_context
 
 
-class ConversationHandler(Handler):
+class ConversationHandler(Handler[Update]):
     """
     A handler to hold a conversation with a single user by managing four collections of other
     handlers.
@@ -391,13 +391,13 @@ class ConversationHandler(Handler):
 
         return tuple(key)
 
-    def check_update(self, update: HandlerArg) -> CheckUpdateType:  # pylint: disable=R0911
+    def check_update(self, update: Any) -> CheckUpdateType:  # pylint: disable=R0911
         """
         Determines whether an update should be handled by this conversationhandler, and if so in
         which state the conversation currently is.
 
         Args:
-            update (:class:`telegram.Update`): Incoming telegram update.
+            update (:class:`telegram.Update` | :obj:`object`): Incoming update.
 
         Returns:
             :obj:`bool`
@@ -487,7 +487,7 @@ class ConversationHandler(Handler):
 
     def handle_update(  # type: ignore[override]
         self,
-        update: HandlerArg,
+        update: Update,
         dispatcher: 'Dispatcher',
         check_result: CheckUpdateType,
         context: CallbackContext = None,
