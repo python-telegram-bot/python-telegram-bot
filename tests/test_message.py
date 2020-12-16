@@ -638,7 +638,7 @@ class TestMessage:
         def test(*args, **kwargs):
             id_ = args[0] == message.chat_id
             text = args[1] == 'test'
-            if kwargs.get('reply_to_message_id'):
+            if kwargs.get('reply_to_message_id') is not None:
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
@@ -661,7 +661,7 @@ class TestMessage:
             cid = args[0] == message.chat_id
             markdown_text = args[1] == test_md_string
             markdown_enabled = kwargs['parse_mode'] == ParseMode.MARKDOWN
-            if kwargs.get('reply_to_message_id'):
+            if kwargs.get('reply_to_message_id') is not None:
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
@@ -690,7 +690,7 @@ class TestMessage:
             cid = args[0] == message.chat_id
             markdown_text = args[1] == test_md_string
             markdown_enabled = kwargs['parse_mode'] == ParseMode.MARKDOWN_V2
-            if kwargs.get('reply_to_message_id'):
+            if kwargs.get('reply_to_message_id') is not None:
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
@@ -723,7 +723,7 @@ class TestMessage:
             cid = args[0] == message.chat_id
             html_text = args[1] == test_html_string
             html_enabled = kwargs['parse_mode'] == ParseMode.HTML
-            if kwargs.get('reply_to_message_id'):
+            if kwargs.get('reply_to_message_id') is not None:
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
@@ -743,7 +743,7 @@ class TestMessage:
         def test(*args, **kwargs):
             id_ = args[0] == message.chat_id
             media = kwargs['media'] == 'reply_media_group'
-            if kwargs.get('reply_to_message_id'):
+            if kwargs.get('reply_to_message_id') is not None:
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
@@ -757,7 +757,7 @@ class TestMessage:
         def test(*args, **kwargs):
             id_ = args[0] == message.chat_id
             photo = kwargs['photo'] == 'test_photo'
-            if kwargs.get('reply_to_message_id'):
+            if kwargs.get('reply_to_message_id') is not None:
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
@@ -771,7 +771,7 @@ class TestMessage:
         def test(*args, **kwargs):
             id_ = args[0] == message.chat_id
             audio = kwargs['audio'] == 'test_audio'
-            if kwargs.get('reply_to_message_id'):
+            if kwargs.get('reply_to_message_id') is not None:
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
@@ -785,7 +785,7 @@ class TestMessage:
         def test(*args, **kwargs):
             id_ = args[0] == message.chat_id
             document = kwargs['document'] == 'test_document'
-            if kwargs.get('reply_to_message_id'):
+            if kwargs.get('reply_to_message_id') is not None:
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
@@ -799,7 +799,7 @@ class TestMessage:
         def test(*args, **kwargs):
             id_ = args[0] == message.chat_id
             animation = kwargs['animation'] == 'test_animation'
-            if kwargs.get('reply_to_message_id'):
+            if kwargs.get('reply_to_message_id') is not None:
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
@@ -813,7 +813,7 @@ class TestMessage:
         def test(*args, **kwargs):
             id_ = args[0] == message.chat_id
             sticker = kwargs['sticker'] == 'test_sticker'
-            if kwargs.get('reply_to_message_id'):
+            if kwargs.get('reply_to_message_id') is not None:
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
@@ -827,7 +827,7 @@ class TestMessage:
         def test(*args, **kwargs):
             id_ = args[0] == message.chat_id
             video = kwargs['video'] == 'test_video'
-            if kwargs.get('reply_to_message_id'):
+            if kwargs.get('reply_to_message_id') is not None:
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
@@ -841,7 +841,7 @@ class TestMessage:
         def test(*args, **kwargs):
             id_ = args[0] == message.chat_id
             video_note = kwargs['video_note'] == 'test_video_note'
-            if kwargs.get('reply_to_message_id'):
+            if kwargs.get('reply_to_message_id') is not None:
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
@@ -855,7 +855,7 @@ class TestMessage:
         def test(*args, **kwargs):
             id_ = args[0] == message.chat_id
             voice = kwargs['voice'] == 'test_voice'
-            if kwargs.get('reply_to_message_id'):
+            if kwargs.get('reply_to_message_id') is not None:
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
@@ -869,7 +869,7 @@ class TestMessage:
         def test(*args, **kwargs):
             id_ = args[0] == message.chat_id
             location = kwargs['location'] == 'test_location'
-            if kwargs.get('reply_to_message_id'):
+            if kwargs.get('reply_to_message_id') is not None:
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
@@ -883,7 +883,7 @@ class TestMessage:
         def test(*args, **kwargs):
             id_ = args[0] == message.chat_id
             venue = kwargs['venue'] == 'test_venue'
-            if kwargs.get('reply_to_message_id'):
+            if kwargs.get('reply_to_message_id') is not None:
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
@@ -897,7 +897,7 @@ class TestMessage:
         def test(*args, **kwargs):
             id_ = args[0] == message.chat_id
             contact = kwargs['contact'] == 'test_contact'
-            if kwargs.get('reply_to_message_id'):
+            if kwargs.get('reply_to_message_id') is not None:
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
@@ -911,7 +911,7 @@ class TestMessage:
         def test(*args, **kwargs):
             id_ = args[0] == message.chat_id
             contact = kwargs['question'] == 'test_poll'
-            if kwargs.get('reply_to_message_id'):
+            if kwargs.get('reply_to_message_id') is not None:
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
@@ -925,7 +925,7 @@ class TestMessage:
         def test(*args, **kwargs):
             id_ = args[0] == message.chat_id
             contact = kwargs['disable_notification'] is True
-            if kwargs.get('reply_to_message_id'):
+            if kwargs.get('reply_to_message_id') is not None:
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
@@ -940,7 +940,7 @@ class TestMessage:
             chat_id = kwargs['chat_id'] == 123456
             from_chat = kwargs['from_chat_id'] == message.chat_id
             message_id = kwargs['message_id'] == message.message_id
-            if kwargs.get('disable_notification'):
+            if kwargs.get('disable_notification') is not None:
                 notification = kwargs['disable_notification'] is True
             else:
                 notification = True
@@ -958,11 +958,11 @@ class TestMessage:
             chat_id = kwargs['chat_id'] == 123456
             from_chat = kwargs['from_chat_id'] == message.chat_id
             message_id = kwargs['message_id'] == message.message_id
-            if kwargs.get('disable_notification'):
+            if kwargs.get('disable_notification') is not None:
                 notification = kwargs['disable_notification'] is True
             else:
                 notification = True
-            if kwargs.get('reply_markup'):
+            if kwargs.get('reply_markup') is not None:
                 reply_markup = kwargs['reply_markup'] is keyboard
             else:
                 reply_markup = True
@@ -982,20 +982,28 @@ class TestMessage:
             chat_id = kwargs['from_chat_id'] == 123456
             from_chat = kwargs['chat_id'] == message.chat_id
             message_id = kwargs['message_id'] == 456789
-            if kwargs.get('disable_notification'):
+            if kwargs.get('disable_notification') is not None:
                 notification = kwargs['disable_notification'] is True
             else:
                 notification = True
-            if kwargs.get('reply_markup'):
+            if kwargs.get('reply_markup') is not None:
                 reply_markup = kwargs['reply_markup'] is keyboard
             else:
                 reply_markup = True
-            return chat_id and from_chat and message_id and notification and reply_markup
+            if kwargs.get('reply_to_message_id') is not None:
+                reply = kwargs['reply_to_message_id'] == message.message_id
+            else:
+                reply = True
+            return chat_id and from_chat and message_id and notification and reply_markup and reply
 
         monkeypatch.setattr(message.bot, 'copy_message', test)
         assert message.reply_copy(123456, 456789)
         assert message.reply_copy(123456, 456789, disable_notification=True)
         assert message.reply_copy(123456, 456789, reply_markup=keyboard)
+        assert message.reply_copy(123456, 456789, quote=True)
+        assert message.reply_copy(
+            123456, 456789, quote=True, reply_to_message_id=message.message_id
+        )
 
     def test_edit_text(self, monkeypatch, message):
         def test(*args, **kwargs):

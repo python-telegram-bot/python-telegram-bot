@@ -27,9 +27,10 @@ if TYPE_CHECKING:
     from telegram.ext import CallbackContext
 
 RT = TypeVar('RT')
+UT = TypeVar('UT')
 
 
-class TypeHandler(Handler):
+class TypeHandler(Handler[UT]):
     """Handler class to handle updates of custom types.
 
     Attributes:
@@ -76,8 +77,8 @@ class TypeHandler(Handler):
 
     def __init__(
         self,
-        type: Type,  # pylint: disable=W0622
-        callback: Callable[[Any, 'CallbackContext'], RT],
+        type: Type[UT],  # pylint: disable=W0622
+        callback: Callable[[UT, 'CallbackContext'], RT],
         strict: bool = False,
         pass_update_queue: bool = False,
         pass_job_queue: bool = False,
@@ -96,7 +97,7 @@ class TypeHandler(Handler):
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
-            update (:class:`telegram.Update`): Incoming telegram update.
+            update (:obj:`object`): Incoming update.
 
         Returns:
             :obj:`bool`

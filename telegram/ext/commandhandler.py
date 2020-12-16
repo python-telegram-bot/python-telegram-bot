@@ -24,7 +24,7 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, Ty
 from telegram import MessageEntity, Update
 from telegram.ext import BaseFilter, Filters
 from telegram.utils.deprecate import TelegramDeprecationWarning
-from telegram.utils.types import HandlerArg, SLT
+from telegram.utils.types import SLT
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 from .handler import Handler
@@ -35,7 +35,7 @@ if TYPE_CHECKING:
 RT = TypeVar('RT')
 
 
-class CommandHandler(Handler):
+class CommandHandler(Handler[Update]):
     """Handler class to handle Telegram commands.
 
     Commands are Telegram messages that start with ``/``, optionally followed by an ``@`` and the
@@ -134,7 +134,7 @@ class CommandHandler(Handler):
     def __init__(
         self,
         command: SLT[str],
-        callback: Callable[[HandlerArg, 'CallbackContext'], RT],
+        callback: Callable[[Update, 'CallbackContext'], RT],
         filters: BaseFilter = None,
         allow_edited: bool = None,
         pass_args: bool = False,
@@ -177,12 +177,12 @@ class CommandHandler(Handler):
         self.pass_args = pass_args
 
     def check_update(
-        self, update: HandlerArg
+        self, update: Any
     ) -> Optional[Union[bool, Tuple[List[str], Optional[Union[bool, Dict]]]]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
-            update (:class:`telegram.Update`): Incoming telegram update.
+            update (:class:`telegram.Update` | :obj:`object`): Incoming update.
 
         Returns:
             :obj:`list`: The list of args for the handler.
@@ -218,7 +218,7 @@ class CommandHandler(Handler):
     def collect_optional_args(
         self,
         dispatcher: 'Dispatcher',
-        update: HandlerArg = None,
+        update: Update = None,
         check_result: Optional[Union[bool, Tuple[List[str], Optional[bool]]]] = None,
     ) -> Dict[str, Any]:
         optional_args = super().collect_optional_args(dispatcher, update)
@@ -229,7 +229,7 @@ class CommandHandler(Handler):
     def collect_additional_context(
         self,
         context: 'CallbackContext',
-        update: HandlerArg,
+        update: Update,
         dispatcher: 'Dispatcher',
         check_result: Optional[Union[bool, Tuple[List[str], Optional[bool]]]],
     ) -> None:
@@ -344,7 +344,7 @@ class PrefixHandler(CommandHandler):
         self,
         prefix: SLT[str],
         command: SLT[str],
-        callback: Callable[[HandlerArg, 'CallbackContext'], RT],
+        callback: Callable[[Update, 'CallbackContext'], RT],
         filters: BaseFilter = None,
         pass_args: bool = False,
         pass_update_queue: bool = False,
@@ -415,12 +415,12 @@ class PrefixHandler(CommandHandler):
         self._commands = [x.lower() + y.lower() for x in self.prefix for y in self.command]
 
     def check_update(
-        self, update: HandlerArg
+        self, update: Update
     ) -> Optional[Union[bool, Tuple[List[str], Optional[Union[bool, Dict]]]]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
-            update (:class:`telegram.Update`): Incoming telegram update.
+            update (:class:`telegram.Update` | :obj:`object`): Incoming update.
 
         Returns:
             :obj:`list`: The list of args for the handler.
@@ -442,7 +442,7 @@ class PrefixHandler(CommandHandler):
     def collect_additional_context(
         self,
         context: 'CallbackContext',
-        update: HandlerArg,
+        update: Update,
         dispatcher: 'Dispatcher',
         check_result: Optional[Union[bool, Tuple[List[str], Optional[bool]]]],
     ) -> None:

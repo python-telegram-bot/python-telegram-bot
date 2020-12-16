@@ -24,7 +24,6 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, TypeVar, Union
 from telegram import Update
 from telegram.ext import BaseFilter, Filters
 from telegram.utils.deprecate import TelegramDeprecationWarning
-from telegram.utils.types import HandlerArg
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 from .handler import Handler
@@ -35,7 +34,7 @@ if TYPE_CHECKING:
 RT = TypeVar('RT')
 
 
-class MessageHandler(Handler):
+class MessageHandler(Handler[Update]):
     """Handler class to handle telegram messages. They might contain text, media or status updates.
 
     Attributes:
@@ -124,7 +123,7 @@ class MessageHandler(Handler):
     def __init__(
         self,
         filters: BaseFilter,
-        callback: Callable[[HandlerArg, 'CallbackContext'], RT],
+        callback: Callable[[Update, 'CallbackContext'], RT],
         pass_update_queue: bool = False,
         pass_job_queue: bool = False,
         pass_user_data: bool = False,
@@ -180,11 +179,11 @@ class MessageHandler(Handler):
                     Filters.update.edited_message | Filters.update.edited_channel_post
                 )
 
-    def check_update(self, update: HandlerArg) -> Optional[Union[bool, Dict[str, Any]]]:
+    def check_update(self, update: Any) -> Optional[Union[bool, Dict[str, Any]]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
-            update (:class:`telegram.Update`): Incoming telegram update.
+            update (:class:`telegram.Update` | :obj:`object`): Incoming update.
 
         Returns:
             :obj:`bool`
@@ -197,7 +196,7 @@ class MessageHandler(Handler):
     def collect_additional_context(
         self,
         context: 'CallbackContext',
-        update: HandlerArg,
+        update: Update,
         dispatcher: 'Dispatcher',
         check_result: Optional[Union[bool, Dict[str, Any]]],
     ) -> None:

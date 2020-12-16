@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the PollHandler classes."""
+from typing import Any
 
 from telegram import Update
-from telegram.utils.types import HandlerArg
 
 from .handler import Handler
 
 
-class PollHandler(Handler):
+class PollHandler(Handler[Update]):
     """Handler class to handle Telegram updates that contain a poll.
 
     Attributes:
@@ -82,11 +82,11 @@ class PollHandler(Handler):
 
     """
 
-    def check_update(self, update: HandlerArg) -> bool:
+    def check_update(self, update: Any) -> bool:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
-            update (:class:`telegram.Update`): Incoming telegram update.
+            update (:class:`telegram.Update` | :obj:`object`): Incoming update.
 
         Returns:
             :obj:`bool`

@@ -21,7 +21,6 @@
 import re
 from typing import TYPE_CHECKING, Any, Callable, Dict, Match, Optional, Pattern, TypeVar, Union
 
-from telegram.utils.types import HandlerArg
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 from .handler import Handler
@@ -32,7 +31,7 @@ if TYPE_CHECKING:
 RT = TypeVar('RT')
 
 
-class StringRegexHandler(Handler):
+class StringRegexHandler(Handler[str]):
     """Handler class to handle string updates based on a regex which checks the update content.
 
     Read the documentation of the ``re`` module for more information. The ``re.match`` function is
@@ -95,7 +94,7 @@ class StringRegexHandler(Handler):
     def __init__(
         self,
         pattern: Union[str, Pattern],
-        callback: Callable[[HandlerArg, 'CallbackContext'], RT],
+        callback: Callable[[str, 'CallbackContext'], RT],
         pass_groups: bool = False,
         pass_groupdict: bool = False,
         pass_update_queue: bool = False,
@@ -116,11 +115,11 @@ class StringRegexHandler(Handler):
         self.pass_groups = pass_groups
         self.pass_groupdict = pass_groupdict
 
-    def check_update(self, update: HandlerArg) -> Optional[Match]:
+    def check_update(self, update: Any) -> Optional[Match]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
-            update (:obj:`str`): An incoming command.
+            update (:obj:`object`): The incoming update.
 
         Returns:
             :obj:`bool`
@@ -135,7 +134,7 @@ class StringRegexHandler(Handler):
     def collect_optional_args(
         self,
         dispatcher: 'Dispatcher',
-        update: HandlerArg = None,
+        update: str = None,
         check_result: Optional[Match] = None,
     ) -> Dict[str, Any]:
         optional_args = super().collect_optional_args(dispatcher, update, check_result)
@@ -149,7 +148,7 @@ class StringRegexHandler(Handler):
     def collect_additional_context(
         self,
         context: 'CallbackContext',
-        update: HandlerArg,
+        update: str,
         dispatcher: 'Dispatcher',
         check_result: Optional[Match],
     ) -> None:

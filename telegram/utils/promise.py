@@ -20,9 +20,9 @@
 
 import logging
 from threading import Event
-from typing import Callable, List, Optional, Tuple, TypeVar, Union
+from typing import Callable, List, Optional, Tuple, TypeVar, Union, Any
 
-from telegram.utils.types import HandlerArg, JSONDict
+from telegram.utils.types import JSONDict
 
 RT = TypeVar('RT')
 
@@ -37,7 +37,8 @@ class Promise:
         pooled_function (:obj:`callable`): The callable that will be called concurrently.
         args (:obj:`list` | :obj:`tuple`): Positional arguments for :attr:`pooled_function`.
         kwargs (:obj:`dict`): Keyword arguments for :attr:`pooled_function`.
-        update (:class:`telegram.Update`, optional): The update this promise is associated with.
+        update (:class:`telegram.Update` | :obj:`object`, optional): The update this promise is
+            associated with.
         error_handling (:obj:`bool`, optional): Whether exceptions raised by :attr:`func`
             may be handled by error handlers. Defaults to :obj:`True`.
 
@@ -46,7 +47,8 @@ class Promise:
         args (:obj:`list` | :obj:`tuple`): Positional arguments for :attr:`pooled_function`.
         kwargs (:obj:`dict`): Keyword arguments for :attr:`pooled_function`.
         done (:obj:`threading.Event`): Is set when the result is available.
-        update (:class:`telegram.Update`): Optional. The update this promise is associated with.
+        update (:class:`telegram.Update` | :obj:`object`): Optional. The update this promise is
+            associated with.
         error_handling (:obj:`bool`): Optional. Whether exceptions raised by :attr:`func`
             may be handled by error handlers. Defaults to :obj:`True`.
 
@@ -58,7 +60,7 @@ class Promise:
         pooled_function: Callable[..., RT],
         args: Union[List, Tuple],
         kwargs: JSONDict,
-        update: HandlerArg = None,
+        update: Any = None,
         error_handling: bool = True,
     ):
         self.pooled_function = pooled_function
