@@ -643,7 +643,9 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._new_quote(quote, reply_to_message_id)
-        return self.bot.send_message(chat_id=self.chat_id, **get_shortcut_kwargs(locals()))
+        return self.bot.send_message(
+            chat_id=self.chat_id, **get_shortcut_kwargs(locals(), ignore=['quote'])
+        )
 
     def reply_markdown(self, *args: Any, **kwargs: Any) -> 'Message':
         """Shortcut for::

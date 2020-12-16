@@ -28,7 +28,19 @@ from html import escape
 from numbers import Number
 from pathlib import Path
 
-from typing import TYPE_CHECKING, Any, DefaultDict, Dict, Optional, Tuple, Union, Type, cast, IO
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    DefaultDict,
+    Dict,
+    Optional,
+    Tuple,
+    Union,
+    Type,
+    cast,
+    IO,
+    List,
+)
 
 import pytz  # pylint: disable=E0401
 
@@ -460,7 +472,7 @@ def decode_user_chat_data_from_json(data: str) -> DefaultDict[int, Dict[Any, Any
     return tmp
 
 
-def get_shortcut_kwargs(locals_dict: Dict[str, Any]) -> Dict[str, Any]:
+def get_shortcut_kwargs(locals_dict: Dict[str, Any], ignore: List[str] = None) -> Dict[str, Any]:
     """
     Simple helper to pass the arguments of shortcuts to the underlying bot method. Use as e.g.::
 
@@ -468,8 +480,16 @@ def get_shortcut_kwargs(locals_dict: Dict[str, Any]) -> Dict[str, Any]:
 
     Args:
         locals_dict: The output of ``locals()``
+        ignore: Names of args/local variables to ignore
     """
-    return {key: value for key, value in locals_dict.items() if key != 'self'}
+    if ignore is None:
+        ignored = set()
+    else:
+        ignored = set(ignore)
+
+    ignored.add('self')
+    relevant_keys = set(locals_dict.keys()).difference(ignored)
+    return {key: locals_dict[key] for key in relevant_keys}
 
 
 class DefaultValue:
