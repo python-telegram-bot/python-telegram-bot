@@ -98,6 +98,16 @@ class TestVideoNote:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    def test_send_video_note_custom_filename(self, bot, chat_id, video_note_file, monkeypatch):
+        def make_assertion(url, data, **kwargs):
+            return data['video_note'].filename == 'custom_filename'
+
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+
+        assert bot.send_video_note(chat_id, video_note_file, filename='custom_filename')
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     def test_get_and_download(self, bot, video_note):
         new_file = bot.get_file(video_note.file_id)
 

@@ -35,7 +35,6 @@ from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.handler import Handler
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.promise import Promise
-from telegram.utils.types import HandlerArg
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 if TYPE_CHECKING:
@@ -288,7 +287,7 @@ class Dispatcher:
                 self.logger.exception('An uncaught error was raised while handling the error.')
 
     def run_async(
-        self, func: Callable[..., Any], *args: Any, update: HandlerArg = None, **kwargs: Any
+        self, func: Callable[..., Any], *args: Any, update: Any = None, **kwargs: Any
     ) -> Promise:
         """
         Queue a function (with given args/kwargs) to be run asynchronously. Exceptions raised
@@ -304,9 +303,9 @@ class Dispatcher:
         Args:
             func (:obj:`callable`): The function to run in the thread.
             *args (:obj:`tuple`, optional): Arguments to ``func``.
-            update (:class:`telegram.Update`, optional): The update associated with the functions
-                call. If passed, it will be available in the error handlers, in case an exception
-                is raised by :attr:`func`.
+            update (:class:`telegram.Update` | :obj:`object`, optional): The update associated with
+                the functions call. If passed, it will be available in the error handlers, in case
+                an exception is raised by :attr:`func`.
             **kwargs (:obj:`dict`, optional): Keyword arguments to ``func``.
 
         Returns:
@@ -319,7 +318,7 @@ class Dispatcher:
         self,
         func: Callable[..., Any],
         *args: Any,
-        update: HandlerArg = None,
+        update: Any = None,
         error_handling: bool = True,
         **kwargs: Any,
     ) -> Promise:
@@ -515,7 +514,7 @@ class Dispatcher:
                 del self.handlers[group]
                 self.groups.remove(group)
 
-    def update_persistence(self, update: HandlerArg = None) -> None:
+    def update_persistence(self, update: Any = None) -> None:
         """Update :attr:`user_data`, :attr:`chat_data` and :attr:`bot_data` in :attr:`persistence`.
 
         Args:
@@ -525,7 +524,7 @@ class Dispatcher:
         with self._update_persistence_lock:
             self.__update_persistence(update)
 
-    def __update_persistence(self, update: HandlerArg = None) -> None:
+    def __update_persistence(self, update: Any = None) -> None:
         if self.persistence:
             # We use list() here in order to decouple chat_ids from self.chat_data, as dict view
             # objects will change, when the dict does and we want to loop over chat_ids
@@ -632,12 +631,12 @@ class Dispatcher:
         self.error_handlers.pop(callback, None)
 
     def dispatch_error(
-        self, update: Optional[HandlerArg], error: Exception, promise: Promise = None
+        self, update: Optional[Any], error: Exception, promise: Promise = None
     ) -> None:
         """Dispatches an error.
 
         Args:
-            update (:obj:`str` | :class:`telegram.Update` | None): The update that caused the error
+            update (:obj:`Any` | :class:`telegram.Update` | None): The update that caused the error.
             error (:obj:`Exception`): The error that was raised.
             promise (:class:`telegram.utils.Promise`, optional): The promise whose pooled function
                 raised the error.
