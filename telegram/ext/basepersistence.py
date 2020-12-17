@@ -33,7 +33,7 @@ class BasePersistence(ABC):
 
     All relevant methods must be overwritten. This includes:
 
-    * meth:`get_bot_data`
+    * `meth:`get_bot_data`
     * :meth:`update_bot_data`
     * :meth:`get_chat_data`
     * :meth:`update_chat_data`
@@ -44,7 +44,7 @@ class BasePersistence(ABC):
     * :meth:`flush`
 
     If you don't actually need one of those methods, a simple ``pass`` is enough. For example, if
-    ``store_bot_data=False``, you don't need :meth:`get_bot_data` and :meth:`update_bot_data.
+    ``store_bot_data=False``, you don't need :meth:`get_bot_data` and :meth:`update_bot_data`.
 
     Warning:
         Persistence will try to replace :class:`telegram.Bot` instances by :attr:`REPLACED_BOT` and
