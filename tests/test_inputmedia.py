@@ -437,6 +437,34 @@ class TestSendMediaGroup:
             mes.caption_entities == [MessageEntity(MessageEntity.BOLD, 0, 5)] for mes in messages
         )
 
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_media_group_custom_filename(
+        self,
+        bot,
+        chat_id,
+        photo_file,  # noqa: F811
+        animation_file,  # noqa: F811
+        audio_file,  # noqa: F811
+        video_file,  # noqa: F811
+        monkeypatch,
+    ):
+        def make_assertion(url, data, **kwargs):
+            result = all(im.media.filename == 'custom_filename' for im in data['media'])
+            # We are a bit hacky here b/c Bot.send_media_group expects a list of Message-dicts
+            return [Message(0, None, None, text=result).to_dict()]
+
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+
+        media = [
+            InputMediaAnimation(animation_file, filename='custom_filename'),
+            InputMediaAudio(audio_file, filename='custom_filename'),
+            InputMediaPhoto(photo_file, filename='custom_filename'),
+            InputMediaVideo(video_file, filename='custom_filename'),
+        ]
+
+        assert bot.send_media_group(chat_id, media)[0].text is True
+
     def test_send_media_group_with_thumbs(
         self, bot, chat_id, video_file, photo_file, monkeypatch  # noqa: F811
     ):

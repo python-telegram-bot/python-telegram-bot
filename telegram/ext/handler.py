@@ -19,20 +19,20 @@
 """This module contains the base class for handlers as used by the Dispatcher."""
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, TypeVar, Union, Generic
 
 from telegram import Update
 from telegram.utils.promise import Promise
-from telegram.utils.types import HandlerArg
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 if TYPE_CHECKING:
     from telegram.ext import CallbackContext, Dispatcher
 
 RT = TypeVar('RT')
+UT = TypeVar('UT')
 
 
-class Handler(ABC):
+class Handler(Generic[UT], ABC):
     """The base class for all update handlers. Create custom handlers by inheriting from it.
 
     Attributes:
@@ -92,14 +92,14 @@ class Handler(ABC):
 
     def __init__(
         self,
-        callback: Callable[[HandlerArg, 'CallbackContext'], RT],
+        callback: Callable[[UT, 'CallbackContext'], RT],
         pass_update_queue: bool = False,
         pass_job_queue: bool = False,
         pass_user_data: bool = False,
         pass_chat_data: bool = False,
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
-        self.callback: Callable[[HandlerArg, 'CallbackContext'], RT] = callback
+        self.callback = callback
         self.pass_update_queue = pass_update_queue
         self.pass_job_queue = pass_job_queue
         self.pass_user_data = pass_user_data
@@ -107,10 +107,14 @@ class Handler(ABC):
         self.run_async = run_async
 
     @abstractmethod
-    def check_update(self, update: HandlerArg) -> Optional[Union[bool, object]]:
+    def check_update(self, update: Any) -> Optional[Union[bool, object]]:
         """
         This method is called to determine if an update should be handled by
         this handler instance. It should always be overridden.
+
+        Note:
+            Custom updates types can be handled by the dispatcher. Therefore, an implementation of
+            this method should always check the type of :attr:`update`.
 
         Args:
             update (:obj:`str` | :class:`telegram.Update`): The update to be tested.
@@ -124,7 +128,7 @@ class Handler(ABC):
 
     def handle_update(
         self,
-        update: HandlerArg,
+        update: UT,
         dispatcher: 'Dispatcher',
         check_result: object,
         context: 'CallbackContext' = None,
@@ -165,7 +169,7 @@ class Handler(ABC):
     def collect_additional_context(
         self,
         context: 'CallbackContext',
-        update: HandlerArg,
+        update: UT,
         dispatcher: 'Dispatcher',
         check_result: Any,
     ) -> None:
@@ -182,7 +186,7 @@ class Handler(ABC):
     def collect_optional_args(
         self,
         dispatcher: 'Dispatcher',
-        update: HandlerArg = None,
+        update: UT = None,
         check_result: Any = None,  # pylint: disable=W0613
     ) -> Dict[str, Any]:
         """

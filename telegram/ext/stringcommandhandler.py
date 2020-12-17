@@ -20,7 +20,6 @@
 
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, TypeVar, Union
 
-from telegram.utils.types import HandlerArg
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 from .handler import Handler
@@ -31,7 +30,7 @@ if TYPE_CHECKING:
 RT = TypeVar('RT')
 
 
-class StringCommandHandler(Handler):
+class StringCommandHandler(Handler[str]):
     """Handler class to handle string commands. Commands are string updates that start with ``/``.
 
     Note:
@@ -86,7 +85,7 @@ class StringCommandHandler(Handler):
     def __init__(
         self,
         command: str,
-        callback: Callable[[HandlerArg, 'CallbackContext'], RT],
+        callback: Callable[[str, 'CallbackContext'], RT],
         pass_args: bool = False,
         pass_update_queue: bool = False,
         pass_job_queue: bool = False,
@@ -101,11 +100,11 @@ class StringCommandHandler(Handler):
         self.command = command
         self.pass_args = pass_args
 
-    def check_update(self, update: HandlerArg) -> Optional[List[str]]:
+    def check_update(self, update: Any) -> Optional[List[str]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
-            update (:obj:`str`): An incoming command.
+            update (:obj:`object`): The incoming update.
 
         Returns:
             :obj:`bool`
@@ -120,7 +119,7 @@ class StringCommandHandler(Handler):
     def collect_optional_args(
         self,
         dispatcher: 'Dispatcher',
-        update: HandlerArg = None,
+        update: str = None,
         check_result: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         optional_args = super().collect_optional_args(dispatcher, update, check_result)
@@ -131,7 +130,7 @@ class StringCommandHandler(Handler):
     def collect_additional_context(
         self,
         context: 'CallbackContext',
-        update: HandlerArg,
+        update: str,
         dispatcher: 'Dispatcher',
         check_result: Optional[List[str]],
     ) -> None:

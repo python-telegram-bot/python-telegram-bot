@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import IO, TYPE_CHECKING, Any, Dict, List, Optional, Tuple, TypeVar, Union
 
 if TYPE_CHECKING:
-    from telegram import InputFile, Update
+    from telegram import InputFile
 
 FileLike = Union[IO, 'InputFile']
 """Either an open file handler or a :class:`telegram.InputFile`."""
@@ -32,9 +32,6 @@ a local file path as string or :class:`pathlib.Path`."""
 
 JSONDict = Dict[str, Any]
 """Dictionary containing response from Telegram or data to send to the API."""
-
-HandlerArg = Union[str, 'Update']
-"""The argument that handlers parse for :meth:`telegram.ext.handler.check_update` etc."""
 
 ConversationDict = Dict[Tuple[int, ...], Optional[object]]
 """Dicts as maintained by the :class:`telegram.ext.ConversationHandler`."""
