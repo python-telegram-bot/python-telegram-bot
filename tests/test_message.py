@@ -49,7 +49,7 @@ from telegram import (
     Bot,
 )
 from telegram.ext import Defaults
-from tests.conftest import check_shortcut_signature
+from tests.conftest import check_shortcut_signature, check_shortcut_call
 from tests.test_passport import RAW_PASSPORT_DATA
 
 
@@ -637,6 +637,8 @@ class TestMessage:
         assert message_params.effective_attachment == item
 
     def test_reply_text(self, monkeypatch, message):
+        send_message = message.bot.send_message
+
         def make_assertion(*_, **kwargs):
             id_ = kwargs['chat_id'] == message.chat_id
             text = kwargs['text'] == 'test'
@@ -644,7 +646,7 @@ class TestMessage:
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id_ and text and reply
+            return id_ and text and reply and check_shortcut_call(kwargs, send_message)
 
         assert check_shortcut_signature(
             Message.reply_text, Bot.send_message, ['chat_id'], ['quote']

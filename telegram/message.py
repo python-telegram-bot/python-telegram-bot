@@ -54,7 +54,6 @@ from telegram.utils.helpers import (
     escape_markdown,
     from_timestamp,
     to_timestamp,
-    get_shortcut_kwargs,
 )
 from telegram.utils.types import JSONDict
 
@@ -625,7 +624,6 @@ class Message(TelegramObject):
         entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         quote: bool = None,
     ) -> Optional['Message']:
-        # pylint: disable=unused-argument
         """Shortcut for::
 
             bot.send_message(update.message.chat_id, *args, **kwargs)
@@ -644,7 +642,17 @@ class Message(TelegramObject):
         """
         reply_to_message_id = self._new_quote(quote, reply_to_message_id)
         return self.bot.send_message(
-            chat_id=self.chat_id, **get_shortcut_kwargs(locals(), ignore=['quote'])
+            chat_id=self.chat_id,
+            text=text,
+            parse_mode=parse_mode,
+            disable_web_page_preview=disable_web_page_preview,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+            allow_sending_without_reply=allow_sending_without_reply,
+            entities=entities,
         )
 
     def reply_markdown(self, *args: Any, **kwargs: Any) -> 'Message':

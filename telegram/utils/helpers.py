@@ -39,7 +39,6 @@ from typing import (
     Type,
     cast,
     IO,
-    List,
 )
 
 import pytz  # pylint: disable=E0401
@@ -470,26 +469,6 @@ def decode_user_chat_data_from_json(data: str) -> DefaultDict[int, Dict[Any, Any
                 pass
             tmp[user][key] = value
     return tmp
-
-
-def get_shortcut_kwargs(locals_dict: Dict[str, Any], ignore: List[str] = None) -> Dict[str, Any]:
-    """
-    Simple helper to pass the arguments of shortcuts to the underlying bot method. Use as e.g.::
-
-        self.bot.send_message(chat_id=self.chat_id, **get_shortcut_kwargs(locals()))
-
-    Args:
-        locals_dict: The output of ``locals()``
-        ignore: Names of args/local variables to ignore
-    """
-    if ignore is None:
-        ignored = set()
-    else:
-        ignored = set(ignore)
-
-    ignored.add('self')
-    relevant_keys = set(locals_dict.keys()).difference(ignored)
-    return {key: locals_dict[key] for key in relevant_keys}
 
 
 class DefaultValue:

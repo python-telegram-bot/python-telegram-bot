@@ -24,7 +24,7 @@ from collections import defaultdict
 from queue import Queue
 from threading import Thread, Event
 from time import sleep
-from typing import Callable, List
+from typing import Callable, List, Dict, Any
 
 import pytest
 import pytz
@@ -377,3 +377,32 @@ def check_shortcut_signature(
     )
 
     return args_check and annotation_check
+
+
+def check_shortcut_call(
+    kwargs: Dict[str, Any],
+    bot_method: Callable,
+) -> bool:
+    """
+    Checks that a shortcut passes all the existing arguments to the underlying bot method. Use as::
+
+        send_message = message.bot.send_message
+
+        def make_assertion(*_, **kwargs):
+            return check_shortcut_call(send_message, kwargs)
+
+        monkeypatch.setattr(message.bot, 'send_message', make_assertion)
+        assert message.reply_text('foobar')
+
+
+    Args:
+        kwargs: The kwargs passed to the bot method by the shortcut
+        bot_method: The bot method, e.g. :meth:`telegram.Bot.send_message`
+
+    Returns:
+        :obj:`bool`
+    """
+    bot_arg_spec = inspect.getfullargspec(bot_method)
+    expected_args = set(bot_arg_spec.args).difference(['self'])
+
+    return expected_args == set(kwargs.keys())
