@@ -636,7 +636,7 @@ class Dispatcher:
         """Dispatches an error.
 
         Args:
-            update (:obj:`Any` | :class:`telegram.Update` | None): The update that caused the error.
+            update (:obj:`Any` | :class:`telegram.Update`): The update that caused the error.
             error (:obj:`Exception`): The error that was raised.
             promise (:class:`telegram.utils.Promise`, optional): The promise whose pooled function
                 raised the error.
