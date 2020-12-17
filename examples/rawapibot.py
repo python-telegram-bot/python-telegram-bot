@@ -52,7 +52,7 @@ def echo(bot: telegram.Bot) -> None:
 
         if update.message:  # your bot can receive updates without messages
             # Reply to the message
-            update.message.reply_text(update.message.text)
+            update.message.reply_text(update.message.text)  # type: ignore[arg-type]
 
 
 if __name__ == '__main__':
