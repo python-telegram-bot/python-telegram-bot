@@ -372,6 +372,10 @@ def check_shortcut_signature(
 
     args_check = expected_args == effective_shortcut_args
 
+    # TODO: Also check annotation of return type. Would currently be a hassle b/c typing doesn't
+    # resolve `ForwardRef('Type')` to `Type`. For now we rely on MyPy, which probably allows the
+    # shortcuts to return more specific types than the bot method, but it's only annotations after
+    # all
     annotation_check = True
     for kwarg in effective_shortcut_args:
         if bot_arg_spec.annotations[kwarg] != shortcut_arg_spec.annotations[kwarg]:
@@ -379,9 +383,17 @@ def check_shortcut_signature(
                 if bot_arg_spec.annotations[kwarg].__name__ != str(
                     shortcut_arg_spec.annotations[kwarg]
                 ):
+                    print(
+                        f'Expected {bot_arg_spec.annotations[kwarg]}, but '
+                        f'got {shortcut_arg_spec.annotations[kwarg]}'
+                    )
                     annotation_check = False
                     break
             else:
+                print(
+                    f'Expected {bot_arg_spec.annotations[kwarg]}, but '
+                    f'got {shortcut_arg_spec.annotations[kwarg]}'
+                )
                 annotation_check = False
                 break
 

@@ -621,7 +621,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
-        Keyword Args:
+        Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -672,7 +672,7 @@ class Message(TelegramObject):
             :attr:`telegram.ParseMode.MARKDOWN` is a legacy mode, retained by Telegram for
             backward compatibility. You should use :meth:`reply_markdown_v2` instead.
 
-        Keyword Args:
+        Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -718,7 +718,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
-        Keyword Args:
+        Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -763,7 +763,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
-        Keyword Args:
+        Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -805,7 +805,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_media_group`.
 
-        Keyword Args:
+        Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the media group is sent as an
                 actual reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
                 this parameter will be ignored. Default: :obj:`True` in group chats and
@@ -849,7 +849,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_photo`.
 
-        Keyword Args:
+        Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the photo is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
                 this parameter will be ignored. Default: :obj:`True` in group chats and
@@ -900,7 +900,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_audio`.
 
-        Keyword Args:
+        Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the audio is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
                 this parameter will be ignored. Default: :obj:`True` in group chats and
@@ -953,7 +953,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_document`.
 
-        Keyword Args:
+        Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the document is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -1006,7 +1006,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_animation`.
 
-        Keyword Args:
+        Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the animation is sent as an
                 actual reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
                 this parameter will be ignored. Default: :obj:`True` in group chats and
@@ -1053,7 +1053,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_sticker`.
 
-        Keyword Args:
+        Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the sticker is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -1101,7 +1101,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video`.
 
-        Keyword Args:
+        Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the video is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -1153,7 +1153,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video_note`.
 
-        Keyword Args:
+        Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the video note is sent as an
                 actual reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
                 this parameter will be ignored. Default: :obj:`True` in group chats and
@@ -1201,7 +1201,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_voice`.
 
-        Keyword Args:
+        Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the voice note is sent as an
                 actual reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
                 this parameter will be ignored. Default: :obj:`True` in group chats and
@@ -1251,7 +1251,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_location`.
 
-        Keyword Args:
+        Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the location is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -1304,7 +1304,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_venue`.
 
-        Keyword Args:
+        Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the venue is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -1355,7 +1355,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_contact`.
 
-        Keyword Args:
+        Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the contact is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -1409,7 +1409,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_poll`.
 
-        Keyword Args:
+        Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the poll is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
                 this parameter will be ignored. Default: :obj:`True` in group chats and
@@ -1459,7 +1459,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_dice`.
 
-        Keyword Args:
+        Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the dice is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False`
@@ -1578,7 +1578,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.copy_message`.
 
-        Keyword Args:
+        Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the copy is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
                 this parameter will be ignored. Default: :obj:`True` in group chats and

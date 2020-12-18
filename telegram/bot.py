@@ -60,7 +60,6 @@ from telegram import (
     Document,
     File,
     GameHighScore,
-    InlineQueryResult,
     LabeledPrice,
     Location,
     MaskPosition,
@@ -105,6 +104,7 @@ if TYPE_CHECKING:
         InputMediaPhoto,
         InputMediaVideo,
         InputMedia,
+        InlineQueryResult,
     )
 
 RT = TypeVar('RT')
@@ -1979,7 +1979,7 @@ class Bot(TelegramObject):
     def answer_inline_query(
         self,
         inline_query_id: str,
-        results: List[InlineQueryResult],
+        results: List['InlineQueryResult'],
         cache_time: int = 300,
         is_personal: bool = None,
         next_offset: str = None,
