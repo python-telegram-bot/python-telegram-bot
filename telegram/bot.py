@@ -27,7 +27,6 @@ import logging
 from datetime import datetime
 
 from typing import (
-    IO,
     TYPE_CHECKING,
     Any,
     Callable,
@@ -565,7 +564,7 @@ class Bot(TelegramObject):
     def send_photo(
         self,
         chat_id: int,
-        photo: Union[str, PhotoSize, IO],
+        photo: Union[FileInput, PhotoSize],
         caption: str = None,
         disable_notification: bool = False,
         reply_to_message_id: Union[int, str] = None,
