@@ -1584,6 +1584,8 @@ class Message(TelegramObject):
                 this parameter will be ignored. Default: :obj:`True` in group chats and
                 :obj:`False` in private chats.
 
+                .. versionadded:: 13.1
+
         Returns:
             :class:`telegram.MessageId`: On success, returns the MessageId of the sent message.
 
