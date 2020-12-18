@@ -1728,7 +1728,7 @@ class Message(TelegramObject):
 
     def edit_reply_markup(
         self,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional['InlineKeyboardMarkup'] = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
     ) -> Union['Message', bool]:

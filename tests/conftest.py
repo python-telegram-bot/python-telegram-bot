@@ -371,10 +371,19 @@ def check_shortcut_signature(
     expected_args.discard('self')
 
     args_check = expected_args == effective_shortcut_args
-    annotation_check = all(
-        bot_arg_spec.annotations[kwarg] == shortcut_arg_spec.annotations[kwarg]
-        for kwarg in effective_shortcut_args
-    )
+
+    annotation_check = True
+    for kwarg in effective_shortcut_args:
+        if bot_arg_spec.annotations[kwarg] != shortcut_arg_spec.annotations[kwarg]:
+            if isinstance(bot_arg_spec.annotations[kwarg], type):
+                if bot_arg_spec.annotations[kwarg].__name__ != str(
+                    shortcut_arg_spec.annotations[kwarg]
+                ):
+                    annotation_check = False
+                    break
+            else:
+                annotation_check = False
+                break
 
     bot_method_signature = inspect.signature(bot_method)
     shortcut_signature = inspect.signature(shortcut)

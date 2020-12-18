@@ -2611,7 +2611,7 @@ class Bot(TelegramObject):
         chat_id: Union[str, int] = None,
         message_id: Union[str, int] = None,
         inline_message_id: Union[str, int] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional['InlineKeyboardMarkup'] = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
     ) -> Union[Message, bool]:
