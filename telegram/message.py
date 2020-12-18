@@ -21,7 +21,7 @@
 import datetime
 import sys
 from html import escape
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, ClassVar, Tuple, IO
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, ClassVar, Tuple
 
 from telegram import (
     Animation,
@@ -830,7 +830,7 @@ class Message(TelegramObject):
 
     def reply_photo(
         self,
-        photo: Union[str, PhotoSize, IO],
+        photo: Union[FileInput, PhotoSize],
         caption: str = None,
         disable_notification: bool = False,
         reply_to_message_id: Union[int, str] = None,

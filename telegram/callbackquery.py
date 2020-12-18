@@ -145,7 +145,7 @@ class CallbackQuery(TelegramObject):
         """
         if self.inline_message_id:
             return self.bot.edit_message_text(
-                text, inline_message_id=self.inline_message_id, *args, **kwargs
+                text=text, inline_message_id=self.inline_message_id, *args, **kwargs
             )
         return self.message.edit_text(text, *args, **kwargs)
 
