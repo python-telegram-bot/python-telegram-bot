@@ -92,8 +92,8 @@ class TestCallbackQuery:
         assert callback_query.answer()
 
     def test_edit_message_text(self, monkeypatch, callback_query):
-        def test(*args, **kwargs):
-            text = args[0] == 'test'
+        def make_assertion(*_, **kwargs):
+            text = kwargs['text'] == 'test'
             try:
                 id_ = kwargs['inline_message_id'] == callback_query.inline_message_id
                 return id_ and text
@@ -102,7 +102,7 @@ class TestCallbackQuery:
                 message_id = kwargs['message_id'] == callback_query.message.message_id
                 return chat_id and message_id and text
 
-        monkeypatch.setattr(callback_query.bot, 'edit_message_text', test)
+        monkeypatch.setattr(callback_query.bot, 'edit_message_text', make_assertion)
         assert callback_query.edit_message_text(text='test')
         assert callback_query.edit_message_text('test')
 

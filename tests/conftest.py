@@ -376,7 +376,14 @@ def check_shortcut_signature(
         for kwarg in effective_shortcut_args
     )
 
-    return args_check and annotation_check
+    bot_method_signature = inspect.signature(bot_method)
+    shortcut_signature = inspect.signature(shortcut)
+    default_check = all(
+        shortcut_signature.parameters[arg].default == bot_method_signature.parameters[arg].default
+        for arg in expected_args
+    )
+
+    return args_check and annotation_check and default_check
 
 
 def check_shortcut_call(
