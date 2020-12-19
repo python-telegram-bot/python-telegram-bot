@@ -103,18 +103,13 @@ class PassportFile(TelegramObject):
             for i, passport_file in enumerate(data)
         ]
 
-    def get_file(self, timeout: int = None, api_kwargs: JSONDict = None) -> 'File':
+    def get_file(self, timeout: float = None, api_kwargs: JSONDict = None) -> 'File':
         """
         Wrapper over :attr:`telegram.Bot.get_file`. Will automatically assign the correct
         credentials to the returned :class:`telegram.File` if originating from
         :obj:`telegram.PassportData.decrypted_data`.
 
-        Args:
-            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
-                the read timeout from the server (instead of the one specified during creation of
-                the connection pool).
-            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
-                Telegram API.
+        For the documentation of the arguments, please see :meth:`telegram.Bot.get_file`.
 
         Returns:
             :class:`telegram.File`
@@ -123,6 +118,6 @@ class PassportFile(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        file = self.bot.get_file(self.file_id, timeout=timeout, api_kwargs=api_kwargs)
+        file = self.bot.get_file(file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs)
         file.set_credentials(self._credentials)
         return file
