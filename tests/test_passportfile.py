@@ -67,7 +67,7 @@ class TestPassportFile:
 
         assert check_shortcut_signature(PassportFile.get_file, Bot.get_file, ['file_id'], [])
 
-        monkeypatch.setattr('telegram.Bot.get_file', make_assertion)
+        monkeypatch.setattr(passport_file.bot, 'get_file', make_assertion)
         assert passport_file.get_file().file_id == 'True'
 
     def test_equality(self):
