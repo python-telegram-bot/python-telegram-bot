@@ -20,11 +20,18 @@
 """This module contains an object that represents a Telegram CallbackQuery"""
 from typing import TYPE_CHECKING, Any, List, Optional, Union, Tuple
 
-from telegram import Message, TelegramObject, User, MessageEntity, Location, ReplyMarkup
+from telegram import Message, TelegramObject, User, Location, ReplyMarkup
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
-    from telegram import Bot, GameHighScore, InlineKeyboardMarkup, MessageId, InputMedia
+    from telegram import (
+        Bot,
+        GameHighScore,
+        InlineKeyboardMarkup,
+        MessageId,
+        InputMedia,
+        MessageEntity,
+    )
 
 
 class CallbackQuery(TelegramObject):
@@ -155,7 +162,7 @@ class CallbackQuery(TelegramObject):
         reply_markup: 'InlineKeyboardMarkup' = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
-        entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
     ) -> Union[Message, bool]:
         """Shortcut for either::
 
@@ -204,7 +211,7 @@ class CallbackQuery(TelegramObject):
         timeout: float = None,
         parse_mode: str = None,
         api_kwargs: JSONDict = None,
-        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
     ) -> Union[Message, bool]:
         """Shortcut for either::
 
@@ -590,7 +597,7 @@ class CallbackQuery(TelegramObject):
         chat_id: Union[int, str],
         caption: str = None,
         parse_mode: str = None,
-        caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
+        caption_entities: Union[Tuple['MessageEntity', ...], List['MessageEntity']] = None,
         disable_notification: bool = False,
         reply_to_message_id: Union[int, str] = None,
         allow_sending_without_reply: bool = False,

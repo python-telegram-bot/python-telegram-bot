@@ -337,8 +337,8 @@ class Message(TelegramObject):
         reply_to_message: 'Message' = None,
         edit_date: datetime.datetime = None,
         text: str = None,
-        entities: List[MessageEntity] = None,
-        caption_entities: List[MessageEntity] = None,
+        entities: List['MessageEntity'] = None,
+        caption_entities: List['MessageEntity'] = None,
         audio: Audio = None,
         document: Document = None,
         game: Game = None,
@@ -612,7 +612,7 @@ class Message(TelegramObject):
         timeout: float = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: bool = None,
-        entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         quote: bool = None,
     ) -> 'Message':
         """Shortcut for::
@@ -656,7 +656,7 @@ class Message(TelegramObject):
         timeout: float = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: bool = None,
-        entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         quote: bool = None,
     ) -> 'Message':
         """Shortcut for::
@@ -706,7 +706,7 @@ class Message(TelegramObject):
         timeout: float = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: bool = None,
-        entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         quote: bool = None,
     ) -> 'Message':
         """Shortcut for::
@@ -752,7 +752,7 @@ class Message(TelegramObject):
         timeout: float = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: bool = None,
-        entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         quote: bool = None,
     ) -> 'Message':
         """Shortcut for::
@@ -830,7 +830,7 @@ class Message(TelegramObject):
 
     def reply_photo(
         self,
-        photo: Union[FileInput, PhotoSize],
+        photo: Union[FileInput, 'PhotoSize'],
         caption: str = None,
         disable_notification: bool = False,
         reply_to_message_id: Union[int, str] = None,
@@ -839,7 +839,7 @@ class Message(TelegramObject):
         parse_mode: str = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: bool = None,
-        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
         quote: bool = None,
     ) -> 'Message':
@@ -877,7 +877,7 @@ class Message(TelegramObject):
 
     def reply_audio(
         self,
-        audio: Union[FileInput, Audio],
+        audio: Union[FileInput, 'Audio'],
         duration: int = None,
         performer: str = None,
         title: str = None,
@@ -890,7 +890,7 @@ class Message(TelegramObject):
         thumb: FileInput = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: bool = None,
-        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
         quote: bool = None,
     ) -> 'Message':
@@ -932,7 +932,7 @@ class Message(TelegramObject):
 
     def reply_document(
         self,
-        document: Union[FileInput, Document],
+        document: Union[FileInput, 'Document'],
         filename: str = None,
         caption: str = None,
         disable_notification: bool = False,
@@ -944,7 +944,7 @@ class Message(TelegramObject):
         api_kwargs: JSONDict = None,
         disable_content_type_detection: bool = None,
         allow_sending_without_reply: bool = None,
-        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         quote: bool = None,
     ) -> 'Message':
         """Shortcut for::
@@ -983,7 +983,7 @@ class Message(TelegramObject):
 
     def reply_animation(
         self,
-        animation: Union[FileInput, Animation],
+        animation: Union[FileInput, 'Animation'],
         duration: int = None,
         width: int = None,
         height: int = None,
@@ -996,7 +996,7 @@ class Message(TelegramObject):
         timeout: float = 20,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: bool = None,
-        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
         quote: bool = None,
     ) -> 'Message':
@@ -1038,7 +1038,7 @@ class Message(TelegramObject):
 
     def reply_sticker(
         self,
-        sticker: Union[FileInput, Sticker],
+        sticker: Union[FileInput, 'Sticker'],
         disable_notification: bool = False,
         reply_to_message_id: Union[int, str] = None,
         reply_markup: ReplyMarkup = None,
@@ -1077,7 +1077,7 @@ class Message(TelegramObject):
 
     def reply_video(
         self,
-        video: Union[FileInput, Video],
+        video: Union[FileInput, 'Video'],
         duration: int = None,
         caption: str = None,
         disable_notification: bool = False,
@@ -1091,7 +1091,7 @@ class Message(TelegramObject):
         thumb: FileInput = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: bool = None,
-        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
         quote: bool = None,
     ) -> 'Message':
@@ -1134,7 +1134,7 @@ class Message(TelegramObject):
 
     def reply_video_note(
         self,
-        video_note: Union[FileInput, VideoNote],
+        video_note: Union[FileInput, 'VideoNote'],
         duration: int = None,
         length: int = None,
         disable_notification: bool = False,
@@ -1181,7 +1181,7 @@ class Message(TelegramObject):
 
     def reply_voice(
         self,
-        voice: Union[FileInput, Voice],
+        voice: Union[FileInput, 'Voice'],
         duration: int = None,
         caption: str = None,
         disable_notification: bool = False,
@@ -1191,7 +1191,7 @@ class Message(TelegramObject):
         parse_mode: str = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: bool = None,
-        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
         quote: bool = None,
     ) -> 'Message':
@@ -1400,7 +1400,7 @@ class Message(TelegramObject):
         close_date: Union[int, datetime.datetime] = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: bool = None,
-        explanation_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        explanation_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         quote: bool = None,
     ) -> 'Message':
         """Shortcut for::
@@ -1516,7 +1516,7 @@ class Message(TelegramObject):
         chat_id: Union[int, str],
         caption: str = None,
         parse_mode: str = None,
-        caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
+        caption_entities: Union[Tuple['MessageEntity', ...], List['MessageEntity']] = None,
         disable_notification: bool = False,
         reply_to_message_id: Union[int, str] = None,
         allow_sending_without_reply: bool = False,
@@ -1559,7 +1559,7 @@ class Message(TelegramObject):
         message_id: Union[str, int],
         caption: str = None,
         parse_mode: str = None,
-        caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
+        caption_entities: Union[Tuple['MessageEntity', ...], List['MessageEntity']] = None,
         disable_notification: bool = False,
         reply_to_message_id: Union[int, str] = None,
         allow_sending_without_reply: bool = False,
@@ -1614,7 +1614,7 @@ class Message(TelegramObject):
         reply_markup: InlineKeyboardMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
-        entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
     ) -> Union['Message', bool]:
         """Shortcut for::
 
@@ -1655,7 +1655,7 @@ class Message(TelegramObject):
         timeout: float = None,
         parse_mode: str = None,
         api_kwargs: JSONDict = None,
-        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
     ) -> Union['Message', bool]:
         """Shortcut for::
 
