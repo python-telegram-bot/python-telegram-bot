@@ -18,17 +18,42 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Chat."""
-
-from typing import TYPE_CHECKING, Any, List, Optional, ClassVar
+from datetime import datetime
+from typing import TYPE_CHECKING, Any, List, Optional, ClassVar, Union, Tuple
 
 from telegram import ChatPhoto, TelegramObject, constants
-from telegram.utils.types import JSONDict
+from telegram.utils.types import JSONDict, FileInput
 
 from .chatpermissions import ChatPermissions
 from .chatlocation import ChatLocation
+from .utils.helpers import DefaultValue, DEFAULT_NONE
 
 if TYPE_CHECKING:
-    from telegram import Bot, ChatMember, Message, MessageId
+    from telegram import (
+        Bot,
+        ChatMember,
+        Message,
+        MessageId,
+        ReplyMarkup,
+        Contact,
+        InlineKeyboardMarkup,
+        Location,
+        Venue,
+        MessageEntity,
+        InputMediaAudio,
+        InputMediaDocument,
+        InputMediaPhoto,
+        InputMediaVideo,
+        PhotoSize,
+        Audio,
+        Document,
+        Animation,
+        LabeledPrice,
+        Sticker,
+        Video,
+        VideoNote,
+        Voice,
+    )
 
 
 class Chat(TelegramObject):
@@ -188,21 +213,32 @@ class Chat(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def leave(self, *args: Any, **kwargs: Any) -> bool:
+    def leave(self, timeout: float = None, api_kwargs: JSONDict = None) -> bool:
         """Shortcut for::
 
             bot.leave_chat(update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.leave_chat`.
 
         Returns:
             :obj:`bool` If the action was sent successfully.
 
         """
-        return self.bot.leave_chat(self.id, *args, **kwargs)
+        return self.bot.leave_chat(
+            chat_id=self.id,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
 
-    def get_administrators(self, *args: Any, **kwargs: Any) -> List['ChatMember']:
+    def get_administrators(
+        self, timeout: float = None, api_kwargs: JSONDict = None
+    ) -> List['ChatMember']:
         """Shortcut for::
 
             bot.get_chat_administrators(update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.get_chat_administrators`.
 
         Returns:
             List[:class:`telegram.ChatMember`]: A list of administrators in a chat. An Array of
@@ -211,34 +247,66 @@ class Chat(TelegramObject):
             and no administrators were appointed, only the creator will be returned.
 
         """
-        return self.bot.get_chat_administrators(self.id, *args, **kwargs)
+        return self.bot.get_chat_administrators(
+            chat_id=self.id,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
 
-    def get_members_count(self, *args: Any, **kwargs: Any) -> int:
+    def get_members_count(self, timeout: float = None, api_kwargs: JSONDict = None) -> int:
         """Shortcut for::
 
             bot.get_chat_members_count(update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.get_chat_members_count`.
 
         Returns:
             :obj:`int`
 
         """
-        return self.bot.get_chat_members_count(self.id, *args, **kwargs)
+        return self.bot.get_chat_members_count(
+            chat_id=self.id,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
 
-    def get_member(self, *args: Any, **kwargs: Any) -> 'ChatMember':
+    def get_member(
+        self,
+        user_id: Union[str, int],
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+    ) -> 'ChatMember':
         """Shortcut for::
 
             bot.get_chat_member(update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.get_chat_member`.
 
         Returns:
             :class:`telegram.ChatMember`
 
         """
-        return self.bot.get_chat_member(self.id, *args, **kwargs)
+        return self.bot.get_chat_member(
+            chat_id=self.id,
+            user_id=user_id,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
 
-    def kick_member(self, *args: Any, **kwargs: Any) -> bool:
+    def kick_member(
+        self,
+        user_id: Union[str, int],
+        timeout: float = None,
+        until_date: Union[int, datetime] = None,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
         """Shortcut for::
 
-                bot.kick_chat_member(update.effective_chat.id, *args, **kwargs)
+            bot.kick_chat_member(update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.kick_chat_member`.
 
         Returns:
             :obj:`bool`: If the action was sent successfully.
@@ -249,299 +317,983 @@ class Chat(TelegramObject):
             member that added them.
 
         """
-        return self.bot.kick_chat_member(self.id, *args, **kwargs)
+        return self.bot.kick_chat_member(
+            chat_id=self.id,
+            user_id=user_id,
+            timeout=timeout,
+            until_date=until_date,
+            api_kwargs=api_kwargs,
+        )
 
-    def unban_member(self, *args: Any, **kwargs: Any) -> bool:
+    def unban_member(
+        self,
+        user_id: Union[str, int],
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+        only_if_banned: bool = None,
+    ) -> bool:
         """Shortcut for::
 
-                bot.unban_chat_member(update.effective_chat.id, *args, **kwargs)
+            bot.unban_chat_member(update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.unban_chat_member`.
 
         Returns:
             :obj:`bool`: If the action was sent successfully.
 
         """
-        return self.bot.unban_chat_member(self.id, *args, **kwargs)
+        return self.bot.unban_chat_member(
+            chat_id=self.id,
+            user_id=user_id,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+            only_if_banned=only_if_banned,
+        )
 
-    def set_permissions(self, *args: Any, **kwargs: Any) -> bool:
+    def set_permissions(
+        self,
+        permissions: ChatPermissions,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
         """Shortcut for::
 
-                bot.set_chat_permissions(update.effective_chat.id, *args, **kwargs)
+            bot.set_chat_permissions(update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.set_chat_permissions`.
 
         Returns:
             :obj:`bool`: If the action was sent successfully.
 
         """
-        return self.bot.set_chat_permissions(self.id, *args, **kwargs)
+        return self.bot.set_chat_permissions(
+            chat_id=self.id,
+            permissions=permissions,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
 
-    def set_administrator_custom_title(self, *args: Any, **kwargs: Any) -> bool:
+    def set_administrator_custom_title(
+        self,
+        user_id: Union[int, str],
+        custom_title: str,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
         """Shortcut for::
 
-                bot.set_chat_administrator_custom_title(update.effective_chat.id, *args, **kwargs)
+            bot.set_chat_administrator_custom_title(update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.set_chat_administrator_custom_title`.
 
         Returns:
         :obj:`bool`: If the action was sent successfully.
 
         """
-        return self.bot.set_chat_administrator_custom_title(self.id, *args, **kwargs)
+        return self.bot.set_chat_administrator_custom_title(
+            chat_id=self.id,
+            user_id=user_id,
+            custom_title=custom_title,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
 
-    def pin_message(self, *args: Any, **kwargs: Any) -> bool:
+    def pin_message(
+        self,
+        message_id: Union[str, int],
+        disable_notification: bool = None,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
         """Shortcut for::
 
              bot.pin_chat_message(chat_id=update.effective_chat.id,
                                   *args,
                                   **kwargs)
 
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.pin_chat_message`.
+
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.pin_chat_message(self.id, *args, **kwargs)
+        return self.bot.pin_chat_message(
+            chat_id=self.id,
+            message_id=message_id,
+            disable_notification=disable_notification,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
 
-    def unpin_message(self, *args: Any, **kwargs: Any) -> bool:
+    def unpin_message(
+        self,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+        message_id: Union[str, int] = None,
+    ) -> bool:
         """Shortcut for::
 
              bot.unpin_chat_message(chat_id=update.effective_chat.id,
                                     *args,
                                     **kwargs)
 
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.unpin_chat_message`.
+
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.unpin_chat_message(self.id, *args, **kwargs)
+        return self.bot.unpin_chat_message(
+            chat_id=self.id,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+            message_id=message_id,
+        )
 
-    def unpin_all_messages(self, *args: Any, **kwargs: Any) -> bool:
+    def unpin_all_messages(
+        self,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
         """Shortcut for::
 
              bot.unpin_all_chat_messages(chat_id=update.effective_chat.id,
                                          *args,
                                          **kwargs)
 
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.unpin_all_chat_messages`.
+
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.unpin_all_chat_messages(chat_id=self.id, *args, **kwargs)
+        return self.bot.unpin_all_chat_messages(
+            chat_id=self.id,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
 
-    def send_message(self, *args: Any, **kwargs: Any) -> 'Message':
+    def send_message(
+        self,
+        text: str,
+        parse_mode: str = None,
+        disable_web_page_preview: bool = None,
+        disable_notification: bool = False,
+        reply_to_message_id: Union[int, str] = None,
+        reply_markup: 'ReplyMarkup' = None,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
+        entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+    ) -> 'Message':
         """Shortcut for::
 
             bot.send_message(update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_message(self.id, *args, **kwargs)
+        return self.bot.send_message(
+            chat_id=self.id,
+            text=text,
+            parse_mode=parse_mode,
+            disable_web_page_preview=disable_web_page_preview,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+            allow_sending_without_reply=allow_sending_without_reply,
+            entities=entities,
+        )
 
-    def send_media_group(self, *args: Any, **kwargs: Any) -> List['Message']:
+    def send_media_group(
+        self,
+        media: List[
+            Union['InputMediaAudio', 'InputMediaDocument', 'InputMediaPhoto', 'InputMediaVideo']
+        ],
+        disable_notification: bool = None,
+        reply_to_message_id: Union[int, str] = None,
+        timeout: float = 20,
+        api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
+    ) -> List['Message']:
         """Shortcut for::
 
             bot.send_media_group(update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_media_group`.
 
         Returns:
             List[:class:`telegram.Message`:] On success, instance representing the message posted.
 
         """
-        return self.bot.send_media_group(self.id, *args, **kwargs)
+        return self.bot.send_media_group(
+            chat_id=self.id,
+            media=media,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+            allow_sending_without_reply=allow_sending_without_reply,
+        )
 
-    def send_chat_action(self, *args: Any, **kwargs: Any) -> bool:
+    def send_chat_action(
+        self,
+        action: str,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
         """Shortcut for::
 
             bot.send_chat_action(update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_chat_action`.
 
         Returns:
             :obj:`True`: On success.
 
         """
-        return self.bot.send_chat_action(self.id, *args, **kwargs)
+        return self.bot.send_chat_action(
+            chat_id=self.id,
+            action=action,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
 
     send_action = send_chat_action
     """Alias for :attr:`send_chat_action`"""
 
-    def send_photo(self, *args: Any, **kwargs: Any) -> 'Message':
+    def send_photo(
+        self,
+        photo: Union[FileInput, 'PhotoSize'],
+        caption: str = None,
+        disable_notification: bool = False,
+        reply_to_message_id: Union[int, str] = None,
+        reply_markup: 'ReplyMarkup' = None,
+        timeout: float = 20,
+        parse_mode: str = None,
+        api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
+        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        filename: str = None,
+    ) -> 'Message':
         """Shortcut for::
 
             bot.send_photo(update.effective_chat.id, *args, **kwargs)
 
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_photo`.
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_photo(self.id, *args, **kwargs)
+        return self.bot.send_photo(
+            chat_id=self.id,
+            photo=photo,
+            caption=caption,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            timeout=timeout,
+            parse_mode=parse_mode,
+            api_kwargs=api_kwargs,
+            allow_sending_without_reply=allow_sending_without_reply,
+            caption_entities=caption_entities,
+            filename=filename,
+        )
 
-    def send_contact(self, *args: Any, **kwargs: Any) -> 'Message':
+    def send_contact(
+        self,
+        phone_number: str = None,
+        first_name: str = None,
+        last_name: str = None,
+        disable_notification: bool = False,
+        reply_to_message_id: Union[int, str] = None,
+        reply_markup: 'ReplyMarkup' = None,
+        timeout: float = None,
+        contact: 'Contact' = None,
+        vcard: str = None,
+        api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
+    ) -> 'Message':
         """Shortcut for::
 
             bot.send_contact(update.effective_chat.id, *args, **kwargs)
 
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_contact`.
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_contact(self.id, *args, **kwargs)
+        return self.bot.send_contact(
+            chat_id=self.id,
+            phone_number=phone_number,
+            first_name=first_name,
+            last_name=last_name,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            timeout=timeout,
+            contact=contact,
+            vcard=vcard,
+            api_kwargs=api_kwargs,
+            allow_sending_without_reply=allow_sending_without_reply,
+        )
 
-    def send_audio(self, *args: Any, **kwargs: Any) -> 'Message':
+    def send_audio(
+        self,
+        audio: Union[FileInput, 'Audio'],
+        duration: int = None,
+        performer: str = None,
+        title: str = None,
+        caption: str = None,
+        disable_notification: bool = False,
+        reply_to_message_id: Union[int, str] = None,
+        reply_markup: 'ReplyMarkup' = None,
+        timeout: float = 20,
+        parse_mode: str = None,
+        thumb: FileInput = None,
+        api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
+        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        filename: str = None,
+    ) -> 'Message':
         """Shortcut for::
 
             bot.send_audio(update.effective_chat.id, *args, **kwargs)
 
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_audio`.
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_audio(self.id, *args, **kwargs)
+        return self.bot.send_audio(
+            chat_id=self.id,
+            audio=audio,
+            duration=duration,
+            performer=performer,
+            title=title,
+            caption=caption,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            timeout=timeout,
+            parse_mode=parse_mode,
+            thumb=thumb,
+            api_kwargs=api_kwargs,
+            allow_sending_without_reply=allow_sending_without_reply,
+            caption_entities=caption_entities,
+            filename=filename,
+        )
 
-    def send_document(self, *args: Any, **kwargs: Any) -> 'Message':
+    def send_document(
+        self,
+        document: Union[FileInput, 'Document'],
+        filename: str = None,
+        caption: str = None,
+        disable_notification: bool = False,
+        reply_to_message_id: Union[int, str] = None,
+        reply_markup: 'ReplyMarkup' = None,
+        timeout: float = 20,
+        parse_mode: str = None,
+        thumb: FileInput = None,
+        api_kwargs: JSONDict = None,
+        disable_content_type_detection: bool = None,
+        allow_sending_without_reply: bool = None,
+        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+    ) -> 'Message':
         """Shortcut for::
 
             bot.send_document(update.effective_chat.id, *args, **kwargs)
 
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_document`.
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_document(self.id, *args, **kwargs)
+        return self.bot.send_document(
+            chat_id=self.id,
+            document=document,
+            filename=filename,
+            caption=caption,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            timeout=timeout,
+            parse_mode=parse_mode,
+            thumb=thumb,
+            api_kwargs=api_kwargs,
+            disable_content_type_detection=disable_content_type_detection,
+            allow_sending_without_reply=allow_sending_without_reply,
+            caption_entities=caption_entities,
+        )
 
-    def send_dice(self, *args: Any, **kwargs: Any) -> 'Message':
+    def send_dice(
+        self,
+        disable_notification: bool = None,
+        reply_to_message_id: Union[int, str] = None,
+        reply_markup: 'ReplyMarkup' = None,
+        timeout: float = None,
+        emoji: str = None,
+        api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
+    ) -> 'Message':
         """Shortcut for::
 
             bot.send_dice(update.effective_chat.id, *args, **kwargs)
 
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_dice`.
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_dice(self.id, *args, **kwargs)
+        return self.bot.send_dice(
+            chat_id=self.id,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            timeout=timeout,
+            emoji=emoji,
+            api_kwargs=api_kwargs,
+            allow_sending_without_reply=allow_sending_without_reply,
+        )
 
-    def send_game(self, *args: Any, **kwargs: Any) -> 'Message':
+    def send_game(
+        self,
+        game_short_name: str,
+        disable_notification: bool = False,
+        reply_to_message_id: Union[int, str] = None,
+        reply_markup: 'InlineKeyboardMarkup' = None,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
+    ) -> 'Message':
         """Shortcut for::
 
             bot.send_game(update.effective_chat.id, *args, **kwargs)
 
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_game`.
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_game(self.id, *args, **kwargs)
+        return self.bot.send_game(
+            chat_id=self.id,
+            game_short_name=game_short_name,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+            allow_sending_without_reply=allow_sending_without_reply,
+        )
 
-    def send_invoice(self, *args: Any, **kwargs: Any) -> 'Message':
+    def send_invoice(
+        self,
+        title: str,
+        description: str,
+        payload: str,
+        provider_token: str,
+        start_parameter: str,
+        currency: str,
+        prices: List['LabeledPrice'],
+        photo_url: str = None,
+        photo_size: int = None,
+        photo_width: int = None,
+        photo_height: int = None,
+        need_name: bool = None,
+        need_phone_number: bool = None,
+        need_email: bool = None,
+        need_shipping_address: bool = None,
+        is_flexible: bool = None,
+        disable_notification: bool = False,
+        reply_to_message_id: Union[int, str] = None,
+        reply_markup: 'InlineKeyboardMarkup' = None,
+        provider_data: Union[str, object] = None,
+        send_phone_number_to_provider: bool = None,
+        send_email_to_provider: bool = None,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
+    ) -> 'Message':
         """Shortcut for::
 
             bot.send_invoice(update.effective_chat.id, *args, **kwargs)
 
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_invoice`.
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_invoice(self.id, *args, **kwargs)
+        return self.bot.send_invoice(
+            chat_id=self.id,
+            title=title,
+            description=description,
+            payload=payload,
+            provider_token=provider_token,
+            start_parameter=start_parameter,
+            currency=currency,
+            prices=prices,
+            photo_url=photo_url,
+            photo_size=photo_size,
+            photo_width=photo_width,
+            photo_height=photo_height,
+            need_name=need_name,
+            need_phone_number=need_phone_number,
+            need_email=need_email,
+            need_shipping_address=need_shipping_address,
+            is_flexible=is_flexible,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            provider_data=provider_data,
+            send_phone_number_to_provider=send_phone_number_to_provider,
+            send_email_to_provider=send_email_to_provider,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+            allow_sending_without_reply=allow_sending_without_reply,
+        )
 
-    def send_location(self, *args: Any, **kwargs: Any) -> 'Message':
+    def send_location(
+        self,
+        latitude: float = None,
+        longitude: float = None,
+        disable_notification: bool = False,
+        reply_to_message_id: Union[int, str] = None,
+        reply_markup: 'ReplyMarkup' = None,
+        timeout: float = None,
+        location: 'Location' = None,
+        live_period: int = None,
+        api_kwargs: JSONDict = None,
+        horizontal_accuracy: float = None,
+        heading: int = None,
+        proximity_alert_radius: int = None,
+        allow_sending_without_reply: bool = None,
+    ) -> 'Message':
         """Shortcut for::
 
             bot.send_location(update.effective_chat.id, *args, **kwargs)
 
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_location`.
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_location(self.id, *args, **kwargs)
+        return self.bot.send_location(
+            chat_id=self.id,
+            latitude=latitude,
+            longitude=longitude,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            timeout=timeout,
+            location=location,
+            live_period=live_period,
+            api_kwargs=api_kwargs,
+            horizontal_accuracy=horizontal_accuracy,
+            heading=heading,
+            proximity_alert_radius=proximity_alert_radius,
+            allow_sending_without_reply=allow_sending_without_reply,
+        )
 
-    def send_animation(self, *args: Any, **kwargs: Any) -> 'Message':
+    def send_animation(
+        self,
+        animation: Union[FileInput, 'Animation'],
+        duration: int = None,
+        width: int = None,
+        height: int = None,
+        thumb: FileInput = None,
+        caption: str = None,
+        parse_mode: str = None,
+        disable_notification: bool = False,
+        reply_to_message_id: Union[int, str] = None,
+        reply_markup: 'ReplyMarkup' = None,
+        timeout: float = 20,
+        api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
+        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        filename: str = None,
+    ) -> 'Message':
         """Shortcut for::
 
             bot.send_animation(update.effective_chat.id, *args, **kwargs)
 
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_animation`.
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_animation(self.id, *args, **kwargs)
+        return self.bot.send_animation(
+            chat_id=self.id,
+            animation=animation,
+            duration=duration,
+            width=width,
+            height=height,
+            thumb=thumb,
+            caption=caption,
+            parse_mode=parse_mode,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+            allow_sending_without_reply=allow_sending_without_reply,
+            caption_entities=caption_entities,
+            filename=filename,
+        )
 
-    def send_sticker(self, *args: Any, **kwargs: Any) -> 'Message':
+    def send_sticker(
+        self,
+        sticker: Union[FileInput, 'Sticker'],
+        disable_notification: bool = False,
+        reply_to_message_id: Union[int, str] = None,
+        reply_markup: 'ReplyMarkup' = None,
+        timeout: float = 20,
+        api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
+    ) -> 'Message':
         """Shortcut for::
 
             bot.send_sticker(update.effective_chat.id, *args, **kwargs)
 
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_sticker`.
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_sticker(self.id, *args, **kwargs)
+        return self.bot.send_sticker(
+            chat_id=self.id,
+            sticker=sticker,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+            allow_sending_without_reply=allow_sending_without_reply,
+        )
 
-    def send_venue(self, *args: Any, **kwargs: Any) -> 'Message':
+    def send_venue(
+        self,
+        latitude: float = None,
+        longitude: float = None,
+        title: str = None,
+        address: str = None,
+        foursquare_id: str = None,
+        disable_notification: bool = False,
+        reply_to_message_id: Union[int, str] = None,
+        reply_markup: 'ReplyMarkup' = None,
+        timeout: float = None,
+        venue: 'Venue' = None,
+        foursquare_type: str = None,
+        api_kwargs: JSONDict = None,
+        google_place_id: str = None,
+        google_place_type: str = None,
+        allow_sending_without_reply: bool = None,
+    ) -> 'Message':
         """Shortcut for::
 
             bot.send_venue(update.effective_chat.id, *args, **kwargs)
 
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_venue`.
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_venue(self.id, *args, **kwargs)
+        return self.bot.send_venue(
+            chat_id=self.id,
+            latitude=latitude,
+            longitude=longitude,
+            title=title,
+            address=address,
+            foursquare_id=foursquare_id,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            timeout=timeout,
+            venue=venue,
+            foursquare_type=foursquare_type,
+            api_kwargs=api_kwargs,
+            google_place_id=google_place_id,
+            google_place_type=google_place_type,
+            allow_sending_without_reply=allow_sending_without_reply,
+        )
 
-    def send_video(self, *args: Any, **kwargs: Any) -> 'Message':
+    def send_video(
+        self,
+        video: Union[FileInput, 'Video'],
+        duration: int = None,
+        caption: str = None,
+        disable_notification: bool = False,
+        reply_to_message_id: Union[int, str] = None,
+        reply_markup: 'ReplyMarkup' = None,
+        timeout: float = 20,
+        width: int = None,
+        height: int = None,
+        parse_mode: str = None,
+        supports_streaming: bool = None,
+        thumb: FileInput = None,
+        api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
+        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        filename: str = None,
+    ) -> 'Message':
         """Shortcut for::
 
             bot.send_video(update.effective_chat.id, *args, **kwargs)
 
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_video`.
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_video(self.id, *args, **kwargs)
+        return self.bot.send_video(
+            chat_id=self.id,
+            video=video,
+            duration=duration,
+            caption=caption,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            timeout=timeout,
+            width=width,
+            height=height,
+            parse_mode=parse_mode,
+            supports_streaming=supports_streaming,
+            thumb=thumb,
+            api_kwargs=api_kwargs,
+            allow_sending_without_reply=allow_sending_without_reply,
+            caption_entities=caption_entities,
+            filename=filename,
+        )
 
-    def send_video_note(self, *args: Any, **kwargs: Any) -> 'Message':
+    def send_video_note(
+        self,
+        video_note: Union[FileInput, 'VideoNote'],
+        duration: int = None,
+        length: int = None,
+        disable_notification: bool = False,
+        reply_to_message_id: Union[int, str] = None,
+        reply_markup: 'ReplyMarkup' = None,
+        timeout: float = 20,
+        thumb: FileInput = None,
+        api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
+        filename: str = None,
+    ) -> 'Message':
         """Shortcut for::
 
             bot.send_video_note(update.effective_chat.id, *args, **kwargs)
 
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_video_note`.
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_video_note(self.id, *args, **kwargs)
+        return self.bot.send_video_note(
+            chat_id=self.id,
+            video_note=video_note,
+            duration=duration,
+            length=length,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            timeout=timeout,
+            thumb=thumb,
+            api_kwargs=api_kwargs,
+            allow_sending_without_reply=allow_sending_without_reply,
+            filename=filename,
+        )
 
-    def send_voice(self, *args: Any, **kwargs: Any) -> 'Message':
+    def send_voice(
+        self,
+        voice: Union[FileInput, 'Voice'],
+        duration: int = None,
+        caption: str = None,
+        disable_notification: bool = False,
+        reply_to_message_id: Union[int, str] = None,
+        reply_markup: 'ReplyMarkup' = None,
+        timeout: float = 20,
+        parse_mode: str = None,
+        api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
+        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        filename: str = None,
+    ) -> 'Message':
         """Shortcut for::
 
             bot.send_voice(update.effective_chat.id, *args, **kwargs)
 
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_voice`.
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_voice(self.id, *args, **kwargs)
+        return self.bot.send_voice(
+            chat_id=self.id,
+            voice=voice,
+            duration=duration,
+            caption=caption,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            timeout=timeout,
+            parse_mode=parse_mode,
+            api_kwargs=api_kwargs,
+            allow_sending_without_reply=allow_sending_without_reply,
+            caption_entities=caption_entities,
+            filename=filename,
+        )
 
-    def send_poll(self, *args: Any, **kwargs: Any) -> 'Message':
+    def send_poll(
+        self,
+        question: str,
+        options: List[str],
+        is_anonymous: bool = True,
+        # We use constant.POLL_REGULAR instead of Poll.REGULAR here to avoid circular imports
+        type: str = constants.POLL_REGULAR,  # pylint: disable=W0622
+        allows_multiple_answers: bool = False,
+        correct_option_id: int = None,
+        is_closed: bool = None,
+        disable_notification: bool = None,
+        reply_to_message_id: Union[int, str] = None,
+        reply_markup: 'ReplyMarkup' = None,
+        timeout: float = None,
+        explanation: str = None,
+        explanation_parse_mode: Union[str, DefaultValue, None] = DEFAULT_NONE,
+        open_period: int = None,
+        close_date: Union[int, datetime] = None,
+        api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
+        explanation_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+    ) -> 'Message':
         """Shortcut for::
 
             bot.send_poll(update.effective_chat.id, *args, **kwargs)
 
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_poll`.
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_poll(self.id, *args, **kwargs)
+        return self.bot.send_poll(
+            chat_id=self.id,
+            question=question,
+            options=options,
+            is_anonymous=is_anonymous,
+            type=type,  # pylint=pylint,
+            allows_multiple_answers=allows_multiple_answers,
+            correct_option_id=correct_option_id,
+            is_closed=is_closed,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            timeout=timeout,
+            explanation=explanation,
+            explanation_parse_mode=explanation_parse_mode,
+            open_period=open_period,
+            close_date=close_date,
+            api_kwargs=api_kwargs,
+            allow_sending_without_reply=allow_sending_without_reply,
+            explanation_entities=explanation_entities,
+        )
 
-    def send_copy(self, *args: Any, **kwargs: Any) -> 'MessageId':
+    def send_copy(
+        self,
+        from_chat_id: Union[str, int],
+        message_id: Union[str, int],
+        caption: str = None,
+        parse_mode: str = None,
+        caption_entities: Union[Tuple['MessageEntity', ...], List['MessageEntity']] = None,
+        disable_notification: bool = False,
+        reply_to_message_id: Union[int, str] = None,
+        allow_sending_without_reply: bool = False,
+        reply_markup: 'ReplyMarkup' = None,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+    ) -> 'MessageId':
         """Shortcut for::
 
             bot.copy_message(chat_id=update.effective_chat.id, *args, **kwargs)
 
+        For the documentation of the arguments, please see :meth:`telegram.Bot.copy_message`.
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.copy_message(chat_id=self.id, *args, **kwargs)
+        return self.bot.copy_message(
+            chat_id=self.id,
+            from_chat_id=from_chat_id,
+            message_id=message_id,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            allow_sending_without_reply=allow_sending_without_reply,
+            reply_markup=reply_markup,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
 
-    def copy_message(self, *args: Any, **kwargs: Any) -> 'MessageId':
+    def copy_message(
+        self,
+        chat_id: Union[int, str],
+        message_id: Union[str, int],
+        caption: str = None,
+        parse_mode: str = None,
+        caption_entities: Union[Tuple['MessageEntity', ...], List['MessageEntity']] = None,
+        disable_notification: bool = False,
+        reply_to_message_id: Union[int, str] = None,
+        allow_sending_without_reply: bool = False,
+        reply_markup: 'ReplyMarkup' = None,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+    ) -> 'MessageId':
         """Shortcut for::
 
             bot.copy_message(from_chat_id=update.effective_chat.id, *args, **kwargs)
 
+        For the documentation of the arguments, please see :meth:`telegram.Bot.copy_message`.
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.copy_message(from_chat_id=self.id, *args, **kwargs)
+        return self.bot.copy_message(
+            from_chat_id=self.id,
+            chat_id=chat_id,
+            message_id=message_id,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            allow_sending_without_reply=allow_sending_without_reply,
+            reply_markup=reply_markup,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
