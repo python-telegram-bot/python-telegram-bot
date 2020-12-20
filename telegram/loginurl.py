@@ -34,13 +34,10 @@ class LoginUrl(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`url` is equal.
 
-    Attributes:
-        url (:obj:`str`): An HTTP URL to be opened with user authorization data.
-        forward_text (:obj:`str`): Optional. New text of the button in forwarded messages.
-        bot_username (:obj:`str`): Optional. Username of a bot, which will be used for user
-            authorization.
-        request_write_access (:obj:`bool`): Optional. Pass :obj:`True` to request the permission
-            for your bot to send messages to the user.
+    Note:
+        You must always check the hash of the received data to verify the authentication
+        and the integrity of the data as described in
+        `Checking authorization <https://core.telegram.org/widgets/login#checking-authorization>`_
 
     Args:
         url (:obj:`str`): An HTTP URL to be opened with user authorization data added to the query
@@ -62,10 +59,14 @@ class LoginUrl(TelegramObject):
         request_write_access (:obj:`bool`, optional): Pass :obj:`True` to request the permission
             for your bot to send messages to the user.
 
-    Note:
-        You must always check the hash of the received data to verify the authentication
-        and the integrity of the data as described in
-        `Checking authorization <https://core.telegram.org/widgets/login#checking-authorization>`_
+    Attributes:
+        url (:obj:`str`): An HTTP URL to be opened with user authorization data.
+        forward_text (:obj:`str`): Optional. New text of the button in forwarded messages.
+        bot_username (:obj:`str`): Optional. Username of a bot, which will be used for user
+            authorization.
+        request_write_access (:obj:`bool`): Optional. Pass :obj:`True` to request the permission
+            for your bot to send messages to the user.
+
     """
 
     def __init__(

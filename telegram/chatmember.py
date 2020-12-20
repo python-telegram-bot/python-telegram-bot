@@ -34,42 +34,6 @@ class ChatMember(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`user` and :attr:`status` are equal.
 
-    Attributes:
-        user (:class:`telegram.User`): Information about the user.
-        status (:obj:`str`): The member's status in the chat.
-        custom_title (:obj:`str`): Optional. Custom title for owner and administrators.
-        is_anonymous (:obj:`bool`): Optional. :obj:`True`, if the user's presence in the chat is
-            hidden.
-        until_date (:class:`datetime.datetime`): Optional. Date when restrictions will be lifted
-            for this user.
-        can_be_edited (:obj:`bool`): Optional. If the bot is allowed to edit administrator
-            privileges of that user.
-        can_change_info (:obj:`bool`): Optional. If the user can change the chat title, photo and
-            other settings.
-        can_post_messages (:obj:`bool`): Optional. If the administrator can post in the channel.
-        can_edit_messages (:obj:`bool`): Optional. If the administrator can edit messages of other
-            users.
-        can_delete_messages (:obj:`bool`): Optional. If the administrator can delete messages of
-            other users.
-        can_invite_users (:obj:`bool`): Optional. If the user can invite new users to the chat.
-        can_restrict_members (:obj:`bool`): Optional. If the administrator can restrict, ban or
-            unban chat members.
-        can_pin_messages (:obj:`bool`): Optional. If the user can pin messages.
-        can_promote_members (:obj:`bool`): Optional. If the administrator can add new
-            administrators.
-        is_member (:obj:`bool`): Optional. Restricted only. :obj:`True`, if the user is a member of
-            the chat at the moment of the request.
-        can_send_messages (:obj:`bool`): Optional. If the user can send text messages, contacts,
-            locations and venues.
-        can_send_media_messages (:obj:`bool`): Optional. If the user can send media messages,
-            implies can_send_messages.
-        can_send_polls (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to
-            send polls.
-        can_send_other_messages (:obj:`bool`): Optional. If the user can send animations, games,
-            stickers and use inline bots, implies can_send_media_messages.
-        can_add_web_page_previews (:obj:`bool`): Optional. If user may add web page previews to his
-            messages, implies can_send_media_messages
-
     Args:
         user (:class:`telegram.User`): Information about the user.
         status (:obj:`str`): The member's status in the chat. Can be 'creator', 'administrator',
@@ -112,6 +76,42 @@ class ChatMember(TelegramObject):
             can send animations, games, stickers and use inline bots.
         can_add_web_page_previews (:obj:`bool`, optional): Restricted only. :obj:`True`, if user
             may add web page previews to his messages.
+
+    Attributes:
+        user (:class:`telegram.User`): Information about the user.
+        status (:obj:`str`): The member's status in the chat.
+        custom_title (:obj:`str`): Optional. Custom title for owner and administrators.
+        is_anonymous (:obj:`bool`): Optional. :obj:`True`, if the user's presence in the chat is
+            hidden.
+        until_date (:class:`datetime.datetime`): Optional. Date when restrictions will be lifted
+            for this user.
+        can_be_edited (:obj:`bool`): Optional. If the bot is allowed to edit administrator
+            privileges of that user.
+        can_change_info (:obj:`bool`): Optional. If the user can change the chat title, photo and
+            other settings.
+        can_post_messages (:obj:`bool`): Optional. If the administrator can post in the channel.
+        can_edit_messages (:obj:`bool`): Optional. If the administrator can edit messages of other
+            users.
+        can_delete_messages (:obj:`bool`): Optional. If the administrator can delete messages of
+            other users.
+        can_invite_users (:obj:`bool`): Optional. If the user can invite new users to the chat.
+        can_restrict_members (:obj:`bool`): Optional. If the administrator can restrict, ban or
+            unban chat members.
+        can_pin_messages (:obj:`bool`): Optional. If the user can pin messages.
+        can_promote_members (:obj:`bool`): Optional. If the administrator can add new
+            administrators.
+        is_member (:obj:`bool`): Optional. Restricted only. :obj:`True`, if the user is a member of
+            the chat at the moment of the request.
+        can_send_messages (:obj:`bool`): Optional. If the user can send text messages, contacts,
+            locations and venues.
+        can_send_media_messages (:obj:`bool`): Optional. If the user can send media messages,
+            implies can_send_messages.
+        can_send_polls (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to
+            send polls.
+        can_send_other_messages (:obj:`bool`): Optional. If the user can send animations, games,
+            stickers and use inline bots, implies can_send_media_messages.
+        can_add_web_page_previews (:obj:`bool`): Optional. If user may add web page previews to his
+            messages, implies can_send_media_messages
 
     """
 

@@ -522,13 +522,6 @@ class Job:
         * If :attr:`job` isn't passed on initialization, it must be set manually afterwards for
           this :class:`telegram.ext.Job` to be useful.
 
-    Attributes:
-        callback (:obj:`callable`): The callback function that should be executed by the new job.
-        context (:obj:`object`): Optional. Additional data needed for the callback function.
-        name (:obj:`str`): Optional. The name of the new job.
-        job_queue (:class:`telegram.ext.JobQueue`): Optional. The ``JobQueue`` this job belongs to.
-        job (:class:`apscheduler.job.Job`): Optional. The APS Job this job is a wrapper for.
-
     Args:
         callback (:obj:`callable`): The callback function that should be executed by the new job.
             Callback signature for context based API:
@@ -543,6 +536,13 @@ class Job:
         job_queue (:class:`telegram.ext.JobQueue`, optional): The ``JobQueue`` this job belongs to.
             Only optional for backward compatibility with ``JobQueue.put()``.
         job (:class:`apscheduler.job.Job`, optional): The APS Job this job is a wrapper for.
+
+    Attributes:
+        callback (:obj:`callable`): The callback function that should be executed by the new job.
+        context (:obj:`object`): Optional. Additional data needed for the callback function.
+        name (:obj:`str`): Optional. The name of the new job.
+        job_queue (:class:`telegram.ext.JobQueue`): Optional. The ``JobQueue`` this job belongs to.
+        job (:class:`apscheduler.job.Job`): Optional. The APS Job this job is a wrapper for.
     """
 
     def __init__(

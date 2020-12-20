@@ -33,11 +33,6 @@ logger = logging.getLogger(__name__)
 class InputFile:
     """This object represents a Telegram InputFile.
 
-    Attributes:
-        input_file_content (:obj:`bytes`): The binary content of the file to send.
-        filename (:obj:`str`): Optional. Filename for the file to be sent.
-        attach (:obj:`str`): Optional. Attach id for sending multiple files.
-
     Args:
         obj (:obj:`File handler` | :obj:`bytes`): An open file descriptor or the files content as
             bytes.
@@ -47,6 +42,11 @@ class InputFile:
 
     Raises:
         TelegramError
+
+    Attributes:
+        input_file_content (:obj:`bytes`): The binary content of the file to send.
+        filename (:obj:`str`): Optional. Filename for the file to be sent.
+        attach (:obj:`str`): Optional. Attach id for sending multiple files.
 
     """
 

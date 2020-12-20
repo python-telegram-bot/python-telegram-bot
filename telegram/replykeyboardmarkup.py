@@ -30,13 +30,6 @@ class ReplyKeyboardMarkup(ReplyMarkup):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their the size of :attr:`keyboard` and all the buttons are equal.
 
-    Attributes:
-        keyboard (List[List[:class:`telegram.KeyboardButton` | :obj:`str`]]): Array of button rows.
-        resize_keyboard (:obj:`bool`): Optional. Requests clients to resize the keyboard.
-        one_time_keyboard (:obj:`bool`): Optional. Requests clients to hide the keyboard as soon as
-            it's been used.
-        selective (:obj:`bool`): Optional. Show the keyboard to specific users only.
-
     Example:
         A user requests to change the bot's language, bot replies to the request with a keyboard
         to select the new language. Other users in the group don't see the keyboard.
@@ -62,6 +55,13 @@ class ReplyKeyboardMarkup(ReplyMarkup):
             Defaults to :obj:`False`.
 
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        keyboard (List[List[:class:`telegram.KeyboardButton` | :obj:`str`]]): Array of button rows.
+        resize_keyboard (:obj:`bool`): Optional. Requests clients to resize the keyboard.
+        one_time_keyboard (:obj:`bool`): Optional. Requests clients to hide the keyboard as soon as
+            it's been used.
+        selective (:obj:`bool`): Optional. Show the keyboard to specific users only.
 
     """
 

@@ -34,24 +34,6 @@ class InlineQueryResultVoice(InlineQueryResult):
     :attr:`input_message_content` to send a message with the specified content instead of the
     the voice message.
 
-    Attributes:
-        type (:obj:`str`): 'voice'.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
-        voice_url (:obj:`str`): A valid URL for the voice recording.
-        title (:obj:`str`): Recording title.
-        caption (:obj:`str`): Optional. Caption, 0-1024 characters after entities parsing.
-        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.ParseMode` for the available modes.
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
-            entities that appear in the caption, which can be specified instead of
-            :attr:`parse_mode`.
-        voice_duration (:obj:`int`): Optional. Recording duration in seconds.
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-            to the message.
-        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-            message to be sent instead of the voice recording.
-
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         voice_url (:obj:`str`): A valid URL for the voice recording.
@@ -69,6 +51,24 @@ class InlineQueryResultVoice(InlineQueryResult):
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the voice recording.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        type (:obj:`str`): 'voice'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        voice_url (:obj:`str`): A valid URL for the voice recording.
+        title (:obj:`str`): Recording title.
+        caption (:obj:`str`): Optional. Caption, 0-1024 characters after entities parsing.
+        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
+            in :class:`telegram.ParseMode` for the available modes.
+        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
+            entities that appear in the caption, which can be specified instead of
+            :attr:`parse_mode`.
+        voice_duration (:obj:`int`): Optional. Recording duration in seconds.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
+            to the message.
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
+            message to be sent instead of the voice recording.
 
     """
 

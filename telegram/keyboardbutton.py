@@ -33,13 +33,11 @@ class KeyboardButton(TelegramObject):
     :attr:`request_poll` are equal.
 
     Note:
-        Optional fields are mutually exclusive.
-
-    Attributes:
-        text (:obj:`str`): Text of the button.
-        request_contact (:obj:`bool`): Optional. The user's phone number will be sent.
-        request_location (:obj:`bool`): Optional. The user's current location will be sent.
-        request_poll (:class:`KeyboardButtonPollType`): Optional. If the user should create a poll.
+        * Optional fields are mutually exclusive.
+        * :attr:`request_contact` and :attr:`request_location` options will only work in Telegram
+          versions released after 9 April, 2016. Older clients will ignore them.
+        * :attr:`request_poll` option will only work in Telegram versions released after 23
+          January, 2020. Older clients will receive unsupported message.
 
     Args:
         text (:obj:`str`): Text of the button. If none of the optional fields are used, it will be
@@ -52,12 +50,11 @@ class KeyboardButton(TelegramObject):
             asked to create a poll and send it to the bot when the button is pressed. Available in
             private chats only.
 
-    Note:
-        :attr:`request_contact` and :attr:`request_location` options will only work in Telegram
-        versions released after 9 April, 2016. Older clients will ignore them.
-
-        :attr:`request_poll` option will only work in Telegram versions released after 23 January,
-        2020. Older clients will receive unsupported message.
+    Attributes:
+        text (:obj:`str`): Text of the button.
+        request_contact (:obj:`bool`): Optional. The user's phone number will be sent.
+        request_location (:obj:`bool`): Optional. The user's current location will be sent.
+        request_poll (:class:`KeyboardButtonPollType`): Optional. If the user should create a poll.
 
     """
 

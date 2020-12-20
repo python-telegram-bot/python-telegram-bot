@@ -33,16 +33,6 @@ UT = TypeVar('UT')
 class TypeHandler(Handler[UT]):
     """Handler class to handle updates of custom types.
 
-    Attributes:
-        type (:obj:`type`): The ``type`` of updates this handler should process.
-        callback (:obj:`callable`): The callback function for this handler.
-        strict (:obj:`bool`): Use ``type`` instead of ``isinstance``. Default is :obj:`False`.
-        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
-            passed to the callback function.
-        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
-            the callback function.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
-
     Warning:
         When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
@@ -72,6 +62,16 @@ class TypeHandler(Handler[UT]):
             DEPRECATED: Please switch to context based callbacks.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
             Defaults to :obj:`False`.
+
+    Attributes:
+        type (:obj:`type`): The ``type`` of updates this handler should process.
+        callback (:obj:`callable`): The callback function for this handler.
+        strict (:obj:`bool`): Use ``type`` instead of ``isinstance``. Default is :obj:`False`.
+        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
+            passed to the callback function.
+        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
+            the callback function.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     """
 

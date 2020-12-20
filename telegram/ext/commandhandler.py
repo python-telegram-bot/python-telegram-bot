@@ -49,27 +49,6 @@ class CommandHandler(Handler[Update]):
     Note:
         :class:`telegram.ext.CommandHandler` does *not* handle (edited) channel posts.
 
-    Attributes:
-        command (:class:`telegram.utils.types.SLT[str]`):
-            The command or list of commands this handler should listen for.
-            Limitations are the same as described here https://core.telegram.org/bots#commands
-        callback (:obj:`callable`): The callback function for this handler.
-        filters (:class:`telegram.ext.BaseFilter`): Optional. Only allow updates with these
-            Filters.
-        allow_edited (:obj:`bool`): Determines whether the handler should also accept
-            edited messages.
-        pass_args (:obj:`bool`): Determines whether the handler should be passed
-            ``args``.
-        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
-            passed to the callback function.
-        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
-            the callback function.
-        pass_user_data (:obj:`bool`): Determines whether ``user_data`` will be passed to
-            the callback function.
-        pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
-            the callback function.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
-
     Note:
         :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a :obj:`dict` you
         can use to keep any data in will be sent to the :attr:`callback` function. Related to
@@ -129,6 +108,27 @@ class CommandHandler(Handler[Update]):
 
     Raises:
         ValueError - when command is too long or has illegal chars.
+
+    Attributes:
+        command (:class:`telegram.utils.types.SLT[str]`):
+            The command or list of commands this handler should listen for.
+            Limitations are the same as described here https://core.telegram.org/bots#commands
+        callback (:obj:`callable`): The callback function for this handler.
+        filters (:class:`telegram.ext.BaseFilter`): Optional. Only allow updates with these
+            Filters.
+        allow_edited (:obj:`bool`): Determines whether the handler should also accept
+            edited messages.
+        pass_args (:obj:`bool`): Determines whether the handler should be passed
+            ``args``.
+        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
+            passed to the callback function.
+        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
+            the callback function.
+        pass_user_data (:obj:`bool`): Determines whether ``user_data`` will be passed to
+            the callback function.
+        pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
+            the callback function.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
     """
 
     def __init__(

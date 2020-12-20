@@ -47,24 +47,6 @@ class InlineQueryHandler(Handler[Update]):
     Handler class to handle Telegram inline queries. Optionally based on a regex. Read the
     documentation of the ``re`` module for more information.
 
-    Attributes:
-        callback (:obj:`callable`): The callback function for this handler.
-        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
-            passed to the callback function.
-        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
-            the callback function.
-        pattern (:obj:`str` | :obj:`Pattern`): Optional. Regex pattern to test
-            :attr:`telegram.InlineQuery.query` against.
-        pass_groups (:obj:`bool`): Determines whether ``groups`` will be passed to the
-            callback function.
-        pass_groupdict (:obj:`bool`): Determines whether ``groupdict``. will be passed to
-            the callback function.
-        pass_user_data (:obj:`bool`): Determines whether ``user_data`` will be passed to
-            the callback function.
-        pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
-            the callback function.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
-
     Note:
         :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
         can use to keep any data in will be sent to the :attr:`callback` function. Related to
@@ -116,6 +98,24 @@ class InlineQueryHandler(Handler[Update]):
             DEPRECATED: Please switch to context based callbacks.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
             Defaults to :obj:`False`.
+
+    Attributes:
+        callback (:obj:`callable`): The callback function for this handler.
+        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
+            passed to the callback function.
+        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
+            the callback function.
+        pattern (:obj:`str` | :obj:`Pattern`): Optional. Regex pattern to test
+            :attr:`telegram.InlineQuery.query` against.
+        pass_groups (:obj:`bool`): Determines whether ``groups`` will be passed to the
+            callback function.
+        pass_groupdict (:obj:`bool`): Determines whether ``groupdict``. will be passed to
+            the callback function.
+        pass_user_data (:obj:`bool`): Determines whether ``user_data`` will be passed to
+            the callback function.
+        pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
+            the callback function.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     """
 

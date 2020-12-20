@@ -34,18 +34,7 @@ class PreCheckoutQuery(TelegramObject):
     considered equal, if their :attr:`id` is equal.
 
     Note:
-        * In Python `from` is a reserved word, use `from_user` instead.
-
-    Attributes:
-        id (:obj:`str`): Unique query identifier.
-        from_user (:class:`telegram.User`): User who sent the query.
-        currency (:obj:`str`): Three-letter ISO 4217 currency code.
-        total_amount (:obj:`int`): Total price in the smallest units of the currency.
-        invoice_payload (:obj:`str`): Bot specified invoice payload.
-        shipping_option_id (:obj:`str`): Optional. Identifier of the shipping option chosen by the
-            user.
-        order_info (:class:`telegram.OrderInfo`): Optional. Order info provided by the user.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+        In Python `from` is a reserved word, use `from_user` instead.
 
     Args:
         id (:obj:`str`): Unique query identifier.
@@ -63,6 +52,17 @@ class PreCheckoutQuery(TelegramObject):
         order_info (:class:`telegram.OrderInfo`, optional): Order info provided by the user.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        id (:obj:`str`): Unique query identifier.
+        from_user (:class:`telegram.User`): User who sent the query.
+        currency (:obj:`str`): Three-letter ISO 4217 currency code.
+        total_amount (:obj:`int`): Total price in the smallest units of the currency.
+        invoice_payload (:obj:`str`): Bot specified invoice payload.
+        shipping_option_id (:obj:`str`): Optional. Identifier of the shipping option chosen by the
+            user.
+        order_info (:class:`telegram.OrderInfo`): Optional. Order info provided by the user.
+        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     """
 

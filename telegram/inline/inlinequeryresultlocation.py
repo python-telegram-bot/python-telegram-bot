@@ -32,28 +32,6 @@ class InlineQueryResultLocation(InlineQueryResult):
     Alternatively, you can use :attr:`input_message_content` to send a message with the specified
     content instead of the location.
 
-    Attributes:
-        type (:obj:`str`): 'location'.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
-        latitude (:obj:`float`): Location latitude in degrees.
-        longitude (:obj:`float`): Location longitude in degrees.
-        title (:obj:`str`): Location title.
-        horizontal_accuracy (:obj:`float`): Optional. The radius of uncertainty for the location,
-            measured in meters.
-        live_period (:obj:`int`): Optional. Period in seconds for which the location can be
-            updated, should be between 60 and 86400.
-        heading (:obj:`int`): Optional. For live locations, a direction in which the user is
-            moving, in degrees.
-        proximity_alert_radius (:obj:`int`): Optional. For live locations, a maximum distance for
-            proximity alerts about approaching another chat member, in meters.
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-            to the message.
-        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-            message to be sent instead of the location.
-        thumb_url (:obj:`str`): Optional. Url of the thumbnail for the result.
-        thumb_width (:obj:`int`): Optional. Thumbnail width.
-        thumb_height (:obj:`int`): Optional. Thumbnail height.
-
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         latitude (:obj:`float`): Location latitude in degrees.
@@ -76,6 +54,28 @@ class InlineQueryResultLocation(InlineQueryResult):
         thumb_width (:obj:`int`, optional): Thumbnail width.
         thumb_height (:obj:`int`, optional): Thumbnail height.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        type (:obj:`str`): 'location'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        latitude (:obj:`float`): Location latitude in degrees.
+        longitude (:obj:`float`): Location longitude in degrees.
+        title (:obj:`str`): Location title.
+        horizontal_accuracy (:obj:`float`): Optional. The radius of uncertainty for the location,
+            measured in meters.
+        live_period (:obj:`int`): Optional. Period in seconds for which the location can be
+            updated, should be between 60 and 86400.
+        heading (:obj:`int`): Optional. For live locations, a direction in which the user is
+            moving, in degrees.
+        proximity_alert_radius (:obj:`int`): Optional. For live locations, a maximum distance for
+            proximity alerts about approaching another chat member, in meters.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
+            to the message.
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
+            message to be sent instead of the location.
+        thumb_url (:obj:`str`): Optional. Url of the thumbnail for the result.
+        thumb_width (:obj:`int`): Optional. Thumbnail width.
+        thumb_height (:obj:`int`): Optional. Thumbnail height.
 
     """
 

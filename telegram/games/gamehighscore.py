@@ -33,12 +33,12 @@ class GameHighScore(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`position`, :attr:`user` and :attr:`score` are equal.
 
-    Attributes:
+    Args:
         position (:obj:`int`): Position in high score table for the game.
         user (:class:`telegram.User`): User.
         score (:obj:`int`): Score.
 
-    Args:
+    Attributes:
         position (:obj:`int`): Position in high score table for the game.
         user (:class:`telegram.User`): User.
         score (:obj:`int`): Score.

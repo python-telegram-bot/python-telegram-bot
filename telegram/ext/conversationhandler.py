@@ -101,35 +101,6 @@ class ConversationHandler(Handler[Update]):
 
     .. _`examples`: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples
 
-    Attributes:
-        entry_points (List[:class:`telegram.ext.Handler`]): A list of ``Handler`` objects that can
-            trigger the start of the conversation.
-        states (Dict[:obj:`object`, List[:class:`telegram.ext.Handler`]]): A :obj:`dict` that
-            defines the different states of conversation a user can be in and one or more
-            associated ``Handler`` objects that should be used in that state.
-        fallbacks (List[:class:`telegram.ext.Handler`]): A list of handlers that might be used if
-            the user is in a conversation, but every handler for their current state returned
-            :obj:`False` on :attr:`check_update`.
-        allow_reentry (:obj:`bool`): Determines if a user can restart a conversation with
-            an entry point.
-        per_chat (:obj:`bool`): If the conversationkey should contain the Chat's ID.
-        per_user (:obj:`bool`): If the conversationkey should contain the User's ID.
-        per_message (:obj:`bool`): If the conversationkey should contain the Message's
-            ID.
-        conversation_timeout (:obj:`float` | :obj:`datetime.timedelta`): Optional. When this
-            handler is inactive more than this timeout (in seconds), it will be automatically
-            ended. If this value is 0 (default), there will be no timeout. When it's triggered, the
-            last received update and the corresponding ``context`` will be handled by ALL the
-            handler's who's :attr:`check_update` method returns :obj:`True` that are in the state
-            :attr:`ConversationHandler.TIMEOUT`.
-        name (:obj:`str`): Optional. The name for this conversationhandler. Required for
-            persistence
-        persistent (:obj:`bool`): Optional. If the conversations dict for this handler should be
-            saved. Name is required and persistence has to be set in :class:`telegram.ext.Updater`
-        map_to_parent (Dict[:obj:`object`, :obj:`object`]): Optional. A :obj:`dict` that can be
-            used to instruct a nested conversationhandler to transition into a mapped state on
-            its parent conversationhandler in place of a specified nested state.
-
     Args:
         entry_points (List[:class:`telegram.ext.Handler`]): A list of ``Handler`` objects that can
             trigger the start of the conversation. The first handler which :attr:`check_update`
@@ -168,6 +139,35 @@ class ConversationHandler(Handler[Update]):
 
     Raises:
         ValueError
+
+    Attributes:
+        entry_points (List[:class:`telegram.ext.Handler`]): A list of ``Handler`` objects that can
+            trigger the start of the conversation.
+        states (Dict[:obj:`object`, List[:class:`telegram.ext.Handler`]]): A :obj:`dict` that
+            defines the different states of conversation a user can be in and one or more
+            associated ``Handler`` objects that should be used in that state.
+        fallbacks (List[:class:`telegram.ext.Handler`]): A list of handlers that might be used if
+            the user is in a conversation, but every handler for their current state returned
+            :obj:`False` on :attr:`check_update`.
+        allow_reentry (:obj:`bool`): Determines if a user can restart a conversation with
+            an entry point.
+        per_chat (:obj:`bool`): If the conversationkey should contain the Chat's ID.
+        per_user (:obj:`bool`): If the conversationkey should contain the User's ID.
+        per_message (:obj:`bool`): If the conversationkey should contain the Message's
+            ID.
+        conversation_timeout (:obj:`float` | :obj:`datetime.timedelta`): Optional. When this
+            handler is inactive more than this timeout (in seconds), it will be automatically
+            ended. If this value is 0 (default), there will be no timeout. When it's triggered, the
+            last received update and the corresponding ``context`` will be handled by ALL the
+            handler's who's :attr:`check_update` method returns :obj:`True` that are in the state
+            :attr:`ConversationHandler.TIMEOUT`.
+        name (:obj:`str`): Optional. The name for this conversationhandler. Required for
+            persistence
+        persistent (:obj:`bool`): Optional. If the conversations dict for this handler should be
+            saved. Name is required and persistence has to be set in :class:`telegram.ext.Updater`
+        map_to_parent (Dict[:obj:`object`, :obj:`object`]): Optional. A :obj:`dict` that can be
+            used to instruct a nested conversationhandler to transition into a mapped state on
+            its parent conversationhandler in place of a specified nested state.
 
     """
 

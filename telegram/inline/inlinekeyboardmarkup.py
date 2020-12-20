@@ -34,14 +34,14 @@ class InlineKeyboardMarkup(ReplyMarkup):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their the size of :attr:`inline_keyboard` and all the buttons are equal.
 
-    Attributes:
-        inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
-            each represented by a list of InlineKeyboardButton objects.
-
     Args:
         inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
             each represented by a list of InlineKeyboardButton objects.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
+            each represented by a list of InlineKeyboardButton objects.
 
     """
 

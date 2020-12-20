@@ -27,18 +27,6 @@ from .handler import Handler
 class PollHandler(Handler[Update]):
     """Handler class to handle Telegram updates that contain a poll.
 
-    Attributes:
-        callback (:obj:`callable`): The callback function for this handler.
-        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
-            passed to the callback function.
-        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
-            the callback function.
-        pass_user_data (:obj:`bool`): Determines whether ``user_data`` will be passed to
-            the callback function.
-        pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
-            the callback function.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
-
     Note:
         :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
         can use to keep any data in will be sent to the :attr:`callback` function. Related to
@@ -79,6 +67,18 @@ class PollHandler(Handler[Update]):
             DEPRECATED: Please switch to context based callbacks.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
             Defaults to :obj:`False`.
+
+    Attributes:
+        callback (:obj:`callable`): The callback function for this handler.
+        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
+            passed to the callback function.
+        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
+            the callback function.
+        pass_user_data (:obj:`bool`): Determines whether ``user_data`` will be passed to
+            the callback function.
+        pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
+            the callback function.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     """
 

@@ -34,14 +34,7 @@ class ShippingQuery(TelegramObject):
     considered equal, if their :attr:`id` is equal.
 
     Note:
-        * In Python `from` is a reserved word, use `from_user` instead.
-
-    Attributes:
-        id (:obj:`str`): Unique query identifier.
-        from_user (:class:`telegram.User`): User who sent the query.
-        invoice_payload (:obj:`str`): Bot specified invoice payload.
-        shipping_address (:class:`telegram.ShippingAddress`): User specified shipping address.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+        In Python `from` is a reserved word, use `from_user` instead.
 
     Args:
         id (:obj:`str`): Unique query identifier.
@@ -50,6 +43,13 @@ class ShippingQuery(TelegramObject):
         shipping_address (:class:`telegram.ShippingAddress`): User specified shipping address.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        id (:obj:`str`): Unique query identifier.
+        from_user (:class:`telegram.User`): User who sent the query.
+        invoice_payload (:obj:`str`): Bot specified invoice payload.
+        shipping_address (:class:`telegram.ShippingAddress`): User specified shipping address.
+        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     """
 

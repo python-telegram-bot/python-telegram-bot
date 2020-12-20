@@ -38,11 +38,11 @@ class PollOption(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`text` and :attr:`voter_count` are equal.
 
-    Attributes:
+    Args:
         text (:obj:`str`): Option text, 1-100 characters.
         voter_count (:obj:`int`): Number of users that voted for this option.
 
-    Args:
+    Attributes:
         text (:obj:`str`): Option text, 1-100 characters.
         voter_count (:obj:`int`): Number of users that voted for this option.
 

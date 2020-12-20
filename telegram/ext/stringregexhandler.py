@@ -45,19 +45,6 @@ class StringRegexHandler(Handler[str]):
         When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
-    Attributes:
-        pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
-        callback (:obj:`callable`): The callback function for this handler.
-        pass_groups (:obj:`bool`): Determines whether ``groups`` will be passed to the
-            callback function.
-        pass_groupdict (:obj:`bool`): Determines whether ``groupdict``. will be passed to
-            the callback function.
-        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
-            passed to the callback function.
-        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
-            the callback function.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
-
     Args:
         pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
         callback (:obj:`callable`): The callback function for this handler. Will be called when
@@ -88,6 +75,19 @@ class StringRegexHandler(Handler[str]):
             DEPRECATED: Please switch to context based callbacks.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
             Defaults to :obj:`False`.
+
+    Attributes:
+        pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
+        callback (:obj:`callable`): The callback function for this handler.
+        pass_groups (:obj:`bool`): Determines whether ``groups`` will be passed to the
+            callback function.
+        pass_groupdict (:obj:`bool`): Determines whether ``groupdict``. will be passed to
+            the callback function.
+        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
+            passed to the callback function.
+        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
+            the callback function.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     """
 

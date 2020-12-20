@@ -29,18 +29,6 @@ class Location(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`longitute` and :attr:`latitude` are equal.
 
-    Attributes:
-        longitude (:obj:`float`): Longitude as defined by sender.
-        latitude (:obj:`float`): Latitude as defined by sender.
-        horizontal_accuracy (:obj:`float`): Optional. The radius of uncertainty for the location,
-            measured in meters.
-        live_period (:obj:`int`): Optional. Time relative to the message sending date, during which
-            the location can be updated, in seconds. For active live locations only.
-        heading (:obj:`int`): Optional. The direction in which user is moving, in degrees.
-            For active live locations only.
-        proximity_alert_radius (:obj:`int`): Optional. Maximum distance for proximity alerts about
-            approaching another chat member, in meters. For sent live locations only.
-
     Args:
         longitude (:obj:`float`): Longitude as defined by sender.
         latitude (:obj:`float`): Latitude as defined by sender.
@@ -53,6 +41,18 @@ class Location(TelegramObject):
         proximity_alert_radius (:obj:`int`, optional): Maximum distance for proximity alerts about
             approaching another chat member, in meters. For sent live locations only.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        longitude (:obj:`float`): Longitude as defined by sender.
+        latitude (:obj:`float`): Latitude as defined by sender.
+        horizontal_accuracy (:obj:`float`): Optional. The radius of uncertainty for the location,
+            measured in meters.
+        live_period (:obj:`int`): Optional. Time relative to the message sending date, during which
+            the location can be updated, in seconds. For active live locations only.
+        heading (:obj:`int`): Optional. The direction in which user is moving, in degrees.
+            For active live locations only.
+        proximity_alert_radius (:obj:`int`): Optional. Maximum distance for proximity alerts about
+            approaching another chat member, in meters. For sent live locations only.
 
     """
 

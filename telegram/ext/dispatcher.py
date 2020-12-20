@@ -106,19 +106,6 @@ class DispatcherHandlerStop(Exception):
 class Dispatcher:
     """This class dispatches all kinds of updates to its registered handlers.
 
-    Attributes:
-        bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
-        update_queue (:obj:`Queue`): The synchronized queue that will contain the updates.
-        job_queue (:class:`telegram.ext.JobQueue`): Optional. The :class:`telegram.ext.JobQueue`
-            instance to pass onto handler callbacks.
-        workers (:obj:`int`, optional): Number of maximum concurrent worker threads for the
-            ``@run_async`` decorator and :meth:`run_async`.
-        user_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the user.
-        chat_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the chat.
-        bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
-        persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
-            store data that should be persistent over restarts.
-
     Args:
         bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
         update_queue (:obj:`Queue`): The synchronized queue that will contain the updates.
@@ -131,6 +118,19 @@ class Dispatcher:
         use_context (:obj:`bool`, optional): If set to :obj:`True` uses the context based callback
             API (ignored if `dispatcher` argument is used). Defaults to :obj:`True`.
             **New users**: set this to :obj:`True`.
+
+    Attributes:
+        bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
+        update_queue (:obj:`Queue`): The synchronized queue that will contain the updates.
+        job_queue (:class:`telegram.ext.JobQueue`): Optional. The :class:`telegram.ext.JobQueue`
+            instance to pass onto handler callbacks.
+        workers (:obj:`int`, optional): Number of maximum concurrent worker threads for the
+            ``@run_async`` decorator and :meth:`run_async`.
+        user_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the user.
+        chat_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the chat.
+        bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
+        persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
+            store data that should be persistent over restarts.
 
     """
 

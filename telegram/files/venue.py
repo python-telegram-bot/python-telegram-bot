@@ -37,15 +37,6 @@ class Venue(TelegramObject):
       Foursquare details and Google Pace details are mutually exclusive. However, this
       behaviour is undocumented and might be changed by Telegram.
 
-    Attributes:
-        location (:class:`telegram.Location`): Venue location.
-        title (:obj:`str`): Name of the venue.
-        address (:obj:`str`): Address of the venue.
-        foursquare_id (:obj:`str`): Optional. Foursquare identifier of the venue.
-        foursquare_type (:obj:`str`): Optional. Foursquare type of the venue.
-        google_place_id (:obj:`str`): Optional. Google Places identifier of the venue.
-        google_place_type (:obj:`str`): Optional. Google Places type of the venue.
-
     Args:
         location (:class:`telegram.Location`): Venue location.
         title (:obj:`str`): Name of the venue.
@@ -57,6 +48,15 @@ class Venue(TelegramObject):
         google_place_type (:obj:`str`, optional): Google Places type of the venue. (See
             `supported types <https://developers.google.com/places/web-service/supported_types>`_.)
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        location (:class:`telegram.Location`): Venue location.
+        title (:obj:`str`): Name of the venue.
+        address (:obj:`str`): Address of the venue.
+        foursquare_id (:obj:`str`): Optional. Foursquare identifier of the venue.
+        foursquare_type (:obj:`str`): Optional. Foursquare type of the venue.
+        google_place_id (:obj:`str`): Optional. Google Places identifier of the venue.
+        google_place_type (:obj:`str`): Optional. Google Places type of the venue.
 
     """
 

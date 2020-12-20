@@ -40,23 +40,6 @@ class RegexHandler(MessageHandler):
     module for more information. The ``re.match`` function is used to determine if an update should
     be handled by this handler.
 
-    Attributes:
-        pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
-        callback (:obj:`callable`): The callback function for this handler.
-        pass_groups (:obj:`bool`): Determines whether ``groups`` will be passed to the
-            callback function.
-        pass_groupdict (:obj:`bool`): Determines whether ``groupdict``. will be passed to
-            the callback function.
-        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
-            passed to the callback function.
-        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
-            the callback function.
-        pass_user_data (:obj:`bool`): Determines whether ``user_data`` will be passed to
-            the callback function.
-        pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
-            the callback function.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
-
     Note:
         This handler is being deprecated. For the same use case use:
         ``MessageHandler(Filters.regex(r'pattern'), callback)``
@@ -105,6 +88,23 @@ class RegexHandler(MessageHandler):
 
     Raises:
         ValueError
+
+    Attributes:
+        pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
+        callback (:obj:`callable`): The callback function for this handler.
+        pass_groups (:obj:`bool`): Determines whether ``groups`` will be passed to the
+            callback function.
+        pass_groupdict (:obj:`bool`): Determines whether ``groupdict``. will be passed to
+            the callback function.
+        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
+            passed to the callback function.
+        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
+            the callback function.
+        pass_user_data (:obj:`bool`): Determines whether ``user_data`` will be passed to
+            the callback function.
+        pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
+            the callback function.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     """
 
