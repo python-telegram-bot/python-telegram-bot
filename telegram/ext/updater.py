@@ -25,7 +25,19 @@ from queue import Queue
 from signal import SIGABRT, SIGINT, SIGTERM, signal
 from threading import Event, Lock, Thread, current_thread
 from time import sleep
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, Union, no_type_check
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Tuple,
+    Union,
+    no_type_check,
+    Type,
+    Generic,
+)
 
 from telegram import Bot, TelegramError
 from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized
@@ -33,13 +45,14 @@ from telegram.ext import Dispatcher, JobQueue
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import get_signal_name
 from telegram.utils.request import Request
+from telegram.utils.types import CCT
 from telegram.utils.webhookhandler import WebhookAppClass, WebhookServer
 
 if TYPE_CHECKING:
     from telegram.ext import BasePersistence, Defaults
 
 
-class Updater:
+class Updater(Generic[CCT]):
     """
     This class, which employs the :class:`telegram.ext.Dispatcher`, provides a frontend to
     :class:`telegram.Bot` to the programmer, so they can focus on coding the bot. Its purpose is to
@@ -94,6 +107,11 @@ class Updater:
             used).
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
             be used if not set explicitly in the bot methods.
+        custom_context (:obj:`class`, optional): Pass a subclass of
+            :class:`telegram.ext.CallbackContext` to be used instead of
+            :class:`telegram.ext.CallbackContext`, i.e. the ``context`` argument in all the
+            callbacks will be of this type instead. Defaults to
+            :class:`telegram.ext.CallbackContext`.
 
     Note:
         * You must supply either a :attr:`bot` or a :attr:`token` argument.
@@ -120,8 +138,9 @@ class Updater:
         persistence: 'BasePersistence' = None,
         defaults: 'Defaults' = None,
         use_context: bool = True,
-        dispatcher: Dispatcher = None,
+        dispatcher: Dispatcher[CCT] = None,
         base_file_url: str = None,
+        custom_context: Type[CCT] = None,
     ):
 
         if defaults and bot:
@@ -148,6 +167,8 @@ class Updater:
                 raise ValueError('`dispatcher` and `workers` are mutually exclusive')
             if use_context != dispatcher.use_context:
                 raise ValueError('`dispatcher` and `use_context` are mutually exclusive')
+            if custom_context != dispatcher.context_class:
+                raise ValueError('`dispatcher` and `custom_context` are mutually exclusive')
 
         self.logger = logging.getLogger(__name__)
 
@@ -186,7 +207,7 @@ class Updater:
             self.job_queue = JobQueue()
             self.__exception_event = Event()
             self.persistence = persistence
-            self.dispatcher = Dispatcher(
+            self.dispatcher: Dispatcher[CCT] = Dispatcher(
                 self.bot,
                 self.update_queue,
                 job_queue=self.job_queue,
@@ -194,6 +215,7 @@ class Updater:
                 exception_event=self.__exception_event,
                 persistence=persistence,
                 use_context=use_context,
+                custom_context=custom_context,
             )
             self.job_queue.set_dispatcher(self.dispatcher)
         else:

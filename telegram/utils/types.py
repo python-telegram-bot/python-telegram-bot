@@ -22,6 +22,7 @@ from typing import IO, TYPE_CHECKING, Any, Dict, List, Optional, Tuple, TypeVar,
 
 if TYPE_CHECKING:
     from telegram import InputFile
+    from telegram.ext import CallbackContext  # noqa: F401
 
 FileLike = Union[IO, 'InputFile']
 """Either an open file handler or a :class:`telegram.InputFile`."""
@@ -39,3 +40,6 @@ ConversationDict = Dict[Tuple[int, ...], Optional[object]]
 RT = TypeVar("RT")
 SLT = Union[RT, List[RT], Tuple[RT, ...]]
 """Single instance or list/tuple of instances."""
+
+CCT = TypeVar('CCT', bound='CallbackContext')
+"""An instance of :class:`telegram.ext.CallbackContext` or a custom subclass."""

@@ -22,9 +22,10 @@ from typing import Any
 from telegram import Update
 
 from .handler import Handler
+from ..utils.types import CCT
 
 
-class PreCheckoutQueryHandler(Handler[Update]):
+class PreCheckoutQueryHandler(Handler[Update, CCT]):
     """Handler class to handle Telegram PreCheckout callback queries.
 
     Attributes:
