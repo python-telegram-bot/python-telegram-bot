@@ -1559,7 +1559,7 @@ class TestBot:
         with pytest.raises(OkException):
             bot.send_photo(chat_id, open('tests/data/telegram.jpg', 'rb'), timeout=TIMEOUT)
 
-        # Test JSON submition
+        # Test JSON submission
         with pytest.raises(OkException):
             bot.get_chat_administrators(chat_id, timeout=TIMEOUT)
 
