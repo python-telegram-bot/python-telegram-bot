@@ -23,7 +23,7 @@ import imghdr
 import logging
 import mimetypes
 import os
-from typing import IO, Optional, Tuple
+from typing import IO, Optional, Tuple, Union
 from uuid import uuid4
 
 DEFAULT_MIME_TYPE = 'application/octet-stream'
@@ -39,7 +39,8 @@ class InputFile:
         attach (:obj:`str`): Optional. Attach id for sending multiple files.
 
     Args:
-        obj (:obj:`File handler`): An open file descriptor.
+        obj (:obj:`File handler` | :obj:`bytes`): An open file descriptor or the files content as
+            bytes.
         filename (:obj:`str`, optional): Filename for this InputFile.
         attach (:obj:`bool`, optional): Whether this should be send as one file or is part of a
             collection of files.
@@ -49,15 +50,18 @@ class InputFile:
 
     """
 
-    def __init__(self, obj: IO, filename: str = None, attach: bool = None):
+    def __init__(self, obj: Union[IO, bytes], filename: str = None, attach: bool = None):
         self.filename = None
-        self.input_file_content = obj.read()
+        if isinstance(obj, bytes):
+            self.input_file_content = obj
+        else:
+            self.input_file_content = obj.read()
         self.attach = 'attached' + uuid4().hex if attach else None
 
         if filename:
             self.filename = filename
-        elif hasattr(obj, 'name') and not isinstance(obj.name, int):
-            self.filename = os.path.basename(obj.name)
+        elif hasattr(obj, 'name') and not isinstance(obj.name, int):  # type: ignore[union-attr]
+            self.filename = os.path.basename(obj.name)  # type: ignore[union-attr]
 
         image_mime_type = self.is_image(self.input_file_content)
         if image_mime_type:

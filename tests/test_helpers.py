@@ -279,17 +279,17 @@ class TestHelpers:
     @pytest.mark.parametrize(
         'string,expected',
         [
-            ('tests/data/game.gif', f"file://{Path.cwd() / 'tests' / 'data' / 'game.gif'}"),
+            ('tests/data/game.gif', (Path.cwd() / 'tests' / 'data' / 'game.gif').as_uri()),
             ('tests/data', 'tests/data'),
             ('file://foobar', 'file://foobar'),
             (
                 str(Path.cwd() / 'tests' / 'data' / 'game.gif'),
-                f"file://{Path.cwd() / 'tests' / 'data' / 'game.gif'}",
+                (Path.cwd() / 'tests' / 'data' / 'game.gif').as_uri(),
             ),
             (str(Path.cwd() / 'tests' / 'data'), str(Path.cwd() / 'tests' / 'data')),
             (
                 Path.cwd() / 'tests' / 'data' / 'game.gif',
-                f"file://{Path.cwd() / 'tests' / 'data' / 'game.gif'}",
+                (Path.cwd() / 'tests' / 'data' / 'game.gif').as_uri(),
             ),
             (Path.cwd() / 'tests' / 'data', Path.cwd() / 'tests' / 'data'),
             (
@@ -311,6 +311,21 @@ class TestHelpers:
 
         with open('tests/data/game.gif', 'rb') as file:
             parsed = helpers.parse_file_input(file, attach=True, filename='test_file')
+
+        assert isinstance(parsed, InputFile)
+        assert parsed.attach
+        assert parsed.filename == 'test_file'
+
+    def test_parse_file_input_bytes(self):
+        with open('tests/data/text_file.txt', 'rb') as file:
+            parsed = helpers.parse_file_input(file.read())
+
+        assert isinstance(parsed, InputFile)
+        assert not parsed.attach
+        assert parsed.filename == 'application.octet-stream'
+
+        with open('tests/data/text_file.txt', 'rb') as file:
+            parsed = helpers.parse_file_input(file.read(), attach=True, filename='test_file')
 
         assert isinstance(parsed, InputFile)
         assert parsed.attach

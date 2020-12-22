@@ -215,7 +215,7 @@ class TestAudio:
     def test_send_audio_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
-        expected = f"file://{Path.cwd() / 'tests/data/telegram.jpg'}"
+        expected = (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
         file = 'tests/data/telegram.jpg'
 
         def make_assertion(_, data, *args, **kwargs):

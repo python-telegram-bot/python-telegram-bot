@@ -86,12 +86,13 @@ def parse_file_input(
       adds the ``file://`` prefix. If the input is a relative path of a local file, computes the
       absolute path and adds the ``file://`` prefix. Returns the input unchanged, otherwise.
     * :class:`pathlib.Path` objects are treated the same way as strings.
-    * For IO input, returns an :class:`telegram.InputFile`.
+    * For IO and bytes input, returns an :class:`telegram.InputFile`.
     * If :attr:`tg_type` is specified and the input is of that type, returns the ``file_id``
       attribute.
 
     Args:
-        file_input (:obj:`str` | `filelike object` | Telegram media object): The input to parse.
+        file_input (:obj:`str` | :obj:`bytes` | `filelike object` | Telegram media object): The
+            input to parse.
         tg_type (:obj:`type`, optional): The Telegram media type the input can be. E.g.
             :class:`telegram.Animation`.
         attach (:obj:`bool`, optional): Whether this file should be send as one file or is part of
@@ -111,10 +112,12 @@ def parse_file_input(
         return file_input
     if isinstance(file_input, (str, Path)):
         if is_local_file(file_input):
-            out = f'file://{Path(file_input).absolute()}'
+            out = Path(file_input).absolute().as_uri()
         else:
             out = file_input  # type: ignore[assignment]
         return out
+    if isinstance(file_input, bytes):
+        return InputFile(file_input, attach=attach, filename=filename)
     if InputFile.is_file(file_input):
         file_input = cast(IO, file_input)
         return InputFile(file_input, attach=attach, filename=filename)
