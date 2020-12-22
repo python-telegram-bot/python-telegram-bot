@@ -45,6 +45,10 @@ def dp2(bot):
         yield dp
 
 
+class CustomContext(CallbackContext):
+    pass
+
+
 class TestDispatcher:
     message_update = Update(
         1, message=Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
@@ -804,3 +808,26 @@ class TestDispatcher:
         assert cdp.persistence.test_flag_bot_data
         assert not cdp.persistence.test_flag_user_data
         assert cdp.persistence.test_flag_chat_data
+
+    def test_custom_context_error_handler(self, bot):
+        def error_handler(_, context):
+            self.received = type(context)
+
+        dispatcher = Dispatcher(bot, Queue(), custom_context=CustomContext)
+        dispatcher.add_error_handler(error_handler)
+        dispatcher.add_handler(MessageHandler(Filters.all, self.callback_raise_error))
+
+        dispatcher.process_update(self.message_update)
+        sleep(0.1)
+        assert self.received == CustomContext
+
+    def test_custom_context_handler_callback(self, bot):
+        def callback(_, context):
+            self.received = type(context)
+
+        dispatcher = Dispatcher(bot, Queue(), custom_context=CustomContext)
+        dispatcher.add_handler(MessageHandler(Filters.all, callback))
+
+        dispatcher.process_update(self.message_update)
+        sleep(0.1)
+        assert self.received == CustomContext

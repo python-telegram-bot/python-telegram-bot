@@ -166,7 +166,7 @@ class Dispatcher(Generic[CCT]):
 
     @overload
     def __init__(
-        self: 'Dispatcher'['CallbackContext'],  # pylint: disable=E1126
+        self: 'Dispatcher[CallbackContext]',
         bot: 'Bot',
         update_queue: Queue,
         workers: int = 4,
@@ -179,7 +179,7 @@ class Dispatcher(Generic[CCT]):
 
     @overload
     def __init__(
-        self: 'Dispatcher'[CCT],  # pylint: disable=E1126
+        self: 'Dispatcher[CCT]',
         bot: 'Bot',
         update_queue: Queue,
         workers: int = 4,

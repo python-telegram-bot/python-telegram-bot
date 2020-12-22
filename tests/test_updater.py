@@ -580,6 +580,12 @@ class TestUpdater:
         with pytest.raises(ValueError):
             Updater(dispatcher=dispatcher, use_context=use_context)
 
+    def test_mutual_exclude_custom_context_dispatcher(self):
+        dispatcher = Dispatcher(None, None)
+        custom_context = object
+        with pytest.raises(ValueError):
+            Updater(dispatcher=dispatcher, custom_context=custom_context)
+
     def test_defaults_warning(self, bot):
         with pytest.warns(TelegramDeprecationWarning, match='no effect when a Bot is passed'):
             Updater(bot=bot, defaults=Defaults())
