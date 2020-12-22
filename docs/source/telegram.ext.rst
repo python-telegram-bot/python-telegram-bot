@@ -13,6 +13,7 @@ telegram.ext package
     telegram.ext.delayqueue
     telegram.ext.callbackcontext
     telegram.ext.defaults
+    telegram.ext.contextcustomizer
 
 Handlers
 --------

@@ -23,6 +23,7 @@ from .picklepersistence import PicklePersistence
 from .dictpersistence import DictPersistence
 from .handler import Handler
 from .callbackcontext import CallbackContext
+from .contextcustomizer import ContextCustomizer
 from .dispatcher import Dispatcher, DispatcherHandlerStop, run_async
 from .jobqueue import JobQueue, Job
 from .updater import Updater
@@ -79,4 +80,5 @@ __all__ = (
     'PollAnswerHandler',
     'PollHandler',
     'Defaults',
+    'ContextCustomizer',
 )

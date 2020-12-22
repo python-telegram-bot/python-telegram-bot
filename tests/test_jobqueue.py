@@ -28,7 +28,7 @@ import pytest
 import pytz
 from apscheduler.schedulers import SchedulerNotRunningError
 from flaky import flaky
-from telegram.ext import JobQueue, Updater, Job, CallbackContext, Dispatcher
+from telegram.ext import JobQueue, Updater, Job, CallbackContext, Dispatcher, ContextCustomizer
 
 
 class CustomContext(CallbackContext):
@@ -516,7 +516,9 @@ class TestJobQueue:
         assert 'No error handlers are registered' in rec.getMessage()
 
     def test_custom_context(self, bot, job_queue):
-        dispatcher = Dispatcher(bot, Queue(), custom_context=CustomContext)
+        dispatcher = Dispatcher(
+            bot, Queue(), context_customizer=ContextCustomizer(context=CustomContext)
+        )
         job_queue.set_dispatcher(dispatcher)
 
         def callback(context):

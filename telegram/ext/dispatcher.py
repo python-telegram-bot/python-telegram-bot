@@ -21,7 +21,6 @@
 import logging
 import warnings
 import weakref
-from collections import defaultdict
 from functools import wraps
 from queue import Empty, Queue
 from threading import BoundedSemaphore, Event, Lock, Thread, current_thread
@@ -30,28 +29,24 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
-    DefaultDict,
     Dict,
     List,
     Optional,
     Set,
     Union,
     Generic,
-    Type,
     TypeVar,
-    overload,
 )
 from uuid import uuid4
 
 from telegram import TelegramError, Update
-from telegram.ext import BasePersistence
+from telegram.ext import BasePersistence, ContextCustomizer
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.handler import Handler
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.promise import Promise
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
-from telegram.utils.types import CCT
-
+from telegram.utils.types import CCT, UD, CD, BD, UDM, CDM
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -121,7 +116,7 @@ class DispatcherHandlerStop(Exception):
         self.state = state
 
 
-class Dispatcher(Generic[CCT]):
+class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
     """This class dispatches all kinds of updates to its registered handlers.
 
     Attributes:
@@ -136,8 +131,8 @@ class Dispatcher(Generic[CCT]):
         bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
             store data that should be persistent over restarts.
-        context_class (:obj:`class`): The class to use for the ``context`` argument of the
-            callbacks.
+        context_customizer (:class:`telegram.ext.ContextCustomizer`): Container for the types used
+            in the ``context`` interface.
 
     Args:
         bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
@@ -151,11 +146,10 @@ class Dispatcher(Generic[CCT]):
         use_context (:obj:`bool`, optional): If set to :obj:`True` uses the context based callback
             API (ignored if `dispatcher` argument is used). Defaults to :obj:`True`.
             **New users**: set this to :obj:`True`.
-        custom_context (:obj:`class`, optional): Pass a subclass of
-            :class:`telegram.ext.CallbackContext` to be used instead of
-            :class:`telegram.ext.CallbackContext`, i.e. the ``context`` argument in all the
-            callbacks will be of this type instead. Defaults to
-            :class:`telegram.ext.CallbackContext`.
+        context_customizer (:class:`telegram.ext.ContextCustomizer`, optional): Pass an instance
+            of :class:`telegram.ext.ContextCustomizer` to customize the the types used in the
+            ``context`` interface. If not passed, the defaults documented in
+            :class:`telegram.ext.ContextCustomizer` will be used.
 
     """
 
@@ -164,33 +158,6 @@ class Dispatcher(Generic[CCT]):
     __singleton = None
     logger = logging.getLogger(__name__)
 
-    @overload
-    def __init__(
-        self: 'Dispatcher[CallbackContext]',
-        bot: 'Bot',
-        update_queue: Queue,
-        workers: int = 4,
-        exception_event: Event = None,
-        job_queue: 'JobQueue' = None,
-        persistence: BasePersistence = None,
-        use_context: bool = True,
-    ):
-        ...
-
-    @overload
-    def __init__(
-        self: 'Dispatcher[CCT]',
-        bot: 'Bot',
-        update_queue: Queue,
-        workers: int = 4,
-        exception_event: Event = None,
-        job_queue: 'JobQueue' = None,
-        persistence: BasePersistence = None,
-        use_context: bool = True,
-        custom_context: Type[CCT] = None,
-    ):
-        ...
-
     def __init__(
         self,
         bot: 'Bot',
@@ -198,15 +165,16 @@ class Dispatcher(Generic[CCT]):
         workers: int = 4,
         exception_event: Event = None,
         job_queue: 'JobQueue' = None,
-        persistence: BasePersistence = None,
+        persistence: BasePersistence[UD, CD, BD, UDM, CDM] = None,
         use_context: bool = True,
-        custom_context: Type[CCT] = None,
+        context_customizer: ContextCustomizer[CCT, UD, CD, BD, UDM, CDM] = ContextCustomizer(),
     ):
         self.bot = bot
         self.update_queue = update_queue
         self.job_queue = job_queue
         self.workers = workers
         self.use_context = use_context
+        self.context_customizer = context_customizer
 
         if not use_context:
             warnings.warn(
@@ -214,20 +182,14 @@ class Dispatcher(Generic[CCT]):
                 TelegramDeprecationWarning,
                 stacklevel=3,
             )
-        if not use_context and custom_context:
-            raise ValueError(
-                'Custom CallbackContext classes can only be used, when use_context=True.'
-            )
-        if custom_context:
-            if not issubclass(custom_context, CallbackContext):
-                raise ValueError('custom_context must be a subclass of CallbackContext')
-            self.context_class = custom_context
-        else:
-            self.context_class = CallbackContext  # type: ignore[assignment]
 
-        self.user_data: DefaultDict[int, Dict[Any, Any]] = defaultdict(dict)
-        self.chat_data: DefaultDict[int, Dict[Any, Any]] = defaultdict(dict)
-        self.bot_data = {}
+        self.user_data = self.context_customizer.user_data_mapping(
+            self.context_customizer.user_data
+        )
+        self.chat_data = self.context_customizer.chat_data_mapping(
+            self.context_customizer.chat_data
+        )
+        self.bot_data = self.context_customizer.bot_data()
         self.persistence: Optional[BasePersistence] = None
         self._update_persistence_lock = Lock()
         if persistence:
@@ -237,16 +199,25 @@ class Dispatcher(Generic[CCT]):
             self.persistence.set_bot(self.bot)
             if self.persistence.store_user_data:
                 self.user_data = self.persistence.get_user_data()
-                if not isinstance(self.user_data, defaultdict):
-                    raise ValueError("user_data must be of type defaultdict")
+                if not isinstance(self.user_data, self.context_customizer.user_data_mapping):
+                    raise ValueError(
+                        f"user_data must be of type "
+                        f"{self.context_customizer.user_data_mapping.__name__}"
+                    )
             if self.persistence.store_chat_data:
                 self.chat_data = self.persistence.get_chat_data()
-                if not isinstance(self.chat_data, defaultdict):
-                    raise ValueError("chat_data must be of type defaultdict")
+                if not isinstance(self.chat_data, self.context_customizer.chat_data_mapping):
+                    raise ValueError(
+                        f"chat_data must be of type "
+                        f"{self.context_customizer.chat_data_mapping.__name__}"
+                    )
             if self.persistence.store_bot_data:
                 self.bot_data = self.persistence.get_bot_data()
-                if not isinstance(self.bot_data, dict):
-                    raise ValueError("bot_data must be of type dict")
+                if not isinstance(self.bot_data, self.context_customizer.bot_data):
+                    raise ValueError(
+                        f"bot_data must be of type {self.context_customizer.bot_data.__name__}"
+                    )
+
         else:
             self.persistence = None
 
@@ -490,7 +461,7 @@ class Dispatcher(Generic[CCT]):
                     check = handler.check_update(update)
                     if check is not None and check is not False:
                         if not context and self.use_context:
-                            context = self.context_class.from_update(update, self)
+                            context = self.context_customizer.context.from_update(update, self)
                         handler.handle_update(update, self, check, context)
 
                         # If handler runs async updating immediately doesn't make sense
@@ -719,7 +690,7 @@ class Dispatcher(Generic[CCT]):
         if self.error_handlers:
             for callback, run_async in self.error_handlers.items():  # pylint: disable=W0621
                 if self.use_context:
-                    context = self.context_class.from_error(
+                    context = self.context_customizer.context.from_error(
                         update, error, self, async_args=async_args, async_kwargs=async_kwargs
                     )
                     if run_async:

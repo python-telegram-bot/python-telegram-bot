@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains custom typing aliases."""
 from pathlib import Path
-from typing import IO, TYPE_CHECKING, Any, Dict, List, Optional, Tuple, TypeVar, Union
+from typing import IO, TYPE_CHECKING, Any, Dict, List, Optional, Tuple, TypeVar, Union, Mapping
 
 if TYPE_CHECKING:
     from telegram import InputFile
@@ -43,3 +43,14 @@ SLT = Union[RT, List[RT], Tuple[RT, ...]]
 
 CCT = TypeVar('CCT', bound='CallbackContext')
 """An instance of :class:`telegram.ext.CallbackContext` or a custom subclass."""
+
+UD = TypeVar('UD')
+"""Type of the user data for a single user."""
+CD = TypeVar('CD')
+"""Type of the chat data for a single user."""
+BD = TypeVar('BD')
+"""Type of the bot data."""
+UDM = TypeVar('UDM', bound=Mapping)
+"""Type of the user data mapping."""
+CDM = TypeVar('CDM', bound=Mapping)
+"""Type of the chat data mapping."""

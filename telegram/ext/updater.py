@@ -41,18 +41,18 @@ from typing import (
 
 from telegram import Bot, TelegramError
 from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized
-from telegram.ext import Dispatcher, JobQueue
+from telegram.ext import Dispatcher, JobQueue, ContextCustomizer
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import get_signal_name
 from telegram.utils.request import Request
-from telegram.utils.types import CCT
+from telegram.utils.types import CCT, UD, BD, UDM, CDM, CD
 from telegram.utils.webhookhandler import WebhookAppClass, WebhookServer
 
 if TYPE_CHECKING:
     from telegram.ext import BasePersistence, Defaults
 
 
-class Updater(Generic[CCT]):
+class Updater(Generic[CCT, UD, CD, BD, UDM, CDM]):
     """
     This class, which employs the :class:`telegram.ext.Dispatcher`, provides a frontend to
     :class:`telegram.Bot` to the programmer, so they can focus on coding the bot. Its purpose is to
@@ -107,11 +107,10 @@ class Updater(Generic[CCT]):
             used).
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
             be used if not set explicitly in the bot methods.
-        custom_context (:obj:`class`, optional): Pass a subclass of
-            :class:`telegram.ext.CallbackContext` to be used instead of
-            :class:`telegram.ext.CallbackContext`, i.e. the ``context`` argument in all the
-            callbacks will be of this type instead. Defaults to
-            :class:`telegram.ext.CallbackContext`.
+        context_customizer (:class:`telegram.ext.ContextCustomizer`, optional): Pass an instance
+            of :class:`telegram.ext.ContextCustomizer` to customize the the types used in the
+            ``context`` interface. If not passed, the defaults documented in
+            :class:`telegram.ext.ContextCustomizer` will be used.
 
     Note:
         * You must supply either a :attr:`bot` or a :attr:`token` argument.
@@ -135,12 +134,12 @@ class Updater(Generic[CCT]):
         private_key_password: bytes = None,
         user_sig_handler: Callable = None,
         request_kwargs: Dict[str, Any] = None,
-        persistence: 'BasePersistence' = None,
+        persistence: 'BasePersistence[UD, CD, BD, UDM, CDM]' = None,
         defaults: 'Defaults' = None,
         use_context: bool = True,
-        dispatcher: Dispatcher[CCT] = None,
+        dispatcher: Dispatcher[CCT, UD, CD, BD, UDM, CDM] = None,
         base_file_url: str = None,
-        custom_context: Type[CCT] = None,
+        context_customizer: ContextCustomizer[CCT, UD, CD, BD, UDM, CDM] = None,
     ):
 
         if defaults and bot:
@@ -167,8 +166,8 @@ class Updater(Generic[CCT]):
                 raise ValueError('`dispatcher` and `workers` are mutually exclusive')
             if use_context != dispatcher.use_context:
                 raise ValueError('`dispatcher` and `use_context` are mutually exclusive')
-            if custom_context != dispatcher.context_class:
-                raise ValueError('`dispatcher` and `custom_context` are mutually exclusive')
+            if context_customizer is not None:
+                raise ValueError('`dispatcher` and `context_customizer` are mutually exclusive')
 
         self.logger = logging.getLogger(__name__)
 
@@ -215,7 +214,7 @@ class Updater(Generic[CCT]):
                 exception_event=self.__exception_event,
                 persistence=persistence,
                 use_context=use_context,
-                custom_context=custom_context,
+                context_customizer=context_customizer or ContextCustomizer(),
             )
             self.job_queue.set_dispatcher(self.dispatcher)
         else:

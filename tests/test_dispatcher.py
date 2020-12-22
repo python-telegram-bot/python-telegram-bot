@@ -32,6 +32,7 @@ from telegram.ext import (
     CallbackContext,
     JobQueue,
     BasePersistence,
+    ContextCustomizer,
 )
 from telegram.ext.dispatcher import run_async, Dispatcher, DispatcherHandlerStop
 from telegram.utils.deprecate import TelegramDeprecationWarning
@@ -813,7 +814,9 @@ class TestDispatcher:
         def error_handler(_, context):
             self.received = type(context)
 
-        dispatcher = Dispatcher(bot, Queue(), custom_context=CustomContext)
+        dispatcher = Dispatcher(
+            bot, Queue(), context_customizer=ContextCustomizer(context=CustomContext)
+        )
         dispatcher.add_error_handler(error_handler)
         dispatcher.add_handler(MessageHandler(Filters.all, self.callback_raise_error))
 
@@ -825,7 +828,9 @@ class TestDispatcher:
         def callback(_, context):
             self.received = type(context)
 
-        dispatcher = Dispatcher(bot, Queue(), custom_context=CustomContext)
+        dispatcher = Dispatcher(
+            bot, Queue(), context_customizer=ContextCustomizer(context=CustomContext)
+        )
         dispatcher.add_handler(MessageHandler(Filters.all, callback))
 
         dispatcher.process_update(self.message_update)

@@ -20,14 +20,14 @@
 import warnings
 from abc import ABC, abstractmethod
 from copy import copy
-from typing import Any, DefaultDict, Dict, Optional, Tuple, cast, ClassVar
+from typing import Any, DefaultDict, Dict, Optional, Tuple, cast, ClassVar, Generic, Mapping
 
 from telegram import Bot
 
-from telegram.utils.types import ConversationDict
+from telegram.utils.types import ConversationDict, CD, UD, BD, UDM, CDM
 
 
-class BasePersistence(ABC):
+class BasePersistence(ABC, Generic[UD, CD, BD, UDM, CDM]):
     """Interface class for adding persistence to your bot.
     Subclass this object for different implementations of a persistent bot.
 
@@ -84,22 +84,22 @@ class BasePersistence(ABC):
         update_chat_data = instance.update_chat_data
         update_bot_data = instance.update_bot_data
 
-        def get_user_data_insert_bot() -> DefaultDict[int, Dict[Any, Any]]:
+        def get_user_data_insert_bot() -> UDM[int, UD]:
             return instance.insert_bot(get_user_data())
 
-        def get_chat_data_insert_bot() -> DefaultDict[int, Dict[Any, Any]]:
+        def get_chat_data_insert_bot() -> CDM[int, CD]:
             return instance.insert_bot(get_chat_data())
 
-        def get_bot_data_insert_bot() -> Dict[Any, Any]:
+        def get_bot_data_insert_bot() -> BD:
             return instance.insert_bot(get_bot_data())
 
-        def update_user_data_replace_bot(user_id: int, data: Dict) -> None:
+        def update_user_data_replace_bot(user_id: int, data: UD) -> None:
             return update_user_data(user_id, instance.replace_bot(data))
 
-        def update_chat_data_replace_bot(chat_id: int, data: Dict) -> None:
+        def update_chat_data_replace_bot(chat_id: int, data: CD) -> None:
             return update_chat_data(chat_id, instance.replace_bot(data))
 
-        def update_bot_data_replace_bot(data: Dict) -> None:
+        def update_bot_data_replace_bot(data: BD) -> None:
             return update_bot_data(instance.replace_bot(data))
 
         instance.get_user_data = get_user_data_insert_bot
@@ -288,27 +288,27 @@ class BasePersistence(ABC):
         return obj
 
     @abstractmethod
-    def get_user_data(self) -> DefaultDict[int, Dict[Any, Any]]:
+    def get_user_data(self) -> UDM[int, UD]:
         """ "Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``user_data`` if stored, or an empty
-        ``defaultdict(dict)``.
+        ``Mapping`` with integer keys.
 
         Returns:
-            :obj:`defaultdict`: The restored user data.
+            :obj:`Mapping[int, UD]`: The restored user data.
         """
 
     @abstractmethod
-    def get_chat_data(self) -> DefaultDict[int, Dict[Any, Any]]:
+    def get_chat_data(self) -> CDM[int, CD]:
         """ "Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``chat_data`` if stored, or an empty
-        ``defaultdict(dict)``.
+        ``Mapping`` with integer keys.
 
         Returns:
-            :obj:`defaultdict`: The restored chat data.
+            :obj:`Mapping[int, Any]`: The restored chat data.
         """
 
     @abstractmethod
-    def get_bot_data(self) -> Dict[Any, Any]:
+    def get_bot_data(self) -> BD:
         """ "Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``bot_data`` if stored, or an empty
         :obj:`dict`.
@@ -345,32 +345,32 @@ class BasePersistence(ABC):
         """
 
     @abstractmethod
-    def update_user_data(self, user_id: int, data: Dict) -> None:
+    def update_user_data(self, user_id: int, data: UD) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
         handled an update.
 
         Args:
             user_id (:obj:`int`): The user the data might have been changed for.
-            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.user_data` [user_id].
+            data (:obj:`UD`): The :attr:`telegram.ext.dispatcher.user_data` [user_id].
         """
 
     @abstractmethod
-    def update_chat_data(self, chat_id: int, data: Dict) -> None:
+    def update_chat_data(self, chat_id: int, data: CD) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
         handled an update.
 
         Args:
             chat_id (:obj:`int`): The chat the data might have been changed for.
-            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.chat_data` [chat_id].
+            data (:obj:`CD`): The :attr:`telegram.ext.dispatcher.chat_data` [chat_id].
         """
 
     @abstractmethod
-    def update_bot_data(self, data: Dict) -> None:
+    def update_bot_data(self, data: BD) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
         handled an update.
 
         Args:
-            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.bot_data` .
+            data (:obj:`BD`): The :attr:`telegram.ext.dispatcher.bot_data` .
         """
 
     def flush(self) -> None:

@@ -19,16 +19,17 @@
 # pylint: disable=R0201
 """This module contains the CallbackContext class."""
 from queue import Queue
-from typing import TYPE_CHECKING, Any, Dict, List, Match, NoReturn, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Match, NoReturn, Optional, Tuple, Union, Generic
 
 from telegram import Update
+from telegram.utils.types import UD, CD, BD
 
 if TYPE_CHECKING:
     from telegram import Bot
     from telegram.ext import Dispatcher, Job, JobQueue
 
 
-class CallbackContext:
+class CallbackContext(Generic[UD, CD, BD]):
     """
     This is a context object passed to the callback called by :class:`telegram.ext.Handler`
     or by the :class:`telegram.ext.Dispatcher` in an error handler added by
@@ -88,8 +89,8 @@ class CallbackContext:
             )
         self._dispatcher = dispatcher
         self._bot_data = dispatcher.bot_data
-        self._chat_data: Optional[Dict[Any, Any]] = None
-        self._user_data: Optional[Dict[Any, Any]] = None
+        self._chat_data: Optional[CD] = None
+        self._user_data: Optional[UD] = None
         self.args: Optional[List[str]] = None
         self.matches: Optional[List[Match]] = None
         self.error: Optional[Exception] = None
@@ -103,7 +104,7 @@ class CallbackContext:
         return self._dispatcher
 
     @property
-    def bot_data(self) -> Dict:
+    def bot_data(self) -> BD:
         """
         bot_data (:obj:`dict`): Optional. A dict that can be used to keep any data in. For each
             update it will be the same :obj:`dict`.
@@ -117,7 +118,7 @@ class CallbackContext:
         )
 
     @property
-    def chat_data(self) -> Optional[Dict]:
+    def chat_data(self) -> Optional[CD]:
         """
 
         chat_data (:obj:`dict`): Optional. A dict that can be used to keep any data in. For each
@@ -138,7 +139,7 @@ class CallbackContext:
         )
 
     @property
-    def user_data(self) -> Optional[Dict]:
+    def user_data(self) -> Optional[UD]:
         """
         user_data (:obj:`dict`): Optional. A dict that can be used to keep any data in. For each
             update from the same user it will be the same :obj:`dict`.
