@@ -98,6 +98,16 @@ class TestAnimation:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    def test_send_animation_custom_filename(self, bot, chat_id, animation_file, monkeypatch):
+        def make_assertion(url, data, **kwargs):
+            return data['animation'].filename == 'custom_filename'
+
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+
+        assert bot.send_animation(chat_id, animation_file, filename='custom_filename')
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     def test_get_and_download(self, bot, animation):
         new_file = bot.get_file(animation.file_id)
 
@@ -183,11 +193,12 @@ class TestAnimation:
     def test_send_animation_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
-        expected = f"file://{Path.cwd() / 'tests/data/telegram.jpg'}"
+        expected = (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
         file = 'tests/data/telegram.jpg'
 
         def make_assertion(_, data, *args, **kwargs):
             nonlocal test_flag
+            print(data.get('animation'), expected)
             test_flag = data.get('animation') == expected and data.get('thumb') == expected
 
         monkeypatch.setattr(bot, '_post', make_assertion)

@@ -117,6 +117,16 @@ class TestPhoto:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    def test_send_photo_custom_filename(self, bot, chat_id, photo_file, monkeypatch):
+        def make_assertion(url, data, **kwargs):
+            return data['photo'].filename == 'custom_filename'
+
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+
+        assert bot.send_photo(chat_id, photo_file, filename='custom_filename')
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     def test_send_photo_parse_mode_markdown(self, bot, chat_id, photo_file, thumb, photo):
         message = bot.send_photo(chat_id, photo_file, caption=self.caption, parse_mode='Markdown')
         assert isinstance(message.photo[0], PhotoSize)
@@ -222,7 +232,7 @@ class TestPhoto:
     def test_send_photo_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
-        expected = f"file://{Path.cwd() / 'tests/data/telegram.jpg'}"
+        expected = (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
         file = 'tests/data/telegram.jpg'
 
         def make_assertion(_, data, *args, **kwargs):

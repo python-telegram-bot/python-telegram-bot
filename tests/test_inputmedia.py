@@ -173,8 +173,8 @@ class TestInputMediaVideo:
         input_media_video = InputMediaVideo(
             'tests/data/telegram.mp4', thumb='tests/data/telegram.jpg'
         )
-        assert input_media_video.media == f"file://{Path.cwd() / 'tests/data/telegram.mp4'}"
-        assert input_media_video.thumb == f"file://{Path.cwd() / 'tests/data/telegram.jpg'}"
+        assert input_media_video.media == (Path.cwd() / 'tests/data/telegram.mp4/').as_uri()
+        assert input_media_video.thumb == (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
 
 
 class TestInputMediaPhoto:
@@ -217,7 +217,7 @@ class TestInputMediaPhoto:
 
     def test_with_local_files(self):
         input_media_photo = InputMediaPhoto('tests/data/telegram.mp4')
-        assert input_media_photo.media == f"file://{Path.cwd() / 'tests/data/telegram.mp4'}"
+        assert input_media_photo.media == (Path.cwd() / 'tests/data/telegram.mp4/').as_uri()
 
 
 class TestInputMediaAnimation:
@@ -269,12 +269,8 @@ class TestInputMediaAnimation:
         input_media_animation = InputMediaAnimation(
             'tests/data/telegram.mp4', thumb='tests/data/telegram.jpg'
         )
-        assert input_media_animation.media == 'file://' + str(
-            Path.cwd() / 'tests/data/telegram.mp4'
-        )
-        assert input_media_animation.thumb == 'file://' + str(
-            Path.cwd() / 'tests/data/telegram.jpg'
-        )
+        assert input_media_animation.media == (Path.cwd() / 'tests/data/telegram.mp4').as_uri()
+        assert input_media_animation.thumb == (Path.cwd() / 'tests/data/telegram.jpg').as_uri()
 
 
 class TestInputMediaAudio:
@@ -332,8 +328,8 @@ class TestInputMediaAudio:
         input_media_audio = InputMediaAudio(
             'tests/data/telegram.mp4', thumb='tests/data/telegram.jpg'
         )
-        assert input_media_audio.media == f"file://{Path.cwd() / 'tests/data/telegram.mp4'}"
-        assert input_media_audio.thumb == f"file://{Path.cwd() / 'tests/data/telegram.jpg'}"
+        assert input_media_audio.media == (Path.cwd() / 'tests/data/telegram.mp4/').as_uri()
+        assert input_media_audio.thumb == (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
 
 
 class TestInputMediaDocument:
@@ -388,12 +384,8 @@ class TestInputMediaDocument:
         input_media_document = InputMediaDocument(
             'tests/data/telegram.mp4', thumb='tests/data/telegram.jpg'
         )
-        assert input_media_document.media == 'file://' + str(
-            Path.cwd() / 'tests/data/telegram.mp4'
-        )
-        assert input_media_document.thumb == 'file://' + str(
-            Path.cwd() / 'tests/data/telegram.jpg'
-        )
+        assert input_media_document.media == (Path.cwd() / 'tests/data/telegram.mp4').as_uri()
+        assert input_media_document.thumb == (Path.cwd() / 'tests/data/telegram.jpg').as_uri()
 
 
 @pytest.fixture(scope='function')  # noqa: F811
@@ -437,6 +429,34 @@ class TestSendMediaGroup:
             mes.caption_entities == [MessageEntity(MessageEntity.BOLD, 0, 5)] for mes in messages
         )
 
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_media_group_custom_filename(
+        self,
+        bot,
+        chat_id,
+        photo_file,  # noqa: F811
+        animation_file,  # noqa: F811
+        audio_file,  # noqa: F811
+        video_file,  # noqa: F811
+        monkeypatch,
+    ):
+        def make_assertion(url, data, **kwargs):
+            result = all(im.media.filename == 'custom_filename' for im in data['media'])
+            # We are a bit hacky here b/c Bot.send_media_group expects a list of Message-dicts
+            return [Message(0, None, None, text=result).to_dict()]
+
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+
+        media = [
+            InputMediaAnimation(animation_file, filename='custom_filename'),
+            InputMediaAudio(audio_file, filename='custom_filename'),
+            InputMediaPhoto(photo_file, filename='custom_filename'),
+            InputMediaVideo(video_file, filename='custom_filename'),
+        ]
+
+        assert bot.send_media_group(chat_id, media)[0].text is True
+
     def test_send_media_group_with_thumbs(
         self, bot, chat_id, video_file, photo_file, monkeypatch  # noqa: F811
     ):
@@ -458,16 +478,22 @@ class TestSendMediaGroup:
         self, bot, chat_id, video_file, photo_file, animation_file  # noqa: F811
     ):  # noqa: F811
         def func():
-            return bot.send_media_group(
-                chat_id, [InputMediaVideo(video_file), InputMediaPhoto(photo_file)]
-            )
+            with open('tests/data/telegram.jpg', 'rb') as file:
+                return bot.send_media_group(
+                    chat_id,
+                    [
+                        InputMediaVideo(video_file),
+                        InputMediaPhoto(photo_file),
+                        InputMediaPhoto(file.read()),
+                    ],
+                )
 
         messages = expect_bad_request(
             func, 'Type of file mismatch', 'Telegram did not accept the file.'
         )
 
         assert isinstance(messages, list)
-        assert len(messages) == 2
+        assert len(messages) == 3
         assert all([isinstance(mes, Message) for mes in messages])
         assert all([mes.media_group_id == messages[0].media_group_id for mes in messages])
 

@@ -31,17 +31,20 @@ class BasePersistence(ABC):
     """Interface class for adding persistence to your bot.
     Subclass this object for different implementations of a persistent bot.
 
-    All relevant methods must be overwritten. This means:
+    All relevant methods must be overwritten. This includes:
 
-    * If :attr:`store_bot_data` is :obj:`True` you must overwrite :meth:`get_bot_data` and
-      :meth:`update_bot_data`.
-    * If :attr:`store_chat_data` is :obj:`True` you must overwrite :meth:`get_chat_data` and
-      :meth:`update_chat_data`.
-    * If :attr:`store_user_data` is :obj:`True` you must overwrite :meth:`get_user_data` and
-      :meth:`update_user_data`.
-    * If you want to store conversation data with :class:`telegram.ext.ConversationHandler`, you
-      must overwrite :meth:`get_conversations` and :meth:`update_conversation`.
-    * :meth:`flush` will be called when the bot is shutdown.
+    * meth:`get_bot_data`
+    * :meth:`update_bot_data`
+    * :meth:`get_chat_data`
+    * :meth:`update_chat_data`
+    * :meth:`get_user_data`
+    * :meth:`update_user_data`
+    * :meth:`get_conversations`
+    * :meth:`update_conversation`
+    * :meth:`flush`
+
+    If you don't actually need one of those methods, a simple ``pass`` is enough. For example, if
+    ``store_bot_data=False``, you don't need :meth:`get_bot_data` and :meth:`update_bot_data.
 
     Warning:
         Persistence will try to replace :class:`telegram.Bot` instances by :attr:`REPLACED_BOT` and
@@ -287,7 +290,7 @@ class BasePersistence(ABC):
     @abstractmethod
     def get_user_data(self) -> DefaultDict[int, Dict[Any, Any]]:
         """ "Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
-        persistence object. It should return the user_data if stored, or an empty
+        persistence object. It should return the ``user_data`` if stored, or an empty
         ``defaultdict(dict)``.
 
         Returns:
@@ -297,7 +300,7 @@ class BasePersistence(ABC):
     @abstractmethod
     def get_chat_data(self) -> DefaultDict[int, Dict[Any, Any]]:
         """ "Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
-        persistence object. It should return the chat_data if stored, or an empty
+        persistence object. It should return the ``chat_data`` if stored, or an empty
         ``defaultdict(dict)``.
 
         Returns:
@@ -307,7 +310,7 @@ class BasePersistence(ABC):
     @abstractmethod
     def get_bot_data(self) -> Dict[Any, Any]:
         """ "Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
-        persistence object. It should return the bot_data if stored, or an empty
+        persistence object. It should return the ``bot_data`` if stored, or an empty
         :obj:`dict`.
 
         Returns:
@@ -372,8 +375,7 @@ class BasePersistence(ABC):
 
     def flush(self) -> None:
         """Will be called by :class:`telegram.ext.Updater` upon receiving a stop signal. Gives the
-        persistence a chance to finish up saving or close a database connection gracefully. If this
-        is not of any importance just pass will be sufficient.
+        persistence a chance to finish up saving or close a database connection gracefully.
         """
 
     REPLACED_BOT: ClassVar[str] = 'bot_instance_replaced_by_ptb_persistence'

@@ -33,7 +33,6 @@ from typing import (
 )
 
 from telegram import Update
-from telegram.utils.types import HandlerArg
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 from .handler import Handler
@@ -44,7 +43,7 @@ if TYPE_CHECKING:
 RT = TypeVar('RT')
 
 
-class CallbackQueryHandler(Handler):
+class CallbackQueryHandler(Handler[Update]):
     """Handler class to handle Telegram callback queries. Optionally based on a regex.
 
     Read the documentation of the ``re`` module for more information.
@@ -123,7 +122,7 @@ class CallbackQueryHandler(Handler):
 
     def __init__(
         self,
-        callback: Callable[[HandlerArg, 'CallbackContext'], RT],
+        callback: Callable[[Update, 'CallbackContext'], RT],
         pass_update_queue: bool = False,
         pass_job_queue: bool = False,
         pattern: Union[str, Pattern] = None,
@@ -149,11 +148,11 @@ class CallbackQueryHandler(Handler):
         self.pass_groups = pass_groups
         self.pass_groupdict = pass_groupdict
 
-    def check_update(self, update: HandlerArg) -> Optional[Union[bool, object]]:
+    def check_update(self, update: Any) -> Optional[Union[bool, object]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
-            update (:class:`telegram.Update`): Incoming telegram update.
+            update (:class:`telegram.Update` | :obj:`object`): Incoming update.
 
         Returns:
             :obj:`bool`
@@ -172,7 +171,7 @@ class CallbackQueryHandler(Handler):
     def collect_optional_args(
         self,
         dispatcher: 'Dispatcher',
-        update: HandlerArg = None,
+        update: Update = None,
         check_result: Union[bool, Match] = None,
     ) -> Dict[str, Any]:
         optional_args = super().collect_optional_args(dispatcher, update, check_result)
@@ -187,7 +186,7 @@ class CallbackQueryHandler(Handler):
     def collect_additional_context(
         self,
         context: 'CallbackContext',
-        update: HandlerArg,
+        update: Update,
         dispatcher: 'Dispatcher',
         check_result: Union[bool, Match],
     ) -> None:

@@ -88,6 +88,16 @@ class TestVoice:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    def test_send_voice_custom_filename(self, bot, chat_id, voice_file, monkeypatch):
+        def make_assertion(url, data, **kwargs):
+            return data['voice'].filename == 'custom_filename'
+
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+
+        assert bot.send_voice(chat_id, voice_file, filename='custom_filename')
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     def test_get_and_download(self, bot, voice):
         new_file = bot.get_file(voice.file_id)
 
@@ -183,7 +193,7 @@ class TestVoice:
     def test_send_voice_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
-        expected = f"file://{Path.cwd() / 'tests/data/telegram.jpg'}"
+        expected = (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
         file = 'tests/data/telegram.jpg'
 
         def make_assertion(_, data, *args, **kwargs):
