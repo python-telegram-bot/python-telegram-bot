@@ -44,6 +44,7 @@ from telegram import (
     Dice,
     MessageEntity,
     ParseMode,
+    Message,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
@@ -1887,3 +1888,56 @@ class TestBot:
         result = mq_bot.send_message(chat_id, 'hello there', delay_queue='custom_dq')
         assert isinstance(result, Promise)
         assert test_flag
+
+    @pytest.mark.parametrize(
+        'default_bot',
+        [
+            {
+                'delay_queue': MessageQueue.DEFAULT_QUEUE_NAME,
+                'delay_queue_per_method': {
+                    'send_dice': MessageQueue.GROUP_QUEUE_NAME,
+                    'send_poll': None,
+                },
+            }
+        ],
+        indirect=True,
+    )
+    def test_message_queue_with_defaults(self, chat_id, default_bot, monkeypatch):
+        default_bot.message_queue = MessageQueue()
+
+        default_counter = 0
+        group_counter = 0
+        orig_default_put = default_bot.message_queue.default_queue.put
+        orig_group_put = default_bot.message_queue.default_queue.put
+
+        def default_put(*args, **kwargs):
+            nonlocal default_counter
+            default_counter += 1
+            return orig_default_put(*args, **kwargs)
+
+        def group_put(*args, **kwargs):
+            nonlocal group_counter
+            group_counter += 1
+            return orig_group_put(*args, **kwargs)
+
+        try:
+            monkeypatch.setattr(default_bot.message_queue.default_queue, 'put', default_put)
+            monkeypatch.setattr(default_bot.message_queue.group_queue, 'put', group_put)
+
+            result = default_bot.send_message(chat_id, 'general kenobi')
+            assert isinstance(result, Promise)
+            assert default_counter == 1
+            assert group_counter == 0
+
+            result = default_bot.send_poll(chat_id, 'question', options=['1', '2'])
+            assert isinstance(result, Message)
+            assert default_counter == 1
+            assert group_counter == 0
+
+            result = default_bot.send_dice(chat_id)
+            assert isinstance(result, Promise)
+            assert default_counter == 1
+            assert group_counter == 1
+        finally:
+            default_bot.message_queue.stop()
+            default_bot.message_queue = None
