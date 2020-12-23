@@ -48,9 +48,13 @@ class DelayQueue(threading.Thread):
     Processes callbacks from queue with specified throughput limits. Creates a separate thread to
     process callbacks with delays.
 
+    .. versionchanged:: 13.2
+        DelayQueue was almost completely overhauled in v13.2. Please read the docs carefully, if
+        you're upgrading from lower versions.
+
     Note:
         For most use cases, the :attr:`parent` argument should be set to
-        :attr:`MessageQueue.DEFAULT_QUEUE_NAME` to ensure that the global flood limits are not
+        :attr:`MessageQueue.default_queue` to ensure that the global flood limits are not
         exceeded.
 
     Args:
@@ -226,6 +230,10 @@ class MessageQueue:
     By default contains two :class:`telegram.ext.DelayQueue` instances, for general requests and
     group requests where the default delay queue is the parent of the group requests one.
 
+    .. versionchanged:: 13.2
+        MessageQueue was almost completely overhauled in v13.2. Please read the docs carefully, if
+        you're upgrading from lower versions.
+
     Args:
         all_burst_limit (:obj:`int`, optional): Number of maximum *all-type* callbacks to process
             per time-window defined by :attr:`all_time_limit_ms`. Defaults to
@@ -391,6 +399,8 @@ class MessageQueue:
 
 def queuedmessage(method: Callable) -> Callable:
     """A decorator to be used with :attr:`telegram.Bot` send* methods.
+
+    .. deprecated:: 13.2
 
     Note:
         As it probably wouldn't be a good idea to make this decorator a property, it has been coded
