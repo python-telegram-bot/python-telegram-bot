@@ -99,6 +99,50 @@ class TestDelayQueue:
         finally:
             delay_queue.stop()
 
+    def test_with_priority(self):
+        parent_queue = DelayQueue()
+        high_priority_queue = DelayQueue(parent=parent_queue, priority=0)
+        low_priority_queue = DelayQueue(parent=parent_queue, priority=1)
+        high_priority_count = 0
+        low_priority_count = 0
+        event_list = []
+
+        def low_priority_callback():
+            nonlocal low_priority_count
+            nonlocal event_list
+            event_list.append((low_priority_count, 'low'))
+            low_priority_count += 1
+
+        def high_priority_callback():
+            nonlocal high_priority_count
+            nonlocal event_list
+            event_list.append((high_priority_count, 'high'))
+            high_priority_count += 1
+
+        # enqueue low priority first
+        for _ in range(3):
+            low_priority_queue.put(low_priority_callback, args=[], kwargs={})
+
+        # enqueue high priority second
+        for _ in range(3):
+            high_priority_queue.put(high_priority_callback, args=[], kwargs={})
+
+        try:
+            sleep(1)
+            # high priority events should be handled first
+            assert event_list == [
+                (0, 'high'),
+                (1, 'high'),
+                (2, 'high'),
+                (0, 'low'),
+                (1, 'low'),
+                (2, 'low'),
+            ]
+        finally:
+            parent_queue.stop()
+            low_priority_queue.stop()
+            high_priority_queue.stop()
+
     def test_put_errors(self):
         delay_queue = DelayQueue(autostart=False)
         with pytest.raises(DelayQueueError, match='stopped thread'):

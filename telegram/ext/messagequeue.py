@@ -23,10 +23,10 @@
 
 import functools
 import logging
-import queue as q
 import threading
 import time
 import warnings
+from queue import PriorityQueue
 
 from typing import Callable, Any, TYPE_CHECKING, List, NoReturn, ClassVar, Dict, Optional
 
@@ -41,6 +41,23 @@ if TYPE_CHECKING:
 
 class DelayQueueError(RuntimeError):
     """Indicates processing errors."""
+
+
+@functools.total_ordering
+class PriorityWrapper:
+    def __init__(self, priority: int, promise: Promise):
+        self.priority = priority
+        self.promise = promise
+
+    def __lt__(self, other: object) -> bool:
+        if not isinstance(other, PriorityWrapper):
+            raise NotImplementedError
+        return self.priority < other.priority
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, PriorityWrapper):
+            raise NotImplementedError
+        return self.priority == other.priority
 
 
 class DelayQueue(threading.Thread):
@@ -58,8 +75,6 @@ class DelayQueue(threading.Thread):
         exceeded.
 
     Args:
-        queue (:obj:`Queue`, optional): Used to pass callbacks to thread. Creates ``Queue``
-            implicitly if not provided.
         parent (:class:`telegram.ext.DelayQueue`, optional): Pass another delay queue to put all
             requests through that delay queue after they were processed by this queue. Defaults to
             :obj:`None`.
@@ -79,6 +94,10 @@ class DelayQueue(threading.Thread):
             Defaults to :obj:`True`.
         name (:obj:`str`, optional): Thread's name. Defaults to ``'DelayQueue-N'``, where N is
             sequential number of object created.
+        priority (:obj:`int`, optional): Priority of the delay queue. Higher priority callbacks are
+            processed before lower priority callbacks, even if scheduled later. Higher number means
+            lower priority (i.e. ``priority = 0`` is processed *before* ``priority = 1``). Only
+            relevant, if the delay queue has a :attr:`parent``. Defaults to ``0``.
 
     Attributes:
         burst_limit (:obj:`int`): Number of maximum callbacks to process per time-window.
@@ -96,7 +115,6 @@ class DelayQueue(threading.Thread):
 
     def __init__(
         self,
-        queue: q.Queue = None,
         burst_limit: int = constants.MAX_MESSAGES_PER_SECOND,
         time_limit_ms: int = 1000,
         exc_route: Callable[[Exception], None] = None,
@@ -104,13 +122,15 @@ class DelayQueue(threading.Thread):
         name: str = None,
         parent: 'DelayQueue' = None,
         error_handler: Callable[[Exception], None] = None,
+        priority: int = 0,
     ):
         self.logger = logging.getLogger(__name__)
-        self._queue = queue if queue is not None else q.Queue()
         self.burst_limit = burst_limit
         self.time_limit = time_limit_ms / 1000
         self.parent = parent
         self.dispatcher: Optional['Dispatcher'] = None
+        self.priority = priority
+        self._queue: 'PriorityQueue[PriorityWrapper]' = PriorityQueue()
 
         if exc_route and error_handler:
             raise ValueError('Only one of exc_route or error_handler can be passed.')
@@ -145,7 +165,7 @@ class DelayQueue(threading.Thread):
         times: List[float] = []  # used to store each callable processing time
 
         while True:
-            promise = self._queue.get()
+            promise = self._queue.get().promise
             if self.__exit_req:
                 return  # shutdown thread
 
@@ -167,7 +187,7 @@ class DelayQueue(threading.Thread):
             # finally process one
             if self.parent:
                 # put through parent, if specified
-                self.parent.put(promise=promise)
+                self.parent.put(promise=promise, priority=self.priority)
             else:
                 promise.run()
                 # error handling
@@ -189,7 +209,11 @@ class DelayQueue(threading.Thread):
         """
 
         self.__exit_req = True  # gently request
-        self._queue.put(None)  # put something to unfreeze if frozen
+        self._queue.put(
+            PriorityWrapper(
+                0, Promise(PriorityQueue, [], {})  # put something to unfreeze if frozen
+            )
+        )
         self.logger.debug('Waiting for DelayQueue %s to shut down.', self.name)
         super().join(timeout=timeout)
         self.logger.debug('DelayQueue %s shut down.', self.name)
@@ -199,7 +223,12 @@ class DelayQueue(threading.Thread):
         raise exc
 
     def put(
-        self, func: Callable = None, args: Any = None, kwargs: Any = None, promise: Promise = None
+        self,
+        func: Callable = None,
+        args: Any = None,
+        kwargs: Any = None,
+        promise: Promise = None,
+        priority: int = 0,
     ) -> Promise:
         """Used to process callbacks in throughput-limiting thread through queue. You must either
         pass a :class:`telegram.utils.Promise` or all of ``func``, ``args`` and ``kwargs``.
@@ -210,6 +239,7 @@ class DelayQueue(threading.Thread):
             args (:obj:`list`, optional): Variable-length `func` arguments.
             kwargs (:obj:`dict`, optional): Arbitrary keyword-arguments to `func`.
             promise (:class:`telegram.utils.Promise`, optional): A promise.
+            priority (:obj:`int`, optional): Priority of the callback. Defaults to ``0``.
 
         """
         if not bool(promise) ^ all(v is not None for v in [func, args, kwargs]):
@@ -220,7 +250,7 @@ class DelayQueue(threading.Thread):
 
         if not promise:
             promise = Promise(func, args, kwargs)  # type: ignore[arg-type]
-        self._queue.put(promise)
+        self._queue.put(PriorityWrapper(priority, promise))
         return promise
 
 
