@@ -1836,42 +1836,44 @@ class TestBot:
 
         monkeypatch.setattr(mq_bot, '_post', _post)
         with caplog.at_level(logging.DEBUG):
-            result = mq_bot.send_message(chat_id, 'text', delay_queue=MessageQueue.DEFAULT_QUEUE)
+            result = mq_bot.send_message(
+                chat_id, 'text', delay_queue=MessageQueue.DEFAULT_QUEUE_NAME
+            )
             assert isinstance(result, Promise)
             assert len(caplog.records) == 4
             assert expected in caplog.records[1].getMessage()
 
         with caplog.at_level(logging.DEBUG):
             result = mq_bot.send_message(
-                text='text', chat_id=chat_id, delay_queue=MessageQueue.DEFAULT_QUEUE
+                text='text', chat_id=chat_id, delay_queue=MessageQueue.DEFAULT_QUEUE_NAME
             )
             assert isinstance(result, Promise)
             assert len(caplog.records) == 8
             assert expected in caplog.records[5].getMessage()
 
         with caplog.at_level(logging.DEBUG):
-            assert isinstance(mq_bot.get_me(delay_queue=MessageQueue.DEFAULT_QUEUE), Promise)
+            assert isinstance(mq_bot.get_me(delay_queue=MessageQueue.DEFAULT_QUEUE_NAME), Promise)
             assert len(caplog.records) == 12
             assert 'default' in caplog.records[9].getMessage()
 
     def test_stopped_message_queue(self, mq_bot, caplog):
         mq_bot.message_queue.stop()
         with caplog.at_level(logging.DEBUG):
-            result = mq_bot.get_me(delay_queue=MessageQueue.DEFAULT_QUEUE)
+            result = mq_bot.get_me(delay_queue=MessageQueue.DEFAULT_QUEUE_NAME)
             assert not isinstance(result, Promise)
             assert len(caplog.records) >= 2
             assert 'Ignoring call to MessageQueue' in caplog.records[1].getMessage()
 
     def test_no_message_queue(self, bot, caplog):
         with caplog.at_level(logging.DEBUG):
-            result = bot.get_me(delay_queue=MessageQueue.DEFAULT_QUEUE)
+            result = bot.get_me(delay_queue=MessageQueue.DEFAULT_QUEUE_NAME)
             assert not isinstance(result, Promise)
             assert len(caplog.records) >= 2
             assert 'Ignoring call to MessageQueue' in caplog.records[1].getMessage()
 
     def test_message_queue_custom_delay_queue(self, chat_id, mq_bot, monkeypatch):
         test_flag = False
-        orig_put = mq_bot.message_queue._delay_queues['custom_dq'].put
+        orig_put = mq_bot.message_queue.delay_queues['custom_dq'].put
 
         def put(*args, **kwargs):
             nonlocal test_flag
@@ -1881,19 +1883,7 @@ class TestBot:
         result = mq_bot.send_message(chat_id, 'general kenobi')
         assert not isinstance(result, Promise)
 
-        monkeypatch.setattr(mq_bot.message_queue._delay_queues['custom_dq'], 'put', put)
+        monkeypatch.setattr(mq_bot.message_queue.delay_queues['custom_dq'], 'put', put)
         result = mq_bot.send_message(chat_id, 'hello there', delay_queue='custom_dq')
         assert isinstance(result, Promise)
         assert test_flag
-
-    @pytest.mark.timeout(10)
-    def test_message_queue_context_manager(self, mq_bot, chat_id):
-        with open('tests/data/telegram.gif', 'rb') as document:
-            with open('tests/data/telegram.jpg', 'rb') as thumb:
-                promise = mq_bot.send_document(
-                    chat_id, document, thumb=thumb, delay_queue=MessageQueue.DEFAULT_QUEUE
-                )
-
-        message = promise.result()
-        assert message.document
-        assert message.document.thumb

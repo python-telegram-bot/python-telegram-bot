@@ -195,7 +195,7 @@ class TestMessageQueue:
 
     def test_auto_start_false(self):
         message_queue = MessageQueue(autostart=False)
-        assert not any(thread.is_alive() for thread in message_queue._delay_queues.values())
+        assert not any(thread.is_alive() for thread in message_queue.delay_queues.values())
 
     def test_exc_route_deprecation(self, recwarn):
         with pytest.raises(ValueError, match='Only one of exc_route or '):
@@ -210,13 +210,13 @@ class TestMessageQueue:
         delay_queue = DelayQueue(autostart=False, name='dq')
         try:
             message_queue.add_delay_queue(delay_queue)
-            assert 'dq' in message_queue._delay_queues
-            assert not any(thread.is_alive() for thread in message_queue._delay_queues.values())
+            assert 'dq' in message_queue.delay_queues
+            assert not any(thread.is_alive() for thread in message_queue.delay_queues.values())
             message_queue.start()
-            assert all(thread.is_alive() for thread in message_queue._delay_queues.values())
+            assert all(thread.is_alive() for thread in message_queue.delay_queues.values())
 
             message_queue.stop()
-            assert not any(thread.is_alive() for thread in message_queue._delay_queues.values())
+            assert not any(thread.is_alive() for thread in message_queue.delay_queues.values())
         finally:
             delay_queue.stop()
             message_queue.stop()
@@ -227,12 +227,12 @@ class TestMessageQueue:
         delay_queue = DelayQueue(name='dq', autostart=autostart)
         try:
             message_queue.add_delay_queue(delay_queue)
-            assert 'dq' in message_queue._delay_queues
+            assert 'dq' in message_queue.delay_queues
             assert delay_queue.is_alive()
-            assert all(thread.is_alive() for thread in message_queue._delay_queues.values())
+            assert all(thread.is_alive() for thread in message_queue.delay_queues.values())
 
             message_queue.stop()
-            assert not any(thread.is_alive() for thread in message_queue._delay_queues.values())
+            assert not any(thread.is_alive() for thread in message_queue.delay_queues.values())
         finally:
             delay_queue.stop()
             message_queue.stop()
@@ -250,11 +250,11 @@ class TestMessageQueue:
         delay_queue = DelayQueue(name='dq')
         try:
             message_queue.add_delay_queue(delay_queue)
-            assert 'dq' in message_queue._delay_queues
+            assert 'dq' in message_queue.delay_queues
             assert delay_queue.is_alive()
 
             message_queue.remove_delay_queue('dq')
-            assert 'dq' not in message_queue._delay_queues
+            assert 'dq' not in message_queue.delay_queues
             if autostart:
                 assert not delay_queue.is_alive()
         finally:
@@ -266,23 +266,23 @@ class TestMessageQueue:
         group_flag = None
 
         message_queue = MessageQueue()
-        original_put = message_queue._delay_queues[MessageQueue.DEFAULT_QUEUE].put
+        original_put = message_queue.default_queue.put
 
         def put(*args, **kwargs):
             nonlocal group_flag
             group_flag = True
             return original_put(*args, **kwargs)
 
-        message_queue._delay_queues[MessageQueue.GROUP_QUEUE].put = put
+        message_queue.group_queue.put = put
 
         try:
-            message_queue.put(self.call, MessageQueue.GROUP_QUEUE, 1, kwarg='foo')
+            message_queue.put(self.call, MessageQueue.GROUP_QUEUE_NAME, 1, kwarg='foo')
             sleep(0.5)
             assert self.test_flag is True
             # make sure that group queue was called, too
             assert group_flag is True
         finally:
-            message_queue._delay_queues[MessageQueue.GROUP_QUEUE].put = original_put
+            message_queue.group_queue.put = original_put
             message_queue.stop()
 
 
@@ -304,8 +304,8 @@ def mq_bot(bot, monkeypatch):
 
     bot = MQBot(token=bot.token)
 
-    orig_default_put = bot._msg_queue._delay_queues[MessageQueue.DEFAULT_QUEUE].put
-    orig_group_put = bot._msg_queue._delay_queues[MessageQueue.GROUP_QUEUE].put
+    orig_default_put = bot._msg_queue.default_queue.put
+    orig_group_put = bot._msg_queue.group_queue.put
 
     def step_default_counter(*args, **kwargs):
         orig_default_put(*args, **kwargs)
@@ -315,12 +315,8 @@ def mq_bot(bot, monkeypatch):
         orig_group_put(*args, **kwargs)
         bot.group_count += 1
 
-    monkeypatch.setattr(
-        bot._msg_queue._delay_queues[MessageQueue.DEFAULT_QUEUE], 'put', step_default_counter
-    )
-    monkeypatch.setattr(
-        bot._msg_queue._delay_queues[MessageQueue.GROUP_QUEUE], 'put', step_group_counter
-    )
+    monkeypatch.setattr(bot._msg_queue.default_queue, 'put', step_default_counter)
+    monkeypatch.setattr(bot._msg_queue.group_queue, 'put', step_group_counter)
     yield bot
     bot._msg_queue.stop()
 

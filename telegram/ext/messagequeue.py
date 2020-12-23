@@ -48,15 +48,10 @@ class DelayQueue(threading.Thread):
     Processes callbacks from queue with specified throughput limits. Creates a separate thread to
     process callbacks with delays.
 
-    Attributes:
-        burst_limit (:obj:`int`): Number of maximum callbacks to process per time-window.
-        time_limit (:obj:`int`): Defines width of time-window used when each processing limit is
-            calculated.
-        name (:obj:`str`): Thread's name.
-        error_handler (:obj:`callable`): Optional. A callable, accepting 1 positional argument.
-            Used to route exceptions from processor thread to main thread.
-        dispatcher (:class:`telegram.ext.Disptacher`): Optional. The dispatcher to use for error
-            handling.
+    Note:
+        For most use cases, the :attr:`parent` argument should be set to
+        :attr:`MessageQueue.DEFAULT_QUEUE_NAME` to ensure that the global flood limits are not
+        exceeded.
 
     Args:
         queue (:obj:`Queue`, optional): Used to pass callbacks to thread. Creates ``Queue``
@@ -80,6 +75,16 @@ class DelayQueue(threading.Thread):
             Defaults to :obj:`True`.
         name (:obj:`str`, optional): Thread's name. Defaults to ``'DelayQueue-N'``, where N is
             sequential number of object created.
+
+    Attributes:
+        burst_limit (:obj:`int`): Number of maximum callbacks to process per time-window.
+        time_limit (:obj:`int`): Defines width of time-window used when each processing limit is
+            calculated.
+        name (:obj:`str`): Thread's name.
+        error_handler (:obj:`callable`): Optional. A callable, accepting 1 positional argument.
+            Used to route exceptions from processor thread to main thread.
+        dispatcher (:class:`telegram.ext.Disptacher`): Optional. The dispatcher to use for error
+            handling.
 
     """
 
@@ -221,11 +226,6 @@ class MessageQueue:
     By default contains two :class:`telegram.ext.DelayQueue` instances, for general requests and
     group requests where the default delay queue is the parent of the group requests one.
 
-    Attributes:
-        running (:obj:`bool`): Whether this message queue has started it's delay queues or not.
-        dispatcher (:class:`telegram.ext.Disptacher`): Optional. The Dispatcher to use for error
-            handling.
-
     Args:
         all_burst_limit (:obj:`int`, optional): Number of maximum *all-type* callbacks to process
             per time-window defined by :attr:`all_time_limit_ms`. Defaults to
@@ -245,6 +245,15 @@ class MessageQueue:
         exc_route (:obj:`callable`, optional): Deprecated alias of :attr:`error_handler`.
         autostart (:obj:`bool`, optional): If :obj:`True`, both default delay queues are started
             immediately after object's creation. Defaults to :obj:`True`.
+
+    Attributes:
+        running (:obj:`bool`): Whether this message queue has started it's delay queues or not.
+        dispatcher (:class:`telegram.ext.Disptacher`): Optional. The Dispatcher to use for error
+            handling.
+        delay_queues (Dict[:obj:`str`, :class:`telegram.ext.DelayQueue`]): A dictionary containing
+            all registered delay queues, where the keys are the names of the delay queues. By
+            default includes bot :attr:`default_queue` and :attr:`group_queue` under the keys
+            :attr:`DEFAULT_QUEUE_NAME` and :attr:`GROUP_QUEUE_NAME`, respectively.
 
     """
 
@@ -270,22 +279,22 @@ class MessageQueue:
                 stacklevel=2,
             )
 
-        self._delay_queues: Dict[str, DelayQueue] = {
-            self.DEFAULT_QUEUE: DelayQueue(
+        self.delay_queues: Dict[str, DelayQueue] = {
+            self.DEFAULT_QUEUE_NAME: DelayQueue(
                 burst_limit=all_burst_limit,
                 time_limit_ms=all_time_limit_ms,
                 error_handler=exc_route or error_handler,
                 autostart=autostart,
-                name=self.DEFAULT_QUEUE,
+                name=self.DEFAULT_QUEUE_NAME,
             )
         }
-        self._delay_queues[self.GROUP_QUEUE] = DelayQueue(
+        self.delay_queues[self.GROUP_QUEUE_NAME] = DelayQueue(
             burst_limit=group_burst_limit,
             time_limit_ms=group_time_limit_ms,
             error_handler=exc_route or error_handler,
             autostart=autostart,
-            name=self.GROUP_QUEUE,
-            parent=self._delay_queues[self.DEFAULT_QUEUE],
+            name=self.GROUP_QUEUE_NAME,
+            parent=self.delay_queues[self.DEFAULT_QUEUE_NAME],
         )
 
     def add_delay_queue(self, delay_queue: DelayQueue) -> None:
@@ -297,7 +306,7 @@ class MessageQueue:
         Args:
             delay_queue (:class:`telegram.ext.DelayQueue`): The delay queue to add.
         """
-        self._delay_queues[delay_queue.name] = delay_queue
+        self.delay_queues[delay_queue.name] = delay_queue
         if self.dispatcher:
             delay_queue.set_dispatcher(self.dispatcher)
         if self.running and not delay_queue.is_alive():
@@ -313,14 +322,14 @@ class MessageQueue:
             timeout (:obj:`float`, optional): The timeout to pass to
                 :meth:`telegram.ext.DelayQueue.stop`.
         """
-        delay_queue = self._delay_queues.pop(name)
+        delay_queue = self.delay_queues.pop(name)
         if self.running and delay_queue.is_alive():
             delay_queue.stop(timeout)
 
     def start(self) -> None:
         """Starts the all :class:`telegram.ext.DelayQueue` registered for this message queue."""
         self.running = True
-        for delay_queue in self._delay_queues.values():
+        for delay_queue in self.delay_queues.values():
             delay_queue.start()
 
     def stop(self, timeout: float = None) -> None:
@@ -332,7 +341,7 @@ class MessageQueue:
                 :meth:`telegram.ext.DelayQueue.stop`.
         """
         self.running = False
-        for delay_queue in self._delay_queues.values():
+        for delay_queue in self.delay_queues.values():
             delay_queue.stop(timeout)
 
     def put(self, func: Callable, delay_queue: str, *args: Any, **kwargs: Any) -> Promise:
@@ -349,7 +358,7 @@ class MessageQueue:
             :class:`telegram.ext.Promise`.
 
         """
-        return self._delay_queues[delay_queue].put(func, args, kwargs)
+        return self.delay_queues[delay_queue].put(func, args, kwargs)
 
     def set_dispatcher(self, dispatcher: 'Dispatcher') -> None:
         """
@@ -360,10 +369,24 @@ class MessageQueue:
         """
         self.dispatcher = dispatcher
 
-    DEFAULT_QUEUE: ClassVar[str] = 'default_delay_queue'
-    """:obj:`str`: The default delay queue."""
-    GROUP_QUEUE: ClassVar[str] = 'group_delay_queue'
-    """:obj:`str`: The default delay queue for group requests."""
+    DEFAULT_QUEUE_NAME: ClassVar[str] = 'default_delay_queue'
+    """:obj:`str`: The default delay queues name."""
+    GROUP_QUEUE_NAME: ClassVar[str] = 'group_delay_queue'
+    """:obj:`str`: The name of the default delay queue for group requests."""
+
+    @property
+    def default_queue(self) -> DelayQueue:
+        """
+        Shortcut for ``MessageQueue.delay_queues[MessageQueue.DEFAULT_QUEUE_NAME]``.
+        """
+        return self.delay_queues[self.DEFAULT_QUEUE_NAME]
+
+    @property
+    def group_queue(self) -> DelayQueue:
+        """
+        Shortcut for ``MessageQueue.delay_queues[MessageQueue.GROUP_QUEUE_NAME]``.
+        """
+        return self.delay_queues[self.GROUP_QUEUE_NAME]
 
 
 def queuedmessage(method: Callable) -> Callable:
@@ -415,10 +438,10 @@ def queuedmessage(method: Callable) -> Callable:
         if queued:
             if not is_group:
                 return self._msg_queue.put(  # type: ignore[attr-defined]
-                    method, MessageQueue.DEFAULT_QUEUE, self, *args, **kwargs
+                    method, MessageQueue.DEFAULT_QUEUE_NAME, self, *args, **kwargs
                 )
             return self._msg_queue.put(  # type: ignore[attr-defined]
-                method, MessageQueue.GROUP_QUEUE, self, *args, **kwargs
+                method, MessageQueue.GROUP_QUEUE_NAME, self, *args, **kwargs
             )
         return method(self, *args, **kwargs)
 

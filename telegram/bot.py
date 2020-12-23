@@ -157,7 +157,7 @@ def mq(func: Callable[..., RT]) -> Callable[..., RT]:
         if not delay_queue:
             return func(*args, **kwargs)
 
-        if delay_queue == self.message_queue.DEFAULT_QUEUE:
+        if delay_queue == self.message_queue.DEFAULT_QUEUE_NAME:
             # For default queue, check if we're in a group setting or not
             chat_id: Union[str, int] = ''
             if 'chat_id' in arg_spec.args:
@@ -180,7 +180,7 @@ def mq(func: Callable[..., RT]) -> Callable[..., RT]:
                 'group' if is_group else 'default',
             )
 
-            queue = self.message_queue.GROUP_QUEUE if is_group else delay_queue
+            queue = self.message_queue.GROUP_QUEUE_NAME if is_group else delay_queue
             return self.message_queue.put(  # type: ignore[return-value]
                 func, queue, *args, **kwargs
             )
