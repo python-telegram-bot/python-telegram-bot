@@ -1194,7 +1194,7 @@ class TestBot:
         assert message.game.animation.file_id != ''
         # We added some test bots later and for some reason the file size is not the same for them
         # so we accept two different sizes here. Shouldn't be too much of
-        assert message.game.photo[0].file_size in [851, 4801]
+        assert message.game.photo[0].file_size in [851, 4928]
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

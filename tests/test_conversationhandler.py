@@ -880,9 +880,9 @@ class TestConversationHandler:
         # t=0 /start (timeout=.5)
         # t=.35 /brew (timeout=.85)
         # t=.5 original timeout
-        # t=.7 /pourCoffee (timeout=1.2)
+        # t=.6 /pourCoffee (timeout=1.1)
         # t=.85 second timeout
-        # t=1.2 actual timeout
+        # t=1.1 actual timeout
         message = Message(
             0,
             None,
@@ -908,9 +908,9 @@ class TestConversationHandler:
         message.entities[0].length = len('/pourCoffee')
         dp.process_update(Update(update_id=0, message=message))
         assert handler.conversations.get((self.group.id, user1.id)) == self.DRINKING
-        sleep(0.5)  # t=1.1
+        sleep(0.4)  # t=1.0
         assert handler.conversations.get((self.group.id, user1.id)) == self.DRINKING
-        sleep(0.3)  # t=1.4
+        sleep(0.3)  # t=1.3
         assert handler.conversations.get((self.group.id, user1.id)) is None
 
     def test_conversation_timeout_two_users(self, dp, bot, user1, user2):
