@@ -174,7 +174,7 @@ class CallbackQuery(TelegramObject):
         return self.message.edit_caption(caption=caption, *args, **kwargs)
 
     def edit_message_reply_markup(
-        self, reply_markup: 'InlineKeyboardMarkup', *args: Any, **kwargs: Any
+        self, reply_markup: Optional['InlineKeyboardMarkup'], *args: Any, **kwargs: Any
     ) -> Union[Message, bool]:
         """Shortcut for either::
 
