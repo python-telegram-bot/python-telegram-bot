@@ -1979,7 +1979,9 @@ class Bot(TelegramObject):
     def answer_inline_query(
         self,
         inline_query_id: str,
-        results: List['InlineQueryResult'],
+        results: Union[
+            List['InlineQueryResult'], Callable[[int], Optional[List['InlineQueryResult']]]
+        ],
         cache_time: int = 300,
         is_personal: bool = None,
         next_offset: str = None,
@@ -2002,9 +2004,9 @@ class Bot(TelegramObject):
             inline_query_id (:obj:`str`): Unique identifier for the answered query.
             results (List[:class:`telegram.InlineQueryResult`] | Callable): A list of results for
                 the inline query. In case :attr:`current_offset` is passed, ``results`` may also be
-                a callable accepts the current page index starting from 0. It must return either a
-                list of :class:`telegram.InlineResult` instances or :obj:`None` if there are no
-                more results.
+                a callable that accepts the current page index starting from 0. It must return
+                either a list of :class:`telegram.InlineResult` instances or :obj:`None` if there
+                are no more results.
             cache_time (:obj:`int`, optional): The maximum amount of time in seconds that the
                 result of the inline query may be cached on the server. Defaults to 300.
             is_personal (:obj:`bool`, optional): Pass :obj:`True`, if results may be cached on
@@ -2087,10 +2089,11 @@ class Bot(TelegramObject):
             next_offset = ''
 
             if callable(results):
-                effective_results = results(current_offset_int)
-                if not effective_results:
+                callable_output = results(current_offset_int)
+                if not callable_output:
                     effective_results = []
                 else:
+                    effective_results = callable_output
                     next_offset = str(current_offset_int + 1)
             else:
                 if len(results) > (current_offset_int + 1) * MAX_INLINE_QUERY_RESULTS:
@@ -2104,7 +2107,7 @@ class Bot(TelegramObject):
                 else:
                     effective_results = results[current_offset_int * MAX_INLINE_QUERY_RESULTS :]
         else:
-            effective_results = results
+            effective_results = results  # type: ignore[assignment]
 
         for result in effective_results:
             _set_defaults(result)
