@@ -33,7 +33,7 @@ class BasePersistence(ABC):
 
     All relevant methods must be overwritten. This includes:
 
-    * `meth:`get_bot_data`
+    * :meth:`get_bot_data`
     * :meth:`update_bot_data`
     * :meth:`get_chat_data`
     * :meth:`update_chat_data`
