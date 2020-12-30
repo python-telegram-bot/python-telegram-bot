@@ -34,30 +34,6 @@ class InlineQueryResultDocument(InlineQueryResult):
     specified content instead of the file. Currently, only .PDF and .ZIP files can be sent
     using this method.
 
-    Attributes:
-        type (:obj:`str`): 'document'.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
-        title (:obj:`str`): Title for the result.
-        caption (:obj:`str`): Optional. Caption of the document to be sent, 0-1024 characters
-            after entities parsing.
-        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.ParseMode` for the available modes.
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
-            entities that appear in the caption, which can be specified instead of
-            :attr:`parse_mode`.
-        document_url (:obj:`str`): A valid URL for the file.
-        mime_type (:obj:`str`): Mime type of the content of the file, either "application/pdf"
-            or "application/zip".
-        description (:obj:`str`): Optional. Short description of the result.
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-            to the message.
-        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-            message to be sent instead of the file.
-        thumb_url (:obj:`str`): Optional. URL of the thumbnail (jpeg only) for the file.
-        thumb_width (:obj:`int`): Optional. Thumbnail width.
-        thumb_height (:obj:`int`): Optional. Thumbnail height.
-
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         title (:obj:`str`): Title for the result.
@@ -81,6 +57,30 @@ class InlineQueryResultDocument(InlineQueryResult):
         thumb_width (:obj:`int`, optional): Thumbnail width.
         thumb_height (:obj:`int`, optional): Thumbnail height.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        type (:obj:`str`): 'document'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        title (:obj:`str`): Title for the result.
+        caption (:obj:`str`): Optional. Caption of the document to be sent, 0-1024 characters
+            after entities parsing.
+        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
+            in :class:`telegram.ParseMode` for the available modes.
+        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
+            entities that appear in the caption, which can be specified instead of
+            :attr:`parse_mode`.
+        document_url (:obj:`str`): A valid URL for the file.
+        mime_type (:obj:`str`): Mime type of the content of the file, either "application/pdf"
+            or "application/zip".
+        description (:obj:`str`): Optional. Short description of the result.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
+            to the message.
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
+            message to be sent instead of the file.
+        thumb_url (:obj:`str`): Optional. URL of the thumbnail (jpeg only) for the file.
+        thumb_width (:obj:`int`): Optional. Thumbnail width.
+        thumb_height (:obj:`int`): Optional. Thumbnail height.
 
     """
 

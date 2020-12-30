@@ -30,11 +30,11 @@ if TYPE_CHECKING:
 class PassportData(TelegramObject):
     """Contains information about Telegram Passport data shared with the bot by the user.
 
-    Attributes:
-        data (List[:class:`telegram.EncryptedPassportElement`]): Array with encrypted information
-            about documents and other Telegram Passport elements that was shared with the bot.
-        credentials (:class:`telegram.EncryptedCredentials`): Encrypted credentials.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+    Note:
+        To be able to decrypt this object, you must pass your ``private_key`` to either
+        :class:`telegram.Updater` or :class:`telegram.Bot`. Decrypted data is then found in
+        :attr:`decrypted_data` and the payload can be found in :attr:`decrypted_credentials`'s
+        attribute :attr:`telegram.Credentials.payload`.
 
     Args:
         data (List[:class:`telegram.EncryptedPassportElement`]): Array with encrypted information
@@ -43,11 +43,11 @@ class PassportData(TelegramObject):
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
-    Note:
-        To be able to decrypt this object, you must pass your private_key to either
-        :class:`telegram.Updater` or :class:`telegram.Bot`. Decrypted data is then found in
-        :attr:`decrypted_data` and the payload can be found in :attr:`decrypted_credentials`'s
-        attribute :attr:`telegram.Credentials.payload`.
+    Attributes:
+        data (List[:class:`telegram.EncryptedPassportElement`]): Array with encrypted information
+            about documents and other Telegram Passport elements that was shared with the bot.
+        credentials (:class:`telegram.EncryptedCredentials`): Encrypted credentials.
+        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
 
     """
 

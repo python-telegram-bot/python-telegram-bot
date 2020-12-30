@@ -30,14 +30,6 @@ class ShippingAddress(TelegramObject):
     considered equal, if their  :attr:`country_code`, :attr:`state`, :attr:`city`,
     :attr:`street_line1`, :attr:`street_line2` and :attr:`post_cod` are equal.
 
-    Attributes:
-        country_code (:obj:`str`): ISO 3166-1 alpha-2 country code.
-        state (:obj:`str`): State, if applicable.
-        city (:obj:`str`): City.
-        street_line1 (:obj:`str`): First line for the address.
-        street_line2 (:obj:`str`): Second line for the address.
-        post_code (:obj:`str`): Address post code.
-
     Args:
         country_code (:obj:`str`): ISO 3166-1 alpha-2 country code.
         state (:obj:`str`): State, if applicable.
@@ -46,6 +38,14 @@ class ShippingAddress(TelegramObject):
         street_line2 (:obj:`str`): Second line for the address.
         post_code (:obj:`str`): Address post code.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        country_code (:obj:`str`): ISO 3166-1 alpha-2 country code.
+        state (:obj:`str`): State, if applicable.
+        city (:obj:`str`): City.
+        street_line1 (:obj:`str`): First line for the address.
+        street_line2 (:obj:`str`): Second line for the address.
+        post_code (:obj:`str`): Address post code.
 
     """
 

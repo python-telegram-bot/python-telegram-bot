@@ -82,92 +82,7 @@ class Message(TelegramObject):
     considered equal, if their :attr:`message_id` and :attr:`chat` are equal.
 
     Note:
-        * In Python `from` is a reserved word, use `from_user` instead.
-
-    Attributes:
-        message_id (:obj:`int`): Unique message identifier inside this chat.
-        from_user (:class:`telegram.User`): Optional. Sender.
-        sender_chat (:class:`telegram.Chat`): Optional. Sender of the message, sent on behalf of a
-            chat. The channel itself for channel messages. The supergroup itself for messages from
-            anonymous group administrators. The linked channel for messages automatically forwarded
-            to the discussion group.
-        date (:class:`datetime.datetime`): Date the message was sent.
-        chat (:class:`telegram.Chat`): Conversation the message belongs to.
-        forward_from (:class:`telegram.User`): Optional. Sender of the original message.
-        forward_from_chat (:class:`telegram.Chat`): Optional. For messages forwarded from channels
-            or from anonymous administrators, information about the original sender chat.
-        forward_from_message_id (:obj:`int`): Optional. Identifier of the original message in the
-            channel.
-        forward_date (:class:`datetime.datetime`): Optional. Date the original message was sent.
-        reply_to_message (:class:`telegram.Message`): Optional. For replies, the original message.
-            Note that the Message object in this field will not contain further
-            ``reply_to_message`` fields even if it itself is a reply.
-        edit_date (:class:`datetime.datetime`): Optional. Date the message was last edited.
-        media_group_id (:obj:`str`): Optional. The unique identifier of a media message group this
-            message belongs to.
-        text (:obj:`str`): Optional. The actual UTF-8 text of the message.
-        entities (List[:class:`telegram.MessageEntity`]): Optional. Special entities like
-            usernames, URLs, bot commands, etc. that appear in the text. See
-            :attr:`Message.parse_entity` and :attr:`parse_entities` methods for how to use
-            properly.
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. Special entities like
-            usernames, URLs, bot commands, etc. that appear in the caption. See
-            :attr:`Message.parse_caption_entity` and :attr:`parse_caption_entities` methods for how
-            to use properly.
-        audio (:class:`telegram.Audio`): Optional. Information about the file.
-        document (:class:`telegram.Document`): Optional. Information about the file.
-        animation (:class:`telegram.Animation`) Optional. Information about the file.
-            For backward compatibility, when this field is set, the document field will also be
-            set.
-        game (:class:`telegram.Game`): Optional. Information about the game.
-        photo (List[:class:`telegram.PhotoSize`]): Optional. Available sizes of the photo.
-        sticker (:class:`telegram.Sticker`): Optional. Information about the sticker.
-        video (:class:`telegram.Video`): Optional. Information about the video.
-        voice (:class:`telegram.Voice`): Optional. Information about the file.
-        video_note (:class:`telegram.VideoNote`): Optional. Information about the video message.
-        new_chat_members (List[:class:`telegram.User`]): Optional. Information about new members to
-            the chat. (the bot itself may be one of these members).
-        caption (:obj:`str`): Optional. Caption for the document, photo or video, 0-1024
-            characters.
-        contact (:class:`telegram.Contact`): Optional. Information about the contact.
-        location (:class:`telegram.Location`): Optional. Information about the location.
-        venue (:class:`telegram.Venue`): Optional. Information about the venue.
-        left_chat_member (:class:`telegram.User`): Optional. Information about the user that left
-            the group. (this member may be the bot itself).
-        new_chat_title (:obj:`str`): Optional. A chat title was changed to this value.
-        new_chat_photo (List[:class:`telegram.PhotoSize`]): Optional. A chat photo was changed to
-            this value.
-        delete_chat_photo (:obj:`bool`): Optional. The chat photo was deleted.
-        group_chat_created (:obj:`bool`): Optional. The group has been created.
-        supergroup_chat_created (:obj:`bool`): Optional. The supergroup has been created.
-        channel_chat_created (:obj:`bool`): Optional. The channel has been created.
-        migrate_to_chat_id (:obj:`int`): Optional. The group has been migrated to a supergroup with
-            the specified identifier.
-        migrate_from_chat_id (:obj:`int`): Optional. The supergroup has been migrated from a group
-            with the specified identifier.
-        pinned_message (:class:`telegram.message`): Optional. Specified message was pinned.
-        invoice (:class:`telegram.Invoice`): Optional. Information about the invoice.
-        successful_payment (:class:`telegram.SuccessfulPayment`): Optional. Information about the
-            payment.
-        connected_website (:obj:`str`): Optional. The domain name of the website on which the user
-            has logged in.
-        forward_signature (:obj:`str`): Optional. Signature of the post author for messages
-            forwarded from channels.
-        forward_sender_name	(:obj:`str`): Optional. Sender's name for messages forwarded from users
-            who disallow adding a link to their account in forwarded messages.
-        author_signature (:obj:`str`): Optional. Signature of the post author for messages in
-            channels, or the custom title of an anonymous group administrator.
-        passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data.
-        poll (:class:`telegram.Poll`): Optional. Message is a native poll,
-            information about the poll.
-        dice (:class:`telegram.Dice`): Optional. Message is a dice.
-        via_bot (:class:`telegram.User`): Optional. Bot through which the message was sent.
-        proximity_alert_triggered (:class:`telegram.ProximityAlertTriggered`): Optional. Service
-            message. A user in the chat triggered another user's proximity alert while sharing
-            Live Location.
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-            to the message.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+        In Python `from` is a reserved word, use `from_user` instead.
 
     Args:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -283,6 +198,91 @@ class Message(TelegramObject):
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. ``login_url`` buttons are represented as ordinary url buttons.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+
+    Attributes:
+        message_id (:obj:`int`): Unique message identifier inside this chat.
+        from_user (:class:`telegram.User`): Optional. Sender.
+        sender_chat (:class:`telegram.Chat`): Optional. Sender of the message, sent on behalf of a
+            chat. The channel itself for channel messages. The supergroup itself for messages from
+            anonymous group administrators. The linked channel for messages automatically forwarded
+            to the discussion group.
+        date (:class:`datetime.datetime`): Date the message was sent.
+        chat (:class:`telegram.Chat`): Conversation the message belongs to.
+        forward_from (:class:`telegram.User`): Optional. Sender of the original message.
+        forward_from_chat (:class:`telegram.Chat`): Optional. For messages forwarded from channels
+            or from anonymous administrators, information about the original sender chat.
+        forward_from_message_id (:obj:`int`): Optional. Identifier of the original message in the
+            channel.
+        forward_date (:class:`datetime.datetime`): Optional. Date the original message was sent.
+        reply_to_message (:class:`telegram.Message`): Optional. For replies, the original message.
+            Note that the Message object in this field will not contain further
+            ``reply_to_message`` fields even if it itself is a reply.
+        edit_date (:class:`datetime.datetime`): Optional. Date the message was last edited.
+        media_group_id (:obj:`str`): Optional. The unique identifier of a media message group this
+            message belongs to.
+        text (:obj:`str`): Optional. The actual UTF-8 text of the message.
+        entities (List[:class:`telegram.MessageEntity`]): Optional. Special entities like
+            usernames, URLs, bot commands, etc. that appear in the text. See
+            :attr:`Message.parse_entity` and :attr:`parse_entities` methods for how to use
+            properly.
+        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. Special entities like
+            usernames, URLs, bot commands, etc. that appear in the caption. See
+            :attr:`Message.parse_caption_entity` and :attr:`parse_caption_entities` methods for how
+            to use properly.
+        audio (:class:`telegram.Audio`): Optional. Information about the file.
+        document (:class:`telegram.Document`): Optional. Information about the file.
+        animation (:class:`telegram.Animation`) Optional. Information about the file.
+            For backward compatibility, when this field is set, the document field will also be
+            set.
+        game (:class:`telegram.Game`): Optional. Information about the game.
+        photo (List[:class:`telegram.PhotoSize`]): Optional. Available sizes of the photo.
+        sticker (:class:`telegram.Sticker`): Optional. Information about the sticker.
+        video (:class:`telegram.Video`): Optional. Information about the video.
+        voice (:class:`telegram.Voice`): Optional. Information about the file.
+        video_note (:class:`telegram.VideoNote`): Optional. Information about the video message.
+        new_chat_members (List[:class:`telegram.User`]): Optional. Information about new members to
+            the chat. (the bot itself may be one of these members).
+        caption (:obj:`str`): Optional. Caption for the document, photo or video, 0-1024
+            characters.
+        contact (:class:`telegram.Contact`): Optional. Information about the contact.
+        location (:class:`telegram.Location`): Optional. Information about the location.
+        venue (:class:`telegram.Venue`): Optional. Information about the venue.
+        left_chat_member (:class:`telegram.User`): Optional. Information about the user that left
+            the group. (this member may be the bot itself).
+        new_chat_title (:obj:`str`): Optional. A chat title was changed to this value.
+        new_chat_photo (List[:class:`telegram.PhotoSize`]): Optional. A chat photo was changed to
+            this value.
+        delete_chat_photo (:obj:`bool`): Optional. The chat photo was deleted.
+        group_chat_created (:obj:`bool`): Optional. The group has been created.
+        supergroup_chat_created (:obj:`bool`): Optional. The supergroup has been created.
+        channel_chat_created (:obj:`bool`): Optional. The channel has been created.
+        migrate_to_chat_id (:obj:`int`): Optional. The group has been migrated to a supergroup with
+            the specified identifier.
+        migrate_from_chat_id (:obj:`int`): Optional. The supergroup has been migrated from a group
+            with the specified identifier.
+        pinned_message (:class:`telegram.message`): Optional. Specified message was pinned.
+        invoice (:class:`telegram.Invoice`): Optional. Information about the invoice.
+        successful_payment (:class:`telegram.SuccessfulPayment`): Optional. Information about the
+            payment.
+        connected_website (:obj:`str`): Optional. The domain name of the website on which the user
+            has logged in.
+        forward_signature (:obj:`str`): Optional. Signature of the post author for messages
+            forwarded from channels.
+        forward_sender_name	(:obj:`str`): Optional. Sender's name for messages forwarded from users
+            who disallow adding a link to their account in forwarded messages.
+        author_signature (:obj:`str`): Optional. Signature of the post author for messages in
+            channels, or the custom title of an anonymous group administrator.
+        passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data.
+        poll (:class:`telegram.Poll`): Optional. Message is a native poll,
+            information about the poll.
+        dice (:class:`telegram.Dice`): Optional. Message is a dice.
+        via_bot (:class:`telegram.User`): Optional. Bot through which the message was sent.
+        proximity_alert_triggered (:class:`telegram.ProximityAlertTriggered`): Optional. Service
+            message. A user in the chat triggered another user's proximity alert while sharing
+            Live Location.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
+            to the message.
+        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     """
     # fmt: on

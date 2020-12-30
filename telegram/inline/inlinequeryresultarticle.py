@@ -29,22 +29,6 @@ if TYPE_CHECKING:
 class InlineQueryResultArticle(InlineQueryResult):
     """This object represents a Telegram InlineQueryResultArticle.
 
-    Attributes:
-        type (:obj:`str`): 'article'.
-        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
-        title (:obj:`str`): Title of the result.
-        input_message_content (:class:`telegram.InputMessageContent`): Content of the message to
-            be sent.
-        reply_markup (:class:`telegram.ReplyMarkup`): Optional. Inline keyboard attached to
-            the message.
-        url (:obj:`str`): Optional. URL of the result.
-        hide_url (:obj:`bool`): Optional. Pass :obj:`True`, if you don't want the URL to be shown
-            in the message.
-        description (:obj:`str`): Optional. Short description of the result.
-        thumb_url (:obj:`str`): Optional. Url of the thumbnail for the result.
-        thumb_width (:obj:`int`): Optional. Thumbnail width.
-        thumb_height (:obj:`int`): Optional. Thumbnail height.
-
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
         title (:obj:`str`): Title of the result.
@@ -60,6 +44,22 @@ class InlineQueryResultArticle(InlineQueryResult):
         thumb_width (:obj:`int`, optional): Thumbnail width.
         thumb_height (:obj:`int`, optional): Thumbnail height.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        type (:obj:`str`): 'article'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
+        title (:obj:`str`): Title of the result.
+        input_message_content (:class:`telegram.InputMessageContent`): Content of the message to
+            be sent.
+        reply_markup (:class:`telegram.ReplyMarkup`): Optional. Inline keyboard attached to
+            the message.
+        url (:obj:`str`): Optional. URL of the result.
+        hide_url (:obj:`bool`): Optional. Pass :obj:`True`, if you don't want the URL to be shown
+            in the message.
+        description (:obj:`str`): Optional. Short description of the result.
+        thumb_url (:obj:`str`): Optional. Url of the thumbnail for the result.
+        thumb_width (:obj:`int`): Optional. Thumbnail width.
+        thumb_height (:obj:`int`): Optional. Thumbnail height.
 
     """
 

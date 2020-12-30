@@ -33,23 +33,6 @@ class Sticker(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
 
-    Attributes:
-        file_id (:obj:`str`): Identifier for this file.
-        file_unique_id (:obj:`str`): Unique identifier for this file, which
-            is supposed to be the same over time and for different bots.
-            Can't be used to download or reuse the file.
-        width (:obj:`int`): Sticker width.
-        height (:obj:`int`): Sticker height.
-        is_animated (:obj:`bool`): :obj:`True`, if the sticker is animated.
-        thumb (:class:`telegram.PhotoSize`): Optional. Sticker thumbnail in the .webp or .jpg
-            format.
-        emoji (:obj:`str`): Optional. Emoji associated with the sticker.
-        set_name (:obj:`str`): Optional. Name of the sticker set to which the sticker belongs.
-        mask_position (:class:`telegram.MaskPosition`): Optional. For mask stickers, the position
-            where the mask should be placed.
-        file_size (:obj:`int`): Optional. File size.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
-
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.
@@ -70,6 +53,22 @@ class Sticker(TelegramObject):
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (obj:`dict`): Arbitrary keyword arguments.
 
+    Attributes:
+        file_id (:obj:`str`): Identifier for this file.
+        file_unique_id (:obj:`str`): Unique identifier for this file, which
+            is supposed to be the same over time and for different bots.
+            Can't be used to download or reuse the file.
+        width (:obj:`int`): Sticker width.
+        height (:obj:`int`): Sticker height.
+        is_animated (:obj:`bool`): :obj:`True`, if the sticker is animated.
+        thumb (:class:`telegram.PhotoSize`): Optional. Sticker thumbnail in the .webp or .jpg
+            format.
+        emoji (:obj:`str`): Optional. Emoji associated with the sticker.
+        set_name (:obj:`str`): Optional. Name of the sticker set to which the sticker belongs.
+        mask_position (:class:`telegram.MaskPosition`): Optional. For mask stickers, the position
+            where the mask should be placed.
+        file_size (:obj:`int`): Optional. File size.
+        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     """
 

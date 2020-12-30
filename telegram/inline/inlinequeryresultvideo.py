@@ -38,6 +38,31 @@ class InlineQueryResultVideo(InlineQueryResult):
         If an InlineQueryResultVideo message contains an embedded video (e.g., YouTube), you must
         replace its content using :attr:`input_message_content`.
 
+    Args:
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        video_url (:obj:`str`): A valid URL for the embedded video player or video file.
+        mime_type (:obj:`str`): Mime type of the content of video url, "text/html" or "video/mp4".
+        thumb_url (:obj:`str`): URL of the thumbnail (jpeg only) for the video.
+        title (:obj:`str`): Title for the result.
+        caption (:obj:`str`, optional): Caption, 0-1024 characters after entities parsing.
+        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
+            in :class:`telegram.ParseMode` for the available modes.
+        caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
+            entities that appear in the caption, which can be specified instead of
+            :attr:`parse_mode`.
+        video_width (:obj:`int`, optional): Video width.
+        video_height (:obj:`int`, optional): Video height.
+        video_duration (:obj:`int`, optional): Video duration in seconds.
+        description (:obj:`str`, optional): Short description of the result.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
+            to the message.
+        input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
+            message to be sent instead of the video. This field is required if
+            InlineQueryResultVideo is used to send an HTML-page as a result
+            (e.g., a YouTube video).
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     Attributes:
         type (:obj:`str`): 'video'.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
@@ -63,31 +88,6 @@ class InlineQueryResultVideo(InlineQueryResult):
             message to be sent instead of the video. This field is required if
             InlineQueryResultVideo is used to send an HTML-page as a result
             (e.g., a YouTube video).
-
-    Args:
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
-        video_url (:obj:`str`): A valid URL for the embedded video player or video file.
-        mime_type (:obj:`str`): Mime type of the content of video url, "text/html" or "video/mp4".
-        thumb_url (:obj:`str`): URL of the thumbnail (jpeg only) for the video.
-        title (:obj:`str`): Title for the result.
-        caption (:obj:`str`, optional): Caption, 0-1024 characters after entities parsing.
-        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.ParseMode` for the available modes.
-        caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
-            entities that appear in the caption, which can be specified instead of
-            :attr:`parse_mode`.
-        video_width (:obj:`int`, optional): Video width.
-        video_height (:obj:`int`, optional): Video height.
-        video_duration (:obj:`int`, optional): Video duration in seconds.
-        description (:obj:`str`, optional): Short description of the result.
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
-            to the message.
-        input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
-            message to be sent instead of the video. This field is required if
-            InlineQueryResultVideo is used to send an HTML-page as a result
-            (e.g., a YouTube video).
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
 

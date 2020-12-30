@@ -42,15 +42,9 @@ class File(TelegramObject):
     considered equal, if their :attr:`file_unique_id` is equal.
 
     Note:
-        Maximum file size to download is 20 MB.
-
-    Attributes:
-        file_id (:obj:`str`): Identifier for this file.
-        file_unique_id (:obj:`str`): Unique identifier for this file, which
-            is supposed to be the same over time and for different bots.
-            Can't be used to download or reuse the file.
-        file_size (:obj:`str`): Optional. File size.
-        file_path (:obj:`str`): Optional. File path. Use :attr:`download` to get the file.
+        * Maximum file size to download is 20 MB.
+        * If you obtain an instance of this class from :attr:`telegram.PassportFile.get_file`,
+          then it will automatically be decrypted as it downloads when you call :attr:`download()`.
 
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -63,9 +57,13 @@ class File(TelegramObject):
         bot (:obj:`telegram.Bot`, optional): Bot to use with shortcut method.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
-    Note:
-        If you obtain an instance of this class from :attr:`telegram.PassportFile.get_file`,
-        then it will automatically be decrypted as it downloads when you call :attr:`download()`.
+    Attributes:
+        file_id (:obj:`str`): Identifier for this file.
+        file_unique_id (:obj:`str`): Unique identifier for this file, which
+            is supposed to be the same over time and for different bots.
+            Can't be used to download or reuse the file.
+        file_size (:obj:`str`): Optional. File size.
+        file_path (:obj:`str`): Optional. File path. Use :attr:`download` to get the file.
 
     """
 

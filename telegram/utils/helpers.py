@@ -511,11 +511,12 @@ class DefaultValue:
         if value:
             ...
 
+    Args:
+        value (:obj:`obj`): The value of the default argument
+
     Attributes:
         value (:obj:`obj`): The value of the default argument
 
-    Args:
-        value (:obj:`obj`): The value of the default argument
     """
 
     def __init__(self, value: Any = None):

@@ -31,18 +31,6 @@ class InputLocationMessageContent(InputMessageContent):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`latitude` and :attr:`longitude` are equal.
 
-    Attributes:
-        latitude (:obj:`float`): Latitude of the location in degrees.
-        longitude (:obj:`float`): Longitude of the location in degrees.
-        horizontal_accuracy (:obj:`float`): Optional. The radius of uncertainty for the location,
-            measured in meters.
-        live_period	(:obj:`int`): Optional. Period in seconds for which the location can be
-            updated.
-        heading (:obj:`int`): Optional. For live locations, a direction in which the user is
-            moving, in degrees.
-        proximity_alert_radius (:obj:`int`): Optional. For live locations, a maximum distance for
-            proximity alerts about approaching another chat member, in meters.
-
     Args:
         latitude (:obj:`float`): Latitude of the location in degrees.
         longitude (:obj:`float`): Longitude of the location in degrees.
@@ -56,6 +44,18 @@ class InputLocationMessageContent(InputMessageContent):
             proximity alerts about approaching another chat member, in meters. Must be between 1
             and 100000 if specified.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        latitude (:obj:`float`): Latitude of the location in degrees.
+        longitude (:obj:`float`): Longitude of the location in degrees.
+        horizontal_accuracy (:obj:`float`): Optional. The radius of uncertainty for the location,
+            measured in meters.
+        live_period	(:obj:`int`): Optional. Period in seconds for which the location can be
+            updated.
+        heading (:obj:`int`): Optional. For live locations, a direction in which the user is
+            moving, in degrees.
+        proximity_alert_radius (:obj:`int`): Optional. For live locations, a maximum distance for
+            proximity alerts about approaching another chat member, in meters.
 
     """
     # fmt: on

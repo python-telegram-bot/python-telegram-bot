@@ -144,6 +144,12 @@ def log(
 class Bot(TelegramObject):
     """This object represents a Telegram Bot.
 
+    Note:
+        Most bot methods have the argument ``api_kwargs`` which allows to pass arbitrary keywords
+        to the Telegram API. This can be used to access new features of the API before they were
+        incorporated into PTB. However, this is not guaranteed to work, i.e. it will fail for
+        passing files.
+
     Args:
         token (:obj:`str`): Bot's unique authentication.
         base_url (:obj:`str`, optional): Telegram Bot API service URL.
@@ -154,12 +160,6 @@ class Bot(TelegramObject):
         private_key_password (:obj:`bytes`, optional): Password for above private key.
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
             be used if not set explicitly in the bot methods.
-
-    Note:
-        Most bot methods have the argument ``api_kwargs`` which allows to pass arbitrary keywords
-        to the Telegram API. This can be used to access new features of the API before they were
-        incorporated into PTB. However, this is not guaranteed to work, i.e. it will fail for
-        passing files.
 
     """
 

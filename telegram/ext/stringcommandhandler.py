@@ -41,17 +41,6 @@ class StringCommandHandler(Handler[str]):
         When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
-    Attributes:
-        command (:obj:`str`): The command this handler should listen for.
-        callback (:obj:`callable`): The callback function for this handler.
-        pass_args (:obj:`bool`): Determines whether the handler should be passed
-            ``args``.
-        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
-            passed to the callback function.
-        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
-            the callback function.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
-
     Args:
         command (:obj:`str`): The command this handler should listen for.
         callback (:obj:`callable`): The callback function for this handler. Will be called when
@@ -79,6 +68,17 @@ class StringCommandHandler(Handler[str]):
             DEPRECATED: Please switch to context based callbacks.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
             Defaults to :obj:`False`.
+
+    Attributes:
+        command (:obj:`str`): The command this handler should listen for.
+        callback (:obj:`callable`): The callback function for this handler.
+        pass_args (:obj:`bool`): Determines whether the handler should be passed
+            ``args``.
+        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
+            passed to the callback function.
+        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
+            the callback function.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     """
 

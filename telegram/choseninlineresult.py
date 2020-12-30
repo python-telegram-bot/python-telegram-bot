@@ -37,14 +37,9 @@ class ChosenInlineResult(TelegramObject):
     considered equal, if their :attr:`result_id` is equal.
 
     Note:
-        In Python `from` is a reserved word, use `from_user` instead.
-
-    Attributes:
-        result_id (:obj:`str`): The unique identifier for the result that was chosen.
-        from_user (:class:`telegram.User`): The user that chose the result.
-        location (:class:`telegram.Location`): Optional. Sender location.
-        inline_message_id (:obj:`str`): Optional. Identifier of the sent inline message.
-        query (:obj:`str`): The query that was used to obtain the result.
+        * In Python `from` is a reserved word, use `from_user` instead.
+        * It is necessary to enable inline feedback via `@Botfather <https://t.me/BotFather>`_ in
+          order to receive these objects in updates.
 
     Args:
         result_id (:obj:`str`): The unique identifier for the result that was chosen.
@@ -57,9 +52,12 @@ class ChosenInlineResult(TelegramObject):
         query (:obj:`str`): The query that was used to obtain the result.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
-    Note:
-        It is necessary to enable inline feedback via `@Botfather <https://t.me/BotFather>`_ in
-        order to receive these objects in updates.
+    Attributes:
+        result_id (:obj:`str`): The unique identifier for the result that was chosen.
+        from_user (:class:`telegram.User`): The user that chose the result.
+        location (:class:`telegram.Location`): Optional. Sender location.
+        inline_message_id (:obj:`str`): Optional. Identifier of the sent inline message.
+        query (:obj:`str`): The query that was used to obtain the result.
 
     """
 

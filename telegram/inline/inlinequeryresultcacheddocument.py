@@ -34,25 +34,6 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
     by the user with an optional caption. Alternatively, you can use :attr:`input_message_content`
     to send a message with the specified content instead of the file.
 
-    Attributes:
-        type (:obj:`str`): 'document'.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
-        title (:obj:`str`): Title for the result.
-        document_file_id (:obj:`str`): A valid file identifier for the file.
-        description (:obj:`str`): Optional. Short description of the result.
-        caption (:obj:`str`): Optional. Caption of the document to be sent, 0-1024 characters
-            after entities parsing.
-        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
-            in :class:`telegram.ParseMode` for the available modes.
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
-            entities that appear in the caption, which can be specified instead of
-            :attr:`parse_mode`.
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-            to the message.
-        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-            message to be sent instead of the file.
-
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         title (:obj:`str`): Title for the result.
@@ -71,6 +52,25 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the file.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        type (:obj:`str`): 'document'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        title (:obj:`str`): Title for the result.
+        document_file_id (:obj:`str`): A valid file identifier for the file.
+        description (:obj:`str`): Optional. Short description of the result.
+        caption (:obj:`str`): Optional. Caption of the document to be sent, 0-1024 characters
+            after entities parsing.
+        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            in :class:`telegram.ParseMode` for the available modes.
+        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
+            entities that appear in the caption, which can be specified instead of
+            :attr:`parse_mode`.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
+            to the message.
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
+            message to be sent instead of the file.
 
     """
 

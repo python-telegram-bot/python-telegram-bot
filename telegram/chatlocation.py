@@ -35,15 +35,15 @@ class ChatLocation(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`location` is equal.
 
-    Attributes:
-        location (:class:`telegram.Location`): The location to which the supergroup is connected.
-        address (:obj:`str`): Location address, as defined by the chat owner
-
     Args:
         location (:class:`telegram.Location`): The location to which the supergroup is connected.
             Can't be a live location.
         address (:obj:`str`): Location address; 1-64 characters, as defined by the chat owner
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        location (:class:`telegram.Location`): The location to which the supergroup is connected.
+        address (:obj:`str`): Location address, as defined by the chat owner
 
     """
 

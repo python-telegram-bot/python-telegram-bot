@@ -1409,13 +1409,6 @@ officedocument.wordprocessingml.document")``-
             that it is not causing race conditions, as this will complete replace the current set
             of allowed users.
 
-        Attributes:
-            user_ids(set(:obj:`int`), optional): Which user ID(s) to allow through.
-            usernames(set(:obj:`str`), optional): Which username(s) (without leading '@') to allow
-                through.
-            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
-                is specified in :attr:`user_ids` and :attr:`usernames`.
-
         Args:
             user_id(:class:`telegram.utils.types.SLT[int]`, optional):
                 Which user ID(s) to allow through.
@@ -1426,6 +1419,13 @@ officedocument.wordprocessingml.document")``-
 
         Raises:
             RuntimeError: If user_id and username are both present.
+
+        Attributes:
+            user_ids(set(:obj:`int`), optional): Which user ID(s) to allow through.
+            usernames(set(:obj:`str`), optional): Which username(s) (without leading '@') to allow
+                through.
+            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
+                is specified in :attr:`user_ids` and :attr:`usernames`.
 
         """
 
@@ -1507,13 +1507,6 @@ officedocument.wordprocessingml.document")``-
             that it is not causing race conditions, as this will complete replace the current set
             of allowed bots.
 
-        Attributes:
-            bot_ids(set(:obj:`int`), optional): Which bot ID(s) to allow through.
-            usernames(set(:obj:`str`), optional): Which username(s) (without leading '@') to allow
-                through.
-            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no bot
-                is specified in :attr:`bot_ids` and :attr:`usernames`.
-
         Args:
             bot_id(:class:`telegram.utils.types.SLT[int]`, optional):
                 Which bot ID(s) to allow through.
@@ -1524,6 +1517,14 @@ officedocument.wordprocessingml.document")``-
 
         Raises:
             RuntimeError: If bot_id and username are both present.
+
+        Attributes:
+            bot_ids(set(:obj:`int`), optional): Which bot ID(s) to allow through.
+            usernames(set(:obj:`str`), optional): Which username(s) (without leading '@') to allow
+                through.
+            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no bot
+                is specified in :attr:`bot_ids` and :attr:`usernames`.
+
         """
 
         def __init__(
@@ -1604,13 +1605,6 @@ officedocument.wordprocessingml.document")``-
             that it is not causing race conditions, as this will complete replace the current set
             of allowed chats.
 
-        Attributes:
-            chat_ids(set(:obj:`int`), optional): Which chat ID(s) to allow through.
-            usernames(set(:obj:`str`), optional): Which username(s) (without leading '@') to allow
-                through.
-            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
-                is specified in :attr:`chat_ids` and :attr:`usernames`.
-
         Args:
             chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
                 Which chat ID(s) to allow through.
@@ -1622,6 +1616,13 @@ officedocument.wordprocessingml.document")``-
 
         Raises:
             RuntimeError: If chat_id and username are both present.
+
+        Attributes:
+            chat_ids(set(:obj:`int`), optional): Which chat ID(s) to allow through.
+            usernames(set(:obj:`str`), optional): Which username(s) (without leading '@') to allow
+                through.
+            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
+                is specified in :attr:`chat_ids` and :attr:`usernames`.
 
         """
 
@@ -1694,6 +1695,19 @@ officedocument.wordprocessingml.document")``-
             that it is not causing race conditions, as this will complete replace the current set
             of allowed chats.
 
+        Args:
+            chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                Which sender chat chat ID(s) to allow through.
+            username(:class:`telegram.utils.types.SLT[str]`, optional):
+                Which sender chat sername(s) to allow through.
+                Leading `'@'` s in usernames will be discarded.
+            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no sender
+                chat is specified in :attr:`chat_ids` and :attr:`usernames`. Defaults to
+                :obj:`False`
+
+        Raises:
+            RuntimeError: If chat_id and username are both present.
+
         Attributes:
             chat_ids(set(:obj:`int`), optional): Which sender chat chat ID(s) to allow through.
             usernames(set(:obj:`str`), optional): Which sender chat username(s) (without leading
@@ -1708,19 +1722,6 @@ officedocument.wordprocessingml.document")``-
 
                 Examples:
                     ``Filters.sender_chat.channel``
-
-        Args:
-            chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
-                Which sender chat chat ID(s) to allow through.
-            username(:class:`telegram.utils.types.SLT[str]`, optional):
-                Which sender chat sername(s) to allow through.
-                Leading `'@'` s in usernames will be discarded.
-            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no sender
-                chat is specified in :attr:`chat_ids` and :attr:`usernames`. Defaults to
-                :obj:`False`
-
-        Raises:
-            RuntimeError: If chat_id and username are both present.
 
         """
 
@@ -1839,13 +1840,13 @@ officedocument.wordprocessingml.document")``-
         To allow only dice with value 5 `or` 6, use
         ``MessageHandler(Filters.dice([5, 6]), callback_method)``.
 
-    Args:
-        update (:class:`telegram.utils.types.SLT[int]`, optional):
-            Which values to allow. If not specified, will allow any dice message.
-
     Note:
         Dice messages don't have text. If you want to filter either text or dice messages, use
         ``Filters.text | Filters.dice``.
+
+    Args:
+        update (:class:`telegram.utils.types.SLT[int]`, optional):
+            Which values to allow. If not specified, will allow any dice message.
 
     Attributes:
         dice: Dice messages with the emoji 🎲. Passing a list of integers is supported just as for

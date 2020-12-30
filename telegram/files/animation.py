@@ -32,20 +32,6 @@ class Animation(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
 
-    Attributes:
-        file_id (:obj:`str`): File identifier.
-        file_unique_id (:obj:`str`): Unique identifier for this file, which
-            is supposed to be the same over time and for different bots.
-            Can't be used to download or reuse the file.
-        width (:obj:`int`): Video width as defined by sender.
-        height (:obj:`int`): Video height as defined by sender.
-        duration (:obj:`int`): Duration of the video in seconds as defined by sender.
-        thumb (:class:`telegram.PhotoSize`): Optional. Animation thumbnail as defined by sender.
-        file_name (:obj:`str`): Optional. Original animation filename as defined by sender.
-        mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
-        file_size (:obj:`int`): Optional. File size.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
-
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.
@@ -61,6 +47,20 @@ class Animation(TelegramObject):
         file_size (:obj:`int`, optional): File size.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        file_id (:obj:`str`): File identifier.
+        file_unique_id (:obj:`str`): Unique identifier for this file, which
+            is supposed to be the same over time and for different bots.
+            Can't be used to download or reuse the file.
+        width (:obj:`int`): Video width as defined by sender.
+        height (:obj:`int`): Video height as defined by sender.
+        duration (:obj:`int`): Duration of the video in seconds as defined by sender.
+        thumb (:class:`telegram.PhotoSize`): Optional. Animation thumbnail as defined by sender.
+        file_name (:obj:`str`): Optional. Original animation filename as defined by sender.
+        mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
+        file_size (:obj:`int`): Optional. File size.
+        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     """
 

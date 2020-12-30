@@ -33,18 +33,6 @@ class WebhookInfo(TelegramObject):
     :attr:`pending_update_count`, :attr:`ip_address`, :attr:`last_error_date`,
     :attr:`last_error_message`, :attr:`max_connections` and :attr:`allowed_updates` are equal.
 
-    Attributes:
-        url (:obj:`str`): Webhook URL.
-        has_custom_certificate (:obj:`bool`): If a custom certificate was provided for webhook.
-        pending_update_count (:obj:`int`): Number of updates awaiting delivery.
-        ip_address (:obj:`str`): Optional. Currently used webhook IP address.
-        last_error_date (:obj:`int`): Optional. Unix time for the most recent error that happened.
-        last_error_message (:obj:`str`): Optional. Error message in human-readable format.
-        max_connections (:obj:`int`): Optional. Maximum allowed number of simultaneous HTTPS
-            connections.
-        allowed_updates (List[:obj:`str`]): Optional. A list of update types the bot is subscribed
-            to.
-
     Args:
         url (:obj:`str`): Webhook URL, may be empty if webhook is not set up.
         has_custom_certificate (:obj:`bool`): :obj:`True`, if a custom certificate was provided for
@@ -59,6 +47,18 @@ class WebhookInfo(TelegramObject):
             connections to the webhook for update delivery.
         allowed_updates (List[:obj:`str`], optional): A list of update types the bot is subscribed
             to. Defaults to all update types.
+
+    Attributes:
+        url (:obj:`str`): Webhook URL.
+        has_custom_certificate (:obj:`bool`): If a custom certificate was provided for webhook.
+        pending_update_count (:obj:`int`): Number of updates awaiting delivery.
+        ip_address (:obj:`str`): Optional. Currently used webhook IP address.
+        last_error_date (:obj:`int`): Optional. Unix time for the most recent error that happened.
+        last_error_message (:obj:`str`): Optional. Error message in human-readable format.
+        max_connections (:obj:`int`): Optional. Maximum allowed number of simultaneous HTTPS
+            connections.
+        allowed_updates (List[:obj:`str`]): Optional. A list of update types the bot is subscribed
+            to.
 
     """
 

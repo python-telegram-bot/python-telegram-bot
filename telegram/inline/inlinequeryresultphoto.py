@@ -33,29 +33,6 @@ class InlineQueryResultPhoto(InlineQueryResult):
     caption. Alternatively, you can use :attr:`input_message_content` to send a message with the
     specified content instead of the photo.
 
-    Attributes:
-        type (:obj:`str`): 'photo'.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
-        photo_url (:obj:`str`): A valid URL of the photo. Photo must be in jpeg format. Photo size
-            must not exceed 5MB.
-        thumb_url (:obj:`str`): URL of the thumbnail for the photo.
-        photo_width (:obj:`int`): Optional. Width of the photo.
-        photo_height (:obj:`int`): Optional. Height of the photo.
-        title (:obj:`str`): Optional. Title for the result.
-        description (:obj:`str`): Optional. Short description of the result.
-        caption (:obj:`str`): Optional. Caption of the photo to be sent, 0-1024 characters after
-            entities parsing.
-        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.ParseMode` for the available modes.
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
-            entities that appear in the caption, which can be specified instead of
-            :attr:`parse_mode`.
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-            to the message.
-        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-            message to be sent instead of the photo.
-
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         photo_url (:obj:`str`): A valid URL of the photo. Photo must be in jpeg format. Photo size
@@ -78,6 +55,29 @@ class InlineQueryResultPhoto(InlineQueryResult):
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the photo.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        type (:obj:`str`): 'photo'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        photo_url (:obj:`str`): A valid URL of the photo. Photo must be in jpeg format. Photo size
+            must not exceed 5MB.
+        thumb_url (:obj:`str`): URL of the thumbnail for the photo.
+        photo_width (:obj:`int`): Optional. Width of the photo.
+        photo_height (:obj:`int`): Optional. Height of the photo.
+        title (:obj:`str`): Optional. Title for the result.
+        description (:obj:`str`): Optional. Short description of the result.
+        caption (:obj:`str`): Optional. Caption of the photo to be sent, 0-1024 characters after
+            entities parsing.
+        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
+            in :class:`telegram.ParseMode` for the available modes.
+        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
+            entities that appear in the caption, which can be specified instead of
+            :attr:`parse_mode`.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
+            to the message.
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
+            message to be sent instead of the photo.
 
     """
 

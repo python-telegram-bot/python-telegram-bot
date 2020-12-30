@@ -34,24 +34,6 @@ class InlineQueryResultCachedMpeg4Gif(InlineQueryResult):
     optional caption. Alternatively, you can use :attr:`input_message_content` to send a message
     with the specified content instead of the animation.
 
-    Attributes:
-        type (:obj:`str`): 'mpeg4_gif'.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
-        mpeg4_file_id (:obj:`str`): A valid file identifier for the MP4 file.
-        title (:obj:`str`): Optional. Title for the result.
-        caption (:obj:`str`): Optional. Caption of the MPEG-4 file to be sent, 0-1024 characters
-            after entities parsing.
-        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.ParseMode` for the available modes.
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
-            entities that appear in the caption, which can be specified instead of
-            :attr:`parse_mode`.
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-            to the message.
-        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-            message to be sent instead of the MPEG-4 file.
-
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         mpeg4_file_id (:obj:`str`): A valid file identifier for the MP4 file.
@@ -69,6 +51,24 @@ class InlineQueryResultCachedMpeg4Gif(InlineQueryResult):
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the MPEG-4 file.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        type (:obj:`str`): 'mpeg4_gif'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        mpeg4_file_id (:obj:`str`): A valid file identifier for the MP4 file.
+        title (:obj:`str`): Optional. Title for the result.
+        caption (:obj:`str`): Optional. Caption of the MPEG-4 file to be sent, 0-1024 characters
+            after entities parsing.
+        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
+            in :class:`telegram.ParseMode` for the available modes.
+        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
+            entities that appear in the caption, which can be specified instead of
+            :attr:`parse_mode`.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
+            to the message.
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
+            message to be sent instead of the MPEG-4 file.
 
     """
 

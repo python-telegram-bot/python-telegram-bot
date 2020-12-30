@@ -60,21 +60,6 @@ class User(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`id` is equal.
 
-    Attributes:
-        id (:obj:`int`): Unique identifier for this user or bot.
-        is_bot (:obj:`bool`): :obj:`True`, if this user is a bot.
-        first_name (:obj:`str`): User's or bots first name.
-        last_name (:obj:`str`): Optional. User's or bots last name.
-        username (:obj:`str`): Optional. User's or bots username.
-        language_code (:obj:`str`): Optional. IETF language tag of the user's language.
-        can_join_groups (:obj:`str`): Optional. :obj:`True`, if the bot can be invited to groups.
-            Returned only in :attr:`telegram.Bot.get_me` requests.
-        can_read_all_group_messages (:obj:`str`): Optional. :obj:`True`, if privacy mode is
-            disabled for the bot. Returned only in :attr:`telegram.Bot.get_me` requests.
-        supports_inline_queries (:obj:`str`): Optional. :obj:`True`, if the bot supports inline
-            queries. Returned only in :attr:`telegram.Bot.get_me` requests.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
-
     Args:
         id (:obj:`int`): Unique identifier for this user or bot.
         is_bot (:obj:`bool`): :obj:`True`, if this user is a bot.
@@ -89,6 +74,21 @@ class User(TelegramObject):
         supports_inline_queries (:obj:`str`, optional): :obj:`True`, if the bot supports inline
             queries. Returned only in :attr:`telegram.Bot.get_me` requests.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+
+    Attributes:
+        id (:obj:`int`): Unique identifier for this user or bot.
+        is_bot (:obj:`bool`): :obj:`True`, if this user is a bot.
+        first_name (:obj:`str`): User's or bot's first name.
+        last_name (:obj:`str`): Optional. User's or bot's last name.
+        username (:obj:`str`): Optional. User's or bot's username.
+        language_code (:obj:`str`): Optional. IETF language tag of the user's language.
+        can_join_groups (:obj:`str`): Optional. :obj:`True`, if the bot can be invited to groups.
+            Returned only in :attr:`telegram.Bot.get_me` requests.
+        can_read_all_group_messages (:obj:`str`): Optional. :obj:`True`, if privacy mode is
+            disabled for the bot. Returned only in :attr:`telegram.Bot.get_me` requests.
+        supports_inline_queries (:obj:`str`): Optional. :obj:`True`, if the bot supports inline
+            queries. Returned only in :attr:`telegram.Bot.get_me` requests.
+        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     """
 

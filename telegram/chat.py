@@ -62,34 +62,6 @@ class Chat(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`id` is equal.
 
-    Attributes:
-        id (:obj:`int`): Unique identifier for this chat.
-        type (:obj:`str`): Type of chat.
-        title (:obj:`str`): Optional. Title, for supergroups, channels and group chats.
-        username (:obj:`str`): Optional. Username.
-        first_name (:obj:`str`): Optional. First name of the other party in a private chat.
-        last_name (:obj:`str`): Optional. Last name of the other party in a private chat.
-        photo (:class:`telegram.ChatPhoto`): Optional. Chat photo.
-        bio (:obj:`str`): Optional. Bio of the other party in a private chat. Returned only in
-            :meth:`telegram.Bot.get_chat`.
-        description (:obj:`str`): Optional. Description, for groups, supergroups and channel chats.
-        invite_link (:obj:`str`): Optional. Chat invite link, for supergroups and channel chats.
-        pinned_message (:class:`telegram.Message`): Optional. The most recent pinned message
-            (by sending date). Returned only in :meth:`telegram.Bot.get_chat`.
-        permissions (:class:`telegram.ChatPermissions`): Optional. Default chat member permissions,
-            for groups and supergroups. Returned only in :meth:`telegram.Bot.get_chat`.
-        slow_mode_delay (:obj:`int`): Optional. For supergroups, the minimum allowed delay between
-            consecutive messages sent by each unprivileged user. Returned only in
-            :meth:`telegram.Bot.get_chat`.
-        sticker_set_name (:obj:`str`): Optional. For supergroups, name of Group sticker set.
-        can_set_sticker_set (:obj:`bool`): Optional. :obj:`True`, if the bot can change group the
-            sticker set.
-        linked_chat_id (:obj:`int`): Optional. Unique identifier for the linked chat, i.e. the
-            discussion group identifier for a channel and vice versa; for supergroups and channel
-            chats. Returned only in :meth:`telegram.Bot.get_chat`.
-        location (:class:`telegram.ChatLocation`): Optional. For supergroups, the location to which
-            the supergroup is connected. Returned only in :meth:`telegram.Bot.get_chat`.
-
     Args:
         id (:obj:`int`): Unique identifier for this chat. This number may be greater than 32 bits
             and some programming languages may have difficulty/silent defects in interpreting it.
@@ -130,6 +102,34 @@ class Chat(TelegramObject):
         location (:class:`telegram.ChatLocation`, optional): For supergroups, the location to which
             the supergroup is connected. Returned only in :meth:`telegram.Bot.get_chat`.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        id (:obj:`int`): Unique identifier for this chat.
+        type (:obj:`str`): Type of chat.
+        title (:obj:`str`): Optional. Title, for supergroups, channels and group chats.
+        username (:obj:`str`): Optional. Username.
+        first_name (:obj:`str`): Optional. First name of the other party in a private chat.
+        last_name (:obj:`str`): Optional. Last name of the other party in a private chat.
+        photo (:class:`telegram.ChatPhoto`): Optional. Chat photo.
+        bio (:obj:`str`): Optional. Bio of the other party in a private chat. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+        description (:obj:`str`): Optional. Description, for groups, supergroups and channel chats.
+        invite_link (:obj:`str`): Optional. Chat invite link, for supergroups and channel chats.
+        pinned_message (:class:`telegram.Message`): Optional. The most recent pinned message
+            (by sending date). Returned only in :meth:`telegram.Bot.get_chat`.
+        permissions (:class:`telegram.ChatPermissions`): Optional. Default chat member permissions,
+            for groups and supergroups. Returned only in :meth:`telegram.Bot.get_chat`.
+        slow_mode_delay (:obj:`int`): Optional. For supergroups, the minimum allowed delay between
+            consecutive messages sent by each unprivileged user. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+        sticker_set_name (:obj:`str`): Optional. For supergroups, name of Group sticker set.
+        can_set_sticker_set (:obj:`bool`): Optional. :obj:`True`, if the bot can change group the
+            sticker set.
+        linked_chat_id (:obj:`int`): Optional. Unique identifier for the linked chat, i.e. the
+            discussion group identifier for a channel and vice versa; for supergroups and channel
+            chats. Returned only in :meth:`telegram.Bot.get_chat`.
+        location (:class:`telegram.ChatLocation`): Optional. For supergroups, the location to which
+            the supergroup is connected. Returned only in :meth:`telegram.Bot.get_chat`.
 
     """
 

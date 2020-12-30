@@ -48,19 +48,10 @@ class CallbackQuery(TelegramObject):
     Note:
         * In Python `from` is a reserved word, use `from_user` instead.
         * Exactly one of the fields :attr:`data` or :attr:`game_short_name` will be present.
-
-    Attributes:
-        id (:obj:`str`): Unique identifier for this query.
-        from_user (:class:`telegram.User`): Sender.
-        chat_instance (:obj:`str`): Global identifier, uniquely corresponding to the chat to which
-            the message with the callback button was sent.
-        message (:class:`telegram.Message`): Optional. Message with the callback button that
-            originated the query.
-        data (:obj:`str`): Optional. Data associated with the callback button.
-        inline_message_id (:obj:`str`): Optional. Identifier of the message sent via the bot in
-                inline mode, that originated the query.
-        game_short_name (:obj:`str`): Optional. Short name of a Game to be returned.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+        * After the user presses an inline button, Telegram clients will display a progress bar
+          until you call :attr:`answer`. It is, therefore, necessary to react
+          by calling :attr:`telegram.Bot.answer_callback_query` even if no notification to the user
+          is needed (e.g., without specifying any of the optional parameters).
 
     Args:
         id (:obj:`str`): Unique identifier for this query.
@@ -78,11 +69,18 @@ class CallbackQuery(TelegramObject):
             the unique identifier for the game
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
 
-    Note:
-        After the user presses an inline button, Telegram clients will display a progress bar
-        until you call :attr:`answer`. It is, therefore, necessary to react
-        by calling :attr:`telegram.Bot.answer_callback_query` even if no notification to the user
-        is needed (e.g., without specifying any of the optional parameters).
+    Attributes:
+        id (:obj:`str`): Unique identifier for this query.
+        from_user (:class:`telegram.User`): Sender.
+        chat_instance (:obj:`str`): Global identifier, uniquely corresponding to the chat to which
+            the message with the callback button was sent.
+        message (:class:`telegram.Message`): Optional. Message with the callback button that
+            originated the query.
+        data (:obj:`str`): Optional. Data associated with the callback button.
+        inline_message_id (:obj:`str`): Optional. Identifier of the message sent via the bot in
+                inline mode, that originated the query.
+        game_short_name (:obj:`str`): Optional. Short name of a Game to be returned.
+        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
 
     """
 

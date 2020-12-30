@@ -32,18 +32,6 @@ class InputTextMessageContent(InputMessageContent):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`message_text` is equal.
 
-    Attributes:
-        message_text (:obj:`str`): Text of the message to be sent, 1-4096 characters after entities
-            parsing.
-        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in your bot's message. See the constants
-            in :class:`telegram.ParseMode` for the available modes.
-        entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
-            entities that appear in the caption, which can be specified instead of
-            :attr:`parse_mode`.
-        disable_web_page_preview (:obj:`bool`): Optional. Disables link previews for links in the
-            sent message.
-
     Args:
         message_text (:obj:`str`): Text of the message to be sent, 1-4096 characters after entities
             parsing. Also found as :attr:`telegram.constants.MAX_MESSAGE_LENGTH`.
@@ -56,6 +44,18 @@ class InputTextMessageContent(InputMessageContent):
         disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in the
             sent message.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        message_text (:obj:`str`): Text of the message to be sent, 1-4096 characters after entities
+            parsing.
+        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width text or inline URLs in your bot's message. See the constants
+            in :class:`telegram.ParseMode` for the available modes.
+        entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
+            entities that appear in the caption, which can be specified instead of
+            :attr:`parse_mode`.
+        disable_web_page_preview (:obj:`bool`): Optional. Disables link previews for links in the
+            sent message.
 
     """
 

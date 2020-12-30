@@ -29,15 +29,14 @@ class ReplyKeyboardRemove(ReplyMarkup):
     until a new keyboard is sent by a bot. An exception is made for one-time keyboards that are
     hidden immediately after the user presses a button (see :class:`telegram.ReplyKeyboardMarkup`).
 
-    Attributes:
-        remove_keyboard (:obj:`True`): Requests clients to remove the custom keyboard.
-        selective (:obj:`bool`): Optional. Use this parameter if you want to remove the keyboard
-            for specific users only.
-
     Example:
         A user votes in a poll, bot returns confirmation message in reply to the vote and removes
         the keyboard for that user, while still showing the keyboard with poll options to users who
         haven't voted yet.
+
+    Note:
+        User will not be able to summon this keyboard; if you want to hide the keyboard from
+        sight but keep it accessible, use :attr:`telegram.ReplyKeyboardMarkup.one_time_keyboard`.
 
     Args:
         selective (:obj:`bool`, optional): Use this parameter if you want to remove the keyboard
@@ -49,9 +48,10 @@ class ReplyKeyboardRemove(ReplyMarkup):
 
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
-    Note:
-        User will not be able to summon this keyboard; if you want to hide the keyboard from
-        sight but keep it accessible, use :attr:`telegram.ReplyKeyboardMarkup.one_time_keyboard`.
+    Attributes:
+        remove_keyboard (:obj:`True`): Requests clients to remove the custom keyboard.
+        selective (:obj:`bool`): Optional. Use this parameter if you want to remove the keyboard
+            for specific users only.
 
     """
 

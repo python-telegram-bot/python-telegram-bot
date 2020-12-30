@@ -28,27 +28,6 @@ from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
 class Defaults:
     """Convenience Class to gather all parameters with a (user defined) default value
 
-    Attributes:
-        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or URLs in your bot's message.
-        disable_notification (:obj:`bool`): Optional. Sends the message silently. Users will
-            receive a notification with no sound.
-        disable_web_page_preview (:obj:`bool`): Optional. Disables link previews for links in this
-            message.
-        allow_sending_without_reply (:obj:`bool`): Optional. Pass :obj:`True`, if the message
-            should be sent even if the specified replied-to message is not found.
-        timeout (:obj:`int` | :obj:`float`): Optional. If this value is specified, use it as the
-            read timeout from the server (instead of the one specified during creation of the
-            connection pool).
-        quote (:obj:`bool`): Optional. If set to :obj:`True`, the reply is sent as an actual reply
-            to the message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter will
-            be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
-        tzinfo (:obj:`tzinfo`): A timezone to be used for all date(time) objects appearing
-            throughout PTB.
-        run_async (:obj:`bool`): Optional. Default setting for the ``run_async`` parameter of
-            handlers and error handlers registered through :meth:`Dispatcher.add_handler` and
-            :meth:`Dispatcher.add_error_handler`.
-
     Parameters:
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or URLs in your bot's message.
@@ -71,6 +50,27 @@ class Defaults:
         run_async (:obj:`bool`, optional): Default setting for the ``run_async`` parameter of
             handlers and error handlers registered through :meth:`Dispatcher.add_handler` and
             :meth:`Dispatcher.add_error_handler`. Defaults to :obj:`False`.
+
+    Attributes:
+        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width text or URLs in your bot's message.
+        disable_notification (:obj:`bool`): Optional. Sends the message silently. Users will
+            receive a notification with no sound.
+        disable_web_page_preview (:obj:`bool`): Optional. Disables link previews for links in this
+            message.
+        allow_sending_without_reply (:obj:`bool`): Optional. Pass :obj:`True`, if the message
+            should be sent even if the specified replied-to message is not found.
+        timeout (:obj:`int` | :obj:`float`): Optional. If this value is specified, use it as the
+            read timeout from the server (instead of the one specified during creation of the
+            connection pool).
+        quote (:obj:`bool`): Optional. If set to :obj:`True`, the reply is sent as an actual reply
+            to the message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter will
+            be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+        tzinfo (:obj:`tzinfo`): A timezone to be used for all date(time) objects appearing
+            throughout PTB.
+        run_async (:obj:`bool`): Optional. Default setting for the ``run_async`` parameter of
+            handlers and error handlers registered through :meth:`Dispatcher.add_handler` and
+            :meth:`Dispatcher.add_error_handler`.
     """
 
     def __init__(

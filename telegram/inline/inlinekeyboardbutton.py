@@ -38,23 +38,6 @@ class InlineKeyboardButton(TelegramObject):
         You must use exactly one of the optional fields. Mind that :attr:`callback_game` is not
         working as expected. Putting a game short name in it might, but is not guaranteed to work.
 
-    Attributes:
-        text (:obj:`str`): Label text on the button.
-        url (:obj:`str`): Optional. HTTP or tg:// url to be opened when button is pressed.
-        login_url (:class:`telegram.LoginUrl`) Optional. An HTTP URL used to automatically
-            authorize the user. Can be used as a replacement for the Telegram Login Widget.
-        callback_data (:obj:`str`): Optional. Data to be sent in a callback query to the bot when
-            button is pressed, UTF-8 1-64 bytes.
-        switch_inline_query (:obj:`str`): Optional. Will prompt the user to select one of their
-            chats, open that chat and insert the bot's username and the specified inline query in
-            the input field. Can be empty, in which case just the bot’s username will be inserted.
-        switch_inline_query_current_chat (:obj:`str`): Optional. Will insert the bot's username and
-            the specified inline query in the current chat's input field. Can be empty, in which
-            case just the bot’s username will be inserted.
-        callback_game (:class:`telegram.CallbackGame`): Optional. Description of the game that will
-            be launched when the user presses the button.
-        pay (:obj:`bool`): Optional. Specify True, to send a Pay button.
-
     Args:
         text (:obj:`str`): Label text on the button.
         url (:obj:`str`): HTTP or tg:// url to be opened when button is pressed.
@@ -80,6 +63,23 @@ class InlineKeyboardButton(TelegramObject):
         pay (:obj:`bool`, optional): Specify :obj:`True`, to send a Pay button. This type of button
             must always be the ``first`` button in the first row.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        text (:obj:`str`): Label text on the button.
+        url (:obj:`str`): Optional. HTTP or tg:// url to be opened when button is pressed.
+        login_url (:class:`telegram.LoginUrl`) Optional. An HTTP URL used to automatically
+            authorize the user. Can be used as a replacement for the Telegram Login Widget.
+        callback_data (:obj:`str`): Optional. Data to be sent in a callback query to the bot when
+            button is pressed, UTF-8 1-64 bytes.
+        switch_inline_query (:obj:`str`): Optional. Will prompt the user to select one of their
+            chats, open that chat and insert the bot's username and the specified inline query in
+            the input field. Can be empty, in which case just the bot’s username will be inserted.
+        switch_inline_query_current_chat (:obj:`str`): Optional. Will insert the bot's username and
+            the specified inline query in the current chat's input field. Can be empty, in which
+            case just the bot’s username will be inserted.
+        callback_game (:class:`telegram.CallbackGame`): Optional. Description of the game that will
+            be launched when the user presses the button.
+        pay (:obj:`bool`): Optional. Specify True, to send a Pay button.
 
     """
 

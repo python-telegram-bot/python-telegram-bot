@@ -29,19 +29,19 @@ if TYPE_CHECKING:
 class InlineQueryResultGame(InlineQueryResult):
     """Represents a :class:`telegram.Game`.
 
-    Attributes:
-        type (:obj:`str`): 'game'.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
-        game_short_name (:obj:`str`): Short name of the game.
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-            to the message.
-
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         game_short_name (:obj:`str`): Short name of the game.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        type (:obj:`str`): 'game'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        game_short_name (:obj:`str`): Short name of the game.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
+            to the message.
 
     """
 

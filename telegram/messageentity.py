@@ -35,14 +35,6 @@ class MessageEntity(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`type`, :attr:`offset` and :attr`length` are equal.
 
-    Attributes:
-        type (:obj:`str`): Type of the entity.
-        offset (:obj:`int`): Offset in UTF-16 code units to the start of the entity.
-        length (:obj:`int`): Length of the entity in UTF-16 code units.
-        url (:obj:`str`): Optional. Url that will be opened after user taps on the text.
-        user (:class:`telegram.User`): Optional. The mentioned user.
-        language (:obj:`str`): Optional. Programming language of the entity text.
-
     Args:
         type (:obj:`str`): Type of the entity. Can be mention (@username), hashtag, bot_command,
             url, email, phone_number, bold (bold text), italic (italic text), strikethrough,
@@ -56,6 +48,14 @@ class MessageEntity(TelegramObject):
              user.
         language (:obj:`str`, optional): For :attr:`PRE` only, the programming language of
             the entity text.
+
+    Attributes:
+        type (:obj:`str`): Type of the entity.
+        offset (:obj:`int`): Offset in UTF-16 code units to the start of the entity.
+        length (:obj:`int`): Length of the entity in UTF-16 code units.
+        url (:obj:`str`): Optional. Url that will be opened after user taps on the text.
+        user (:class:`telegram.User`): Optional. The mentioned user.
+        language (:obj:`str`): Optional. Programming language of the entity text.
 
     """
 

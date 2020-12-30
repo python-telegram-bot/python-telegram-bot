@@ -34,16 +34,6 @@ class SuccessfulPayment(TelegramObject):
     considered equal, if their :attr:`telegram_payment_charge_id` and
     :attr:`provider_payment_charge_id` are equal.
 
-    Attributes:
-        currency (:obj:`str`): Three-letter ISO 4217 currency code.
-        total_amount (:obj:`int`): Total price in the smallest units of the currency.
-        invoice_payload (:obj:`str`): Bot specified invoice payload.
-        shipping_option_id (:obj:`str`): Optional. Identifier of the shipping option chosen by the
-            user.
-        order_info (:class:`telegram.OrderInfo`): Optional. Order info provided by the user.
-        telegram_payment_charge_id (:obj:`str`): Telegram payment identifier.
-        provider_payment_charge_id (:obj:`str`): Provider payment identifier.
-
     Args:
         currency (:obj:`str`): Three-letter ISO 4217 currency code.
         total_amount (:obj:`int`): Total price in the smallest units of the currency (integer, not
@@ -59,6 +49,16 @@ class SuccessfulPayment(TelegramObject):
         telegram_payment_charge_id (:obj:`str`): Telegram payment identifier.
         provider_payment_charge_id (:obj:`str`): Provider payment identifier.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        currency (:obj:`str`): Three-letter ISO 4217 currency code.
+        total_amount (:obj:`int`): Total price in the smallest units of the currency.
+        invoice_payload (:obj:`str`): Bot specified invoice payload.
+        shipping_option_id (:obj:`str`): Optional. Identifier of the shipping option chosen by the
+            user.
+        order_info (:class:`telegram.OrderInfo`): Optional. Order info provided by the user.
+        telegram_payment_charge_id (:obj:`str`): Telegram payment identifier.
+        provider_payment_charge_id (:obj:`str`): Provider payment identifier.
 
     """
 
