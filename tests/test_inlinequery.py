@@ -19,7 +19,8 @@
 
 import pytest
 
-from telegram import User, Location, InlineQuery, Update
+from telegram import User, Location, InlineQuery, Update, Bot
+from tests.conftest import check_shortcut_signature, check_shortcut_call
 
 
 @pytest.fixture(scope='class')
@@ -68,20 +69,32 @@ class TestInlineQuery:
         assert inline_query_dict['offset'] == inline_query.offset
 
     def test_answer(self, monkeypatch, inline_query):
-        def test(*args, **kwargs):
-            return args[0] == inline_query.id
+        answer_inline_query = inline_query.bot.answer_inline_query
 
-        monkeypatch.setattr(inline_query.bot, 'answer_inline_query', test)
-        assert inline_query.answer()
+        def make_assertion(*_, **kwargs):
+            return kwargs['inline_query_id'] == inline_query.id and check_shortcut_call(
+                kwargs, answer_inline_query
+            )
+
+        assert check_shortcut_signature(
+            InlineQuery.answer, Bot.answer_inline_query, ['inline_query_id'], ['auto_pagination']
+        )
+
+        monkeypatch.setattr(inline_query.bot, 'answer_inline_query', make_assertion)
+        assert inline_query.answer(results=[])
+
+    def test_answer_error(self, inline_query):
+        with pytest.raises(TypeError, match='mutually exclusive'):
+            inline_query.answer(results=[], auto_pagination=True, current_offset='foobar')
 
     def test_answer_auto_pagination(self, monkeypatch, inline_query):
-        def make_assertion(*args, **kwargs):
-            inline_query_id_matches = args[0] == inline_query.id
+        def make_assertion(*_, **kwargs):
+            inline_query_id_matches = kwargs['inline_query_id'] == inline_query.id
             offset_matches = kwargs.get('current_offset') == inline_query.offset
             return offset_matches and inline_query_id_matches
 
         monkeypatch.setattr(inline_query.bot, 'answer_inline_query', make_assertion)
-        assert inline_query.answer(auto_pagination=True)
+        assert inline_query.answer(results=[], auto_pagination=True)
 
     def test_equality(self):
         a = InlineQuery(self.id_, User(1, '', False), '', '')

@@ -28,7 +28,18 @@ from html import escape
 from numbers import Number
 from pathlib import Path
 
-from typing import TYPE_CHECKING, Any, DefaultDict, Dict, Optional, Tuple, Union, Type, cast, IO
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    DefaultDict,
+    Dict,
+    Optional,
+    Tuple,
+    Union,
+    Type,
+    cast,
+    IO,
+)
 
 import pytz  # pylint: disable=E0401
 

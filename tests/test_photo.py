@@ -23,10 +23,10 @@ from pathlib import Path
 import pytest
 from flaky import flaky
 
-from telegram import Sticker, TelegramError, PhotoSize, InputFile, MessageEntity
+from telegram import Sticker, TelegramError, PhotoSize, InputFile, MessageEntity, Bot
 from telegram.error import BadRequest
 from telegram.utils.helpers import escape_markdown
-from tests.conftest import expect_bad_request
+from tests.conftest import expect_bad_request, check_shortcut_call, check_shortcut_signature
 
 
 @pytest.fixture(scope='function')
@@ -466,10 +466,14 @@ class TestPhoto:
             bot.send_photo(chat_id=chat_id)
 
     def test_get_file_instance_method(self, monkeypatch, photo):
-        def test(*args, **kwargs):
-            return args[1] == photo.file_id
+        get_file = photo.bot.get_file
 
-        monkeypatch.setattr('telegram.Bot.get_file', test)
+        def make_assertion(*_, **kwargs):
+            return kwargs['file_id'] == photo.file_id and check_shortcut_call(kwargs, get_file)
+
+        assert check_shortcut_signature(PhotoSize.get_file, Bot.get_file, ['file_id'], [])
+
+        monkeypatch.setattr('telegram.Bot.get_file', make_assertion)
         assert photo.get_file()
 
     def test_equality(self, photo):

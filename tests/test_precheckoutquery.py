@@ -19,7 +19,8 @@
 
 import pytest
 
-from telegram import Update, User, PreCheckoutQuery, OrderInfo
+from telegram import Update, User, PreCheckoutQuery, OrderInfo, Bot
+from tests.conftest import check_shortcut_call, check_shortcut_signature
 
 
 @pytest.fixture(scope='class')
@@ -79,11 +80,19 @@ class TestPreCheckoutQuery:
         assert pre_checkout_query_dict['order_info'] == pre_checkout_query.order_info.to_dict()
 
     def test_answer(self, monkeypatch, pre_checkout_query):
-        def test(*args, **kwargs):
-            return args[0] == pre_checkout_query.id
+        answer_pre_checkout_query = pre_checkout_query.bot.answer_pre_checkout_query
 
-        monkeypatch.setattr(pre_checkout_query.bot, 'answer_pre_checkout_query', test)
-        assert pre_checkout_query.answer()
+        def make_assertion(*_, **kwargs):
+            return kwargs[
+                'pre_checkout_query_id'
+            ] == pre_checkout_query.id and check_shortcut_call(kwargs, answer_pre_checkout_query)
+
+        assert check_shortcut_signature(
+            PreCheckoutQuery.answer, Bot.answer_pre_checkout_query, ['pre_checkout_query_id'], []
+        )
+
+        monkeypatch.setattr(pre_checkout_query.bot, 'answer_pre_checkout_query', make_assertion)
+        assert pre_checkout_query.answer(ok=True)
 
     def test_equality(self):
         a = PreCheckoutQuery(

@@ -19,16 +19,18 @@
 
 import pytest
 
-from telegram import PassportFile, PassportElementError
+from telegram import PassportFile, PassportElementError, Bot, File
+from tests.conftest import check_shortcut_signature, check_shortcut_call
 
 
 @pytest.fixture(scope='class')
-def passport_file():
+def passport_file(bot):
     return PassportFile(
         file_id=TestPassportFile.file_id,
         file_unique_id=TestPassportFile.file_unique_id,
         file_size=TestPassportFile.file_size,
         file_date=TestPassportFile.file_date,
+        bot=bot,
     )
 
 
@@ -52,6 +54,21 @@ class TestPassportFile:
         assert passport_file_dict['file_unique_id'] == passport_file.file_unique_id
         assert passport_file_dict['file_size'] == passport_file.file_size
         assert passport_file_dict['file_date'] == passport_file.file_date
+
+    def test_get_file_instance_method(self, monkeypatch, passport_file):
+        get_file = passport_file.bot.get_file
+
+        def make_assertion(*_, **kwargs):
+            result = kwargs['file_id'] == passport_file.file_id and check_shortcut_call(
+                kwargs, get_file
+            )
+            # we need to be a bit hacky here, b/c PF.get_file needs Bot.get_file to return a File
+            return File(file_id=result, file_unique_id=result)
+
+        assert check_shortcut_signature(PassportFile.get_file, Bot.get_file, ['file_id'], [])
+
+        monkeypatch.setattr(passport_file.bot, 'get_file', make_assertion)
+        assert passport_file.get_file().file_id == 'True'
 
     def test_equality(self):
         a = PassportFile(self.file_id, self.file_unique_id, self.file_size, self.file_date)

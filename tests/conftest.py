@@ -17,12 +17,14 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime
+import inspect
 import os
 import re
 from collections import defaultdict
 from queue import Queue
 from threading import Thread, Event
 from time import sleep
+from typing import Callable, List, Dict, Any
 
 import pytest
 import pytz
@@ -339,3 +341,96 @@ def expect_bad_request(func, message, reason):
             pytest.xfail(f'{reason}. {e}')
         else:
             raise e
+
+
+def check_shortcut_signature(
+    shortcut: Callable,
+    bot_method: Callable,
+    shortcut_kwargs: List[str],
+    additional_kwargs: List[str],
+) -> bool:
+    """
+    Checks that the signature of a shortcut matches the signature of the underlying bot method.
+
+    Args:
+        shortcut: The shortcut, e.g. :meth:`telegram.Message.reply_text`
+        bot_method: The bot method, e.g. :meth:`telegram.Bot.send_message`
+        shortcut_kwargs: The kwargs passed by the shortcut directly, e.g. ``chat_id``
+        additional_kwargs: Additional kwargs of the shortcut that the bot method doesn't have, e.g.
+            ``quote``.
+
+    Returns:
+        :obj:`bool`: Whether or not the signature matches.
+    """
+    shortcut_arg_spec = inspect.getfullargspec(shortcut)
+    effective_shortcut_args = set(shortcut_arg_spec.args).difference(additional_kwargs)
+    effective_shortcut_args.discard('self')
+
+    bot_arg_spec = inspect.getfullargspec(bot_method)
+    expected_args = set(bot_arg_spec.args).difference(shortcut_kwargs)
+    expected_args.discard('self')
+
+    args_check = expected_args == effective_shortcut_args
+
+    # TODO: Also check annotation of return type. Would currently be a hassle b/c typing doesn't
+    # resolve `ForwardRef('Type')` to `Type`. For now we rely on MyPy, which probably allows the
+    # shortcuts to return more specific types than the bot method, but it's only annotations after
+    # all
+    annotation_check = True
+    for kwarg in effective_shortcut_args:
+        if bot_arg_spec.annotations[kwarg] != shortcut_arg_spec.annotations[kwarg]:
+            if isinstance(bot_arg_spec.annotations[kwarg], type):
+                if bot_arg_spec.annotations[kwarg].__name__ != str(
+                    shortcut_arg_spec.annotations[kwarg]
+                ):
+                    print(
+                        f'Expected {bot_arg_spec.annotations[kwarg]}, but '
+                        f'got {shortcut_arg_spec.annotations[kwarg]}'
+                    )
+                    annotation_check = False
+                    break
+            else:
+                print(
+                    f'Expected {bot_arg_spec.annotations[kwarg]}, but '
+                    f'got {shortcut_arg_spec.annotations[kwarg]}'
+                )
+                annotation_check = False
+                break
+
+    bot_method_signature = inspect.signature(bot_method)
+    shortcut_signature = inspect.signature(shortcut)
+    default_check = all(
+        shortcut_signature.parameters[arg].default == bot_method_signature.parameters[arg].default
+        for arg in expected_args
+    )
+
+    return args_check and annotation_check and default_check
+
+
+def check_shortcut_call(
+    kwargs: Dict[str, Any],
+    bot_method: Callable,
+) -> bool:
+    """
+    Checks that a shortcut passes all the existing arguments to the underlying bot method. Use as::
+
+        send_message = message.bot.send_message
+
+        def make_assertion(*_, **kwargs):
+            return check_shortcut_call(send_message, kwargs)
+
+        monkeypatch.setattr(message.bot, 'send_message', make_assertion)
+        assert message.reply_text('foobar')
+
+
+    Args:
+        kwargs: The kwargs passed to the bot method by the shortcut
+        bot_method: The bot method, e.g. :meth:`telegram.Bot.send_message`
+
+    Returns:
+        :obj:`bool`
+    """
+    bot_arg_spec = inspect.getfullargspec(bot_method)
+    expected_args = set(bot_arg_spec.args).difference(['self'])
+
+    return expected_args == set(kwargs.keys())

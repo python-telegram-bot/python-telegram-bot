@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import Update, User
+from telegram import Update, User, Bot
 from telegram.utils.helpers import escape_markdown
+from tests.conftest import check_shortcut_signature, check_shortcut_call
 
 
 @pytest.fixture(scope='function')
@@ -127,177 +128,381 @@ class TestUser:
         user.username = None
         assert user.link is None
 
-    def test_get_profile_photos(self, monkeypatch, user):
-        def test(*args, **kwargs):
-            return args[0] == user.id
+    def test_instance_method_get_profile_photos(self, monkeypatch, user):
+        get_profile_photos = user.bot.get_user_profile_photos
 
-        monkeypatch.setattr(user.bot, 'get_user_profile_photos', test)
+        def make_assertion(*_, **kwargs):
+            return kwargs['user_id'] == user.id and check_shortcut_call(kwargs, get_profile_photos)
+
+        assert check_shortcut_signature(
+            User.get_profile_photos, Bot.get_user_profile_photos, ['user_id'], []
+        )
+
+        monkeypatch.setattr(user.bot, 'get_user_profile_photos', make_assertion)
         assert user.get_profile_photos()
 
-    def test_pin_message(self, monkeypatch, user):
-        def make_assertion(*args, **kwargs):
-            return args[0] == user.id
+    def test_instance_method_pin_message(self, monkeypatch, user):
+        pin_message = user.bot.pin_chat_message
+
+        def make_assertion(*_, **kwargs):
+            return kwargs['chat_id'] == user.id and check_shortcut_call(kwargs, pin_message)
+
+        assert check_shortcut_signature(User.pin_message, Bot.pin_chat_message, ['chat_id'], [])
 
         monkeypatch.setattr(user.bot, 'pin_chat_message', make_assertion)
-        assert user.pin_message()
+        assert user.pin_message(1)
 
-    def test_unpin_message(self, monkeypatch, user):
-        def make_assertion(*args, **kwargs):
-            return args[0] == user.id
+    def test_instance_method_unpin_message(self, monkeypatch, user):
+        unpin_message = user.bot.unpin_chat_message
+
+        def make_assertion(*_, **kwargs):
+            return kwargs['chat_id'] == user.id and check_shortcut_call(kwargs, unpin_message)
+
+        assert check_shortcut_signature(
+            User.unpin_message, Bot.unpin_chat_message, ['chat_id'], []
+        )
 
         monkeypatch.setattr(user.bot, 'unpin_chat_message', make_assertion)
         assert user.unpin_message()
 
-    def test_unpin_all_messages(self, monkeypatch, user):
-        def make_assertion(*args, **kwargs):
-            return args[0] == user.id
+    def test_instance_method_unpin_all_messages(self, monkeypatch, user):
+        unpin_all_messages = user.bot.unpin_all_chat_messages
+
+        def make_assertion(*_, **kwargs):
+            return kwargs['chat_id'] == user.id and check_shortcut_call(kwargs, unpin_all_messages)
+
+        assert check_shortcut_signature(
+            User.unpin_all_messages, Bot.unpin_all_chat_messages, ['chat_id'], []
+        )
 
         monkeypatch.setattr(user.bot, 'unpin_all_chat_messages', make_assertion)
         assert user.unpin_all_messages()
 
     def test_instance_method_send_message(self, monkeypatch, user):
-        def test(*args, **kwargs):
-            return args[0] == user.id and args[1] == 'test'
+        send_message = user.bot.send_message
 
-        monkeypatch.setattr(user.bot, 'send_message', test)
+        def make_assertion(*_, **kwargs):
+            return (
+                kwargs['chat_id'] == user.id
+                and kwargs['text'] == 'test'
+                and check_shortcut_call(kwargs, send_message)
+            )
+
+        assert check_shortcut_signature(User.send_message, Bot.send_message, ['chat_id'], [])
+
+        monkeypatch.setattr(user.bot, 'send_message', make_assertion)
         assert user.send_message('test')
 
     def test_instance_method_send_photo(self, monkeypatch, user):
-        def test(*args, **kwargs):
-            return args[0] == user.id and args[1] == 'test_photo'
+        send_photo = user.bot.send_photo
 
-        monkeypatch.setattr(user.bot, 'send_photo', test)
+        def make_assertion(*_, **kwargs):
+            return (
+                kwargs['chat_id'] == user.id
+                and kwargs['photo'] == 'test_photo'
+                and check_shortcut_call(kwargs, send_photo)
+            )
+
+        assert check_shortcut_signature(User.send_photo, Bot.send_photo, ['chat_id'], [])
+
+        monkeypatch.setattr(user.bot, 'send_photo', make_assertion)
         assert user.send_photo('test_photo')
 
     def test_instance_method_send_media_group(self, monkeypatch, user):
-        def test(*args, **kwargs):
-            return args[0] == user.id and args[1] == 'test_media_group'
+        send_media_group = user.bot.send_media_group
 
-        monkeypatch.setattr(user.bot, 'send_media_group', test)
+        def make_assertion(*_, **kwargs):
+            return (
+                kwargs['chat_id'] == user.id
+                and kwargs['media'] == 'test_media_group'
+                and check_shortcut_call(kwargs, send_media_group)
+            )
+
+        assert check_shortcut_signature(
+            User.send_media_group, Bot.send_media_group, ['chat_id'], []
+        )
+
+        monkeypatch.setattr(user.bot, 'send_media_group', make_assertion)
         assert user.send_media_group('test_media_group')
 
     def test_instance_method_send_audio(self, monkeypatch, user):
-        def test(*args, **kwargs):
-            return args[0] == user.id and args[1] == 'test_audio'
+        send_audio = user.bot.send_audio
 
-        monkeypatch.setattr(user.bot, 'send_audio', test)
+        def make_assertion(*_, **kwargs):
+            return (
+                kwargs['chat_id'] == user.id
+                and kwargs['audio'] == 'test_audio'
+                and check_shortcut_call(kwargs, send_audio)
+            )
+
+        assert check_shortcut_signature(User.send_audio, Bot.send_audio, ['chat_id'], [])
+
+        monkeypatch.setattr(user.bot, 'send_audio', make_assertion)
         assert user.send_audio('test_audio')
 
     def test_instance_method_send_chat_action(self, monkeypatch, user):
-        def test(*args, **kwargs):
-            return args[0] == user.id and args[1] == 'test_chat_action'
+        send_chat_action = user.bot.send_chat_action
 
-        monkeypatch.setattr(user.bot, 'send_chat_action', test)
+        def make_assertion(*_, **kwargs):
+            return (
+                kwargs['chat_id'] == user.id
+                and kwargs['action'] == 'test_chat_action'
+                and check_shortcut_call(kwargs, send_chat_action)
+            )
+
+        assert check_shortcut_signature(
+            User.send_chat_action, Bot.send_chat_action, ['chat_id'], []
+        )
+
+        monkeypatch.setattr(user.bot, 'send_chat_action', make_assertion)
         assert user.send_chat_action('test_chat_action')
 
     def test_instance_method_send_contact(self, monkeypatch, user):
-        def test(*args, **kwargs):
-            return args[0] == user.id and args[1] == 'test_contact'
+        send_contact = user.bot.send_contact
 
-        monkeypatch.setattr(user.bot, 'send_contact', test)
-        assert user.send_contact('test_contact')
+        def make_assertion(*_, **kwargs):
+            return (
+                kwargs['chat_id'] == user.id
+                and kwargs['phone_number'] == 'test_contact'
+                and check_shortcut_call(kwargs, send_contact)
+            )
+
+        assert check_shortcut_signature(User.send_contact, Bot.send_contact, ['chat_id'], [])
+
+        monkeypatch.setattr(user.bot, 'send_contact', make_assertion)
+        assert user.send_contact(phone_number='test_contact')
 
     def test_instance_method_send_dice(self, monkeypatch, user):
-        def test(*args, **kwargs):
-            return args[0] == user.id and args[1] == 'test_dice'
+        send_dice = user.bot.send_dice
 
-        monkeypatch.setattr(user.bot, 'send_dice', test)
-        assert user.send_dice('test_dice')
+        def make_assertion(*_, **kwargs):
+            return (
+                kwargs['chat_id'] == user.id
+                and kwargs['emoji'] == 'test_dice'
+                and check_shortcut_call(kwargs, send_dice)
+            )
+
+        assert check_shortcut_signature(User.send_dice, Bot.send_dice, ['chat_id'], [])
+
+        monkeypatch.setattr(user.bot, 'send_dice', make_assertion)
+        assert user.send_dice(emoji='test_dice')
 
     def test_instance_method_send_document(self, monkeypatch, user):
-        def test(*args, **kwargs):
-            return args[0] == user.id and args[1] == 'test_document'
+        send_document = user.bot.send_document
 
-        monkeypatch.setattr(user.bot, 'send_document', test)
+        def make_assertion(*_, **kwargs):
+            return (
+                kwargs['chat_id'] == user.id
+                and kwargs['document'] == 'test_document'
+                and check_shortcut_call(kwargs, send_document)
+            )
+
+        assert check_shortcut_signature(User.send_document, Bot.send_document, ['chat_id'], [])
+
+        monkeypatch.setattr(user.bot, 'send_document', make_assertion)
         assert user.send_document('test_document')
 
     def test_instance_method_send_game(self, monkeypatch, user):
-        def test(*args, **kwargs):
-            return args[0] == user.id and args[1] == 'test_game'
+        send_game = user.bot.send_game
 
-        monkeypatch.setattr(user.bot, 'send_game', test)
-        assert user.send_game('test_game')
+        def make_assertion(*_, **kwargs):
+            return (
+                kwargs['chat_id'] == user.id
+                and kwargs['game_short_name'] == 'test_game'
+                and check_shortcut_call(kwargs, send_game)
+            )
+
+        assert check_shortcut_signature(User.send_game, Bot.send_game, ['chat_id'], [])
+
+        monkeypatch.setattr(user.bot, 'send_game', make_assertion)
+        assert user.send_game(game_short_name='test_game')
 
     def test_instance_method_send_invoice(self, monkeypatch, user):
-        def test(*args, **kwargs):
-            return args[0] == user.id and args[1] == 'test_invoice'
+        send_invoice = user.bot.send_invoice
 
-        monkeypatch.setattr(user.bot, 'send_invoice', test)
-        assert user.send_invoice('test_invoice')
+        def make_assertion(*_, **kwargs):
+            title = kwargs['title'] == 'title'
+            description = kwargs['description'] == 'description'
+            payload = kwargs['payload'] == 'payload'
+            provider_token = kwargs['provider_token'] == 'provider_token'
+            start_parameter = kwargs['start_parameter'] == 'start_parameter'
+            currency = kwargs['currency'] == 'currency'
+            prices = kwargs['prices'] == 'prices'
+            args = (
+                title
+                and description
+                and payload
+                and provider_token
+                and start_parameter
+                and currency
+                and prices
+            )
+            return (
+                kwargs['chat_id'] == user.id and args and check_shortcut_call(kwargs, send_invoice)
+            )
+
+        assert check_shortcut_signature(User.send_invoice, Bot.send_invoice, ['chat_id'], [])
+
+        monkeypatch.setattr(user.bot, 'send_invoice', make_assertion)
+        assert user.send_invoice(
+            'title',
+            'description',
+            'payload',
+            'provider_token',
+            'start_parameter',
+            'currency',
+            'prices',
+        )
 
     def test_instance_method_send_location(self, monkeypatch, user):
-        def test(*args, **kwargs):
-            return args[0] == user.id and args[1] == 'test_location'
+        send_location = user.bot.send_location
 
-        monkeypatch.setattr(user.bot, 'send_location', test)
+        def make_assertion(*_, **kwargs):
+            return (
+                kwargs['chat_id'] == user.id
+                and kwargs['latitude'] == 'test_location'
+                and check_shortcut_call(kwargs, send_location)
+            )
+
+        assert check_shortcut_signature(User.send_location, Bot.send_location, ['chat_id'], [])
+
+        monkeypatch.setattr(user.bot, 'send_location', make_assertion)
         assert user.send_location('test_location')
 
     def test_instance_method_send_sticker(self, monkeypatch, user):
-        def test(*args, **kwargs):
-            return args[0] == user.id and args[1] == 'test_sticker'
+        send_sticker = user.bot.send_sticker
 
-        monkeypatch.setattr(user.bot, 'send_sticker', test)
+        def make_assertion(*_, **kwargs):
+            return (
+                kwargs['chat_id'] == user.id
+                and kwargs['sticker'] == 'test_sticker'
+                and check_shortcut_call(kwargs, send_sticker)
+            )
+
+        assert check_shortcut_signature(User.send_sticker, Bot.send_sticker, ['chat_id'], [])
+
+        monkeypatch.setattr(user.bot, 'send_sticker', make_assertion)
         assert user.send_sticker('test_sticker')
 
     def test_instance_method_send_video(self, monkeypatch, user):
-        def test(*args, **kwargs):
-            return args[0] == user.id and args[1] == 'test_video'
+        send_video = user.bot.send_video
 
-        monkeypatch.setattr(user.bot, 'send_video', test)
+        def make_assertion(*_, **kwargs):
+            return (
+                kwargs['chat_id'] == user.id
+                and kwargs['video'] == 'test_video'
+                and check_shortcut_call(kwargs, send_video)
+            )
+
+        assert check_shortcut_signature(User.send_video, Bot.send_video, ['chat_id'], [])
+
+        monkeypatch.setattr(user.bot, 'send_video', make_assertion)
         assert user.send_video('test_video')
 
     def test_instance_method_send_venue(self, monkeypatch, user):
-        def test(*args, **kwargs):
-            return args[0] == user.id and args[1] == 'test_venue'
+        send_venue = user.bot.send_venue
 
-        monkeypatch.setattr(user.bot, 'send_venue', test)
-        assert user.send_venue('test_venue')
+        def make_assertion(*_, **kwargs):
+            return (
+                kwargs['chat_id'] == user.id
+                and kwargs['title'] == 'test_venue'
+                and check_shortcut_call(kwargs, send_venue)
+            )
+
+        assert check_shortcut_signature(User.send_venue, Bot.send_venue, ['chat_id'], [])
+
+        monkeypatch.setattr(user.bot, 'send_venue', make_assertion)
+        assert user.send_venue(title='test_venue')
 
     def test_instance_method_send_video_note(self, monkeypatch, user):
-        def test(*args, **kwargs):
-            return args[0] == user.id and args[1] == 'test_video_note'
+        send_video_note = user.bot.send_video_note
 
-        monkeypatch.setattr(user.bot, 'send_video_note', test)
+        def make_assertion(*_, **kwargs):
+            return (
+                kwargs['chat_id'] == user.id
+                and kwargs['video_note'] == 'test_video_note'
+                and check_shortcut_call(kwargs, send_video_note)
+            )
+
+        assert check_shortcut_signature(User.send_video_note, Bot.send_video_note, ['chat_id'], [])
+
+        monkeypatch.setattr(user.bot, 'send_video_note', make_assertion)
         assert user.send_video_note('test_video_note')
 
     def test_instance_method_send_voice(self, monkeypatch, user):
-        def test(*args, **kwargs):
-            return args[0] == user.id and args[1] == 'test_voice'
+        send_voice = user.bot.send_voice
 
-        monkeypatch.setattr(user.bot, 'send_voice', test)
+        def make_assertion(*_, **kwargs):
+            return (
+                kwargs['chat_id'] == user.id
+                and kwargs['voice'] == 'test_voice'
+                and check_shortcut_call(kwargs, send_voice)
+            )
+
+        assert check_shortcut_signature(User.send_voice, Bot.send_voice, ['chat_id'], [])
+
+        monkeypatch.setattr(user.bot, 'send_voice', make_assertion)
         assert user.send_voice('test_voice')
 
     def test_instance_method_send_animation(self, monkeypatch, user):
-        def test(*args, **kwargs):
-            return args[0] == user.id and args[1] == 'test_animation'
+        send_animation = user.bot.send_animation
 
-        monkeypatch.setattr(user.bot, 'send_animation', test)
+        def make_assertion(*_, **kwargs):
+            return (
+                kwargs['chat_id'] == user.id
+                and kwargs['animation'] == 'test_animation'
+                and check_shortcut_call(kwargs, send_animation)
+            )
+
+        assert check_shortcut_signature(User.send_animation, Bot.send_animation, ['chat_id'], [])
+
+        monkeypatch.setattr(user.bot, 'send_animation', make_assertion)
         assert user.send_animation('test_animation')
 
     def test_instance_method_send_poll(self, monkeypatch, user):
-        def test(*args, **kwargs):
-            return args[0] == user.id and args[1] == 'test_poll'
+        send_poll = user.bot.send_poll
 
-        monkeypatch.setattr(user.bot, 'send_poll', test)
-        assert user.send_poll('test_poll')
+        def make_assertion(*_, **kwargs):
+            return (
+                kwargs['chat_id'] == user.id
+                and kwargs['question'] == 'test_poll'
+                and check_shortcut_call(kwargs, send_poll)
+            )
+
+        assert check_shortcut_signature(User.send_poll, Bot.send_poll, ['chat_id'], [])
+
+        monkeypatch.setattr(user.bot, 'send_poll', make_assertion)
+        assert user.send_poll(question='test_poll', options=[1, 2])
 
     def test_instance_method_send_copy(self, monkeypatch, user):
-        def test(*args, **kwargs):
-            assert args[0] == 'test_copy'
-            assert kwargs['chat_id'] == user.id
-            return args
+        send_copy = user.bot.copy_message
 
-        monkeypatch.setattr(user.bot, 'copy_message', test)
-        assert user.send_copy('test_copy')
+        def make_assertion(*_, **kwargs):
+            user_id = kwargs['chat_id'] == user.id
+            message_id = kwargs['message_id'] == 'message_id'
+            from_chat_id = kwargs['from_chat_id'] == 'from_chat_id'
+            return (
+                from_chat_id and message_id and user_id and check_shortcut_call(kwargs, send_copy)
+            )
+
+        assert check_shortcut_signature(User.send_copy, Bot.copy_message, ['chat_id'], [])
+
+        monkeypatch.setattr(user.bot, 'copy_message', make_assertion)
+        assert user.send_copy(from_chat_id='from_chat_id', message_id='message_id')
 
     def test_instance_method_copy_message(self, monkeypatch, user):
-        def test(*args, **kwargs):
-            assert args[0] == 'test_copy'
-            assert kwargs['from_chat_id'] == user.id
-            return args
+        copy_message = user.bot.copy_message
 
-        monkeypatch.setattr(user.bot, 'copy_message', test)
-        assert user.copy_message('test_copy')
+        def make_assertion(*_, **kwargs):
+            chat_id = kwargs['chat_id'] == 'chat_id'
+            message_id = kwargs['message_id'] == 'message_id'
+            user_id = kwargs['from_chat_id'] == user.id
+            return chat_id and message_id and user_id and check_shortcut_call(kwargs, copy_message)
+
+        assert check_shortcut_signature(User.copy_message, Bot.copy_message, ['from_chat_id'], [])
+
+        monkeypatch.setattr(user.bot, 'copy_message', make_assertion)
+        assert user.copy_message(chat_id='chat_id', message_id='message_id')
 
     def test_mention_html(self, user):
         expected = u'<a href="tg://user?id={}">{}</a>'

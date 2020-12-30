@@ -442,8 +442,8 @@ class TestPassport:
         selfie = passport_data.decrypted_data[1].selfie
 
         # NOTE: file_unique_id is not used in the get_file method, so it is passed directly
-        def get_file(*args, **kwargs):
-            return File(args[0], selfie.file_unique_id)
+        def get_file(*_, **kwargs):
+            return File(kwargs['file_id'], selfie.file_unique_id)
 
         monkeypatch.setattr(passport_data.bot, 'get_file', get_file)
         file = selfie.get_file()

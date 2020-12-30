@@ -19,7 +19,8 @@
 
 import pytest
 
-from telegram import Update, User, ShippingAddress, ShippingQuery
+from telegram import Update, User, ShippingAddress, ShippingQuery, Bot
+from tests.conftest import check_shortcut_call, check_shortcut_signature
 
 
 @pytest.fixture(scope='class')
@@ -64,11 +65,19 @@ class TestShippingQuery:
         assert shipping_query_dict['shipping_address'] == shipping_query.shipping_address.to_dict()
 
     def test_answer(self, monkeypatch, shipping_query):
-        def test(*args, **kwargs):
-            return args[0] == shipping_query.id
+        answer_shipping_query = shipping_query.bot.answer_shipping_query
 
-        monkeypatch.setattr(shipping_query.bot, 'answer_shipping_query', test)
-        assert shipping_query.answer()
+        def make_assertion(*_, **kwargs):
+            return kwargs['shipping_query_id'] == shipping_query.id and check_shortcut_call(
+                kwargs, answer_shipping_query
+            )
+
+        assert check_shortcut_signature(
+            ShippingQuery.answer, Bot.answer_shipping_query, ['shipping_query_id'], []
+        )
+
+        monkeypatch.setattr(shipping_query.bot, 'answer_shipping_query', make_assertion)
+        assert shipping_query.answer(ok=True)
 
     def test_equality(self):
         a = ShippingQuery(self.id_, self.from_user, self.invoice_payload, self.shipping_address)
