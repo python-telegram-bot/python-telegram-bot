@@ -95,15 +95,10 @@ class Document(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def get_file(self, timeout: int = None, api_kwargs: JSONDict = None) -> 'File':
+    def get_file(self, timeout: float = None, api_kwargs: JSONDict = None) -> 'File':
         """Convenience wrapper over :attr:`telegram.Bot.get_file`
 
-        Args:
-            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
-                the read timeout from the server (instead of the one specified during creation of
-                the connection pool).
-            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
-                Telegram API.
+        For the documentation of the arguments, please see :meth:`telegram.Bot.get_file`.
 
         Returns:
             :class:`telegram.File`
@@ -112,4 +107,4 @@ class Document(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        return self.bot.get_file(self.file_id, timeout=timeout, api_kwargs=api_kwargs)
+        return self.bot.get_file(file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs)

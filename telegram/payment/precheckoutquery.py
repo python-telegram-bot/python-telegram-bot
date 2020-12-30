@@ -102,21 +102,25 @@ class PreCheckoutQuery(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def answer(self, *args: Any, **kwargs: Any) -> bool:
+    def answer(  # pylint: disable=C0103
+        self,
+        ok: bool,
+        error_message: str = None,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
         """Shortcut for::
 
             bot.answer_pre_checkout_query(update.pre_checkout_query.id, *args, **kwargs)
 
-        Args:
-            ok (:obj:`bool`): Specify :obj:`True` if everything is alright
-                (goods are available, etc.) and the bot is ready to proceed with the order.
-                Use :obj:`False` if there are any problems.
-            error_message (:obj:`str`, optional): Required if ok is :obj:`False`. Error message in
-                human readable form that explains the reason for failure to proceed with the
-                checkout (e.g. "Sorry, somebody just bought the last of our amazing black T-shirts
-                while you were busy filling out your payment details. Please choose a different
-                color or garment!"). Telegram will display this message to the user.
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.answer_pre_checkout_query`.
 
         """
-        return self.bot.answer_pre_checkout_query(self.id, *args, **kwargs)
+        return self.bot.answer_pre_checkout_query(
+            pre_checkout_query_id=self.id,
+            ok=ok,
+            error_message=error_message,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )

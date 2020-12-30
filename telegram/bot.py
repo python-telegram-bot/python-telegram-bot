@@ -60,13 +60,9 @@ from telegram import (
     Document,
     File,
     GameHighScore,
-    InlineQueryResult,
-    InputMedia,
-    LabeledPrice,
     Location,
     MaskPosition,
     Message,
-    MessageEntity,
     MessageId,
     PassportElementError,
     PhotoSize,
@@ -84,10 +80,6 @@ from telegram import (
     VideoNote,
     Voice,
     WebhookInfo,
-    InputMediaAudio,
-    InputMediaDocument,
-    InputMediaPhoto,
-    InputMediaVideo,
     InlineKeyboardMarkup,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
@@ -104,6 +96,16 @@ from telegram.utils.types import FileInput, JSONDict
 
 if TYPE_CHECKING:
     from telegram.ext import Defaults
+    from telegram import (
+        InputMediaAudio,
+        InputMediaDocument,
+        InputMediaPhoto,
+        InputMediaVideo,
+        InputMedia,
+        InlineQueryResult,
+        LabeledPrice,
+        MessageEntity,
+    )
 
 RT = TypeVar('RT')
 
@@ -253,7 +255,7 @@ class Bot(TelegramObject):
         allow_sending_without_reply: bool = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
-    ) -> Union[bool, Message, None]:
+    ) -> Union[bool, Message]:
         if reply_to_message_id is not None:
             data['reply_to_message_id'] = reply_to_message_id
 
@@ -282,7 +284,7 @@ class Bot(TelegramObject):
         if result is True:
             return result
 
-        return Message.de_json(result, self)  # type: ignore[arg-type]
+        return Message.de_json(result, self)  # type: ignore[arg-type,return-value]
 
     @property
     def request(self) -> Request:
@@ -370,7 +372,7 @@ class Bot(TelegramObject):
         return f'@{self.username}'
 
     @log
-    def get_me(self, timeout: int = None, api_kwargs: JSONDict = None) -> Optional[User]:
+    def get_me(self, timeout: int = None, api_kwargs: JSONDict = None) -> User:
         """A simple method for testing your bot's auth token. Requires no parameters.
 
         Args:
@@ -392,7 +394,7 @@ class Bot(TelegramObject):
 
         self.bot = User.de_json(result, self)  # type: ignore
 
-        return self.bot
+        return self.bot  # type: ignore[return-value]
 
     @log
     def send_message(
@@ -407,8 +409,8 @@ class Bot(TelegramObject):
         timeout: float = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: bool = None,
-        entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
-    ) -> Optional[Message]:
+        entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+    ) -> Message:
         """Use this method to send text messages.
 
         Args:
@@ -519,7 +521,7 @@ class Bot(TelegramObject):
         disable_notification: bool = False,
         timeout: float = None,
         api_kwargs: JSONDict = None,
-    ) -> Optional[Message]:
+    ) -> Message:
         """Use this method to forward messages of any kind.
 
         Args:
@@ -564,7 +566,7 @@ class Bot(TelegramObject):
     def send_photo(
         self,
         chat_id: int,
-        photo: Union[FileInput, PhotoSize],
+        photo: Union[FileInput, 'PhotoSize'],
         caption: str = None,
         disable_notification: bool = False,
         reply_to_message_id: Union[int, str] = None,
@@ -573,9 +575,9 @@ class Bot(TelegramObject):
         parse_mode: str = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: bool = None,
-        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
-    ) -> Optional[Message]:
+    ) -> Message:
         """Use this method to send photos.
 
         Note:
@@ -654,7 +656,7 @@ class Bot(TelegramObject):
     def send_audio(
         self,
         chat_id: Union[int, str],
-        audio: Union[FileInput, Audio],
+        audio: Union[FileInput, 'Audio'],
         duration: int = None,
         performer: str = None,
         title: str = None,
@@ -667,9 +669,9 @@ class Bot(TelegramObject):
         thumb: FileInput = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: bool = None,
-        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
-    ) -> Optional[Message]:
+    ) -> Message:
         """
         Use this method to send audio files, if you want Telegram clients to display them in the
         music player. Your audio must be in the .mp3 or .m4a format.
@@ -775,7 +777,7 @@ class Bot(TelegramObject):
     def send_document(
         self,
         chat_id: Union[int, str],
-        document: Union[FileInput, Document],
+        document: Union[FileInput, 'Document'],
         filename: str = None,
         caption: str = None,
         disable_notification: bool = False,
@@ -787,8 +789,8 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
         disable_content_type_detection: bool = None,
         allow_sending_without_reply: bool = None,
-        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
-    ) -> Optional[Message]:
+        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+    ) -> Message:
         """
         Use this method to send general files.
 
@@ -884,14 +886,14 @@ class Bot(TelegramObject):
     def send_sticker(
         self,
         chat_id: Union[int, str],
-        sticker: Union[FileInput, Sticker],
+        sticker: Union[FileInput, 'Sticker'],
         disable_notification: bool = False,
         reply_to_message_id: Union[int, str] = None,
         reply_markup: ReplyMarkup = None,
         timeout: float = 20,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: bool = None,
-    ) -> Optional[Message]:
+    ) -> Message:
         """
         Use this method to send static .WEBP or animated .TGS stickers.
 
@@ -948,7 +950,7 @@ class Bot(TelegramObject):
     def send_video(
         self,
         chat_id: Union[int, str],
-        video: Union[FileInput, Video],
+        video: Union[FileInput, 'Video'],
         duration: int = None,
         caption: str = None,
         disable_notification: bool = False,
@@ -962,9 +964,9 @@ class Bot(TelegramObject):
         thumb: FileInput = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: bool = None,
-        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
-    ) -> Optional[Message]:
+    ) -> Message:
         """
         Use this method to send video files, Telegram clients support mp4 videos
         (other formats may be sent as Document).
@@ -1075,7 +1077,7 @@ class Bot(TelegramObject):
     def send_video_note(
         self,
         chat_id: Union[int, str],
-        video_note: Union[FileInput, VideoNote],
+        video_note: Union[FileInput, 'VideoNote'],
         duration: int = None,
         length: int = None,
         disable_notification: bool = False,
@@ -1086,7 +1088,7 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: bool = None,
         filename: str = None,
-    ) -> Optional[Message]:
+    ) -> Message:
         """
         As of v.4.0, Telegram clients support rounded square mp4 videos of up to 1 minute long.
         Use this method to send video messages.
@@ -1174,7 +1176,7 @@ class Bot(TelegramObject):
     def send_animation(
         self,
         chat_id: Union[int, str],
-        animation: Union[FileInput, Animation],
+        animation: Union[FileInput, 'Animation'],
         duration: int = None,
         width: int = None,
         height: int = None,
@@ -1187,9 +1189,9 @@ class Bot(TelegramObject):
         timeout: float = 20,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: bool = None,
-        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
-    ) -> Optional[Message]:
+    ) -> Message:
         """
         Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound).
         Bots can currently send animation files of up to 50 MB in size, this limit may be changed
@@ -1292,7 +1294,7 @@ class Bot(TelegramObject):
     def send_voice(
         self,
         chat_id: Union[int, str],
-        voice: Union[FileInput, Voice],
+        voice: Union[FileInput, 'Voice'],
         duration: int = None,
         caption: str = None,
         disable_notification: bool = False,
@@ -1302,9 +1304,9 @@ class Bot(TelegramObject):
         parse_mode: str = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: bool = None,
-        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
-    ) -> Optional[Message]:
+    ) -> Message:
         """
         Use this method to send audio files, if you want Telegram clients to display the file
         as a playable voice message. For this to work, your audio must be in an .ogg file
@@ -1390,13 +1392,15 @@ class Bot(TelegramObject):
     def send_media_group(
         self,
         chat_id: Union[int, str],
-        media: List[Union[InputMediaAudio, InputMediaDocument, InputMediaPhoto, InputMediaVideo]],
+        media: List[
+            Union['InputMediaAudio', 'InputMediaDocument', 'InputMediaPhoto', 'InputMediaVideo']
+        ],
         disable_notification: bool = None,
         reply_to_message_id: Union[int, str] = None,
         timeout: float = 20,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: bool = None,
-    ) -> List[Optional[Message]]:
+    ) -> List[Message]:
         """Use this method to send a group of photos or videos as an album.
 
         Args:
@@ -1462,7 +1466,7 @@ class Bot(TelegramObject):
         heading: int = None,
         proximity_alert_radius: int = None,
         allow_sending_without_reply: bool = None,
-    ) -> Optional[Message]:
+    ) -> Message:
         """Use this method to send point on the map.
 
         Note:
@@ -1556,7 +1560,7 @@ class Bot(TelegramObject):
         horizontal_accuracy: float = None,
         heading: int = None,
         proximity_alert_radius: int = None,
-    ) -> Union[Optional[Message], bool]:
+    ) -> Union[Message, bool]:
         """Use this method to edit live location messages sent by the bot or via the bot
         (for inline bots). A location can be edited until its :attr:`live_period` expires or
         editing is explicitly disabled by a call to :attr:`stop_message_live_location`.
@@ -1639,7 +1643,7 @@ class Bot(TelegramObject):
         reply_markup: InlineKeyboardMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
-    ) -> Union[Optional[Message], bool]:
+    ) -> Union[Message, bool]:
         """Use this method to stop updating a live location message sent by the bot or via the bot
         (for inline bots) before live_period expires.
 
@@ -1699,7 +1703,7 @@ class Bot(TelegramObject):
         google_place_id: str = None,
         google_place_type: str = None,
         allow_sending_without_reply: bool = None,
-    ) -> Optional[Message]:
+    ) -> Message:
         """Use this method to send information about a venue.
 
         Note:
@@ -1807,7 +1811,7 @@ class Bot(TelegramObject):
         vcard: str = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: bool = None,
-    ) -> Optional[Message]:
+    ) -> Message:
         """Use this method to send phone contacts.
 
         Note:
@@ -1889,7 +1893,7 @@ class Bot(TelegramObject):
         timeout: float = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: bool = None,
-    ) -> Optional[Message]:
+    ) -> Message:
         """Use this method to send a game.
 
         Args:
@@ -1975,7 +1979,9 @@ class Bot(TelegramObject):
     def answer_inline_query(
         self,
         inline_query_id: str,
-        results: List[InlineQueryResult],
+        results: Union[
+            List['InlineQueryResult'], Callable[[int], Optional[List['InlineQueryResult']]]
+        ],
         cache_time: int = 300,
         is_personal: bool = None,
         next_offset: str = None,
@@ -1998,9 +2004,9 @@ class Bot(TelegramObject):
             inline_query_id (:obj:`str`): Unique identifier for the answered query.
             results (List[:class:`telegram.InlineQueryResult`] | Callable): A list of results for
                 the inline query. In case :attr:`current_offset` is passed, ``results`` may also be
-                a callable accepts the current page index starting from 0. It must return either a
-                list of :class:`telegram.InlineResult` instances or :obj:`None` if there are no
-                more results.
+                a callable that accepts the current page index starting from 0. It must return
+                either a list of :class:`telegram.InlineResult` instances or :obj:`None` if there
+                are no more results.
             cache_time (:obj:`int`, optional): The maximum amount of time in seconds that the
                 result of the inline query may be cached on the server. Defaults to 300.
             is_personal (:obj:`bool`, optional): Pass :obj:`True`, if results may be cached on
@@ -2083,10 +2089,11 @@ class Bot(TelegramObject):
             next_offset = ''
 
             if callable(results):
-                effective_results = results(current_offset_int)
-                if not effective_results:
+                callable_output = results(current_offset_int)
+                if not callable_output:
                     effective_results = []
                 else:
+                    effective_results = callable_output
                     next_offset = str(current_offset_int + 1)
             else:
                 if len(results) > (current_offset_int + 1) * MAX_INLINE_QUERY_RESULTS:
@@ -2100,7 +2107,7 @@ class Bot(TelegramObject):
                 else:
                     effective_results = results[current_offset_int * MAX_INLINE_QUERY_RESULTS :]
         else:
-            effective_results = results
+            effective_results = results  # type: ignore[assignment]
 
         for result in effective_results:
             _set_defaults(result)
@@ -2397,8 +2404,8 @@ class Bot(TelegramObject):
         reply_markup: InlineKeyboardMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
-        entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
-    ) -> Union[Optional[Message], bool]:
+        entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+    ) -> Union[Message, bool]:
         """
         Use this method to edit text and game messages.
 
@@ -2468,7 +2475,7 @@ class Bot(TelegramObject):
         timeout: float = None,
         parse_mode: str = None,
         api_kwargs: JSONDict = None,
-        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
     ) -> Union[Message, bool]:
         """
         Use this method to edit captions of messages.
@@ -2526,7 +2533,7 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return self._message(  # type: ignore[return-value]
+        return self._message(
             'editMessageCaption',
             data,
             timeout=timeout,
@@ -2540,7 +2547,7 @@ class Bot(TelegramObject):
         chat_id: Union[str, int] = None,
         message_id: Union[str, int] = None,
         inline_message_id: Union[str, int] = None,
-        media: InputMedia = None,
+        media: 'InputMedia' = None,
         reply_markup: InlineKeyboardMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
@@ -2593,7 +2600,7 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return self._message(  # type: ignore[return-value]
+        return self._message(
             'editMessageMedia',
             data,
             timeout=timeout,
@@ -2607,7 +2614,7 @@ class Bot(TelegramObject):
         chat_id: Union[str, int] = None,
         message_id: Union[str, int] = None,
         inline_message_id: Union[str, int] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional['InlineKeyboardMarkup'] = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
     ) -> Union[Message, bool]:
@@ -2654,7 +2661,7 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return self._message(  # type: ignore[return-value]
+        return self._message(
             'editMessageReplyMarkup',
             data,
             timeout=timeout,
@@ -3158,7 +3165,7 @@ class Bot(TelegramObject):
         if disable_edit_message is not None:
             data['disable_edit_message'] = disable_edit_message
 
-        return self._message(  # type: ignore[return-value]
+        return self._message(
             'setGameScore',
             data,
             timeout=timeout,
@@ -3223,7 +3230,7 @@ class Bot(TelegramObject):
         provider_token: str,
         start_parameter: str,
         currency: str,
-        prices: List[LabeledPrice],
+        prices: List['LabeledPrice'],
         photo_url: str = None,
         photo_size: int = None,
         photo_width: int = None,
@@ -4404,7 +4411,7 @@ class Bot(TelegramObject):
         close_date: Union[int, datetime] = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: bool = None,
-        explanation_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        explanation_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
     ) -> Message:
         """
         Use this method to send a native poll.
@@ -4724,14 +4731,14 @@ class Bot(TelegramObject):
         message_id: Union[str, int],
         caption: str = None,
         parse_mode: str = None,
-        caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
+        caption_entities: Union[Tuple['MessageEntity', ...], List['MessageEntity']] = None,
         disable_notification: bool = False,
         reply_to_message_id: Union[int, str] = None,
         allow_sending_without_reply: bool = False,
         reply_markup: ReplyMarkup = None,
         timeout: float = None,
         api_kwargs: JSONDict = None,
-    ) -> Optional[MessageId]:
+    ) -> MessageId:
         """
         Use this method to copy messages of any kind. The method is analogous to the method
         forwardMessages, but the copied message doesn't have a link to the original message.

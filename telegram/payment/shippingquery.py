@@ -18,9 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ShippingQuery."""
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any, Optional, List
 
-from telegram import ShippingAddress, TelegramObject, User
+from telegram import ShippingAddress, TelegramObject, User, ShippingOption
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -83,21 +83,27 @@ class ShippingQuery(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def answer(self, *args: Any, **kwargs: Any) -> bool:
+    def answer(  # pylint: disable=C0103
+        self,
+        ok: bool,
+        shipping_options: List[ShippingOption] = None,
+        error_message: str = None,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
         """Shortcut for::
 
             bot.answer_shipping_query(update.shipping_query.id, *args, **kwargs)
 
-        Args:
-            ok (:obj:`bool`): Specify :obj:`True` if delivery to the specified address is
-                possible and :obj:`False` if there are any problems
-                (for example, if delivery to the specified address is not possible).
-            shipping_options (List[:class:`telegram.ShippingOption`], optional): Required if ok is
-                :obj:`True`. A JSON-serialized array of available shipping options.
-            error_message (:obj:`str`, optional): Required if ok is :obj:`False`. Error message in
-                human readable form that explains why it is impossible to complete the order (e.g.
-                "Sorry, delivery to your desired address is unavailable'). Telegram will display
-                this message to the user.
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.answer_shipping_query`.
 
         """
-        return self.bot.answer_shipping_query(self.id, *args, **kwargs)
+        return self.bot.answer_shipping_query(
+            shipping_query_id=self.id,
+            ok=ok,
+            shipping_options=shipping_options,
+            error_message=error_message,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )

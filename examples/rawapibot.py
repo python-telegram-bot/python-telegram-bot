@@ -51,8 +51,9 @@ def echo(bot: telegram.Bot) -> None:
         UPDATE_ID = update.update_id + 1
 
         if update.message:  # your bot can receive updates without messages
-            # Reply to the message
-            update.message.reply_text(update.message.text)
+            if update.message.text:  # not all messages contain text
+                # Reply to the message
+                update.message.reply_text(update.message.text)
 
 
 if __name__ == '__main__':
