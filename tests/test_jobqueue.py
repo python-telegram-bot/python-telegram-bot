@@ -20,6 +20,7 @@ import calendar
 import datetime as dtm
 import logging
 import os
+import platform
 import time
 from queue import Queue
 from time import sleep
@@ -41,8 +42,8 @@ def job_queue(bot, _dp):
 
 
 @pytest.mark.skipif(
-    os.getenv('GITHUB_ACTIONS', False) and os.name == 'nt',
-    reason="On windows precise timings are not accurate.",
+    os.getenv('GITHUB_ACTIONS', False) and platform.system() in ['Windows', 'Darwin'],
+    reason="On Windows & MacOS precise timings are not accurate.",
 )
 @flaky(10, 1)  # Timings aren't quite perfect
 class TestJobQueue:
