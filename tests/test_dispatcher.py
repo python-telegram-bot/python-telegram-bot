@@ -35,6 +35,7 @@ from telegram.ext import (
 )
 from telegram.ext.dispatcher import run_async, Dispatcher, DispatcherHandlerStop
 from telegram.utils.deprecate import TelegramDeprecationWarning
+from telegram.utils.helpers import DEFAULT_FALSE
 from tests.conftest import create_dp
 from collections import defaultdict
 
@@ -804,3 +805,74 @@ class TestDispatcher:
         assert cdp.persistence.test_flag_bot_data
         assert not cdp.persistence.test_flag_user_data
         assert cdp.persistence.test_flag_chat_data
+
+    def test_update_persistence_once_per_update(self, monkeypatch, dp):
+        def update_persistence(*args, **kwargs):
+            self.count += 1
+
+        def dummy_callback(*args):
+            pass
+
+        monkeypatch.setattr(dp, 'update_persistence', update_persistence)
+
+        for group in range(5):
+            dp.add_handler(MessageHandler(Filters.text, dummy_callback), group=group)
+
+        update = Update(1, message=Message(1, None, Chat(1, ''), from_user=None, text=None))
+        dp.process_update(update)
+        assert self.count == 0
+
+        update = Update(1, message=Message(1, None, Chat(1, ''), from_user=None, text='text'))
+        dp.process_update(update)
+        assert self.count == 1
+
+    def test_update_persistence_all_async(self, monkeypatch, dp):
+        def update_persistence(*args, **kwargs):
+            self.count += 1
+
+        def dummy_callback(*args, **kwargs):
+            pass
+
+        monkeypatch.setattr(dp, 'update_persistence', update_persistence)
+        monkeypatch.setattr(dp, 'run_async', dummy_callback)
+
+        for group in range(5):
+            dp.add_handler(
+                MessageHandler(Filters.text, dummy_callback, run_async=True), group=group
+            )
+
+        update = Update(1, message=Message(1, None, Chat(1, ''), from_user=None, text='Text'))
+        dp.process_update(update)
+        assert self.count == 0
+
+        dp.bot.defaults = Defaults(run_async=True)
+        try:
+            for group in range(5):
+                dp.add_handler(MessageHandler(Filters.text, dummy_callback), group=group)
+
+            update = Update(1, message=Message(1, None, Chat(1, ''), from_user=None, text='Text'))
+            dp.process_update(update)
+            assert self.count == 0
+        finally:
+            dp.bot.defaults = None
+
+    @pytest.mark.parametrize('run_async', [DEFAULT_FALSE, False])
+    def test_update_persistence_one_sync(self, monkeypatch, dp, run_async):
+        def update_persistence(*args, **kwargs):
+            self.count += 1
+
+        def dummy_callback(*args, **kwargs):
+            pass
+
+        monkeypatch.setattr(dp, 'update_persistence', update_persistence)
+        monkeypatch.setattr(dp, 'run_async', dummy_callback)
+
+        for group in range(5):
+            dp.add_handler(
+                MessageHandler(Filters.text, dummy_callback, run_async=True), group=group
+            )
+        dp.add_handler(MessageHandler(Filters.text, dummy_callback, run_async=run_async), group=5)
+
+        update = Update(1, message=Message(1, None, Chat(1, ''), from_user=None, text='Text'))
+        dp.process_update(update)
+        assert self.count == 1
