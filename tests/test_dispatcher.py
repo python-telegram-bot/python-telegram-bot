@@ -876,3 +876,25 @@ class TestDispatcher:
         update = Update(1, message=Message(1, None, Chat(1, ''), from_user=None, text='Text'))
         dp.process_update(update)
         assert self.count == 1
+
+    @pytest.mark.parametrize('run_async,expected', [(DEFAULT_FALSE, 1), (False, 1), (True, 0)])
+    def test_update_persistence_defaults_async(self, monkeypatch, dp, run_async, expected):
+        def update_persistence(*args, **kwargs):
+            self.count += 1
+
+        def dummy_callback(*args, **kwargs):
+            pass
+
+        monkeypatch.setattr(dp, 'update_persistence', update_persistence)
+        monkeypatch.setattr(dp, 'run_async', dummy_callback)
+        dp.bot.defaults = Defaults(run_async=run_async)
+
+        try:
+            for group in range(5):
+                dp.add_handler(MessageHandler(Filters.text, dummy_callback), group=group)
+
+            update = Update(1, message=Message(1, None, Chat(1, ''), from_user=None, text='Text'))
+            dp.process_update(update)
+            assert self.count == expected
+        finally:
+            dp.bot.defaults = None

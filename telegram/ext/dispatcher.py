@@ -463,7 +463,7 @@ class Dispatcher:
         if handled:
             # Respect default settings
             if all(mode is DEFAULT_FALSE for mode in sync_modes) and self.bot.defaults:
-                handled_only_async = not self.bot.defaults.run_async
+                handled_only_async = self.bot.defaults.run_async
             # If update was only handled by async handlers, we don't need to update here
             if not handled_only_async:
                 self.update_persistence(update=update)
