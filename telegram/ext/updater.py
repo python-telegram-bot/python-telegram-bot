@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,22 +20,26 @@
 
 import logging
 import ssl
-from threading import Thread, Lock, current_thread, Event
-from time import sleep
-from signal import signal, SIGINT, SIGTERM, SIGABRT
+import warnings
 from queue import Queue
+from signal import SIGABRT, SIGINT, SIGTERM, signal
+from threading import Event, Lock, Thread, current_thread
+from time import sleep
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, Union, no_type_check
 
-from telegram import Bot, TelegramError, Update
+from telegram import Bot, TelegramError
+from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized
 from telegram.ext import Dispatcher, JobQueue
-from telegram.error import Unauthorized, InvalidToken, RetryAfter, TimedOut
+from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import get_signal_name
 from telegram.utils.request import Request
-from telegram.utils.webhookhandler import (WebhookServer, WebhookAppClass)
+from telegram.utils.webhookhandler import WebhookAppClass, WebhookServer
 
-logging.getLogger(__name__).addHandler(logging.NullHandler())
+if TYPE_CHECKING:
+    from telegram.ext import BasePersistence, Defaults
 
 
-class Updater(object):
+class Updater:
     """
     This class, which employs the :class:`telegram.ext.Dispatcher`, provides a frontend to
     :class:`telegram.Bot` to the programmer, so they can focus on coding the bot. Its purpose is to
@@ -46,18 +50,11 @@ class Updater(object):
     production, use a webhook to receive updates. This is achieved using the WebhookServer and
     WebhookHandler classes.
 
-
-    Attributes:
-        bot (:class:`telegram.Bot`): The bot used with this Updater.
-        user_sig_handler (:obj:`signal`): signals the updater will respond to.
-        update_queue (:obj:`Queue`): Queue for the updates.
-        job_queue (:class:`telegram.ext.JobQueue`): Jobqueue for the updater.
-        dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that handles the updates and
-            dispatches them to the handlers.
-        running (:obj:`bool`): Indicates if the updater is running.
-        persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
-            store data that should be persistent over restarts.
-        use_context (:obj:`bool`, optional): ``True`` if using context based callbacks.
+    Note:
+        * You must supply either a :attr:`bot` or a :attr:`token` argument.
+        * If you supply a :attr:`bot`, you will need to pass :attr:`arbitrary_callback_data`,
+          :attr:`validate_callback_data` and :attr:`defaults` to the bot instead of the
+          :class:`telegram.ext.Updater`.
 
     Args:
         token (:obj:`str`, optional): The bot's token given by the @BotFather.
@@ -76,14 +73,14 @@ class Updater(object):
         private_key_password (:obj:`bytes`, optional): Password for above private key.
         user_sig_handler (:obj:`function`, optional): Takes ``signum, frame`` as positional
             arguments. This will be called when a signal is received, defaults are (SIGINT,
-            SIGTERM, SIGABRT) setable with :attr:`idle`.
+            SIGTERM, SIGABRT) settable with :attr:`idle`.
         request_kwargs (:obj:`dict`, optional): Keyword args to control the creation of a
             `telegram.utils.request.Request` object (ignored if `bot` or `dispatcher` argument is
             used). The request_kwargs are very useful for the advanced users who would like to
             control the default timeouts and/or control the proxy used for http communication.
-        use_context (:obj:`bool`, optional): If set to ``True`` Use the context based callback API
-            (ignored if `dispatcher` argument is used). During the deprecation period of the old
-            API the default is ``False``. **New users**: set this to ``True``.
+        use_context (:obj:`bool`, optional): If set to :obj:`True` uses the context based callback
+            API (ignored if `dispatcher` argument is used). Defaults to :obj:`True`.
+            **New users**: set this to :obj:`True`.
         persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
             store data that should be persistent over restarts (ignored if `dispatcher` argument is
             used).
@@ -97,36 +94,63 @@ class Updater(object):
             relevant, if :attr:`arbitrary_callback_data` as :obj:`True`. For more info, please see
             our wiki. Defaults to :obj:`True`.
 
-    Note:
-        * You must supply either a :attr:`bot` or a :attr:`token` argument.
-        * If you supply a :attr:`bot`, you will need to pass :attr:`defaults` to *both* the bot and
-          the :class:`telegram.ext.Updater`.
-        * If you supply a :attr:`bot`, you will need to pass :attr:`arbitrary_callback_data` and
-          :attr:`validate_callback_data` to the bot instead of the :class:`telegram.ext.Updater`.
-
     Raises:
         ValueError: If both :attr:`token` and :attr:`bot` are passed or none of them.
+
+
+    Attributes:
+        bot (:class:`telegram.Bot`): The bot used with this Updater.
+        user_sig_handler (:obj:`function`): Optional. Function to be called when a signal is
+            received.
+        update_queue (:obj:`Queue`): Queue for the updates.
+        job_queue (:class:`telegram.ext.JobQueue`): Jobqueue for the updater.
+        dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that handles the updates and
+            dispatches them to the handlers.
+        running (:obj:`bool`): Indicates if the updater is running.
+        persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
+            store data that should be persistent over restarts.
+        use_context (:obj:`bool`): Optional. :obj:`True` if using context based callbacks.
 
     """
 
     _request = None
 
-    def __init__(self,
-                 token=None,
-                 base_url=None,
-                 workers=4,
-                 bot=None,
-                 private_key=None,
-                 private_key_password=None,
-                 user_sig_handler=None,
-                 request_kwargs=None,
-                 persistence=None,
-                 defaults=None,
-                 use_context=False,
-                 dispatcher=None,
-                 base_file_url=None,
-                 arbitrary_callback_data=False,
-                 validate_callback_data=True):
+    def __init__(
+        self,
+        token: str = None,
+        base_url: str = None,
+        workers: int = 4,
+        bot: Bot = None,
+        private_key: bytes = None,
+        private_key_password: bytes = None,
+        user_sig_handler: Callable = None,
+        request_kwargs: Dict[str, Any] = None,
+        persistence: 'BasePersistence' = None,
+        defaults: 'Defaults' = None,
+        use_context: bool = True,
+        dispatcher: Dispatcher = None,
+        base_file_url: str = None,
+        arbitrary_callback_data: bool = DEFAULT_FALSE,
+        validate_callback_data: bool = DEFAULT_TRUE,
+    ):
+
+        if defaults and bot:
+            warnings.warn(
+                'Passing defaults to an Updater has no effect when a Bot is passed '
+                'as well. Pass them to the Bot instead.',
+                TelegramDeprecationWarning,
+                stacklevel=2,
+            )
+        if (
+            arbitrary_callback_data is not DEFAULT_FALSE
+            or validate_callback_data is not DEFAULT_TRUE
+        ) and bot:
+            warnings.warn(
+                'Passing arbitrary_callback_data/validate_callback_data to an Updater has no '
+                'effect when a Bot is passed as well. Pass them to the Bot instead.',
+                warnings.WarningMessage,
+                stacklevel=2,
+            )
 
         if dispatcher is None:
             if (token is None) and (bot is None):
@@ -155,7 +179,8 @@ class Updater(object):
                 if bot.request.con_pool_size < con_pool_size:
                     self.logger.warning(
                         'Connection pool of Request object is smaller than optimal value (%s)',
-                        con_pool_size)
+                        con_pool_size,
+                    )
             else:
                 # we need a connection pool the size of:
                 # * for each of the workers
@@ -168,26 +193,30 @@ class Updater(object):
                 if 'con_pool_size' not in request_kwargs:
                     request_kwargs['con_pool_size'] = con_pool_size
                 self._request = Request(**request_kwargs)
-                self.bot = Bot(token,
-                               base_url,
-                               base_file_url=base_file_url,
-                               request=self._request,
-                               private_key=private_key,
-                               private_key_password=private_key_password,
-                               defaults=defaults,
-                               arbitrary_callback_data=arbitrary_callback_data,
-                               validate_callback_data=validate_callback_data)
-            self.update_queue = Queue()
+                self.bot = Bot(
+                    token,  # type: ignore[arg-type]
+                    base_url,
+                    base_file_url=base_file_url,
+                    request=self._request,
+                    private_key=private_key,
+                    private_key_password=private_key_password,
+                    defaults=defaults,
+                    arbitrary_callback_data=bool(arbitrary_callback_data),
+                    validate_callback_data=bool(validate_callback_data),
+                )
+            self.update_queue: Queue = Queue()
             self.job_queue = JobQueue()
             self.__exception_event = Event()
             self.persistence = persistence
-            self.dispatcher = Dispatcher(self.bot,
-                                         self.update_queue,
-                                         job_queue=self.job_queue,
-                                         workers=workers,
-                                         exception_event=self.__exception_event,
-                                         persistence=persistence,
-                                         use_context=use_context)
+            self.dispatcher = Dispatcher(
+                self.bot,
+                self.update_queue,
+                job_queue=self.job_queue,
+                workers=workers,
+                exception_event=self.__exception_event,
+                persistence=persistence,
+                use_context=use_context,
+            )
             self.job_queue.set_dispatcher(self.dispatcher)
         else:
             con_pool_size = dispatcher.workers + 4
@@ -196,7 +225,8 @@ class Updater(object):
             if self.bot.request.con_pool_size < con_pool_size:
                 self.logger.warning(
                     'Connection pool of Request object is smaller than optimal value (%s)',
-                    con_pool_size)
+                    con_pool_size,
+                )
             self.update_queue = dispatcher.update_queue
             self.__exception_event = dispatcher.exception_event
             self.persistence = dispatcher.persistence
@@ -209,37 +239,38 @@ class Updater(object):
         self.is_idle = False
         self.httpd = None
         self.__lock = Lock()
-        self.__threads = []
+        self.__threads: List[Thread] = []
 
-        # Just for passing to WebhookAppClass
-        self._default_quote = defaults.quote if defaults else None
-
-    def _init_thread(self, target, name, *args, **kwargs):
-        thr = Thread(target=self._thread_wrapper,
-                     name="Bot:{}:{}".format(self.bot.id, name),
-                     args=(target,) + args,
-                     kwargs=kwargs)
+    def _init_thread(self, target: Callable, name: str, *args: Any, **kwargs: Any) -> None:
+        thr = Thread(
+            target=self._thread_wrapper,
+            name=f"Bot:{self.bot.id}:{name}",
+            args=(target,) + args,
+            kwargs=kwargs,
+        )
         thr.start()
         self.__threads.append(thr)
 
-    def _thread_wrapper(self, target, *args, **kwargs):
+    def _thread_wrapper(self, target: Callable, *args: Any, **kwargs: Any) -> None:
         thr_name = current_thread().name
-        self.logger.debug('{0} - started'.format(thr_name))
+        self.logger.debug('%s - started', thr_name)
         try:
             target(*args, **kwargs)
         except Exception:
             self.__exception_event.set()
             self.logger.exception('unhandled exception in %s', thr_name)
             raise
-        self.logger.debug('{0} - ended'.format(thr_name))
+        self.logger.debug('%s - ended', thr_name)
 
-    def start_polling(self,
-                      poll_interval=0.0,
-                      timeout=10,
-                      clean=False,
-                      bootstrap_retries=-1,
-                      read_latency=2.,
-                      allowed_updates=None):
+    def start_polling(
+        self,
+        poll_interval: float = 0.0,
+        timeout: float = 10,
+        clean: bool = False,
+        bootstrap_retries: int = -1,
+        read_latency: float = 2.0,
+        allowed_updates: List[str] = None,
+    ) -> Optional[Queue]:
         """Starts polling updates from Telegram.
 
         Args:
@@ -247,7 +278,7 @@ class Updater(object):
                 Telegram in seconds. Default is 0.0.
             timeout (:obj:`float`, optional): Passed to :attr:`telegram.Bot.get_updates`.
             clean (:obj:`bool`, optional): Whether to clean any pending updates on Telegram servers
-                before actually starting to poll. Default is False.
+                before actually starting to poll. Default is :obj:`False`.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 `Updater` will retry on failures on the Telegram server.
 
@@ -272,31 +303,56 @@ class Updater(object):
                 # Create & start threads
                 self.job_queue.start()
                 dispatcher_ready = Event()
+                polling_ready = Event()
                 self._init_thread(self.dispatcher.start, "dispatcher", ready=dispatcher_ready)
-                self._init_thread(self._start_polling, "updater", poll_interval, timeout,
-                                  read_latency, bootstrap_retries, clean, allowed_updates)
+                self._init_thread(
+                    self._start_polling,
+                    "updater",
+                    poll_interval,
+                    timeout,
+                    read_latency,
+                    bootstrap_retries,
+                    clean,
+                    allowed_updates,
+                    ready=polling_ready,
+                )
 
+                self.logger.debug('Waiting for Dispatcher and polling to start')
                 dispatcher_ready.wait()
+                polling_ready.wait()
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
+            return None
 
-    def start_webhook(self,
-                      listen='127.0.0.1',
-                      port=80,
-                      url_path='',
-                      cert=None,
-                      key=None,
-                      clean=False,
-                      bootstrap_retries=0,
-                      webhook_url=None,
-                      allowed_updates=None):
+    def start_webhook(
+        self,
+        listen: str = '127.0.0.1',
+        port: int = 80,
+        url_path: str = '',
+        cert: str = None,
+        key: str = None,
+        clean: bool = False,
+        bootstrap_retries: int = 0,
+        webhook_url: str = None,
+        allowed_updates: List[str] = None,
+        force_event_loop: bool = False,
+    ) -> Optional[Queue]:
         """
         Starts a small http server to listen for updates via webhook. If cert
         and key are not provided, the webhook will be started directly on
         http://listen:port/url_path, so SSL can be handled by another
         application. Else, the webhook will be started on
         https://listen:port/url_path
+
+        Note:
+            Due to an incompatibility of the Tornado library PTB uses for the webhook with Python
+            3.8+ on Windows machines, PTB will attempt to set the event loop to
+            :attr:`asyncio.SelectorEventLoop` and raise an exception, if an incompatible event loop
+            has already been specified. See this `thread`_ for more details. To suppress the
+            exception, set :attr:`force_event_loop` to :obj:`True`.
+
+            .. _thread: https://github.com/tornadoweb/tornado/issues/2608
 
         Args:
             listen (:obj:`str`, optional): IP-Address to listen on. Default ``127.0.0.1``.
@@ -305,7 +361,7 @@ class Updater(object):
             cert (:obj:`str`, optional): Path to the SSL certificate file.
             key (:obj:`str`, optional): Path to the SSL key file.
             clean (:obj:`bool`, optional): Whether to clean any pending updates on Telegram servers
-                before actually starting the webhook. Default is ``False``.
+                before actually starting the webhook. Default is :obj:`False`.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 `Updater` will retry on failures on the Telegram server.
 
@@ -317,6 +373,8 @@ class Updater(object):
                 NAT, reverse proxy, etc. Default is derived from `listen`, `port` & `url_path`.
             allowed_updates (List[:obj:`str`], optional): Passed to
                 :attr:`telegram.Bot.set_webhook`.
+            force_event_loop (:obj:`bool`, optional): Force using the current event loop. See above
+                note for details. Defaults to :obj:`False`
 
         Returns:
             :obj:`Queue`: The update queue that can be filled from the main thread.
@@ -327,16 +385,45 @@ class Updater(object):
                 self.running = True
 
                 # Create & start threads
+                webhook_ready = Event()
+                dispatcher_ready = Event()
                 self.job_queue.start()
-                self._init_thread(self.dispatcher.start, "dispatcher"),
-                self._init_thread(self._start_webhook, "updater", listen, port, url_path, cert,
-                                  key, bootstrap_retries, clean, webhook_url, allowed_updates)
+                self._init_thread(self.dispatcher.start, "dispatcher", dispatcher_ready)
+                self._init_thread(
+                    self._start_webhook,
+                    "updater",
+                    listen,
+                    port,
+                    url_path,
+                    cert,
+                    key,
+                    bootstrap_retries,
+                    clean,
+                    webhook_url,
+                    allowed_updates,
+                    ready=webhook_ready,
+                    force_event_loop=force_event_loop,
+                )
+
+                self.logger.debug('Waiting for Dispatcher and Webhook to start')
+                webhook_ready.wait()
+                dispatcher_ready.wait()
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
+            return None
 
-    def _start_polling(self, poll_interval, timeout, read_latency, bootstrap_retries, clean,
-                       allowed_updates):  # pragma: no cover
+    @no_type_check
+    def _start_polling(
+        self,
+        poll_interval,
+        timeout,
+        read_latency,
+        bootstrap_retries,
+        clean,
+        allowed_updates,
+        ready=None,
+    ):  # pragma: no cover
         # Thread target of thread 'updater'. Runs in background, pulls
         # updates from Telegram and inserts them in the update queue of the
         # Dispatcher.
@@ -348,10 +435,12 @@ class Updater(object):
         self.logger.debug('Bootstrap done')
 
         def polling_action_cb():
-            updates = self.bot.get_updates(self.last_update_id,
-                                           timeout=timeout,
-                                           read_latency=read_latency,
-                                           allowed_updates=allowed_updates)
+            updates = self.bot.get_updates(
+                self.last_update_id,
+                timeout=timeout,
+                read_latency=read_latency,
+                allowed_updates=allowed_updates,
+            )
 
             if updates:
                 if not self.running:
@@ -369,14 +458,19 @@ class Updater(object):
             # broadcast it
             self.update_queue.put(exc)
 
-        self._network_loop_retry(polling_action_cb, polling_onerr_cb, 'getting Updates',
-                                 poll_interval)
+        if ready is not None:
+            ready.set()
 
+        self._network_loop_retry(
+            polling_action_cb, polling_onerr_cb, 'getting Updates', poll_interval
+        )
+
+    @no_type_check
     def _network_loop_retry(self, action_cb, onerr_cb, description, interval):
         """Perform a loop calling `action_cb`, retrying after network errors.
 
-        Stop condition for loop: `self.running` evaluates False or return value of `action_cb`
-        evaluates False.
+        Stop condition for loop: `self.running` evaluates :obj:`False` or return value of
+        `action_cb` evaluates :obj:`False`.
 
         Args:
             action_cb (:obj:`callable`): Network oriented callback function to call.
@@ -393,9 +487,9 @@ class Updater(object):
             try:
                 if not action_cb():
                     break
-            except RetryAfter as e:
-                self.logger.info('%s', e)
-                cur_interval = 0.5 + e.retry_after
+            except RetryAfter as exc:
+                self.logger.info('%s', exc)
+                cur_interval = 0.5 + exc.retry_after
             except TimedOut as toe:
                 self.logger.debug('Timed out %s: %s', description, toe)
                 # If failure is due to timeout, we should retry asap.
@@ -403,9 +497,9 @@ class Updater(object):
             except InvalidToken as pex:
                 self.logger.error('Invalid token; aborting')
                 raise pex
-            except TelegramError as te:
-                self.logger.error('Error while %s: %s', description, te)
-                onerr_cb(te)
+            except TelegramError as telegram_exc:
+                self.logger.error('Error while %s: %s', description, telegram_exc)
+                onerr_cb(telegram_exc)
                 cur_interval = self._increase_poll_interval(cur_interval)
             else:
                 cur_interval = interval
@@ -414,7 +508,7 @@ class Updater(object):
                 sleep(cur_interval)
 
     @staticmethod
-    def _increase_poll_interval(current_interval):
+    def _increase_poll_interval(current_interval: float) -> float:
         # increase waiting times on subsequent errors up to 30secs
         if current_interval == 0:
             current_interval = 1
@@ -424,16 +518,28 @@ class Updater(object):
             current_interval = 30
         return current_interval
 
-    def _start_webhook(self, listen, port, url_path, cert, key, bootstrap_retries, clean,
-                       webhook_url, allowed_updates):
+    @no_type_check
+    def _start_webhook(
+        self,
+        listen,
+        port,
+        url_path,
+        cert,
+        key,
+        bootstrap_retries,
+        clean,
+        webhook_url,
+        allowed_updates,
+        ready=None,
+        force_event_loop=False,
+    ):
         self.logger.debug('Updater thread started (webhook)')
         use_ssl = cert is not None and key is not None
         if not url_path.startswith('/'):
-            url_path = '/{0}'.format(url_path)
+            url_path = f'/{url_path}'
 
         # Create Tornado app instance
-        app = WebhookAppClass(url_path, self.bot, self.update_queue,
-                              default_quote=self._default_quote)
+        app = WebhookAppClass(url_path, self.bot, self.update_queue)
 
         # Form SSL Context
         # An SSLError is raised if the private key does not match with the certificate
@@ -441,8 +547,8 @@ class Updater(object):
             try:
                 ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
                 ssl_ctx.load_cert_chain(cert, key)
-            except ssl.SSLError:
-                raise TelegramError('Invalid SSL Certificate')
+            except ssl.SSLError as exc:
+                raise TelegramError('Invalid SSL Certificate') from exc
         else:
             ssl_ctx = None
 
@@ -454,28 +560,29 @@ class Updater(object):
             if not webhook_url:
                 webhook_url = self._gen_webhook_url(listen, port, url_path)
 
-            self._bootstrap(max_retries=bootstrap_retries,
-                            clean=clean,
-                            webhook_url=webhook_url,
-                            cert=open(cert, 'rb'),
-                            allowed_updates=allowed_updates)
+            self._bootstrap(
+                max_retries=bootstrap_retries,
+                clean=clean,
+                webhook_url=webhook_url,
+                cert=open(cert, 'rb'),
+                allowed_updates=allowed_updates,
+            )
         elif clean:
-            self.logger.warning("cleaning updates is not supported if "
-                                "SSL-termination happens elsewhere; skipping")
+            self.logger.warning(
+                "cleaning updates is not supported if "
+                "SSL-termination happens elsewhere; skipping"
+            )
 
-        self.httpd.serve_forever()
+        self.httpd.serve_forever(force_event_loop=force_event_loop, ready=ready)
 
     @staticmethod
-    def _gen_webhook_url(listen, port, url_path):
-        return 'https://{listen}:{port}{path}'.format(listen=listen, port=port, path=url_path)
+    def _gen_webhook_url(listen: str, port: int, url_path: str) -> str:
+        return f'https://{listen}:{port}{url_path}'
 
-    def _bootstrap(self,
-                   max_retries,
-                   clean,
-                   webhook_url,
-                   allowed_updates,
-                   cert=None,
-                   bootstrap_interval=5):
+    @no_type_check
+    def _bootstrap(
+        self, max_retries, clean, webhook_url, allowed_updates, cert=None, bootstrap_interval=5
+    ):
         retries = [0]
 
         def bootstrap_del_webhook():
@@ -490,16 +597,17 @@ class Updater(object):
             return False
 
         def bootstrap_set_webhook():
-            self.bot.set_webhook(url=webhook_url,
-                                 certificate=cert,
-                                 allowed_updates=allowed_updates)
+            self.bot.set_webhook(
+                url=webhook_url, certificate=cert, allowed_updates=allowed_updates
+            )
             return False
 
         def bootstrap_onerr_cb(exc):
             if not isinstance(exc, Unauthorized) and (max_retries < 0 or retries[0] < max_retries):
                 retries[0] += 1
-                self.logger.warning('Failed bootstrap phase; try=%s max_retries=%s', retries[0],
-                                    max_retries)
+                self.logger.warning(
+                    'Failed bootstrap phase; try=%s max_retries=%s', retries[0], max_retries
+                )
             else:
                 self.logger.error('Failed bootstrap phase after %s retries (%s)', retries[0], exc)
                 raise exc
@@ -509,24 +617,36 @@ class Updater(object):
         # We also take this chance to delete pre-configured webhook if this is a polling Updater.
         # NOTE: We don't know ahead if a webhook is configured, so we just delete.
         if clean or not webhook_url:
-            self._network_loop_retry(bootstrap_del_webhook, bootstrap_onerr_cb,
-                                     'bootstrap del webhook', bootstrap_interval)
+            self._network_loop_retry(
+                bootstrap_del_webhook,
+                bootstrap_onerr_cb,
+                'bootstrap del webhook',
+                bootstrap_interval,
+            )
             retries[0] = 0
 
         # Clean pending messages, if requested.
         if clean:
-            self._network_loop_retry(bootstrap_clean_updates, bootstrap_onerr_cb,
-                                     'bootstrap clean updates', bootstrap_interval)
+            self._network_loop_retry(
+                bootstrap_clean_updates,
+                bootstrap_onerr_cb,
+                'bootstrap clean updates',
+                bootstrap_interval,
+            )
             retries[0] = 0
             sleep(1)
 
         # Restore/set webhook settings, if needed. Again, we don't know ahead if a webhook is set,
         # so we set it anyhow.
         if webhook_url:
-            self._network_loop_retry(bootstrap_set_webhook, bootstrap_onerr_cb,
-                                     'bootstrap set webhook', bootstrap_interval)
+            self._network_loop_retry(
+                bootstrap_set_webhook,
+                bootstrap_onerr_cb,
+                'bootstrap set webhook',
+                bootstrap_interval,
+            )
 
-    def stop(self):
+    def stop(self) -> None:
         """Stops the polling/webhook thread, the dispatcher and the job queue."""
 
         self.job_queue.stop()
@@ -544,32 +664,39 @@ class Updater(object):
                 if self._request:
                     self._request.stop()
 
-    def _stop_httpd(self):
+    @no_type_check
+    def _stop_httpd(self) -> None:
         if self.httpd:
-            self.logger.debug('Waiting for current webhook connection to be '
-                              'closed... Send a Telegram message to the bot to exit '
-                              'immediately.')
+            self.logger.debug(
+                'Waiting for current webhook connection to be '
+                'closed... Send a Telegram message to the bot to exit '
+                'immediately.'
+            )
             self.httpd.shutdown()
             self.httpd = None
 
-    def _stop_dispatcher(self):
+    @no_type_check
+    def _stop_dispatcher(self) -> None:
         self.logger.debug('Requesting Dispatcher to stop...')
         self.dispatcher.stop()
 
-    def _join_threads(self):
+    @no_type_check
+    def _join_threads(self) -> None:
         for thr in self.__threads:
-            self.logger.debug('Waiting for {0} thread to end'.format(thr.name))
+            self.logger.debug('Waiting for %s thread to end', thr.name)
             thr.join()
-            self.logger.debug('{0} thread has ended'.format(thr.name))
+            self.logger.debug('%s thread has ended', thr.name)
         self.__threads = []
 
-    def signal_handler(self, signum, frame):
+    @no_type_check
+    def signal_handler(self, signum, frame) -> None:
         self.is_idle = False
         if self.running:
-            self.logger.info('Received signal {} ({}), stopping...'.format(
-                signum, get_signal_name(signum)))
+            self.logger.info(
+                'Received signal %s (%s), stopping...', signum, get_signal_name(signum)
+            )
             if self.persistence:
-                # Update user_data and chat_data before flushing
+                # Update user_data, chat_data and bot_data before flushing
                 self.dispatcher.update_persistence()
                 self.persistence.flush()
             self.stop()
@@ -577,10 +704,12 @@ class Updater(object):
                 self.user_sig_handler(signum, frame)
         else:
             self.logger.warning('Exiting immediately!')
+            # pylint: disable=C0415,W0212
             import os
+
             os._exit(1)
 
-    def idle(self, stop_signals=(SIGINT, SIGTERM, SIGABRT)):
+    def idle(self, stop_signals: Union[List, Tuple] = (SIGINT, SIGTERM, SIGABRT)) -> None:
         """Blocks until one of the signals are received and stops the updater.
 
         Args:

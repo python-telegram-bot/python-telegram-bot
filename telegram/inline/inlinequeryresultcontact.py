@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultContact."""
 
+from typing import TYPE_CHECKING, Any
+
 from telegram import InlineQueryResult
+
+if TYPE_CHECKING:
+    from telegram import InputMessageContent, ReplyMarkup
 
 
 class InlineQueryResultContact(InlineQueryResult):
@@ -26,22 +31,6 @@ class InlineQueryResultContact(InlineQueryResult):
     Represents a contact with a phone number. By default, this contact will be sent by the user.
     Alternatively, you can use :attr:`input_message_content` to send a message with the specified
     content instead of the contact.
-
-    Attributes:
-        type (:obj:`str`): 'contact'.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
-        phone_number (:obj:`str`): Contact's phone number.
-        first_name (:obj:`str`): Contact's first name.
-        last_name (:obj:`str`): Optional. Contact's last name.
-        vcard (:obj:`str`): Optional. Additional data about the contact in the form of a vCard,
-            0-2048 bytes.
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-            to the message.
-        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-            message to be sent instead of the contact.
-        thumb_url (:obj:`str`): Optional. Url of the thumbnail for the result.
-        thumb_width (:obj:`int`): Optional. Thumbnail width.
-        thumb_height (:obj:`int`): Optional. Thumbnail height.
 
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
@@ -59,22 +48,40 @@ class InlineQueryResultContact(InlineQueryResult):
         thumb_height (:obj:`int`, optional): Thumbnail height.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
+    Attributes:
+        type (:obj:`str`): 'contact'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        phone_number (:obj:`str`): Contact's phone number.
+        first_name (:obj:`str`): Contact's first name.
+        last_name (:obj:`str`): Optional. Contact's last name.
+        vcard (:obj:`str`): Optional. Additional data about the contact in the form of a vCard,
+            0-2048 bytes.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
+            to the message.
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
+            message to be sent instead of the contact.
+        thumb_url (:obj:`str`): Optional. Url of the thumbnail for the result.
+        thumb_width (:obj:`int`): Optional. Thumbnail width.
+        thumb_height (:obj:`int`): Optional. Thumbnail height.
+
     """
 
-    def __init__(self,
-                 id,
-                 phone_number,
-                 first_name,
-                 last_name=None,
-                 reply_markup=None,
-                 input_message_content=None,
-                 thumb_url=None,
-                 thumb_width=None,
-                 thumb_height=None,
-                 vcard=None,
-                 **kwargs):
+    def __init__(
+        self,
+        id: str,  # pylint: disable=W0622
+        phone_number: str,
+        first_name: str,
+        last_name: str = None,
+        reply_markup: 'ReplyMarkup' = None,
+        input_message_content: 'InputMessageContent' = None,
+        thumb_url: str = None,
+        thumb_width: int = None,
+        thumb_height: int = None,
+        vcard: str = None,
+        **_kwargs: Any,
+    ):
         # Required
-        super(InlineQueryResultContact, self).__init__('contact', id)
+        super().__init__('contact', id)
         self.phone_number = phone_number
         self.first_name = first_name
 

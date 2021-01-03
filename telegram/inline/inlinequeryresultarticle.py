@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,11 +18,32 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultArticle."""
 
+from typing import TYPE_CHECKING, Any
+
 from telegram import InlineQueryResult
+
+if TYPE_CHECKING:
+    from telegram import InputMessageContent, ReplyMarkup
 
 
 class InlineQueryResultArticle(InlineQueryResult):
     """This object represents a Telegram InlineQueryResultArticle.
+
+    Args:
+        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
+        title (:obj:`str`): Title of the result.
+        input_message_content (:class:`telegram.InputMessageContent`): Content of the message to
+            be sent.
+        reply_markup (:class:`telegram.ReplyMarkup`, optional): Inline keyboard attached to
+            the message
+        url (:obj:`str`, optional): URL of the result.
+        hide_url (:obj:`bool`, optional): Pass :obj:`True`, if you don't want the URL to be shown
+            in the message.
+        description (:obj:`str`, optional): Short description of the result.
+        thumb_url (:obj:`str`, optional): Url of the thumbnail for the result.
+        thumb_width (:obj:`int`, optional): Thumbnail width.
+        thumb_height (:obj:`int`, optional): Thumbnail height.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): 'article'.
@@ -33,46 +54,32 @@ class InlineQueryResultArticle(InlineQueryResult):
         reply_markup (:class:`telegram.ReplyMarkup`): Optional. Inline keyboard attached to
             the message.
         url (:obj:`str`): Optional. URL of the result.
-        hide_url (:obj:`bool`): Optional. Pass True, if you don't want the URL to be shown in the
-            message.
+        hide_url (:obj:`bool`): Optional. Pass :obj:`True`, if you don't want the URL to be shown
+            in the message.
         description (:obj:`str`): Optional. Short description of the result.
         thumb_url (:obj:`str`): Optional. Url of the thumbnail for the result.
         thumb_width (:obj:`int`): Optional. Thumbnail width.
         thumb_height (:obj:`int`): Optional. Thumbnail height.
 
-    Args:
-        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
-        title (:obj:`str`): Title of the result.
-        input_message_content (:class:`telegram.InputMessageContent`): Content of the message to
-            be sent.
-        reply_markup (:class:`telegram.ReplyMarkup`, optional): Inline keyboard attached to
-            the message
-        url (:obj:`str`, optional): URL of the result.
-        hide_url (:obj:`bool`, optional): Pass True, if you don't want the URL to be shown in the
-            message.
-        description (:obj:`str`, optional): Short description of the result.
-        thumb_url (:obj:`str`, optional): Url of the thumbnail for the result.
-        thumb_width (:obj:`int`, optional): Thumbnail width.
-        thumb_height (:obj:`int`, optional): Thumbnail height.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
-
     """
 
-    def __init__(self,
-                 id,
-                 title,
-                 input_message_content,
-                 reply_markup=None,
-                 url=None,
-                 hide_url=None,
-                 description=None,
-                 thumb_url=None,
-                 thumb_width=None,
-                 thumb_height=None,
-                 **kwargs):
+    def __init__(
+        self,
+        id: str,  # pylint: disable=W0622
+        title: str,
+        input_message_content: 'InputMessageContent',
+        reply_markup: 'ReplyMarkup' = None,
+        url: str = None,
+        hide_url: bool = None,
+        description: str = None,
+        thumb_url: str = None,
+        thumb_width: int = None,
+        thumb_height: int = None,
+        **_kwargs: Any,
+    ):
 
         # Required
-        super(InlineQueryResultArticle, self).__init__('article', id)
+        super().__init__('article', id)
         self.title = title
         self.input_message_content = input_message_content
 

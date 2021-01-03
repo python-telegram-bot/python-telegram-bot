@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,14 +18,39 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Video."""
 
+from typing import TYPE_CHECKING, Any, Optional
+
 from telegram import PhotoSize, TelegramObject
+from telegram.utils.types import JSONDict
+
+if TYPE_CHECKING:
+    from telegram import Bot, File
 
 
 class Video(TelegramObject):
     """This object represents a video file.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`file_unique_id` is equal.
+
+    Args:
+        file_id (:obj:`str`): Identifier for this file, which can be used to download
+            or reuse the file.
+        file_unique_id (:obj:`str`): Unique identifier for this file, which
+            is supposed to be the same over time and for different bots.
+            Can't be used to download or reuse the file.
+        width (:obj:`int`): Video width as defined by sender.
+        height (:obj:`int`): Video height as defined by sender.
+        duration (:obj:`int`): Duration of the video in seconds as defined by sender.
+        thumb (:class:`telegram.PhotoSize`, optional): Video thumbnail.
+        file_name (:obj:`str`, optional): Original filename as defined by sender.
+        mime_type (:obj:`str`, optional): Mime type of a file as defined by sender.
+        file_size (:obj:`int`, optional): File size.
+        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     Attributes:
-        file_id (:obj:`str`): Unique identifier for this file.
+        file_id (:obj:`str`): Identifier for this file.
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
@@ -33,37 +58,27 @@ class Video(TelegramObject):
         height (:obj:`int`): Video height as defined by sender.
         duration (:obj:`int`): Duration of the video in seconds as defined by sender.
         thumb (:class:`telegram.PhotoSize`): Optional. Video thumbnail.
+        file_name (:obj:`str`): Optional. Original filename as defined by sender.
         mime_type (:obj:`str`): Optional. Mime type of a file as defined by sender.
         file_size (:obj:`int`): Optional. File size.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
-    Args:
-        file_id (:obj:`str`): Identifier for this file, which can be used to download
-            or reuse the file.
-        file_unique_id (:obj:`str`): Unique and the same over time and
-            for different bots file identifier.
-        width (:obj:`int`): Video width as defined by sender.
-        height (:obj:`int`): Video height as defined by sender.
-        duration (:obj:`int`): Duration of the video in seconds as defined by sender.
-        thumb (:class:`telegram.PhotoSize`, optional): Video thumbnail.
-        mime_type (:obj:`str`, optional): Mime type of a file as defined by sender.
-        file_size (:obj:`int`, optional): File size.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
-
     """
 
-    def __init__(self,
-                 file_id,
-                 file_unique_id,
-                 width,
-                 height,
-                 duration,
-                 thumb=None,
-                 mime_type=None,
-                 file_size=None,
-                 bot=None,
-                 **kwargs):
+    def __init__(
+        self,
+        file_id: str,
+        file_unique_id: str,
+        width: int,
+        height: int,
+        duration: int,
+        thumb: PhotoSize = None,
+        mime_type: str = None,
+        file_size: int = None,
+        bot: 'Bot' = None,
+        file_name: str = None,
+        **_kwargs: Any,
+    ):
         # Required
         self.file_id = str(file_id)
         self.file_unique_id = str(file_unique_id)
@@ -72,6 +87,7 @@ class Video(TelegramObject):
         self.duration = int(duration)
         # Optionals
         self.thumb = thumb
+        self.file_name = file_name
         self.mime_type = mime_type
         self.file_size = file_size
         self.bot = bot
@@ -79,24 +95,20 @@ class Video(TelegramObject):
         self._id_attrs = (self.file_unique_id,)
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Video']:
+        data = cls.parse_data(data)
+
         if not data:
             return None
-
-        data = super(Video, cls).de_json(data, bot)
 
         data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
 
         return cls(bot=bot, **data)
 
-    def get_file(self, timeout=None, **kwargs):
+    def get_file(self, timeout: float = None, api_kwargs: JSONDict = None) -> 'File':
         """Convenience wrapper over :attr:`telegram.Bot.get_file`
 
-        Args:
-            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
-                the read timeout from the server (instead of the one specified during creation of
-                the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+        For the documentation of the arguments, please see :meth:`telegram.Bot.get_file`.
 
         Returns:
             :class:`telegram.File`
@@ -105,4 +117,4 @@ class Video(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        return self.bot.get_file(self.file_id, timeout=timeout, **kwargs)
+        return self.bot.get_file(file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs)

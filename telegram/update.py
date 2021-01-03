@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,41 +18,41 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Update."""
 
-from telegram import (Message, TelegramObject, InlineQuery, ChosenInlineResult,
-                      CallbackQuery, ShippingQuery, PreCheckoutQuery, Poll)
+from typing import TYPE_CHECKING, Any, Optional
+
+from telegram import (
+    CallbackQuery,
+    ChosenInlineResult,
+    InlineQuery,
+    Message,
+    Poll,
+    PreCheckoutQuery,
+    ShippingQuery,
+    TelegramObject,
+)
 from telegram.poll import PollAnswer
+from telegram.utils.types import JSONDict
+
+if TYPE_CHECKING:
+    from telegram import Bot, Chat, User  # noqa
 
 
 class Update(TelegramObject):
     """This object represents an incoming update.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`update_id` is equal.
+
     Note:
         At most one of the optional parameters can be present in any given update.
-
-    Attributes:
-        update_id (:obj:`int`): The update's unique identifier.
-        message (:class:`telegram.Message`): Optional. New incoming message.
-        edited_message (:class:`telegram.Message`): Optional. New version of a message.
-        channel_post (:class:`telegram.Message`): Optional. New incoming channel post.
-        edited_channel_post (:class:`telegram.Message`): Optional. New version of a channel post.
-        inline_query (:class:`telegram.InlineQuery`): Optional. New incoming inline query.
-        chosen_inline_result (:class:`telegram.ChosenInlineResult`): Optional. The result of an
-            inline query that was chosen by a user.
-        callback_query (:class:`telegram.CallbackQuery`): Optional. New incoming callback query.
-        shipping_query (:class:`telegram.ShippingQuery`): Optional. New incoming shipping query.
-        pre_checkout_query (:class:`telegram.PreCheckoutQuery`): Optional. New incoming
-            pre-checkout query.
-        poll (:class:`telegram.Poll`): Optional. New poll state. Bots receive only updates
-            about stopped polls and polls, which are sent by the bot
-        poll_answer (:class:`telegram.PollAnswer`): Optional. A user changed their answer
-            in a non-anonymous poll. Bots receive new votes only in polls that were sent
-            by the bot itself.
 
     Args:
         update_id (:obj:`int`): The update's unique identifier. Update identifiers start from a
             certain positive number and increase sequentially. This ID becomes especially handy if
             you're using Webhooks, since it allows you to ignore repeated updates or to restore the
-            correct update sequence, should they get out of order.
+            correct update sequence, should they get out of order. If there are no new updates for
+            at least a week, then identifier of the next update will be chosen randomly instead of
+            sequentially.
         message (:class:`telegram.Message`, optional): New incoming message of any kind - text,
             photo, sticker, etc.
         edited_message (:class:`telegram.Message`, optional): New version of a message that is
@@ -68,30 +68,51 @@ class Update(TelegramObject):
         shipping_query (:class:`telegram.ShippingQuery`, optional): New incoming shipping query.
             Only for invoices with flexible price.
         pre_checkout_query (:class:`telegram.PreCheckoutQuery`, optional): New incoming
-            pre-checkout query. Contains full information about checkout
-        poll (:class:`telegram.Poll`, optional): New poll state. Bots receive only updates
-            about polls, which are sent or stopped by the bot
+            pre-checkout query. Contains full information about checkout.
+        poll (:class:`telegram.Poll`, optional): New poll state. Bots receive only updates about
+            stopped polls and polls, which are sent by the bot.
         poll_answer (:class:`telegram.PollAnswer`, optional): A user changed their answer
             in a non-anonymous poll. Bots receive new votes only in polls that were sent
             by the bot itself.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
+    Attributes:
+        update_id (:obj:`int`): The update's unique identifier.
+        message (:class:`telegram.Message`): Optional. New incoming message.
+        edited_message (:class:`telegram.Message`): Optional. New version of a message.
+        channel_post (:class:`telegram.Message`): Optional. New incoming channel post.
+        edited_channel_post (:class:`telegram.Message`): Optional. New version of a channel post.
+        inline_query (:class:`telegram.InlineQuery`): Optional. New incoming inline query.
+        chosen_inline_result (:class:`telegram.ChosenInlineResult`): Optional. The result of an
+            inline query that was chosen by a user.
+        callback_query (:class:`telegram.CallbackQuery`): Optional. New incoming callback query.
+        shipping_query (:class:`telegram.ShippingQuery`): Optional. New incoming shipping query.
+        pre_checkout_query (:class:`telegram.PreCheckoutQuery`): Optional. New incoming
+            pre-checkout query.
+        poll (:class:`telegram.Poll`): Optional. New poll state. Bots receive only updates
+            about stopped polls and polls, which are sent by the bot.
+        poll_answer (:class:`telegram.PollAnswer`): Optional. A user changed their answer
+            in a non-anonymous poll. Bots receive new votes only in polls that were sent
+            by the bot itself.
+
     """
 
-    def __init__(self,
-                 update_id,
-                 message=None,
-                 edited_message=None,
-                 channel_post=None,
-                 edited_channel_post=None,
-                 inline_query=None,
-                 chosen_inline_result=None,
-                 callback_query=None,
-                 shipping_query=None,
-                 pre_checkout_query=None,
-                 poll=None,
-                 poll_answer=None,
-                 **kwargs):
+    def __init__(
+        self,
+        update_id: int,
+        message: Message = None,
+        edited_message: Message = None,
+        channel_post: Message = None,
+        edited_channel_post: Message = None,
+        inline_query: InlineQuery = None,
+        chosen_inline_result: ChosenInlineResult = None,
+        callback_query: CallbackQuery = None,
+        shipping_query: ShippingQuery = None,
+        pre_checkout_query: PreCheckoutQuery = None,
+        poll: Poll = None,
+        poll_answer: PollAnswer = None,
+        **_kwargs: Any,
+    ):
         # Required
         self.update_id = int(update_id)
         # Optionals
@@ -107,17 +128,17 @@ class Update(TelegramObject):
         self.poll = poll
         self.poll_answer = poll_answer
 
-        self._effective_user = None
-        self._effective_chat = None
-        self._effective_message = None
+        self._effective_user: Optional['User'] = None
+        self._effective_chat: Optional['Chat'] = None
+        self._effective_message: Optional[Message] = None
 
         self._id_attrs = (self.update_id,)
 
     @property
-    def effective_user(self):
+    def effective_user(self) -> Optional['User']:
         """
         :class:`telegram.User`: The user that sent this update, no matter what kind of update this
-            is. Will be ``None`` for :attr:`channel_post` and :attr:`poll`.
+            is. Will be :obj:`None` for :attr:`channel_post` and :attr:`poll`.
 
         """
         if self._effective_user:
@@ -153,10 +174,10 @@ class Update(TelegramObject):
         return user
 
     @property
-    def effective_chat(self):
+    def effective_chat(self) -> Optional['Chat']:
         """
         :class:`telegram.Chat`: The chat that this update was sent in, no matter what kind of
-            update this is. Will be ``None`` for :attr:`inline_query`,
+            update this is. Will be :obj:`None` for :attr:`inline_query`,
             :attr:`chosen_inline_result`, :attr:`callback_query` from inline messages,
             :attr:`shipping_query`, :attr:`pre_checkout_query`, :attr:`poll` and
             :attr:`poll_answer`.
@@ -186,10 +207,10 @@ class Update(TelegramObject):
         return chat
 
     @property
-    def effective_message(self):
+    def effective_message(self) -> Optional[Message]:
         """
         :class:`telegram.Message`: The message included in this update, no matter what kind of
-            update this is. Will be ``None`` for :attr:`inline_query`,
+            update this is. Will be :obj:`None` for :attr:`inline_query`,
             :attr:`chosen_inline_result`, :attr:`callback_query` from inline messages,
             :attr:`shipping_query`, :attr:`pre_checkout_query`, :attr:`poll` and
             :attr:`poll_answer`.
@@ -219,37 +240,23 @@ class Update(TelegramObject):
         return message
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Update']:
+        data = cls.parse_data(data)
+
         if not data:
             return None
 
-        data = super(Update, cls).de_json(data, bot)
-
-        message = data.get('message')
-        if message:
-            message['default_quote'] = data.get('default_quote')
-        data['message'] = Message.de_json(message, bot)
-        edited_message = data.get('edited_message')
-        if edited_message:
-            edited_message['default_quote'] = data.get('default_quote')
-        data['edited_message'] = Message.de_json(edited_message, bot)
+        data['message'] = Message.de_json(data.get('message'), bot)
+        data['edited_message'] = Message.de_json(data.get('edited_message'), bot)
         data['inline_query'] = InlineQuery.de_json(data.get('inline_query'), bot)
         data['chosen_inline_result'] = ChosenInlineResult.de_json(
-            data.get('chosen_inline_result'), bot)
-        callback_query = data.get('callback_query')
-        if callback_query:
-            callback_query['default_quote'] = data.get('default_quote')
-        data['callback_query'] = CallbackQuery.de_json(callback_query, bot)
+            data.get('chosen_inline_result'), bot
+        )
+        data['callback_query'] = CallbackQuery.de_json(data.get('callback_query'), bot)
         data['shipping_query'] = ShippingQuery.de_json(data.get('shipping_query'), bot)
         data['pre_checkout_query'] = PreCheckoutQuery.de_json(data.get('pre_checkout_query'), bot)
-        channel_post = data.get('channel_post')
-        if channel_post:
-            channel_post['default_quote'] = data.get('default_quote')
-        data['channel_post'] = Message.de_json(channel_post, bot)
-        edited_channel_post = data.get('edited_channel_post')
-        if edited_channel_post:
-            edited_channel_post['default_quote'] = data.get('default_quote')
-        data['edited_channel_post'] = Message.de_json(edited_channel_post, bot)
+        data['channel_post'] = Message.de_json(data.get('channel_post'), bot)
+        data['edited_channel_post'] = Message.de_json(data.get('edited_channel_post'), bot)
         data['poll'] = Poll.de_json(data.get('poll'), bot)
         data['poll_answer'] = PollAnswer.de_json(data.get('poll_answer'), bot)
 

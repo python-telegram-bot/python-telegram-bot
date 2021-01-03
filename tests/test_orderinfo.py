@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -24,11 +24,15 @@ from telegram import ShippingAddress, OrderInfo
 
 @pytest.fixture(scope='class')
 def order_info():
-    return OrderInfo(TestOrderInfo.name, TestOrderInfo.phone_number,
-                     TestOrderInfo.email, TestOrderInfo.shipping_address)
+    return OrderInfo(
+        TestOrderInfo.name,
+        TestOrderInfo.phone_number,
+        TestOrderInfo.email,
+        TestOrderInfo.shipping_address,
+    )
 
 
-class TestOrderInfo(object):
+class TestOrderInfo:
     name = 'name'
     phone_number = 'phone_number'
     email = 'email'
@@ -39,7 +43,7 @@ class TestOrderInfo(object):
             'name': TestOrderInfo.name,
             'phone_number': TestOrderInfo.phone_number,
             'email': TestOrderInfo.email,
-            'shipping_address': TestOrderInfo.shipping_address.to_dict()
+            'shipping_address': TestOrderInfo.shipping_address.to_dict(),
         }
         order_info = OrderInfo.de_json(json_dict, bot)
 
@@ -56,3 +60,42 @@ class TestOrderInfo(object):
         assert order_info_dict['phone_number'] == order_info.phone_number
         assert order_info_dict['email'] == order_info.email
         assert order_info_dict['shipping_address'] == order_info.shipping_address.to_dict()
+
+    def test_equality(self):
+        a = OrderInfo(
+            'name',
+            'number',
+            'mail',
+            ShippingAddress('GB', '', 'London', '12 Grimmauld Place', '', 'WC1'),
+        )
+        b = OrderInfo(
+            'name',
+            'number',
+            'mail',
+            ShippingAddress('GB', '', 'London', '12 Grimmauld Place', '', 'WC1'),
+        )
+        c = OrderInfo(
+            'name',
+            'number',
+            'mail',
+            ShippingAddress('GB', '', 'London', '13 Grimmauld Place', '', 'WC1'),
+        )
+        d = OrderInfo(
+            'name',
+            'number',
+            'e-mail',
+            ShippingAddress('GB', '', 'London', '12 Grimmauld Place', '', 'WC1'),
+        )
+        e = ShippingAddress('GB', '', 'London', '12 Grimmauld Place', '', 'WC1')
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import os
+from pathlib import Path
 from tempfile import TemporaryFile, mkstemp
 
 import pytest
@@ -28,18 +29,32 @@ from telegram import File, TelegramError, Voice
 
 @pytest.fixture(scope='class')
 def file(bot):
-    return File(TestFile.file_id,
-                TestFile.file_unique_id,
-                file_path=TestFile.file_path,
-                file_size=TestFile.file_size,
-                bot=bot)
+    return File(
+        TestFile.file_id,
+        TestFile.file_unique_id,
+        file_path=TestFile.file_path,
+        file_size=TestFile.file_size,
+        bot=bot,
+    )
 
 
-class TestFile(object):
+@pytest.fixture(scope='class')
+def local_file(bot):
+    return File(
+        TestFile.file_id,
+        TestFile.file_unique_id,
+        file_path=str(Path.cwd() / 'tests' / 'data' / 'local_file.txt'),
+        file_size=TestFile.file_size,
+        bot=bot,
+    )
+
+
+class TestFile:
     file_id = 'NOTVALIDDOESNOTMATTER'
     file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
     file_path = (
-        u'https://api.org/file/bot133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0/document/file_3')
+        u'https://api.org/file/bot133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0/document/file_3'
+    )
     file_size = 28232
     file_content = u'Saint-Saëns'.encode('utf-8')  # Intentionally contains unicode chars.
 
@@ -48,7 +63,7 @@ class TestFile(object):
             'file_id': self.file_id,
             'file_unique_id': self.file_unique_id,
             'file_path': self.file_path,
-            'file_size': self.file_size
+            'file_size': self.file_size,
         }
         new_file = File.de_json(json_dict, bot)
 
@@ -72,6 +87,10 @@ class TestFile(object):
         with pytest.raises(TelegramError):
             bot.get_file(file_id='')
 
+    def test_download_mutuall_exclusive(self, file):
+        with pytest.raises(ValueError, match='custom_path and out are mutually exclusive'):
+            file.download('custom_path', 'out')
+
     def test_download(self, monkeypatch, file):
         def test(*args, **kwargs):
             return self.file_content
@@ -84,6 +103,9 @@ class TestFile(object):
                 assert fobj.read() == self.file_content
         finally:
             os.unlink(out_file)
+
+    def test_download_local_file(self, local_file):
+        assert local_file.download() == local_file.file_path
 
     def test_download_custom_path(self, monkeypatch, file):
         def test(*args, **kwargs):
@@ -101,6 +123,18 @@ class TestFile(object):
             os.close(file_handle)
             os.unlink(custom_path)
 
+    def test_download_custom_path_local_file(self, local_file):
+        file_handle, custom_path = mkstemp()
+        try:
+            out_file = local_file.download(custom_path)
+            assert out_file == custom_path
+
+            with open(out_file, 'rb') as fobj:
+                assert fobj.read() == self.file_content
+        finally:
+            os.close(file_handle)
+            os.unlink(custom_path)
+
     def test_download_no_filename(self, monkeypatch, file):
         def test(*args, **kwargs):
             return self.file_content
@@ -110,7 +144,7 @@ class TestFile(object):
         monkeypatch.setattr('telegram.utils.request.Request.retrieve', test)
         out_file = file.download()
 
-        assert out_file[-len(file.file_id):] == file.file_id
+        assert out_file[-len(file.file_id) :] == file.file_id
         try:
             with open(out_file, 'rb') as fobj:
                 assert fobj.read() == self.file_content
@@ -124,6 +158,14 @@ class TestFile(object):
         monkeypatch.setattr('telegram.utils.request.Request.retrieve', test)
         with TemporaryFile() as custom_fobj:
             out_fobj = file.download(out=custom_fobj)
+            assert out_fobj is custom_fobj
+
+            out_fobj.seek(0)
+            assert out_fobj.read() == self.file_content
+
+    def test_download_file_obj_local_file(self, local_file):
+        with TemporaryFile() as custom_fobj:
+            out_fobj = local_file.download(out=custom_fobj)
             assert out_fobj is custom_fobj
 
             out_fobj.seek(0)
@@ -143,8 +185,20 @@ class TestFile(object):
         buf2 = buf[:]
         buf3 = file.download_as_bytearray(buf=buf2)
         assert buf3 is buf2
-        assert buf2[len(buf):] == buf
-        assert buf2[:len(buf)] == buf
+        assert buf2[len(buf) :] == buf
+        assert buf2[: len(buf)] == buf
+
+    def test_download_bytearray_local_file(self, local_file):
+        # Check that a download to a newly allocated bytearray works.
+        buf = local_file.download_as_bytearray()
+        assert buf == bytearray(self.file_content)
+
+        # Check that a download to a given bytearray works (extends the bytearray).
+        buf2 = buf[:]
+        buf3 = local_file.download_as_bytearray(buf=buf2)
+        assert buf3 is buf2
+        assert buf2[len(buf) :] == buf
+        assert buf2[: len(buf)] == buf
 
     def test_equality(self, bot):
         a = File(self.file_id, self.file_unique_id, bot)

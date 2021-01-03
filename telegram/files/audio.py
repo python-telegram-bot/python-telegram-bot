@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,14 +18,40 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Audio."""
 
-from telegram import TelegramObject, PhotoSize
+from typing import TYPE_CHECKING, Any, Optional
+
+from telegram import PhotoSize, TelegramObject
+from telegram.utils.types import JSONDict
+
+if TYPE_CHECKING:
+    from telegram import Bot, File
 
 
 class Audio(TelegramObject):
     """This object represents an audio file to be treated as music by the Telegram clients.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`file_unique_id` is equal.
+
+    Args:
+        file_id (:obj:`str`): Identifier for this file, which can be used to download
+            or reuse the file.
+        file_unique_id (:obj:`str`): Unique identifier for this file, which is supposed to be
+            the same over time and for different bots. Can't be used to download or reuse the file.
+        duration (:obj:`int`): Duration of the audio in seconds as defined by sender.
+        performer (:obj:`str`, optional): Performer of the audio as defined by sender or by audio
+            tags.
+        title (:obj:`str`, optional): Title of the audio as defined by sender or by audio tags.
+        file_name (:obj:`str`, optional): Original filename as defined by sender.
+        mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
+        file_size (:obj:`int`, optional): File size.
+        thumb (:class:`telegram.PhotoSize`, optional): Thumbnail of the album cover to
+            which the music file belongs.
+        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     Attributes:
-        file_id (:obj:`str`): Unique identifier for this file.
+        file_id (:obj:`str`): Identifier for this file.
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
@@ -33,41 +59,29 @@ class Audio(TelegramObject):
         performer (:obj:`str`): Optional. Performer of the audio as defined by sender or by audio
             tags.
         title (:obj:`str`): Optional. Title of the audio as defined by sender or by audio tags.
+        file_name (:obj:`str`): Optional. Original filename as defined by sender.
         mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
         file_size (:obj:`int`): Optional. File size.
         thumb (:class:`telegram.PhotoSize`): Optional. Thumbnail of the album cover to
-            which the music file belongs
+            which the music file belongs.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
-
-    Args:
-        file_id (:obj:`str`): Identifier for this file, which can be used to download
-            or reuse the file.
-        file_unique_id (:obj:`str`): Unique and the same over time and
-            for different bots file identifier.
-        duration (:obj:`int`): Duration of the audio in seconds as defined by sender.
-        performer (:obj:`str`, optional): Performer of the audio as defined by sender or by audio
-            tags.
-        title (:obj:`str`, optional): Title of the audio as defined by sender or by audio tags.
-        mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
-        file_size (:obj:`int`, optional): File size.
-        thumb (:class:`telegram.PhotoSize`, optional): Thumbnail of the album cover to
-            which the music file belongs
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
 
-    def __init__(self,
-                 file_id,
-                 file_unique_id,
-                 duration,
-                 performer=None,
-                 title=None,
-                 mime_type=None,
-                 file_size=None,
-                 thumb=None,
-                 bot=None,
-                 **kwargs):
+    def __init__(
+        self,
+        file_id: str,
+        file_unique_id: str,
+        duration: int,
+        performer: str = None,
+        title: str = None,
+        mime_type: str = None,
+        file_size: int = None,
+        thumb: PhotoSize = None,
+        bot: 'Bot' = None,
+        file_name: str = None,
+        **_kwargs: Any,
+    ):
         # Required
         self.file_id = str(file_id)
         self.file_unique_id = str(file_unique_id)
@@ -75,6 +89,7 @@ class Audio(TelegramObject):
         # Optionals
         self.performer = performer
         self.title = title
+        self.file_name = file_name
         self.mime_type = mime_type
         self.file_size = file_size
         self.thumb = thumb
@@ -83,7 +98,9 @@ class Audio(TelegramObject):
         self._id_attrs = (self.file_unique_id,)
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Audio']:
+        data = cls.parse_data(data)
+
         if not data:
             return None
 
@@ -91,14 +108,10 @@ class Audio(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def get_file(self, timeout=None, **kwargs):
+    def get_file(self, timeout: float = None, api_kwargs: JSONDict = None) -> 'File':
         """Convenience wrapper over :attr:`telegram.Bot.get_file`
 
-        Args:
-            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
-                the read timeout from the server (instead of the one specified during creation of
-                the connection pool).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+        For the documentation of the arguments, please see :meth:`telegram.Bot.get_file`.
 
         Returns:
             :class:`telegram.File`
@@ -107,4 +120,4 @@ class Audio(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        return self.bot.get_file(self.file_id, timeout=timeout, **kwargs)
+        return self.bot.get_file(file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs)

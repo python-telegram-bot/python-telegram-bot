@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -27,7 +27,16 @@ from telegram.vendor.ptb_urllib3 import urllib3
 import telegram
 
 IGNORED_OBJECTS = ('ResponseParameters', 'CallbackGame')
-IGNORED_PARAMETERS = {'self', 'args', 'kwargs', 'read_latency', 'network_delay', 'timeout', 'bot'}
+IGNORED_PARAMETERS = {
+    'self',
+    'args',
+    '_kwargs',
+    'read_latency',
+    'network_delay',
+    'timeout',
+    'bot',
+    'api_kwargs',
+}
 
 
 def find_next_sibling_until(tag, name, until):
@@ -59,8 +68,7 @@ def check_method(h4):
     checked = []
     for parameter in table:
         param = sig.parameters.get(parameter[0])
-        assert param is not None, "Parameter {} not found in {}".format(parameter[0],
-                                                                        method.__name__)
+        assert param is not None, f"Parameter {parameter[0]} not found in {method.__name__}"
         # TODO: Check type via docstring
         # TODO: Check if optional or required
         checked.append(parameter[0])
@@ -68,8 +76,19 @@ def check_method(h4):
     ignored = IGNORED_PARAMETERS.copy()
     if name == 'getUpdates':
         ignored -= {'timeout'}  # Has it's own timeout parameter that we do wanna check for
-    elif name == 'sendDocument':
-        ignored |= {'filename'}  # Undocumented
+    elif name in (
+        f'send{media_type}'
+        for media_type in [
+            'Animation',
+            'Audio',
+            'Document',
+            'Photo',
+            'Video',
+            'VideoNote',
+            'Voice',
+        ]
+    ):
+        ignored |= {'filename'}  # Convenience parameter
     elif name == 'setGameScore':
         ignored |= {'edit_message'}  # TODO: Now deprecated, so no longer in telegrams docs
     elif name == 'sendContact':
@@ -78,6 +97,8 @@ def check_method(h4):
         ignored |= {'location'}  # Added for ease of use
     elif name == 'sendVenue':
         ignored |= {'venue'}  # Added for ease of use
+    elif name == 'answerInlineQuery':
+        ignored |= {'current_offset'}  # Added for ease of use
 
     assert (sig.parameters.keys() ^ checked) - ignored == set()
 
@@ -95,8 +116,9 @@ def check_object(h4):
         field = parameter[0]
         if field == 'from':
             field = 'from_user'
-        elif ((name.startswith('InlineQueryResult')
-               or name.startswith('InputMedia')) and field == 'type'):
+        elif (
+            name.startswith('InlineQueryResult') or name.startswith('InputMedia')
+        ) and field == 'type':
             continue
         elif name.startswith('PassportElementError') and field == 'source':
             continue
@@ -104,7 +126,7 @@ def check_object(h4):
             continue
 
         param = sig.parameters.get(field)
-        assert param is not None, "Attribute {} not found in {}".format(field, obj.__name__)
+        assert param is not None, f"Attribute {field} not found in {obj.__name__}"
         # TODO: Check type via docstring
         # TODO: Check if optional or required
         checked.append(field)
@@ -120,17 +142,15 @@ def check_object(h4):
         ignored |= {'credentials'}
     elif name == 'PassportElementError':
         ignored |= {'message', 'type', 'source'}
-    elif name == 'Message':
-        ignored |= {'default_quote'}
+    elif name.startswith('InputMedia'):
+        ignored |= {'filename'}  # Convenience parameter
 
     assert (sig.parameters.keys() ^ checked) - ignored == set()
 
 
 argvalues = []
 names = []
-http = urllib3.PoolManager(
-    cert_reqs='CERT_REQUIRED',
-    ca_certs=certifi.where())
+http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 request = http.request('GET', 'https://core.telegram.org/bots/api')
 soup = BeautifulSoup(request.data.decode('utf-8'), 'html.parser')
 
@@ -150,7 +170,6 @@ for thing in soup.select('h4 > a.anchor'):
 
 
 @pytest.mark.parametrize(('method', 'data'), argvalues=argvalues, ids=names)
-@pytest.mark.skipif(os.getenv('TEST_OFFICIAL') != 'true',
-                    reason='test_official is not enabled')
+@pytest.mark.skipif(os.getenv('TEST_OFFICIAL') != 'true', reason='test_official is not enabled')
 def test_official(method, data):
     method(data)

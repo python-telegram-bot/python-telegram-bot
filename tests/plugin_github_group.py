@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,7 @@ def terminal_summary_wrapper(original, plugin_name):
     text = fold_plugins[plugin_name]
 
     def pytest_terminal_summary(terminalreporter):
-        terminalreporter.write('##[group] {}\n'.format(text))
+        terminalreporter.write(f'##[group] {text}\n')
         original(terminalreporter)
         terminalreporter.write('##[endgroup]')
 
@@ -37,8 +37,7 @@ def terminal_summary_wrapper(original, plugin_name):
 def pytest_configure(config):
     for hookimpl in config.pluginmanager.hook.pytest_terminal_summary._nonwrappers:
         if hookimpl.plugin_name in fold_plugins.keys():
-            hookimpl.function = terminal_summary_wrapper(hookimpl.function,
-                                                         hookimpl.plugin_name)
+            hookimpl.function = terminal_summary_wrapper(hookimpl.function, hookimpl.plugin_name)
 
 
 terminal = None
@@ -69,7 +68,7 @@ def pytest_runtest_protocol(item, nextitem):
 
     if previous_name is None or previous_name != name:
         previous_name = name
-        terminal.write('\n##[group] {}'.format(name))
+        terminal.write(f'\n##[group] {name}')
 
     yield
 

@@ -17,7 +17,7 @@ We have a vibrant community of developers helping each other in our `Telegram gr
    :target: https://pypi.org/project/python-telegram-bot/
    :alt: Supported Python versions
 
-.. image:: https://www.cpu.re/static/python-telegram-bot/downloads.svg
+.. image:: https://cpu.re/static/python-telegram-bot/downloads.svg
    :target: https://www.cpu.re/static/python-telegram-bot/downloads-by-python-version.txt
    :alt: PyPi Package Monthly Download
 
@@ -44,6 +44,9 @@ We have a vibrant community of developers helping each other in our `Telegram gr
 .. image:: https://api.codacy.com/project/badge/Grade/99d901eaa09b44b4819aec05c330c968
    :target: https://www.codacy.com/app/python-telegram-bot/python-telegram-bot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=python-telegram-bot/python-telegram-bot&amp;utm_campaign=Badge_Grade
    :alt: Code quality
+
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/psf/black
 
 .. image:: https://img.shields.io/badge/Telegram-Group-blue.svg
    :target: https://telegram.me/pythontelegrambotgroup
@@ -83,7 +86,7 @@ Introduction
 
 This library provides a pure Python interface for the
 `Telegram Bot API <https://core.telegram.org/bots/api>`_.
-It's compatible with Python versions 3.5+ and `PyPy <http://pypy.org/>`_.
+It's compatible with Python versions 3.6+. PTB might also work on `PyPy <http://pypy.org/>`_, though there have been a lot of issues before. Hence, PyPy is not officially supported.
 
 In addition to the pure API implementation, this library features a number of high-level classes to
 make the development of bots easy and straightforward. These classes are contained in the
@@ -93,7 +96,7 @@ make the development of bots easy and straightforward. These classes are contain
 Telegram API support
 ====================
 
-All types and methods of the Telegram Bot API **4.7** are supported.
+All types and methods of the Telegram Bot API **5.0** are supported.
 
 ==========
 Installing
@@ -139,7 +142,7 @@ Learning by example
 
 We believe that the best way to learn this package is by example. Here
 are some examples for you to review. Even if it is not your approach for learning, please take a
-look at ``echobot2``, it is the de facto base for most of the bots out there. Best of all,
+look at ``echobot.py``, it is the de facto base for most of the bots out there. Best of all,
 the code for these examples are released to the public domain, so you can start by grabbing the
 code and building on top of it.
 
@@ -187,11 +190,13 @@ You can get help in several ways:
 
 1. We have a vibrant community of developers helping each other in our `Telegram group <https://telegram.me/pythontelegrambotgroup>`_. Join us!
 
-2. Report bugs, request new features or ask questions by `creating an issue <https://github.com/python-telegram-bot/python-telegram-bot/issues/new/choose>`_.
+2. In case you are unable to join our group due to Telegram restrictions, you can use our `IRC channel <https://webchat.freenode.net/?channels=##python-telegram-bot>`_.
 
-3. Our `Wiki pages <https://github.com/python-telegram-bot/python-telegram-bot/wiki/>`_ offer a growing amount of resources.
+3. Report bugs, request new features or ask questions by `creating an issue <https://github.com/python-telegram-bot/python-telegram-bot/issues/new/choose>`_ or `a discussion <https://github.com/python-telegram-bot/python-telegram-bot/discussions/new>`_.
 
-4. You can even ask for help on Stack Overflow using the `python-telegram-bot tag <https://stackoverflow.com/questions/tagged/python-telegram-bot>`_.
+4. Our `Wiki pages <https://github.com/python-telegram-bot/python-telegram-bot/wiki/>`_ offer a growing amount of resources.
+
+5. You can even ask for help on Stack Overflow using the `python-telegram-bot tag <https://stackoverflow.com/questions/tagged/python-telegram-bot>`_.
 
 
 

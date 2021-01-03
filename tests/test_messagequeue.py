@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,16 +18,18 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 import os
-from time import sleep
+from time import sleep, perf_counter
 
 import pytest
 
 import telegram.ext.messagequeue as mq
 
 
-@pytest.mark.skipif(os.getenv('GITHUB_ACTIONS', False) and os.name == 'nt',
-                    reason="On windows precise timings are not accurate.")
-class TestDelayQueue(object):
+@pytest.mark.skipif(
+    os.getenv('GITHUB_ACTIONS', False) and os.name == 'nt',
+    reason="On windows precise timings are not accurate.",
+)
+class TestDelayQueue:
     N = 128
     burst_limit = 30
     time_limit_ms = 1000
@@ -35,20 +37,21 @@ class TestDelayQueue(object):
     testtimes = []
 
     def call(self):
-        self.testtimes.append(mq.curtime())
+        self.testtimes.append(perf_counter())
 
     def test_delayqueue_limits(self):
-        dsp = mq.DelayQueue(burst_limit=self.burst_limit, time_limit_ms=self.time_limit_ms,
-                            autostart=True)
+        dsp = mq.DelayQueue(
+            burst_limit=self.burst_limit, time_limit_ms=self.time_limit_ms, autostart=True
+        )
         assert dsp.is_alive() is True
 
         for _ in range(self.N):
             dsp(self.call)
 
-        starttime = mq.curtime()
+        starttime = perf_counter()
         # wait up to 20 sec more than needed
-        app_endtime = ((self.N * self.burst_limit / (1000 * self.time_limit_ms)) + starttime + 20)
-        while not dsp._queue.empty() and mq.curtime() < app_endtime:
+        app_endtime = (self.N * self.burst_limit / (1000 * self.time_limit_ms)) + starttime + 20
+        while not dsp._queue.empty() and perf_counter() < app_endtime:
             sleep(1)
         assert dsp._queue.empty() is True  # check loop exit condition
 

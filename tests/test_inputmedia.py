@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,73 +16,106 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+from pathlib import Path
+
 import pytest
 from flaky import flaky
 
-from telegram import (InputMediaVideo, InputMediaPhoto, InputMediaAnimation, Message, InputFile,
-                      InputMediaAudio, InputMediaDocument)
+from telegram import (
+    InputMediaVideo,
+    InputMediaPhoto,
+    InputMediaAnimation,
+    Message,
+    InputFile,
+    InputMediaAudio,
+    InputMediaDocument,
+    MessageEntity,
+)
+
 # noinspection PyUnresolvedReferences
+from telegram.error import BadRequest
 from .test_animation import animation, animation_file  # noqa: F401
+
 # noinspection PyUnresolvedReferences
 from .test_audio import audio, audio_file  # noqa: F401
+
 # noinspection PyUnresolvedReferences
 from .test_document import document, document_file  # noqa: F401
+
 # noinspection PyUnresolvedReferences
 from .test_photo import _photo, photo_file, photo, thumb  # noqa: F401
+
 # noinspection PyUnresolvedReferences
 from .test_video import video, video_file  # noqa: F401
+from tests.conftest import expect_bad_request
 
 
 @pytest.fixture(scope='class')
 def input_media_video(class_thumb_file):
-    return InputMediaVideo(media=TestInputMediaVideo.media,
-                           caption=TestInputMediaVideo.caption,
-                           width=TestInputMediaVideo.width,
-                           height=TestInputMediaVideo.height,
-                           duration=TestInputMediaVideo.duration,
-                           parse_mode=TestInputMediaVideo.parse_mode,
-                           thumb=class_thumb_file,
-                           supports_streaming=TestInputMediaVideo.supports_streaming)
+    return InputMediaVideo(
+        media=TestInputMediaVideo.media,
+        caption=TestInputMediaVideo.caption,
+        width=TestInputMediaVideo.width,
+        height=TestInputMediaVideo.height,
+        duration=TestInputMediaVideo.duration,
+        parse_mode=TestInputMediaVideo.parse_mode,
+        caption_entities=TestInputMediaVideo.caption_entities,
+        thumb=class_thumb_file,
+        supports_streaming=TestInputMediaVideo.supports_streaming,
+    )
 
 
 @pytest.fixture(scope='class')
 def input_media_photo(class_thumb_file):
-    return InputMediaPhoto(media=TestInputMediaPhoto.media,
-                           caption=TestInputMediaPhoto.caption,
-                           parse_mode=TestInputMediaPhoto.parse_mode)
+    return InputMediaPhoto(
+        media=TestInputMediaPhoto.media,
+        caption=TestInputMediaPhoto.caption,
+        parse_mode=TestInputMediaPhoto.parse_mode,
+        caption_entities=TestInputMediaPhoto.caption_entities,
+    )
 
 
 @pytest.fixture(scope='class')
 def input_media_animation(class_thumb_file):
-    return InputMediaAnimation(media=TestInputMediaAnimation.media,
-                               caption=TestInputMediaAnimation.caption,
-                               parse_mode=TestInputMediaAnimation.parse_mode,
-                               width=TestInputMediaAnimation.width,
-                               height=TestInputMediaAnimation.height,
-                               thumb=class_thumb_file,
-                               duration=TestInputMediaAnimation.duration)
+    return InputMediaAnimation(
+        media=TestInputMediaAnimation.media,
+        caption=TestInputMediaAnimation.caption,
+        parse_mode=TestInputMediaAnimation.parse_mode,
+        caption_entities=TestInputMediaAnimation.caption_entities,
+        width=TestInputMediaAnimation.width,
+        height=TestInputMediaAnimation.height,
+        thumb=class_thumb_file,
+        duration=TestInputMediaAnimation.duration,
+    )
 
 
 @pytest.fixture(scope='class')
 def input_media_audio(class_thumb_file):
-    return InputMediaAudio(media=TestInputMediaAudio.media,
-                           caption=TestInputMediaAudio.caption,
-                           duration=TestInputMediaAudio.duration,
-                           performer=TestInputMediaAudio.performer,
-                           title=TestInputMediaAudio.title,
-                           thumb=class_thumb_file,
-                           parse_mode=TestInputMediaAudio.parse_mode)
+    return InputMediaAudio(
+        media=TestInputMediaAudio.media,
+        caption=TestInputMediaAudio.caption,
+        duration=TestInputMediaAudio.duration,
+        performer=TestInputMediaAudio.performer,
+        title=TestInputMediaAudio.title,
+        thumb=class_thumb_file,
+        parse_mode=TestInputMediaAudio.parse_mode,
+        caption_entities=TestInputMediaAudio.caption_entities,
+    )
 
 
 @pytest.fixture(scope='class')
 def input_media_document(class_thumb_file):
-    return InputMediaDocument(media=TestInputMediaDocument.media,
-                              caption=TestInputMediaDocument.caption,
-                              thumb=class_thumb_file,
-                              parse_mode=TestInputMediaDocument.parse_mode)
+    return InputMediaDocument(
+        media=TestInputMediaDocument.media,
+        caption=TestInputMediaDocument.caption,
+        thumb=class_thumb_file,
+        parse_mode=TestInputMediaDocument.parse_mode,
+        caption_entities=TestInputMediaDocument.caption_entities,
+        disable_content_type_detection=TestInputMediaDocument.disable_content_type_detection,
+    )
 
 
-class TestInputMediaVideo(object):
+class TestInputMediaVideo:
     type_ = "video"
     media = "NOTAREALFILEID"
     caption = "My Caption"
@@ -91,6 +124,7 @@ class TestInputMediaVideo(object):
     duration = 5
     parse_mode = 'HTML'
     supports_streaming = True
+    caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
 
     def test_expected_values(self, input_media_video):
         assert input_media_video.type == self.type_
@@ -100,6 +134,7 @@ class TestInputMediaVideo(object):
         assert input_media_video.height == self.height
         assert input_media_video.duration == self.duration
         assert input_media_video.parse_mode == self.parse_mode
+        assert input_media_video.caption_entities == self.caption_entities
         assert input_media_video.supports_streaming == self.supports_streaming
         assert isinstance(input_media_video.thumb, InputFile)
 
@@ -112,6 +147,9 @@ class TestInputMediaVideo(object):
         assert input_media_video_dict['height'] == input_media_video.height
         assert input_media_video_dict['duration'] == input_media_video.duration
         assert input_media_video_dict['parse_mode'] == input_media_video.parse_mode
+        assert input_media_video_dict['caption_entities'] == [
+            ce.to_dict() for ce in input_media_video.caption_entities
+        ]
         assert input_media_video_dict['supports_streaming'] == input_media_video.supports_streaming
 
     def test_with_video(self, video):  # noqa: F811
@@ -131,18 +169,27 @@ class TestInputMediaVideo(object):
         assert isinstance(input_media_video.media, InputFile)
         assert input_media_video.caption == "test 3"
 
+    def test_with_local_files(self):
+        input_media_video = InputMediaVideo(
+            'tests/data/telegram.mp4', thumb='tests/data/telegram.jpg'
+        )
+        assert input_media_video.media == (Path.cwd() / 'tests/data/telegram.mp4/').as_uri()
+        assert input_media_video.thumb == (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
 
-class TestInputMediaPhoto(object):
+
+class TestInputMediaPhoto:
     type_ = "photo"
     media = "NOTAREALFILEID"
     caption = "My Caption"
     parse_mode = 'Markdown'
+    caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
 
     def test_expected_values(self, input_media_photo):
         assert input_media_photo.type == self.type_
         assert input_media_photo.media == self.media
         assert input_media_photo.caption == self.caption
         assert input_media_photo.parse_mode == self.parse_mode
+        assert input_media_photo.caption_entities == self.caption_entities
 
     def test_to_dict(self, input_media_photo):
         input_media_photo_dict = input_media_photo.to_dict()
@@ -150,6 +197,9 @@ class TestInputMediaPhoto(object):
         assert input_media_photo_dict['media'] == input_media_photo.media
         assert input_media_photo_dict['caption'] == input_media_photo.caption
         assert input_media_photo_dict['parse_mode'] == input_media_photo.parse_mode
+        assert input_media_photo_dict['caption_entities'] == [
+            ce.to_dict() for ce in input_media_photo.caption_entities
+        ]
 
     def test_with_photo(self, photo):  # noqa: F811
         # fixture found in test_photo
@@ -165,12 +215,17 @@ class TestInputMediaPhoto(object):
         assert isinstance(input_media_photo.media, InputFile)
         assert input_media_photo.caption == "test 2"
 
+    def test_with_local_files(self):
+        input_media_photo = InputMediaPhoto('tests/data/telegram.mp4')
+        assert input_media_photo.media == (Path.cwd() / 'tests/data/telegram.mp4/').as_uri()
 
-class TestInputMediaAnimation(object):
+
+class TestInputMediaAnimation:
     type_ = "animation"
     media = "NOTAREALFILEID"
     caption = "My Caption"
     parse_mode = 'Markdown'
+    caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
     width = 30
     height = 30
     duration = 1
@@ -180,6 +235,7 @@ class TestInputMediaAnimation(object):
         assert input_media_animation.media == self.media
         assert input_media_animation.caption == self.caption
         assert input_media_animation.parse_mode == self.parse_mode
+        assert input_media_animation.caption_entities == self.caption_entities
         assert isinstance(input_media_animation.thumb, InputFile)
 
     def test_to_dict(self, input_media_animation):
@@ -188,6 +244,9 @@ class TestInputMediaAnimation(object):
         assert input_media_animation_dict['media'] == input_media_animation.media
         assert input_media_animation_dict['caption'] == input_media_animation.caption
         assert input_media_animation_dict['parse_mode'] == input_media_animation.parse_mode
+        assert input_media_animation_dict['caption_entities'] == [
+            ce.to_dict() for ce in input_media_animation.caption_entities
+        ]
         assert input_media_animation_dict['width'] == input_media_animation.width
         assert input_media_animation_dict['height'] == input_media_animation.height
         assert input_media_animation_dict['duration'] == input_media_animation.duration
@@ -206,8 +265,15 @@ class TestInputMediaAnimation(object):
         assert isinstance(input_media_animation.media, InputFile)
         assert input_media_animation.caption == "test 2"
 
+    def test_with_local_files(self):
+        input_media_animation = InputMediaAnimation(
+            'tests/data/telegram.mp4', thumb='tests/data/telegram.jpg'
+        )
+        assert input_media_animation.media == (Path.cwd() / 'tests/data/telegram.mp4').as_uri()
+        assert input_media_animation.thumb == (Path.cwd() / 'tests/data/telegram.jpg').as_uri()
 
-class TestInputMediaAudio(object):
+
+class TestInputMediaAudio:
     type_ = "audio"
     media = "NOTAREALFILEID"
     caption = "My Caption"
@@ -215,6 +281,7 @@ class TestInputMediaAudio(object):
     performer = 'performer'
     title = 'title'
     parse_mode = 'HTML'
+    caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
 
     def test_expected_values(self, input_media_audio):
         assert input_media_audio.type == self.type_
@@ -224,6 +291,7 @@ class TestInputMediaAudio(object):
         assert input_media_audio.performer == self.performer
         assert input_media_audio.title == self.title
         assert input_media_audio.parse_mode == self.parse_mode
+        assert input_media_audio.caption_entities == self.caption_entities
         assert isinstance(input_media_audio.thumb, InputFile)
 
     def test_to_dict(self, input_media_audio):
@@ -235,6 +303,9 @@ class TestInputMediaAudio(object):
         assert input_media_audio_dict['performer'] == input_media_audio.performer
         assert input_media_audio_dict['title'] == input_media_audio.title
         assert input_media_audio_dict['parse_mode'] == input_media_audio.parse_mode
+        assert input_media_audio_dict['caption_entities'] == [
+            ce.to_dict() for ce in input_media_audio.caption_entities
+        ]
 
     def test_with_audio(self, audio):  # noqa: F811
         # fixture found in test_audio
@@ -253,18 +324,32 @@ class TestInputMediaAudio(object):
         assert isinstance(input_media_audio.media, InputFile)
         assert input_media_audio.caption == "test 3"
 
+    def test_with_local_files(self):
+        input_media_audio = InputMediaAudio(
+            'tests/data/telegram.mp4', thumb='tests/data/telegram.jpg'
+        )
+        assert input_media_audio.media == (Path.cwd() / 'tests/data/telegram.mp4/').as_uri()
+        assert input_media_audio.thumb == (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
 
-class TestInputMediaDocument(object):
+
+class TestInputMediaDocument:
     type_ = "document"
     media = "NOTAREALFILEID"
     caption = "My Caption"
     parse_mode = 'HTML'
+    caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
+    disable_content_type_detection = True
 
     def test_expected_values(self, input_media_document):
         assert input_media_document.type == self.type_
         assert input_media_document.media == self.media
         assert input_media_document.caption == self.caption
         assert input_media_document.parse_mode == self.parse_mode
+        assert input_media_document.caption_entities == self.caption_entities
+        assert (
+            input_media_document.disable_content_type_detection
+            == self.disable_content_type_detection
+        )
         assert isinstance(input_media_document.thumb, InputFile)
 
     def test_to_dict(self, input_media_document):
@@ -273,6 +358,13 @@ class TestInputMediaDocument(object):
         assert input_media_document_dict['media'] == input_media_document.media
         assert input_media_document_dict['caption'] == input_media_document.caption
         assert input_media_document_dict['parse_mode'] == input_media_document.parse_mode
+        assert input_media_document_dict['caption_entities'] == [
+            ce.to_dict() for ce in input_media_document.caption_entities
+        ]
+        assert (
+            input_media_document['disable_content_type_detection']
+            == input_media_document.disable_content_type_detection
+        )
 
     def test_with_document(self, document):  # noqa: F811
         # fixture found in test_document
@@ -288,53 +380,157 @@ class TestInputMediaDocument(object):
         assert isinstance(input_media_document.media, InputFile)
         assert input_media_document.caption == "test 3"
 
+    def test_with_local_files(self):
+        input_media_document = InputMediaDocument(
+            'tests/data/telegram.mp4', thumb='tests/data/telegram.jpg'
+        )
+        assert input_media_document.media == (Path.cwd() / 'tests/data/telegram.mp4').as_uri()
+        assert input_media_document.thumb == (Path.cwd() / 'tests/data/telegram.jpg').as_uri()
+
 
 @pytest.fixture(scope='function')  # noqa: F811
 def media_group(photo, thumb):  # noqa: F811
-    return [InputMediaPhoto(photo, caption='photo `1`', parse_mode='Markdown'),
-            InputMediaPhoto(thumb, caption='<b>photo</b> 2', parse_mode='HTML')]
+    return [
+        InputMediaPhoto(photo, caption='*photo* 1', parse_mode='Markdown'),
+        InputMediaPhoto(thumb, caption='<b>photo</b> 2', parse_mode='HTML'),
+        InputMediaPhoto(
+            photo, caption='photo 3', caption_entities=[MessageEntity(MessageEntity.BOLD, 0, 5)]
+        ),
+    ]
 
 
-class TestSendMediaGroup(object):
+class TestSendMediaGroup:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_media_group_photo(self, bot, chat_id, media_group):
         messages = bot.send_media_group(chat_id, media_group)
         assert isinstance(messages, list)
-        assert len(messages) == 2
+        assert len(messages) == 3
         assert all([isinstance(mes, Message) for mes in messages])
         assert all([mes.media_group_id == messages[0].media_group_id for mes in messages])
+        assert all(mes.caption == f'photo {idx+1}' for idx, mes in enumerate(messages))
+        assert all(
+            mes.caption_entities == [MessageEntity(MessageEntity.BOLD, 0, 5)] for mes in messages
+        )
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_media_group_all_args(self, bot, chat_id, media_group):
         m1 = bot.send_message(chat_id, text="test")
-        messages = bot.send_media_group(chat_id, media_group, disable_notification=True,
-                                        reply_to_message_id=m1.message_id)
+        messages = bot.send_media_group(
+            chat_id, media_group, disable_notification=True, reply_to_message_id=m1.message_id
+        )
         assert isinstance(messages, list)
-        assert len(messages) == 2
+        assert len(messages) == 3
         assert all([isinstance(mes, Message) for mes in messages])
         assert all([mes.media_group_id == messages[0].media_group_id for mes in messages])
+        assert all(mes.caption == f'photo {idx+1}' for idx, mes in enumerate(messages))
+        assert all(
+            mes.caption_entities == [MessageEntity(MessageEntity.BOLD, 0, 5)] for mes in messages
+        )
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_media_group_custom_filename(
+        self,
+        bot,
+        chat_id,
+        photo_file,  # noqa: F811
+        animation_file,  # noqa: F811
+        audio_file,  # noqa: F811
+        video_file,  # noqa: F811
+        monkeypatch,
+    ):
+        def make_assertion(url, data, **kwargs):
+            result = all(im.media.filename == 'custom_filename' for im in data['media'])
+            # We are a bit hacky here b/c Bot.send_media_group expects a list of Message-dicts
+            return [Message(0, None, None, text=result).to_dict()]
+
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+
+        media = [
+            InputMediaAnimation(animation_file, filename='custom_filename'),
+            InputMediaAudio(audio_file, filename='custom_filename'),
+            InputMediaPhoto(photo_file, filename='custom_filename'),
+            InputMediaVideo(video_file, filename='custom_filename'),
+        ]
+
+        assert bot.send_media_group(chat_id, media)[0].text is True
+
+    def test_send_media_group_with_thumbs(
+        self, bot, chat_id, video_file, photo_file, monkeypatch  # noqa: F811
+    ):
+        def test(*args, **kwargs):
+            data = kwargs['fields']
+            video_check = data[input_video.media.attach] == input_video.media.field_tuple
+            thumb_check = data[input_video.thumb.attach] == input_video.thumb.field_tuple
+            result = video_check and thumb_check
+            raise Exception(f"Test was {'successful' if result else 'failing'}")
+
+        monkeypatch.setattr('telegram.utils.request.Request._request_wrapper', test)
+        input_video = InputMediaVideo(video_file, thumb=photo_file)
+        with pytest.raises(Exception, match='Test was successful'):
+            bot.send_media_group(chat_id, [input_video, input_video])
 
     @flaky(3, 1)  # noqa: F811
     @pytest.mark.timeout(10)  # noqa: F811
-    def test_send_media_group_new_files(self, bot, chat_id, video_file, photo_file,  # noqa: F811
-                                        animation_file):  # noqa: F811
-        messages = bot.send_media_group(chat_id, [
-            InputMediaVideo(video_file),
-            InputMediaPhoto(photo_file)
-        ])
+    def test_send_media_group_new_files(
+        self, bot, chat_id, video_file, photo_file, animation_file  # noqa: F811
+    ):  # noqa: F811
+        def func():
+            with open('tests/data/telegram.jpg', 'rb') as file:
+                return bot.send_media_group(
+                    chat_id,
+                    [
+                        InputMediaVideo(video_file),
+                        InputMediaPhoto(photo_file),
+                        InputMediaPhoto(file.read()),
+                    ],
+                )
+
+        messages = expect_bad_request(
+            func, 'Type of file mismatch', 'Telegram did not accept the file.'
+        )
+
         assert isinstance(messages, list)
-        assert len(messages) == 2
+        assert len(messages) == 3
         assert all([isinstance(mes, Message) for mes in messages])
         assert all([mes.media_group_id == messages[0].media_group_id for mes in messages])
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    @pytest.mark.parametrize('default_bot', [{'quote': True}], indirect=True)
-    def test_send_media_group_default_quote(self, default_bot, chat_id, media_group):
-        messages = default_bot.send_media_group(chat_id, media_group)
-        assert all([mes.default_quote is True for mes in messages])
+    @pytest.mark.parametrize(
+        'default_bot,custom',
+        [
+            ({'allow_sending_without_reply': True}, None),
+            ({'allow_sending_without_reply': False}, None),
+            ({'allow_sending_without_reply': False}, True),
+        ],
+        indirect=['default_bot'],
+    )
+    def test_send_media_group_default_allow_sending_without_reply(
+        self, default_bot, chat_id, media_group, custom
+    ):
+        reply_to_message = default_bot.send_message(chat_id, 'test')
+        reply_to_message.delete()
+        if custom is not None:
+            messages = default_bot.send_media_group(
+                chat_id,
+                media_group,
+                allow_sending_without_reply=custom,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert [m.reply_to_message is None for m in messages]
+        elif default_bot.defaults.allow_sending_without_reply:
+            messages = default_bot.send_media_group(
+                chat_id, media_group, reply_to_message_id=reply_to_message.message_id
+            )
+            assert [m.reply_to_message is None for m in messages]
+        else:
+            with pytest.raises(BadRequest, match='message not found'):
+                default_bot.send_media_group(
+                    chat_id, media_group, reply_to_message_id=reply_to_message.message_id
+                )
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -351,6 +547,7 @@ class TestSendMediaGroup(object):
         messages = bot.send_media_group(chat_id, media_group)
         cid = messages[-1].chat.id
         mid = messages[-1].message_id
-        new_message = bot.edit_message_media(chat_id=cid, message_id=mid,
-                                             media=InputMediaPhoto(thumb_file))
+        new_message = bot.edit_message_media(
+            chat_id=cid, message_id=mid, media=InputMediaPhoto(thumb_file)
+        )
         assert isinstance(new_message, Message)

@@ -23,7 +23,7 @@ from telegram.ext import Defaults
 from telegram import User
 
 
-class TestDefault(object):
+class TestDefault:
     def test_data_assignment(self, cdp):
         defaults = Defaults()
 
@@ -34,9 +34,15 @@ class TestDefault(object):
         with pytest.raises(AttributeError):
             defaults.disable_web_page_preview = True
         with pytest.raises(AttributeError):
+            defaults.allow_sending_without_reply = True
+        with pytest.raises(AttributeError):
             defaults.timeout = True
         with pytest.raises(AttributeError):
             defaults.quote = True
+        with pytest.raises(AttributeError):
+            defaults.tzinfo = True
+        with pytest.raises(AttributeError):
+            defaults.run_async = True
 
     def test_equality(self):
         a = Defaults(parse_mode='HTML', quote=True)

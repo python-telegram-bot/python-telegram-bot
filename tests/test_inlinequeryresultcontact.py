@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,8 +19,13 @@
 
 import pytest
 
-from telegram import (InlineQueryResultVoice, InputTextMessageContent, InlineKeyboardButton,
-                      InlineKeyboardMarkup, InlineQueryResultContact)
+from telegram import (
+    InlineQueryResultVoice,
+    InputTextMessageContent,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    InlineQueryResultContact,
+)
 
 
 @pytest.fixture(scope='class')
@@ -34,10 +39,11 @@ def inline_query_result_contact():
         thumb_width=TestInlineQueryResultContact.thumb_width,
         thumb_height=TestInlineQueryResultContact.thumb_height,
         input_message_content=TestInlineQueryResultContact.input_message_content,
-        reply_markup=TestInlineQueryResultContact.reply_markup)
+        reply_markup=TestInlineQueryResultContact.reply_markup,
+    )
 
 
-class TestInlineQueryResultContact(object):
+class TestInlineQueryResultContact:
     id_ = 'id'
     type_ = 'contact'
     phone_number = 'phone_number'
@@ -58,8 +64,10 @@ class TestInlineQueryResultContact(object):
         assert inline_query_result_contact.thumb_url == self.thumb_url
         assert inline_query_result_contact.thumb_width == self.thumb_width
         assert inline_query_result_contact.thumb_height == self.thumb_height
-        assert (inline_query_result_contact.input_message_content.to_dict()
-                == self.input_message_content.to_dict())
+        assert (
+            inline_query_result_contact.input_message_content.to_dict()
+            == self.input_message_content.to_dict()
+        )
         assert inline_query_result_contact.reply_markup.to_dict() == self.reply_markup.to_dict()
 
     def test_to_dict(self, inline_query_result_contact):
@@ -68,22 +76,36 @@ class TestInlineQueryResultContact(object):
         assert isinstance(inline_query_result_contact_dict, dict)
         assert inline_query_result_contact_dict['id'] == inline_query_result_contact.id
         assert inline_query_result_contact_dict['type'] == inline_query_result_contact.type
-        assert (inline_query_result_contact_dict['phone_number']
-                == inline_query_result_contact.phone_number)
-        assert (inline_query_result_contact_dict['first_name']
-                == inline_query_result_contact.first_name)
-        assert (inline_query_result_contact_dict['last_name']
-                == inline_query_result_contact.last_name)
-        assert (inline_query_result_contact_dict['thumb_url']
-                == inline_query_result_contact.thumb_url)
-        assert (inline_query_result_contact_dict['thumb_width']
-                == inline_query_result_contact.thumb_width)
-        assert (inline_query_result_contact_dict['thumb_height']
-                == inline_query_result_contact.thumb_height)
-        assert (inline_query_result_contact_dict['input_message_content']
-                == inline_query_result_contact.input_message_content.to_dict())
-        assert (inline_query_result_contact_dict['reply_markup']
-                == inline_query_result_contact.reply_markup.to_dict())
+        assert (
+            inline_query_result_contact_dict['phone_number']
+            == inline_query_result_contact.phone_number
+        )
+        assert (
+            inline_query_result_contact_dict['first_name']
+            == inline_query_result_contact.first_name
+        )
+        assert (
+            inline_query_result_contact_dict['last_name'] == inline_query_result_contact.last_name
+        )
+        assert (
+            inline_query_result_contact_dict['thumb_url'] == inline_query_result_contact.thumb_url
+        )
+        assert (
+            inline_query_result_contact_dict['thumb_width']
+            == inline_query_result_contact.thumb_width
+        )
+        assert (
+            inline_query_result_contact_dict['thumb_height']
+            == inline_query_result_contact.thumb_height
+        )
+        assert (
+            inline_query_result_contact_dict['input_message_content']
+            == inline_query_result_contact.input_message_content.to_dict()
+        )
+        assert (
+            inline_query_result_contact_dict['reply_markup']
+            == inline_query_result_contact.reply_markup.to_dict()
+        )
 
     def test_equality(self):
         a = InlineQueryResultContact(self.id_, self.phone_number, self.first_name)

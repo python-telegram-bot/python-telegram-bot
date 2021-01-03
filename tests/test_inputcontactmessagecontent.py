@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,17 +19,19 @@
 
 import pytest
 
-from telegram import InputContactMessageContent
+from telegram import InputContactMessageContent, User
 
 
 @pytest.fixture(scope='class')
 def input_contact_message_content():
-    return InputContactMessageContent(TestInputContactMessageContent.phone_number,
-                                      TestInputContactMessageContent.first_name,
-                                      last_name=TestInputContactMessageContent.last_name)
+    return InputContactMessageContent(
+        TestInputContactMessageContent.phone_number,
+        TestInputContactMessageContent.first_name,
+        last_name=TestInputContactMessageContent.last_name,
+    )
 
 
-class TestInputContactMessageContent(object):
+class TestInputContactMessageContent:
     phone_number = 'phone number'
     first_name = 'first name'
     last_name = 'last name'
@@ -43,9 +45,30 @@ class TestInputContactMessageContent(object):
         input_contact_message_content_dict = input_contact_message_content.to_dict()
 
         assert isinstance(input_contact_message_content_dict, dict)
-        assert (input_contact_message_content_dict['phone_number']
-                == input_contact_message_content.phone_number)
-        assert (input_contact_message_content_dict['first_name']
-                == input_contact_message_content.first_name)
-        assert (input_contact_message_content_dict['last_name']
-                == input_contact_message_content.last_name)
+        assert (
+            input_contact_message_content_dict['phone_number']
+            == input_contact_message_content.phone_number
+        )
+        assert (
+            input_contact_message_content_dict['first_name']
+            == input_contact_message_content.first_name
+        )
+        assert (
+            input_contact_message_content_dict['last_name']
+            == input_contact_message_content.last_name
+        )
+
+    def test_equality(self):
+        a = InputContactMessageContent('phone', 'first', last_name='last')
+        b = InputContactMessageContent('phone', 'first_name', vcard='vcard')
+        c = InputContactMessageContent('phone_number', 'first', vcard='vcard')
+        d = User(123, 'first', False)
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)

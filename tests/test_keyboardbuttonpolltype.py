@@ -26,7 +26,7 @@ def keyboard_button_poll_type():
     return KeyboardButtonPollType(TestKeyboardButtonPollType.type)
 
 
-class TestKeyboardButtonPollType(object):
+class TestKeyboardButtonPollType:
     type = Poll.QUIZ
 
     def test_to_dict(self, keyboard_button_poll_type):

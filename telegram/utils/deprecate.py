@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,9 @@
 """This module facilitates the deprecation of functions."""
 
 import warnings
+from typing import Any, Callable, TypeVar
+
+RT = TypeVar('RT')
 
 
 # We use our own DeprecationWarning since they are muted by default and "UserWarning" makes it
@@ -28,18 +31,19 @@ class TelegramDeprecationWarning(Warning):
     pass
 
 
-def warn_deprecate_obj(old, new, stacklevel=3):
+def warn_deprecate_obj(old: str, new: str, stacklevel: int = 3) -> None:
     warnings.warn(
-        '{0} is being deprecated, please use {1} from now on.'.format(old, new),
+        f'{old} is being deprecated, please use {new} from now on.',
         category=TelegramDeprecationWarning,
-        stacklevel=stacklevel)
+        stacklevel=stacklevel,
+    )
 
 
-def deprecate(func, old, new):
+def deprecate(func: Callable[..., RT], old: str, new: str) -> Callable[..., RT]:
     """Warn users invoking old to switch to the new function."""
 
-    def f(*args, **kwargs):
+    def wrapped(*args: Any, **kwargs: Any) -> RT:
         warn_deprecate_obj(old, new)
         return func(*args, **kwargs)
 
-    return f
+    return wrapped

@@ -4,7 +4,7 @@
 # Tymofii A. Khodniev (thodnev) <thodnev@mail.ru>
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,46 +20,29 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/]
 """A throughput-limiting message processor for Telegram bots."""
-from telegram.utils import promise
-
 import functools
-import sys
-import time
+import queue as q
 import threading
-if sys.version_info.major > 2:
-    import queue as q
-else:
-    import Queue as q
+import time
+from typing import TYPE_CHECKING, Any, Callable, List, NoReturn
+
+from telegram.utils.promise import Promise
+
+if TYPE_CHECKING:
+    from telegram import Bot
 
 # We need to count < 1s intervals, so the most accurate timer is needed
-# Starting from Python 3.3 we have time.perf_counter which is the clock
-#  with the highest resolution available to the system, so let's use it there.
-# In Python 2.7, there's no perf_counter yet, so fallback on what we have:
-#  on Windows, the best available is time.clock while time.time is on
-#  another platforms (M. Lutz, "Learning Python," 4ed, p.630-634)
-if sys.version_info.major == 3 and sys.version_info.minor >= 3:
-    curtime = time.perf_counter  # pylint: disable=E1101
-else:
-    curtime = time.clock if sys.platform[:3] == 'win' else time.time
+curtime = time.perf_counter
 
 
 class DelayQueueError(RuntimeError):
     """Indicates processing errors."""
-    pass
 
 
 class DelayQueue(threading.Thread):
     """
     Processes callbacks from queue with specified throughput limits. Creates a separate thread to
     process callbacks with delays.
-
-    Attributes:
-        burst_limit (:obj:`int`): Number of maximum callbacks to process per time-window.
-        time_limit (:obj:`int`): Defines width of time-window used when each processing limit is
-            calculated.
-        exc_route (:obj:`callable`): A callable, accepting 1 positional argument; used to route
-            exceptions from processor thread to main thread;
-        name (:obj:`str`): Thread's name.
 
     Args:
         queue (:obj:`Queue`, optional): Used to pass callbacks to thread. Creates ``Queue``
@@ -72,49 +55,60 @@ class DelayQueue(threading.Thread):
             route exceptions from processor thread to main thread; is called on `Exception`
             subclass exceptions. If not provided, exceptions are routed through dummy handler,
             which re-raises them.
-        autostart (:obj:`bool`, optional): If True, processor is started immediately after object's
-            creation; if ``False``, should be started manually by `start` method. Defaults to True.
+        autostart (:obj:`bool`, optional): If :obj:`True`, processor is started immediately after
+            object's creation; if :obj:`False`, should be started manually by `start` method.
+            Defaults to :obj:`True`.
         name (:obj:`str`, optional): Thread's name. Defaults to ``'DelayQueue-N'``, where N is
             sequential number of object created.
+
+    Attributes:
+        burst_limit (:obj:`int`): Number of maximum callbacks to process per time-window.
+        time_limit (:obj:`int`): Defines width of time-window used when each processing limit is
+            calculated.
+        exc_route (:obj:`callable`): A callable, accepting 1 positional argument; used to route
+            exceptions from processor thread to main thread;
+        name (:obj:`str`): Thread's name.
 
     """
 
     _instcnt = 0  # instance counter
 
-    def __init__(self,
-                 queue=None,
-                 burst_limit=30,
-                 time_limit_ms=1000,
-                 exc_route=None,
-                 autostart=True,
-                 name=None):
+    def __init__(
+        self,
+        queue: q.Queue = None,
+        burst_limit: int = 30,
+        time_limit_ms: int = 1000,
+        exc_route: Callable[[Exception], None] = None,
+        autostart: bool = True,
+        name: str = None,
+    ):
         self._queue = queue if queue is not None else q.Queue()
         self.burst_limit = burst_limit
         self.time_limit = time_limit_ms / 1000
-        self.exc_route = (exc_route if exc_route is not None else self._default_exception_handler)
+        self.exc_route = exc_route if exc_route is not None else self._default_exception_handler
         self.__exit_req = False  # flag to gently exit thread
         self.__class__._instcnt += 1
         if name is None:
-            name = '%s-%s' % (self.__class__.__name__, self.__class__._instcnt)
-        super(DelayQueue, self).__init__(name=name)
+            name = f'{self.__class__.__name__}-{self.__class__._instcnt}'
+        super().__init__(name=name)
         self.daemon = False
         if autostart:  # immediately start processing
-            super(DelayQueue, self).start()
+            super().start()
 
-    def run(self):
+    def run(self) -> None:
         """
         Do not use the method except for unthreaded testing purposes, the method normally is
         automatically called by autostart argument.
 
         """
 
-        times = []  # used to store each callable processing time
+        times: List[float] = []  # used to store each callable processing time
         while True:
             item = self._queue.get()
             if self.__exit_req:
                 return  # shutdown thread
             # delay routine
-            now = curtime()
+            now = time.perf_counter()
             t_delta = now - self.time_limit  # calculate early to improve perf.
             if times and t_delta > times[-1]:
                 # if last call was before the limit time-window
@@ -133,23 +127,24 @@ class DelayQueue(threading.Thread):
             except Exception as exc:  # re-route any exceptions
                 self.exc_route(exc)  # to prevent thread exit
 
-    def stop(self, timeout=None):
+    def stop(self, timeout: float = None) -> None:
         """Used to gently stop processor and shutdown its thread.
 
         Args:
             timeout (:obj:`float`): Indicates maximum time to wait for processor to stop and its
                 thread to exit. If timeout exceeds and processor has not stopped, method silently
                 returns. :attr:`is_alive` could be used afterwards to check the actual status.
-                ``timeout`` set to None, blocks until processor is shut down. Defaults to None.
+                ``timeout`` set to :obj:`None`, blocks until processor is shut down.
+                Defaults to :obj:`None`.
 
         """
 
         self.__exit_req = True  # gently request
         self._queue.put(None)  # put something to unfreeze if frozen
-        super(DelayQueue, self).join(timeout=timeout)
+        super().join(timeout=timeout)
 
     @staticmethod
-    def _default_exception_handler(exc):
+    def _default_exception_handler(exc: Exception) -> NoReturn:
         """
         Dummy exception handler which re-raises exception in thread. Could be possibly overwritten
         by subclasses.
@@ -158,7 +153,7 @@ class DelayQueue(threading.Thread):
 
         raise exc
 
-    def __call__(self, func, *args, **kwargs):
+    def __call__(self, func: Callable, *args: Any, **kwargs: Any) -> None:
         """Used to process callbacks in throughput-limiting thread through queue.
 
         Args:
@@ -174,13 +169,13 @@ class DelayQueue(threading.Thread):
         self._queue.put((func, args, kwargs))
 
 
-# The most straightforward way to implement this is to use 2 sequenital delay
+# The most straightforward way to implement this is to use 2 sequential delay
 # queues, like on classic delay chain schematics in electronics.
 # So, message path is:
 # msg --> group delay if group msg, else no delay --> normal msg delay --> out
 # This way OS threading scheduler cares of timings accuracy.
 # (see time.time, time.clock, time.perf_counter, time.sleep @ docs.python.org)
-class MessageQueue(object):
+class MessageQueue:
     """
     Implements callback processing with proper delays to avoid hitting Telegram's message limits.
     Contains two ``DelayQueue``, for group and for all messages, interconnected in delay chain.
@@ -200,56 +195,60 @@ class MessageQueue(object):
             to route exceptions from processor threads to main thread; is called on ``Exception``
             subclass exceptions. If not provided, exceptions are routed through dummy handler,
             which re-raises them.
-        autostart (:obj:`bool`, optional): If True, processors are started immediately after
-            object's creation; if ``False``, should be started manually by :attr:`start` method.
-            Defaults to ``True``.
+        autostart (:obj:`bool`, optional): If :obj:`True`, processors are started immediately after
+            object's creation; if :obj:`False`, should be started manually by :attr:`start` method.
+            Defaults to :obj:`True`.
 
     """
 
-    def __init__(self,
-                 all_burst_limit=30,
-                 all_time_limit_ms=1000,
-                 group_burst_limit=20,
-                 group_time_limit_ms=60000,
-                 exc_route=None,
-                 autostart=True):
-        # create accoring delay queues, use composition
+    def __init__(
+        self,
+        all_burst_limit: int = 30,
+        all_time_limit_ms: int = 1000,
+        group_burst_limit: int = 20,
+        group_time_limit_ms: int = 60000,
+        exc_route: Callable[[Exception], None] = None,
+        autostart: bool = True,
+    ):
+        # create according delay queues, use composition
         self._all_delayq = DelayQueue(
             burst_limit=all_burst_limit,
             time_limit_ms=all_time_limit_ms,
             exc_route=exc_route,
-            autostart=autostart)
+            autostart=autostart,
+        )
         self._group_delayq = DelayQueue(
             burst_limit=group_burst_limit,
             time_limit_ms=group_time_limit_ms,
             exc_route=exc_route,
-            autostart=autostart)
+            autostart=autostart,
+        )
 
-    def start(self):
+    def start(self) -> None:
         """Method is used to manually start the ``MessageQueue`` processing."""
         self._all_delayq.start()
         self._group_delayq.start()
 
-    def stop(self, timeout=None):
+    def stop(self, timeout: float = None) -> None:
         self._group_delayq.stop(timeout=timeout)
         self._all_delayq.stop(timeout=timeout)
 
-    stop.__doc__ = DelayQueue.stop.__doc__ or ''  # reuse docsting if any
+    stop.__doc__ = DelayQueue.stop.__doc__ or ''  # reuse docstring if any
 
-    def __call__(self, promise, is_group_msg=False):
+    def __call__(self, promise: Callable, is_group_msg: bool = False) -> Callable:
         """
-        Processes callables in troughput-limiting queues to avoid hitting limits (specified with
+        Processes callables in throughput-limiting queues to avoid hitting limits (specified with
         :attr:`burst_limit` and :attr:`time_limit`.
 
         Args:
             promise (:obj:`callable`): Mainly the ``telegram.utils.promise.Promise`` (see Notes for
                 other callables), that is processed in delay queues.
             is_group_msg (:obj:`bool`, optional): Defines whether ``promise`` would be processed in
-                group*+*all* ``DelayQueue``s (if set to ``True``), or only through *all*
-                ``DelayQueue`` (if set to ``False``), resulting in needed delays to avoid
-                hitting specified limits. Defaults to ``False``.
+                group*+*all* ``DelayQueue``s (if set to :obj:`True`), or only through *all*
+                ``DelayQueue`` (if set to :obj:`False`), resulting in needed delays to avoid
+                hitting specified limits. Defaults to :obj:`False`.
 
-        Notes:
+        Note:
             Method is designed to accept ``telegram.utils.promise.Promise`` as ``promise``
             argument, but other callables could be used too. For example, lambdas or simple
             functions could be used to wrap original func to be called with needed args. In that
@@ -268,7 +267,7 @@ class MessageQueue(object):
         return promise
 
 
-def queuedmessage(method):
+def queuedmessage(method: Callable) -> Callable:
     """A decorator to be used with :attr:`telegram.Bot` send* methods.
 
     Note:
@@ -287,12 +286,12 @@ def queuedmessage(method):
     Wrapped method starts accepting the next kwargs:
 
     Args:
-        queued (:obj:`bool`, optional): If set to ``True``, the ``MessageQueue`` is used to process
-            output messages. Defaults to `self._is_queued_out`.
-        isgroup (:obj:`bool`, optional): If set to ``True``, the message is meant to be group-type
-            (as there's no obvious way to determine its type in other way at the moment).
+        queued (:obj:`bool`, optional): If set to :obj:`True`, the ``MessageQueue`` is used to
+            process output messages. Defaults to `self._is_queued_out`.
+        isgroup (:obj:`bool`, optional): If set to :obj:`True`, the message is meant to be
+            group-type(as there's no obvious way to determine its type in other way at the moment).
             Group-type messages could have additional processing delay according to limits set
-            in `self._out_queue`. Defaults to ``False``.
+            in `self._out_queue`. Defaults to :obj:`False`.
 
     Returns:
         ``telegram.utils.promise.Promise``: In case call is queued or original method's return
@@ -301,12 +300,15 @@ def queuedmessage(method):
     """
 
     @functools.wraps(method)
-    def wrapped(self, *args, **kwargs):
-        queued = kwargs.pop('queued', self._is_messages_queued_default)
+    def wrapped(self: 'Bot', *args: Any, **kwargs: Any) -> Any:
+        # pylint: disable=W0212
+        queued = kwargs.pop(
+            'queued', self._is_messages_queued_default  # type: ignore[attr-defined]
+        )
         isgroup = kwargs.pop('isgroup', False)
         if queued:
-            prom = promise.Promise(method, (self, ) + args, kwargs)
-            return self._msg_queue(prom, isgroup)
+            prom = Promise(method, (self,) + args, kwargs)
+            return self._msg_queue(prom, isgroup)  # type: ignore[attr-defined]
         return method(self, *args, **kwargs)
 
     return wrapped

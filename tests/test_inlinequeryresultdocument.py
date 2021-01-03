@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,8 +19,14 @@
 
 import pytest
 
-from telegram import (InlineKeyboardButton, InputTextMessageContent, InlineQueryResultDocument,
-                      InlineKeyboardMarkup, InlineQueryResultVoice)
+from telegram import (
+    InlineKeyboardButton,
+    InputTextMessageContent,
+    InlineQueryResultDocument,
+    InlineKeyboardMarkup,
+    InlineQueryResultVoice,
+    MessageEntity,
+)
 
 
 @pytest.fixture(scope='class')
@@ -32,21 +38,24 @@ def inline_query_result_document():
         TestInlineQueryResultDocument.mime_type,
         caption=TestInlineQueryResultDocument.caption,
         parse_mode=TestInlineQueryResultDocument.parse_mode,
+        caption_entities=TestInlineQueryResultDocument.caption_entities,
         description=TestInlineQueryResultDocument.description,
         thumb_url=TestInlineQueryResultDocument.thumb_url,
         thumb_width=TestInlineQueryResultDocument.thumb_width,
         thumb_height=TestInlineQueryResultDocument.thumb_height,
         input_message_content=TestInlineQueryResultDocument.input_message_content,
-        reply_markup=TestInlineQueryResultDocument.reply_markup)
+        reply_markup=TestInlineQueryResultDocument.reply_markup,
+    )
 
 
-class TestInlineQueryResultDocument(object):
+class TestInlineQueryResultDocument:
     id_ = 'id'
     type_ = 'document'
     document_url = 'document url'
     title = 'title'
     caption = 'caption'
     parse_mode = 'Markdown'
+    caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     mime_type = 'mime type'
     description = 'description'
     thumb_url = 'thumb url'
@@ -62,13 +71,16 @@ class TestInlineQueryResultDocument(object):
         assert inline_query_result_document.title == self.title
         assert inline_query_result_document.caption == self.caption
         assert inline_query_result_document.parse_mode == self.parse_mode
+        assert inline_query_result_document.caption_entities == self.caption_entities
         assert inline_query_result_document.mime_type == self.mime_type
         assert inline_query_result_document.description == self.description
         assert inline_query_result_document.thumb_url == self.thumb_url
         assert inline_query_result_document.thumb_width == self.thumb_width
         assert inline_query_result_document.thumb_height == self.thumb_height
-        assert (inline_query_result_document.input_message_content.to_dict()
-                == self.input_message_content.to_dict())
+        assert (
+            inline_query_result_document.input_message_content.to_dict()
+            == self.input_message_content.to_dict()
+        )
         assert inline_query_result_document.reply_markup.to_dict() == self.reply_markup.to_dict()
 
     def test_to_dict(self, inline_query_result_document):
@@ -77,32 +89,51 @@ class TestInlineQueryResultDocument(object):
         assert isinstance(inline_query_result_document_dict, dict)
         assert inline_query_result_document_dict['id'] == inline_query_result_document.id
         assert inline_query_result_document_dict['type'] == inline_query_result_document.type
-        assert (inline_query_result_document_dict['document_url']
-                == inline_query_result_document.document_url)
+        assert (
+            inline_query_result_document_dict['document_url']
+            == inline_query_result_document.document_url
+        )
         assert inline_query_result_document_dict['title'] == inline_query_result_document.title
         assert inline_query_result_document_dict['caption'] == inline_query_result_document.caption
-        assert (inline_query_result_document_dict['parse_mode']
-                == inline_query_result_document.parse_mode)
-        assert (inline_query_result_document_dict['mime_type']
-                == inline_query_result_document.mime_type)
-        assert (inline_query_result_document_dict['description']
-                == inline_query_result_document.description)
-        assert (inline_query_result_document_dict['thumb_url']
-                == inline_query_result_document.thumb_url)
-        assert (inline_query_result_document_dict['thumb_width']
-                == inline_query_result_document.thumb_width)
-        assert (inline_query_result_document_dict['thumb_height']
-                == inline_query_result_document.thumb_height)
-        assert (inline_query_result_document_dict['input_message_content']
-                == inline_query_result_document.input_message_content.to_dict())
-        assert (inline_query_result_document_dict['reply_markup']
-                == inline_query_result_document.reply_markup.to_dict())
+        assert (
+            inline_query_result_document_dict['parse_mode']
+            == inline_query_result_document.parse_mode
+        )
+        assert inline_query_result_document_dict['caption_entities'] == [
+            ce.to_dict() for ce in inline_query_result_document.caption_entities
+        ]
+        assert (
+            inline_query_result_document_dict['mime_type']
+            == inline_query_result_document.mime_type
+        )
+        assert (
+            inline_query_result_document_dict['description']
+            == inline_query_result_document.description
+        )
+        assert (
+            inline_query_result_document_dict['thumb_url']
+            == inline_query_result_document.thumb_url
+        )
+        assert (
+            inline_query_result_document_dict['thumb_width']
+            == inline_query_result_document.thumb_width
+        )
+        assert (
+            inline_query_result_document_dict['thumb_height']
+            == inline_query_result_document.thumb_height
+        )
+        assert (
+            inline_query_result_document_dict['input_message_content']
+            == inline_query_result_document.input_message_content.to_dict()
+        )
+        assert (
+            inline_query_result_document_dict['reply_markup']
+            == inline_query_result_document.reply_markup.to_dict()
+        )
 
     def test_equality(self):
-        a = InlineQueryResultDocument(self.id_, self.document_url, self.title,
-                                      self.mime_type)
-        b = InlineQueryResultDocument(self.id_, self.document_url, self.title,
-                                      self.mime_type)
+        a = InlineQueryResultDocument(self.id_, self.document_url, self.title, self.mime_type)
+        b = InlineQueryResultDocument(self.id_, self.document_url, self.title, self.mime_type)
         c = InlineQueryResultDocument(self.id_, '', self.title, self.mime_type)
         d = InlineQueryResultDocument('', self.document_url, self.title, self.mime_type)
         e = InlineQueryResultVoice(self.id_, '', '')

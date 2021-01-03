@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,53 +20,74 @@
 
 import logging
 from threading import Event
+from typing import Callable, List, Optional, Tuple, TypeVar, Union, Any
+
+from telegram.utils.types import JSONDict
+
+RT = TypeVar('RT')
 
 
 logger = logging.getLogger(__name__)
-logger.addHandler(logging.NullHandler())
 
 
-class Promise(object):
+class Promise:
     """A simple Promise implementation for use with the run_async decorator, DelayQueue etc.
 
     Args:
         pooled_function (:obj:`callable`): The callable that will be called concurrently.
         args (:obj:`list` | :obj:`tuple`): Positional arguments for :attr:`pooled_function`.
         kwargs (:obj:`dict`): Keyword arguments for :attr:`pooled_function`.
+        update (:class:`telegram.Update` | :obj:`object`, optional): The update this promise is
+            associated with.
+        error_handling (:obj:`bool`, optional): Whether exceptions raised by :attr:`func`
+            may be handled by error handlers. Defaults to :obj:`True`.
 
     Attributes:
         pooled_function (:obj:`callable`): The callable that will be called concurrently.
         args (:obj:`list` | :obj:`tuple`): Positional arguments for :attr:`pooled_function`.
         kwargs (:obj:`dict`): Keyword arguments for :attr:`pooled_function`.
         done (:obj:`threading.Event`): Is set when the result is available.
+        update (:class:`telegram.Update` | :obj:`object`): Optional. The update this promise is
+            associated with.
+        error_handling (:obj:`bool`): Optional. Whether exceptions raised by :attr:`func`
+            may be handled by error handlers. Defaults to :obj:`True`.
 
     """
 
-    def __init__(self, pooled_function, args, kwargs):
+    # TODO: Remove error_handling parameter once we drop the @run_async decorator
+    def __init__(
+        self,
+        pooled_function: Callable[..., RT],
+        args: Union[List, Tuple],
+        kwargs: JSONDict,
+        update: Any = None,
+        error_handling: bool = True,
+    ):
         self.pooled_function = pooled_function
         self.args = args
         self.kwargs = kwargs
+        self.update = update
+        self.error_handling = error_handling
         self.done = Event()
-        self._result = None
-        self._exception = None
+        self._result: Optional[RT] = None
+        self._exception: Optional[Exception] = None
 
-    def run(self):
+    def run(self) -> None:
         """Calls the :attr:`pooled_function` callable."""
 
         try:
             self._result = self.pooled_function(*self.args, **self.kwargs)
 
         except Exception as exc:
-            logger.exception('An uncaught error was raised while running the promise')
             self._exception = exc
 
         finally:
             self.done.set()
 
-    def __call__(self):
+    def __call__(self) -> None:
         self.run()
 
-    def result(self, timeout=None):
+    def result(self, timeout: float = None) -> Optional[RT]:
         """Return the result of the ``Promise``.
 
         Args:
@@ -86,7 +107,7 @@ class Promise(object):
         return self._result
 
     @property
-    def exception(self):
+    def exception(self) -> Optional[Exception]:
         """The exception raised by :attr:`pooled_function` or ``None`` if no exception has been
         raised (yet)."""
         return self._exception

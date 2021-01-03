@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultLocation."""
 
+from typing import TYPE_CHECKING, Any
+
 from telegram import InlineQueryResult
+
+if TYPE_CHECKING:
+    from telegram import InputMessageContent, ReplyMarkup
 
 
 class InlineQueryResultLocation(InlineQueryResult):
@@ -27,29 +32,20 @@ class InlineQueryResultLocation(InlineQueryResult):
     Alternatively, you can use :attr:`input_message_content` to send a message with the specified
     content instead of the location.
 
-    Attributes:
-        type (:obj:`str`): 'location'.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
-        latitude (:obj:`float`): Location latitude in degrees.
-        longitude (:obj:`float`): Location longitude in degrees.
-        title (:obj:`str`): Location title.
-        live_period (:obj:`int`): Optional. Period in seconds for which the location can be
-            updated, should be between 60 and 86400.
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-            to the message.
-        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-            message to be sent instead of the location.
-        thumb_url (:obj:`str`): Optional. Url of the thumbnail for the result.
-        thumb_width (:obj:`int`): Optional. Thumbnail width.
-        thumb_height (:obj:`int`): Optional. Thumbnail height.
-
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         latitude (:obj:`float`): Location latitude in degrees.
         longitude (:obj:`float`): Location longitude in degrees.
         title (:obj:`str`): Location title.
+        horizontal_accuracy (:obj:`float`, optional): The radius of uncertainty for the location,
+            measured in meters; 0-1500.
         live_period (:obj:`int`, optional): Period in seconds for which the location can be
             updated, should be between 60 and 86400.
+        heading (:obj:`int`, optional): For live locations, a direction in which the user is
+            moving, in degrees. Must be between 1 and 360 if specified.
+        proximity_alert_radius (:obj:`int`, optional): For live locations, a maximum distance for
+            proximity alerts about approaching another chat member, in meters. Must be between 1
+            and 100000 if specified.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
@@ -59,24 +55,51 @@ class InlineQueryResultLocation(InlineQueryResult):
         thumb_height (:obj:`int`, optional): Thumbnail height.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
+    Attributes:
+        type (:obj:`str`): 'location'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        latitude (:obj:`float`): Location latitude in degrees.
+        longitude (:obj:`float`): Location longitude in degrees.
+        title (:obj:`str`): Location title.
+        horizontal_accuracy (:obj:`float`): Optional. The radius of uncertainty for the location,
+            measured in meters.
+        live_period (:obj:`int`): Optional. Period in seconds for which the location can be
+            updated, should be between 60 and 86400.
+        heading (:obj:`int`): Optional. For live locations, a direction in which the user is
+            moving, in degrees.
+        proximity_alert_radius (:obj:`int`): Optional. For live locations, a maximum distance for
+            proximity alerts about approaching another chat member, in meters.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
+            to the message.
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
+            message to be sent instead of the location.
+        thumb_url (:obj:`str`): Optional. Url of the thumbnail for the result.
+        thumb_width (:obj:`int`): Optional. Thumbnail width.
+        thumb_height (:obj:`int`): Optional. Thumbnail height.
+
     """
 
-    def __init__(self,
-                 id,
-                 latitude,
-                 longitude,
-                 title,
-                 live_period=None,
-                 reply_markup=None,
-                 input_message_content=None,
-                 thumb_url=None,
-                 thumb_width=None,
-                 thumb_height=None,
-                 **kwargs):
+    def __init__(
+        self,
+        id: str,  # pylint: disable=W0622
+        latitude: float,
+        longitude: float,
+        title: str,
+        live_period: int = None,
+        reply_markup: 'ReplyMarkup' = None,
+        input_message_content: 'InputMessageContent' = None,
+        thumb_url: str = None,
+        thumb_width: int = None,
+        thumb_height: int = None,
+        horizontal_accuracy: float = None,
+        heading: int = None,
+        proximity_alert_radius: int = None,
+        **_kwargs: Any,
+    ):
         # Required
-        super(InlineQueryResultLocation, self).__init__('location', id)
-        self.latitude = latitude
-        self.longitude = longitude
+        super().__init__('location', id)
+        self.latitude = float(latitude)
+        self.longitude = float(longitude)
         self.title = title
 
         # Optionals
@@ -86,3 +109,8 @@ class InlineQueryResultLocation(InlineQueryResult):
         self.thumb_url = thumb_url
         self.thumb_width = thumb_width
         self.thumb_height = thumb_height
+        self.horizontal_accuracy = float(horizontal_accuracy) if horizontal_accuracy else None
+        self.heading = int(heading) if heading else None
+        self.proximity_alert_radius = (
+            int(proximity_alert_radius) if proximity_alert_radius else None
+        )

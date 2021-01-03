@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,8 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultVideo."""
 
-from telegram import InlineQueryResult
-from telegram.utils.helpers import DEFAULT_NONE
+from typing import TYPE_CHECKING, Any, Union, Tuple, List
+
+from telegram import InlineQueryResult, MessageEntity
+from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
+
+if TYPE_CHECKING:
+    from telegram import InputMessageContent, ReplyMarkup
 
 
 class InlineQueryResultVideo(InlineQueryResult):
@@ -33,29 +38,6 @@ class InlineQueryResultVideo(InlineQueryResult):
         If an InlineQueryResultVideo message contains an embedded video (e.g., YouTube), you must
         replace its content using :attr:`input_message_content`.
 
-    Attributes:
-        type (:obj:`str`): 'video'.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
-        video_url (:obj:`str`): A valid URL for the embedded video player or video file.
-        mime_type (:obj:`str`): Mime type of the content of video url, "text/html" or "video/mp4".
-        thumb_url (:obj:`str`): URL of the thumbnail (jpeg only) for the video.
-        title (:obj:`str`): Title for the result.
-        caption (:obj:`str`): Optional. Caption of the video to be sent, 0-1024 characters after
-            entities parsing.
-        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.ParseMode` for the available modes.
-        video_width (:obj:`int`): Optional. Video width.
-        video_height (:obj:`int`): Optional. Video height.
-        video_duration (:obj:`int`): Optional. Video duration in seconds.
-        description (:obj:`str`): Optional. Short description of the result.
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-            to the message.
-        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-            message to be sent instead of the video. This field is required if
-            InlineQueryResultVideo is used to send an HTML-page as a result
-            (e.g., a YouTube video).
-
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         video_url (:obj:`str`): A valid URL for the embedded video player or video file.
@@ -66,6 +48,9 @@ class InlineQueryResultVideo(InlineQueryResult):
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
+        caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
+            entities that appear in the caption, which can be specified instead of
+            :attr:`parse_mode`.
         video_width (:obj:`int`, optional): Video width.
         video_height (:obj:`int`, optional): Video height.
         video_duration (:obj:`int`, optional): Video duration in seconds.
@@ -78,26 +63,55 @@ class InlineQueryResultVideo(InlineQueryResult):
             (e.g., a YouTube video).
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
+    Attributes:
+        type (:obj:`str`): 'video'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        video_url (:obj:`str`): A valid URL for the embedded video player or video file.
+        mime_type (:obj:`str`): Mime type of the content of video url, "text/html" or "video/mp4".
+        thumb_url (:obj:`str`): URL of the thumbnail (jpeg only) for the video.
+        title (:obj:`str`): Title for the result.
+        caption (:obj:`str`): Optional. Caption of the video to be sent, 0-1024 characters after
+            entities parsing.
+        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
+            in :class:`telegram.ParseMode` for the available modes.
+        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
+            entities that appear in the caption, which can be specified instead of
+            :attr:`parse_mode`.
+        video_width (:obj:`int`): Optional. Video width.
+        video_height (:obj:`int`): Optional. Video height.
+        video_duration (:obj:`int`): Optional. Video duration in seconds.
+        description (:obj:`str`): Optional. Short description of the result.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
+            to the message.
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
+            message to be sent instead of the video. This field is required if
+            InlineQueryResultVideo is used to send an HTML-page as a result
+            (e.g., a YouTube video).
+
     """
 
-    def __init__(self,
-                 id,
-                 video_url,
-                 mime_type,
-                 thumb_url,
-                 title,
-                 caption=None,
-                 video_width=None,
-                 video_height=None,
-                 video_duration=None,
-                 description=None,
-                 reply_markup=None,
-                 input_message_content=None,
-                 parse_mode=DEFAULT_NONE,
-                 **kwargs):
+    def __init__(
+        self,
+        id: str,  # pylint: disable=W0622
+        video_url: str,
+        mime_type: str,
+        thumb_url: str,
+        title: str,
+        caption: str = None,
+        video_width: int = None,
+        video_height: int = None,
+        video_duration: int = None,
+        description: str = None,
+        reply_markup: 'ReplyMarkup' = None,
+        input_message_content: 'InputMessageContent' = None,
+        parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+        caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
+        **_kwargs: Any,
+    ):
 
         # Required
-        super(InlineQueryResultVideo, self).__init__('video', id)
+        super().__init__('video', id)
         self.video_url = video_url
         self.mime_type = mime_type
         self.thumb_url = thumb_url
@@ -106,6 +120,7 @@ class InlineQueryResultVideo(InlineQueryResult):
         # Optional
         self.caption = caption
         self.parse_mode = parse_mode
+        self.caption_entities = caption_entities
         self.video_width = video_width
         self.video_height = video_height
         self.video_duration = video_duration

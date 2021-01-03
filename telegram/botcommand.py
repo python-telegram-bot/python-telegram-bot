@@ -2,7 +2,7 @@
 # pylint: disable=R0903
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,6 +18,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Bot Command."""
+from typing import Any
+
 from telegram import TelegramObject
 
 
@@ -25,22 +27,22 @@ class BotCommand(TelegramObject):
     """
     This object represents a bot command.
 
-    Attributes:
-        command (:obj:`str`): Text of the command.
-        description (:obj:`str`): Description of the command.
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`command` and :attr:`description` are equal.
 
     Args:
         command (:obj:`str`): Text of the command, 1-32 characters. Can contain only lowercase
             English letters, digits and underscores.
         description (:obj:`str`): Description of the command, 3-256 characters.
+
+    Attributes:
+        command (:obj:`str`): Text of the command.
+        description (:obj:`str`): Description of the command.
+
     """
-    def __init__(self, command, description, **kwargs):
+
+    def __init__(self, command: str, description: str, **_kwargs: Any):
         self.command = command
         self.description = description
 
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(**data)
+        self._id_attrs = (self.command, self.description)

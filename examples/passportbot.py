@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# pylint: disable=W0613, C0116
+# type: ignore[union-attr]
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -12,16 +14,18 @@ See https://git.io/fAvYd for how to use Telegram Passport properly with python-t
 """
 import logging
 
-from telegram.ext import Updater, MessageHandler, Filters
+from telegram import Update
+from telegram.ext import Updater, MessageHandler, Filters, CallbackContext
 
 # Enable logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.DEBUG)
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
+)
 
 logger = logging.getLogger(__name__)
 
 
-def msg(update, context):
+def msg(update: Update, context: CallbackContext) -> None:
     # If we received any passport data
     passport_data = update.message.passport_data
     if passport_data:
@@ -39,18 +43,28 @@ def msg(update, context):
                 print('Phone: ', data.phone_number)
             elif data.type == 'email':
                 print('Email: ', data.email)
-            if data.type in ('personal_details', 'passport', 'driver_license', 'identity_card',
-                             'internal_passport', 'address'):
+            if data.type in (
+                'personal_details',
+                'passport',
+                'driver_license',
+                'identity_card',
+                'internal_passport',
+                'address',
+            ):
                 print(data.type, data.data)
-            if data.type in ('utility_bill', 'bank_statement', 'rental_agreement',
-                             'passport_registration', 'temporary_registration'):
+            if data.type in (
+                'utility_bill',
+                'bank_statement',
+                'rental_agreement',
+                'passport_registration',
+                'temporary_registration',
+            ):
                 print(data.type, len(data.files), 'files')
                 for file in data.files:
                     actual_file = file.get_file()
                     print(actual_file)
                     actual_file.download()
-            if data.type in ('passport', 'driver_license', 'identity_card',
-                             'internal_passport'):
+            if data.type in ('passport', 'driver_license', 'identity_card', 'internal_passport'):
                 if data.front_side:
                     file = data.front_side.get_file()
                     print(data.type, file)
@@ -60,26 +74,27 @@ def msg(update, context):
                     file = data.reverse_side.get_file()
                     print(data.type, file)
                     file.download()
-            if data.type in ('passport', 'driver_license', 'identity_card',
-                             'internal_passport'):
+            if data.type in ('passport', 'driver_license', 'identity_card', 'internal_passport'):
                 if data.selfie:
                     file = data.selfie.get_file()
                     print(data.type, file)
                     file.download()
-            if data.type in ('passport', 'driver_license', 'identity_card',
-                             'internal_passport', 'utility_bill', 'bank_statement',
-                             'rental_agreement', 'passport_registration',
-                             'temporary_registration'):
+            if data.type in (
+                'passport',
+                'driver_license',
+                'identity_card',
+                'internal_passport',
+                'utility_bill',
+                'bank_statement',
+                'rental_agreement',
+                'passport_registration',
+                'temporary_registration',
+            ):
                 print(data.type, len(data.translation), 'translation')
                 for file in data.translation:
                     actual_file = file.get_file()
                     print(actual_file)
                     actual_file.download()
-
-
-def error(update, context):
-    """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 
 def main():
@@ -88,13 +103,10 @@ def main():
     updater = Updater("TOKEN", private_key=open('private.key', 'rb').read())
 
     # Get the dispatcher to register handlers
-    dp = updater.dispatcher
+    dispatcher = updater.dispatcher
 
     # On messages that include passport data call msg
-    dp.add_handler(MessageHandler(Filters.passport_data, msg))
-
-    # log all errors
-    dp.add_error_handler(error)
+    dispatcher.add_handler(MessageHandler(Filters.passport_data, msg))
 
     # Start the Bot
     updater.start_polling()

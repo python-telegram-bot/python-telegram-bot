@@ -2,7 +2,7 @@
 # pylint: disable=R0903
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,6 +18,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram LoginUrl."""
+from typing import Any
+
 from telegram import TelegramObject
 
 
@@ -29,31 +31,52 @@ class LoginUrl(TelegramObject):
 
     Sample bot: `@discussbot <https://t.me/dicussbot>`_
 
-    Attributes:
-        url (:obj:`str`): An HTTP URL to be opened with user authorization data.
-        forward_text (:obj:`str`): Optional. New text of the button in forwarded messages.
-        bot_username (:obj:`str`): Optional. Username of a bot, which will be used for user
-            authorization.
-        request_write_access (:obj:`bool`): Optional. Pass True to request the permission for your
-            bot to send messages to the user.
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`url` is equal.
+
+    Note:
+        You must always check the hash of the received data to verify the authentication
+        and the integrity of the data as described in
+        `Checking authorization <https://core.telegram.org/widgets/login#checking-authorization>`_
 
     Args:
         url (:obj:`str`): An HTTP URL to be opened with user authorization data added to the query
             string when the button is pressed. If the user refuses to provide authorization data,
             the original URL without information about the user will be opened. The data added is
-            the same as described in Receiving authorization data.
-            NOTE: You must always check the hash of the received data to verify the authentication
-            and the integrity of the data as described in Checking authorization.
+            the same as described in
+            `Receiving authorization data
+            <https://core.telegram.org/widgets/login#receiving-authorization-data>`_
         forward_text (:obj:`str`, optional): New text of the button in forwarded messages.
         bot_username (:obj:`str`, optional): Username of a bot, which will be used for user
-            authorization. See Setting up a bot for more details. If not specified, the current
+            authorization. See
+            `Setting up a bot <https://core.telegram.org/widgets/login#setting-up-a-bot>`_
+            for more details. If not specified, the current
             bot's username will be assumed. The url's domain must be the same as the domain linked
-            with the bot. See Linking your domain to the bot for more details.
-        request_write_access (:obj:`bool`, optional): Pass True to request the permission for your
-            bot to send messages to the user.
+            with the bot. See
+            `Linking your domain to the bot
+            <https://core.telegram.org/widgets/login#linking-your-domain-to-the-bot>`_
+            for more details.
+        request_write_access (:obj:`bool`, optional): Pass :obj:`True` to request the permission
+            for your bot to send messages to the user.
+
+    Attributes:
+        url (:obj:`str`): An HTTP URL to be opened with user authorization data.
+        forward_text (:obj:`str`): Optional. New text of the button in forwarded messages.
+        bot_username (:obj:`str`): Optional. Username of a bot, which will be used for user
+            authorization.
+        request_write_access (:obj:`bool`): Optional. Pass :obj:`True` to request the permission
+            for your bot to send messages to the user.
+
     """
 
-    def __init__(self, url, forward_text=None, bot_username=None, request_write_access=None):
+    def __init__(
+        self,
+        url: str,
+        forward_text: bool = None,
+        bot_username: str = None,
+        request_write_access: bool = None,
+        **_kwargs: Any,
+    ):
         # Required
         self.url = url
         # Optional

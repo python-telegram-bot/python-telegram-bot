@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,8 @@ import os
 import pytest
 from flaky import flaky
 
-from telegram import ChatPhoto, Voice, TelegramError
+from telegram import ChatPhoto, Voice, TelegramError, Bot
+from tests.conftest import expect_bad_request, check_shortcut_call, check_shortcut_signature
 
 
 @pytest.fixture(scope='function')
@@ -33,10 +34,13 @@ def chatphoto_file():
 
 @pytest.fixture(scope='function')
 def chat_photo(bot, super_group_id):
-    return bot.get_chat(super_group_id, timeout=50).photo
+    def func():
+        return bot.get_chat(super_group_id, timeout=50).photo
+
+    return expect_bad_request(func, 'Type of file mismatch', 'Telegram did not accept the file.')
 
 
-class TestChatPhoto(object):
+class TestChatPhoto:
     chatphoto_small_file_id = 'smallCgADAQADngIAAuyVeEez0xRovKi9VAI'
     chatphoto_big_file_id = 'bigCgADAQADngIAAuyVeEez0xRovKi9VAI'
     chatphoto_small_file_unique_id = 'smalladc3145fd2e84d95b64d68eaa22aa33e'
@@ -46,7 +50,10 @@ class TestChatPhoto(object):
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_all_args(self, bot, super_group_id, chatphoto_file, chat_photo, thumb_file):
-        assert bot.set_chat_photo(super_group_id, chatphoto_file)
+        def func():
+            assert bot.set_chat_photo(super_group_id, chatphoto_file)
+
+        expect_bad_request(func, 'Type of file mismatch', 'Telegram did not accept the file.')
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -70,10 +77,10 @@ class TestChatPhoto(object):
         assert os.path.isfile('telegram.jpg')
 
     def test_send_with_chat_photo(self, monkeypatch, bot, super_group_id, chat_photo):
-        def test(_, url, data, **kwargs):
+        def test(url, data, **kwargs):
             return data['photo'] == chat_photo
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr(bot.request, 'post', test)
         message = bot.set_chat_photo(photo=chat_photo, chat_id=super_group_id)
         assert message
 
@@ -118,26 +125,47 @@ class TestChatPhoto(object):
             bot.set_chat_photo(chat_id=super_group_id)
 
     def test_get_small_file_instance_method(self, monkeypatch, chat_photo):
-        def test(*args, **kwargs):
-            return args[1] == chat_photo.small_file_id
+        get_small_file = chat_photo.bot.get_file
 
-        monkeypatch.setattr('telegram.Bot.get_file', test)
+        def make_assertion(*_, **kwargs):
+            return kwargs['file_id'] == chat_photo.small_file_id and check_shortcut_call(
+                kwargs, get_small_file
+            )
+
+        assert check_shortcut_signature(ChatPhoto.get_small_file, Bot.get_file, ['file_id'], [])
+
+        monkeypatch.setattr('telegram.Bot.get_file', make_assertion)
         assert chat_photo.get_small_file()
 
     def test_get_big_file_instance_method(self, monkeypatch, chat_photo):
-        def test(*args, **kwargs):
-            return args[1] == chat_photo.big_file_id
+        get_big_file = chat_photo.bot.get_file
 
-        monkeypatch.setattr('telegram.Bot.get_file', test)
+        def make_assertion(*_, **kwargs):
+            return kwargs['file_id'] == chat_photo.big_file_id and check_shortcut_call(
+                kwargs, get_big_file
+            )
+
+        assert check_shortcut_signature(ChatPhoto.get_big_file, Bot.get_file, ['file_id'], [])
+
+        monkeypatch.setattr('telegram.Bot.get_file', make_assertion)
         assert chat_photo.get_big_file()
 
     def test_equality(self):
-        a = ChatPhoto(self.chatphoto_small_file_id, self.chatphoto_big_file_id,
-                      self.chatphoto_small_file_unique_id, self.chatphoto_big_file_unique_id)
-        b = ChatPhoto(self.chatphoto_small_file_id, self.chatphoto_big_file_id,
-                      self.chatphoto_small_file_unique_id, self.chatphoto_big_file_unique_id)
-        c = ChatPhoto('', '', self.chatphoto_small_file_unique_id,
-                      self.chatphoto_big_file_unique_id)
+        a = ChatPhoto(
+            self.chatphoto_small_file_id,
+            self.chatphoto_big_file_id,
+            self.chatphoto_small_file_unique_id,
+            self.chatphoto_big_file_unique_id,
+        )
+        b = ChatPhoto(
+            self.chatphoto_small_file_id,
+            self.chatphoto_big_file_id,
+            self.chatphoto_small_file_unique_id,
+            self.chatphoto_big_file_unique_id,
+        )
+        c = ChatPhoto(
+            '', '', self.chatphoto_small_file_unique_id, self.chatphoto_big_file_unique_id
+        )
         d = ChatPhoto('', '', 0, 0)
         e = Voice(self.chatphoto_small_file_id, self.chatphoto_small_file_unique_id, 0)
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -24,12 +24,14 @@ from telegram import PassportElementErrorUnspecified, PassportElementErrorDataFi
 
 @pytest.fixture(scope='class')
 def passport_element_error_unspecified():
-    return PassportElementErrorUnspecified(TestPassportElementErrorUnspecified.type_,
-                                           TestPassportElementErrorUnspecified.element_hash,
-                                           TestPassportElementErrorUnspecified.message)
+    return PassportElementErrorUnspecified(
+        TestPassportElementErrorUnspecified.type_,
+        TestPassportElementErrorUnspecified.element_hash,
+        TestPassportElementErrorUnspecified.message,
+    )
 
 
-class TestPassportElementErrorUnspecified(object):
+class TestPassportElementErrorUnspecified:
     source = 'unspecified'
     type_ = 'test_type'
     element_hash = 'element_hash'
@@ -45,14 +47,22 @@ class TestPassportElementErrorUnspecified(object):
         passport_element_error_unspecified_dict = passport_element_error_unspecified.to_dict()
 
         assert isinstance(passport_element_error_unspecified_dict, dict)
-        assert (passport_element_error_unspecified_dict['source']
-                == passport_element_error_unspecified.source)
-        assert (passport_element_error_unspecified_dict['type']
-                == passport_element_error_unspecified.type)
-        assert (passport_element_error_unspecified_dict['element_hash']
-                == passport_element_error_unspecified.element_hash)
-        assert (passport_element_error_unspecified_dict['message']
-                == passport_element_error_unspecified.message)
+        assert (
+            passport_element_error_unspecified_dict['source']
+            == passport_element_error_unspecified.source
+        )
+        assert (
+            passport_element_error_unspecified_dict['type']
+            == passport_element_error_unspecified.type
+        )
+        assert (
+            passport_element_error_unspecified_dict['element_hash']
+            == passport_element_error_unspecified.element_hash
+        )
+        assert (
+            passport_element_error_unspecified_dict['message']
+            == passport_element_error_unspecified.message
+        )
 
     def test_equality(self):
         a = PassportElementErrorUnspecified(self.type_, self.element_hash, self.message)

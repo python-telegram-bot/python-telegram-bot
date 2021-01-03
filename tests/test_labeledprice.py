@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 
 import pytest
 
-from telegram import LabeledPrice
+from telegram import LabeledPrice, Location
 
 
 @pytest.fixture(scope='class')
@@ -27,7 +27,7 @@ def labeled_price():
     return LabeledPrice(TestLabeledPrice.label, TestLabeledPrice.amount)
 
 
-class TestLabeledPrice(object):
+class TestLabeledPrice:
     label = 'label'
     amount = 100
 
@@ -41,3 +41,18 @@ class TestLabeledPrice(object):
         assert isinstance(labeled_price_dict, dict)
         assert labeled_price_dict['label'] == labeled_price.label
         assert labeled_price_dict['amount'] == labeled_price.amount
+
+    def test_equality(self):
+        a = LabeledPrice('label', 100)
+        b = LabeledPrice('label', 100)
+        c = LabeledPrice('Label', 101)
+        d = Location(123, 456)
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)

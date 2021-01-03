@@ -18,6 +18,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a type of a Telegram Poll."""
+from typing import Any
+
 from telegram import TelegramObject
 
 
@@ -25,13 +27,17 @@ class KeyboardButtonPollType(TelegramObject):
     """This object represents type of a poll, which is allowed to be created
     and sent when the corresponding button is pressed.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`type` is equal.
+
     Attributes:
         type (:obj:`str`): Optional. If :attr:`telegram.Poll.QUIZ` is passed, the user will be
             allowed to create only polls in the quiz mode. If :attr:`telegram.Poll.REGULAR` is
             passed, only regular polls will be allowed. Otherwise, the user will be allowed to
             create a poll of any type.
     """
-    def __init__(self, type=None):
+
+    def __init__(self, type: str = None, **_kwargs: Any):  # pylint: disable=W0622
         self.type = type
 
         self._id_attrs = (self.type,)

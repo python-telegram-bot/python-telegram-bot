@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -23,14 +23,17 @@ from telegram import constants
 from telegram.error import BadRequest
 
 
-class TestConstants(object):
+class TestConstants:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_max_message_length(self, bot, chat_id):
         bot.send_message(chat_id=chat_id, text='a' * constants.MAX_MESSAGE_LENGTH)
 
-        with pytest.raises(BadRequest, match='Message is too long',
-                           message='MAX_MESSAGE_LENGTH is no longer valid'):
+        with pytest.raises(
+            BadRequest,
+            match='Message is too long',
+            message='MAX_MESSAGE_LENGTH is no longer valid',
+        ):
             bot.send_message(chat_id=chat_id, text='a' * (constants.MAX_MESSAGE_LENGTH + 1))
 
     @flaky(3, 1)
@@ -42,7 +45,10 @@ class TestConstants(object):
         assert good_msg.caption == good_caption
 
         bad_caption = good_caption + 'Z'
-        with pytest.raises(BadRequest, match="Media_caption_too_long",
-                           message='MAX_CAPTION_LENGTH is no longer valid'):
+        with pytest.raises(
+            BadRequest,
+            match="Media_caption_too_long",
+            message='MAX_CAPTION_LENGTH is no longer valid',
+        ):
             with open('tests/data/telegram.png', 'rb') as f:
                 bot.send_photo(photo=f, caption=bad_caption, chat_id=chat_id)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -24,16 +24,18 @@ from telegram import OrderInfo, SuccessfulPayment
 
 @pytest.fixture(scope='class')
 def successful_payment():
-    return SuccessfulPayment(TestSuccessfulPayment.currency,
-                             TestSuccessfulPayment.total_amount,
-                             TestSuccessfulPayment.invoice_payload,
-                             TestSuccessfulPayment.telegram_payment_charge_id,
-                             TestSuccessfulPayment.provider_payment_charge_id,
-                             shipping_option_id=TestSuccessfulPayment.shipping_option_id,
-                             order_info=TestSuccessfulPayment.order_info)
+    return SuccessfulPayment(
+        TestSuccessfulPayment.currency,
+        TestSuccessfulPayment.total_amount,
+        TestSuccessfulPayment.invoice_payload,
+        TestSuccessfulPayment.telegram_payment_charge_id,
+        TestSuccessfulPayment.provider_payment_charge_id,
+        shipping_option_id=TestSuccessfulPayment.shipping_option_id,
+        order_info=TestSuccessfulPayment.order_info,
+    )
 
 
-class TestSuccessfulPayment(object):
+class TestSuccessfulPayment:
     invoice_payload = 'invoice_payload'
     shipping_option_id = 'shipping_option_id'
     currency = 'EUR'
@@ -50,7 +52,7 @@ class TestSuccessfulPayment(object):
             'total_amount': self.total_amount,
             'order_info': self.order_info.to_dict(),
             'telegram_payment_charge_id': self.telegram_payment_charge_id,
-            'provider_payment_charge_id': self.provider_payment_charge_id
+            'provider_payment_charge_id': self.provider_payment_charge_id,
         }
         successful_payment = SuccessfulPayment.de_json(json_dict, bot)
 
@@ -66,26 +68,45 @@ class TestSuccessfulPayment(object):
 
         assert isinstance(successful_payment_dict, dict)
         assert successful_payment_dict['invoice_payload'] == successful_payment.invoice_payload
-        assert (successful_payment_dict['shipping_option_id']
-                == successful_payment.shipping_option_id)
+        assert (
+            successful_payment_dict['shipping_option_id'] == successful_payment.shipping_option_id
+        )
         assert successful_payment_dict['currency'] == successful_payment.currency
         assert successful_payment_dict['order_info'] == successful_payment.order_info.to_dict()
-        assert (successful_payment_dict['telegram_payment_charge_id']
-                == successful_payment.telegram_payment_charge_id)
-        assert (successful_payment_dict['provider_payment_charge_id']
-                == successful_payment.provider_payment_charge_id)
+        assert (
+            successful_payment_dict['telegram_payment_charge_id']
+            == successful_payment.telegram_payment_charge_id
+        )
+        assert (
+            successful_payment_dict['provider_payment_charge_id']
+            == successful_payment.provider_payment_charge_id
+        )
 
     def test_equality(self):
-        a = SuccessfulPayment(self.currency, self.total_amount, self.invoice_payload,
-                              self.telegram_payment_charge_id,
-                              self.provider_payment_charge_id)
-        b = SuccessfulPayment(self.currency, self.total_amount, self.invoice_payload,
-                              self.telegram_payment_charge_id,
-                              self.provider_payment_charge_id)
-        c = SuccessfulPayment('', 0, '', self.telegram_payment_charge_id,
-                              self.provider_payment_charge_id)
-        d = SuccessfulPayment(self.currency, self.total_amount, self.invoice_payload,
-                              self.telegram_payment_charge_id, '')
+        a = SuccessfulPayment(
+            self.currency,
+            self.total_amount,
+            self.invoice_payload,
+            self.telegram_payment_charge_id,
+            self.provider_payment_charge_id,
+        )
+        b = SuccessfulPayment(
+            self.currency,
+            self.total_amount,
+            self.invoice_payload,
+            self.telegram_payment_charge_id,
+            self.provider_payment_charge_id,
+        )
+        c = SuccessfulPayment(
+            '', 0, '', self.telegram_payment_charge_id, self.provider_payment_charge_id
+        )
+        d = SuccessfulPayment(
+            self.currency,
+            self.total_amount,
+            self.invoice_payload,
+            self.telegram_payment_charge_id,
+            '',
+        )
 
         assert a == b
         assert hash(a) == hash(b)

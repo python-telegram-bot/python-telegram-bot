@@ -2,7 +2,7 @@
 # pylint: disable=R0903
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,28 +18,30 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatAction."""
+from typing import ClassVar
+from telegram import constants
 
 
-class ChatAction(object):
-    """Helper class to provide constants for different chatactions."""
+class ChatAction:
+    """Helper class to provide constants for different chat actions."""
 
-    FIND_LOCATION = 'find_location'
-    """:obj:`str`: 'find_location'"""
-    RECORD_AUDIO = 'record_audio'
-    """:obj:`str`: 'record_audio'"""
-    RECORD_VIDEO = 'record_video'
-    """:obj:`str`: 'record_video'"""
-    RECORD_VIDEO_NOTE = 'record_video_note'
-    """:obj:`str`: 'record_video_note'"""
-    TYPING = 'typing'
-    """:obj:`str`: 'typing'"""
-    UPLOAD_AUDIO = 'upload_audio'
-    """:obj:`str`: 'upload_audio'"""
-    UPLOAD_DOCUMENT = 'upload_document'
-    """:obj:`str`: 'upload_document'"""
-    UPLOAD_PHOTO = 'upload_photo'
-    """:obj:`str`: 'upload_photo'"""
-    UPLOAD_VIDEO = 'upload_video'
-    """:obj:`str`: 'upload_video'"""
-    UPLOAD_VIDEO_NOTE = 'upload_video_note'
-    """:obj:`str`: 'upload_video_note'"""
+    FIND_LOCATION: ClassVar[str] = constants.CHATACTION_FIND_LOCATION
+    """:const:`telegram.constants.CHATACTION_FIND_LOCATION`"""
+    RECORD_AUDIO: ClassVar[str] = constants.CHATACTION_RECORD_AUDIO
+    """:const:`telegram.constants.CHATACTION_RECORD_AUDIO`"""
+    RECORD_VIDEO: ClassVar[str] = constants.CHATACTION_RECORD_VIDEO
+    """:const:`telegram.constants.CHATACTION_RECORD_VIDEO`"""
+    RECORD_VIDEO_NOTE: ClassVar[str] = constants.CHATACTION_RECORD_VIDEO_NOTE
+    """:const:`telegram.constants.CHATACTION_RECORD_VIDEO_NOTE`"""
+    TYPING: ClassVar[str] = constants.CHATACTION_TYPING
+    """:const:`telegram.constants.CHATACTION_TYPING`"""
+    UPLOAD_AUDIO: ClassVar[str] = constants.CHATACTION_UPLOAD_AUDIO
+    """:const:`telegram.constants.CHATACTION_UPLOAD_AUDIO`"""
+    UPLOAD_DOCUMENT: ClassVar[str] = constants.CHATACTION_UPLOAD_DOCUMENT
+    """:const:`telegram.constants.CHATACTION_UPLOAD_DOCUMENT`"""
+    UPLOAD_PHOTO: ClassVar[str] = constants.CHATACTION_UPLOAD_PHOTO
+    """:const:`telegram.constants.CHATACTION_UPLOAD_PHOTO`"""
+    UPLOAD_VIDEO: ClassVar[str] = constants.CHATACTION_UPLOAD_VIDEO
+    """:const:`telegram.constants.CHATACTION_UPLOAD_VIDEO`"""
+    UPLOAD_VIDEO_NOTE: ClassVar[str] = constants.CHATACTION_UPLOAD_VIDEO_NOTE
+    """:const:`telegram.constants.CHATACTION_UPLOAD_VIDEO_NOTE`"""

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -29,7 +29,7 @@ except ImportError:
 from telegram import TelegramObject
 
 
-class TestTelegramObject(object):
+class TestTelegramObject:
     def test_to_json_native(self, monkeypatch):
         if ujson:
             monkeypatch.setattr('ujson.dumps', json_lib.dumps)
@@ -74,3 +74,36 @@ class TestTelegramObject(object):
 
         monkeypatch.setattr('telegram.TelegramObject.to_dict', lambda _: d)
         telegram_object.to_json()
+
+    def test_to_dict_private_attribute(self):
+        class TelegramObjectSubclass(TelegramObject):
+            def __init__(self):
+                self.a = 1
+                self._b = 2
+
+        subclass_instance = TelegramObjectSubclass()
+        assert subclass_instance.to_dict() == {'a': 1}
+
+    def test_meaningless_comparison(self, recwarn):
+        expected_warning = "Objects of type TGO can not be meaningfully tested for equivalence."
+
+        class TGO(TelegramObject):
+            pass
+
+        a = TGO()
+        b = TGO()
+        assert a == b
+        assert len(recwarn) == 2
+        assert str(recwarn[0].message) == expected_warning
+        assert str(recwarn[1].message) == expected_warning
+
+    def test_meaningful_comparison(self, recwarn):
+        class TGO(TelegramObject):
+            _id_attrs = (1,)
+
+        a = TGO()
+        b = TGO()
+        assert a == b
+        assert len(recwarn) == 0
+        assert b == a
+        assert len(recwarn) == 0

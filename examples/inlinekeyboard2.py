@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# pylint: disable=W0613, C0116
+# type: ignore[union-attr]
+# This program is dedicated to the public domain under the CC0 license.
+
 """Simple inline keyboard bot with multiple CallbackQueryHandlers.
 
 This Bot uses the Updater class to handle the bot.
@@ -12,13 +16,20 @@ ConversationHandler.
 Send /start to initiate the conversation.
 Press Ctrl-C on the command line to stop the bot.
 """
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, ConversationHandler
 import logging
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram.ext import (
+    Updater,
+    CommandHandler,
+    CallbackQueryHandler,
+    ConversationHandler,
+    CallbackContext,
+)
 
 # Enable logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+)
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +39,7 @@ FIRST, SECOND = range(2)
 ONE, TWO, THREE, FOUR = range(4)
 
 
-def start(update, context):
+def start(update: Update, context: CallbackContext) -> None:
     """Send message on `/start`."""
     # Get user that sent /start and log his name
     user = update.message.from_user
@@ -38,20 +49,19 @@ def start(update, context):
     # The keyboard is a list of button rows, where each row is in turn
     # a list (hence `[[...]]`).
     keyboard = [
-        [InlineKeyboardButton("1", callback_data=str(ONE)),
-         InlineKeyboardButton("2", callback_data=str(TWO))]
+        [
+            InlineKeyboardButton("1", callback_data=str(ONE)),
+            InlineKeyboardButton("2", callback_data=str(TWO)),
+        ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     # Send message with text and appended InlineKeyboard
-    update.message.reply_text(
-        "Start handler, Choose a route",
-        reply_markup=reply_markup
-    )
+    update.message.reply_text("Start handler, Choose a route", reply_markup=reply_markup)
     # Tell ConversationHandler that we're in state `FIRST` now
     return FIRST
 
 
-def start_over(update, context):
+def start_over(update: Update, context: CallbackContext) -> None:
     """Prompt same text & keyboard as `start` does but not as new message"""
     # Get CallbackQuery from Update
     query = update.callback_query
@@ -59,99 +69,95 @@ def start_over(update, context):
     # Some clients may have trouble otherwise. See https://core.telegram.org/bots/api#callbackquery
     query.answer()
     keyboard = [
-        [InlineKeyboardButton("1", callback_data=str(ONE)),
-         InlineKeyboardButton("2", callback_data=str(TWO))]
+        [
+            InlineKeyboardButton("1", callback_data=str(ONE)),
+            InlineKeyboardButton("2", callback_data=str(TWO)),
+        ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     # Instead of sending a new message, edit the message that
     # originated the CallbackQuery. This gives the feeling of an
     # interactive menu.
-    query.edit_message_text(
-        text="Start handler, Choose a route",
-        reply_markup=reply_markup
-    )
+    query.edit_message_text(text="Start handler, Choose a route", reply_markup=reply_markup)
     return FIRST
 
 
-def one(update, context):
+def one(update: Update, context: CallbackContext) -> None:
     """Show new choice of buttons"""
     query = update.callback_query
     query.answer()
     keyboard = [
-        [InlineKeyboardButton("3", callback_data=str(THREE)),
-         InlineKeyboardButton("4", callback_data=str(FOUR))]
+        [
+            InlineKeyboardButton("3", callback_data=str(THREE)),
+            InlineKeyboardButton("4", callback_data=str(FOUR)),
+        ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     query.edit_message_text(
-        text="First CallbackQueryHandler, Choose a route",
-        reply_markup=reply_markup
+        text="First CallbackQueryHandler, Choose a route", reply_markup=reply_markup
     )
     return FIRST
 
 
-def two(update, context):
+def two(update: Update, context: CallbackContext) -> None:
     """Show new choice of buttons"""
     query = update.callback_query
     query.answer()
     keyboard = [
-        [InlineKeyboardButton("1", callback_data=str(ONE)),
-         InlineKeyboardButton("3", callback_data=str(THREE))]
+        [
+            InlineKeyboardButton("1", callback_data=str(ONE)),
+            InlineKeyboardButton("3", callback_data=str(THREE)),
+        ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     query.edit_message_text(
-        text="Second CallbackQueryHandler, Choose a route",
-        reply_markup=reply_markup
+        text="Second CallbackQueryHandler, Choose a route", reply_markup=reply_markup
     )
     return FIRST
 
 
-def three(update, context):
+def three(update: Update, context: CallbackContext) -> None:
     """Show new choice of buttons"""
     query = update.callback_query
     query.answer()
     keyboard = [
-        [InlineKeyboardButton("Yes, let's do it again!", callback_data=str(ONE)),
-         InlineKeyboardButton("Nah, I've had enough ...", callback_data=str(TWO))]
+        [
+            InlineKeyboardButton("Yes, let's do it again!", callback_data=str(ONE)),
+            InlineKeyboardButton("Nah, I've had enough ...", callback_data=str(TWO)),
+        ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     query.edit_message_text(
-        text="Third CallbackQueryHandler. Do want to start over?",
-        reply_markup=reply_markup
+        text="Third CallbackQueryHandler. Do want to start over?", reply_markup=reply_markup
     )
     # Transfer to conversation state `SECOND`
     return SECOND
 
 
-def four(update, context):
+def four(update: Update, context: CallbackContext) -> None:
     """Show new choice of buttons"""
     query = update.callback_query
     query.answer()
     keyboard = [
-        [InlineKeyboardButton("2", callback_data=str(TWO)),
-         InlineKeyboardButton("4", callback_data=str(FOUR))]
+        [
+            InlineKeyboardButton("2", callback_data=str(TWO)),
+            InlineKeyboardButton("4", callback_data=str(FOUR)),
+        ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     query.edit_message_text(
-        text="Fourth CallbackQueryHandler, Choose a route",
-        reply_markup=reply_markup
+        text="Fourth CallbackQueryHandler, Choose a route", reply_markup=reply_markup
     )
     return FIRST
 
 
-def end(update, context):
+def end(update: Update, context: CallbackContext) -> None:
     """Returns `ConversationHandler.END`, which tells the
     ConversationHandler that the conversation is over"""
     query = update.callback_query
     query.answer()
-    query.edit_message_text(
-        text="See you next time!"
-    )
+    query.edit_message_text(text="See you next time!")
     return ConversationHandler.END
-
-
-def error(update, context):
-    """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 
 def main():
@@ -159,7 +165,7 @@ def main():
     updater = Updater("TOKEN", use_context=True)
 
     # Get the dispatcher to register handlers
-    dp = updater.dispatcher
+    dispatcher = updater.dispatcher
 
     # Setup conversation handler with the states FIRST and SECOND
     # Use the pattern parameter to pass CallbackQueries with specific
@@ -170,22 +176,23 @@ def main():
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
         states={
-            FIRST: [CallbackQueryHandler(one, pattern='^' + str(ONE) + '$'),
-                    CallbackQueryHandler(two, pattern='^' + str(TWO) + '$'),
-                    CallbackQueryHandler(three, pattern='^' + str(THREE) + '$'),
-                    CallbackQueryHandler(four, pattern='^' + str(FOUR) + '$')],
-            SECOND: [CallbackQueryHandler(start_over, pattern='^' + str(ONE) + '$'),
-                     CallbackQueryHandler(end, pattern='^' + str(TWO) + '$')]
+            FIRST: [
+                CallbackQueryHandler(one, pattern='^' + str(ONE) + '$'),
+                CallbackQueryHandler(two, pattern='^' + str(TWO) + '$'),
+                CallbackQueryHandler(three, pattern='^' + str(THREE) + '$'),
+                CallbackQueryHandler(four, pattern='^' + str(FOUR) + '$'),
+            ],
+            SECOND: [
+                CallbackQueryHandler(start_over, pattern='^' + str(ONE) + '$'),
+                CallbackQueryHandler(end, pattern='^' + str(TWO) + '$'),
+            ],
         },
-        fallbacks=[CommandHandler('start', start)]
+        fallbacks=[CommandHandler('start', start)],
     )
 
     # Add ConversationHandler to dispatcher that will be used for handling
     # updates
-    dp.add_handler(conv_handler)
-
-    # log all errors
-    dp.add_error_handler(error)
+    dispatcher.add_handler(conv_handler)
 
     # Start the Bot
     updater.start_polling()

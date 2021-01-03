@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,8 +19,14 @@
 
 import pytest
 
-from telegram import (InlineKeyboardButton, InputTextMessageContent, InlineQueryResultGif,
-                      InlineQueryResultVoice, InlineKeyboardMarkup)
+from telegram import (
+    InlineKeyboardButton,
+    InputTextMessageContent,
+    InlineQueryResultGif,
+    InlineQueryResultVoice,
+    InlineKeyboardMarkup,
+    MessageEntity,
+)
 
 
 @pytest.fixture(scope='class')
@@ -35,11 +41,14 @@ def inline_query_result_gif():
         title=TestInlineQueryResultGif.title,
         caption=TestInlineQueryResultGif.caption,
         parse_mode=TestInlineQueryResultGif.parse_mode,
+        caption_entities=TestInlineQueryResultGif.caption_entities,
         input_message_content=TestInlineQueryResultGif.input_message_content,
-        reply_markup=TestInlineQueryResultGif.reply_markup)
+        reply_markup=TestInlineQueryResultGif.reply_markup,
+        thumb_mime_type=TestInlineQueryResultGif.thumb_mime_type,
+    )
 
 
-class TestInlineQueryResultGif(object):
+class TestInlineQueryResultGif:
     id_ = 'id'
     type_ = 'gif'
     gif_url = 'gif url'
@@ -47,9 +56,11 @@ class TestInlineQueryResultGif(object):
     gif_height = 15
     gif_duration = 1
     thumb_url = 'thumb url'
+    thumb_mime_type = 'image/jpeg'
     title = 'title'
     caption = 'caption'
     parse_mode = 'HTML'
+    caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     input_message_content = InputTextMessageContent('input_message_content')
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
@@ -61,11 +72,15 @@ class TestInlineQueryResultGif(object):
         assert inline_query_result_gif.gif_height == self.gif_height
         assert inline_query_result_gif.gif_duration == self.gif_duration
         assert inline_query_result_gif.thumb_url == self.thumb_url
+        assert inline_query_result_gif.thumb_mime_type == self.thumb_mime_type
         assert inline_query_result_gif.title == self.title
         assert inline_query_result_gif.caption == self.caption
         assert inline_query_result_gif.parse_mode == self.parse_mode
-        assert (inline_query_result_gif.input_message_content.to_dict()
-                == self.input_message_content.to_dict())
+        assert inline_query_result_gif.caption_entities == self.caption_entities
+        assert (
+            inline_query_result_gif.input_message_content.to_dict()
+            == self.input_message_content.to_dict()
+        )
         assert inline_query_result_gif.reply_markup.to_dict() == self.reply_markup.to_dict()
 
     def test_to_dict(self, inline_query_result_gif):
@@ -79,13 +94,24 @@ class TestInlineQueryResultGif(object):
         assert inline_query_result_gif_dict['gif_height'] == inline_query_result_gif.gif_height
         assert inline_query_result_gif_dict['gif_duration'] == inline_query_result_gif.gif_duration
         assert inline_query_result_gif_dict['thumb_url'] == inline_query_result_gif.thumb_url
+        assert (
+            inline_query_result_gif_dict['thumb_mime_type']
+            == inline_query_result_gif.thumb_mime_type
+        )
         assert inline_query_result_gif_dict['title'] == inline_query_result_gif.title
         assert inline_query_result_gif_dict['caption'] == inline_query_result_gif.caption
         assert inline_query_result_gif_dict['parse_mode'] == inline_query_result_gif.parse_mode
-        assert (inline_query_result_gif_dict['input_message_content']
-                == inline_query_result_gif.input_message_content.to_dict())
-        assert (inline_query_result_gif_dict['reply_markup']
-                == inline_query_result_gif.reply_markup.to_dict())
+        assert inline_query_result_gif_dict['caption_entities'] == [
+            ce.to_dict() for ce in inline_query_result_gif.caption_entities
+        ]
+        assert (
+            inline_query_result_gif_dict['input_message_content']
+            == inline_query_result_gif.input_message_content.to_dict()
+        )
+        assert (
+            inline_query_result_gif_dict['reply_markup']
+            == inline_query_result_gif.reply_markup.to_dict()
+        )
 
     def test_equality(self):
         a = InlineQueryResultGif(self.id_, self.gif_url, self.thumb_url)

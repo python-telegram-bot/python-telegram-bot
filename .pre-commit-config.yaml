@@ -1,20 +1,27 @@
+# Make sure that
+#   * the revs specified here match requirements-dev.txt
+#   * the makefile checks the same files as pre-commit
 repos:
--   repo: git://github.com/python-telegram-bot/mirrors-yapf
-    rev: 5769e088ef6e0a0d1eb63bd6d0c1fe9f3606d6c8
+-   repo: https://github.com/psf/black
+    rev: 20.8b1
     hooks:
-    -   id: yapf
-        files: ^(telegram|tests)/.*\.py$
+    -   id: black
         args:
         - --diff
+        - --check
 -   repo: https://gitlab.com/pycqa/flake8
-    rev: 3.7.1
+    rev: 3.8.4
     hooks:
     -   id: flake8
--   repo: git://github.com/pre-commit/mirrors-pylint
-    rev: 9d8dcbc2b86c796275680f239c1e90dcd50bd398
+-   repo: https://github.com/PyCQA/pylint
+    rev: pylint-2.6.0
     hooks:
     -   id: pylint
-        files: ^telegram/.*\.py$
+        files: ^(telegram|examples)/.*\.py$
         args:
-        - --errors-only
-        - --disable=import-error
+        - --rcfile=setup.cfg
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v0.790
+    hooks:
+    -   id: mypy
+        files: ^(telegram|examples)/.*\.py$

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,12 +17,15 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import os
+from pathlib import Path
 
 import pytest
 from flaky import flaky
 
-from telegram import Document, PhotoSize, TelegramError, Voice
+from telegram import Document, PhotoSize, TelegramError, Voice, MessageEntity, Bot
+from telegram.error import BadRequest
 from telegram.utils.helpers import escape_markdown
+from tests.conftest import check_shortcut_signature, check_shortcut_call
 
 
 @pytest.fixture(scope='function')
@@ -38,7 +41,7 @@ def document(bot, chat_id):
         return bot.send_document(chat_id, document=f, timeout=50).document
 
 
-class TestDocument(object):
+class TestDocument:
     caption = 'DocumentTest - *Caption*'
     document_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.gif'
     file_size = 12948
@@ -68,9 +71,15 @@ class TestDocument(object):
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_all_args(self, bot, chat_id, document_file, document, thumb_file):
-        message = bot.send_document(chat_id, document=document_file, caption=self.caption,
-                                    disable_notification=False, filename='telegram_custom.png',
-                                    parse_mode='Markdown', thumb=thumb_file)
+        message = bot.send_document(
+            chat_id,
+            document=document_file,
+            caption=self.caption,
+            disable_notification=False,
+            filename='telegram_custom.png',
+            parse_mode='Markdown',
+            thumb=thumb_file,
+        )
 
         assert isinstance(message.document, Document)
         assert isinstance(message.document.file_id, str)
@@ -123,15 +132,41 @@ class TestDocument(object):
 
         assert message.document == document
 
-    def test_send_with_document(self, monkeypatch, bot, chat_id, document):
-        def test(_, url, data, **kwargs):
-            return data['document'] == document.file_id
+    @pytest.mark.parametrize('disable_content_type_detection', [True, False, None])
+    def test_send_with_document(
+        self, monkeypatch, bot, chat_id, document, disable_content_type_detection
+    ):
+        def make_assertion(url, data, **kwargs):
+            type_detection = (
+                data.get('disable_content_type_detection') == disable_content_type_detection
+            )
+            return data['document'] == document.file_id and type_detection
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
 
-        message = bot.send_document(document=document, chat_id=chat_id)
+        message = bot.send_document(
+            document=document,
+            chat_id=chat_id,
+            disable_content_type_detection=disable_content_type_detection,
+        )
 
         assert message
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_document_caption_entities(self, bot, chat_id, document):
+        test_string = 'Italic Bold Code'
+        entities = [
+            MessageEntity(MessageEntity.ITALIC, 0, 6),
+            MessageEntity(MessageEntity.ITALIC, 7, 4),
+            MessageEntity(MessageEntity.ITALIC, 12, 4),
+        ]
+        message = bot.send_document(
+            chat_id, document, caption=test_string, caption_entities=entities
+        )
+
+        assert message.caption == test_string
+        assert message.caption_entities == entities
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -150,8 +185,9 @@ class TestDocument(object):
     def test_send_document_default_parse_mode_2(self, default_bot, chat_id, document):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_document(chat_id, document, caption=test_markdown_string,
-                                            parse_mode=None)
+        message = default_bot.send_document(
+            chat_id, document, caption=test_markdown_string, parse_mode=None
+        )
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
@@ -161,10 +197,60 @@ class TestDocument(object):
     def test_send_document_default_parse_mode_3(self, default_bot, chat_id, document):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_document(chat_id, document, caption=test_markdown_string,
-                                            parse_mode='HTML')
+        message = default_bot.send_document(
+            chat_id, document, caption=test_markdown_string, parse_mode='HTML'
+        )
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize(
+        'default_bot,custom',
+        [
+            ({'allow_sending_without_reply': True}, None),
+            ({'allow_sending_without_reply': False}, None),
+            ({'allow_sending_without_reply': False}, True),
+        ],
+        indirect=['default_bot'],
+    )
+    def test_send_document_default_allow_sending_without_reply(
+        self, default_bot, chat_id, document, custom
+    ):
+        reply_to_message = default_bot.send_message(chat_id, 'test')
+        reply_to_message.delete()
+        if custom is not None:
+            message = default_bot.send_document(
+                chat_id,
+                document,
+                allow_sending_without_reply=custom,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert message.reply_to_message is None
+        elif default_bot.defaults.allow_sending_without_reply:
+            message = default_bot.send_document(
+                chat_id, document, reply_to_message_id=reply_to_message.message_id
+            )
+            assert message.reply_to_message is None
+        else:
+            with pytest.raises(BadRequest, match='message not found'):
+                default_bot.send_document(
+                    chat_id, document, reply_to_message_id=reply_to_message.message_id
+                )
+
+    def test_send_document_local_files(self, monkeypatch, bot, chat_id):
+        # For just test that the correct paths are passed as we have no local bot API set up
+        test_flag = False
+        expected = (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
+        file = 'tests/data/telegram.jpg'
+
+        def make_assertion(_, data, *args, **kwargs):
+            nonlocal test_flag
+            test_flag = data.get('document') == expected and data.get('thumb') == expected
+
+        monkeypatch.setattr(bot, '_post', make_assertion)
+        bot.send_document(chat_id, file, thumb=file)
+        assert test_flag
 
     def test_de_json(self, bot, document):
         json_dict = {
@@ -173,7 +259,7 @@ class TestDocument(object):
             'thumb': document.thumb.to_dict(),
             'file_name': self.file_name,
             'mime_type': self.mime_type,
-            'file_size': self.file_size
+            'file_size': self.file_size,
         }
         test_document = Document.de_json(json_dict, bot)
 
@@ -212,10 +298,14 @@ class TestDocument(object):
             bot.send_document(chat_id=chat_id)
 
     def test_get_file_instance_method(self, monkeypatch, document):
-        def test(*args, **kwargs):
-            return args[1] == document.file_id
+        get_file = document.bot.get_file
 
-        monkeypatch.setattr('telegram.Bot.get_file', test)
+        def make_assertion(*_, **kwargs):
+            return kwargs['file_id'] == document.file_id and check_shortcut_call(kwargs, get_file)
+
+        assert check_shortcut_signature(Document.get_file, Bot.get_file, ['file_id'], [])
+
+        monkeypatch.setattr('telegram.Bot.get_file', make_assertion)
         assert document.get_file()
 
     def test_equality(self, document):

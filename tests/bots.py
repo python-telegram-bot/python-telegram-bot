@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -21,6 +21,9 @@ import json
 import base64
 import os
 import random
+import pytest
+from telegram.utils.request import Request
+from telegram.error import RetryAfter, TimedOut
 
 # Provide some public fallbacks so it's easy for contributors to run tests on their local machine
 # These bots are only able to talk in our test chats, so they are quite useless for other
@@ -30,19 +33,20 @@ FALLBACKS = [
         'token': '579694714:AAHRLL5zBVy4Blx2jRFKe1HlfnXCg08WuLY',
         'payment_provider_token': '284685063:TEST:NjQ0NjZlNzI5YjJi',
         'chat_id': '675666224',
-        'super_group_id': '-1001493296829',
+        'super_group_id': '-1001310911135',
         'channel_id': '@pythontelegrambottests',
         'bot_name': 'PTB tests fallback 1',
-        'bot_username': '@ptb_fallback_1_bot'
-    }, {
+        'bot_username': '@ptb_fallback_1_bot',
+    },
+    {
         'token': '558194066:AAEEylntuKSLXj9odiv3TnX7Z5KY2J3zY3M',
         'payment_provider_token': '284685063:TEST:YjEwODQwMTFmNDcy',
         'chat_id': '675666224',
-        'super_group_id': '-1001493296829',
+        'super_group_id': '-1001221216830',
         'channel_id': '@pythontelegrambottests',
         'bot_name': 'PTB tests fallback 2',
-        'bot_username': '@ptb_fallback_2_bot'
-    }
+        'bot_username': '@ptb_fallback_2_bot',
+    },
 ]
 
 GITHUB_ACTION = os.getenv('GITHUB_ACTION', None)
@@ -73,3 +77,19 @@ def get(name, fallback):
 
 def get_bot():
     return {k: get(k, v) for k, v in random.choice(FALLBACKS).items()}
+
+
+# Patch request to xfail on flood control errors and TimedOut errors
+original_request_wrapper = Request._request_wrapper
+
+
+def patient_request_wrapper(*args, **kwargs):
+    try:
+        return original_request_wrapper(*args, **kwargs)
+    except RetryAfter as e:
+        pytest.xfail(f'Not waiting for flood control: {e}')
+    except TimedOut as e:
+        pytest.xfail(f'Ignoring TimedOut error: {e}')
+
+
+Request._request_wrapper = patient_request_wrapper

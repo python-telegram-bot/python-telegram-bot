@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,6 +17,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import logging
 import os
 import subprocess
 import sys
@@ -25,7 +26,7 @@ from io import BytesIO
 from telegram import InputFile
 
 
-class TestInputFile(object):
+class TestInputFile:
     png = os.path.join('tests', 'data', 'game.png')
 
     def test_subprocess_pipe(self):
@@ -48,11 +49,10 @@ class TestInputFile(object):
             # to kill it.
             pass
 
-    def test_mimetypes(self):
+    def test_mimetypes(self, caplog):
         # Only test a few to make sure logic works okay
         assert InputFile(open('tests/data/telegram.jpg', 'rb')).mimetype == 'image/jpeg'
-        if sys.version_info >= (3, 5):
-            assert InputFile(open('tests/data/telegram.webp', 'rb')).mimetype == 'image/webp'
+        assert InputFile(open('tests/data/telegram.webp', 'rb')).mimetype == 'image/webp'
         assert InputFile(open('tests/data/telegram.mp3', 'rb')).mimetype == 'audio/mpeg'
 
         # Test guess from file
@@ -60,23 +60,34 @@ class TestInputFile(object):
         assert InputFile(BytesIO(b'blah'), filename='tg.mp3').mimetype == 'audio/mpeg'
 
         # Test fallback
-        assert (InputFile(BytesIO(b'blah'), filename='tg.notaproperext').mimetype
-                == 'application/octet-stream')
+        assert (
+            InputFile(BytesIO(b'blah'), filename='tg.notaproperext').mimetype
+            == 'application/octet-stream'
+        )
         assert InputFile(BytesIO(b'blah')).mimetype == 'application/octet-stream'
+
+        # Test string file
+        with caplog.at_level(logging.DEBUG):
+            assert InputFile(open('tests/data/text_file.txt', 'r')).mimetype == 'text/plain'
+
+            assert len(caplog.records) == 1
+            assert caplog.records[0].getMessage().startswith('Could not parse file content')
 
     def test_filenames(self):
         assert InputFile(open('tests/data/telegram.jpg', 'rb')).filename == 'telegram.jpg'
-        assert InputFile(open('tests/data/telegram.jpg', 'rb'),
-                         filename='blah').filename == 'blah'
-        assert InputFile(open('tests/data/telegram.jpg', 'rb'),
-                         filename='blah.jpg').filename == 'blah.jpg'
+        assert InputFile(open('tests/data/telegram.jpg', 'rb'), filename='blah').filename == 'blah'
+        assert (
+            InputFile(open('tests/data/telegram.jpg', 'rb'), filename='blah.jpg').filename
+            == 'blah.jpg'
+        )
         assert InputFile(open('tests/data/telegram', 'rb')).filename == 'telegram'
-        assert InputFile(open('tests/data/telegram', 'rb'),
-                         filename='blah').filename == 'blah'
-        assert InputFile(open('tests/data/telegram', 'rb'),
-                         filename='blah.jpg').filename == 'blah.jpg'
+        assert InputFile(open('tests/data/telegram', 'rb'), filename='blah').filename == 'blah'
+        assert (
+            InputFile(open('tests/data/telegram', 'rb'), filename='blah.jpg').filename
+            == 'blah.jpg'
+        )
 
-        class MockedFileobject(object):
+        class MockedFileobject:
             # A open(?, 'rb') without a .name
             def __init__(self, f):
                 self.f = open(f, 'rb')
@@ -85,13 +96,33 @@ class TestInputFile(object):
                 return self.f.read()
 
         assert InputFile(MockedFileobject('tests/data/telegram.jpg')).filename == 'image.jpeg'
-        assert InputFile(MockedFileobject('tests/data/telegram.jpg'),
-                         filename='blah').filename == 'blah'
-        assert InputFile(MockedFileobject('tests/data/telegram.jpg'),
-                         filename='blah.jpg').filename == 'blah.jpg'
-        assert InputFile(
-            MockedFileobject('tests/data/telegram')).filename == 'application.octet-stream'
-        assert InputFile(MockedFileobject('tests/data/telegram'),
-                         filename='blah').filename == 'blah'
-        assert InputFile(MockedFileobject('tests/data/telegram'),
-                         filename='blah.jpg').filename == 'blah.jpg'
+        assert (
+            InputFile(MockedFileobject('tests/data/telegram.jpg'), filename='blah').filename
+            == 'blah'
+        )
+        assert (
+            InputFile(MockedFileobject('tests/data/telegram.jpg'), filename='blah.jpg').filename
+            == 'blah.jpg'
+        )
+        assert (
+            InputFile(MockedFileobject('tests/data/telegram')).filename
+            == 'application.octet-stream'
+        )
+        assert (
+            InputFile(MockedFileobject('tests/data/telegram'), filename='blah').filename == 'blah'
+        )
+        assert (
+            InputFile(MockedFileobject('tests/data/telegram'), filename='blah.jpg').filename
+            == 'blah.jpg'
+        )
+
+    def test_send_bytes(self, bot, chat_id):
+        # We test this here and not at the respective test modules because it's not worth
+        # duplicating the test for the different methods
+        with open('tests/data/text_file.txt', 'rb') as file:
+            message = bot.send_document(chat_id, file.read())
+
+        out = BytesIO()
+        assert message.document.get_file().download(out=out)
+        out.seek(0)
+        assert out.read().decode('utf-8') == 'PTB Rocks!'

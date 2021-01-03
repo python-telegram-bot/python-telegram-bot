@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,11 +17,14 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import os
+from pathlib import Path
 
 import pytest
 from flaky import flaky
 
-from telegram import VideoNote, TelegramError, Voice, PhotoSize
+from telegram import VideoNote, TelegramError, Voice, PhotoSize, Bot
+from telegram.error import BadRequest
+from tests.conftest import check_shortcut_call, check_shortcut_signature
 
 
 @pytest.fixture(scope='function')
@@ -37,7 +40,7 @@ def video_note(bot, chat_id):
         return bot.send_video_note(chat_id, video_note=f, timeout=50).video_note
 
 
-class TestVideoNote(object):
+class TestVideoNote:
     length = 240
     duration = 3
     file_size = 132084
@@ -72,9 +75,14 @@ class TestVideoNote(object):
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_all_args(self, bot, chat_id, video_note_file, video_note, thumb_file):
-        message = bot.send_video_note(chat_id, video_note_file, duration=self.duration,
-                                      length=self.length, disable_notification=False,
-                                      thumb=thumb_file)
+        message = bot.send_video_note(
+            chat_id,
+            video_note_file,
+            duration=self.duration,
+            length=self.length,
+            disable_notification=False,
+            thumb=thumb_file,
+        )
 
         assert isinstance(message.video_note, VideoNote)
         assert isinstance(message.video_note.file_id, str)
@@ -88,6 +96,16 @@ class TestVideoNote(object):
         assert message.video_note.thumb.file_size == self.thumb_file_size
         assert message.video_note.thumb.width == self.thumb_width
         assert message.video_note.thumb.height == self.thumb_height
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_video_note_custom_filename(self, bot, chat_id, video_note_file, monkeypatch):
+        def make_assertion(url, data, **kwargs):
+            return data['video_note'].filename == 'custom_filename'
+
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+
+        assert bot.send_video_note(chat_id, video_note_file, filename='custom_filename')
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -111,10 +129,10 @@ class TestVideoNote(object):
         assert message.video_note == video_note
 
     def test_send_with_video_note(self, monkeypatch, bot, chat_id, video_note):
-        def test(_, url, data, **kwargs):
+        def test(url, data, **kwargs):
             return data['video_note'] == video_note.file_id
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr(bot.request, 'post', test)
         message = bot.send_video_note(chat_id, video_note=video_note)
         assert message
 
@@ -124,7 +142,7 @@ class TestVideoNote(object):
             'file_unique_id': self.videonote_file_unique_id,
             'length': self.length,
             'duration': self.duration,
-            'file_size': self.file_size
+            'file_size': self.file_size,
         }
         json_video_note = VideoNote.de_json(json_dict, bot)
 
@@ -144,6 +162,55 @@ class TestVideoNote(object):
         assert video_note_dict['duration'] == video_note.duration
         assert video_note_dict['file_size'] == video_note.file_size
 
+    def test_send_video_note_local_files(self, monkeypatch, bot, chat_id):
+        # For just test that the correct paths are passed as we have no local bot API set up
+        test_flag = False
+        expected = (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
+        file = 'tests/data/telegram.jpg'
+
+        def make_assertion(_, data, *args, **kwargs):
+            nonlocal test_flag
+            test_flag = data.get('video_note') == expected and data.get('thumb') == expected
+
+        monkeypatch.setattr(bot, '_post', make_assertion)
+        bot.send_video_note(chat_id, file, thumb=file)
+        assert test_flag
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize(
+        'default_bot,custom',
+        [
+            ({'allow_sending_without_reply': True}, None),
+            ({'allow_sending_without_reply': False}, None),
+            ({'allow_sending_without_reply': False}, True),
+        ],
+        indirect=['default_bot'],
+    )
+    def test_send_video_note_default_allow_sending_without_reply(
+        self, default_bot, chat_id, video_note, custom
+    ):
+        reply_to_message = default_bot.send_message(chat_id, 'test')
+        reply_to_message.delete()
+        if custom is not None:
+            message = default_bot.send_video_note(
+                chat_id,
+                video_note,
+                allow_sending_without_reply=custom,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert message.reply_to_message is None
+        elif default_bot.defaults.allow_sending_without_reply:
+            message = default_bot.send_video_note(
+                chat_id, video_note, reply_to_message_id=reply_to_message.message_id
+            )
+            assert message.reply_to_message is None
+        else:
+            with pytest.raises(BadRequest, match='message not found'):
+                default_bot.send_video_note(
+                    chat_id, video_note, reply_to_message_id=reply_to_message.message_id
+                )
+
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_error_send_empty_file(self, bot, chat_id):
@@ -161,10 +228,16 @@ class TestVideoNote(object):
             bot.send_video_note(chat_id=chat_id)
 
     def test_get_file_instance_method(self, monkeypatch, video_note):
-        def test(*args, **kwargs):
-            return args[1] == video_note.file_id
+        get_file = video_note.bot.get_file
 
-        monkeypatch.setattr('telegram.Bot.get_file', test)
+        def make_assertion(*_, **kwargs):
+            return kwargs['file_id'] == video_note.file_id and check_shortcut_call(
+                kwargs, get_file
+            )
+
+        assert check_shortcut_signature(VideoNote.get_file, Bot.get_file, ['file_id'], [])
+
+        monkeypatch.setattr('telegram.Bot.get_file', make_assertion)
         assert video_note.get_file()
 
     def test_equality(self, video_note):

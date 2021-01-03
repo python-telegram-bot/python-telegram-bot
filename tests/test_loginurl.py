@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -24,12 +24,15 @@ from telegram import LoginUrl
 
 @pytest.fixture(scope='class')
 def login_url():
-    return LoginUrl(url=TestLoginUrl.url, forward_text=TestLoginUrl.forward_text,
-                    bot_username=TestLoginUrl.bot_username,
-                    request_write_access=TestLoginUrl.request_write_access)
+    return LoginUrl(
+        url=TestLoginUrl.url,
+        forward_text=TestLoginUrl.forward_text,
+        bot_username=TestLoginUrl.bot_username,
+        request_write_access=TestLoginUrl.request_write_access,
+    )
 
 
-class TestLoginUrl(object):
+class TestLoginUrl:
     url = "http://www.google.com"
     forward_text = "Send me forward!"
     bot_username = "botname"

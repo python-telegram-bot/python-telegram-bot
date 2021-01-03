@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -32,14 +32,12 @@ def chosen_inline_result(user):
     return ChosenInlineResult(TestChosenInlineResult.result_id, user, TestChosenInlineResult.query)
 
 
-class TestChosenInlineResult(object):
+class TestChosenInlineResult:
     result_id = 'result id'
     query = 'query text'
 
     def test_de_json_required(self, bot, user):
-        json_dict = {'result_id': self.result_id,
-                     'from': user.to_dict(),
-                     'query': self.query}
+        json_dict = {'result_id': self.result_id, 'from': user.to_dict(), 'query': self.query}
         result = ChosenInlineResult.de_json(json_dict, bot)
 
         assert result.result_id == self.result_id
@@ -48,11 +46,13 @@ class TestChosenInlineResult(object):
 
     def test_de_json_all(self, bot, user):
         loc = Location(-42.003, 34.004)
-        json_dict = {'result_id': self.result_id,
-                     'from': user.to_dict(),
-                     'query': self.query,
-                     'location': loc.to_dict(),
-                     'inline_message_id': 'a random id'}
+        json_dict = {
+            'result_id': self.result_id,
+            'from': user.to_dict(),
+            'query': self.query,
+            'location': loc.to_dict(),
+            'inline_message_id': 'a random id',
+        }
         result = ChosenInlineResult.de_json(json_dict, bot)
 
         assert result.result_id == self.result_id

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 import pytest
 from flaky import flaky
 
-from telegram import ForceReply
+from telegram import ForceReply, ReplyKeyboardRemove
 
 
 @pytest.fixture(scope='class')
@@ -28,7 +28,7 @@ def force_reply():
     return ForceReply(TestForceReply.force_reply, TestForceReply.selective)
 
 
-class TestForceReply(object):
+class TestForceReply:
     force_reply = True
     selective = True
 
@@ -49,3 +49,18 @@ class TestForceReply(object):
         assert isinstance(force_reply_dict, dict)
         assert force_reply_dict['force_reply'] == force_reply.force_reply
         assert force_reply_dict['selective'] == force_reply.selective
+
+    def test_equality(self):
+        a = ForceReply(True, False)
+        b = ForceReply(False, False)
+        c = ForceReply(True, True)
+        d = ReplyKeyboardRemove()
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)

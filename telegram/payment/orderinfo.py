@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,17 +18,21 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram OrderInfo."""
 
-from telegram import TelegramObject, ShippingAddress
+from typing import TYPE_CHECKING, Any, Optional
+
+from telegram import ShippingAddress, TelegramObject
+from telegram.utils.types import JSONDict
+
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class OrderInfo(TelegramObject):
     """This object represents information about an order.
 
-    Attributes:
-        name (:obj:`str`): Optional. User name.
-        phone_number (:obj:`str`): Optional. User's phone number.
-        email (:obj:`str`): Optional. User email.
-        shipping_address (:class:`telegram.ShippingAddress`): Optional. User shipping address.
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`name`, :attr:`phone_number`, :attr:`email` and
+    :attr:`shipping_address` are equal.
 
     Args:
         name (:obj:`str`, optional): User name.
@@ -37,20 +41,35 @@ class OrderInfo(TelegramObject):
         shipping_address (:class:`telegram.ShippingAddress`, optional): User shipping address.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
+    Attributes:
+        name (:obj:`str`): Optional. User name.
+        phone_number (:obj:`str`): Optional. User's phone number.
+        email (:obj:`str`): Optional. User email.
+        shipping_address (:class:`telegram.ShippingAddress`): Optional. User shipping address.
+
     """
 
-    def __init__(self, name=None, phone_number=None, email=None, shipping_address=None, **kwargs):
+    def __init__(
+        self,
+        name: str = None,
+        phone_number: str = None,
+        email: str = None,
+        shipping_address: str = None,
+        **_kwargs: Any,
+    ):
         self.name = name
         self.phone_number = phone_number
         self.email = email
         self.shipping_address = shipping_address
 
+        self._id_attrs = (self.name, self.phone_number, self.email, self.shipping_address)
+
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['OrderInfo']:
+        data = cls.parse_data(data)
+
         if not data:
             return cls()
-
-        data = super(OrderInfo, cls).de_json(data, bot)
 
         data['shipping_address'] = ShippingAddress.de_json(data.get('shipping_address'), bot)
 

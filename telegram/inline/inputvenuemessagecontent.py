@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,21 +18,21 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputVenueMessageContent."""
 
+from typing import Any
+
 from telegram import InputMessageContent
 
 
 class InputVenueMessageContent(InputMessageContent):
     """Represents the content of a venue message to be sent as the result of an inline query.
 
-    Attributes:
-        latitude (:obj:`float`): Latitude of the location in degrees.
-        longitude (:obj:`float`): Longitude of the location in degrees.
-        title (:obj:`str`): Name of the venue.
-        address (:obj:`str`): Address of the venue.
-        foursquare_id (:obj:`str`): Optional. Foursquare identifier of the venue, if known.
-        foursquare_type (:obj:`str`): Optional. Foursquare type of the venue, if known.
-            (For example, "arts_entertainment/default", "arts_entertainment/aquarium" or
-            "food/icecream".)
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`latitude`, :attr:`longitude` and :attr:`title`
+    are equal.
+
+    Note:
+      Foursquare details and Google Pace details are mutually exclusive. However, this
+      behaviour is undocumented and might be changed by Telegram.
 
     Args:
         latitude (:obj:`float`): Latitude of the location in degrees.
@@ -43,12 +43,35 @@ class InputVenueMessageContent(InputMessageContent):
         foursquare_type (:obj:`str`, optional): Foursquare type of the venue, if known.
             (For example, "arts_entertainment/default", "arts_entertainment/aquarium" or
             "food/icecream".)
+        google_place_id (:obj:`str`, optional): Google Places identifier of the venue.
+        google_place_type (:obj:`str`, optional): Google Places type of the venue. (See
+            `supported types <https://developers.google.com/places/web-service/supported_types>`_.)
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        latitude (:obj:`float`): Latitude of the location in degrees.
+        longitude (:obj:`float`): Longitude of the location in degrees.
+        title (:obj:`str`): Name of the venue.
+        address (:obj:`str`): Address of the venue.
+        foursquare_id (:obj:`str`): Optional. Foursquare identifier of the venue, if known.
+        foursquare_type (:obj:`str`): Optional. Foursquare type of the venue, if known.
+        google_place_id (:obj:`str`): Optional. Google Places identifier of the venue.
+        google_place_type (:obj:`str`): Optional. Google Places type of the venue.
 
     """
 
-    def __init__(self, latitude, longitude, title, address, foursquare_id=None,
-                 foursquare_type=None, **kwargs):
+    def __init__(
+        self,
+        latitude: float,
+        longitude: float,
+        title: str,
+        address: str,
+        foursquare_id: str = None,
+        foursquare_type: str = None,
+        google_place_id: str = None,
+        google_place_type: str = None,
+        **_kwargs: Any,
+    ):
         # Required
         self.latitude = latitude
         self.longitude = longitude
@@ -57,3 +80,11 @@ class InputVenueMessageContent(InputMessageContent):
         # Optionals
         self.foursquare_id = foursquare_id
         self.foursquare_type = foursquare_type
+        self.google_place_id = google_place_id
+        self.google_place_type = google_place_type
+
+        self._id_attrs = (
+            self.latitude,
+            self.longitude,
+            self.title,
+        )

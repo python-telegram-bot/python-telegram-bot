@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,19 +19,21 @@
 
 import pytest
 
-from telegram import KeyboardButton
+from telegram import KeyboardButton, InlineKeyboardButton
 from telegram.keyboardbuttonpolltype import KeyboardButtonPollType
 
 
 @pytest.fixture(scope='class')
 def keyboard_button():
-    return KeyboardButton(TestKeyboardButton.text,
-                          request_location=TestKeyboardButton.request_location,
-                          request_contact=TestKeyboardButton.request_contact,
-                          request_poll=TestKeyboardButton.request_poll)
+    return KeyboardButton(
+        TestKeyboardButton.text,
+        request_location=TestKeyboardButton.request_location,
+        request_contact=TestKeyboardButton.request_contact,
+        request_poll=TestKeyboardButton.request_poll,
+    )
 
 
-class TestKeyboardButton(object):
+class TestKeyboardButton:
     text = 'text'
     request_location = True
     request_contact = True
@@ -51,3 +53,18 @@ class TestKeyboardButton(object):
         assert keyboard_button_dict['request_location'] == keyboard_button.request_location
         assert keyboard_button_dict['request_contact'] == keyboard_button.request_contact
         assert keyboard_button_dict['request_poll'] == keyboard_button.request_poll.to_dict()
+
+    def test_equality(self):
+        a = KeyboardButton('test', request_contact=True)
+        b = KeyboardButton('test', request_contact=True)
+        c = KeyboardButton('Test', request_location=True)
+        d = InlineKeyboardButton('test', callback_data='test')
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)

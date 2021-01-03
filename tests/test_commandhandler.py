@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -26,8 +26,12 @@ from telegram.utils.deprecate import TelegramDeprecationWarning
 
 from telegram import Message, Update, Chat, Bot
 from telegram.ext import CommandHandler, Filters, CallbackContext, JobQueue, PrefixHandler
-from tests.conftest import make_command_message, make_command_update, make_message, \
-    make_message_update
+from tests.conftest import (
+    make_command_message,
+    make_command_update,
+    make_message,
+    make_message_update,
+)
 
 
 def is_match(handler, update):
@@ -42,9 +46,10 @@ def is_match(handler, update):
     return check is not None and check is not False
 
 
-class BaseTest(object):
+class BaseTest:
     """Base class for command and prefix handler test classes. Contains
     utility methods an several callbacks used by both classes."""
+
     test_flag = False
     SRE_TYPE = type(re.match("", ""))
 
@@ -81,15 +86,17 @@ class BaseTest(object):
         return callback
 
     def callback_context(self, update, context):
-        self.test_flag = (isinstance(context, CallbackContext)
-                          and isinstance(context.bot, Bot)
-                          and isinstance(update, Update)
-                          and isinstance(context.update_queue, Queue)
-                          and isinstance(context.job_queue, JobQueue)
-                          and isinstance(context.user_data, dict)
-                          and isinstance(context.chat_data, dict)
-                          and isinstance(context.bot_data, dict)
-                          and isinstance(update.message, Message))
+        self.test_flag = (
+            isinstance(context, CallbackContext)
+            and isinstance(context.bot, Bot)
+            and isinstance(update, Update)
+            and isinstance(context.update_queue, Queue)
+            and isinstance(context.job_queue, JobQueue)
+            and isinstance(context.user_data, dict)
+            and isinstance(context.chat_data, dict)
+            and isinstance(context.bot_data, dict)
+            and isinstance(update.message, Message)
+        )
 
     def callback_context_args(self, update, context):
         self.test_flag = context.args == ['one', 'two']
@@ -132,6 +139,7 @@ class BaseTest(object):
 
 # ----------------------------- CommandHandler -----------------------------
 
+
 class TestCommandHandler(BaseTest):
     CMD = '/test'
 
@@ -150,7 +158,7 @@ class TestCommandHandler(BaseTest):
     def ch_callback_args(self, bot, update, args):
         if update.message.text == self.CMD:
             self.test_flag = len(args) == 0
-        elif update.message.text == '{}@{}'.format(self.CMD, bot.username):
+        elif update.message.text == f'{self.CMD}@{bot.username}':
             self.test_flag = len(args) == 0
         else:
             self.test_flag = args == ['one', 'two']
@@ -167,13 +175,14 @@ class TestCommandHandler(BaseTest):
 
         assert self.response(dp, make_command_update(command))
         assert not is_match(handler, make_command_update(command[1:]))
-        assert not is_match(handler, make_command_update('/not{}'.format(command[1:])))
-        assert not is_match(handler, make_command_update('not {} at start'.format(command)))
+        assert not is_match(handler, make_command_update(f'/not{command[1:]}'))
+        assert not is_match(handler, make_command_update(f'not {command} at start'))
 
-    @pytest.mark.parametrize('cmd',
-                             ['way_too_longcommand1234567yes_way_toooooooLong', 'ïñválídletters',
-                              'invalid #&* chars'],
-                             ids=['too long', 'invalid letter', 'invalid characters'])
+    @pytest.mark.parametrize(
+        'cmd',
+        ['way_too_longcommand1234567yes_way_toooooooLong', 'ïñválídletters', 'invalid #&* chars'],
+        ids=['too long', 'invalid letter', 'invalid characters'],
+    )
     def test_invalid_commands(self, cmd):
         with pytest.raises(ValueError, match='not a valid bot command'):
             CommandHandler(cmd, self.callback_basic)
@@ -218,7 +227,7 @@ class TestCommandHandler(BaseTest):
         """Test the passing of arguments alongside a command"""
         handler = self.make_default_handler(self.ch_callback_args, pass_args=True)
         dp.add_handler(handler)
-        at_command = '{}@{}'.format(command, bot.username)
+        at_command = f'{command}@{bot.username}'
         assert self.response(dp, make_command_update(command))
         assert self.response(dp, make_command_update(command + ' one two'))
         assert self.response(dp, make_command_update(at_command, bot=bot))
@@ -262,18 +271,21 @@ class TestCommandHandler(BaseTest):
 
     def test_context_regex(self, cdp, command):
         """Test CHs with context-based callbacks and a single filter"""
-        handler = self.make_default_handler(self.callback_context_regex1,
-                                            filters=Filters.regex('one two'))
+        handler = self.make_default_handler(
+            self.callback_context_regex1, filters=Filters.regex('one two')
+        )
         self._test_context_args_or_regex(cdp, handler, command)
 
     def test_context_multiple_regex(self, cdp, command):
         """Test CHs with context-based callbacks and filters combined"""
-        handler = self.make_default_handler(self.callback_context_regex2,
-                                            filters=Filters.regex('one') & Filters.regex('two'))
+        handler = self.make_default_handler(
+            self.callback_context_regex2, filters=Filters.regex('one') & Filters.regex('two')
+        )
         self._test_context_args_or_regex(cdp, handler, command)
 
 
 # ----------------------------- PrefixHandler -----------------------------
+
 
 def combinations(prefixes, commands):
     return (prefix + command for prefix in prefixes for command in commands)
@@ -291,7 +303,7 @@ class TestPrefixHandler(BaseTest):
 
     @pytest.fixture(scope='class', params=[1, 2], ids=['single prefix', 'multiple prefixes'])
     def prefixes(self, request):
-        return TestPrefixHandler.PREFIXES[:request.param]
+        return TestPrefixHandler.PREFIXES[: request.param]
 
     @pytest.fixture(scope='class', params=COMMANDS)
     def command(self, request):
@@ -299,7 +311,7 @@ class TestPrefixHandler(BaseTest):
 
     @pytest.fixture(scope='class', params=[1, 2], ids=['single command', 'multiple commands'])
     def commands(self, request):
-        return TestPrefixHandler.COMMANDS[:request.param]
+        return TestPrefixHandler.COMMANDS[: request.param]
 
     @pytest.fixture(scope='class')
     def prefix_message_text(self, prefix, command):
@@ -332,7 +344,7 @@ class TestPrefixHandler(BaseTest):
         assert self.response(dp, make_message_update(text))
         assert not is_match(handler, make_message_update(command))
         assert not is_match(handler, make_message_update(prefix + 'notacommand'))
-        assert not is_match(handler, make_command_update('not {} at start'.format(text)))
+        assert not is_match(handler, make_command_update(f'not {text} at start'))
 
     def test_single_multi_prefixes_commands(self, prefixes, commands, prefix_message_update):
         """Test various combinations of prefixes and commands"""
@@ -363,11 +375,13 @@ class TestPrefixHandler(BaseTest):
     @pytest.mark.parametrize('pass_keyword', BaseTest.PASS_KEYWORDS)
     def test_pass_data(self, dp, pass_combination, prefix_message_update, pass_keyword):
         """Assert that callbacks receive data iff its corresponding ``pass_*`` kwarg is enabled"""
-        handler = self.make_default_handler(self.make_callback_for(pass_keyword),
-                                            **pass_combination)
+        handler = self.make_default_handler(
+            self.make_callback_for(pass_keyword), **pass_combination
+        )
         dp.add_handler(handler)
-        assert self.response(dp, prefix_message_update) \
-            == pass_combination.get(pass_keyword, False)
+        assert self.response(dp, prefix_message_update) == pass_combination.get(
+            pass_keyword, False
+        )
 
     def test_other_update_types(self, false_update):
         handler = self.make_default_handler()
@@ -412,12 +426,13 @@ class TestPrefixHandler(BaseTest):
         self._test_context_args_or_regex(cdp, handler, prefix_message_text)
 
     def test_context_regex(self, cdp, prefix_message_text):
-        handler = self.make_default_handler(self.callback_context_regex1,
-                                            filters=Filters.regex('one two'))
+        handler = self.make_default_handler(
+            self.callback_context_regex1, filters=Filters.regex('one two')
+        )
         self._test_context_args_or_regex(cdp, handler, prefix_message_text)
 
     def test_context_multiple_regex(self, cdp, prefix_message_text):
-        handler = self.make_default_handler(self.callback_context_regex2,
-                                            filters=Filters.regex('one') & Filters.regex(
-                                                'two'))
+        handler = self.make_default_handler(
+            self.callback_context_regex2, filters=Filters.regex('one') & Filters.regex('two')
+        )
         self._test_context_args_or_regex(cdp, handler, prefix_message_text)

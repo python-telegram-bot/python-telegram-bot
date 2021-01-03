@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -29,7 +29,7 @@ from .updater import Updater
 from .callbackqueryhandler import CallbackQueryHandler
 from .choseninlineresulthandler import ChosenInlineResultHandler
 from .inlinequeryhandler import InlineQueryHandler
-from .filters import BaseFilter, Filters
+from .filters import BaseFilter, MessageFilter, UpdateFilter, Filters
 from .messagehandler import MessageHandler
 from .commandhandler import CommandHandler, PrefixHandler
 from .regexhandler import RegexHandler
@@ -45,11 +45,38 @@ from .pollanswerhandler import PollAnswerHandler
 from .pollhandler import PollHandler
 from .defaults import Defaults
 
-__all__ = ('Dispatcher', 'JobQueue', 'Job', 'Updater', 'CallbackQueryHandler',
-           'ChosenInlineResultHandler', 'CommandHandler', 'Handler', 'InlineQueryHandler',
-           'MessageHandler', 'BaseFilter', 'Filters', 'RegexHandler', 'StringCommandHandler',
-           'StringRegexHandler', 'TypeHandler', 'ConversationHandler',
-           'PreCheckoutQueryHandler', 'ShippingQueryHandler', 'MessageQueue', 'DelayQueue',
-           'DispatcherHandlerStop', 'run_async', 'CallbackContext', 'BasePersistence',
-           'PicklePersistence', 'DictPersistence', 'PrefixHandler', 'PollAnswerHandler',
-           'PollHandler', 'Defaults')
+__all__ = (
+    'Dispatcher',
+    'JobQueue',
+    'Job',
+    'Updater',
+    'CallbackQueryHandler',
+    'ChosenInlineResultHandler',
+    'CommandHandler',
+    'Handler',
+    'InlineQueryHandler',
+    'MessageHandler',
+    'BaseFilter',
+    'MessageFilter',
+    'UpdateFilter',
+    'Filters',
+    'RegexHandler',
+    'StringCommandHandler',
+    'StringRegexHandler',
+    'TypeHandler',
+    'ConversationHandler',
+    'PreCheckoutQueryHandler',
+    'ShippingQueryHandler',
+    'MessageQueue',
+    'DelayQueue',
+    'DispatcherHandlerStop',
+    'run_async',
+    'CallbackContext',
+    'BasePersistence',
+    'PicklePersistence',
+    'DictPersistence',
+    'PrefixHandler',
+    'PollAnswerHandler',
+    'PollHandler',
+    'Defaults',
+)

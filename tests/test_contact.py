@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,17 +18,23 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 import pytest
+from flaky import flaky
 
 from telegram import Contact, Voice
+from telegram.error import BadRequest
 
 
 @pytest.fixture(scope='class')
 def contact():
-    return Contact(TestContact.phone_number, TestContact.first_name, TestContact.last_name,
-                   TestContact.user_id)
+    return Contact(
+        TestContact.phone_number,
+        TestContact.first_name,
+        TestContact.last_name,
+        TestContact.user_id,
+    )
 
 
-class TestContact(object):
+class TestContact:
     phone_number = '+11234567890'
     first_name = 'Leandro'
     last_name = 'Toledo'
@@ -42,8 +48,12 @@ class TestContact(object):
         assert contact.first_name == self.first_name
 
     def test_de_json_all(self, bot):
-        json_dict = {'phone_number': self.phone_number, 'first_name': self.first_name,
-                     'last_name': self.last_name, 'user_id': self.user_id}
+        json_dict = {
+            'phone_number': self.phone_number,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'user_id': self.user_id,
+        }
         contact = Contact.de_json(json_dict, bot)
 
         assert contact.phone_number == self.phone_number
@@ -52,15 +62,50 @@ class TestContact(object):
         assert contact.user_id == self.user_id
 
     def test_send_with_contact(self, monkeypatch, bot, chat_id, contact):
-        def test(_, url, data, **kwargs):
+        def test(url, data, **kwargs):
             phone = data['phone_number'] == contact.phone_number
             first = data['first_name'] == contact.first_name
             last = data['last_name'] == contact.last_name
             return phone and first and last
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr(bot.request, 'post', test)
         message = bot.send_contact(contact=contact, chat_id=chat_id)
         assert message
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize(
+        'default_bot,custom',
+        [
+            ({'allow_sending_without_reply': True}, None),
+            ({'allow_sending_without_reply': False}, None),
+            ({'allow_sending_without_reply': False}, True),
+        ],
+        indirect=['default_bot'],
+    )
+    def test_send_contact_default_allow_sending_without_reply(
+        self, default_bot, chat_id, contact, custom
+    ):
+        reply_to_message = default_bot.send_message(chat_id, 'test')
+        reply_to_message.delete()
+        if custom is not None:
+            message = default_bot.send_contact(
+                chat_id,
+                contact=contact,
+                allow_sending_without_reply=custom,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert message.reply_to_message is None
+        elif default_bot.defaults.allow_sending_without_reply:
+            message = default_bot.send_contact(
+                chat_id, contact=contact, reply_to_message_id=reply_to_message.message_id
+            )
+            assert message.reply_to_message is None
+        else:
+            with pytest.raises(BadRequest, match='message not found'):
+                default_bot.send_contact(
+                    chat_id, contact=contact, reply_to_message_id=reply_to_message.message_id
+                )
 
     def test_send_contact_without_required(self, bot, chat_id):
         with pytest.raises(ValueError, match='Either contact or phone_number and first_name'):

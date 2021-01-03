@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,21 +17,33 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime
+import inspect
 import os
-import sys
 import re
 from collections import defaultdict
 from queue import Queue
 from threading import Thread, Event
 from time import sleep
+from typing import Callable, List, Dict, Any
 
 import pytest
+import pytz
 
-from telegram import (Bot, Message, User, Chat, MessageEntity, Update,
-                      InlineQuery, CallbackQuery, ShippingQuery, PreCheckoutQuery,
-                      ChosenInlineResult)
-from telegram.ext import Dispatcher, JobQueue, Updater, BaseFilter, Defaults
-from telegram.utils.helpers import _UtcOffsetTimezone
+from telegram import (
+    Bot,
+    Message,
+    User,
+    Chat,
+    MessageEntity,
+    Update,
+    InlineQuery,
+    CallbackQuery,
+    ShippingQuery,
+    PreCheckoutQuery,
+    ChosenInlineResult,
+)
+from telegram.ext import Dispatcher, JobQueue, Updater, MessageFilter, Defaults, UpdateFilter
+from telegram.error import BadRequest
 from tests.bots import get_bot
 
 GITHUB_ACTION = os.getenv('GITHUB_ACTION', False)
@@ -55,11 +67,25 @@ def bot(bot_info):
 
 
 DEFAULT_BOTS = {}
+
+
 @pytest.fixture(scope='function')
 def default_bot(request, bot_info):
     param = request.param if hasattr(request, 'param') else {}
 
     defaults = Defaults(**param)
+    default_bot = DEFAULT_BOTS.get(defaults)
+    if default_bot:
+        return default_bot
+    else:
+        default_bot = make_bot(bot_info, **{'defaults': defaults})
+        DEFAULT_BOTS[defaults] = default_bot
+        return default_bot
+
+
+@pytest.fixture(scope='function')
+def tz_bot(timezone, bot_info):
+    defaults = Defaults(tzinfo=timezone)
     default_bot = DEFAULT_BOTS.get(defaults)
     if default_bot:
         return default_bot
@@ -121,7 +147,7 @@ def dp(_dp):
     _dp.persistence = None
     _dp.handlers = {}
     _dp.groups = []
-    _dp.error_handlers = []
+    _dp.error_handlers = {}
     _dp.__stop_event = Event()
     _dp.__exception_event = Event()
     _dp.__async_queue = Queue()
@@ -143,7 +169,7 @@ def cdp(dp):
 
 @pytest.fixture(scope='function')
 def updater(bot):
-    up = Updater(bot=bot, workers=2)
+    up = Updater(bot=bot, workers=2, use_context=False)
     yield up
     if up.running:
         up.stop()
@@ -164,9 +190,8 @@ def class_thumb_file():
 
 
 def pytest_configure(config):
-    if sys.version_info >= (3,):
-        config.addinivalue_line('filterwarnings', 'ignore::ResourceWarning')
-        # TODO: Write so good code that we don't need to ignore ResourceWarnings anymore
+    config.addinivalue_line('filterwarnings', 'ignore::ResourceWarning')
+    # TODO: Write so good code that we don't need to ignore ResourceWarnings anymore
 
 
 def make_bot(bot_info, **kwargs):
@@ -184,13 +209,15 @@ def make_message(text, **kwargs):
     :param text: (str) message text
     :return: a (fake) ``telegram.Message``
     """
-    return Message(message_id=1,
-                   from_user=kwargs.pop('user', User(id=1, first_name='', is_bot=False)),
-                   date=kwargs.pop('date', DATE),
-                   chat=kwargs.pop('chat', Chat(id=1, type='')),
-                   text=text,
-                   bot=kwargs.pop('bot', make_bot(get_bot())),
-                   **kwargs)
+    return Message(
+        message_id=1,
+        from_user=kwargs.pop('user', User(id=1, first_name='', is_bot=False)),
+        date=kwargs.pop('date', DATE),
+        chat=kwargs.pop('chat', Chat(id=1, type='')),
+        text=text,
+        bot=kwargs.pop('bot', make_bot(get_bot())),
+        **kwargs,
+    )
 
 
 def make_command_message(text, **kwargs):
@@ -206,9 +233,15 @@ def make_command_message(text, **kwargs):
     """
 
     match = re.search(CMD_PATTERN, text)
-    entities = [MessageEntity(type=MessageEntity.BOT_COMMAND,
-                              offset=match.start(0),
-                              length=len(match.group(0)))] if match else []
+    entities = (
+        [
+            MessageEntity(
+                type=MessageEntity.BOT_COMMAND, offset=match.start(0), length=len(match.group(0))
+            )
+        ]
+        if match
+        else []
+    )
 
     return make_message(text, entities=entities, **kwargs)
 
@@ -240,20 +273,24 @@ def make_command_update(message, edited=False, **kwargs):
     return make_message_update(message, make_command_message, edited, **kwargs)
 
 
-@pytest.fixture(scope='function')
-def mock_filter():
-    class MockFilter(BaseFilter):
+@pytest.fixture(
+    scope='class',
+    params=[{'class': MessageFilter}, {'class': UpdateFilter}],
+    ids=['MessageFilter', 'UpdateFilter'],
+)
+def mock_filter(request):
+    class MockFilter(request.param['class']):
         def __init__(self):
             self.tested = False
 
-        def filter(self, message):
+        def filter(self, _):
             self.tested = True
 
     return MockFilter()
 
 
 def get_false_update_fixture_decorator_params():
-    message = Message(1, User(1, '', False), DATE, Chat(1, ''), text='test')
+    message = Message(1, DATE, Chat(1, ''), from_user=User(1, '', False), text='test')
     params = [
         {'callback_query': CallbackQuery(1, User(1, '', False), 'chat', message=message)},
         {'channel_post': message},
@@ -262,7 +299,7 @@ def get_false_update_fixture_decorator_params():
         {'chosen_inline_result': ChosenInlineResult('id', User(1, '', False), '')},
         {'shipping_query': ShippingQuery('id', User(1, '', False), '', None)},
         {'pre_checkout_query': PreCheckoutQuery('id', User(1, '', False), '', 0, '')},
-        {'callback_query': CallbackQuery(1, User(1, '', False), 'chat')}
+        {'callback_query': CallbackQuery(1, User(1, '', False), 'chat')},
     ]
     ids = tuple(key for kwargs in params for key in kwargs)
     return {'params': params, 'ids': ids}
@@ -273,11 +310,127 @@ def false_update(request):
     return Update(update_id=1, **request.param)
 
 
-@pytest.fixture(params=[1, 2], ids=lambda h: 'UTC +{hour:0>2}:00'.format(hour=h))
-def utc_offset(request):
-    return datetime.timedelta(hours=request.param)
+@pytest.fixture(params=['Europe/Berlin', 'Asia/Singapore', 'UTC'])
+def tzinfo(request):
+    return pytz.timezone(request.param)
 
 
 @pytest.fixture()
-def timezone(utc_offset):
-    return _UtcOffsetTimezone(utc_offset)
+def timezone(tzinfo):
+    return tzinfo
+
+
+def expect_bad_request(func, message, reason):
+    """
+    Wrapper for testing bot functions expected to result in an :class:`telegram.error.BadRequest`.
+    Makes it XFAIL, if the specified error message is present.
+
+    Args:
+        func: The callable to be executed.
+        message: The expected message of the bad request error. If another message is present,
+            the error will be reraised.
+        reason: Explanation for the XFAIL.
+
+    Returns:
+        On success, returns the return value of :attr:`func`
+    """
+    try:
+        return func()
+    except BadRequest as e:
+        if message in str(e):
+            pytest.xfail(f'{reason}. {e}')
+        else:
+            raise e
+
+
+def check_shortcut_signature(
+    shortcut: Callable,
+    bot_method: Callable,
+    shortcut_kwargs: List[str],
+    additional_kwargs: List[str],
+) -> bool:
+    """
+    Checks that the signature of a shortcut matches the signature of the underlying bot method.
+
+    Args:
+        shortcut: The shortcut, e.g. :meth:`telegram.Message.reply_text`
+        bot_method: The bot method, e.g. :meth:`telegram.Bot.send_message`
+        shortcut_kwargs: The kwargs passed by the shortcut directly, e.g. ``chat_id``
+        additional_kwargs: Additional kwargs of the shortcut that the bot method doesn't have, e.g.
+            ``quote``.
+
+    Returns:
+        :obj:`bool`: Whether or not the signature matches.
+    """
+    shortcut_arg_spec = inspect.getfullargspec(shortcut)
+    effective_shortcut_args = set(shortcut_arg_spec.args).difference(additional_kwargs)
+    effective_shortcut_args.discard('self')
+
+    bot_arg_spec = inspect.getfullargspec(bot_method)
+    expected_args = set(bot_arg_spec.args).difference(shortcut_kwargs)
+    expected_args.discard('self')
+
+    args_check = expected_args == effective_shortcut_args
+
+    # TODO: Also check annotation of return type. Would currently be a hassle b/c typing doesn't
+    # resolve `ForwardRef('Type')` to `Type`. For now we rely on MyPy, which probably allows the
+    # shortcuts to return more specific types than the bot method, but it's only annotations after
+    # all
+    annotation_check = True
+    for kwarg in effective_shortcut_args:
+        if bot_arg_spec.annotations[kwarg] != shortcut_arg_spec.annotations[kwarg]:
+            if isinstance(bot_arg_spec.annotations[kwarg], type):
+                if bot_arg_spec.annotations[kwarg].__name__ != str(
+                    shortcut_arg_spec.annotations[kwarg]
+                ):
+                    print(
+                        f'Expected {bot_arg_spec.annotations[kwarg]}, but '
+                        f'got {shortcut_arg_spec.annotations[kwarg]}'
+                    )
+                    annotation_check = False
+                    break
+            else:
+                print(
+                    f'Expected {bot_arg_spec.annotations[kwarg]}, but '
+                    f'got {shortcut_arg_spec.annotations[kwarg]}'
+                )
+                annotation_check = False
+                break
+
+    bot_method_signature = inspect.signature(bot_method)
+    shortcut_signature = inspect.signature(shortcut)
+    default_check = all(
+        shortcut_signature.parameters[arg].default == bot_method_signature.parameters[arg].default
+        for arg in expected_args
+    )
+
+    return args_check and annotation_check and default_check
+
+
+def check_shortcut_call(
+    kwargs: Dict[str, Any],
+    bot_method: Callable,
+) -> bool:
+    """
+    Checks that a shortcut passes all the existing arguments to the underlying bot method. Use as::
+
+        send_message = message.bot.send_message
+
+        def make_assertion(*_, **kwargs):
+            return check_shortcut_call(send_message, kwargs)
+
+        monkeypatch.setattr(message.bot, 'send_message', make_assertion)
+        assert message.reply_text('foobar')
+
+
+    Args:
+        kwargs: The kwargs passed to the bot method by the shortcut
+        bot_method: The bot method, e.g. :meth:`telegram.Bot.send_message`
+
+    Returns:
+        :obj:`bool`
+    """
+    bot_arg_spec = inspect.getfullargspec(bot_method)
+    expected_args = set(bot_arg_spec.args).difference(['self'])
+
+    return expected_args == set(kwargs.keys())

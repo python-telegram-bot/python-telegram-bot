@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -24,12 +24,14 @@ from telegram import PassportElementErrorFile, PassportElementErrorSelfie
 
 @pytest.fixture(scope='class')
 def passport_element_error_file():
-    return PassportElementErrorFile(TestPassportElementErrorFile.type_,
-                                    TestPassportElementErrorFile.file_hash,
-                                    TestPassportElementErrorFile.message)
+    return PassportElementErrorFile(
+        TestPassportElementErrorFile.type_,
+        TestPassportElementErrorFile.file_hash,
+        TestPassportElementErrorFile.message,
+    )
 
 
-class TestPassportElementErrorFile(object):
+class TestPassportElementErrorFile:
     source = 'file'
     type_ = 'test_type'
     file_hash = 'file_hash'
@@ -45,14 +47,12 @@ class TestPassportElementErrorFile(object):
         passport_element_error_file_dict = passport_element_error_file.to_dict()
 
         assert isinstance(passport_element_error_file_dict, dict)
-        assert (passport_element_error_file_dict['source']
-                == passport_element_error_file.source)
-        assert (passport_element_error_file_dict['type']
-                == passport_element_error_file.type)
-        assert (passport_element_error_file_dict['file_hash']
-                == passport_element_error_file.file_hash)
-        assert (passport_element_error_file_dict['message']
-                == passport_element_error_file.message)
+        assert passport_element_error_file_dict['source'] == passport_element_error_file.source
+        assert passport_element_error_file_dict['type'] == passport_element_error_file.type
+        assert (
+            passport_element_error_file_dict['file_hash'] == passport_element_error_file.file_hash
+        )
+        assert passport_element_error_file_dict['message'] == passport_element_error_file.message
 
     def test_equality(self):
         a = PassportElementErrorFile(self.type_, self.file_hash, self.message)

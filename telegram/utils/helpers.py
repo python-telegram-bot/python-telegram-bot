@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,10 +19,34 @@
 """This module contains helper functions."""
 
 import datetime as dtm  # dtm = "DateTime Module"
+import re
+import signal
 import time
 
 from collections import defaultdict
+from html import escape
 from numbers import Number
+from pathlib import Path
+
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    DefaultDict,
+    Dict,
+    Optional,
+    Tuple,
+    Union,
+    Type,
+    cast,
+    IO,
+)
+
+import pytz  # pylint: disable=E0401
+
+from telegram.utils.types import JSONDict, FileInput
+
+if TYPE_CHECKING:
+    from telegram import Message, Update, TelegramObject, InputFile
 
 import hmac
 import base64
@@ -32,24 +56,93 @@ from telegram.error import InvalidCallbackData
 try:
     import ujson as json
 except ImportError:
-    import json
-from html import escape
+    import json  # type: ignore[no-redef]
 
-import re
-import signal
 
 # From https://stackoverflow.com/questions/2549939/get-signal-names-from-numbers-in-python
-_signames = {v: k
-             for k, v in reversed(sorted(vars(signal).items()))
-             if k.startswith('SIG') and not k.startswith('SIG_')}
+_signames = {
+    v: k
+    for k, v in reversed(sorted(vars(signal).items()))
+    if k.startswith('SIG') and not k.startswith('SIG_')
+}
 
 
-def get_signal_name(signum):
+def get_signal_name(signum: int) -> str:
     """Returns the signal name of the given signal number."""
     return _signames[signum]
 
 
-def escape_markdown(text, version=1, entity_type=None):
+def is_local_file(obj: Optional[Union[str, Path]]) -> bool:
+    """
+    Checks if a given string is a file on local system.
+
+    Args:
+        obj (:obj:`str`): The string to check.
+    """
+    if obj is None:
+        return False
+
+    path = Path(obj)
+    try:
+        return path.is_file()
+    except Exception:
+        return False
+
+
+def parse_file_input(
+    file_input: Union[FileInput, 'TelegramObject'],
+    tg_type: Type['TelegramObject'] = None,
+    attach: bool = None,
+    filename: str = None,
+) -> Union[str, 'InputFile', Any]:
+    """
+    Parses input for sending files:
+
+    * For string input, if the input is an absolute path of a local file,
+      adds the ``file://`` prefix. If the input is a relative path of a local file, computes the
+      absolute path and adds the ``file://`` prefix. Returns the input unchanged, otherwise.
+    * :class:`pathlib.Path` objects are treated the same way as strings.
+    * For IO and bytes input, returns an :class:`telegram.InputFile`.
+    * If :attr:`tg_type` is specified and the input is of that type, returns the ``file_id``
+      attribute.
+
+    Args:
+        file_input (:obj:`str` | :obj:`bytes` | `filelike object` | Telegram media object): The
+            input to parse.
+        tg_type (:obj:`type`, optional): The Telegram media type the input can be. E.g.
+            :class:`telegram.Animation`.
+        attach (:obj:`bool`, optional): Whether this file should be send as one file or is part of
+            a collection of files. Only relevant in case an :class:`telegram.InputFile` is
+            returned.
+        filename (:obj:`str`, optional): The filename. Only relevant in case an
+            :class:`telegram.InputFile` is returned.
+
+    Returns:
+        :obj:`str` | :class:`telegram.InputFile` | :obj:`object`: The parsed input or the untouched
+            :attr:`file_input`, in case it's no valid file input.
+    """
+    # Importing on file-level yields cyclic Import Errors
+    from telegram import InputFile  # pylint: disable=C0415
+
+    if isinstance(file_input, str) and file_input.startswith('file://'):
+        return file_input
+    if isinstance(file_input, (str, Path)):
+        if is_local_file(file_input):
+            out = Path(file_input).absolute().as_uri()
+        else:
+            out = file_input  # type: ignore[assignment]
+        return out
+    if isinstance(file_input, bytes):
+        return InputFile(file_input, attach=attach, filename=filename)
+    if InputFile.is_file(file_input):
+        file_input = cast(IO, file_input)
+        return InputFile(file_input, attach=attach, filename=filename)
+    if tg_type and isinstance(file_input, tg_type):
+        return file_input.file_id  # type: ignore[attr-defined]
+    return file_input
+
+
+def escape_markdown(text: str, version: int = 1, entity_type: str = None) -> str:
     """
     Helper function to escape telegram markup symbols.
 
@@ -63,77 +156,45 @@ def escape_markdown(text, version=1, entity_type=None):
             ``version=2``, will be ignored else.
     """
     if int(version) == 1:
-        escape_chars = '\*_`\['
+        escape_chars = r'_*`['
     elif int(version) == 2:
-        if entity_type == 'pre' or entity_type == 'code':
-            escape_chars = '`\\\\'
+        if entity_type in ['pre', 'code']:
+            escape_chars = r'\`'
         elif entity_type == 'text_link':
-            escape_chars = ')\\\\'
+            escape_chars = r'\)'
         else:
-            escape_chars = '_*\[\]()~`>\#\+\-=|{}\.!'
+            escape_chars = r'_*[]()~`>#+-=|{}.!'
     else:
-        raise ValueError('Markdown version musst be either 1 or 2!')
+        raise ValueError('Markdown version must be either 1 or 2!')
 
-    return re.sub(r'([%s])' % escape_chars, r'\\\1', text)
+    return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
 
 
 # -------- date/time related helpers --------
-# TODO: add generic specification of UTC for naive datetimes to docs
-
-if hasattr(dtm, 'timezone'):
-    # Python 3.3+
-    def _datetime_to_float_timestamp(dt_obj):
-        if dt_obj.tzinfo is None:
-            dt_obj = dt_obj.replace(tzinfo=_UTC)
-        return dt_obj.timestamp()
-
-    _UtcOffsetTimezone = dtm.timezone
-    _UTC = dtm.timezone.utc
-else:
-    # Python < 3.3 (incl 2.7)
-
-    # hardcoded timezone class (`datetime.timezone` isn't available in py2)
-    class _UtcOffsetTimezone(dtm.tzinfo):
-        def __init__(self, offset):
-            self.offset = offset
-
-        def tzname(self, dt):
-            return 'UTC +{}'.format(self.offset)
-
-        def utcoffset(self, dt):
-            return self.offset
-
-        def dst(self, dt):
-            return dtm.timedelta(0)
-
-    _UTC = _UtcOffsetTimezone(dtm.timedelta(0))
-    __EPOCH_DT = dtm.datetime.fromtimestamp(0, tz=_UTC)
-    __NAIVE_EPOCH_DT = __EPOCH_DT.replace(tzinfo=None)
-
-    # _datetime_to_float_timestamp
-    # Not using future.backports.datetime here as datetime value might be an input from the user,
-    # making every isinstace() call more delicate. So we just use our own compat layer.
-    def _datetime_to_float_timestamp(dt_obj):
-        epoch_dt = __EPOCH_DT if dt_obj.tzinfo is not None else __NAIVE_EPOCH_DT
-        return (dt_obj - epoch_dt).total_seconds()
-
-_datetime_to_float_timestamp.__doc__ = \
-    """Converts a datetime object to a float timestamp (with sub-second precision).
-If the datetime object is timezone-naive, it is assumed to be in UTC."""
+def _datetime_to_float_timestamp(dt_obj: dtm.datetime) -> float:
+    """
+    Converts a datetime object to a float timestamp (with sub-second precision).
+    If the datetime object is timezone-naive, it is assumed to be in UTC.
+    """
+    if dt_obj.tzinfo is None:
+        dt_obj = dt_obj.replace(tzinfo=dtm.timezone.utc)
+    return dt_obj.timestamp()
 
 
-def to_float_timestamp(t, reference_timestamp=None):
+def to_float_timestamp(
+    time_object: Union[int, float, dtm.timedelta, dtm.datetime, dtm.time],
+    reference_timestamp: float = None,
+    tzinfo: pytz.BaseTzInfo = None,
+) -> float:
     """
     Converts a given time object to a float POSIX timestamp.
     Used to convert different time specifications to a common format. The time object
     can be relative (i.e. indicate a time increment, or a time of day) or absolute.
     Any objects from the :class:`datetime` module that are timezone-naive will be assumed
-    to be in UTC.
-
-    ``None`` s are left alone (i.e. ``to_float_timestamp(None)`` is ``None``).
+    to be in UTC, if ``bot`` is not passed or ``bot.defaults`` is :obj:`None`.
 
     Args:
-        t (int | float | datetime.timedelta | datetime.datetime | datetime.time):
+        time_object (int | float | datetime.timedelta | datetime.datetime | datetime.time):
             Time value to convert. The semantics of this parameter will depend on its type:
 
             * :obj:`int` or :obj:`float` will be interpreted as "seconds from ``reference_t``"
@@ -149,7 +210,10 @@ def to_float_timestamp(t, reference_timestamp=None):
 
             If ``t`` is given as an absolute representation of date & time (i.e. a
             ``datetime.datetime`` object), ``reference_timestamp`` is not relevant and so its
-            value should be ``None``. If this is not the case, a ``ValueError`` will be raised.
+            value should be :obj:`None`. If this is not the case, a ``ValueError`` will be raised.
+        tzinfo (:obj:`datetime.tzinfo`, optional): If ``t`` is a naive object from the
+            :class:`datetime` module, it will be interpreted as this timezone. Defaults to
+            ``pytz.utc``.
 
     Returns:
         (float | None) The return value depends on the type of argument ``t``. If ``t`` is
@@ -168,60 +232,88 @@ def to_float_timestamp(t, reference_timestamp=None):
 
     if reference_timestamp is None:
         reference_timestamp = time.time()
-    elif isinstance(t, dtm.datetime):
+    elif isinstance(time_object, dtm.datetime):
         raise ValueError('t is an (absolute) datetime while reference_timestamp is not None')
 
-    if isinstance(t, dtm.timedelta):
-        return reference_timestamp + t.total_seconds()
-    elif isinstance(t, Number):
-        return reference_timestamp + t
-    elif isinstance(t, dtm.time):
-        if t.tzinfo is not None:
-            reference_dt = dtm.datetime.fromtimestamp(reference_timestamp, tz=t.tzinfo)
-        else:
-            reference_dt = dtm.datetime.utcfromtimestamp(reference_timestamp)  # assume UTC
+    if isinstance(time_object, dtm.timedelta):
+        return reference_timestamp + time_object.total_seconds()
+    if isinstance(time_object, (int, float)):
+        return reference_timestamp + time_object
+
+    if tzinfo is None:
+        tzinfo = pytz.utc
+
+    if isinstance(time_object, dtm.time):
+        reference_dt = dtm.datetime.fromtimestamp(
+            reference_timestamp, tz=time_object.tzinfo or tzinfo
+        )
         reference_date = reference_dt.date()
         reference_time = reference_dt.timetz()
-        if reference_time > t:  # if the time of day has passed today, use tomorrow
-            reference_date += dtm.timedelta(days=1)
-        return _datetime_to_float_timestamp(dtm.datetime.combine(reference_date, t))
-    elif isinstance(t, dtm.datetime):
-        return _datetime_to_float_timestamp(t)
 
-    raise TypeError('Unable to convert {} object to timestamp'.format(type(t).__name__))
+        aware_datetime = dtm.datetime.combine(reference_date, time_object)
+        if aware_datetime.tzinfo is None:
+            aware_datetime = tzinfo.localize(aware_datetime)
+
+        # if the time of day has passed today, use tomorrow
+        if reference_time > aware_datetime.timetz():
+            aware_datetime += dtm.timedelta(days=1)
+        return _datetime_to_float_timestamp(aware_datetime)
+    if isinstance(time_object, dtm.datetime):
+        if time_object.tzinfo is None:
+            time_object = tzinfo.localize(time_object)
+        return _datetime_to_float_timestamp(time_object)
+    if isinstance(time_object, Number):
+        return reference_timestamp + time_object
+
+    raise TypeError(f'Unable to convert {type(time_object).__name__} object to timestamp')
 
 
-def to_timestamp(dt_obj, reference_timestamp=None):
+def to_timestamp(
+    dt_obj: Union[int, float, dtm.timedelta, dtm.datetime, dtm.time, None],
+    reference_timestamp: float = None,
+    tzinfo: pytz.BaseTzInfo = None,
+) -> Optional[int]:
     """
     Wrapper over :func:`to_float_timestamp` which returns an integer (the float value truncated
     down to the nearest integer).
 
     See the documentation for :func:`to_float_timestamp` for more details.
     """
-    return int(to_float_timestamp(dt_obj, reference_timestamp)) if dt_obj is not None else None
+    return (
+        int(to_float_timestamp(dt_obj, reference_timestamp, tzinfo))
+        if dt_obj is not None
+        else None
+    )
 
 
-def from_timestamp(unixtime):
+def from_timestamp(
+    unixtime: Optional[int], tzinfo: dtm.tzinfo = pytz.utc
+) -> Optional[dtm.datetime]:
     """
-    Converts an (integer) unix timestamp to a naive datetime object in UTC.
-    ``None`` s are left alone (i.e. ``from_timestamp(None)`` is ``None``).
+    Converts an (integer) unix timestamp to a timezone aware datetime object.
+    :obj:`None`s are left alone (i.e. ``from_timestamp(None)`` is :obj:`None`).
 
     Args:
-        unixtime (int): integer POSIX timestamp
+        unixtime (int): Integer POSIX timestamp.
+        tzinfo (:obj:`datetime.tzinfo`, optional): The timezone, the timestamp is to be converted
+            to. Defaults to UTC.
 
     Returns:
-        equivalent :obj:`datetime.datetime` value in naive UTC if ``timestamp`` is not
-        ``None``; else ``None``
+        timezone aware equivalent :obj:`datetime.datetime` value if ``timestamp`` is not
+        :obj:`None`; else :obj:`None`
     """
     if unixtime is None:
         return None
 
+    if tzinfo is not None:
+        return dtm.datetime.fromtimestamp(unixtime, tz=tzinfo)
     return dtm.datetime.utcfromtimestamp(unixtime)
+
 
 # -------- end --------
 
 
-def mention_html(user_id, name):
+def mention_html(user_id: Union[int, str], name: str) -> str:
     """
     Args:
         user_id (:obj:`int`) The user's id which you want to mention.
@@ -230,11 +322,10 @@ def mention_html(user_id, name):
     Returns:
         :obj:`str`: The inline mention for the user as html.
     """
-    if isinstance(user_id, int):
-        return u'<a href="tg://user?id={}">{}</a>'.format(user_id, escape(name))
+    return u'<a href="tg://user?id={}">{}</a>'.format(user_id, escape(name))
 
 
-def mention_markdown(user_id, name, version=1):
+def mention_markdown(user_id: Union[int, str], name: str, version: int = 1) -> str:
     """
     Args:
         user_id (:obj:`int`) The user's id which you want to mention.
@@ -245,11 +336,10 @@ def mention_markdown(user_id, name, version=1):
     Returns:
         :obj:`str`: The inline mention for the user as markdown.
     """
-    if isinstance(user_id, int):
-        return u'[{}](tg://user?id={})'.format(escape_markdown(name, version=version), user_id)
+    return u'[{}](tg://user?id={})'.format(escape_markdown(name, version=version), user_id)
 
 
-def effective_message_type(entity):
+def effective_message_type(entity: Union['Message', 'Update']) -> Optional[str]:
     """
     Extracts the type of message as a string identifier from a :class:`telegram.Message` or a
     :class:`telegram.Update`.
@@ -263,15 +353,14 @@ def effective_message_type(entity):
     """
 
     # Importing on file-level yields cyclic Import Errors
-    from telegram import Message
-    from telegram import Update
+    from telegram import Message, Update  # pylint: disable=C0415
 
     if isinstance(entity, Message):
         message = entity
     elif isinstance(entity, Update):
-        message = entity.effective_message
+        message = entity.effective_message  # type: ignore[assignment]
     else:
-        raise TypeError("entity is not Message or Update (got: {})".format(type(entity)))
+        raise TypeError(f"entity is not Message or Update (got: {type(entity)})")
 
     for i in Message.MESSAGE_TYPES:
         if getattr(message, i, None):
@@ -280,7 +369,7 @@ def effective_message_type(entity):
     return None
 
 
-def create_deep_linked_url(bot_username, payload=None, group=False):
+def create_deep_linked_url(bot_username: str, payload: str = None, group: bool = False) -> str:
     """
     Creates a deep-linked URL for this ``bot_username`` with the specified ``payload``.
     See  https://core.telegram.org/bots#deep-linking to learn more.
@@ -297,8 +386,9 @@ def create_deep_linked_url(bot_username, payload=None, group=False):
     Args:
         bot_username (:obj:`str`): The username to link to
         payload (:obj:`str`, optional): Parameters to encode in the created URL
-        group (:obj:`bool`, optional): If `True` the user is prompted to select a group to add the
-            bot to. If `False`, opens a one-on-one conversation with the bot. Defaults to `False`.
+        group (:obj:`bool`, optional): If :obj:`True` the user is prompted to select a group to
+            add the bot to. If :obj:`False`, opens a one-on-one conversation with the bot.
+            Defaults to :obj:`False`.
 
     Returns:
         :obj:`str`: An URL to start the bot with specific parameters
@@ -306,7 +396,7 @@ def create_deep_linked_url(bot_username, payload=None, group=False):
     if bot_username is None or len(bot_username) <= 3:
         raise ValueError("You must provide a valid bot_username.")
 
-    base_url = 'https://t.me/{}'.format(bot_username)
+    base_url = f'https://t.me/{bot_username}'
     if not payload:
         return base_url
 
@@ -314,32 +404,30 @@ def create_deep_linked_url(bot_username, payload=None, group=False):
         raise ValueError("The deep-linking payload must not exceed 64 characters.")
 
     if not re.match(r'^[A-Za-z0-9_-]+$', payload):
-        raise ValueError("Only the following characters are allowed for deep-linked "
-                         "URLs: A-Z, a-z, 0-9, _ and -")
+        raise ValueError(
+            "Only the following characters are allowed for deep-linked "
+            "URLs: A-Z, a-z, 0-9, _ and -"
+        )
 
     if group:
         key = 'startgroup'
     else:
         key = 'start'
 
-    return '{0}?{1}={2}'.format(
-        base_url,
-        key,
-        payload
-    )
+    return f'{base_url}?{key}={payload}'
 
 
-def encode_conversations_to_json(conversations):
+def encode_conversations_to_json(conversations: Dict[str, Dict[Tuple, Any]]) -> str:
     """Helper method to encode a conversations dict (that uses tuples as keys) to a
     JSON-serializable way. Use :attr:`_decode_conversations_from_json` to decode.
 
     Args:
-        conversations (:obj:`dict`): The conversations dict to transofrm to JSON.
+        conversations (:obj:`dict`): The conversations dict to transform to JSON.
 
     Returns:
         :obj:`str`: The JSON-serialized conversations dict
     """
-    tmp = {}
+    tmp: Dict[str, JSONDict] = {}
     for handler, states in conversations.items():
         tmp[handler] = {}
         for key, state in states.items():
@@ -347,7 +435,7 @@ def encode_conversations_to_json(conversations):
     return json.dumps(tmp)
 
 
-def decode_conversations_from_json(json_string):
+def decode_conversations_from_json(json_string: str) -> Dict[str, Dict[Tuple, Any]]:
     """Helper method to decode a conversations dict (that uses tuples as keys) from a
     JSON-string created with :attr:`_encode_conversations_to_json`.
 
@@ -358,7 +446,7 @@ def decode_conversations_from_json(json_string):
         :obj:`dict`: The conversations dict after decoding
     """
     tmp = json.loads(json_string)
-    conversations = {}
+    conversations: Dict[str, Dict[Tuple, Any]] = {}
     for handler, states in tmp.items():
         conversations[handler] = {}
         for key, state in states.items():
@@ -366,7 +454,7 @@ def decode_conversations_from_json(json_string):
     return conversations
 
 
-def decode_user_chat_data_from_json(data):
+def decode_user_chat_data_from_json(data: str) -> DefaultDict[int, Dict[Any, Any]]:
     """Helper method to decode chat or user data (that uses ints as keys) from a
     JSON-string.
 
@@ -377,12 +465,12 @@ def decode_user_chat_data_from_json(data):
         :obj:`dict`: The user/chat_data defaultdict after decoding
     """
 
-    tmp = defaultdict(dict)
+    tmp: DefaultDict[int, Dict[Any, Any]] = defaultdict(dict)
     decoded_data = json.loads(data)
-    for user, data in decoded_data.items():
+    for user, user_data in decoded_data.items():
         user = int(user)
         tmp[user] = {}
-        for key, value in data.items():
+        for key, value in user_data.items():
             try:
                 key = int(key)
             except ValueError:
@@ -428,21 +516,26 @@ class DefaultValue:
         if value:
             ...
 
+    Args:
+        value (:obj:`obj`): The value of the default argument
+
     Attributes:
         value (:obj:`obj`): The value of the default argument
 
-    Args:
-        value (:obj:`obj`): The value of the default argument
     """
-    def __init__(self, value=None):
+
+    def __init__(self, value: Any = None):
         self.value = value
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return bool(self.value)
 
 
-DEFAULT_NONE = DefaultValue(None)
+DEFAULT_NONE: DefaultValue = DefaultValue(None)
 """:class:`DefaultValue`: Default `None`"""
+
+DEFAULT_FALSE: DefaultValue = DefaultValue(False)
+""":class:`DefaultValue`: Default `False`"""
 
 
 def get_callback_data_signature(chat_id, callback_data, bot):
@@ -459,9 +552,11 @@ def get_callback_data_signature(chat_id, callback_data, bot):
     Returns:
         :class:`HMAC`: The encrpyted data to send in the :class:`telegram.InlineKeyboardButton`.
     """
-    mac = hmac.new('{}{}'.format(bot.token, bot.username).encode('utf-8'),
-                   msg='{}{}'.format(chat_id, callback_data).encode('utf-8'),
-                   digestmod='md5')
+    mac = hmac.new(
+        '{}{}'.format(bot.token, bot.username).encode('utf-8'),
+        msg='{}{}'.format(chat_id, callback_data).encode('utf-8'),
+        digestmod='md5',
+    )
     return mac.digest()
 
 

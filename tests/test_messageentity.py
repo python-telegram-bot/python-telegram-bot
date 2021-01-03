@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -22,8 +22,7 @@ import pytest
 from telegram import MessageEntity, User
 
 
-@pytest.fixture(scope="class",
-                params=MessageEntity.ALL_TYPES)
+@pytest.fixture(scope="class", params=MessageEntity.ALL_TYPES)
 def message_entity(request):
     type_ = request.param
     url = None
@@ -38,18 +37,14 @@ def message_entity(request):
     return MessageEntity(type, 1, 3, url=url, user=user, language=language)
 
 
-class TestMessageEntity(object):
+class TestMessageEntity:
     type_ = 'url'
     offset = 1
     length = 2
     url = 'url'
 
     def test_de_json(self, bot):
-        json_dict = {
-            'type': self.type_,
-            'offset': self.offset,
-            'length': self.length
-        }
+        json_dict = {'type': self.type_, 'offset': self.offset, 'length': self.length}
         entity = MessageEntity.de_json(json_dict, bot)
 
         assert entity.type == self.type_

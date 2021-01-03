@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,7 @@ from telegram import Bot
 from telegram.ext import TypeHandler, CallbackContext, JobQueue
 
 
-class TestTypeHandler(object):
+class TestTypeHandler:
     test_flag = False
 
     @pytest.fixture(autouse=True)
@@ -44,14 +44,16 @@ class TestTypeHandler(object):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
     def callback_context(self, update, context):
-        self.test_flag = (isinstance(context, CallbackContext)
-                          and isinstance(context.bot, Bot)
-                          and isinstance(update, dict)
-                          and isinstance(context.update_queue, Queue)
-                          and isinstance(context.job_queue, JobQueue)
-                          and context.user_data is None
-                          and context.chat_data is None
-                          and isinstance(context.bot_data, dict))
+        self.test_flag = (
+            isinstance(context, CallbackContext)
+            and isinstance(context.bot, Bot)
+            and isinstance(update, dict)
+            and isinstance(context.update_queue, Queue)
+            and isinstance(context.job_queue, JobQueue)
+            and context.user_data is None
+            and context.chat_data is None
+            and isinstance(context.bot_data, dict)
+        )
 
     def test_basic(self, dp):
         handler = TypeHandler(dict, self.callback_basic)
@@ -76,8 +78,7 @@ class TestTypeHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = TypeHandler(dict, self.callback_queue_1,
-                              pass_update_queue=True)
+        handler = TypeHandler(dict, self.callback_queue_1, pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -85,8 +86,9 @@ class TestTypeHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = TypeHandler(dict, self.callback_queue_2, pass_job_queue=True,
-                              pass_update_queue=True)
+        handler = TypeHandler(
+            dict, self.callback_queue_2, pass_job_queue=True, pass_update_queue=True
+        )
         dp.add_handler(handler)
 
         self.test_flag = False

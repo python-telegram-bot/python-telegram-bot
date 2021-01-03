@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -24,12 +24,14 @@ from telegram import EncryptedCredentials, PassportElementError
 
 @pytest.fixture(scope='class')
 def encrypted_credentials():
-    return EncryptedCredentials(TestEncryptedCredentials.data,
-                                TestEncryptedCredentials.hash,
-                                TestEncryptedCredentials.secret)
+    return EncryptedCredentials(
+        TestEncryptedCredentials.data,
+        TestEncryptedCredentials.hash,
+        TestEncryptedCredentials.secret,
+    )
 
 
-class TestEncryptedCredentials(object):
+class TestEncryptedCredentials:
     data = 'data'
     hash = 'hash'
     secret = 'secret'
@@ -43,12 +45,9 @@ class TestEncryptedCredentials(object):
         encrypted_credentials_dict = encrypted_credentials.to_dict()
 
         assert isinstance(encrypted_credentials_dict, dict)
-        assert (encrypted_credentials_dict['data']
-                == encrypted_credentials.data)
-        assert (encrypted_credentials_dict['hash']
-                == encrypted_credentials.hash)
-        assert (encrypted_credentials_dict['secret']
-                == encrypted_credentials.secret)
+        assert encrypted_credentials_dict['data'] == encrypted_credentials.data
+        assert encrypted_credentials_dict['hash'] == encrypted_credentials.hash
+        assert encrypted_credentials_dict['secret'] == encrypted_credentials.secret
 
     def test_equality(self):
         a = EncryptedCredentials(self.data, self.hash, self.secret)

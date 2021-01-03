@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -24,12 +24,14 @@ from telegram import PassportElementErrorFrontSide, PassportElementErrorSelfie
 
 @pytest.fixture(scope='class')
 def passport_element_error_front_side():
-    return PassportElementErrorFrontSide(TestPassportElementErrorFrontSide.type_,
-                                         TestPassportElementErrorFrontSide.file_hash,
-                                         TestPassportElementErrorFrontSide.message)
+    return PassportElementErrorFrontSide(
+        TestPassportElementErrorFrontSide.type_,
+        TestPassportElementErrorFrontSide.file_hash,
+        TestPassportElementErrorFrontSide.message,
+    )
 
 
-class TestPassportElementErrorFrontSide(object):
+class TestPassportElementErrorFrontSide:
     source = 'front_side'
     type_ = 'test_type'
     file_hash = 'file_hash'
@@ -45,14 +47,22 @@ class TestPassportElementErrorFrontSide(object):
         passport_element_error_front_side_dict = passport_element_error_front_side.to_dict()
 
         assert isinstance(passport_element_error_front_side_dict, dict)
-        assert (passport_element_error_front_side_dict['source']
-                == passport_element_error_front_side.source)
-        assert (passport_element_error_front_side_dict['type']
-                == passport_element_error_front_side.type)
-        assert (passport_element_error_front_side_dict['file_hash']
-                == passport_element_error_front_side.file_hash)
-        assert (passport_element_error_front_side_dict['message']
-                == passport_element_error_front_side.message)
+        assert (
+            passport_element_error_front_side_dict['source']
+            == passport_element_error_front_side.source
+        )
+        assert (
+            passport_element_error_front_side_dict['type']
+            == passport_element_error_front_side.type
+        )
+        assert (
+            passport_element_error_front_side_dict['file_hash']
+            == passport_element_error_front_side.file_hash
+        )
+        assert (
+            passport_element_error_front_side_dict['message']
+            == passport_element_error_front_side.message
+        )
 
     def test_equality(self):
         a = PassportElementErrorFrontSide(self.type_, self.file_hash, self.message)

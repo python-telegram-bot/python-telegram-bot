@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,19 +19,22 @@
 
 import pytest
 
-from telegram import Update, User, ShippingAddress, ShippingQuery
+from telegram import Update, User, ShippingAddress, ShippingQuery, Bot
+from tests.conftest import check_shortcut_call, check_shortcut_signature
 
 
 @pytest.fixture(scope='class')
 def shipping_query(bot):
-    return ShippingQuery(TestShippingQuery.id_,
-                         TestShippingQuery.from_user,
-                         TestShippingQuery.invoice_payload,
-                         TestShippingQuery.shipping_address,
-                         bot=bot)
+    return ShippingQuery(
+        TestShippingQuery.id_,
+        TestShippingQuery.from_user,
+        TestShippingQuery.invoice_payload,
+        TestShippingQuery.shipping_address,
+        bot=bot,
+    )
 
 
-class TestShippingQuery(object):
+class TestShippingQuery:
     id_ = 5
     invoice_payload = 'invoice_payload'
     from_user = User(0, '', False)
@@ -42,7 +45,7 @@ class TestShippingQuery(object):
             'id': TestShippingQuery.id_,
             'invoice_payload': TestShippingQuery.invoice_payload,
             'from': TestShippingQuery.from_user.to_dict(),
-            'shipping_address': TestShippingQuery.shipping_address.to_dict()
+            'shipping_address': TestShippingQuery.shipping_address.to_dict(),
         }
         shipping_query = ShippingQuery.de_json(json_dict, bot)
 
@@ -50,7 +53,7 @@ class TestShippingQuery(object):
         assert shipping_query.invoice_payload == self.invoice_payload
         assert shipping_query.from_user == self.from_user
         assert shipping_query.shipping_address == self.shipping_address
-        assert shipping_query.bot == bot
+        assert shipping_query.bot is bot
 
     def test_to_dict(self, shipping_query):
         shipping_query_dict = shipping_query.to_dict()
@@ -62,11 +65,19 @@ class TestShippingQuery(object):
         assert shipping_query_dict['shipping_address'] == shipping_query.shipping_address.to_dict()
 
     def test_answer(self, monkeypatch, shipping_query):
-        def test(*args, **kwargs):
-            return args[0] == shipping_query.id
+        answer_shipping_query = shipping_query.bot.answer_shipping_query
 
-        monkeypatch.setattr(shipping_query.bot, 'answer_shipping_query', test)
-        assert shipping_query.answer()
+        def make_assertion(*_, **kwargs):
+            return kwargs['shipping_query_id'] == shipping_query.id and check_shortcut_call(
+                kwargs, answer_shipping_query
+            )
+
+        assert check_shortcut_signature(
+            ShippingQuery.answer, Bot.answer_shipping_query, ['shipping_query_id'], []
+        )
+
+        monkeypatch.setattr(shipping_query.bot, 'answer_shipping_query', make_assertion)
+        assert shipping_query.answer(ok=True)
 
     def test_equality(self):
         a = ShippingQuery(self.id_, self.from_user, self.invoice_payload, self.shipping_address)

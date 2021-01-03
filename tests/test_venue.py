@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,25 +18,33 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 import pytest
+from flaky import flaky
 
 from telegram import Location, Venue
+from telegram.error import BadRequest
 
 
 @pytest.fixture(scope='class')
 def venue():
-    return Venue(TestVenue.location,
-                 TestVenue.title,
-                 TestVenue.address,
-                 foursquare_id=TestVenue.foursquare_id,
-                 foursquare_type=TestVenue.foursquare_type)
+    return Venue(
+        TestVenue.location,
+        TestVenue.title,
+        TestVenue.address,
+        foursquare_id=TestVenue.foursquare_id,
+        foursquare_type=TestVenue.foursquare_type,
+        google_place_id=TestVenue.google_place_id,
+        google_place_type=TestVenue.google_place_type,
+    )
 
 
-class TestVenue(object):
+class TestVenue:
     location = Location(longitude=-46.788279, latitude=-23.691288)
     title = 'title'
     address = 'address'
     foursquare_id = 'foursquare id'
     foursquare_type = 'foursquare type'
+    google_place_id = 'google place id'
+    google_place_type = 'google place type'
 
     def test_de_json(self, bot):
         json_dict = {
@@ -44,7 +52,9 @@ class TestVenue(object):
             'title': TestVenue.title,
             'address': TestVenue.address,
             'foursquare_id': TestVenue.foursquare_id,
-            'foursquare_type': TestVenue.foursquare_type
+            'foursquare_type': TestVenue.foursquare_type,
+            'google_place_id': TestVenue.google_place_id,
+            'google_place_type': TestVenue.google_place_type,
         }
         venue = Venue.de_json(json_dict, bot)
 
@@ -53,19 +63,60 @@ class TestVenue(object):
         assert venue.address == self.address
         assert venue.foursquare_id == self.foursquare_id
         assert venue.foursquare_type == self.foursquare_type
+        assert venue.google_place_id == self.google_place_id
+        assert venue.google_place_type == self.google_place_type
 
     def test_send_with_venue(self, monkeypatch, bot, chat_id, venue):
-        def test(_, url, data, **kwargs):
-            return (data['longitude'] == self.location.longitude
-                    and data['latitude'] == self.location.latitude
-                    and data['title'] == self.title
-                    and data['address'] == self.address
-                    and data['foursquare_id'] == self.foursquare_id
-                    and data['foursquare_type'] == self.foursquare_type)
+        def test(url, data, **kwargs):
+            return (
+                data['longitude'] == self.location.longitude
+                and data['latitude'] == self.location.latitude
+                and data['title'] == self.title
+                and data['address'] == self.address
+                and data['foursquare_id'] == self.foursquare_id
+                and data['foursquare_type'] == self.foursquare_type
+                and data['google_place_id'] == self.google_place_id
+                and data['google_place_type'] == self.google_place_type
+            )
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        monkeypatch.setattr(bot.request, 'post', test)
         message = bot.send_venue(chat_id, venue=venue)
         assert message
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize(
+        'default_bot,custom',
+        [
+            ({'allow_sending_without_reply': True}, None),
+            ({'allow_sending_without_reply': False}, None),
+            ({'allow_sending_without_reply': False}, True),
+        ],
+        indirect=['default_bot'],
+    )
+    def test_send_venue_default_allow_sending_without_reply(
+        self, default_bot, chat_id, venue, custom
+    ):
+        reply_to_message = default_bot.send_message(chat_id, 'test')
+        reply_to_message.delete()
+        if custom is not None:
+            message = default_bot.send_venue(
+                chat_id,
+                venue=venue,
+                allow_sending_without_reply=custom,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert message.reply_to_message is None
+        elif default_bot.defaults.allow_sending_without_reply:
+            message = default_bot.send_venue(
+                chat_id, venue=venue, reply_to_message_id=reply_to_message.message_id
+            )
+            assert message.reply_to_message is None
+        else:
+            with pytest.raises(BadRequest, match='message not found'):
+                default_bot.send_venue(
+                    chat_id, venue=venue, reply_to_message_id=reply_to_message.message_id
+                )
 
     def test_send_venue_without_required(self, bot, chat_id):
         with pytest.raises(ValueError, match='Either venue or latitude, longitude, address and'):
@@ -80,6 +131,8 @@ class TestVenue(object):
         assert venue_dict['address'] == venue.address
         assert venue_dict['foursquare_id'] == venue.foursquare_id
         assert venue_dict['foursquare_type'] == venue.foursquare_type
+        assert venue_dict['google_place_id'] == venue.google_place_id
+        assert venue_dict['google_place_type'] == venue.google_place_type
 
     def test_equality(self):
         a = Venue(Location(0, 0), self.title, self.address)

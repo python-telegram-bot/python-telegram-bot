@@ -45,6 +45,7 @@ with codecs.open('README.rst', 'r', 'utf-8') as fd:
           description="We have made you a wrapper you can't refuse",
           long_description=fd.read(),
           packages=packages,
+          package_data={'telegram': ['py.typed']},
           install_requires=requirements,
           extras_require={
               'json': 'ujson',
@@ -61,8 +62,8 @@ with codecs.open('README.rst', 'r', 'utf-8') as fd:
               'Topic :: Internet',
               'Programming Language :: Python',
               'Programming Language :: Python :: 3',
-              'Programming Language :: Python :: 3.5',
               'Programming Language :: Python :: 3.6',
               'Programming Language :: Python :: 3.7',
               'Programming Language :: Python :: 3.8',
+              'Programming Language :: Python :: 3.9',
           ],)
