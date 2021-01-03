@@ -157,7 +157,6 @@ def message(bot):
                 ]
             },
         },
-        {'quote': True},
         {'dice': Dice(4, '🎲')},
         {'via_bot': User(9, 'A_Bot', True)},
         {

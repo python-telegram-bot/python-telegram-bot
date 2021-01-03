@@ -48,7 +48,7 @@ class PicklePersistence(BasePersistence):
         store_bot_data (:obj:`bool`, optional): Whether bot_data should be saved by this
             persistence class. Default is :obj:`True`.
         store_callback_data (:obj:`bool`, optional): Whether callback_data should be saved by this
-            persistence class. Default is ``True``.
+            persistence class. Default is :obj:`False`.
         single_file (:obj:`bool`, optional): When :obj:`False` will store 3 separate files of
             `filename_user_data`, `filename_chat_data` and `filename_conversations`. Default is
             :obj:`True`.
@@ -85,7 +85,7 @@ class PicklePersistence(BasePersistence):
         store_bot_data: bool = True,
         single_file: bool = True,
         on_flush: bool = False,
-        store_callback_data: bool = True,
+        store_callback_data: bool = False,
     ):
         super().__init__(
             store_user_data=store_user_data,

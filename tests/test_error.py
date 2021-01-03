@@ -31,6 +31,7 @@ from telegram.error import (
     ChatMigrated,
     RetryAfter,
     Conflict,
+    InvalidCallbackData,
 )
 
 
@@ -112,6 +113,7 @@ class TestErrors:
             (RetryAfter(12), ["message", "retry_after"]),
             (Conflict("test message"), ["message"]),
             (TelegramDecryptionError("test message"), ["message"]),
+            (InvalidCallbackData(789), ['update_id']),
         ],
     )
     def test_errors_pickling(self, exception, attributes):
@@ -147,6 +149,7 @@ class TestErrors:
                     RetryAfter,
                     Conflict,
                     TelegramDecryptionError,
+                    InvalidCallbackData,
                 },
                 NetworkError: {BadRequest, TimedOut},
             }

@@ -347,7 +347,13 @@ class TestUpdater:
                     from_user=None,
                     chat_instance=123,
                     data='invalid data',
-                    message=Message(1, User(1, '', False), None, Chat(1, ''), text='Webhook'),
+                    message=Message(
+                        1,
+                        from_user=User(1, '', False),
+                        date=None,
+                        chat=Chat(1, ''),
+                        text='Webhook',
+                    ),
                 ),
             )
             self._send_webhook_msg(ip, port, update.to_json(), 'TOKEN')

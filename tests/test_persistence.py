@@ -183,17 +183,20 @@ class TestBasePersistence:
         assert base_persistence.store_user_data
         assert base_persistence.store_bot_data
 
-    def test_abstract_methods(self):
+    def test_abstract_methods(self, base_persistence):
         with pytest.raises(
             TypeError,
             match=(
                 'get_bot_data, get_chat_data, get_conversations, '
                 'get_user_data, update_bot_data, update_chat_data, '
-                'update_conversation, update_user_data, '
-                'get_callback_data, update_callback_data'
+                'update_conversation, update_user_data'
             ),
         ):
             BasePersistence()
+        with pytest.raises(NotImplementedError):
+            base_persistence.get_callback_data()
+        with pytest.raises(NotImplementedError):
+            base_persistence.update_callback_data({'foo': 'bar'})
 
     def test_implementation(self, updater, base_persistence):
         dp = updater.dispatcher
@@ -2009,7 +2012,7 @@ class TestDictPersistence:
             context.dispatcher.user_data[789]['test3'] = '123'
             context.dispatcher.callback_data['test'] = 'Working3!'
 
-        dict_persistence = DictPersistence()
+        dict_persistence = DictPersistence(store_callback_data=True)
         cdp.persistence = dict_persistence
         job_queue.set_dispatcher(cdp)
         job_queue.start()

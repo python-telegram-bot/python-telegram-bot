@@ -727,6 +727,9 @@ class TestDispatcher:
             def get_user_data(self):
                 pass
 
+            def get_callback_data(self):
+                pass
+
             def get_conversations(self, name):
                 pass
 

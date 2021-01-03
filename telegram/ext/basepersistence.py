@@ -66,9 +66,9 @@ class BasePersistence(ABC):
         store_chat_data (:obj:`bool`, optional): Whether chat_data should be saved by this
             persistence class. Default is :obj:`True` .
         store_bot_data (:obj:`bool`, optional): Whether bot_data should be saved by this
-            persistence class. Default is :obj:`True` .
+            persistence class. Default is :obj:`True`.
         store_callback_data (:obj:`bool`, optional): Whether callback_data should be saved by this
-            persistence class. Default is ``True`` .
+            persistence class. Default is :obj:`False`.
 
     Attributes:
         store_user_data (:obj:`bool`): Optional, Whether user_data should be saved by this
@@ -121,7 +121,7 @@ class BasePersistence(ABC):
         store_user_data: bool = True,
         store_chat_data: bool = True,
         store_bot_data: bool = True,
-        store_callback_data: bool = True,
+        store_callback_data: bool = False,
     ):
         self.store_user_data = store_user_data
         self.store_chat_data = store_chat_data
@@ -325,7 +325,6 @@ class BasePersistence(ABC):
             :obj:`dict`: The restored bot data.
         """
 
-    @abstractmethod
     def get_callback_data(self) -> Dict[str, Any]:
         """ "Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the callback_data if stored, or an empty
@@ -334,6 +333,7 @@ class BasePersistence(ABC):
         Returns:
             :obj:`dict`: The restored bot data.
         """
+        raise NotImplementedError
 
     @abstractmethod
     def get_conversations(self, name: str) -> ConversationDict:
@@ -391,7 +391,6 @@ class BasePersistence(ABC):
             data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.bot_data` .
         """
 
-    @abstractmethod
     def update_callback_data(self, data: Dict[str, Any]) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
         handled an update.
@@ -399,6 +398,7 @@ class BasePersistence(ABC):
         Args:
             data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.update_callback_data` .
         """
+        raise NotImplementedError
 
     def flush(self) -> None:
         """Will be called by :class:`telegram.ext.Updater` upon receiving a stop signal. Gives the
