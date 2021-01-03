@@ -206,7 +206,6 @@ def message(bot):
         'passport_data',
         'poll',
         'reply_markup',
-        'default_quote',
         'dice',
         'via_bot',
         'proximity_alert_triggered',

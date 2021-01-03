@@ -168,7 +168,7 @@ class CallbackQueryHandler(Handler[Update]):
                 if callback_data is not None:
                     if callable(self.pattern):
                         return self.pattern(callback_data)
-                    elif isinstance(callback_data, str):
+                    if isinstance(callback_data, str):
                         match = re.match(self.pattern, callback_data)
                         if match:
                             return match

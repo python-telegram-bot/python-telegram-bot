@@ -27,11 +27,11 @@ from threading import Event, Lock, Thread, current_thread
 from time import sleep
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, Union, no_type_check
 
-from telegram import Bot, TelegramError
+from telegram import Bot, TelegramError, Update
 from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized
 from telegram.ext import Dispatcher, JobQueue
 from telegram.utils.deprecate import TelegramDeprecationWarning
-from telegram.utils.helpers import get_signal_name
+from telegram.utils.helpers import get_signal_name, DEFAULT_FALSE, DEFAULT_TRUE, DefaultValue
 from telegram.utils.request import Request
 from telegram.utils.webhookhandler import WebhookAppClass, WebhookServer
 
@@ -130,8 +130,8 @@ class Updater:
         use_context: bool = True,
         dispatcher: Dispatcher = None,
         base_file_url: str = None,
-        arbitrary_callback_data: bool = DEFAULT_FALSE,
-        validate_callback_data: bool = DEFAULT_TRUE,
+        arbitrary_callback_data: Union[DefaultValue, bool] = DEFAULT_FALSE,
+        validate_callback_data: Union[DefaultValue, bool] = DEFAULT_TRUE,
     ):
 
         if defaults and bot:
@@ -148,7 +148,6 @@ class Updater:
             warnings.warn(
                 'Passing arbitrary_callback_data/validate_callback_data to an Updater has no '
                 'effect when a Bot is passed as well. Pass them to the Bot instead.',
-                warnings.WarningMessage,
                 stacklevel=2,
             )
 

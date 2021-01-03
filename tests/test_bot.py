@@ -43,9 +43,12 @@ from telegram import (
     Dice,
     MessageEntity,
     ParseMode,
+    CallbackQuery,
+    Message,
+    Chat,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
-from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
+from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter, InvalidCallbackData
 from telegram.utils.helpers import from_timestamp, escape_markdown, to_timestamp
 from tests.conftest import expect_bad_request
 
@@ -1112,7 +1115,13 @@ class TestBot:
                         from_user=None,
                         chat_instance=123,
                         data='invalid data',
-                        message=Message(1, User(1, '', False), None, Chat(1, ''), text='Webhook'),
+                        message=Message(
+                            1,
+                            from_user=User(1, '', False),
+                            date=None,
+                            chat=Chat(1, ''),
+                            text='Webhook',
+                        ),
                     ),
                 ).to_dict()
             ]
@@ -1128,23 +1137,6 @@ class TestBot:
 
         # Reset b/c bots scope is session
         bot.arbitrary_callback_data = False
-
-    @pytest.mark.parametrize('default_bot', [{'quote': True}], indirect=True)
-    def test_get_updates_default_quote(self, default_bot, monkeypatch):
-        def post(*args, **kwargs):
-            return [
-                Update(
-                    17, message=Message(1, User(1, '', False), None, Chat(1, ''), text='Webhook')
-                ).to_dict()
-            ]
-
-        monkeypatch.setattr('telegram.utils.request.Request.post', post)
-        default_bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
-        updates = default_bot.get_updates(timeout=1)
-
-        assert isinstance(updates, list)
-        assert isinstance(updates[0], Update)
-        assert updates[0].message.default_quote is True
 
     @flaky(3, 1)
     @pytest.mark.timeout(15)

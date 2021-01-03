@@ -550,9 +550,9 @@ class Dispatcher:
             if self.persistence.store_callback_data:
                 try:
                     self.persistence.update_callback_data(self.callback_data)
-                except Exception as e:
+                except Exception as exc:
                     try:
-                        self.dispatch_error(update, e)
+                        self.dispatch_error(update, exc)
                     except Exception:
                         message = (
                             'Saving callback data raised an error and an '

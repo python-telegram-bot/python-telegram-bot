@@ -79,6 +79,7 @@ class BasePersistence(ABC):
             persistence class.
         store_callback_data (:obj:`bool`): Optional. Whether callback_data should be saved by this
             persistence class.
+    """
 
     def __new__(cls, *args: Any, **kwargs: Any) -> 'BasePersistence':  # pylint: disable=W0613
         instance = super().__new__(cls)
@@ -323,10 +324,10 @@ class BasePersistence(ABC):
         Returns:
             :obj:`dict`: The restored bot data.
         """
-    
+
     @abstractmethod
-    def get_callback_data(self) -> Dict[int, Any]:
-        """"Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
+    def get_callback_data(self) -> Dict[str, Any]:
+        """ "Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the callback_data if stored, or an empty
         ``dict``.
 
@@ -391,7 +392,7 @@ class BasePersistence(ABC):
         """
 
     @abstractmethod
-    def update_callback_data(self, data: Dict[int, Any]) -> None:
+    def update_callback_data(self, data: Dict[str, Any]) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
         handled an update.
 

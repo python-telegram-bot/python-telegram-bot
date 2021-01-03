@@ -137,8 +137,10 @@ class DictPersistence(BasePersistence):
             try:
                 self._callback_data = json.loads(callback_data_json)
                 self._callback_data_json = callback_data_json
-            except (ValueError, AttributeError):
-                raise TypeError("Unable to deserialize callback_data_json. Not valid JSON")
+            except (ValueError, AttributeError) as exc:
+                raise TypeError(
+                    "Unable to deserialize callback_data_json. Not valid JSON"
+                ) from exc
             if not isinstance(self._bot_data, dict):
                 raise TypeError("callback_data_json must be serialized dict")
 
@@ -188,17 +190,16 @@ class DictPersistence(BasePersistence):
         return json.dumps(self.bot_data)
 
     @property
-    def callback_data(self):
+    def callback_data(self) -> Optional[Dict[str, Any]]:
         """:obj:`dict`: The callback_data as a dict"""
         return self._callback_data
 
     @property
-    def callback_data_json(self):
+    def callback_data_json(self) -> str:
         """:obj:`str`: The callback_data serialized as a JSON-string."""
         if self._callback_data_json:
             return self._callback_data_json
-        else:
-            return json.dumps(self.callback_data)
+        return json.dumps(self.callback_data)
 
     @property
     def conversations(self) -> Optional[Dict[str, Dict[Tuple, Any]]]:
@@ -250,17 +251,17 @@ class DictPersistence(BasePersistence):
             self._bot_data = {}
         return deepcopy(self.bot_data)  # type: ignore[arg-type]
 
-    def get_callback_data(self):
+    def get_callback_data(self) -> Dict[str, Any]:
         """Returns the callback_data created from the ``callback_data_json`` or an empty dict.
 
         Returns:
-            :obj:`defaultdict`: The restored user data.
+            :obj:`dict`: The restored user data.
         """
         if self.callback_data:
             pass
         else:
             self._callback_data = {}
-        return deepcopy(self.callback_data)
+        return deepcopy(self.callback_data)  # type: ignore[arg-type]
 
     def get_conversations(self, name: str) -> ConversationDict:
         """Returns the conversations created from the ``conversations_json`` or an empty
@@ -331,7 +332,7 @@ class DictPersistence(BasePersistence):
         self._bot_data = data.copy()
         self._bot_data_json = None
 
-    def update_callback_data(self, data):
+    def update_callback_data(self, data: Dict[str, Any]) -> None:
         """Will update the callback_data (if changed).
 
         Args:

@@ -99,7 +99,7 @@ class PicklePersistence(BasePersistence):
         self.user_data: Optional[DefaultDict[int, Dict]] = None
         self.chat_data: Optional[DefaultDict[int, Dict]] = None
         self.bot_data: Optional[Dict] = None
-        self.callback_data = None
+        self.callback_data: Optional[Dict[str, Any]] = None
         self.conversations: Optional[Dict[str, Dict[Tuple, Any]]] = None
 
     def load_singlefile(self) -> None:
@@ -210,7 +210,7 @@ class PicklePersistence(BasePersistence):
             self.load_singlefile()
         return deepcopy(self.bot_data)  # type: ignore[arg-type]
 
-    def get_callback_data(self):
+    def get_callback_data(self) -> Dict[str, Any]:
         """Returns the callback_data from the pickle file if it exsists or an empty dict.
 
         Returns:
@@ -226,7 +226,7 @@ class PicklePersistence(BasePersistence):
             self.callback_data = data
         else:
             self.load_singlefile()
-        return deepcopy(self.callback_data)
+        return deepcopy(self.callback_data)  # type: ignore[arg-type]
 
     def get_conversations(self, name: str) -> ConversationDict:
         """Returns the conversations from the pickle file if it exsists or an empty dict.
@@ -326,7 +326,7 @@ class PicklePersistence(BasePersistence):
             else:
                 self.dump_singlefile()
 
-    def update_callback_data(self, data):
+    def update_callback_data(self, data: Dict[str, Any]) -> None:
         """Will update the callback_data (if changed) and depending on :attr:`on_flush` save the
         pickle file.
 

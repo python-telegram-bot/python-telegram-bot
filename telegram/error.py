@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=C0115
 """This module contains an object that represents Telegram errors."""
-from typing import Tuple
+from typing import Tuple, Optional
 
 
 def _lstrip_str(in_s: str, lstr: str) -> str:
@@ -136,8 +136,9 @@ class InvalidCallbackData(TelegramError):
         update_id (:obj:`int`, optional): The ID of the untrusted Update.
     """
 
-    def __init__(self, update_id=None):
-        super(InvalidCallbackData, self).__init__(
-            'The callback data has been tampered with! ' 'Skipping it.'
-        )
+    def __init__(self, update_id: int = None) -> None:
+        super().__init__('The callback data has been tampered with! Skipping it.')
         self.update_id = update_id
+
+    def __reduce__(self) -> Tuple[type, Tuple[Optional[int]]]:  # type: ignore[override]
+        return self.__class__, (self.update_id,)

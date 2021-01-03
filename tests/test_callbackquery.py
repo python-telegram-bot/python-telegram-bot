@@ -20,6 +20,8 @@
 import pytest
 
 from telegram import CallbackQuery, User, Message, Chat, Audio, Bot
+from telegram.error import InvalidCallbackData
+from telegram.utils.helpers import sign_callback_data
 from tests.conftest import check_shortcut_signature, check_shortcut_call
 
 

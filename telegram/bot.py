@@ -24,6 +24,7 @@
 import functools
 import inspect
 import logging
+import warnings
 from datetime import datetime
 
 from typing import (
@@ -36,6 +37,8 @@ from typing import (
     TypeVar,
     Union,
     no_type_check,
+    Dict,
+    cast,
 )
 
 from decorator import decorate
@@ -83,13 +86,14 @@ from telegram import (
     InlineKeyboardMarkup,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
-from telegram.error import InvalidToken, TelegramError
+from telegram.error import InvalidToken, TelegramError, InvalidCallbackData
 from telegram.utils.helpers import (
     DEFAULT_NONE,
     DefaultValue,
     to_timestamp,
     is_local_file,
     parse_file_input,
+    sign_callback_data,
 )
 from telegram.utils.request import Request
 from telegram.utils.types import FileInput, JSONDict
@@ -215,7 +219,7 @@ class Bot(TelegramObject):
         self.defaults = defaults
 
         # Dictionary for callback_data
-        self.callback_data = {}
+        self.callback_data: Dict[str, Any] = {}
         self.arbitrary_callback_data = arbitrary_callback_data
         self.validate_callback_data = validate_callback_data
 
@@ -273,9 +277,9 @@ class Bot(TelegramObject):
         timeout: float = None,
         api_kwargs: JSONDict = None,
     ) -> Union[bool, Message]:
-        def _replace_callback_data(reply_markup, chat_id):
+        def _replace_callback_data(reply_markup: ReplyMarkup, chat_id: int) -> None:
             if isinstance(reply_markup, InlineKeyboardMarkup):
-                for button in [b for l in reply_markup.inline_keyboard for b in l]:
+                for button in [b for list_ in reply_markup.inline_keyboard for b in list_]:
                     if button.callback_data:
                         self.callback_data[str(id(button.callback_data))] = button.callback_data
                         button.callback_data = sign_callback_data(
@@ -1471,10 +1475,6 @@ class Bot(TelegramObject):
             data['allow_sending_without_reply'] = allow_sending_without_reply
 
         result = self._post('sendMediaGroup', data, timeout=timeout, api_kwargs=api_kwargs)
-
-        if self.defaults:
-            for res in result:  # type: ignore
-                res['default_quote'] = self.defaults.quote  # type: ignore
 
         return [Message.de_json(res, self) for res in result]  # type: ignore
 
@@ -2739,9 +2739,8 @@ class Bot(TelegramObject):
             2. In order to avoid getting duplicate updates, recalculate offset after each
                server response.
             3. To take full advantage of this library take a look at :class:`telegram.ext.Updater`
-            4. The renutred list may contain :class:`telegram.error.InvalidCallbackData` instances.
-               Make sure to ignore the corresponding update id. For more information, please see
-               our wiki.
+            4. Updates causing :class:`telegram.error.InvalidCallbackData` will be logged and not
+               returned.
 
         Returns:
             List[:class:`telegram.Update` | :class:`telegram.error.InvalidCallbackData`]
@@ -2764,29 +2763,28 @@ class Bot(TelegramObject):
         # * Long polling poses a different problem: the connection might have been dropped while
         #   waiting for the server to return and there's no way of knowing the connection had been
         #   dropped in real time.
-        result = self._post(
-            'getUpdates', data, timeout=float(read_latency) + float(timeout), api_kwargs=api_kwargs
+        result = cast(
+            List[JSONDict],
+            self._post(
+                'getUpdates',
+                data,
+                timeout=float(read_latency) + float(timeout),
+                api_kwargs=api_kwargs,
+            ),
         )
 
         if result:
-            self.logger.debug(
-                'Getting updates: %s', [u['update_id'] for u in result]  # type: ignore
-            )
+            self.logger.debug('Getting updates: %s', [u['update_id'] for u in result])
         else:
             self.logger.debug('No new updates found.')
-
-        if self.defaults:
-            for u in result:  # type: ignore
-                u['default_quote'] = self.defaults.quote  # type: ignore
 
         updates = []
         for u in result:
             try:
-                updates.append(Update.de_json(u, self))
-            except InvalidCallbackData as e:
-                e.update_id = int(u['update_id'])
-                self.logger.warning('{} Malicious update: {}'.format(e, u))
-                updates.append(e)
+                updates.append(cast(Update, Update.de_json(u, self)))
+            except InvalidCallbackData as exc:
+                exc.update_id = int(u['update_id'])
+                self.logger.warning('%s Malicious update: %s', exc, u)
         return updates
 
     @log
@@ -2969,9 +2967,6 @@ class Bot(TelegramObject):
         data: JSONDict = {'chat_id': chat_id}
 
         result = self._post('getChat', data, timeout=timeout, api_kwargs=api_kwargs)
-
-        if self.defaults:
-            result['default_quote'] = self.defaults.quote  # type: ignore
 
         return Chat.de_json(result, self)  # type: ignore
 
