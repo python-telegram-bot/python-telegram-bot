@@ -40,6 +40,10 @@ class TestCallbackDataCache:
         assert ccd.maxsize == maxsize
         assert isinstance(ccd._data, dict)
         assert isinstance(ccd._deque, deque)
+        maxsize, data, queue = ccd.persistence_data
+        assert data is ccd._data
+        assert queue is ccd._deque
+        assert maxsize == ccd.maxsize
 
     @pytest.mark.parametrize('data,queue', [({}, None), (None, deque())])
     def test_init_error(self, data, queue):
@@ -50,7 +54,7 @@ class TestCallbackDataCache:
         obj = {1: 'foo'}
         now = time.time()
         uuid = callback_data_cache.put(obj)
-        data, queue = callback_data_cache.persistence_data
+        _, data, queue = callback_data_cache.persistence_data
         assert queue == deque((uuid,))
         assert list(data.keys()) == [uuid]
         assert pytest.approx(data[uuid][0]) == now
@@ -67,7 +71,7 @@ class TestCallbackDataCache:
         assert len(caplog.records) == 1
         assert uuid_foo in caplog.records[-1].getMessage()
 
-        data, queue = ccd.persistence_data
+        _, data, queue = ccd.persistence_data
         assert queue == deque((uuid_bar,))
         assert list(data.keys()) == [uuid_bar]
         assert pytest.approx(data[uuid_bar][0]) == now
@@ -79,7 +83,7 @@ class TestCallbackDataCache:
         result = callback_data_cache.pop(uuid)
 
         assert result is obj
-        data, queue = callback_data_cache.persistence_data
+        _, data, queue = callback_data_cache.persistence_data
         assert uuid not in data
         assert uuid not in queue
 
@@ -91,7 +95,7 @@ class TestCallbackDataCache:
         out = callback_data_cache.clear()
 
         assert len(expected) == len(out)
-        assert callback_data_cache.persistence_data == ({}, deque())
+        assert callback_data_cache.persistence_data == (1024, {}, deque())
 
         for idx, uuid in enumerate(expected):
             assert out[idx][0] == uuid

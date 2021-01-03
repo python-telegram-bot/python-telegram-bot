@@ -18,12 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardButton."""
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Union
 
 from telegram import TelegramObject
+from telegram.utils.helpers import sign_callback_data
 
 if TYPE_CHECKING:
-    from telegram import CallbackGame, LoginUrl
+    from telegram import CallbackGame, LoginUrl, Bot
 
 
 class InlineKeyboardButton(TelegramObject):
@@ -43,8 +44,9 @@ class InlineKeyboardButton(TelegramObject):
         url (:obj:`str`): HTTP or tg:// url to be opened when button is pressed.
         login_url (:class:`telegram.LoginUrl`, optional) An HTTP URL used to automatically
             authorize the user. Can be used as a replacement for the Telegram Login Widget.
-        callback_data (:obj:`str`, optional): Data to be sent in a callback query to the bot when
-            button is pressed, UTF-8 1-64 bytes.
+        callback_data (:obj:`str` | :obj:`Any`, optional): Data to be sent in a callback query to
+            the bot when button is pressed, UTF-8 1-64 bytes. If the bot instance allows arbitrary
+            callback data, anything can be passed.
         switch_inline_query (:obj:`str`, optional): If set, pressing the button will prompt the
             user to select one of their chats, open that chat and insert the bot's username and the
             specified inline query in the input field. Can be empty, in which case just the bot's
@@ -69,8 +71,8 @@ class InlineKeyboardButton(TelegramObject):
         url (:obj:`str`): Optional. HTTP or tg:// url to be opened when button is pressed.
         login_url (:class:`telegram.LoginUrl`) Optional. An HTTP URL used to automatically
             authorize the user. Can be used as a replacement for the Telegram Login Widget.
-        callback_data (:obj:`str`): Optional. Data to be sent in a callback query to the bot when
-            button is pressed, UTF-8 1-64 bytes.
+        callback_data (:obj:`str` | :obj:`Any`): Optional. Data to be sent in a callback query to
+            the bot when button is pressed, UTF-8 1-64 bytes.
         switch_inline_query (:obj:`str`): Optional. Will prompt the user to select one of their
             chats, open that chat and insert the bot's username and the specified inline query in
             the input field. Can be empty, in which case just the bot’s username will be inserted.
@@ -87,7 +89,7 @@ class InlineKeyboardButton(TelegramObject):
         self,
         text: str,
         url: str = None,
-        callback_data: str = None,
+        callback_data: Any = None,
         switch_inline_query: str = None,
         switch_inline_query_current_chat: str = None,
         callback_game: 'CallbackGame' = None,
@@ -117,3 +119,24 @@ class InlineKeyboardButton(TelegramObject):
             self.callback_game,
             self.pay,
         )
+
+    def replace_callback_data(
+        self, bot: 'Bot', chat_id: Union[int, str] = None
+    ) -> 'InlineKeyboardButton':
+        """
+        If this button has :attr:`callback_data`, will store that data in the bots callback data
+        cache and return a new button where the :attr:`callback_data` is replaced by the
+        corresponding unique identifier/a signed version of it. Otherwise just returns the button.
+
+        Args:
+            bot (:class:`telegram.Bot`): The bot this button will be sent with.
+            chat_id (:obj:`int` | :obj:`str`, optional): The chat this button will be sent to.
+
+        Returns:
+            :class:`telegram.InlineKeyboardButton`:
+        """
+        if not self.callback_data:
+            return self
+        uuid = bot.callback_data.put(self.callback_data)
+        callback_data = sign_callback_data(chat_id=chat_id, callback_data=uuid, bot=bot)
+        return InlineKeyboardButton(self.text, callback_data=callback_data)

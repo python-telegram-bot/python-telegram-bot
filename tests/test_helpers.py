@@ -20,6 +20,7 @@ import time
 import datetime as dtm
 from pathlib import Path
 import base64
+from uuid import uuid4
 
 import pytest
 
@@ -342,48 +343,62 @@ class TestHelpers:
     def test_parse_file_input_other(self, obj):
         assert helpers.parse_file_input(obj) is obj
 
-    @pytest.mark.parametrize(
-        'callback_data',
-        ['string', object(), Message(1, None, 0, None), Update(1), User(1, 'name', False)],
-    )
-    def test_sign_callback_data(self, bot, callback_data):
-        data = str(id(callback_data))
-        signed_data = helpers.sign_callback_data(-1234567890, data, bot)
+    @pytest.mark.parametrize('chat_id', [None, -1234567890])
+    def test_sign_callback_data(self, bot, chat_id):
+        uuid = str(uuid4())
+        signed_data = helpers.sign_callback_data(callback_data=uuid, bot=bot, chat_id=chat_id)
 
         assert isinstance(signed_data, str)
         assert len(signed_data) <= 64
 
         [signature, data] = signed_data.split(' ')
-        assert str(id(callback_data)) == data
+        assert data == uuid
 
-        sig = helpers.get_callback_data_signature(-1234567890, str(id(callback_data)), bot)
+        sig = helpers.get_callback_data_signature(callback_data=uuid, bot=bot, chat_id=chat_id)
         assert signature == base64.b64encode(sig).decode('utf-8')
 
-    @pytest.mark.parametrize(
-        'callback_data',
-        ['string', object(), Message(1, None, 0, None), Update(1), User(1, 'name', False)],
-    )
-    def test_validate_callback_data(self, bot, callback_data):
-        data = str(id(callback_data))
-        signed_data = helpers.sign_callback_data(-1234567890, data, bot)
+    @pytest.mark.parametrize('chat_id,not_chat_id', [(None, -1234567890), (-1234567890, None)])
+    def test_validate_callback_data(self, bot, chat_id, not_chat_id):
+        uuid = str(uuid4())
+        signed_data = helpers.sign_callback_data(callback_data=uuid, bot=bot, chat_id=chat_id)
 
-        assert data == helpers.validate_callback_data(-1234567890, signed_data, bot)
-
-        with pytest.raises(InvalidCallbackData):
-            helpers.validate_callback_data(-1234567, signed_data, bot)
-        assert data == helpers.validate_callback_data(-1234567, signed_data)
+        assert (
+            helpers.validate_callback_data(callback_data=signed_data, bot=bot, chat_id=chat_id)
+            == uuid
+        )
 
         with pytest.raises(InvalidCallbackData):
-            helpers.validate_callback_data(-1234567890, signed_data + 'abc', bot)
-        assert data + 'abc' == helpers.validate_callback_data(-1234567890, signed_data + 'abc')
+            helpers.validate_callback_data(callback_data=signed_data, bot=bot, chat_id=-123456)
+        with pytest.raises(InvalidCallbackData):
+            helpers.validate_callback_data(callback_data=signed_data, bot=bot, chat_id=not_chat_id)
+        assert helpers.validate_callback_data(callback_data=signed_data, chat_id=-123456) == uuid
+        assert (
+            helpers.validate_callback_data(callback_data=signed_data, chat_id=not_chat_id) == uuid
+        )
 
         with pytest.raises(InvalidCallbackData):
-            helpers.validate_callback_data(-1234567890, signed_data.replace('=', '=a'), bot)
-        assert data == helpers.validate_callback_data(-1234567890, signed_data.replace('=', '=a'))
+            helpers.validate_callback_data(
+                callback_data=signed_data + 'foobar', bot=bot, chat_id=chat_id
+            )
+        assert (
+            helpers.validate_callback_data(callback_data=signed_data + 'foobar', chat_id=chat_id)
+            == uuid + 'foobar'
+        )
+
+        with pytest.raises(InvalidCallbackData):
+            helpers.validate_callback_data(
+                callback_data=signed_data.replace('=', '=a'), bot=bot, chat_id=chat_id
+            )
+        assert (
+            helpers.validate_callback_data(
+                callback_data=signed_data.replace('=', '=a'), chat_id=chat_id
+            )
+            == uuid
+        )
 
         char_list = list(signed_data)
         char_list[1] = 'abc'
         s_data = ''.join(char_list)
         with pytest.raises(InvalidCallbackData):
-            helpers.validate_callback_data(-1234567890, s_data, bot)
-        assert data == helpers.validate_callback_data(-1234567890, s_data)
+            helpers.validate_callback_data(callback_data=s_data, bot=bot, chat_id=chat_id)
+        assert helpers.validate_callback_data(callback_data=s_data, chat_id=chat_id) == uuid

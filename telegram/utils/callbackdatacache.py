@@ -22,10 +22,11 @@ import time
 from datetime import datetime
 from collections import deque
 from threading import Lock
-from typing import Dict, Deque, Any, Tuple, Union, List
+from typing import Dict, Deque, Any, Tuple, Union, List, Optional
 from uuid import uuid4
 
 from telegram.utils.helpers import to_float_timestamp
+from telegram.utils.types import CCDData
 
 
 class CallbackDataCache:
@@ -56,7 +57,7 @@ class CallbackDataCache:
 
     def __init__(
         self,
-        maxsize: int = 1024,
+        maxsize: Optional[int] = 1024,
         data: Dict[str, Tuple[float, Any]] = None,
         queue: Deque[str] = None,
     ):
@@ -74,17 +75,19 @@ class CallbackDataCache:
         self.__lock = Lock()
 
     @property
-    def persistence_data(self) -> Tuple[Dict[str, Tuple[float, Any]], Deque[str]]:
+    def persistence_data(self) -> CCDData:
         """
         The data that needs to be persistence to allow caching callback data across bot reboots.
+        A new instance of this class can be created by::
+
+            CallbackDataCache(*callback_data_cache.persistence_data)
 
         Returns:
-             Tuple[Dict[:obj:`str`, Tuple[:obj:`float`, :obj:`Any`]], Deque[:obj:`str`]]: The
-                internal data as expected by
+             :class:`telegram.utils.types.CCDData`: The internal data as expected by
                 :meth:`telegram.ext.BasePersistence.update_callback_data`.
         """
         with self.__lock:
-            return self._data, self._deque
+            return self.maxsize, self._data, self._deque
 
     @property
     def full(self) -> bool:

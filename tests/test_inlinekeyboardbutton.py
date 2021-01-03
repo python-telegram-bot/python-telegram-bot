@@ -36,6 +36,10 @@ def inline_keyboard_button():
     )
 
 
+# InlineKeyboardButton.replace_callback_data is testing in test_inlinekeyboardmarkup.py
+# in the respective test
+
+
 class TestInlineKeyboardButton:
     text = 'text'
     url = 'url'

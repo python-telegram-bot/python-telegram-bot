@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import logging
 import time
 import datetime as dtm
 from pathlib import Path
@@ -48,7 +49,7 @@ from telegram import (
     Chat,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
-from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter, InvalidCallbackData
+from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
 from telegram.utils.helpers import from_timestamp, escape_markdown, to_timestamp
 from tests.conftest import expect_bad_request
 
@@ -1105,7 +1106,7 @@ class TestBot:
         if updates:
             assert isinstance(updates[0], Update)
 
-    def test_get_updates_malicious_callback_data(self, bot, monkeypatch):
+    def test_get_updates_malicious_callback_data(self, bot, monkeypatch, caplog):
         def post(*args, **kwargs):
             return [
                 Update(
@@ -1127,16 +1128,24 @@ class TestBot:
             ]
 
         bot.arbitrary_callback_data = True
-        monkeypatch.setattr('telegram.utils.request.Request.post', post)
-        bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
-        updates = bot.get_updates(timeout=1)
+        try:
+            monkeypatch.setattr(bot.request, 'post', post)
+            bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
+            with caplog.at_level(logging.DEBUG):
+                updates = bot.get_updates(timeout=1)
 
-        assert isinstance(updates, list)
-        assert isinstance(updates[0], InvalidCallbackData)
-        assert updates[0].update_id == 17
+            print([record.getMessage() for record in caplog.records])
+            assert any(
+                "has been tampered with! Skipping it. Malicious update: {'update_id': 17"
+                in record.getMessage()
+                for record in caplog.records
+            )
+            assert isinstance(updates, list)
+            assert len(updates) == 0
 
-        # Reset b/c bots scope is session
-        bot.arbitrary_callback_data = False
+        finally:
+            # Reset b/c bots scope is session
+            bot.arbitrary_callback_data = False
 
     @flaky(3, 1)
     @pytest.mark.timeout(15)

@@ -22,6 +22,7 @@ from queue import Queue
 from typing import TYPE_CHECKING, Any, Dict, List, Match, NoReturn, Optional, Tuple, Union
 
 from telegram import Update
+from telegram.utils.callbackdatacache import CallbackDataCache
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -141,6 +142,15 @@ class CallbackContext:
         raise AttributeError(
             "You can not assign a new value to user_data, see " "https://git.io/fjxKe"
         )
+
+    @property
+    def callback_data_cache(self) -> Optional[CallbackDataCache]:
+        """
+        :class:`telegram.utils.callbackdatacache.CallbackDataCache`: Optional. Cache for the bots
+            callback data. Only present when the bot uses allows to use arbitrary callback data.
+            Useful for manually dropping unused objects from the cache.
+        """
+        return self.bot.callback_data if self.bot.arbitrary_callback_data else None
 
     @classmethod
     def from_error(

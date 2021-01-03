@@ -20,7 +20,7 @@
 from copy import deepcopy
 
 from typing import Any, DefaultDict, Dict, Optional, Tuple
-from collections import defaultdict
+from collections import defaultdict, deque
 
 from telegram.utils.helpers import (
     decode_conversations_from_json,
@@ -28,7 +28,7 @@ from telegram.utils.helpers import (
     encode_conversations_to_json,
 )
 from telegram.ext import BasePersistence
-from telegram.utils.types import ConversationDict
+from telegram.utils.types import ConversationDict, CCDData
 
 try:
     import ujson as json
@@ -135,7 +135,10 @@ class DictPersistence(BasePersistence):
                 raise TypeError("bot_data_json must be serialized dict")
         if callback_data_json:
             try:
-                self._callback_data = json.loads(callback_data_json)
+                data = json.loads(callback_data_json)
+                self._callback_data = (
+                    (data[0], data[1], deque(data[2])) if data is not None else None
+                )
                 self._callback_data_json = callback_data_json
             except (ValueError, AttributeError) as exc:
                 raise TypeError(
@@ -190,16 +193,20 @@ class DictPersistence(BasePersistence):
         return json.dumps(self.bot_data)
 
     @property
-    def callback_data(self) -> Optional[Dict[str, Any]]:
-        """:obj:`dict`: The callback_data as a dict"""
+    def callback_data(self) -> Optional[CCDData]:
+        """:class:`telegram.utils.types.CCDData`: The meta data on the stored callback data."""
         return self._callback_data
 
     @property
     def callback_data_json(self) -> str:
-        """:obj:`str`: The callback_data serialized as a JSON-string."""
+        """:obj:`str`: The meta data on the stored callback data as a JSON-string."""
         if self._callback_data_json:
             return self._callback_data_json
-        return json.dumps(self.callback_data)
+        if self.callback_data is None:
+            return json.dumps(self.callback_data)
+        return json.dumps(
+            (self.callback_data[0], self.callback_data[1], list(self.callback_data[2]))
+        )
 
     @property
     def conversations(self) -> Optional[Dict[str, Dict[Tuple, Any]]]:
@@ -251,17 +258,19 @@ class DictPersistence(BasePersistence):
             self._bot_data = {}
         return deepcopy(self.bot_data)  # type: ignore[arg-type]
 
-    def get_callback_data(self) -> Dict[str, Any]:
-        """Returns the callback_data created from the ``callback_data_json`` or an empty dict.
+    def get_callback_data(self) -> Optional[CCDData]:
+        """Returns the callback_data created from the ``callback_data_json`` or :obj:`None`.
 
         Returns:
-            :obj:`dict`: The restored user data.
+            Optional[:class:`telegram.utils.types.CCDData`:]: The restored meta data as three-tuple
+                of :obj:`int`, dictionary and :class:`collections.deque` or :obj:`None`, if no data
+                was stored.
         """
         if self.callback_data:
             pass
         else:
-            self._callback_data = {}
-        return deepcopy(self.callback_data)  # type: ignore[arg-type]
+            self._callback_data = None
+        return deepcopy(self.callback_data)
 
     def get_conversations(self, name: str) -> ConversationDict:
         """Returns the conversations created from the ``conversations_json`` or an empty
@@ -332,13 +341,14 @@ class DictPersistence(BasePersistence):
         self._bot_data = data.copy()
         self._bot_data_json = None
 
-    def update_callback_data(self, data: Dict[str, Any]) -> None:
+    def update_callback_data(self, data: CCDData) -> None:
         """Will update the callback_data (if changed).
 
         Args:
-            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.callback_data`.
+            data (:class:`telegram.utils.types.CCDData`:): The relevant data to restore
+                :attr:`telegram.ext.dispatcher.bot.callback_data`.
         """
         if self._callback_data == data:
             return
-        self._callback_data = data.copy()
+        self._callback_data = (data[0], data[1].copy(), data[2].copy())
         self._callback_data_json = None

@@ -86,13 +86,18 @@ class Updater:
             used).
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
             be used if not set explicitly in the bot methods.
-        arbitrary_callback_data (:obj:`bool`, optional): Whether to allow arbitrary objects as
-            callback data for :class:`telegram.InlineKeyboardButton`. For more info, please see
+        arbitrary_callback_data (:obj:`bool` | :obj:`int` | :obj:`None`, optional): Whether to
+            allow arbitrary objects as callback data for :class:`telegram.InlineKeyboardButton`.
+            Pass an integer to specify the maximum number of cached objects. Pass 0 or :obj:`None`
+            for unlimited cache size. Cache limit defaults to 1024. For more info, please see
             our wiki. Defaults to :obj:`False`.
-        validate_callback_data (:obj:`bool`, optional): Whether the callback data of
-            :class:`telegram.CallbackQuery` updates received by the bot should be validated. Only
-            relevant, if :attr:`arbitrary_callback_data` as :obj:`True`. For more info, please see
-            our wiki. Defaults to :obj:`True`.
+
+            Warning:
+                Not limiting :attr:`maxsize` may cause memory issues for long running bots. If you
+                don't limit the size, you should be sure that every inline button is actually
+                pressed or that you manually clear the cache using e.g. :meth:`clear`.
+        validate_callback_data (:obj:`bool`, optional): Whether or not to validate incoming
+            callback data. Only relevant if :attr:`arbitrary_callback_data` is used.
 
     Raises:
         ValueError: If both :attr:`token` and :attr:`bot` are passed or none of them.
@@ -130,7 +135,7 @@ class Updater:
         use_context: bool = True,
         dispatcher: Dispatcher = None,
         base_file_url: str = None,
-        arbitrary_callback_data: Union[DefaultValue, bool] = DEFAULT_FALSE,
+        arbitrary_callback_data: Union[DefaultValue, bool, int, None] = DEFAULT_FALSE,
         validate_callback_data: Union[DefaultValue, bool] = DEFAULT_TRUE,
     ):
 
@@ -200,7 +205,11 @@ class Updater:
                     private_key=private_key,
                     private_key_password=private_key_password,
                     defaults=defaults,
-                    arbitrary_callback_data=bool(arbitrary_callback_data),
+                    arbitrary_callback_data=(
+                        False  # type: ignore[arg-type]
+                        if arbitrary_callback_data is DEFAULT_FALSE
+                        else arbitrary_callback_data
+                    ),
                     validate_callback_data=bool(validate_callback_data),
                 )
             self.update_queue: Queue = Queue()

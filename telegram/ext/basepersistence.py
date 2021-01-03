@@ -24,7 +24,7 @@ from typing import Any, DefaultDict, Dict, Optional, Tuple, cast, ClassVar
 
 from telegram import Bot
 
-from telegram.utils.types import ConversationDict
+from telegram.utils.types import ConversationDict, CCDData
 
 
 class BasePersistence(ABC):
@@ -325,13 +325,14 @@ class BasePersistence(ABC):
             :obj:`dict`: The restored bot data.
         """
 
-    def get_callback_data(self) -> Dict[str, Any]:
-        """ "Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
-        persistence object. It should return the callback_data if stored, or an empty
-        ``dict``.
+    def get_callback_data(self) -> Optional[CCDData]:
+        """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
+        persistence object. If callback data was stored, it should be returned.
 
         Returns:
-            :obj:`dict`: The restored bot data.
+            Optional[:class:`telegram.utils.types.CCDData`:]: The restored meta data as three-tuple
+                of :obj:`int`, dictionary and :class:`collections.deque` or :obj:`None`, if no data
+                was stored.
         """
         raise NotImplementedError
 
@@ -391,12 +392,13 @@ class BasePersistence(ABC):
             data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.bot_data` .
         """
 
-    def update_callback_data(self, data: Dict[str, Any]) -> None:
+    def update_callback_data(self, data: CCDData) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
         handled an update.
 
         Args:
-            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.update_callback_data` .
+            data (:class:`telegram.utils.types.CCDData`:): The relevant data to restore
+                :attr:`telegram.ext.dispatcher.bot.callback_data`.
         """
         raise NotImplementedError
 

@@ -536,67 +536,75 @@ DEFAULT_NONE: DefaultValue = DefaultValue(None)
 DEFAULT_FALSE: DefaultValue = DefaultValue(False)
 """:class:`DefaultValue`: Default :obj:`False`"""
 
-DEFAULT_TRUE: DefaultValue = DefaultValue(False)
+DEFAULT_TRUE: DefaultValue = DefaultValue(True)
 """:class:`DefaultValue`: Default :obj:`True`"""
 
 
-def get_callback_data_signature(chat_id: int, callback_data: str, bot: 'Bot') -> bytes:
+def get_callback_data_signature(
+    callback_data: str, bot: 'Bot', chat_id: Union[int, str] = None
+) -> bytes:
     """
     Creates a signature, where the key is based on the bots token and username and the message
     is based on both the chat ID and the callback data.
 
     Args:
-        chat_id (:obj:`str` | :obj:`int`): The chat the :class:`telegram.InlineKeyboardButton` is
-            sent to.
         callback_data (:obj:`str`): The callback data.
         bot (:class:`telegram.Bot`, optional): The bot sending the message.
+        chat_id (:obj:`str` | :obj:`int`, optional): The chat the
+            :class:`telegram.InlineKeyboardButton` is sent to.
 
     Returns:
-        :obj:`bytes`: The encrpyted data to send in the :class:`telegram.InlineKeyboardButton`.
+        :obj:`bytes`: The encrypted data to send in the :class:`telegram.InlineKeyboardButton`.
     """
     mac = hmac.new(
         f'{bot.token}{bot.username}'.encode('utf-8'),
-        msg=f'{chat_id}{callback_data}'.encode('utf-8'),
+        msg=f'{chat_id or ""}{callback_data}'.encode('utf-8'),
         digestmod='md5',
     )
     return mac.digest()
 
 
-def sign_callback_data(chat_id: int, callback_data: str, bot: 'Bot') -> str:
+def sign_callback_data(callback_data: str, bot: 'Bot', chat_id: Union[int, str] = None) -> str:
     """
     Prepends a signature based on :meth:`telegram.utils.helpers.get_callback_data_signature`
     to the callback data.
 
     Args:
-        chat_id (:obj:`str` | :obj:`int`): The chat the :class:`telegram.InlineKeyboardButton` is
-            sent to.
         callback_data (:obj:`str`): The callback data.
         bot (:class:`telegram.Bot`, optional): The bot sending the message.
+        chat_id (:obj:`str` | :obj:`int`, optional): The chat the
+            :class:`telegram.InlineKeyboardButton` is sent to.
 
     Returns:
-        :obj:`str`: The encrpyted data to send in the :class:`telegram.InlineKeyboardButton`.
+        :obj:`str`: The encrypted data to send in the :class:`telegram.InlineKeyboardButton`.
     """
-    bytes_ = get_callback_data_signature(chat_id, callback_data, bot)
+    bytes_ = get_callback_data_signature(callback_data=callback_data, bot=bot, chat_id=chat_id)
     return f'{base64.b64encode(bytes_).decode("utf-8")} {callback_data}'
 
 
-def validate_callback_data(chat_id: int, callback_data: str, bot: 'Bot' = None) -> str:
+def validate_callback_data(
+    callback_data: str, bot: 'Bot' = None, chat_id: Union[int, str] = None
+) -> str:
     """
-    Verifies the integrity of the callback data. If the check is successfull, the original
+    Verifies the integrity of the callback data. If the check is successful, the original
     data is returned.
 
+    Note:
+        The :attr:`callback_data` must be validated with a :attr:`chat_id` if and only if it was
+        signed with a :attr:`chat_id`.
+
     Args:
-        chat_id (:obj:`str` | :obj:`int`): The chat the :class:`telegram.CallbackQuery` originated
-            from.
         callback_data (:obj:`str`): The callback data.
         bot (:class:`telegram.Bot`, optional): The bot receiving the message. If not passed,
             the data will not be validated.
+        chat_id (:obj:`str` | :obj:`int`, optional): The chat the :class:`telegram.CallbackQuery`
+            originated from.
 
     Returns:
         :obj:`str`: The original callback data.
 
     Raises:
-        telegram.error.InlavidCallbackData: If the callback data has been tempered with.
+        telegram.error.InvalidCallbackData: If the callback data has been tempered with.
     """
     [signed_data, raw_data] = callback_data.split(' ')
 
@@ -611,7 +619,7 @@ def validate_callback_data(chat_id: int, callback_data: str, bot: 'Bot' = None) 
     if len(signature) != 16:
         raise InvalidCallbackData()
 
-    expected = get_callback_data_signature(chat_id, raw_data, bot)
+    expected = get_callback_data_signature(callback_data=raw_data, bot=bot, chat_id=chat_id)
     if not hmac.compare_digest(signature, expected):
         raise InvalidCallbackData()
 

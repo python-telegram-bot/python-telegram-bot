@@ -86,23 +86,30 @@ class TestCallbackQuery:
 
     def test_de_json_malicious_callback_data(self, bot):
         bot.arbitrary_callback_data = True
-        signed_data = sign_callback_data(123456, 'callback_data', bot)
-        json_dict = {
-            'id': self.id_,
-            'from': self.from_user.to_dict(),
-            'chat_instance': self.chat_instance,
-            'message': self.message.to_dict(),
-            'data': signed_data + 'error',
-            'inline_message_id': self.inline_message_id,
-            'game_short_name': self.game_short_name,
-            'default_quote': True,
-        }
-        with pytest.raises(InvalidCallbackData):
-            CallbackQuery.de_json(json_dict, bot)
+        try:
+            signed_data = sign_callback_data(
+                chat_id=123456, callback_data='callback_data', bot=bot
+            )
+            bot.callback_data.clear()
+            bot.callback_data._data['callback_dataerror'] = (0, 'test')
+            bot.callback_data._deque.appendleft('callback_dataerror')
+            json_dict = {
+                'id': self.id_,
+                'from': self.from_user.to_dict(),
+                'chat_instance': self.chat_instance,
+                'message': self.message.to_dict(),
+                'data': signed_data + 'error',
+                'inline_message_id': self.inline_message_id,
+                'game_short_name': self.game_short_name,
+                'default_quote': True,
+            }
+            with pytest.raises(InvalidCallbackData):
+                CallbackQuery.de_json(json_dict, bot)
 
-        bot.validate_callback_data = False
-        assert CallbackQuery.de_json(json_dict, bot).data is None
-        bot.validate_callback_data = True
+            bot.validate_callback_data = False
+            assert CallbackQuery.de_json(json_dict, bot).data == 'test'
+        finally:
+            bot.validate_callback_data = False
 
     def test_to_dict(self, callback_query):
         callback_query_dict = callback_query.to_dict()

@@ -571,7 +571,7 @@ class TestDispatcher:
                 self.store_callback_data = True
 
             def get_callback_data(self):
-                return dict()
+                return None
 
             def update_callback_data(self, data):
                 raise Exception

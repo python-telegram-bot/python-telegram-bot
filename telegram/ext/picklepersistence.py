@@ -23,7 +23,7 @@ from copy import deepcopy
 from typing import Any, DefaultDict, Dict, Optional, Tuple
 
 from telegram.ext import BasePersistence
-from telegram.utils.types import ConversationDict
+from telegram.utils.types import ConversationDict, CCDData
 
 
 class PicklePersistence(BasePersistence):
@@ -99,7 +99,7 @@ class PicklePersistence(BasePersistence):
         self.user_data: Optional[DefaultDict[int, Dict]] = None
         self.chat_data: Optional[DefaultDict[int, Dict]] = None
         self.bot_data: Optional[Dict] = None
-        self.callback_data: Optional[Dict[str, Any]] = None
+        self.callback_data: Optional[CCDData] = None
         self.conversations: Optional[Dict[str, Dict[Tuple, Any]]] = None
 
     def load_singlefile(self) -> None:
@@ -118,7 +118,7 @@ class PicklePersistence(BasePersistence):
             self.user_data = defaultdict(dict)
             self.chat_data = defaultdict(dict)
             self.bot_data = {}
-            self.callback_data = {}
+            self.callback_data = None
         except pickle.UnpicklingError as exc:
             raise TypeError(f"File {filename} does not contain valid pickle data") from exc
         except Exception as exc:
@@ -210,11 +210,13 @@ class PicklePersistence(BasePersistence):
             self.load_singlefile()
         return deepcopy(self.bot_data)  # type: ignore[arg-type]
 
-    def get_callback_data(self) -> Dict[str, Any]:
-        """Returns the callback_data from the pickle file if it exsists or an empty dict.
+    def get_callback_data(self) -> Optional[CCDData]:
+        """Returns the callback data from the pickle file if it exists or :obj:`None`.
 
         Returns:
-            :obj:`dict`: The restored bot data.
+            Optional[:class:`telegram.utils.types.CCDData`:]: The restored meta data as three-tuple
+                of :obj:`int`, dictionary and :class:`collections.deque` or :obj:`None`, if no data
+                was stored.
         """
         if self.callback_data:
             pass
@@ -222,11 +224,11 @@ class PicklePersistence(BasePersistence):
             filename = "{}_callback_data".format(self.filename)
             data = self.load_file(filename)
             if not data:
-                data = {}
+                data = None
             self.callback_data = data
         else:
             self.load_singlefile()
-        return deepcopy(self.callback_data)  # type: ignore[arg-type]
+        return deepcopy(self.callback_data)
 
     def get_conversations(self, name: str) -> ConversationDict:
         """Returns the conversations from the pickle file if it exsists or an empty dict.
@@ -326,16 +328,17 @@ class PicklePersistence(BasePersistence):
             else:
                 self.dump_singlefile()
 
-    def update_callback_data(self, data: Dict[str, Any]) -> None:
+    def update_callback_data(self, data: CCDData) -> None:
         """Will update the callback_data (if changed) and depending on :attr:`on_flush` save the
         pickle file.
 
         Args:
-            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.callback_data`.
+            data (:class:`telegram.utils.types.CCDData`:): The relevant data to restore
+                :attr:`telegram.ext.dispatcher.bot.callback_data`.
         """
         if self.callback_data == data:
             return
-        self.callback_data = data.copy()
+        self.callback_data = (data[0], data[1].copy(), data[2].copy())
         if not self.on_flush:
             if not self.single_file:
                 filename = "{}_callback_data".format(self.filename)

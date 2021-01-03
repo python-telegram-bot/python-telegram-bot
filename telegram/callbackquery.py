@@ -122,12 +122,12 @@ class CallbackQuery(TelegramObject):
         data['message'] = Message.de_json(data.get('message'), bot)
 
         if bot.arbitrary_callback_data and 'data' in data:
-            chat_id = data['message'].chat.id
+            chat_id = data['message'].chat.id if isinstance(data['message'], Message) else None
             if bot.validate_callback_data:
-                key = validate_callback_data(chat_id, data['data'], bot)
+                uuid = validate_callback_data(callback_data=data['data'], bot=bot, chat_id=chat_id)
             else:
-                key = validate_callback_data(chat_id, data['data'])
-            data['data'] = bot.callback_data.get(key, None)
+                uuid = validate_callback_data(callback_data=data['data'], chat_id=chat_id)
+            data['data'] = bot.callback_data.pop(uuid)
 
         return cls(bot=bot, **data)
 

@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains custom typing aliases."""
 from pathlib import Path
-from typing import IO, TYPE_CHECKING, Any, Dict, List, Optional, Tuple, TypeVar, Union
+from typing import IO, TYPE_CHECKING, Any, Dict, List, Optional, Tuple, TypeVar, Union, Deque
 
 if TYPE_CHECKING:
     from telegram import InputFile
@@ -39,3 +39,9 @@ ConversationDict = Dict[Tuple[int, ...], Optional[object]]
 RT = TypeVar("RT")
 SLT = Union[RT, List[RT], Tuple[RT, ...]]
 """Single instance or list/tuple of instances."""
+
+CCDData = Tuple[Optional[int], Dict[str, Tuple[float, Any]], Deque[str]]
+"""
+Tuple[Optional[:obj:`int`], Dict[:obj:`str`, Tuple[:obj:`float`, :obj:`Any`]], Deque[:obj:`str`]]:
+    Data returned by :attr:`telegram.utils.callbackdatacache.CallbackDataCache.persistence_data`.
+"""

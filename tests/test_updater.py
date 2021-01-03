@@ -332,7 +332,7 @@ class TestUpdater:
         q = Queue()
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
         monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
-        monkeypatch.setattr('telegram.ext.Dispatcher.process_update', lambda _, u: q.put(u))
+        monkeypatch.setattr(updater.dispatcher, 'process_update', lambda _, u: q.put(u))
 
         ip = '127.0.0.1'
         port = randrange(1024, 49152)  # Select random port
