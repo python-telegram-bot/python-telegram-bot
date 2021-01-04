@@ -50,6 +50,14 @@ class TestCallbackDataCache:
         with pytest.raises(ValueError, match='You must either pass both'):
             CallbackDataCache(data=data, queue=queue)
 
+    @pytest.mark.parametrize('maxsize', [0, None])
+    def test_full_unlimited(self, maxsize):
+        ccd = CallbackDataCache(maxsize=maxsize)
+        assert not ccd.full
+        for i in range(100):
+            ccd.put(i)
+            assert not ccd.full
+
     def test_put(self, callback_data_cache):
         obj = {1: 'foo'}
         now = time.time()
@@ -63,6 +71,7 @@ class TestCallbackDataCache:
     def test_put_full(self, caplog):
         ccd = CallbackDataCache(1)
         uuid_foo = ccd.put('foo')
+        assert ccd.full
 
         with caplog.at_level(logging.DEBUG):
             now = time.time()
@@ -70,6 +79,7 @@ class TestCallbackDataCache:
 
         assert len(caplog.records) == 1
         assert uuid_foo in caplog.records[-1].getMessage()
+        assert ccd.full
 
         _, data, queue = ccd.persistence_data
         assert queue == deque((uuid_bar,))

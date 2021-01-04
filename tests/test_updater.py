@@ -37,9 +37,10 @@ from urllib.error import HTTPError
 import pytest
 
 from telegram import TelegramError, Message, User, Chat, Update, Bot, CallbackQuery
-from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter, InvalidCallbackData
+from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter
 from telegram.ext import Updater, Dispatcher, DictPersistence, Defaults
 from telegram.utils.deprecate import TelegramDeprecationWarning
+from telegram.utils.helpers import DEFAULT_FALSE, DEFAULT_TRUE
 from telegram.utils.webhookhandler import WebhookServer
 
 signalskip = pytest.mark.skipif(
@@ -88,6 +89,14 @@ class TestUpdater:
     def callback(self, bot, update):
         self.received = update.message.text
         self.cb_handler_called.set()
+
+    @pytest.mark.parametrize('acd, vcd', [(True, DEFAULT_TRUE), (DEFAULT_FALSE, False)])
+    def test_warn_arbitrary_callback_data(self, bot, recwarn, acd, vcd):
+        Updater(bot=bot, arbitrary_callback_data=acd, validate_callback_data=vcd)
+        assert len(recwarn) == 1
+        assert 'Passing arbitrary_callback_data/validate_callback_data to an Updater' in str(
+            recwarn[0].message
+        )
 
     @pytest.mark.parametrize(
         ('error',),
@@ -162,20 +171,6 @@ class TestUpdater:
         event.clear()
         event.wait()
         assert self.err_handler_called.wait(0.5) is not True
-
-    def test_get_updates_invalid_callback_data_error(self, monkeypatch, updater):
-        error = InvalidCallbackData(update_id=7)
-        error.message = 'This should not be passed to the update queue!'
-
-        def test(*args, **kwargs):
-            return [error]
-
-        monkeypatch.setattr(updater.bot, 'get_updates', test)
-        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
-        updater.dispatcher.add_error_handler(self.error_handler)
-        updater.start_polling(0.01)
-
-        assert self.received != error.message
 
     def test_webhook(self, monkeypatch, updater):
         q = Queue()

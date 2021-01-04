@@ -27,7 +27,7 @@ from threading import Event, Lock, Thread, current_thread
 from time import sleep
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, Union, no_type_check
 
-from telegram import Bot, TelegramError, Update
+from telegram import Bot, TelegramError
 from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized
 from telegram.ext import Dispatcher, JobQueue
 from telegram.utils.deprecate import TelegramDeprecationWarning
@@ -455,8 +455,7 @@ class Updater:
                     self.logger.debug('Updates ignored and will be pulled again on restart')
                 else:
                     for update in updates:
-                        if isinstance(update, Update):
-                            self.update_queue.put(update)
+                        self.update_queue.put(update)
                     self.last_update_id = updates[-1].update_id + 1
 
             return True
