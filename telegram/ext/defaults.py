@@ -2,7 +2,7 @@
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2020-2021
-# Leandro Leandro Toledo de Souza <devs@python-telegram-bot.org>
+# Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser Public License as published by
