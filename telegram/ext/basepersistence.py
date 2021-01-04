@@ -24,7 +24,7 @@ from typing import Any, DefaultDict, Dict, Optional, Tuple, cast, ClassVar
 
 from telegram import Bot
 
-from telegram.utils.types import ConversationDict, CCDData
+from telegram.utils.types import ConversationDict, CDCData
 
 
 class BasePersistence(ABC):
@@ -86,9 +86,11 @@ class BasePersistence(ABC):
         get_user_data = instance.get_user_data
         get_chat_data = instance.get_chat_data
         get_bot_data = instance.get_bot_data
+        get_callback_data = instance.get_callback_data
         update_user_data = instance.update_user_data
         update_chat_data = instance.update_chat_data
         update_bot_data = instance.update_bot_data
+        update_callback_data = instance.update_callback_data
 
         def get_user_data_insert_bot() -> DefaultDict[int, Dict[Any, Any]]:
             return instance.insert_bot(get_user_data())
@@ -99,6 +101,12 @@ class BasePersistence(ABC):
         def get_bot_data_insert_bot() -> Dict[Any, Any]:
             return instance.insert_bot(get_bot_data())
 
+        def get_callback_data_insert_bot() -> Optional[CDCData]:
+            cdc_data = get_callback_data()
+            if cdc_data is None:
+                return None
+            return cdc_data[0], instance.insert_bot(cdc_data[1]), cdc_data[2]
+
         def update_user_data_replace_bot(user_id: int, data: Dict) -> None:
             return update_user_data(user_id, instance.replace_bot(data))
 
@@ -108,12 +116,18 @@ class BasePersistence(ABC):
         def update_bot_data_replace_bot(data: Dict) -> None:
             return update_bot_data(instance.replace_bot(data))
 
+        def update_callback_data_replace_bot(data: CDCData) -> None:
+            maxsize, obj_data, queue = data
+            return update_callback_data((maxsize, instance.replace_bot(obj_data), queue))
+
         instance.get_user_data = get_user_data_insert_bot
         instance.get_chat_data = get_chat_data_insert_bot
         instance.get_bot_data = get_bot_data_insert_bot
+        instance.get_callback_data = get_callback_data_insert_bot
         instance.update_user_data = update_user_data_replace_bot
         instance.update_chat_data = update_chat_data_replace_bot
         instance.update_bot_data = update_bot_data_replace_bot
+        instance.update_callback_data = update_callback_data_replace_bot
         return instance
 
     def __init__(
@@ -325,12 +339,12 @@ class BasePersistence(ABC):
             :obj:`dict`: The restored bot data.
         """
 
-    def get_callback_data(self) -> Optional[CCDData]:
+    def get_callback_data(self) -> Optional[CDCData]:
         """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. If callback data was stored, it should be returned.
 
         Returns:
-            Optional[:class:`telegram.utils.types.CCDData`:]: The restored meta data as three-tuple
+            Optional[:class:`telegram.utils.types.CDCData`:]: The restored meta data as three-tuple
                 of :obj:`int`, dictionary and :class:`collections.deque` or :obj:`None`, if no data
                 was stored.
         """
@@ -392,12 +406,12 @@ class BasePersistence(ABC):
             data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.bot_data` .
         """
 
-    def update_callback_data(self, data: CCDData) -> None:
+    def update_callback_data(self, data: CDCData) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
         handled an update.
 
         Args:
-            data (:class:`telegram.utils.types.CCDData`:): The relevant data to restore
+            data (:class:`telegram.utils.types.CDCData`:): The relevant data to restore
                 :attr:`telegram.ext.dispatcher.bot.callback_data`.
         """
         raise NotImplementedError

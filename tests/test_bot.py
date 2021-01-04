@@ -49,8 +49,13 @@ from telegram import (
     Chat,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
-from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
-from telegram.utils.helpers import from_timestamp, escape_markdown, to_timestamp
+from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter, InvalidCallbackData
+from telegram.utils.helpers import (
+    from_timestamp,
+    escape_markdown,
+    to_timestamp,
+    validate_callback_data,
+)
 from tests.conftest import expect_bad_request
 
 BASE_TIME = time.time()
@@ -115,6 +120,15 @@ class TestBot:
         with pytest.raises(InvalidToken, match='Invalid token'):
             Bot(token)
 
+    @pytest.mark.parametrize(
+        'acd_in,maxsize,acd',
+        [(True, 1024, True), (False, 1024, False), (0, 0, True), (None, None, True)],
+    )
+    def test_callback_data_maxsize(self, bot, acd_in, maxsize, acd):
+        bot = Bot(bot.token, arbitrary_callback_data=acd_in)
+        assert bot.arbitrary_callback_data == acd
+        assert bot.callback_data.maxsize == maxsize
+
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_invalid_token_server_response(self, monkeypatch):
@@ -166,7 +180,7 @@ class TestBot:
         assert len(recwarn) == 1
         assert str(recwarn[0].message) == (
             "If 'validate_callback_data' is False, incoming callback data wont be"
-            "validated. Use only if you revoked your bot token and set to true"
+            "validated. Use only if you revoked your bot token and set to True"
             "after a few days."
         )
 
@@ -1860,3 +1874,141 @@ class TestBot:
             assert len(message.caption_entities) == 1
         else:
             assert len(message.caption_entities) == 0
+
+    def test_replace_callback_data_send_message(self, bot, chat_id):
+        try:
+            bot.arbitrary_callback_data = True
+            replace_button = InlineKeyboardButton(text='replace', callback_data='replace_test')
+            no_replace_button = InlineKeyboardButton(
+                text='no_replace', url='http://python-telegram-bot.org/'
+            )
+            reply_markup = InlineKeyboardMarkup.from_row(
+                [
+                    replace_button,
+                    no_replace_button,
+                ]
+            )
+            message = bot.send_message(chat_id=chat_id, text='test', reply_markup=reply_markup)
+            inline_keyboard = message.reply_markup.inline_keyboard
+
+            assert inline_keyboard[0][1] == no_replace_button
+            assert inline_keyboard[0][0] != replace_button
+            uuid = validate_callback_data(
+                callback_data=inline_keyboard[0][0].callback_data, bot=bot, chat_id=chat_id
+            )
+            assert bot.callback_data.pop(uuid) == 'replace_test'
+        finally:
+            bot.arbitrary_callback_data = False
+            bot.callback_data.clear()
+
+    def test_replace_callback_data_stop_poll(self, bot, chat_id):
+        poll_message = bot.send_poll(chat_id=chat_id, question='test', options=['1', '2'])
+        try:
+            bot.arbitrary_callback_data = True
+            replace_button = InlineKeyboardButton(text='replace', callback_data='replace_test')
+            no_replace_button = InlineKeyboardButton(
+                text='no_replace', url='http://python-telegram-bot.org/'
+            )
+            reply_markup = InlineKeyboardMarkup.from_row(
+                [
+                    replace_button,
+                    no_replace_button,
+                ]
+            )
+            poll_message.stop_poll(reply_markup=reply_markup)
+            helper_message = poll_message.reply_text('temp', quote=True)
+            message = helper_message.reply_to_message
+            inline_keyboard = message.reply_markup.inline_keyboard
+
+            assert inline_keyboard[0][1] == no_replace_button
+            assert inline_keyboard[0][0] != replace_button
+            uuid = validate_callback_data(
+                callback_data=inline_keyboard[0][0].callback_data, bot=bot, chat_id=chat_id
+            )
+            assert bot.callback_data.pop(uuid) == 'replace_test'
+        finally:
+            bot.arbitrary_callback_data = False
+            bot.callback_data.clear()
+
+    def test_replace_callback_data_copy_message(self, bot, chat_id):
+        original_message = bot.send_message(chat_id=chat_id, text='original')
+        try:
+            bot.arbitrary_callback_data = True
+            replace_button = InlineKeyboardButton(text='replace', callback_data='replace_test')
+            no_replace_button = InlineKeyboardButton(
+                text='no_replace', url='http://python-telegram-bot.org/'
+            )
+            reply_markup = InlineKeyboardMarkup.from_row(
+                [
+                    replace_button,
+                    no_replace_button,
+                ]
+            )
+            message_id = original_message.copy(chat_id=chat_id, reply_markup=reply_markup)
+            helper_message = bot.send_message(
+                chat_id=chat_id, reply_to_message_id=message_id.message_id, text='temp'
+            )
+            message = helper_message.reply_to_message
+            inline_keyboard = message.reply_markup.inline_keyboard
+
+            assert inline_keyboard[0][1] == no_replace_button
+            assert inline_keyboard[0][0] != replace_button
+            uuid = validate_callback_data(
+                callback_data=inline_keyboard[0][0].callback_data, bot=bot, chat_id=chat_id
+            )
+            assert bot.callback_data.pop(uuid) == 'replace_test'
+        finally:
+            bot.arbitrary_callback_data = False
+            bot.callback_data.clear()
+
+    # TODO: Needs improvement. We need incoming inline query to test answer.
+    def test_replace_callback_data_answer_inline_query(self, monkeypatch, bot, chat_id):
+        # For now just test that our internals pass the correct data
+        def make_assertion(
+            endpoint,
+            data=None,
+            timeout=None,
+            api_kwargs=None,
+        ):
+            inline_keyboard = InlineKeyboardMarkup.de_json(
+                data['results'][0]['reply_markup'], bot
+            ).inline_keyboard
+            assertion_1 = inline_keyboard[0][1] == no_replace_button
+            assertion_2 = inline_keyboard[0][0] != replace_button
+            with pytest.raises(InvalidCallbackData):
+                validate_callback_data(
+                    callback_data=inline_keyboard[0][0].callback_data, bot=bot, chat_id=chat_id
+                )
+
+            uuid = validate_callback_data(
+                callback_data=inline_keyboard[0][0].callback_data, bot=bot, chat_id=None
+            )
+            assertion_3 = bot.callback_data.pop(uuid) == 'replace_test'
+            return assertion_1 and assertion_2 and assertion_3
+
+        try:
+            bot.arbitrary_callback_data = True
+            replace_button = InlineKeyboardButton(text='replace', callback_data='replace_test')
+            no_replace_button = InlineKeyboardButton(
+                text='no_replace', url='http://python-telegram-bot.org/'
+            )
+            reply_markup = InlineKeyboardMarkup.from_row(
+                [
+                    replace_button,
+                    no_replace_button,
+                ]
+            )
+
+            bot.username  # call this here so `bot.get_me()` won't be called after mocking
+            monkeypatch.setattr(bot, '_post', make_assertion)
+            results = [
+                InlineQueryResultArticle(
+                    '11', 'first', InputTextMessageContent('first'), reply_markup=reply_markup
+                ),
+            ]
+
+            assert bot.answer_inline_query(chat_id, results=results)
+
+        finally:
+            bot.arbitrary_callback_data = False
+            bot.callback_data.clear()

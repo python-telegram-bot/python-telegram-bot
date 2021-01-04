@@ -227,7 +227,7 @@ class Bot(TelegramObject):
         self.defaults = defaults
 
         # set up callback_data
-        if isinstance(arbitrary_callback_data, int) or arbitrary_callback_data is None:
+        if not isinstance(arbitrary_callback_data, bool) or arbitrary_callback_data is None:
             maxsize = cast(Union[int, None], arbitrary_callback_data)
             self.arbitrary_callback_data = True
         else:
@@ -239,7 +239,7 @@ class Bot(TelegramObject):
         if self.arbitrary_callback_data and not self.validate_callback_data:
             warnings.warn(
                 "If 'validate_callback_data' is False, incoming callback data wont be"
-                "validated. Use only if you revoked your bot token and set to true"
+                "validated. Use only if you revoked your bot token and set to True"
                 "after a few days."
             )
 

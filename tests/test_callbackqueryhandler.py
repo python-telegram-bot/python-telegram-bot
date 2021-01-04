@@ -149,6 +149,17 @@ class TestCallbackQueryHandler:
         callback_query.callback_query.data = 'callback_data'
         assert not handler.check_update(callback_query)
 
+    def test_with_type_pattern(self, callback_query):
+        class CallbackData:
+            pass
+
+        handler = CallbackQueryHandler(self.callback_basic, pattern=CallbackData)
+
+        callback_query.callback_query.data = CallbackData()
+        assert handler.check_update(callback_query)
+        callback_query.callback_query.data = 'callback_data'
+        assert not handler.check_update(callback_query)
+
     def test_with_passing_group_dict(self, dp, callback_query):
         handler = CallbackQueryHandler(
             self.callback_group, pattern='(?P<begin>.*)est(?P<end>.*)', pass_groups=True

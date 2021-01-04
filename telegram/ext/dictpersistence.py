@@ -28,7 +28,7 @@ from telegram.utils.helpers import (
     encode_conversations_to_json,
 )
 from telegram.ext import BasePersistence
-from telegram.utils.types import ConversationDict, CCDData
+from telegram.utils.types import ConversationDict, CDCData
 
 try:
     import ujson as json
@@ -193,8 +193,8 @@ class DictPersistence(BasePersistence):
         return json.dumps(self.bot_data)
 
     @property
-    def callback_data(self) -> Optional[CCDData]:
-        """:class:`telegram.utils.types.CCDData`: The meta data on the stored callback data."""
+    def callback_data(self) -> Optional[CDCData]:
+        """:class:`telegram.utils.types.CDCData`: The meta data on the stored callback data."""
         return self._callback_data
 
     @property
@@ -258,11 +258,11 @@ class DictPersistence(BasePersistence):
             self._bot_data = {}
         return deepcopy(self.bot_data)  # type: ignore[arg-type]
 
-    def get_callback_data(self) -> Optional[CCDData]:
+    def get_callback_data(self) -> Optional[CDCData]:
         """Returns the callback_data created from the ``callback_data_json`` or :obj:`None`.
 
         Returns:
-            Optional[:class:`telegram.utils.types.CCDData`:]: The restored meta data as three-tuple
+            Optional[:class:`telegram.utils.types.CDCData`:]: The restored meta data as three-tuple
                 of :obj:`int`, dictionary and :class:`collections.deque` or :obj:`None`, if no data
                 was stored.
         """
@@ -341,11 +341,11 @@ class DictPersistence(BasePersistence):
         self._bot_data = data.copy()
         self._bot_data_json = None
 
-    def update_callback_data(self, data: CCDData) -> None:
+    def update_callback_data(self, data: CDCData) -> None:
         """Will update the callback_data (if changed).
 
         Args:
-            data (:class:`telegram.utils.types.CCDData`:): The relevant data to restore
+            data (:class:`telegram.utils.types.CDCData`:): The relevant data to restore
                 :attr:`telegram.ext.dispatcher.bot.callback_data`.
         """
         if self._callback_data == data:

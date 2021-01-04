@@ -64,6 +64,7 @@ def change_directory(tmp_path):
 def reset_callback_data_cache(bot):
     yield
     bot.callback_data.clear()
+    bot.arbitrary_callback_data = False
 
 
 @pytest.fixture(scope="function")
@@ -106,6 +107,7 @@ def bot_persistence():
             self.bot_data = None
             self.chat_data = defaultdict(dict)
             self.user_data = defaultdict(dict)
+            self.callback_data = None
 
         def get_bot_data(self):
             return self.bot_data
@@ -115,6 +117,9 @@ def bot_persistence():
 
         def get_user_data(self):
             return self.user_data
+
+        def get_callback_data(self):
+            return self.callback_data
 
         def get_conversations(self, name):
             raise NotImplementedError
@@ -127,6 +132,9 @@ def bot_persistence():
 
         def update_user_data(self, user_id, data):
             self.user_data[user_id] = data
+
+        def update_callback_data(self, data):
+            self.callback_data = data
 
         def update_conversation(self, name, key, new_state):
             raise NotImplementedError
@@ -210,7 +218,7 @@ class TestBasePersistence:
         with pytest.raises(NotImplementedError):
             base_persistence.get_callback_data()
         with pytest.raises(NotImplementedError):
-            base_persistence.update_callback_data({'foo': 'bar'})
+            base_persistence.update_callback_data((1024, {'foo': 'bar'}, deque()))
 
     def test_implementation(self, updater, base_persistence):
         dp = updater.dispatcher
@@ -590,12 +598,18 @@ class TestBasePersistence:
         assert persistence.user_data[123][1].bot == BasePersistence.REPLACED_BOT
         assert persistence.user_data[123][1] == cc.replace_bot()
 
+        persistence.update_callback_data((1024, {'1': (0, cc)}, deque(['1'])))
+        assert persistence.callback_data[1]['1'][1].bot == BasePersistence.REPLACED_BOT
+        assert persistence.callback_data[1]['1'][1] == cc.replace_bot()
+
         assert persistence.get_bot_data()[1] == cc
         assert persistence.get_bot_data()[1].bot is bot
         assert persistence.get_chat_data()[123][1] == cc
         assert persistence.get_chat_data()[123][1].bot is bot
         assert persistence.get_user_data()[123][1] == cc
         assert persistence.get_user_data()[123][1].bot is bot
+        assert persistence.get_callback_data()[1]['1'][1].bot is bot
+        assert persistence.get_callback_data()[1]['1'][1] == cc
 
     def test_bot_replace_insert_bot_unpickable_objects(self, bot, bot_persistence, recwarn):
         """Here check that unpickable objects are just returned verbatim."""
@@ -614,10 +628,13 @@ class TestBasePersistence:
         assert persistence.chat_data[123][1] is lock
         persistence.update_user_data(123, {1: lock})
         assert persistence.user_data[123][1] is lock
+        persistence.update_callback_data((1024, {'1': (0, lock)}, deque(['1'])))
+        assert persistence.callback_data[1]['1'][1] is lock
 
         assert persistence.get_bot_data()[1] is lock
         assert persistence.get_chat_data()[123][1] is lock
         assert persistence.get_user_data()[123][1] is lock
+        assert persistence.get_callback_data()[1]['1'][1] is lock
 
         cc = CustomClass()
 
@@ -627,10 +644,13 @@ class TestBasePersistence:
         assert persistence.chat_data[123][1] is cc
         persistence.update_user_data(123, {1: cc})
         assert persistence.user_data[123][1] is cc
+        persistence.update_callback_data((1024, {'1': (0, cc)}, deque(['1'])))
+        assert persistence.callback_data[1]['1'][1] is cc
 
         assert persistence.get_bot_data()[1] is cc
         assert persistence.get_chat_data()[123][1] is cc
         assert persistence.get_user_data()[123][1] is cc
+        assert persistence.get_callback_data()[1]['1'][1] is cc
 
         assert len(recwarn) == 2
         assert str(recwarn[0].message).startswith(
@@ -661,12 +681,15 @@ class TestBasePersistence:
         assert persistence.chat_data[123][1].data == expected
         persistence.update_user_data(123, {1: cc})
         assert persistence.user_data[123][1].data == expected
+        persistence.update_callback_data((1024, {'1': (0, cc)}, deque(['1'])))
+        assert persistence.callback_data[1]['1'][1].data == expected
 
         expected = {1: bot, 2: 'foo'}
 
         assert persistence.get_bot_data()[1].data == expected
         assert persistence.get_chat_data()[123][1].data == expected
         assert persistence.get_user_data()[123][1].data == expected
+        assert persistence.get_callback_data()[1]['1'][1].data == expected
 
     @pytest.mark.filterwarnings('ignore:BasePersistence')
     def test_replace_insert_bot_item_identity(self, bot, bot_persistence):
@@ -1646,6 +1669,8 @@ class TestPickelPersistence:
         assert nested_ch.conversations == pickle_persistence.conversations['name3']
 
     def test_with_job(self, job_queue, cdp, pickle_persistence):
+        cdp.bot.arbitrary_callback_data = True
+
         def job_callback(context):
             context.bot_data['test1'] = '456'
             context.dispatcher.chat_data[123]['test2'] = '789'
@@ -2021,6 +2046,8 @@ class TestDictPersistence:
         assert nested_ch.conversations == dict_persistence.conversations['name3']
 
     def test_with_job(self, job_queue, cdp):
+        cdp.bot.arbitrary_callback_data = True
+
         def job_callback(context):
             context.bot_data['test1'] = '456'
             context.dispatcher.chat_data[123]['test2'] = '789'
@@ -2032,7 +2059,7 @@ class TestDictPersistence:
         job_queue.set_dispatcher(cdp)
         job_queue.start()
         job_queue.run_once(job_callback, 0.01)
-        sleep(0.5)
+        sleep(0.8)
         bot_data = dict_persistence.get_bot_data()
         assert bot_data == {'test1': '456'}
         chat_data = dict_persistence.get_chat_data()

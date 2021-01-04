@@ -23,7 +23,7 @@ from copy import deepcopy
 from typing import Any, DefaultDict, Dict, Optional, Tuple
 
 from telegram.ext import BasePersistence
-from telegram.utils.types import ConversationDict, CCDData
+from telegram.utils.types import ConversationDict, CDCData
 
 
 class PicklePersistence(BasePersistence):
@@ -99,7 +99,7 @@ class PicklePersistence(BasePersistence):
         self.user_data: Optional[DefaultDict[int, Dict]] = None
         self.chat_data: Optional[DefaultDict[int, Dict]] = None
         self.bot_data: Optional[Dict] = None
-        self.callback_data: Optional[CCDData] = None
+        self.callback_data: Optional[CDCData] = None
         self.conversations: Optional[Dict[str, Dict[Tuple, Any]]] = None
 
     def load_singlefile(self) -> None:
@@ -210,11 +210,11 @@ class PicklePersistence(BasePersistence):
             self.load_singlefile()
         return deepcopy(self.bot_data)  # type: ignore[arg-type]
 
-    def get_callback_data(self) -> Optional[CCDData]:
+    def get_callback_data(self) -> Optional[CDCData]:
         """Returns the callback data from the pickle file if it exists or :obj:`None`.
 
         Returns:
-            Optional[:class:`telegram.utils.types.CCDData`:]: The restored meta data as three-tuple
+            Optional[:class:`telegram.utils.types.CDCData`:]: The restored meta data as three-tuple
                 of :obj:`int`, dictionary and :class:`collections.deque` or :obj:`None`, if no data
                 was stored.
         """
@@ -328,12 +328,12 @@ class PicklePersistence(BasePersistence):
             else:
                 self.dump_singlefile()
 
-    def update_callback_data(self, data: CCDData) -> None:
+    def update_callback_data(self, data: CDCData) -> None:
         """Will update the callback_data (if changed) and depending on :attr:`on_flush` save the
         pickle file.
 
         Args:
-            data (:class:`telegram.utils.types.CCDData`:): The relevant data to restore
+            data (:class:`telegram.utils.types.CDCData`:): The relevant data to restore
                 :attr:`telegram.ext.dispatcher.bot.callback_data`.
         """
         if self.callback_data == data:

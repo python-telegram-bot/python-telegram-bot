@@ -26,7 +26,7 @@ from typing import Dict, Deque, Any, Tuple, Union, List, Optional
 from uuid import uuid4
 
 from telegram.utils.helpers import to_float_timestamp
-from telegram.utils.types import CCDData
+from telegram.utils.types import CDCData
 
 
 class CallbackDataCache:
@@ -75,7 +75,7 @@ class CallbackDataCache:
         self.__lock = Lock()
 
     @property
-    def persistence_data(self) -> CCDData:
+    def persistence_data(self) -> CDCData:
         """
         The data that needs to be persistence to allow caching callback data across bot reboots.
         A new instance of this class can be created by::
@@ -83,7 +83,7 @@ class CallbackDataCache:
             CallbackDataCache(*callback_data_cache.persistence_data)
 
         Returns:
-             :class:`telegram.utils.types.CCDData`: The internal data as expected by
+             :class:`telegram.utils.types.CDCData`: The internal data as expected by
                 :meth:`telegram.ext.BasePersistence.update_callback_data`.
         """
         with self.__lock:

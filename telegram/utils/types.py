@@ -40,7 +40,7 @@ RT = TypeVar("RT")
 SLT = Union[RT, List[RT], Tuple[RT, ...]]
 """Single instance or list/tuple of instances."""
 
-CCDData = Tuple[Optional[int], Dict[str, Tuple[float, Any]], Deque[str]]
+CDCData = Tuple[Optional[int], Dict[str, Tuple[float, Any]], Deque[str]]
 """
 Tuple[Optional[:obj:`int`], Dict[:obj:`str`, Tuple[:obj:`float`, :obj:`Any`]], Deque[:obj:`str`]]:
     Data returned by :attr:`telegram.utils.callbackdatacache.CallbackDataCache.persistence_data`.
