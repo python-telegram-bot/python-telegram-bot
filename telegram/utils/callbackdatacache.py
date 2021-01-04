@@ -180,9 +180,6 @@ class CallbackDataCache:
             else:
                 effective_cutoff = time_cutoff
 
-            for uuid, tpl in self._data.items():
-                print(tpl[0], effective_cutoff)
-
             out = [(uuid, tpl[1]) for uuid, tpl in self._data.items() if tpl[0] < effective_cutoff]
             for uuid, _ in out:
                 self.__pop(uuid)

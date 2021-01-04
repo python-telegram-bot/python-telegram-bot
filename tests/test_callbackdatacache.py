@@ -114,12 +114,13 @@ class TestCallbackDataCache:
     @pytest.mark.parametrize('method', ['time', 'datetime'])
     def test_clear_cutoff(self, callback_data_cache, method):
         expected = [callback_data_cache.put(i) for i in range(100)]
-        time.sleep(0.5)
-        remaining = [callback_data_cache.put(i) for i in 'abcdefg']
 
-        out = callback_data_cache.clear(
-            time.time() if method == 'time' else datetime.now(pytz.utc)
-        )
+        time.sleep(0.2)
+        cutoff = time.time() if method == 'time' else datetime.now(pytz.utc)
+        time.sleep(0.1)
+
+        remaining = [callback_data_cache.put(i) for i in 'abcdefg']
+        out = callback_data_cache.clear(cutoff)
 
         assert len(expected) == len(out)
         for idx, uuid in enumerate(expected):
