@@ -357,7 +357,10 @@ class TestHelpers:
         sig = helpers.get_callback_data_signature(callback_data=uuid, bot=bot, chat_id=chat_id)
         assert signature == base64.b64encode(sig).decode('utf-8')
 
-    @pytest.mark.parametrize('chat_id,not_chat_id', [(None, -1234567890), (-1234567890, None)])
+    # Channel & Supergroup names can have up to 32 characters
+    # Chat IDs are guaranteed to have <= 52 bits, so <= 16 digits
+    # Hence, we use f'@{uuid4()}' to simulate a random max length username
+    @pytest.mark.parametrize('chat_id,not_chat_id', [(None, f'@{uuid4()}'), (f'@{uuid4()}', None)])
     def test_validate_callback_data(self, bot, chat_id, not_chat_id):
         uuid = str(uuid4())
         signed_data = helpers.sign_callback_data(callback_data=uuid, bot=bot, chat_id=chat_id)

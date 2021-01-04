@@ -557,7 +557,7 @@ def get_callback_data_signature(
         :obj:`bytes`: The encrypted data to send in the :class:`telegram.InlineKeyboardButton`.
     """
     mac = hmac.new(
-        f'{bot.token}{bot.username}'.encode('utf-8'),
+        key=f'{bot.token}{bot.username}'.encode('utf-8'),
         msg=f'{chat_id or ""}{callback_data}'.encode('utf-8'),
         digestmod='md5',
     )
