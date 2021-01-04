@@ -135,7 +135,7 @@ class User(TelegramObject):
         available) :attr:`last_name`."""
 
         if self.last_name:
-            return u'{} {}'.format(self.first_name, self.last_name)
+            return f'{self.first_name} {self.last_name}'
         return self.first_name
 
     @property
