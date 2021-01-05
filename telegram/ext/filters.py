@@ -643,7 +643,7 @@ class Filters:
                     send media with wrong types that don't fit to this handler.
 
             Example:
-                Filters.documents.category('audio/') returns :obj:`True` for all types
+                Filters.document.category('audio/') returns :obj:`True` for all types
                 of audio sent as file, for example 'audio/mpeg' or 'audio/x-wav'.
             """
 
@@ -677,7 +677,7 @@ class Filters:
                     send media with wrong types that don't fit to this handler.
 
             Example:
-                ``Filters.documents.mime_type('audio/mpeg')`` filters all audio in mp3 format.
+                ``Filters.document.mime_type('audio/mpeg')`` filters all audio in mp3 format.
             """
 
             def __init__(self, mimetype: Optional[str]):
@@ -794,7 +794,7 @@ class Filters:
                 send media with wrong types that don't fit to this handler.
 
             Example:
-                ``Filters.documents.category('audio/')`` filters all types
+                ``Filters.document.category('audio/')`` filters all types
                 of audio sent as file, for example 'audio/mpeg' or 'audio/x-wav'.
         application: Same as ``Filters.document.category("application")``.
         audio: Same as ``Filters.document.category("audio")``.
@@ -811,7 +811,7 @@ class Filters:
                 send media with wrong types that don't fit to this handler.
 
             Example:
-                ``Filters.documents.mime_type('audio/mpeg')`` filters all audio in mp3 format.
+                ``Filters.document.mime_type('audio/mpeg')`` filters all audio in mp3 format.
         apk: Same as ``Filters.document.mime_type("application/vnd.android.package-archive")``-
         doc: Same as ``Filters.document.mime_type("application/msword")``-
         docx: Same as ``Filters.document.mime_type("application/vnd.openxmlformats-\
