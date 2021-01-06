@@ -21,7 +21,7 @@
 from typing import TYPE_CHECKING, Any, List, Optional, Union, Tuple
 
 from telegram import Message, TelegramObject, User, Location, ReplyMarkup
-from telegram.utils.helpers import validate_callback_data
+from telegram.error import InvalidCallbackData
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -122,12 +122,10 @@ class CallbackQuery(TelegramObject):
         data['message'] = Message.de_json(data.get('message'), bot)
 
         if bot.arbitrary_callback_data and 'data' in data:
-            chat_id = data['message'].chat.id if isinstance(data['message'], Message) else None
-            if bot.validate_callback_data:
-                uuid = validate_callback_data(callback_data=data['data'], bot=bot, chat_id=chat_id)
-            else:
-                uuid = validate_callback_data(callback_data=data['data'], chat_id=chat_id)
-            data['data'] = bot.callback_data.pop(uuid)
+            try:
+                data['data'] = bot.callback_data.pop(data['data'])
+            except IndexError as exc:
+                raise InvalidCallbackData() from exc
 
         return cls(bot=bot, **data)
 

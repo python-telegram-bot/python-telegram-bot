@@ -31,7 +31,7 @@ from telegram import Bot, TelegramError
 from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized
 from telegram.ext import Dispatcher, JobQueue
 from telegram.utils.deprecate import TelegramDeprecationWarning
-from telegram.utils.helpers import get_signal_name, DEFAULT_FALSE, DEFAULT_TRUE, DefaultValue
+from telegram.utils.helpers import get_signal_name, DEFAULT_FALSE, DefaultValue
 from telegram.utils.request import Request
 from telegram.utils.webhookhandler import WebhookAppClass, WebhookServer
 
@@ -53,8 +53,7 @@ class Updater:
     Note:
         * You must supply either a :attr:`bot` or a :attr:`token` argument.
         * If you supply a :attr:`bot`, you will need to pass :attr:`arbitrary_callback_data`,
-          :attr:`validate_callback_data` and :attr:`defaults` to the bot instead of the
-          :class:`telegram.ext.Updater`.
+          and :attr:`defaults` to the bot instead of the :class:`telegram.ext.Updater`.
 
     Args:
         token (:obj:`str`, optional): The bot's token given by the @BotFather.
@@ -96,8 +95,6 @@ class Updater:
                 Not limiting :attr:`maxsize` may cause memory issues for long running bots. If you
                 don't limit the size, you should be sure that every inline button is actually
                 pressed or that you manually clear the cache using e.g. :meth:`clear`.
-        validate_callback_data (:obj:`bool`, optional): Whether or not to validate incoming
-            callback data. Only relevant if :attr:`arbitrary_callback_data` is used.
 
     Raises:
         ValueError: If both :attr:`token` and :attr:`bot` are passed or none of them.
@@ -136,7 +133,6 @@ class Updater:
         dispatcher: Dispatcher = None,
         base_file_url: str = None,
         arbitrary_callback_data: Union[DefaultValue, bool, int, None] = DEFAULT_FALSE,
-        validate_callback_data: Union[DefaultValue, bool] = DEFAULT_TRUE,
     ):
 
         if defaults and bot:
@@ -146,12 +142,9 @@ class Updater:
                 TelegramDeprecationWarning,
                 stacklevel=2,
             )
-        if (
-            arbitrary_callback_data is not DEFAULT_FALSE
-            or validate_callback_data is not DEFAULT_TRUE
-        ) and bot:
+        if arbitrary_callback_data is not DEFAULT_FALSE and bot:
             warnings.warn(
-                'Passing arbitrary_callback_data/validate_callback_data to an Updater has no '
+                'Passing arbitrary_callback_data to an Updater has no '
                 'effect when a Bot is passed as well. Pass them to the Bot instead.',
                 stacklevel=2,
             )
@@ -210,7 +203,6 @@ class Updater:
                         if arbitrary_callback_data is DEFAULT_FALSE
                         else arbitrary_callback_data
                     ),
-                    validate_callback_data=bool(validate_callback_data),
                 )
             self.update_queue: Queue = Queue()
             self.job_queue = JobQueue()

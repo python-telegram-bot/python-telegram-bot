@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardMarkup."""
 
-from typing import TYPE_CHECKING, Any, List, Optional, Union
+from typing import TYPE_CHECKING, Any, List, Optional
 
 from telegram import InlineKeyboardButton, ReplyMarkup
 from telegram.utils.types import JSONDict
@@ -128,23 +128,20 @@ class InlineKeyboardMarkup(ReplyMarkup):
         button_grid = [[button] for button in button_column]
         return cls(button_grid, **kwargs)
 
-    def replace_callback_data(
-        self, bot: 'Bot', chat_id: Union[int, str] = None
-    ) -> 'InlineKeyboardMarkup':
+    def replace_callback_data(self, bot: 'Bot') -> 'InlineKeyboardMarkup':
         """
         Builds a new keyboard by calling
         :meth:`telegram.InlineKeyboardButton.replace_callback_data` for all buttons.
 
         Args:
             bot (:class:`telegram.Bot`): The bot this keyboard will be sent with.
-            chat_id (:obj:`int` | :obj:`str`, optional): The chat this keyboard will be sent to.
 
         Returns:
             :class:`telegram.InlineKeyboardMarkup`:
         """
         return InlineKeyboardMarkup(
             [
-                [btn.replace_callback_data(bot=bot, chat_id=chat_id) for btn in column]
+                [btn.replace_callback_data(bot=bot) for btn in column]
                 for column in self.inline_keyboard
             ]
         )

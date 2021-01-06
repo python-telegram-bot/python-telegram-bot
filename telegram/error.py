@@ -137,7 +137,10 @@ class InvalidCallbackData(TelegramError):
     """
 
     def __init__(self, update_id: int = None) -> None:
-        super().__init__('The callback data has been tampered with! Skipping it.')
+        super().__init__(
+            'The object belonging to this callback_data was deleted or the callback_data was '
+            'manipulated.'
+        )
         self.update_id = update_id
 
     def __reduce__(self) -> Tuple[type, Tuple[Optional[int]]]:  # type: ignore[override]

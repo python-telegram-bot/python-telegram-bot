@@ -19,8 +19,6 @@
 import time
 import datetime as dtm
 from pathlib import Path
-import base64
-from uuid import uuid4
 
 import pytest
 
@@ -30,7 +28,6 @@ from telegram import User
 from telegram import MessageEntity
 from telegram.ext import Defaults
 from telegram.message import Message
-from telegram.error import InvalidCallbackData
 from telegram.utils import helpers
 from telegram.utils.helpers import _datetime_to_float_timestamp
 
@@ -342,66 +339,3 @@ class TestHelpers:
     @pytest.mark.parametrize('obj', [{1: 2}, [1, 2], (1, 2)])
     def test_parse_file_input_other(self, obj):
         assert helpers.parse_file_input(obj) is obj
-
-    @pytest.mark.parametrize('chat_id', [None, -1234567890])
-    def test_sign_callback_data(self, bot, chat_id):
-        uuid = str(uuid4())
-        signed_data = helpers.sign_callback_data(callback_data=uuid, bot=bot, chat_id=chat_id)
-
-        assert isinstance(signed_data, str)
-        assert len(signed_data) <= 64
-
-        [signature, data] = signed_data.split(' ')
-        assert data == uuid
-
-        sig = helpers.get_callback_data_signature(callback_data=uuid, bot=bot, chat_id=chat_id)
-        assert signature == base64.b64encode(sig).decode('utf-8')
-
-    # Channel & Supergroup names can have up to 32 characters
-    # Chat IDs are guaranteed to have <= 52 bits, so <= 16 digits
-    # Hence, we use f'@{uuid4()}' to simulate a random max length username
-    @pytest.mark.parametrize('chat_id,not_chat_id', [(None, f'@{uuid4()}'), (f'@{uuid4()}', None)])
-    def test_validate_callback_data(self, bot, chat_id, not_chat_id):
-        uuid = str(uuid4())
-        signed_data = helpers.sign_callback_data(callback_data=uuid, bot=bot, chat_id=chat_id)
-
-        assert (
-            helpers.validate_callback_data(callback_data=signed_data, bot=bot, chat_id=chat_id)
-            == uuid
-        )
-
-        with pytest.raises(InvalidCallbackData):
-            helpers.validate_callback_data(callback_data=signed_data, bot=bot, chat_id=-123456)
-        with pytest.raises(InvalidCallbackData):
-            helpers.validate_callback_data(callback_data=signed_data, bot=bot, chat_id=not_chat_id)
-        assert helpers.validate_callback_data(callback_data=signed_data, chat_id=-123456) == uuid
-        assert (
-            helpers.validate_callback_data(callback_data=signed_data, chat_id=not_chat_id) == uuid
-        )
-
-        with pytest.raises(InvalidCallbackData):
-            helpers.validate_callback_data(
-                callback_data=signed_data + 'foobar', bot=bot, chat_id=chat_id
-            )
-        assert (
-            helpers.validate_callback_data(callback_data=signed_data + 'foobar', chat_id=chat_id)
-            == uuid + 'foobar'
-        )
-
-        with pytest.raises(InvalidCallbackData):
-            helpers.validate_callback_data(
-                callback_data=signed_data.replace('=', '=a'), bot=bot, chat_id=chat_id
-            )
-        assert (
-            helpers.validate_callback_data(
-                callback_data=signed_data.replace('=', '=a'), chat_id=chat_id
-            )
-            == uuid
-        )
-
-        char_list = list(signed_data)
-        char_list[1] = 'abc'
-        s_data = ''.join(char_list)
-        with pytest.raises(InvalidCallbackData):
-            helpers.validate_callback_data(callback_data=s_data, bot=bot, chat_id=chat_id)
-        assert helpers.validate_callback_data(callback_data=s_data, chat_id=chat_id) == uuid

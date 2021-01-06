@@ -181,7 +181,7 @@ class WebhookHandler(tornado.web.RequestHandler):
                 self.logger.debug('Received Update with ID %d on Webhook', update.update_id)
                 self.update_queue.put(update)
         except InvalidCallbackData as exc:
-            self.logger.warning('%s Malicious update: %s', exc, data)
+            self.logger.warning('%s Skipping CallbackQuery with invalid data: %s', exc, data)
 
     def _validate_post(self) -> None:
         ct_header = self.request.headers.get("Content-Type", None)

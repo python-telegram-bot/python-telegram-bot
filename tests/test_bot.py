@@ -49,12 +49,11 @@ from telegram import (
     Chat,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
-from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter, InvalidCallbackData
+from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
 from telegram.utils.helpers import (
     from_timestamp,
     escape_markdown,
     to_timestamp,
-    validate_callback_data,
 )
 from tests.conftest import expect_bad_request
 
@@ -174,15 +173,6 @@ class TestBot:
         assert to_dict_bot["first_name"] == bot.first_name
         if bot.last_name:
             assert to_dict_bot["last_name"] == bot.last_name
-
-    def test_validate_callback_data_warning(self, bot, recwarn):
-        Bot(bot.token, arbitrary_callback_data=True, validate_callback_data=False)
-        assert len(recwarn) == 1
-        assert str(recwarn[0].message) == (
-            "If 'validate_callback_data' is False, incoming callback data wont be"
-            "validated. Use only if you revoked your bot token and set to True"
-            "after a few days."
-        )
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -1120,7 +1110,7 @@ class TestBot:
         if updates:
             assert isinstance(updates[0], Update)
 
-    def test_get_updates_malicious_callback_data(self, bot, monkeypatch, caplog):
+    def test_get_updates_invalid_callback_data(self, bot, monkeypatch, caplog):
         def post(*args, **kwargs):
             return [
                 Update(
@@ -1148,10 +1138,8 @@ class TestBot:
             with caplog.at_level(logging.DEBUG):
                 updates = bot.get_updates(timeout=1)
 
-            print([record.getMessage() for record in caplog.records])
             assert any(
-                "has been tampered with! Skipping it. Malicious update: {'update_id': 17"
-                in record.getMessage()
+                "Skipping CallbackQuery with invalid data: {'update_id': 17" in record.getMessage()
                 for record in caplog.records
             )
             assert isinstance(updates, list)
@@ -1893,10 +1881,7 @@ class TestBot:
 
             assert inline_keyboard[0][1] == no_replace_button
             assert inline_keyboard[0][0] != replace_button
-            uuid = validate_callback_data(
-                callback_data=inline_keyboard[0][0].callback_data, bot=bot, chat_id=chat_id
-            )
-            assert bot.callback_data.pop(uuid) == 'replace_test'
+            assert bot.callback_data.pop(inline_keyboard[0][0].callback_data) == 'replace_test'
         finally:
             bot.arbitrary_callback_data = False
             bot.callback_data.clear()
@@ -1922,10 +1907,7 @@ class TestBot:
 
             assert inline_keyboard[0][1] == no_replace_button
             assert inline_keyboard[0][0] != replace_button
-            uuid = validate_callback_data(
-                callback_data=inline_keyboard[0][0].callback_data, bot=bot, chat_id=chat_id
-            )
-            assert bot.callback_data.pop(uuid) == 'replace_test'
+            assert bot.callback_data.pop(inline_keyboard[0][0].callback_data) == 'replace_test'
         finally:
             bot.arbitrary_callback_data = False
             bot.callback_data.clear()
@@ -1953,10 +1935,7 @@ class TestBot:
 
             assert inline_keyboard[0][1] == no_replace_button
             assert inline_keyboard[0][0] != replace_button
-            uuid = validate_callback_data(
-                callback_data=inline_keyboard[0][0].callback_data, bot=bot, chat_id=chat_id
-            )
-            assert bot.callback_data.pop(uuid) == 'replace_test'
+            assert bot.callback_data.pop(inline_keyboard[0][0].callback_data) == 'replace_test'
         finally:
             bot.arbitrary_callback_data = False
             bot.callback_data.clear()
@@ -1975,15 +1954,9 @@ class TestBot:
             ).inline_keyboard
             assertion_1 = inline_keyboard[0][1] == no_replace_button
             assertion_2 = inline_keyboard[0][0] != replace_button
-            with pytest.raises(InvalidCallbackData):
-                validate_callback_data(
-                    callback_data=inline_keyboard[0][0].callback_data, bot=bot, chat_id=chat_id
-                )
-
-            uuid = validate_callback_data(
-                callback_data=inline_keyboard[0][0].callback_data, bot=bot, chat_id=None
+            assertion_3 = (
+                bot.callback_data.pop(inline_keyboard[0][0].callback_data) == 'replace_test'
             )
-            assertion_3 = bot.callback_data.pop(uuid) == 'replace_test'
             return assertion_1 and assertion_2 and assertion_3
 
         try:

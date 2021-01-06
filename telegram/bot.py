@@ -24,7 +24,6 @@
 import functools
 import inspect
 import logging
-import warnings
 from datetime import datetime
 
 from typing import (
@@ -173,8 +172,6 @@ class Bot(TelegramObject):
                 Not limiting :attr:`maxsize` may cause memory issues for long running bots. If you
                 don't limit the size, you should be sure that every inline button is actually
                 pressed or that you manually clear the cache using e.g. :meth:`clear`.
-        validate_callback_data (:obj:`bool`, optional): Whether or not to validate incoming
-            callback data. Only relevant if :attr:`arbitrary_callback_data` is used.
 
     """
 
@@ -219,7 +216,6 @@ class Bot(TelegramObject):
         private_key_password: bytes = None,
         defaults: 'Defaults' = None,
         arbitrary_callback_data: Union[bool, int, None] = False,
-        validate_callback_data: bool = True,
     ):
         self.token = self._validate_token(token)
 
@@ -233,15 +229,7 @@ class Bot(TelegramObject):
         else:
             maxsize = 1024
             self.arbitrary_callback_data = arbitrary_callback_data
-        self.validate_callback_data = validate_callback_data
         self.callback_data: CallbackDataCache = CallbackDataCache(maxsize=maxsize)
-
-        if self.arbitrary_callback_data and not self.validate_callback_data:
-            warnings.warn(
-                "If 'validate_callback_data' is False, incoming callback data wont be"
-                "validated. Use only if you revoked your bot token and set to True"
-                "after a few days."
-            )
 
         if base_url is None:
             base_url = 'https://api.telegram.org/bot'
@@ -302,9 +290,7 @@ class Bot(TelegramObject):
         if reply_markup is not None:
             if isinstance(reply_markup, ReplyMarkup):
                 if self.arbitrary_callback_data and isinstance(reply_markup, InlineKeyboardMarkup):
-                    reply_markup = reply_markup.replace_callback_data(
-                        bot=self, chat_id=data.get('chat_id', None)
-                    )
+                    reply_markup = reply_markup.replace_callback_data(bot=self)
                 # We need to_json() instead of to_dict() here, because reply_markups may be
                 # attached to media messages, which aren't json dumped by utils.request
                 data['reply_markup'] = reply_markup.to_json()
@@ -2757,7 +2743,7 @@ class Bot(TelegramObject):
                returned.
 
         Returns:
-            List[:class:`telegram.Update` | :class:`telegram.error.InvalidCallbackData`]
+            List[:class:`telegram.Update`]
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2798,7 +2784,7 @@ class Bot(TelegramObject):
                 updates.append(cast(Update, Update.de_json(u, self)))
             except InvalidCallbackData as exc:
                 exc.update_id = int(u['update_id'])
-                self.logger.warning('%s Malicious update: %s', exc, u)
+                self.logger.warning('%s Skipping CallbackQuery with invalid data: %s', exc, u)
         return updates
 
     @log
@@ -4600,9 +4586,7 @@ class Bot(TelegramObject):
         if reply_markup:
             if isinstance(reply_markup, ReplyMarkup):
                 if self.arbitrary_callback_data and isinstance(reply_markup, InlineKeyboardMarkup):
-                    reply_markup = reply_markup.replace_callback_data(
-                        bot=self, chat_id=data.get('chat_id', None)
-                    )
+                    reply_markup = reply_markup.replace_callback_data(bot=self)
                 # We need to_json() instead of to_dict() here, because reply_markups may be
                 # attached to media messages, which aren't json dumped by utils.request
                 data['reply_markup'] = reply_markup.to_json()
@@ -4851,9 +4835,7 @@ class Bot(TelegramObject):
         if reply_markup:
             if isinstance(reply_markup, ReplyMarkup):
                 if self.arbitrary_callback_data and isinstance(reply_markup, InlineKeyboardMarkup):
-                    reply_markup = reply_markup.replace_callback_data(
-                        bot=self, chat_id=data.get('chat_id', None)
-                    )
+                    reply_markup = reply_markup.replace_callback_data(bot=self)
                 # We need to_json() instead of to_dict() here, because reply_markups may be
                 # attached to media messages, which aren't json dumped by utils.request
                 data['reply_markup'] = reply_markup.to_json()

@@ -40,7 +40,6 @@ from telegram import TelegramError, Message, User, Chat, Update, Bot, CallbackQu
 from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter
 from telegram.ext import Updater, Dispatcher, DictPersistence, Defaults
 from telegram.utils.deprecate import TelegramDeprecationWarning
-from telegram.utils.helpers import DEFAULT_FALSE, DEFAULT_TRUE
 from telegram.utils.webhookhandler import WebhookServer
 
 signalskip = pytest.mark.skipif(
@@ -90,13 +89,10 @@ class TestUpdater:
         self.received = update.message.text
         self.cb_handler_called.set()
 
-    @pytest.mark.parametrize('acd, vcd', [(True, DEFAULT_TRUE), (DEFAULT_FALSE, False)])
-    def test_warn_arbitrary_callback_data(self, bot, recwarn, acd, vcd):
-        Updater(bot=bot, arbitrary_callback_data=acd, validate_callback_data=vcd)
+    def test_warn_arbitrary_callback_data(self, bot, recwarn):
+        Updater(bot=bot, arbitrary_callback_data=True)
         assert len(recwarn) == 1
-        assert 'Passing arbitrary_callback_data/validate_callback_data to an Updater' in str(
-            recwarn[0].message
-        )
+        assert 'Passing arbitrary_callback_data to an Updater' in str(recwarn[0].message)
 
     @pytest.mark.parametrize(
         ('error',),

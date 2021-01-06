@@ -18,10 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardButton."""
 
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any
 
 from telegram import TelegramObject
-from telegram.utils.helpers import sign_callback_data
 
 if TYPE_CHECKING:
     from telegram import CallbackGame, LoginUrl, Bot
@@ -120,9 +119,7 @@ class InlineKeyboardButton(TelegramObject):
             self.pay,
         )
 
-    def replace_callback_data(
-        self, bot: 'Bot', chat_id: Union[int, str] = None
-    ) -> 'InlineKeyboardButton':
+    def replace_callback_data(self, bot: 'Bot') -> 'InlineKeyboardButton':
         """
         If this button has :attr:`callback_data`, will store that data in the bots callback data
         cache and return a new button where the :attr:`callback_data` is replaced by the
@@ -130,13 +127,12 @@ class InlineKeyboardButton(TelegramObject):
 
         Args:
             bot (:class:`telegram.Bot`): The bot this button will be sent with.
-            chat_id (:obj:`int` | :obj:`str`, optional): The chat this button will be sent to.
 
         Returns:
             :class:`telegram.InlineKeyboardButton`:
         """
         if not self.callback_data:
             return self
-        uuid = bot.callback_data.put(self.callback_data)
-        callback_data = sign_callback_data(chat_id=chat_id, callback_data=uuid, bot=bot)
-        return InlineKeyboardButton(self.text, callback_data=callback_data)
+        return InlineKeyboardButton(
+            self.text, callback_data=bot.callback_data.put(self.callback_data)
+        )

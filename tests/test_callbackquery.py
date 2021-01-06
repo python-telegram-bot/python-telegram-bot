@@ -21,7 +21,6 @@ import pytest
 
 from telegram import CallbackQuery, User, Message, Chat, Audio, Bot
 from telegram.error import InvalidCallbackData
-from telegram.utils.helpers import sign_callback_data
 from tests.conftest import check_shortcut_signature, check_shortcut_call
 
 
@@ -84,36 +83,26 @@ class TestCallbackQuery:
         assert callback_query.inline_message_id == self.inline_message_id
         assert callback_query.game_short_name == self.game_short_name
 
-    @pytest.mark.parametrize('inline_message', [True, False])
-    def test_de_json_malicious_callback_data(self, bot, inline_message):
+    def test_de_json_arbitrary_callback_data(self, bot):
         bot.arbitrary_callback_data = True
         try:
-            signed_data = sign_callback_data(
-                chat_id=4 if not inline_message else None,
-                callback_data='callback_data',
-                bot=bot,
-            )
             bot.callback_data.clear()
-            bot.callback_data._data['callback_dataerror'] = (0, 'test')
-            bot.callback_data._deque.appendleft('callback_dataerror')
+            bot.callback_data._data['callback_data'] = (0, 'test')
+            bot.callback_data._deque.appendleft('callback_data')
             json_dict = {
                 'id': self.id_,
                 'from': self.from_user.to_dict(),
                 'chat_instance': self.chat_instance,
-                'message': self.message.to_dict() if not inline_message else None,
-                'data': signed_data + 'error',
+                'message': self.message.to_dict(),
+                'data': 'callback_data',
                 'inline_message_id': self.inline_message_id,
                 'game_short_name': self.game_short_name,
                 'default_quote': True,
             }
-            bot.validate_callback_data = True
+            assert CallbackQuery.de_json(json_dict, bot).data == 'test'
             with pytest.raises(InvalidCallbackData):
                 CallbackQuery.de_json(json_dict, bot)
-
-            bot.validate_callback_data = False
-            assert CallbackQuery.de_json(json_dict, bot).data == 'test'
         finally:
-            bot.validate_callback_data = True
             bot.arbitrary_callback_data = False
             bot.callback_data.clear()
 
