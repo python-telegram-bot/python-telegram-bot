@@ -99,6 +99,11 @@ class ConversationHandler(Handler[Update]):
         :attr:`END` to end the *parent* conversation from within the nested one. For an example on
         nested :class:`ConversationHandler` s, see our `examples`_.
 
+        Note that setting :attr:`run_async` to :obj:`True` will override the attribute
+        :attr:`run_async` in all the handlers used in this :class:`ConversationHandler` and set
+        them to :obj:`True`. This includes handlers used in :attr:`entry_points`, :attr:`states`,
+        and :attr:`fallback`.
+
     .. _`examples`: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples
 
     Args:
@@ -136,6 +141,9 @@ class ConversationHandler(Handler[Update]):
         map_to_parent (Dict[:obj:`object`, :obj:`object`], optional): A :obj:`dict` that can be
             used to instruct a nested conversationhandler to transition into a mapped state on
             its parent conversationhandler in place of a specified nested state.
+        run_async (:obj:`bool`, optional): If set to :obj:`True`, all the handlers in this
+            :class:`ConversationHandler` will be set with :attr:`run_async` equals to :obj:`True`.
+            Default is :obj:`False`.
 
     Raises:
         ValueError
@@ -168,6 +176,8 @@ class ConversationHandler(Handler[Update]):
         map_to_parent (Dict[:obj:`object`, :obj:`object`]): Optional. A :obj:`dict` that can be
             used to instruct a nested conversationhandler to transition into a mapped state on
             its parent conversationhandler in place of a specified nested state.
+        run_async (:obj:`bool`): If set to :obj:`True`, all the handlers in this
+            :class:`ConversationHandler` will be set with :attr:`run_async` equals to :obj:`True`.
 
     """
 
@@ -192,8 +202,9 @@ class ConversationHandler(Handler[Update]):
         name: str = None,
         persistent: bool = False,
         map_to_parent: Dict[object, object] = None,
+        run_async: bool = False,
     ):
-        self.run_async = False
+        self.run_async = run_async
 
         self._entry_points = entry_points
         self._states = states
@@ -229,7 +240,7 @@ class ConversationHandler(Handler[Update]):
                 "since message IDs are not globally unique."
             )
 
-        all_handlers = list()
+        all_handlers: List[Handler] = list()
         all_handlers.extend(entry_points)
         all_handlers.extend(fallbacks)
 
@@ -262,6 +273,10 @@ class ConversationHandler(Handler[Update]):
                         "since inline queries have no chat context."
                     )
                     break
+
+        if self.run_async:
+            for handler in all_handlers:
+                handler.run_async = True
 
     @property
     def entry_points(self) -> List[Handler]:
