@@ -1450,6 +1450,7 @@ class TestConversationHandler:
             entry_points=[CommandHandler('start', self.start_end, run_async=True)],
             states=self.states,
             fallbacks=self.fallbacks,
+            run_async=False,
         )
 
         for handler in conv_handler.entry_points:
