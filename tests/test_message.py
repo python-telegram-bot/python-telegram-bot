@@ -1406,18 +1406,21 @@ class TestMessage:
     def test_default_quote(self, message):
         message.bot.defaults = Defaults()
 
-        message.bot.defaults._quote = False
-        assert message._quote(None, None) is None
+        try:
+            message.bot.defaults._quote = False
+            assert message._quote(None, None) is None
 
-        message.bot.defaults._quote = True
-        assert message._quote(None, None) == message.message_id
+            message.bot.defaults._quote = True
+            assert message._quote(None, None) == message.message_id
 
-        message.bot.defaults._quote = None
-        message.chat.type = Chat.PRIVATE
-        assert message._quote(None, None) is None
+            message.bot.defaults._quote = None
+            message.chat.type = Chat.PRIVATE
+            assert message._quote(None, None) is None
 
-        message.chat.type = Chat.GROUP
-        assert message._quote(None, None)
+            message.chat.type = Chat.GROUP
+            assert message._quote(None, None)
+        finally:
+            message.bot.defaults = None
 
     def test_equality(self):
         id_ = 1

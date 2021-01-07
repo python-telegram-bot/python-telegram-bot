@@ -314,7 +314,7 @@ class TestJobQueue:
             next_months_days = calendar.monthrange(now.year, now.month + 1)[1]
 
         expected_reschedule_time += dtm.timedelta(this_months_days)
-        if next_months_days < this_months_days:
+        if day > next_months_days:
             expected_reschedule_time += dtm.timedelta(next_months_days)
 
         expected_reschedule_time = timezone.normalize(expected_reschedule_time)

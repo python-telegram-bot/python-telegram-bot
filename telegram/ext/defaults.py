@@ -173,7 +173,7 @@ class Defaults:
         )
 
     @property
-    def run_async(self) -> Optional[bool]:
+    def run_async(self) -> bool:
         return self._run_async
 
     @run_async.setter

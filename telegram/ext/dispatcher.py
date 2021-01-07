@@ -402,11 +402,17 @@ class Dispatcher:
     def has_running_threads(self) -> bool:
         return self.running or bool(self.__async_threads)
 
-    def process_update(self, update: Union[str, Update, TelegramError]) -> None:
-        """Processes a single update.
+    def process_update(self, update: Any) -> None:
+        """Processes a single update and updates the persistence.
+
+        Note:
+            If the update is handled by least one synchronously running handlers (i.e.
+            ``run_async=False`), :meth:`update_persistence` is called *once* after all handlers
+            synchronous handlers are done. Each asynchronously running handler will trigger
+            :meth:`update_persistence` on its own.
 
         Args:
-            update (:obj:`str` | :class:`telegram.Update` | :class:`telegram.TelegramError`):
+            update (:class:`telegram.Update` | :obj:`object` | :class:`telegram.TelegramError`):
                 The update to process.
 
         """
@@ -420,6 +426,8 @@ class Dispatcher:
             return
 
         context = None
+        handled = False
+        sync_modes = []
 
         for group in self.groups:
             try:
@@ -428,11 +436,9 @@ class Dispatcher:
                     if check is not None and check is not False:
                         if not context and self.use_context:
                             context = CallbackContext.from_update(update, self)
+                        handled = True
+                        sync_modes.append(handler.run_async)
                         handler.handle_update(update, self, check, context)
-
-                        # If handler runs async updating immediately doesn't make sense
-                        if not handler.run_async:
-                            self.update_persistence(update=update)
                         break
 
             # Stop processing with any other handler.
@@ -451,6 +457,16 @@ class Dispatcher:
                 # Errors should not stop the thread.
                 except Exception:
                     self.logger.exception('An uncaught error was raised while handling the error.')
+
+        # Update persistence, if handled
+        handled_only_async = all(sync_modes)
+        if handled:
+            # Respect default settings
+            if all(mode is DEFAULT_FALSE for mode in sync_modes) and self.bot.defaults:
+                handled_only_async = self.bot.defaults.run_async
+            # If update was only handled by async handlers, we don't need to update here
+            if not handled_only_async:
+                self.update_persistence(update=update)
 
     def add_handler(self, handler: Handler, group: int = DEFAULT_GROUP) -> None:
         """Register a handler.
