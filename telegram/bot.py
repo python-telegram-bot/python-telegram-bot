@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # pylint: disable=E0611,E0213,E1102,C0103,E1101,R0913,R0904
 #
 # A library that provides a Python interface to the Telegram Bot API

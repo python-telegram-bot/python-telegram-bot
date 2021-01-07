@@ -36,7 +36,7 @@ def webhook_info():
     )
 
 
-class TestWebhookInfo(object):
+class TestWebhookInfo:
     url = "http://www.google.com"
     has_custom_certificate = False
     pending_update_count = 5

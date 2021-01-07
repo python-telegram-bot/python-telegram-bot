@@ -317,7 +317,7 @@ def mention_html(user_id: Union[int, str], name: str) -> str:
     Returns:
         :obj:`str`: The inline mention for the user as html.
     """
-    return u'<a href="tg://user?id={}">{}</a>'.format(user_id, escape(name))
+    return '<a href="tg://user?id={}">{}</a>'.format(user_id, escape(name))
 
 
 def mention_markdown(user_id: Union[int, str], name: str, version: int = 1) -> str:
@@ -331,7 +331,7 @@ def mention_markdown(user_id: Union[int, str], name: str, version: int = 1) -> s
     Returns:
         :obj:`str`: The inline mention for the user as markdown.
     """
-    return u'[{}](tg://user?id={})'.format(escape_markdown(name, version=version), user_id)
+    return '[{}](tg://user?id={})'.format(escape_markdown(name, version=version), user_id)
 
 
 def effective_message_type(entity: Union['Message', 'Update']) -> Optional[str]:

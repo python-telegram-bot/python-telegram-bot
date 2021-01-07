@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # pylint: disable=W0613, C0116, C0103
 # type: ignore[union-attr]
 # This program is dedicated to the public domain under the CC0 license.
