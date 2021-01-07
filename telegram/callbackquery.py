@@ -18,9 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=W0622
 """This module contains an object that represents a Telegram CallbackQuery"""
-from typing import TYPE_CHECKING, Any, List, Optional, Union, Tuple
+from typing import TYPE_CHECKING, Any, List, Optional, Union, Tuple, ClassVar
 
-from telegram import Message, TelegramObject, User, Location, ReplyMarkup
+from telegram import Message, TelegramObject, User, Location, ReplyMarkup, constants
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -631,3 +631,10 @@ class CallbackQuery(TelegramObject):
             timeout=timeout,
             api_kwargs=api_kwargs,
         )
+
+    MAX_ANSWER_TEXT_LENGTH: ClassVar[int] = constants.MAX_ANSWER_CALLBACK_QUERY_TEXT_LENGTH
+    """
+    :const:`telegram.constants.MAX_ANSWER_CALLBACK_QUERY_TEXT_LENGTH`
+
+    .. versionadded:: 13.2
+    """
