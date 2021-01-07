@@ -195,6 +195,10 @@ class Chat(TelegramObject):
         :obj:`str`: Convenience property. If :attr:`first_name` is not :obj:`None` gives,
         :attr:`first_name` followed by (if available) :attr:`last_name`.
 
+        Note:
+            :attr:`full_name` will always be :obj:`None`, if the chat is a (super)group or
+            channel.
+
         .. versionadded:: 13.2
         """
         if not self.first_name:
