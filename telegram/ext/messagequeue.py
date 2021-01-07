@@ -4,7 +4,7 @@
 # Tymofii A. Khodniev (thodnev) <thodnev@mail.ru>
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -44,14 +44,6 @@ class DelayQueue(threading.Thread):
     Processes callbacks from queue with specified throughput limits. Creates a separate thread to
     process callbacks with delays.
 
-    Attributes:
-        burst_limit (:obj:`int`): Number of maximum callbacks to process per time-window.
-        time_limit (:obj:`int`): Defines width of time-window used when each processing limit is
-            calculated.
-        exc_route (:obj:`callable`): A callable, accepting 1 positional argument; used to route
-            exceptions from processor thread to main thread;
-        name (:obj:`str`): Thread's name.
-
     Args:
         queue (:obj:`Queue`, optional): Used to pass callbacks to thread. Creates ``Queue``
             implicitly if not provided.
@@ -68,6 +60,14 @@ class DelayQueue(threading.Thread):
             Defaults to :obj:`True`.
         name (:obj:`str`, optional): Thread's name. Defaults to ``'DelayQueue-N'``, where N is
             sequential number of object created.
+
+    Attributes:
+        burst_limit (:obj:`int`): Number of maximum callbacks to process per time-window.
+        time_limit (:obj:`int`): Defines width of time-window used when each processing limit is
+            calculated.
+        exc_route (:obj:`callable`): A callable, accepting 1 positional argument; used to route
+            exceptions from processor thread to main thread;
+        name (:obj:`str`): Thread's name.
 
     """
 

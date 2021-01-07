@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -33,12 +33,12 @@ class GameHighScore(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`position`, :attr:`user` and :attr:`score` are equal.
 
-    Attributes:
+    Args:
         position (:obj:`int`): Position in high score table for the game.
         user (:class:`telegram.User`): User.
         score (:obj:`int`): Score.
 
-    Args:
+    Attributes:
         position (:obj:`int`): Position in high score table for the game.
         user (:class:`telegram.User`): User.
         score (:obj:`int`): Score.

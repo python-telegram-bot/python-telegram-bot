@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,9 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ShippingQuery."""
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any, Optional, List
 
-from telegram import ShippingAddress, TelegramObject, User
+from telegram import ShippingAddress, TelegramObject, User, ShippingOption
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -34,14 +34,7 @@ class ShippingQuery(TelegramObject):
     considered equal, if their :attr:`id` is equal.
 
     Note:
-        * In Python `from` is a reserved word, use `from_user` instead.
-
-    Attributes:
-        id (:obj:`str`): Unique query identifier.
-        from_user (:class:`telegram.User`): User who sent the query.
-        invoice_payload (:obj:`str`): Bot specified invoice payload.
-        shipping_address (:class:`telegram.ShippingAddress`): User specified shipping address.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+        In Python `from` is a reserved word, use `from_user` instead.
 
     Args:
         id (:obj:`str`): Unique query identifier.
@@ -50,6 +43,13 @@ class ShippingQuery(TelegramObject):
         shipping_address (:class:`telegram.ShippingAddress`): User specified shipping address.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        id (:obj:`str`): Unique query identifier.
+        from_user (:class:`telegram.User`): User who sent the query.
+        invoice_payload (:obj:`str`): Bot specified invoice payload.
+        shipping_address (:class:`telegram.ShippingAddress`): User specified shipping address.
+        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     """
 
@@ -83,21 +83,27 @@ class ShippingQuery(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def answer(self, *args: Any, **kwargs: Any) -> bool:
+    def answer(  # pylint: disable=C0103
+        self,
+        ok: bool,
+        shipping_options: List[ShippingOption] = None,
+        error_message: str = None,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
         """Shortcut for::
 
             bot.answer_shipping_query(update.shipping_query.id, *args, **kwargs)
 
-        Args:
-            ok (:obj:`bool`): Specify :obj:`True` if delivery to the specified address is
-                possible and :obj:`False` if there are any problems
-                (for example, if delivery to the specified address is not possible).
-            shipping_options (List[:class:`telegram.ShippingOption`], optional): Required if ok is
-                :obj:`True`. A JSON-serialized array of available shipping options.
-            error_message (:obj:`str`, optional): Required if ok is :obj:`False`. Error message in
-                human readable form that explains why it is impossible to complete the order (e.g.
-                "Sorry, delivery to your desired address is unavailable'). Telegram will display
-                this message to the user.
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.answer_shipping_query`.
 
         """
-        return self.bot.answer_shipping_query(self.id, *args, **kwargs)
+        return self.bot.answer_shipping_query(
+            shipping_query_id=self.id,
+            ok=ok,
+            shipping_options=shipping_options,
+            error_message=error_message,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )

@@ -2,7 +2,7 @@
 # pylint: disable=R0903
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -38,11 +38,11 @@ class PollOption(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`text` and :attr:`voter_count` are equal.
 
-    Attributes:
+    Args:
         text (:obj:`str`): Option text, 1-100 characters.
         voter_count (:obj:`int`): Number of users that voted for this option.
 
-    Args:
+    Attributes:
         text (:obj:`str`): Option text, 1-100 characters.
         voter_count (:obj:`int`): Number of users that voted for this option.
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -36,26 +36,6 @@ RT = TypeVar('RT')
 
 class MessageHandler(Handler[Update]):
     """Handler class to handle telegram messages. They might contain text, media or status updates.
-
-    Attributes:
-        filters (:obj:`Filter`): Only allow updates with these Filters. See
-            :mod:`telegram.ext.filters` for a full list of all available filters.
-        callback (:obj:`callable`): The callback function for this handler.
-        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
-            passed to the callback function.
-        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
-            the callback function.
-        pass_user_data (:obj:`bool`): Determines whether ``user_data`` will be passed to
-            the callback function.
-        pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
-            the callback function.
-        message_updates (:obj:`bool`): Should "normal" message updates be handled?
-            Default is :obj:`None`.
-        channel_post_updates (:obj:`bool`): Should channel posts updates be handled?
-            Default is :obj:`None`.
-        edited_updates (:obj:`bool`): Should "edited" message updates be handled?
-            Default is :obj:`None`.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     Note:
         :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
@@ -117,6 +97,26 @@ class MessageHandler(Handler[Update]):
 
     Raises:
         ValueError
+
+    Attributes:
+        filters (:obj:`Filter`): Only allow updates with these Filters. See
+            :mod:`telegram.ext.filters` for a full list of all available filters.
+        callback (:obj:`callable`): The callback function for this handler.
+        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
+            passed to the callback function.
+        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
+            the callback function.
+        pass_user_data (:obj:`bool`): Determines whether ``user_data`` will be passed to
+            the callback function.
+        pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
+            the callback function.
+        message_updates (:obj:`bool`): Should "normal" message updates be handled?
+            Default is :obj:`None`.
+        channel_post_updates (:obj:`bool`): Should channel posts updates be handled?
+            Default is :obj:`None`.
+        edited_updates (:obj:`bool`): Should "edited" message updates be handled?
+            Default is :obj:`None`.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     """
 

@@ -2,7 +2,7 @@
 # pylint: disable=R0903
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -49,14 +49,15 @@ class Dice(TelegramObject):
         can be found at our `wiki <https://git.io/JkeC6>`_. However, this behaviour is undocumented
         and might be changed by Telegram.
 
-    Attributes:
-        value (:obj:`int`): Value of the dice.
-        emoji (:obj:`str`): Emoji on which the dice throw animation is based.
-
     Args:
         value (:obj:`int`): Value of the dice. 1-6 for dice and darts, 1-5 for basketball and
             football/soccer ball, 1-64 for slot machine.
         emoji (:obj:`str`): Emoji on which the dice throw animation is based.
+
+    Attributes:
+        value (:obj:`int`): Value of the dice.
+        emoji (:obj:`str`): Emoji on which the dice throw animation is based.
+
     """
 
     def __init__(self, value: int, emoji: str, **_kwargs: Any):

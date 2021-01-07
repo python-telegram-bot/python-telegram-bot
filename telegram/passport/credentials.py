@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -110,12 +110,9 @@ class EncryptedCredentials(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`data`, :attr:`hash` and :attr:`secret` are equal.
 
-    Attributes:
-        data (:class:`telegram.Credentials` or :obj:`str`): Decrypted data with unique user's
-            nonce, data hashes and secrets used for EncryptedPassportElement decryption and
-            authentication or base64 encrypted data.
-        hash (:obj:`str`): Base64-encoded data hash for data authentication.
-        secret (:obj:`str`): Decrypted or encrypted secret used for decryption.
+    Note:
+        This object is decrypted only when originating from
+        :obj:`telegram.PassportData.decrypted_credentials`.
 
     Args:
         data (:class:`telegram.Credentials` or :obj:`str`): Decrypted data with unique user's
@@ -125,9 +122,12 @@ class EncryptedCredentials(TelegramObject):
         secret (:obj:`str`): Decrypted or encrypted secret used for decryption.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
-    Note:
-        This object is decrypted only when originating from
-        :obj:`telegram.PassportData.decrypted_credentials`.
+    Attributes:
+        data (:class:`telegram.Credentials` or :obj:`str`): Decrypted data with unique user's
+            nonce, data hashes and secrets used for EncryptedPassportElement decryption and
+            authentication or base64 encrypted data.
+        hash (:obj:`str`): Base64-encoded data hash for data authentication.
+        secret (:obj:`str`): Decrypted or encrypted secret used for decryption.
 
     """
 

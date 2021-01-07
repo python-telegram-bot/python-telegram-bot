@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -1356,7 +1356,7 @@ class TestPickelPersistence:
         job_queue.set_dispatcher(cdp)
         job_queue.start()
         job_queue.run_once(job_callback, 0.01)
-        sleep(0.05)
+        sleep(0.5)
         bot_data = pickle_persistence.get_bot_data()
         assert bot_data == {'test1': '456'}
         chat_data = pickle_persistence.get_chat_data()
@@ -1684,7 +1684,7 @@ class TestDictPersistence:
         job_queue.set_dispatcher(cdp)
         job_queue.start()
         job_queue.run_once(job_callback, 0.01)
-        sleep(0.05)
+        sleep(0.5)
         bot_data = dict_persistence.get_bot_data()
         assert bot_data == {'test1': '456'}
         chat_data = dict_persistence.get_chat_data()

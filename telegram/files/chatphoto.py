@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,7 @@
 from typing import TYPE_CHECKING, Any
 
 from telegram import TelegramObject
+from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
     from telegram import Bot, File
@@ -32,19 +33,6 @@ class ChatPhoto(TelegramObject):
     considered equal, if their :attr:`small_file_unique_id` and :attr:`big_file_unique_id` are
     equal.
 
-    Attributes:
-        small_file_id (:obj:`str`): File identifier of small (160x160) chat photo.
-            This file_id can be used only for photo download and only for as long
-            as the photo is not changed.
-        small_file_unique_id (:obj:`str`): Unique file identifier of small (160x160) chat photo,
-            which is supposed to be the same over time and for different bots.
-            Can't be used to download or reuse the file.
-        big_file_id (:obj:`str`): File identifier of big (640x640) chat photo.
-            This file_id can be used only for photo download and only for as long as
-            the photo is not changed.
-        big_file_unique_id (:obj:`str`): Unique file identifier of big (640x640) chat photo,
-            which is supposed to be the same over time and for different bots.
-            Can't be used to download or reuse the file.
     Args:
         small_file_id (:obj:`str`): Unique file identifier of small (160x160) chat photo. This
             file_id can be used only for photo download and only for as long
@@ -59,6 +47,20 @@ class ChatPhoto(TelegramObject):
             Can't be used to download or reuse the file.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        small_file_id (:obj:`str`): File identifier of small (160x160) chat photo.
+            This file_id can be used only for photo download and only for as long
+            as the photo is not changed.
+        small_file_unique_id (:obj:`str`): Unique file identifier of small (160x160) chat photo,
+            which is supposed to be the same over time and for different bots.
+            Can't be used to download or reuse the file.
+        big_file_id (:obj:`str`): File identifier of big (640x640) chat photo.
+            This file_id can be used only for photo download and only for as long as
+            the photo is not changed.
+        big_file_unique_id (:obj:`str`): Unique file identifier of big (640x640) chat photo,
+            which is supposed to be the same over time and for different bots.
+            Can't be used to download or reuse the file.
 
     """
 
@@ -83,16 +85,11 @@ class ChatPhoto(TelegramObject):
             self.big_file_unique_id,
         )
 
-    def get_small_file(self, timeout: int = None, **kwargs: Any) -> 'File':
+    def get_small_file(self, timeout: float = None, api_kwargs: JSONDict = None) -> 'File':
         """Convenience wrapper over :attr:`telegram.Bot.get_file` for getting the
         small (160x160) chat photo
 
-        Args:
-            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
-                the read timeout from the server (instead of the one specified during creation of
-                the connection pool).
-            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
-                Telegram API.
+        For the documentation of the arguments, please see :meth:`telegram.Bot.get_file`.
 
         Returns:
             :class:`telegram.File`
@@ -101,18 +98,15 @@ class ChatPhoto(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        return self.bot.get_file(self.small_file_id, timeout=timeout, **kwargs)
+        return self.bot.get_file(
+            file_id=self.small_file_id, timeout=timeout, api_kwargs=api_kwargs
+        )
 
-    def get_big_file(self, timeout: int = None, **kwargs: Any) -> 'File':
+    def get_big_file(self, timeout: float = None, api_kwargs: JSONDict = None) -> 'File':
         """Convenience wrapper over :attr:`telegram.Bot.get_file` for getting the
         big (640x640) chat photo
 
-        Args:
-            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
-                the read timeout from the server (instead of the one specified during creation of
-                the connection pool).
-            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
-                Telegram API.
+        For the documentation of the arguments, please see :meth:`telegram.Bot.get_file`.
 
         Returns:
             :class:`telegram.File`
@@ -121,4 +115,4 @@ class ChatPhoto(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        return self.bot.get_file(self.big_file_id, timeout=timeout, **kwargs)
+        return self.bot.get_file(file_id=self.big_file_id, timeout=timeout, api_kwargs=api_kwargs)

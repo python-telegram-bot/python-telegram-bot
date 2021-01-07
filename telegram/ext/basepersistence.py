@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -58,14 +58,6 @@ class BasePersistence(ABC):
          of the :meth:`update/get_*` methods, i.e. you don't need to worry about it while
          implementing a custom persistence subclass.
 
-    Attributes:
-        store_user_data (:obj:`bool`): Optional, Whether user_data should be saved by this
-            persistence class.
-        store_chat_data (:obj:`bool`): Optional. Whether chat_data should be saved by this
-            persistence class.
-        store_bot_data (:obj:`bool`): Optional. Whether bot_data should be saved by this
-            persistence class.
-
     Args:
         store_user_data (:obj:`bool`, optional): Whether user_data should be saved by this
             persistence class. Default is :obj:`True`.
@@ -73,6 +65,14 @@ class BasePersistence(ABC):
             persistence class. Default is :obj:`True` .
         store_bot_data (:obj:`bool`, optional): Whether bot_data should be saved by this
             persistence class. Default is :obj:`True` .
+
+    Attributes:
+        store_user_data (:obj:`bool`): Optional, Whether user_data should be saved by this
+            persistence class.
+        store_chat_data (:obj:`bool`): Optional. Whether chat_data should be saved by this
+            persistence class.
+        store_bot_data (:obj:`bool`): Optional. Whether bot_data should be saved by this
+            persistence class.
     """
 
     def __new__(cls, *args: Any, **kwargs: Any) -> 'BasePersistence':  # pylint: disable=W0613

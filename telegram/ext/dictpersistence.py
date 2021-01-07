@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -54,14 +54,6 @@ class DictPersistence(BasePersistence):
         :meth:`telegram.ext.BasePersistence.replace_bot` and
         :meth:`telegram.ext.BasePersistence.insert_bot`.
 
-    Attributes:
-        store_user_data (:obj:`bool`): Whether user_data should be saved by this
-            persistence class.
-        store_chat_data (:obj:`bool`): Whether chat_data should be saved by this
-            persistence class.
-        store_bot_data (:obj:`bool`): Whether bot_data should be saved by this
-            persistence class.
-
     Args:
         store_user_data (:obj:`bool`, optional): Whether user_data should be saved by this
             persistence class. Default is :obj:`True`.
@@ -77,6 +69,14 @@ class DictPersistence(BasePersistence):
             bot_data on creating this persistence. Default is ``""``.
         conversations_json (:obj:`str`, optional): Json string that will be used to reconstruct
             conversation on creating this persistence. Default is ``""``.
+
+    Attributes:
+        store_user_data (:obj:`bool`): Whether user_data should be saved by this
+            persistence class.
+        store_chat_data (:obj:`bool`): Whether chat_data should be saved by this
+            persistence class.
+        store_bot_data (:obj:`bool`): Whether bot_data should be saved by this
+            persistence class.
     """
 
     def __init__(
