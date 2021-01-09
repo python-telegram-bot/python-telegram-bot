@@ -137,8 +137,7 @@ class ConversationHandler(Handler[Update]):
             used to instruct a nested conversationhandler to transition into a mapped state on
             its parent conversationhandler in place of a specified nested state.
         run_async (:obj:`bool`, optional): Pass :obj:`True` to override the
-            :attr:`Handler.run_async` setting of all handlers (in :attr:`entry_points`,
-            :attr:`states` and :attr:`fallbacks`.
+            :attr:`Handler.run_async` setting of all handlers.
 
             .. versionadded:: 13.2
 
@@ -175,7 +174,7 @@ class ConversationHandler(Handler[Update]):
             its parent conversationhandler in place of a specified nested state.
         run_async (:obj:`bool`): Pass :obj:`True` to override the
             :attr:`Handler.run_async` setting of all handlers (in :attr:`entry_points`,
-            :attr:`states` and :attr:`fallbacks`.
+            :attr:`states` and :attr:`fallbacks`).
 
             .. versionadded:: 13.2
 
