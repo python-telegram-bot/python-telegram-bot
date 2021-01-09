@@ -136,8 +136,13 @@ class ConversationHandler(Handler[Update]):
         map_to_parent (Dict[:obj:`object`, :obj:`object`], optional): A :obj:`dict` that can be
             used to instruct a nested conversationhandler to transition into a mapped state on
             its parent conversationhandler in place of a specified nested state.
-        run_async (:obj:`bool`, optional): Pass :obj:`True` to override the
-            :attr:`Handler.run_async` setting of all handlers.
+        run_async (:obj:`bool`, optional): Pass :obj:`True` to *override* the
+            :attr:`Handler.run_async` setting of all handlers (in :attr:`entry_points`,
+            :attr:`states` and :attr:`fallbacks`).
+
+            Note:
+                If set to :obj:`True`, you should not pass a handler instance, that needs to be
+                run synchronously in another context.
 
             .. versionadded:: 13.2
 
@@ -172,9 +177,8 @@ class ConversationHandler(Handler[Update]):
         map_to_parent (Dict[:obj:`object`, :obj:`object`]): Optional. A :obj:`dict` that can be
             used to instruct a nested conversationhandler to transition into a mapped state on
             its parent conversationhandler in place of a specified nested state.
-        run_async (:obj:`bool`): Pass :obj:`True` to override the
-            :attr:`Handler.run_async` setting of all handlers (in :attr:`entry_points`,
-            :attr:`states` and :attr:`fallbacks`).
+        run_async (:obj:`bool`): If :obj:`True`, will override the
+            :attr:`Handler.run_async` setting of all internal handlers on initialization.
 
             .. versionadded:: 13.2
 
