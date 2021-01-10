@@ -190,6 +190,24 @@ class Chat(TelegramObject):
         self._id_attrs = (self.id,)
 
     @property
+    def full_name(self) -> Optional[str]:
+        """
+        :obj:`str`: Convenience property. If :attr:`first_name` is not :obj:`None` gives,
+        :attr:`first_name` followed by (if available) :attr:`last_name`.
+
+        Note:
+            :attr:`full_name` will always be :obj:`None`, if the chat is a (super)group or
+            channel.
+
+        .. versionadded:: 13.2
+        """
+        if not self.first_name:
+            return None
+        if self.last_name:
+            return f'{self.first_name} {self.last_name}'
+        return self.first_name
+
+    @property
     def link(self) -> Optional[str]:
         """:obj:`str`: Convenience property. If the chat has a :attr:`username`, returns a t.me
         link of the chat."""
@@ -348,6 +366,80 @@ class Chat(TelegramObject):
             timeout=timeout,
             api_kwargs=api_kwargs,
             only_if_banned=only_if_banned,
+        )
+
+    def promote_member(
+        self,
+        user_id: Union[str, int],
+        can_change_info: bool = None,
+        can_post_messages: bool = None,
+        can_edit_messages: bool = None,
+        can_delete_messages: bool = None,
+        can_invite_users: bool = None,
+        can_restrict_members: bool = None,
+        can_pin_messages: bool = None,
+        can_promote_members: bool = None,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+        is_anonymous: bool = None,
+    ) -> bool:
+        """Shortcut for::
+
+            bot.promote_chat_member(update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.promote_chat_member`.
+
+        .. versionadded:: 13.2
+
+        Returns:
+            :obj:`bool`: If the action was sent successfully.
+
+        """
+        return self.bot.promote_chat_member(
+            chat_id=self.id,
+            user_id=user_id,
+            can_change_info=can_change_info,
+            can_post_messages=can_post_messages,
+            can_edit_messages=can_edit_messages,
+            can_delete_messages=can_delete_messages,
+            can_invite_users=can_invite_users,
+            can_restrict_members=can_restrict_members,
+            can_pin_messages=can_pin_messages,
+            can_promote_members=can_promote_members,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+            is_anonymous=is_anonymous,
+        )
+
+    def restrict_member(
+        self,
+        user_id: Union[str, int],
+        permissions: ChatPermissions,
+        until_date: Union[int, datetime] = None,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+            bot.restrict_chat_member(update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.restrict_chat_member`.
+
+        .. versionadded:: 13.2
+
+        Returns:
+            :obj:`bool`: If the action was sent successfully.
+
+        """
+        return self.bot.restrict_chat_member(
+            chat_id=self.id,
+            user_id=user_id,
+            permissions=permissions,
+            until_date=until_date,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
         )
 
     def set_permissions(

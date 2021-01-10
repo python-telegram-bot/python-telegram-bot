@@ -112,6 +112,19 @@ class TestChat:
         chat.username = None
         assert chat.link is None
 
+    def test_full_name(self):
+        chat = Chat(
+            id=1, type=Chat.PRIVATE, first_name=u'first\u2022name', last_name=u'last\u2022name'
+        )
+        assert chat.full_name == u'first\u2022name last\u2022name'
+        chat = Chat(id=1, type=Chat.PRIVATE, first_name=u'first\u2022name')
+        assert chat.full_name == u'first\u2022name'
+        chat = Chat(
+            id=1,
+            type=Chat.PRIVATE,
+        )
+        assert chat.full_name is None
+
     def test_send_action(self, monkeypatch, chat):
         send_chat_action = chat.bot.send_chat_action
 
@@ -210,6 +223,44 @@ class TestChat:
 
         monkeypatch.setattr(chat.bot, 'unban_chat_member', make_assertion)
         assert chat.unban_member(user_id=42, only_if_banned=only_if_banned)
+
+    @pytest.mark.parametrize('is_anonymous', [True, False, None])
+    def test_promote_member(self, monkeypatch, chat, is_anonymous):
+        promote_chat_member = chat.bot.promote_chat_member
+
+        def make_assertion(*_, **kwargs):
+            chat_id = kwargs['chat_id'] == chat.id
+            user_id = kwargs['user_id'] == 42
+            o_i_b = kwargs.get('is_anonymous', None) == is_anonymous
+            return (
+                chat_id and user_id and o_i_b and check_shortcut_call(kwargs, promote_chat_member)
+            )
+
+        assert check_shortcut_signature(
+            Chat.promote_member, Bot.promote_chat_member, ['chat_id'], []
+        )
+
+        monkeypatch.setattr(chat.bot, 'promote_chat_member', make_assertion)
+        assert chat.promote_member(user_id=42, is_anonymous=is_anonymous)
+
+    def test_restrict_member(self, monkeypatch, chat):
+        restrict_chat_member = chat.bot.restrict_chat_member
+        permissions = ChatPermissions(True, False, True, False, True, False, True, False)
+
+        def make_assertion(*_, **kwargs):
+            chat_id = kwargs['chat_id'] == chat.id
+            user_id = kwargs['user_id'] == 42
+            o_i_b = kwargs.get('permissions', None) == permissions
+            return (
+                chat_id and user_id and o_i_b and check_shortcut_call(kwargs, restrict_chat_member)
+            )
+
+        assert check_shortcut_signature(
+            Chat.restrict_member, Bot.restrict_chat_member, ['chat_id'], []
+        )
+
+        monkeypatch.setattr(chat.bot, 'restrict_chat_member', make_assertion)
+        assert chat.restrict_member(user_id=42, permissions=permissions)
 
     def test_set_permissions(self, monkeypatch, chat):
         set_chat_permissions = chat.bot.set_chat_permissions
