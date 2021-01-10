@@ -32,6 +32,9 @@ Attributes:
     MAX_MESSAGES_PER_SECOND (:obj:`int`): 30
     MAX_MESSAGES_PER_MINUTE_PER_GROUP (:obj:`int`): 20
     MAX_INLINE_QUERY_RESULTS (:obj:`int`): 50
+    MAX_ANSWER_CALLBACK_QUERY_TEXT_LENGTH (:obj:`int`): 200
+
+        .. versionadded:: 13.2
 
 The following constant have been found by experimentation:
 
@@ -149,6 +152,7 @@ MAX_MESSAGES_PER_SECOND: int = 30
 MAX_MESSAGES_PER_MINUTE_PER_GROUP: int = 20
 MAX_MESSAGE_ENTITIES: int = 100
 MAX_INLINE_QUERY_RESULTS: int = 50
+MAX_ANSWER_CALLBACK_QUERY_TEXT_LENGTH: int = 200
 
 CHAT_PRIVATE: str = 'private'
 CHAT_GROUP: str = 'group'

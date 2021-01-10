@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2020
+# Copyright (C) 2020-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -173,7 +173,7 @@ class Defaults:
         )
 
     @property
-    def run_async(self) -> Optional[bool]:
+    def run_async(self) -> bool:
         return self._run_async
 
     @run_async.setter

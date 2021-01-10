@@ -19,9 +19,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineQuery."""
 
-from typing import TYPE_CHECKING, Any, Optional, List, Union, Callable
+from typing import TYPE_CHECKING, Any, Optional, List, Union, Callable, ClassVar
 
-from telegram import Location, TelegramObject, User
+from telegram import Location, TelegramObject, User, constants
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -142,3 +142,10 @@ class InlineQuery(TelegramObject):
             timeout=timeout,
             api_kwargs=api_kwargs,
         )
+
+    MAX_RESULTS: ClassVar[int] = constants.MAX_INLINE_QUERY_RESULTS
+    """
+    :const:`telegram.constants.MAX_INLINE_QUERY_RESULTS`
+
+    .. versionadded:: 13.2
+    """

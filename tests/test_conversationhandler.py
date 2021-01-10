@@ -1429,3 +1429,36 @@ class TestConversationHandler:
         assert self.current_state[user1.id] == self.STOPPING
         assert handler.conversations.get((0, user1.id)) is None
         assert not self.test_flag
+
+    def test_conversation_handler_run_async_true(self, dp):
+        conv_handler = ConversationHandler(
+            entry_points=self.entry_points,
+            states=self.states,
+            fallbacks=self.fallbacks,
+            run_async=True,
+        )
+
+        all_handlers = conv_handler.entry_points + conv_handler.fallbacks
+        for state_handlers in conv_handler.states.values():
+            all_handlers += state_handlers
+
+        for handler in all_handlers:
+            assert handler.run_async
+
+    def test_conversation_handler_run_async_false(self, dp):
+        conv_handler = ConversationHandler(
+            entry_points=[CommandHandler('start', self.start_end, run_async=True)],
+            states=self.states,
+            fallbacks=self.fallbacks,
+            run_async=False,
+        )
+
+        for handler in conv_handler.entry_points:
+            assert handler.run_async
+
+        all_handlers = conv_handler.fallbacks
+        for state_handlers in conv_handler.states.values():
+            all_handlers += state_handlers
+
+        for handler in all_handlers:
+            assert not handler.run_async.value
