@@ -114,11 +114,11 @@ class TestChat:
 
     def test_full_name(self):
         chat = Chat(
-            id=1, type=Chat.PRIVATE, first_name=u'first\u2022name', last_name=u'last\u2022name'
+            id=1, type=Chat.PRIVATE, first_name='first\u2022name', last_name='last\u2022name'
         )
-        assert chat.full_name == u'first\u2022name last\u2022name'
-        chat = Chat(id=1, type=Chat.PRIVATE, first_name=u'first\u2022name')
-        assert chat.full_name == u'first\u2022name'
+        assert chat.full_name == 'first\u2022name last\u2022name'
+        chat = Chat(id=1, type=Chat.PRIVATE, first_name='first\u2022name')
+        assert chat.full_name == 'first\u2022name'
         chat = Chat(
             id=1,
             type=Chat.PRIVATE,
