@@ -53,6 +53,10 @@ class CallbackQuery(TelegramObject):
           until you call :attr:`answer`. It is, therefore, necessary to react
           by calling :attr:`telegram.Bot.answer_callback_query` even if no notification to the user
           is needed (e.g., without specifying any of the optional parameters).
+        * If you're using :attr:`Bot.arbitrary_callback_data`, :attr:`data` maybe be an instance of
+          :class:`telegram.error.InvalidCallbackData`. This will be the case, if the data
+          associated with the button triggering the :class:`telegram.CallbackQuery` was already
+          deleted or if :attr:`data` was manipulated by a malicious client.
 
     Args:
         id (:obj:`str`): Unique identifier for this query.
@@ -106,10 +110,21 @@ class CallbackQuery(TelegramObject):
         self.data = data
         self.inline_message_id = inline_message_id
         self.game_short_name = game_short_name
-
         self.bot = bot
 
+        self._callback_data = _kwargs.pop('callback_data', None)
+
         self._id_attrs = (self.id,)
+
+    def drop_callback_data(self) -> None:
+        """
+        Deletes the callback data stored in cache for all buttons associated with
+        :attr:`reply_markup`. Will have no effect if :attr:`reply_markup` is :obj:`None`. Will
+        automatically be called by all methods that change the reply markup of the message
+        associated with this callback query.
+        """
+        if self._callback_data:
+            self.bot.callback_data.drop_keyboard(self._callback_data)
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['CallbackQuery']:
@@ -119,13 +134,20 @@ class CallbackQuery(TelegramObject):
             return None
 
         data['from_user'] = User.de_json(data.get('from'), bot)
-        data['message'] = Message.de_json(data.get('message'), bot)
 
-        if bot.arbitrary_callback_data and 'data' in data:
+        if bot.arbitrary_callback_data and data.get('data'):
+            # Pass along the callback_data to message for the drop_callback_data shortcuts
+            if data.get('message'):
+                data['message']['callback_data'] = data['data']
+
+            # Pass the data to init for the drop_callback_data shortcuts
+            data['callback_data'] = data['data']
             try:
-                data['data'] = bot.callback_data.pop(data['data'])
-            except IndexError as exc:
-                raise InvalidCallbackData() from exc
+                data['data'] = bot.callback_data.get_button_data(data['data'])
+            except IndexError:
+                data['data'] = InvalidCallbackData()
+
+        data['message'] = Message.de_json(data.get('message'), bot)
 
         return cls(bot=bot, **data)
 
@@ -186,6 +208,7 @@ class CallbackQuery(TelegramObject):
             edited Message is returned, otherwise :obj:`True` is returned.
 
         """
+        self.drop_callback_data()
         if self.inline_message_id:
             return self.bot.edit_message_text(
                 inline_message_id=self.inline_message_id,
@@ -236,6 +259,7 @@ class CallbackQuery(TelegramObject):
             edited Message is returned, otherwise :obj:`True` is returned.
 
         """
+        self.drop_callback_data()
         if self.inline_message_id:
             return self.bot.edit_message_caption(
                 caption=caption,
@@ -288,6 +312,7 @@ class CallbackQuery(TelegramObject):
             edited Message is returned, otherwise :obj:`True` is returned.
 
         """
+        self.drop_callback_data()
         if self.inline_message_id:
             return self.bot.edit_message_reply_markup(
                 reply_markup=reply_markup,
@@ -327,6 +352,7 @@ class CallbackQuery(TelegramObject):
             edited Message is returned, otherwise :obj:`True` is returned.
 
         """
+        self.drop_callback_data()
         if self.inline_message_id:
             return self.bot.edit_message_media(
                 inline_message_id=self.inline_message_id,
@@ -375,6 +401,7 @@ class CallbackQuery(TelegramObject):
             edited Message is returned, otherwise :obj:`True` is returned.
 
         """
+        self.drop_callback_data()
         if self.inline_message_id:
             return self.bot.edit_message_live_location(
                 inline_message_id=self.inline_message_id,
@@ -427,6 +454,7 @@ class CallbackQuery(TelegramObject):
             edited Message is returned, otherwise :obj:`True` is returned.
 
         """
+        self.drop_callback_data()
         if self.inline_message_id:
             return self.bot.stop_message_live_location(
                 inline_message_id=self.inline_message_id,
@@ -542,6 +570,7 @@ class CallbackQuery(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
+        self.drop_callback_data()
         return self.message.delete(
             timeout=timeout,
             api_kwargs=api_kwargs,

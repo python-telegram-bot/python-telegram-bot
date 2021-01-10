@@ -26,7 +26,7 @@ from contextlib import contextmanager
 
 from flaky import flaky
 from functools import partial
-from queue import Queue, Empty
+from queue import Queue
 from random import randrange
 from threading import Thread, Event
 from time import sleep
@@ -36,7 +36,7 @@ from urllib.error import HTTPError
 
 import pytest
 
-from telegram import TelegramError, Message, User, Chat, Update, Bot, CallbackQuery
+from telegram import TelegramError, Message, User, Chat, Update, Bot
 from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter
 from telegram.ext import Updater, Dispatcher, DictPersistence, Defaults
 from telegram.utils.deprecate import TelegramDeprecationWarning
@@ -317,63 +317,6 @@ class TestUpdater:
                 force_event_loop=True,
             )
             assert isinstance(asyncio.get_event_loop(), asyncio.ProactorEventLoop)
-
-    def test_webhook_invalid_callback_data(self, monkeypatch, updater):
-        updater.bot.arbitrary_callback_data = True
-        q = Queue()
-        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
-        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
-        monkeypatch.setattr(updater.dispatcher, 'process_update', lambda _, u: q.put(u))
-
-        ip = '127.0.0.1'
-        port = randrange(1024, 49152)  # Select random port
-        updater.start_webhook(ip, port, url_path='TOKEN')
-        sleep(0.2)
-        try:
-            # Now, we send an update to the server via urlopen
-            update = Update(
-                1,
-                callback_query=CallbackQuery(
-                    id=1,
-                    from_user=None,
-                    chat_instance=123,
-                    data='invalid data',
-                    message=Message(
-                        1,
-                        from_user=User(1, '', False),
-                        date=None,
-                        chat=Chat(1, ''),
-                        text='Webhook',
-                    ),
-                ),
-            )
-            self._send_webhook_msg(ip, port, update.to_json(), 'TOKEN')
-            sleep(0.2)
-            # Make sure the update wasn't accepted and the queue is empty
-            with pytest.raises(Empty):
-                assert q.get(False)
-
-            # Returns 404 if path is incorrect
-            with pytest.raises(HTTPError) as excinfo:
-                self._send_webhook_msg(ip, port, None, 'webookhandler.py')
-            assert excinfo.value.code == 404
-
-            with pytest.raises(HTTPError) as excinfo:
-                self._send_webhook_msg(
-                    ip, port, None, 'webookhandler.py', get_method=lambda: 'HEAD'
-                )
-            assert excinfo.value.code == 404
-
-            # Test multiple shutdown() calls
-            updater.httpd.shutdown()
-        finally:
-            updater.httpd.shutdown()
-            sleep(0.2)
-            assert not updater.httpd.is_running
-            updater.stop()
-
-        # Reset b/c bots scope is session
-        updater.bot.arbitrary_callback_data = False
 
     def test_webhook_ssl(self, monkeypatch, updater):
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)

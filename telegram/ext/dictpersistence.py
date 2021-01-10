@@ -20,7 +20,7 @@
 from copy import deepcopy
 
 from typing import Any, DefaultDict, Dict, Optional, Tuple
-from collections import defaultdict, deque
+from collections import defaultdict
 
 from telegram.utils.helpers import (
     decode_conversations_from_json,
@@ -135,10 +135,7 @@ class DictPersistence(BasePersistence):
                 raise TypeError("bot_data_json must be serialized dict")
         if callback_data_json:
             try:
-                data = json.loads(callback_data_json)
-                self._callback_data = (
-                    (data[0], data[1], deque(data[2])) if data is not None else None
-                )
+                self._callback_data = json.loads(callback_data_json)
                 self._callback_data_json = callback_data_json
             except (ValueError, AttributeError) as exc:
                 raise TypeError(
@@ -202,11 +199,7 @@ class DictPersistence(BasePersistence):
         """:obj:`str`: The meta data on the stored callback data as a JSON-string."""
         if self._callback_data_json:
             return self._callback_data_json
-        if self.callback_data is None:
-            return json.dumps(self.callback_data)
-        return json.dumps(
-            (self.callback_data[0], self.callback_data[1], list(self.callback_data[2]))
-        )
+        return json.dumps(self.callback_data)
 
     @property
     def conversations(self) -> Optional[Dict[str, Dict[Tuple, Any]]]:
@@ -350,5 +343,5 @@ class DictPersistence(BasePersistence):
         """
         if self._callback_data == data:
             return
-        self._callback_data = (data[0], data[1].copy(), data[2].copy())
+        self._callback_data = (data[0].copy(), data[1].copy())
         self._callback_data_json = None

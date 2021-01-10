@@ -435,6 +435,8 @@ class Message(TelegramObject):
         self.reply_markup = reply_markup
         self.bot = bot
 
+        self._callback_data = _kwargs.pop('callback_data', None)
+
         self._id_attrs = (self.message_id, self.chat)
 
     @property
@@ -501,6 +503,15 @@ class Message(TelegramObject):
         data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
 
         return cls(bot=bot, **data)
+
+    def drop_callback_data(self) -> None:
+        """
+        Deletes the callback data stored in cache for all buttons associated with
+        :attr:`reply_markup`. Will have no effect if :attr:`reply_markup` is :obj:`None`. Will
+        automatically be called by all methods that change the reply markup of this message.
+        """
+        if self._callback_data:
+            self.bot.callback_data.drop_keyboard(self._callback_data)
 
     @property
     def effective_attachment(
@@ -1635,6 +1646,7 @@ class Message(TelegramObject):
             edited Message is returned, otherwise ``True`` is returned.
 
         """
+        self.drop_callback_data()
         return self.bot.edit_message_text(
             chat_id=self.chat_id,
             message_id=self.message_id,
@@ -1677,6 +1689,7 @@ class Message(TelegramObject):
             edited Message is returned, otherwise ``True`` is returned.
 
         """
+        self.drop_callback_data()
         return self.bot.edit_message_caption(
             chat_id=self.chat_id,
             message_id=self.message_id,
@@ -1716,6 +1729,7 @@ class Message(TelegramObject):
             edited Message is returned, otherwise ``True`` is returned.
 
         """
+        self.drop_callback_data()
         return self.bot.edit_message_media(
             chat_id=self.chat_id,
             message_id=self.message_id,
@@ -1751,6 +1765,7 @@ class Message(TelegramObject):
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
             edited Message is returned, otherwise ``True`` is returned.
         """
+        self.drop_callback_data()
         return self.bot.edit_message_reply_markup(
             chat_id=self.chat_id,
             message_id=self.message_id,
@@ -1791,6 +1806,7 @@ class Message(TelegramObject):
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
             edited Message is returned, otherwise :obj:`True` is returned.
         """
+        self.drop_callback_data()
         return self.bot.edit_message_live_location(
             chat_id=self.chat_id,
             message_id=self.message_id,
@@ -1831,6 +1847,7 @@ class Message(TelegramObject):
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
             edited Message is returned, otherwise :obj:`True` is returned.
         """
+        self.drop_callback_data()
         return self.bot.stop_message_live_location(
             chat_id=self.chat_id,
             message_id=self.message_id,
@@ -1930,6 +1947,7 @@ class Message(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
+        self.drop_callback_data()
         return self.bot.delete_message(
             chat_id=self.chat_id,
             message_id=self.message_id,
@@ -1957,6 +1975,7 @@ class Message(TelegramObject):
             returned.
 
         """
+        self.drop_callback_data()
         return self.bot.stop_poll(
             chat_id=self.chat_id,
             message_id=self.message_id,

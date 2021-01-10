@@ -128,24 +128,6 @@ class InlineKeyboardMarkup(ReplyMarkup):
         button_grid = [[button] for button in button_column]
         return cls(button_grid, **kwargs)
 
-    def replace_callback_data(self, bot: 'Bot') -> 'InlineKeyboardMarkup':
-        """
-        Builds a new keyboard by calling
-        :meth:`telegram.InlineKeyboardButton.replace_callback_data` for all buttons.
-
-        Args:
-            bot (:class:`telegram.Bot`): The bot this keyboard will be sent with.
-
-        Returns:
-            :class:`telegram.InlineKeyboardMarkup`:
-        """
-        return InlineKeyboardMarkup(
-            [
-                [btn.replace_callback_data(bot=bot) for btn in column]
-                for column in self.inline_keyboard
-            ]
-        )
-
     def __eq__(self, other: object) -> bool:
         if isinstance(other, self.__class__):
             if len(self.inline_keyboard) != len(other.inline_keyboard):

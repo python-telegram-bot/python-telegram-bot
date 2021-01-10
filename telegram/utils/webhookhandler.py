@@ -33,7 +33,6 @@ from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 
 from telegram import Update
-from telegram.error import InvalidCallbackData
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -175,13 +174,10 @@ class WebhookHandler(tornado.web.RequestHandler):
         data = json.loads(json_string)
         self.set_status(200)
         self.logger.debug('Webhook received data: %s', json_string)
-        try:
-            update = Update.de_json(data, self.bot)
-            if update:
-                self.logger.debug('Received Update with ID %d on Webhook', update.update_id)
-                self.update_queue.put(update)
-        except InvalidCallbackData as exc:
-            self.logger.warning('%s Skipping CallbackQuery with invalid data: %s', exc, data)
+        update = Update.de_json(data, self.bot)
+        if update:
+            self.logger.debug('Received Update with ID %d on Webhook', update.update_id)
+            self.update_queue.put(update)
 
     def _validate_post(self) -> None:
         ct_header = self.request.headers.get("Content-Type", None)

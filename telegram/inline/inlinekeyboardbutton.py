@@ -18,9 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardButton."""
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Optional
 
 from telegram import TelegramObject
+from telegram.error import InvalidCallbackData
+from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
     from telegram import CallbackGame, LoginUrl, Bot
@@ -35,8 +37,13 @@ class InlineKeyboardButton(TelegramObject):
     and :attr:`pay` are equal.
 
     Note:
-        You must use exactly one of the optional fields. Mind that :attr:`callback_game` is not
-        working as expected. Putting a game short name in it might, but is not guaranteed to work.
+        * You must use exactly one of the optional fields. Mind that :attr:`callback_game` is not
+          working as expected. Putting a game short name in it might, but is not guaranteed to
+          work.
+        * If you're using :attr:`Bot.arbitrary_callback_data`, in keyboards returned in a response
+          from telegram, :attr:`callback_data` maybe be an instance of
+          :class:`telegram.error.InvalidCallbackData`. This will be the case, if the data
+          associated with the button was already deleted.
 
     Args:
         text (:obj:`str`): Label text on the button.
@@ -119,20 +126,20 @@ class InlineKeyboardButton(TelegramObject):
             self.pay,
         )
 
-    def replace_callback_data(self, bot: 'Bot') -> 'InlineKeyboardButton':
-        """
-        If this button has :attr:`callback_data`, will store that data in the bots callback data
-        cache and return a new button where the :attr:`callback_data` is replaced by the
-        corresponding unique identifier/a signed version of it. Otherwise just returns the button.
+    @classmethod
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['InlineKeyboardButton']:
+        data = cls.parse_data(data)
 
-        Args:
-            bot (:class:`telegram.Bot`): The bot this button will be sent with.
+        if not data:
+            return None
 
-        Returns:
-            :class:`telegram.InlineKeyboardButton`:
-        """
-        if not self.callback_data:
-            return self
-        return InlineKeyboardButton(
-            self.text, callback_data=bot.callback_data.put(self.callback_data)
-        )
+        if data.get('callback_data', None):
+            # No need to for update=True, that's already done in CallbackQuery.de_json
+            try:
+                data['callback_data'] = bot.callback_data.get_button_data(
+                    data['callback_data'], update=False
+                )
+            except IndexError:
+                data['callback_data'] = InvalidCallbackData()
+
+        return cls(**data)

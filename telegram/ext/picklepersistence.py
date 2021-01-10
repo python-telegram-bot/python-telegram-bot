@@ -338,7 +338,7 @@ class PicklePersistence(BasePersistence):
         """
         if self.callback_data == data:
             return
-        self.callback_data = (data[0], data[1].copy(), data[2].copy())
+        self.callback_data = (data[0].copy(), data[1].copy())
         if not self.on_flush:
             if not self.single_file:
                 filename = "{}_callback_data".format(self.filename)

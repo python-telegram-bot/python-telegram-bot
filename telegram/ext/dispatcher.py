@@ -188,10 +188,12 @@ class Dispatcher:
             if self.persistence.store_callback_data:
                 callback_data = self.persistence.get_callback_data()
                 if callback_data is not None:
-                    if not isinstance(callback_data, tuple) and len(callback_data) != 3:
-                        print(callback_data)
-                        raise ValueError('callback_data must be a 3-tuple')
-                    self.bot.callback_data = CallbackDataCache(*callback_data)
+                    if not isinstance(callback_data, tuple) and len(callback_data) != 2:
+                        raise ValueError('callback_data must be a 2-tuple')
+                    button_data, lru_list = callback_data
+                    self.bot.callback_data = CallbackDataCache(
+                        self.bot.callback_data.maxsize, button_data=button_data, lru_list=lru_list
+                    )
         else:
             self.persistence = None
 

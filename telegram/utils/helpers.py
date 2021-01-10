@@ -531,6 +531,3 @@ DEFAULT_NONE: DefaultValue = DefaultValue(None)
 
 DEFAULT_FALSE: DefaultValue = DefaultValue(False)
 """:class:`DefaultValue`: Default :obj:`False`"""
-
-DEFAULT_TRUE: DefaultValue = DefaultValue(True)
-""":class:`DefaultValue`: Default :obj:`True`"""

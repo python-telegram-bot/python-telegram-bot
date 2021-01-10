@@ -105,7 +105,7 @@ class BasePersistence(ABC):
             cdc_data = get_callback_data()
             if cdc_data is None:
                 return None
-            return cdc_data[0], instance.insert_bot(cdc_data[1]), cdc_data[2]
+            return instance.insert_bot(cdc_data[0]), cdc_data[1]
 
         def update_user_data_replace_bot(user_id: int, data: Dict) -> None:
             return update_user_data(user_id, instance.replace_bot(data))
@@ -117,8 +117,8 @@ class BasePersistence(ABC):
             return update_bot_data(instance.replace_bot(data))
 
         def update_callback_data_replace_bot(data: CDCData) -> None:
-            maxsize, obj_data, queue = data
-            return update_callback_data((maxsize, instance.replace_bot(obj_data), queue))
+            obj_data, queue = data
+            return update_callback_data((instance.replace_bot(obj_data), queue))
 
         instance.get_user_data = get_user_data_insert_bot
         instance.get_chat_data = get_chat_data_insert_bot

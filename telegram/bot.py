@@ -84,7 +84,7 @@ from telegram import (
     InlineKeyboardMarkup,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
-from telegram.error import InvalidToken, TelegramError, InvalidCallbackData
+from telegram.error import InvalidToken, TelegramError
 from telegram.utils.helpers import (
     DEFAULT_NONE,
     DefaultValue,
@@ -171,7 +171,7 @@ class Bot(TelegramObject):
             Warning:
                 Not limiting :attr:`maxsize` may cause memory issues for long running bots. If you
                 don't limit the size, you should be sure that every inline button is actually
-                pressed or that you manually clear the cache using e.g. :meth:`clear`.
+                pressed or that you manually clear the cache.
 
     """
 
@@ -290,7 +290,7 @@ class Bot(TelegramObject):
         if reply_markup is not None:
             if isinstance(reply_markup, ReplyMarkup):
                 if self.arbitrary_callback_data and isinstance(reply_markup, InlineKeyboardMarkup):
-                    reply_markup = reply_markup.replace_callback_data(bot=self)
+                    reply_markup = self.callback_data.put_keyboard(reply_markup)
                 # We need to_json() instead of to_dict() here, because reply_markups may be
                 # attached to media messages, which aren't json dumped by utils.request
                 data['reply_markup'] = reply_markup.to_json()
@@ -2138,7 +2138,7 @@ class Bot(TelegramObject):
                 if hasattr(result, 'reply_markup') and isinstance(
                     result.reply_markup, InlineKeyboardMarkup  # type: ignore[attr-defined]
                 ):
-                    markup = result.reply_markup.replace_callback_data(bot=self)  # type: ignore
+                    markup = self.callback_data.put_keyboard(result.reply_markup)  # type: ignore
                     result.reply_markup = markup  # type: ignore[attr-defined]
 
         results_dicts = [res.to_dict() for res in effective_results]
@@ -2739,8 +2739,6 @@ class Bot(TelegramObject):
             2. In order to avoid getting duplicate updates, recalculate offset after each
                server response.
             3. To take full advantage of this library take a look at :class:`telegram.ext.Updater`
-            4. Updates causing :class:`telegram.error.InvalidCallbackData` will be logged and not
-               returned.
 
         Returns:
             List[:class:`telegram.Update`]
@@ -2778,14 +2776,7 @@ class Bot(TelegramObject):
         else:
             self.logger.debug('No new updates found.')
 
-        updates = []
-        for u in result:
-            try:
-                updates.append(cast(Update, Update.de_json(u, self)))
-            except InvalidCallbackData as exc:
-                exc.update_id = int(u['update_id'])
-                self.logger.warning('%s Skipping CallbackQuery with invalid data: %s', exc, u)
-        return updates
+        return [cast(Update, Update.de_json(u, self)) for u in result]
 
     @log
     def set_webhook(
@@ -4586,7 +4577,7 @@ class Bot(TelegramObject):
         if reply_markup:
             if isinstance(reply_markup, ReplyMarkup):
                 if self.arbitrary_callback_data and isinstance(reply_markup, InlineKeyboardMarkup):
-                    reply_markup = reply_markup.replace_callback_data(bot=self)
+                    reply_markup = self.callback_data.put_keyboard(reply_markup)
                 # We need to_json() instead of to_dict() here, because reply_markups may be
                 # attached to media messages, which aren't json dumped by utils.request
                 data['reply_markup'] = reply_markup.to_json()
@@ -4835,7 +4826,7 @@ class Bot(TelegramObject):
         if reply_markup:
             if isinstance(reply_markup, ReplyMarkup):
                 if self.arbitrary_callback_data and isinstance(reply_markup, InlineKeyboardMarkup):
-                    reply_markup = reply_markup.replace_callback_data(bot=self)
+                    reply_markup = self.callback_data.put_keyboard(reply_markup)
                 # We need to_json() instead of to_dict() here, because reply_markups may be
                 # attached to media messages, which aren't json dumped by utils.request
                 data['reply_markup'] = reply_markup.to_json()
