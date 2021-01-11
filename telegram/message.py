@@ -2341,7 +2341,11 @@ class Message(TelegramObject):
                         )
 
                     text = Message._parse_markdown(
-                        text, nested_entities, urled=urled, offset=entity.offset, version=version
+                        orig_text,
+                        nested_entities,
+                        urled=urled,
+                        offset=entity.offset,
+                        version=version,
                     )
 
                 if entity.type == MessageEntity.TEXT_LINK:
