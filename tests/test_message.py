@@ -266,7 +266,7 @@ class TestMessage:
     ]
     test_text_v2 = (
         r'Test for <bold, ita_lic, \`code, links, text-mention and `\pre. '
-        'http://google.com and bold nested in strk-trgh nested in italic. Python pre.'
+        'http://google.com and bold nested in strk>trgh nested in italic. Python pre.'
     )
     test_message = Message(
         message_id=1,
@@ -357,7 +357,7 @@ class TestMessage:
             r'<a href="http://github.com/abc\)def">links</a>, '
             '<a href="tg://user?id=123456789">text-mention</a> and '
             r'<pre>`\pre</pre>. http://google.com '
-            'and <i>bold <b>nested in <s>strk-trgh</s> nested in</b> italic</i>. '
+            'and <i>bold <b>nested in <s>strk&gt;trgh</s> nested in</b> italic</i>. '
             '<pre><code class="python">Python pre</code></pre>.'
         )
         text_html = self.test_message_v2.text_html
@@ -375,7 +375,7 @@ class TestMessage:
             r'<a href="http://github.com/abc\)def">links</a>, '
             '<a href="tg://user?id=123456789">text-mention</a> and '
             r'<pre>`\pre</pre>. <a href="http://google.com">http://google.com</a> '
-            'and <i>bold <b>nested in <s>strk-trgh</s> nested in</b> italic</i>. '
+            'and <i>bold <b>nested in <s>strk&gt;trgh</s> nested in</b> italic</i>. '
             '<pre><code class="python">Python pre</code></pre>.'
         )
         text_html = self.test_message_v2.text_html_urled
@@ -396,7 +396,7 @@ class TestMessage:
             r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
             '[links](http://github.com/abc\\\\\\)def), '
             '[text\\-mention](tg://user?id=123456789) and ```\\`\\\\pre```\\. '
-            r'http://google\.com and _bold *nested in ~strk\-trgh~ nested in* italic_\. '
+            r'http://google\.com and _bold *nested in ~strk\>trgh~ nested in* italic_\. '
             '```python\nPython pre```\\.'
         )
         text_markdown = self.test_message_v2.text_markdown_v2
@@ -442,7 +442,7 @@ class TestMessage:
             r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
             '[links](http://github.com/abc\\\\\\)def), '
             '[text\\-mention](tg://user?id=123456789) and ```\\`\\\\pre```\\. '
-            r'[http://google\.com](http://google.com) and _bold *nested in ~strk\-trgh~ '
+            r'[http://google\.com](http://google.com) and _bold *nested in ~strk\>trgh~ '
             'nested in* italic_\\. ```python\nPython pre```\\.'
         )
         text_markdown = self.test_message_v2.text_markdown_v2_urled
@@ -473,7 +473,7 @@ class TestMessage:
             r'<a href="http://github.com/abc\)def">links</a>, '
             '<a href="tg://user?id=123456789">text-mention</a> and '
             r'<pre>`\pre</pre>. http://google.com '
-            'and <i>bold <b>nested in <s>strk-trgh</s> nested in</b> italic</i>. '
+            'and <i>bold <b>nested in <s>strk&gt;trgh</s> nested in</b> italic</i>. '
             '<pre><code class="python">Python pre</code></pre>.'
         )
         caption_html = self.test_message_v2.caption_html
@@ -491,7 +491,7 @@ class TestMessage:
             r'<a href="http://github.com/abc\)def">links</a>, '
             '<a href="tg://user?id=123456789">text-mention</a> and '
             r'<pre>`\pre</pre>. <a href="http://google.com">http://google.com</a> '
-            'and <i>bold <b>nested in <s>strk-trgh</s> nested in</b> italic</i>. '
+            'and <i>bold <b>nested in <s>strk&gt;trgh</s> nested in</b> italic</i>. '
             '<pre><code class="python">Python pre</code></pre>.'
         )
         caption_html = self.test_message_v2.caption_html_urled
@@ -512,7 +512,7 @@ class TestMessage:
             r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
             '[links](http://github.com/abc\\\\\\)def), '
             '[text\\-mention](tg://user?id=123456789) and ```\\`\\\\pre```\\. '
-            r'http://google\.com and _bold *nested in ~strk\-trgh~ nested in* italic_\. '
+            r'http://google\.com and _bold *nested in ~strk\>trgh~ nested in* italic_\. '
             '```python\nPython pre```\\.'
         )
         caption_markdown = self.test_message_v2.caption_markdown_v2
@@ -539,7 +539,7 @@ class TestMessage:
             r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
             '[links](http://github.com/abc\\\\\\)def), '
             '[text\\-mention](tg://user?id=123456789) and ```\\`\\\\pre```\\. '
-            r'[http://google\.com](http://google.com) and _bold *nested in ~strk\-trgh~ '
+            r'[http://google\.com](http://google.com) and _bold *nested in ~strk\>trgh~ '
             'nested in* italic_\\. ```python\nPython pre```\\.'
         )
         caption_markdown = self.test_message_v2.caption_markdown_v2_urled
@@ -698,7 +698,7 @@ class TestMessage:
             r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
             '[links](http://github.com/abc\\\\\\)def), '
             '[text\\-mention](tg://user?id=123456789) and ```\\`\\\\pre```\\. '
-            r'http://google\.com and _bold *nested in ~strk\-trgh~ nested in* italic_\. '
+            r'http://google\.com and _bold *nested in ~strk\>trgh~ nested in* italic_\. '
             '```python\nPython pre```\\.'
         )
 
@@ -738,7 +738,7 @@ class TestMessage:
             r'<a href="http://github.com/abc\)def">links</a>, '
             '<a href="tg://user?id=123456789">text-mention</a> and '
             r'<pre>`\pre</pre>. http://google.com '
-            'and <i>bold <b>nested in <s>strk-trgh</s> nested in</b> italic</i>. '
+            'and <i>bold <b>nested in <s>strk&gt;trgh</s> nested in</b> italic</i>. '
             '<pre><code class="python">Python pre</code></pre>.'
         )
 
