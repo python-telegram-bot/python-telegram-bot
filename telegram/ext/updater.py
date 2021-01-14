@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -63,19 +63,10 @@ class Updater(Generic[CCT, UD, CD, BD, UDM, CDM]):
     production, use a webhook to receive updates. This is achieved using the WebhookServer and
     WebhookHandler classes.
 
-
-    Attributes:
-        bot (:class:`telegram.Bot`): The bot used with this Updater.
-        user_sig_handler (:obj:`function`): Optional. Function to be called when a signal is
-            received.
-        update_queue (:obj:`Queue`): Queue for the updates.
-        job_queue (:class:`telegram.ext.JobQueue`): Jobqueue for the updater.
-        dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that handles the updates and
-            dispatches them to the handlers.
-        running (:obj:`bool`): Indicates if the updater is running.
-        persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
-            store data that should be persistent over restarts.
-        use_context (:obj:`bool`): Optional. :obj:`True` if using context based callbacks.
+    Note:
+        * You must supply either a :attr:`bot` or a :attr:`token` argument.
+        * If you supply a :attr:`bot`, you will need to pass :attr:`defaults` to *both* the bot and
+          the :class:`telegram.ext.Updater`.
 
     Args:
         token (:obj:`str`, optional): The bot's token given by the @BotFather.
@@ -112,13 +103,22 @@ class Updater(Generic[CCT, UD, CD, BD, UDM, CDM]):
             ``context`` interface. If not passed, the defaults documented in
             :class:`telegram.ext.ContextCustomizer` will be used.
 
-    Note:
-        * You must supply either a :attr:`bot` or a :attr:`token` argument.
-        * If you supply a :attr:`bot`, you will need to pass :attr:`defaults` to *both* the bot and
-          the :class:`telegram.ext.Updater`.
-
     Raises:
         ValueError: If both :attr:`token` and :attr:`bot` are passed or none of them.
+
+
+    Attributes:
+        bot (:class:`telegram.Bot`): The bot used with this Updater.
+        user_sig_handler (:obj:`function`): Optional. Function to be called when a signal is
+            received.
+        update_queue (:obj:`Queue`): Queue for the updates.
+        job_queue (:class:`telegram.ext.JobQueue`): Jobqueue for the updater.
+        dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that handles the updates and
+            dispatches them to the handlers.
+        running (:obj:`bool`): Indicates if the updater is running.
+        persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
+            store data that should be persistent over restarts.
+        use_context (:obj:`bool`): Optional. :obj:`True` if using context based callbacks.
 
     """
 

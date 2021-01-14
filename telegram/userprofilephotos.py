@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -33,14 +33,14 @@ class UserProfilePhotos(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`total_count` and :attr:`photos` are equal.
 
-    Attributes:
-        total_count (:obj:`int`): Total number of profile pictures.
-        photos (List[List[:class:`telegram.PhotoSize`]]): Requested profile pictures.
-
     Args:
         total_count (:obj:`int`): Total number of profile pictures the target user has.
         photos (List[List[:class:`telegram.PhotoSize`]]): Requested profile pictures (in up to 4
             sizes each).
+
+    Attributes:
+        total_count (:obj:`int`): Total number of profile pictures.
+        photos (List[List[:class:`telegram.PhotoSize`]]): Requested profile pictures.
 
     """
 

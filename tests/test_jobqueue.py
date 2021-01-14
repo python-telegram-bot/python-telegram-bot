@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,7 @@ import calendar
 import datetime as dtm
 import logging
 import os
+import platform
 import time
 from queue import Queue
 from time import sleep
@@ -45,8 +46,8 @@ def job_queue(bot, _dp):
 
 
 @pytest.mark.skipif(
-    os.getenv('GITHUB_ACTIONS', False) and os.name == 'nt',
-    reason="On windows precise timings are not accurate.",
+    os.getenv('GITHUB_ACTIONS', False) and platform.system() in ['Windows', 'Darwin'],
+    reason="On Windows & MacOS precise timings are not accurate.",
 )
 @flaky(10, 1)  # Timings aren't quite perfect
 class TestJobQueue:
@@ -317,7 +318,7 @@ class TestJobQueue:
             next_months_days = calendar.monthrange(now.year, now.month + 1)[1]
 
         expected_reschedule_time += dtm.timedelta(this_months_days)
-        if next_months_days < this_months_days:
+        if day > next_months_days:
             expected_reschedule_time += dtm.timedelta(next_months_days)
 
         expected_reschedule_time = timezone.normalize(expected_reschedule_time)

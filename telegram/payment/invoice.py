@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -30,13 +30,6 @@ class Invoice(TelegramObject):
     considered equal, if their :attr:`title`, :attr:`description`, :attr:`start_parameter`,
     :attr:`currency` and :attr:`total_amount` are equal.
 
-    Attributes:
-        title (:obj:`str`): Product name.
-        description (:obj:`str`): Product description.
-        start_parameter (:obj:`str`): Unique bot deep-linking parameter.
-        currency (:obj:`str`): Three-letter ISO 4217 currency code.
-        total_amount (:obj:`int`): Total price in the smallest units of the currency.
-
     Args:
         title (:obj:`str`): Product name.
         description (:obj:`str`): Product description.
@@ -50,6 +43,13 @@ class Invoice(TelegramObject):
             it shows the number of digits past the decimal point for each currency
             (2 for the majority of currencies).
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        title (:obj:`str`): Product name.
+        description (:obj:`str`): Product description.
+        start_parameter (:obj:`str`): Unique bot deep-linking parameter.
+        currency (:obj:`str`): Three-letter ISO 4217 currency code.
+        total_amount (:obj:`int`): Total price in the smallest units of the currency.
 
     """
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -33,16 +33,6 @@ class PhotoSize(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
 
-    Attributes:
-        file_id (:obj:`str`): Identifier for this file.
-        file_unique_id (:obj:`str`): Unique identifier for this file, which
-            is supposed to be the same over time and for different bots.
-            Can't be used to download or reuse the file.
-        width (:obj:`int`): Photo width.
-        height (:obj:`int`): Photo height.
-        file_size (:obj:`int`): Optional. File size.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
-
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.
@@ -54,6 +44,16 @@ class PhotoSize(TelegramObject):
         file_size (:obj:`int`, optional): File size.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        file_id (:obj:`str`): Identifier for this file.
+        file_unique_id (:obj:`str`): Unique identifier for this file, which
+            is supposed to be the same over time and for different bots.
+            Can't be used to download or reuse the file.
+        width (:obj:`int`): Photo width.
+        height (:obj:`int`): Photo height.
+        file_size (:obj:`int`): Optional. File size.
+        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     """
 
@@ -78,15 +78,10 @@ class PhotoSize(TelegramObject):
 
         self._id_attrs = (self.file_unique_id,)
 
-    def get_file(self, timeout: int = None, api_kwargs: JSONDict = None) -> 'File':
+    def get_file(self, timeout: float = None, api_kwargs: JSONDict = None) -> 'File':
         """Convenience wrapper over :attr:`telegram.Bot.get_file`
 
-        Args:
-            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
-                the read timeout from the server (instead of the one specified during creation of
-                the connection pool).
-            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
-                Telegram API.
+        For the documentation of the arguments, please see :meth:`telegram.Bot.get_file`.
 
         Returns:
             :class:`telegram.File`
@@ -95,4 +90,4 @@ class PhotoSize(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        return self.bot.get_file(self.file_id, timeout=timeout, api_kwargs=api_kwargs)
+        return self.bot.get_file(file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs)

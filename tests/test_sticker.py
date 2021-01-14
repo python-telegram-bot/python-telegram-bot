@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -24,8 +24,9 @@ from time import sleep
 import pytest
 from flaky import flaky
 
-from telegram import Sticker, PhotoSize, TelegramError, StickerSet, Audio, MaskPosition
+from telegram import Sticker, PhotoSize, TelegramError, StickerSet, Audio, MaskPosition, Bot
 from telegram.error import BadRequest
+from tests.conftest import check_shortcut_call, check_shortcut_signature
 
 
 @pytest.fixture(scope='function')
@@ -505,10 +506,14 @@ class TestStickerSet:
         assert test_flag
 
     def test_get_file_instance_method(self, monkeypatch, sticker):
-        def test(*args, **kwargs):
-            return args[1] == sticker.file_id
+        get_file = sticker.bot.get_file
 
-        monkeypatch.setattr('telegram.Bot.get_file', test)
+        def make_assertion(*_, **kwargs):
+            return kwargs['file_id'] == sticker.file_id and check_shortcut_call(kwargs, get_file)
+
+        assert check_shortcut_signature(Sticker.get_file, Bot.get_file, ['file_id'], [])
+
+        monkeypatch.setattr('telegram.Bot.get_file', make_assertion)
         assert sticker.get_file()
 
     def test_equality(self):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -34,18 +34,7 @@ class PreCheckoutQuery(TelegramObject):
     considered equal, if their :attr:`id` is equal.
 
     Note:
-        * In Python `from` is a reserved word, use `from_user` instead.
-
-    Attributes:
-        id (:obj:`str`): Unique query identifier.
-        from_user (:class:`telegram.User`): User who sent the query.
-        currency (:obj:`str`): Three-letter ISO 4217 currency code.
-        total_amount (:obj:`int`): Total price in the smallest units of the currency.
-        invoice_payload (:obj:`str`): Bot specified invoice payload.
-        shipping_option_id (:obj:`str`): Optional. Identifier of the shipping option chosen by the
-            user.
-        order_info (:class:`telegram.OrderInfo`): Optional. Order info provided by the user.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+        In Python `from` is a reserved word, use `from_user` instead.
 
     Args:
         id (:obj:`str`): Unique query identifier.
@@ -63,6 +52,17 @@ class PreCheckoutQuery(TelegramObject):
         order_info (:class:`telegram.OrderInfo`, optional): Order info provided by the user.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        id (:obj:`str`): Unique query identifier.
+        from_user (:class:`telegram.User`): User who sent the query.
+        currency (:obj:`str`): Three-letter ISO 4217 currency code.
+        total_amount (:obj:`int`): Total price in the smallest units of the currency.
+        invoice_payload (:obj:`str`): Bot specified invoice payload.
+        shipping_option_id (:obj:`str`): Optional. Identifier of the shipping option chosen by the
+            user.
+        order_info (:class:`telegram.OrderInfo`): Optional. Order info provided by the user.
+        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     """
 
@@ -102,21 +102,25 @@ class PreCheckoutQuery(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def answer(self, *args: Any, **kwargs: Any) -> bool:
+    def answer(  # pylint: disable=C0103
+        self,
+        ok: bool,
+        error_message: str = None,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
         """Shortcut for::
 
             bot.answer_pre_checkout_query(update.pre_checkout_query.id, *args, **kwargs)
 
-        Args:
-            ok (:obj:`bool`): Specify :obj:`True` if everything is alright
-                (goods are available, etc.) and the bot is ready to proceed with the order.
-                Use :obj:`False` if there are any problems.
-            error_message (:obj:`str`, optional): Required if ok is :obj:`False`. Error message in
-                human readable form that explains the reason for failure to proceed with the
-                checkout (e.g. "Sorry, somebody just bought the last of our amazing black T-shirts
-                while you were busy filling out your payment details. Please choose a different
-                color or garment!"). Telegram will display this message to the user.
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.answer_pre_checkout_query`.
 
         """
-        return self.bot.answer_pre_checkout_query(self.id, *args, **kwargs)
+        return self.bot.answer_pre_checkout_query(
+            pre_checkout_query_id=self.id,
+            ok=ok,
+            error_message=error_message,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )

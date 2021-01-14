@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -1189,10 +1189,12 @@ class TestBot:
 
         assert message.game
         assert message.game.description == (
-            'A no-op test game, for python-telegram-bot ' 'bot framework testing.'
+            'A no-op test game, for python-telegram-bot bot framework testing.'
         )
         assert message.game.animation.file_id != ''
-        assert message.game.photo[0].file_size == 851
+        # We added some test bots later and for some reason the file size is not the same for them
+        # so we accept two different sizes here. Shouldn't be too much of
+        assert message.game.photo[0].file_size in [851, 4928]
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

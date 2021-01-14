@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -28,7 +28,18 @@ from html import escape
 from numbers import Number
 from pathlib import Path
 
-from typing import TYPE_CHECKING, Any, DefaultDict, Dict, Optional, Tuple, Union, Type, cast, IO
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    DefaultDict,
+    Dict,
+    Optional,
+    Tuple,
+    Union,
+    Type,
+    cast,
+    IO,
+)
 
 import pytz  # pylint: disable=E0401
 
@@ -306,7 +317,7 @@ def mention_html(user_id: Union[int, str], name: str) -> str:
     Returns:
         :obj:`str`: The inline mention for the user as html.
     """
-    return u'<a href="tg://user?id={}">{}</a>'.format(user_id, escape(name))
+    return f'<a href="tg://user?id={user_id}">{escape(name)}</a>'
 
 
 def mention_markdown(user_id: Union[int, str], name: str, version: int = 1) -> str:
@@ -320,7 +331,7 @@ def mention_markdown(user_id: Union[int, str], name: str, version: int = 1) -> s
     Returns:
         :obj:`str`: The inline mention for the user as markdown.
     """
-    return u'[{}](tg://user?id={})'.format(escape_markdown(name, version=version), user_id)
+    return f'[{escape_markdown(name, version=version)}](tg://user?id={user_id})'
 
 
 def effective_message_type(entity: Union['Message', 'Update']) -> Optional[str]:
@@ -500,11 +511,12 @@ class DefaultValue:
         if value:
             ...
 
+    Args:
+        value (:obj:`obj`): The value of the default argument
+
     Attributes:
         value (:obj:`obj`): The value of the default argument
 
-    Args:
-        value (:obj:`obj`): The value of the default argument
     """
 
     def __init__(self, value: Any = None):

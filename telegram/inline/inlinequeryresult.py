@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -31,14 +31,14 @@ class InlineQueryResult(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`id` is equal.
 
-    Attributes:
-        type (:obj:`str`): Type of the result.
-        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
-
     Args:
         type (:obj:`str`): Type of the result.
         id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Attributes:
+        type (:obj:`str`): Type of the result.
+        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
 
     """
 

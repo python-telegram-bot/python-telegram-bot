@@ -2,7 +2,7 @@
 # pylint: disable=W0622,E0611
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -33,11 +33,6 @@ logger = logging.getLogger(__name__)
 class InputFile:
     """This object represents a Telegram InputFile.
 
-    Attributes:
-        input_file_content (:obj:`bytes`): The binary content of the file to send.
-        filename (:obj:`str`): Optional. Filename for the file to be sent.
-        attach (:obj:`str`): Optional. Attach id for sending multiple files.
-
     Args:
         obj (:obj:`File handler` | :obj:`bytes`): An open file descriptor or the files content as
             bytes.
@@ -47,6 +42,11 @@ class InputFile:
 
     Raises:
         TelegramError
+
+    Attributes:
+        input_file_content (:obj:`bytes`): The binary content of the file to send.
+        filename (:obj:`str`): Optional. Filename for the file to be sent.
+        attach (:obj:`str`): Optional. Attach id for sending multiple files.
 
     """
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -119,21 +119,6 @@ class DispatcherHandlerStop(Exception):
 class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
     """This class dispatches all kinds of updates to its registered handlers.
 
-    Attributes:
-        bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
-        update_queue (:obj:`Queue`): The synchronized queue that will contain the updates.
-        job_queue (:class:`telegram.ext.JobQueue`): Optional. The :class:`telegram.ext.JobQueue`
-            instance to pass onto handler callbacks.
-        workers (:obj:`int`, optional): Number of maximum concurrent worker threads for the
-            ``@run_async`` decorator and :meth:`run_async`.
-        user_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the user.
-        chat_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the chat.
-        bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
-        persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
-            store data that should be persistent over restarts.
-        context_customizer (:class:`telegram.ext.ContextCustomizer`): Container for the types used
-            in the ``context`` interface.
-
     Args:
         bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
         update_queue (:obj:`Queue`): The synchronized queue that will contain the updates.
@@ -150,6 +135,21 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
             of :class:`telegram.ext.ContextCustomizer` to customize the the types used in the
             ``context`` interface. If not passed, the defaults documented in
             :class:`telegram.ext.ContextCustomizer` will be used.
+
+    Attributes:
+        bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
+        update_queue (:obj:`Queue`): The synchronized queue that will contain the updates.
+        job_queue (:class:`telegram.ext.JobQueue`): Optional. The :class:`telegram.ext.JobQueue`
+            instance to pass onto handler callbacks.
+        workers (:obj:`int`, optional): Number of maximum concurrent worker threads for the
+            ``@run_async`` decorator and :meth:`run_async`.
+        user_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the user.
+        chat_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the chat.
+        bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
+        persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
+            store data that should be persistent over restarts.
+        context_customizer (:class:`telegram.ext.ContextCustomizer`): Container for the types used
+            in the ``context`` interface.
 
     """
 
@@ -436,11 +436,17 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
     def has_running_threads(self) -> bool:
         return self.running or bool(self.__async_threads)
 
-    def process_update(self, update: Union[str, Update, TelegramError]) -> None:
-        """Processes a single update.
+    def process_update(self, update: Any) -> None:
+        """Processes a single update and updates the persistence.
+
+        Note:
+            If the update is handled by least one synchronously running handlers (i.e.
+            ``run_async=False`), :meth:`update_persistence` is called *once* after all handlers
+            synchronous handlers are done. Each asynchronously running handler will trigger
+            :meth:`update_persistence` on its own.
 
         Args:
-            update (:obj:`str` | :class:`telegram.Update` | :class:`telegram.TelegramError`):
+            update (:class:`telegram.Update` | :obj:`object` | :class:`telegram.TelegramError`):
                 The update to process.
 
         """
@@ -454,6 +460,8 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
             return
 
         context = None
+        handled = False
+        sync_modes = []
 
         for group in self.groups:
             try:
@@ -462,11 +470,9 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
                     if check is not None and check is not False:
                         if not context and self.use_context:
                             context = self.context_customizer.context.from_update(update, self)
+                        handled = True
+                        sync_modes.append(handler.run_async)
                         handler.handle_update(update, self, check, context)
-
-                        # If handler runs async updating immediately doesn't make sense
-                        if not handler.run_async:
-                            self.update_persistence(update=update)
                         break
 
             # Stop processing with any other handler.
@@ -485,6 +491,16 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
                 # Errors should not stop the thread.
                 except Exception:
                     self.logger.exception('An uncaught error was raised while handling the error.')
+
+        # Update persistence, if handled
+        handled_only_async = all(sync_modes)
+        if handled:
+            # Respect default settings
+            if all(mode is DEFAULT_FALSE for mode in sync_modes) and self.bot.defaults:
+                handled_only_async = self.bot.defaults.run_async
+            # If update was only handled by async handlers, we don't need to update here
+            if not handled_only_async:
+                self.update_persistence(update=update)
 
     def add_handler(self, handler: Handler[UT, CCT], group: int = DEFAULT_GROUP) -> None:
         """Register a handler.
