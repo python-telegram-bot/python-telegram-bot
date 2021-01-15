@@ -36,6 +36,7 @@ from typing import (
     Union,
     Generic,
     TypeVar,
+    overload,
 )
 from uuid import uuid4
 
@@ -49,6 +50,7 @@ from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 from telegram.utils.types import CCT, UD, CD, BD, UDM, CDM
 
 if TYPE_CHECKING:
+    from collections import defaultdict
     from telegram import Bot
     from telegram.ext import JobQueue
 
@@ -158,16 +160,45 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
     __singleton = None
     logger = logging.getLogger(__name__)
 
+    @overload
     def __init__(
+        self: 'Dispatcher[CallbackContext, dict, dict, dict, defaultdict, defaultdict]',
+        bot: 'Bot',
+        update_queue: Queue,
+        workers: int = 4,
+        exception_event: Event = None,
+        job_queue: 'JobQueue' = None,
+        persistence: BasePersistence = None,
+        use_context: bool = True,
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self: 'Dispatcher[CCT, UD, CD, BD, UDM, CDM]',
+        bot: 'Bot',
+        update_queue: Queue,
+        workers: int = 4,
+        exception_event: Event = None,
+        job_queue: 'JobQueue' = None,
+        persistence: BasePersistence = None,
+        use_context: bool = True,
+        context_customizer: ContextCustomizer[
+            CCT, UD, CD, BD, UDM, CDM
+        ] = ContextCustomizer(),  # type: ignore[assignment]
+    ):
+        ...
+
+    def __init__(  # type: ignore[no-untyped-def]
         self,
         bot: 'Bot',
         update_queue: Queue,
         workers: int = 4,
         exception_event: Event = None,
         job_queue: 'JobQueue' = None,
-        persistence: BasePersistence[UD, CD, BD, UDM, CDM] = None,
+        persistence: BasePersistence = None,
         use_context: bool = True,
-        context_customizer: ContextCustomizer[CCT, UD, CD, BD, UDM, CDM] = ContextCustomizer(),
+        context_customizer=ContextCustomizer(),
     ):
         self.bot = bot
         self.update_queue = update_queue
@@ -643,7 +674,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
 
     def add_error_handler(
         self,
-        callback: Callable[[Any, CCT], None],
+        callback: Callable[[object, CCT], None],
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,  # pylint: disable=W0621
     ) -> None:
         """Registers an error handler in the Dispatcher. This handler will receive every error
@@ -679,7 +710,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
 
         self.error_handlers[callback] = run_async
 
-    def remove_error_handler(self, callback: Callable[[Any, CCT], None]) -> None:
+    def remove_error_handler(self, callback: Callable[[object, CCT], None]) -> None:
         """Removes an error handler.
 
         Args:

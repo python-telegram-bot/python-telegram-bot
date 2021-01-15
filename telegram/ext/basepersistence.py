@@ -19,8 +19,9 @@
 """This module contains the BasePersistence class."""
 import warnings
 from abc import ABC, abstractmethod
+from collections.abc import Mapping
 from copy import copy
-from typing import Any, DefaultDict, Dict, Optional, Tuple, cast, ClassVar, Generic, Mapping
+from typing import Any, Dict, Optional, Tuple, cast, ClassVar, Generic
 
 from telegram import Bot
 
@@ -84,10 +85,10 @@ class BasePersistence(ABC, Generic[UD, CD, BD, UDM, CDM]):
         update_chat_data = instance.update_chat_data
         update_bot_data = instance.update_bot_data
 
-        def get_user_data_insert_bot() -> UDM[int, UD]:
+        def get_user_data_insert_bot() -> Mapping[int, UD]:
             return instance.insert_bot(get_user_data())
 
-        def get_chat_data_insert_bot() -> CDM[int, CD]:
+        def get_chat_data_insert_bot() -> Mapping[int, CD]:
             return instance.insert_bot(get_chat_data())
 
         def get_bot_data_insert_bot() -> BD:
@@ -288,7 +289,7 @@ class BasePersistence(ABC, Generic[UD, CD, BD, UDM, CDM]):
         return obj
 
     @abstractmethod
-    def get_user_data(self) -> UDM[int, UD]:
+    def get_user_data(self) -> Mapping[int, UD]:
         """ "Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``user_data`` if stored, or an empty
         ``Mapping`` with integer keys.
@@ -298,7 +299,7 @@ class BasePersistence(ABC, Generic[UD, CD, BD, UDM, CDM]):
         """
 
     @abstractmethod
-    def get_chat_data(self) -> CDM[int, CD]:
+    def get_chat_data(self) -> Mapping[int, CD]:
         """ "Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``chat_data`` if stored, or an empty
         ``Mapping`` with integer keys.

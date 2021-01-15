@@ -35,8 +35,8 @@ from typing import (
     Tuple,
     Union,
     no_type_check,
-    Type,
     Generic,
+    overload,
 )
 
 from telegram import Bot, TelegramError
@@ -49,7 +49,8 @@ from telegram.utils.types import CCT, UD, BD, UDM, CDM, CD
 from telegram.utils.webhookhandler import WebhookAppClass, WebhookServer
 
 if TYPE_CHECKING:
-    from telegram.ext import BasePersistence, Defaults
+    from collections import defaultdict
+    from telegram.ext import BasePersistence, Defaults, CallbackContext
 
 
 class Updater(Generic[CCT, UD, CD, BD, UDM, CDM]):
@@ -124,7 +125,52 @@ class Updater(Generic[CCT, UD, CD, BD, UDM, CDM]):
 
     _request = None
 
+    @overload
     def __init__(
+        self: 'Updater[CallbackContext, dict, dict, dict, defaultdict, defaultdict]',
+        token: str = None,
+        base_url: str = None,
+        workers: int = 4,
+        bot: Bot = None,
+        private_key: bytes = None,
+        private_key_password: bytes = None,
+        user_sig_handler: Callable = None,
+        request_kwargs: Dict[str, Any] = None,
+        persistence: BasePersistence = None,  # pylint: disable=E0601
+        defaults: 'Defaults' = None,
+        use_context: bool = True,
+        base_file_url: str = None,
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self: 'Updater[CCT, UD, CD, BD, UDM, CDM]',
+        token: str = None,
+        base_url: str = None,
+        workers: int = 4,
+        bot: Bot = None,
+        private_key: bytes = None,
+        private_key_password: bytes = None,
+        user_sig_handler: Callable = None,
+        request_kwargs: Dict[str, Any] = None,
+        persistence: BasePersistence = None,
+        defaults: 'Defaults' = None,
+        use_context: bool = True,
+        base_file_url: str = None,
+        context_customizer: ContextCustomizer[CCT, UD, CD, BD, UDM, CDM] = None,
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self: 'Updater[CCT, UD, CD, BD, UDM, CDM]',
+        user_sig_handler: Callable = None,
+        dispatcher: Dispatcher[CCT, UD, CD, BD, UDM, CDM] = None,
+    ):
+        ...
+
+    def __init__(  # type: ignore[no-untyped-def,misc]
         self,
         token: str = None,
         base_url: str = None,
@@ -134,10 +180,10 @@ class Updater(Generic[CCT, UD, CD, BD, UDM, CDM]):
         private_key_password: bytes = None,
         user_sig_handler: Callable = None,
         request_kwargs: Dict[str, Any] = None,
-        persistence: 'BasePersistence[UD, CD, BD, UDM, CDM]' = None,
+        persistence: BasePersistence = None,
         defaults: 'Defaults' = None,
         use_context: bool = True,
-        dispatcher: Dispatcher[CCT, UD, CD, BD, UDM, CDM] = None,
+        dispatcher=None,
         base_file_url: str = None,
         context_customizer: ContextCustomizer[CCT, UD, CD, BD, UDM, CDM] = None,
     ):
@@ -206,16 +252,27 @@ class Updater(Generic[CCT, UD, CD, BD, UDM, CDM]):
             self.job_queue = JobQueue()
             self.__exception_event = Event()
             self.persistence = persistence
-            self.dispatcher: Dispatcher[CCT] = Dispatcher(
-                self.bot,
-                self.update_queue,
-                job_queue=self.job_queue,
-                workers=workers,
-                exception_event=self.__exception_event,
-                persistence=persistence,
-                use_context=use_context,
-                context_customizer=context_customizer or ContextCustomizer(),
-            )
+            if context_customizer:
+                self.dispatcher = Dispatcher(
+                    self.bot,
+                    self.update_queue,
+                    job_queue=self.job_queue,
+                    workers=workers,
+                    exception_event=self.__exception_event,
+                    persistence=persistence,
+                    use_context=use_context,
+                    context_customizer=context_customizer,
+                )
+            else:
+                self.dispatcher = Dispatcher(  # type: ignore[assignment]
+                    self.bot,
+                    self.update_queue,
+                    job_queue=self.job_queue,
+                    workers=workers,
+                    exception_event=self.__exception_event,
+                    persistence=persistence,
+                    use_context=use_context,
+                )
             self.job_queue.set_dispatcher(self.dispatcher)
         else:
             con_pool_size = dispatcher.workers + 4
