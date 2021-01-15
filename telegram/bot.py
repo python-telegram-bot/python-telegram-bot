@@ -286,68 +286,68 @@ class Bot(TelegramObject):
 
         return token
 
-    @property  # type: ignore
+    @property
     def bot(self) -> User:
-        """:class:`telegram.User`: Instance for the bot."""
+        """:class:`telegram.User`: User instance for the bot as returned by :meth:`get_me`."""
 
         if self._bot is None:
-            self.get_me()
+            self._bot = self.get_me()
         return self._bot
 
-    @property  # type: ignore
+    @property
     def id(self) -> int:
         """:obj:`int`: Unique identifier for this bot."""
 
-        return self.bot.id  # type: ignore
+        return self.bot.id
 
-    @property  # type: ignore
+    @property
     def first_name(self) -> str:
         """:obj:`str`: Bot's first name."""
 
-        return self.bot.first_name  # type: ignore
+        return self.bot.first_name
 
-    @property  # type: ignore
+    @property
     def last_name(self) -> str:
         """:obj:`str`: Optional. Bot's last name."""
 
         return self.bot.last_name  # type: ignore
 
-    @property  # type: ignore
+    @property
     def username(self) -> str:
         """:obj:`str`: Bot's username."""
 
         return self.bot.username  # type: ignore
 
-    @property  # type: ignore
+    @property
     def link(self) -> str:
         """:obj:`str`: Convenience property. Returns the t.me link of the bot."""
 
         return f"https://t.me/{self.username}"
 
-    @property  # type: ignore
+    @property
     def can_join_groups(self) -> bool:
         """:obj:`bool`: Bot's can_join_groups attribute."""
 
         return self.bot.can_join_groups  # type: ignore
 
-    @property  # type: ignore
+    @property
     def can_read_all_group_messages(self) -> bool:
         """:obj:`bool`: Bot's can_read_all_group_messages attribute."""
 
         return self.bot.can_read_all_group_messages  # type: ignore
 
-    @property  # type: ignore
+    @property
     def supports_inline_queries(self) -> bool:
         """:obj:`bool`: Bot's supports_inline_queries attribute."""
 
         return self.bot.supports_inline_queries  # type: ignore
 
-    @property  # type: ignore
+    @property
     def commands(self) -> List[BotCommand]:
         """List[:class:`BotCommand`]: Bot's commands."""
 
         if self._commands is None:
-            self.get_my_commands()
+            self._commands = self.get_my_commands()
         return self._commands
 
     @property

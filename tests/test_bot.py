@@ -146,10 +146,11 @@ class TestBot:
         assert commands == bot.commands
 
     def test_comparison(self, bot):
-        bot1 = bot.get_me()
+        get_me_bot = bot.get_me()
 
-        assert isinstance(bot1, User)
-        assert bot1 == bot
+        assert isinstance(get_me_bot, User)
+        assert get_me_bot == bot
+        assert get_me_bot in (bot,)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
