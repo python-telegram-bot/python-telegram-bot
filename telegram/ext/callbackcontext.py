@@ -73,9 +73,8 @@ class CallbackContext:
             is handled by :class:`telegram.ext.CommandHandler`, :class:`telegram.ext.PrefixHandler`
             or :class:`telegram.ext.StringCommandHandler`. It contains a list of the words in the
             text after the command, using any whitespace string as a delimiter.
-        error (:class:`telegram.TelegramError`): Optional. The error that was raised.
-            Only present when passed to a error handler registered with
-            :attr:`telegram.ext.Dispatcher.add_error_handler`.
+        error (:obj:`Exception`): Optional. The error that was raised. Only present when passed
+            to a error handler registered with :attr:`telegram.ext.Dispatcher.add_error_handler`.
         async_args (List[:obj:`object`]): Optional. Positional arguments of the function that
             raised the error. Only present when the raising function was run asynchronously using
             :meth:`telegram.ext.Dispatcher.run_async`.
