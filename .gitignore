@@ -84,3 +84,6 @@ telegram.jpg
 
 # Exclude .exrc file for Vim
 .exrc
+
+# virtual env
+venv*

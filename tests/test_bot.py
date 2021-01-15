@@ -145,6 +145,12 @@ class TestBot:
         assert f'https://t.me/{get_me_bot.username}' == bot.link
         assert commands == bot.commands
 
+    def test_comparison(self, bot):
+        bot1 = bot.get_me()
+
+        assert isinstance(bot1, User)
+        assert bot1 == bot
+
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_to_dict(self, bot):

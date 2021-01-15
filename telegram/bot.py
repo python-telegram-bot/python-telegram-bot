@@ -110,22 +110,6 @@ if TYPE_CHECKING:
 RT = TypeVar('RT')
 
 
-def info(func: Callable[..., RT]) -> Callable[..., RT]:
-    # pylint: disable=W0212
-    @functools.wraps(func)
-    def decorator(self: 'Bot', *args: Any, **kwargs: Any) -> RT:
-        if not self.bot:
-            self.get_me()
-
-        if self._commands is None:
-            self.get_my_commands()
-
-        result = func(self, *args, **kwargs)
-        return result
-
-    return decorator
-
-
 def log(
     func: Callable[..., RT], *args: Any, **kwargs: Any  # pylint: disable=W0613
 ) -> Callable[..., RT]:
@@ -217,7 +201,7 @@ class Bot(TelegramObject):
 
         self.base_url = str(base_url) + str(self.token)
         self.base_file_url = str(base_file_url) + str(self.token)
-        self.bot: Optional[User] = None
+        self._bot: Optional[User] = None
         self._commands: Optional[List[BotCommand]] = None
         self._request = request or Request()
         self.logger = logging.getLogger(__name__)
@@ -303,67 +287,68 @@ class Bot(TelegramObject):
         return token
 
     @property  # type: ignore
-    @info
+    def bot(self) -> User:
+        """:class:`telegram.User`: Instance for the bot."""
+
+        if self._bot is None:
+            self.get_me()
+        return self._bot
+
+    @property  # type: ignore
     def id(self) -> int:
         """:obj:`int`: Unique identifier for this bot."""
 
         return self.bot.id  # type: ignore
 
     @property  # type: ignore
-    @info
     def first_name(self) -> str:
         """:obj:`str`: Bot's first name."""
 
         return self.bot.first_name  # type: ignore
 
     @property  # type: ignore
-    @info
     def last_name(self) -> str:
         """:obj:`str`: Optional. Bot's last name."""
 
         return self.bot.last_name  # type: ignore
 
     @property  # type: ignore
-    @info
     def username(self) -> str:
         """:obj:`str`: Bot's username."""
 
         return self.bot.username  # type: ignore
 
     @property  # type: ignore
-    @info
     def link(self) -> str:
         """:obj:`str`: Convenience property. Returns the t.me link of the bot."""
 
         return f"https://t.me/{self.username}"
 
     @property  # type: ignore
-    @info
     def can_join_groups(self) -> bool:
         """:obj:`bool`: Bot's can_join_groups attribute."""
 
         return self.bot.can_join_groups  # type: ignore
 
     @property  # type: ignore
-    @info
     def can_read_all_group_messages(self) -> bool:
         """:obj:`bool`: Bot's can_read_all_group_messages attribute."""
 
         return self.bot.can_read_all_group_messages  # type: ignore
 
     @property  # type: ignore
-    @info
     def supports_inline_queries(self) -> bool:
         """:obj:`bool`: Bot's supports_inline_queries attribute."""
 
         return self.bot.supports_inline_queries  # type: ignore
 
     @property  # type: ignore
-    @info
     def commands(self) -> List[BotCommand]:
         """List[:class:`BotCommand`]: Bot's commands."""
 
-        return self._commands or []
+        if self._commands is None:
+            self.get_my_commands()
+        return self._commands
 
     @property
     def name(self) -> str:
@@ -392,9 +377,9 @@ class Bot(TelegramObject):
         """
         result = self._post('getMe', timeout=timeout, api_kwargs=api_kwargs)
 
-        self.bot = User.de_json(result, self)  # type: ignore
+        self._bot = User.de_json(result, self)  # type: ignore
 
-        return self.bot  # type: ignore[return-value]
+        return self._bot  # type: ignore[return-value]
 
     @log
     def send_message(
@@ -4813,6 +4798,9 @@ class Bot(TelegramObject):
             data['last_name'] = self.last_name
 
         return data
+
+    def __eq__(self, other: object) -> bool:
+        return self.bot == other
 
     # camelCase aliases
     getMe = get_me
