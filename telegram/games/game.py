@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram Game."""
 
 import sys
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional, Any
 
 from telegram import Animation, MessageEntity, PhotoSize, TelegramObject
 from telegram.utils.types import JSONDict

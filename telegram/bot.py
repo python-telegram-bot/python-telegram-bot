@@ -28,7 +28,6 @@ from datetime import datetime
 
 from typing import (
     TYPE_CHECKING,
-    Any,
     Callable,
     List,
     Optional,
@@ -113,7 +112,7 @@ RT = TypeVar('RT')
 def info(func: Callable[..., RT]) -> Callable[..., RT]:
     # pylint: disable=W0212
     @functools.wraps(func)
-    def decorator(self: 'Bot', *args: Any, **kwargs: Any) -> RT:
+    def decorator(self: 'Bot', *args: object, **kwargs: object) -> RT:
         if not self.bot:
             self.get_me()
 
@@ -127,11 +126,11 @@ def info(func: Callable[..., RT]) -> Callable[..., RT]:
 
 
 def log(
-    func: Callable[..., RT], *args: Any, **kwargs: Any  # pylint: disable=W0613
+    func: Callable[..., RT], *args: object, **kwargs: object  # pylint: disable=W0613
 ) -> Callable[..., RT]:
     logger = logging.getLogger(func.__module__)
 
-    def decorator(self: 'Bot', *args: Any, **kwargs: Any) -> RT:  # pylint: disable=W0613
+    def decorator(self: 'Bot', *args: object, **kwargs: object) -> RT:  # pylint: disable=W0613
         logger.debug('Entering: %s', func.__name__)
         result = func(*args, **kwargs)
         logger.debug(result)
@@ -163,7 +162,7 @@ class Bot(TelegramObject):
 
     """
 
-    def __new__(cls, *args: Any, **kwargs: Any) -> 'Bot':  # pylint: disable=W0613
+    def __new__(cls, *args: object, **kwargs: object) -> 'Bot':  # pylint: disable=W0613
         # Get default values from kwargs
         defaults = kwargs.get('defaults')
 

@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram UserProfilePhotos."""
 
-from typing import TYPE_CHECKING, Any, List, Optional
+from typing import TYPE_CHECKING, List, Optional, Any
 
 from telegram import PhotoSize, TelegramObject
 from telegram.utils.types import JSONDict

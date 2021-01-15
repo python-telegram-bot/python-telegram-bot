@@ -25,7 +25,7 @@ import sys
 from queue import Queue
 from ssl import SSLContext
 from threading import Event, Lock
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Optional, Any
 
 import tornado.web
 from tornado import httputil
@@ -79,7 +79,7 @@ class WebhookServer:
                 return
             self.loop.add_callback(self.loop.stop)  # type: ignore
 
-    def handle_error(self, request: Any, client_address: str) -> None:  # pylint: disable=W0613
+    def handle_error(self, request: object, client_address: str) -> None:  # pylint: disable=W0613
         """Handle an error gracefully."""
         self.logger.debug(
             'Exception happened during processing of request from %s',

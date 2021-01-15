@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultCachedAudio."""
 
-from typing import TYPE_CHECKING, Any, Union, Tuple, List
+from typing import TYPE_CHECKING, Union, Tuple, List, Any
 
 from telegram import InlineQueryResult, MessageEntity
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue

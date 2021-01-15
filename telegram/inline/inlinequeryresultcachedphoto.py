@@ -19,7 +19,7 @@
 # pylint: disable=W0622
 """This module contains the classes that represent Telegram InlineQueryResultPhoto"""
 
-from typing import TYPE_CHECKING, Any, Union, Tuple, List
+from typing import TYPE_CHECKING, Union, Tuple, List, Any
 
 from telegram import InlineQueryResult, MessageEntity
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue

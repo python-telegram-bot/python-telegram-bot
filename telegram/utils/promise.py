@@ -20,7 +20,7 @@
 
 import logging
 from threading import Event
-from typing import Callable, List, Optional, Tuple, TypeVar, Union, Any
+from typing import Callable, List, Optional, Tuple, TypeVar, Union
 
 from telegram.utils.types import JSONDict
 
@@ -60,7 +60,7 @@ class Promise:
         pooled_function: Callable[..., RT],
         args: Union[List, Tuple],
         kwargs: JSONDict,
-        update: Any = None,
+        update: object = None,
         error_handling: bool = True,
     ):
         self.pooled_function = pooled_function
@@ -99,7 +99,7 @@ class Promise:
             expires.
 
         Raises:
-            Any exception raised by :attr:`pooled_function`.
+            object exception raised by :attr:`pooled_function`.
         """
         self.done.wait(timeout=timeout)
         if self._exception is not None:

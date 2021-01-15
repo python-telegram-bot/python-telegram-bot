@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineQuery."""
 
-from typing import TYPE_CHECKING, Any, Optional, List, Union, Callable, ClassVar
+from typing import TYPE_CHECKING, Optional, List, Union, Callable, ClassVar, Any
 
 from telegram import Location, TelegramObject, User, constants
 from telegram.utils.types import JSONDict

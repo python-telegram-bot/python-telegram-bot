@@ -19,7 +19,7 @@
 """This module contains the base class for handlers as used by the Dispatcher."""
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, TypeVar, Union, Generic
+from typing import TYPE_CHECKING, Callable, Dict, Optional, TypeVar, Union, Generic, Any
 
 from telegram import Update
 from telegram.utils.promise import Promise
@@ -107,7 +107,7 @@ class Handler(Generic[UT], ABC):
         self.run_async = run_async
 
     @abstractmethod
-    def check_update(self, update: Any) -> Optional[Union[bool, object]]:
+    def check_update(self, update: object) -> Optional[Union[bool, object]]:
         """
         This method is called to determine if an update should be handled by
         this handler instance. It should always be overridden.
@@ -188,7 +188,7 @@ class Handler(Generic[UT], ABC):
         dispatcher: 'Dispatcher',
         update: UT = None,
         check_result: Any = None,  # pylint: disable=W0613
-    ) -> Dict[str, Any]:
+    ) -> Dict[str, object]:
         """
         Prepares the optional arguments. If the handler has additional optional args,
         it should subclass this method, but remember to call this super method.
@@ -202,7 +202,7 @@ class Handler(Generic[UT], ABC):
             check_result: The result from check_update
 
         """
-        optional_args: Dict[str, Any] = dict()
+        optional_args: Dict[str, object] = dict()
 
         if self.pass_update_queue:
             optional_args['update_queue'] = dispatcher.update_queue

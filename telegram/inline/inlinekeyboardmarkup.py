@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardMarkup."""
 
-from typing import TYPE_CHECKING, Any, List, Optional
+from typing import TYPE_CHECKING, List, Optional, Any
 
 from telegram import InlineKeyboardButton, ReplyMarkup
 from telegram.utils.types import JSONDict
@@ -77,7 +77,7 @@ class InlineKeyboardMarkup(ReplyMarkup):
         return cls(keyboard)
 
     @classmethod
-    def from_button(cls, button: InlineKeyboardButton, **kwargs: Any) -> 'InlineKeyboardMarkup':
+    def from_button(cls, button: InlineKeyboardButton, **kwargs: object) -> 'InlineKeyboardMarkup':
         """Shortcut for::
 
             InlineKeyboardMarkup([[button]], **kwargs)
@@ -93,7 +93,7 @@ class InlineKeyboardMarkup(ReplyMarkup):
 
     @classmethod
     def from_row(
-        cls, button_row: List[InlineKeyboardButton], **kwargs: Any
+        cls, button_row: List[InlineKeyboardButton], **kwargs: object
     ) -> 'InlineKeyboardMarkup':
         """Shortcut for::
 
@@ -111,7 +111,7 @@ class InlineKeyboardMarkup(ReplyMarkup):
 
     @classmethod
     def from_column(
-        cls, button_column: List[InlineKeyboardButton], **kwargs: Any
+        cls, button_column: List[InlineKeyboardButton], **kwargs: object
     ) -> 'InlineKeyboardMarkup':
         """Shortcut for::
 

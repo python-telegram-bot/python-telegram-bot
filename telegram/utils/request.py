@@ -28,7 +28,7 @@ try:
 except ImportError:
     import json  # type: ignore[no-redef]
 
-from typing import Any, Union
+from typing import Union, Any
 
 import certifi  # pylint: disable=E0401
 
@@ -226,7 +226,7 @@ class Request:
 
         return data['result']
 
-    def _request_wrapper(self, *args: Any, **kwargs: Any) -> bytes:
+    def _request_wrapper(self, *args: object, **kwargs: Any) -> bytes:
         """Wraps urllib3 request for handling known exceptions.
 
         Args:

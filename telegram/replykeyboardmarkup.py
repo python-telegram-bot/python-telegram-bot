@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ReplyKeyboardMarkup."""
 
-from typing import Any, List, Union
+from typing import List, Union, Any
 
 from telegram import KeyboardButton, ReplyMarkup
 from telegram.utils.types import JSONDict
@@ -110,7 +110,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
-        **kwargs: Any,
+        **kwargs: object,
     ) -> 'ReplyKeyboardMarkup':
         """Shortcut for::
 
@@ -155,7 +155,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
-        **kwargs: Any,
+        **kwargs: object,
     ) -> 'ReplyKeyboardMarkup':
         """Shortcut for::
 
@@ -201,7 +201,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
-        **kwargs: Any,
+        **kwargs: object,
     ) -> 'ReplyKeyboardMarkup':
         """Shortcut for::
 
