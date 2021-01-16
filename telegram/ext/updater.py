@@ -136,7 +136,7 @@ class Updater(Generic[CCT, UD, CD, BD, UDM, CDM]):
         private_key_password: bytes = None,
         user_sig_handler: Callable = None,
         request_kwargs: Dict[str, Any] = None,
-        persistence: BasePersistence = None,  # pylint: disable=E0601
+        persistence: 'BasePersistence' = None,  # pylint: disable=E0601
         defaults: 'Defaults' = None,
         use_context: bool = True,
         base_file_url: str = None,
@@ -154,7 +154,7 @@ class Updater(Generic[CCT, UD, CD, BD, UDM, CDM]):
         private_key_password: bytes = None,
         user_sig_handler: Callable = None,
         request_kwargs: Dict[str, Any] = None,
-        persistence: BasePersistence = None,
+        persistence: 'BasePersistence' = None,
         defaults: 'Defaults' = None,
         use_context: bool = True,
         base_file_url: str = None,
@@ -180,7 +180,7 @@ class Updater(Generic[CCT, UD, CD, BD, UDM, CDM]):
         private_key_password: bytes = None,
         user_sig_handler: Callable = None,
         request_kwargs: Dict[str, Any] = None,
-        persistence: BasePersistence = None,
+        persistence: 'BasePersistence' = None,
         defaults: 'Defaults' = None,
         use_context: bool = True,
         dispatcher=None,

@@ -19,9 +19,8 @@
 """This module contains the BasePersistence class."""
 import warnings
 from abc import ABC, abstractmethod
-from collections.abc import Mapping
 from copy import copy
-from typing import Any, Dict, Optional, Tuple, cast, ClassVar, Generic
+from typing import Any, Dict, Optional, Tuple, cast, ClassVar, Generic, Mapping
 
 from telegram import Bot
 

@@ -904,29 +904,71 @@ class TestDispatcher:
         finally:
             dp.bot.defaults = None
 
+    def test_custom_context_init(self, bot):
+        class CustomUserMapping(defaultdict):
+            pass
+
+        class CustomChatMapping(defaultdict):
+            pass
+
+        cc = ContextCustomizer(
+            context=CustomContext,
+            user_data=int,
+            chat_data=float,
+            bot_data=complex,
+            user_data_mapping=CustomUserMapping,
+            chat_data_mapping=CustomChatMapping,
+        )
+
+        dispatcher = Dispatcher(bot, Queue(), context_customizer=cc)
+
+        assert isinstance(dispatcher.user_data, CustomUserMapping)
+        assert isinstance(dispatcher.user_data[1], int)
+        assert isinstance(dispatcher.chat_data, CustomChatMapping)
+        assert isinstance(dispatcher.chat_data[1], float)
+        assert isinstance(dispatcher.bot_data, complex)
+
     def test_custom_context_error_handler(self, bot):
         def error_handler(_, context):
-            self.received = type(context)
+            self.received = (
+                type(context),
+                type(context.user_data),
+                type(context.chat_data),
+                type(context.bot_data),
+            )
 
         dispatcher = Dispatcher(
-            bot, Queue(), context_customizer=ContextCustomizer(context=CustomContext)
+            bot,
+            Queue(),
+            context_customizer=ContextCustomizer(
+                context=CustomContext, bot_data=int, user_data=float, chat_data=complex
+            ),
         )
         dispatcher.add_error_handler(error_handler)
         dispatcher.add_handler(MessageHandler(Filters.all, self.callback_raise_error))
 
         dispatcher.process_update(self.message_update)
         sleep(0.1)
-        assert self.received == CustomContext
+        assert self.received == (CustomContext, float, complex, int)
 
     def test_custom_context_handler_callback(self, bot):
         def callback(_, context):
-            self.received = type(context)
+            self.received = (
+                type(context),
+                type(context.user_data),
+                type(context.chat_data),
+                type(context.bot_data),
+            )
 
         dispatcher = Dispatcher(
-            bot, Queue(), context_customizer=ContextCustomizer(context=CustomContext)
+            bot,
+            Queue(),
+            context_customizer=ContextCustomizer(
+                context=CustomContext, bot_data=int, user_data=float, chat_data=complex
+            ),
         )
         dispatcher.add_handler(MessageHandler(Filters.all, callback))
 
         dispatcher.process_update(self.message_update)
         sleep(0.1)
-        assert self.received == CustomContext
+        assert self.received == (CustomContext, float, complex, int)

@@ -637,6 +637,18 @@ class ContextCustomizer(Generic[CCT, UD, CD, BD, UDM, CDM]):
     ):
         ...
 
+    @overload
+    def __init__(
+        self: "ContextCustomizer[CCT, UD, CD, BD, UDM, CDM]",
+        context: Type[CCT],
+        bot_data: Type[BD],
+        chat_data: Type[CD],
+        user_data: Type[UD],
+        chat_data_mapping: Type[UDM],
+        user_data_mapping: Type[CDM],
+    ):
+        ...
+
     def __init__(  # type: ignore[no-untyped-def]
         self,
         context=CallbackContext,
