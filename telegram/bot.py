@@ -128,6 +128,10 @@ def log(
 class Bot(TelegramObject):
     """This object represents a Telegram Bot.
 
+    .. versionadded:: 13.2
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`bot` is equal.
+
     Note:
         Most bot methods have the argument ``api_kwargs`` which allows to pass arbitrary keywords
         to the Telegram API. This can be used to access new features of the API before they were
@@ -4801,6 +4805,9 @@ class Bot(TelegramObject):
 
     def __eq__(self, other: object) -> bool:
         return self.bot == other
+
+    def __hash__(self) -> int:
+        return hash(self.bot)
 
     # camelCase aliases
     getMe = get_me

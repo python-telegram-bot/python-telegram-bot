@@ -48,6 +48,8 @@ from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
 from telegram.utils.helpers import from_timestamp, escape_markdown, to_timestamp
 from tests.conftest import expect_bad_request
+from tests.bots import FALLBACKS
+
 
 BASE_TIME = time.time()
 HIGHSCORE_DELTA = 1450000000
@@ -145,12 +147,21 @@ class TestBot:
         assert f'https://t.me/{get_me_bot.username}' == bot.link
         assert commands == bot.commands
 
-    def test_comparison(self, bot):
-        get_me_bot = bot.get_me()
+    def test_equality(self):
+        a = Bot(FALLBACKS[0]["token"])
+        b = Bot(FALLBACKS[0]["token"])
+        c = Bot(FALLBACKS[1]["token"])
+        d = Update(123456789)
 
-        assert isinstance(get_me_bot, User)
-        assert get_me_bot == bot
-        assert get_me_bot in (bot,)
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
