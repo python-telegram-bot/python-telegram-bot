@@ -17,8 +17,8 @@ We have a vibrant community of developers helping each other in our `Telegram gr
    :target: https://pypi.org/project/python-telegram-bot/
    :alt: Supported Python versions
 
-.. image:: https://cpu.re/static/python-telegram-bot/downloads.svg
-   :target: https://www.cpu.re/static/python-telegram-bot/downloads-by-python-version.txt
+.. image:: https://img.shields.io/pypi/dm/python-telegram-bot
+   :target: https://pypistats.org/packages/python-telegram-bot
    :alt: PyPi Package Monthly Download
 
 .. image:: https://img.shields.io/badge/docs-latest-af1a97.svg
@@ -29,7 +29,7 @@ We have a vibrant community of developers helping each other in our `Telegram gr
    :target: https://www.gnu.org/licenses/lgpl-3.0.html
    :alt: LGPLv3 License
 
-.. image:: https://github.com/python-telegram-bot/python-telegram-bot/workflows/GitHub%20Actions/badge.svg?event=schedule
+.. image:: https://github.com/python-telegram-bot/python-telegram-bot/workflows/GitHub%20Actions/badge.svg
    :target: https://github.com/python-telegram-bot/python-telegram-bot/
    :alt: Github Actions workflow
 
