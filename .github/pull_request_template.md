@@ -9,7 +9,7 @@ Hey! You're PRing? Cool! Please have a look at the below checklist. It's here to
 - [ ] Added myself alphabetically to `AUTHORS.rst` (optional)
 
 
-### If the PR contains API changes (delete if not relevant)
+### If the PR contains API changes (otherwise, you can delete this passage)
 
 * New classes:
     - [ ] Added `self._id_attrs` and corresponding documentation
