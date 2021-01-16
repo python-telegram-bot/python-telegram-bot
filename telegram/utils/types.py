@@ -29,6 +29,7 @@ from typing import (
     TypeVar,
     Union,
     Mapping,
+    DefaultDict,
 )
 
 if TYPE_CHECKING:
@@ -65,3 +66,7 @@ UDM = TypeVar('UDM', bound=Mapping)
 """Type of the user data mapping."""
 CDM = TypeVar('CDM', bound=Mapping)
 """Type of the chat data mapping."""
+
+DDType = TypeVar('DDType')
+IntDD = DefaultDict[int, DDType]
+"""Type for default dicts with integer keys and generic value."""

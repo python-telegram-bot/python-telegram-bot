@@ -47,10 +47,9 @@ from telegram.ext.handler import Handler
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.promise import Promise
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
-from telegram.utils.types import CCT, UD, CD, BD, UDM, CDM
+from telegram.utils.types import CCT, UD, CD, BD, UDM, CDM, IntDD  # pylint: disable=W0611
 
 if TYPE_CHECKING:
-    from collections import defaultdict
     from telegram import Bot
     from telegram.ext import JobQueue
 
@@ -162,7 +161,8 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
 
     @overload
     def __init__(
-        self: 'Dispatcher[CallbackContext, dict, dict, dict, defaultdict, defaultdict]',
+        self: 'Dispatcher[CallbackContext[Dict, Dict, Dict], Dict, Dict, Dict, '
+        'IntDD[Dict], IntDD[Dict]]',
         bot: 'Bot',
         update_queue: Queue,
         workers: int = 4,
@@ -189,7 +189,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
     ):
         ...
 
-    def __init__(  # type: ignore[no-untyped-def]
+    def __init__(
         self,
         bot: 'Bot',
         update_queue: Queue,
@@ -198,7 +198,9 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
         job_queue: 'JobQueue' = None,
         persistence: BasePersistence = None,
         use_context: bool = True,
-        context_customizer=ContextCustomizer(),
+        context_customizer: ContextCustomizer[
+            CCT, UD, CD, BD, UDM, CDM
+        ] = ContextCustomizer(),  # type: ignore[assignment]
     ):
         self.bot = bot
         self.update_queue = update_queue
@@ -214,10 +216,10 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
                 stacklevel=3,
             )
 
-        self.user_data = self.context_customizer.user_data_mapping(
+        self.user_data = self.context_customizer.user_data_mapping(  # type: ignore[call-arg]
             self.context_customizer.user_data
         )
-        self.chat_data = self.context_customizer.chat_data_mapping(
+        self.chat_data = self.context_customizer.chat_data_mapping(  # type: ignore[call-arg]
             self.context_customizer.chat_data
         )
         self.bot_data = self.context_customizer.bot_data()
@@ -229,14 +231,14 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
             self.persistence = persistence
             self.persistence.set_bot(self.bot)
             if self.persistence.store_user_data:
-                self.user_data = self.persistence.get_user_data()
+                self.user_data = self.persistence.get_user_data()  # type: ignore[assignment]
                 if not isinstance(self.user_data, self.context_customizer.user_data_mapping):
                     raise ValueError(
                         f"user_data must be of type "
                         f"{self.context_customizer.user_data_mapping.__name__}"
                     )
             if self.persistence.store_chat_data:
-                self.chat_data = self.persistence.get_chat_data()
+                self.chat_data = self.persistence.get_chat_data()  # type: ignore[assignment]
                 if not isinstance(self.chat_data, self.context_customizer.chat_data_mapping):
                     raise ValueError(
                         f"chat_data must be of type "
