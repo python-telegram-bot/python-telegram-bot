@@ -12,15 +12,14 @@ def requirements():
     """Build the requirements list for this project"""
     requirements_list = []
 
-    for file_name in ['requirements-raw.txt', 'requirements.txt']:
-        with open(file_name) as reqs:
-            for install in reqs:
-                requirements_list.append(install.strip())
+    with open('requirements-raw.txt') as requirements:
+        for install in requirements:
+            requirements_list.append(install.strip())
 
     return requirements_list
 
 
-packages = find_packages(exclude=['tests*'])
+packages = find_packages(exclude=['tests*', 'telegram.ext*'])
 requirements = requirements()
 
 # Allow for a package install to not use the vendored urllib3
@@ -36,7 +35,7 @@ with codecs.open('README.rst', 'r', 'utf-8') as fd:
         code = compile(fh.read(), fn, 'exec')
         exec(code)
 
-    setup(name='python-telegram-bot',
+    setup(name='python-telegram-bot-raw',
           version=__version__,
           author='Leandro Toledo',
           author_email='devs@python-telegram-bot.org',
@@ -53,6 +52,7 @@ with codecs.open('README.rst', 'r', 'utf-8') as fd:
               'socks': 'PySocks'
           },
           include_package_data=True,
+          exclude_package_data={'': ['requirements.txt']},
           classifiers=[
               'Development Status :: 5 - Production/Stable',
               'Intended Audience :: Developers',
