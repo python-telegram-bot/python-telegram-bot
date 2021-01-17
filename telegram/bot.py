@@ -129,8 +129,8 @@ class Bot(TelegramObject):
     """This object represents a Telegram Bot.
 
     .. versionadded:: 13.2
-    Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`bot` is equal.
+        Objects of this class are comparable in terms of equality. Two objects of this class are
+        considered equal, if their :attr:`bot` is equal.
 
     Note:
         Most bot methods have the argument ``api_kwargs`` which allows to pass arbitrary keywords
