@@ -252,27 +252,16 @@ class Updater(Generic[CCT, UD, CD, BD, UDM, CDM]):
             self.job_queue = JobQueue()
             self.__exception_event = Event()
             self.persistence = persistence
-            if context_customizer:
-                self.dispatcher = Dispatcher(
-                    self.bot,
-                    self.update_queue,
-                    job_queue=self.job_queue,
-                    workers=workers,
-                    exception_event=self.__exception_event,
-                    persistence=persistence,
-                    use_context=use_context,
-                    context_customizer=context_customizer,
-                )
-            else:
-                self.dispatcher = Dispatcher(  # type: ignore[assignment]
-                    self.bot,
-                    self.update_queue,
-                    job_queue=self.job_queue,
-                    workers=workers,
-                    exception_event=self.__exception_event,
-                    persistence=persistence,
-                    use_context=use_context,
-                )
+            self.dispatcher = Dispatcher(
+                self.bot,
+                self.update_queue,
+                job_queue=self.job_queue,
+                workers=workers,
+                exception_event=self.__exception_event,
+                persistence=persistence,
+                use_context=use_context,
+                context_customizer=context_customizer,
+            )
             self.job_queue.set_dispatcher(self.dispatcher)
         else:
             con_pool_size = dispatcher.workers + 4

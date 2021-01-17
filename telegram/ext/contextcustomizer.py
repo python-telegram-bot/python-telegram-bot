@@ -35,26 +35,32 @@ class ContextCustomizer(Generic[CCT, UD, CD, BD, UDM, CDM]):
             (error-)handler callbacks and job callbacks. Must be a subclass of
             :class:`telegram.ext.CallbackContext`. Defaults to
             :class:`telegram.ext.CallbackContext`.
-        bot_data (:obj:`type`, optional): Determines the type of ``context.bot_data` of all
-            (error-)handler callbacks and job callbacks. Defaults to :obj:`Dict`. Must support
-            instantiating without arguments
-        chat_data (:obj:`type`, optional): Determines the type of ``context.chat_data` of all
-            (error-)handler callbacks and job callbacks. Defaults to :obj:`Dict`.
-        user_data (:obj:`type`, optional): Determines the type of ``context.user_data` of all
-            (error-)handler callbacks and job callbacks. Defaults to :obj:`Dict`.
+        bot_data (:obj:`type`, optional): Determines the type of ``context.bot_data`` of all
+            (error-)handler callbacks and job callbacks. Defaults to :obj:`dict`. Must support
+            instantiating without arguments.
+        chat_data (:obj:`type`, optional): Determines the type of ``context.chat_data`` of all
+            (error-)handler callbacks and job callbacks. Defaults to :obj:`dict`.
+        user_data (:obj:`type`, optional): Determines the type of ``context.user_data`` of all
+            (error-)handler callbacks and job callbacks. Defaults to :obj:`dict`.
         chat_data_mapping (:obj:`type`, optional): In combination with :attr:`chat_data` determines
-            the type of :attr:`telegram.ext.Dispatcher.chat_data`. Must support instantiating via
+            the type of :attr:`telegram.ext.Dispatcher.chat_data`. Must be a subclass of
+            :obj:`collections.abc.Mapping` with integer keys supporting instantiating via
 
             .. code:: python
 
                 chat_data_mapping(chat_data)
 
+            Defaults to :obj:`defaultdict`.
+
         user_data_mapping (:obj:`type`, optional): In combination with :attr:`user_data` determines
-            the type of :attr:`telegram.ext.Dispatcher.user_data`. Must support instantiating via
+            the type of :attr:`telegram.ext.Dispatcher.user_data`. Must be a subclass of
+            :obj:`collections.abc.Mapping` with integer keys supporting instantiating via
 
             .. code:: python
 
                 user_data_mapping(user_data)
+
+            Defaults to :obj:`defaultdict`.
 
     """
 

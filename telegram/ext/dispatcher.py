@@ -37,6 +37,7 @@ from typing import (
     Generic,
     TypeVar,
     overload,
+    cast,
 )
 from uuid import uuid4
 
@@ -183,9 +184,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
         job_queue: 'JobQueue' = None,
         persistence: BasePersistence = None,
         use_context: bool = True,
-        context_customizer: ContextCustomizer[
-            CCT, UD, CD, BD, UDM, CDM
-        ] = ContextCustomizer(),  # type: ignore[assignment]
+        context_customizer: ContextCustomizer[CCT, UD, CD, BD, UDM, CDM] = None,
     ):
         ...
 
@@ -198,16 +197,16 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
         job_queue: 'JobQueue' = None,
         persistence: BasePersistence = None,
         use_context: bool = True,
-        context_customizer: ContextCustomizer[
-            CCT, UD, CD, BD, UDM, CDM
-        ] = ContextCustomizer(),  # type: ignore[assignment]
+        context_customizer: ContextCustomizer[CCT, UD, CD, BD, UDM, CDM] = None,
     ):
         self.bot = bot
         self.update_queue = update_queue
         self.job_queue = job_queue
         self.workers = workers
         self.use_context = use_context
-        self.context_customizer = context_customizer
+        self.context_customizer = cast(
+            ContextCustomizer[CCT, UD, CD, BD, UDM, CDM], context_customizer or ContextCustomizer()
+        )
 
         if not use_context:
             warnings.warn(

@@ -27,7 +27,7 @@ from telegram import Bot
 from telegram.utils.types import ConversationDict, CD, UD, BD, UDM, CDM
 
 
-class BasePersistence(ABC, Generic[UD, CD, BD, UDM, CDM]):
+class BasePersistence(Generic[UD, CD, BD, UDM, CDM], ABC):
     """Interface class for adding persistence to your bot.
     Subclass this object for different implementations of a persistent bot.
 
