@@ -91,7 +91,7 @@ Here's how to make a one-off code change.
 
      Once the process terminates, you can view the built documentation by opening ``docs/build/html/index.html`` with a browser.
 
-   - Add ``.. versionadded:: version``, ``.. versionchanged:: version`` or ``.. deprecated:: version`` to the associated documentation of your changes, depending on what kind of change you made. This only applies if the change you made is visible to an end user.
+   - Add ``.. versionadded:: version``, ``.. versionchanged:: version`` or ``.. deprecated:: version`` to the associated documentation of your changes, depending on what kind of change you made. This only applies if the change you made is visible to an end user. The directives should be added to class/method descriptions if their general behaviour changed and to the description of all arguments & attributes that changed.
 
    - For consistency, please conform to `Google Python Style Guide`_ and `Google Python Style Docstrings`_.
 

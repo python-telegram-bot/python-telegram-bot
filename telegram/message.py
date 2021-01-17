@@ -2171,11 +2171,12 @@ class Message(TelegramObject):
                 }
                 parsed_entities.extend(list(nested_entities.keys()))
 
+                orig_text = text
                 text = escape(text)
 
                 if nested_entities:
                     text = Message._parse_html(
-                        text, nested_entities, urled=urled, offset=entity.offset
+                        orig_text, nested_entities, urled=urled, offset=entity.offset
                     )
 
                 if entity.type == MessageEntity.TEXT_LINK:
@@ -2341,7 +2342,11 @@ class Message(TelegramObject):
                         )
 
                     text = Message._parse_markdown(
-                        text, nested_entities, urled=urled, offset=entity.offset, version=version
+                        orig_text,
+                        nested_entities,
+                        urled=urled,
+                        offset=entity.offset,
+                        version=version,
                     )
 
                 if entity.type == MessageEntity.TEXT_LINK:
