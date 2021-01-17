@@ -46,7 +46,7 @@ class TestVoice:
     mime_type = 'audio/ogg'
     file_size = 9199
 
-    caption = u'Test *voice*'
+    caption = 'Test *voice*'
     voice_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.ogg'
 
     voice_file_id = '5a3128a4d2a04750b5b58397f3b5e812'

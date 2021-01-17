@@ -78,9 +78,9 @@ def _render_part(self: RequestField, name: str, value: str) -> str:  # pylint: d
     Content-Disposition headers since telegram servers don't understand it. Instead just escape
     \\ and " and replace any \n and \r with a space.
     """
-    value = value.replace(u'\\', u'\\\\').replace(u'"', u'\\"')
-    value = value.replace(u'\r', u' ').replace(u'\n', u' ')
-    return u'{}="{}"'.format(name, value)
+    value = value.replace('\\', '\\\\').replace('"', '\\"')
+    value = value.replace('\r', ' ').replace('\n', ' ')
+    return f'{name}="{value}"'
 
 
 RequestField._render_part = _render_part  # type: ignore  # pylint: disable=W0212

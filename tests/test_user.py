@@ -57,8 +57,8 @@ def user(bot):
 class TestUser:
     id_ = 1
     is_bot = True
-    first_name = u'first\u2022name'
-    last_name = u'last\u2022name'
+    first_name = 'first\u2022name'
+    last_name = 'last\u2022name'
     username = 'username'
     language_code = 'en_us'
     can_join_groups = True
@@ -112,16 +112,16 @@ class TestUser:
     def test_name(self, user):
         assert user.name == '@username'
         user.username = None
-        assert user.name == u'first\u2022name last\u2022name'
+        assert user.name == 'first\u2022name last\u2022name'
         user.last_name = None
-        assert user.name == u'first\u2022name'
+        assert user.name == 'first\u2022name'
         user.username = self.username
         assert user.name == '@username'
 
     def test_full_name(self, user):
-        assert user.full_name == u'first\u2022name last\u2022name'
+        assert user.full_name == 'first\u2022name last\u2022name'
         user.last_name = None
-        assert user.full_name == u'first\u2022name'
+        assert user.full_name == 'first\u2022name'
 
     def test_link(self, user):
         assert user.link == f'https://t.me/{user.username}'
@@ -505,7 +505,7 @@ class TestUser:
         assert user.copy_message(chat_id='chat_id', message_id='message_id')
 
     def test_mention_html(self, user):
-        expected = u'<a href="tg://user?id={}">{}</a>'
+        expected = '<a href="tg://user?id={}">{}</a>'
 
         assert user.mention_html() == expected.format(user.id, user.full_name)
         assert user.mention_html('the<b>name\u2022') == expected.format(
@@ -514,7 +514,7 @@ class TestUser:
         assert user.mention_html(user.username) == expected.format(user.id, user.username)
 
     def test_mention_markdown(self, user):
-        expected = u'[{}](tg://user?id={})'
+        expected = '[{}](tg://user?id={})'
 
         assert user.mention_markdown() == expected.format(user.full_name, user.id)
         assert user.mention_markdown('the_name*\u2022') == expected.format(
@@ -526,7 +526,7 @@ class TestUser:
         user.first_name = 'first{name'
         user.last_name = 'last_name'
 
-        expected = u'[{}](tg://user?id={})'
+        expected = '[{}](tg://user?id={})'
 
         assert user.mention_markdown_v2() == expected.format(
             escape_markdown(user.full_name, version=2), user.id
