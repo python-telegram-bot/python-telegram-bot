@@ -146,6 +146,8 @@ class TestBot:
         assert get_me_bot.supports_inline_queries == bot.supports_inline_queries
         assert f'https://t.me/{get_me_bot.username}' == bot.link
         assert commands == bot.commands
+        bot._commands = None
+        assert commands == bot.commands
 
     def test_equality(self):
         a = Bot(FALLBACKS[0]["token"])
