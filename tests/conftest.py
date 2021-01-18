@@ -361,12 +361,12 @@ def check_shortcut_signature(
     Returns:
         :obj:`bool`: Whether or not the signature matches.
     """
-    shortcut_arg_spec = inspect.getfullargspec(shortcut)
-    effective_shortcut_args = set(shortcut_arg_spec.args).difference(additional_kwargs)
+    shortcut_sig = inspect.signature(shortcut)
+    effective_shortcut_args = set(shortcut_sig.parameters.keys()).difference(additional_kwargs)
     effective_shortcut_args.discard('self')
 
-    bot_arg_spec = inspect.getfullargspec(bot_method)
-    expected_args = set(bot_arg_spec.args).difference(shortcut_kwargs)
+    bot_sig = inspect.signature(bot_method)
+    expected_args = set(bot_sig.parameters.keys()).difference(shortcut_kwargs)
     expected_args.discard('self')
 
     args_check = expected_args == effective_shortcut_args
@@ -377,29 +377,29 @@ def check_shortcut_signature(
     # all
     annotation_check = True
     for kwarg in effective_shortcut_args:
-        if bot_arg_spec.annotations[kwarg] != shortcut_arg_spec.annotations[kwarg]:
-            if isinstance(bot_arg_spec.annotations[kwarg], type):
-                if bot_arg_spec.annotations[kwarg].__name__ != str(
-                    shortcut_arg_spec.annotations[kwarg]
+        if bot_sig.parameters[kwarg].annotation != shortcut_sig.parameters[kwarg].annotation:
+            if isinstance(bot_sig.parameters[kwarg].annotation, type):
+                if bot_sig.parameters[kwarg].annotation.__name__ != str(
+                    shortcut_sig.parameters[kwarg].annotation
                 ):
                     print(
-                        f'Expected {bot_arg_spec.annotations[kwarg]}, but '
-                        f'got {shortcut_arg_spec.annotations[kwarg]}'
+                        f'Expected {bot_sig.parameters[kwarg].annotation}, but '
+                        f'got {shortcut_sig.parameters[kwarg].annotation}'
                     )
                     annotation_check = False
                     break
             else:
                 print(
-                    f'Expected {bot_arg_spec.annotations[kwarg]}, but '
-                    f'got {shortcut_arg_spec.annotations[kwarg]}'
+                    f'Expected {bot_sig.parameters[kwarg].annotation}, but '
+                    f'got {shortcut_sig.parameters[kwarg].annotation}'
                 )
                 annotation_check = False
                 break
 
-    bot_method_signature = inspect.signature(bot_method)
-    shortcut_signature = inspect.signature(shortcut)
+    bot_method_sig = inspect.signature(bot_method)
+    shortcut_sig = inspect.signature(shortcut)
     default_check = all(
-        shortcut_signature.parameters[arg].default == bot_method_signature.parameters[arg].default
+        shortcut_sig.parameters[arg].default == bot_method_sig.parameters[arg].default
         for arg in expected_args
     )
 
@@ -429,7 +429,7 @@ def check_shortcut_call(
     Returns:
         :obj:`bool`
     """
-    bot_arg_spec = inspect.getfullargspec(bot_method)
-    expected_args = set(bot_arg_spec.args).difference(['self'])
+    bot_signature = inspect.signature(bot_method)
+    expected_args = set(bot_signature.parameters.keys()).difference(['self'])
 
     return expected_args == set(kwargs.keys())
