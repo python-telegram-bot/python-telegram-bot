@@ -812,22 +812,22 @@ class Filters:
 
             Example:
                 ``Filters.document.mime_type('audio/mpeg')`` filters all audio in mp3 format.
-        apk: Same as ``Filters.document.mime_type("application/vnd.android.package-archive")``-
-        doc: Same as ``Filters.document.mime_type("application/msword")``-
+        apk: Same as ``Filters.document.mime_type("application/vnd.android.package-archive")``.
+        doc: Same as ``Filters.document.mime_type("application/msword")``.
         docx: Same as ``Filters.document.mime_type("application/vnd.openxmlformats-\
-officedocument.wordprocessingml.document")``-
-        exe: Same as ``Filters.document.mime_type("application/x-ms-dos-executable")``-
-        gif: Same as ``Filters.document.mime_type("video/mp4")``-
-        jpg: Same as ``Filters.document.mime_type("image/jpeg")``-
-        mp3: Same as ``Filters.document.mime_type("audio/mpeg")``-
-        pdf: Same as ``Filters.document.mime_type("application/pdf")``-
-        py: Same as ``Filters.document.mime_type("text/x-python")``-
-        svg: Same as ``Filters.document.mime_type("image/svg+xml")``-
-        txt: Same as ``Filters.document.mime_type("text/plain")``-
-        targz: Same as ``Filters.document.mime_type("application/x-compressed-tar")``-
-        wav: Same as ``Filters.document.mime_type("audio/x-wav")``-
-        xml: Same as ``Filters.document.mime_type("application/xml")``-
-        zip: Same as ``Filters.document.mime_type("application/zip")``-
+officedocument.wordprocessingml.document")``.
+        exe: Same as ``Filters.document.mime_type("application/x-ms-dos-executable")``.
+        gif: Same as ``Filters.document.mime_type("video/mp4")``.
+        jpg: Same as ``Filters.document.mime_type("image/jpeg")``.
+        mp3: Same as ``Filters.document.mime_type("audio/mpeg")``.
+        pdf: Same as ``Filters.document.mime_type("application/pdf")``.
+        py: Same as ``Filters.document.mime_type("text/x-python")``.
+        svg: Same as ``Filters.document.mime_type("image/svg+xml")``.
+        txt: Same as ``Filters.document.mime_type("text/plain")``.
+        targz: Same as ``Filters.document.mime_type("application/x-compressed-tar")``.
+        wav: Same as ``Filters.document.mime_type("audio/x-wav")``.
+        xml: Same as ``Filters.document.mime_type("application/xml")``.
+        zip: Same as ``Filters.document.mime_type("application/zip")``.
         file_extension: This filter filters documents by their file ending/extension.
 
             Note:
@@ -1699,14 +1699,14 @@ officedocument.wordprocessingml.document")``-
             chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
                 Which sender chat chat ID(s) to allow through.
             username(:class:`telegram.utils.types.SLT[str]`, optional):
-                Which sender chat sername(s) to allow through.
+                Which sender chat username(s) to allow through.
                 Leading `'@'` s in usernames will be discarded.
             allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no sender
                 chat is specified in :attr:`chat_ids` and :attr:`usernames`. Defaults to
                 :obj:`False`
 
         Raises:
-            RuntimeError: If chat_id and username are both present.
+            RuntimeError: If both chat_id and username are present.
 
         Attributes:
             chat_ids(set(:obj:`int`), optional): Which sender chat chat ID(s) to allow through.
@@ -1756,7 +1756,7 @@ officedocument.wordprocessingml.document")``-
             Args:
                 username(:class:`telegram.utils.types.SLT[str]`, optional):
                     Which sender chat username(s) to disallow through.
-                    Leading '@'s in usernames will be discarded.
+                    Leading `'@'` s in usernames will be discarded.
             """
             return super().remove_usernames(username)
 
