@@ -34,7 +34,7 @@ from telegram.ext import (
     Handler,
     InlineQueryHandler,
 )
-from telegram.utils.promise import Promise
+from telegram.ext.utils.promise import Promise
 from telegram.utils.types import ConversationDict
 
 if TYPE_CHECKING:

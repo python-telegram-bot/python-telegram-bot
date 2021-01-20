@@ -34,7 +34,7 @@ from telegram.ext import BasePersistence
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.handler import Handler
 from telegram.utils.deprecate import TelegramDeprecationWarning
-from telegram.utils.promise import Promise
+from telegram.ext.utils.promise import Promise
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 if TYPE_CHECKING:

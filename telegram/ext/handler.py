@@ -22,7 +22,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, TypeVar, Union, Generic
 
 from telegram import Update
-from telegram.utils.promise import Promise
+from telegram.ext.utils.promise import Promise
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 if TYPE_CHECKING:
