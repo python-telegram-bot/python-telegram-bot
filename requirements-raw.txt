@@ -1,3 +1,0 @@
-certifi
-cryptography
-pytz>=2018.6

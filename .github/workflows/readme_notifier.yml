@@ -1,0 +1,16 @@
+name: Warning maintainers
+on:
+  pull_request:
+    paths:
+      - README.rst
+      - README_RAW.rst
+jobs:
+  job:
+    runs-on: ubuntu-latest
+    name: about readme change
+    steps:
+      - name: running the check
+        uses: Poolitzer/notifier-action@master
+        with:
+          notify-message: Hey! Looks like you edited README.rst or README_RAW.rst. I'm just a friendly reminder to apply relevant changes to both of those files :)
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
