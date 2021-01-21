@@ -132,8 +132,7 @@ def create_dp(bot):
 
 @pytest.fixture(scope='session')
 def _dp(bot):
-    for dp in create_dp(bot):
-        yield dp
+    yield from create_dp(bot)
 
 
 @pytest.fixture(scope='function')
@@ -177,14 +176,14 @@ def updater(bot):
 
 @pytest.fixture(scope='function')
 def thumb_file():
-    f = open(u'tests/data/thumb.jpg', 'rb')
+    f = open('tests/data/thumb.jpg', 'rb')
     yield f
     f.close()
 
 
 @pytest.fixture(scope='class')
 def class_thumb_file():
-    f = open(u'tests/data/thumb.jpg', 'rb')
+    f = open('tests/data/thumb.jpg', 'rb')
     yield f
     f.close()
 

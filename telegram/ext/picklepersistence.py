@@ -163,7 +163,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD, UDM, CDM]):
                 # For backwards compatibility with files not containing bot data
                 self.bot_data = data.get('bot_data', {})
                 self.conversations = data['conversations']
-        except IOError:
+        except OSError:
             self.conversations = dict()
             self.user_data = self.context_customizer.user_data_mapping(  # type: ignore[call-arg]
                 self.context_customizer.user_data
@@ -182,7 +182,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD, UDM, CDM]):
         try:
             with open(filename, "rb") as file:
                 return pickle.load(file)
-        except IOError:
+        except OSError:
             return None
         except pickle.UnpicklingError as exc:
             raise TypeError(f"File {filename} does not contain valid pickle data") from exc

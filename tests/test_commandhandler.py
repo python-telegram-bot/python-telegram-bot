@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2021
