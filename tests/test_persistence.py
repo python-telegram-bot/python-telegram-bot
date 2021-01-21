@@ -45,6 +45,7 @@ from telegram.ext import (
     DictPersistence,
     TypeHandler,
     JobQueue,
+    ContextCustomizer,
 )
 
 
@@ -775,7 +776,11 @@ def update(bot):
     return Update(0, message=message)
 
 
-class TestPickelPersistence:
+class CustomMapping(defaultdict):
+    pass
+
+
+class TestPicklePersistence:
     def test_no_files_present_multi_file(self, pickle_persistence):
         assert pickle_persistence.get_user_data() == defaultdict(dict)
         assert pickle_persistence.get_user_data() == defaultdict(dict)
@@ -1363,6 +1368,51 @@ class TestPickelPersistence:
         assert chat_data[123] == {'test2': '789'}
         user_data = pickle_persistence.get_user_data()
         assert user_data[789] == {'test3': '123'}
+
+    @pytest.mark.parametrize('singlefile', [True, False])
+    @pytest.mark.parametrize('udm', [defaultdict, CustomMapping])
+    @pytest.mark.parametrize('cdm', [defaultdict, CustomMapping])
+    @pytest.mark.parametrize('ud', [int, float, complex])
+    @pytest.mark.parametrize('cd', [int, float, complex])
+    @pytest.mark.parametrize('bd', [int, float, complex])
+    def test_with_context_customizer(self, ud, cd, bd, udm, cdm, singlefile):
+        cc = ContextCustomizer(
+            user_data=ud, chat_data=cd, bot_data=bd, user_data_mapping=udm, chat_data_mapping=cdm
+        )
+        persistence = PicklePersistence(
+            'pickletest', single_file=singlefile, context_customizer=cc
+        )
+
+        assert isinstance(persistence.get_user_data(), udm)
+        assert isinstance(persistence.get_user_data()[1], ud)
+        assert persistence.get_user_data()[1] == 0
+        assert isinstance(persistence.get_chat_data(), cdm)
+        assert isinstance(persistence.get_chat_data()[1], cd)
+        assert persistence.get_chat_data()[1] == 0
+        assert isinstance(persistence.get_bot_data(), bd)
+        assert persistence.get_bot_data() == 0
+
+        persistence.user_data = None
+        persistence.chat_data = None
+        persistence.update_user_data(1, ud(1))
+        persistence.update_chat_data(1, cd(1))
+        persistence.update_bot_data(bd(1))
+        assert persistence.get_user_data()[1] == 1
+        assert persistence.get_chat_data()[1] == 1
+        assert persistence.get_bot_data() == 1
+
+        persistence.flush()
+        persistence = PicklePersistence(
+            'pickletest', single_file=singlefile, context_customizer=cc
+        )
+        assert isinstance(persistence.get_user_data(), udm)
+        assert isinstance(persistence.get_user_data()[1], ud)
+        assert persistence.get_user_data()[1] == 1
+        assert isinstance(persistence.get_chat_data(), cdm)
+        assert isinstance(persistence.get_chat_data()[1], cd)
+        assert persistence.get_chat_data()[1] == 1
+        assert isinstance(persistence.get_bot_data(), bd)
+        assert persistence.get_bot_data() == 1
 
 
 @pytest.fixture(scope='function')

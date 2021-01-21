@@ -161,7 +161,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD, UDM, CDM]):
                     )
                 )
                 # For backwards compatibility with files not containing bot data
-                self.bot_data = data.get('bot_data', {})
+                self.bot_data = data.get('bot_data', self.context_customizer.bot_data())
                 self.conversations = data['conversations']
         except OSError:
             self.conversations = dict()
@@ -264,7 +264,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD, UDM, CDM]):
             filename = f"{self.filename}_bot_data"
             data = self.load_file(filename)
             if not data:
-                data = {}
+                data = self.context_customizer.bot_data()
             self.bot_data = data
         else:
             self.load_singlefile()
