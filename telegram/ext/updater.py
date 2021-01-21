@@ -208,12 +208,12 @@ class Updater(Generic[CCT, UD, CD, BD, UDM, CDM]):
                 raise ValueError('`dispatcher` and `bot` are mutually exclusive')
             if persistence is not None:
                 raise ValueError('`dispatcher` and `persistence` are mutually exclusive')
-            if workers is not None:
-                raise ValueError('`dispatcher` and `workers` are mutually exclusive')
             if use_context != dispatcher.use_context:
                 raise ValueError('`dispatcher` and `use_context` are mutually exclusive')
             if context_customizer is not None:
                 raise ValueError('`dispatcher` and `context_customizer` are mutually exclusive')
+            if workers is not None:
+                raise ValueError('`dispatcher` and `workers` are mutually exclusive')
 
         self.logger = logging.getLogger(__name__)
 
