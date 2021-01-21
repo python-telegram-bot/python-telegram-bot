@@ -182,9 +182,9 @@ def _datetime_to_float_timestamp(dt_obj: dtm.datetime) -> float:
     return dt_obj.timestamp()
 
 
-def _utc_localize(datetime: dtm.datetime, tzinfo: dtm.tzinfo) -> dtm.datetime:
+def _localize(datetime: dtm.datetime, tzinfo: dtm.tzinfo) -> dtm.datetime:
     """
-    Localize the datetime as UTC depending on whether pytz is available or not
+    Localize the datetime, where UTC is handled depending on whether pytz is available or not
     """
     if tzinfo is DTM_UTC:
         return datetime.replace(tzinfo=DTM_UTC)
@@ -194,7 +194,7 @@ def _utc_localize(datetime: dtm.datetime, tzinfo: dtm.tzinfo) -> dtm.datetime:
 def to_float_timestamp(
     time_object: Union[int, float, dtm.timedelta, dtm.datetime, dtm.time],
     reference_timestamp: float = None,
-    tzinfo: pytz.BaseTzInfo = None,
+    tzinfo: dtm.tzinfo = None,
 ) -> float:
     """
     Converts a given time object to a float POSIX timestamp.
@@ -266,7 +266,7 @@ def to_float_timestamp(
 
         aware_datetime = dtm.datetime.combine(reference_date, time_object)
         if aware_datetime.tzinfo is None:
-            aware_datetime = _utc_localize(aware_datetime, UTC)
+            aware_datetime = _localize(aware_datetime, tzinfo)
 
         # if the time of day has passed today, use tomorrow
         if reference_time > aware_datetime.timetz():
@@ -274,7 +274,7 @@ def to_float_timestamp(
         return _datetime_to_float_timestamp(aware_datetime)
     if isinstance(time_object, dtm.datetime):
         if time_object.tzinfo is None:
-            time_object = _utc_localize(time_object, UTC)
+            time_object = _localize(time_object, tzinfo)
         return _datetime_to_float_timestamp(time_object)
 
     raise TypeError(f'Unable to convert {type(time_object).__name__} object to timestamp')
@@ -283,7 +283,7 @@ def to_float_timestamp(
 def to_timestamp(
     dt_obj: Union[int, float, dtm.timedelta, dtm.datetime, dtm.time, None],
     reference_timestamp: float = None,
-    tzinfo: pytz.BaseTzInfo = None,
+    tzinfo: dtm.tzinfo = None,
 ) -> Optional[int]:
     """
     Wrapper over :func:`to_float_timestamp` which returns an integer (the float value truncated
@@ -298,9 +298,7 @@ def to_timestamp(
     )
 
 
-def from_timestamp(
-    unixtime: Optional[int], tzinfo: dtm.tzinfo = pytz.utc
-) -> Optional[dtm.datetime]:
+def from_timestamp(unixtime: Optional[int], tzinfo: dtm.tzinfo = UTC) -> Optional[dtm.datetime]:
     """
     Converts an (integer) unix timestamp to a timezone aware datetime object.
     :obj:`None`s are left alone (i.e. ``from_timestamp(None)`` is :obj:`None`).
