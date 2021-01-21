@@ -211,9 +211,9 @@ class Handler(Generic[UT, CCT], ABC):
             optional_args['job_queue'] = dispatcher.job_queue
         if self.pass_user_data and isinstance(update, Update):
             user = update.effective_user
-            optional_args['user_data'] = dispatcher.user_data[user.id] if user else None
+            optional_args['user_data'] = dispatcher.user_data[user.id if user else None]
         if self.pass_chat_data and isinstance(update, Update):
             chat = update.effective_chat
-            optional_args['chat_data'] = dispatcher.chat_data[chat.id] if chat else None
+            optional_args['chat_data'] = dispatcher.chat_data[chat.id if chat else None]
 
         return optional_args
