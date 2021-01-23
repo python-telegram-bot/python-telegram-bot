@@ -83,7 +83,7 @@ def _render_part(self: RequestField, name: str, value: str) -> str:  # pylint: d
     return f'{name}="{value}"'
 
 
-RequestField._render_part = _render_part  # type: ignore[assignment]  # pylint: disable=W0212
+RequestField._render_part = _render_part  # type: ignore  # pylint: disable=W0212
 
 logging.getLogger('urllib3').setLevel(logging.WARNING)
 
@@ -163,7 +163,7 @@ class Request:
             appengine.AppEngineManager,
             'SOCKSProxyManager',  # noqa: F821
             urllib3.ProxyManager,
-        ] = None  # type: ignore[assignment]
+        ] = None  # type: ignore
         if not proxy_url:
             if appengine.is_appengine_sandbox():
                 # Use URLFetch service if running in App Engine
@@ -194,7 +194,7 @@ class Request:
         return self._con_pool_size
 
     def stop(self) -> None:
-        self._con_pool.clear()  # type: ignore[union-attr]
+        self._con_pool.clear()  # type: ignore
 
     @staticmethod
     def _parse(json_data: bytes) -> Union[JSONDict, bool]:
