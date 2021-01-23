@@ -199,13 +199,12 @@ class Dispatcher:
                     raise ValueError("bot_data must be of type dict")
             if self.persistence.store_callback_data:
                 self.bot = cast(telegram.ext.bot.Bot, self.bot)
-                callback_data = self.persistence.get_callback_data()
-                if callback_data is not None:
-                    if not isinstance(callback_data, tuple) and len(callback_data) != 2:
+                persistent_data = self.persistence.get_callback_data()
+                if persistent_data is not None:
+                    if not isinstance(persistent_data, tuple) and len(persistent_data) != 2:
                         raise ValueError('callback_data must be a 2-tuple')
-                    button_data, lru_list = callback_data
                     self.bot.callback_data = CallbackDataCache(
-                        self.bot.callback_data.maxsize, button_data=button_data, lru_list=lru_list
+                        self.bot.callback_data.maxsize, persistent_data=persistent_data
                     )
         else:
             self.persistence = None

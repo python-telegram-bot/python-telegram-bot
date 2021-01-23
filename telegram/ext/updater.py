@@ -87,14 +87,8 @@ class Updater:
             be used if not set explicitly in the bot methods.
         arbitrary_callback_data (:obj:`bool` | :obj:`int` | :obj:`None`, optional): Whether to
             allow arbitrary objects as callback data for :class:`telegram.InlineKeyboardButton`.
-            Pass an integer to specify the maximum number of cached objects. Pass 0 or :obj:`None`
-            for unlimited cache size. Cache limit defaults to 1024. For more info, please see
-            our wiki. Defaults to :obj:`False`.
-
-            Warning:
-                Not limiting :attr:`maxsize` may cause memory issues for long running bots. If you
-                don't limit the size, you should be sure that every inline button is actually
-                pressed or that you manually clear the cache using e.g. :meth:`clear`.
+            Pass an integer to specify the maximum number of cached objects. For more info, please
+            see our wiki. Defaults to :obj:`False`.
 
     Raises:
         ValueError: If both :attr:`token` and :attr:`bot` are passed or none of them.

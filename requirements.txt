@@ -4,3 +4,4 @@ cryptography
 decorator>=4.4.0
 APScheduler==3.6.3
 pytz>=2018.6
+cachetools==4.2.0

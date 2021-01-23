@@ -49,16 +49,10 @@ class Bot(telegram.bot.Bot):
     Args:
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
             be used if not set explicitly in the bot methods.
-        arbitrary_callback_data (:obj:`bool` | :obj:`int` | :obj:`None`, optional): Whether to
+        arbitrary_callback_data (:obj:`bool` | :obj:`int`, optional): Whether to
             allow arbitrary objects as callback data for :class:`telegram.InlineKeyboardButton`.
-            Pass an integer to specify the maximum number objects cached in memory. Pass 0 or
-            :obj:`None` for unlimited cache size. Cache limit defaults to 1024. For more info,
+            Pass an integer to specify the maximum number objects cached in memory. For more info,
             please see our wiki. Defaults to :obj:`False`.
-
-            Warning:
-                Not limiting :attr:`maxsize` may cause memory issues for long running bots. If you
-                don't limit the size, you should be sure that every inline button is actually
-                pressed or that you manually clear the cache.
 
     """
 
@@ -71,7 +65,7 @@ class Bot(telegram.bot.Bot):
         private_key: bytes = None,
         private_key_password: bytes = None,
         defaults: Defaults = None,
-        arbitrary_callback_data: Union[bool, int, None] = False,
+        arbitrary_callback_data: Union[bool, int] = False,
     ):
         super().__init__(
             token=token,
@@ -84,8 +78,8 @@ class Bot(telegram.bot.Bot):
         )
 
         # set up callback_data
-        if not isinstance(arbitrary_callback_data, bool) or arbitrary_callback_data is None:
-            maxsize = cast(Union[int, None], arbitrary_callback_data)
+        if not isinstance(arbitrary_callback_data, bool):
+            maxsize = cast(int, arbitrary_callback_data)
             self.arbitrary_callback_data = True
         else:
             maxsize = 1024
@@ -145,26 +139,8 @@ class Bot(telegram.bot.Bot):
         )
 
         for update in updates:
-            if not update.callback_query:
-                continue
-
-            callback_query = update.callback_query
-            # Get the cached callback data for the CallbackQuery
-            if callback_query.data:
-                callback_query.data = self.callback_data.get_button_data(  # type: ignore
-                    callback_query.data, update=True
-                )
-            # Get the cached callback data for the inline keyboard attached to the
-            # CallbackQuery
-            if callback_query.message and callback_query.message.reply_markup:
-                for row in callback_query.message.reply_markup.inline_keyboard:
-                    for button in row:
-                        if button.callback_data:
-                            button.callback_data = self.callback_data.get_button_data(
-                                # No need to update again, this was already done above
-                                button.callback_data,
-                                update=False,
-                            )
+            if update.callback_query:
+                self.callback_data.process_callback_query(update.callback_query)
 
         return updates
 
