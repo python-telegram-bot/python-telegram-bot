@@ -2005,8 +2005,8 @@ class Bot(TelegramObject):
             results (List[:class:`telegram.InlineQueryResult`] | Callable): A list of results for
                 the inline query. In case :attr:`current_offset` is passed, ``results`` may also be
                 a callable that accepts the current page index starting from 0. It must return
-                either a list of :class:`telegram.InlineResult` instances or :obj:`None` if there
-                are no more results.
+                either a list of :class:`telegram.InlineQueryResult` instances or :obj:`None` if
+                there are no more results.
             cache_time (:obj:`int`, optional): The maximum amount of time in seconds that the
                 result of the inline query may be cached on the server. Defaults to 300.
             is_personal (:obj:`bool`, optional): Pass :obj:`True`, if results may be cached on
