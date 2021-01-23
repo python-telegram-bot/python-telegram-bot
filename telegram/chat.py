@@ -651,7 +651,7 @@ class Chat(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_chat_action`.
 
         Returns:
-            :obj:`True`: On success.
+            :obj:`bool`: On success, :obj:`True` is returned.
 
         """
         return self.bot.send_chat_action(

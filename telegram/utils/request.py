@@ -130,14 +130,14 @@ class Request:
         # TODO: Support other platforms like mac and windows.
         if 'linux' in sys.platform:
             sockopts.append(
-                (socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 120)
-            )  # pylint: disable=no-member
+                (socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 120)  # pylint: disable=no-member
+            )
             sockopts.append(
-                (socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 30)
-            )  # pylint: disable=no-member
+                (socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 30)  # pylint: disable=no-member
+            )
             sockopts.append(
-                (socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 8)
-            )  # pylint: disable=no-member
+                (socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 8)  # pylint: disable=no-member
+            )
 
         self._con_pool_size = con_pool_size
 
