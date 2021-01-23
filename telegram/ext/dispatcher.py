@@ -26,14 +26,26 @@ from functools import wraps
 from queue import Empty, Queue
 from threading import BoundedSemaphore, Event, Lock, Thread, current_thread
 from time import sleep
-from typing import TYPE_CHECKING, Any, Callable, DefaultDict, Dict, List, Optional, Set, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    DefaultDict,
+    Dict,
+    List,
+    Optional,
+    Set,
+    Union,
+    cast,
+)
 from uuid import uuid4
 
 from telegram import TelegramError, Update
 from telegram.ext import BasePersistence
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.handler import Handler
-from telegram.utils.callbackdatacache import CallbackDataCache
+import telegram.ext.bot
+from telegram.ext.utils.callbackdatacache import CallbackDataCache
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.promise import Promise
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
@@ -186,6 +198,7 @@ class Dispatcher:
                 if not isinstance(self.bot_data, dict):
                     raise ValueError("bot_data must be of type dict")
             if self.persistence.store_callback_data:
+                self.bot = cast(telegram.ext.bot.Bot, self.bot)
                 callback_data = self.persistence.get_callback_data()
                 if callback_data is not None:
                     if not isinstance(callback_data, tuple) and len(callback_data) != 2:
@@ -568,6 +581,7 @@ class Dispatcher:
                     user_ids = []
 
             if self.persistence.store_callback_data:
+                self.bot = cast(telegram.ext.bot.Bot, self.bot)
                 try:
                     self.persistence.update_callback_data(self.bot.callback_data.persistence_data)
                 except Exception as exc:

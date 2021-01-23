@@ -24,6 +24,7 @@
 import functools
 import inspect
 import logging
+import warnings
 from datetime import datetime
 
 from typing import (
@@ -85,6 +86,7 @@ from telegram import (
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import InvalidToken, TelegramError
+from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import (
     DEFAULT_NONE,
     DefaultValue,
@@ -92,7 +94,6 @@ from telegram.utils.helpers import (
     is_local_file,
     parse_file_input,
 )
-from telegram.utils.callbackdatacache import CallbackDataCache
 from telegram.utils.request import Request
 from telegram.utils.types import FileInput, JSONDict
 
@@ -162,16 +163,11 @@ class Bot(TelegramObject):
         private_key_password (:obj:`bytes`, optional): Password for above private key.
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
             be used if not set explicitly in the bot methods.
-        arbitrary_callback_data (:obj:`bool` | :obj:`int` | :obj:`None`, optional): Whether to
-            allow arbitrary objects as callback data for :class:`telegram.InlineKeyboardButton`.
-            Pass an integer to specify the maximum number of cached objects. Pass 0 or :obj:`None`
-            for unlimited cache size. Cache limit defaults to 1024. For more info, please see
-            our wiki. Defaults to :obj:`False`.
 
-            Warning:
-                Not limiting :attr:`maxsize` may cause memory issues for long running bots. If you
-                don't limit the size, you should be sure that every inline button is actually
-                pressed or that you manually clear the cache.
+            .. deprecated:: 13.2
+               Passing :class:`telegram.ext.Defaults` to :class:`telegram.Bot` is deprecated. If
+               you want to use :class:`telegram.ext.Defaults`, please use
+               :class:`telegram.ext.Bot` instead.
 
     """
 
@@ -215,21 +211,18 @@ class Bot(TelegramObject):
         private_key: bytes = None,
         private_key_password: bytes = None,
         defaults: 'Defaults' = None,
-        arbitrary_callback_data: Union[bool, int, None] = False,
     ):
         self.token = self._validate_token(token)
 
         # Gather default
         self.defaults = defaults
 
-        # set up callback_data
-        if not isinstance(arbitrary_callback_data, bool) or arbitrary_callback_data is None:
-            maxsize = cast(Union[int, None], arbitrary_callback_data)
-            self.arbitrary_callback_data = True
-        else:
-            maxsize = 1024
-            self.arbitrary_callback_data = arbitrary_callback_data
-        self.callback_data: CallbackDataCache = CallbackDataCache(maxsize=maxsize)
+        if self.defaults:
+            warnings.warn(
+                'Passing Defaults to telegram.Bot is deprecated. Use telegram.ext.Bot instead.',
+                TelegramDeprecationWarning,
+                stacklevel=3,
+            )
 
         if base_url is None:
             base_url = 'https://api.telegram.org/bot'
@@ -289,8 +282,6 @@ class Bot(TelegramObject):
 
         if reply_markup is not None:
             if isinstance(reply_markup, ReplyMarkup):
-                if self.arbitrary_callback_data and isinstance(reply_markup, InlineKeyboardMarkup):
-                    reply_markup = self.callback_data.put_keyboard(reply_markup)
                 # We need to_json() instead of to_dict() here, because reply_markups may be
                 # attached to media messages, which aren't json dumped by utils.request
                 data['reply_markup'] = reply_markup.to_json()
@@ -1995,6 +1986,62 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
+    def _effective_inline_results(  # pylint: disable=R0201
+        self,
+        results: Union[
+            List['InlineQueryResult'], Callable[[int], Optional[List['InlineQueryResult']]]
+        ],
+        next_offset: str = None,
+        current_offset: str = None,
+    ) -> Tuple[List['InlineQueryResult'], Optional[str]]:
+        """
+        Builds the effective results from the results input.
+        We make this a stand-alone method so tg.ext.Bot can wrap it.
+
+        Returns:
+            Tuple of 1. the effective results and 2. correct the next_offset
+
+        """
+        if current_offset is not None and next_offset is not None:
+            raise ValueError('`current_offset` and `next_offset` are mutually exclusive!')
+
+        if current_offset is not None:
+            # Convert the string input to integer
+            if current_offset == '':
+                current_offset_int = 0
+            else:
+                current_offset_int = int(current_offset)
+
+            # for now set to empty string, stating that there are no more results
+            # might change later
+            next_offset = ''
+
+            if callable(results):
+                callable_output = results(current_offset_int)
+                if not callable_output:
+                    effective_results = []
+                else:
+                    effective_results = callable_output
+                    # the callback *might* return more results on the next call, so we increment
+                    # the page count
+                    next_offset = str(current_offset_int + 1)
+            else:
+                if len(results) > (current_offset_int + 1) * MAX_INLINE_QUERY_RESULTS:
+                    # we expect more results for the next page
+                    next_offset_int = current_offset_int + 1
+                    next_offset = str(next_offset_int)
+                    effective_results = results[
+                        current_offset_int
+                        * MAX_INLINE_QUERY_RESULTS : next_offset_int
+                        * MAX_INLINE_QUERY_RESULTS
+                    ]
+                else:
+                    effective_results = results[current_offset_int * MAX_INLINE_QUERY_RESULTS :]
+        else:
+            effective_results = results  # type: ignore[assignment]
+
+        return effective_results, next_offset
+
     @log
     def answer_inline_query(
         self,
@@ -2097,49 +2144,13 @@ class Bot(TelegramObject):
                     else:
                         res.input_message_content.disable_web_page_preview = None
 
-        if current_offset is not None and next_offset is not None:
-            raise ValueError('`current_offset` and `next_offset` are mutually exclusive!')
-
-        if current_offset is not None:
-            if current_offset == '':
-                current_offset_int = 0
-            else:
-                current_offset_int = int(current_offset)
-
-            next_offset = ''
-
-            if callable(results):
-                callable_output = results(current_offset_int)
-                if not callable_output:
-                    effective_results = []
-                else:
-                    effective_results = callable_output
-                    next_offset = str(current_offset_int + 1)
-            else:
-                if len(results) > (current_offset_int + 1) * MAX_INLINE_QUERY_RESULTS:
-                    next_offset_int = current_offset_int + 1
-                    next_offset = str(next_offset_int)
-                    effective_results = results[
-                        current_offset_int
-                        * MAX_INLINE_QUERY_RESULTS : next_offset_int
-                        * MAX_INLINE_QUERY_RESULTS
-                    ]
-                else:
-                    effective_results = results[current_offset_int * MAX_INLINE_QUERY_RESULTS :]
-        else:
-            effective_results = results  # type: ignore[assignment]
+        effective_results, next_offset = self._effective_inline_results(
+            results=results, next_offset=next_offset, current_offset=current_offset
+        )
 
         # Apply defaults
         for result in effective_results:
             _set_defaults(result)
-        # Process arbitrary callback
-        if self.arbitrary_callback_data:
-            for result in effective_results:
-                if hasattr(result, 'reply_markup') and isinstance(
-                    result.reply_markup, InlineKeyboardMarkup  # type: ignore[attr-defined]
-                ):
-                    markup = self.callback_data.put_keyboard(result.reply_markup)  # type: ignore
-                    result.reply_markup = markup  # type: ignore[attr-defined]
 
         results_dicts = [res.to_dict() for res in effective_results]
 
@@ -4576,8 +4587,6 @@ class Bot(TelegramObject):
 
         if reply_markup:
             if isinstance(reply_markup, ReplyMarkup):
-                if self.arbitrary_callback_data and isinstance(reply_markup, InlineKeyboardMarkup):
-                    reply_markup = self.callback_data.put_keyboard(reply_markup)
                 # We need to_json() instead of to_dict() here, because reply_markups may be
                 # attached to media messages, which aren't json dumped by utils.request
                 data['reply_markup'] = reply_markup.to_json()
@@ -4825,8 +4834,6 @@ class Bot(TelegramObject):
             data['allow_sending_without_reply'] = allow_sending_without_reply
         if reply_markup:
             if isinstance(reply_markup, ReplyMarkup):
-                if self.arbitrary_callback_data and isinstance(reply_markup, InlineKeyboardMarkup):
-                    reply_markup = self.callback_data.put_keyboard(reply_markup)
                 # We need to_json() instead of to_dict() here, because reply_markups may be
                 # attached to media messages, which aren't json dumped by utils.request
                 data['reply_markup'] = reply_markup.to_json()

@@ -17,22 +17,14 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains custom typing aliases."""
-from pathlib import Path
-from typing import IO, TYPE_CHECKING, Any, Dict, List, Tuple, TypeVar, Union
+from typing import Any, Dict, List, Optional, Tuple
 
-if TYPE_CHECKING:
-    from telegram import InputFile
+ConversationDict = Dict[Tuple[int, ...], Optional[object]]
+"""Dicts as maintained by the :class:`telegram.ext.ConversationHandler`."""
 
-FileLike = Union[IO, 'InputFile']
-"""Either an open file handler or a :class:`telegram.InputFile`."""
-
-FileInput = Union[str, bytes, FileLike, Path]
-"""Valid input for passing files to Telegram. Either a file id as string, a file like object,
-a local file path as string, :class:`pathlib.Path` or the file contents as :obj:`bytes`."""
-
-JSONDict = Dict[str, Any]
-"""Dictionary containing response from Telegram or data to send to the API."""
-
-RT = TypeVar("RT")
-SLT = Union[RT, List[RT], Tuple[RT, ...]]
-"""Single instance or list/tuple of instances."""
+CDCData = Tuple[Dict[str, Any], List[Tuple[str, List[str], float]]]
+"""
+Tuple[Dict[:obj:`str`, :obj:`Any`], List[Tuple[:obj:`str`, List[:obj:`str`], :obj:`float`]]]:
+    Data returned by
+    :attr:`telegram.ext.utils.callbackdatacache.CallbackDataCache.persistence_data`.
+"""

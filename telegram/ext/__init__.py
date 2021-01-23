@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Extensions over the Telegram Bot API to facilitate bot making"""
 
+from .bot import Bot
 from .basepersistence import BasePersistence
 from .picklepersistence import PicklePersistence
 from .dictpersistence import DictPersistence
@@ -46,6 +47,7 @@ from .pollhandler import PollHandler
 from .defaults import Defaults
 
 __all__ = (
+    'Bot',
     'Dispatcher',
     'JobQueue',
     'Job',

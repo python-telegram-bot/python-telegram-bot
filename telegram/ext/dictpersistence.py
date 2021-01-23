@@ -28,7 +28,7 @@ from telegram.utils.helpers import (
     encode_conversations_to_json,
 )
 from telegram.ext import BasePersistence
-from telegram.utils.types import ConversationDict, CDCData
+from telegram.ext.utils.types import ConversationDict, CDCData
 
 try:
     import ujson as json

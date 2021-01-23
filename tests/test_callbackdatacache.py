@@ -24,7 +24,7 @@ from datetime import datetime
 import pytest
 import pytz
 
-from telegram.utils.callbackdatacache import CallbackDataCache
+from telegram.ext.utils.callbackdatacache import CallbackDataCache
 
 
 @pytest.fixture(scope='function')

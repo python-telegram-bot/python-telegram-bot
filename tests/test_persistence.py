@@ -19,7 +19,7 @@
 import signal
 from threading import Lock
 
-from telegram.utils.callbackdatacache import CallbackDataCache
+from telegram.ext.utils.callbackdatacache import CallbackDataCache
 from telegram.utils.helpers import encode_conversations_to_json
 
 try:

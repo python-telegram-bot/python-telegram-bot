@@ -24,9 +24,28 @@ from threading import Lock
 from typing import Dict, Any, Tuple, Union, List, Optional, Iterator
 from uuid import uuid4
 
-from telegram import InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton, TelegramError
 from telegram.utils.helpers import to_float_timestamp
-from telegram.utils.types import CDCData
+from telegram.ext.utils.types import CDCData
+
+
+class InvalidCallbackData(TelegramError):
+    """
+    Raised when the received callback data has been tempered with or deleted from cache.
+
+    Args:
+        uuid (:obj:`int`, optional): The UUID of which the callback data could not be found.
+    """
+
+    def __init__(self, uuid: str = None) -> None:
+        super().__init__(
+            'The object belonging to this callback_data was deleted or the callback_data was '
+            'manipulated.'
+        )
+        self.uuid = uuid
+
+    def __reduce__(self) -> Tuple[type, Tuple[Optional[str]]]:  # type: ignore[override]
+        return self.__class__, (self.uuid,)
 
 
 class Node:
@@ -245,7 +264,9 @@ class CallbackDataCache:
         self._first_node = node
         node.access_time = time.time()
 
-    def get_button_data(self, callback_data: str, update: bool = True) -> Any:
+    def get_button_data(
+        self, callback_data: str, update: bool = True
+    ) -> Union[Any, InvalidCallbackData]:
         """
         Looks up the stored :attr:`callback_data` for a button without deleting it from memory.
 
@@ -255,23 +276,20 @@ class CallbackDataCache:
                 with should be marked as recently used. Defaults to :obj:`True`.
 
         Returns:
-            The original :attr:`callback_data`.
-
-        Raises:
-            IndexError: If the button could not be found.
+            The original :attr:`callback_data`, or :class:`InvalidButtonData`, if not found.
 
         """
         with self.__lock:
             data = self.__get_button_data(callback_data[32:])
-            if update:
+            if update and not isinstance(data, InvalidCallbackData):
                 self.__update(callback_data[:32])
             return data
 
     def __get_button_data(self, uuid: str) -> Any:
         try:
             return self._button_data[uuid]
-        except KeyError as exc:
-            raise IndexError(f'Button {uuid} could not be found.') from exc
+        except KeyError:
+            return InvalidCallbackData(uuid)
 
     def drop_keyboard(self, callback_data: str) -> None:
         """

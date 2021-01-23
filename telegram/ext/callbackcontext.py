@@ -22,7 +22,8 @@ from queue import Queue
 from typing import TYPE_CHECKING, Any, Dict, List, Match, NoReturn, Optional, Tuple, Union
 
 from telegram import Update
-from telegram.utils.callbackdatacache import CallbackDataCache
+from telegram.ext import Bot as ExtBot
+from telegram.ext.utils.callbackdatacache import CallbackDataCache
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -150,7 +151,9 @@ class CallbackContext:
             callback data. Only present when the bot uses allows to use arbitrary callback data.
             Useful for manually dropping unused objects from the cache.
         """
-        return self.bot.callback_data if self.bot.arbitrary_callback_data else None
+        if isinstance(self.bot, ExtBot):
+            return self.bot.callback_data if self.bot.arbitrary_callback_data else None
+        return None
 
     @classmethod
     def from_error(

@@ -23,8 +23,9 @@ from copy import copy
 from typing import Any, DefaultDict, Dict, Optional, Tuple, cast, ClassVar
 
 from telegram import Bot
+import telegram.ext.bot
 
-from telegram.utils.types import ConversationDict, CDCData
+from telegram.ext.utils.types import ConversationDict, CDCData
 
 
 class BasePersistence(ABC):
@@ -149,6 +150,9 @@ class BasePersistence(ABC):
         Args:
             bot (:class:`telegram.Bot`): The bot.
         """
+        if self.store_callback_data and not isinstance(bot, telegram.ext.bot.Bot):
+            raise TypeError('store_callback_data can only be used with telegram.ext.Bot.')
+
         self.bot = bot
 
     @classmethod

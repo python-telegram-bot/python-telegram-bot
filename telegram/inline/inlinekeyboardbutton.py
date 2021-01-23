@@ -18,14 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardButton."""
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
 from telegram import TelegramObject
-from telegram.error import InvalidCallbackData
-from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
-    from telegram import CallbackGame, LoginUrl, Bot
+    from telegram import CallbackGame, LoginUrl
 
 
 class InlineKeyboardButton(TelegramObject):
@@ -125,21 +123,3 @@ class InlineKeyboardButton(TelegramObject):
             self.callback_game,
             self.pay,
         )
-
-    @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['InlineKeyboardButton']:
-        data = cls.parse_data(data)
-
-        if not data:
-            return None
-
-        if data.get('callback_data', None):
-            # No need to for update=True, that's already done in CallbackQuery.de_json
-            try:
-                data['callback_data'] = bot.callback_data.get_button_data(
-                    data['callback_data'], update=False
-                )
-            except IndexError:
-                data['callback_data'] = InvalidCallbackData()
-
-        return cls(**data)

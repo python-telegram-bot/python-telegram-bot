@@ -35,7 +35,7 @@ from telegram.ext import (
     InlineQueryHandler,
 )
 from telegram.utils.promise import Promise
-from telegram.utils.types import ConversationDict
+from telegram.ext.utils.types import ConversationDict
 
 if TYPE_CHECKING:
     from telegram.ext import Dispatcher, Job

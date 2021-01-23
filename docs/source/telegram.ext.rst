@@ -3,6 +3,7 @@ telegram.ext package
 
 .. toctree::
 
+    telegram.ext.bot
     telegram.ext.updater
     telegram.ext.dispatcher
     telegram.ext.dispatcherhandlerstop

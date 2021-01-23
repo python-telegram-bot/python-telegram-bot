@@ -23,7 +23,7 @@ from copy import deepcopy
 from typing import Any, DefaultDict, Dict, Optional, Tuple
 
 from telegram.ext import BasePersistence
-from telegram.utils.types import ConversationDict, CDCData
+from telegram.ext.utils.types import ConversationDict, CDCData
 
 
 class PicklePersistence(BasePersistence):
