@@ -69,6 +69,7 @@ if TYPE_CHECKING:
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
+        LabeledPrice,
     )
 
 _UNDEFINED = object()
@@ -1477,6 +1478,149 @@ class Message(TelegramObject):
             reply_markup=reply_markup,
             timeout=timeout,
             emoji=emoji,
+            api_kwargs=api_kwargs,
+            allow_sending_without_reply=allow_sending_without_reply,
+        )
+
+    def reply_chat_action(
+        self,
+        action: str,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+            bot.send_chat_action(update.effective_message.chat_id, *args, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_chat_action`.
+
+        .. versionadded:: 13.2
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.send_chat_action(
+            chat_id=self.chat_id,
+            action=action,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    def reply_game(
+        self,
+        game_short_name: str,
+        disable_notification: bool = False,
+        reply_to_message_id: Union[int, str] = None,
+        reply_markup: 'InlineKeyboardMarkup' = None,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
+        quote: bool = None,
+    ) -> 'Message':
+        """Shortcut for::
+
+            bot.send_game(update.effective_message.chat_id, *args, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_game`.
+
+        Args:
+            quote (:obj:`bool`, optional): If set to :obj:`True`, the game is sent as an actual
+                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
+                parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False`
+                in private chats.
+
+        .. versionadded:: 13.2
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        return self.bot.send_game(
+            chat_id=self.chat_id,
+            game_short_name=game_short_name,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+            allow_sending_without_reply=allow_sending_without_reply,
+        )
+
+    def reply_invoice(
+        self,
+        title: str,
+        description: str,
+        payload: str,
+        provider_token: str,
+        start_parameter: str,
+        currency: str,
+        prices: List['LabeledPrice'],
+        photo_url: str = None,
+        photo_size: int = None,
+        photo_width: int = None,
+        photo_height: int = None,
+        need_name: bool = None,
+        need_phone_number: bool = None,
+        need_email: bool = None,
+        need_shipping_address: bool = None,
+        is_flexible: bool = None,
+        disable_notification: bool = False,
+        reply_to_message_id: Union[int, str] = None,
+        reply_markup: 'InlineKeyboardMarkup' = None,
+        provider_data: Union[str, object] = None,
+        send_phone_number_to_provider: bool = None,
+        send_email_to_provider: bool = None,
+        timeout: float = None,
+        api_kwargs: JSONDict = None,
+        allow_sending_without_reply: bool = None,
+        quote: bool = None,
+    ) -> 'Message':
+        """Shortcut for::
+
+            bot.send_invoice(update.effective_message.chat_id, *args, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.send_invoice`.
+
+        Args:
+            quote (:obj:`bool`, optional): If set to :obj:`True`, the invoice is sent as an actual
+                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
+                parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False`
+                in private chats.
+
+        .. versionadded:: 13.2
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        return self.bot.send_invoice(
+            chat_id=self.chat_id,
+            title=title,
+            description=description,
+            payload=payload,
+            provider_token=provider_token,
+            start_parameter=start_parameter,
+            currency=currency,
+            prices=prices,
+            photo_url=photo_url,
+            photo_size=photo_size,
+            photo_width=photo_width,
+            photo_height=photo_height,
+            need_name=need_name,
+            need_phone_number=need_phone_number,
+            need_email=need_email,
+            need_shipping_address=need_shipping_address,
+            is_flexible=is_flexible,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            provider_data=provider_data,
+            send_phone_number_to_provider=send_phone_number_to_provider,
+            send_email_to_provider=send_email_to_provider,
+            timeout=timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
         )

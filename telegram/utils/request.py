@@ -40,11 +40,11 @@ try:
     from telegram.vendor.ptb_urllib3.urllib3.util.timeout import Timeout
 except ImportError:  # pragma: no cover
     try:
-        import urllib3  # type: ignore[no-redef]
-        import urllib3.contrib.appengine as appengine  # type: ignore[no-redef]
-        from urllib3.connection import HTTPConnection  # type: ignore[no-redef]
-        from urllib3.fields import RequestField  # type: ignore[no-redef]
-        from urllib3.util.timeout import Timeout  # type: ignore[no-redef]
+        import urllib3
+        import urllib3.contrib.appengine as appengine
+        from urllib3.connection import HTTPConnection
+        from urllib3.fields import RequestField
+        from urllib3.util.timeout import Timeout
 
         warnings.warn(
             'python-telegram-bot is using upstream urllib3. This is allowed but not '
@@ -83,7 +83,7 @@ def _render_part(self: RequestField, name: str, value: str) -> str:  # pylint: d
     return f'{name}="{value}"'
 
 
-RequestField._render_part = _render_part  # type: ignore  # pylint: disable=W0212
+RequestField._render_part = _render_part  # pylint: disable=W0212
 
 logging.getLogger('urllib3').setLevel(logging.WARNING)
 
@@ -130,14 +130,14 @@ class Request:
         # TODO: Support other platforms like mac and windows.
         if 'linux' in sys.platform:
             sockopts.append(
-                (socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 120)
-            )  # pylint: disable=no-member
+                (socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 120)  # pylint: disable=no-member
+            )
             sockopts.append(
-                (socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 30)
-            )  # pylint: disable=no-member
+                (socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 30)  # pylint: disable=no-member
+            )
             sockopts.append(
-                (socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 8)
-            )  # pylint: disable=no-member
+                (socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 8)  # pylint: disable=no-member
+            )
 
         self._con_pool_size = con_pool_size
 
@@ -163,7 +163,7 @@ class Request:
             appengine.AppEngineManager,
             'SOCKSProxyManager',  # noqa: F821
             urllib3.ProxyManager,
-        ] = None  # type: ignore
+        ] = None
         if not proxy_url:
             if appengine.is_appengine_sandbox():
                 # Use URLFetch service if running in App Engine
@@ -194,7 +194,7 @@ class Request:
         return self._con_pool_size
 
     def stop(self) -> None:
-        self._con_pool.clear()  # type: ignore
+        self._con_pool.clear()
 
     @staticmethod
     def _parse(json_data: bytes) -> Union[JSONDict, bool]:
