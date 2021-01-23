@@ -29,7 +29,7 @@ except ImportError:
 import logging
 import os
 import pickle
-from collections import defaultdict, deque
+from collections import defaultdict
 from time import sleep
 
 import pytest
@@ -63,7 +63,8 @@ def change_directory(tmp_path):
 @pytest.fixture(autouse=True)
 def reset_callback_data_cache(bot):
     yield
-    bot.callback_data.clear()
+    bot.callback_data.clear_callback_data()
+    bot.callback_data.clear_callback_queries()
     bot.arbitrary_callback_data = False
 
 
@@ -159,7 +160,7 @@ def user_data():
 
 @pytest.fixture(scope="function")
 def callback_data():
-    return 1024, {'test1': 'test2'}, deque([1, 2, 3])
+    return [('test1', 1000, {'button1': 'test0', 'button2': 'test1'})], {'test1': 'test2'}
 
 
 @pytest.fixture(scope='function')
@@ -193,9 +194,9 @@ def job_queue(bot):
 
 
 def assert_data_in_cache(callback_data_cache: CallbackDataCache, data):
-    for key, val in callback_data_cache._data.items():
-        if val[1] == data:
-            return key
+    for val in callback_data_cache._keyboard_data.values():
+        if data in val.button_data.values():
+            return data
     return False
 
 
@@ -218,7 +219,7 @@ class TestBasePersistence:
         with pytest.raises(NotImplementedError):
             base_persistence.get_callback_data()
         with pytest.raises(NotImplementedError):
-            base_persistence.update_callback_data((1024, {'foo': 'bar'}, deque()))
+            base_persistence.update_callback_data((None, {'foo': 'bar'}))
 
     def test_implementation(self, updater, base_persistence):
         dp = updater.dispatcher
@@ -272,7 +273,7 @@ class TestBasePersistence:
             return bot_data
 
         base_persistence.get_bot_data = get_bot_data
-        with pytest.raises(ValueError, match="callback_data must be a 3-tuple"):
+        with pytest.raises(ValueError, match="callback_data must be a 2-tuple"):
             Updater(bot=bot, persistence=base_persistence)
 
         def get_callback_data():
@@ -598,9 +599,9 @@ class TestBasePersistence:
         assert persistence.user_data[123][1].bot == BasePersistence.REPLACED_BOT
         assert persistence.user_data[123][1] == cc.replace_bot()
 
-        persistence.update_callback_data((1024, {'1': (0, cc)}, deque(['1'])))
-        assert persistence.callback_data[1]['1'][1].bot == BasePersistence.REPLACED_BOT
-        assert persistence.callback_data[1]['1'][1] == cc.replace_bot()
+        persistence.update_callback_data(([('1', 2, {0: cc})], {'1': '2'}))
+        assert persistence.callback_data[0][0][2][0].bot == BasePersistence.REPLACED_BOT
+        assert persistence.callback_data[0][0][2][0] == cc.replace_bot()
 
         assert persistence.get_bot_data()[1] == cc
         assert persistence.get_bot_data()[1].bot is bot
@@ -608,8 +609,8 @@ class TestBasePersistence:
         assert persistence.get_chat_data()[123][1].bot is bot
         assert persistence.get_user_data()[123][1] == cc
         assert persistence.get_user_data()[123][1].bot is bot
-        assert persistence.get_callback_data()[1]['1'][1].bot is bot
-        assert persistence.get_callback_data()[1]['1'][1] == cc
+        assert persistence.get_callback_data()[0][0][2][0].bot is bot
+        assert persistence.get_callback_data()[0][0][2][0] == cc
 
     def test_bot_replace_insert_bot_unpickable_objects(self, bot, bot_persistence, recwarn):
         """Here check that unpickable objects are just returned verbatim."""
@@ -628,13 +629,13 @@ class TestBasePersistence:
         assert persistence.chat_data[123][1] is lock
         persistence.update_user_data(123, {1: lock})
         assert persistence.user_data[123][1] is lock
-        persistence.update_callback_data((1024, {'1': (0, lock)}, deque(['1'])))
-        assert persistence.callback_data[1]['1'][1] is lock
+        persistence.update_callback_data(([('1', 2, {0: lock})], {'1': '2'}))
+        assert persistence.callback_data[0][0][2][0] is lock
 
         assert persistence.get_bot_data()[1] is lock
         assert persistence.get_chat_data()[123][1] is lock
         assert persistence.get_user_data()[123][1] is lock
-        assert persistence.get_callback_data()[1]['1'][1] is lock
+        assert persistence.get_callback_data()[0][0][2][0] is lock
 
         cc = CustomClass()
 
@@ -644,13 +645,13 @@ class TestBasePersistence:
         assert persistence.chat_data[123][1] is cc
         persistence.update_user_data(123, {1: cc})
         assert persistence.user_data[123][1] is cc
-        persistence.update_callback_data((1024, {'1': (0, cc)}, deque(['1'])))
-        assert persistence.callback_data[1]['1'][1] is cc
+        persistence.update_callback_data(([('1', 2, {0: cc})], {'1': '2'}))
+        assert persistence.callback_data[0][0][2][0] is cc
 
         assert persistence.get_bot_data()[1] is cc
         assert persistence.get_chat_data()[123][1] is cc
         assert persistence.get_user_data()[123][1] is cc
-        assert persistence.get_callback_data()[1]['1'][1] is cc
+        assert persistence.get_callback_data()[0][0][2][0] is cc
 
         assert len(recwarn) == 2
         assert str(recwarn[0].message).startswith(
@@ -681,15 +682,15 @@ class TestBasePersistence:
         assert persistence.chat_data[123][1].data == expected
         persistence.update_user_data(123, {1: cc})
         assert persistence.user_data[123][1].data == expected
-        persistence.update_callback_data((1024, {'1': (0, cc)}, deque(['1'])))
-        assert persistence.callback_data[1]['1'][1].data == expected
+        persistence.update_callback_data(([('1', 2, {0: cc})], {'1': '2'}))
+        assert persistence.callback_data[0][0][2][0].data == expected
 
         expected = {1: bot, 2: 'foo'}
 
         assert persistence.get_bot_data()[1].data == expected
         assert persistence.get_chat_data()[123][1].data == expected
         assert persistence.get_user_data()[123][1].data == expected
-        assert persistence.get_callback_data()[1]['1'][1].data == expected
+        assert persistence.get_callback_data()[0][0][2][0].data == expected
 
     @pytest.mark.filterwarnings('ignore:BasePersistence')
     def test_replace_insert_bot_item_identity(self, bot, bot_persistence):
@@ -897,7 +898,7 @@ def update(bot):
     return Update(0, message=message)
 
 
-class TestPickelPersistence:
+class TestPicklePersistence:
     def test_no_files_present_multi_file(self, pickle_persistence):
         assert pickle_persistence.get_user_data() == defaultdict(dict)
         assert pickle_persistence.get_user_data() == defaultdict(dict)
@@ -963,9 +964,8 @@ class TestPickelPersistence:
 
         callback_data = pickle_persistence.get_callback_data()
         assert isinstance(callback_data, tuple)
-        assert callback_data[0] == 1024
+        assert callback_data[0] == [('test1', 1000, {'button1': 'test0', 'button2': 'test1'})]
         assert callback_data[1] == {'test1': 'test2'}
-        assert callback_data[2] == deque([1, 2, 3])
 
         conversation1 = pickle_persistence.get_conversations('name1')
         assert isinstance(conversation1, dict)
@@ -1002,9 +1002,8 @@ class TestPickelPersistence:
 
         callback_data = pickle_persistence.get_callback_data()
         assert isinstance(callback_data, tuple)
-        assert callback_data[0] == 1024
+        assert callback_data[0] == [('test1', 1000, {'button1': 'test0', 'button2': 'test1'})]
         assert callback_data[1] == {'test1': 'test2'}
-        assert callback_data[2] == deque([1, 2, 3])
 
         conversation1 = pickle_persistence.get_conversations('name1')
         assert isinstance(conversation1, dict)
@@ -1038,9 +1037,8 @@ class TestPickelPersistence:
 
         callback_data = pickle_persistence.get_callback_data()
         assert isinstance(callback_data, tuple)
-        assert callback_data[0] == 1024
+        assert callback_data[0] == [('test1', 1000, {'button1': 'test0', 'button2': 'test1'})]
         assert callback_data[1] == {'test1': 'test2'}
-        assert callback_data[2] == deque([1, 2, 3])
 
         conversation1 = pickle_persistence.get_conversations('name1')
         assert isinstance(conversation1, dict)
@@ -1112,9 +1110,8 @@ class TestPickelPersistence:
 
         callback_data = pickle_persistence.get_callback_data()
         assert isinstance(callback_data, tuple)
-        assert callback_data[0] == 1024
+        assert callback_data[0] == [('test1', 1000, {'button1': 'test0', 'button2': 'test1'})]
         assert callback_data[1] == {'test1': 'test2'}
-        assert callback_data[2] == deque([1, 2, 3])
 
         conversation1 = pickle_persistence.get_conversations('name1')
         assert isinstance(conversation1, dict)
@@ -1195,7 +1192,7 @@ class TestPickelPersistence:
         assert bot_data_test == bot_data
 
         callback_data = pickle_persistence.get_callback_data()
-        callback_data[2].appendleft(4)
+        callback_data[1]['test3'] = 'test4'
         assert not pickle_persistence.callback_data == callback_data
         pickle_persistence.update_callback_data(callback_data)
         assert pickle_persistence.callback_data == callback_data
@@ -1243,7 +1240,7 @@ class TestPickelPersistence:
         assert bot_data_test == bot_data
 
         callback_data = pickle_persistence.get_callback_data()
-        callback_data[2].appendleft(4)
+        callback_data[1]['test3'] = 'test4'
         assert not pickle_persistence.callback_data == callback_data
         pickle_persistence.update_callback_data(callback_data)
         assert pickle_persistence.callback_data == callback_data
@@ -1299,7 +1296,7 @@ class TestPickelPersistence:
         assert not bot_data_test == bot_data
 
         callback_data = pickle_persistence.get_callback_data()
-        callback_data[2].appendleft(4)
+        callback_data[1]['test3'] = 'test4'
         assert not pickle_persistence.callback_data == callback_data
 
         pickle_persistence.update_callback_data(callback_data)
@@ -1372,7 +1369,7 @@ class TestPickelPersistence:
         assert not bot_data_test == bot_data
 
         callback_data = pickle_persistence.get_callback_data()
-        callback_data[2].appendleft(4)
+        callback_data[1]['test3'] = 'test4'
         assert not pickle_persistence.callback_data == callback_data
         pickle_persistence.update_callback_data(callback_data)
         assert pickle_persistence.callback_data == callback_data
@@ -1460,7 +1457,7 @@ class TestPickelPersistence:
         dp.user_data[4242424242]['my_test'] = 'Working!'
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
         dp.bot_data['test'] = 'Working3!'
-        dp.bot.callback_data.put('Working4!')
+        dp.bot.callback_data._callback_queries['test'] = 'Working4!'
         u.signal_handler(signal.SIGINT, None)
         del dp
         del u
@@ -1476,7 +1473,7 @@ class TestPickelPersistence:
         assert pickle_persistence_2.get_chat_data()[-4242424242]['my_test2'] == 'Working2!'
         assert pickle_persistence_2.get_bot_data()['test'] == 'Working3!'
         data = pickle_persistence_2.get_callback_data()[1]
-        assert list(data.values())[0][1] == 'Working4!'
+        assert data['test'] == 'Working4!'
 
     def test_flush_on_stop_only_bot(self, bot, update, pickle_persistence_only_bot):
         u = Updater(bot=bot, persistence=pickle_persistence_only_bot)
@@ -1485,7 +1482,7 @@ class TestPickelPersistence:
         dp.user_data[4242424242]['my_test'] = 'Working!'
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
         dp.bot_data['my_test3'] = 'Working3!'
-        dp.bot.callback_data.put('Working4!')
+        dp.bot.callback_data._callback_queries['test'] = 'Working4!'
         u.signal_handler(signal.SIGINT, None)
         del dp
         del u
@@ -1511,7 +1508,7 @@ class TestPickelPersistence:
         dp.user_data[4242424242]['my_test'] = 'Working!'
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
         dp.bot_data['my_test3'] = 'Working3!'
-        dp.bot.callback_data.put('Working4!')
+        dp.bot.callback_data._callback_queries['test'] = 'Working4!'
         u.signal_handler(signal.SIGINT, None)
         del dp
         del u
@@ -1537,7 +1534,7 @@ class TestPickelPersistence:
         dp.user_data[4242424242]['my_test'] = 'Working!'
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
         dp.bot_data['my_test3'] = 'Working3!'
-        dp.bot.callback_data.put('Working4!')
+        dp.bot.callback_data._callback_queries['test'] = 'Working4!'
         u.signal_handler(signal.SIGINT, None)
         del dp
         del u
@@ -1563,7 +1560,7 @@ class TestPickelPersistence:
         dp.user_data[4242424242]['my_test'] = 'Working!'
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
         dp.bot_data['my_test3'] = 'Working3!'
-        dp.bot.callback_data.put('Working4!')
+        dp.bot.callback_data._callback_queries['test'] = 'Working4!'
         u.signal_handler(signal.SIGINT, None)
         del dp
         del u
@@ -1581,9 +1578,9 @@ class TestPickelPersistence:
         assert pickle_persistence_2.get_chat_data() == {}
         assert pickle_persistence_2.get_bot_data() == {}
         data = pickle_persistence_2.get_callback_data()[1]
-        assert list(data.values())[0][1] == 'Working4!'
+        assert data['test'] == 'Working4!'
 
-    def test_with_conversationHandler(self, dp, update, good_pickle_files, pickle_persistence):
+    def test_with_conversation_handler(self, dp, update, good_pickle_files, pickle_persistence):
         dp.persistence = pickle_persistence
         dp.use_context = True
         NEXT, NEXT2 = range(2)
@@ -1675,7 +1672,7 @@ class TestPickelPersistence:
             context.bot_data['test1'] = '456'
             context.dispatcher.chat_data[123]['test2'] = '789'
             context.dispatcher.user_data[789]['test3'] = '123'
-            context.callback_data_cache.put('Working4!')
+            context.bot.callback_data._callback_queries['test'] = 'Working4!'
 
         cdp.persistence = pickle_persistence
         job_queue.set_dispatcher(cdp)
@@ -1689,7 +1686,7 @@ class TestPickelPersistence:
         user_data = pickle_persistence.get_user_data()
         assert user_data[789] == {'test3': '123'}
         data = pickle_persistence.get_callback_data()[1]
-        assert list(data.values())[0][1] == 'Working4!'
+        assert data['test'] == 'Working4!'
 
 
 @pytest.fixture(scope='function')
@@ -1709,7 +1706,7 @@ def bot_data_json(bot_data):
 
 @pytest.fixture(scope='function')
 def callback_data_json(callback_data):
-    return json.dumps((callback_data[0], callback_data[1], list(callback_data[2])))
+    return json.dumps(callback_data)
 
 
 @pytest.fixture(scope='function')
@@ -1793,9 +1790,8 @@ class TestDictPersistence:
         callback_data = dict_persistence.get_callback_data()
 
         assert isinstance(callback_data, tuple)
-        assert callback_data[0] == 1024
+        assert callback_data[0] == [('test1', 1000, {'button1': 'test0', 'button2': 'test1'})]
         assert callback_data[1] == {'test1': 'test2'}
-        assert callback_data[2] == deque([1, 2, 3])
 
         conversation1 = dict_persistence.get_conversations('name1')
         assert isinstance(conversation1, dict)
@@ -1892,14 +1888,12 @@ class TestDictPersistence:
         assert dict_persistence.bot_data_json != bot_data_json
         assert dict_persistence.bot_data_json == json.dumps(bot_data_two)
 
-        callback_data = (2048, callback_data[1], callback_data[2])
-        callback_data_two = (2048, callback_data[1].copy(), callback_data[2].copy())
+        callback_data[1]['test3'] = 'test4'
+        callback_data_two = (callback_data[0].copy(), callback_data[1].copy())
         dict_persistence.update_callback_data(callback_data)
         assert dict_persistence.callback_data == callback_data_two
         assert dict_persistence.callback_data_json != callback_data_json
-        assert dict_persistence.callback_data_json == json.dumps(
-            (2048, callback_data_two[1], list(callback_data_two[2]))
-        )
+        assert dict_persistence.callback_data_json == json.dumps(callback_data)
 
         conversations_two = conversations.copy()
         conversations_two.update({'name4': {(1, 2): 3}})
@@ -2052,7 +2046,7 @@ class TestDictPersistence:
             context.bot_data['test1'] = '456'
             context.dispatcher.chat_data[123]['test2'] = '789'
             context.dispatcher.user_data[789]['test3'] = '123'
-            context.callback_data_cache.put('Working4!')
+            context.bot.callback_data._callback_queries['test'] = 'Working4!'
 
         dict_persistence = DictPersistence(store_callback_data=True)
         cdp.persistence = dict_persistence
@@ -2067,4 +2061,4 @@ class TestDictPersistence:
         user_data = dict_persistence.get_user_data()
         assert user_data[789] == {'test3': '123'}
         data = dict_persistence.get_callback_data()[1]
-        assert list(data.values())[0][1] == 'Working4!'
+        assert data['test'] == 'Working4!'

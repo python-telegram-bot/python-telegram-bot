@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import logging
 import time
 import datetime as dtm
 from pathlib import Path
@@ -49,7 +48,9 @@ from telegram import (
     Chat,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
+from telegram.ext import Bot as ExtBot
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
+from telegram.ext.utils.callbackdatacache import InvalidCallbackData
 from telegram.utils.helpers import (
     from_timestamp,
     escape_markdown,
@@ -103,6 +104,10 @@ def inline_results():
 
 
 class TestBot:
+    """
+    Most are executed on tg.ext.Bot, as that class only extends the functionality of tg.bot
+    """
+
     @pytest.mark.parametrize(
         'token',
         argvalues=[
@@ -124,7 +129,7 @@ class TestBot:
         [(True, 1024, True), (False, 1024, False), (0, 0, True), (None, None, True)],
     )
     def test_callback_data_maxsize(self, bot, acd_in, maxsize, acd):
-        bot = Bot(bot.token, arbitrary_callback_data=acd_in)
+        bot = ExtBot(bot.token, arbitrary_callback_data=acd_in)
         assert bot.arbitrary_callback_data == acd
         assert bot.callback_data.maxsize == maxsize
 
@@ -1110,7 +1115,7 @@ class TestBot:
         if updates:
             assert isinstance(updates[0], Update)
 
-    def test_get_updates_invalid_callback_data(self, bot, monkeypatch, caplog):
+    def test_get_updates_invalid_callback_data(self, bot, monkeypatch):
         def post(*args, **kwargs):
             return [
                 Update(
@@ -1135,15 +1140,11 @@ class TestBot:
         try:
             monkeypatch.setattr(bot.request, 'post', post)
             bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
-            with caplog.at_level(logging.DEBUG):
-                updates = bot.get_updates(timeout=1)
+            updates = bot.get_updates(timeout=1)
 
-            assert any(
-                "Skipping CallbackQuery with invalid data: {'update_id': 17" in record.getMessage()
-                for record in caplog.records
-            )
             assert isinstance(updates, list)
-            assert len(updates) == 0
+            assert len(updates) == 1
+            assert isinstance(updates[0].callback_query.data, InvalidCallbackData)
 
         finally:
             # Reset b/c bots scope is session
@@ -1881,10 +1882,15 @@ class TestBot:
 
             assert inline_keyboard[0][1] == no_replace_button
             assert inline_keyboard[0][0] != replace_button
-            assert bot.callback_data.pop(inline_keyboard[0][0].callback_data) == 'replace_test'
+            keyboard, button = (
+                inline_keyboard[0][0].callback_data[:32],
+                inline_keyboard[0][0].callback_data[32:],
+            )
+            assert bot.callback_data._keyboard_data[keyboard].button_data[button] == 'replace_test'
         finally:
             bot.arbitrary_callback_data = False
-            bot.callback_data.clear()
+            bot.callback_data.clear_callback_data()
+            bot.callback_data.clear_callback_queries()
 
     def test_replace_callback_data_stop_poll(self, bot, chat_id):
         poll_message = bot.send_poll(chat_id=chat_id, question='test', options=['1', '2'])
@@ -1907,10 +1913,15 @@ class TestBot:
 
             assert inline_keyboard[0][1] == no_replace_button
             assert inline_keyboard[0][0] != replace_button
-            assert bot.callback_data.pop(inline_keyboard[0][0].callback_data) == 'replace_test'
+            keyboard, button = (
+                inline_keyboard[0][0].callback_data[:32],
+                inline_keyboard[0][0].callback_data[32:],
+            )
+            assert bot.callback_data._keyboard_data[keyboard].button_data[button] == 'replace_test'
         finally:
             bot.arbitrary_callback_data = False
-            bot.callback_data.clear()
+            bot.callback_data.clear_callback_data()
+            bot.callback_data.clear_callback_queries()
 
     def test_replace_callback_data_copy_message(self, bot, chat_id):
         original_message = bot.send_message(chat_id=chat_id, text='original')
@@ -1932,13 +1943,15 @@ class TestBot:
             )
             message = helper_message.reply_to_message
             inline_keyboard = message.reply_markup.inline_keyboard
-
-            assert inline_keyboard[0][1] == no_replace_button
-            assert inline_keyboard[0][0] != replace_button
-            assert bot.callback_data.pop(inline_keyboard[0][0].callback_data) == 'replace_test'
+            keyboard, button = (
+                inline_keyboard[0][0].callback_data[:32],
+                inline_keyboard[0][0].callback_data[32:],
+            )
+            assert bot.callback_data._keyboard_data[keyboard].button_data[button] == 'replace_test'
         finally:
             bot.arbitrary_callback_data = False
-            bot.callback_data.clear()
+            bot.callback_data.clear_callback_data()
+            bot.callback_data.clear_callback_queries()
 
     # TODO: Needs improvement. We need incoming inline query to test answer.
     def test_replace_callback_data_answer_inline_query(self, monkeypatch, bot, chat_id):
@@ -1954,8 +1967,12 @@ class TestBot:
             ).inline_keyboard
             assertion_1 = inline_keyboard[0][1] == no_replace_button
             assertion_2 = inline_keyboard[0][0] != replace_button
+            keyboard, button = (
+                inline_keyboard[0][0].callback_data[:32],
+                inline_keyboard[0][0].callback_data[32:],
+            )
             assertion_3 = (
-                bot.callback_data.pop(inline_keyboard[0][0].callback_data) == 'replace_test'
+                bot.callback_data._keyboard_data[keyboard].button_data[button] == 'replace_test'
             )
             return assertion_1 and assertion_2 and assertion_3
 
@@ -1984,4 +2001,5 @@ class TestBot:
 
         finally:
             bot.arbitrary_callback_data = False
-            bot.callback_data.clear()
+            bot.callback_data.clear_callback_data()
+            bot.callback_data.clear_callback_queries()

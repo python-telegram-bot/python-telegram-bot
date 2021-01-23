@@ -19,7 +19,7 @@
 """This module contains the DictPersistence class."""
 from copy import deepcopy
 
-from typing import Any, DefaultDict, Dict, Optional, Tuple
+from typing import Any, DefaultDict, Dict, Optional, Tuple, cast
 from collections import defaultdict
 
 from telegram.utils.helpers import (
@@ -135,7 +135,11 @@ class DictPersistence(BasePersistence):
                 raise TypeError("bot_data_json must be serialized dict")
         if callback_data_json:
             try:
-                self._callback_data = json.loads(callback_data_json)
+                data = json.loads(callback_data_json)
+                if data:
+                    self._callback_data = cast(CDCData, ([tuple(d) for d in data[0]], data[1]))
+                else:
+                    self._callback_data = None
                 self._callback_data_json = callback_data_json
             except (ValueError, AttributeError) as exc:
                 raise TypeError(

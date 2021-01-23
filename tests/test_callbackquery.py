@@ -20,7 +20,6 @@
 import pytest
 
 from telegram import CallbackQuery, User, Message, Chat, Audio, Bot
-from telegram.error import InvalidCallbackData
 from tests.conftest import check_shortcut_signature, check_shortcut_call
 
 
@@ -82,29 +81,6 @@ class TestCallbackQuery:
         assert callback_query.data == self.data
         assert callback_query.inline_message_id == self.inline_message_id
         assert callback_query.game_short_name == self.game_short_name
-
-    def test_de_json_arbitrary_callback_data(self, bot):
-        bot.arbitrary_callback_data = True
-        try:
-            bot.callback_data.clear()
-            bot.callback_data._data['callback_data'] = (0, 'test')
-            bot.callback_data._deque.appendleft('callback_data')
-            json_dict = {
-                'id': self.id_,
-                'from': self.from_user.to_dict(),
-                'chat_instance': self.chat_instance,
-                'message': self.message.to_dict(),
-                'data': 'callback_data',
-                'inline_message_id': self.inline_message_id,
-                'game_short_name': self.game_short_name,
-                'default_quote': True,
-            }
-            assert CallbackQuery.de_json(json_dict, bot).data == 'test'
-            with pytest.raises(InvalidCallbackData):
-                CallbackQuery.de_json(json_dict, bot)
-        finally:
-            bot.arbitrary_callback_data = False
-            bot.callback_data.clear()
 
     def test_to_dict(self, callback_query):
         callback_query_dict = callback_query.to_dict()

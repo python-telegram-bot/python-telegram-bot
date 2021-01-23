@@ -136,22 +136,6 @@ class TestInlineKeyboardMarkup:
         assert keyboard[0][0].text == 'start'
         assert keyboard[0][0].url == 'http://google.com'
 
-    def test_replace_callback_data(self, bot):
-        try:
-            button_1 = InlineKeyboardButton(text='no_callback_data', url='http://google.com')
-            obj = {1: 'test'}
-            button_2 = InlineKeyboardButton(text='callback_data', callback_data=obj)
-            keyboard = InlineKeyboardMarkup([[button_1, button_2]])
-
-            parsed_keyboard = keyboard.replace_callback_data(bot=bot)
-            assert parsed_keyboard.inline_keyboard[0][0] is button_1
-            assert parsed_keyboard.inline_keyboard[0][1] is not button_2
-            assert parsed_keyboard.inline_keyboard[0][1].text == button_2.text
-            uuid = parsed_keyboard.inline_keyboard[0][1].callback_data
-            assert bot.callback_data.pop(uuid=uuid) is obj
-        finally:
-            bot.callback_data.clear()
-
     def test_equality(self):
         a = InlineKeyboardMarkup.from_column(
             [

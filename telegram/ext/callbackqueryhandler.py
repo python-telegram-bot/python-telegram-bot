@@ -49,13 +49,19 @@ class CallbackQueryHandler(Handler[Update]):
     Read the documentation of the ``re`` module for more information.
 
     Note:
-        :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
-        can use to keep any data in will be sent to the :attr:`callback` function. Related to
-        either the user or the chat that the update was sent in. For each update from the same user
-        or in the same chat, it will be the same ``dict``.
+        * :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
+          can use to keep any data in will be sent to the :attr:`callback` function. Related to
+          either the user or the chat that the update was sent in. For each update from the same
+          user or in the same chat, it will be the same ``dict``.
 
-        Note that this is DEPRECATED, and you should use context based callbacks. See
-        https://git.io/fxJuV for more info.
+          Note that this is DEPRECATED, and you should use context based callbacks. See
+          https://git.io/fxJuV for more info.
+        * If your bot allows arbitrary objects as ``callback_data``, it may happen that the
+          original ``callback_data`` for the incoming :class:`telegram.CallbackQuery`` can not be
+          found. This is the case when either a malicious client tempered with the
+          ``callback_data`` or the data was simply dropped from cache or not persisted. In these
+          cases, an instance of :class:`telegram.ext.utils.callbackdatacache.InvalidCallbackData`
+          will be set as ``callback_data``.
 
     Warning:
         When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
