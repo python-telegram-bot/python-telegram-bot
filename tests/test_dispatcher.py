@@ -42,8 +42,7 @@ from collections import defaultdict
 
 @pytest.fixture(scope='function')
 def dp2(bot):
-    for dp in create_dp(bot):
-        yield dp
+    yield from create_dp(bot)
 
 
 class TestDispatcher:
@@ -698,7 +697,7 @@ class TestDispatcher:
     def test_error_while_persisting(self, cdp, monkeypatch):
         class OwnPersistence(BasePersistence):
             def __init__(self):
-                super(OwnPersistence, self).__init__()
+                super().__init__()
                 self.store_user_data = True
                 self.store_chat_data = True
                 self.store_bot_data = True
@@ -765,7 +764,7 @@ class TestDispatcher:
     def test_persisting_no_user_no_chat(self, cdp):
         class OwnPersistence(BasePersistence):
             def __init__(self):
-                super(OwnPersistence, self).__init__()
+                super().__init__()
                 self.store_user_data = True
                 self.store_chat_data = True
                 self.store_bot_data = True
