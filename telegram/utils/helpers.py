@@ -114,7 +114,7 @@ def parse_file_input(
 
     Returns:
         :obj:`str` | :class:`telegram.InputFile` | :obj:`object`: The parsed input or the untouched
-            :attr:`file_input`, in case it's no valid file input.
+        :attr:`file_input`, in case it's no valid file input.
     """
     # Importing on file-level yields cyclic Import Errors
     from telegram import InputFile  # pylint: disable=C0415
@@ -189,7 +189,8 @@ def to_float_timestamp(
     to be in UTC, if ``bot`` is not passed or ``bot.defaults`` is :obj:`None`.
 
     Args:
-        time_object (int | float | datetime.timedelta | datetime.datetime | datetime.time):
+        time_object (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` | \
+            :obj:`datetime.datetime` | :obj:`datetime.time`):
             Time value to convert. The semantics of this parameter will depend on its type:
 
             * :obj:`int` or :obj:`float` will be interpreted as "seconds from ``reference_t``"
@@ -198,21 +199,22 @@ def to_float_timestamp(
             * :obj:`datetime.datetime` will be interpreted as an absolute date/time value
             * :obj:`datetime.time` will be interpreted as a specific time of day
 
-        reference_timestamp (float, optional): POSIX timestamp that indicates the absolute time
-            from which relative calculations are to be performed (e.g. when ``t`` is given as an
-            :obj:`int`, indicating "seconds from ``reference_t``"). Defaults to now (the time at
+        reference_timestamp (:obj:`float`, optional): POSIX timestamp that indicates the absolute
+            time from which relative calculations are to be performed (e.g. when ``t`` is given as
+            an :obj:`int`, indicating "seconds from ``reference_t``"). Defaults to now (the time at
             which this function is called).
 
             If ``t`` is given as an absolute representation of date & time (i.e. a
-            ``datetime.datetime`` object), ``reference_timestamp`` is not relevant and so its
+            :obj:`datetime.datetime` object), ``reference_timestamp`` is not relevant and so its
             value should be :obj:`None`. If this is not the case, a ``ValueError`` will be raised.
         tzinfo (:obj:`datetime.tzinfo`, optional): If ``t`` is a naive object from the
             :class:`datetime` module, it will be interpreted as this timezone. Defaults to
             ``pytz.utc``.
 
     Returns:
-        (float | None) The return value depends on the type of argument ``t``. If ``t`` is
-            given as a time increment (i.e. as a obj:`int`, :obj:`float` or
+        :obj:`float` | :obj:`None`:
+            The return value depends on the type of argument ``t``.
+            If ``t`` is given as a time increment (i.e. as a :obj:`int`, :obj:`float` or
             :obj:`datetime.timedelta`), then the return value will be ``reference_t`` + ``t``.
 
             Else if it is given as an absolute date/time value (i.e. a :obj:`datetime.datetime`
@@ -222,7 +224,9 @@ def to_float_timestamp(
             object), the return value is the nearest future occurrence of that time of day.
 
     Raises:
-        TypeError: if `t`'s type is not one of those described above
+        TypeError: If ``t``'s type is not one of those described above.
+        ValueError: If ``t`` is a :obj:`datetime.datetime` and :obj:`reference_timestamp` is not
+            :obj:`None`.
     """
 
     if reference_timestamp is None:
@@ -286,16 +290,16 @@ def from_timestamp(
 ) -> Optional[dtm.datetime]:
     """
     Converts an (integer) unix timestamp to a timezone aware datetime object.
-    :obj:`None`s are left alone (i.e. ``from_timestamp(None)`` is :obj:`None`).
+    :obj:`None` s are left alone (i.e. ``from_timestamp(None)`` is :obj:`None`).
 
     Args:
-        unixtime (int): Integer POSIX timestamp.
-        tzinfo (:obj:`datetime.tzinfo`, optional): The timezone, the timestamp is to be converted
-            to. Defaults to UTC.
+        unixtime (:obj:`int`): Integer POSIX timestamp.
+        tzinfo (:obj:`datetime.tzinfo`, optional): The timezone to which the timestamp is to be
+            converted to. Defaults to UTC.
 
     Returns:
-        timezone aware equivalent :obj:`datetime.datetime` value if ``timestamp`` is not
-        :obj:`None`; else :obj:`None`
+        Timezone aware equivalent :obj:`datetime.datetime` value if ``unixtime`` is not
+        :obj:`None`; else :obj:`None`.
     """
     if unixtime is None:
         return None
@@ -311,11 +315,11 @@ def from_timestamp(
 def mention_html(user_id: Union[int, str], name: str) -> str:
     """
     Args:
-        user_id (:obj:`int`) The user's id which you want to mention.
-        name (:obj:`str`) The name the mention is showing.
+        user_id (:obj:`int`): The user's id which you want to mention.
+        name (:obj:`str`): The name the mention is showing.
 
     Returns:
-        :obj:`str`: The inline mention for the user as html.
+        :obj:`str`: The inline mention for the user as HTML.
     """
     return f'<a href="tg://user?id={user_id}">{escape(name)}</a>'
 
@@ -323,13 +327,13 @@ def mention_html(user_id: Union[int, str], name: str) -> str:
 def mention_markdown(user_id: Union[int, str], name: str, version: int = 1) -> str:
     """
     Args:
-        user_id (:obj:`int`) The user's id which you want to mention.
-        name (:obj:`str`) The name the mention is showing.
-        version (:obj:`int` | :obj:`str`): Use to specify the version of telegrams Markdown.
-            Either ``1`` or ``2``. Defaults to ``1``
+        user_id (:obj:`int`): The user's id which you want to mention.
+        name (:obj:`str`): The name the mention is showing.
+        version (:obj:`int` | :obj:`str`): Use to specify the version of Telegram's Markdown.
+            Either ``1`` or ``2``. Defaults to ``1``.
 
     Returns:
-        :obj:`str`: The inline mention for the user as markdown.
+        :obj:`str`: The inline mention for the user as Markdown.
     """
     return f'[{escape_markdown(name, version=version)}](tg://user?id={user_id})'
 
@@ -340,10 +344,11 @@ def effective_message_type(entity: Union['Message', 'Update']) -> Optional[str]:
     :class:`telegram.Update`.
 
     Args:
-        entity (:obj:`Update` | :obj:`Message`) The ``update`` or ``message`` to extract from
+        entity (:class:`telegram.Update` | :class:`telegram.Message`): The ``update`` or
+            ``message`` to extract from.
 
     Returns:
-        str: One of ``Message.MESSAGE_TYPES``
+        :obj:`str`: One of ``Message.MESSAGE_TYPES``
 
     """
 
@@ -414,7 +419,7 @@ def create_deep_linked_url(bot_username: str, payload: str = None, group: bool =
 
 def encode_conversations_to_json(conversations: Dict[str, Dict[Tuple, Any]]) -> str:
     """Helper method to encode a conversations dict (that uses tuples as keys) to a
-    JSON-serializable way. Use :attr:`_decode_conversations_from_json` to decode.
+    JSON-serializable way. Use :meth:`decode_conversations_from_json` to decode.
 
     Args:
         conversations (:obj:`dict`): The conversations dict to transform to JSON.
@@ -432,7 +437,7 @@ def encode_conversations_to_json(conversations: Dict[str, Dict[Tuple, Any]]) -> 
 
 def decode_conversations_from_json(json_string: str) -> Dict[str, Dict[Tuple, Any]]:
     """Helper method to decode a conversations dict (that uses tuples as keys) from a
-    JSON-string created with :attr:`_encode_conversations_to_json`.
+    JSON-string created with :meth:`encode_conversations_to_json`.
 
     Args:
         json_string (:obj:`str`): The conversations dict as JSON string.
@@ -485,7 +490,7 @@ class DefaultValue:
                 arg = arg.value
             else:
                 print('`arg` was set explicitly')
-            print('`arg` = ' + str(arg))
+            print(f'`arg` = {str(arg)}')
 
     This yields::
 
@@ -527,7 +532,7 @@ class DefaultValue:
 
 
 DEFAULT_NONE: DefaultValue = DefaultValue(None)
-""":class:`DefaultValue`: Default `None`"""
+""":class:`DefaultValue`: Default :obj:`None`"""
 
 DEFAULT_FALSE: DefaultValue = DefaultValue(False)
-""":class:`DefaultValue`: Default `False`"""
+""":class:`DefaultValue`: Default :obj:`False`"""
