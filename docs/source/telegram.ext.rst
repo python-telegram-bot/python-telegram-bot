@@ -45,3 +45,11 @@ Persistence
     telegram.ext.basepersistence
     telegram.ext.picklepersistence
     telegram.ext.dictpersistence
+
+utils
+-----
+
+.. toctree::
+
+    telegram.ext.utils.callbackdatacache
+    telegram.ext.utils.types

@@ -74,7 +74,7 @@ class KeyboardData:
 
 class CallbackDataCache:
     """A custom cache for storing the callback data of a :class:`telegram.ext.Bot.`. Internally, it
-    keeps to mappings:
+    keeps to mappings with fixed maximum size:
 
         * One for mapping the data received in callback queries to the cached objects
         * One for mapping the IDs of received callback queries to the cached objects
@@ -126,7 +126,7 @@ class CallbackDataCache:
                 self._callback_queries.items()
             )
 
-    def put_keyboard(self, reply_markup: InlineKeyboardMarkup) -> InlineKeyboardMarkup:
+    def process_keyboard(self, reply_markup: InlineKeyboardMarkup) -> InlineKeyboardMarkup:
         """
         Registers the reply markup to the cache. If any of the buttons have :attr:`callback_data`,
         stores that data and builds a new keyboard the the correspondingly replaced buttons.
@@ -140,7 +140,34 @@ class CallbackDataCache:
 
         """
         with self.__lock:
-            return self.__put_keyboard(reply_markup)
+            return self.__process_keyboard(reply_markup)
+
+    def __process_keyboard(self, reply_markup: InlineKeyboardMarkup) -> InlineKeyboardMarkup:
+        keyboard_uuid = uuid4().hex
+        keyboard_data = KeyboardData(keyboard_uuid)
+
+        # Built a new nested list of buttons by replacing the callback data if needed
+        buttons = [
+            [
+                # We create a new button instead of replacing callback_data in case the
+                # same object is used elsewhere
+                InlineKeyboardButton(
+                    btn.text,
+                    callback_data=self.__put_button(btn.callback_data, keyboard_data),
+                )
+                if btn.callback_data
+                else btn
+                for btn in column
+            ]
+            for column in reply_markup.inline_keyboard
+        ]
+
+        if not keyboard_data.button_data:
+            # If we arrive here, no data had to be replaced and we can return the input
+            return reply_markup
+
+        self._keyboard_data[keyboard_uuid] = keyboard_data
+        return InlineKeyboardMarkup(buttons)
 
     @staticmethod
     def __put_button(callback_data: Any, keyboard_data: KeyboardData) -> str:
@@ -168,38 +195,11 @@ class CallbackDataCache:
         # Extract the uuids as put in __put_button
         return callback_data[:32], callback_data[32:]
 
-    def __put_keyboard(self, reply_markup: InlineKeyboardMarkup) -> InlineKeyboardMarkup:
-        keyboard_uuid = uuid4().hex
-        keyboard_data = KeyboardData(keyboard_uuid)
-
-        # Built a new nested list of buttons by replacing the callback data if needed
-        buttons = [
-            [
-                # We create a new button instead of replacing callback_data in case the
-                # same object is used elsewhere
-                InlineKeyboardButton(
-                    btn.text,
-                    callback_data=self.__put_button(btn.callback_data, keyboard_data),
-                )
-                if btn.callback_data
-                else btn
-                for btn in column
-            ]
-            for column in reply_markup.inline_keyboard
-        ]
-
-        if not keyboard_data.button_data:
-            # If we arrive here, no data had to be replaced and we can return the input
-            return reply_markup
-
-        self._keyboard_data[keyboard_uuid] = keyboard_data
-        return InlineKeyboardMarkup(buttons)
-
     def process_callback_query(self, callback_query: CallbackQuery) -> CallbackQuery:
         """
         Replaces the data in the callback query and the attached messages keyboard with the cached
-        objects, if necessary. If the data could not be found, :class:`InvalidButtonData` will be
-        inserted.
+        objects, if necessary. If the data could not be found,
+        :class:`telegram.ext.utils.callbackdatacache.InvalidButtonData` will be inserted.
         If :attr:`callback_query.data` is present, this also saves the callback queries ID in order
         to be able to resolve it to the stored data.
 
@@ -214,21 +214,45 @@ class CallbackDataCache:
 
         """
         with self.__lock:
-            if not callback_query.data:
-                return callback_query
+            mapped = False
 
-            # Map the callback queries ID to the keyboards UUID for later use
-            self._callback_queries[callback_query.id] = self.extract_uuids(callback_query.data)[0]
-            # Get the cached callback data for the CallbackQuery
-            callback_query.data = self.__get_button_data(callback_query.data)
+            if callback_query.data:
+                data = callback_query.data
+
+                # Get the cached callback data for the CallbackQuery
+                callback_query.data = self.__get_button_data(data)
+
+                # Map the callback queries ID to the keyboards UUID for later use
+                if not isinstance(callback_query.data, InvalidCallbackData):
+                    self._callback_queries[callback_query.id] = self.extract_uuids(data)[0]
+                mapped = True
 
             # Get the cached callback data for the inline keyboard attached to the
-            # CallbackQuery
-            if callback_query.message and callback_query.message.reply_markup:
+            # CallbackQuery.
+            if (  # pylint: disable=R1702
+                callback_query.message and callback_query.message.reply_markup
+            ):
                 for row in callback_query.message.reply_markup.inline_keyboard:
-                    for button in row:
+                    for idx, button in enumerate(row):
                         if button.callback_data:
-                            button.callback_data = self.__get_button_data(button.callback_data)
+                            button_data = button.callback_data
+                            callback_data = self.__get_button_data(button_data)
+
+                            # We create new buttons instead of overriding the callback_data to make
+                            # sure the _id_attrs change, too
+                            row[idx] = InlineKeyboardButton(
+                                text=button.text,
+                                callback_data=callback_data,
+                            )
+
+                            # Map the callback queries ID to the keyboards UUID for later use
+                            # in case this hasn't happened yet, i.e. for CQ with game_short_name
+                            if not mapped:
+                                if not isinstance(callback_data, InvalidCallbackData):
+                                    self._callback_queries[callback_query.id] = self.extract_uuids(
+                                        button_data
+                                    )[0]
+                                mapped = True
 
             return callback_query
 
@@ -249,7 +273,7 @@ class CallbackDataCache:
         Deletes the data for the specified callback query.
 
         Note:
-            Will *not* raise exceptions in case the data is not found in the cache.
+            Will *not* raise exceptions in case the callback data is not found in the cache.
             *Will* raise :class:`KeyError` in case the callback query can not be found in the
             cache.
 
@@ -262,7 +286,7 @@ class CallbackDataCache:
         with self.__lock:
             try:
                 keyboard_uuid = self._callback_queries.pop(callback_query.id)
-                return self.__drop_keyboard(keyboard_uuid)
+                self.__drop_keyboard(keyboard_uuid)
             except KeyError as exc:
                 raise KeyError('CallbackQuery was not found in cache.') from exc
 
@@ -285,18 +309,12 @@ class CallbackDataCache:
         with self.__lock:
             self.__clear(self._keyboard_data, time_cutoff)
 
-    def clear_callback_queries(self, time_cutoff: Union[float, datetime] = None) -> None:
+    def clear_callback_queries(self) -> None:
         """
         Clears the stored callback query IDs.
-
-        Args:
-            time_cutoff (:obj:`float` | :obj:`datetime.datetime`, optional): Pass a UNIX timestamp
-                or a :obj:`datetime.datetime` to clear only entries which are older. Naive
-                :obj:`datetime.datetime` objects will be assumed to be in UTC.
-
         """
         with self.__lock:
-            self.__clear(self._callback_queries, time_cutoff)
+            self.__clear(self._callback_queries)
 
     @staticmethod
     def __clear(mapping: MutableMapping, time_cutoff: Union[float, datetime] = None) -> None:
@@ -309,6 +327,8 @@ class CallbackDataCache:
         else:
             effective_cutoff = time_cutoff
 
-        to_drop = (key for key, data in mapping.items() if data.access_time < effective_cutoff)
+        # We need a list instead of a generator here, as the list doesn't change it's size
+        # during the iteration
+        to_drop = [key for key, data in mapping.items() if data.access_time < effective_cutoff]
         for key in to_drop:
             mapping.pop(key)

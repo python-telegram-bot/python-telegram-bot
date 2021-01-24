@@ -91,7 +91,7 @@ class Bot(telegram.bot.Bot):
         # CallbackDataCache build a new keyboard with the data replaced. Otherwise return the input
         if isinstance(reply_markup, ReplyMarkup):
             if self.arbitrary_callback_data and isinstance(reply_markup, InlineKeyboardMarkup):
-                return self.callback_data.put_keyboard(reply_markup)
+                return self.callback_data.process_keyboard(reply_markup)
 
         return reply_markup
 

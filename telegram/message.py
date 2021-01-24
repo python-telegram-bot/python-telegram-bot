@@ -435,8 +435,6 @@ class Message(TelegramObject):
         self.reply_markup = reply_markup
         self.bot = bot
 
-        self._callback_data = _kwargs.pop('callback_data', None)
-
         self._id_attrs = (self.message_id, self.chat)
 
     @property

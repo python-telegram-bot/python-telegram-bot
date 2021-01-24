@@ -111,8 +111,6 @@ class CallbackQuery(TelegramObject):
         self.game_short_name = game_short_name
         self.bot = bot
 
-        self._callback_data = _kwargs.pop('callback_data', None)
-
         self._id_attrs = (self.id,)
 
     @classmethod
