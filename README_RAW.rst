@@ -111,7 +111,7 @@ All types and methods of the Telegram Bot API **5.0** are supported.
 Installing
 ==========
 
-You can install or upgrade python-telegram-bot with:
+You can install or upgrade python-telegram-bot-raw with:
 
 .. code:: shell
 
