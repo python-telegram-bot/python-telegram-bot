@@ -21,14 +21,23 @@ import logging
 import time
 from datetime import datetime
 from threading import Lock
-from typing import Dict, Any, Tuple, Union, Optional, MutableMapping
+from typing import Dict, Any, Tuple, Union, Optional, MutableMapping, TYPE_CHECKING
 from uuid import uuid4
 
 from cachetools import LRUCache  # pylint: disable=E0401
 
-from telegram import InlineKeyboardMarkup, InlineKeyboardButton, TelegramError, CallbackQuery
+from telegram import (
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+    TelegramError,
+    CallbackQuery,
+    Message,
+)
 from telegram.utils.helpers import to_float_timestamp
 from telegram.ext.utils.types import CDCData
+
+if TYPE_CHECKING:
+    from telegram.ext import Bot
 
 
 class InvalidCallbackData(TelegramError):
@@ -82,23 +91,27 @@ class CallbackDataCache:
     If necessary, will drop the least recently used items.
 
     Args:
+        bot: (:class:`telegram.ext.Bot`): The bot this cache is for.
         maxsize (:obj:`int`, optional): Maximum number of items in each of the internal mappings.
             Defaults to 1024.
         persistent_data (:obj:`telegram.ext.utils.types.CDCData`, optional): Data to initialize
             the cache with, as returned by :meth:`telegram.ext.BasePersistence.get_callback_data`.
 
     Attributes:
+        bot: (:class:`telegram.Bot`): The bot this cache is for.
         maxsize (:obj:`int`): maximum size of the cache.
 
     """
 
     def __init__(
         self,
+        bot: 'Bot',
         maxsize: int = 1024,
         persistent_data: CDCData = None,
     ):
         self.logger = logging.getLogger(__name__)
 
+        self.bot = bot
         self.maxsize = maxsize
         self._keyboard_data: MutableMapping[str, KeyboardData] = LRUCache(maxsize=maxsize)
         self._callback_queries: MutableMapping[str, str] = LRUCache(maxsize=maxsize)
@@ -195,13 +208,68 @@ class CallbackDataCache:
         # Extract the uuids as put in __put_button
         return callback_data[:32], callback_data[32:]
 
+    def process_message(self, message: Message) -> Message:
+        """
+        Replaces the data in the inline keyboard attached to the message with the cached
+        objects, if necessary. If the data could not be found,
+        :class:`telegram.ext.utils.callbackdatacache.InvalidButtonData` will be inserted.
+        Also considers :attr:`message.reply_to_message` and :attr:`message.pinned_message`, if
+        present and if they were sent by the bot itself.
+
+        Warning:
+            * *In place*, i.e. the passed :class:`telegram.Message` will be changed!
+            * Pass only messages that were sent by this caches bot!
+
+        Args:
+            message (:class:`telegram.Message`): The message.
+
+        Returns:
+            The callback query with inserted data.
+
+        """
+        with self.__lock:
+            return self.__process_message(message)[0]
+
+    def __process_message(self, message: Message) -> Tuple[Message, Optional[str]]:
+        """
+        As documented in process_message, but as second output gives the keyboards uuid, if any
+        """
+        if message.reply_to_message and message.reply_to_message.from_user == self.bot:
+            self.__process_message(message.reply_to_message)
+        if message.pinned_message and message.pinned_message.from_user == self.bot:
+            self.__process_message(message.pinned_message)
+
+        if not message.reply_markup:
+            return message, None
+
+        keyboard_uuid = None
+
+        for row in message.reply_markup.inline_keyboard:
+            for idx, button in enumerate(row):
+                if button.callback_data:
+                    button_data = button.callback_data
+                    callback_data = self.__get_button_data(button_data)
+
+                    # We create new buttons instead of overriding the callback_data to make
+                    # sure the _id_attrs change, too
+                    row[idx] = InlineKeyboardButton(
+                        text=button.text,
+                        callback_data=callback_data,
+                    )
+
+                    if not keyboard_uuid:
+                        if not isinstance(callback_data, InvalidCallbackData):
+                            keyboard_uuid = self.extract_uuids(button_data)[0]
+
+        return message, keyboard_uuid
+
     def process_callback_query(self, callback_query: CallbackQuery) -> CallbackQuery:
         """
         Replaces the data in the callback query and the attached messages keyboard with the cached
         objects, if necessary. If the data could not be found,
         :class:`telegram.ext.utils.callbackdatacache.InvalidButtonData` will be inserted.
-        If :attr:`callback_query.data` is present, this also saves the callback queries ID in order
-        to be able to resolve it to the stored data.
+        If :attr:`callback_query.data` or `attr:`callback_query.message` is present, this also
+        saves the callback queries ID in order to be able to resolve it to the stored data.
 
         Warning:
             *In place*, i.e. the passed :class:`telegram.CallbackQuery` will be changed!
@@ -229,30 +297,10 @@ class CallbackDataCache:
 
             # Get the cached callback data for the inline keyboard attached to the
             # CallbackQuery.
-            if (  # pylint: disable=R1702
-                callback_query.message and callback_query.message.reply_markup
-            ):
-                for row in callback_query.message.reply_markup.inline_keyboard:
-                    for idx, button in enumerate(row):
-                        if button.callback_data:
-                            button_data = button.callback_data
-                            callback_data = self.__get_button_data(button_data)
-
-                            # We create new buttons instead of overriding the callback_data to make
-                            # sure the _id_attrs change, too
-                            row[idx] = InlineKeyboardButton(
-                                text=button.text,
-                                callback_data=callback_data,
-                            )
-
-                            # Map the callback queries ID to the keyboards UUID for later use
-                            # in case this hasn't happened yet, i.e. for CQ with game_short_name
-                            if not mapped:
-                                if not isinstance(callback_data, InvalidCallbackData):
-                                    self._callback_queries[callback_query.id] = self.extract_uuids(
-                                        button_data
-                                    )[0]
-                                mapped = True
+            if callback_query.message:
+                _, keyboard_uuid = self.__process_message(callback_query.message)
+                if not mapped and keyboard_uuid:
+                    self._callback_queries[callback_query.id] = keyboard_uuid
 
             return callback_query
 
@@ -302,8 +350,9 @@ class CallbackDataCache:
 
         Args:
             time_cutoff (:obj:`float` | :obj:`datetime.datetime`, optional): Pass a UNIX timestamp
-                or a :obj:`datetime.datetime` to clear only entries which are older. Naive
-                :obj:`datetime.datetime` objects will be assumed to be in UTC.
+                or a :obj:`datetime.datetime` to clear only entries which are older.
+                For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
+                bot will be used.
 
         """
         with self.__lock:
@@ -316,14 +365,15 @@ class CallbackDataCache:
         with self.__lock:
             self.__clear(self._callback_queries)
 
-    @staticmethod
-    def __clear(mapping: MutableMapping, time_cutoff: Union[float, datetime] = None) -> None:
+    def __clear(self, mapping: MutableMapping, time_cutoff: Union[float, datetime] = None) -> None:
         if not time_cutoff:
             mapping.clear()
             return
 
         if isinstance(time_cutoff, datetime):
-            effective_cutoff = to_float_timestamp(time_cutoff)
+            effective_cutoff = to_float_timestamp(
+                time_cutoff, tzinfo=self.bot.defaults.tzinfo if self.bot.defaults else None
+            )
         else:
             effective_cutoff = time_cutoff
 

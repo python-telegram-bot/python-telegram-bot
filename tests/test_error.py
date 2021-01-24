@@ -113,6 +113,7 @@ class TestErrors:
             (RetryAfter(12), ["message", "retry_after"]),
             (Conflict("test message"), ["message"]),
             (TelegramDecryptionError("test message"), ["message"]),
+            (InvalidCallbackData('test data'), ['callback_data']),
         ],
     )
     def test_errors_pickling(self, exception, attributes):

@@ -1901,12 +1901,10 @@ class TestBot:
             inline_keyboard = message.reply_markup.inline_keyboard
 
             assert inline_keyboard[0][1] == no_replace_button
-            assert inline_keyboard[0][0] != replace_button
-            keyboard, button = (
-                inline_keyboard[0][0].callback_data[:32],
-                inline_keyboard[0][0].callback_data[32:],
-            )
-            assert bot.callback_data._keyboard_data[keyboard].button_data[button] == 'replace_test'
+            assert inline_keyboard[0][0] == replace_button
+            keyboard = list(bot.callback_data._keyboard_data)[0]
+            data = list(bot.callback_data._keyboard_data[keyboard].button_data.values())[0]
+            assert data == 'replace_test'
         finally:
             bot.arbitrary_callback_data = False
             bot.callback_data.clear_callback_data()
@@ -1932,12 +1930,10 @@ class TestBot:
             inline_keyboard = message.reply_markup.inline_keyboard
 
             assert inline_keyboard[0][1] == no_replace_button
-            assert inline_keyboard[0][0] != replace_button
-            keyboard, button = (
-                inline_keyboard[0][0].callback_data[:32],
-                inline_keyboard[0][0].callback_data[32:],
-            )
-            assert bot.callback_data._keyboard_data[keyboard].button_data[button] == 'replace_test'
+            assert inline_keyboard[0][0] == replace_button
+            keyboard = list(bot.callback_data._keyboard_data)[0]
+            data = list(bot.callback_data._keyboard_data[keyboard].button_data.values())[0]
+            assert data == 'replace_test'
         finally:
             bot.arbitrary_callback_data = False
             bot.callback_data.clear_callback_data()
@@ -1963,11 +1959,12 @@ class TestBot:
             )
             message = helper_message.reply_to_message
             inline_keyboard = message.reply_markup.inline_keyboard
-            keyboard, button = (
-                inline_keyboard[0][0].callback_data[:32],
-                inline_keyboard[0][0].callback_data[32:],
-            )
-            assert bot.callback_data._keyboard_data[keyboard].button_data[button] == 'replace_test'
+
+            assert inline_keyboard[0][1] == no_replace_button
+            assert inline_keyboard[0][0] == replace_button
+            keyboard = list(bot.callback_data._keyboard_data)[0]
+            data = list(bot.callback_data._keyboard_data[keyboard].button_data.values())[0]
+            assert data == 'replace_test'
         finally:
             bot.arbitrary_callback_data = False
             bot.callback_data.clear_callback_data()
@@ -2023,3 +2020,28 @@ class TestBot:
             bot.arbitrary_callback_data = False
             bot.callback_data.clear_callback_data()
             bot.callback_data.clear_callback_queries()
+
+    def test_get_chat_arbitrary_callback_data(self, super_group_id, bot):
+        try:
+            bot.arbitrary_callback_data = True
+            reply_markup = InlineKeyboardMarkup.from_button(
+                InlineKeyboardButton(text='text', callback_data='callback_data')
+            )
+
+            message = bot.send_message(
+                super_group_id, text='get_chat_arbitrary_callback_data', reply_markup=reply_markup
+            )
+            message.pin()
+
+            keyboard = list(bot.callback_data._keyboard_data)[0]
+            data = list(bot.callback_data._keyboard_data[keyboard].button_data.values())[0]
+            assert data == 'callback_data'
+
+            chat = bot.get_chat(super_group_id)
+            assert chat.pinned_message == message
+            assert chat.pinned_message.reply_markup == reply_markup
+        finally:
+            bot.arbitrary_callback_data = False
+            bot.callback_data.clear_callback_data()
+            bot.callback_data.clear_callback_queries()
+            bot.unpin_all_chat_messages(super_group_id)

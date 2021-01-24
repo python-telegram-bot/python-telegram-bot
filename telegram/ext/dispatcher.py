@@ -204,7 +204,7 @@ class Dispatcher:
                     if not isinstance(persistent_data, tuple) and len(persistent_data) != 2:
                         raise ValueError('callback_data must be a 2-tuple')
                     self.bot.callback_data = CallbackDataCache(
-                        self.bot.callback_data.maxsize, persistent_data=persistent_data
+                        self.bot, self.bot.callback_data.maxsize, persistent_data=persistent_data
                     )
         else:
             self.persistence = None

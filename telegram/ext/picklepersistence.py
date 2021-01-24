@@ -221,7 +221,7 @@ class PicklePersistence(BasePersistence):
         if self.callback_data:
             pass
         elif not self.single_file:
-            filename = "{}_callback_data".format(self.filename)
+            filename = f"{self.filename}_callback_data"
             data = self.load_file(filename)
             if not data:
                 data = None
@@ -341,7 +341,7 @@ class PicklePersistence(BasePersistence):
         self.callback_data = (data[0].copy(), data[1].copy())
         if not self.on_flush:
             if not self.single_file:
-                filename = "{}_callback_data".format(self.filename)
+                filename = f"{self.filename}_callback_data"
                 self.dump_file(filename, self.callback_data)
             else:
                 self.dump_singlefile()
@@ -359,6 +359,6 @@ class PicklePersistence(BasePersistence):
             if self.bot_data:
                 self.dump_file(f"{self.filename}_bot_data", self.bot_data)
             if self.callback_data:
-                self.dump_file("{}_callback_data".format(self.filename), self.callback_data)
+                self.dump_file(f"{self.filename}_callback_data", self.callback_data)
             if self.conversations:
                 self.dump_file(f"{self.filename}_conversations", self.conversations)

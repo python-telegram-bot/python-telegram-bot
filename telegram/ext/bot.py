@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # pylint: disable=E0611,E0213,E1102,C0103,E1101,R0913,R0904
 #
 # A library that provides a Python interface to the Telegram Bot API
@@ -21,7 +20,7 @@
 # pylint: disable=C0112
 """This module contains an object that represents a Telegram Bot with convenience extensions."""
 from copy import copy
-from typing import Union, cast, List, Callable, Optional, Tuple
+from typing import Union, cast, List, Callable, Optional, Tuple, TypeVar
 
 import telegram.bot
 from telegram import (
@@ -33,11 +32,14 @@ from telegram import (
     MessageId,
     InlineQueryResult,
     Update,
+    Chat,
 )
 from telegram.ext.utils.callbackdatacache import CallbackDataCache
 from telegram.utils.request import Request
 from telegram.utils.types import JSONDict
 from .defaults import Defaults
+
+T = TypeVar('T', bound=object)
 
 
 class Bot(telegram.bot.Bot):
@@ -51,8 +53,8 @@ class Bot(telegram.bot.Bot):
             be used if not set explicitly in the bot methods.
         arbitrary_callback_data (:obj:`bool` | :obj:`int`, optional): Whether to
             allow arbitrary objects as callback data for :class:`telegram.InlineKeyboardButton`.
-            Pass an integer to specify the maximum number objects cached in memory. For more info,
-            please see our wiki. Defaults to :obj:`False`.
+            Pass an integer to specify the maximum number objects cached in memory. For more
+            details, please see our wiki. Defaults to :obj:`False`.
 
     """
 
@@ -84,7 +86,7 @@ class Bot(telegram.bot.Bot):
         else:
             maxsize = 1024
             self.arbitrary_callback_data = arbitrary_callback_data
-        self.callback_data: CallbackDataCache = CallbackDataCache(maxsize=maxsize)
+        self.callback_data: CallbackDataCache = CallbackDataCache(bot=self, maxsize=maxsize)
 
     def _replace_keyboard(self, reply_markup: Optional[ReplyMarkup]) -> Optional[ReplyMarkup]:
         # If the reply_markup is an inline keyboard and we allow arbitrary callback data, let the
@@ -94,6 +96,17 @@ class Bot(telegram.bot.Bot):
                 return self.callback_data.process_keyboard(reply_markup)
 
         return reply_markup
+
+    def _insert_callback_data(self, obj: T) -> T:
+        if not self.arbitrary_callback_data:
+            return obj
+        if isinstance(obj, Message):
+            return self.callback_data.process_message(message=obj)  # type: ignore[return-value]
+        # If the pinned message was not sent by this bot, replacing callback data in the inline
+        # keyboard will only give InvalidCallbackData
+        if isinstance(obj, Chat) and obj.pinned_message and obj.pinned_message.from_user == self:
+            obj.pinned_message = self.callback_data.process_message(obj.pinned_message)
+        return obj
 
     def _message(
         self,
@@ -106,9 +119,9 @@ class Bot(telegram.bot.Bot):
         timeout: float = None,
         api_kwargs: JSONDict = None,
     ) -> Union[bool, Message]:
-        # We override this method to call self._replace_keyboard. This covers most methods that
-        # have a reply_markup
-        return super()._message(
+        # We override this method to call self._replace_keyboard and self._insert_callback_data.
+        # This covers most methods that have a reply_markup
+        result = super()._message(
             endpoint=endpoint,
             data=data,
             reply_to_message_id=reply_to_message_id,
@@ -118,6 +131,7 @@ class Bot(telegram.bot.Bot):
             timeout=timeout,
             api_kwargs=api_kwargs,
         )
+        return self._insert_callback_data(result)
 
     def get_updates(
         self,
@@ -139,6 +153,10 @@ class Bot(telegram.bot.Bot):
         )
 
         for update in updates:
+            # CallbackQueries are the only updates that can directly contain a message sent by
+            # the bot itself. All other incoming messages are from users or other bots
+            # We also don't have to worry about effective_chat.pinned_message, as that's only
+            # returned in get_chat
             if update.callback_query:
                 self.callback_data.process_callback_query(update.callback_query)
 
@@ -187,14 +205,15 @@ class Bot(telegram.bot.Bot):
         api_kwargs: JSONDict = None,
     ) -> Poll:
         """"""  # hide from decs
-        # We override this method to call self._replace_keyboard
-        return super().stop_poll(
+        # We override this method to call self._replace_keyboard and self._insert_callback_data
+        result = super().stop_poll(
             chat_id=chat_id,
             message_id=message_id,
             reply_markup=self._replace_keyboard(reply_markup),
             timeout=timeout,
             api_kwargs=api_kwargs,
         )
+        return self._insert_callback_data(result)
 
     def copy_message(
         self,
@@ -212,8 +231,8 @@ class Bot(telegram.bot.Bot):
         api_kwargs: JSONDict = None,
     ) -> MessageId:
         """"""  # hide from docs
-        # We override this method to call self._replace_keyboard
-        return super().copy_message(
+        # We override this method to call self._replace_keyboard and self._insert_callback_data
+        result = super().copy_message(
             chat_id=chat_id,
             from_chat_id=from_chat_id,
             message_id=message_id,
@@ -227,3 +246,12 @@ class Bot(telegram.bot.Bot):
             timeout=timeout,
             api_kwargs=api_kwargs,
         )
+        return self._insert_callback_data(result)
+
+    def get_chat(
+        self, chat_id: Union[str, int], timeout: float = None, api_kwargs: JSONDict = None
+    ) -> Chat:
+        """"""  # hide from docs
+        # We override this method to call self._insert_callback_data
+        result = super().get_chat(chat_id=chat_id, timeout=timeout, api_kwargs=api_kwargs)
+        return self._insert_callback_data(result)

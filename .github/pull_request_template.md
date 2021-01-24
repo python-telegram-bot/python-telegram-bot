@@ -27,3 +27,4 @@ Hey! You're PRing? Cool! Please have a look at the below checklist. It's here to
     - [ ] Added new handlers for new update types
     - [ ] Added new filters for new message (sub)types
     - [ ] Added or updated documentation for the changed class(es) and/or method(s)
+    - [ ] Added logic for arbitrary callback data in `tg.ext.Bot` for new methods that either accept a `reply_markup` in some form or have a return type that is/contains `telegram.Message`

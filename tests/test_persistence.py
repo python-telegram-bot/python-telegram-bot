@@ -34,7 +34,7 @@ from time import sleep
 
 import pytest
 
-from telegram import Update, Message, User, Chat, MessageEntity
+from telegram import Update, Message, User, Chat, MessageEntity, Bot
 from telegram.ext import (
     BasePersistence,
     Updater,
@@ -68,33 +68,34 @@ def reset_callback_data_cache(bot):
     bot.arbitrary_callback_data = False
 
 
+class OwnPersistence(BasePersistence):
+    def get_bot_data(self):
+        raise NotImplementedError
+
+    def get_chat_data(self):
+        raise NotImplementedError
+
+    def get_user_data(self):
+        raise NotImplementedError
+
+    def get_conversations(self, name):
+        raise NotImplementedError
+
+    def update_bot_data(self, data):
+        raise NotImplementedError
+
+    def update_chat_data(self, chat_id, data):
+        raise NotImplementedError
+
+    def update_conversation(self, name, key, new_state):
+        raise NotImplementedError
+
+    def update_user_data(self, user_id, data):
+        raise NotImplementedError
+
+
 @pytest.fixture(scope="function")
 def base_persistence():
-    class OwnPersistence(BasePersistence):
-        def get_bot_data(self):
-            raise NotImplementedError
-
-        def get_chat_data(self):
-            raise NotImplementedError
-
-        def get_user_data(self):
-            raise NotImplementedError
-
-        def get_conversations(self, name):
-            raise NotImplementedError
-
-        def update_bot_data(self, data):
-            raise NotImplementedError
-
-        def update_chat_data(self, chat_id, data):
-            raise NotImplementedError
-
-        def update_conversation(self, name, key, new_state):
-            raise NotImplementedError
-
-        def update_user_data(self, user_id, data):
-            raise NotImplementedError
-
     return OwnPersistence(
         store_chat_data=True, store_user_data=True, store_bot_data=True, store_callback_data=True
     )
@@ -742,6 +743,12 @@ class TestBasePersistence:
         persistence.update_bot_data(data)
         assert make_assertion(persistence.bot_data)
         assert make_assertion(persistence.get_bot_data())
+
+    def test_set_bot_exception(self, bot):
+        non_ext_bot = Bot(bot.token)
+        persistence = OwnPersistence(store_callback_data=True)
+        with pytest.raises(TypeError, match='store_callback_data can only be used'):
+            persistence.set_bot(non_ext_bot)
 
 
 @pytest.fixture(scope='function')
@@ -1890,6 +1897,7 @@ class TestDictPersistence:
 
         callback_data[1]['test3'] = 'test4'
         callback_data_two = (callback_data[0].copy(), callback_data[1].copy())
+        dict_persistence.update_callback_data(callback_data)
         dict_persistence.update_callback_data(callback_data)
         assert dict_persistence.callback_data == callback_data_two
         assert dict_persistence.callback_data_json != callback_data_json
