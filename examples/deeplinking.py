@@ -52,7 +52,7 @@ KEYBOARD_CALLBACKDATA = "keyboard-callback-data"
 def start(update: Update, context: CallbackContext) -> None:
     """Send a deep-linked URL when the command /start is issued."""
     bot = context.bot
-    url = helpers.create_deep_linked_url(bot.get_me().username, CHECK_THIS_OUT, group=True)
+    url = helpers.create_deep_linked_url(bot.username, CHECK_THIS_OUT, group=True)
     text = "Feel free to tell your friends about it:\n\n" + url
     update.message.reply_text(text)
 
@@ -60,7 +60,7 @@ def start(update: Update, context: CallbackContext) -> None:
 def deep_linked_level_1(update: Update, context: CallbackContext) -> None:
     """Reached through the CHECK_THIS_OUT payload"""
     bot = context.bot
-    url = helpers.create_deep_linked_url(bot.get_me().username, SO_COOL)
+    url = helpers.create_deep_linked_url(bot.username, SO_COOL)
     text = (
         "Awesome, you just accessed hidden functionality! "
         " Now let's get back to the private chat."
@@ -74,7 +74,7 @@ def deep_linked_level_1(update: Update, context: CallbackContext) -> None:
 def deep_linked_level_2(update: Update, context: CallbackContext) -> None:
     """Reached through the SO_COOL payload"""
     bot = context.bot
-    url = helpers.create_deep_linked_url(bot.get_me().username, USING_ENTITIES)
+    url = helpers.create_deep_linked_url(bot.username, USING_ENTITIES)
     text = f"You can also mask the deep-linked URLs as links: [▶️ CLICK HERE]({url})."
     update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
 
@@ -92,7 +92,7 @@ def deep_linked_level_3(update: Update, context: CallbackContext) -> None:
 def deep_link_level_3_callback(update: Update, context: CallbackContext) -> None:
     """Answers CallbackQuery with deeplinking url."""
     bot = context.bot
-    url = helpers.create_deep_linked_url(bot.get_me().username, USING_KEYBOARD)
+    url = helpers.create_deep_linked_url(bot.username, USING_KEYBOARD)
     update.callback_query.answer(url=url)
 
 
