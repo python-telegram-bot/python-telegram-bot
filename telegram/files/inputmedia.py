@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram InputMedia Objects."""
-
 from typing import Union, List, Tuple
 
 from telegram import (
@@ -42,7 +41,7 @@ class InputMedia(TelegramObject):
     :class:`telegram.InputMediaVideo` for detailed use.
 
     """
-
+    media: Union[str, InputFile] = None
     caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...], None] = None
 
     def to_dict(self) -> JSONDict:

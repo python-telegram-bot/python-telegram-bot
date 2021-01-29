@@ -17,46 +17,22 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains methods to make POST and GET requests."""
-import logging
+import abc
 import os
 import socket
 import sys
-import warnings
+from pathlib import Path
 
 try:
     import ujson as json
 except ImportError:
     import json  # type: ignore[no-redef]
 
-from typing import Any, Union
+from typing import Any, Union, Optional, Tuple
 
 import certifi  # pylint: disable=E0401
 
-try:
-    import telegram.vendor.ptb_urllib3.urllib3 as urllib3
-    import telegram.vendor.ptb_urllib3.urllib3.contrib.appengine as appengine
-    from telegram.vendor.ptb_urllib3.urllib3.connection import HTTPConnection
-    from telegram.vendor.ptb_urllib3.urllib3.fields import RequestField
-    from telegram.vendor.ptb_urllib3.urllib3.util.timeout import Timeout
-except ImportError:  # pragma: no cover
-    try:
-        import urllib3  # type: ignore[no-redef]
-        import urllib3.contrib.appengine as appengine  # type: ignore[no-redef]
-        from urllib3.connection import HTTPConnection  # type: ignore[no-redef]
-        from urllib3.fields import RequestField  # type: ignore[no-redef]
-        from urllib3.util.timeout import Timeout  # type: ignore[no-redef]
-
-        warnings.warn(
-            'python-telegram-bot is using upstream urllib3. This is allowed but not '
-            'supported by python-telegram-bot maintainers.'
-        )
-    except ImportError:
-        warnings.warn(
-            "python-telegram-bot wasn't properly installed. Please refer to README.rst on "
-            "how to properly install."
-        )
-        raise
-
+from telegram import __version__ as ptb_ver
 # pylint: disable=C0412
 from telegram import InputFile, InputMedia, TelegramError
 from telegram.error import (
@@ -72,22 +48,204 @@ from telegram.error import (
 from telegram.utils.types import JSONDict
 
 
-def _render_part(self: RequestField, name: str, value: str) -> str:  # pylint: disable=W0613
-    """
-    Monkey patch urllib3.urllib3.fields.RequestField to make it *not* support RFC2231 compliant
-    Content-Disposition headers since telegram servers don't understand it. Instead just escape
-    \\ and " and replace any \n and \r with a space.
-    """
-    value = value.replace('\\', '\\\\').replace('"', '\\"')
-    value = value.replace('\r', ' ').replace('\n', ' ')
-    return f'{name}="{value}"'
+USER_AGENT = f'Python Telegram Bot {ptb_ver}' \
+             f' (https://github.com/python-telegram-bot/python-telegram-bot)'
 
 
-RequestField._render_part = _render_part  # type: ignore  # pylint: disable=W0212
+class PtbRequestBase(abc.ABC):
 
-logging.getLogger('urllib3').setLevel(logging.WARNING)
+    async def post(self, url: str, data: Optional[JSONDict], timeout: float = None) -> Union[JSONDict, bool]:
+        """Request an URL.
 
-USER_AGENT = 'Python Telegram Bot (https://github.com/python-telegram-bot/python-telegram-bot)'
+        Args:
+            url (:obj:`str`): The web location we want to retrieve.
+            data (dict[str, str|int], optional): A dict of key/value pairs.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+
+        Returns:
+          A JSON object.
+
+        """
+        # Are we uploading files?
+        files = False
+
+        # Convert data into a JSON serializable object which we can send to telegram servers.
+        # TODO p3: We should implement a proper Serializer instead of all this memcopy &
+        #          manipulations.
+        # pylint: disable=R1702
+        for key, val in data.copy().items():
+            if isinstance(val, InputFile):
+                data[key] = val.field_tuple
+                files = True
+            elif isinstance(val, (float, int)):
+                # TODO p3: Is this really necessary? Seems like an ancient relic.
+                data[key] = str(val)
+            elif key == 'media':
+                # One media or multiple
+                if isinstance(val, InputMedia):
+                    # Attach and set val to attached name
+                    data[key] = val.to_json()
+                    if isinstance(val.media, InputFile):  # type: ignore
+                        data[val.media.attach] = val.media.field_tuple  # type: ignore
+                else:
+                    # Attach and set val to attached name for all
+                    media = []
+                    for med in val:
+                        media_dict = med.to_dict()
+                        media.append(media_dict)
+                        if isinstance(med.media, InputFile):
+                            data[med.media.attach] = med.media.field_tuple
+                            # if the file has a thumb, we also need to attach it to the data
+                            if "thumb" in media_dict:
+                                data[med.thumb.attach] = med.thumb.field_tuple
+                    data[key] = json.dumps(media)
+                files = True
+            elif isinstance(val, list):
+                # In case we're sending files, we need to json-dump lists manually
+                # As we can't know if that's the case, we just json-dump here
+                data[key] = json.dumps(val)
+
+        result = self._request_wrapper('POST', url, data, files)
+        return self._parse(result)
+
+    async def retrieve(self, url: str, timeout: float = None) -> bytes:
+        """Retrieve the contents of a file by its URL.
+
+        Args:
+            url (:obj:`str`): The web location we want to retrieve.
+            timeout (:obj:`int` | :obj:`float`): If this value is specified, use it as the read
+                timeout from the server (instead of the one specified during creation of the
+                connection pool).
+
+        Raises:
+            TelegramError
+
+        """
+        return await self._request_wrapper('GET', url, None, False, read_timeout=timeout)
+
+    async def download(self, url: str, filename: str, timeout: float = None) -> None:
+        """Download a file from the given ``url`` and save it to ``filename``.
+
+        Args:
+            url (str): The web location we want to retrieve.
+            timeout (:obj:`int` | :obj:`float`): If this value is specified, use it as the read
+                timeout from the server (instead of the one specified during creation of the
+                connection pool).
+            filename (:obj:`str`): The filename within the path to download the file.
+
+        Raises:
+            TelegramError
+
+        """
+        buf = await self.retrieve(url, timeout=timeout)
+        Path(filename).write_bytes(buf)
+
+    async def _request_wrapper(self, method: str, url: str, data: Optional[JSONDict],
+                               is_files: bool,
+                               read_timeout: float = None,
+                               ) -> bytes:
+        """Wraps the real implementation request method.
+
+        Performs the following tasks:
+        * Handle the various HTTP response codes.
+        * Parse the Telegram server response.
+
+        Args:
+            method: HTTP method (i.e. 'POST', 'GET', etc.).
+            url: The request's URL.
+            data: Data to send over as the request's payload.
+            is_files: Are we sending multiple files?
+            read_timeout: Timeout for waiting to server's response.
+
+        Returns:
+            bytes: The payload part of the HTTP server response.
+
+        Raises:
+            TelegramError
+
+        """
+        try:
+            code, payload = await self.do_request(method, url, data, is_files, read_timeout=read_timeout)
+        except TelegramError:
+            raise
+        except Exception as e:
+            raise NetworkError(f"Unknown error in HTTP implementation {e}") from e
+
+        if 200 <= code <= 299:
+            # 200-299 range are HTTP success statuses
+            return payload
+
+        try:
+            message = str(self._parse(payload))
+        except ValueError:
+            message = 'Unknown HTTPError'
+
+        if code in (401, 403):
+            raise Unauthorized(message)
+        if code == 400:
+            raise BadRequest(message)
+        if code == 404:
+            raise InvalidToken()
+        if code == 409:
+            raise Conflict(message)
+        if code == 413:
+            raise NetworkError(
+                'File too large. Check telegram api limits '
+                'https://core.telegram.org/bots/api#senddocument'
+            )
+        if code == 502:
+            raise NetworkError('Bad Gateway')
+        raise NetworkError(f'{message} ({code})')
+
+    @staticmethod
+    def _parse(json_data: bytes) -> Union[JSONDict, bool]:
+        """Try and parse the JSON returned from Telegram.
+
+        Returns:
+            dict: A JSON parsed as Python dict with results - on error this dict will be empty.
+
+        """
+        decoded_s = json_data.decode('utf-8', 'replace')
+        try:
+            data = json.loads(decoded_s)
+        except ValueError as exc:
+            raise TelegramError('Invalid server response') from exc
+
+        if not data.get('ok'):  # pragma: no cover
+            description = data.get('description')
+            parameters = data.get('parameters')
+            if parameters:
+                migrate_to_chat_id = parameters.get('migrate_to_chat_id')
+                if migrate_to_chat_id:
+                    raise ChatMigrated(migrate_to_chat_id)
+                retry_after = parameters.get('retry_after')
+                if retry_after:
+                    raise RetryAfter(retry_after)
+            if description:
+                return description
+
+        return data['result']
+
+
+    @abc.abstractmethod
+    async def do_request(self, method: str, url: str, data: JSONDict, is_files: bool,
+                         read_timeout: float = None,
+                         ) -> Tuple[int, bytes]:
+        """Implement this method using the real HTTP client.
+
+        Args:
+            method: HTTP method (i.e. 'POST', 'GET', etc.).
+            url: The request's URL.
+            data: Data to send over as the request's payload.
+            is_files: Are we sending multiple files?
+            read_timeout: Timeout for waiting to server's response.
+
+        Returns:
+            Tuple of the HTTP return code & the payload part of the server response.
+
+        """
 
 
 class Request:
@@ -111,12 +269,12 @@ class Request:
     """
 
     def __init__(
-        self,
-        con_pool_size: int = 1,
-        proxy_url: str = None,
-        urllib3_proxy_kwargs: JSONDict = None,
-        connect_timeout: float = 5.0,
-        read_timeout: float = 5.0,
+            self,
+            con_pool_size: int = 1,
+            proxy_url: str = None,
+            urllib3_proxy_kwargs: JSONDict = None,
+            connect_timeout: float = 5.0,
+            read_timeout: float = 5.0,
     ):
         if urllib3_proxy_kwargs is None:
             urllib3_proxy_kwargs = dict()
@@ -195,36 +353,6 @@ class Request:
 
     def stop(self) -> None:
         self._con_pool.clear()  # type: ignore
-
-    @staticmethod
-    def _parse(json_data: bytes) -> Union[JSONDict, bool]:
-        """Try and parse the JSON returned from Telegram.
-
-        Returns:
-            dict: A JSON parsed as Python dict with results - on error this dict will be empty.
-
-        """
-
-        decoded_s = json_data.decode('utf-8', 'replace')
-        try:
-            data = json.loads(decoded_s)
-        except ValueError as exc:
-            raise TelegramError('Invalid server response') from exc
-
-        if not data.get('ok'):  # pragma: no cover
-            description = data.get('description')
-            parameters = data.get('parameters')
-            if parameters:
-                migrate_to_chat_id = parameters.get('migrate_to_chat_id')
-                if migrate_to_chat_id:
-                    raise ChatMigrated(migrate_to_chat_id)
-                retry_after = parameters.get('retry_after')
-                if retry_after:
-                    raise RetryAfter(retry_after)
-            if description:
-                return description
-
-        return data['result']
 
     def _request_wrapper(self, *args: Any, **kwargs: Any) -> bytes:
         """Wraps urllib3 request for handling known exceptions.
