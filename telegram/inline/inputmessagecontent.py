@@ -30,6 +30,8 @@ class InputMessageContent(TelegramObject):
 
     """
 
+    __slots__ = ()
+
     @property
     def _has_parse_mode(self) -> bool:
         return hasattr(self, 'parse_mode')

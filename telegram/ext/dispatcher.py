@@ -134,6 +134,30 @@ class Dispatcher:
 
     """
 
+    # Allowing '__weakref__' creation here since we need it for the singleton
+    __slots__ = (
+        'workers',
+        'persistence',
+        'use_context',
+        'update_queue',
+        'job_queue',
+        'user_data',
+        'chat_data',
+        'bot_data',
+        '_update_persistence_lock',
+        'handlers',
+        'groups',
+        'error_handlers',
+        'running',
+        '__stop_event',
+        '__exception_event',
+        '__async_queue',
+        '__async_threads',
+        'bot',
+        '__dict__',
+        '__weakref__',
+    )
+
     __singleton_lock = Lock()
     __singleton_semaphore = BoundedSemaphore()
     __singleton = None

@@ -90,6 +90,16 @@ class Handler(Generic[UT], ABC):
 
     """
 
+    __slots__ = (
+        'callback',
+        'pass_update_queue',
+        'pass_job_queue',
+        'pass_user_data',
+        'pass_chat_data',
+        'run_async',
+        '__dict__',
+    )
+
     def __init__(
         self,
         callback: Callable[[UT, 'CallbackContext'], RT],

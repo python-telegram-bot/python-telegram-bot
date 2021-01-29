@@ -54,6 +54,18 @@ class Promise:
 
     """
 
+    __slots__ = (
+        'pooled_function',
+        'args',
+        'kwargs',
+        'update',
+        'error_handling',
+        'done',
+        '_result',
+        '_exception',
+        '__dict__',
+    )
+
     # TODO: Remove error_handling parameter once we drop the @run_async decorator
     def __init__(
         self,

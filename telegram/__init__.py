@@ -147,7 +147,7 @@ from .version import __version__  # noqa: F401
 
 __author__ = 'devs@python-telegram-bot.org'
 
-__all__ = [
+__all__ = (
     'Audio',
     'Bot',
     'Chat',
@@ -163,7 +163,6 @@ __all__ = [
     'InlineKeyboardButton',
     'InlineKeyboardMarkup',
     'InlineQuery',
-    'InlineQueryResult',
     'InlineQueryResult',
     'InlineQueryResultArticle',
     'InlineQueryResultAudio',
@@ -248,7 +247,6 @@ __all__ = [
     'PassportElementErrorFrontSide',
     'PassportElementErrorFiles',
     'PassportElementErrorDataField',
-    'PassportElementErrorFile',
     'Credentials',
     'DataCredentials',
     'SecureData',
@@ -256,7 +254,6 @@ __all__ = [
     'IdDocumentData',
     'PersonalDetails',
     'ResidentialAddress',
-    'InputMediaVideo',
     'InputMediaAnimation',
     'InputMediaAudio',
     'InputMediaDocument',
@@ -274,4 +271,4 @@ __all__ = [
     'Dice',
     'BotCommand',
     'MessageId',
-]
+)

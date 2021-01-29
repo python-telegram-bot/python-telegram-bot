@@ -83,6 +83,18 @@ class InlineKeyboardButton(TelegramObject):
 
     """
 
+    __slots__ = (
+        'callback_game',
+        'url',
+        'switch_inline_query_current_chat',
+        'callback_data',
+        'pay',
+        'switch_inline_query',
+        'text',
+        '_id_attrs',
+        'login_url',
+    )
+
     def __init__(
         self,
         text: str,

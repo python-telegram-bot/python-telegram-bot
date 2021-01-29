@@ -59,6 +59,8 @@ class InputTextMessageContent(InputMessageContent):
 
     """
 
+    __slots__ = ('disable_web_page_preview', 'parse_mode', 'entities', 'message_text', '_id_attrs')
+
     def __init__(
         self,
         message_text: str,

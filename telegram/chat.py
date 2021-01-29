@@ -133,6 +133,29 @@ class Chat(TelegramObject):
 
     """
 
+    __slots__ = (
+        'bio',
+        'id',
+        'type',
+        'last_name',
+        'bot',
+        'sticker_set_name',
+        'slow_mode_delay',
+        'location',
+        'first_name',
+        'permissions',
+        'invite_link',
+        'pinned_message',
+        'description',
+        'can_set_sticker_set',
+        'username',
+        'title',
+        'photo',
+        'linked_chat_id',
+        'all_members_are_administrators',
+        '_id_attrs',
+    )
+
     PRIVATE: ClassVar[str] = constants.CHAT_PRIVATE
     """:const:`telegram.constants.CHAT_PRIVATE`"""
     GROUP: ClassVar[str] = constants.CHAT_GROUP

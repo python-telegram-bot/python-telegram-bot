@@ -75,6 +75,8 @@ class BasePersistence(ABC):
             persistence class.
     """
 
+    __slots__ = ('store_user_data', 'store_chat_data', 'store_bot_data', 'bot', '__dict__')
+
     def __new__(cls, *args: Any, **kwargs: Any) -> 'BasePersistence':  # pylint: disable=W0613
         instance = super().__new__(cls)
         get_user_data = instance.get_user_data

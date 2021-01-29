@@ -25,6 +25,7 @@ from telegram import constants
 class ChatAction:
     """Helper class to provide constants for different chat actions."""
 
+    __slots__ = ('__dict__',)  # Adding __dict__ here since it doesn't subclass TGObject
     FIND_LOCATION: ClassVar[str] = constants.CHATACTION_FIND_LOCATION
     """:const:`telegram.constants.CHATACTION_FIND_LOCATION`"""
     RECORD_AUDIO: ClassVar[str] = constants.CHATACTION_RECORD_AUDIO

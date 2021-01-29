@@ -53,6 +53,8 @@ class JobQueue:
 
     """
 
+    __slots__ = ('_dispatcher', 'logger', 'scheduler', '__dict__')
+
     def __init__(self) -> None:
         self._dispatcher: 'Dispatcher' = None  # type: ignore[assignment]
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -544,6 +546,17 @@ class Job:
         job_queue (:class:`telegram.ext.JobQueue`): Optional. The ``JobQueue`` this job belongs to.
         job (:class:`apscheduler.job.Job`): Optional. The APS Job this job is a wrapper for.
     """
+
+    __slots__ = (
+        'callback',
+        'context',
+        'name',
+        'job_queue',
+        '_removed',
+        '_enabled',
+        'job',
+        '__dict__',
+    )
 
     def __init__(
         self,

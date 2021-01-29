@@ -75,6 +75,8 @@ class TypeHandler(Handler[UT]):
 
     """
 
+    __slots__ = ('type', 'strict')
+
     def __init__(
         self,
         type: Type[UT],  # pylint: disable=W0622

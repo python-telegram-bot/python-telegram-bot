@@ -28,3 +28,5 @@ class ReplyMarkup(TelegramObject):
     detailed use.
 
     """
+
+    __slots__ = ()

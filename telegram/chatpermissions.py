@@ -78,6 +78,18 @@ class ChatPermissions(TelegramObject):
 
     """
 
+    __slots__ = (
+        'can_send_other_messages',
+        'can_invite_users',
+        'can_send_polls',
+        '_id_attrs',
+        'can_send_messages',
+        'can_send_media_messages',
+        'can_change_info',
+        'can_pin_messages',
+        'can_add_web_page_previews',
+    )
+
     def __init__(
         self,
         can_send_messages: bool = None,

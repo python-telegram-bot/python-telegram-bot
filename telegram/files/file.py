@@ -67,6 +67,16 @@ class File(TelegramObject):
 
     """
 
+    __slots__ = (
+        'bot',
+        'file_id',
+        'file_size',
+        'file_unique_id',
+        'file_path',
+        '_credentials',
+        '_id_attrs',
+    )
+
     def __init__(
         self,
         file_id: str,

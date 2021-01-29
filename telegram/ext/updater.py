@@ -105,6 +105,33 @@ class Updater:
 
     """
 
+    # '_request' is not included in slots since its a class variable too.
+    __slots__ = (
+        'workers',
+        'private_key',
+        'base_url',
+        'persistence',
+        'private_key_password',
+        'use_context',
+        'dispatcher',
+        'user_sig_handler',
+        'base_file_url',
+        'request_kwargs',
+        'defaults',
+        'bot',
+        'token',
+        'logger',
+        'update_queue',
+        'job_queue',
+        '__exception_event',
+        'last_update_id',
+        'running',
+        'is_idle',
+        'httpd',
+        '__lock',
+        '__threads',
+        '__dict__',
+    )
     _request = None
 
     def __init__(

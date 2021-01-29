@@ -71,6 +71,8 @@ class DelayQueue(threading.Thread):
 
     """
 
+    # __dict__ already present in threading.Thread, so not included here
+    __slots__ = ('_queue', 'burst_limit', 'time_limit', 'exc_route', '__exit_req', 'daemon')
     _instcnt = 0  # instance counter
 
     def __init__(
@@ -200,6 +202,8 @@ class MessageQueue:
             Defaults to :obj:`True`.
 
     """
+
+    __slots__ = ('_all_delayq', '_group_delayq')
 
     def __init__(
         self,

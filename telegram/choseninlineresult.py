@@ -61,6 +61,8 @@ class ChosenInlineResult(TelegramObject):
 
     """
 
+    __slots__ = ('location', 'result_id', 'from_user', 'inline_message_id', '_id_attrs', 'query')
+
     def __init__(
         self,
         result_id: str,

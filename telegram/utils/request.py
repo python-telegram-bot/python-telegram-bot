@@ -110,6 +110,8 @@ class Request:
 
     """
 
+    __slots__ = ('_connect_timeout', '_con_pool_size', '_con_pool', '__dict__')
+
     def __init__(
         self,
         con_pool_size: int = 1,

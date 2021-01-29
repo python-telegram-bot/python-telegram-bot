@@ -39,6 +39,9 @@ def _lstrip_str(in_s: str, lstr: str) -> str:
 
 
 class TelegramError(Exception):
+    # Apparently the base class Exception already has __dict__ in it, so its not included here
+    __slots__ = ('message',)
+
     def __init__(self, message: str):
         super().__init__()
 

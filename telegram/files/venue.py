@@ -60,6 +60,17 @@ class Venue(TelegramObject):
 
     """
 
+    __slots__ = (
+        'google_place_type',
+        'location',
+        'title',
+        'address',
+        'foursquare_type',
+        'foursquare_id',
+        'google_place_id',
+        '_id_attrs',
+    )
+
     def __init__(
         self,
         location: Location,

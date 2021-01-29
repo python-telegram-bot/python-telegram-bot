@@ -28,7 +28,7 @@ RT = TypeVar('RT')
 # seem like it's the user that issued the warning
 # We name it something else so that you don't get confused when you attempt to suppress it
 class TelegramDeprecationWarning(Warning):
-    pass
+    __slots__ = ()
 
 
 def warn_deprecate_obj(old: str, new: str, stacklevel: int = 3) -> None:

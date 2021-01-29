@@ -44,6 +44,8 @@ class UserProfilePhotos(TelegramObject):
 
     """
 
+    __slots__ = ('photos', 'total_count', '_id_attrs')
+
     def __init__(self, total_count: int, photos: List[List[PhotoSize]], **_kwargs: Any):
         # Required
         self.total_count = int(total_count)

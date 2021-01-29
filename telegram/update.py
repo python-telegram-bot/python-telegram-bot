@@ -97,6 +97,25 @@ class Update(TelegramObject):
 
     """
 
+    __slots__ = (
+        'callback_query',
+        'chosen_inline_result',
+        'pre_checkout_query',
+        'inline_query',
+        'update_id',
+        'message',
+        'shipping_query',
+        'poll',
+        'poll_answer',
+        'channel_post',
+        'edited_channel_post',
+        'edited_message',
+        '_effective_user',
+        '_effective_chat',
+        '_effective_message',
+        '_id_attrs',
+    )
+
     def __init__(
         self,
         update_id: int,

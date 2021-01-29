@@ -150,6 +150,19 @@ class Bot(TelegramObject):
 
     """
 
+    __slots__ = (
+        'token',
+        'base_url',
+        'base_file_url',
+        'private_key',
+        'private_key_password',
+        'defaults',
+        '_bot',
+        '_commands',
+        '_request',
+        'logger',
+    )
+
     def __new__(cls, *args: Any, **kwargs: Any) -> 'Bot':  # pylint: disable=W0613
         # Get default values from kwargs
         defaults = kwargs.get('defaults')

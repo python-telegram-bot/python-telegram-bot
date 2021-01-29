@@ -65,6 +65,8 @@ class ReplyKeyboardMarkup(ReplyMarkup):
 
     """
 
+    __slots__ = ('selective', 'keyboard', 'resize_keyboard', 'one_time_keyboard')
+
     def __init__(
         self,
         keyboard: List[List[Union[str, KeyboardButton]]],

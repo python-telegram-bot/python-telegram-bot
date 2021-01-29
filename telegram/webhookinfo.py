@@ -62,6 +62,18 @@ class WebhookInfo(TelegramObject):
 
     """
 
+    __slots__ = (
+        'allowed_updates',
+        'url',
+        'max_connections',
+        'last_error_date',
+        'ip_address',
+        'last_error_message',
+        'pending_update_count',
+        'has_custom_certificate',
+        '_id_attrs',
+    )
+
     def __init__(
         self,
         url: str,

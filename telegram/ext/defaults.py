@@ -73,6 +73,18 @@ class Defaults:
             :meth:`Dispatcher.add_error_handler`.
     """
 
+    __slots__ = (
+        '_timeout',
+        '_tzinfo',
+        '_disable_web_page_preview',
+        '_run_async',
+        '_quote',
+        '_disable_notification',
+        '_allow_sending_without_reply',
+        '_parse_mode',
+        '__dict__',
+    )
+
     def __init__(
         self,
         parse_mode: str = None,
@@ -199,7 +211,7 @@ class Defaults:
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, Defaults):
-            return self.__dict__ == other.__dict__
+            return all(getattr(self, attr) == getattr(other, attr) for attr in self.__slots__)
         return False
 
     def __ne__(self, other: object) -> bool:

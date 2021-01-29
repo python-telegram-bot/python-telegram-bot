@@ -46,6 +46,20 @@ class PersonalDetails(TelegramObject):
             residence.
     """
 
+    __slots__ = (
+        'middle_name',
+        'first_name_native',
+        'last_name_native',
+        'residence_country_code',
+        'first_name',
+        'last_name',
+        'country_code',
+        'gender',
+        'bot',
+        'middle_name_native',
+        'birth_date',
+    )
+
     def __init__(
         self,
         first_name: str,
@@ -89,6 +103,16 @@ class ResidentialAddress(TelegramObject):
         post_code (:obj:`str`): Address post code.
     """
 
+    __slots__ = (
+        'post_code',
+        'city',
+        'country_code',
+        'street_line2',
+        'street_line1',
+        'bot',
+        'state',
+    )
+
     def __init__(
         self,
         street_line1: str,
@@ -119,6 +143,8 @@ class IdDocumentData(TelegramObject):
         document_no (:obj:`str`): Document number.
         expiry_date (:obj:`str`): Optional. Date of expiry, in DD.MM.YYYY format.
     """
+
+    __slots__ = ('document_no', 'bot', 'expiry_date')
 
     def __init__(self, document_no: str, expiry_date: str, bot: 'Bot' = None, **_kwargs: Any):
         self.document_no = document_no

@@ -85,6 +85,8 @@ class ChosenInlineResultHandler(Handler[Update]):
 
     """
 
+    __slots__ = ()
+
     def check_update(self, update: Any) -> Optional[Union[bool, object]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 

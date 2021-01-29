@@ -44,6 +44,8 @@ class TelegramDecryptionError(TelegramError):
     Something went wrong with decryption.
     """
 
+    __slots__ = ('_msg',)
+
     def __init__(self, message: Union[str, Exception]):
         super().__init__(f"TelegramDecryptionError: {message}")
         self._msg = str(message)
@@ -131,6 +133,16 @@ class EncryptedCredentials(TelegramObject):
 
     """
 
+    __slots__ = (
+        'hash',
+        'secret',
+        'bot',
+        'data',
+        '_id_attrs',
+        '_decrypted_secret',
+        '_decrypted_data',
+    )
+
     def __init__(self, data: str, hash: str, secret: str, bot: 'Bot' = None, **_kwargs: Any):
         # Required
         self.data = data
@@ -195,6 +207,8 @@ class Credentials(TelegramObject):
         nonce (:obj:`str`): Bot-specified nonce
     """
 
+    __slots__ = ('bot', 'nonce', 'secure_data')
+
     def __init__(self, secure_data: 'SecureData', nonce: str, bot: 'Bot' = None, **_kwargs: Any):
         # Required
         self.secure_data = secure_data
@@ -241,6 +255,21 @@ class SecureData(TelegramObject):
         temporary_registration (:class:`telegram.SecureValue`, optional): Credentials for encrypted
             temporary registration.
     """
+
+    __slots__ = (
+        'bot',
+        'utility_bill',
+        'personal_details',
+        'temporary_registration',
+        'address',
+        'driver_license',
+        'rental_agreement',
+        'internal_passport',
+        'identity_card',
+        'bank_statement',
+        'passport',
+        'passport_registration',
+    )
 
     def __init__(
         self,
@@ -374,6 +403,8 @@ class SecureValue(TelegramObject):
 class _CredentialsBase(TelegramObject):
     """Base class for DataCredentials and FileCredentials."""
 
+    __slots__ = ('hash', 'secret', 'file_hash', 'data_hash', 'bot')
+
     def __init__(self, hash: str, secret: str, bot: 'Bot' = None, **_kwargs: Any):
         self.hash = hash
         self.secret = secret
@@ -398,6 +429,8 @@ class DataCredentials(_CredentialsBase):
         hash (:obj:`str`): Checksum of encrypted data
         secret (:obj:`str`): Secret of encrypted data
     """
+
+    __slots__ = ()
 
     def __init__(self, data_hash: str, secret: str, **_kwargs: Any):
         super().__init__(data_hash, secret, **_kwargs)
@@ -424,6 +457,8 @@ class FileCredentials(_CredentialsBase):
         hash (:obj:`str`): Checksum of encrypted file
         secret (:obj:`str`): Secret of encrypted file
     """
+
+    __slots__ = ()
 
     def __init__(self, file_hash: str, secret: str, **_kwargs: Any):
         super().__init__(file_hash, secret, **_kwargs)

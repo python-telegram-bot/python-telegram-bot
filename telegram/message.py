@@ -287,6 +287,61 @@ class Message(TelegramObject):
 
     """
     # fmt: on
+    __slots__ = (
+        'reply_markup',
+        'audio',
+        'contact',
+        'migrate_to_chat_id',
+        'forward_signature',
+        'chat',
+        'successful_payment',
+        'game',
+        'text',
+        'forward_sender_name',
+        'document',
+        'new_chat_title',
+        'forward_date',
+        'group_chat_created',
+        'media_group_id',
+        'caption',
+        'video',
+        'bot',
+        'entities',
+        'via_bot',
+        'new_chat_members',
+        'connected_website',
+        'animation',
+        'migrate_from_chat_id',
+        'forward_from',
+        'sticker',
+        'location',
+        'venue',
+        'edit_date',
+        'reply_to_message',
+        'passport_data',
+        'pinned_message',
+        'forward_from_chat',
+        'new_chat_photo',
+        'message_id',
+        'delete_chat_photo',
+        'from_user',
+        'author_signature',
+        'proximity_alert_triggered',
+        'sender_chat',
+        'dice',
+        'forward_from_message_id',
+        'caption_entities',
+        'voice',
+        'date',
+        'supergroup_chat_created',
+        'poll',
+        'left_chat_member',
+        'photo',
+        'channel_chat_created',
+        'invoice',
+        'video_note',
+        '_id_attrs',
+    )
 
     _effective_attachment = _UNDEFINED
 
@@ -553,8 +608,8 @@ class Message(TelegramObject):
         return self._effective_attachment  # type: ignore
 
     def __getitem__(self, item: str) -> Any:  # pylint: disable=R1710
-        if item in self.__dict__.keys():
-            return self.__dict__[item]
+        if item in self.__slots__:
+            return getattr(self, item)
         if item == 'chat_id':
             return self.chat.id
 

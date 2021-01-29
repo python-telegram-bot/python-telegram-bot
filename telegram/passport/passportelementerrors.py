@@ -42,6 +42,9 @@ class PassportElementError(TelegramObject):
 
     """
 
+    # All subclasses of this class won't have _id_attrs in slots since it's added here.
+    __slots__ = ('message', 'source', 'type', '_id_attrs')
+
     def __init__(self, source: str, type: str, message: str, **_kwargs: Any):
         # Required
         self.source = str(source)
@@ -79,6 +82,8 @@ class PassportElementErrorDataField(PassportElementError):
 
     """
 
+    __slots__ = ('data_hash', 'field_name')
+
     def __init__(self, type: str, field_name: str, data_hash: str, message: str, **_kwargs: Any):
         # Required
         super().__init__('data', type, message)
@@ -114,6 +119,8 @@ class PassportElementErrorFile(PassportElementError):
 
     """
 
+    __slots__ = ('file_hash',)
+
     def __init__(self, type: str, file_hash: str, message: str, **_kwargs: Any):
         # Required
         super().__init__('file', type, message)
@@ -147,6 +154,8 @@ class PassportElementErrorFiles(PassportElementError):
         message (:obj:`str`): Error message.
 
     """
+
+    __slots__ = ('file_hashes',)
 
     def __init__(self, type: str, file_hashes: str, message: str, **_kwargs: Any):
         # Required
@@ -182,6 +191,8 @@ class PassportElementErrorFrontSide(PassportElementError):
 
     """
 
+    __slots__ = ('file_hash',)
+
     def __init__(self, type: str, file_hash: str, message: str, **_kwargs: Any):
         # Required
         super().__init__('front_side', type, message)
@@ -216,6 +227,8 @@ class PassportElementErrorReverseSide(PassportElementError):
 
     """
 
+    __slots__ = ('file_hash',)
+
     def __init__(self, type: str, file_hash: str, message: str, **_kwargs: Any):
         # Required
         super().__init__('reverse_side', type, message)
@@ -247,6 +260,8 @@ class PassportElementErrorSelfie(PassportElementError):
         message (:obj:`str`): Error message.
 
     """
+
+    __slots__ = ('file_hash',)
 
     def __init__(self, type: str, file_hash: str, message: str, **_kwargs: Any):
         # Required
@@ -284,6 +299,8 @@ class PassportElementErrorTranslationFile(PassportElementError):
 
     """
 
+    __slots__ = ('file_hash',)
+
     def __init__(self, type: str, file_hash: str, message: str, **_kwargs: Any):
         # Required
         super().__init__('translation_file', type, message)
@@ -320,6 +337,8 @@ class PassportElementErrorTranslationFiles(PassportElementError):
 
     """
 
+    __slots__ = ('file_hashes',)
+
     def __init__(self, type: str, file_hashes: str, message: str, **_kwargs: Any):
         # Required
         super().__init__('translation_files', type, message)
@@ -349,6 +368,8 @@ class PassportElementErrorUnspecified(PassportElementError):
         message (:obj:`str`): Error message.
 
     """
+
+    __slots__ = ('element_hash',)
 
     def __init__(self, type: str, element_hash: str, message: str, **_kwargs: Any):
         # Required

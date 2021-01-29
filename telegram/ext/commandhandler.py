@@ -131,6 +131,8 @@ class CommandHandler(Handler[Update]):
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
     """
 
+    __slots__ = ('command', 'filters', 'pass_args')
+
     def __init__(
         self,
         command: SLT[str],
@@ -339,6 +341,9 @@ class PrefixHandler(CommandHandler):
             Defaults to :obj:`False`.
 
     """
+
+    # 'prefix' & 'command' here are both instance variables & class properties, so they're left out
+    __slots__ = ('_prefix', '_command', '_commands')
 
     def __init__(
         self,

@@ -50,6 +50,8 @@ class InputFile:
 
     """
 
+    __slots__ = ('filename', 'attach', 'input_file_content', 'mimetype', '__dict__')
+
     def __init__(self, obj: Union[IO, bytes], filename: str = None, attach: bool = None):
         self.filename = None
         if isinstance(obj, bytes):

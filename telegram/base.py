@@ -38,6 +38,10 @@ class TelegramObject:
 
     # def __init__(self, *args: Any, **_kwargs: Any):
     #     pass
+    # Adding slots reduces memory usage & allows for faster attribute access.
+    # Only instance variables should be added to __slots__.
+    # We add __dict__ here for backward compatibility & also to avoid repetition for subclasses.
+    __slots__ = ('__dict__',)
 
     _id_attrs: Tuple[Any, ...] = ()
 
@@ -45,7 +49,7 @@ class TelegramObject:
         return str(self.to_dict())
 
     def __getitem__(self, item: str) -> Any:
-        return self.__dict__[item]
+        return getattr(self, item)
 
     @staticmethod
     def parse_data(data: Optional[JSONDict]) -> Optional[JSONDict]:
@@ -83,11 +87,15 @@ class TelegramObject:
     def to_dict(self) -> JSONDict:
         data = dict()
 
-        for key in iter(self.__dict__):
+        # We want to get all attributes for the class, using self.__slots__ only includes the
+        # attributes used by that class itself, and not its superclass(es). Hence we get its MRO
+        # and then get their attributes. The `[:-2]` slice excludes the `type` class & this
+        # class itself
+        attrs = {attr for cls in self.__class__.__mro__[:-2] for attr in cls.__slots__}
+        for key in attrs:
             if key == 'bot' or key.startswith('_'):
                 continue
-
-            value = self.__dict__[key]
+            value = getattr(self, key, None)  # getattr since the keys are actually strings.
             if value is not None:
                 if hasattr(value, 'to_dict'):
                     data[key] = value.to_dict()

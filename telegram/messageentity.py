@@ -59,6 +59,8 @@ class MessageEntity(TelegramObject):
 
     """
 
+    __slots__ = ('length', 'url', 'user', 'type', 'language', 'offset', '_id_attrs')
+
     def __init__(
         self,
         type: str,  # pylint: disable=W0622

@@ -45,6 +45,18 @@ except ImportError:
 
 
 class WebhookServer:
+    __slots__ = (
+        'http_server',
+        'listen',
+        'port',
+        'loop',
+        'logger',
+        'is_running',
+        'server_lock',
+        'shutdown_lock',
+        '__dict__',
+    )
+
     def __init__(
         self, listen: str, port: int, webhook_app: 'WebhookAppClass', ssl_ctx: SSLContext
     ):

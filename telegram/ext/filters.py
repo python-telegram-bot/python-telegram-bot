@@ -110,6 +110,8 @@ class BaseFilter(ABC):
             (depends on the handler).
     """
 
+    # Slots are empty here since 'name' & 'data_filter' are class attributes/properties
+    __slots__ = ()
     _name = None
     data_filter = False
 
@@ -135,7 +137,7 @@ class BaseFilter(ABC):
 
     @name.setter
     def name(self, name: Optional[str]) -> None:
-        self._name = name
+        self._name = name  # pylint: disable=E0237
 
     def __repr__(self) -> str:
         # We do this here instead of in a __init__ so filter don't have to call __init__ or super()
@@ -158,6 +160,10 @@ class MessageFilter(BaseFilter, ABC):
             (depends on the handler).
 
     """
+
+    # 'data_filter' and 'name' is included since they are listed as attributes to the class & users
+    # inherit this class to make custom filters.
+    # __slots__ = ('data_filter', 'name')  # commented since they're somehow breaking other filters
 
     def __call__(self, update: Update) -> Optional[Union[bool, Dict]]:
         return self.filter(update.effective_message)
@@ -191,6 +197,8 @@ class UpdateFilter(BaseFilter, ABC):
 
     """
 
+    # __slots__ = ('data_filter', 'name')
+
     def __call__(self, update: Update) -> Optional[Union[bool, Dict]]:
         return self.filter(update)
 
@@ -214,6 +222,8 @@ class InvertedFilter(UpdateFilter):
         f: The filter to invert.
 
     """
+
+    __slots__ = ('f',)
 
     def __init__(self, f: BaseFilter):
         self.f = f
@@ -239,6 +249,8 @@ class MergedFilter(UpdateFilter):
         or_filter: Optional filter to "or" with base_filter. Mutually exclusive with and_filter.
 
     """
+
+    __slots__ = ('base_filter', 'and_filter', 'or_filter')
 
     def __init__(
         self, base_filter: BaseFilter, and_filter: BaseFilter = None, or_filter: BaseFilter = None
@@ -324,6 +336,8 @@ class XORFilter(UpdateFilter):
 
     """
 
+    __slots__ = ('base_filter', 'xor_filter', 'merged_filter')
+
     def __init__(self, base_filter: BaseFilter, xor_filter: BaseFilter):
         self.base_filter = base_filter
         self.xor_filter = xor_filter
@@ -342,11 +356,15 @@ class XORFilter(UpdateFilter):
 
 
 class _DiceEmoji(MessageFilter):
+    __slots__ = ('name', 'emoji')
+
     def __init__(self, emoji: str = None, name: str = None):
         self.name = f'Filters.dice.{name}' if name else 'Filters.dice'
         self.emoji = emoji
 
     class _DiceValues(MessageFilter):
+        __slots__ = ('values', 'emoji', 'name')
+
         def __init__(
             self,
             values: SLT[int],
@@ -402,6 +420,8 @@ class Filters:
         name = 'Filters.text'
 
         class _TextStrings(MessageFilter):
+            __slots__ = ('strings', 'name')
+
             def __init__(self, strings: Union[List[str], Tuple[str]]):
                 self.strings = strings
                 self.name = f'Filters.text({strings})'
@@ -453,6 +473,8 @@ class Filters:
         name = 'Filters.caption'
 
         class _CaptionStrings(MessageFilter):
+            __slots__ = ('strings', 'name')
+
             def __init__(self, strings: Union[List[str], Tuple[str]]):
                 self.strings = strings
                 self.name = f'Filters.caption({strings})'
@@ -488,6 +510,8 @@ class Filters:
         name = 'Filters.command'
 
         class _CommandOnlyStart(MessageFilter):
+            __slots__ = ('only_start', 'name')
+
             def __init__(self, only_start: bool):
                 self.only_start = only_start
                 self.name = f'Filters.command({only_start})'
@@ -560,6 +584,7 @@ class Filters:
             pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
         """
 
+        __slots__ = ('pattern', 'name')
         data_filter = True
 
         def __init__(self, pattern: Union[str, Pattern]):
@@ -595,6 +620,7 @@ class Filters:
             pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
         """
 
+        __slots__ = ('pattern', 'name')
         data_filter = True
 
         def __init__(self, pattern: Union[str, Pattern]):
@@ -647,6 +673,8 @@ class Filters:
                 of audio sent as file, for example 'audio/mpeg' or 'audio/x-wav'.
             """
 
+            __slots__ = ('category', 'name')
+
             def __init__(self, category: Optional[str]):
                 """Initialize the category you want to filter
 
@@ -679,6 +707,8 @@ class Filters:
             Example:
                 ``Filters.documents.mime_type('audio/mpeg')`` filters all audio in mp3 format.
             """
+
+            __slots__ = ('mimetype', 'name')
 
             def __init__(self, mimetype: Optional[str]):
                 """Initialize the category you want to filter
@@ -735,6 +765,8 @@ class Filters:
                 * ``Filters.document.file_extension(None)``
                   filters files without a dot in the filename.
             """
+
+            __slots__ = ('file_extension', 'is_case_sensitive', 'name')
 
             def __init__(self, file_extension: Optional[str], case_sensitive: bool = False):
                 """Initialize the extension you want to filter.
@@ -1121,6 +1153,8 @@ officedocument.wordprocessingml.document")``-
 
         """
 
+        __slots__ = ('entity_type', 'name')
+
         def __init__(self, entity_type: str):
             self.entity_type = entity_type
             self.name = f'Filters.entity({self.entity_type})'
@@ -1142,6 +1176,8 @@ officedocument.wordprocessingml.document")``-
                 in :class:`telegram.MessageEntity`.
 
         """
+
+        __slots__ = ('entity_type', 'name')
 
         def __init__(self, entity_type: str):
             self.entity_type = entity_type
@@ -1254,6 +1290,15 @@ officedocument.wordprocessingml.document")``-
     """
 
     class _ChatUserBaseFilter(MessageFilter):
+        __slots__ = (
+            'chat_id_name',
+            'username_name',
+            'allow_empty',
+            '__lock',
+            '_chat_ids',
+            '_usernames',
+        )
+
         def __init__(
             self,
             chat_id: SLT[int] = None,
@@ -1428,6 +1473,7 @@ officedocument.wordprocessingml.document")``-
                 is specified in :attr:`user_ids` and :attr:`usernames`.
 
         """
+        __slots__ = ('chat_id_name',)
 
         def __init__(
             self,
@@ -1526,6 +1572,7 @@ officedocument.wordprocessingml.document")``-
                 is specified in :attr:`bot_ids` and :attr:`usernames`.
 
         """
+        __slots__ = ('chat_id_name',)
 
         def __init__(
             self,
@@ -1625,6 +1672,7 @@ officedocument.wordprocessingml.document")``-
                 is specified in :attr:`chat_ids` and :attr:`usernames`.
 
         """
+        __slots__ = ()
 
         def get_chat_or_user(self, message: Message) -> Optional[Chat]:
             return message.chat
@@ -1724,6 +1772,7 @@ officedocument.wordprocessingml.document")``-
                     ``Filters.sender_chat.channel``
 
         """
+        __slots__ = ()
 
         def get_chat_or_user(self, message: Message) -> Optional[Chat]:
             return message.sender_chat
@@ -1878,6 +1927,8 @@ officedocument.wordprocessingml.document")``-
                 'en' will match both 'en_US' and 'en_GB'.
 
         """
+
+        __slots__ = ('lang', 'name')
 
         def __init__(self, lang: SLT[str]):
             if isinstance(lang, str):
