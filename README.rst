@@ -99,13 +99,13 @@ In addition to the pure API implementation, this library features a number of hi
 make the development of bots easy and straightforward. These classes are contained in the
 ``telegram.ext`` submodule.
 
-The pure API implementation *without* ``telegram.ext`` is also available via the standalone package ``python-telegram-bot-raw``. Please head `here <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/README_RAW.rst>`_ for details.
+A pure API implementation *without* ``telegram.ext`` is available as the standalone package ``python-telegram-bot-raw``.  `See here for details. <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/README_RAW.rst>`_
 
 ----
 Note
 ----
 
-You should only ever install *one* of ``python-telegram-bot`` and ``python-telegram-bot-raw``.
+Installing both ``python-telegram-bot`` and ``python-telegram-bot-raw`` in conjunction will result in undesired side-effects, so only install *one* of both.
 
 ====================
 Telegram API support

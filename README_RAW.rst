@@ -99,7 +99,7 @@ It's compatible with Python versions 3.6+. PTB-Raw might also work on `PyPy <htt
 Note
 ----
 
-You should only ever install *one* of ``python-telegram-bot`` and ``python-telegram-bot-raw``.
+Installing both ``python-telegram-bot`` and ``python-telegram-bot-raw`` in conjunction will result in undesired side-effects, so only install *one* of both.
 
 ====================
 Telegram API support
