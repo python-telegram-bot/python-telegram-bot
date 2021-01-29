@@ -21,6 +21,7 @@ import subprocess
 import sys
 import time
 import datetime as dtm
+from importlib import reload
 from pathlib import Path
 
 import pytest
@@ -59,11 +60,14 @@ def pytz_install(request):
         if skip:
             pytest.skip(reason)
         subprocess.check_call([sys.executable, "-m", "pip", "uninstall", "pytz", "-y"])
+        del sys.modules['pytz']
+        reload(helpers)
     yield
     if not request.param:
         if skip:
             pytest.skip(reason)
         subprocess.check_call([sys.executable, "-m", "pip", "install", "pytz"])
+        reload(helpers)
 
 
 class TestHelpers:
