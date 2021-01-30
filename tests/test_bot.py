@@ -129,7 +129,7 @@ class TestBot:
         monkeypatch.setattr(bot.request, 'post', post)
         bot.send_message(123, 'text', api_kwargs={'unknown_kwarg_1': 7, 'unknown_kwarg_2': 5})
 
-    # @flaky(3, 1)
+    @flaky(3, 1)
     @pytest.mark.asyncio
     @pytest.mark.timeout(10)
     async def test_get_me_and_properties(self, bot: Bot):
