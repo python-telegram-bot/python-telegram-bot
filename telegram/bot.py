@@ -88,7 +88,8 @@ from telegram.utils.helpers import (
     is_local_file,
     parse_file_input,
 )
-from telegram.utils.request import Request
+from telegram.utils.request import PtbRequestBase
+from telegram.utils.request_httpx import PtbHttpx
 from telegram.utils.types import FileInput, JSONDict
 
 if TYPE_CHECKING:
@@ -189,7 +190,7 @@ class Bot(TelegramObject):
         token: str,
         base_url: str = None,
         base_file_url: str = None,
-        request: 'Request' = None,
+        request: 'PtbRequestBase' = None,
         private_key: bytes = None,
         private_key_password: bytes = None,
         defaults: 'Defaults' = None,
@@ -209,7 +210,7 @@ class Bot(TelegramObject):
         self.base_file_url = str(base_file_url) + str(self.token)
         self._bot: Optional[User] = None
         self._commands: Optional[List[BotCommand]] = None
-        self._request = request or Request()
+        self._request: PtbRequestBase = request or PtbHttpx()
         self.logger = logging.getLogger(__name__)
 
         if private_key:
@@ -217,7 +218,19 @@ class Bot(TelegramObject):
                 private_key, password=private_key_password, backend=default_backend()
             )
 
-    def _post(
+    async def do_init(self):
+        """Perform initialization sequence which loads data from Telegram servers."""
+        await self.get_me()
+        await self.get_my_commands()
+
+    async def __aenter__(self):
+        await self.do_init()
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self.close()
+
+    async def _post(
         self,
         endpoint: str,
         data: JSONDict = None,
@@ -233,9 +246,9 @@ class Bot(TelegramObject):
             else:
                 data = api_kwargs
 
-        return self.request.post(f'{self.base_url}/{endpoint}', data=data, timeout=timeout)
+        return await self.request.post(f'{self.base_url}/{endpoint}', data=data, timeout=timeout)
 
-    def _message(
+    async def _message(
         self,
         endpoint: str,
         data: JSONDict,
@@ -269,7 +282,7 @@ class Bot(TelegramObject):
             else:
                 data['media'].parse_mode = None
 
-        result = self._post(endpoint, data, timeout=timeout, api_kwargs=api_kwargs)
+        result = await self._post(endpoint, data, timeout=timeout, api_kwargs=api_kwargs)
 
         if result is True:
             return result
@@ -277,7 +290,7 @@ class Bot(TelegramObject):
         return Message.de_json(result, self)  # type: ignore[arg-type,return-value]
 
     @property
-    def request(self) -> Request:
+    def request(self) -> PtbRequestBase:
         return self._request
 
     @staticmethod
@@ -295,75 +308,64 @@ class Bot(TelegramObject):
     @property
     def bot(self) -> User:
         """:class:`telegram.User`: User instance for the bot as returned by :meth:`get_me`."""
-
         if self._bot is None:
-            self._bot = self.get_me()
+            raise RuntimeError(f'{self.__class__.__name__} is not properly initialized')
         return self._bot
 
     @property
     def id(self) -> int:
         """:obj:`int`: Unique identifier for this bot."""
-
         return self.bot.id
 
     @property
     def first_name(self) -> str:
         """:obj:`str`: Bot's first name."""
-
         return self.bot.first_name
 
     @property
     def last_name(self) -> str:
         """:obj:`str`: Optional. Bot's last name."""
-
         return self.bot.last_name  # type: ignore
 
     @property
     def username(self) -> str:
         """:obj:`str`: Bot's username."""
-
         return self.bot.username  # type: ignore
 
     @property
     def link(self) -> str:
         """:obj:`str`: Convenience property. Returns the t.me link of the bot."""
-
         return f"https://t.me/{self.username}"
 
     @property
     def can_join_groups(self) -> bool:
         """:obj:`bool`: Bot's can_join_groups attribute."""
-
         return self.bot.can_join_groups  # type: ignore
 
     @property
     def can_read_all_group_messages(self) -> bool:
         """:obj:`bool`: Bot's can_read_all_group_messages attribute."""
-
         return self.bot.can_read_all_group_messages  # type: ignore
 
     @property
     def supports_inline_queries(self) -> bool:
         """:obj:`bool`: Bot's supports_inline_queries attribute."""
-
         return self.bot.supports_inline_queries  # type: ignore
 
     @property
     def commands(self) -> List[BotCommand]:
         """List[:class:`BotCommand`]: Bot's commands."""
-
         if self._commands is None:
-            self._commands = self.get_my_commands()
+            raise RuntimeError(f'{self.__class__.__name__} is not properly initialized')
         return self._commands
 
     @property
     def name(self) -> str:
         """:obj:`str`: Bot's @username."""
-
         return f'@{self.username}'
 
     @log
-    def get_me(self, timeout: int = None, api_kwargs: JSONDict = None) -> User:
+    async def get_me(self, timeout: int = None, api_kwargs: JSONDict = None) -> User:
         """A simple method for testing your bot's auth token. Requires no parameters.
 
         Args:
@@ -381,14 +383,12 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        result = self._post('getMe', timeout=timeout, api_kwargs=api_kwargs)
-
+        result = await self._post('getMe', timeout=timeout, api_kwargs=api_kwargs)
         self._bot = User.de_json(result, self)  # type: ignore
-
         return self._bot  # type: ignore[return-value]
 
     @log
-    def send_message(
+    async def send_message(
         self,
         chat_id: Union[int, str],
         text: str,
@@ -447,7 +447,7 @@ class Bot(TelegramObject):
         if disable_web_page_preview:
             data['disable_web_page_preview'] = disable_web_page_preview
 
-        return self._message(  # type: ignore[return-value]
+        return await self._message(  # type: ignore[return-value]
             'sendMessage',
             data,
             disable_notification=disable_notification,
@@ -459,7 +459,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def delete_message(
+    async def delete_message(
         self,
         chat_id: Union[str, int],
         message_id: Union[str, int],
@@ -498,13 +498,11 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {'chat_id': chat_id, 'message_id': message_id}
-
-        result = self._post('deleteMessage', data, timeout=timeout, api_kwargs=api_kwargs)
-
+        result = await self._post('deleteMessage', data, timeout=timeout, api_kwargs=api_kwargs)
         return result  # type: ignore[return-value]
 
     @log
-    def forward_message(
+    async def forward_message(
         self,
         chat_id: Union[int, str],
         from_chat_id: Union[str, int],
@@ -545,7 +543,7 @@ class Bot(TelegramObject):
         if message_id:
             data['message_id'] = message_id
 
-        return self._message(  # type: ignore[return-value]
+        return await self._message(  # type: ignore[return-value]
             'forwardMessage',
             data,
             disable_notification=disable_notification,
@@ -554,7 +552,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def send_photo(
+    async def send_photo(
         self,
         chat_id: int,
         photo: Union[FileInput, 'PhotoSize'],
@@ -632,7 +630,7 @@ class Bot(TelegramObject):
         if caption_entities:
             data['caption_entities'] = [me.to_dict() for me in caption_entities]
 
-        return self._message(  # type: ignore[return-value]
+        return await self._message(  # type: ignore[return-value]
             'sendPhoto',
             data,
             timeout=timeout,
@@ -644,7 +642,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def send_audio(
+    async def send_audio(
         self,
         chat_id: Union[int, str],
         audio: Union[FileInput, 'Audio'],
@@ -753,7 +751,7 @@ class Bot(TelegramObject):
         if thumb:
             data['thumb'] = parse_file_input(thumb, attach=True)
 
-        return self._message(  # type: ignore[return-value]
+        return await self._message(  # type: ignore[return-value]
             'sendAudio',
             data,
             timeout=timeout,
@@ -765,7 +763,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def send_document(
+    async def send_document(
         self,
         chat_id: Union[int, str],
         document: Union[FileInput, 'Document'],
@@ -862,7 +860,7 @@ class Bot(TelegramObject):
         if thumb:
             data['thumb'] = parse_file_input(thumb, attach=True)
 
-        return self._message(  # type: ignore[return-value]
+        return await self._message(  # type: ignore[return-value]
             'sendDocument',
             data,
             timeout=timeout,
@@ -874,7 +872,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def send_sticker(
+    async def send_sticker(
         self,
         chat_id: Union[int, str],
         sticker: Union[FileInput, 'Sticker'],
@@ -925,8 +923,7 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {'chat_id': chat_id, 'sticker': parse_file_input(sticker, Sticker)}
-
-        return self._message(  # type: ignore[return-value]
+        return await self._message(  # type: ignore[return-value]
             'sendSticker',
             data,
             timeout=timeout,
@@ -938,7 +935,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def send_video(
+    async def send_video(
         self,
         chat_id: Union[int, str],
         video: Union[FileInput, 'Video'],
@@ -1053,7 +1050,7 @@ class Bot(TelegramObject):
         if thumb:
             data['thumb'] = parse_file_input(thumb, attach=True)
 
-        return self._message(  # type: ignore[return-value]
+        return await self._message(  # type: ignore[return-value]
             'sendVideo',
             data,
             timeout=timeout,
@@ -1065,7 +1062,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def send_video_note(
+    async def send_video_note(
         self,
         chat_id: Union[int, str],
         video_note: Union[FileInput, 'VideoNote'],
@@ -1152,7 +1149,7 @@ class Bot(TelegramObject):
         if thumb:
             data['thumb'] = parse_file_input(thumb, attach=True)
 
-        return self._message(  # type: ignore[return-value]
+        return await self._message(  # type: ignore[return-value]
             'sendVideoNote',
             data,
             timeout=timeout,
@@ -1164,7 +1161,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def send_animation(
+    async def send_animation(
         self,
         chat_id: Union[int, str],
         animation: Union[FileInput, 'Animation'],
@@ -1270,7 +1267,7 @@ class Bot(TelegramObject):
         if caption_entities:
             data['caption_entities'] = [me.to_dict() for me in caption_entities]
 
-        return self._message(  # type: ignore[return-value]
+        return await self._message(  # type: ignore[return-value]
             'sendAnimation',
             data,
             timeout=timeout,
@@ -1282,7 +1279,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def send_voice(
+    async def send_voice(
         self,
         chat_id: Union[int, str],
         voice: Union[FileInput, 'Voice'],
@@ -1368,7 +1365,7 @@ class Bot(TelegramObject):
         if caption_entities:
             data['caption_entities'] = [me.to_dict() for me in caption_entities]
 
-        return self._message(  # type: ignore[return-value]
+        return await self._message(  # type: ignore[return-value]
             'sendVoice',
             data,
             timeout=timeout,
@@ -1380,7 +1377,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def send_media_group(
+    async def send_media_group(
         self,
         chat_id: Union[int, str],
         media: List[
@@ -1432,7 +1429,7 @@ class Bot(TelegramObject):
         if allow_sending_without_reply is not None:
             data['allow_sending_without_reply'] = allow_sending_without_reply
 
-        result = self._post('sendMediaGroup', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = await self._post('sendMediaGroup', data, timeout=timeout, api_kwargs=api_kwargs)
 
         if self.defaults:
             for res in result:  # type: ignore
@@ -1441,7 +1438,7 @@ class Bot(TelegramObject):
         return [Message.de_json(res, self) for res in result]  # type: ignore
 
     @log
-    def send_location(
+    async def send_location(
         self,
         chat_id: Union[int, str],
         latitude: float = None,
@@ -1525,7 +1522,7 @@ class Bot(TelegramObject):
         if proximity_alert_radius:
             data['proximity_alert_radius'] = proximity_alert_radius
 
-        return self._message(  # type: ignore[return-value]
+        return await self._message(  # type: ignore[return-value]
             'sendLocation',
             data,
             timeout=timeout,
@@ -1537,7 +1534,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def edit_message_live_location(
+    async def edit_message_live_location(
         self,
         chat_id: Union[str, int] = None,
         message_id: Union[str, int] = None,
@@ -1617,7 +1614,7 @@ class Bot(TelegramObject):
         if proximity_alert_radius:
             data['proximity_alert_radius'] = proximity_alert_radius
 
-        return self._message(
+        return await self._message(
             'editMessageLiveLocation',
             data,
             timeout=timeout,
@@ -1626,7 +1623,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def stop_message_live_location(
+    async def stop_message_live_location(
         self,
         chat_id: Union[str, int] = None,
         message_id: Union[str, int] = None,
@@ -1667,7 +1664,7 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return self._message(
+        return await self._message(
             'stopMessageLiveLocation',
             data,
             timeout=timeout,
@@ -1676,7 +1673,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def send_venue(
+    async def send_venue(
         self,
         chat_id: Union[int, str],
         latitude: float = None,
@@ -1776,7 +1773,7 @@ class Bot(TelegramObject):
         if google_place_type:
             data['google_place_type'] = google_place_type
 
-        return self._message(  # type: ignore[return-value]
+        return await self._message(  # type: ignore[return-value]
             'sendVenue',
             data,
             timeout=timeout,
@@ -1788,7 +1785,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def send_contact(
+    async def send_contact(
         self,
         chat_id: Union[int, str],
         phone_number: str = None,
@@ -1862,7 +1859,7 @@ class Bot(TelegramObject):
         if vcard:
             data['vcard'] = vcard
 
-        return self._message(  # type: ignore[return-value]
+        return await self._message(  # type: ignore[return-value]
             'sendContact',
             data,
             timeout=timeout,
@@ -1874,7 +1871,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def send_game(
+    async def send_game(
         self,
         chat_id: Union[int, str],
         game_short_name: str,
@@ -1916,7 +1913,7 @@ class Bot(TelegramObject):
         """
         data: JSONDict = {'chat_id': chat_id, 'game_short_name': game_short_name}
 
-        return self._message(  # type: ignore[return-value]
+        return await self._message(  # type: ignore[return-value]
             'sendGame',
             data,
             timeout=timeout,
@@ -1928,7 +1925,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def send_chat_action(
+    async def send_chat_action(
         self,
         chat_id: Union[str, int],
         action: str,
@@ -1961,13 +1958,11 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {'chat_id': chat_id, 'action': action}
-
-        result = self._post('sendChatAction', data, timeout=timeout, api_kwargs=api_kwargs)
-
+        result = await self._post('sendChatAction', data, timeout=timeout, api_kwargs=api_kwargs)
         return result  # type: ignore[return-value]
 
     @log
-    def answer_inline_query(
+    async def answer_inline_query(
         self,
         inline_query_id: str,
         results: Union[
@@ -2118,7 +2113,7 @@ class Bot(TelegramObject):
         if switch_pm_parameter:
             data['switch_pm_parameter'] = switch_pm_parameter
 
-        return self._post(  # type: ignore[return-value]
+        return await self._post(  # type: ignore[return-value]
             'answerInlineQuery',
             data,
             timeout=timeout,
@@ -2126,7 +2121,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def get_user_profile_photos(
+    async def get_user_profile_photos(
         self,
         user_id: Union[str, int],
         offset: int = None,
@@ -2162,12 +2157,14 @@ class Bot(TelegramObject):
         if limit:
             data['limit'] = limit
 
-        result = self._post('getUserProfilePhotos', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = await self._post(
+            'getUserProfilePhotos', data, timeout=timeout, api_kwargs=api_kwargs
+        )
 
         return UserProfilePhotos.de_json(result, self)  # type: ignore
 
     @log
-    def get_file(
+    async def get_file(
         self,
         file_id: Union[
             str, Animation, Audio, ChatPhoto, Document, PhotoSize, Sticker, Video, VideoNote, Voice
@@ -2215,7 +2212,7 @@ class Bot(TelegramObject):
 
         data: JSONDict = {'file_id': file_id}
 
-        result = self._post('getFile', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = await self._post('getFile', data, timeout=timeout, api_kwargs=api_kwargs)
 
         if result.get('file_path') and not is_local_file(  # type: ignore[union-attr]
             result['file_path']  # type: ignore[index]
@@ -2227,7 +2224,7 @@ class Bot(TelegramObject):
         return File.de_json(result, self)  # type: ignore
 
     @log
-    def kick_chat_member(
+    async def kick_chat_member(
         self,
         chat_id: Union[str, int],
         user_id: Union[str, int],
@@ -2272,12 +2269,12 @@ class Bot(TelegramObject):
                 )
             data['until_date'] = until_date
 
-        result = self._post('kickChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = await self._post('kickChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
     @log
-    def unban_chat_member(
+    async def unban_chat_member(
         self,
         chat_id: Union[str, int],
         user_id: Union[str, int],
@@ -2316,12 +2313,12 @@ class Bot(TelegramObject):
         if only_if_banned is not None:
             data['only_if_banned'] = only_if_banned
 
-        result = self._post('unbanChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = await self._post('unbanChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
     @log
-    def answer_callback_query(
+    async def answer_callback_query(
         self,
         callback_query_id: str,
         text: str = None,
@@ -2379,12 +2376,14 @@ class Bot(TelegramObject):
         if cache_time is not None:
             data['cache_time'] = cache_time
 
-        result = self._post('answerCallbackQuery', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = await self._post(
+            'answerCallbackQuery', data, timeout=timeout, api_kwargs=api_kwargs
+        )
 
         return result  # type: ignore[return-value]
 
     @log
-    def edit_message_text(
+    async def edit_message_text(
         self,
         text: str,
         chat_id: Union[str, int] = None,
@@ -2447,7 +2446,7 @@ class Bot(TelegramObject):
         if disable_web_page_preview:
             data['disable_web_page_preview'] = disable_web_page_preview
 
-        return self._message(
+        return await self._message(
             'editMessageText',
             data,
             timeout=timeout,
@@ -2456,7 +2455,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def edit_message_caption(
+    async def edit_message_caption(
         self,
         chat_id: Union[str, int] = None,
         message_id: Union[str, int] = None,
@@ -2524,7 +2523,7 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return self._message(
+        return await self._message(
             'editMessageCaption',
             data,
             timeout=timeout,
@@ -2533,7 +2532,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def edit_message_media(
+    async def edit_message_media(
         self,
         chat_id: Union[str, int] = None,
         message_id: Union[str, int] = None,
@@ -2591,7 +2590,7 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return self._message(
+        return await self._message(
             'editMessageMedia',
             data,
             timeout=timeout,
@@ -2600,7 +2599,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def edit_message_reply_markup(
+    async def edit_message_reply_markup(
         self,
         chat_id: Union[str, int] = None,
         message_id: Union[str, int] = None,
@@ -2652,7 +2651,7 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return self._message(
+        return await self._message(
             'editMessageReplyMarkup',
             data,
             timeout=timeout,
@@ -2661,7 +2660,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def get_updates(
+    async def get_updates(
         self,
         offset: int = None,
         limit: int = 100,
@@ -2723,7 +2722,7 @@ class Bot(TelegramObject):
         # * Long polling poses a different problem: the connection might have been dropped while
         #   waiting for the server to return and there's no way of knowing the connection had been
         #   dropped in real time.
-        result = self._post(
+        result = await self._post(
             'getUpdates', data, timeout=float(read_latency) + float(timeout), api_kwargs=api_kwargs
         )
 
@@ -2741,7 +2740,7 @@ class Bot(TelegramObject):
         return [Update.de_json(u, self) for u in result]  # type: ignore
 
     @log
-    def set_webhook(
+    async def set_webhook(
         self,
         url: str = None,
         certificate: FileInput = None,
@@ -2828,12 +2827,12 @@ class Bot(TelegramObject):
         if drop_pending_updates:
             data['drop_pending_updates'] = drop_pending_updates
 
-        result = self._post('setWebhook', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = await self._post('setWebhook', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
     @log
-    def delete_webhook(
+    async def delete_webhook(
         self, timeout: float = None, api_kwargs: JSONDict = None, drop_pending_updates: bool = None
     ) -> bool:
         """
@@ -2861,12 +2860,12 @@ class Bot(TelegramObject):
         if drop_pending_updates:
             data['drop_pending_updates'] = drop_pending_updates
 
-        result = self._post('deleteWebhook', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = await self._post('deleteWebhook', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
     @log
-    def leave_chat(
+    async def leave_chat(
         self, chat_id: Union[str, int], timeout: float = None, api_kwargs: JSONDict = None
     ) -> bool:
         """Use this method for your bot to leave a group, supergroup or channel.
@@ -2889,12 +2888,12 @@ class Bot(TelegramObject):
         """
         data: JSONDict = {'chat_id': chat_id}
 
-        result = self._post('leaveChat', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = await self._post('leaveChat', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
     @log
-    def get_chat(
+    async def get_chat(
         self, chat_id: Union[str, int], timeout: float = None, api_kwargs: JSONDict = None
     ) -> Chat:
         """
@@ -2919,7 +2918,7 @@ class Bot(TelegramObject):
         """
         data: JSONDict = {'chat_id': chat_id}
 
-        result = self._post('getChat', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = await self._post('getChat', data, timeout=timeout, api_kwargs=api_kwargs)
 
         if self.defaults:
             result['default_quote'] = self.defaults.quote  # type: ignore
@@ -2927,7 +2926,7 @@ class Bot(TelegramObject):
         return Chat.de_json(result, self)  # type: ignore
 
     @log
-    def get_chat_administrators(
+    async def get_chat_administrators(
         self, chat_id: Union[str, int], timeout: float = None, api_kwargs: JSONDict = None
     ) -> List[ChatMember]:
         """
@@ -2953,13 +2952,13 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {'chat_id': chat_id}
-
-        result = self._post('getChatAdministrators', data, timeout=timeout, api_kwargs=api_kwargs)
-
+        result = await self._post(
+            'getChatAdministrators', data, timeout=timeout, api_kwargs=api_kwargs
+        )
         return [ChatMember.de_json(x, self) for x in result]  # type: ignore
 
     @log
-    def get_chat_members_count(
+    async def get_chat_members_count(
         self, chat_id: Union[str, int], timeout: float = None, api_kwargs: JSONDict = None
     ) -> int:
         """Use this method to get the number of members in a chat.
@@ -2981,13 +2980,13 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {'chat_id': chat_id}
-
-        result = self._post('getChatMembersCount', data, timeout=timeout, api_kwargs=api_kwargs)
-
+        result = await self._post(
+            'getChatMembersCount', data, timeout=timeout, api_kwargs=api_kwargs
+        )
         return result  # type: ignore[return-value]
 
     @log
-    def get_chat_member(
+    async def get_chat_member(
         self,
         chat_id: Union[str, int],
         user_id: Union[str, int],
@@ -3014,13 +3013,11 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {'chat_id': chat_id, 'user_id': user_id}
-
-        result = self._post('getChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
-
+        result = await self._post('getChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
         return ChatMember.de_json(result, self)  # type: ignore
 
     @log
-    def set_chat_sticker_set(
+    async def set_chat_sticker_set(
         self,
         chat_id: Union[str, int],
         sticker_set_name: str,
@@ -3047,13 +3044,13 @@ class Bot(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
         """
         data: JSONDict = {'chat_id': chat_id, 'sticker_set_name': sticker_set_name}
-
-        result = self._post('setChatStickerSet', data, timeout=timeout, api_kwargs=api_kwargs)
-
+        result = await self._post(
+            'setChatStickerSet', data, timeout=timeout, api_kwargs=api_kwargs
+        )
         return result  # type: ignore[return-value]
 
     @log
-    def delete_chat_sticker_set(
+    async def delete_chat_sticker_set(
         self, chat_id: Union[str, int], timeout: float = None, api_kwargs: JSONDict = None
     ) -> bool:
         """Use this method to delete a group sticker set from a supergroup. The bot must be an
@@ -3074,12 +3071,14 @@ class Bot(TelegramObject):
              :obj:`bool`: On success, :obj:`True` is returned.
         """
         data: JSONDict = {'chat_id': chat_id}
-
-        result = self._post('deleteChatStickerSet', data, timeout=timeout, api_kwargs=api_kwargs)
-
+        result = await self._post(
+            'deleteChatStickerSet', data, timeout=timeout, api_kwargs=api_kwargs
+        )
         return result  # type: ignore[return-value]
 
-    def get_webhook_info(self, timeout: float = None, api_kwargs: JSONDict = None) -> WebhookInfo:
+    async def get_webhook_info(
+        self, timeout: float = None, api_kwargs: JSONDict = None
+    ) -> WebhookInfo:
         """Use this method to get current webhook status. Requires no parameters.
 
         If the bot is using getUpdates, will return an object with the url field empty.
@@ -3095,12 +3094,11 @@ class Bot(TelegramObject):
             :class:`telegram.WebhookInfo`
 
         """
-        result = self._post('getWebhookInfo', None, timeout=timeout, api_kwargs=api_kwargs)
-
+        result = await self._post('getWebhookInfo', None, timeout=timeout, api_kwargs=api_kwargs)
         return WebhookInfo.de_json(result, self)  # type: ignore
 
     @log
-    def set_game_score(
+    async def set_game_score(
         self,
         user_id: Union[int, str],
         score: int,
@@ -3156,7 +3154,7 @@ class Bot(TelegramObject):
         if disable_edit_message is not None:
             data['disable_edit_message'] = disable_edit_message
 
-        return self._message(
+        return await self._message(
             'setGameScore',
             data,
             timeout=timeout,
@@ -3164,7 +3162,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def get_game_high_scores(
+    async def get_game_high_scores(
         self,
         user_id: Union[int, str],
         chat_id: Union[str, int] = None,
@@ -3207,12 +3205,14 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        result = self._post('getGameHighScores', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = await self._post(
+            'getGameHighScores', data, timeout=timeout, api_kwargs=api_kwargs
+        )
 
         return [GameHighScore.de_json(hs, self) for hs in result]  # type: ignore
 
     @log
-    def send_invoice(
+    async def send_invoice(
         self,
         chat_id: Union[int, str],
         title: str,
@@ -3341,7 +3341,7 @@ class Bot(TelegramObject):
         if send_email_to_provider is not None:
             data['send_email_to_provider'] = send_email_to_provider
 
-        return self._message(  # type: ignore[return-value]
+        return await self._message(  # type: ignore[return-value]
             'sendInvoice',
             data,
             timeout=timeout,
@@ -3353,7 +3353,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def answer_shipping_query(
+    async def answer_shipping_query(
         self,
         shipping_query_id: str,
         ok: bool,
@@ -3413,12 +3413,14 @@ class Bot(TelegramObject):
         if error_message is not None:
             data['error_message'] = error_message
 
-        result = self._post('answerShippingQuery', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = await self._post(
+            'answerShippingQuery', data, timeout=timeout, api_kwargs=api_kwargs
+        )
 
         return result  # type: ignore[return-value]
 
     @log
-    def answer_pre_checkout_query(
+    async def answer_pre_checkout_query(
         self,
         pre_checkout_query_id: str,
         ok: bool,
@@ -3472,12 +3474,14 @@ class Bot(TelegramObject):
         if error_message is not None:
             data['error_message'] = error_message
 
-        result = self._post('answerPreCheckoutQuery', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = await self._post(
+            'answerPreCheckoutQuery', data, timeout=timeout, api_kwargs=api_kwargs
+        )
 
         return result  # type: ignore[return-value]
 
     @log
-    def restrict_chat_member(
+    async def restrict_chat_member(
         self,
         chat_id: Union[str, int],
         user_id: Union[str, int],
@@ -3533,12 +3537,14 @@ class Bot(TelegramObject):
                 )
             data['until_date'] = until_date
 
-        result = self._post('restrictChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = await self._post(
+            'restrictChatMember', data, timeout=timeout, api_kwargs=api_kwargs
+        )
 
         return result  # type: ignore[return-value]
 
     @log
-    def promote_chat_member(
+    async def promote_chat_member(
         self,
         chat_id: Union[str, int],
         user_id: Union[str, int],
@@ -3617,12 +3623,14 @@ class Bot(TelegramObject):
         if can_promote_members is not None:
             data['can_promote_members'] = can_promote_members
 
-        result = self._post('promoteChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = await self._post(
+            'promoteChatMember', data, timeout=timeout, api_kwargs=api_kwargs
+        )
 
         return result  # type: ignore[return-value]
 
     @log
-    def set_chat_permissions(
+    async def set_chat_permissions(
         self,
         chat_id: Union[str, int],
         permissions: ChatPermissions,
@@ -3652,13 +3660,13 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {'chat_id': chat_id, 'permissions': permissions.to_dict()}
-
-        result = self._post('setChatPermissions', data, timeout=timeout, api_kwargs=api_kwargs)
-
+        result = await self._post(
+            'setChatPermissions', data, timeout=timeout, api_kwargs=api_kwargs
+        )
         return result  # type: ignore[return-value]
 
     @log
-    def set_chat_administrator_custom_title(
+    async def set_chat_administrator_custom_title(
         self,
         chat_id: Union[int, str],
         user_id: Union[int, str],
@@ -3691,14 +3699,14 @@ class Bot(TelegramObject):
         """
         data: JSONDict = {'chat_id': chat_id, 'user_id': user_id, 'custom_title': custom_title}
 
-        result = self._post(
+        result = await self._post(
             'setChatAdministratorCustomTitle', data, timeout=timeout, api_kwargs=api_kwargs
         )
 
         return result  # type: ignore[return-value]
 
     @log
-    def export_chat_invite_link(
+    async def export_chat_invite_link(
         self, chat_id: Union[str, int], timeout: float = None, api_kwargs: JSONDict = None
     ) -> str:
         """
@@ -3723,13 +3731,13 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {'chat_id': chat_id}
-
-        result = self._post('exportChatInviteLink', data, timeout=timeout, api_kwargs=api_kwargs)
-
+        result = await self._post(
+            'exportChatInviteLink', data, timeout=timeout, api_kwargs=api_kwargs
+        )
         return result  # type: ignore[return-value]
 
     @log
-    def set_chat_photo(
+    async def set_chat_photo(
         self,
         chat_id: Union[str, int],
         photo: FileInput,
@@ -3762,13 +3770,11 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {'chat_id': chat_id, 'photo': parse_file_input(photo)}
-
-        result = self._post('setChatPhoto', data, timeout=timeout, api_kwargs=api_kwargs)
-
+        result = await self._post('setChatPhoto', data, timeout=timeout, api_kwargs=api_kwargs)
         return result  # type: ignore[return-value]
 
     @log
-    def delete_chat_photo(
+    async def delete_chat_photo(
         self, chat_id: Union[str, int], timeout: float = None, api_kwargs: JSONDict = None
     ) -> bool:
         """
@@ -3793,13 +3799,11 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {'chat_id': chat_id}
-
-        result = self._post('deleteChatPhoto', data, timeout=timeout, api_kwargs=api_kwargs)
-
+        result = await self._post('deleteChatPhoto', data, timeout=timeout, api_kwargs=api_kwargs)
         return result  # type: ignore[return-value]
 
     @log
-    def set_chat_title(
+    async def set_chat_title(
         self,
         chat_id: Union[str, int],
         title: str,
@@ -3829,13 +3833,11 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {'chat_id': chat_id, 'title': title}
-
-        result = self._post('setChatTitle', data, timeout=timeout, api_kwargs=api_kwargs)
-
+        result = await self._post('setChatTitle', data, timeout=timeout, api_kwargs=api_kwargs)
         return result  # type: ignore[return-value]
 
     @log
-    def set_chat_description(
+    async def set_chat_description(
         self,
         chat_id: Union[str, int],
         description: str,
@@ -3865,13 +3867,13 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {'chat_id': chat_id, 'description': description}
-
-        result = self._post('setChatDescription', data, timeout=timeout, api_kwargs=api_kwargs)
-
+        result = await self._post(
+            'setChatDescription', data, timeout=timeout, api_kwargs=api_kwargs
+        )
         return result  # type: ignore[return-value]
 
     @log
-    def pin_chat_message(
+    async def pin_chat_message(
         self,
         chat_id: Union[str, int],
         message_id: Union[str, int],
@@ -3910,12 +3912,12 @@ class Bot(TelegramObject):
         if disable_notification is not None:
             data['disable_notification'] = disable_notification
 
-        return self._post(  # type: ignore[return-value]
+        return await self._post(  # type: ignore[return-value]
             'pinChatMessage', data, timeout=timeout, api_kwargs=api_kwargs
         )
 
     @log
-    def unpin_chat_message(
+    async def unpin_chat_message(
         self,
         chat_id: Union[str, int],
         timeout: float = None,
@@ -3951,12 +3953,12 @@ class Bot(TelegramObject):
         if message_id is not None:
             data['message_id'] = message_id
 
-        return self._post(  # type: ignore[return-value]
+        return await self._post(  # type: ignore[return-value]
             'unpinChatMessage', data, timeout=timeout, api_kwargs=api_kwargs
         )
 
     @log
-    def unpin_all_chat_messages(
+    async def unpin_all_chat_messages(
         self,
         chat_id: Union[str, int],
         timeout: float = None,
@@ -3986,13 +3988,12 @@ class Bot(TelegramObject):
         """
 
         data: JSONDict = {'chat_id': chat_id}
-
-        return self._post(  # type: ignore[return-value]
+        return await self._post(  # type: ignore[return-value]
             'unpinAllChatMessages', data, timeout=timeout, api_kwargs=api_kwargs
         )
 
     @log
-    def get_sticker_set(
+    async def get_sticker_set(
         self, name: str, timeout: float = None, api_kwargs: JSONDict = None
     ) -> StickerSet:
         """Use this method to get a sticker set.
@@ -4013,13 +4014,11 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {'name': name}
-
-        result = self._post('getStickerSet', data, timeout=timeout, api_kwargs=api_kwargs)
-
+        result = await self._post('getStickerSet', data, timeout=timeout, api_kwargs=api_kwargs)
         return StickerSet.de_json(result, self)  # type: ignore
 
     @log
-    def upload_sticker_file(
+    async def upload_sticker_file(
         self,
         user_id: Union[str, int],
         png_sticker: FileInput,
@@ -4058,13 +4057,13 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {'user_id': user_id, 'png_sticker': parse_file_input(png_sticker)}
-
-        result = self._post('uploadStickerFile', data, timeout=timeout, api_kwargs=api_kwargs)
-
+        result = await self._post(
+            'uploadStickerFile', data, timeout=timeout, api_kwargs=api_kwargs
+        )
         return File.de_json(result, self)  # type: ignore
 
     @log
-    def create_new_sticker_set(
+    async def create_new_sticker_set(
         self,
         user_id: Union[str, int],
         name: str,
@@ -4148,12 +4147,14 @@ class Bot(TelegramObject):
             # message here, which isn't json dumped by utils.request
             data['mask_position'] = mask_position.to_json()
 
-        result = self._post('createNewStickerSet', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = await self._post(
+            'createNewStickerSet', data, timeout=timeout, api_kwargs=api_kwargs
+        )
 
         return result  # type: ignore[return-value]
 
     @log
-    def add_sticker_to_set(
+    async def add_sticker_to_set(
         self,
         user_id: Union[str, int],
         name: str,
@@ -4227,12 +4228,12 @@ class Bot(TelegramObject):
             # message here, which isn't json dumped by utils.request
             data['mask_position'] = mask_position.to_json()
 
-        result = self._post('addStickerToSet', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = await self._post('addStickerToSet', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
     @log
-    def set_sticker_position_in_set(
+    async def set_sticker_position_in_set(
         self, sticker: str, position: int, timeout: float = None, api_kwargs: JSONDict = None
     ) -> bool:
         """Use this method to move a sticker in a set created by the bot to a specific position.
@@ -4254,15 +4255,13 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {'sticker': sticker, 'position': position}
-
-        result = self._post(
+        result = await self._post(
             'setStickerPositionInSet', data, timeout=timeout, api_kwargs=api_kwargs
         )
-
         return result  # type: ignore[return-value]
 
     @log
-    def delete_sticker_from_set(
+    async def delete_sticker_from_set(
         self, sticker: str, timeout: float = None, api_kwargs: JSONDict = None
     ) -> bool:
         """Use this method to delete a sticker from a set created by the bot.
@@ -4283,13 +4282,13 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {'sticker': sticker}
-
-        result = self._post('deleteStickerFromSet', data, timeout=timeout, api_kwargs=api_kwargs)
-
+        result = await self._post(
+            'deleteStickerFromSet', data, timeout=timeout, api_kwargs=api_kwargs
+        )
         return result  # type: ignore[return-value]
 
     @log
-    def set_sticker_set_thumb(
+    async def set_sticker_set_thumb(
         self,
         name: str,
         user_id: Union[str, int],
@@ -4332,16 +4331,17 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {'name': name, 'user_id': user_id}
-
         if thumb is not None:
             data['thumb'] = parse_file_input(thumb)
 
-        result = self._post('setStickerSetThumb', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = await self._post(
+            'setStickerSetThumb', data, timeout=timeout, api_kwargs=api_kwargs
+        )
 
         return result  # type: ignore[return-value]
 
     @log
-    def set_passport_data_errors(
+    async def set_passport_data_errors(
         self,
         user_id: Union[str, int],
         errors: List[PassportElementError],
@@ -4376,13 +4376,13 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {'user_id': user_id, 'errors': [error.to_dict() for error in errors]}
-
-        result = self._post('setPassportDataErrors', data, timeout=timeout, api_kwargs=api_kwargs)
-
+        result = await self._post(
+            'setPassportDataErrors', data, timeout=timeout, api_kwargs=api_kwargs
+        )
         return result  # type: ignore[return-value]
 
     @log
-    def send_poll(
+    async def send_poll(
         self,
         chat_id: Union[int, str],
         question: str,
@@ -4494,7 +4494,7 @@ class Bot(TelegramObject):
                 )
             data['close_date'] = close_date
 
-        return self._message(  # type: ignore[return-value]
+        return await self._message(  # type: ignore[return-value]
             'sendPoll',
             data,
             timeout=timeout,
@@ -4506,7 +4506,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def stop_poll(
+    async def stop_poll(
         self,
         chat_id: Union[int, str],
         message_id: Union[int, str],
@@ -4547,12 +4547,11 @@ class Bot(TelegramObject):
             else:
                 data['reply_markup'] = reply_markup
 
-        result = self._post('stopPoll', data, timeout=timeout, api_kwargs=api_kwargs)
-
+        result = await self._post('stopPoll', data, timeout=timeout, api_kwargs=api_kwargs)
         return Poll.de_json(result, self)  # type: ignore
 
     @log
-    def send_dice(
+    async def send_dice(
         self,
         chat_id: Union[int, str],
         disable_notification: bool = None,
@@ -4598,11 +4597,10 @@ class Bot(TelegramObject):
         data: JSONDict = {
             'chat_id': chat_id,
         }
-
         if emoji:
             data['emoji'] = emoji
 
-        return self._message(  # type: ignore[return-value]
+        return await self._message(  # type: ignore[return-value]
             'sendDice',
             data,
             timeout=timeout,
@@ -4614,7 +4612,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def get_my_commands(
+    async def get_my_commands(
         self, timeout: float = None, api_kwargs: JSONDict = None
     ) -> List[BotCommand]:
         """
@@ -4634,14 +4632,12 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        result = self._post('getMyCommands', timeout=timeout, api_kwargs=api_kwargs)
-
+        result = await self._post('getMyCommands', timeout=timeout, api_kwargs=api_kwargs)
         self._commands = [BotCommand.de_json(c, self) for c in result]  # type: ignore
-
         return self._commands
 
     @log
-    def set_my_commands(
+    async def set_my_commands(
         self,
         commands: List[Union[BotCommand, Tuple[str, str]]],
         timeout: float = None,
@@ -4668,10 +4664,9 @@ class Bot(TelegramObject):
 
         """
         cmds = [c if isinstance(c, BotCommand) else BotCommand(c[0], c[1]) for c in commands]
-
         data: JSONDict = {'commands': [c.to_dict() for c in cmds]}
 
-        result = self._post('setMyCommands', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = await self._post('setMyCommands', data, timeout=timeout, api_kwargs=api_kwargs)
 
         # Set commands. No need to check for outcome.
         # If request failed, we won't come this far
@@ -4680,7 +4675,7 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
-    def log_out(self) -> bool:
+    async def log_out(self) -> bool:
         """
         Use this method to log out from the cloud Bot API server before launching the bot locally.
         You *must* log out the bot before running it locally, otherwise there is no guarantee that
@@ -4695,10 +4690,10 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        return self._post('logOut')  # type: ignore[return-value]
+        return await self._post('logOut')  # type: ignore[return-value]
 
     @log
-    def close(self) -> bool:
+    async def close(self) -> bool:
         """
         Use this method to close the bot instance before moving it from one local server to
         another. You need to delete the webhook before calling this method to ensure that the bot
@@ -4712,10 +4707,12 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        return self._post('close')  # type: ignore[return-value]
+        res = await self._post('close')  # type: ignore[return-value]
+        await self.request.stop()
+        return res
 
     @log
-    def copy_message(
+    async def copy_message(
         self,
         chat_id: Union[int, str],
         from_chat_id: Union[str, int],
@@ -4794,7 +4791,7 @@ class Bot(TelegramObject):
             else:
                 data['reply_markup'] = reply_markup
 
-        result = self._post('copyMessage', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = await self._post('copyMessage', data, timeout=timeout, api_kwargs=api_kwargs)
         return MessageId.de_json(result, self)  # type: ignore
 
     def to_dict(self) -> JSONDict:
