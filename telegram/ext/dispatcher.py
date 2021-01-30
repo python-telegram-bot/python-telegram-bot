@@ -26,7 +26,7 @@ from functools import wraps
 from queue import Empty, Queue
 from threading import BoundedSemaphore, Event, Lock, Thread, current_thread
 from time import sleep
-from typing import TYPE_CHECKING, Any, Callable, DefaultDict, Dict, List, Optional, Set, Union
+from typing import TYPE_CHECKING, Callable, DefaultDict, Dict, List, Optional, Set, Union
 from uuid import uuid4
 
 from telegram import TelegramError, Update
@@ -45,8 +45,8 @@ DEFAULT_GROUP: int = 0
 
 
 def run_async(
-    func: Callable[[Update, CallbackContext], Any]
-) -> Callable[[Update, CallbackContext], Any]:
+    func: Callable[[Update, CallbackContext], object]
+) -> Callable[[Update, CallbackContext], object]:
     """
     Function decorator that will run the function in a new thread.
 
@@ -64,7 +64,7 @@ def run_async(
     """
 
     @wraps(func)
-    def async_func(*args: Any, **kwargs: Any) -> Any:
+    def async_func(*args: object, **kwargs: object) -> object:
         warnings.warn(
             'The @run_async decorator is deprecated. Use the `run_async` parameter of '
             'your Handler or `Dispatcher.run_async` instead.',
@@ -162,8 +162,8 @@ class Dispatcher:
                 stacklevel=3,
             )
 
-        self.user_data: DefaultDict[int, Dict[Any, Any]] = defaultdict(dict)
-        self.chat_data: DefaultDict[int, Dict[Any, Any]] = defaultdict(dict)
+        self.user_data: DefaultDict[int, Dict[object, object]] = defaultdict(dict)
+        self.chat_data: DefaultDict[int, Dict[object, object]] = defaultdict(dict)
         self.bot_data = {}
         self.persistence: Optional[BasePersistence] = None
         self._update_persistence_lock = Lock()
@@ -287,7 +287,7 @@ class Dispatcher:
                 self.logger.exception('An uncaught error was raised while handling the error.')
 
     def run_async(
-        self, func: Callable[..., Any], *args: Any, update: Any = None, **kwargs: Any
+        self, func: Callable[..., object], *args: object, update: object = None, **kwargs: object
     ) -> Promise:
         """
         Queue a function (with given args/kwargs) to be run asynchronously. Exceptions raised
@@ -316,11 +316,11 @@ class Dispatcher:
 
     def _run_async(
         self,
-        func: Callable[..., Any],
-        *args: Any,
-        update: Any = None,
+        func: Callable[..., object],
+        *args: object,
+        update: object = None,
         error_handling: bool = True,
-        **kwargs: Any,
+        **kwargs: object,
     ) -> Promise:
         # TODO: Remove error_handling parameter once we drop the @run_async decorator
         promise = Promise(func, args, kwargs, update=update, error_handling=error_handling)
@@ -402,7 +402,7 @@ class Dispatcher:
     def has_running_threads(self) -> bool:
         return self.running or bool(self.__async_threads)
 
-    def process_update(self, update: Any) -> None:
+    def process_update(self, update: object) -> None:
         """Processes a single update and updates the persistence.
 
         Note:
@@ -530,7 +530,7 @@ class Dispatcher:
                 del self.handlers[group]
                 self.groups.remove(group)
 
-    def update_persistence(self, update: Any = None) -> None:
+    def update_persistence(self, update: object = None) -> None:
         """Update :attr:`user_data`, :attr:`chat_data` and :attr:`bot_data` in :attr:`persistence`.
 
         Args:
@@ -540,7 +540,7 @@ class Dispatcher:
         with self._update_persistence_lock:
             self.__update_persistence(update)
 
-    def __update_persistence(self, update: Any = None) -> None:
+    def __update_persistence(self, update: object = None) -> None:
         if self.persistence:
             # We use list() here in order to decouple chat_ids from self.chat_data, as dict view
             # objects will change, when the dict does and we want to loop over chat_ids
@@ -601,7 +601,7 @@ class Dispatcher:
 
     def add_error_handler(
         self,
-        callback: Callable[[Any, CallbackContext], None],
+        callback: Callable[[object, CallbackContext], None],
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,  # pylint: disable=W0621
     ) -> None:
         """Registers an error handler in the Dispatcher. This handler will receive every error
@@ -637,7 +637,7 @@ class Dispatcher:
 
         self.error_handlers[callback] = run_async
 
-    def remove_error_handler(self, callback: Callable[[Any, CallbackContext], None]) -> None:
+    def remove_error_handler(self, callback: Callable[[object, CallbackContext], None]) -> None:
         """Removes an error handler.
 
         Args:
@@ -647,12 +647,12 @@ class Dispatcher:
         self.error_handlers.pop(callback, None)
 
     def dispatch_error(
-        self, update: Optional[Any], error: Exception, promise: Promise = None
+        self, update: Optional[object], error: Exception, promise: Promise = None
     ) -> None:
         """Dispatches an error.
 
         Args:
-            update (:obj:`Any` | :class:`telegram.Update`): The update that caused the error.
+            update (:obj:`object` | :class:`telegram.Update`): The update that caused the error.
             error (:obj:`Exception`): The error that was raised.
             promise (:class:`telegram.utils.Promise`, optional): The promise whose pooled function
                 raised the error.

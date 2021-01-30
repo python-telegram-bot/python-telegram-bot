@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Chat."""
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, List, Optional, ClassVar, Union, Tuple
+from typing import TYPE_CHECKING, List, Optional, ClassVar, Union, Tuple, Any
 
 from telegram import ChatPhoto, TelegramObject, constants
 from telegram.utils.types import JSONDict, FileInput
@@ -651,7 +651,7 @@ class Chat(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_chat_action`.
 
         Returns:
-            :obj:`True`: On success.
+            :obj:`bool`: On success, :obj:`True` is returned.
 
         """
         return self.bot.send_chat_action(

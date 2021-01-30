@@ -19,7 +19,7 @@
 """This module contains the DictPersistence class."""
 from copy import deepcopy
 
-from typing import Any, DefaultDict, Dict, Optional, Tuple
+from typing import DefaultDict, Dict, Optional, Tuple
 from collections import defaultdict
 
 from telegram.utils.helpers import (
@@ -169,7 +169,7 @@ class DictPersistence(BasePersistence):
         return json.dumps(self.bot_data)
 
     @property
-    def conversations(self) -> Optional[Dict[str, Dict[Tuple, Any]]]:
+    def conversations(self) -> Optional[Dict[str, Dict[Tuple, object]]]:
         """:obj:`dict`: The conversations as a dict."""
         return self._conversations
 
@@ -180,7 +180,7 @@ class DictPersistence(BasePersistence):
             return self._conversations_json
         return encode_conversations_to_json(self.conversations)  # type: ignore[arg-type]
 
-    def get_user_data(self) -> DefaultDict[int, Dict[Any, Any]]:
+    def get_user_data(self) -> DefaultDict[int, Dict[object, object]]:
         """Returns the user_data created from the ``user_data_json`` or an empty
         :obj:`defaultdict`.
 
@@ -193,7 +193,7 @@ class DictPersistence(BasePersistence):
             self._user_data = defaultdict(dict)
         return deepcopy(self.user_data)  # type: ignore[arg-type]
 
-    def get_chat_data(self) -> DefaultDict[int, Dict[Any, Any]]:
+    def get_chat_data(self) -> DefaultDict[int, Dict[object, object]]:
         """Returns the chat_data created from the ``chat_data_json`` or an empty
         :obj:`defaultdict`.
 
@@ -206,7 +206,7 @@ class DictPersistence(BasePersistence):
             self._chat_data = defaultdict(dict)
         return deepcopy(self.chat_data)  # type: ignore[arg-type]
 
-    def get_bot_data(self) -> Dict[Any, Any]:
+    def get_bot_data(self) -> Dict[object, object]:
         """Returns the bot_data created from the ``bot_data_json`` or an empty :obj:`dict`.
 
         Returns:

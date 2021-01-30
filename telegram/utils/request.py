@@ -130,14 +130,14 @@ class Request:
         # TODO: Support other platforms like mac and windows.
         if 'linux' in sys.platform:
             sockopts.append(
-                (socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 120)
-            )  # pylint: disable=no-member
+                (socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 120)  # pylint: disable=no-member
+            )
             sockopts.append(
-                (socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 30)
-            )  # pylint: disable=no-member
+                (socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 30)  # pylint: disable=no-member
+            )
             sockopts.append(
-                (socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 8)
-            )  # pylint: disable=no-member
+                (socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 8)  # pylint: disable=no-member
+            )
 
         self._con_pool_size = con_pool_size
 
@@ -226,7 +226,7 @@ class Request:
 
         return data['result']
 
-    def _request_wrapper(self, *args: Any, **kwargs: Any) -> bytes:
+    def _request_wrapper(self, *args: object, **kwargs: Any) -> bytes:
         """Wraps urllib3 request for handling known exceptions.
 
         Args:

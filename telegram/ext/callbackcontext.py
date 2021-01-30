@@ -19,7 +19,7 @@
 # pylint: disable=R0201
 """This module contains the CallbackContext class."""
 from queue import Queue
-from typing import TYPE_CHECKING, Any, Dict, List, Match, NoReturn, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Dict, List, Match, NoReturn, Optional, Tuple, Union
 
 from telegram import Update
 
@@ -98,14 +98,14 @@ class CallbackContext:
             )
         self._dispatcher = dispatcher
         self._bot_data = dispatcher.bot_data
-        self._chat_data: Optional[Dict[Any, Any]] = None
-        self._user_data: Optional[Dict[Any, Any]] = None
+        self._chat_data: Optional[Dict[object, object]] = None
+        self._user_data: Optional[Dict[object, object]] = None
         self.args: Optional[List[str]] = None
         self.matches: Optional[List[Match]] = None
         self.error: Optional[Exception] = None
         self.job: Optional['Job'] = None
         self.async_args: Optional[Union[List, Tuple]] = None
-        self.async_kwargs: Optional[Dict[str, Any]] = None
+        self.async_kwargs: Optional[Dict[str, object]] = None
 
     @property
     def dispatcher(self) -> 'Dispatcher':
@@ -117,7 +117,7 @@ class CallbackContext:
         return self._bot_data
 
     @bot_data.setter
-    def bot_data(self, value: Any) -> NoReturn:
+    def bot_data(self, value: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to bot_data, see " "https://git.io/fjxKe"
         )
@@ -127,7 +127,7 @@ class CallbackContext:
         return self._chat_data
 
     @chat_data.setter
-    def chat_data(self, value: Any) -> NoReturn:
+    def chat_data(self, value: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to chat_data, see " "https://git.io/fjxKe"
         )
@@ -137,7 +137,7 @@ class CallbackContext:
         return self._user_data
 
     @user_data.setter
-    def user_data(self, value: Any) -> NoReturn:
+    def user_data(self, value: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to user_data, see " "https://git.io/fjxKe"
         )
@@ -149,7 +149,7 @@ class CallbackContext:
         error: Exception,
         dispatcher: 'Dispatcher',
         async_args: Union[List, Tuple] = None,
-        async_kwargs: Dict[str, Any] = None,
+        async_kwargs: Dict[str, object] = None,
     ) -> 'CallbackContext':
         self = cls.from_update(update, dispatcher)
         self.error = error
@@ -177,7 +177,7 @@ class CallbackContext:
         self.job = job
         return self
 
-    def update(self, data: Dict[str, Any]) -> None:
+    def update(self, data: Dict[str, object]) -> None:
         self.__dict__.update(data)
 
     @property

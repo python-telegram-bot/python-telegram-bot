@@ -219,7 +219,7 @@ class Updater:
         self.__lock = Lock()
         self.__threads: List[Thread] = []
 
-    def _init_thread(self, target: Callable, name: str, *args: Any, **kwargs: Any) -> None:
+    def _init_thread(self, target: Callable, name: str, *args: object, **kwargs: object) -> None:
         thr = Thread(
             target=self._thread_wrapper,
             name=f"Bot:{self.bot.id}:{name}",
@@ -229,7 +229,7 @@ class Updater:
         thr.start()
         self.__threads.append(thr)
 
-    def _thread_wrapper(self, target: Callable, *args: Any, **kwargs: Any) -> None:
+    def _thread_wrapper(self, target: Callable, *args: object, **kwargs: object) -> None:
         thr_name = current_thread().name
         self.logger.debug('%s - started', thr_name)
         try:

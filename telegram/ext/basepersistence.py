@@ -20,7 +20,7 @@
 import warnings
 from abc import ABC, abstractmethod
 from copy import copy
-from typing import Any, DefaultDict, Dict, Optional, Tuple, cast, ClassVar
+from typing import DefaultDict, Dict, Optional, Tuple, cast, ClassVar
 
 from telegram import Bot
 
@@ -75,7 +75,9 @@ class BasePersistence(ABC):
             persistence class.
     """
 
-    def __new__(cls, *args: Any, **kwargs: Any) -> 'BasePersistence':  # pylint: disable=W0613
+    def __new__(
+        cls, *args: object, **kwargs: object  # pylint: disable=W0613
+    ) -> 'BasePersistence':
         instance = super().__new__(cls)
         get_user_data = instance.get_user_data
         get_chat_data = instance.get_chat_data
@@ -84,13 +86,13 @@ class BasePersistence(ABC):
         update_chat_data = instance.update_chat_data
         update_bot_data = instance.update_bot_data
 
-        def get_user_data_insert_bot() -> DefaultDict[int, Dict[Any, Any]]:
+        def get_user_data_insert_bot() -> DefaultDict[int, Dict[object, object]]:
             return instance.insert_bot(get_user_data())
 
-        def get_chat_data_insert_bot() -> DefaultDict[int, Dict[Any, Any]]:
+        def get_chat_data_insert_bot() -> DefaultDict[int, Dict[object, object]]:
             return instance.insert_bot(get_chat_data())
 
-        def get_bot_data_insert_bot() -> Dict[Any, Any]:
+        def get_bot_data_insert_bot() -> Dict[object, object]:
             return instance.insert_bot(get_bot_data())
 
         def update_user_data_replace_bot(user_id: int, data: Dict) -> None:
@@ -146,7 +148,7 @@ class BasePersistence(ABC):
         return cls._replace_bot(obj, {})
 
     @classmethod
-    def _replace_bot(cls, obj: object, memo: Dict[int, Any]) -> object:  # pylint: disable=R0911
+    def _replace_bot(cls, obj: object, memo: Dict[int, object]) -> object:  # pylint: disable=R0911
         obj_id = id(obj)
         if obj_id in memo:
             return memo[obj_id]
@@ -223,7 +225,7 @@ class BasePersistence(ABC):
         """
         return self._insert_bot(obj, {})
 
-    def _insert_bot(self, obj: object, memo: Dict[int, Any]) -> object:  # pylint: disable=R0911
+    def _insert_bot(self, obj: object, memo: Dict[int, object]) -> object:  # pylint: disable=R0911
         obj_id = id(obj)
         if obj_id in memo:
             return memo[obj_id]
@@ -288,7 +290,7 @@ class BasePersistence(ABC):
         return obj
 
     @abstractmethod
-    def get_user_data(self) -> DefaultDict[int, Dict[Any, Any]]:
+    def get_user_data(self) -> DefaultDict[int, Dict[object, object]]:
         """ "Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``user_data`` if stored, or an empty
         ``defaultdict(dict)``.
@@ -298,7 +300,7 @@ class BasePersistence(ABC):
         """
 
     @abstractmethod
-    def get_chat_data(self) -> DefaultDict[int, Dict[Any, Any]]:
+    def get_chat_data(self) -> DefaultDict[int, Dict[object, object]]:
         """ "Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``chat_data`` if stored, or an empty
         ``defaultdict(dict)``.
@@ -308,7 +310,7 @@ class BasePersistence(ABC):
         """
 
     @abstractmethod
-    def get_bot_data(self) -> Dict[Any, Any]:
+    def get_bot_data(self) -> Dict[object, object]:
         """ "Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``bot_data`` if stored, or an empty
         :obj:`dict`.
