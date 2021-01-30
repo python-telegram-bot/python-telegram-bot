@@ -19,7 +19,7 @@
 """This module contains the CommandHandler and PrefixHandler classes."""
 import re
 import warnings
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, TypeVar, Union
+from typing import TYPE_CHECKING, Callable, Dict, List, Optional, Tuple, TypeVar, Union
 
 from telegram import MessageEntity, Update
 from telegram.ext import BaseFilter, Filters
@@ -177,7 +177,7 @@ class CommandHandler(Handler[Update]):
         self.pass_args = pass_args
 
     def check_update(
-        self, update: Any
+        self, update: object
     ) -> Optional[Union[bool, Tuple[List[str], Optional[Union[bool, Dict]]]]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
@@ -220,7 +220,7 @@ class CommandHandler(Handler[Update]):
         dispatcher: 'Dispatcher',
         update: Update = None,
         check_result: Optional[Union[bool, Tuple[List[str], Optional[bool]]]] = None,
-    ) -> Dict[str, Any]:
+    ) -> Dict[str, object]:
         optional_args = super().collect_optional_args(dispatcher, update)
         if self.pass_args and isinstance(check_result, tuple):
             optional_args['args'] = check_result[0]
@@ -415,7 +415,7 @@ class PrefixHandler(CommandHandler):
         self._commands = [x.lower() + y.lower() for x in self.prefix for y in self.command]
 
     def check_update(
-        self, update: Update
+        self, update: object
     ) -> Optional[Union[bool, Tuple[List[str], Optional[Union[bool, Dict]]]]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 

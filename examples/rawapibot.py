@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # pylint: disable=W0603
 """Simple Bot to reply to Telegram messages.
 

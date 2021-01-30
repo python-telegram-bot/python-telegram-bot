@@ -405,7 +405,7 @@ class TestPassport:
 
     def test_bot_init_invalid_key(self, bot):
         with pytest.raises(TypeError):
-            Bot(bot.token, private_key=u'Invalid key!')
+            Bot(bot.token, private_key='Invalid key!')
 
         with pytest.raises(ValueError):
             Bot(bot.token, private_key=b'Invalid key!')

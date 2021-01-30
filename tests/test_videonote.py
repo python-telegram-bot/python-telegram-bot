@@ -49,7 +49,7 @@ class TestVideoNote:
     thumb_height = 240
     thumb_file_size = 11547
 
-    caption = u'VideoNoteTest - Caption'
+    caption = 'VideoNoteTest - Caption'
     videonote_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
     videonote_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
 

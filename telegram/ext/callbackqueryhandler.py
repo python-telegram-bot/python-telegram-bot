@@ -21,7 +21,6 @@
 import re
 from typing import (
     TYPE_CHECKING,
-    Any,
     Callable,
     Dict,
     Match,
@@ -148,7 +147,7 @@ class CallbackQueryHandler(Handler[Update]):
         self.pass_groups = pass_groups
         self.pass_groupdict = pass_groupdict
 
-    def check_update(self, update: Any) -> Optional[Union[bool, object]]:
+    def check_update(self, update: object) -> Optional[Union[bool, object]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
@@ -173,7 +172,7 @@ class CallbackQueryHandler(Handler[Update]):
         dispatcher: 'Dispatcher',
         update: Update = None,
         check_result: Union[bool, Match] = None,
-    ) -> Dict[str, Any]:
+    ) -> Dict[str, object]:
         optional_args = super().collect_optional_args(dispatcher, update, check_result)
         if self.pattern:
             check_result = cast(Match, check_result)

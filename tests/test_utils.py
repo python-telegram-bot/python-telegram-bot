@@ -16,19 +16,22 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the :class:`telegram.ext.utils.promise.Promise` class for backwards
-compatibility."""
-import warnings
 
-import telegram.ext.utils.webhookhandler as webhook_handler
-from telegram.utils.deprecate import TelegramDeprecationWarning
 
-warnings.warn(
-    'telegram.utils.webhookhandler is deprecated. Please use telegram.ext.utils.webhookhandler '
-    'instead.',
-    TelegramDeprecationWarning,
-)
+class TestUtils:
+    def test_promise_deprecation(self, recwarn):
+        import telegram.utils.promise  # noqa: F401
 
-WebhookHandler = webhook_handler.WebhookHandler
-WebhookServer = webhook_handler.WebhookServer
-WebhookAppClass = webhook_handler.WebhookAppClass
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message) == (
+            'telegram.utils.promise is deprecated. Please use telegram.ext.utils.promise instead.'
+        )
+
+    def test_webhookhandler_deprecation(self, recwarn):
+        import telegram.utils.webhookhandler  # noqa: F401
+
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message) == (
+            'telegram.utils.webhookhandler is deprecated. Please use '
+            'telegram.ext.utils.webhookhandler instead.'
+        )

@@ -47,6 +47,7 @@ from telegram import (
     ProximityAlertTriggered,
     Dice,
     Bot,
+    ChatAction,
 )
 from telegram.ext import Defaults
 from tests.conftest import check_shortcut_signature, check_shortcut_call
@@ -259,14 +260,14 @@ class TestMessage:
         },
         {'length': 5, 'offset': 57, 'type': 'pre'},
         {'length': 17, 'offset': 64, 'type': 'url'},
-        {'length': 36, 'offset': 86, 'type': 'italic'},
-        {'length': 24, 'offset': 91, 'type': 'bold'},
-        {'length': 4, 'offset': 101, 'type': 'strikethrough'},
-        {'length': 10, 'offset': 124, 'type': 'pre', 'language': 'python'},
+        {'length': 41, 'offset': 86, 'type': 'italic'},
+        {'length': 29, 'offset': 91, 'type': 'bold'},
+        {'length': 9, 'offset': 101, 'type': 'strikethrough'},
+        {'length': 10, 'offset': 129, 'type': 'pre', 'language': 'python'},
     ]
     test_text_v2 = (
         r'Test for <bold, ita_lic, \`code, links, text-mention and `\pre. '
-        'http://google.com and bold nested in strk nested in italic. Python pre.'
+        'http://google.com and bold nested in strk>trgh nested in italic. Python pre.'
     )
     test_message = Message(
         message_id=1,
@@ -357,7 +358,7 @@ class TestMessage:
             r'<a href="http://github.com/abc\)def">links</a>, '
             '<a href="tg://user?id=123456789">text-mention</a> and '
             r'<pre>`\pre</pre>. http://google.com '
-            'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>. '
+            'and <i>bold <b>nested in <s>strk&gt;trgh</s> nested in</b> italic</i>. '
             '<pre><code class="python">Python pre</code></pre>.'
         )
         text_html = self.test_message_v2.text_html
@@ -375,7 +376,7 @@ class TestMessage:
             r'<a href="http://github.com/abc\)def">links</a>, '
             '<a href="tg://user?id=123456789">text-mention</a> and '
             r'<pre>`\pre</pre>. <a href="http://google.com">http://google.com</a> '
-            'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>. '
+            'and <i>bold <b>nested in <s>strk&gt;trgh</s> nested in</b> italic</i>. '
             '<pre><code class="python">Python pre</code></pre>.'
         )
         text_html = self.test_message_v2.text_html_urled
@@ -396,7 +397,7 @@ class TestMessage:
             r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
             '[links](http://github.com/abc\\\\\\)def), '
             '[text\\-mention](tg://user?id=123456789) and ```\\`\\\\pre```\\. '
-            r'http://google\.com and _bold *nested in ~strk~ nested in* italic_\. '
+            r'http://google\.com and _bold *nested in ~strk\>trgh~ nested in* italic_\. '
             '```python\nPython pre```\\.'
         )
         text_markdown = self.test_message_v2.text_markdown_v2
@@ -442,7 +443,7 @@ class TestMessage:
             r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
             '[links](http://github.com/abc\\\\\\)def), '
             '[text\\-mention](tg://user?id=123456789) and ```\\`\\\\pre```\\. '
-            r'[http://google\.com](http://google.com) and _bold *nested in ~strk~ '
+            r'[http://google\.com](http://google.com) and _bold *nested in ~strk\>trgh~ '
             'nested in* italic_\\. ```python\nPython pre```\\.'
         )
         text_markdown = self.test_message_v2.text_markdown_v2_urled
@@ -473,7 +474,7 @@ class TestMessage:
             r'<a href="http://github.com/abc\)def">links</a>, '
             '<a href="tg://user?id=123456789">text-mention</a> and '
             r'<pre>`\pre</pre>. http://google.com '
-            'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>. '
+            'and <i>bold <b>nested in <s>strk&gt;trgh</s> nested in</b> italic</i>. '
             '<pre><code class="python">Python pre</code></pre>.'
         )
         caption_html = self.test_message_v2.caption_html
@@ -491,7 +492,7 @@ class TestMessage:
             r'<a href="http://github.com/abc\)def">links</a>, '
             '<a href="tg://user?id=123456789">text-mention</a> and '
             r'<pre>`\pre</pre>. <a href="http://google.com">http://google.com</a> '
-            'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>. '
+            'and <i>bold <b>nested in <s>strk&gt;trgh</s> nested in</b> italic</i>. '
             '<pre><code class="python">Python pre</code></pre>.'
         )
         caption_html = self.test_message_v2.caption_html_urled
@@ -512,7 +513,7 @@ class TestMessage:
             r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
             '[links](http://github.com/abc\\\\\\)def), '
             '[text\\-mention](tg://user?id=123456789) and ```\\`\\\\pre```\\. '
-            r'http://google\.com and _bold *nested in ~strk~ nested in* italic_\. '
+            r'http://google\.com and _bold *nested in ~strk\>trgh~ nested in* italic_\. '
             '```python\nPython pre```\\.'
         )
         caption_markdown = self.test_message_v2.caption_markdown_v2
@@ -539,7 +540,7 @@ class TestMessage:
             r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
             '[links](http://github.com/abc\\\\\\)def), '
             '[text\\-mention](tg://user?id=123456789) and ```\\`\\\\pre```\\. '
-            r'[http://google\.com](http://google.com) and _bold *nested in ~strk~ '
+            r'[http://google\.com](http://google.com) and _bold *nested in ~strk\>trgh~ '
             'nested in* italic_\\. ```python\nPython pre```\\.'
         )
         caption_markdown = self.test_message_v2.caption_markdown_v2_urled
@@ -698,7 +699,7 @@ class TestMessage:
             r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
             '[links](http://github.com/abc\\\\\\)def), '
             '[text\\-mention](tg://user?id=123456789) and ```\\`\\\\pre```\\. '
-            r'http://google\.com and _bold *nested in ~strk~ nested in* italic_\. '
+            r'http://google\.com and _bold *nested in ~strk\>trgh~ nested in* italic_\. '
             '```python\nPython pre```\\.'
         )
 
@@ -738,7 +739,7 @@ class TestMessage:
             r'<a href="http://github.com/abc\)def">links</a>, '
             '<a href="tg://user?id=123456789">text-mention</a> and '
             r'<pre>`\pre</pre>. http://google.com '
-            'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>. '
+            'and <i>bold <b>nested in <s>strk&gt;trgh</s> nested in</b> italic</i>. '
             '<pre><code class="python">Python pre</code></pre>.'
         )
 
@@ -1046,6 +1047,88 @@ class TestMessage:
         monkeypatch.setattr(message.bot, 'send_dice', make_assertion)
         assert message.reply_dice(disable_notification=True)
         assert message.reply_dice(disable_notification=True, quote=True)
+
+    def test_reply_action(self, monkeypatch, message: Message):
+        send_chat_action = message.bot.send_chat_action
+
+        def make_assertion(*_, **kwargs):
+            id_ = kwargs['chat_id'] == message.chat_id
+            action = kwargs['action'] == ChatAction.TYPING
+            return id_ and action and check_shortcut_call(kwargs, send_chat_action)
+
+        assert check_shortcut_signature(
+            Message.reply_chat_action, Bot.send_chat_action, ['chat_id'], []
+        )
+
+        monkeypatch.setattr(message.bot, 'send_chat_action', make_assertion)
+        assert message.reply_chat_action(action=ChatAction.TYPING)
+
+    def test_reply_game(self, monkeypatch, message: Message):
+        send_game = message.bot.send_game
+
+        def make_assertion(*_, **kwargs):
+            return (
+                kwargs['chat_id'] == message.chat_id
+                and kwargs['game_short_name'] == 'test_game'
+                and check_shortcut_call(kwargs, send_game)
+            )
+
+        assert check_shortcut_signature(Message.reply_game, Bot.send_game, ['chat_id'], ['quote'])
+
+        monkeypatch.setattr(message.bot, 'send_game', make_assertion)
+        assert message.reply_game(game_short_name='test_game')
+        assert message.reply_game(game_short_name='test_game', quote=True)
+
+    def test_reply_invoice(self, monkeypatch, message: Message):
+        send_invoice = message.bot.send_invoice
+
+        def make_assertion(*_, **kwargs):
+            title = kwargs['title'] == 'title'
+            description = kwargs['description'] == 'description'
+            payload = kwargs['payload'] == 'payload'
+            provider_token = kwargs['provider_token'] == 'provider_token'
+            start_parameter = kwargs['start_parameter'] == 'start_parameter'
+            currency = kwargs['currency'] == 'currency'
+            prices = kwargs['prices'] == 'prices'
+            args = (
+                title
+                and description
+                and payload
+                and provider_token
+                and start_parameter
+                and currency
+                and prices
+            )
+            return (
+                kwargs['chat_id'] == message.chat_id
+                and args
+                and check_shortcut_call(kwargs, send_invoice)
+            )
+
+        assert check_shortcut_signature(
+            Message.reply_invoice, Bot.send_invoice, ['chat_id'], ['quote']
+        )
+
+        monkeypatch.setattr(message.bot, 'send_invoice', make_assertion)
+        assert message.reply_invoice(
+            'title',
+            'description',
+            'payload',
+            'provider_token',
+            'start_parameter',
+            'currency',
+            'prices',
+        )
+        assert message.reply_invoice(
+            'title',
+            'description',
+            'payload',
+            'provider_token',
+            'start_parameter',
+            'currency',
+            'prices',
+            quote=True,
+        )
 
     @pytest.mark.parametrize('disable_notification', [False, True])
     def test_forward(self, monkeypatch, message, disable_notification):

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2021
@@ -68,7 +67,7 @@ class TestInputFile:
 
         # Test string file
         with caplog.at_level(logging.DEBUG):
-            assert InputFile(open('tests/data/text_file.txt', 'r')).mimetype == 'text/plain'
+            assert InputFile(open('tests/data/text_file.txt')).mimetype == 'text/plain'
 
             assert len(caplog.records) == 1
             assert caplog.records[0].getMessage().startswith('Could not parse file content')

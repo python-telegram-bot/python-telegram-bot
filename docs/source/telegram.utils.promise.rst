@@ -1,6 +1,9 @@
 telegram.utils.promise.Promise
 ==============================
 
-.. autoclass:: telegram.utils.promise.Promise
-    :members:
-    :show-inheritance:
+.. py:class:: telegram.utils.promise.Promise
+
+   Shortcut for :class:`telegram.ext.utils.promise.Promise`.
+
+   .. deprecated:: 13.2
+      Use :class:`telegram.ext.utils.promise.Promise` instead.

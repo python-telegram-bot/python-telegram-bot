@@ -40,7 +40,7 @@ from telegram import TelegramError, Message, User, Chat, Update, Bot
 from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter
 from telegram.ext import Updater, Dispatcher, DictPersistence, Defaults
 from telegram.utils.deprecate import TelegramDeprecationWarning
-from telegram.utils.webhookhandler import WebhookServer
+from telegram.ext.utils.webhookhandler import WebhookServer
 
 signalskip = pytest.mark.skipif(
     sys.platform == 'win32',
@@ -208,7 +208,7 @@ class TestUpdater:
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
         monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
         # prevent api calls from @info decorator when updater.bot.id is used in thread names
-        monkeypatch.setattr(updater.bot, 'bot', User(id=123, first_name='bot', is_bot=True))
+        monkeypatch.setattr(updater.bot, '_bot', User(id=123, first_name='bot', is_bot=True))
         monkeypatch.setattr(updater.bot, '_commands', [])
 
         ip = '127.0.0.1'

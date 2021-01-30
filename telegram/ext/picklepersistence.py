@@ -93,7 +93,7 @@ class PicklePersistence(BasePersistence):
         self.user_data: Optional[DefaultDict[int, Dict]] = None
         self.chat_data: Optional[DefaultDict[int, Dict]] = None
         self.bot_data: Optional[Dict] = None
-        self.conversations: Optional[Dict[str, Dict[Tuple, Any]]] = None
+        self.conversations: Optional[Dict[str, Dict[Tuple, object]]] = None
 
     def load_singlefile(self) -> None:
         try:
@@ -105,7 +105,7 @@ class PicklePersistence(BasePersistence):
                 # For backwards compatibility with files not containing bot data
                 self.bot_data = data.get('bot_data', {})
                 self.conversations = data['conversations']
-        except IOError:
+        except OSError:
             self.conversations = dict()
             self.user_data = defaultdict(dict)
             self.chat_data = defaultdict(dict)
@@ -120,7 +120,7 @@ class PicklePersistence(BasePersistence):
         try:
             with open(filename, "rb") as file:
                 return pickle.load(file)
-        except IOError:
+        except OSError:
             return None
         except pickle.UnpicklingError as exc:
             raise TypeError(f"File {filename} does not contain valid pickle data") from exc
@@ -138,11 +138,11 @@ class PicklePersistence(BasePersistence):
             pickle.dump(data, file)
 
     @staticmethod
-    def dump_file(filename: str, data: Any) -> None:
+    def dump_file(filename: str, data: object) -> None:
         with open(filename, "wb") as file:
             pickle.dump(data, file)
 
-    def get_user_data(self) -> DefaultDict[int, Dict[Any, Any]]:
+    def get_user_data(self) -> DefaultDict[int, Dict[object, object]]:
         """Returns the user_data from the pickle file if it exists or an empty :obj:`defaultdict`.
 
         Returns:
@@ -162,7 +162,7 @@ class PicklePersistence(BasePersistence):
             self.load_singlefile()
         return deepcopy(self.user_data)  # type: ignore[arg-type]
 
-    def get_chat_data(self) -> DefaultDict[int, Dict[Any, Any]]:
+    def get_chat_data(self) -> DefaultDict[int, Dict[object, object]]:
         """Returns the chat_data from the pickle file if it exists or an empty :obj:`defaultdict`.
 
         Returns:
@@ -182,7 +182,7 @@ class PicklePersistence(BasePersistence):
             self.load_singlefile()
         return deepcopy(self.chat_data)  # type: ignore[arg-type]
 
-    def get_bot_data(self) -> Dict[Any, Any]:
+    def get_bot_data(self) -> Dict[object, object]:
         """Returns the bot_data from the pickle file if it exists or an empty :obj:`dict`.
 
         Returns:
