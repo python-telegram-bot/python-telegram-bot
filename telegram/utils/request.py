@@ -27,7 +27,7 @@ except ImportError:
 
 from typing import Union, Optional, Tuple
 
-from telegram import __version__ as ptb_ver
+from telegram.version import __version__ as ptb_ver
 
 # pylint: disable=C0412
 from telegram import InputFile, InputMedia, TelegramError
@@ -113,7 +113,7 @@ class PtbRequestBase(abc.ABC):
                 # As we can't know if that's the case, we just json-dump here
                 data[key] = json.dumps(val)
 
-        result = self._request_wrapper('POST', url, data, files, read_timeout=timeout)
+        result = await self._request_wrapper('POST', url, data, files, read_timeout=timeout)
         return self._parse(result)
 
     async def retrieve(self, url: str, timeout: float = None) -> bytes:

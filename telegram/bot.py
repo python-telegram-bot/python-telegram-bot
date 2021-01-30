@@ -227,7 +227,7 @@ class Bot(TelegramObject):
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        await self.close()
+        pass
 
     async def _post(
         self,
@@ -4706,9 +4706,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        res = await self._post('close')  # type: ignore[return-value]
-        await self.request.stop()
-        return res
+        return await self._post('close')  # type: ignore[return-value]
 
     @log
     async def copy_message(
