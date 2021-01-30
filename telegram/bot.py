@@ -27,7 +27,6 @@ from datetime import datetime
 
 from typing import (
     TYPE_CHECKING,
-    Any,
     Callable,
     List,
     Optional,
@@ -36,8 +35,6 @@ from typing import (
     Union,
     no_type_check,
 )
-
-from decorator import decorate
 
 try:
     import ujson as json
@@ -110,18 +107,19 @@ RT = TypeVar('RT')
 
 
 def log(
-    func: Callable[..., RT], *args: Any, **kwargs: Any  # pylint: disable=W0613
+    func: Callable[..., RT], *args: object, **kwargs: object  # pylint: disable=W0613
 ) -> Callable[..., RT]:
     logger = logging.getLogger(func.__module__)
 
-    def decorator(self: 'Bot', *args: Any, **kwargs: Any) -> RT:  # pylint: disable=W0613
+    @functools.wraps(func)
+    def decorator(*args: object, **kwargs: object) -> RT:  # pylint: disable=W0613
         logger.debug('Entering: %s', func.__name__)
         result = func(*args, **kwargs)
         logger.debug(result)
         logger.debug('Exiting: %s', func.__name__)
         return result
 
-    return decorate(func, decorator)
+    return decorator
 
 
 class Bot(TelegramObject):
@@ -163,7 +161,7 @@ class Bot(TelegramObject):
         'logger',
     )
 
-    def __new__(cls, *args: Any, **kwargs: Any) -> 'Bot':  # pylint: disable=W0613
+    def __new__(cls, *args: object, **kwargs: object) -> 'Bot':  # pylint: disable=W0613
         # Get default values from kwargs
         defaults = kwargs.get('defaults')
 
@@ -176,12 +174,16 @@ class Bot(TelegramObject):
         # For each method ...
         for method_name, method in inspect.getmembers(instance, predicate=inspect.ismethod):
             # ... get kwargs
-            argspec = inspect.getfullargspec(method)
-            kwarg_names = argspec.args[-len(argspec.defaults or []) :]
+            signature = inspect.signature(method, follow_wrapped=True)
+            kwarg_names = (
+                p.name
+                for p in signature.parameters.values()
+                if p.default != inspect.Signature.empty
+            )
             # ... check if Defaults has a attribute that matches the kwarg name
-            needs_default = [
+            needs_default = (
                 kwarg_name for kwarg_name in kwarg_names if hasattr(defaults, kwarg_name)
-            ]
+            )
             # ... make a dict of kwarg name and the default value
             default_kwargs = {
                 kwarg_name: getattr(defaults, kwarg_name)

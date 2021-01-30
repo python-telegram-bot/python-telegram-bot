@@ -112,7 +112,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
-        **kwargs: Any,
+        **kwargs: object,
     ) -> 'ReplyKeyboardMarkup':
         """Shortcut for::
 
@@ -157,7 +157,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
-        **kwargs: Any,
+        **kwargs: object,
     ) -> 'ReplyKeyboardMarkup':
         """Shortcut for::
 
@@ -203,7 +203,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
-        **kwargs: Any,
+        **kwargs: object,
     ) -> 'ReplyKeyboardMarkup':
         """Shortcut for::
 

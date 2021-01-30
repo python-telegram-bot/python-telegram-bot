@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the PreCheckoutQueryHandler class."""
-from typing import Any
+
 
 from telegram import Update
 
@@ -84,7 +84,7 @@ class PreCheckoutQueryHandler(Handler[Update]):
 
     __slots__ = ()
 
-    def check_update(self, update: Any) -> bool:
+    def check_update(self, update: object) -> bool:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
