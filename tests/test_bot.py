@@ -129,7 +129,7 @@ class TestBot:
         monkeypatch.setattr(bot.request, 'post', post)
         bot.send_message(123, 'text', api_kwargs={'unknown_kwarg_1': 7, 'unknown_kwarg_2': 5})
 
-    @flaky(3, 1)
+    # @flaky(3, 1)
     @pytest.mark.asyncio
     @pytest.mark.timeout(10)
     async def test_get_me_and_properties(self, bot: Bot):
@@ -148,7 +148,8 @@ class TestBot:
         assert f'https://t.me/{get_me_bot.username}' == bot.link
         assert commands == bot.commands
         bot._commands = None
-        assert commands == bot.commands
+        with pytest.raises(RuntimeError):
+            assert commands == bot.commands
 
     def test_equality(self):
         a = Bot(FALLBACKS[0]["token"])
