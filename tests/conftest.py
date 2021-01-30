@@ -24,7 +24,7 @@ from collections import defaultdict
 from queue import Queue
 from threading import Thread, Event
 from time import sleep
-from typing import Callable, List, Dict
+from typing import Callable, List, Dict, Optional
 
 import pytest
 import pytz
@@ -43,7 +43,9 @@ from telegram import (
     ChosenInlineResult,
 )
 from telegram.ext import Dispatcher, JobQueue, Updater, MessageFilter, Defaults, UpdateFilter
-from telegram.error import BadRequest
+from telegram.error import BadRequest, RetryAfter, TimedOut
+from telegram.utils.request_httpx import PtbHttpx
+from telegram.utils.types import JSONDict
 from tests.bots import get_bot
 
 GITHUB_ACTION = os.getenv('GITHUB_ACTION', False)
@@ -194,9 +196,26 @@ def pytest_configure(config):
 
 
 async def make_bot(bot_info, **kwargs):
-    bot = Bot(bot_info['token'], private_key=PRIVATE_KEY, **kwargs)
+    bot = Bot(bot_info['token'], private_key=PRIVATE_KEY, request=PtbTestHttpx(), **kwargs)
     await bot.do_init()
     return bot
+
+
+class PtbTestHttpx(PtbHttpx):
+    async def _request_wrapper(
+        self,
+        method: str,
+        url: str,
+        data: Optional[JSONDict],
+        is_files: bool,
+        read_timeout: float = None,
+    ) -> bytes:
+        try:
+            return await super()._request_wrapper(method, url, data, is_files, read_timeout)
+        except RetryAfter as e:
+            pytest.xfail(f'Not waiting for flood control: {e}')
+        except TimedOut as e:
+            pytest.xfail(f'Ignoring TimedOut error: {e}')
 
 
 CMD_PATTERN = re.compile(r'/[\da-z_]{1,32}(?:@\w{1,32})?')
