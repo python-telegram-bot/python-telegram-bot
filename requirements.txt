@@ -1,6 +1,6 @@
 certifi
-tornado>=5.1
 cryptography
-decorator>=4.4.0
+# only telegram.ext: # Keep this line here; used in setup(-raw).py
+tornado>=5.1
 APScheduler==3.6.3
 pytz>=2018.6

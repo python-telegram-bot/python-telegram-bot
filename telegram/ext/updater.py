@@ -33,7 +33,7 @@ from telegram.ext import Dispatcher, JobQueue
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import get_signal_name
 from telegram.utils.request import Request
-from telegram.utils.webhookhandler import WebhookAppClass, WebhookServer
+from telegram.ext.utils.webhookhandler import WebhookAppClass, WebhookServer
 
 if TYPE_CHECKING:
     from telegram.ext import BasePersistence, Defaults

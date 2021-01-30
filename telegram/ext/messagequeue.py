@@ -26,7 +26,7 @@ import threading
 import time
 from typing import TYPE_CHECKING, Callable, List, NoReturn
 
-from telegram.utils.promise import Promise
+from telegram.ext.utils.promise import Promise
 
 if TYPE_CHECKING:
     from telegram import Bot

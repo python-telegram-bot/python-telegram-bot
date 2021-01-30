@@ -27,3 +27,4 @@ Hey! You're PRing? Cool! Please have a look at the below checklist. It's here to
     - [ ] Added new handlers for new update types
     - [ ] Added new filters for new message (sub)types
     - [ ] Added or updated documentation for the changed class(es) and/or method(s)
+    - [ ] Updated the Bot API version number in all places in `README.rst` and `README_RAW.rst`, including the badge

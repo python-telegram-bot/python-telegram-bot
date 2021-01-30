@@ -36,8 +36,6 @@ from typing import (
     no_type_check,
 )
 
-from decorator import decorate
-
 try:
     import ujson as json
 except ImportError:
@@ -113,14 +111,15 @@ def log(
 ) -> Callable[..., RT]:
     logger = logging.getLogger(func.__module__)
 
-    def decorator(self: 'Bot', *args: object, **kwargs: object) -> RT:  # pylint: disable=W0613
+    @functools.wraps(func)
+    def decorator(*args: object, **kwargs: object) -> RT:  # pylint: disable=W0613
         logger.debug('Entering: %s', func.__name__)
         result = func(*args, **kwargs)
         logger.debug(result)
         logger.debug('Exiting: %s', func.__name__)
         return result
 
-    return decorate(func, decorator)
+    return decorator
 
 
 class Bot(TelegramObject):
@@ -162,12 +161,16 @@ class Bot(TelegramObject):
         # For each method ...
         for method_name, method in inspect.getmembers(instance, predicate=inspect.ismethod):
             # ... get kwargs
-            argspec = inspect.getfullargspec(method)
-            kwarg_names = argspec.args[-len(argspec.defaults or []) :]
+            signature = inspect.signature(method, follow_wrapped=True)
+            kwarg_names = (
+                p.name
+                for p in signature.parameters.values()
+                if p.default != inspect.Signature.empty
+            )
             # ... check if Defaults has a attribute that matches the kwarg name
-            needs_default = [
+            needs_default = (
                 kwarg_name for kwarg_name in kwarg_names if hasattr(defaults, kwarg_name)
-            ]
+            )
             # ... make a dict of kwarg name and the default value
             default_kwargs = {
                 kwarg_name: getattr(defaults, kwarg_name)

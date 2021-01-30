@@ -25,7 +25,6 @@ import time
 
 from collections import defaultdict
 from html import escape
-from numbers import Number
 from pathlib import Path
 
 from typing import (
@@ -41,12 +40,19 @@ from typing import (
     IO,
 )
 
-import pytz  # pylint: disable=E0401
-
 from telegram.utils.types import JSONDict, FileInput
 
 if TYPE_CHECKING:
     from telegram import Message, Update, TelegramObject, InputFile
+
+# in PTB-Raw we don't have pytz, so we make a little workaround here
+DTM_UTC = dtm.timezone.utc
+try:
+    import pytz  # pylint: disable=E0401
+
+    UTC = pytz.utc
+except ImportError:
+    UTC = DTM_UTC  # type: ignore[assignment]
 
 try:
     import ujson as json
@@ -176,10 +182,19 @@ def _datetime_to_float_timestamp(dt_obj: dtm.datetime) -> float:
     return dt_obj.timestamp()
 
 
+def _localize(datetime: dtm.datetime, tzinfo: dtm.tzinfo) -> dtm.datetime:
+    """
+    Localize the datetime, where UTC is handled depending on whether pytz is available or not
+    """
+    if tzinfo is DTM_UTC:
+        return datetime.replace(tzinfo=DTM_UTC)
+    return tzinfo.localize(datetime)  # type: ignore[attr-defined]
+
+
 def to_float_timestamp(
     time_object: Union[int, float, dtm.timedelta, dtm.datetime, dtm.time],
     reference_timestamp: float = None,
-    tzinfo: pytz.BaseTzInfo = None,
+    tzinfo: dtm.tzinfo = None,
 ) -> float:
     """
     Converts a given time object to a float POSIX timestamp.
@@ -206,9 +221,13 @@ def to_float_timestamp(
             If ``t`` is given as an absolute representation of date & time (i.e. a
             ``datetime.datetime`` object), ``reference_timestamp`` is not relevant and so its
             value should be :obj:`None`. If this is not the case, a ``ValueError`` will be raised.
-        tzinfo (:obj:`datetime.tzinfo`, optional): If ``t`` is a naive object from the
+        tzinfo (:obj:`pytz.BaseTzInfo`, optional): If ``t`` is a naive object from the
             :class:`datetime` module, it will be interpreted as this timezone. Defaults to
             ``pytz.utc``.
+
+            Note:
+                Only to be used by ``telegram.ext``.
+
 
     Returns:
         (float | None) The return value depends on the type of argument ``t``. If ``t`` is
@@ -236,7 +255,7 @@ def to_float_timestamp(
         return reference_timestamp + time_object
 
     if tzinfo is None:
-        tzinfo = pytz.utc
+        tzinfo = UTC
 
     if isinstance(time_object, dtm.time):
         reference_dt = dtm.datetime.fromtimestamp(
@@ -247,7 +266,7 @@ def to_float_timestamp(
 
         aware_datetime = dtm.datetime.combine(reference_date, time_object)
         if aware_datetime.tzinfo is None:
-            aware_datetime = tzinfo.localize(aware_datetime)
+            aware_datetime = _localize(aware_datetime, tzinfo)
 
         # if the time of day has passed today, use tomorrow
         if reference_time > aware_datetime.timetz():
@@ -255,10 +274,8 @@ def to_float_timestamp(
         return _datetime_to_float_timestamp(aware_datetime)
     if isinstance(time_object, dtm.datetime):
         if time_object.tzinfo is None:
-            time_object = tzinfo.localize(time_object)
+            time_object = _localize(time_object, tzinfo)
         return _datetime_to_float_timestamp(time_object)
-    if isinstance(time_object, Number):
-        return reference_timestamp + time_object
 
     raise TypeError(f'Unable to convert {type(time_object).__name__} object to timestamp')
 
@@ -266,7 +283,7 @@ def to_float_timestamp(
 def to_timestamp(
     dt_obj: Union[int, float, dtm.timedelta, dtm.datetime, dtm.time, None],
     reference_timestamp: float = None,
-    tzinfo: pytz.BaseTzInfo = None,
+    tzinfo: dtm.tzinfo = None,
 ) -> Optional[int]:
     """
     Wrapper over :func:`to_float_timestamp` which returns an integer (the float value truncated
@@ -281,9 +298,7 @@ def to_timestamp(
     )
 
 
-def from_timestamp(
-    unixtime: Optional[int], tzinfo: dtm.tzinfo = pytz.utc
-) -> Optional[dtm.datetime]:
+def from_timestamp(unixtime: Optional[int], tzinfo: dtm.tzinfo = UTC) -> Optional[dtm.datetime]:
     """
     Converts an (integer) unix timestamp to a timezone aware datetime object.
     :obj:`None`s are left alone (i.e. ``from_timestamp(None)`` is :obj:`None`).
