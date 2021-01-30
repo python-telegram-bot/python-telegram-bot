@@ -78,9 +78,9 @@ def _render_part(self: RequestField, name: str, value: str) -> str:  # pylint: d
     Content-Disposition headers since telegram servers don't understand it. Instead just escape
     \\ and " and replace any \n and \r with a space.
     """
-    value = value.replace(u'\\', u'\\\\').replace(u'"', u'\\"')
-    value = value.replace(u'\r', u' ').replace(u'\n', u' ')
-    return u'{}="{}"'.format(name, value)
+    value = value.replace('\\', '\\\\').replace('"', '\\"')
+    value = value.replace('\r', ' ').replace('\n', ' ')
+    return f'{name}="{value}"'
 
 
 RequestField._render_part = _render_part  # type: ignore  # pylint: disable=W0212
@@ -130,14 +130,14 @@ class Request:
         # TODO: Support other platforms like mac and windows.
         if 'linux' in sys.platform:
             sockopts.append(
-                (socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 120)
-            )  # pylint: disable=no-member
+                (socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 120)  # pylint: disable=no-member
+            )
             sockopts.append(
-                (socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 30)
-            )  # pylint: disable=no-member
+                (socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 30)  # pylint: disable=no-member
+            )
             sockopts.append(
-                (socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 8)
-            )  # pylint: disable=no-member
+                (socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 8)  # pylint: disable=no-member
+            )
 
         self._con_pool_size = con_pool_size
 

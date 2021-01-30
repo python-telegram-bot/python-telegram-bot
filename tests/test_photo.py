@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
@@ -31,7 +30,7 @@ from tests.conftest import expect_bad_request, check_shortcut_call, check_shortc
 
 @pytest.fixture(scope='function')
 def photo_file():
-    f = open(u'tests/data/telegram.jpg', 'rb')
+    f = open('tests/data/telegram.jpg', 'rb')
     yield f
     f.close()
 
@@ -58,7 +57,7 @@ def photo(_photo):
 class TestPhoto:
     width = 800
     height = 800
-    caption = u'<b>PhotoTest</b> - *Caption*'
+    caption = '<b>PhotoTest</b> - *Caption*'
     photo_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram_new.jpg'
     file_size = 29176
 
@@ -350,7 +349,7 @@ class TestPhoto:
         """
         Regression test for https://github.com/python-telegram-bot/python-telegram-bot/issues/1202
         """
-        with open(u'tests/data/测试.png', 'rb') as f:
+        with open('tests/data/测试.png', 'rb') as f:
             message = bot.send_photo(photo=f, chat_id=chat_id)
 
         photo = message.photo[-1]

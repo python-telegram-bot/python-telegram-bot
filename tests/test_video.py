@@ -54,7 +54,7 @@ class TestVideo:
     thumb_height = 320
     thumb_file_size = 1767
 
-    caption = u'<b>VideoTest</b> - *Caption*'
+    caption = '<b>VideoTest</b> - *Caption*'
     video_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.mp4'
 
     video_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
