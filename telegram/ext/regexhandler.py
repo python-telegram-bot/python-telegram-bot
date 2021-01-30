@@ -20,7 +20,7 @@
 """This module contains the RegexHandler class."""
 
 import warnings
-from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, Pattern, TypeVar, Union
+from typing import TYPE_CHECKING, Callable, Dict, Optional, Pattern, TypeVar, Union, Any
 
 from telegram import Update
 from telegram.ext import Filters, MessageHandler
@@ -149,7 +149,7 @@ class RegexHandler(MessageHandler):
         dispatcher: 'Dispatcher',
         update: Update = None,
         check_result: Optional[Union[bool, Dict[str, Any]]] = None,
-    ) -> Dict[str, Any]:
+    ) -> Dict[str, object]:
         optional_args = super().collect_optional_args(dispatcher, update, check_result)
         if isinstance(check_result, dict):
             if self.pass_groups:

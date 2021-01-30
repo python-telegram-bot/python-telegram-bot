@@ -19,7 +19,7 @@
 """This module contains the StringRegexHandler class."""
 
 import re
-from typing import TYPE_CHECKING, Any, Callable, Dict, Match, Optional, Pattern, TypeVar, Union
+from typing import TYPE_CHECKING, Callable, Dict, Match, Optional, Pattern, TypeVar, Union
 
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
@@ -115,7 +115,7 @@ class StringRegexHandler(Handler[str]):
         self.pass_groups = pass_groups
         self.pass_groupdict = pass_groupdict
 
-    def check_update(self, update: Any) -> Optional[Match]:
+    def check_update(self, update: object) -> Optional[Match]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
@@ -136,7 +136,7 @@ class StringRegexHandler(Handler[str]):
         dispatcher: 'Dispatcher',
         update: str = None,
         check_result: Optional[Match] = None,
-    ) -> Dict[str, Any]:
+    ) -> Dict[str, object]:
         optional_args = super().collect_optional_args(dispatcher, update, check_result)
         if self.pattern:
             if self.pass_groups and check_result:

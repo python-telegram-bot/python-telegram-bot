@@ -18,8 +18,15 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the :class:`telegram.ext.utils.promise.Promise` class for backwards
 compatibility."""
+import warnings
 
 import telegram.ext.utils.promise as promise
+from telegram.utils.deprecate import TelegramDeprecationWarning
+
+warnings.warn(
+    'telegram.utils.promise is deprecated. Please use telegram.ext.utils.promise instead.',
+    TelegramDeprecationWarning,
+)
 
 Promise = promise.Promise
 """

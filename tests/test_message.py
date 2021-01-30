@@ -47,6 +47,7 @@ from telegram import (
     ProximityAlertTriggered,
     Dice,
     Bot,
+    ChatAction,
 )
 from telegram.ext import Defaults
 from tests.conftest import check_shortcut_signature, check_shortcut_call
@@ -1046,6 +1047,88 @@ class TestMessage:
         monkeypatch.setattr(message.bot, 'send_dice', make_assertion)
         assert message.reply_dice(disable_notification=True)
         assert message.reply_dice(disable_notification=True, quote=True)
+
+    def test_reply_action(self, monkeypatch, message: Message):
+        send_chat_action = message.bot.send_chat_action
+
+        def make_assertion(*_, **kwargs):
+            id_ = kwargs['chat_id'] == message.chat_id
+            action = kwargs['action'] == ChatAction.TYPING
+            return id_ and action and check_shortcut_call(kwargs, send_chat_action)
+
+        assert check_shortcut_signature(
+            Message.reply_chat_action, Bot.send_chat_action, ['chat_id'], []
+        )
+
+        monkeypatch.setattr(message.bot, 'send_chat_action', make_assertion)
+        assert message.reply_chat_action(action=ChatAction.TYPING)
+
+    def test_reply_game(self, monkeypatch, message: Message):
+        send_game = message.bot.send_game
+
+        def make_assertion(*_, **kwargs):
+            return (
+                kwargs['chat_id'] == message.chat_id
+                and kwargs['game_short_name'] == 'test_game'
+                and check_shortcut_call(kwargs, send_game)
+            )
+
+        assert check_shortcut_signature(Message.reply_game, Bot.send_game, ['chat_id'], ['quote'])
+
+        monkeypatch.setattr(message.bot, 'send_game', make_assertion)
+        assert message.reply_game(game_short_name='test_game')
+        assert message.reply_game(game_short_name='test_game', quote=True)
+
+    def test_reply_invoice(self, monkeypatch, message: Message):
+        send_invoice = message.bot.send_invoice
+
+        def make_assertion(*_, **kwargs):
+            title = kwargs['title'] == 'title'
+            description = kwargs['description'] == 'description'
+            payload = kwargs['payload'] == 'payload'
+            provider_token = kwargs['provider_token'] == 'provider_token'
+            start_parameter = kwargs['start_parameter'] == 'start_parameter'
+            currency = kwargs['currency'] == 'currency'
+            prices = kwargs['prices'] == 'prices'
+            args = (
+                title
+                and description
+                and payload
+                and provider_token
+                and start_parameter
+                and currency
+                and prices
+            )
+            return (
+                kwargs['chat_id'] == message.chat_id
+                and args
+                and check_shortcut_call(kwargs, send_invoice)
+            )
+
+        assert check_shortcut_signature(
+            Message.reply_invoice, Bot.send_invoice, ['chat_id'], ['quote']
+        )
+
+        monkeypatch.setattr(message.bot, 'send_invoice', make_assertion)
+        assert message.reply_invoice(
+            'title',
+            'description',
+            'payload',
+            'provider_token',
+            'start_parameter',
+            'currency',
+            'prices',
+        )
+        assert message.reply_invoice(
+            'title',
+            'description',
+            'payload',
+            'provider_token',
+            'start_parameter',
+            'currency',
+            'prices',
+            quote=True,
+        )
 
     @pytest.mark.parametrize('disable_notification', [False, True])
     def test_forward(self, monkeypatch, message, disable_notification):
