@@ -6,9 +6,9 @@ pylint==2.6.0
 mypy==0.790
 pyupgrade==2.7.4
 
-pytest==4.2.0
-# Need older attrs version for pytest 4.2.0
-attrs==19.1.0
+pytest>=6.2.2
+attrs>=20.3.0
+pytest-asyncio
 
 flaky
 beautifulsoup4

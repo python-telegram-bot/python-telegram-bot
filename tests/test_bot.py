@@ -56,11 +56,11 @@ HIGHSCORE_DELTA = 1450000000
 
 
 @pytest.fixture(scope='class')
-def message(bot, chat_id):
-    to_reply_to = bot.send_message(
+async def message(bot, chat_id):
+    to_reply_to = await bot.send_message(
         chat_id, 'Text', disable_web_page_preview=True, disable_notification=True
     )
-    return bot.send_message(
+    return await bot.send_message(
         chat_id,
         'Text',
         reply_to_message_id=to_reply_to.message_id,
@@ -130,8 +130,9 @@ class TestBot:
         bot.send_message(123, 'text', api_kwargs={'unknown_kwarg_1': 7, 'unknown_kwarg_2': 5})
 
     @flaky(3, 1)
+    @pytest.mark.asyncio
     @pytest.mark.timeout(10)
-    def test_get_me_and_properties(self, bot):
+    async def test_get_me_and_properties(self, bot):
         get_me_bot = bot.get_me()
         commands = bot.get_my_commands()
 

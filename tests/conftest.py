@@ -62,15 +62,15 @@ def bot_info():
 
 
 @pytest.fixture(scope='session')
-def bot(bot_info):
-    return make_bot(bot_info)
+async def bot(bot_info):
+    return await make_bot(bot_info)
 
 
 DEFAULT_BOTS = {}
 
 
 @pytest.fixture(scope='function')
-def default_bot(request, bot_info):
+async def default_bot(request, bot_info):
     param = request.param if hasattr(request, 'param') else {}
 
     defaults = Defaults(**param)
@@ -78,19 +78,19 @@ def default_bot(request, bot_info):
     if default_bot:
         return default_bot
     else:
-        default_bot = make_bot(bot_info, **{'defaults': defaults})
+        default_bot = await make_bot(bot_info, **{'defaults': defaults})
         DEFAULT_BOTS[defaults] = default_bot
         return default_bot
 
 
 @pytest.fixture(scope='function')
-def tz_bot(timezone, bot_info):
+async def tz_bot(timezone, bot_info):
     defaults = Defaults(tzinfo=timezone)
     default_bot = DEFAULT_BOTS.get(defaults)
     if default_bot:
         return default_bot
     else:
-        default_bot = make_bot(bot_info, **{'defaults': defaults})
+        default_bot = await make_bot(bot_info, **{'defaults': defaults})
         DEFAULT_BOTS[defaults] = default_bot
         return default_bot
 
@@ -193,15 +193,17 @@ def pytest_configure(config):
     # TODO: Write so good code that we don't need to ignore ResourceWarnings anymore
 
 
-def make_bot(bot_info, **kwargs):
-    return Bot(bot_info['token'], private_key=PRIVATE_KEY, **kwargs)
+async def make_bot(bot_info, **kwargs):
+    bot = Bot(bot_info['token'], private_key=PRIVATE_KEY, **kwargs)
+    await bot.do_init()
+    return bot
 
 
 CMD_PATTERN = re.compile(r'/[\da-z_]{1,32}(?:@\w{1,32})?')
 DATE = datetime.datetime.now()
 
 
-def make_message(text, **kwargs):
+async def make_message(text, **kwargs):
     """
     Testing utility factory to create a fake ``telegram.Message`` with
     reasonable defaults for mimicking a real message.
@@ -214,7 +216,7 @@ def make_message(text, **kwargs):
         date=kwargs.pop('date', DATE),
         chat=kwargs.pop('chat', Chat(id=1, type='')),
         text=text,
-        bot=kwargs.pop('bot', make_bot(get_bot())),
+        bot=kwargs.pop('bot', await make_bot(get_bot())),
         **kwargs,
     )
 
