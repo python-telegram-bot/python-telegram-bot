@@ -132,9 +132,9 @@ class TestBot:
     @flaky(3, 1)
     @pytest.mark.asyncio
     @pytest.mark.timeout(10)
-    async def test_get_me_and_properties(self, bot):
-        get_me_bot = bot.get_me()
-        commands = bot.get_my_commands()
+    async def test_get_me_and_properties(self, bot: Bot):
+        get_me_bot = await bot.get_me()
+        commands = await bot.get_my_commands()
 
         assert isinstance(get_me_bot, User)
         assert get_me_bot.id == bot.id
