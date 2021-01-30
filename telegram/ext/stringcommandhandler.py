@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the StringCommandHandler class."""
 
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Callable, Dict, List, Optional, TypeVar, Union
 
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
@@ -100,7 +100,7 @@ class StringCommandHandler(Handler[str]):
         self.command = command
         self.pass_args = pass_args
 
-    def check_update(self, update: Any) -> Optional[List[str]]:
+    def check_update(self, update: object) -> Optional[List[str]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
@@ -121,7 +121,7 @@ class StringCommandHandler(Handler[str]):
         dispatcher: 'Dispatcher',
         update: str = None,
         check_result: Optional[List[str]] = None,
-    ) -> Dict[str, Any]:
+    ) -> Dict[str, object]:
         optional_args = super().collect_optional_args(dispatcher, update, check_result)
         if self.pass_args:
             optional_args['args'] = check_result

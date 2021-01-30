@@ -20,7 +20,6 @@
 import re
 from typing import (
     TYPE_CHECKING,
-    Any,
     Callable,
     Dict,
     Match,
@@ -147,7 +146,7 @@ class InlineQueryHandler(Handler[Update]):
         self.pass_groups = pass_groups
         self.pass_groupdict = pass_groupdict
 
-    def check_update(self, update: Any) -> Optional[Union[bool, Match]]:
+    def check_update(self, update: object) -> Optional[Union[bool, Match]]:
         """
         Determines whether an update should be passed to this handlers :attr:`callback`.
 
@@ -174,7 +173,7 @@ class InlineQueryHandler(Handler[Update]):
         dispatcher: 'Dispatcher',
         update: Update = None,
         check_result: Optional[Union[bool, Match]] = None,
-    ) -> Dict[str, Any]:
+    ) -> Dict[str, object]:
         optional_args = super().collect_optional_args(dispatcher, update, check_result)
         if self.pattern:
             check_result = cast(Match, check_result)

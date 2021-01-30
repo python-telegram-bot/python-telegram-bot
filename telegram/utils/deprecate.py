@@ -19,7 +19,7 @@
 """This module facilitates the deprecation of functions."""
 
 import warnings
-from typing import Any, Callable, TypeVar
+from typing import Callable, TypeVar
 
 RT = TypeVar('RT')
 
@@ -42,7 +42,7 @@ def warn_deprecate_obj(old: str, new: str, stacklevel: int = 3) -> None:
 def deprecate(func: Callable[..., RT], old: str, new: str) -> Callable[..., RT]:
     """Warn users invoking old to switch to the new function."""
 
-    def wrapped(*args: Any, **kwargs: Any) -> RT:
+    def wrapped(*args: object, **kwargs: object) -> RT:
         warn_deprecate_obj(old, new)
         return func(*args, **kwargs)
 

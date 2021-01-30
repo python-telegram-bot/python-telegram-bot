@@ -24,7 +24,7 @@ from collections import defaultdict
 from queue import Queue
 from threading import Thread, Event
 from time import sleep
-from typing import Callable, List, Dict, Any
+from typing import Callable, List, Dict
 
 import pytest
 import pytz
@@ -407,7 +407,7 @@ def check_shortcut_signature(
 
 
 def check_shortcut_call(
-    kwargs: Dict[str, Any],
+    kwargs: Dict[str, object],
     bot_method: Callable,
 ) -> bool:
     """

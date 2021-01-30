@@ -24,7 +24,7 @@ import functools
 import queue as q
 import threading
 import time
-from typing import TYPE_CHECKING, Any, Callable, List, NoReturn
+from typing import TYPE_CHECKING, Callable, List, NoReturn
 
 from telegram.utils.promise import Promise
 
@@ -153,7 +153,7 @@ class DelayQueue(threading.Thread):
 
         raise exc
 
-    def __call__(self, func: Callable, *args: Any, **kwargs: Any) -> None:
+    def __call__(self, func: Callable, *args: object, **kwargs: object) -> None:
         """Used to process callbacks in throughput-limiting thread through queue.
 
         Args:
@@ -300,7 +300,7 @@ def queuedmessage(method: Callable) -> Callable:
     """
 
     @functools.wraps(method)
-    def wrapped(self: 'Bot', *args: Any, **kwargs: Any) -> Any:
+    def wrapped(self: 'Bot', *args: object, **kwargs: object) -> object:
         # pylint: disable=W0212
         queued = kwargs.pop(
             'queued', self._is_messages_queued_default  # type: ignore[attr-defined]

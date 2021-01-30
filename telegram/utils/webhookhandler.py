@@ -79,7 +79,7 @@ class WebhookServer:
                 return
             self.loop.add_callback(self.loop.stop)  # type: ignore
 
-    def handle_error(self, request: Any, client_address: str) -> None:  # pylint: disable=W0613
+    def handle_error(self, request: object, client_address: str) -> None:  # pylint: disable=W0613
         """Handle an error gracefully."""
         self.logger.debug(
             'Exception happened during processing of request from %s',

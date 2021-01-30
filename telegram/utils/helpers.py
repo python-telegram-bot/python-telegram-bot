@@ -185,7 +185,7 @@ def to_float_timestamp(
     Converts a given time object to a float POSIX timestamp.
     Used to convert different time specifications to a common format. The time object
     can be relative (i.e. indicate a time increment, or a time of day) or absolute.
-    Any objects from the :class:`datetime` module that are timezone-naive will be assumed
+    object objects from the :class:`datetime` module that are timezone-naive will be assumed
     to be in UTC, if ``bot`` is not passed or ``bot.defaults`` is :obj:`None`.
 
     Args:
@@ -412,7 +412,7 @@ def create_deep_linked_url(bot_username: str, payload: str = None, group: bool =
     return f'{base_url}?{key}={payload}'
 
 
-def encode_conversations_to_json(conversations: Dict[str, Dict[Tuple, Any]]) -> str:
+def encode_conversations_to_json(conversations: Dict[str, Dict[Tuple, object]]) -> str:
     """Helper method to encode a conversations dict (that uses tuples as keys) to a
     JSON-serializable way. Use :attr:`_decode_conversations_from_json` to decode.
 
@@ -430,7 +430,7 @@ def encode_conversations_to_json(conversations: Dict[str, Dict[Tuple, Any]]) -> 
     return json.dumps(tmp)
 
 
-def decode_conversations_from_json(json_string: str) -> Dict[str, Dict[Tuple, Any]]:
+def decode_conversations_from_json(json_string: str) -> Dict[str, Dict[Tuple, object]]:
     """Helper method to decode a conversations dict (that uses tuples as keys) from a
     JSON-string created with :attr:`_encode_conversations_to_json`.
 
@@ -441,7 +441,7 @@ def decode_conversations_from_json(json_string: str) -> Dict[str, Dict[Tuple, An
         :obj:`dict`: The conversations dict after decoding
     """
     tmp = json.loads(json_string)
-    conversations: Dict[str, Dict[Tuple, Any]] = {}
+    conversations: Dict[str, Dict[Tuple, object]] = {}
     for handler, states in tmp.items():
         conversations[handler] = {}
         for key, state in states.items():
@@ -449,7 +449,7 @@ def decode_conversations_from_json(json_string: str) -> Dict[str, Dict[Tuple, An
     return conversations
 
 
-def decode_user_chat_data_from_json(data: str) -> DefaultDict[int, Dict[Any, Any]]:
+def decode_user_chat_data_from_json(data: str) -> DefaultDict[int, Dict[object, object]]:
     """Helper method to decode chat or user data (that uses ints as keys) from a
     JSON-string.
 
@@ -460,7 +460,7 @@ def decode_user_chat_data_from_json(data: str) -> DefaultDict[int, Dict[Any, Any
         :obj:`dict`: The user/chat_data defaultdict after decoding
     """
 
-    tmp: DefaultDict[int, Dict[Any, Any]] = defaultdict(dict)
+    tmp: DefaultDict[int, Dict[object, object]] = defaultdict(dict)
     decoded_data = json.loads(data)
     for user, user_data in decoded_data.items():
         user = int(user)
@@ -519,7 +519,7 @@ class DefaultValue:
 
     """
 
-    def __init__(self, value: Any = None):
+    def __init__(self, value: object = None):
         self.value = value
 
     def __bool__(self) -> bool:

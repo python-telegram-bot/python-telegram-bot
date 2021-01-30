@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the ChosenInlineResultHandler class."""
 
-from typing import Optional, TypeVar, Union, Any
+from typing import Optional, TypeVar, Union
 
 from telegram import Update
 
@@ -85,7 +85,7 @@ class ChosenInlineResultHandler(Handler[Update]):
 
     """
 
-    def check_update(self, update: Any) -> Optional[Union[bool, object]]:
+    def check_update(self, update: object) -> Optional[Union[bool, object]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:

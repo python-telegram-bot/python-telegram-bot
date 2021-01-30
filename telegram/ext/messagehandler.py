@@ -19,7 +19,7 @@
 # TODO: Remove allow_edited
 """This module contains the MessageHandler class."""
 import warnings
-from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Callable, Dict, Optional, TypeVar, Union
 
 from telegram import Update
 from telegram.ext import BaseFilter, Filters
@@ -179,7 +179,7 @@ class MessageHandler(Handler[Update]):
                     Filters.update.edited_message | Filters.update.edited_channel_post
                 )
 
-    def check_update(self, update: Any) -> Optional[Union[bool, Dict[str, Any]]]:
+    def check_update(self, update: object) -> Optional[Union[bool, Dict[str, object]]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
@@ -198,7 +198,7 @@ class MessageHandler(Handler[Update]):
         context: 'CallbackContext',
         update: Update,
         dispatcher: 'Dispatcher',
-        check_result: Optional[Union[bool, Dict[str, Any]]],
+        check_result: Optional[Union[bool, Dict[str, object]]],
     ) -> None:
         if isinstance(check_result, dict):
             context.update(check_result)
