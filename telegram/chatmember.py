@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatMember."""
 import datetime
-from typing import TYPE_CHECKING, Optional, ClassVar, Any
+from typing import TYPE_CHECKING, Any, Optional, ClassVar
 
 from telegram import TelegramObject, User, constants
 from telegram.utils.helpers import from_timestamp, to_timestamp

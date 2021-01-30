@@ -21,7 +21,7 @@
 import datetime
 import sys
 from html import escape
-from typing import TYPE_CHECKING, Dict, List, Optional, Union, ClassVar, Tuple, Any
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, ClassVar, Tuple
 
 from telegram import (
     Animation,

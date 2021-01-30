@@ -28,7 +28,7 @@ try:
 except ImportError:
     import json  # type: ignore[no-redef]
 
-from typing import Union, Any
+from typing import Any, Union
 
 import certifi  # pylint: disable=E0401
 

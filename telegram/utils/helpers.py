@@ -30,6 +30,7 @@ from pathlib import Path
 
 from typing import (
     TYPE_CHECKING,
+    Any,
     DefaultDict,
     Dict,
     Optional,
@@ -38,7 +39,6 @@ from typing import (
     Type,
     cast,
     IO,
-    Any,
 )
 
 import pytz  # pylint: disable=E0401

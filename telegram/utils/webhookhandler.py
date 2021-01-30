@@ -25,7 +25,7 @@ import sys
 from queue import Queue
 from ssl import SSLContext
 from threading import Event, Lock
-from typing import TYPE_CHECKING, Optional, Any
+from typing import TYPE_CHECKING, Any, Optional
 
 import tornado.web
 from tornado import httputil

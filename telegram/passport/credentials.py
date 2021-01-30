@@ -23,7 +23,7 @@ except ImportError:
     import json  # type: ignore[no-redef]
 
 from base64 import b64decode
-from typing import TYPE_CHECKING, List, Optional, Tuple, Union, no_type_check, Any
+from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Union, no_type_check
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric.padding import MGF1, OAEP

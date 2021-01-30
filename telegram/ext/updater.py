@@ -25,17 +25,7 @@ from queue import Queue
 from signal import SIGABRT, SIGINT, SIGTERM, signal
 from threading import Event, Lock, Thread, current_thread
 from time import sleep
-from typing import (
-    TYPE_CHECKING,
-    Callable,
-    Dict,
-    List,
-    Optional,
-    Tuple,
-    Union,
-    no_type_check,
-    Any,
-)
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, Union, no_type_check
 
 from telegram import Bot, TelegramError
 from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized

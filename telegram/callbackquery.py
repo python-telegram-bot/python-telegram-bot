@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=W0622
 """This module contains an object that represents a Telegram CallbackQuery"""
-from typing import TYPE_CHECKING, List, Optional, Union, Tuple, ClassVar, Any
+from typing import TYPE_CHECKING, Any, List, Optional, Union, Tuple, ClassVar
 
 from telegram import Message, TelegramObject, User, Location, ReplyMarkup, constants
 from telegram.utils.types import JSONDict

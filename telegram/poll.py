@@ -21,7 +21,7 @@
 
 import datetime
 import sys
-from typing import TYPE_CHECKING, Dict, List, Optional, ClassVar, Any
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, ClassVar
 
 from telegram import MessageEntity, TelegramObject, User, constants
 from telegram.utils.helpers import from_timestamp, to_timestamp

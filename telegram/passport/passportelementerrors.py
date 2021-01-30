@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=W0622
 """This module contains the classes that represent Telegram PassportElementError."""
+
 from typing import Any
 
 from telegram import TelegramObject

@@ -22,7 +22,7 @@ import shutil
 import urllib.parse as urllib_parse
 from base64 import b64decode
 from os.path import basename
-from typing import IO, TYPE_CHECKING, Optional, Union, Any
+from typing import IO, TYPE_CHECKING, Any, Optional, Union
 
 from telegram import TelegramObject
 from telegram.passport.credentials import decrypt

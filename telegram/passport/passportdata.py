@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Contains information about Telegram Passport data shared with the bot by the user."""
 
-from typing import TYPE_CHECKING, List, Optional, Any
+from typing import TYPE_CHECKING, Any, List, Optional
 
 from telegram import EncryptedCredentials, EncryptedPassportElement, TelegramObject
 from telegram.utils.types import JSONDict

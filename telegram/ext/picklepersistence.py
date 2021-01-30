@@ -20,7 +20,7 @@
 import pickle
 from collections import defaultdict
 from copy import deepcopy
-from typing import DefaultDict, Dict, Optional, Tuple, Any
+from typing import Any, DefaultDict, Dict, Optional, Tuple
 
 from telegram.ext import BasePersistence
 from telegram.utils.types import ConversationDict

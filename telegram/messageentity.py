@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram MessageEntity."""
 
-from typing import TYPE_CHECKING, List, Optional, ClassVar, Any
+from typing import TYPE_CHECKING, Any, List, Optional, ClassVar
 
 from telegram import TelegramObject, User, constants
 from telegram.utils.types import JSONDict

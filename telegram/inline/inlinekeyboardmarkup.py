@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardMarkup."""
 
-from typing import TYPE_CHECKING, List, Optional, Any
+from typing import TYPE_CHECKING, Any, List, Optional
 
 from telegram import InlineKeyboardButton, ReplyMarkup
 from telegram.utils.types import JSONDict

@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram WebhookInfo."""
 
-from typing import List, Any
+from typing import Any, List
 
 from telegram import TelegramObject
 

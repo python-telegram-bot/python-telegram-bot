@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Proximity Alert."""
-from typing import Optional, TYPE_CHECKING, Any
+from typing import Any, Optional, TYPE_CHECKING
 
 from telegram import TelegramObject, User
 from telegram.utils.types import JSONDict

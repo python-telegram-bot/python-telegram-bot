@@ -36,9 +36,6 @@ TO = TypeVar('TO', bound='TelegramObject', covariant=True)
 class TelegramObject:
     """Base class for most telegram objects."""
 
-    # def __init__(self, *args: object, **_kwargs: Any):
-    #     pass
-
     _id_attrs: Tuple[object, ...] = ()
 
     def __str__(self) -> str:

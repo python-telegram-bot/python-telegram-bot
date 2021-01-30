@@ -19,7 +19,7 @@
 """This module contains the base class for handlers as used by the Dispatcher."""
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Callable, Dict, Optional, TypeVar, Union, Generic, Any
+from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, TypeVar, Union, Generic
 
 from telegram import Update
 from telegram.utils.promise import Promise

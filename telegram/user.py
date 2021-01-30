@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram User."""
 from datetime import datetime
-from typing import TYPE_CHECKING, List, Optional, Union, Tuple, Any
+from typing import TYPE_CHECKING, Any, List, Optional, Union, Tuple
 
 from telegram import TelegramObject, constants
 from telegram.utils.helpers import mention_html as util_mention_html, DefaultValue, DEFAULT_NONE
