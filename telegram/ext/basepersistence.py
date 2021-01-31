@@ -82,8 +82,8 @@ class BasePersistence(ABC):
     if version_info < (3, 7):
         __slots__ = ('store_user_data', 'store_chat_data', 'store_bot_data', 'bot')
     else:
-        __slots__ = (  # type: ignore
-            'store_user_data',
+        __slots__ = (
+            'store_user_data',  # type: ignore[assignment]
             'store_chat_data',
             'store_bot_data',
             'bot',

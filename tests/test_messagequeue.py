@@ -48,7 +48,7 @@ class TestDelayQueue:
             val = getattr(q, member[0], 'err')
             assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
-    def test_warning_setting_custom_attr(self, bot, recwarn):
+    def test_warning_setting_custom_attr_dq(self, bot, recwarn):
         inst = mq.DelayQueue(
             burst_limit=self.burst_limit, time_limit_ms=self.time_limit_ms, autostart=True
         )
@@ -56,6 +56,14 @@ class TestDelayQueue:
         assert len(recwarn) == 1 and 'custom attributes' in str(recwarn[0].message)
         with pytest.warns(None) as check:
             inst.burst_limit = 20
+        assert not check
+
+    def test_warning_setting_custom_attr_mq(self, bot, recwarn):
+        inst = mq.MessageQueue()
+        inst.custom = 'bad practice!'
+        assert len(recwarn) == 1 and 'custom attributes' in str(recwarn[0].message)
+        with pytest.warns(None) as check:
+            inst._all_delayq = 'something'
         assert not check
 
     def call(self):

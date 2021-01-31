@@ -35,6 +35,11 @@ class TestDefault:
             val = getattr(a, member[0], 'err')
             assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
+    def test_warning_setting_custom_attr(self, recwarn):
+        inst = Defaults(parse_mode='HTML', quote=True)
+        inst.custom = 'bad practice!'
+        assert len(recwarn) == 1 and 'custom attributes' in str(recwarn[0].message)
+
     def test_data_assignment(self, cdp):
         defaults = Defaults()
 

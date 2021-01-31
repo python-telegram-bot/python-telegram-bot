@@ -103,8 +103,8 @@ class Handler(Generic[UT], ABC):
             'run_async',
         )
     else:
-        __slots__ = (  # type: ignore[assignment]
-            'callback',
+        __slots__ = (
+            'callback',  # type: ignore[assignment]
             'pass_update_queue',
             'pass_job_queue',
             'pass_user_data',

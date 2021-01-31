@@ -42,6 +42,11 @@ class TestParseMode:
             val = getattr(p, member[0], 'err')
             assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
+    def test_warning_setting_custom_attr(self, recwarn):
+        inst = ParseMode()
+        inst.custom = 'bad practice!'
+        assert len(recwarn) == 1 and 'custom attributes' in str(recwarn[0].message)
+
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_message_with_parse_mode_markdown(self, bot, chat_id):

@@ -71,6 +71,11 @@ class TestChat:
             val = getattr(chat, member[0], 'err')
             assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
+    def test_warning_setting_custom_attr(self, recwarn):
+        inst = ChatAction()
+        inst.custom = 'bad practice!'
+        assert len(recwarn) == 1 and 'custom attributes' in str(recwarn[0].message)
+
     def test_de_json(self, bot):
         json_dict = {
             'id': self.id_,
