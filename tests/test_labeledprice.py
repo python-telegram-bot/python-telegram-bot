@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 
@@ -30,6 +31,15 @@ def labeled_price():
 class TestLabeledPrice:
     label = 'label'
     amount = 100
+
+    def test_extra_slots(self, labeled_price):
+        members = inspect.getmembers(
+            labeled_price.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(labeled_price, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_expected_values(self, labeled_price):
         assert labeled_price.label == self.label

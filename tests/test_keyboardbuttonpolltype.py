@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
+
 import pytest
 
 from telegram import KeyboardButtonPollType, Poll
@@ -28,6 +30,15 @@ def keyboard_button_poll_type():
 
 class TestKeyboardButtonPollType:
     type = Poll.QUIZ
+
+    def test_extra_slots(self, keyboard_button_poll_type):
+        members = inspect.getmembers(
+            keyboard_button_poll_type.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(keyboard_button_poll_type, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_to_dict(self, keyboard_button_poll_type):
         keyboard_button_poll_type_dict = keyboard_button_poll_type.to_dict()

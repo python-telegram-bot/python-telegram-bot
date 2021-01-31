@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 import os
 from pathlib import Path
 
@@ -52,6 +53,15 @@ class TestDocument:
     thumb_height = 300
     document_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
     document_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
+
+    def test_extra_slots(self, document):
+        members = inspect.getmembers(
+            document.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(document, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_creation(self, document):
         assert isinstance(document, Document)

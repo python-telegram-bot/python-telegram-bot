@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime
+import inspect
 
 import pytest
 
@@ -36,6 +37,15 @@ def chat_member(user):
 
 class TestChatMember:
     status = ChatMember.CREATOR
+
+    def test_extra_slots(self, chat_member):
+        members = inspect.getmembers(
+            chat_member.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(chat_member, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_de_json_required_args(self, bot, user):
         json_dict = {'user': user.to_dict(), 'status': self.status}

@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 from flaky import flaky
@@ -35,6 +36,15 @@ class TestInlineKeyboardMarkup:
             InlineKeyboardButton(text='button2', callback_data='data2'),
         ]
     ]
+
+    def test_extra_slots(self, inline_keyboard_markup):
+        members = inspect.getmembers(
+            inline_keyboard_markup.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(inline_keyboard_markup, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

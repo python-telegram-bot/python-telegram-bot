@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 
@@ -37,6 +38,15 @@ class TestInputTextMessageContent:
     parse_mode = ParseMode.MARKDOWN
     entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     disable_web_page_preview = True
+
+    def test_extra_slots(self, input_text_message_content):
+        members = inspect.getmembers(
+            input_text_message_content.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(input_text_message_content, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_expected_values(self, input_text_message_content):
         assert input_text_message_content.parse_mode == self.parse_mode

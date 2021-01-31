@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
+import inspect
 import os
 import pytest
 from flaky import flaky
@@ -46,6 +46,15 @@ class TestChatPhoto:
     chatphoto_small_file_unique_id = 'smalladc3145fd2e84d95b64d68eaa22aa33e'
     chatphoto_big_file_unique_id = 'bigadc3145fd2e84d95b64d68eaa22aa33e'
     chatphoto_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.jpg'
+
+    def test_extra_slots(self, chat_photo):
+        members = inspect.getmembers(
+            chat_photo.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(chat_photo, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

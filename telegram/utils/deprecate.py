@@ -47,3 +47,17 @@ def deprecate(func: Callable[..., RT], old: str, new: str) -> Callable[..., RT]:
         return func(*args, **kwargs)
 
     return wrapped
+
+
+# Function to warn users that setting custom attributes is deprecated (Use only in __setattr__!)
+# Checks if a custom attribute is added by checking length of dictionary before & after
+# assigning attribute. This is the fastest way to do it (I hope!).
+def set_new_attribute_deprecated(self: object, key: str, value: object) -> None:
+    org = len(self.__dict__)
+    object.__setattr__(self, key, value)
+    new = len(self.__dict__)
+    if new > org:
+        warnings.warn(
+            "Setting custom attributes is deprecated and will be removed in the next" " version",
+            TelegramDeprecationWarning,
+        )

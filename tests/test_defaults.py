@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 
@@ -24,6 +25,16 @@ from telegram import User
 
 
 class TestDefault:
+    def test_extra_slots(self):
+        a = Defaults(parse_mode='HTML', quote=True)
+        members = inspect.getmembers(
+            a.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(a, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+
     def test_data_assignment(self, cdp):
         defaults = Defaults()
 

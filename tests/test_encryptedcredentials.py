@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 
@@ -35,6 +36,15 @@ class TestEncryptedCredentials:
     data = 'data'
     hash = 'hash'
     secret = 'secret'
+
+    def test_extra_slots(self, encrypted_credentials):
+        members = inspect.getmembers(
+            encrypted_credentials.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(encrypted_credentials, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_expected_values(self, encrypted_credentials):
         assert encrypted_credentials.data == self.data

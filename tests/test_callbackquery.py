@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 
@@ -49,6 +50,16 @@ class TestCallbackQuery:
     data = 'data'
     inline_message_id = 'inline_message_id'
     game_short_name = 'the_game'
+
+    def test_extra_slots(self):
+        query = CallbackQuery(self.id_, self.from_user, 'chat')
+        members = inspect.getmembers(
+            CallbackQuery,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(query, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     @staticmethod
     def check_passed_ids(callback_query: CallbackQuery, kwargs):

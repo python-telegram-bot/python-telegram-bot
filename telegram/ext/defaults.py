@@ -22,6 +22,7 @@ from typing import NoReturn, Optional, Union
 
 import pytz
 
+from telegram.utils.deprecate import set_new_attribute_deprecated
 from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
 
 
@@ -106,6 +107,9 @@ class Defaults:
         self._quote = quote
         self._tzinfo = tzinfo
         self._run_async = run_async
+
+    def __setattr__(self, key: str, value: object) -> None:
+        set_new_attribute_deprecated(self, key, value)
 
     @property
     def parse_mode(self) -> Optional[str]:

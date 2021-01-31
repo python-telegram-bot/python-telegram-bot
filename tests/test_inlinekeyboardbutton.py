@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 
@@ -45,6 +46,15 @@ class TestInlineKeyboardButton:
     callback_game = 'callback_game'
     pay = 'pay'
     login_url = LoginUrl("http://google.com")
+
+    def test_extra_slots(self, inline_keyboard_button):
+        members = inspect.getmembers(
+            inline_keyboard_button.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(inline_keyboard_button, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_expected_values(self, inline_keyboard_button):
         assert inline_keyboard_button.text == self.text

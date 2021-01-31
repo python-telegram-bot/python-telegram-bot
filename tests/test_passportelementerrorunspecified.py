@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 
@@ -36,6 +37,15 @@ class TestPassportElementErrorUnspecified:
     type_ = 'test_type'
     element_hash = 'element_hash'
     message = 'Error message'
+
+    def test_extra_slots(self, passport_element_error_unspecified):
+        members = inspect.getmembers(
+            passport_element_error_unspecified.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(passport_element_error_unspecified, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_expected_values(self, passport_element_error_unspecified):
         assert passport_element_error_unspecified.source == self.source

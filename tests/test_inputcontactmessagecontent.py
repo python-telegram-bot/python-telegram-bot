@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 
@@ -35,6 +36,15 @@ class TestInputContactMessageContent:
     phone_number = 'phone number'
     first_name = 'first name'
     last_name = 'last name'
+
+    def test_extra_slots(self, input_contact_message_content):
+        members = inspect.getmembers(
+            input_contact_message_content.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(input_contact_message_content, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_expected_values(self, input_contact_message_content):
         assert input_contact_message_content.first_name == self.first_name

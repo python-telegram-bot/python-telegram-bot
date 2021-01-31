@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 
@@ -39,6 +40,15 @@ class TestShippingQuery:
     invoice_payload = 'invoice_payload'
     from_user = User(0, '', False)
     shipping_address = ShippingAddress('GB', '', 'London', '12 Grimmauld Place', '', 'WC1')
+
+    def test_extra_slots(self, shipping_query):
+        members = inspect.getmembers(
+            shipping_query.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(shipping_query, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_de_json(self, bot):
         json_dict = {

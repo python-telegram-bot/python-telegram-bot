@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 from queue import Queue
 
 import pytest
@@ -70,6 +71,16 @@ def false_update(request):
 
 class TestStringRegexHandler:
     test_flag = False
+
+    def test_extra_slots(self):
+        s = StringRegexHandler('pfft', self.callback_basic)
+        members = inspect.getmembers(
+            s.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(s, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     @pytest.fixture(autouse=True)
     def reset(self):

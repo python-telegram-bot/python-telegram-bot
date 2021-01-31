@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 
@@ -35,6 +36,15 @@ def chosen_inline_result(user):
 class TestChosenInlineResult:
     result_id = 'result id'
     query = 'query text'
+
+    def test_extra_slots(self, chosen_inline_result):
+        members = inspect.getmembers(
+            chosen_inline_result.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(chosen_inline_result, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_de_json_required(self, bot, user):
         json_dict = {'result_id': self.result_id, 'from': user.to_dict(), 'query': self.query}

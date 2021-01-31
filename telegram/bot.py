@@ -153,7 +153,6 @@ class Bot(TelegramObject):
         'base_url',
         'base_file_url',
         'private_key',
-        'private_key_password',
         'defaults',
         '_bot',
         '_commands',

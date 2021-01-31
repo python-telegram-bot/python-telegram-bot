@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 import os
 from pathlib import Path
 
@@ -51,6 +52,15 @@ class TestVoice:
 
     voice_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
     voice_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
+
+    def test_extra_slots(self, voice):
+        members = inspect.getmembers(
+            voice.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(voice, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_creation(self, voice):
         # Make sure file has been uploaded.

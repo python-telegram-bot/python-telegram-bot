@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
+import inspect
 import os
 from pathlib import Path
 
@@ -57,6 +57,22 @@ class TestAnimation:
     mime_type = 'video/mp4'
     file_size = 4127
     caption = "Test *animation*"
+
+    def test_extra_slots(self):
+        animation = Animation(
+            self.animation_file_id,
+            self.animation_file_unique_id,
+            self.height,
+            self.width,
+            self.duration,
+        )
+        members = inspect.getmembers(
+            Animation,
+            predicate=lambda a: not inspect.isroutine(a) and (inspect.ismemberdescriptor(a)),
+        )
+        for member in members:
+            val = getattr(animation, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_creation(self, animation):
         assert isinstance(animation, Animation)

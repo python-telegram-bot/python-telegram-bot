@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 from flaky import flaky
@@ -43,6 +44,15 @@ class TestLocation:
     live_period = 60
     heading = 90
     proximity_alert_radius = 50
+
+    def test_extra_slots(self, location):
+        members = inspect.getmembers(
+            location.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(location, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_de_json(self, bot):
         json_dict = {

@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 
@@ -60,6 +61,15 @@ class TestChat:
     bio = "I'm a Barbie Girl in a Barbie World"
     linked_chat_id = 11880
     location = ChatLocation(Location(123, 456), 'Barbie World')
+
+    def test_extra_slots(self, chat):
+        members = inspect.getmembers(
+            chat.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(chat, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_de_json(self, bot):
         json_dict = {

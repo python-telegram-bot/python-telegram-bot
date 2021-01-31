@@ -30,7 +30,7 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, Un
 from telegram import Bot, TelegramError
 from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized
 from telegram.ext import Dispatcher, JobQueue
-from telegram.utils.deprecate import TelegramDeprecationWarning
+from telegram.utils.deprecate import TelegramDeprecationWarning, set_new_attribute_deprecated
 from telegram.utils.helpers import get_signal_name
 from telegram.utils.request import Request
 from telegram.ext.utils.webhookhandler import WebhookAppClass, WebhookServer
@@ -107,19 +107,10 @@ class Updater:
 
     # '_request' is not included in slots since its a class variable too.
     __slots__ = (
-        'workers',
-        'private_key',
-        'base_url',
         'persistence',
-        'private_key_password',
-        'use_context',
         'dispatcher',
         'user_sig_handler',
-        'base_file_url',
-        'request_kwargs',
-        'defaults',
         'bot',
-        'token',
         'logger',
         'update_queue',
         'job_queue',
@@ -199,7 +190,7 @@ class Updater:
                     request_kwargs = {}
                 if 'con_pool_size' not in request_kwargs:
                     request_kwargs['con_pool_size'] = con_pool_size
-                self._request = Request(**request_kwargs)
+                self.__class__._request = Request(**request_kwargs)
                 self.bot = Bot(
                     token,  # type: ignore[arg-type]
                     base_url,
@@ -245,6 +236,9 @@ class Updater:
         self.httpd = None
         self.__lock = Lock()
         self.__threads: List[Thread] = []
+
+    def __setattr__(self, key: str, value: object) -> None:
+        set_new_attribute_deprecated(self, key, value)
 
     def _init_thread(self, target: Callable, name: str, *args: object, **kwargs: object) -> None:
         thr = Thread(

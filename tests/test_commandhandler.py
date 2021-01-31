@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 import re
 from queue import Queue
 
@@ -141,6 +142,16 @@ class BaseTest:
 
 class TestCommandHandler(BaseTest):
     CMD = '/test'
+
+    def test_extra_slots(self):
+        handler = self.make_default_handler()
+        members = inspect.getmembers(
+            handler.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(handler, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     @pytest.fixture(scope='class')
     def command(self):
@@ -295,6 +306,16 @@ class TestPrefixHandler(BaseTest):
     PREFIXES = ['!', '#', 'mytrig-']
     COMMANDS = ['help', 'test']
     COMBINATIONS = list(combinations(PREFIXES, COMMANDS))
+
+    def test_extra_slots(self):
+        handler = self.make_default_handler()
+        members = inspect.getmembers(
+            handler.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(handler, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     @pytest.fixture(scope='class', params=PREFIXES)
     def prefix(self, request):

@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
+
 from telegram import PhotoSize, UserProfilePhotos
 
 
@@ -31,6 +33,16 @@ class TestUserProfilePhotos:
             PhotoSize('file_id4', 'file_un_id4', 512, 512),
         ],
     ]
+
+    def test_extra_slots(self):
+        u = UserProfilePhotos(self.total_count, self.photos)
+        members = inspect.getmembers(
+            u.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(u, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_de_json(self, bot):
         json_dict = {'total_count': 2, 'photos': [[y.to_dict() for y in x] for x in self.photos]}

@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 
@@ -44,6 +45,15 @@ class TestGame:
     ).decode('unicode-escape')
     text_entities = [MessageEntity(13, 17, MessageEntity.URL)]
     animation = Animation('blah', 'unique_id', 320, 180, 1)
+
+    def test_extra_slots(self, game):
+        members = inspect.getmembers(
+            game.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(game, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_de_json_required(self, bot):
         json_dict = {

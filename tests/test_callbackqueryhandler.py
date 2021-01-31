@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 from queue import Queue
 
 import pytest
@@ -71,6 +72,17 @@ def callback_query(bot):
 
 class TestCallbackQueryHandler:
     test_flag = False
+
+    def test_extra_slots(self):
+        handler = CallbackQueryHandler(self.callback_data_1, pass_user_data=True)
+
+        members = inspect.getmembers(
+            CallbackQueryHandler,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(handler, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     @pytest.fixture(autouse=True)
     def reset(self):

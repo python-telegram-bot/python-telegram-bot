@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 from copy import deepcopy
 
 import pytest
@@ -229,6 +230,15 @@ class TestPassport:
     utility_bill_translation_2_file_unique_id = 'f008ca48c44b4a47895ddbcd2f76741e'
     driver_license_selfie_credentials_file_hash = 'Cila/qLXSBH7DpZFbb5bRZIRxeFW2uv/ulL0u0JNsYI='
     driver_license_selfie_credentials_secret = 'tivdId6RNYNsvXYPppdzrbxOBuBOr9wXRPDcCvnXU7E='
+
+    def test_extra_slots(self, passport_data):
+        members = inspect.getmembers(
+            passport_data.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(passport_data, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_creation(self, passport_data):
         assert isinstance(passport_data, PassportData)

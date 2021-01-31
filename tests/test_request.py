@@ -16,11 +16,23 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 
 from telegram import TelegramError
 from telegram.utils.request import Request
+
+
+def test_extra_slots():
+    r = Request()
+    members = inspect.getmembers(
+        r.__class__,
+        predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+    )
+    for member in members:
+        val = getattr(r, member[0], 'err')
+        assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
 
 def test_replaced_unprintable_char():

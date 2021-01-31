@@ -20,6 +20,7 @@
 """This module contains an object that represents a Telegram ChatAction."""
 from typing import ClassVar
 from telegram import constants
+from telegram.utils.deprecate import set_new_attribute_deprecated
 
 
 class ChatAction:
@@ -46,3 +47,6 @@ class ChatAction:
     """:const:`telegram.constants.CHATACTION_UPLOAD_VIDEO`"""
     UPLOAD_VIDEO_NOTE: ClassVar[str] = constants.CHATACTION_UPLOAD_VIDEO_NOTE
     """:const:`telegram.constants.CHATACTION_UPLOAD_VIDEO_NOTE`"""
+
+    def __setattr__(self, key: str, value: object) -> None:
+        set_new_attribute_deprecated(self, key, value)

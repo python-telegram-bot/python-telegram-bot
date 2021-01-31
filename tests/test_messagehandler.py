@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 import re
 from queue import Queue
 
@@ -70,6 +71,16 @@ def message(bot):
 class TestMessageHandler:
     test_flag = False
     SRE_TYPE = type(re.match("", ""))
+
+    def test_extra_slots(self):
+        handler = MessageHandler(Filters.all, self.callback_basic)
+        members = inspect.getmembers(
+            handler.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(handler, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     @pytest.fixture(autouse=True)
     def reset(self):

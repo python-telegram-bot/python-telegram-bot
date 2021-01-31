@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 
@@ -41,6 +42,15 @@ class TestInlineQuery:
     query = 'query text'
     offset = 'offset'
     location = Location(8.8, 53.1)
+
+    def test_extra_slots(self, inline_query):
+        members = inspect.getmembers(
+            inline_query.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(inline_query, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_de_json(self, bot):
         json_dict = {

@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 import logging
 import os
 import subprocess
@@ -27,6 +28,16 @@ from telegram import InputFile
 
 class TestInputFile:
     png = os.path.join('tests', 'data', 'game.png')
+
+    def test_extra_slots(self):
+        file = InputFile(BytesIO(b'blah'), filename='tg.jpg')
+        members = inspect.getmembers(
+            file.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(file, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_subprocess_pipe(self):
         if sys.platform == 'win32':

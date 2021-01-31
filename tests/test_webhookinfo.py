@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 import time
@@ -44,6 +45,15 @@ class TestWebhookInfo:
     last_error_date = time.time()
     max_connections = 42
     allowed_updates = ['type1', 'type2']
+
+    def test_extra_slots(self, webhook_info):
+        members = inspect.getmembers(
+            webhook_info.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(webhook_info, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_to_dict(self, webhook_info):
         webhook_info_dict = webhook_info.to_dict()

@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 from flaky import flaky
@@ -44,6 +45,15 @@ class TestInvoice:
     start_parameter = 'start_parameter'
     currency = 'EUR'
     total_amount = sum([p.amount for p in prices])
+
+    def test_extra_slots(self, invoice):
+        members = inspect.getmembers(
+            invoice.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(invoice, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_de_json(self, bot):
         invoice_json = Invoice.de_json(

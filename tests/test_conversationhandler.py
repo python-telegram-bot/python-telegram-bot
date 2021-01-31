@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 import logging
 from time import sleep
 
@@ -93,6 +94,26 @@ class TestConversationHandler:
 
     raise_dp_handler_stop = False
     test_flag = False
+
+    def test_extra_slots(self):
+        handler = ConversationHandler(self.entry_points, self.states, self.fallbacks)
+        members = inspect.getmembers(
+            handler.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        print(members)
+        for member in members:
+            if member[0] in {
+                'callback',
+                'pass_update_queue',
+                'pass_job_queue',
+                'pass_user_data',
+                'pass_chat_data',
+                'run_async',
+            }:
+                continue
+            val = getattr(handler, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     # Test related
     @pytest.fixture(autouse=True)

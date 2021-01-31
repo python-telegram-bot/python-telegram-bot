@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 
@@ -36,6 +37,15 @@ class TestPassportElementErrorSelfie:
     type_ = 'test_type'
     file_hash = 'file_hash'
     message = 'Error message'
+
+    def test_extra_slots(self, passport_element_error_selfie):
+        members = inspect.getmembers(
+            passport_element_error_selfie.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(passport_element_error_selfie, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_expected_values(self, passport_element_error_selfie):
         assert passport_element_error_selfie.source == self.source

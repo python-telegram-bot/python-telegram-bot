@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 from pathlib import Path
 
 import pytest
@@ -126,6 +127,15 @@ class TestInputMediaVideo:
     supports_streaming = True
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
 
+    def test_extra_slots(self, input_media_video):
+        members = inspect.getmembers(
+            input_media_video.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(input_media_video, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+
     def test_expected_values(self, input_media_video):
         assert input_media_video.type == self.type_
         assert input_media_video.media == self.media
@@ -184,6 +194,15 @@ class TestInputMediaPhoto:
     parse_mode = 'Markdown'
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
 
+    def test_extra_slots(self, input_media_photo):
+        members = inspect.getmembers(
+            input_media_photo.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(input_media_photo, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+
     def test_expected_values(self, input_media_photo):
         assert input_media_photo.type == self.type_
         assert input_media_photo.media == self.media
@@ -229,6 +248,15 @@ class TestInputMediaAnimation:
     width = 30
     height = 30
     duration = 1
+
+    def test_extra_slots(self, input_media_animation):
+        members = inspect.getmembers(
+            input_media_animation.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(input_media_animation, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_expected_values(self, input_media_animation):
         assert input_media_animation.type == self.type_
@@ -282,6 +310,15 @@ class TestInputMediaAudio:
     title = 'title'
     parse_mode = 'HTML'
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
+
+    def test_extra_slots(self, input_media_audio):
+        members = inspect.getmembers(
+            input_media_audio.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(input_media_audio, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_expected_values(self, input_media_audio):
         assert input_media_audio.type == self.type_
@@ -339,6 +376,15 @@ class TestInputMediaDocument:
     parse_mode = 'HTML'
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
     disable_content_type_detection = True
+
+    def test_extra_slots(self, input_media_document):
+        members = inspect.getmembers(
+            input_media_document.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(input_media_document, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_expected_values(self, input_media_document):
         assert input_media_document.type == self.type_

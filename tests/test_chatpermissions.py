@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 
@@ -45,6 +46,15 @@ class TestChatPermissions:
     can_change_info = False
     can_invite_users = None
     can_pin_messages = None
+
+    def test_extra_slots(self, chat_permissions):
+        members = inspect.getmembers(
+            chat_permissions.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(chat_permissions, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_de_json(self, bot):
         json_dict = {

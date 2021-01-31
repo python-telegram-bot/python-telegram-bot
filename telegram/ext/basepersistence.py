@@ -18,9 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the BasePersistence class."""
 import warnings
+from sys import version_info
 from abc import ABC, abstractmethod
 from copy import copy
 from typing import DefaultDict, Dict, Optional, Tuple, cast, ClassVar
+
+from telegram.utils.deprecate import set_new_attribute_deprecated
 
 from telegram import Bot
 
@@ -75,7 +78,17 @@ class BasePersistence(ABC):
             persistence class.
     """
 
-    __slots__ = ('store_user_data', 'store_chat_data', 'store_bot_data', 'bot', '__dict__')
+    # Apparently Py 3.7 and below have '__dict__' in ABC
+    if version_info < (3, 7):
+        __slots__ = ('store_user_data', 'store_chat_data', 'store_bot_data', 'bot')
+    else:
+        __slots__ = (  # type: ignore
+            'store_user_data',
+            'store_chat_data',
+            'store_bot_data',
+            'bot',
+            '__dict__',
+        )
 
     def __new__(
         cls, *args: object, **kwargs: object  # pylint: disable=W0613
@@ -124,6 +137,9 @@ class BasePersistence(ABC):
         self.store_chat_data = store_chat_data
         self.store_bot_data = store_bot_data
         self.bot: Bot = None  # type: ignore[assignment]
+
+    def __setattr__(self, key: str, value: object) -> None:
+        set_new_attribute_deprecated(self, key, value)
 
     def set_bot(self, bot: Bot) -> None:
         """Set the Bot to be used by this persistence instance.

@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 
@@ -56,6 +57,15 @@ class TestInlineQueryResultArticle:
     thumb_url = 'thumb url'
     thumb_height = 10
     thumb_width = 15
+
+    def test_extra_slots(self, inline_query_result_article):
+        members = inspect.getmembers(
+            inline_query_result_article.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(inline_query_result_article, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_expected_values(self, inline_query_result_article):
         assert inline_query_result_article.type == self.type_

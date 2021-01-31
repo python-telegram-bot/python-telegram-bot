@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 
@@ -45,6 +46,15 @@ class TestPreCheckoutQuery:
     total_amount = 100
     from_user = User(0, '', False)
     order_info = OrderInfo()
+
+    def test_extra_slots(self, pre_checkout_query):
+        members = inspect.getmembers(
+            pre_checkout_query.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(pre_checkout_query, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_de_json(self, bot):
         json_dict = {

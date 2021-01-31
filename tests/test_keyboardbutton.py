@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 
@@ -38,6 +39,15 @@ class TestKeyboardButton:
     request_location = True
     request_contact = True
     request_poll = KeyboardButtonPollType("quiz")
+
+    def test_extra_slots(self, keyboard_button):
+        members = inspect.getmembers(
+            keyboard_button.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(keyboard_button, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_expected_values(self, keyboard_button):
         assert keyboard_button.text == self.text

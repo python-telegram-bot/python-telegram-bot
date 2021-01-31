@@ -33,7 +33,7 @@ from telegram import TelegramError, Update
 from telegram.ext import BasePersistence
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.handler import Handler
-from telegram.utils.deprecate import TelegramDeprecationWarning
+from telegram.utils.deprecate import TelegramDeprecationWarning, set_new_attribute_deprecated
 from telegram.ext.utils.promise import Promise
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
@@ -97,6 +97,8 @@ class DispatcherHandlerStop(Exception):
     Args:
         state (:obj:`object`, optional): The next state of the conversation.
     """
+
+    __slots__ = ('state',)
 
     def __init__(self, state: object = None) -> None:
         super().__init__()
@@ -233,6 +235,9 @@ class Dispatcher:
                 self._set_singleton(self)
             else:
                 self._set_singleton(None)
+
+    def __setattr__(self, key: str, value: object) -> None:
+        set_new_attribute_deprecated(self, key, value)
 
     @property
     def exception_event(self) -> Event:

@@ -27,6 +27,7 @@ import time
 from typing import TYPE_CHECKING, Callable, List, NoReturn
 
 from telegram.ext.utils.promise import Promise
+from telegram.utils.deprecate import set_new_attribute_deprecated
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -37,6 +38,8 @@ curtime = time.perf_counter
 
 class DelayQueueError(RuntimeError):
     """Indicates processing errors."""
+
+    __slots__ = ()
 
 
 class DelayQueue(threading.Thread):
@@ -96,6 +99,9 @@ class DelayQueue(threading.Thread):
         self.daemon = False
         if autostart:  # immediately start processing
             super().start()
+
+    def __setattr__(self, key: str, value: object) -> None:
+        set_new_attribute_deprecated(self, key, value)
 
     def run(self) -> None:
         """
@@ -203,7 +209,7 @@ class MessageQueue:
 
     """
 
-    __slots__ = ('_all_delayq', '_group_delayq')
+    __slots__ = ('_all_delayq', '_group_delayq', '__dict__')
 
     def __init__(
         self,
@@ -227,6 +233,9 @@ class MessageQueue:
             exc_route=exc_route,
             autostart=autostart,
         )
+
+    def __setattr__(self, key: str, value: object) -> None:
+        set_new_attribute_deprecated(self, key, value)
 
     def start(self) -> None:
         """Method is used to manually start the ``MessageQueue`` processing."""

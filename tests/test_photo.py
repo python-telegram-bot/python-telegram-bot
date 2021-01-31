@@ -15,6 +15,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 import os
 from io import BytesIO
 from pathlib import Path
@@ -60,6 +61,15 @@ class TestPhoto:
     caption = '<b>PhotoTest</b> - *Caption*'
     photo_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram_new.jpg'
     file_size = 29176
+
+    def test_extra_slots(self, photo):
+        members = inspect.getmembers(
+            photo.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(photo, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_creation(self, thumb, photo):
         # Make sure file has been uploaded.

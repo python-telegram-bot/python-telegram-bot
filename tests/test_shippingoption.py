@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 
@@ -33,6 +34,15 @@ class TestShippingOption:
     id_ = 'id'
     title = 'title'
     prices = [LabeledPrice('Fish Container', 100), LabeledPrice('Premium Fish Container', 1000)]
+
+    def test_extra_slots(self, shipping_option):
+        members = inspect.getmembers(
+            shipping_option.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(shipping_option, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_expected_values(self, shipping_option):
         assert shipping_option.id == self.id_

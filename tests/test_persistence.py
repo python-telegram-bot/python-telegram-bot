@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 import signal
 from threading import Lock
 
@@ -169,6 +170,15 @@ def job_queue(bot):
 
 
 class TestBasePersistence:
+    def test_extra_slots(self, bot_persistence):
+        members = inspect.getmembers(
+            bot_persistence.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(bot_persistence, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+
     def test_creation(self, base_persistence):
         assert base_persistence.store_chat_data
         assert base_persistence.store_user_data
@@ -188,6 +198,14 @@ class TestBasePersistence:
     def test_implementation(self, updater, base_persistence):
         dp = updater.dispatcher
         assert dp.persistence == base_persistence
+
+    def test_warning_setting_custom_attr(self, bot_persistence, recwarn):
+        inst = bot_persistence
+        inst.custom = 'bad practice!'
+        assert len(recwarn) == 1 and 'custom attributes' in str(recwarn[0].message)
+        with pytest.warns(None) as check:
+            inst.bot_data = {'ok': 'this is ok'}
+        assert not check
 
     def test_conversationhandler_addition(self, dp, base_persistence):
         with pytest.raises(ValueError, match="when handler is unnamed"):

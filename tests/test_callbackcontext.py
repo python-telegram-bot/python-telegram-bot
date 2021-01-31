@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
+
 import pytest
 
 from telegram import Update, Message, Chat, User, TelegramError
@@ -23,6 +25,16 @@ from telegram.ext import CallbackContext
 
 
 class TestCallbackContext:
+    def test_extra_slots(self, cdp):
+        context = CallbackContext(cdp)
+        members = inspect.getmembers(
+            CallbackContext,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(context, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+
     def test_non_context_dp(self, dp):
         with pytest.raises(ValueError):
             CallbackContext(dp)

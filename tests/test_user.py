@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
+
 import pytest
 
 from telegram import Update, User, Bot
@@ -64,6 +66,15 @@ class TestUser:
     can_join_groups = True
     can_read_all_group_messages = True
     supports_inline_queries = False
+
+    def test_extra_slots(self, user):
+        members = inspect.getmembers(
+            user.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(user, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_de_json(self, json_dict, bot):
         user = User.de_json(json_dict, bot)

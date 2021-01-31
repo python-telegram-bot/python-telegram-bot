@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 import logging
 from queue import Queue
 from threading import current_thread
@@ -52,6 +53,15 @@ class TestDispatcher:
     received = None
     count = 0
 
+    def test_extra_slots(self, dp2):
+        members = inspect.getmembers(
+            dp2.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(dp2, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+
     @pytest.fixture(autouse=True, name='reset')
     def reset_fixture(self):
         self.reset()
@@ -77,6 +87,14 @@ class TestDispatcher:
             self.count = count
 
         return callback
+
+    def test_warning_setting_custom_attr(self, dp2, recwarn):
+        inst = dp2
+        inst.custom = 'bad practice!'
+        assert len(recwarn) == 1 and 'custom attributes' in str(recwarn[0].message)
+        with pytest.warns(None) as check:
+            inst.bot_data = {'ok': 'this is ok'}
+        assert not check
 
     def callback_raise_error(self, bot, update):
         if isinstance(bot, Bot):

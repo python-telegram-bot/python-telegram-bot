@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 from flaky import flaky
@@ -31,6 +32,15 @@ def reply_keyboard_remove():
 class TestReplyKeyboardRemove:
     remove_keyboard = True
     selective = True
+
+    def test_extra_slots(self, reply_keyboard_remove):
+        members = inspect.getmembers(
+            reply_keyboard_remove.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(reply_keyboard_remove, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

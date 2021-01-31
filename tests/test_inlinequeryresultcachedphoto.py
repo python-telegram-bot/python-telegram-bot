@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 
@@ -55,6 +56,15 @@ class TestInlineQueryResultCachedPhoto:
     caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     input_message_content = InputTextMessageContent('input_message_content')
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
+
+    def test_extra_slots(self, inline_query_result_cached_photo):
+        members = inspect.getmembers(
+            inline_query_result_cached_photo.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(inline_query_result_cached_photo, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     def test_expected_values(self, inline_query_result_cached_photo):
         assert inline_query_result_cached_photo.type == self.type_

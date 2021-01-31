@@ -26,6 +26,7 @@ import warnings
 from typing import TYPE_CHECKING, List, Optional, Tuple, Type, TypeVar
 
 from telegram.utils.types import JSONDict
+from telegram.utils.deprecate import set_new_attribute_deprecated
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -48,6 +49,9 @@ class TelegramObject:
 
     def __getitem__(self, item: str) -> object:
         return getattr(self, item)
+
+    def __setattr__(self, key: str, value: object) -> None:
+        set_new_attribute_deprecated(self, key, value)
 
     @staticmethod
     def parse_data(data: Optional[JSONDict]) -> Optional[JSONDict]:

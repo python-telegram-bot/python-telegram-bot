@@ -86,6 +86,18 @@ class TestTelegramObject:
         subclass_instance = TelegramObjectSubclass()
         assert subclass_instance.to_dict() == {'a': 1}
 
+    def test_warning_setting_custom_attr(self, recwarn):
+        expected_warning = (
+            "Setting custom attributes is deprecated and will be removed in the " "next version"
+        )
+
+        class TGObjectTest(TelegramObject):
+            __slots__ = ()
+
+        inst = TGObjectTest()
+        inst.custom = 'bad practice!'
+        assert str(recwarn[0].message) == expected_warning
+
     def test_meaningless_comparison(self, recwarn):
         expected_warning = "Objects of type TGO can not be meaningfully tested for equivalence."
 

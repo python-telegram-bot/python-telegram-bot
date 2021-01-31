@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+import inspect
 import logging
 import os
 import signal
@@ -72,6 +73,24 @@ class TestUpdater:
     err_handler_called = Event()
     cb_handler_called = Event()
     offset = 0
+
+    def test_extra_slots(self, bot):
+        u = Updater(token=bot.token)
+        members = inspect.getmembers(
+            u.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(u, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+
+    def test_warning_setting_custom_attr(self, bot, recwarn):
+        inst = Updater(token=bot.token)
+        inst.custom = 'bad practice!'
+        assert len(recwarn) == 1 and 'custom attributes' in str(recwarn[0].message)
+        with pytest.warns(None) as check:
+            inst.is_idle = True
+        assert not check
 
     @pytest.fixture(autouse=True)
     def reset(self):

@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
+
 import pytest
 from flaky import flaky
 
@@ -29,6 +31,16 @@ class TestParseMode:
         '<a href="tg://user?id=123456789">name</a>.'
     )
     formatted_text_formatted = 'bold italic link name.'
+
+    def test_extra_slots(self):
+        p = ParseMode()
+        members = inspect.getmembers(
+            p.__class__,
+            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
+        )
+        for member in members:
+            val = getattr(p, member[0], 'err')
+            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
