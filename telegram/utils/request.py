@@ -54,6 +54,17 @@ class PtbRequestBase(abc.ABC):
         f' (https://github.com/python-telegram-bot/python-telegram-bot)'
     )
 
+    async def __aenter__(self):
+        await self.do_init()
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self.stop()
+
+    @abc.abstractmethod
+    async def do_init(self):
+        """Initialize resources used by this class."""
+
     @abc.abstractmethod
     async def stop(self) -> None:
         """Stop & clear resources used by this class."""
