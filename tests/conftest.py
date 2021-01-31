@@ -77,7 +77,6 @@ def bot_info():
 async def bot(bot_info):
     async with await make_bot(bot_info) as bot:
         yield bot
-        await bot.request.stop()
 
 
 DEFAULT_BOTS = {}
@@ -210,8 +209,7 @@ def pytest_configure(config):
 
 
 async def make_bot(bot_info, **kwargs):
-    request = PtbTestHttpx()
-    bot = Bot(bot_info['token'], private_key=PRIVATE_KEY, request=request, **kwargs)
+    bot = Bot(bot_info['token'], private_key=PRIVATE_KEY, **kwargs)
     return bot
 
 

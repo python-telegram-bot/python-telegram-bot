@@ -34,6 +34,7 @@ from typing import (
     TypeVar,
     Union,
     no_type_check,
+    Type,
 )
 
 try:
@@ -189,7 +190,7 @@ class Bot(TelegramObject):
         token: str,
         base_url: str = None,
         base_file_url: str = None,
-        request: 'PtbRequestBase' = None,
+        request: Union[PtbRequestBase, Type[PtbRequestBase]] = PtbHttpx,
         private_key: bytes = None,
         private_key_password: bytes = None,
         defaults: 'Defaults' = None,
@@ -209,7 +210,9 @@ class Bot(TelegramObject):
         self.base_file_url = str(base_file_url) + str(self.token)
         self._bot: Optional[User] = None
         self._commands: Optional[List[BotCommand]] = None
-        self._request: PtbRequestBase = request or PtbHttpx()
+        self._request: Tuple[PtbRequestBase, bool] = (
+            (request, False) if isinstance(request, PtbRequestBase) else (request(), True)
+        )
         self.logger = logging.getLogger(__name__)
 
         if private_key:
@@ -222,12 +225,16 @@ class Bot(TelegramObject):
         await self.get_me()
         await self.get_my_commands()
 
+    async def do_teardown(self):
+        if self._request[1]:
+            await self._request[0].stop()
+
     async def __aenter__(self):
         await self.do_init()
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        pass
+        await self.do_teardown()
 
     async def _post(
         self,
@@ -290,7 +297,7 @@ class Bot(TelegramObject):
 
     @property
     def request(self) -> PtbRequestBase:
-        return self._request
+        return self._request[0]
 
     @staticmethod
     def _validate_token(token: str) -> str:
