@@ -62,7 +62,7 @@ class ConversationHandler(Handler[Update]):
     managing four collections of other handlers.
 
     Note:
-        ``ConversationHandler`` will only accept updates that are instances of (subclasses of)
+        ``ConversationHandler`` will only accept updates that are (subclass-)instances of
         :class:`telegram.Update`. This is, because depending on the :attr:`per_user` and
         :attr:`per_chat` ``ConversationHandler`` relies on
         :attr:`telegram.Update.effective_user` and/or :attr:`telegram.Update.effective_chat` in order
