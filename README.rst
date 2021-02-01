@@ -28,8 +28,8 @@ We have a vibrant community of developers helping each other in our `Telegram gr
    :target: https://pypistats.org/packages/python-telegram-bot
    :alt: PyPi Package Monthly Download
 
-.. image:: https://img.shields.io/badge/docs-latest-af1a97.svg
-   :target: https://python-telegram-bot.readthedocs.io/
+.. image:: https://readthedocs.org/projects/python-telegram-bot/badge/?version=stable
+   :target: https://python-telegram-bot.readthedocs.io/en/stable/?badge=stable
    :alt: Documentation Status
 
 .. image:: https://img.shields.io/pypi/l/python-telegram-bot.svg

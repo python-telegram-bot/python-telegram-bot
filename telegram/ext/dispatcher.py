@@ -407,12 +407,13 @@ class Dispatcher:
 
         Note:
             If the update is handled by least one synchronously running handlers (i.e.
-            ``run_async=False`), :meth:`update_persistence` is called *once* after all handlers
+            ``run_async=False``), :meth:`update_persistence` is called *once* after all handlers
             synchronous handlers are done. Each asynchronously running handler will trigger
             :meth:`update_persistence` on its own.
 
         Args:
-            update (:class:`telegram.Update` | :obj:`object` | :class:`telegram.TelegramError`):
+            update (:class:`telegram.Update` | :obj:`object` |
+            :class:`telegram.error.TelegramError`):
                 The update to process.
 
         """

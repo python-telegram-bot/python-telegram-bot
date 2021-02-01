@@ -2,7 +2,7 @@
 # pylint: disable=W0603
 """Simple Bot to reply to Telegram messages.
 
-This is built on the API wrapper, see rawapibot.py to see the same example built
+This is built on the API wrapper, see echobot.py to see the same example built
 on the telegram.ext bot framework.
 This program is dedicated to the public domain under the CC0 license.
 """
