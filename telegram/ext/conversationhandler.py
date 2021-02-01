@@ -65,8 +65,8 @@ class ConversationHandler(Handler[Update]):
         ``ConversationHandler`` will only accept updates that are (subclass-)instances of
         :class:`telegram.Update`. This is, because depending on the :attr:`per_user` and
         :attr:`per_chat` ``ConversationHandler`` relies on
-        :attr:`telegram.Update.effective_user` and/or :attr:`telegram.Update.effective_chat` in order
-        to determine which conversation an update should belong to. For ``per_message=True``,
+        :attr:`telegram.Update.effective_user` and/or :attr:`telegram.Update.effective_chat` in
+        order to determine which conversation an update should belong to. For ``per_message=True``,
         ``ConversationHandler`` uses ``update.callback_query.message.message_id`` when
         ``per_chat=True`` and ``update.callback_query.inline_message_id`` when ``per_chat=False``.
         For a more detailed explanation, please see our `FAQ`_.
