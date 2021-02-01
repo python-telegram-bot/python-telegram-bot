@@ -58,8 +58,22 @@ class _ConversationTimeoutContext:
 
 class ConversationHandler(Handler[Update]):
     """
-    A handler to hold a conversation with a single user by managing four collections of other
-    handlers.
+    A handler to hold a conversation with a single or multiple users through Telegram updates by
+    managing four collections of other handlers.
+
+    Note:
+        ``ConversationHandler`` will only accept updates that are (subclass-)instances of
+        :class:`telegram.Update`. This is, because depending on the :attr:`per_user` and
+        :attr:`per_chat` ``ConversationHandler`` relies on
+        :attr:`telegram.Update.effective_user` and/or :attr:`telegram.Update.effective_chat` in
+        order to determine which conversation an update should belong to. For ``per_message=True``,
+        ``ConversationHandler`` uses ``update.callback_query.message.message_id`` when
+        ``per_chat=True`` and ``update.callback_query.inline_message_id`` when ``per_chat=False``.
+        For a more detailed explanation, please see our `FAQ`_.
+
+        Finally, ``ConversationHandler``, does *not* handle (edited) channel posts.
+
+    .. _`FAQ`: https://git.io/JtcyU
 
     The first collection, a ``list`` named :attr:`entry_points`, is used to initiate the
     conversation, for example with a :class:`telegram.ext.CommandHandler` or
@@ -424,7 +438,7 @@ class ConversationHandler(Handler[Update]):
         if not isinstance(update, Update):
             return None
         # Ignore messages in channels
-        if update.channel_post:
+        if update.channel_post or update.edited_channel_post:
             return None
         if self.per_chat and not update.effective_chat:
             return None
