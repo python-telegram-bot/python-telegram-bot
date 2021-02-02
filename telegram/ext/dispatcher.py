@@ -412,8 +412,8 @@ class Dispatcher:
             :meth:`update_persistence` on its own.
 
         Args:
-            update (:class:`telegram.Update` | :obj:`object` |
-            :class:`telegram.error.TelegramError`):
+            update (:class:`telegram.Update` | :obj:`object` | \
+                :class:`telegram.error.TelegramError`):
                 The update to process.
 
         """
