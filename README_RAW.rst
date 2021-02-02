@@ -13,11 +13,11 @@ We have a vibrant community of developers helping each other in our `Telegram gr
 *Stay tuned for library updates and new releases on our* `Telegram Channel <https://telegram.me/pythontelegrambotchannel>`_.
 
 .. image:: https://img.shields.io/pypi/v/python-telegram-bot-raw.svg
-   :target: https://pypi.org/project/python-telegram-bot/
+   :target: https://pypi.org/project/python-telegram-bot-raw/
    :alt: PyPi Package Version
 
 .. image:: https://img.shields.io/pypi/pyversions/python-telegram-bot-raw.svg
-   :target: https://pypi.org/project/python-telegram-bot/
+   :target: https://pypi.org/project/python-telegram-bot-raw/
    :alt: Supported Python versions
 
 .. image:: https://img.shields.io/badge/Bot%20API-5.0-blue?logo=telegram
@@ -25,10 +25,10 @@ We have a vibrant community of developers helping each other in our `Telegram gr
    :alt: Supported Bot API versions
 
 .. image:: https://img.shields.io/pypi/dm/python-telegram-bot-raw
-   :target: https://pypistats.org/packages/python-telegram-bot
+   :target: https://pypistats.org/packages/python-telegram-bot-raw
    :alt: PyPi Package Monthly Download
 
-.. image:: https://img.shields.io/badge/docs-latest-af1a97.svg
+.. image:: https://readthedocs.org/projects/python-telegram-bot/badge/?version=stable
    :target: https://python-telegram-bot.readthedocs.io/
    :alt: Documentation Status
 
