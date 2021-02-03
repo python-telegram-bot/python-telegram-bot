@@ -54,7 +54,7 @@ class PtbRequestBase(abc.ABC):
         f' (https://github.com/python-telegram-bot/python-telegram-bot)'
     )
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> 'PtbRequestBase':
         await self.do_init()
         return self
 
@@ -62,7 +62,7 @@ class PtbRequestBase(abc.ABC):
         await self.stop()
 
     @abc.abstractmethod
-    async def do_init(self):
+    async def do_init(self) -> None:
         """Initialize resources used by this class."""
 
     @abc.abstractmethod

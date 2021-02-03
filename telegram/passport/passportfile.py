@@ -103,7 +103,7 @@ class PassportFile(TelegramObject):
             for i, passport_file in enumerate(data)
         ]
 
-    def get_file(self, timeout: float = None, api_kwargs: JSONDict = None) -> 'File':
+    async def get_file(self, timeout: float = None, api_kwargs: JSONDict = None) -> 'File':
         """
         Wrapper over :attr:`telegram.Bot.get_file`. Will automatically assign the correct
         credentials to the returned :class:`telegram.File` if originating from
@@ -118,6 +118,8 @@ class PassportFile(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        file = self.bot.get_file(file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs)
+        file = await self.bot.get_file(
+            file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs
+        )
         file.set_credentials(self._credentials)
         return file

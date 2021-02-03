@@ -41,6 +41,7 @@ class InputMedia(TelegramObject):
     :class:`telegram.InputMediaVideo` for detailed use.
 
     """
+
     media: Union[str, InputFile] = None
     caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...], None] = None
 

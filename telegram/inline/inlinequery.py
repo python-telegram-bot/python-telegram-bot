@@ -93,7 +93,7 @@ class InlineQuery(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def answer(
+    async def answer(
         self,
         results: Union[
             List['InlineQueryResult'], Callable[[int], Optional[List['InlineQueryResult']]]
@@ -130,7 +130,7 @@ class InlineQuery(TelegramObject):
             # We raise TypeError instead of ValueError for backwards compatibility with versions
             # which didn't check this here but let Python do the checking
             raise TypeError('current_offset and auto_pagination are mutually exclusive!')
-        return self.bot.answer_inline_query(
+        return await self.bot.answer_inline_query(
             inline_query_id=self.id,
             current_offset=self.offset if auto_pagination else current_offset,
             results=results,

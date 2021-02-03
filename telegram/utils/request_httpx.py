@@ -71,7 +71,7 @@ class PtbHttpx(PtbRequestBase):
         # TODO p0: Test client with proxy!
         self._client = httpx.AsyncClient(timeout=timeout, proxies=proxy_url, limits=limits)
 
-    async def do_init(self):
+    async def do_init(self) -> None:
         pass
 
     async def stop(self) -> None:

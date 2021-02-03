@@ -89,12 +89,12 @@ async def default_bot(request, bot_info):
     defaults = Defaults(**param)
     default_bot = DEFAULT_BOTS.get(defaults)
     if default_bot:
-        return default_bot
+        yield default_bot
     else:
         default_bot = await make_bot(bot_info, **{'defaults': defaults})
         await default_bot.do_init()
         DEFAULT_BOTS[defaults] = default_bot
-        return default_bot
+        yield default_bot
 
 
 @pytest.fixture(scope='function')
@@ -102,12 +102,12 @@ async def tz_bot(timezone, bot_info):
     defaults = Defaults(tzinfo=timezone)
     default_bot = DEFAULT_BOTS.get(defaults)
     if default_bot:
-        return default_bot
+        yield default_bot
     else:
         default_bot = await make_bot(bot_info, **{'defaults': defaults})
         await default_bot.do_init()
         DEFAULT_BOTS[defaults] = default_bot
-        return default_bot
+        yield default_bot
 
 
 @pytest.fixture(scope='session')
@@ -356,13 +356,13 @@ def timezone(tzinfo):
     return tzinfo
 
 
-def expect_bad_request(func, message, reason):
+async def expect_bad_request(func, message, reason):
     """
     Wrapper for testing bot functions expected to result in an :class:`telegram.error.BadRequest`.
     Makes it XFAIL, if the specified error message is present.
 
     Args:
-        func: The callable to be executed.
+        func: The awaitable to be executed.
         message: The expected message of the bad request error. If another message is present,
             the error will be reraised.
         reason: Explanation for the XFAIL.
@@ -371,7 +371,7 @@ def expect_bad_request(func, message, reason):
         On success, returns the return value of :attr:`func`
     """
     try:
-        return func()
+        return await func()
     except BadRequest as e:
         if message in str(e):
             pytest.xfail(f'{reason}. {e}')

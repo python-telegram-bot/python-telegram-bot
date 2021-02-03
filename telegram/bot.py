@@ -220,16 +220,16 @@ class Bot(TelegramObject):
                 private_key, password=private_key_password, backend=default_backend()
             )
 
-    async def do_init(self):
+    async def do_init(self) -> None:
         """Perform initialization sequence which loads data from Telegram servers."""
         await self.get_me()
         await self.get_my_commands()
 
-    async def do_teardown(self):
+    async def do_teardown(self) -> None:
         if self._request[1]:
             await self._request[0].stop()
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> 'Bot':
         await self.do_init()
         return self
 

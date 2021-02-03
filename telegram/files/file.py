@@ -87,7 +87,7 @@ class File(TelegramObject):
 
         self._id_attrs = (self.file_unique_id,)
 
-    def download(
+    async def download(
         self, custom_path: str = None, out: IO = None, timeout: int = None
     ) -> Union[str, IO]:
         """
@@ -135,7 +135,7 @@ class File(TelegramObject):
                 with open(url, 'rb') as file:
                     buf = file.read()
             else:
-                buf = self.bot.request.retrieve(url)
+                buf = await self.bot.request.retrieve(url)
                 if self._credentials:
                     buf = decrypt(
                         b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
@@ -156,7 +156,7 @@ class File(TelegramObject):
         else:
             filename = os.path.join(os.getcwd(), self.file_id)
 
-        buf = self.bot.request.retrieve(url, timeout=timeout)
+        buf = await self.bot.request.retrieve(url, timeout=timeout)
         if self._credentials:
             buf = decrypt(
                 b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
@@ -174,7 +174,7 @@ class File(TelegramObject):
             )
         )
 
-    def download_as_bytearray(self, buf: bytearray = None) -> bytes:
+    async def download_as_bytearray(self, buf: bytearray = None) -> bytes:
         """Download this file and return it as a bytearray.
 
         Args:
@@ -191,7 +191,7 @@ class File(TelegramObject):
             with open(self.file_path, "rb") as file:
                 buf.extend(file.read())
         else:
-            buf.extend(self.bot.request.retrieve(self._get_encoded_url()))
+            buf.extend(await self.bot.request.retrieve(self._get_encoded_url()))
         return buf
 
     def set_credentials(self, credentials: 'FileCredentials') -> None:

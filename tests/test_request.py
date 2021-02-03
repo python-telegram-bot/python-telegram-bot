@@ -17,28 +17,28 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-import pytest
-
-from telegram import TelegramError
-from telegram.utils.request import Request
-
-
-def test_replaced_unprintable_char():
-    """
-    Clients can send arbitrary bytes in callback data.
-    Make sure the correct error is raised in this case.
-    """
-    server_response = b'{"invalid utf-8": "\x80", "result": "KUKU"}'
-
-    assert Request._parse(server_response) == 'KUKU'
-
-
-def test_parse_illegal_json():
-    """
-    Clients can send arbitrary bytes in callback data.
-    Make sure the correct error is raised in this case.
-    """
-    server_response = b'{"invalid utf-8": "\x80", result: "KUKU"}'
-
-    with pytest.raises(TelegramError, match='Invalid server response'):
-        Request._parse(server_response)
+# import pytest
+#
+# from telegram import TelegramError
+# from telegram.utils.request import Request
+#
+#
+# def test_replaced_unprintable_char():
+#     """
+#     Clients can send arbitrary bytes in callback data.
+#     Make sure the correct error is raised in this case.
+#     """
+#     server_response = b'{"invalid utf-8": "\x80", "result": "KUKU"}'
+#
+#     assert Request._parse(server_response) == 'KUKU'
+#
+#
+# def test_parse_illegal_json():
+#     """
+#     Clients can send arbitrary bytes in callback data.
+#     Make sure the correct error is raised in this case.
+#     """
+#     server_response = b'{"invalid utf-8": "\x80", result: "KUKU"}'
+#
+#     with pytest.raises(TelegramError, match='Invalid server response'):
+#         Request._parse(server_response)
