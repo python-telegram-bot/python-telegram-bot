@@ -1188,7 +1188,6 @@ class TestBot:
 
     @flaky(3, 1)
     @pytest.mark.timeout(15)
-    @pytest.mark.xfail
     @pytest.mark.asyncio
     async def test_set_webhook_get_webhook_info_and_delete_webhook(self, bot):
         url = 'https://python-telegram-bot.org/test/webhook'
@@ -1198,7 +1197,7 @@ class TestBot:
             url,
             max_connections=max_connections,
             allowed_updates=allowed_updates,
-            ip_address='1.1.1.1',
+            ip_address='198.51.100.142',
         )
         await asyncio.sleep(2)
         live_info = await bot.get_webhook_info()
@@ -1210,7 +1209,7 @@ class TestBot:
         assert live_info.url == url
         assert live_info.max_connections == max_connections
         assert live_info.allowed_updates == allowed_updates
-        assert live_info.ip_address == '1.1.1.1'
+        assert live_info.ip_address == '198.51.100.142'
 
     @pytest.mark.parametrize('drop_pending_updates', [True, False])
     @pytest.mark.asyncio
