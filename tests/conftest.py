@@ -370,40 +370,42 @@ def check_shortcut_signature(
     expected_args.discard('self')
 
     args_check = expected_args == effective_shortcut_args
+    if not args_check:
+        pytest.fail(f'Expected arguments {expected_args}, got {effective_shortcut_args}')
+        return False
 
     # TODO: Also check annotation of return type. Would currently be a hassle b/c typing doesn't
     # resolve `ForwardRef('Type')` to `Type`. For now we rely on MyPy, which probably allows the
     # shortcuts to return more specific types than the bot method, but it's only annotations after
     # all
-    annotation_check = True
     for kwarg in effective_shortcut_args:
         if bot_sig.parameters[kwarg].annotation != shortcut_sig.parameters[kwarg].annotation:
             if isinstance(bot_sig.parameters[kwarg].annotation, type):
                 if bot_sig.parameters[kwarg].annotation.__name__ != str(
                     shortcut_sig.parameters[kwarg].annotation
                 ):
-                    print(
-                        f'Expected {bot_sig.parameters[kwarg].annotation}, but '
-                        f'got {shortcut_sig.parameters[kwarg].annotation}'
+                    pytest.fail(
+                        f'For argument {kwarg} I expected {bot_sig.parameters[kwarg].annotation}, '
+                        f'but got {shortcut_sig.parameters[kwarg].annotation}'
                     )
-                    annotation_check = False
-                    break
+                    return False
             else:
-                print(
-                    f'Expected {bot_sig.parameters[kwarg].annotation}, but '
+                pytest.fail(
+                    f'For argument {kwarg} I expected {bot_sig.parameters[kwarg].annotation}, but '
                     f'got {shortcut_sig.parameters[kwarg].annotation}'
                 )
-                annotation_check = False
-                break
+                return False
 
     bot_method_sig = inspect.signature(bot_method)
     shortcut_sig = inspect.signature(shortcut)
-    default_check = all(
-        shortcut_sig.parameters[arg].default == bot_method_sig.parameters[arg].default
-        for arg in expected_args
-    )
+    for arg in expected_args:
+        if not shortcut_sig.parameters[arg].default == bot_method_sig.parameters[arg].default:
+            pytest.fail(
+                f'Default for argument {arg} does not match the default of the Bot method.'
+            )
+            return False
 
-    return args_check and annotation_check and default_check
+    return True
 
 
 def check_shortcut_call(

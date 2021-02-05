@@ -21,7 +21,8 @@
 from typing import TYPE_CHECKING, Any, List, Optional
 
 from telegram import TelegramObject
-from telegram.utils.types import JSONDict
+from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
     from telegram import Bot, File, FileCredentials
@@ -103,7 +104,9 @@ class PassportFile(TelegramObject):
             for i, passport_file in enumerate(data)
         ]
 
-    def get_file(self, timeout: float = None, api_kwargs: JSONDict = None) -> 'File':
+    def get_file(
+        self, timeout: ODVInput[float] = DEFAULT_NONE, api_kwargs: JSONDict = None
+    ) -> 'File':
         """
         Wrapper over :attr:`telegram.Bot.get_file`. Will automatically assign the correct
         credentials to the returned :class:`telegram.File` if originating from

@@ -21,7 +21,8 @@
 from typing import TYPE_CHECKING, Any, Optional
 
 from telegram import OrderInfo, TelegramObject, User
-from telegram.utils.types import JSONDict
+from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -106,7 +107,7 @@ class PreCheckoutQuery(TelegramObject):
         self,
         ok: bool,
         error_message: str = None,
-        timeout: float = None,
+        timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
         """Shortcut for::

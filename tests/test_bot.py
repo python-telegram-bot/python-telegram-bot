@@ -672,6 +672,31 @@ class TestBot:
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_answer_inline_query_default_parse_mode(self, monkeypatch, default_bot):
         def test(url, data, *args, **kwargs):
+            print()
+            print(data)
+            print(
+                {
+                    'cache_time': 300,
+                    'results': [
+                        {
+                            'title': 'test_result',
+                            'id': '123',
+                            'type': 'document',
+                            'document_url': 'https://raw.githubusercontent.com/'
+                            'python-telegram-bot/logos/master/logo/png/'
+                            'ptb-logo_240.png',
+                            'mime_type': 'image/png',
+                            'caption': 'ptb_logo',
+                            'parse_mode': 'Markdown',
+                        }
+                    ],
+                    'next_offset': '42',
+                    'switch_pm_parameter': 'start_pm',
+                    'inline_query_id': 1234,
+                    'is_personal': True,
+                    'switch_pm_text': 'switch pm',
+                }
+            )
             return data == {
                 'cache_time': 300,
                 'results': [
@@ -1790,8 +1815,8 @@ class TestBot:
         'default_bot',
         [
             ({'parse_mode': ParseMode.HTML, 'allow_sending_without_reply': True}),
-            ({'parse_mode': False, 'allow_sending_without_reply': True}),
-            ({'parse_mode': False, 'allow_sending_without_reply': False}),
+            ({'parse_mode': None, 'allow_sending_without_reply': True}),
+            ({'parse_mode': None, 'allow_sending_without_reply': False}),
         ],
         indirect=['default_bot'],
     )
