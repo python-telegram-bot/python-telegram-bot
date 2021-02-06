@@ -309,14 +309,13 @@ class TestAnimation:
             bot.send_animation(chat_id=chat_id)
 
     def test_get_file_instance_method(self, monkeypatch, animation):
-        get_file = animation.bot.get_file
-
         def make_assertion(*_, **kwargs):
-            return kwargs['file_id'] == animation.file_id and check_shortcut_call(kwargs, get_file)
+            return kwargs['file_id'] == animation.file_id
 
         assert check_shortcut_signature(Animation.get_file, Bot.get_file, ['file_id'], [])
+        assert check_shortcut_call(animation.get_file, animation.bot, 'get_file')
 
-        monkeypatch.setattr('telegram.Bot.get_file', make_assertion)
+        monkeypatch.setattr(animation.bot, 'get_file', make_assertion)
         assert animation.get_file()
 
     def test_equality(self):

@@ -284,14 +284,13 @@ class TestVoice:
             bot.sendVoice(chat_id)
 
     def test_get_file_instance_method(self, monkeypatch, voice):
-        get_file = voice.bot.get_file
-
         def make_assertion(*_, **kwargs):
-            return kwargs['file_id'] == voice.file_id and check_shortcut_call(kwargs, get_file)
+            return kwargs['file_id'] == voice.file_id
 
         assert check_shortcut_signature(Voice.get_file, Bot.get_file, ['file_id'], [])
+        assert check_shortcut_call(voice.get_file, voice.bot, 'get_file')
 
-        monkeypatch.setattr('telegram.Bot.get_file', make_assertion)
+        monkeypatch.setattr(voice.bot, 'get_file', make_assertion)
         assert voice.get_file()
 
     def test_equality(self, voice):

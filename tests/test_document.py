@@ -298,14 +298,13 @@ class TestDocument:
             bot.send_document(chat_id=chat_id)
 
     def test_get_file_instance_method(self, monkeypatch, document):
-        get_file = document.bot.get_file
-
         def make_assertion(*_, **kwargs):
-            return kwargs['file_id'] == document.file_id and check_shortcut_call(kwargs, get_file)
+            return kwargs['file_id'] == document.file_id
 
         assert check_shortcut_signature(Document.get_file, Bot.get_file, ['file_id'], [])
+        assert check_shortcut_call(document.get_file, document.bot, 'get_file')
 
-        monkeypatch.setattr('telegram.Bot.get_file', make_assertion)
+        monkeypatch.setattr(document.bot, 'get_file', make_assertion)
         assert document.get_file()
 
     def test_equality(self, document):

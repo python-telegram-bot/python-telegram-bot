@@ -24,7 +24,7 @@ from collections import defaultdict
 from queue import Queue
 from threading import Thread, Event
 from time import sleep
-from typing import Callable, List, Dict
+from typing import Callable, List, Iterable
 
 import pytest
 import pytz
@@ -41,6 +41,7 @@ from telegram import (
     ShippingQuery,
     PreCheckoutQuery,
     ChosenInlineResult,
+    File,
 )
 from telegram.ext import Dispatcher, JobQueue, Updater, MessageFilter, Defaults, UpdateFilter
 from telegram.error import BadRequest
@@ -409,29 +410,57 @@ def check_shortcut_signature(
 
 
 def check_shortcut_call(
-    kwargs: Dict[str, object],
-    bot_method: Callable,
+    shortcut_method: Callable,
+    bot: Bot,
+    bot_method_name: str,
+    skip_params: Iterable[str] = None,
 ) -> bool:
     """
     Checks that a shortcut passes all the existing arguments to the underlying bot method. Use as::
 
-        send_message = message.bot.send_message
-
-        def make_assertion(*_, **kwargs):
-            return check_shortcut_call(send_message, kwargs)
-
-        monkeypatch.setattr(message.bot, 'send_message', make_assertion)
-        assert message.reply_text('foobar')
-
+        assert check_shortcut_call(message.reply_text, message.bot, 'send_message')
 
     Args:
-        kwargs: The kwargs passed to the bot method by the shortcut
-        bot_method: The bot method, e.g. :meth:`telegram.Bot.send_message`
+        shortcut_method: The shortcut method, e.g. `message.reply_text`
+        bot: The bot
+        bot_method_name: The bot methods name, e.g. `'send_message'`
+        skip_params: Parameters that are allowed to be missing, e.g. `['inline_message_id']`
 
     Returns:
         :obj:`bool`
     """
-    bot_signature = inspect.signature(bot_method)
-    expected_args = set(bot_signature.parameters.keys()).difference(['self'])
+    if not skip_params:
+        skip_params = set()
 
-    return expected_args == set(kwargs.keys())
+    orig_bot_method = getattr(bot, bot_method_name)
+    bot_signature = inspect.signature(orig_bot_method)
+    expected_args = set(bot_signature.parameters.keys()).difference(['self']) - set(skip_params)
+
+    shortcut_signature = inspect.signature(shortcut_method)
+    # auto_pagination: Special casing for InlineQuery.answer
+    kwargs = {name: True for name in shortcut_signature.parameters if name != 'auto_pagination'}
+
+    def make_assertion(**kw):
+        # "if value" makes sure that value is not None, False or DEFAULT_{NONE, FALSE}
+        # That will be the case for all args passed by the shortcuts directly (e.g. self.chat_id)
+        # and for the args set in kwargs above
+        received_kwargs = {param for param, value in kw.items() if value}
+        if not received_kwargs == expected_args:
+            pytest.fail(
+                f'{orig_bot_method.__name__} did not receive the parameters '
+                f'{expected_args - received_kwargs}'
+            )
+
+        if bot_method_name == 'get_file':
+            # This is here mainly for PassportFile.get_file, which calls .set_credentials on the
+            # return value
+            return File(file_id='result', file_unique_id='result')
+        return True
+
+    setattr(bot, bot_method_name, make_assertion)
+    try:
+        shortcut_method(**kwargs)
+    finally:
+        setattr(bot, bot_method_name, orig_bot_method)
+
+    return True
