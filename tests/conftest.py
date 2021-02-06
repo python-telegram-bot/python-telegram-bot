@@ -414,6 +414,7 @@ def check_shortcut_call(
     bot: Bot,
     bot_method_name: str,
     skip_params: Iterable[str] = None,
+    shortcut_kwargs: Iterable[str] = None,
 ) -> bool:
     """
     Checks that a shortcut passes all the existing arguments to the underlying bot method. Use as::
@@ -425,29 +426,38 @@ def check_shortcut_call(
         bot: The bot
         bot_method_name: The bot methods name, e.g. `'send_message'`
         skip_params: Parameters that are allowed to be missing, e.g. `['inline_message_id']`
+        shortcut_kwargs: The kwargs passed by the shortcut directly, e.g. ``chat_id``
 
     Returns:
         :obj:`bool`
     """
     if not skip_params:
         skip_params = set()
+    if not shortcut_kwargs:
+        shortcut_kwargs = set()
 
     orig_bot_method = getattr(bot, bot_method_name)
     bot_signature = inspect.signature(orig_bot_method)
     expected_args = set(bot_signature.parameters.keys()).difference(['self']) - set(skip_params)
+    positional_args = {
+        name for name, param in bot_signature.parameters.items() if param.default == param.empty
+    }
+    ignored_args = positional_args | set(shortcut_kwargs)
 
     shortcut_signature = inspect.signature(shortcut_method)
     # auto_pagination: Special casing for InlineQuery.answer
-    kwargs = {name: True for name in shortcut_signature.parameters if name != 'auto_pagination'}
+    kwargs = {name: name for name in shortcut_signature.parameters if name != 'auto_pagination'}
 
     def make_assertion(**kw):
-        # "if value" makes sure that value is not None, False or DEFAULT_{NONE, FALSE}
-        # That will be the case for all args passed by the shortcuts directly (e.g. self.chat_id)
-        # and for the args set in kwargs above
-        received_kwargs = {param for param, value in kw.items() if value}
+        # name == value makes sure that
+        # a) we receive non-None input for all parameters
+        # b) we receive the correct input for each kwarg
+        received_kwargs = {
+            name for name, value in kw.items() if name in ignored_args or value == name
+        }
         if not received_kwargs == expected_args:
             pytest.fail(
-                f'{orig_bot_method.__name__} did not receive the parameters '
+                f'{orig_bot_method.__name__} did not receive correct value for the parameters '
                 f'{expected_args - received_kwargs}'
             )
 

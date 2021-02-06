@@ -1197,7 +1197,11 @@ class TestMessage:
             [],
         )
         assert check_shortcut_call(
-            message.edit_text, message.bot, 'edit_message_text', skip_params=['inline_message_id']
+            message.edit_text,
+            message.bot,
+            'edit_message_text',
+            skip_params=['inline_message_id'],
+            shortcut_kwargs=['message_id', 'chat_id'],
         )
 
         monkeypatch.setattr(message.bot, 'edit_message_text', make_assertion)
@@ -1221,6 +1225,7 @@ class TestMessage:
             message.bot,
             'edit_message_caption',
             skip_params=['inline_message_id'],
+            shortcut_kwargs=['message_id', 'chat_id'],
         )
 
         monkeypatch.setattr(message.bot, 'edit_message_caption', make_assertion)
@@ -1244,6 +1249,7 @@ class TestMessage:
             message.bot,
             'edit_message_media',
             skip_params=['inline_message_id'],
+            shortcut_kwargs=['message_id', 'chat_id'],
         )
 
         monkeypatch.setattr(message.bot, 'edit_message_media', make_assertion)
@@ -1267,6 +1273,7 @@ class TestMessage:
             message.bot,
             'edit_message_reply_markup',
             skip_params=['inline_message_id'],
+            shortcut_kwargs=['message_id', 'chat_id'],
         )
 
         monkeypatch.setattr(message.bot, 'edit_message_reply_markup', make_assertion)
@@ -1291,6 +1298,7 @@ class TestMessage:
             message.bot,
             'edit_message_live_location',
             skip_params=['inline_message_id'],
+            shortcut_kwargs=['message_id', 'chat_id'],
         )
 
         monkeypatch.setattr(message.bot, 'edit_message_live_location', make_assertion)
@@ -1313,6 +1321,7 @@ class TestMessage:
             message.bot,
             'stop_message_live_location',
             skip_params=['inline_message_id'],
+            shortcut_kwargs=['message_id', 'chat_id'],
         )
 
         monkeypatch.setattr(message.bot, 'stop_message_live_location', make_assertion)
@@ -1337,6 +1346,7 @@ class TestMessage:
             message.bot,
             'set_game_score',
             skip_params=['inline_message_id'],
+            shortcut_kwargs=['message_id', 'chat_id'],
         )
 
         monkeypatch.setattr(message.bot, 'set_game_score', make_assertion)
@@ -1360,6 +1370,7 @@ class TestMessage:
             message.bot,
             'get_game_high_scores',
             skip_params=['inline_message_id'],
+            shortcut_kwargs=['message_id', 'chat_id'],
         )
 
         monkeypatch.setattr(message.bot, 'get_game_high_scores', make_assertion)
@@ -1416,7 +1427,12 @@ class TestMessage:
         assert check_shortcut_signature(
             Message.unpin, Bot.unpin_chat_message, ['chat_id', 'message_id'], []
         )
-        assert check_shortcut_call(message.unpin, message.bot, 'unpin_chat_message')
+        assert check_shortcut_call(
+            message.unpin,
+            message.bot,
+            'unpin_chat_message',
+            shortcut_kwargs=['chat_id', 'message_id'],
+        )
 
         monkeypatch.setattr(message.bot, 'unpin_chat_message', make_assertion)
         assert message.unpin()

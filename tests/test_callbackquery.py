@@ -57,6 +57,12 @@ class TestCallbackQuery:
         return {'inline_message_id'}
 
     @staticmethod
+    def shortcut_kwargs(callback_query: CallbackQuery):
+        if not callback_query.inline_message_id:
+            return {'message_id', 'chat_id'}
+        return {'inline_message_id'}
+
+    @staticmethod
     def check_passed_ids(callback_query: CallbackQuery, kwargs):
         if callback_query.inline_message_id:
             id_ = kwargs['inline_message_id'] == callback_query.inline_message_id
@@ -134,6 +140,7 @@ class TestCallbackQuery:
             callback_query.bot,
             'edit_message_text',
             skip_params=self.skip_params(callback_query),
+            shortcut_kwargs=self.shortcut_kwargs(callback_query),
         )
 
         monkeypatch.setattr(callback_query.bot, 'edit_message_text', make_assertion)
@@ -157,6 +164,7 @@ class TestCallbackQuery:
             callback_query.bot,
             'edit_message_caption',
             skip_params=self.skip_params(callback_query),
+            shortcut_kwargs=self.shortcut_kwargs(callback_query),
         )
 
         monkeypatch.setattr(callback_query.bot, 'edit_message_caption', make_assertion)
@@ -180,6 +188,7 @@ class TestCallbackQuery:
             callback_query.bot,
             'edit_message_reply_markup',
             skip_params=self.skip_params(callback_query),
+            shortcut_kwargs=self.shortcut_kwargs(callback_query),
         )
 
         monkeypatch.setattr(callback_query.bot, 'edit_message_reply_markup', make_assertion)
@@ -203,6 +212,7 @@ class TestCallbackQuery:
             callback_query.bot,
             'edit_message_media',
             skip_params=self.skip_params(callback_query),
+            shortcut_kwargs=self.shortcut_kwargs(callback_query),
         )
 
         monkeypatch.setattr(callback_query.bot, 'edit_message_media', make_assertion)
@@ -227,6 +237,7 @@ class TestCallbackQuery:
             callback_query.bot,
             'edit_message_live_location',
             skip_params=self.skip_params(callback_query),
+            shortcut_kwargs=self.shortcut_kwargs(callback_query),
         )
 
         monkeypatch.setattr(callback_query.bot, 'edit_message_live_location', make_assertion)
@@ -249,6 +260,7 @@ class TestCallbackQuery:
             callback_query.bot,
             'stop_message_live_location',
             skip_params=self.skip_params(callback_query),
+            shortcut_kwargs=self.shortcut_kwargs(callback_query),
         )
 
         monkeypatch.setattr(callback_query.bot, 'stop_message_live_location', make_assertion)
@@ -272,6 +284,7 @@ class TestCallbackQuery:
             callback_query.bot,
             'set_game_score',
             skip_params=self.skip_params(callback_query),
+            shortcut_kwargs=self.shortcut_kwargs(callback_query),
         )
 
         monkeypatch.setattr(callback_query.bot, 'set_game_score', make_assertion)
@@ -295,6 +308,7 @@ class TestCallbackQuery:
             callback_query.bot,
             'get_game_high_scores',
             skip_params=self.skip_params(callback_query),
+            shortcut_kwargs=self.shortcut_kwargs(callback_query),
         )
 
         monkeypatch.setattr(callback_query.bot, 'get_game_high_scores', make_assertion)
@@ -357,7 +371,10 @@ class TestCallbackQuery:
             [],
         )
         assert check_shortcut_call(
-            callback_query.unpin_message, callback_query.bot, 'unpin_chat_message'
+            callback_query.unpin_message,
+            callback_query.bot,
+            'unpin_chat_message',
+            shortcut_kwargs=['message_id', 'chat_id'],
         )
 
         monkeypatch.setattr(callback_query.bot, 'unpin_chat_message', make_assertion)
