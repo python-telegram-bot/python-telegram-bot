@@ -196,19 +196,21 @@ class Bot(TelegramObject):
         """
         effective_timeout = DefaultValue.get_value(timeout)
 
+        # If we have no Defaults, we just need to replace DefaultValue instances
+        # with the actual value
         if not self.defaults:
-            data.update(
-                (key, value.value)
-                for key, value in data.items()
-                if isinstance(value, DefaultValue)
-            )
+            data.update((key, DefaultValue.get_value(value)) for key, value in data.items())
             return effective_timeout
 
+        # if we have Defaults, we replace all DefaultValue instances with the relevant
+        # Defaults value. If there is none, we fall back to the default value of the bot method
         for key in data:
             if isinstance(data[key], DefaultValue):
                 data[key] = self.defaults.api_defaults.get(key, data[key].value)
 
         if isinstance(timeout, DefaultValue):
+            # If we get here, we use Defaults.timeout, unless that's not set, which is the
+            # case if isinstance(self.defaults.timeout, DefaultValue)
             return (
                 self.defaults.timeout
                 if not isinstance(self.defaults.timeout, DefaultValue)
@@ -1433,7 +1435,7 @@ class Bot(TelegramObject):
         for m in data['media']:
             if m.parse_mode == DEFAULT_NONE:
                 if self.defaults:
-                    m.parse_mode = self.defaults.parse_mode
+                    m.parse_mode = DefaultValue.get_value(self.defaults.parse_mode)
                 else:
                     m.parse_mode = None
 

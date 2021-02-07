@@ -206,8 +206,8 @@ class TestBot:
         The same test is also run for all the shortcuts (Message.reply_text) etc in the
         corresponding tests.
 
-        Finally, there are some tests for Defaults.{parse_mode, quote} at the appropriate places,
-        as those are the only things we can actually check.
+        Finally, there are some tests for Defaults.{parse_mode, quote, allow_sending_without_reply}
+        at the appropriate places, as those are the only things we can actually check.
         """
         bot_method = getattr(bot, bot_method_name)
         assert check_defaults_handling(bot_method, bot)
