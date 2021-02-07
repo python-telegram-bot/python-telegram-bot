@@ -477,8 +477,8 @@ def check_shortcut_call(
     return True
 
 
-def check_shortcut_defaults(
-    shortcut_method: Callable,
+def check_defaults_handling(
+    method: Callable,
     bot: Bot,
     return_value=None,
 ) -> bool:
@@ -486,11 +486,8 @@ def check_shortcut_defaults(
     Checks that tg.ext.Defaults are handled correctly.
 
     Args:
-        shortcut_method: The shortcut/bot_method
+        method: The shortcut/bot_method
         bot: The bot
-        monkeypatch: The monkeypatch fixture
-        method_timeout: Optional. The default timeout for the method. Relevant for media methods,
-            i.e. pass 20. Defaults to None.
         return_value: Optional. The return value of Bot._post that the method expects. Defaults to
             None. get_file is automatically  handled.
 
@@ -504,7 +501,7 @@ def check_shortcut_defaults(
                 # Some special casing
                 if name == 'permissions':
                     kws[name] = ChatPermissions()
-                elif name in ['prices', 'media', 'results']:
+                elif name in ['prices', 'media', 'results', 'commands', 'errors']:
                     kws[name] = []
                 elif name == 'ok':
                     kws['ok'] = False
@@ -517,11 +514,11 @@ def check_shortcut_defaults(
                 if dfv != DEFAULT_NONE:
                     kws[name] = dfv
             # Some special casing for methods that have "exactly one of the optionals" type args
-            elif name in ['location', 'contact', 'venue']:
+            elif name in ['location', 'contact', 'venue', 'inline_message_id']:
                 kws[name] = True
         return kws
 
-    shortcut_signature = inspect.signature(shortcut_method)
+    shortcut_signature = inspect.signature(method)
     kwargs_need_default = [
         kwarg
         for kwarg, value in shortcut_signature.parameters.items()
@@ -559,7 +556,7 @@ def check_shortcut_defaults(
                 if value != df_value:
                     pytest.fail(f'Got value {value} for argument {arg} instead of {df_value}')
 
-        if shortcut_method.__name__ in ['get_file', 'get_small_file', 'get_big_file']:
+        if method.__name__ in ['get_file', 'get_small_file', 'get_big_file']:
             # This is here mainly for PassportFile.get_file, which calls .set_credentials on the
             # return value
             out = File(file_id='result', file_unique_id='result')
@@ -586,13 +583,13 @@ def check_shortcut_defaults(
             )
             assertion_callback = functools.partial(make_assertion, df_value=default_value)
             setattr(bot.request, 'post', assertion_callback)
-            assert shortcut_method(**kwargs) in expected_return_values
+            assert method(**kwargs) in expected_return_values
 
             # 2: test that we get the manually passed non-None value
             kwargs = build_kwargs(shortcut_signature, kwargs_need_default, dfv='non-None-value')
             assertion_callback = functools.partial(make_assertion, df_value='non-None-value')
             setattr(bot.request, 'post', assertion_callback)
-            assert shortcut_method(**kwargs) in expected_return_values
+            assert method(**kwargs) in expected_return_values
 
             # 3: test that we get the manually passed None value
             kwargs = build_kwargs(
@@ -602,7 +599,7 @@ def check_shortcut_defaults(
             )
             assertion_callback = functools.partial(make_assertion, df_value=None)
             setattr(bot.request, 'post', assertion_callback)
-            assert shortcut_method(**kwargs) in expected_return_values
+            assert method(**kwargs) in expected_return_values
     except Exception as exc:
         raise exc
     finally:

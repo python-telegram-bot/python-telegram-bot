@@ -20,7 +20,7 @@
 import pytest
 
 from telegram import User, Location, InlineQuery, Update, Bot
-from tests.conftest import check_shortcut_signature, check_shortcut_call, check_shortcut_defaults
+from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
 
 
 @pytest.fixture(scope='class')
@@ -76,7 +76,7 @@ class TestInlineQuery:
             InlineQuery.answer, Bot.answer_inline_query, ['inline_query_id'], ['auto_pagination']
         )
         assert check_shortcut_call(inline_query.answer, inline_query.bot, 'answer_inline_query')
-        assert check_shortcut_defaults(inline_query.answer, inline_query.bot)
+        assert check_defaults_handling(inline_query.answer, inline_query.bot)
 
         monkeypatch.setattr(inline_query.bot, 'answer_inline_query', make_assertion)
         assert inline_query.answer(results=[])

@@ -20,7 +20,7 @@
 import pytest
 
 from telegram import PassportFile, PassportElementError, Bot, File
-from tests.conftest import check_shortcut_signature, check_shortcut_call, check_shortcut_defaults
+from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
 
 
 @pytest.fixture(scope='class')
@@ -63,7 +63,7 @@ class TestPassportFile:
 
         assert check_shortcut_signature(PassportFile.get_file, Bot.get_file, ['file_id'], [])
         assert check_shortcut_call(passport_file.get_file, passport_file.bot, 'get_file')
-        assert check_shortcut_defaults(passport_file.get_file, passport_file.bot)
+        assert check_defaults_handling(passport_file.get_file, passport_file.bot)
 
         monkeypatch.setattr(passport_file.bot, 'get_file', make_assertion)
         assert passport_file.get_file().file_id == 'True'

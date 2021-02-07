@@ -26,7 +26,7 @@ from tests.conftest import (
     expect_bad_request,
     check_shortcut_call,
     check_shortcut_signature,
-    check_shortcut_defaults,
+    check_defaults_handling,
 )
 
 
@@ -135,7 +135,7 @@ class TestChatPhoto:
 
         assert check_shortcut_signature(ChatPhoto.get_small_file, Bot.get_file, ['file_id'], [])
         assert check_shortcut_call(chat_photo.get_small_file, chat_photo.bot, 'get_file')
-        assert check_shortcut_defaults(chat_photo.get_small_file, chat_photo.bot)
+        assert check_defaults_handling(chat_photo.get_small_file, chat_photo.bot)
 
         monkeypatch.setattr(chat_photo.bot, 'get_file', make_assertion)
         assert chat_photo.get_small_file()
@@ -146,7 +146,7 @@ class TestChatPhoto:
 
         assert check_shortcut_signature(ChatPhoto.get_big_file, Bot.get_file, ['file_id'], [])
         assert check_shortcut_call(chat_photo.get_big_file, chat_photo.bot, 'get_file')
-        assert check_shortcut_defaults(chat_photo.get_big_file, chat_photo.bot)
+        assert check_defaults_handling(chat_photo.get_big_file, chat_photo.bot)
 
         monkeypatch.setattr(chat_photo.bot, 'get_file', make_assertion)
         assert chat_photo.get_big_file()

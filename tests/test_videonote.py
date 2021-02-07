@@ -24,7 +24,7 @@ from flaky import flaky
 
 from telegram import VideoNote, TelegramError, Voice, PhotoSize, Bot
 from telegram.error import BadRequest
-from tests.conftest import check_shortcut_call, check_shortcut_signature, check_shortcut_defaults
+from tests.conftest import check_shortcut_call, check_shortcut_signature, check_defaults_handling
 
 
 @pytest.fixture(scope='function')
@@ -233,7 +233,7 @@ class TestVideoNote:
 
         assert check_shortcut_signature(VideoNote.get_file, Bot.get_file, ['file_id'], [])
         assert check_shortcut_call(video_note.get_file, video_note.bot, 'get_file')
-        assert check_shortcut_defaults(video_note.get_file, video_note.bot)
+        assert check_defaults_handling(video_note.get_file, video_note.bot)
 
         monkeypatch.setattr(video_note.bot, 'get_file', make_assertion)
         assert video_note.get_file()

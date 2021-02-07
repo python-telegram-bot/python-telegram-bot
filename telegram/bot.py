@@ -4669,9 +4669,9 @@ class Bot(TelegramObject):
         """
         result = self._post('getMyCommands', timeout=timeout, api_kwargs=api_kwargs)
 
-        self._commands = [BotCommand.de_json(c, self) for c in result]  # type: ignore
+        self._commands = BotCommand.de_list(result, self)  # type: ignore[assignment,arg-type]
 
-        return self._commands
+        return self._commands  # type: ignore[return-value]
 
     @log
     def set_my_commands(
@@ -4713,7 +4713,7 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
-    def log_out(self) -> bool:
+    def log_out(self, timeout: ODVInput[float] = DEFAULT_NONE) -> bool:
         """
         Use this method to log out from the cloud Bot API server before launching the bot locally.
         You *must* log out the bot before running it locally, otherwise there is no guarantee that
@@ -4721,6 +4721,11 @@ class Bot(TelegramObject):
         local server, but will not be able to log in back to the cloud Bot API server for 10
         minutes.
 
+        Args:
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+
         Returns:
             :obj:`True`: On success
 
@@ -4728,16 +4733,21 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        return self._post('logOut')  # type: ignore[return-value]
+        return self._post('logOut', timeout=timeout)  # type: ignore[return-value]
 
     @log
-    def close(self) -> bool:
+    def close(self, timeout: ODVInput[float] = DEFAULT_NONE) -> bool:
         """
         Use this method to close the bot instance before moving it from one local server to
         another. You need to delete the webhook before calling this method to ensure that the bot
         isn't launched again after server restart. The method will return error 429 in the first
         10 minutes after the bot is launched.
 
+        Args:
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+
         Returns:
             :obj:`True`: On success
 
@@ -4745,7 +4755,7 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        return self._post('close')  # type: ignore[return-value]
+        return self._post('close', timeout=timeout)  # type: ignore[return-value]
 
     @log
     def copy_message(

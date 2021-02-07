@@ -20,7 +20,7 @@
 import pytest
 
 from telegram import CallbackQuery, User, Message, Chat, Audio, Bot
-from tests.conftest import check_shortcut_signature, check_shortcut_call, check_shortcut_defaults
+from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
 
 
 @pytest.fixture(scope='function', params=['message', 'inline'])
@@ -118,7 +118,7 @@ class TestCallbackQuery:
         assert check_shortcut_call(
             callback_query.answer, callback_query.bot, 'answer_callback_query'
         )
-        assert check_shortcut_defaults(callback_query.answer, callback_query.bot)
+        assert check_defaults_handling(callback_query.answer, callback_query.bot)
 
         monkeypatch.setattr(callback_query.bot, 'answer_callback_query', make_assertion)
         # TODO: PEP8
@@ -334,7 +334,7 @@ class TestCallbackQuery:
         assert check_shortcut_call(
             callback_query.delete_message, callback_query.bot, 'delete_message'
         )
-        assert check_shortcut_defaults(callback_query.delete_message, callback_query.bot)
+        assert check_defaults_handling(callback_query.delete_message, callback_query.bot)
 
         monkeypatch.setattr(callback_query.bot, 'delete_message', make_assertion)
         assert callback_query.delete_message()
@@ -355,7 +355,7 @@ class TestCallbackQuery:
         assert check_shortcut_call(
             callback_query.pin_message, callback_query.bot, 'pin_chat_message'
         )
-        assert check_shortcut_defaults(callback_query.pin_message, callback_query.bot)
+        assert check_defaults_handling(callback_query.pin_message, callback_query.bot)
 
         monkeypatch.setattr(callback_query.bot, 'pin_chat_message', make_assertion)
         assert callback_query.pin_message()
@@ -379,7 +379,7 @@ class TestCallbackQuery:
             'unpin_chat_message',
             shortcut_kwargs=['message_id', 'chat_id'],
         )
-        assert check_shortcut_defaults(callback_query.unpin_message, callback_query.bot)
+        assert check_defaults_handling(callback_query.unpin_message, callback_query.bot)
 
         monkeypatch.setattr(callback_query.bot, 'unpin_chat_message', make_assertion)
         assert callback_query.unpin_message()
@@ -401,7 +401,7 @@ class TestCallbackQuery:
             [],
         )
         assert check_shortcut_call(callback_query.copy_message, callback_query.bot, 'copy_message')
-        assert check_shortcut_defaults(callback_query.copy_message, callback_query.bot)
+        assert check_defaults_handling(callback_query.copy_message, callback_query.bot)
 
         monkeypatch.setattr(callback_query.bot, 'copy_message', make_assertion)
         assert callback_query.copy_message(1)
