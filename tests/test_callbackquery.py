@@ -143,6 +143,7 @@ class TestCallbackQuery:
             skip_params=self.skip_params(callback_query),
             shortcut_kwargs=self.shortcut_kwargs(callback_query),
         )
+        assert check_defaults_handling(callback_query.edit_message_text, callback_query.bot)
 
         monkeypatch.setattr(callback_query.bot, 'edit_message_text', make_assertion)
         assert callback_query.edit_message_text(text='test')
@@ -167,6 +168,7 @@ class TestCallbackQuery:
             skip_params=self.skip_params(callback_query),
             shortcut_kwargs=self.shortcut_kwargs(callback_query),
         )
+        assert check_defaults_handling(callback_query.edit_message_caption, callback_query.bot)
 
         monkeypatch.setattr(callback_query.bot, 'edit_message_caption', make_assertion)
         assert callback_query.edit_message_caption(caption='new caption')
@@ -190,6 +192,9 @@ class TestCallbackQuery:
             'edit_message_reply_markup',
             skip_params=self.skip_params(callback_query),
             shortcut_kwargs=self.shortcut_kwargs(callback_query),
+        )
+        assert check_defaults_handling(
+            callback_query.edit_message_reply_markup, callback_query.bot
         )
 
         monkeypatch.setattr(callback_query.bot, 'edit_message_reply_markup', make_assertion)
@@ -215,6 +220,7 @@ class TestCallbackQuery:
             skip_params=self.skip_params(callback_query),
             shortcut_kwargs=self.shortcut_kwargs(callback_query),
         )
+        assert check_defaults_handling(callback_query.edit_message_media, callback_query.bot)
 
         monkeypatch.setattr(callback_query.bot, 'edit_message_media', make_assertion)
         assert callback_query.edit_message_media(media=[['1', '2']])
@@ -240,6 +246,9 @@ class TestCallbackQuery:
             skip_params=self.skip_params(callback_query),
             shortcut_kwargs=self.shortcut_kwargs(callback_query),
         )
+        assert check_defaults_handling(
+            callback_query.edit_message_live_location, callback_query.bot
+        )
 
         monkeypatch.setattr(callback_query.bot, 'edit_message_live_location', make_assertion)
         assert callback_query.edit_message_live_location(latitude=1, longitude=2)
@@ -262,6 +271,9 @@ class TestCallbackQuery:
             'stop_message_live_location',
             skip_params=self.skip_params(callback_query),
             shortcut_kwargs=self.shortcut_kwargs(callback_query),
+        )
+        assert check_defaults_handling(
+            callback_query.stop_message_live_location, callback_query.bot
         )
 
         monkeypatch.setattr(callback_query.bot, 'stop_message_live_location', make_assertion)
@@ -287,6 +299,7 @@ class TestCallbackQuery:
             skip_params=self.skip_params(callback_query),
             shortcut_kwargs=self.shortcut_kwargs(callback_query),
         )
+        assert check_defaults_handling(callback_query.set_game_score, callback_query.bot)
 
         monkeypatch.setattr(callback_query.bot, 'set_game_score', make_assertion)
         assert callback_query.set_game_score(user_id=1, score=2)
@@ -311,6 +324,7 @@ class TestCallbackQuery:
             skip_params=self.skip_params(callback_query),
             shortcut_kwargs=self.shortcut_kwargs(callback_query),
         )
+        assert check_defaults_handling(callback_query.get_game_high_scores, callback_query.bot)
 
         monkeypatch.setattr(callback_query.bot, 'get_game_high_scores', make_assertion)
         assert callback_query.get_game_high_scores(user_id=1)
