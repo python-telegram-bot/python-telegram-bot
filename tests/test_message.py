@@ -50,7 +50,7 @@ from telegram import (
     ChatAction,
 )
 from telegram.ext import Defaults
-from tests.conftest import check_shortcut_signature, check_shortcut_call
+from tests.conftest import check_shortcut_signature, check_shortcut_call, check_shortcut_defaults
 from tests.test_passport import RAW_PASSPORT_DATA
 
 
@@ -651,6 +651,7 @@ class TestMessage:
             Message.reply_text, Bot.send_message, ['chat_id'], ['quote']
         )
         assert check_shortcut_call(message.reply_text, message.bot, 'send_message')
+        assert check_shortcut_defaults(message.reply_text, message.bot, monkeypatch)
 
         monkeypatch.setattr(message.bot, 'send_message', make_assertion)
         assert message.reply_text('test')
@@ -679,6 +680,7 @@ class TestMessage:
             Message.reply_markdown, Bot.send_message, ['chat_id', 'parse_mode'], ['quote']
         )
         assert check_shortcut_call(message.reply_text, message.bot, 'send_message')
+        assert check_shortcut_defaults(message.reply_text, message.bot, monkeypatch)
 
         text_markdown = self.test_message.text_markdown
         assert text_markdown == test_md_string
@@ -713,6 +715,7 @@ class TestMessage:
             Message.reply_markdown_v2, Bot.send_message, ['chat_id', 'parse_mode'], ['quote']
         )
         assert check_shortcut_call(message.reply_text, message.bot, 'send_message')
+        assert check_shortcut_defaults(message.reply_text, message.bot, monkeypatch)
 
         text_markdown = self.test_message_v2.text_markdown_v2
         assert text_markdown == test_md_string
@@ -751,6 +754,7 @@ class TestMessage:
             Message.reply_html, Bot.send_message, ['chat_id', 'parse_mode'], ['quote']
         )
         assert check_shortcut_call(message.reply_text, message.bot, 'send_message')
+        assert check_shortcut_defaults(message.reply_text, message.bot, monkeypatch)
 
         text_html = self.test_message_v2.text_html
         assert text_html == test_html_string
@@ -776,6 +780,9 @@ class TestMessage:
             Message.reply_media_group, Bot.send_media_group, ['chat_id'], ['quote']
         )
         assert check_shortcut_call(message.reply_media_group, message.bot, 'send_media_group')
+        assert check_shortcut_defaults(
+            message.reply_media_group, message.bot, monkeypatch, method_timeout=20
+        )
 
         monkeypatch.setattr(message.bot, 'send_media_group', make_assertion)
         assert message.reply_media_group(media='reply_media_group')
@@ -795,6 +802,9 @@ class TestMessage:
             Message.reply_photo, Bot.send_photo, ['chat_id'], ['quote']
         )
         assert check_shortcut_call(message.reply_photo, message.bot, 'send_photo')
+        assert check_shortcut_defaults(
+            message.reply_photo, message.bot, monkeypatch, method_timeout=20
+        )
 
         monkeypatch.setattr(message.bot, 'send_photo', make_assertion)
         assert message.reply_photo(photo='test_photo')
@@ -814,6 +824,9 @@ class TestMessage:
             Message.reply_audio, Bot.send_audio, ['chat_id'], ['quote']
         )
         assert check_shortcut_call(message.reply_audio, message.bot, 'send_audio')
+        assert check_shortcut_defaults(
+            message.reply_audio, message.bot, monkeypatch, method_timeout=20
+        )
 
         monkeypatch.setattr(message.bot, 'send_audio', make_assertion)
         assert message.reply_audio(audio='test_audio')
@@ -833,6 +846,9 @@ class TestMessage:
             Message.reply_document, Bot.send_document, ['chat_id'], ['quote']
         )
         assert check_shortcut_call(message.reply_document, message.bot, 'send_document')
+        assert check_shortcut_defaults(
+            message.reply_document, message.bot, monkeypatch, method_timeout=20
+        )
 
         monkeypatch.setattr(message.bot, 'send_document', make_assertion)
         assert message.reply_document(document='test_document')
@@ -852,6 +868,9 @@ class TestMessage:
             Message.reply_animation, Bot.send_animation, ['chat_id'], ['quote']
         )
         assert check_shortcut_call(message.reply_animation, message.bot, 'send_animation')
+        assert check_shortcut_defaults(
+            message.reply_animation, message.bot, monkeypatch, method_timeout=20
+        )
 
         monkeypatch.setattr(message.bot, 'send_animation', make_assertion)
         assert message.reply_animation(animation='test_animation')
@@ -871,6 +890,9 @@ class TestMessage:
             Message.reply_sticker, Bot.send_sticker, ['chat_id'], ['quote']
         )
         assert check_shortcut_call(message.reply_sticker, message.bot, 'send_sticker')
+        assert check_shortcut_defaults(
+            message.reply_sticker, message.bot, monkeypatch, method_timeout=20
+        )
 
         monkeypatch.setattr(message.bot, 'send_sticker', make_assertion)
         assert message.reply_sticker(sticker='test_sticker')
@@ -890,6 +912,9 @@ class TestMessage:
             Message.reply_video, Bot.send_video, ['chat_id'], ['quote']
         )
         assert check_shortcut_call(message.reply_video, message.bot, 'send_video')
+        assert check_shortcut_defaults(
+            message.reply_video, message.bot, monkeypatch, method_timeout=20
+        )
 
         monkeypatch.setattr(message.bot, 'send_video', make_assertion)
         assert message.reply_video(video='test_video')
@@ -909,6 +934,9 @@ class TestMessage:
             Message.reply_video_note, Bot.send_video_note, ['chat_id'], ['quote']
         )
         assert check_shortcut_call(message.reply_video_note, message.bot, 'send_video_note')
+        assert check_shortcut_defaults(
+            message.reply_video_note, message.bot, monkeypatch, method_timeout=20
+        )
 
         monkeypatch.setattr(message.bot, 'send_video_note', make_assertion)
         assert message.reply_video_note(video_note='test_video_note')
@@ -928,6 +956,9 @@ class TestMessage:
             Message.reply_voice, Bot.send_voice, ['chat_id'], ['quote']
         )
         assert check_shortcut_call(message.reply_voice, message.bot, 'send_voice')
+        assert check_shortcut_defaults(
+            message.reply_voice, message.bot, monkeypatch, method_timeout=20
+        )
 
         monkeypatch.setattr(message.bot, 'send_voice', make_assertion)
         assert message.reply_voice(voice='test_voice')
@@ -947,6 +978,7 @@ class TestMessage:
             Message.reply_location, Bot.send_location, ['chat_id'], ['quote']
         )
         assert check_shortcut_call(message.reply_location, message.bot, 'send_location')
+        assert check_shortcut_defaults(message.reply_location, message.bot, monkeypatch)
 
         monkeypatch.setattr(message.bot, 'send_location', make_assertion)
         assert message.reply_location(location='test_location')
@@ -966,6 +998,7 @@ class TestMessage:
             Message.reply_venue, Bot.send_venue, ['chat_id'], ['quote']
         )
         assert check_shortcut_call(message.reply_venue, message.bot, 'send_venue')
+        assert check_shortcut_defaults(message.reply_venue, message.bot, monkeypatch)
 
         monkeypatch.setattr(message.bot, 'send_venue', make_assertion)
         assert message.reply_venue(venue='test_venue')
@@ -985,6 +1018,7 @@ class TestMessage:
             Message.reply_contact, Bot.send_contact, ['chat_id'], ['quote']
         )
         assert check_shortcut_call(message.reply_contact, message.bot, 'send_contact')
+        assert check_shortcut_defaults(message.reply_contact, message.bot, monkeypatch)
 
         monkeypatch.setattr(message.bot, 'send_contact', make_assertion)
         assert message.reply_contact(contact='test_contact')
@@ -1003,6 +1037,7 @@ class TestMessage:
 
         assert check_shortcut_signature(Message.reply_poll, Bot.send_poll, ['chat_id'], ['quote'])
         assert check_shortcut_call(message.reply_poll, message.bot, 'send_poll')
+        assert check_shortcut_defaults(message.reply_poll, message.bot, monkeypatch)
 
         monkeypatch.setattr(message.bot, 'send_poll', make_assertion)
         assert message.reply_poll(question='test_poll', options=['1', '2', '3'])
@@ -1020,6 +1055,7 @@ class TestMessage:
 
         assert check_shortcut_signature(Message.reply_dice, Bot.send_dice, ['chat_id'], ['quote'])
         assert check_shortcut_call(message.reply_dice, message.bot, 'send_dice')
+        assert check_shortcut_defaults(message.reply_dice, message.bot, monkeypatch)
 
         monkeypatch.setattr(message.bot, 'send_dice', make_assertion)
         assert message.reply_dice(disable_notification=True)
@@ -1035,6 +1071,7 @@ class TestMessage:
             Message.reply_chat_action, Bot.send_chat_action, ['chat_id'], []
         )
         assert check_shortcut_call(message.reply_chat_action, message.bot, 'send_chat_action')
+        assert check_shortcut_defaults(message.reply_chat_action, message.bot, monkeypatch)
 
         monkeypatch.setattr(message.bot, 'send_chat_action', make_assertion)
         assert message.reply_chat_action(action=ChatAction.TYPING)
@@ -1047,6 +1084,7 @@ class TestMessage:
 
         assert check_shortcut_signature(Message.reply_game, Bot.send_game, ['chat_id'], ['quote'])
         assert check_shortcut_call(message.reply_game, message.bot, 'send_game')
+        assert check_shortcut_defaults(message.reply_game, message.bot, monkeypatch)
 
         monkeypatch.setattr(message.bot, 'send_game', make_assertion)
         assert message.reply_game(game_short_name='test_game')
@@ -1076,6 +1114,7 @@ class TestMessage:
             Message.reply_invoice, Bot.send_invoice, ['chat_id'], ['quote']
         )
         assert check_shortcut_call(message.reply_invoice, message.bot, 'send_invoice')
+        assert check_shortcut_defaults(message.reply_invoice, message.bot, monkeypatch)
 
         monkeypatch.setattr(message.bot, 'send_invoice', make_assertion)
         assert message.reply_invoice(
@@ -1111,6 +1150,7 @@ class TestMessage:
             Message.forward, Bot.forward_message, ['from_chat_id', 'message_id'], []
         )
         assert check_shortcut_call(message.forward, message.bot, 'forward_message')
+        assert check_shortcut_defaults(message.forward, message.bot, monkeypatch)
 
         monkeypatch.setattr(message.bot, 'forward_message', make_assertion)
         assert message.forward(123456, disable_notification=disable_notification)
@@ -1135,6 +1175,7 @@ class TestMessage:
             Message.copy, Bot.copy_message, ['from_chat_id', 'message_id'], []
         )
         assert check_shortcut_call(message.copy, message.bot, 'copy_message')
+        assert check_shortcut_defaults(message.copy, message.bot, monkeypatch)
 
         monkeypatch.setattr(message.bot, 'copy_message', make_assertion)
         assert message.copy(123456, disable_notification=disable_notification)
@@ -1166,6 +1207,7 @@ class TestMessage:
             Message.reply_copy, Bot.copy_message, ['chat_id'], ['quote']
         )
         assert check_shortcut_call(message.copy, message.bot, 'copy_message')
+        assert check_shortcut_defaults(message.copy, message.bot, monkeypatch)
 
         monkeypatch.setattr(message.bot, 'copy_message', make_assertion)
         assert message.reply_copy(123456, 456789, disable_notification=disable_notification)
@@ -1386,6 +1428,7 @@ class TestMessage:
             Message.delete, Bot.delete_message, ['chat_id', 'message_id'], []
         )
         assert check_shortcut_call(message.delete, message.bot, 'delete_message')
+        assert check_shortcut_defaults(message.delete, message.bot, monkeypatch)
 
         monkeypatch.setattr(message.bot, 'delete_message', make_assertion)
         assert message.delete()
@@ -1400,6 +1443,7 @@ class TestMessage:
             Message.stop_poll, Bot.stop_poll, ['chat_id', 'message_id'], []
         )
         assert check_shortcut_call(message.stop_poll, message.bot, 'stop_poll')
+        assert check_shortcut_defaults(message.stop_poll, message.bot, monkeypatch)
 
         monkeypatch.setattr(message.bot, 'stop_poll', make_assertion)
         assert message.stop_poll()
@@ -1414,6 +1458,7 @@ class TestMessage:
             Message.pin, Bot.pin_chat_message, ['chat_id', 'message_id'], []
         )
         assert check_shortcut_call(message.pin, message.bot, 'pin_chat_message')
+        assert check_shortcut_defaults(message.pin, message.bot, monkeypatch)
 
         monkeypatch.setattr(message.bot, 'pin_chat_message', make_assertion)
         assert message.pin()

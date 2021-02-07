@@ -88,7 +88,6 @@ from telegram.utils.helpers import (
     to_timestamp,
     is_local_file,
     parse_file_input,
-    DEFAULT_FALSE,
     DEFAULT_20,
 )
 from telegram.utils.request import Request
@@ -209,11 +208,13 @@ class Bot(TelegramObject):
             if isinstance(data[key], DefaultValue):
                 data[key] = self.defaults.api_defaults.get(key, data[key].value)
 
-        return (
-            self.defaults.timeout
-            if not isinstance(self.defaults.timeout, DefaultValue)
-            else effective_timeout
-        )
+        if isinstance(timeout, DefaultValue):
+            return (
+                self.defaults.timeout
+                if not isinstance(self.defaults.timeout, DefaultValue)
+                else effective_timeout
+            )
+        return effective_timeout
 
     def _post(
         self,
@@ -401,7 +402,7 @@ class Bot(TelegramObject):
         text: str,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
-        disable_notification: DVInput[bool] = DEFAULT_FALSE,
+        disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Union[int, str] = None,
         reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
@@ -517,7 +518,7 @@ class Bot(TelegramObject):
         chat_id: Union[int, str],
         from_chat_id: Union[str, int],
         message_id: Union[str, int],
-        disable_notification: DVInput[bool] = DEFAULT_FALSE,
+        disable_notification: DVInput[bool] = DEFAULT_NONE,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> Message:
@@ -567,7 +568,7 @@ class Bot(TelegramObject):
         chat_id: int,
         photo: Union[FileInput, 'PhotoSize'],
         caption: str = None,
-        disable_notification: DVInput[bool] = DEFAULT_FALSE,
+        disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Union[int, str] = None,
         reply_markup: ReplyMarkup = None,
         timeout: DVInput[float] = DEFAULT_20,
@@ -660,7 +661,7 @@ class Bot(TelegramObject):
         performer: str = None,
         title: str = None,
         caption: str = None,
-        disable_notification: DVInput[bool] = DEFAULT_FALSE,
+        disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Union[int, str] = None,
         reply_markup: ReplyMarkup = None,
         timeout: DVInput[float] = DEFAULT_20,
@@ -779,7 +780,7 @@ class Bot(TelegramObject):
         document: Union[FileInput, 'Document'],
         filename: str = None,
         caption: str = None,
-        disable_notification: DVInput[bool] = DEFAULT_FALSE,
+        disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Union[int, str] = None,
         reply_markup: ReplyMarkup = None,
         timeout: DVInput[float] = DEFAULT_20,
@@ -886,7 +887,7 @@ class Bot(TelegramObject):
         self,
         chat_id: Union[int, str],
         sticker: Union[FileInput, 'Sticker'],
-        disable_notification: DVInput[bool] = DEFAULT_FALSE,
+        disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Union[int, str] = None,
         reply_markup: ReplyMarkup = None,
         timeout: DVInput[float] = DEFAULT_20,
@@ -952,7 +953,7 @@ class Bot(TelegramObject):
         video: Union[FileInput, 'Video'],
         duration: int = None,
         caption: str = None,
-        disable_notification: DVInput[bool] = DEFAULT_FALSE,
+        disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Union[int, str] = None,
         reply_markup: ReplyMarkup = None,
         timeout: DVInput[float] = DEFAULT_20,
@@ -1078,7 +1079,7 @@ class Bot(TelegramObject):
         video_note: Union[FileInput, 'VideoNote'],
         duration: int = None,
         length: int = None,
-        disable_notification: DVInput[bool] = DEFAULT_FALSE,
+        disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Union[int, str] = None,
         reply_markup: ReplyMarkup = None,
         timeout: DVInput[float] = DEFAULT_20,
@@ -1181,7 +1182,7 @@ class Bot(TelegramObject):
         thumb: FileInput = None,
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        disable_notification: DVInput[bool] = DEFAULT_FALSE,
+        disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Union[int, str] = None,
         reply_markup: ReplyMarkup = None,
         timeout: DVInput[float] = DEFAULT_20,
@@ -1294,7 +1295,7 @@ class Bot(TelegramObject):
         voice: Union[FileInput, 'Voice'],
         duration: int = None,
         caption: str = None,
-        disable_notification: DVInput[bool] = DEFAULT_FALSE,
+        disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Union[int, str] = None,
         reply_markup: ReplyMarkup = None,
         timeout: DVInput[float] = DEFAULT_20,
@@ -1441,7 +1442,7 @@ class Bot(TelegramObject):
 
         result = self._post('sendMediaGroup', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        return [Message.de_json(res, self) for res in result]  # type: ignore
+        return Message.de_list(result, self)  # type: ignore
 
     @log
     def send_location(
@@ -1449,7 +1450,7 @@ class Bot(TelegramObject):
         chat_id: Union[int, str],
         latitude: float = None,
         longitude: float = None,
-        disable_notification: DVInput[bool] = DEFAULT_FALSE,
+        disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Union[int, str] = None,
         reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1505,12 +1506,12 @@ class Bot(TelegramObject):
         """
         if not ((latitude is not None and longitude is not None) or location):
             raise ValueError(
-                "Either location or latitude and longitude must be passed as" "argument."
+                "Either location or latitude and longitude must be passed as argument."
             )
 
         if not (latitude is not None or longitude is not None) ^ bool(location):
             raise ValueError(
-                "Either location or latitude and longitude must be passed as" "argument. Not both."
+                "Either location or latitude and longitude must be passed as argument. Not both."
             )
 
         if isinstance(location, Location):
@@ -1594,11 +1595,11 @@ class Bot(TelegramObject):
         """
         if not (all([latitude, longitude]) or location):
             raise ValueError(
-                "Either location or latitude and longitude must be passed as" "argument."
+                "Either location or latitude and longitude must be passed as argument."
             )
         if not (latitude is not None or longitude is not None) ^ bool(location):
             raise ValueError(
-                "Either location or latitude and longitude must be passed as" "argument. Not both."
+                "Either location or latitude and longitude must be passed as argument. Not both."
             )
 
         if isinstance(location, Location):
@@ -1687,7 +1688,7 @@ class Bot(TelegramObject):
         title: str = None,
         address: str = None,
         foursquare_id: str = None,
-        disable_notification: DVInput[bool] = DEFAULT_FALSE,
+        disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Union[int, str] = None,
         reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1797,7 +1798,7 @@ class Bot(TelegramObject):
         phone_number: str = None,
         first_name: str = None,
         last_name: str = None,
-        disable_notification: DVInput[bool] = DEFAULT_FALSE,
+        disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Union[int, str] = None,
         reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1845,7 +1846,7 @@ class Bot(TelegramObject):
         """
         if (not contact) and (not all([phone_number, first_name])):
             raise ValueError(
-                "Either contact or phone_number and first_name must be passed as" "arguments."
+                "Either contact or phone_number and first_name must be passed as arguments."
             )
 
         if isinstance(contact, Contact):
@@ -1881,7 +1882,7 @@ class Bot(TelegramObject):
         self,
         chat_id: Union[int, str],
         game_short_name: str,
-        disable_notification: DVInput[bool] = DEFAULT_FALSE,
+        disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Union[int, str] = None,
         reply_markup: InlineKeyboardMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3248,7 +3249,7 @@ class Bot(TelegramObject):
         need_email: bool = None,
         need_shipping_address: bool = None,
         is_flexible: bool = None,
-        disable_notification: DVInput[bool] = DEFAULT_FALSE,
+        disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Union[int, str] = None,
         reply_markup: InlineKeyboardMarkup = None,
         provider_data: Union[str, object] = None,
@@ -4755,9 +4756,9 @@ class Bot(TelegramObject):
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[Tuple['MessageEntity', ...], List['MessageEntity']] = None,
-        disable_notification: DVInput[bool] = DEFAULT_FALSE,
+        disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Union[int, str] = None,
-        allow_sending_without_reply: DVInput[bool] = DEFAULT_FALSE,
+        allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
         reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,

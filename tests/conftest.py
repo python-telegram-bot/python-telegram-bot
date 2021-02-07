@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime
+import functools
 import inspect
 import os
 import re
@@ -24,7 +25,7 @@ from collections import defaultdict
 from queue import Queue
 from threading import Thread, Event
 from time import sleep
-from typing import Callable, List, Iterable
+from typing import Callable, List, Iterable, Any
 
 import pytest
 import pytz
@@ -45,6 +46,7 @@ from telegram import (
 )
 from telegram.ext import Dispatcher, JobQueue, Updater, MessageFilter, Defaults, UpdateFilter
 from telegram.error import BadRequest
+from telegram.utils.helpers import DefaultValue, DEFAULT_NONE
 from tests.bots import get_bot
 
 GITHUB_ACTION = os.getenv('GITHUB_ACTION', False)
@@ -472,5 +474,104 @@ def check_shortcut_call(
         shortcut_method(**kwargs)
     finally:
         setattr(bot, bot_method_name, orig_bot_method)
+
+    return True
+
+
+def check_shortcut_defaults(
+    shortcut_method: Callable,
+    bot: Bot,
+    monkeypatch,
+    method_timeout: float = None,
+) -> bool:
+    def build_kwargs(signature: inspect.Signature, default_kwargs, dfv: Any = DEFAULT_NONE):
+        kws = {}
+        for name, param in signature.parameters.items():
+            # For required params we need to pass something and because
+            # send_invoice.prices needs a list, we rather use a list
+            if param.default == param.empty:
+                kws[name] = []  # 'required_arg'
+            # pass values for params that can have defaults only if we don't want to use the
+            # standard default
+            elif name in default_kwargs:
+                if dfv != DEFAULT_NONE:
+                    kws[name] = dfv
+            # Some special casing for methods that have "exactly one of the optionals" type args
+            elif name in ['location', 'contact', 'venue']:
+                kws[name] = True
+        return kws
+
+    shortcut_signature = inspect.signature(shortcut_method)
+    kwargs_need_default = [
+        kwarg
+        for kwarg, value in shortcut_signature.parameters.items()
+        if isinstance(value.default, DefaultValue)
+    ]
+
+    default_kwarg_names = kwargs_need_default
+    # special case explanation_parse_mode of Bot.send_poll:
+    if 'explanation_parse_mode' in default_kwarg_names:
+        default_kwarg_names.remove('explanation_parse_mode')
+
+    defaults_no_custom_defaults = Defaults()
+    defaults_custom_defaults = Defaults(
+        **{kwarg: 'custom_default' for kwarg in default_kwarg_names}
+    )
+
+    def make_assertion(_, data, timeout=DEFAULT_NONE, df_value=DEFAULT_NONE):
+        expected_timeout = method_timeout if df_value == DEFAULT_NONE else df_value
+        if timeout != expected_timeout:
+            pytest.fail(f'Got value {timeout} for "timeout", expected {expected_timeout}')
+
+        for arg in (dkw for dkw in kwargs_need_default if dkw != 'timeout'):
+            # 'None' should not be passed along to Telegram
+            if df_value in [None, DEFAULT_NONE]:
+                if arg in data:
+                    pytest.fail(
+                        f'Got value {data[arg]} for argument {arg}, expected it to be absent'
+                    )
+            else:
+                value = data.get(arg, '`not passed at all`')
+                if value != df_value:
+                    pytest.fail(f'Got value {value} for argument {arg} instead of {df_value}')
+
+        if shortcut_method.__name__ == 'get_file':
+            # This is here mainly for PassportFile.get_file, which calls .set_credentials on the
+            # return value
+            return File(file_id='result', file_unique_id='result')
+        # Otherwise return None, as TGObject.de_json/list(None) in [None, []]
+        # That way we can check what gets passed to Request.post without having to actually
+        # make a request
+        return None
+
+    for default_value, defaults in [
+        (DEFAULT_NONE, defaults_no_custom_defaults),
+        ('custom_default', defaults_custom_defaults),
+    ]:
+        bot.defaults = defaults
+        # 1: test that we get the correct default value, if we don't specify anything
+        kwargs = build_kwargs(
+            shortcut_signature,
+            kwargs_need_default,
+        )
+        assertion_callback = functools.partial(make_assertion, df_value=default_value)
+        monkeypatch.setattr(bot.request, 'post', assertion_callback)
+        assert shortcut_method(**kwargs) in [None, []]
+
+        # 2: test that we get the manually passed non-None value
+        kwargs = build_kwargs(shortcut_signature, kwargs_need_default, dfv='non-None-value')
+        assertion_callback = functools.partial(make_assertion, df_value='non-None-value')
+        monkeypatch.setattr(bot.request, 'post', assertion_callback)
+        assert shortcut_method(**kwargs) in [None, []]
+
+        # 3: test that we get the manually passed None value
+        kwargs = build_kwargs(
+            shortcut_signature,
+            kwargs_need_default,
+            dfv=None,
+        )
+        assertion_callback = functools.partial(make_assertion, df_value=None)
+        monkeypatch.setattr(bot.request, 'post', assertion_callback)
+        assert shortcut_method(**kwargs) in [None, []]
 
     return True
