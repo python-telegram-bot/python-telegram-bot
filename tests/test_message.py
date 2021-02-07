@@ -780,7 +780,7 @@ class TestMessage:
             Message.reply_media_group, Bot.send_media_group, ['chat_id'], ['quote']
         )
         assert check_shortcut_call(message.reply_media_group, message.bot, 'send_media_group')
-        assert check_shortcut_defaults(message.reply_media_group, message.bot, method_timeout=20)
+        assert check_shortcut_defaults(message.reply_media_group, message.bot)
 
         monkeypatch.setattr(message.bot, 'send_media_group', make_assertion)
         assert message.reply_media_group(media='reply_media_group')
@@ -800,7 +800,7 @@ class TestMessage:
             Message.reply_photo, Bot.send_photo, ['chat_id'], ['quote']
         )
         assert check_shortcut_call(message.reply_photo, message.bot, 'send_photo')
-        assert check_shortcut_defaults(message.reply_photo, message.bot, method_timeout=20)
+        assert check_shortcut_defaults(message.reply_photo, message.bot)
 
         monkeypatch.setattr(message.bot, 'send_photo', make_assertion)
         assert message.reply_photo(photo='test_photo')
@@ -820,7 +820,7 @@ class TestMessage:
             Message.reply_audio, Bot.send_audio, ['chat_id'], ['quote']
         )
         assert check_shortcut_call(message.reply_audio, message.bot, 'send_audio')
-        assert check_shortcut_defaults(message.reply_audio, message.bot, method_timeout=20)
+        assert check_shortcut_defaults(message.reply_audio, message.bot)
 
         monkeypatch.setattr(message.bot, 'send_audio', make_assertion)
         assert message.reply_audio(audio='test_audio')
@@ -840,7 +840,7 @@ class TestMessage:
             Message.reply_document, Bot.send_document, ['chat_id'], ['quote']
         )
         assert check_shortcut_call(message.reply_document, message.bot, 'send_document')
-        assert check_shortcut_defaults(message.reply_document, message.bot, method_timeout=20)
+        assert check_shortcut_defaults(message.reply_document, message.bot)
 
         monkeypatch.setattr(message.bot, 'send_document', make_assertion)
         assert message.reply_document(document='test_document')
@@ -860,7 +860,7 @@ class TestMessage:
             Message.reply_animation, Bot.send_animation, ['chat_id'], ['quote']
         )
         assert check_shortcut_call(message.reply_animation, message.bot, 'send_animation')
-        assert check_shortcut_defaults(message.reply_animation, message.bot, method_timeout=20)
+        assert check_shortcut_defaults(message.reply_animation, message.bot)
 
         monkeypatch.setattr(message.bot, 'send_animation', make_assertion)
         assert message.reply_animation(animation='test_animation')
@@ -880,7 +880,7 @@ class TestMessage:
             Message.reply_sticker, Bot.send_sticker, ['chat_id'], ['quote']
         )
         assert check_shortcut_call(message.reply_sticker, message.bot, 'send_sticker')
-        assert check_shortcut_defaults(message.reply_sticker, message.bot, method_timeout=20)
+        assert check_shortcut_defaults(message.reply_sticker, message.bot)
 
         monkeypatch.setattr(message.bot, 'send_sticker', make_assertion)
         assert message.reply_sticker(sticker='test_sticker')
@@ -900,7 +900,7 @@ class TestMessage:
             Message.reply_video, Bot.send_video, ['chat_id'], ['quote']
         )
         assert check_shortcut_call(message.reply_video, message.bot, 'send_video')
-        assert check_shortcut_defaults(message.reply_video, message.bot, method_timeout=20)
+        assert check_shortcut_defaults(message.reply_video, message.bot)
 
         monkeypatch.setattr(message.bot, 'send_video', make_assertion)
         assert message.reply_video(video='test_video')
@@ -920,7 +920,7 @@ class TestMessage:
             Message.reply_video_note, Bot.send_video_note, ['chat_id'], ['quote']
         )
         assert check_shortcut_call(message.reply_video_note, message.bot, 'send_video_note')
-        assert check_shortcut_defaults(message.reply_video_note, message.bot, method_timeout=20)
+        assert check_shortcut_defaults(message.reply_video_note, message.bot)
 
         monkeypatch.setattr(message.bot, 'send_video_note', make_assertion)
         assert message.reply_video_note(video_note='test_video_note')
@@ -940,7 +940,7 @@ class TestMessage:
             Message.reply_voice, Bot.send_voice, ['chat_id'], ['quote']
         )
         assert check_shortcut_call(message.reply_voice, message.bot, 'send_voice')
-        assert check_shortcut_defaults(message.reply_voice, message.bot, method_timeout=20)
+        assert check_shortcut_defaults(message.reply_voice, message.bot)
 
         monkeypatch.setattr(message.bot, 'send_voice', make_assertion)
         assert message.reply_voice(voice='test_voice')

@@ -195,7 +195,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.send_photo, Bot.send_photo, ['chat_id'], [])
         assert check_shortcut_call(user.send_photo, user.bot, 'send_photo')
-        assert check_shortcut_defaults(user.send_photo, user.bot, method_timeout=20)
+        assert check_shortcut_defaults(user.send_photo, user.bot)
 
         monkeypatch.setattr(user.bot, 'send_photo', make_assertion)
         assert user.send_photo('test_photo')
@@ -208,7 +208,7 @@ class TestUser:
             User.send_media_group, Bot.send_media_group, ['chat_id'], []
         )
         assert check_shortcut_call(user.send_media_group, user.bot, 'send_media_group')
-        assert check_shortcut_defaults(user.send_media_group, user.bot, method_timeout=20)
+        assert check_shortcut_defaults(user.send_media_group, user.bot)
 
         monkeypatch.setattr(user.bot, 'send_media_group', make_assertion)
         assert user.send_media_group('test_media_group')
@@ -219,7 +219,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.send_audio, Bot.send_audio, ['chat_id'], [])
         assert check_shortcut_call(user.send_audio, user.bot, 'send_audio')
-        assert check_shortcut_defaults(user.send_audio, user.bot, method_timeout=20)
+        assert check_shortcut_defaults(user.send_audio, user.bot)
 
         monkeypatch.setattr(user.bot, 'send_audio', make_assertion)
         assert user.send_audio('test_audio')
@@ -265,7 +265,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.send_document, Bot.send_document, ['chat_id'], [])
         assert check_shortcut_call(user.send_document, user.bot, 'send_document')
-        assert check_shortcut_defaults(user.send_document, user.bot, method_timeout=20)
+        assert check_shortcut_defaults(user.send_document, user.bot)
 
         monkeypatch.setattr(user.bot, 'send_document', make_assertion)
         assert user.send_document('test_document')
@@ -333,7 +333,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.send_sticker, Bot.send_sticker, ['chat_id'], [])
         assert check_shortcut_call(user.send_sticker, user.bot, 'send_sticker')
-        assert check_shortcut_defaults(user.send_sticker, user.bot, method_timeout=20)
+        assert check_shortcut_defaults(user.send_sticker, user.bot)
 
         monkeypatch.setattr(user.bot, 'send_sticker', make_assertion)
         assert user.send_sticker('test_sticker')
@@ -344,7 +344,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.send_video, Bot.send_video, ['chat_id'], [])
         assert check_shortcut_call(user.send_video, user.bot, 'send_video')
-        assert check_shortcut_defaults(user.send_video, user.bot, method_timeout=20)
+        assert check_shortcut_defaults(user.send_video, user.bot)
 
         monkeypatch.setattr(user.bot, 'send_video', make_assertion)
         assert user.send_video('test_video')
@@ -366,7 +366,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.send_video_note, Bot.send_video_note, ['chat_id'], [])
         assert check_shortcut_call(user.send_video_note, user.bot, 'send_video_note')
-        assert check_shortcut_defaults(user.send_video_note, user.bot, method_timeout=20)
+        assert check_shortcut_defaults(user.send_video_note, user.bot)
 
         monkeypatch.setattr(user.bot, 'send_video_note', make_assertion)
         assert user.send_video_note('test_video_note')
@@ -377,7 +377,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.send_voice, Bot.send_voice, ['chat_id'], [])
         assert check_shortcut_call(user.send_voice, user.bot, 'send_voice')
-        assert check_shortcut_defaults(user.send_voice, user.bot, method_timeout=20)
+        assert check_shortcut_defaults(user.send_voice, user.bot)
 
         monkeypatch.setattr(user.bot, 'send_voice', make_assertion)
         assert user.send_voice('test_voice')
@@ -388,7 +388,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.send_animation, Bot.send_animation, ['chat_id'], [])
         assert check_shortcut_call(user.send_animation, user.bot, 'send_animation')
-        assert check_shortcut_defaults(user.send_animation, user.bot, method_timeout=20)
+        assert check_shortcut_defaults(user.send_animation, user.bot)
 
         monkeypatch.setattr(user.bot, 'send_animation', make_assertion)
         assert user.send_animation('test_animation')

@@ -480,7 +480,6 @@ def check_shortcut_call(
 def check_shortcut_defaults(
     shortcut_method: Callable,
     bot: Bot,
-    method_timeout: float = None,
     return_value=None,
 ) -> bool:
     """
@@ -528,6 +527,8 @@ def check_shortcut_defaults(
         for kwarg, value in shortcut_signature.parameters.items()
         if isinstance(value.default, DefaultValue)
     ]
+    # shortcut_signature.parameters['timeout'] is of type DefaultValue
+    method_timeout = shortcut_signature.parameters['timeout'].default.value
 
     default_kwarg_names = kwargs_need_default
     # special case explanation_parse_mode of Bot.send_poll:
