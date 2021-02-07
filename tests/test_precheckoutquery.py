@@ -20,7 +20,7 @@
 import pytest
 
 from telegram import Update, User, PreCheckoutQuery, OrderInfo, Bot
-from tests.conftest import check_shortcut_call, check_shortcut_signature
+from tests.conftest import check_shortcut_call, check_shortcut_signature, check_shortcut_defaults
 
 
 @pytest.fixture(scope='class')
@@ -91,6 +91,7 @@ class TestPreCheckoutQuery:
             pre_checkout_query.bot,
             'answer_pre_checkout_query',
         )
+        assert check_shortcut_defaults(pre_checkout_query.answer, pre_checkout_query.bot)
 
         monkeypatch.setattr(pre_checkout_query.bot, 'answer_pre_checkout_query', make_assertion)
         assert pre_checkout_query.answer(ok=True)

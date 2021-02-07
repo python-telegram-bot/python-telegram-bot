@@ -20,7 +20,7 @@ import pytest
 
 from telegram import Update, User, Bot
 from telegram.utils.helpers import escape_markdown
-from tests.conftest import check_shortcut_signature, check_shortcut_call
+from tests.conftest import check_shortcut_signature, check_shortcut_call, check_shortcut_defaults
 
 
 @pytest.fixture(scope='function')
@@ -136,6 +136,7 @@ class TestUser:
             User.get_profile_photos, Bot.get_user_profile_photos, ['user_id'], []
         )
         assert check_shortcut_call(user.get_profile_photos, user.bot, 'get_user_profile_photos')
+        assert check_shortcut_defaults(user.get_profile_photos, user.bot)
 
         monkeypatch.setattr(user.bot, 'get_user_profile_photos', make_assertion)
         assert user.get_profile_photos()
@@ -146,6 +147,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.pin_message, Bot.pin_chat_message, ['chat_id'], [])
         assert check_shortcut_call(user.pin_message, user.bot, 'pin_chat_message')
+        assert check_shortcut_defaults(user.pin_message, user.bot)
 
         monkeypatch.setattr(user.bot, 'pin_chat_message', make_assertion)
         assert user.pin_message(1)
@@ -158,6 +160,7 @@ class TestUser:
             User.unpin_message, Bot.unpin_chat_message, ['chat_id'], []
         )
         assert check_shortcut_call(user.unpin_message, user.bot, 'unpin_chat_message')
+        assert check_shortcut_defaults(user.unpin_message, user.bot)
 
         monkeypatch.setattr(user.bot, 'unpin_chat_message', make_assertion)
         assert user.unpin_message()
@@ -170,6 +173,7 @@ class TestUser:
             User.unpin_all_messages, Bot.unpin_all_chat_messages, ['chat_id'], []
         )
         assert check_shortcut_call(user.unpin_all_messages, user.bot, 'unpin_all_chat_messages')
+        assert check_shortcut_defaults(user.unpin_all_messages, user.bot)
 
         monkeypatch.setattr(user.bot, 'unpin_all_chat_messages', make_assertion)
         assert user.unpin_all_messages()
@@ -180,6 +184,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.send_message, Bot.send_message, ['chat_id'], [])
         assert check_shortcut_call(user.send_message, user.bot, 'send_message')
+        assert check_shortcut_defaults(user.send_message, user.bot)
 
         monkeypatch.setattr(user.bot, 'send_message', make_assertion)
         assert user.send_message('test')
@@ -190,6 +195,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.send_photo, Bot.send_photo, ['chat_id'], [])
         assert check_shortcut_call(user.send_photo, user.bot, 'send_photo')
+        assert check_shortcut_defaults(user.send_photo, user.bot, method_timeout=20)
 
         monkeypatch.setattr(user.bot, 'send_photo', make_assertion)
         assert user.send_photo('test_photo')
@@ -202,6 +208,7 @@ class TestUser:
             User.send_media_group, Bot.send_media_group, ['chat_id'], []
         )
         assert check_shortcut_call(user.send_media_group, user.bot, 'send_media_group')
+        assert check_shortcut_defaults(user.send_media_group, user.bot, method_timeout=20)
 
         monkeypatch.setattr(user.bot, 'send_media_group', make_assertion)
         assert user.send_media_group('test_media_group')
@@ -212,6 +219,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.send_audio, Bot.send_audio, ['chat_id'], [])
         assert check_shortcut_call(user.send_audio, user.bot, 'send_audio')
+        assert check_shortcut_defaults(user.send_audio, user.bot, method_timeout=20)
 
         monkeypatch.setattr(user.bot, 'send_audio', make_assertion)
         assert user.send_audio('test_audio')
@@ -224,6 +232,7 @@ class TestUser:
             User.send_chat_action, Bot.send_chat_action, ['chat_id'], []
         )
         assert check_shortcut_call(user.send_chat_action, user.bot, 'send_chat_action')
+        assert check_shortcut_defaults(user.send_chat_action, user.bot)
 
         monkeypatch.setattr(user.bot, 'send_chat_action', make_assertion)
         assert user.send_chat_action('test_chat_action')
@@ -234,6 +243,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.send_contact, Bot.send_contact, ['chat_id'], [])
         assert check_shortcut_call(user.send_contact, user.bot, 'send_contact')
+        assert check_shortcut_defaults(user.send_contact, user.bot)
 
         monkeypatch.setattr(user.bot, 'send_contact', make_assertion)
         assert user.send_contact(phone_number='test_contact')
@@ -244,6 +254,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.send_dice, Bot.send_dice, ['chat_id'], [])
         assert check_shortcut_call(user.send_dice, user.bot, 'send_dice')
+        assert check_shortcut_defaults(user.send_dice, user.bot)
 
         monkeypatch.setattr(user.bot, 'send_dice', make_assertion)
         assert user.send_dice(emoji='test_dice')
@@ -254,6 +265,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.send_document, Bot.send_document, ['chat_id'], [])
         assert check_shortcut_call(user.send_document, user.bot, 'send_document')
+        assert check_shortcut_defaults(user.send_document, user.bot, method_timeout=20)
 
         monkeypatch.setattr(user.bot, 'send_document', make_assertion)
         assert user.send_document('test_document')
@@ -264,6 +276,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.send_game, Bot.send_game, ['chat_id'], [])
         assert check_shortcut_call(user.send_game, user.bot, 'send_game')
+        assert check_shortcut_defaults(user.send_game, user.bot)
 
         monkeypatch.setattr(user.bot, 'send_game', make_assertion)
         assert user.send_game(game_short_name='test_game')
@@ -290,6 +303,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.send_invoice, Bot.send_invoice, ['chat_id'], [])
         assert check_shortcut_call(user.send_invoice, user.bot, 'send_invoice')
+        assert check_shortcut_defaults(user.send_invoice, user.bot)
 
         monkeypatch.setattr(user.bot, 'send_invoice', make_assertion)
         assert user.send_invoice(
@@ -308,6 +322,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.send_location, Bot.send_location, ['chat_id'], [])
         assert check_shortcut_call(user.send_location, user.bot, 'send_location')
+        assert check_shortcut_defaults(user.send_location, user.bot)
 
         monkeypatch.setattr(user.bot, 'send_location', make_assertion)
         assert user.send_location('test_location')
@@ -318,6 +333,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.send_sticker, Bot.send_sticker, ['chat_id'], [])
         assert check_shortcut_call(user.send_sticker, user.bot, 'send_sticker')
+        assert check_shortcut_defaults(user.send_sticker, user.bot, method_timeout=20)
 
         monkeypatch.setattr(user.bot, 'send_sticker', make_assertion)
         assert user.send_sticker('test_sticker')
@@ -328,6 +344,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.send_video, Bot.send_video, ['chat_id'], [])
         assert check_shortcut_call(user.send_video, user.bot, 'send_video')
+        assert check_shortcut_defaults(user.send_video, user.bot, method_timeout=20)
 
         monkeypatch.setattr(user.bot, 'send_video', make_assertion)
         assert user.send_video('test_video')
@@ -338,6 +355,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.send_venue, Bot.send_venue, ['chat_id'], [])
         assert check_shortcut_call(user.send_venue, user.bot, 'send_venue')
+        assert check_shortcut_defaults(user.send_venue, user.bot)
 
         monkeypatch.setattr(user.bot, 'send_venue', make_assertion)
         assert user.send_venue(title='test_venue')
@@ -348,6 +366,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.send_video_note, Bot.send_video_note, ['chat_id'], [])
         assert check_shortcut_call(user.send_video_note, user.bot, 'send_video_note')
+        assert check_shortcut_defaults(user.send_video_note, user.bot, method_timeout=20)
 
         monkeypatch.setattr(user.bot, 'send_video_note', make_assertion)
         assert user.send_video_note('test_video_note')
@@ -358,6 +377,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.send_voice, Bot.send_voice, ['chat_id'], [])
         assert check_shortcut_call(user.send_voice, user.bot, 'send_voice')
+        assert check_shortcut_defaults(user.send_voice, user.bot, method_timeout=20)
 
         monkeypatch.setattr(user.bot, 'send_voice', make_assertion)
         assert user.send_voice('test_voice')
@@ -368,6 +388,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.send_animation, Bot.send_animation, ['chat_id'], [])
         assert check_shortcut_call(user.send_animation, user.bot, 'send_animation')
+        assert check_shortcut_defaults(user.send_animation, user.bot, method_timeout=20)
 
         monkeypatch.setattr(user.bot, 'send_animation', make_assertion)
         assert user.send_animation('test_animation')
@@ -378,6 +399,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.send_poll, Bot.send_poll, ['chat_id'], [])
         assert check_shortcut_call(user.send_poll, user.bot, 'send_poll')
+        assert check_shortcut_defaults(user.send_poll, user.bot)
 
         monkeypatch.setattr(user.bot, 'send_poll', make_assertion)
         assert user.send_poll(question='test_poll', options=[1, 2])
@@ -391,6 +413,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.send_copy, Bot.copy_message, ['chat_id'], [])
         assert check_shortcut_call(user.copy_message, user.bot, 'copy_message')
+        assert check_shortcut_defaults(user.copy_message, user.bot)
 
         monkeypatch.setattr(user.bot, 'copy_message', make_assertion)
         assert user.send_copy(from_chat_id='from_chat_id', message_id='message_id')
@@ -404,6 +427,7 @@ class TestUser:
 
         assert check_shortcut_signature(User.copy_message, Bot.copy_message, ['from_chat_id'], [])
         assert check_shortcut_call(user.copy_message, user.bot, 'copy_message')
+        assert check_shortcut_defaults(user.copy_message, user.bot)
 
         monkeypatch.setattr(user.bot, 'copy_message', make_assertion)
         assert user.copy_message(chat_id='chat_id', message_id='message_id')

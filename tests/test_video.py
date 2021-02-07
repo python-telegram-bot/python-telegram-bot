@@ -25,7 +25,7 @@ from flaky import flaky
 from telegram import Video, TelegramError, Voice, PhotoSize, MessageEntity, Bot
 from telegram.error import BadRequest
 from telegram.utils.helpers import escape_markdown
-from tests.conftest import check_shortcut_call, check_shortcut_signature
+from tests.conftest import check_shortcut_call, check_shortcut_signature, check_shortcut_defaults
 
 
 @pytest.fixture(scope='function')
@@ -335,6 +335,7 @@ class TestVideo:
 
         assert check_shortcut_signature(Video.get_file, Bot.get_file, ['file_id'], [])
         assert check_shortcut_call(video.get_file, video.bot, 'get_file')
+        assert check_shortcut_defaults(video.get_file, video.bot)
 
         monkeypatch.setattr(video.bot, 'get_file', make_assertion)
         assert video.get_file()

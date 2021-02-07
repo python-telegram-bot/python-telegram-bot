@@ -25,7 +25,7 @@ from flaky import flaky
 
 from telegram import Sticker, PhotoSize, TelegramError, StickerSet, Audio, MaskPosition, Bot
 from telegram.error import BadRequest
-from tests.conftest import check_shortcut_call, check_shortcut_signature
+from tests.conftest import check_shortcut_call, check_shortcut_signature, check_shortcut_defaults
 
 
 @pytest.fixture(scope='function')
@@ -510,6 +510,7 @@ class TestStickerSet:
 
         assert check_shortcut_signature(Sticker.get_file, Bot.get_file, ['file_id'], [])
         assert check_shortcut_call(sticker.get_file, sticker.bot, 'get_file')
+        assert check_shortcut_defaults(sticker.get_file, sticker.bot)
 
         monkeypatch.setattr(sticker.bot, 'get_file', make_assertion)
         assert sticker.get_file()

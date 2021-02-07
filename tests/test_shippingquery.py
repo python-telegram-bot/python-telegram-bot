@@ -20,7 +20,7 @@
 import pytest
 
 from telegram import Update, User, ShippingAddress, ShippingQuery, Bot
-from tests.conftest import check_shortcut_call, check_shortcut_signature
+from tests.conftest import check_shortcut_call, check_shortcut_signature, check_shortcut_defaults
 
 
 @pytest.fixture(scope='class')
@@ -74,6 +74,7 @@ class TestShippingQuery:
         assert check_shortcut_call(
             shipping_query.answer, shipping_query.bot, 'answer_shipping_query'
         )
+        assert check_shortcut_defaults(shipping_query.answer, shipping_query.bot)
 
         monkeypatch.setattr(shipping_query.bot, 'answer_shipping_query', make_assertion)
         assert shipping_query.answer(ok=True)

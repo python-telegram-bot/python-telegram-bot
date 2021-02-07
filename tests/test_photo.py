@@ -25,7 +25,12 @@ from flaky import flaky
 from telegram import Sticker, TelegramError, PhotoSize, InputFile, MessageEntity, Bot
 from telegram.error import BadRequest
 from telegram.utils.helpers import escape_markdown
-from tests.conftest import expect_bad_request, check_shortcut_call, check_shortcut_signature
+from tests.conftest import (
+    expect_bad_request,
+    check_shortcut_call,
+    check_shortcut_signature,
+    check_shortcut_defaults,
+)
 
 
 @pytest.fixture(scope='function')
@@ -470,6 +475,7 @@ class TestPhoto:
 
         assert check_shortcut_signature(PhotoSize.get_file, Bot.get_file, ['file_id'], [])
         assert check_shortcut_call(photo.get_file, photo.bot, 'get_file')
+        assert check_shortcut_defaults(photo.get_file, photo.bot)
 
         monkeypatch.setattr(photo.bot, 'get_file', make_assertion)
         assert photo.get_file()

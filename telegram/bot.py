@@ -2966,7 +2966,7 @@ class Bot(TelegramObject):
 
         result = self._post('getChatAdministrators', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        return [ChatMember.de_json(x, self) for x in result]  # type: ignore
+        return ChatMember.de_list(result, self)  # type: ignore
 
     @log
     def get_chat_members_count(
@@ -3227,7 +3227,7 @@ class Bot(TelegramObject):
 
         result = self._post('getGameHighScores', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        return [GameHighScore.de_json(hs, self) for hs in result]  # type: ignore
+        return GameHighScore.de_list(result, self)  # type: ignore
 
     @log
     def send_invoice(

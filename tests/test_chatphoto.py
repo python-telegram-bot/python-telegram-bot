@@ -22,7 +22,12 @@ import pytest
 from flaky import flaky
 
 from telegram import ChatPhoto, Voice, TelegramError, Bot
-from tests.conftest import expect_bad_request, check_shortcut_call, check_shortcut_signature
+from tests.conftest import (
+    expect_bad_request,
+    check_shortcut_call,
+    check_shortcut_signature,
+    check_shortcut_defaults,
+)
 
 
 @pytest.fixture(scope='function')
@@ -130,8 +135,9 @@ class TestChatPhoto:
 
         assert check_shortcut_signature(ChatPhoto.get_small_file, Bot.get_file, ['file_id'], [])
         assert check_shortcut_call(chat_photo.get_small_file, chat_photo.bot, 'get_file')
+        assert check_shortcut_defaults(chat_photo.get_small_file, chat_photo.bot)
 
-        monkeypatch.setattr('telegram.Bot.get_file', make_assertion)
+        monkeypatch.setattr(chat_photo.bot, 'get_file', make_assertion)
         assert chat_photo.get_small_file()
 
     def test_get_big_file_instance_method(self, monkeypatch, chat_photo):
@@ -140,8 +146,9 @@ class TestChatPhoto:
 
         assert check_shortcut_signature(ChatPhoto.get_big_file, Bot.get_file, ['file_id'], [])
         assert check_shortcut_call(chat_photo.get_big_file, chat_photo.bot, 'get_file')
+        assert check_shortcut_defaults(chat_photo.get_big_file, chat_photo.bot)
 
-        monkeypatch.setattr('telegram.Bot.get_file', make_assertion)
+        monkeypatch.setattr(chat_photo.bot, 'get_file', make_assertion)
         assert chat_photo.get_big_file()
 
     def test_equality(self):
