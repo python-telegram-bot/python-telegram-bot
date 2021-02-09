@@ -199,7 +199,6 @@ class TestAnimation:
 
         def make_assertion(_, data, *args, **kwargs):
             nonlocal test_flag
-            print(data.get('animation'), expected)
             test_flag = data.get('animation') == expected and data.get('thumb') == expected
 
         monkeypatch.setattr(bot, '_post', make_assertion)
