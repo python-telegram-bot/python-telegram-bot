@@ -40,12 +40,21 @@ jobs:
           python -W ignore -m pip install -r requirements-dev.txt
 
       - name: Test with pytest
+        # We run three different suites here
+        # 1. Test just the build process
+        # 2. Test everything else
+        # 3. Test just utils.helpers.py without pytz being installed
+        # The last one is achieved by mocking the pytz import, see test_helpers.py for details
         run: |
           pytest -v -m nocoverage
           nocov_exit=$?
           pytest -v -m "not nocoverage" --cov
           cov_exit=$?
-          global_exit=$(( nocov_exit > cov_exit ? nocov_exit : cov_exit ))
+          echo "TEST_NO_PYTEST=True" >> $GITHUB_ENV
+          pytest -v -m "not nocoverage" --cov -k test_helpers.py
+          no_pytz_exit=$?
+          pytz_exit=$(( nocov_exit > cov_exit ? nocov_exit : cov_exit ))
+          global_exit=$(( pytz_exit > no_pytz_exit ? pytz_exit : no_pytz_exit ))
           exit ${global_exit}
         env:
           JOB_INDEX: ${{ strategy.job-index }}
