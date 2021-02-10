@@ -27,9 +27,9 @@ from telegram.ext import (
     CallbackContext,
 )
 
-# Enable logging
+# Enable logging - info level
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO #-> change INFO to DEBUG to have a debug-level log
 )
 
 logger = logging.getLogger(__name__)
