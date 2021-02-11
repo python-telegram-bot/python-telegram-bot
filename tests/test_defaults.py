@@ -30,6 +30,8 @@ class TestDefault:
         with pytest.raises(AttributeError):
             defaults.parse_mode = True
         with pytest.raises(AttributeError):
+            defaults.explanation_parse_mode = True
+        with pytest.raises(AttributeError):
             defaults.disable_notification = True
         with pytest.raises(AttributeError):
             defaults.disable_web_page_preview = True
