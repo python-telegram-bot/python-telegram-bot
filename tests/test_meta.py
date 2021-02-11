@@ -23,11 +23,11 @@ import pytest
 
 def call_pre_commit_hook(hook_id):
     __tracebackhide__ = True
-    return os.system(' '.join(['pre-commit', 'run', '--all-files', hook_id]))  # pragma: no cover
+    return os.system(' '.join(['pre-commit', 'run', hook_id, '--all-files']))  # pragma: no cover
 
 
 @pytest.mark.nocoverage
-@pytest.mark.parametrize('hook_id', argvalues=('yapf', 'flake8', 'pylint'))
+@pytest.mark.parametrize('hook_id', ('black', 'flake8', 'pylint', 'mypy'))
 @pytest.mark.skipif(not os.getenv('TEST_PRE_COMMIT', False), reason='TEST_PRE_COMMIT not enabled')
 def test_pre_commit_hook(hook_id):
     assert call_pre_commit_hook(hook_id) == 0  # pragma: no cover
@@ -37,3 +37,9 @@ def test_pre_commit_hook(hook_id):
 @pytest.mark.skipif(not os.getenv('TEST_BUILD', False), reason='TEST_BUILD not enabled')
 def test_build():
     assert os.system('python setup.py bdist_dumb') == 0  # pragma: no cover
+
+
+@pytest.mark.nocoverage
+@pytest.mark.skipif(not os.getenv('TEST_BUILD', False), reason='TEST_BUILD not enabled')
+def test_build_raw():
+    assert os.system('python setup-raw.py bdist_dumb') == 0  # pragma: no cover

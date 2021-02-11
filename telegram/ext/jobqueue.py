@@ -21,13 +21,14 @@
 
 import datetime
 import logging
-from typing import TYPE_CHECKING, Any, Callable, List, Optional, Tuple, Union, cast, overload
+from typing import TYPE_CHECKING, Callable, List, Optional, Tuple, Union, cast, overload
 
 import pytz
 from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED, JobEvent
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.combining import OrTrigger
 from apscheduler.triggers.cron import CronTrigger
+from apscheduler.job import Job as APSJob
 
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.utils.types import JSONDict
@@ -35,6 +36,7 @@ from telegram.utils.types import JSONDict
 if TYPE_CHECKING:
     from telegram import Bot
     from telegram.ext import Dispatcher
+    import apscheduler.job  # noqa: F401
 
 
 class Days:
@@ -551,7 +553,7 @@ class Job:
         context: object = None,
         name: str = None,
         job_queue: JobQueue = None,
-        job: 'Job' = None,
+        job: APSJob = None,
     ):
 
         self.callback = callback
@@ -562,7 +564,7 @@ class Job:
         self._removed = False
         self._enabled = False
 
-        self.job = cast('Job', job)
+        self.job = cast(APSJob, job)
 
     def run(self, dispatcher: 'Dispatcher') -> None:
         """Executes the callback function independently of the jobs schedule."""
@@ -618,7 +620,7 @@ class Job:
         return self.job.next_run_time
 
     @classmethod
-    def from_aps_job(cls, job: 'Job', job_queue: JobQueue) -> 'Job':
+    def from_aps_job(cls, job: APSJob, job_queue: JobQueue) -> 'Job':
         # context based callbacks
         if len(job.args) == 1:
             context = job.args[0].job.context
@@ -626,7 +628,7 @@ class Job:
             context = job.args[1].context
         return cls(job.func, context=context, name=job.name, job_queue=job_queue, job=job)
 
-    def __getattr__(self, item: str) -> Any:
+    def __getattr__(self, item: str) -> object:
         return getattr(self.job, item)
 
     def __lt__(self, other: object) -> bool:

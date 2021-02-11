@@ -2,6 +2,73 @@
 Changelog
 =========
 
+Version 13.2
+============
+*Released 2021-02-02*
+
+**Major Changes:**
+
+- Introduce ``python-telegram-bot-raw`` (`#2324`_)
+- Explicit Signatures for Shortcuts (`#2240`_)
+
+**New Features:**
+
+- Add Missing Shortcuts to ``Message`` (`#2330`_)
+- Rich Comparison for ``Bot`` (`#2320`_)
+- Add ``run_async`` Parameter to ``ConversationHandler`` (`#2292`_)
+- Add New Shortcuts to ``Chat`` (`#2291`_)
+- Add New Constant ``MAX_ANSWER_CALLBACK_QUERY_TEXT_LENGTH`` (`#2282`_)
+- Allow Passing Custom Filename For All Media (`#2249`_)
+- Handle Bytes as File Input (`#2233`_)
+
+**Bug Fixes:**
+
+- Fix Escaping in Nested Entities in ``Message`` Properties (`#2312`_)
+- Adjust Calling of ``Dispatcher.update_persistence`` (`#2285`_)
+- Add ``quote`` kwarg to ``Message.reply_copy`` (`#2232`_)
+- ``ConversationHandler``: Docs & ``edited_channel_post`` behavior (`#2339`_)
+
+**Minor changes, CI improvements, doc fixes and type hinting:**
+
+- Doc Fixes (`#2253`_, `#2225`_)
+- Reduce Usage of ``typing.Any`` (`#2321`_)
+- Extend Deeplinking Example (`#2335`_)
+- Add pyupgrade to pre-commit Hooks (`#2301`_)
+- Add PR Template (`#2299`_)
+- Drop Nightly Tests & Update Badges (`#2323`_)
+- Update Copyright (`#2289`_, `#2287`_)
+- Change Order of Class DocStrings (`#2256`_)
+- Add macOS to Test Matrix (`#2266`_)
+- Start Using Versioning Directives in Docs (`#2252`_)
+- Improve Annotations & Docs of Handlers (`#2243`_)
+
+.. _`#2324`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2324
+.. _`#2240`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2240
+.. _`#2330`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2330
+.. _`#2320`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2320
+.. _`#2292`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2292
+.. _`#2291`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2291
+.. _`#2282`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2282
+.. _`#2249`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2249
+.. _`#2233`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2233
+.. _`#2312`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2312
+.. _`#2285`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2285
+.. _`#2232`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2232
+.. _`#2339`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2339
+.. _`#2253`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2253
+.. _`#2225`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2225
+.. _`#2321`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2321
+.. _`#2335`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2335
+.. _`#2301`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2301
+.. _`#2299`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2299
+.. _`#2323`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2323
+.. _`#2289`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2289
+.. _`#2287`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2287
+.. _`#2256`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2256
+.. _`#2266`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2266
+.. _`#2252`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2252
+.. _`#2243`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2243
+
 Version 13.1
 ============
 *Released 2020-11-29*

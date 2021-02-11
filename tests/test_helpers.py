@@ -16,8 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import os
+import subprocess
+import sys
 import time
 import datetime as dtm
+from importlib import reload
 from pathlib import Path
 
 import pytest
@@ -44,6 +48,26 @@ TIME_OF_DAY_TIME_SPECS = [
 ]
 RELATIVE_TIME_SPECS = DELTA_TIME_SPECS + TIME_OF_DAY_TIME_SPECS
 TIME_SPECS = ABSOLUTE_TIME_SPECS + RELATIVE_TIME_SPECS
+
+
+# This is here for ptb-raw, where we don't have pytz (unless the user installs it)
+@pytest.fixture(scope='function', params=[True, False])
+def pytz_install(request):
+    skip = not os.getenv('GITHUB_ACTIONS', False)
+    reason = 'Un/installing pytz slows tests down, so we just do that in CI'
+
+    if not request.param:
+        if skip:
+            pytest.skip(reason)
+        subprocess.check_call([sys.executable, "-m", "pip", "uninstall", "pytz", "-y"])
+        del sys.modules['pytz']
+        reload(helpers)
+    yield
+    if not request.param:
+        if skip:
+            pytest.skip(reason)
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "pytz"])
+        reload(helpers)
 
 
 class TestHelpers:
@@ -84,10 +108,18 @@ class TestHelpers:
         with pytest.raises(ValueError):
             helpers.escape_markdown('abc', version=-1)
 
-    def test_to_float_timestamp_absolute_naive(self):
+    def test_to_float_timestamp_absolute_naive(self, pytz_install):
         """Conversion from timezone-naive datetime to timestamp.
         Naive datetimes should be assumed to be in UTC.
         """
+        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5)
+        assert helpers.to_float_timestamp(datetime) == 1573431976.1
+
+    def test_to_float_timestamp_absolute_naive_no_pytz(self, monkeypatch, pytz_install):
+        """Conversion from timezone-naive datetime to timestamp.
+        Naive datetimes should be assumed to be in UTC.
+        """
+        monkeypatch.setattr(helpers, 'UTC', helpers.DTM_UTC)
         datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5)
         assert helpers.to_float_timestamp(datetime) == 1573431976.1
 
@@ -114,7 +146,7 @@ class TestHelpers:
         delta = time_spec.total_seconds() if hasattr(time_spec, 'total_seconds') else time_spec
         assert helpers.to_float_timestamp(time_spec, reference_t) == reference_t + delta
 
-    def test_to_float_timestamp_time_of_day(self):
+    def test_to_float_timestamp_time_of_day(self, pytz_install):
         """Conversion from time-of-day specification to timestamp"""
         hour, hour_delta = 12, 1
         ref_t = _datetime_to_float_timestamp(dtm.datetime(1970, 1, 1, hour=hour))
@@ -141,7 +173,7 @@ class TestHelpers:
         )
 
     @pytest.mark.parametrize('time_spec', RELATIVE_TIME_SPECS, ids=str)
-    def test_to_float_timestamp_default_reference(self, time_spec):
+    def test_to_float_timestamp_default_reference(self, time_spec, pytz_install):
         """The reference timestamp for relative time specifications should default to now"""
         now = time.time()
         assert helpers.to_float_timestamp(time_spec) == pytest.approx(
@@ -153,7 +185,7 @@ class TestHelpers:
             helpers.to_float_timestamp(Defaults())
 
     @pytest.mark.parametrize('time_spec', TIME_SPECS, ids=str)
-    def test_to_timestamp(self, time_spec):
+    def test_to_timestamp(self, time_spec, pytz_install):
         # delegate tests to `to_float_timestamp`
         assert helpers.to_timestamp(time_spec) == int(helpers.to_float_timestamp(time_spec))
 
@@ -164,7 +196,7 @@ class TestHelpers:
     def test_from_timestamp_none(self):
         assert helpers.from_timestamp(None) is None
 
-    def test_from_timestamp_naive(self):
+    def test_from_timestamp_naive(self, pytz_install):
         datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, tzinfo=None)
         assert helpers.from_timestamp(1573431976, tzinfo=None) == datetime
 

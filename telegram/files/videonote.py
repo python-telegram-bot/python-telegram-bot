@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram VideoNote."""
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Optional, Any
 
 from telegram import PhotoSize, TelegramObject
 from telegram.utils.types import JSONDict
@@ -103,7 +103,7 @@ class VideoNote(TelegramObject):
             :class:`telegram.File`
 
         Raises:
-            :class:`telegram.TelegramError`
+            :class:`telegram.error.TelegramError`
 
         """
         return self.bot.get_file(file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs)

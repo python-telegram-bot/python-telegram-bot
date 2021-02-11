@@ -22,7 +22,7 @@
 import logging
 import warnings
 from threading import Lock
-from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Tuple, cast, ClassVar
+from typing import TYPE_CHECKING, Dict, List, NoReturn, Optional, Tuple, cast, ClassVar
 
 from telegram import Update
 from telegram.ext import (
@@ -34,7 +34,7 @@ from telegram.ext import (
     Handler,
     InlineQueryHandler,
 )
-from telegram.utils.promise import Promise
+from telegram.ext.utils.promise import Promise
 from telegram.ext.utils.types import ConversationDict
 
 if TYPE_CHECKING:
@@ -58,8 +58,22 @@ class _ConversationTimeoutContext:
 
 class ConversationHandler(Handler[Update]):
     """
-    A handler to hold a conversation with a single user by managing four collections of other
-    handlers.
+    A handler to hold a conversation with a single or multiple users through Telegram updates by
+    managing four collections of other handlers.
+
+    Note:
+        ``ConversationHandler`` will only accept updates that are (subclass-)instances of
+        :class:`telegram.Update`. This is, because depending on the :attr:`per_user` and
+        :attr:`per_chat` ``ConversationHandler`` relies on
+        :attr:`telegram.Update.effective_user` and/or :attr:`telegram.Update.effective_chat` in
+        order to determine which conversation an update should belong to. For ``per_message=True``,
+        ``ConversationHandler`` uses ``update.callback_query.message.message_id`` when
+        ``per_chat=True`` and ``update.callback_query.inline_message_id`` when ``per_chat=False``.
+        For a more detailed explanation, please see our `FAQ`_.
+
+        Finally, ``ConversationHandler``, does *not* handle (edited) channel posts.
+
+    .. _`FAQ`: https://git.io/JtcyU
 
     The first collection, a ``list`` named :attr:`entry_points`, is used to initiate the
     conversation, for example with a :class:`telegram.ext.CommandHandler` or
@@ -286,7 +300,7 @@ class ConversationHandler(Handler[Update]):
         return self._entry_points
 
     @entry_points.setter
-    def entry_points(self, value: Any) -> NoReturn:
+    def entry_points(self, value: object) -> NoReturn:
         raise ValueError('You can not assign a new value to entry_points after initialization.')
 
     @property
@@ -294,7 +308,7 @@ class ConversationHandler(Handler[Update]):
         return self._states
 
     @states.setter
-    def states(self, value: Any) -> NoReturn:
+    def states(self, value: object) -> NoReturn:
         raise ValueError('You can not assign a new value to states after initialization.')
 
     @property
@@ -302,7 +316,7 @@ class ConversationHandler(Handler[Update]):
         return self._fallbacks
 
     @fallbacks.setter
-    def fallbacks(self, value: Any) -> NoReturn:
+    def fallbacks(self, value: object) -> NoReturn:
         raise ValueError('You can not assign a new value to fallbacks after initialization.')
 
     @property
@@ -310,7 +324,7 @@ class ConversationHandler(Handler[Update]):
         return self._allow_reentry
 
     @allow_reentry.setter
-    def allow_reentry(self, value: Any) -> NoReturn:
+    def allow_reentry(self, value: object) -> NoReturn:
         raise ValueError('You can not assign a new value to allow_reentry after initialization.')
 
     @property
@@ -318,7 +332,7 @@ class ConversationHandler(Handler[Update]):
         return self._per_user
 
     @per_user.setter
-    def per_user(self, value: Any) -> NoReturn:
+    def per_user(self, value: object) -> NoReturn:
         raise ValueError('You can not assign a new value to per_user after initialization.')
 
     @property
@@ -326,7 +340,7 @@ class ConversationHandler(Handler[Update]):
         return self._per_chat
 
     @per_chat.setter
-    def per_chat(self, value: Any) -> NoReturn:
+    def per_chat(self, value: object) -> NoReturn:
         raise ValueError('You can not assign a new value to per_chat after initialization.')
 
     @property
@@ -334,7 +348,7 @@ class ConversationHandler(Handler[Update]):
         return self._per_message
 
     @per_message.setter
-    def per_message(self, value: Any) -> NoReturn:
+    def per_message(self, value: object) -> NoReturn:
         raise ValueError('You can not assign a new value to per_message after initialization.')
 
     @property
@@ -342,7 +356,7 @@ class ConversationHandler(Handler[Update]):
         return self._conversation_timeout
 
     @conversation_timeout.setter
-    def conversation_timeout(self, value: Any) -> NoReturn:
+    def conversation_timeout(self, value: object) -> NoReturn:
         raise ValueError(
             'You can not assign a new value to conversation_timeout after ' 'initialization.'
         )
@@ -352,7 +366,7 @@ class ConversationHandler(Handler[Update]):
         return self._name
 
     @name.setter
-    def name(self, value: Any) -> NoReturn:
+    def name(self, value: object) -> NoReturn:
         raise ValueError('You can not assign a new value to name after initialization.')
 
     @property
@@ -360,7 +374,7 @@ class ConversationHandler(Handler[Update]):
         return self._map_to_parent
 
     @map_to_parent.setter
-    def map_to_parent(self, value: Any) -> NoReturn:
+    def map_to_parent(self, value: object) -> NoReturn:
         raise ValueError('You can not assign a new value to map_to_parent after initialization.')
 
     @property
@@ -409,7 +423,7 @@ class ConversationHandler(Handler[Update]):
 
         return tuple(key)
 
-    def check_update(self, update: Any) -> CheckUpdateType:  # pylint: disable=R0911
+    def check_update(self, update: object) -> CheckUpdateType:  # pylint: disable=R0911
         """
         Determines whether an update should be handled by this conversationhandler, and if so in
         which state the conversation currently is.
@@ -424,7 +438,7 @@ class ConversationHandler(Handler[Update]):
         if not isinstance(update, Update):
             return None
         # Ignore messages in channels
-        if update.channel_post:
+        if update.channel_post or update.edited_channel_post:
             return None
         if self.per_chat and not update.effective_chat:
             return None

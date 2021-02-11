@@ -1,1 +1,1 @@
-include LICENSE LICENSE.lesser Makefile requirements.txt py.typed
+include LICENSE LICENSE.lesser Makefile requirements.txt README_RAW.rst telegram/py.typed

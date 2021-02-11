@@ -40,7 +40,7 @@ from telegram import TelegramError, Message, User, Chat, Update, Bot
 from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter
 from telegram.ext import Updater, Dispatcher, DictPersistence, Defaults
 from telegram.utils.deprecate import TelegramDeprecationWarning
-from telegram.utils.webhookhandler import WebhookServer
+from telegram.ext.utils.webhookhandler import WebhookServer
 
 signalskip = pytest.mark.skipif(
     sys.platform == 'win32',

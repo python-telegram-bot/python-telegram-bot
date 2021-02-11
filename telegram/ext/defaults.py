@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=R0201, E0401
 """This module contains the class Defaults, which allows to pass default values to Updater."""
-from typing import Any, NoReturn, Optional, Union
+from typing import NoReturn, Optional, Union
 
 import pytz
 
@@ -100,7 +100,7 @@ class Defaults:
         return self._parse_mode
 
     @parse_mode.setter
-    def parse_mode(self, value: Any) -> NoReturn:
+    def parse_mode(self, value: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to defaults after because it would "
             "not have any effect."
@@ -111,7 +111,7 @@ class Defaults:
         return self._disable_notification
 
     @disable_notification.setter
-    def disable_notification(self, value: Any) -> NoReturn:
+    def disable_notification(self, value: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to defaults after because it would "
             "not have any effect."
@@ -122,7 +122,7 @@ class Defaults:
         return self._disable_web_page_preview
 
     @disable_web_page_preview.setter
-    def disable_web_page_preview(self, value: Any) -> NoReturn:
+    def disable_web_page_preview(self, value: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to defaults after because it would "
             "not have any effect."
@@ -133,7 +133,7 @@ class Defaults:
         return self._allow_sending_without_reply
 
     @allow_sending_without_reply.setter
-    def allow_sending_without_reply(self, value: Any) -> NoReturn:
+    def allow_sending_without_reply(self, value: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to defaults after because it would "
             "not have any effect."
@@ -144,7 +144,7 @@ class Defaults:
         return self._timeout
 
     @timeout.setter
-    def timeout(self, value: Any) -> NoReturn:
+    def timeout(self, value: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to defaults after because it would "
             "not have any effect."
@@ -155,7 +155,7 @@ class Defaults:
         return self._quote
 
     @quote.setter
-    def quote(self, value: Any) -> NoReturn:
+    def quote(self, value: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to defaults after because it would "
             "not have any effect."
@@ -166,7 +166,7 @@ class Defaults:
         return self._tzinfo
 
     @tzinfo.setter
-    def tzinfo(self, value: Any) -> NoReturn:
+    def tzinfo(self, value: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to defaults after because it would "
             "not have any effect."
@@ -177,7 +177,7 @@ class Defaults:
         return self._run_async
 
     @run_async.setter
-    def run_async(self, value: Any) -> NoReturn:
+    def run_async(self, value: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to defaults after because it would "
             "not have any effect."

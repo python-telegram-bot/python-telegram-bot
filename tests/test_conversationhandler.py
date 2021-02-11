@@ -726,10 +726,14 @@ class TestConversationHandler:
 
     def test_channel_message_without_chat(self, bot):
         handler = ConversationHandler(
-            entry_points=[CommandHandler('start', self.start_end)], states={}, fallbacks=[]
+            entry_points=[MessageHandler(Filters.all, self.start_end)], states={}, fallbacks=[]
         )
-        message = Message(0, None, None, Chat(0, Chat.CHANNEL, 'Misses Test'), bot=bot)
-        update = Update(0, message=message)
+        message = Message(0, date=None, chat=Chat(0, Chat.CHANNEL, 'Misses Test'), bot=bot)
+
+        update = Update(0, channel_post=message)
+        assert not handler.check_update(update)
+
+        update = Update(0, edited_channel_post=message)
         assert not handler.check_update(update)
 
     def test_all_update_types(self, dp, bot, user1):
