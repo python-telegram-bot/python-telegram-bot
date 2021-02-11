@@ -48,11 +48,14 @@ jobs:
         run: |
           pytest -v -m nocoverage
           nocov_exit=$?
+          echo "Testing build finished with exit status $nocov_exit"
           pytest -v -m "not nocoverage" --cov
           cov_exit=$?
+          echo "Testing everything except build finished with exit status cov_exit"
           echo "TEST_NO_PYTEST=True" >> $GITHUB_ENV
-          pytest -v -m "not nocoverage" --cov -k test_helpers.py
+          pytest -v -m "not nocoverage" --cov-append -k test_helpers.py
           no_pytz_exit=$?
+          echo "Testing helpers without pytz finished with exit status cov_exit"
           pytz_exit=$(( nocov_exit > cov_exit ? nocov_exit : cov_exit ))
           global_exit=$(( pytz_exit > no_pytz_exit ? pytz_exit : no_pytz_exit ))
           exit ${global_exit}

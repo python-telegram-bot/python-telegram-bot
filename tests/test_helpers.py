@@ -74,6 +74,13 @@ if os.getenv('TEST_NO_PYTZ', False):
 
 
 class TestHelpers:
+    def test_helpers_utc(self):
+        # Here we just test, that we got the correct UTC variant
+        if os.getenv('TEST_NO_PYTZ', False):
+            assert helpers.UTC is helpers.DTM_UTC
+        else:
+            assert helpers.UTC is not helpers.DTM_UTC
+
     def test_escape_markdown(self):
         test_str = '*bold*, _italic_, `code`, [text_link](http://github.com/)'
         expected_str = r'\*bold\*, \_italic\_, \`code\`, \[text\_link](http://github.com/)'
