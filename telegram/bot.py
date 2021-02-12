@@ -34,7 +34,6 @@ from typing import (
     Union,
     no_type_check,
     Dict,
-    Any,
     cast,
 )
 
@@ -184,12 +183,14 @@ class Bot(TelegramObject):
                 private_key, password=private_key_password, backend=default_backend()
             )
 
-    def _insert_defaults(self, data: Dict[str, Any], timeout: ODVInput[float]) -> Optional[float]:
+    def _insert_defaults(
+        self, data: Dict[str, object], timeout: ODVInput[float]
+    ) -> Optional[float]:
         """
         Inserts the defaults values for optional kwargs for which tg.ext.Defaults provides
         convenience functionality, i.e. the kwargs with a tg.utils.helpers.DefaultValue default
 
-        data is edited in-place. As timeout as not passed via the kwargs, it needs to be passed
+        data is edited in-place. As timeout is not passed via the kwargs, it needs to be passed
         separately and gets returned.
 
         This can only work, if all kwargs that may have defaults are passed in data!
@@ -204,9 +205,9 @@ class Bot(TelegramObject):
 
         # if we have Defaults, we replace all DefaultValue instances with the relevant
         # Defaults value. If there is none, we fall back to the default value of the bot method
-        for key in data:
-            if isinstance(data[key], DefaultValue):
-                data[key] = self.defaults.api_defaults.get(key, data[key].value)
+        for key, val in data.items():
+            if isinstance(val, DefaultValue):
+                data[key] = self.defaults.api_defaults.get(key, val.value)
 
         if isinstance(timeout, DefaultValue):
             # If we get here, we use Defaults.timeout, unless that's not set, which is the
@@ -275,7 +276,7 @@ class Bot(TelegramObject):
 
         if data.get('media') and (data['media'].parse_mode == DEFAULT_NONE):
             if self.defaults:
-                data['media'].parse_mode = self.defaults.parse_mode
+                data['media'].parse_mode = DefaultValue.get_value(self.defaults.parse_mode)
             else:
                 data['media'].parse_mode = None
 
@@ -2060,7 +2061,9 @@ class Bot(TelegramObject):
                     and res.input_message_content.parse_mode == DEFAULT_NONE
                 ):
                     if self.defaults:
-                        res.input_message_content.parse_mode = self.defaults.parse_mode
+                        res.input_message_content.parse_mode = DefaultValue.get_value(
+                            self.defaults.parse_mode
+                        )
                     else:
                         res.input_message_content.parse_mode = None
                 if (
@@ -2069,7 +2072,7 @@ class Bot(TelegramObject):
                 ):
                     if self.defaults:
                         res.input_message_content.disable_web_page_preview = (
-                            self.defaults.disable_web_page_preview
+                            DefaultValue.get_value(self.defaults.disable_web_page_preview)
                         )
                     else:
                         res.input_message_content.disable_web_page_preview = None
@@ -2689,9 +2692,9 @@ class Bot(TelegramObject):
             timeout (:obj:`int`, optional): Timeout in seconds for long polling. Defaults to 0,
                 i.e. usual short polling. Should be positive, short polling should be used for
                 testing purposes only.
-            read_latency (Optional[float|int]): Grace time in seconds for receiving the reply from
-                server. Will be added to the ``timeout`` value and used as the read timeout from
-                server. Defaults to  ``2``.
+            read_latency (:obj:`float`| :obj:`int`, optional): Grace time in seconds for receiving
+                the reply from server. Will be added to the ``timeout`` value and used as the read
+                timeout from server. Defaults to  ``2``.
             allowed_updates (List[:obj:`str`]), optional): A JSON-serialized list the types of
                 updates you want your bot to receive. For example, specify ["message",
                 "edited_channel_post", "callback_query"] to only receive updates of these types.

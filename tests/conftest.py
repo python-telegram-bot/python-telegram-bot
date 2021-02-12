@@ -437,7 +437,7 @@ def check_shortcut_call(
 
     orig_bot_method = getattr(bot, bot_method_name)
     bot_signature = inspect.signature(orig_bot_method)
-    expected_args = set(bot_signature.parameters.keys()).difference(['self']) - set(skip_params)
+    expected_args = set(bot_signature.parameters.keys()) - {'self'} - set(skip_params)
     positional_args = {
         name for name, param in bot_signature.parameters.items() if param.default == param.empty
     }
@@ -489,7 +489,7 @@ def check_defaults_handling(
         method: The shortcut/bot_method
         bot: The bot
         return_value: Optional. The return value of Bot._post that the method expects. Defaults to
-            None. get_file is automatically  handled.
+            None. get_file is automatically handled.
 
     """
 
