@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+fix-2361#!/usr/bin/env python
 """The setup and build script for the python-telegram-bot library."""
 
 import codecs
