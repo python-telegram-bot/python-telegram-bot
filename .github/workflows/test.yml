@@ -42,7 +42,6 @@ jobs:
           pytest -v -s --cov -k test_no_passport.py
           no_passport_exit=$?
           export TEST_NO_PASSPORT='false'
-          echo "TEST_NO_PASSPORT now has the value ${TEST_NO_PASSPORT}"
           pytest -v -s --cov --cov-append
           passport_exit=$?
           global_exit=$(( passport_exit > no_passport_exit ? passport_exit : no_passport_exit ))
