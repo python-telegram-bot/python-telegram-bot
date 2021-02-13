@@ -41,8 +41,15 @@ try:
 except ImportError:
     import json  # type: ignore[no-redef]  # noqa: F723
 
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import serialization
+try:
+    from cryptography.hazmat.backends import default_backend
+    from cryptography.hazmat.primitives import serialization
+
+    CRYPTO_INSTALLED = True
+except ImportError:
+    default_backend = None  # type: ignore[assignment]
+    serialization = None  # type: ignore[assignment]
+    CRYPTO_INSTALLED = False
 
 from telegram import (
     Animation,
@@ -212,6 +219,11 @@ class Bot(TelegramObject):
         self.logger = logging.getLogger(__name__)
 
         if private_key:
+            if not CRYPTO_INSTALLED:
+                raise RuntimeError(
+                    'To use Telegram Passports, PTB must be installed via `pip install '
+                    'python-telegram-bot[passport]`.'
+                )
             self.private_key = serialization.load_pem_private_key(
                 private_key, password=private_key_password, backend=default_backend()
             )
