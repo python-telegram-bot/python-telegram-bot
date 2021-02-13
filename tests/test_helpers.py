@@ -63,7 +63,9 @@ import to raise the expected exception.
 Note that a fixture that just does this for every test that needs it is a nice idea, but for some
 reason makes test_updater.py hang indefinitely on GitHub Actions (at least when Hinrich tried that)
 """
-if env_var_2_bool(os.getenv('TEST_NO_PYTZ', False)):
+
+TEST_NO_PYTZ = env_var_2_bool(os.getenv('TEST_NO_PYTZ', False))
+if TEST_NO_PYTZ:
     orig_import = __import__
 
     def import_mock(module_name, *args, **kwargs):
@@ -78,7 +80,7 @@ if env_var_2_bool(os.getenv('TEST_NO_PYTZ', False)):
 class TestHelpers:
     def test_helpers_utc(self):
         # Here we just test, that we got the correct UTC variant
-        if os.getenv('TEST_NO_PYTZ', False):
+        if TEST_NO_PYTZ:
             assert helpers.UTC is helpers.DTM_UTC
         else:
             assert helpers.UTC is not helpers.DTM_UTC
