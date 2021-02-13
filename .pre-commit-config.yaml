@@ -21,12 +21,12 @@ repos:
         args:
         - --rcfile=setup.cfg
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.790
+    rev: v0.800
     hooks:
     -   id: mypy
         files: ^(telegram|examples)/.*\.py$
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v2.7.4
+    rev: v2.10.0
     hooks:
     -   id: pyupgrade
         files: ^(telegram|examples|tests)/.*\.py$

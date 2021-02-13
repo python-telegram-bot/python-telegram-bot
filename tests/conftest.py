@@ -57,6 +57,8 @@ PRIVATE_KEY = b"-----BEGIN RSA PRIVATE KEY-----\r\nMIIEowIBAAKCAQEA0AvEbNaOnfIL3
 
 
 def env_var_2_bool(env_var: object) -> bool:
+    if isinstance(env_var, bool):
+        return env_var
     if not isinstance(env_var, str):
         return False
     return env_var.lower().strip() == 'true'
