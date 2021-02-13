@@ -1,4 +1,3 @@
-cryptography!=3.4
 httpx >= 0.16.1
 # only telegram.ext: # Keep this line here; used in setup(-raw).py
 tornado>=5.1

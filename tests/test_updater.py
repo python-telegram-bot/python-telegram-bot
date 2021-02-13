@@ -111,6 +111,7 @@ class TestUpdater:
         self.err_handler_called.clear()
         self.err_handler_called.wait()
 
+    @pytest.mark.filterwarnings('ignore:.*:pytest.PytestUnhandledThreadExceptionWarning')
     def test_get_updates_bailout_err(self, monkeypatch, updater, caplog):
         error = InvalidToken()
 

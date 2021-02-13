@@ -377,7 +377,7 @@ class TestBot:
         assert message_quiz.poll.explanation_entities == explanation_entities
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
+    @pytest.mark.timeout(15)
     @pytest.mark.parametrize(['open_period', 'close_date'], [(5, None), (None, True)])
     @pytest.mark.asyncio
     async def test_send_open_period(self, bot, super_group_id, open_period, close_date):
