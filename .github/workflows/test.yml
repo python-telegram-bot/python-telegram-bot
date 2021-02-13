@@ -39,10 +39,11 @@ jobs:
         # 3. Test everything else
         # The second one is achieved by mocking the imports, see test_no_passport.py for details
         run: |
-          pytest -v --cov -k test_no_passport.py
+          pytest -v -s --cov -k test_no_passport.py
           no_passport_exit=$?
           export TEST_NO_PASSPORT='false'
-          pytest -v --cov --cov-append
+          echo "TEST_NO_PASSPORT now has the value ${TEST_NO_PASSPORT}"
+          pytest -v -s --cov --cov-append
           passport_exit=$?
           global_exit=$(( passport_exit > no_passport_exit ? passport_exit : no_passport_exit ))
           exit ${global_exit}

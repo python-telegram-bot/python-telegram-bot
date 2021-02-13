@@ -43,6 +43,8 @@ from tests.conftest import env_var_2_bool
 
 TEST_NO_PASSPORT = env_var_2_bool(os.getenv('TEST_NO_PASSPORT', False))
 
+print('in test_no_passport the env var value is', os.getenv('TEST_NO_PASSPORT', 'NOOONE'))
+
 if TEST_NO_PASSPORT:
     orig_import = __import__
 
