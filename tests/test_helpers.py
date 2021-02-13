@@ -36,6 +36,8 @@ from telegram.utils.helpers import _datetime_to_float_timestamp
 
 
 # sample time specification values categorised into absolute / delta / time-of-day
+from tests.conftest import env_var_2_bool
+
 ABSOLUTE_TIME_SPECS = [
     dtm.datetime.now(tz=dtm.timezone(dtm.timedelta(hours=-7))),
     dtm.datetime.utcnow(),
@@ -61,7 +63,7 @@ import to raise the expected exception.
 Note that a fixture that just does this for every test that needs it is a nice idea, but for some
 reason makes test_updater.py hang indefinitely on GitHub Actions (at least when Hinrich tried that)
 """
-if os.getenv('TEST_NO_PYTZ', False):
+if env_var_2_bool(os.getenv('TEST_NO_PYTZ', False)):
     orig_import = __import__
 
     def import_mock(module_name, *args, **kwargs):
