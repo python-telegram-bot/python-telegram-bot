@@ -63,8 +63,8 @@ import to raise the expected exception.
 Note that a fixture that just does this for every test that needs it is a nice idea, but for some
 reason makes test_updater.py hang indefinitely on GitHub Actions (at least when Hinrich tried that)
 """
-
 TEST_NO_PYTZ = env_var_2_bool(os.getenv('TEST_NO_PYTZ', False))
+
 if TEST_NO_PYTZ:
     orig_import = __import__
 
