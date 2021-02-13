@@ -39,9 +39,9 @@ import pytest
 
 from telegram import bot
 from telegram.passport import credentials
+from tests.conftest import env_var_2_bool
 
-TEST_NO_PASSPORT = os.getenv('TEST_NO_PASSPORT', False)
-print('TEST_NO_PASSPORT environment variable is', TEST_NO_PASSPORT)
+TEST_NO_PASSPORT = env_var_2_bool(os.getenv('TEST_NO_PASSPORT', False))
 
 if TEST_NO_PASSPORT:
     orig_import = __import__
