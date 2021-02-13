@@ -115,7 +115,7 @@ class PassportFile(TelegramObject):
             :class:`telegram.File`
 
         Raises:
-            :class:`telegram.TelegramError`
+            :class:`telegram.error.TelegramError`
 
         """
         file = await self.bot.get_file(
