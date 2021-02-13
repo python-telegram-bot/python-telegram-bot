@@ -1,5 +1,4 @@
 certifi
-cryptography!=3.4
 # only telegram.ext: # Keep this line here; used in setup(-raw).py
 tornado>=5.1
 APScheduler==3.6.3

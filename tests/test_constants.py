@@ -32,7 +32,6 @@ class TestConstants:
         with pytest.raises(
             BadRequest,
             match='Message is too long',
-            message='MAX_MESSAGE_LENGTH is no longer valid',
         ):
             bot.send_message(chat_id=chat_id, text='a' * (constants.MAX_MESSAGE_LENGTH + 1))
 
@@ -48,7 +47,6 @@ class TestConstants:
         with pytest.raises(
             BadRequest,
             match="Media_caption_too_long",
-            message='MAX_CAPTION_LENGTH is no longer valid',
         ):
             with open('tests/data/telegram.png', 'rb') as f:
                 bot.send_photo(photo=f, caption=bad_caption, chat_id=chat_id)
