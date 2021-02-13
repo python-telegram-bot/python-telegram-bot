@@ -41,7 +41,7 @@ jobs:
         run: |
           pytest -v --cov -k test_no_passport.py
           no_passport_exit=$?
-          echo "TEST_NO_PASSPORT='false'" >> $GITHUB_ENV
+          export TEST_NO_PASSPORT='false'
           pytest -v --cov --cov-append
           passport_exit=$?
           global_exit=$(( passport_exit > no_passport_exit ? passport_exit : no_passport_exit ))
@@ -109,5 +109,6 @@ jobs:
         run: |
           python -W ignore -m pip install --upgrade pip
           python -W ignore -m pip install -r requirements.txt
+          python -W ignore -m pip install -r requirements-dev.txt
       - name: Run pre-commit tests
         run: pre-commit run --all-files
