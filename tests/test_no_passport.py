@@ -41,6 +41,7 @@ from telegram import bot
 from telegram.passport import credentials
 
 TEST_NO_PASSPORT = os.getenv('TEST_NO_PASSPORT', False)
+print('TEST_NO_PASSPORT environment variable is', TEST_NO_PASSPORT)
 
 if TEST_NO_PASSPORT:
     orig_import = __import__

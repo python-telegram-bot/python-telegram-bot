@@ -50,8 +50,8 @@ jobs:
           nocov_exit=$?
           pytest -v -m "not nocoverage" --cov -k test_no_passport.py
           no_passport_exit=$?
-          echo "TEST_NO_PASSPORT=False" >> $GITHUB_ENV
-          pytest -v -m "not nocoverage" --cov  --cov-append
+          echo "TEST_NO_PASSPORT=false" >> $GITHUB_ENV
+          pytest -v -m "not nocoverage" --cov --cov-append
           cov_exit=$?
           with_passport_exit=$$(( nocov_exit > cov_exit ? nocov_exit : cov_exit ))
           global_exit=$(( with_passport_exit > no_passport_exit ? with_passport_exit : no_passport_exit ))
