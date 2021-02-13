@@ -43,8 +43,7 @@ class PtbHttpx(PtbRequestBase):
             uploading a file). `None` will set an infinite timeout. This value is usually
              overridden by the various ``telegram.Bot`` methods. (default: 5.0)
         pool_timeout (float): Timeout waiting for a connection object to become available and
-            returned from the connection pool. `None` will set an infinite timeout. (default:
-             no timeout)
+            returned from the connection pool. `None` will set an infinite timeout. (default: 1.0)
 
     """
 
@@ -55,7 +54,7 @@ class PtbHttpx(PtbRequestBase):
         connect_timeout: float = 5.0,
         read_timeout: float = 5.0,
         write_timeout: float = 5.0,
-        pool_timeout: float = None,
+        pool_timeout: float = 1.0,
     ):
         timeout = httpx.Timeout(
             connect=connect_timeout,
