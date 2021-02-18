@@ -24,9 +24,11 @@ import functools
 import queue as q
 import threading
 import time
+import warnings
 from typing import TYPE_CHECKING, Callable, List, NoReturn
 
 from telegram.ext.utils.promise import Promise
+from telegram.utils.deprecate import TelegramDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -43,6 +45,10 @@ class DelayQueue(threading.Thread):
     """
     Processes callbacks from queue with specified throughput limits. Creates a separate thread to
     process callbacks with delays.
+
+    .. deprecated:: 13.3
+       :class:`telegram.ext.DelayQueue` in its current form is deprecated and will be reinvented
+       in a future release. See `this thread <https://git.io/JtDbF>`_ for a list of known bugs.
 
     Args:
         queue (:obj:`Queue`, optional): Used to pass callbacks to thread. Creates ``Queue``
@@ -82,6 +88,12 @@ class DelayQueue(threading.Thread):
         autostart: bool = True,
         name: str = None,
     ):
+        warnings.warn(
+            'DelayQueue in its current form is deprecated and will be reinvented in a future '
+            'release. See https://git.io/JtDbF for a list of known bugs.',
+            category=TelegramDeprecationWarning,
+        )
+
         self._queue = queue if queue is not None else q.Queue()
         self.burst_limit = burst_limit
         self.time_limit = time_limit_ms / 1000
@@ -182,6 +194,10 @@ class MessageQueue:
     Callables are processed through *group* ``DelayQueue``, then through *all* ``DelayQueue`` for
     group-type messages. For non-group messages, only the *all* ``DelayQueue`` is used.
 
+    .. deprecated:: 13.3
+       :class:`telegram.ext.MessageQueue` in its current form is deprecated and will be reinvented
+       in a future release. See `this thread <https://git.io/JtDbF>`_ for a list of known bugs.
+
     Args:
         all_burst_limit (:obj:`int`, optional): Number of maximum *all-type* callbacks to process
             per time-window defined by :attr:`all_time_limit_ms`. Defaults to 30.
@@ -210,6 +226,12 @@ class MessageQueue:
         exc_route: Callable[[Exception], None] = None,
         autostart: bool = True,
     ):
+        warnings.warn(
+            'MessageQueue in its current form is deprecated and will be reinvented in a future '
+            'release. See https://git.io/JtDbF for a list of known bugs.',
+            category=TelegramDeprecationWarning,
+        )
+
         # create according delay queues, use composition
         self._all_delayq = DelayQueue(
             burst_limit=all_burst_limit,
