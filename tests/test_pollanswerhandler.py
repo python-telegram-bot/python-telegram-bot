@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
 from queue import Queue
 
 import pytest
@@ -75,15 +74,14 @@ def poll_answer(bot):
 class TestPollAnswerHandler:
     test_flag = False
 
-    def test_extra_slots(self):
+    def test_slot_behaviour(self, recwarn, mro_slots):
         handler = PollAnswerHandler(self.callback_basic)
-        members = inspect.getmembers(
-            handler.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(handler, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+        for attr in handler.__slots__:
+            assert getattr(handler, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not handler.__dict__, f"got missing slot(s): {handler.__dict__}"
+        assert len(mro_slots(handler)) == len(set(mro_slots(handler))), "duplicate slot"
+        handler.custom, handler.callback = 'should give warning', self.callback_basic
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     @pytest.fixture(autouse=True)
     def reset(self):

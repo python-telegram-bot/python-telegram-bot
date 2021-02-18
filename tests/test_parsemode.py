@@ -16,8 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
-
 import pytest
 from flaky import flaky
 
@@ -32,20 +30,14 @@ class TestParseMode:
     )
     formatted_text_formatted = 'bold italic link name.'
 
-    def test_extra_slots(self):
-        p = ParseMode()
-        members = inspect.getmembers(
-            p.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(p, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
-
-    def test_warning_setting_custom_attr(self, recwarn):
+    def test_slot_behaviour(self, recwarn, mro_slots):
         inst = ParseMode()
-        inst.custom = 'bad practice!'
-        assert len(recwarn) == 1 and 'custom attributes' in str(recwarn[0].message)
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.custom = 'should give warning'
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

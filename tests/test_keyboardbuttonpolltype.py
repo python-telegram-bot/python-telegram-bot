@@ -16,8 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
-
 import pytest
 
 from telegram import KeyboardButtonPollType, Poll
@@ -31,14 +29,14 @@ def keyboard_button_poll_type():
 class TestKeyboardButtonPollType:
     type = Poll.QUIZ
 
-    def test_extra_slots(self, keyboard_button_poll_type):
-        members = inspect.getmembers(
-            keyboard_button_poll_type.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(keyboard_button_poll_type, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+    def test_slot_behaviour(self, keyboard_button_poll_type, recwarn, mro_slots):
+        inst = keyboard_button_poll_type
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.custom, inst.type = 'should give warning', self.type
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_to_dict(self, keyboard_button_poll_type):
         keyboard_button_poll_type_dict = keyboard_button_poll_type.to_dict()

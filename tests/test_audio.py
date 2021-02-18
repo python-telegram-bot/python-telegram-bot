@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
 import os
 from pathlib import Path
 
@@ -60,14 +59,13 @@ class TestAudio:
     audio_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
     audio_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
 
-    def test_extra_slots(self, audio):
-        a = Audio(audio.file_id, audio.file_unique_id, audio.duration)
-        members = inspect.getmembers(
-            Audio, predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b))
-        )
-        for member in members:
-            val = getattr(a, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+    def test_slot_behaviour(self, audio, recwarn, mro_slots):
+        for attr in audio.__slots__:
+            assert getattr(audio, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not audio.__dict__, f"got missing slot(s): {audio.__dict__}"
+        assert len(mro_slots(audio)) == len(set(mro_slots(audio))), "duplicate slot"
+        audio.custom, audio.file_name = 'should give warning', self.file_name
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_creation(self, audio):
         # Make sure file has been uploaded.
@@ -236,6 +234,7 @@ class TestAudio:
         monkeypatch.setattr(bot, '_post', make_assertion)
         bot.send_audio(chat_id, file, thumb=file)
         assert test_flag
+        monkeypatch.delattr(bot, '_post')
 
     def test_de_json(self, bot, audio):
         json_dict = {

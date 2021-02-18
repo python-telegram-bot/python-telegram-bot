@@ -16,8 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
-
 import pytest
 
 from telegram import ShippingAddress
@@ -43,14 +41,14 @@ class TestShippingAddress:
     street_line2 = 'street_line2'
     post_code = 'WC1'
 
-    def test_extra_slots(self, shipping_address):
-        members = inspect.getmembers(
-            shipping_address.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(shipping_address, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+    def test_slot_behaviour(self, shipping_address, recwarn, mro_slots):
+        inst = shipping_address
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.custom, inst.state = 'should give warning', self.state
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_de_json(self, bot):
         json_dict = {

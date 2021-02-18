@@ -16,8 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
-
 import pytest
 
 from telegram import InputContactMessageContent, User
@@ -37,14 +35,14 @@ class TestInputContactMessageContent:
     first_name = 'first name'
     last_name = 'last name'
 
-    def test_extra_slots(self, input_contact_message_content):
-        members = inspect.getmembers(
-            input_contact_message_content.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(input_contact_message_content, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+    def test_slot_behaviour(self, input_contact_message_content, mro_slots, recwarn):
+        inst = input_contact_message_content
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.custom, inst.first_name = 'should give warning', self.first_name
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_expected_values(self, input_contact_message_content):
         assert input_contact_message_content.first_name == self.first_name

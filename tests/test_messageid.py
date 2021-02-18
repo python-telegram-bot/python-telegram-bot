@@ -15,8 +15,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
-
 import pytest
 from telegram import MessageId, User
 
@@ -29,14 +27,13 @@ def message_id():
 class TestMessageId:
     m_id = 1234
 
-    def test_extra_slots(self, message_id):
-        members = inspect.getmembers(
-            message_id.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(message_id, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+    def test_slot_behaviour(self, message_id, recwarn, mro_slots):
+        for attr in message_id.__slots__:
+            assert getattr(message_id, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not message_id.__dict__, f"got missing slot(s): {message_id.__dict__}"
+        assert len(mro_slots(message_id)) == len(set(mro_slots(message_id))), "duplicate slot"
+        message_id.custom, message_id.message_id = 'should give warning', self.m_id
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_de_json(self):
         json_dict = {'message_id': self.m_id}

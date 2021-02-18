@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
 import os
 from pathlib import Path
 from tempfile import TemporaryFile, mkstemp
@@ -58,14 +57,13 @@ class TestFile:
     file_size = 28232
     file_content = 'Saint-Saëns'.encode()  # Intentionally contains unicode chars.
 
-    def test_extra_slots(self, file):
-        members = inspect.getmembers(
-            file.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(file, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+    def test_slot_behaviour(self, file, recwarn, mro_slots):
+        for attr in file.__slots__:
+            assert getattr(file, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not file.__dict__, f"got missing slot(s): {file.__dict__}"
+        assert len(mro_slots(file)) == len(set(mro_slots(file))), "duplicate slot"
+        file.custom, file.file_id = 'should give warning', self.file_id
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_de_json(self, bot):
         json_dict = {

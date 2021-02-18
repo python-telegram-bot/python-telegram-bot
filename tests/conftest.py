@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime
 import inspect
+
 import os
 import re
 from collections import defaultdict
@@ -147,10 +148,13 @@ def dp(_dp):
     _dp.handlers = {}
     _dp.groups = []
     _dp.error_handlers = {}
-    _dp.__stop_event = Event()
-    _dp.__exception_event = Event()
-    _dp.__async_queue = Queue()
-    _dp.__async_threads = set()
+    # For some reason if we setattr with the name mangled, then some tests(like async) run forever,
+    # due to threads not acquiring, (blocking). This adds these attributes to the
+    # __dict__, without raising a TGDeprecation warning.
+    object.__setattr__(_dp, '__stop_event', Event())
+    object.__setattr__(_dp, '__exception_event', Event())
+    object.__setattr__(_dp, '__async_queue', Queue())
+    object.__setattr__(_dp, '__async_threads', set())
     _dp.persistence = None
     _dp.use_context = False
     if _dp._Dispatcher__singleton_semaphore.acquire(blocking=0):
@@ -317,6 +321,19 @@ def tzinfo(request):
 @pytest.fixture()
 def timezone(tzinfo):
     return tzinfo
+
+
+@pytest.fixture()
+def mro_slots():
+    def _mro_slots(_class):
+        return [
+            attr
+            for cls in _class.__class__.__mro__[:-1]
+            for attr in cls.__slots__
+            if attr != '__dict__'
+        ]
+
+    return _mro_slots
 
 
 def expect_bad_request(func, message, reason):

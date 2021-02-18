@@ -16,8 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
-
 import pytest
 from flaky import flaky
 
@@ -47,14 +45,13 @@ class TestVenue:
     google_place_id = 'google place id'
     google_place_type = 'google place type'
 
-    def test_extra_slots(self, venue):
-        members = inspect.getmembers(
-            venue.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(venue, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+    def test_slot_behaviour(self, venue, mro_slots, recwarn):
+        for attr in venue.__slots__:
+            assert getattr(venue, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not venue.__dict__, f"got missing slot(s): {venue.__dict__}"
+        assert len(mro_slots(venue)) == len(set(mro_slots(venue))), "duplicate slot"
+        venue.custom, venue.title = 'should give warning', self.title
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_de_json(self, bot):
         json_dict = {

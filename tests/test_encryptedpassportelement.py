@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
 
 import pytest
 
@@ -47,14 +46,14 @@ class TestEncryptedPassportElement:
     reverse_side = PassportFile('file_id', 50, 0)
     selfie = PassportFile('file_id', 50, 0)
 
-    def test_extra_slots(self, encrypted_passport_element):
-        members = inspect.getmembers(
-            encrypted_passport_element.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(encrypted_passport_element, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+    def test_slot_behaviour(self, encrypted_passport_element, recwarn, mro_slots):
+        inst = encrypted_passport_element
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.custom, inst.phone_number = 'should give warning', self.phone_number
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_expected_values(self, encrypted_passport_element):
         assert encrypted_passport_element.type == self.type_

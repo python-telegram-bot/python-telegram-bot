@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
 
 import pytest
 from flaky import flaky
@@ -33,14 +32,13 @@ class TestForceReply:
     force_reply = True
     selective = True
 
-    def test_extra_slots(self, force_reply):
-        members = inspect.getmembers(
-            force_reply.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(force_reply, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+    def test_slot_behaviour(self, force_reply, recwarn, mro_slots):
+        for attr in force_reply.__slots__:
+            assert getattr(force_reply, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not force_reply.__dict__, f"got missing slot(s): {force_reply.__dict__}"
+        assert len(mro_slots(force_reply)) == len(set(mro_slots(force_reply))), "duplicate slot"
+        force_reply.custom, force_reply.force_reply = 'should give warning', self.force_reply
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

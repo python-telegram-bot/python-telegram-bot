@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
 import os
 from time import sleep, perf_counter
 
@@ -36,35 +35,15 @@ class TestDelayQueue:
     margin_ms = 0
     testtimes = []
 
-    def test_extra_slots(self):
-        q = mq.DelayQueue(
-            burst_limit=self.burst_limit, time_limit_ms=self.time_limit_ms, autostart=True
-        )
-        members = inspect.getmembers(
-            q.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(q, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
-
-    def test_warning_setting_custom_attr_dq(self, bot, recwarn):
-        inst = mq.DelayQueue(
-            burst_limit=self.burst_limit, time_limit_ms=self.time_limit_ms, autostart=True
-        )
-        inst.custom = 'bad practice!'
-        assert len(recwarn) == 1 and 'custom attributes' in str(recwarn[0].message)
-        with pytest.warns(None) as check:
-            inst.burst_limit = 20
-        assert not check
-
-    def test_warning_setting_custom_attr_mq(self, bot, recwarn):
-        inst = mq.MessageQueue()
-        inst.custom = 'bad practice!'
-        assert len(recwarn) == 1 and 'custom attributes' in str(recwarn[0].message)
-        with pytest.warns(None) as check:
-            inst._all_delayq = 'something'
-        assert not check
+    def test_slot_behaviour(self, recwarn, mro_slots):
+        q = mq.DelayQueue(burst_limit=self.burst_limit, time_limit_ms=self.time_limit_ms)
+        for at in q.__slots__:
+            at = f"_DelayQueue{at}" if at.startswith('__') and not at.endswith('__') else at
+            assert getattr(q, at, 'err') != 'err', f"got extra slot '{at}'"
+        assert not q.__dict__, f"got missing slot(s): {q.__dict__}"
+        q.custom, q.burst_limit = 'should give warning', self.burst_limit
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+        q.stop()  # Important to make sure tests gracefully exit
 
     def call(self):
         self.testtimes.append(perf_counter())
@@ -97,4 +76,15 @@ class TestDelayQueue:
                 passes.append(part)
             else:
                 fails.append(part)
-        assert fails == []
+        assert not fails
+
+
+class TestMessageQueue:
+    def test_slot_behaviour(self, recwarn, mro_slots):
+        q = mq.MessageQueue()
+        for at in q.__slots__:
+            assert getattr(q, at, 'err') != 'err', f"got extra slot '{at}'"
+        assert not q.__dict__, f"got missing slot(s): {q.__dict__}"
+        q.custom, q._all_delayq = 'should give warning', q._all_delayq
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+        q.stop()

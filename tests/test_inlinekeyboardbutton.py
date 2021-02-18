@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
 
 import pytest
 
@@ -47,14 +46,14 @@ class TestInlineKeyboardButton:
     pay = 'pay'
     login_url = LoginUrl("http://google.com")
 
-    def test_extra_slots(self, inline_keyboard_button):
-        members = inspect.getmembers(
-            inline_keyboard_button.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(inline_keyboard_button, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+    def test_slot_behaviour(self, inline_keyboard_button, recwarn, mro_slots):
+        inst = inline_keyboard_button
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.custom, inst.text = 'should give warning', self.text
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_expected_values(self, inline_keyboard_button):
         assert inline_keyboard_button.text == self.text

@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
 
 import pytest
 
@@ -43,14 +42,13 @@ class TestInlineQuery:
     offset = 'offset'
     location = Location(8.8, 53.1)
 
-    def test_extra_slots(self, inline_query):
-        members = inspect.getmembers(
-            inline_query.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(inline_query, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+    def test_slot_behaviour(self, inline_query, recwarn, mro_slots):
+        for attr in inline_query.__slots__:
+            assert getattr(inline_query, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inline_query.__dict__, f"got missing slot(s): {inline_query.__dict__}"
+        assert len(mro_slots(inline_query)) == len(set(mro_slots(inline_query))), "duplicate slot"
+        inline_query.custom, inline_query.id = 'should give warning', self.id_
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_de_json(self, bot):
         json_dict = {

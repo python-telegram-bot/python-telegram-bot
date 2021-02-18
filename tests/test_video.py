@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
 import os
 from pathlib import Path
 
@@ -61,14 +60,13 @@ class TestVideo:
     video_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
     video_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
 
-    def test_extra_slots(self, video):
-        members = inspect.getmembers(
-            video.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(video, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+    def test_slot_behaviour(self, video, mro_slots, recwarn):
+        for attr in video.__slots__:
+            assert getattr(video, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not video.__dict__, f"got missing slot(s): {video.__dict__}"
+        assert len(mro_slots(video)) == len(set(mro_slots(video))), "duplicate slot"
+        video.custom, video.width = 'should give warning', self.width
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_creation(self, video):
         # Make sure file has been uploaded.
@@ -252,6 +250,7 @@ class TestVideo:
         monkeypatch.setattr(bot, '_post', make_assertion)
         bot.send_video(chat_id, file, thumb=file)
         assert test_flag
+        monkeypatch.delattr(bot, '_post')
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

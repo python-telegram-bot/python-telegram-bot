@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
 import logging
 from queue import Queue
 from threading import current_thread
@@ -53,14 +52,14 @@ class TestDispatcher:
     received = None
     count = 0
 
-    def test_extra_slots(self, dp2):
-        members = inspect.getmembers(
-            dp2.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(dp2, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+    def test_slot_behaviour(self, dp2, recwarn, mro_slots):
+        for at in dp2.__slots__:
+            at = f"_Dispatcher{at}" if at.startswith('__') and not at.endswith('__') else at
+            assert getattr(dp2, at, 'err') != 'err', f"got extra slot '{at}'"
+        assert not dp2.__dict__, f"got missing slot(s): {dp2.__dict__}"
+        assert len(mro_slots(dp2)) == len(set(mro_slots(dp2))), "duplicate slot"
+        dp2.custom, dp2.running = 'should give warning', dp2.running
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     @pytest.fixture(autouse=True, name='reset')
     def reset_fixture(self):
@@ -87,14 +86,6 @@ class TestDispatcher:
             self.count = count
 
         return callback
-
-    def test_warning_setting_custom_attr(self, dp2, recwarn):
-        inst = dp2
-        inst.custom = 'bad practice!'
-        assert len(recwarn) == 1 and 'custom attributes' in str(recwarn[0].message)
-        with pytest.warns(None) as check:
-            inst.bot_data = {'ok': 'this is ok'}
-        assert not check
 
     def callback_raise_error(self, bot, update):
         if isinstance(bot, Bot):
@@ -694,7 +685,6 @@ class TestDispatcher:
 
     def test_sensible_worker_thread_names(self, dp2):
         thread_names = [thread.name for thread in getattr(dp2, '_Dispatcher__async_threads')]
-        print(thread_names)
         for thread_name in thread_names:
             assert thread_name.startswith(f"Bot:{dp2.bot.id}:worker:")
 

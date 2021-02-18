@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
 from collections import OrderedDict
 from queue import Queue
 
@@ -29,24 +28,14 @@ from telegram.ext import TypeHandler, CallbackContext, JobQueue
 class TestTypeHandler:
     test_flag = False
 
-    def test_extra_slots(self):
-        h = TypeHandler(dict, self.callback_basic)
-        members = inspect.getmembers(
-            h.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(h, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
-
-    def test_warning_setting_custom_attr(self, recwarn):
+    def test_slot_behaviour(self, mro_slots, recwarn):
         inst = TypeHandler(dict, self.callback_basic)
-        inst.custom = 'bad practice!'
-        assert len(recwarn) == 1 and 'custom attributes' in str(recwarn[0].message)
-
-        with pytest.warns(None) as check:
-            inst.strict = True
-        assert not check
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.custom, inst.callback = 'should give warning', self.callback_basic
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     @pytest.fixture(autouse=True)
     def reset(self):

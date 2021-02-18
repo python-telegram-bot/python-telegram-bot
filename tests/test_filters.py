@@ -22,6 +22,7 @@ import pytest
 
 from telegram import Message, User, Chat, MessageEntity, Document, Update, Dice
 from telegram.ext import Filters, BaseFilter, MessageFilter, UpdateFilter
+import inspect
 import re
 
 from telegram.utils.deprecate import TelegramDeprecationWarning
@@ -57,6 +58,61 @@ def base_class(request):
 
 
 class TestFilters:
+    def test_all_filters_slot_behaviour(self, recwarn, mro_slots):
+        """
+        Use depth first search to get all nested filters, and instantiate them (which need it) with
+        the correct number of arguments, then test each filter separately. Also tests setting
+        custom attributes on custom filters.
+        """
+        # The total no. of filters excluding filters defined in __all__ is about 70 as of 16/2/21.
+        # Gather all the filters to test using DFS-
+        visited = []
+        classes = inspect.getmembers(Filters, predicate=inspect.isclass)  # List[Tuple[str, type]]
+        stack = classes.copy()
+        while stack:
+            cls = stack[-1][-1]  # get last element and its class
+            for inner_cls in inspect.getmembers(
+                cls,  # Get inner filters
+                lambda a: inspect.isclass(a) and not issubclass(a, cls.__class__),
+            ):
+                if inner_cls[1] not in visited:
+                    stack.append(inner_cls)
+                    visited.append(inner_cls[1])
+                    classes.append(inner_cls)
+                    break
+            else:
+                stack.pop()
+
+        # Now start the actual testing
+        for name, cls in classes:
+            # Can't instantiate abstract classes without overriding methods, so skip them for now
+            if inspect.isabstract(cls) or name in {'__class__', '__base__'}:
+                continue
+
+            # get no. of args minus the 'self' argument
+            args = len(inspect.signature(cls.__init__).parameters) - 1
+            if cls.__base__.__name__ == '_ChatUserBaseFilter':  # Special case, only 1 arg needed
+                inst = cls('1')
+            else:
+                inst = cls() if args < 1 else cls(*['blah'] * args)  # unpack variable no. of args
+
+            for attr in cls.__slots__:
+                assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}' for {name}"
+                assert not inst.__dict__, f"got missing slot(s): {inst.__dict__} for {name}"
+                assert len(mro_slots(inst)) == len(set(mro_slots(inst))), f"same slot in {name}"
+
+            with pytest.warns(TelegramDeprecationWarning, match='custom attributes') as warn:
+                inst.custom = 'should give warning'
+                if not warn:
+                    pytest.fail(f"Filter {name!r} didn't warn when setting custom attr")
+
+        class CustomFilter(MessageFilter):
+            def filter(self, message: Message):
+                pass
+
+        with pytest.warns(None):
+            CustomFilter().custom = 'this is allowed'
+
     def test_filters_all(self, update):
         assert Filters.all(update)
 

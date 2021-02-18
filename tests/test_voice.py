@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
 import os
 from pathlib import Path
 
@@ -53,14 +52,13 @@ class TestVoice:
     voice_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
     voice_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
 
-    def test_extra_slots(self, voice):
-        members = inspect.getmembers(
-            voice.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(voice, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+    def test_slot_behaviour(self, voice, recwarn, mro_slots):
+        for attr in voice.__slots__:
+            assert getattr(voice, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not voice.__dict__, f"got missing slot(s): {voice.__dict__}"
+        assert len(mro_slots(voice)) == len(set(mro_slots(voice))), "duplicate slot"
+        voice.custom, voice.duration = 'should give warning', self.duration
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_creation(self, voice):
         # Make sure file has been uploaded.
@@ -214,6 +212,7 @@ class TestVoice:
         monkeypatch.setattr(bot, '_post', make_assertion)
         bot.send_voice(chat_id, file)
         assert test_flag
+        monkeypatch.delattr(bot, '_post')
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

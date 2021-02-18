@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
-import inspect
 import logging
 import os
 import signal
@@ -74,23 +73,14 @@ class TestUpdater:
     cb_handler_called = Event()
     offset = 0
 
-    def test_extra_slots(self, bot):
-        u = Updater(token=bot.token)
-        members = inspect.getmembers(
-            u.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(u, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
-
-    def test_warning_setting_custom_attr(self, bot, recwarn):
-        inst = Updater(token=bot.token)
-        inst.custom = 'bad practice!'
-        assert len(recwarn) == 1 and 'custom attributes' in str(recwarn[0].message)
-        with pytest.warns(None) as check:
-            inst.is_idle = True
-        assert not check
+    def test_slot_behaviour(self, updater, mro_slots, recwarn):
+        for at in updater.__slots__:
+            at = f"_Updater{at}" if at.startswith('__') and not at.endswith('__') else at
+            assert getattr(updater, at, 'err') != 'err', f"got extra slot '{at}'"
+        assert not updater.__dict__, f"got missing slot(s): {updater.__dict__}"
+        assert len(mro_slots(updater)) == len(set(mro_slots(updater))), "duplicate slot"
+        updater.custom, updater.running = 'should give warning', updater.running
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     @pytest.fixture(autouse=True)
     def reset(self):

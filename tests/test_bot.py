@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
+
 import time
 import datetime as dtm
 from pathlib import Path
@@ -97,17 +97,22 @@ def inline_results():
     return inline_results_callback()
 
 
+@pytest.fixture(scope='function')
+def inst(request, bot, default_bot):
+    return bot if request.param == 'bot' else default_bot
+
+
 class TestBot:
-    def test_extra_slots(self):
-        bot = Bot(FALLBACKS[0]["token"])
-        members = inspect.getmembers(
-            Bot, predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b))
-        )
-        for member in members:
-            if member[0] == 'private_key':
-                continue
-            val = getattr(bot, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+    @pytest.mark.parametrize(
+        'inst', ['bot', pytest.param("default_bot", marks=pytest.mark.xfail)], indirect=True
+    )
+    def test_slot_behaviour(self, inst, recwarn, mro_slots):
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inst.__dict__ or len(inst.__dict__) == 1, f"got missing slots: {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.custom, inst.base_url = 'should give warning', inst.base_url
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     @pytest.mark.parametrize(
         'token',
@@ -594,6 +599,7 @@ class TestBot:
         assert bot.send_chat_action(chat_id, ChatAction.TYPING)
 
     # TODO: Needs improvement. We need incoming inline query to test answer.
+    @pytest.mark.filterwarnings("ignore:.*custom attributes")
     def test_answer_inline_query(self, monkeypatch, bot):
         # For now just test that our internals pass the correct data
         def test(url, data, *args, **kwargs):
@@ -635,6 +641,7 @@ class TestBot:
             switch_pm_text='switch pm',
             switch_pm_parameter='start_pm',
         )
+        monkeypatch.delattr(bot.request, 'post')
 
     def test_answer_inline_query_no_default_parse_mode(self, monkeypatch, bot):
         def test(url, data, *args, **kwargs):
@@ -844,8 +851,10 @@ class TestBot:
         resulting_path = bot.get_file('file_id').file_path
         assert bot.token not in resulting_path
         assert resulting_path == path
+        monkeypatch.delattr(bot, '_post')
 
     # TODO: Needs improvement. No feasable way to test until bots can add members.
+    @pytest.mark.filterwarnings("ignore:.*custom attributes")
     def test_kick_chat_member(self, monkeypatch, bot):
         def test(url, data, *args, **kwargs):
             chat_id = data['chat_id'] == 2
@@ -859,6 +868,7 @@ class TestBot:
         assert bot.kick_chat_member(2, 32)
         assert bot.kick_chat_member(2, 32, until_date=until)
         assert bot.kick_chat_member(2, 32, until_date=1577887200)
+        monkeypatch.delattr(bot.request, 'post')
 
     def test_kick_chat_member_default_tz(self, monkeypatch, tz_bot):
         until = dtm.datetime(2020, 1, 11, 16, 13)

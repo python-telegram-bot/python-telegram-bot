@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
 from datetime import datetime
 
 import pytest
@@ -291,14 +290,13 @@ class TestMessage:
         caption_entities=[MessageEntity(**e) for e in test_entities_v2],
     )
 
-    def test_extra_slots(self, message):
-        members = inspect.getmembers(
-            message.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(message, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+    def test_slot_behaviour(self, message, recwarn, mro_slots):
+        for attr in message.__slots__:
+            assert getattr(message, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not message.__dict__, f"got missing slot(s): {message.__dict__}"
+        assert len(mro_slots(message)) == len(set(mro_slots(message))), "duplicate slot"
+        message.custom, message.message_id = 'should give warning', self.id_
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_all_possibilities_de_json_and_to_dict(self, bot, message_params):
         new = Message.de_json(message_params.to_dict(), bot)

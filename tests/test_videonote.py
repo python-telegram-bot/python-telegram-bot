@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
 import os
 from pathlib import Path
 
@@ -54,14 +53,13 @@ class TestVideoNote:
     videonote_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
     videonote_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
 
-    def test_extra_slots(self, video_note):
-        members = inspect.getmembers(
-            video_note.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(video_note, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+    def test_slot_behaviour(self, video_note, recwarn, mro_slots):
+        for attr in video_note.__slots__:
+            assert getattr(video_note, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not video_note.__dict__, f"got missing slot(s): {video_note.__dict__}"
+        assert len(mro_slots(video_note)) == len(set(mro_slots(video_note))), "duplicate slot"
+        video_note.custom, video_note.length = 'should give warning', self.length
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_creation(self, video_note):
         # Make sure file has been uploaded.
@@ -185,6 +183,7 @@ class TestVideoNote:
         monkeypatch.setattr(bot, '_post', make_assertion)
         bot.send_video_note(chat_id, file, thumb=file)
         assert test_flag
+        monkeypatch.delattr(bot, '_post')
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

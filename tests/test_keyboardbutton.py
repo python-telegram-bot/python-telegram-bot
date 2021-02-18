@@ -16,8 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
-
 import pytest
 
 from telegram import KeyboardButton, InlineKeyboardButton
@@ -40,14 +38,14 @@ class TestKeyboardButton:
     request_contact = True
     request_poll = KeyboardButtonPollType("quiz")
 
-    def test_extra_slots(self, keyboard_button):
-        members = inspect.getmembers(
-            keyboard_button.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(keyboard_button, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+    def test_slot_behaviour(self, keyboard_button, recwarn, mro_slots):
+        inst = keyboard_button
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.custom, inst.text = 'should give warning', self.text
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_expected_values(self, keyboard_button):
         assert keyboard_button.text == self.text

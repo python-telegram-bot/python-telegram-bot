@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
 
 import pytest
 
@@ -35,14 +34,13 @@ class TestGameHighScore:
     user = User(2, 'test user', False)
     score = 42
 
-    def test_extra_slots(self, game_highscore):
-        members = inspect.getmembers(
-            game_highscore.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(game_highscore, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+    def test_slot_behaviour(self, game_highscore, recwarn, mro_slots):
+        for attr in game_highscore.__slots__:
+            assert getattr(game_highscore, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not game_highscore.__dict__, f"got missing slot(s): {game_highscore.__dict__}"
+        assert len(mro_slots(game_highscore)) == len(set(mro_slots(game_highscore))), "same slot"
+        game_highscore.custom, game_highscore.position = 'should give warning', self.position
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_de_json(self, bot):
         json_dict = {'position': self.position, 'user': self.user.to_dict(), 'score': self.score}

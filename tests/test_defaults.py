@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
 
 import pytest
 
@@ -25,20 +24,14 @@ from telegram import User
 
 
 class TestDefault:
-    def test_extra_slots(self):
+    def test_slot_behaviour(self, recwarn, mro_slots):
         a = Defaults(parse_mode='HTML', quote=True)
-        members = inspect.getmembers(
-            a.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(a, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
-
-    def test_warning_setting_custom_attr(self, recwarn):
-        inst = Defaults(parse_mode='HTML', quote=True)
-        inst.custom = 'bad practice!'
-        assert len(recwarn) == 1 and 'custom attributes' in str(recwarn[0].message)
+        for attr in a.__slots__:
+            assert getattr(a, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not a.__dict__, f"got missing slot(s): {a.__dict__}"
+        assert len(mro_slots(a)) == len(set(mro_slots(a))), "duplicate slot"
+        a.custom, a._parse_mode = 'should give warning', a._parse_mode
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_data_assignment(self, cdp):
         defaults = Defaults()

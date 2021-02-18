@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
 
 import pytest
 
@@ -31,14 +30,13 @@ def dice(request):
 class TestDice:
     value = 4
 
-    def test_extra_slots(self, dice):
-        members = inspect.getmembers(
-            dice.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(dice, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+    def test_slot_behaviour(self, dice, recwarn, mro_slots):
+        for attr in dice.__slots__:
+            assert getattr(dice, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not dice.__dict__, f"got missing slot(s): {dice.__dict__}"
+        assert len(mro_slots(dice)) == len(set(mro_slots(dice))), "duplicate slot"
+        dice.custom, dice.value = 'should give warning', self.value
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     @pytest.mark.parametrize('emoji', Dice.ALL_EMOJI)
     def test_de_json(self, bot, emoji):

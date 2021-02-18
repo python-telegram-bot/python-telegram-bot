@@ -15,7 +15,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
 import os
 from io import BytesIO
 from pathlib import Path
@@ -62,14 +61,13 @@ class TestPhoto:
     photo_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram_new.jpg'
     file_size = 29176
 
-    def test_extra_slots(self, photo):
-        members = inspect.getmembers(
-            photo.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(photo, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+    def test_slot_behaviour(self, photo, recwarn, mro_slots):
+        for attr in photo.__slots__:
+            assert getattr(photo, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not photo.__dict__, f"got missing slot(s): {photo.__dict__}"
+        assert len(mro_slots(photo)) == len(set(mro_slots(photo))), "duplicate slot"
+        photo.custom, photo.width = 'should give warning', self.width
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_creation(self, thumb, photo):
         # Make sure file has been uploaded.
@@ -251,6 +249,7 @@ class TestPhoto:
         monkeypatch.setattr(bot, '_post', make_assertion)
         bot.send_photo(chat_id, file)
         assert test_flag
+        monkeypatch.delattr(bot, '_post')
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

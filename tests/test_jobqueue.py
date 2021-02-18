@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import calendar
 import datetime as dtm
-import inspect
 import logging
 import os
 import platform
@@ -52,22 +51,13 @@ class TestJobQueue:
     job_time = 0
     received_error = None
 
-    def test_extra_slots(self, job_queue):
-        members = inspect.getmembers(
-            job_queue.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(job_queue, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
-
-    def test_warning_setting_custom_attr(self, job_queue, recwarn, _dp):
-        inst = job_queue
-        inst.custom = 'bad practice!'
-        assert len(recwarn) == 1 and 'custom attributes' in str(recwarn[0].message)
-        with pytest.warns(None) as check:
-            inst._dispatcher = _dp
-        assert not check
+    def test_slot_behaviour(self, job_queue, recwarn, mro_slots, _dp):
+        for attr in job_queue.__slots__:
+            assert getattr(job_queue, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not job_queue.__dict__, f"got missing slot(s): {job_queue.__dict__}"
+        assert len(mro_slots(job_queue)) == len(set(mro_slots(job_queue))), "duplicate slot"
+        job_queue.custom, job_queue._dispatcher = 'should give warning', _dp
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     @pytest.fixture(autouse=True)
     def reset(self):

@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
 
 import pytest
 
@@ -51,15 +50,13 @@ class TestCallbackQuery:
     inline_message_id = 'inline_message_id'
     game_short_name = 'the_game'
 
-    def test_extra_slots(self):
-        query = CallbackQuery(self.id_, self.from_user, 'chat')
-        members = inspect.getmembers(
-            CallbackQuery,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(query, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+    def test_slot_behaviour(self, callback_query, recwarn, mro_slots):
+        for attr in callback_query.__slots__:
+            assert getattr(callback_query, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not callback_query.__dict__, f"got missing slot(s): {callback_query.__dict__}"
+        assert len(mro_slots(callback_query)) == len(set(mro_slots(callback_query))), "same slot"
+        callback_query.custom, callback_query.id = 'should give warning', self.id_
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     @staticmethod
     def check_passed_ids(callback_query: CallbackQuery, kwargs):

@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
 
 import pytest
 from flaky import flaky
@@ -41,14 +40,13 @@ class TestContact:
     last_name = 'Toledo'
     user_id = 23
 
-    def test_extra_slots(self, contact):
-        members = inspect.getmembers(
-            contact.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(contact, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+    def test_slot_behaviour(self, contact, recwarn, mro_slots):
+        for attr in contact.__slots__:
+            assert getattr(contact, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not contact.__dict__, f"got missing slot(s): {contact.__dict__}"
+        assert len(mro_slots(contact)) == len(set(mro_slots(contact))), "duplicate slot"
+        contact.custom, contact.first_name = 'should give warning', self.first_name
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_de_json_required(self, bot):
         json_dict = {'phone_number': self.phone_number, 'first_name': self.first_name}

@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import inspect
 
 import pytest
 
@@ -46,14 +45,13 @@ class TestGame:
     text_entities = [MessageEntity(13, 17, MessageEntity.URL)]
     animation = Animation('blah', 'unique_id', 320, 180, 1)
 
-    def test_extra_slots(self, game):
-        members = inspect.getmembers(
-            game.__class__,
-            predicate=lambda b: not inspect.isroutine(b) and (inspect.ismemberdescriptor(b)),
-        )
-        for member in members:
-            val = getattr(game, member[0], 'err')
-            assert False if val == 'err' else True, f"got extra slot '{member[0]}'"
+    def test_slot_behaviour(self, game, recwarn, mro_slots):
+        for attr in game.__slots__:
+            assert getattr(game, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not game.__dict__, f"got missing slot(s): {game.__dict__}"
+        assert len(mro_slots(game)) == len(set(mro_slots(game))), "duplicate slot"
+        game.custom, game.title = 'should give warning', self.title
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_de_json_required(self, bot):
         json_dict = {
