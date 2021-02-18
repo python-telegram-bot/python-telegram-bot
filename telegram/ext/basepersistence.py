@@ -140,6 +140,13 @@ class BasePersistence(ABC):
         self.bot: Bot = None  # type: ignore[assignment]
 
     def __setattr__(self, key: str, value: object) -> None:
+        # Allow user defined subclasses to have custom attributes.
+        if issubclass(self.__class__, BasePersistence) and self.__class__.__name__ not in {
+            'DictPersistence',
+            'PicklePersistence',
+        }:
+            object.__setattr__(self, key, value)
+            return
         set_new_attribute_deprecated(self, key, value)
 
     def set_bot(self, bot: Bot) -> None:

@@ -130,6 +130,12 @@ class Handler(Generic[UT], ABC):
         self.run_async = run_async
 
     def __setattr__(self, key: str, value: object) -> None:
+        # See comment on BaseFilter to know why this was done.
+        if issubclass(self.__class__, Handler) and not self.__class__.__module__.startswith(
+            'telegram.ext.'
+        ):
+            object.__setattr__(self, key, value)
+            return
         set_new_attribute_deprecated(self, key, value)
 
     @abstractmethod
