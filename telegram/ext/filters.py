@@ -23,6 +23,7 @@ import re
 import warnings
 
 from abc import ABC, abstractmethod
+from sys import version_info as py_ver
 from threading import Lock
 from typing import (
     Dict,
@@ -50,7 +51,7 @@ __all__ = [
     'XORFilter',
 ]
 
-from telegram.utils.deprecate import TelegramDeprecationWarning
+from telegram.utils.deprecate import TelegramDeprecationWarning, set_new_attribute_deprecated
 from telegram.utils.types import SLT
 
 
@@ -110,10 +111,17 @@ class BaseFilter(ABC):
             (depends on the handler).
     """
 
-    # Slots are empty here since 'name' & 'data_filter' are class attributes/properties
-    __slots__ = ()
-    _name = None
-    data_filter = False
+    if py_ver < (3, 7):
+        __slots__ = ('_name', '_data_filter')
+    else:
+        __slots__ = ('_name', '_data_filter', '__dict__')  # type: ignore[assignment]
+
+    def __new__(cls, *args: object, **kwargs: object) -> 'BaseFilter':  # pylint: disable=W0613
+        instance = super().__new__(cls)
+        object.__setattr__(instance, '_name', None)
+        object.__setattr__(instance, '_data_filter', False)
+
+        return instance
 
     @abstractmethod
     def __call__(self, update: Update) -> Optional[Union[bool, Dict]]:
@@ -131,6 +139,26 @@ class BaseFilter(ABC):
     def __invert__(self) -> 'BaseFilter':
         return InvertedFilter(self)
 
+    def __setattr__(self, key: str, value: object) -> None:
+        # Allow setting custom attributes w/o warning for user defined custom filters.
+        # To differentiate between a custom and a PTB filter, we use this hacky but
+        # simple way of checking the module name where the class is defined from.
+        if (
+            issubclass(self.__class__, (UpdateFilter, MessageFilter))
+            and self.__class__.__module__ != __name__
+        ):  # __name__ is telegram.ext.filters
+            object.__setattr__(self, key, value)
+            return
+        set_new_attribute_deprecated(self, key, value)
+
+    @property
+    def data_filter(self) -> bool:
+        return self._data_filter
+
+    @data_filter.setter
+    def data_filter(self, value: bool) -> None:
+        self._data_filter = value
+
     @property
     def name(self) -> Optional[str]:
         return self._name
@@ -146,7 +174,7 @@ class BaseFilter(ABC):
         return self.name
 
 
-class MessageFilter(BaseFilter, ABC):
+class MessageFilter(BaseFilter):
     """Base class for all Message Filters. In contrast to :class:`UpdateFilter`, the object passed
     to :meth:`filter` is ``update.effective_message``.
 
@@ -161,9 +189,7 @@ class MessageFilter(BaseFilter, ABC):
 
     """
 
-    # 'data_filter' and 'name' is included since they are listed as attributes to the class & users
-    # inherit this class to make custom filters.
-    # __slots__ = ('data_filter', 'name')  # commented since they're somehow breaking other filters
+    __slots__ = ()
 
     def __call__(self, update: Update) -> Optional[Union[bool, Dict]]:
         return self.filter(update.effective_message)
@@ -181,7 +207,7 @@ class MessageFilter(BaseFilter, ABC):
         """
 
 
-class UpdateFilter(BaseFilter, ABC):
+class UpdateFilter(BaseFilter):
     """Base class for all Update Filters. In contrast to :class:`UpdateFilter`, the object
     passed to :meth:`filter` is ``update``, which allows to create filters like
     :attr:`Filters.update.edited_message`.
@@ -197,7 +223,7 @@ class UpdateFilter(BaseFilter, ABC):
 
     """
 
-    # __slots__ = ('data_filter', 'name')
+    __slots__ = ()
 
     def __call__(self, update: Update) -> Optional[Union[bool, Dict]]:
         return self.filter(update)

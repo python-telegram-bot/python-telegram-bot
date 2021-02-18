@@ -48,7 +48,7 @@ class TelegramObject:
         return str(self.to_dict())
 
     def __getitem__(self, item: str) -> object:
-        return getattr(self, item)
+        return getattr(self, item, None)
 
     def __setattr__(self, key: str, value: object) -> None:
         set_new_attribute_deprecated(self, key, value)
@@ -91,13 +91,14 @@ class TelegramObject:
 
         # We want to get all attributes for the class, using self.__slots__ only includes the
         # attributes used by that class itself, and not its superclass(es). Hence we get its MRO
-        # and then get their attributes. The `[:-2]` slice excludes the `type` class & this
-        # class itself
+        # and then get their attributes. The `[:-2]` slice excludes the `object` class & the
+        # TelegramObject class itself.
         attrs = {attr for cls in self.__class__.__mro__[:-2] for attr in cls.__slots__}
         for key in attrs:
             if key == 'bot' or key.startswith('_'):
                 continue
-            value = getattr(self, key, None)  # getattr since the keys are actually strings.
+
+            value = getattr(self, key, None)
             if value is not None:
                 if hasattr(value, 'to_dict'):
                     data[key] = value.to_dict()

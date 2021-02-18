@@ -343,8 +343,6 @@ class Message(TelegramObject):
         '_id_attrs',
     )
 
-    _effective_attachment = _UNDEFINED
-
     ATTACHMENT_TYPES: ClassVar[List[str]] = [
         'audio',
         'game',
@@ -608,10 +606,7 @@ class Message(TelegramObject):
         return self._effective_attachment  # type: ignore
 
     def __getitem__(self, item: str) -> Any:  # pylint: disable=R1710
-        if item in self.__slots__:
-            return getattr(self, item)
-        if item == 'chat_id':
-            return self.chat.id
+        return self.chat.id if item == 'chat_id' else super().__getitem__(item)
 
     def to_dict(self) -> JSONDict:
         data = super().to_dict()

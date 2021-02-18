@@ -192,8 +192,8 @@ class CallbackContext:
         return self
 
     def update(self, data: Dict[str, object]) -> None:
-        for datum in data:
-            setattr(self, datum, data[datum])
+        for key, value in data.items():
+            setattr(self, key, value)
 
     @property
     def bot(self) -> 'Bot':

@@ -342,7 +342,7 @@ class PrefixHandler(CommandHandler):
 
     """
 
-    # 'prefix' & 'command' here are both instance variables & class properties, so they're left out
+    # 'prefix' is a class property, & 'command' is included in the superclass, so they're left out.
     __slots__ = ('_prefix', '_command', '_commands')
 
     def __init__(

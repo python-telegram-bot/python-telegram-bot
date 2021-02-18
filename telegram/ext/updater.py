@@ -105,7 +105,6 @@ class Updater:
 
     """
 
-    # '_request' is not included in slots since its a class variable too.
     __slots__ = (
         'persistence',
         'dispatcher',
@@ -117,13 +116,13 @@ class Updater:
         '__exception_event',
         'last_update_id',
         'running',
+        '_request',
         'is_idle',
         'httpd',
         '__lock',
         '__threads',
         '__dict__',
     )
-    _request = None
 
     def __init__(
         self,
@@ -168,6 +167,7 @@ class Updater:
                 raise ValueError('`dispatcher` and `use_context` are mutually exclusive')
 
         self.logger = logging.getLogger(__name__)
+        self._request = None
 
         if dispatcher is None:
             con_pool_size = workers + 4
@@ -190,7 +190,7 @@ class Updater:
                     request_kwargs = {}
                 if 'con_pool_size' not in request_kwargs:
                     request_kwargs['con_pool_size'] = con_pool_size
-                self.__class__._request = Request(**request_kwargs)
+                self._request = Request(**request_kwargs)
                 self.bot = Bot(
                     token,  # type: ignore[arg-type]
                     base_url,
