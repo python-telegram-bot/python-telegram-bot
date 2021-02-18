@@ -191,8 +191,9 @@ class Bot(TelegramObject):
             }
             # ... apply the defaults using a partial
             if default_kwargs:
-                setattr(instance, method_name, functools.partial(method, **default_kwargs))
-
+                object.__setattr__(
+                    instance, method_name, functools.partial(method, **default_kwargs)
+                )
         return instance
 
     def __init__(

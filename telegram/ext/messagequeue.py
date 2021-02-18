@@ -75,7 +75,28 @@ class DelayQueue(threading.Thread):
     """
 
     # __dict__ already present in threading.Thread, so not included here
-    __slots__ = ('_queue', 'burst_limit', 'time_limit', 'exc_route', '__exit_req', 'daemon')
+    __slots__ = (
+        '_queue',
+        'burst_limit',
+        'time_limit',
+        'exc_route',
+        '__exit_req',
+        'daemon',
+        # The following slots are set by Threading, since the superclass doesn't have slots.
+        '_target',
+        '_name',
+        '_args',
+        '_kwargs',
+        '_daemonic',
+        '_ident',
+        '_native_id',
+        '_tstate_lock',
+        '_started',
+        '_is_stopped',
+        '_initialized',
+        '_stderr',
+        '_invoke_excepthook',
+    )
     _instcnt = 0  # instance counter
 
     def __init__(
@@ -101,6 +122,8 @@ class DelayQueue(threading.Thread):
             super().start()
 
     def __setattr__(self, key: str, value: object) -> None:
+        if key.startswith('__'):
+            key = f"_DelayQueue{key}"
         set_new_attribute_deprecated(self, key, value)
 
     def run(self) -> None:

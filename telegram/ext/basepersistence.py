@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the BasePersistence class."""
 import warnings
-from sys import version_info
+from sys import version_info as py_ver
 from abc import ABC, abstractmethod
 from copy import copy
 from typing import DefaultDict, Dict, Optional, Tuple, cast, ClassVar
@@ -79,7 +79,7 @@ class BasePersistence(ABC):
     """
 
     # Apparently Py 3.7 and below have '__dict__' in ABC
-    if version_info < (3, 7):
+    if py_ver < (3, 7):
         __slots__ = ('store_user_data', 'store_chat_data', 'store_bot_data', 'bot')
     else:
         __slots__ = (
@@ -119,12 +119,13 @@ class BasePersistence(ABC):
         def update_bot_data_replace_bot(data: Dict) -> None:
             return update_bot_data(instance.replace_bot(data))
 
-        instance.get_user_data = get_user_data_insert_bot
-        instance.get_chat_data = get_chat_data_insert_bot
-        instance.get_bot_data = get_bot_data_insert_bot
-        instance.update_user_data = update_user_data_replace_bot
-        instance.update_chat_data = update_chat_data_replace_bot
-        instance.update_bot_data = update_bot_data_replace_bot
+        # We want to ignore TGDeprecation warnings so we use obj.__setattr__. Adds to __dict__
+        object.__setattr__(instance, 'get_user_data', get_user_data_insert_bot)
+        object.__setattr__(instance, 'get_chat_data', get_chat_data_insert_bot)
+        object.__setattr__(instance, 'get_bot_data', get_bot_data_insert_bot)
+        object.__setattr__(instance, 'update_user_data', update_user_data_replace_bot)
+        object.__setattr__(instance, 'update_chat_data', update_chat_data_replace_bot)
+        object.__setattr__(instance, 'update_bot_data', update_bot_data_replace_bot)
         return instance
 
     def __init__(

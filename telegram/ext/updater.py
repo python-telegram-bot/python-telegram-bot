@@ -238,6 +238,8 @@ class Updater:
         self.__threads: List[Thread] = []
 
     def __setattr__(self, key: str, value: object) -> None:
+        if key.startswith('__'):
+            key = f"_Updater{key}"
         set_new_attribute_deprecated(self, key, value)
 
     def _init_thread(self, target: Callable, name: str, *args: object, **kwargs: object) -> None:

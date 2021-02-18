@@ -340,6 +340,7 @@ class Message(TelegramObject):
         'channel_chat_created',
         'invoice',
         'video_note',
+        '_effective_attachment',
         '_id_attrs',
     )
 
@@ -488,6 +489,8 @@ class Message(TelegramObject):
         self.proximity_alert_triggered = proximity_alert_triggered
         self.reply_markup = reply_markup
         self.bot = bot
+
+        self._effective_attachment = _UNDEFINED
 
         self._id_attrs = (self.message_id, self.chat)
 

@@ -534,6 +534,8 @@ class DefaultValue:
 
     """
 
+    __slots__ = ('value', '__dict__')
+
     def __init__(self, value: object = None):
         self.value = value
 

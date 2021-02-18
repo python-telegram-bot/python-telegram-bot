@@ -26,7 +26,7 @@ from functools import wraps
 from queue import Empty, Queue
 from threading import BoundedSemaphore, Event, Lock, Thread, current_thread
 from time import sleep
-from typing import TYPE_CHECKING, Callable, DefaultDict, Dict, List, Optional, Set, Union
+from typing import TYPE_CHECKING, Callable, DefaultDict, Dict, List, Optional, Union, Set
 from uuid import uuid4
 
 from telegram import TelegramError, Update
@@ -237,6 +237,11 @@ class Dispatcher:
                 self._set_singleton(None)
 
     def __setattr__(self, key: str, value: object) -> None:
+        # Mangled names don't automatically apply in __setattr__ (see
+        # https://docs.python.org/3/tutorial/classes.html#private-variables), so we have to make
+        # it mangled so they don't raise TelegramDeprecationWarning unnecessarily
+        if key.startswith('__'):
+            key = f"_Dispatcher{key}"
         set_new_attribute_deprecated(self, key, value)
 
     @property
@@ -392,7 +397,7 @@ class Dispatcher:
                 if self.__stop_event.is_set():
                     self.logger.debug('orderly stopping')
                     break
-                if self.__exception_event.is_set():
+                if self.exception_event.is_set():
                     self.logger.critical('stopping due to exception in another thread')
                     break
                 continue

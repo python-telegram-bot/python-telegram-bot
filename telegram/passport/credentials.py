@@ -355,6 +355,8 @@ class SecureValue(TelegramObject):
 
     """
 
+    __slots__ = ('data', 'front_side', 'reverse_side', 'selfie', 'files', 'translation', 'bot')
+
     def __init__(
         self,
         data: 'DataCredentials' = None,

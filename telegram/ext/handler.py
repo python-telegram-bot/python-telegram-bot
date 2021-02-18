@@ -19,7 +19,7 @@
 """This module contains the base class for handlers as used by the Dispatcher."""
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, TypeVar, Union, Generic
-from sys import version_info
+from sys import version_info as py_ver
 
 from telegram.utils.deprecate import set_new_attribute_deprecated
 
@@ -93,7 +93,7 @@ class Handler(Generic[UT], ABC):
     """
 
     # Apparently Py 3.7 and below have '__dict__' in ABC
-    if version_info < (3, 7):
+    if py_ver < (3, 7):
         __slots__ = (
             'callback',
             'pass_update_queue',
