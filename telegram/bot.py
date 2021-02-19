@@ -195,6 +195,7 @@ class Bot(TelegramObject):
         self._bot: Optional[User] = None
         self._commands: Optional[List[BotCommand]] = None
         self._request = request or Request()
+        self.private_key = None
         self.logger = logging.getLogger(__name__)
 
         if private_key:

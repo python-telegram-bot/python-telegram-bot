@@ -42,7 +42,7 @@ class TestDelayQueue:
             assert getattr(q, at, 'err') != 'err', f"got extra slot '{at}'"
         assert not q.__dict__, f"got missing slot(s): {q.__dict__}"
         q.custom, q.burst_limit = 'should give warning', self.burst_limit
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+        assert len(recwarn) == 2 and 'custom' in str(recwarn[1].message), recwarn.list
         q.stop()  # Important to make sure tests gracefully exit
 
     def call(self):
@@ -86,5 +86,5 @@ class TestMessageQueue:
             assert getattr(q, at, 'err') != 'err', f"got extra slot '{at}'"
         assert not q.__dict__, f"got missing slot(s): {q.__dict__}"
         q.custom, q._all_delayq = 'should give warning', q._all_delayq
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+        assert len(recwarn) == 3 and 'custom' in str(recwarn[2].message), recwarn.list
         q.stop()

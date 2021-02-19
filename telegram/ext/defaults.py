@@ -89,6 +89,7 @@ class Defaults:
         '_disable_notification',
         '_allow_sending_without_reply',
         '_parse_mode',
+        '_api_defaults',
         '__dict__',
     )
 
@@ -114,9 +115,6 @@ class Defaults:
         self._tzinfo = tzinfo
         self._run_async = run_async
 
-    def __setattr__(self, key: str, value: object) -> None:
-        set_new_attribute_deprecated(self, key, value)
-
         # Gather all defaults that actually have a default value
         self._api_defaults = {}
         for kwarg in (
@@ -130,8 +128,11 @@ class Defaults:
             if value not in [None, DEFAULT_NONE]:
                 self._api_defaults[kwarg] = value
         # Special casing, as None is a valid default value
-        if self.timeout != DEFAULT_NONE:
-            self._api_defaults['timeout'] = self.timeout
+        if self._timeout != DEFAULT_NONE:
+            self._api_defaults['timeout'] = self._timeout
+
+    def __setattr__(self, key: str, value: object) -> None:
+        set_new_attribute_deprecated(self, key, value)
 
     @property
     def api_defaults(self) -> Dict[str, Any]:

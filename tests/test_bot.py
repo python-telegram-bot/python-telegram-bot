@@ -98,18 +98,17 @@ def inline_results():
 
 
 @pytest.fixture(scope='function')
-def inst(request, bot, default_bot):
-    return bot if request.param == 'bot' else default_bot
+def inst(request, bot_info, default_bot):
+    # We make a new bot since the 'bot' fixture is polluted with monkeypatch setattr's
+    return Bot(bot_info['token']) if request.param == 'bot' else default_bot
 
 
 class TestBot:
-    @pytest.mark.parametrize(
-        'inst', ['bot', pytest.param("default_bot", marks=pytest.mark.xfail)], indirect=True
-    )
+    @pytest.mark.parametrize('inst', ['bot', "default_bot"], indirect=True)
     def test_slot_behaviour(self, inst, recwarn, mro_slots):
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not inst.__dict__ or len(inst.__dict__) == 1, f"got missing slots: {inst.__dict__}"
+        assert not inst.__dict__, f"got missing slots: {inst.__dict__}"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
         inst.custom, inst.base_url = 'should give warning', inst.base_url
         assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list

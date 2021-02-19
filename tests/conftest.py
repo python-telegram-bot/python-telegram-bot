@@ -349,7 +349,7 @@ def mro_slots():
         return [
             attr
             for cls in _class.__class__.__mro__[:-1]
-            if hasattr(cls, '__slots__')
+            if hasattr(cls, '__slots__')  # ABC doesn't have slots in py 3.7 and below
             for attr in cls.__slots__
             if attr != '__dict__'
         ]

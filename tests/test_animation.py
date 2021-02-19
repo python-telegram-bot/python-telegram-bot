@@ -57,10 +57,11 @@ class TestAnimation:
     file_size = 4127
     caption = "Test *animation*"
 
-    def test_slot_behaviour(self, animation, recwarn):
+    def test_slot_behaviour(self, animation, recwarn, mro_slots):
         for attr in animation.__slots__:
             assert getattr(animation, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert not animation.__dict__, f"got missing slot(s): {animation.__dict__}"
+        assert len(mro_slots(animation)) == len(set(mro_slots(animation))), "duplicate slot"
         animation.custom, animation.file_name = 'should give warning', self.file_name
         assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
