@@ -30,8 +30,8 @@ from telegram import (
     Video,
     MessageEntity,
 )
-from telegram.utils.helpers import DEFAULT_NONE, DefaultValue, parse_file_input
-from telegram.utils.types import FileInput, JSONDict
+from telegram.utils.helpers import DEFAULT_NONE, parse_file_input
+from telegram.utils.types import FileInput, JSONDict, ODVInput
 
 
 class InputMedia(TelegramObject):
@@ -130,7 +130,7 @@ class InputMediaAnimation(InputMedia):
         media: Union[FileInput, Animation],
         thumb: FileInput = None,
         caption: str = None,
-        parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
         width: int = None,
         height: int = None,
         duration: int = None,
@@ -203,7 +203,7 @@ class InputMediaPhoto(InputMedia):
         self,
         media: Union[FileInput, PhotoSize],
         caption: str = None,
-        parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
     ):
@@ -300,7 +300,7 @@ class InputMediaVideo(InputMedia):
         height: int = None,
         duration: int = None,
         supports_streaming: bool = None,
-        parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
         thumb: FileInput = None,
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
@@ -408,7 +408,7 @@ class InputMediaAudio(InputMedia):
         media: Union[FileInput, Audio],
         thumb: FileInput = None,
         caption: str = None,
-        parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
         duration: int = None,
         performer: str = None,
         title: str = None,
@@ -506,7 +506,7 @@ class InputMediaDocument(InputMedia):
         media: Union[FileInput, Document],
         thumb: FileInput = None,
         caption: str = None,
-        parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_content_type_detection: bool = None,
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,

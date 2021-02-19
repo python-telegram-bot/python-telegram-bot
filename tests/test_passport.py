@@ -31,27 +31,12 @@ from telegram import (
     TelegramDecryptionError,
 )
 
-# Generated using the scope:
-# {
-#   data: [
-#     {
-#       type: 'personal_details',
-#       native_names: true
-#     },
-#     {
-#       type: 'id_document',
-#       selfie: true,
-#       translation: true
-#     },
-#     {
-#       type: 'address_document',
-#       translation: true
-#     },
-#     'address',
-#     'email'
-#   ],
-#   v: 1
-# }
+
+# Note: All classes in telegram.credentials (except EncryptedCredentials) aren't directly tested
+# here, although they are implicitly tested. Testing for those classes was too much work and not
+# worth it.
+
+
 RAW_PASSPORT_DATA = {
     'credentials': {
         'hash': 'qB4hz2LMcXYhglwz6EvXMMyI3PURisWLXl/iCmCXcSk=',
