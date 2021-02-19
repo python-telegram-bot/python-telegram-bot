@@ -22,7 +22,12 @@ import pytest
 from flaky import flaky
 
 from telegram import ChatPhoto, Voice, TelegramError, Bot
-from tests.conftest import expect_bad_request, check_shortcut_call, check_shortcut_signature
+from tests.conftest import (
+    expect_bad_request,
+    check_shortcut_call,
+    check_shortcut_signature,
+    check_defaults_handling,
+)
 
 
 @pytest.fixture(scope='function')
@@ -125,29 +130,25 @@ class TestChatPhoto:
             bot.set_chat_photo(chat_id=super_group_id)
 
     def test_get_small_file_instance_method(self, monkeypatch, chat_photo):
-        get_small_file = chat_photo.bot.get_file
-
         def make_assertion(*_, **kwargs):
-            return kwargs['file_id'] == chat_photo.small_file_id and check_shortcut_call(
-                kwargs, get_small_file
-            )
+            return kwargs['file_id'] == chat_photo.small_file_id
 
         assert check_shortcut_signature(ChatPhoto.get_small_file, Bot.get_file, ['file_id'], [])
+        assert check_shortcut_call(chat_photo.get_small_file, chat_photo.bot, 'get_file')
+        assert check_defaults_handling(chat_photo.get_small_file, chat_photo.bot)
 
-        monkeypatch.setattr('telegram.Bot.get_file', make_assertion)
+        monkeypatch.setattr(chat_photo.bot, 'get_file', make_assertion)
         assert chat_photo.get_small_file()
 
     def test_get_big_file_instance_method(self, monkeypatch, chat_photo):
-        get_big_file = chat_photo.bot.get_file
-
         def make_assertion(*_, **kwargs):
-            return kwargs['file_id'] == chat_photo.big_file_id and check_shortcut_call(
-                kwargs, get_big_file
-            )
+            return kwargs['file_id'] == chat_photo.big_file_id
 
         assert check_shortcut_signature(ChatPhoto.get_big_file, Bot.get_file, ['file_id'], [])
+        assert check_shortcut_call(chat_photo.get_big_file, chat_photo.bot, 'get_file')
+        assert check_defaults_handling(chat_photo.get_big_file, chat_photo.bot)
 
-        monkeypatch.setattr('telegram.Bot.get_file', make_assertion)
+        monkeypatch.setattr(chat_photo.bot, 'get_file', make_assertion)
         assert chat_photo.get_big_file()
 
     def test_equality(self):

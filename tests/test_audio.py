@@ -24,7 +24,7 @@ from flaky import flaky
 
 from telegram import Audio, TelegramError, Voice, MessageEntity, Bot
 from telegram.utils.helpers import escape_markdown
-from tests.conftest import check_shortcut_call, check_shortcut_signature
+from tests.conftest import check_shortcut_call, check_shortcut_signature, check_defaults_handling
 
 
 @pytest.fixture(scope='function')
@@ -282,14 +282,14 @@ class TestAudio:
             bot.send_audio(chat_id=chat_id)
 
     def test_get_file_instance_method(self, monkeypatch, audio):
-        get_file = audio.bot.get_file
-
         def make_assertion(*_, **kwargs):
-            return kwargs['file_id'] == audio.file_id and check_shortcut_call(kwargs, get_file)
+            return kwargs['file_id'] == audio.file_id
 
         assert check_shortcut_signature(Audio.get_file, Bot.get_file, ['file_id'], [])
+        assert check_shortcut_call(audio.get_file, audio.bot, 'get_file')
+        assert check_defaults_handling(audio.get_file, audio.bot)
 
-        monkeypatch.setattr('telegram.Bot.get_file', make_assertion)
+        monkeypatch.setattr(audio.bot, 'get_file', make_assertion)
         assert audio.get_file()
 
     def test_equality(self, audio):

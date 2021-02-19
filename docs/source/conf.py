@@ -33,6 +33,9 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon'
 ]
+# Don't show type hints in the signature - that just makes it hardly readable
+# and we document the types anyway
+autodoc_typehints = 'description'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
