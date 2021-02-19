@@ -91,7 +91,7 @@ class BaseFilter(ABC):
 
 
     If you want to create your own filters create a class inheriting from either
-    :class:`MessageFilter` or :class:`UpdateFilter` and implement a :meth:``filter`` method that
+    :class:`MessageFilter` or :class:`UpdateFilter` and implement a :meth:`filter` method that
     returns a boolean: :obj:`True` if the message should be
     handled, :obj:`False` otherwise.
     Note that the filters work only as class instances, not
@@ -148,7 +148,8 @@ class MessageFilter(BaseFilter, ABC):
     """Base class for all Message Filters. In contrast to :class:`UpdateFilter`, the object passed
     to :meth:`filter` is ``update.effective_message``.
 
-    Please see :class:`telegram.ext.BaseFilter` for details on how to create custom filters.
+    Please see :class:`telegram.ext.filters.BaseFilter` for details on how to create custom
+    filters.
 
     Attributes:
         name (:obj:`str`): Name for this filter. Defaults to the type of filter.
@@ -176,11 +177,12 @@ class MessageFilter(BaseFilter, ABC):
 
 
 class UpdateFilter(BaseFilter, ABC):
-    """Base class for all Update Filters. In contrast to :class:`UpdateFilter`, the object
+    """Base class for all Update Filters. In contrast to :class:`MessageFilter`, the object
     passed to :meth:`filter` is ``update``, which allows to create filters like
     :attr:`Filters.update.edited_message`.
 
-    Please see :class:`telegram.ext.BaseFilter` for details on how to create custom filters.
+    Please see :class:`telegram.ext.filters.BaseFilter` for details on how to create custom
+    filters.
 
     Attributes:
         name (:obj:`str`): Name for this filter. Defaults to the type of filter.
@@ -316,7 +318,7 @@ class MergedFilter(UpdateFilter):
 
 class XORFilter(UpdateFilter):
     """Convenience filter acting as wrapper for :class:`MergedFilter` representing the an XOR gate
-    for two filters
+    for two filters.
 
     Args:
         base_filter: Filter 1 of the merged filter.
@@ -1413,7 +1415,7 @@ officedocument.wordprocessingml.document")``.
             user_id(:class:`telegram.utils.types.SLT[int]`, optional):
                 Which user ID(s) to allow through.
             username(:class:`telegram.utils.types.SLT[str]`, optional):
-                Which username(s) to allow through. Leading '@'s in usernames will be discarded.
+                Which username(s) to allow through. Leading `'@'` s in usernames will be discarded.
             allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
                 is specified in :attr:`user_ids` and :attr:`usernames`. Defaults to :obj:`False`
 
@@ -1456,7 +1458,7 @@ officedocument.wordprocessingml.document")``.
             Args:
                 username(:class:`telegram.utils.types.SLT[str]`, optional):
                     Which username(s) to allow through.
-                    Leading '@'s in usernames will be discarded.
+                    Leading `'@'` s in usernames will be discarded.
             """
             return super().add_usernames(username)
 
@@ -1477,7 +1479,7 @@ officedocument.wordprocessingml.document")``.
             Args:
                 username(:class:`telegram.utils.types.SLT[str]`, optional):
                     Which username(s) to disallow through.
-                    Leading '@'s in usernames will be discarded.
+                    Leading `'@'` s in usernames will be discarded.
             """
             return super().remove_usernames(username)
 
@@ -1511,7 +1513,7 @@ officedocument.wordprocessingml.document")``.
             bot_id(:class:`telegram.utils.types.SLT[int]`, optional):
                 Which bot ID(s) to allow through.
             username(:class:`telegram.utils.types.SLT[str]`, optional):
-                Which username(s) to allow through. Leading '@'s in usernames will be discarded.
+                Which username(s) to allow through. Leading `'@'` s in usernames will be discarded.
             allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
                 is specified in :attr:`bot_ids` and :attr:`usernames`. Defaults to :obj:`False`
 
@@ -1554,7 +1556,7 @@ officedocument.wordprocessingml.document")``.
             Args:
                 username(:class:`telegram.utils.types.SLT[str]`, optional):
                     Which username(s) to allow through.
-                    Leading '@'s in usernames will be discarded.
+                    Leading `'@'` s in usernames will be discarded.
             """
             return super().add_usernames(username)
 
@@ -1576,7 +1578,7 @@ officedocument.wordprocessingml.document")``.
             Args:
                 username(:class:`telegram.utils.types.SLT[str]`, optional):
                     Which username(s) to disallow through.
-                    Leading '@'s in usernames will be discarded.
+                    Leading `'@'` s in usernames will be discarded.
             """
             return super().remove_usernames(username)
 
@@ -1657,7 +1659,7 @@ officedocument.wordprocessingml.document")``.
             Args:
                 username(:class:`telegram.utils.types.SLT[str]`, optional):
                     Which username(s) to disallow through.
-                    Leading '@'s in usernames will be discarded.
+                    Leading `'@'` s in usernames will be discarded.
             """
             return super().remove_usernames(username)
 
