@@ -371,7 +371,7 @@ class TestBot:
         assert message_quiz.poll.explanation_entities == explanation_entities
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
+    @pytest.mark.timeout(15)
     @pytest.mark.parametrize(['open_period', 'close_date'], [(5, None), (None, True)])
     def test_send_open_period(self, bot, super_group_id, open_period, close_date):
         question = 'Is this a test?'
@@ -1603,7 +1603,7 @@ class TestBot:
         with pytest.raises(OkException):
             bot.send_photo(chat_id, open('tests/data/telegram.jpg', 'rb'), timeout=TIMEOUT)
 
-        # Test JSON submition
+        # Test JSON submission
         with pytest.raises(OkException):
             bot.get_chat_administrators(chat_id, timeout=TIMEOUT)
 

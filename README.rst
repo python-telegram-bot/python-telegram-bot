@@ -28,8 +28,8 @@ We have a vibrant community of developers helping each other in our `Telegram gr
    :target: https://pypistats.org/packages/python-telegram-bot
    :alt: PyPi Package Monthly Download
 
-.. image:: https://img.shields.io/badge/docs-latest-af1a97.svg
-   :target: https://python-telegram-bot.readthedocs.io/
+.. image:: https://readthedocs.org/projects/python-telegram-bot/badge/?version=stable
+   :target: https://python-telegram-bot.readthedocs.io/en/stable/?badge=stable
    :alt: Documentation Status
 
 .. image:: https://img.shields.io/pypi/l/python-telegram-bot.svg
@@ -136,6 +136,16 @@ In case you have a previously cloned local repository already, you should initia
 .. code:: shell
 
     $ git submodule update --init --recursive
+
+---------------------
+Optional Dependencies
+---------------------
+
+PTB can be installed with optional dependencies:
+
+* ``pip install python-telegram-bot[passport]`` installs the `cryptography <https://cryptography.io>`_ library. Use this, if you want to use Telegram Passport related functionality.
+* ``pip install python-telegram-bot[ujson]`` installs the `ujson <https://pypi.org/project/ujson/>`_ library. It will then be used for JSON de- & encoding, which can bring speed up compared to the standard `json <https://docs.python.org/3/library/json.html>`_ library.
+* ``pip install python-telegram-bot[socks]`` installs the `PySocks <https://pypi.org/project/PySocks/>`_ library. Use this, if you want to work behind a Socks5 server.
 
 ===============
 Getting started

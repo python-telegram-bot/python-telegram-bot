@@ -104,7 +104,7 @@ class ChatPhoto(TelegramObject):
             :class:`telegram.File`
 
         Raises:
-            :class:`telegram.TelegramError`
+            :class:`telegram.error.TelegramError`
 
         """
         return self.bot.get_file(
@@ -121,7 +121,7 @@ class ChatPhoto(TelegramObject):
             :class:`telegram.File`
 
         Raises:
-            :class:`telegram.TelegramError`
+            :class:`telegram.error.TelegramError`
 
         """
         return self.bot.get_file(file_id=self.big_file_id, timeout=timeout, api_kwargs=api_kwargs)

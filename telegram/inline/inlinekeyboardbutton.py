@@ -41,7 +41,7 @@ class InlineKeyboardButton(TelegramObject):
     Args:
         text (:obj:`str`): Label text on the button.
         url (:obj:`str`): HTTP or tg:// url to be opened when button is pressed.
-        login_url (:class:`telegram.LoginUrl`, optional) An HTTP URL used to automatically
+        login_url (:class:`telegram.LoginUrl`, optional): An HTTP URL used to automatically
             authorize the user. Can be used as a replacement for the Telegram Login Widget.
         callback_data (:obj:`str`, optional): Data to be sent in a callback query to the bot when
             button is pressed, UTF-8 1-64 bytes.
@@ -67,7 +67,7 @@ class InlineKeyboardButton(TelegramObject):
     Attributes:
         text (:obj:`str`): Label text on the button.
         url (:obj:`str`): Optional. HTTP or tg:// url to be opened when button is pressed.
-        login_url (:class:`telegram.LoginUrl`) Optional. An HTTP URL used to automatically
+        login_url (:class:`telegram.LoginUrl`): Optional. An HTTP URL used to automatically
             authorize the user. Can be used as a replacement for the Telegram Login Widget.
         callback_data (:obj:`str`): Optional. Data to be sent in a callback query to the bot when
             button is pressed, UTF-8 1-64 bytes.
@@ -79,7 +79,7 @@ class InlineKeyboardButton(TelegramObject):
             case just the bot’s username will be inserted.
         callback_game (:class:`telegram.CallbackGame`): Optional. Description of the game that will
             be launched when the user presses the button.
-        pay (:obj:`bool`): Optional. Specify True, to send a Pay button.
+        pay (:obj:`bool`): Optional. Specify :obj:`True`, to send a Pay button.
 
     """
 

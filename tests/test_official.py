@@ -25,6 +25,7 @@ from bs4 import BeautifulSoup
 from telegram.vendor.ptb_urllib3 import urllib3
 
 import telegram
+from tests.conftest import env_var_2_bool
 
 IGNORED_OBJECTS = ('ResponseParameters', 'CallbackGame')
 IGNORED_PARAMETERS = {
@@ -170,6 +171,8 @@ for thing in soup.select('h4 > a.anchor'):
 
 
 @pytest.mark.parametrize(('method', 'data'), argvalues=argvalues, ids=names)
-@pytest.mark.skipif(os.getenv('TEST_OFFICIAL') != 'true', reason='test_official is not enabled')
+@pytest.mark.skipif(
+    not env_var_2_bool(os.getenv('TEST_OFFICIAL')), reason='test_official is not enabled'
+)
 def test_official(method, data):
     method(data)

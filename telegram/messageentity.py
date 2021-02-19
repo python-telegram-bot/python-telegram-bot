@@ -33,7 +33,7 @@ class MessageEntity(TelegramObject):
     usernames, URLs, etc.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`type`, :attr:`offset` and :attr`length` are equal.
+    considered equal, if their :attr:`type`, :attr:`offset` and :attr:`length` are equal.
 
     Args:
         type (:obj:`str`): Type of the entity. Can be mention (@username), hashtag, bot_command,
