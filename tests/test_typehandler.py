@@ -116,6 +116,7 @@ class TestTypeHandler:
 class TestHandler:
     def test_slot_behaviour(self, recwarn, mro_slots):
         class SubclassHandler(Handler):
+            __slots__ = ()
             def __init__(self):
                 super().__init__(lambda x: None)
 
