@@ -22,6 +22,7 @@ import pytest
 
 from telegram import Message, User, Chat, MessageEntity, Document, Update, Dice
 from telegram.ext import Filters, BaseFilter, MessageFilter, UpdateFilter
+from sys import version_info as py_ver
 import inspect
 import re
 
@@ -106,12 +107,17 @@ class TestFilters:
                 if not warn:
                     pytest.fail(f"Filter {name!r} didn't warn when setting custom attr")
 
+        assert '__dict__' not in BaseFilter.__slots__ if py_ver < (3, 7) else True, 'dict in abc'
+
         class CustomFilter(MessageFilter):
             def filter(self, message: Message):
                 pass
 
         with pytest.warns(None):
-            CustomFilter().custom = 'this is allowed'
+            CustomFilter().custom = 'allowed'  # Test setting custom attr to custom filters
+
+        with pytest.warns(TelegramDeprecationWarning, match='custom attributes'):
+            Filters().custom = 'raise warning'
 
     def test_filters_all(self, update):
         assert Filters.all(update)

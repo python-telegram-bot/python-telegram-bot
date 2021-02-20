@@ -81,6 +81,8 @@ class TestUpdater:
         assert len(mro_slots(updater)) == len(set(mro_slots(updater))), "duplicate slot"
         updater.custom, updater.running = 'should give warning', updater.running
         assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+        updater.__setattr__('__test', 'mangled success')
+        assert getattr(updater, '_Updater__test', 'e') == 'mangled success', "mangling failed"
 
     @pytest.fixture(autouse=True)
     def reset(self):

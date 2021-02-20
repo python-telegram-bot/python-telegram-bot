@@ -30,6 +30,7 @@ import os
 import pickle
 from collections import defaultdict
 from time import sleep
+from sys import version_info as py_ver
 
 import pytest
 
@@ -176,10 +177,11 @@ class TestBasePersistence:
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
         # assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
-        # This test fails if the child class doesn't define __slots__
+        # The below test fails if the child class doesn't define __slots__ (not a cause of concern)
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
         inst.store_user_data, inst.custom = {}, "custom persistence shouldn't warn"
         assert len(recwarn) == 0, recwarn.list
+        assert '__dict__' not in BasePersistence.__slots__ if py_ver < (3, 7) else True, 'has dict'
 
     def test_creation(self, base_persistence):
         assert base_persistence.store_chat_data

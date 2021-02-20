@@ -60,6 +60,8 @@ class TestDispatcher:
         assert len(mro_slots(dp2)) == len(set(mro_slots(dp2))), "duplicate slot"
         dp2.custom, dp2.running = 'should give warning', dp2.running
         assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+        dp2.__setattr__('__test', 'mangled success')
+        assert getattr(dp2, '_Dispatcher__test', 'e') == 'mangled success', "mangling failed"
 
     @pytest.fixture(autouse=True, name='reset')
     def reset_fixture(self):

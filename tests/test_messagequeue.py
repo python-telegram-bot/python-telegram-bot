@@ -43,6 +43,8 @@ class TestDelayQueue:
         assert not q.__dict__, f"got missing slot(s): {q.__dict__}"
         q.custom, q.burst_limit = 'should give warning', self.burst_limit
         assert len(recwarn) == 2 and 'custom' in str(recwarn[1].message), recwarn.list
+        q.__setattr__('__test', 'mangled success')
+        assert getattr(q, '_DelayQueue__test', 'e') == 'mangled success', "mangling failed"
         q.stop()  # Important to make sure tests gracefully exit
 
     def call(self):

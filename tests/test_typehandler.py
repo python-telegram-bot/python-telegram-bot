@@ -18,11 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 from collections import OrderedDict
 from queue import Queue
+from sys import version_info as py_ver
 
 import pytest
 
 from telegram import Bot
-from telegram.ext import TypeHandler, CallbackContext, JobQueue
+from telegram.ext import TypeHandler, CallbackContext, JobQueue, Handler
 
 
 class TestTypeHandler:
@@ -110,3 +111,22 @@ class TestTypeHandler:
 
         cdp.process_update({'a': 1, 'b': 2})
         assert self.test_flag
+
+
+class TestHandler:
+    def test_slot_behaviour(self, recwarn, mro_slots):
+        class SubclassHandler(Handler):
+            def __init__(self):
+                super().__init__(lambda x: None)
+
+            def check_update(self, update: object):
+                pass
+
+        inst = SubclassHandler()
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        assert '__dict__' not in Handler.__slots__ if py_ver < (3, 7) else True, 'dict in abc'
+        inst.custom = 'should not give warning'
+        assert len(recwarn) == 0, recwarn.list
