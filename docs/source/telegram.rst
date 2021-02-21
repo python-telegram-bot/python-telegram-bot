@@ -140,6 +140,7 @@ Passport
     telegram.credentials
     telegram.datacredentials
     telegram.securedata
+    telegram.securevalue
     telegram.filecredentials
     telegram.iddocumentdata
     telegram.personaldetails

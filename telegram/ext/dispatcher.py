@@ -80,7 +80,7 @@ def run_async(
 
 class DispatcherHandlerStop(Exception):
     """
-    Raise this in handler to prevent execution any other handler (even in different group).
+    Raise this in handler to prevent execution of any other handler (even in different group).
 
     In order to use this exception in a :class:`telegram.ext.ConversationHandler`, pass the
     optional ``state`` parameter instead of returning the next state:
@@ -619,7 +619,7 @@ class Dispatcher:
             callback (:obj:`callable`): The callback function for this error handler. Will be
                 called when an error is raised. Callback signature for context based API:
 
-                ``def callback(update: Update, context: CallbackContext)``
+                ``def callback(update: object, context: CallbackContext)``
 
                 The error that happened will be present in context.error.
             run_async (:obj:`bool`, optional): Whether this handlers callback should be run

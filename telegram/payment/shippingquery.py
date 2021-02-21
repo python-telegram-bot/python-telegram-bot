@@ -21,7 +21,8 @@
 from typing import TYPE_CHECKING, Any, Optional, List
 
 from telegram import ShippingAddress, TelegramObject, User, ShippingOption
-from telegram.utils.types import JSONDict
+from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -88,7 +89,7 @@ class ShippingQuery(TelegramObject):
         ok: bool,
         shipping_options: List[ShippingOption] = None,
         error_message: str = None,
-        timeout: float = None,
+        timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
         """Shortcut for::

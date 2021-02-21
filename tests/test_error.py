@@ -115,7 +115,6 @@ class TestErrors:
         ],
     )
     def test_errors_pickling(self, exception, attributes):
-        print(exception)
         pickled = pickle.dumps(exception)
         unpickled = pickle.loads(pickled)
         assert type(unpickled) is type(exception)

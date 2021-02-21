@@ -38,6 +38,9 @@ from typing import (
     Type,
     cast,
     IO,
+    TypeVar,
+    Generic,
+    overload,
 )
 
 from telegram.utils.types import JSONDict, FileInput
@@ -494,7 +497,11 @@ def decode_user_chat_data_from_json(data: str) -> DefaultDict[int, Dict[object, 
     return tmp
 
 
-class DefaultValue:
+DVType = TypeVar('DVType', bound=object)
+OT = TypeVar('OT', bound=object)
+
+
+class DefaultValue(Generic[DVType]):
     """Wrapper for immutable default arguments that allows to check, if the default value was set
     explicitly. Usage::
 
@@ -531,6 +538,9 @@ class DefaultValue:
         if value:
             ...
 
+    ``repr(DefaultValue(value))`` returns ``repr(value)`` and ``str(DefaultValue(value))`` returns
+    ``f'DefaultValue({value})'``.
+
     Args:
         value (:obj:`obj`): The value of the default argument
 
@@ -539,11 +549,44 @@ class DefaultValue:
 
     """
 
-    def __init__(self, value: object = None):
+    def __init__(self, value: DVType = None):
         self.value = value
 
     def __bool__(self) -> bool:
         return bool(self.value)
+
+    @overload
+    @staticmethod
+    def get_value(obj: 'DefaultValue[OT]') -> OT:
+        ...
+
+    @overload
+    @staticmethod
+    def get_value(obj: OT) -> OT:
+        ...
+
+    @staticmethod
+    def get_value(obj: Union[OT, 'DefaultValue[OT]']) -> OT:
+        """
+        Shortcut for::
+
+            return obj.value if isinstance(obj, DefaultValue) else obj
+
+        Args:
+            obj (:obj:`object`): The object to process
+
+        Returns:
+            Same type as input, or the value of the input: The value
+        """
+        return obj.value if isinstance(obj, DefaultValue) else obj  # type: ignore[return-value]
+
+    # This is mostly here for readability during debugging
+    def __str__(self) -> str:
+        return f'DefaultValue({self.value})'
+
+    # This is here to have the default instances nicely rendered in the docs
+    def __repr__(self) -> str:
+        return repr(self.value)
 
 
 DEFAULT_NONE: DefaultValue = DefaultValue(None)
@@ -551,3 +594,6 @@ DEFAULT_NONE: DefaultValue = DefaultValue(None)
 
 DEFAULT_FALSE: DefaultValue = DefaultValue(False)
 """:class:`DefaultValue`: Default :obj:`False`"""
+
+DEFAULT_20: DefaultValue = DefaultValue(20)
+""":class:`DefaultValue`: Default :obj:`20`"""

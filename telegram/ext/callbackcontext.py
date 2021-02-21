@@ -118,7 +118,7 @@ class CallbackContext:
     @bot_data.setter
     def bot_data(self, value: object) -> NoReturn:
         raise AttributeError(
-            "You can not assign a new value to bot_data, see " "https://git.io/fjxKe"
+            "You can not assign a new value to bot_data, see https://git.io/Jt6ic"
         )
 
     @property
@@ -128,7 +128,7 @@ class CallbackContext:
     @chat_data.setter
     def chat_data(self, value: object) -> NoReturn:
         raise AttributeError(
-            "You can not assign a new value to chat_data, see " "https://git.io/fjxKe"
+            "You can not assign a new value to chat_data, see https://git.io/Jt6ic"
         )
 
     @property
@@ -138,7 +138,7 @@ class CallbackContext:
     @user_data.setter
     def user_data(self, value: object) -> NoReturn:
         raise AttributeError(
-            "You can not assign a new value to user_data, see " "https://git.io/fjxKe"
+            "You can not assign a new value to user_data, see https://git.io/Jt6ic"
         )
 
     @classmethod

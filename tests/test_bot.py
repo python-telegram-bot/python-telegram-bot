@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+import inspect
 import time
 import datetime as dtm
 from pathlib import Path
@@ -48,7 +49,7 @@ from telegram import (
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
 from telegram.utils.helpers import from_timestamp, escape_markdown, to_timestamp
-from tests.conftest import expect_bad_request
+from tests.conftest import expect_bad_request, check_defaults_handling
 from tests.bots import FALLBACKS
 
 
@@ -191,6 +192,43 @@ class TestBot:
         assert to_dict_bot["first_name"] == bot.first_name
         if bot.last_name:
             assert to_dict_bot["last_name"] == bot.last_name
+
+    @pytest.mark.parametrize(
+        'bot_method_name',
+        argvalues=[
+            name
+            for name, _ in inspect.getmembers(Bot, predicate=inspect.isfunction)
+            if not name.startswith('_')
+            and name
+            not in [
+                'de_json',
+                'de_list',
+                'to_dict',
+                'to_json',
+                'parse_data',
+                'get_updates',
+                'getUpdates',
+                'do_init',
+                'do_teardown',
+            ]
+        ],
+    )
+    @pytest.mark.asyncio
+    async def test_defaults_handling(self, bot_method_name, bot):
+        """
+        Here we check that the bot methods handle tg.ext.Defaults correctly. As for most defaults,
+        we can't really check the effect, we just check if we're passing the correct kwargs to
+        Request.post. As bot method tests a scattered across the different test files, we do
+        this here in one place.
+
+        The same test is also run for all the shortcuts (Message.reply_text) etc in the
+        corresponding tests.
+
+        Finally, there are some tests for Defaults.{parse_mode, quote, allow_sending_without_reply}
+        at the appropriate places, as those are the only things we can actually check.
+        """
+        bot_method = getattr(bot, bot_method_name)
+        assert await check_defaults_handling(bot_method, bot)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -400,7 +438,7 @@ class TestBot:
             open_period=open_period,
             close_date=close_date,
         )
-        time.sleep(5.1)
+        await asyncio.sleep(5.1)
         new_message = await bot.edit_message_reply_markup(
             chat_id=super_group_id,
             message_id=message.message_id,
@@ -1944,8 +1982,8 @@ class TestBot:
         'default_bot',
         [
             ({'parse_mode': ParseMode.HTML, 'allow_sending_without_reply': True}),
-            ({'parse_mode': False, 'allow_sending_without_reply': True}),
-            ({'parse_mode': False, 'allow_sending_without_reply': False}),
+            ({'parse_mode': None, 'allow_sending_without_reply': True}),
+            ({'parse_mode': None, 'allow_sending_without_reply': False}),
         ],
         indirect=['default_bot'],
     )
