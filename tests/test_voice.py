@@ -36,9 +36,10 @@ def voice_file():
 
 
 @pytest.fixture(scope='class')
-def voice(bot, chat_id):
+@pytest.mark.asyncio
+async def voice(bot, chat_id):
     with open('tests/data/telegram.ogg', 'rb') as f:
-        return bot.send_voice(chat_id, voice=f, timeout=50).voice
+        return await bot.send_voice(chat_id, voice=f, timeout=50).voice
 
 
 class TestVoice:

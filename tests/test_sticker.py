@@ -36,9 +36,10 @@ def sticker_file():
 
 
 @pytest.fixture(scope='class')
-def sticker(bot, chat_id):
+@pytest.mark.asyncio
+async def sticker(bot, chat_id):
     with open('tests/data/telegram.webp', 'rb') as f:
-        return bot.send_sticker(chat_id, sticker=f, timeout=50).sticker
+        return await (bot.send_sticker(chat_id, sticker=f, timeout=50)).sticker
 
 
 @pytest.fixture(scope='function')
@@ -49,9 +50,10 @@ def animated_sticker_file():
 
 
 @pytest.fixture(scope='class')
-def animated_sticker(bot, chat_id):
+@pytest.mark.asyncio
+async def animated_sticker(bot, chat_id):
     with open('tests/data/telegram_animated_sticker.tgs', 'rb') as f:
-        return bot.send_sticker(chat_id, sticker=f, timeout=50).sticker
+        return (await bot.send_sticker(chat_id, sticker=f, timeout=50)).sticker
 
 
 class TestSticker:
@@ -365,15 +367,16 @@ class TestStickerSet:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_bot_methods_1_png(self, bot, chat_id, sticker_file):
+    @pytest.mark.asyncio
+    async def test_bot_methods_1_png(self, bot, chat_id, sticker_file):
         with open('tests/data/telegram_sticker.png', 'rb') as f:
-            file = bot.upload_sticker_file(95205500, f)
+            file = await bot.upload_sticker_file(95205500, f)
         assert file
-        assert bot.add_sticker_to_set(
+        assert await bot.add_sticker_to_set(
             chat_id, f'test_by_{bot.username}', png_sticker=file.file_id, emojis='😄'
         )
         # Also test with file input and mask
-        assert bot.add_sticker_to_set(
+        assert await bot.add_sticker_to_set(
             chat_id,
             f'test_by_{bot.username}',
             png_sticker=sticker_file,

@@ -36,9 +36,10 @@ def document_file():
 
 
 @pytest.fixture(scope='class')
-def document(bot, chat_id):
+@pytest.mark.asyncio
+async def document(bot, chat_id):
     with open('tests/data/telegram.png', 'rb') as f:
-        return bot.send_document(chat_id, document=f, timeout=50).document
+        return (await bot.send_document(chat_id, document=f, timeout=50)).document
 
 
 class TestDocument:

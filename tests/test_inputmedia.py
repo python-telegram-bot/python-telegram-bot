@@ -475,12 +475,13 @@ class TestSendMediaGroup:
 
     @flaky(3, 1)  # noqa: F811
     @pytest.mark.timeout(10)  # noqa: F811
-    def test_send_media_group_new_files(
+    @pytest.mark.asyncio
+    async def test_send_media_group_new_files(
         self, bot, chat_id, video_file, photo_file, animation_file  # noqa: F811
     ):  # noqa: F811
-        def func():
+        async def func():
             with open('tests/data/telegram.jpg', 'rb') as file:
-                return bot.send_media_group(
+                return await bot.send_media_group(
                     chat_id,
                     [
                         InputMediaVideo(video_file),
@@ -489,7 +490,7 @@ class TestSendMediaGroup:
                     ],
                 )
 
-        messages = expect_bad_request(
+        messages = await expect_bad_request(
             func, 'Type of file mismatch', 'Telegram did not accept the file.'
         )
 

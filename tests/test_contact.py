@@ -83,11 +83,12 @@ class TestContact:
         ],
         indirect=['default_bot'],
     )
-    def test_send_contact_default_allow_sending_without_reply(
+    @pytest.mark.asyncio
+    async def test_send_contact_default_allow_sending_without_reply(
         self, default_bot, chat_id, contact, custom
     ):
-        reply_to_message = default_bot.send_message(chat_id, 'test')
-        reply_to_message.delete()
+        reply_to_message = await default_bot.send_message(chat_id, 'test')
+        await reply_to_message.delete()
         if custom is not None:
             message = default_bot.send_contact(
                 chat_id,

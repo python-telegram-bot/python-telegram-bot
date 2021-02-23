@@ -38,11 +38,14 @@ def chatphoto_file():
 
 
 @pytest.fixture(scope='function')
-def chat_photo(bot, super_group_id):
-    def func():
-        return bot.get_chat(super_group_id, timeout=50).photo
+@pytest.mark.asyncio
+async def chat_photo(bot, super_group_id):
+    async def func():
+        return (await bot.get_chat(super_group_id, timeout=50)).photo
 
-    return expect_bad_request(func, 'Type of file mismatch', 'Telegram did not accept the file.')
+    return await expect_bad_request(
+        func, 'Type of file mismatch', 'Telegram did not accept the file.'
+    )
 
 
 class TestChatPhoto:
@@ -144,7 +147,7 @@ class TestChatPhoto:
         assert await check_defaults_handling(chat_photo.get_small_file, chat_photo.bot)
 
         monkeypatch.setattr(chat_photo.bot, 'get_file', make_assertion)
-        assert chat_photo.get_small_file()
+        assert await chat_photo.get_small_file()
 
     @pytest.mark.asyncio
     async def test_get_big_file_instance_method(self, monkeypatch, chat_photo):
@@ -156,7 +159,7 @@ class TestChatPhoto:
         assert await check_defaults_handling(chat_photo.get_big_file, chat_photo.bot)
 
         monkeypatch.setattr(chat_photo.bot, 'get_file', make_assertion)
-        assert chat_photo.get_big_file()
+        assert await chat_photo.get_big_file()
 
     def test_equality(self):
         a = ChatPhoto(

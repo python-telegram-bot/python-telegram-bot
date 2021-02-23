@@ -82,8 +82,9 @@ class TestAudio:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_all_args(self, bot, chat_id, audio_file, thumb_file):
-        message = bot.send_audio(
+    @pytest.mark.asyncio
+    async def test_send_all_args(self, bot, chat_id, audio_file, thumb_file):
+        message = await bot.send_audio(
             chat_id,
             audio=audio_file,
             caption=self.caption,
@@ -207,27 +208,31 @@ class TestAudio:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    def test_send_audio_default_parse_mode_3(self, default_bot, chat_id, audio_file, thumb_file):
+    @pytest.mark.asyncio
+    async def test_send_audio_default_parse_mode_3(
+        self, default_bot, chat_id, audio_file, thumb_file
+    ):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_audio(
+        message = await default_bot.send_audio(
             chat_id, audio_file, caption=test_markdown_string, parse_mode='HTML'
         )
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
-    def test_send_audio_local_files(self, monkeypatch, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_send_audio_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
         expected = (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
         file = 'tests/data/telegram.jpg'
 
-        def make_assertion(_, data, *args, **kwargs):
+        async def make_assertion(_, data, *args, **kwargs):
             nonlocal test_flag
             test_flag = data.get('audio') == expected and data.get('thumb') == expected
 
         monkeypatch.setattr(bot, '_post', make_assertion)
-        bot.send_audio(chat_id, file, thumb=file)
+        await bot.send_audio(chat_id, file, thumb=file)
         assert test_flag
 
     def test_de_json(self, bot, audio):
@@ -268,21 +273,24 @@ class TestAudio:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_error_send_empty_file(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_error_send_empty_file(self, bot, chat_id):
         audio_file = open(os.devnull, 'rb')
 
         with pytest.raises(TelegramError):
-            bot.send_audio(chat_id=chat_id, audio=audio_file)
+            await bot.send_audio(chat_id=chat_id, audio=audio_file)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_error_send_empty_file_id(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
-            bot.send_audio(chat_id=chat_id, audio='')
+            await bot.send_audio(chat_id=chat_id, audio='')
 
-    def test_error_send_without_required_args(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_error_send_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
-            bot.send_audio(chat_id=chat_id)
+            await bot.send_audio(chat_id=chat_id)
 
     @pytest.mark.asyncio
     async def test_get_file_instance_method(self, monkeypatch, audio):

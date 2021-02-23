@@ -36,9 +36,10 @@ def video_file():
 
 
 @pytest.fixture(scope='class')
-def video(bot, chat_id):
+@pytest.mark.asyncio
+async def video(bot, chat_id):
     with open('tests/data/telegram.mp4', 'rb') as f:
-        return bot.send_video(chat_id, video=f, timeout=50).video
+        return (await bot.send_video(chat_id, video=f, timeout=50)).video
 
 
 class TestVideo:

@@ -41,12 +41,15 @@ def photo_file():
 
 
 @pytest.fixture(scope='class')
-def _photo(bot, chat_id):
-    def func():
+@pytest.mark.asyncio
+async def _photo(bot, chat_id):
+    async def func():
         with open('tests/data/telegram.jpg', 'rb') as f:
-            return bot.send_photo(chat_id, photo=f, timeout=50).photo
+            return (await bot.send_photo(chat_id, photo=f, timeout=50)).photo
 
-    return expect_bad_request(func, 'Type of file mismatch', 'Telegram did not accept the file.')
+    return await expect_bad_request(
+        func, 'Type of file mismatch', 'Telegram did not accept the file.'
+    )
 
 
 @pytest.fixture(scope='class')
@@ -350,12 +353,13 @@ class TestPhoto:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_file_unicode_filename(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_send_file_unicode_filename(self, bot, chat_id):
         """
         Regression test for https://github.com/python-telegram-bot/python-telegram-bot/issues/1202
         """
         with open('tests/data/测试.png', 'rb') as f:
-            message = bot.send_photo(photo=f, chat_id=chat_id)
+            message = await bot.send_photo(photo=f, chat_id=chat_id)
 
         photo = message.photo[-1]
 

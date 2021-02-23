@@ -22,6 +22,8 @@ import subprocess
 import sys
 from io import BytesIO
 
+import pytest
+
 from telegram import InputFile
 
 
@@ -115,11 +117,12 @@ class TestInputFile:
             == 'blah.jpg'
         )
 
-    def test_send_bytes(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_send_bytes(self, bot, chat_id):
         # We test this here and not at the respective test modules because it's not worth
         # duplicating the test for the different methods
         with open('tests/data/text_file.txt', 'rb') as file:
-            message = bot.send_document(chat_id, file.read())
+            message = await bot.send_document(chat_id, file.read())
 
         out = BytesIO()
         assert message.document.get_file().download(out=out)
