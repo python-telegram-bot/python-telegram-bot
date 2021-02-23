@@ -79,8 +79,9 @@ class TestPreCheckoutQuery:
         assert pre_checkout_query_dict['from'] == pre_checkout_query.from_user.to_dict()
         assert pre_checkout_query_dict['order_info'] == pre_checkout_query.order_info.to_dict()
 
-    def test_answer(self, monkeypatch, pre_checkout_query):
-        def make_assertion(*_, **kwargs):
+    @pytest.mark.asyncio
+    async def test_answer(self, monkeypatch, pre_checkout_query):
+        async def make_assertion(*_, **kwargs):
             return kwargs['pre_checkout_query_id'] == pre_checkout_query.id
 
         assert check_shortcut_signature(

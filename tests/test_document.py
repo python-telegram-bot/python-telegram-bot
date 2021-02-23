@@ -297,8 +297,9 @@ class TestDocument:
         with pytest.raises(TypeError):
             bot.send_document(chat_id=chat_id)
 
-    def test_get_file_instance_method(self, monkeypatch, document):
-        def make_assertion(*_, **kwargs):
+    @pytest.mark.asyncio
+    async def test_get_file_instance_method(self, monkeypatch, document):
+        async def make_assertion(*_, **kwargs):
             return kwargs['file_id'] == document.file_id
 
         assert check_shortcut_signature(Document.get_file, Bot.get_file, ['file_id'], [])

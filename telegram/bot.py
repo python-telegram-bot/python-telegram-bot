@@ -23,6 +23,7 @@
 import functools
 import logging
 from datetime import datetime
+from types import TracebackType
 
 from typing import (
     TYPE_CHECKING,
@@ -212,7 +213,9 @@ class Bot(TelegramObject):
         await self.do_init()
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(
+        self, exc_type: Type[Exception], exc_val: Exception, exc_tb: TracebackType
+    ):
         await self.do_teardown()
 
     def _insert_defaults(

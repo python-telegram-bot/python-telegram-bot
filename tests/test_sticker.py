@@ -504,8 +504,9 @@ class TestStickerSet:
         bot.set_sticker_set_thumb('name', chat_id, thumb=file)
         assert test_flag
 
-    def test_get_file_instance_method(self, monkeypatch, sticker):
-        def make_assertion(*_, **kwargs):
+    @pytest.mark.asyncio
+    async def test_get_file_instance_method(self, monkeypatch, sticker):
+        async def make_assertion(*_, **kwargs):
             return kwargs['file_id'] == sticker.file_id
 
         assert check_shortcut_signature(Sticker.get_file, Bot.get_file, ['file_id'], [])

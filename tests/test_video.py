@@ -329,8 +329,9 @@ class TestVideo:
         with pytest.raises(TypeError):
             bot.send_video(chat_id=chat_id)
 
-    def test_get_file_instance_method(self, monkeypatch, video):
-        def make_assertion(*_, **kwargs):
+    @pytest.mark.asyncio
+    async def test_get_file_instance_method(self, monkeypatch, video):
+        async def make_assertion(*_, **kwargs):
             return kwargs['file_id'] == video.file_id
 
         assert check_shortcut_signature(Video.get_file, Bot.get_file, ['file_id'], [])

@@ -35,10 +35,13 @@ def audio_file():
 
 
 @pytest.fixture(scope='class')
-def audio(bot, chat_id):
+@pytest.mark.asyncio
+async def audio(bot, chat_id):
     with open('tests/data/telegram.mp3', 'rb') as f:
-        return bot.send_audio(
-            chat_id, audio=f, timeout=50, thumb=open('tests/data/thumb.jpg', 'rb')
+        return (
+            await bot.send_audio(
+                chat_id, audio=f, timeout=50, thumb=open('tests/data/thumb.jpg', 'rb')
+            )
         ).audio
 
 
@@ -281,8 +284,9 @@ class TestAudio:
         with pytest.raises(TypeError):
             bot.send_audio(chat_id=chat_id)
 
-    def test_get_file_instance_method(self, monkeypatch, audio):
-        def make_assertion(*_, **kwargs):
+    @pytest.mark.asyncio
+    async def test_get_file_instance_method(self, monkeypatch, audio):
+        async def make_assertion(*_, **kwargs):
             return kwargs['file_id'] == audio.file_id
 
         assert check_shortcut_signature(Audio.get_file, Bot.get_file, ['file_id'], [])

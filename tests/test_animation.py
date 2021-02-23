@@ -37,10 +37,13 @@ def animation_file():
 
 
 @pytest.fixture(scope='class')
-def animation(bot, chat_id):
+@pytest.mark.asyncio
+async def animation(bot, chat_id):
     with open('tests/data/game.gif', 'rb') as f:
-        return bot.send_animation(
-            chat_id, animation=f, timeout=50, thumb=open('tests/data/thumb.jpg', 'rb')
+        return (
+            await bot.send_animation(
+                chat_id, animation=f, timeout=50, thumb=open('tests/data/thumb.jpg', 'rb')
+            )
         ).animation
 
 
@@ -307,8 +310,9 @@ class TestAnimation:
         with pytest.raises(TypeError):
             bot.send_animation(chat_id=chat_id)
 
-    def test_get_file_instance_method(self, monkeypatch, animation):
-        def make_assertion(*_, **kwargs):
+    @pytest.mark.asyncio
+    async def test_get_file_instance_method(self, monkeypatch, animation):
+        async def make_assertion(*_, **kwargs):
             return kwargs['file_id'] == animation.file_id
 
         assert check_shortcut_signature(Animation.get_file, Bot.get_file, ['file_id'], [])

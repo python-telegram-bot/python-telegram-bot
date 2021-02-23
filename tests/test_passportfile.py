@@ -55,8 +55,9 @@ class TestPassportFile:
         assert passport_file_dict['file_size'] == passport_file.file_size
         assert passport_file_dict['file_date'] == passport_file.file_date
 
-    def test_get_file_instance_method(self, monkeypatch, passport_file):
-        def make_assertion(*_, **kwargs):
+    @pytest.mark.asyncio
+    async def test_get_file_instance_method(self, monkeypatch, passport_file):
+        async def make_assertion(*_, **kwargs):
             result = kwargs['file_id'] == passport_file.file_id
             # we need to be a bit hacky here, b/c PF.get_file needs Bot.get_file to return a File
             return File(file_id=result, file_unique_id=result)

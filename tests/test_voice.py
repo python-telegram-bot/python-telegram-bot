@@ -283,8 +283,9 @@ class TestVoice:
         with pytest.raises(TypeError):
             bot.sendVoice(chat_id)
 
-    def test_get_file_instance_method(self, monkeypatch, voice):
-        def make_assertion(*_, **kwargs):
+    @pytest.mark.asyncio
+    async def test_get_file_instance_method(self, monkeypatch, voice):
+        async def make_assertion(*_, **kwargs):
             return kwargs['file_id'] == voice.file_id
 
         assert check_shortcut_signature(Voice.get_file, Bot.get_file, ['file_id'], [])

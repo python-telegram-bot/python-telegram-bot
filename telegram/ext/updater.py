@@ -32,6 +32,7 @@ from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized
 from telegram.ext import Dispatcher, JobQueue
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import get_signal_name
+from telegram.utils.request_httpx import PtbHttpx
 from telegram.ext.utils.webhookhandler import WebhookAppClass, WebhookServer
 
 if TYPE_CHECKING:
@@ -171,7 +172,7 @@ class Updater:
                     request_kwargs = {}
                 if 'con_pool_size' not in request_kwargs:
                     request_kwargs['con_pool_size'] = con_pool_size
-                self._request = Request(**request_kwargs)
+                self._request = PtbHttpx(**request_kwargs)
                 self.bot = Bot(
                     token,  # type: ignore[arg-type]
                     base_url,
