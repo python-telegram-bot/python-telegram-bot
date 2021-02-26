@@ -36,7 +36,7 @@ from typing import (
     no_type_check,
     Dict,
     cast,
-    Type,
+    Type, Awaitable,
 )
 
 try:
@@ -119,14 +119,14 @@ RT = TypeVar('RT')
 
 
 def log(
-    func: Callable[..., RT], *args: object, **kwargs: object  # pylint: disable=W0613
-) -> Callable[..., RT]:
+    func: Callable[..., Awaitable[RT]], *args: object, **kwargs: object  # pylint: disable=W0613
+) -> Callable[..., Awaitable[RT]]:
     logger = logging.getLogger(func.__module__)
 
     @functools.wraps(func)
-    def decorator(*args: object, **kwargs: object) -> RT:  # pylint: disable=W0613
+    async def decorator(*args: object, **kwargs: object) -> RT:  # pylint: disable=W0613
         logger.debug('Entering: %s', func.__name__)
-        result = func(*args, **kwargs)
+        result = await func(*args, **kwargs)
         logger.debug(result)
         logger.debug('Exiting: %s', func.__name__)
         return result
