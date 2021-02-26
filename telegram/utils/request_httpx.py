@@ -17,7 +17,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains methods to make POST and GET requests using the httpx library."""
 import logging
-from typing import Tuple
+from typing import Tuple, List
 
 import httpx
 
@@ -81,7 +81,7 @@ class PtbHttpx(PtbRequestBase):
         method: str,
         url: str,
         data: JSONDict,
-        is_files: bool,
+        files: List[Tuple[str, bytes, str]],
         read_timeout: float = None,
         write_timeout: float = None,
     ) -> Tuple[int, bytes]:
@@ -99,8 +99,12 @@ class PtbHttpx(PtbRequestBase):
 
         headers = {'User-Agent': self.user_agent}
 
-        key = "data" if is_files else "json"
-        kwargs = {key: data}
+        kwargs = {}
+        if files:
+            kwargs['data'] = data
+            kwargs['files'] = {'voice': x for i, x in enumerate(files)}
+        else:
+            kwargs['json'] = data
 
         try:
             res = await self._client.request(

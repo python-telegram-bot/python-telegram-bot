@@ -36,10 +36,9 @@ def voice_file():
 
 
 @pytest.fixture(scope='class')
-@pytest.mark.asyncio
 async def voice(bot, chat_id):
     with open('tests/data/telegram.ogg', 'rb') as f:
-        return await bot.send_voice(chat_id, voice=f, timeout=50).voice
+        return (await bot.send_voice(chat_id, voice=f, timeout=50)).voice
 
 
 class TestVoice:
@@ -53,7 +52,8 @@ class TestVoice:
     voice_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
     voice_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
 
-    def test_creation(self, voice):
+    @pytest.mark.asyncio
+    async def test_creation(self, voice):
         # Make sure file has been uploaded.
         assert isinstance(voice, Voice)
         assert isinstance(voice.file_id, str)
