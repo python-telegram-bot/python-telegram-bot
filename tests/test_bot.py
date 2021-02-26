@@ -1936,7 +1936,7 @@ class TestBot:
             return data
 
         monkeypatch.setattr(bot.request, 'post', post)
-        bot.copy_message(
+        await bot.copy_message(
             chat_id,
             from_chat_id=chat_id,
             message_id=media_message.message_id,

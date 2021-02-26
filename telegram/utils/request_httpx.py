@@ -17,7 +17,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains methods to make POST and GET requests using the httpx library."""
 import logging
-from typing import Tuple, List
+from typing import Tuple, Dict
 
 import httpx
 
@@ -81,7 +81,7 @@ class PtbHttpx(PtbRequestBase):
         method: str,
         url: str,
         data: JSONDict,
-        files: List[Tuple[str, bytes, str]],
+        files: Dict[str, Tuple[str, bytes, str]],
         read_timeout: float = None,
         write_timeout: float = None,
     ) -> Tuple[int, bytes]:
@@ -102,8 +102,12 @@ class PtbHttpx(PtbRequestBase):
         kwargs = {}
         if files:
             kwargs['data'] = data
-            kwargs['files'] = {'voice': x for i, x in enumerate(files)}
+            kwargs['files'] = files
+            # kwargs['files'] = {f'upload{i}': x for i, x in enumerate(files)}
         else:
+            # TODO p0: Use optional ujson to encode here. However, it's wrong because it breaks
+            #          the clean layers we use between Base interface and the implementations. It
+            #          would be for the best to pass clear, well defined objects.
             kwargs['json'] = data
 
         try:

@@ -19,13 +19,12 @@
 """This module contains an abstract class to make POST and GET requests."""
 import abc
 from pathlib import Path
+from typing import Union, Optional, Tuple, Dict
 
 try:
     import ujson as json
 except ImportError:
     import json  # type: ignore[no-redef]
-
-from typing import Union, Optional, Tuple, List
 
 from telegram.version import __version__ as ptb_ver
 
@@ -86,7 +85,7 @@ class PtbRequestBase(abc.ABC):
 
         """
         # Optional files to upload in multi-part form.
-        files = []
+        files = {}
 
         # Convert data into a JSON serializable object which we can send to telegram servers.
         # TODO p3: We should implement a proper Serializer instead of all this memcopy &
@@ -94,7 +93,7 @@ class PtbRequestBase(abc.ABC):
         # pylint: disable=R1702
         for key, val in data.copy().items():
             if isinstance(val, InputFile):
-                files.append(val.field_tuple)
+                files[key] = (val.field_tuple)
                 del data[key]
             elif isinstance(val, (float, int)):
                 # TODO p3: Is this really necessary? Seems like an ancient relic.
@@ -105,7 +104,8 @@ class PtbRequestBase(abc.ABC):
                     # Attach and set val to attached name
                     data[key] = val.to_json()
                     if isinstance(val.media, InputFile):  # type: ignore
-                        data[val.media.attach] = val.media.field_tuple  # type: ignore
+                        files[val.media.attach] = val.media.field_tuple
+                        del data[val.media.attach]
                 else:
                     # Attach and set val to attached name for all
                     media = []
@@ -113,12 +113,13 @@ class PtbRequestBase(abc.ABC):
                         media_dict = med.to_dict()
                         media.append(media_dict)
                         if isinstance(med.media, InputFile):
-                            data[med.media.attach] = med.media.field_tuple
+                            files[med.media.attach] = med.media.field_tuple
+                            del data[med.media.attach]
                             # if the file has a thumb, we also need to attach it to the data
                             if "thumb" in media_dict:
-                                data[med.thumb.attach] = med.thumb.field_tuple
+                                files[med.thumb.attach] = med.thumb.field_tuple
+                                del data[med.thumb.attach]
                     data[key] = json.dumps(media)
-                files = True
             elif isinstance(val, list):
                 # In case we're sending files, we need to json-dump lists manually
                 # As we can't know if that's the case, we just json-dump here
@@ -140,7 +141,7 @@ class PtbRequestBase(abc.ABC):
             TelegramError
 
         """
-        return await self._request_wrapper('GET', url, None, False, read_timeout=timeout)
+        return await self._request_wrapper('GET', url, None, {}, read_timeout=timeout)
 
     async def download(self, url: str, filename: str, timeout: float = None) -> None:
         """Download a file from the given ``url`` and save it to ``filename``.
@@ -164,7 +165,7 @@ class PtbRequestBase(abc.ABC):
         method: str,
         url: str,
         data: Optional[JSONDict],
-        files: List[Tuple[str, bytes, str]],
+        files: Dict[str, Tuple[str, bytes, str]],
         read_timeout: float = None,
     ) -> bytes:
         """Wraps the real implementation request method.
@@ -177,7 +178,8 @@ class PtbRequestBase(abc.ABC):
             method: HTTP method (i.e. 'POST', 'GET', etc.).
             url: The request's URL.
             data: Data to send over as the request's payload.
-            files: List of files to upload as multi-form.
+            files: Files to upload as multi-form. Key is the form field name. Value is the file to
+                   upload (filename, file-content, content-type).
             read_timeout: Timeout for waiting to server's response.
 
         Returns:
@@ -257,7 +259,7 @@ class PtbRequestBase(abc.ABC):
         method: str,
         url: str,
         data: JSONDict,
-        files: List[Tuple[str, bytes, str]],
+        files: Dict[str, Tuple[str, bytes, str]],
         read_timeout: float = None,
         write_timeout: float = None,
     ) -> Tuple[int, bytes]:
@@ -267,7 +269,8 @@ class PtbRequestBase(abc.ABC):
             method: HTTP method (i.e. 'POST', 'GET', etc.).
             url: The request's URL.
             data: Data to send over as the request's payload.
-            files: List of files to upload as multi-form.
+            files: Files to upload as multi-form. Key is the form field name. Value is the file to
+                   upload (filename, file-content, content-type).
             read_timeout: Timeout for waiting to server's response.
             write_timeout: Timeout for sending data to the server.
 

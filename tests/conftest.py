@@ -26,7 +26,7 @@ from collections import defaultdict
 from queue import Queue
 from threading import Thread, Event
 from time import sleep
-from typing import Callable, List, Iterable, Any, Optional
+from typing import Callable, List, Iterable, Any, Optional, Dict, Tuple
 
 import pytest
 import pytz
@@ -239,11 +239,11 @@ class PtbTestHttpx(PtbHttpx):
         method: str,
         url: str,
         data: Optional[JSONDict],
-        is_files: bool,
+        files: Dict[str, Tuple[str, bytes, str]],
         read_timeout: float = None,
     ) -> bytes:
         try:
-            return await super()._request_wrapper(method, url, data, is_files, read_timeout)
+            return await super()._request_wrapper(method, url, data, files, read_timeout)
         except RetryAfter as e:
             pytest.xfail(f'Not waiting for flood control: {e}')
         except TimedOut as e:
