@@ -93,7 +93,7 @@ class PtbRequestBase(abc.ABC):
         # pylint: disable=R1702
         for key, val in data.copy().items():
             if isinstance(val, InputFile):
-                files[key] = (val.field_tuple)
+                files[key] = val.field_tuple
                 del data[key]
             elif isinstance(val, (float, int)):
                 # TODO p3: Is this really necessary? Seems like an ancient relic.

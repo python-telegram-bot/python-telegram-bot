@@ -36,7 +36,8 @@ from typing import (
     no_type_check,
     Dict,
     cast,
-    Type, Awaitable,
+    Type,
+    Awaitable,
 )
 
 try:
