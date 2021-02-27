@@ -76,7 +76,7 @@ class TestChatPhoto:
 
         assert os.path.isfile('telegram.jpg')
 
-        new_file = bot.get_file(chat_photo.big_file_id)
+        new_file = await bot.get_file(chat_photo.big_file_id)
 
         assert new_file.file_id == chat_photo.big_file_id
         assert new_file.file_path.startswith('https://')
@@ -85,12 +85,13 @@ class TestChatPhoto:
 
         assert os.path.isfile('telegram.jpg')
 
-    def test_send_with_chat_photo(self, monkeypatch, bot, super_group_id, chat_photo):
-        def test(url, data, **kwargs):
+    @pytest.mark.asyncio
+    async def test_send_with_chat_photo(self, monkeypatch, bot, super_group_id, chat_photo):
+        async def test(url, data, **kwargs):
             return data['photo'] == chat_photo
 
         monkeypatch.setattr(bot.request, 'post', test)
-        message = bot.set_chat_photo(photo=chat_photo, chat_id=super_group_id)
+        message = await bot.set_chat_photo(photo=chat_photo, chat_id=super_group_id)
         assert message
 
     def test_de_json(self, bot, chat_photo):

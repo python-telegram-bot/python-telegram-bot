@@ -125,8 +125,9 @@ class TestAudio:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_get_and_download(self, bot, audio):
-        new_file = bot.get_file(audio.file_id)
+    @pytest.mark.asyncio
+    async def test_get_and_download(self, bot, audio):
+        new_file = await bot.get_file(audio.file_id)
 
         assert new_file.file_size == self.file_size
         assert new_file.file_id == audio.file_id
@@ -139,8 +140,11 @@ class TestAudio:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_mp3_url_file(self, bot, chat_id, audio):
-        message = bot.send_audio(chat_id=chat_id, audio=self.audio_file_url, caption=self.caption)
+    @pytest.mark.asyncio
+    async def test_send_mp3_url_file(self, bot, chat_id, audio):
+        message = await bot.send_audio(
+            chat_id=chat_id, audio=self.audio_file_url, caption=self.caption
+        )
 
         assert message.caption == self.caption
 
@@ -155,29 +159,34 @@ class TestAudio:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_resend(self, bot, chat_id, audio):
-        message = bot.send_audio(chat_id=chat_id, audio=audio.file_id)
+    @pytest.mark.asyncio
+    async def test_resend(self, bot, chat_id, audio):
+        message = await bot.send_audio(chat_id=chat_id, audio=audio.file_id)
 
         assert message.audio == audio
 
-    def test_send_with_audio(self, monkeypatch, bot, chat_id, audio):
-        def test(url, data, **kwargs):
+    @pytest.mark.asyncio
+    async def test_send_with_audio(self, monkeypatch, bot, chat_id, audio):
+        async def test(url, data, **kwargs):
             return data['audio'] == audio.file_id
 
         monkeypatch.setattr(bot.request, 'post', test)
-        message = bot.send_audio(audio=audio, chat_id=chat_id)
+        message = await bot.send_audio(audio=audio, chat_id=chat_id)
         assert message
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_audio_caption_entities(self, bot, chat_id, audio):
+    @pytest.mark.asyncio
+    async def test_send_audio_caption_entities(self, bot, chat_id, audio):
         test_string = 'Italic Bold Code'
         entities = [
             MessageEntity(MessageEntity.ITALIC, 0, 6),
             MessageEntity(MessageEntity.ITALIC, 7, 4),
             MessageEntity(MessageEntity.ITALIC, 12, 4),
         ]
-        message = bot.send_audio(chat_id, audio, caption=test_string, caption_entities=entities)
+        message = await bot.send_audio(
+            chat_id, audio, caption=test_string, caption_entities=entities
+        )
 
         assert message.caption == test_string
         assert message.caption_entities == entities
@@ -185,21 +194,27 @@ class TestAudio:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    def test_send_audio_default_parse_mode_1(self, default_bot, chat_id, audio_file, thumb_file):
+    @pytest.mark.asyncio
+    async def test_send_audio_default_parse_mode_1(
+        self, default_bot, chat_id, audio_file, thumb_file
+    ):
         test_string = 'Italic Bold Code'
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_audio(chat_id, audio_file, caption=test_markdown_string)
+        message = await default_bot.send_audio(chat_id, audio_file, caption=test_markdown_string)
         assert message.caption_markdown == test_markdown_string
         assert message.caption == test_string
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    def test_send_audio_default_parse_mode_2(self, default_bot, chat_id, audio_file, thumb_file):
+    @pytest.mark.asyncio
+    async def test_send_audio_default_parse_mode_2(
+        self, default_bot, chat_id, audio_file, thumb_file
+    ):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_audio(
+        message = await default_bot.send_audio(
             chat_id, audio_file, caption=test_markdown_string, parse_mode=None
         )
         assert message.caption == test_markdown_string

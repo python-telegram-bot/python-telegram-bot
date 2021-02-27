@@ -34,8 +34,11 @@ class TestReplyKeyboardRemove:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_message_with_reply_keyboard_remove(self, bot, chat_id, reply_keyboard_remove):
-        message = bot.send_message(chat_id, 'Text', reply_markup=reply_keyboard_remove)
+    @pytest.mark.asyncio
+    async def test_send_message_with_reply_keyboard_remove(
+        self, bot, chat_id, reply_keyboard_remove
+    ):
+        message = await bot.send_message(chat_id, 'Text', reply_markup=reply_keyboard_remove)
 
         assert message.text == 'Text'
 

@@ -67,7 +67,7 @@ class TestPassportFile:
         assert await check_defaults_handling(passport_file.get_file, passport_file.bot)
 
         monkeypatch.setattr(passport_file.bot, 'get_file', make_assertion)
-        assert passport_file.get_file().file_id == 'True'
+        assert (await passport_file.get_file()).file_id == 'True'
 
     def test_equality(self):
         a = PassportFile(self.file_id, self.file_unique_id, self.file_size, self.file_date)

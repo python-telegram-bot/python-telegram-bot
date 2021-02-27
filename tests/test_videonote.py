@@ -75,8 +75,9 @@ class TestVideoNote:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_all_args(self, bot, chat_id, video_note_file, video_note, thumb_file):
-        message = bot.send_video_note(
+    @pytest.mark.asyncio
+    async def test_send_all_args(self, bot, chat_id, video_note_file, video_note, thumb_file):
+        message = await bot.send_video_note(
             chat_id,
             video_note_file,
             duration=self.duration,
@@ -110,8 +111,9 @@ class TestVideoNote:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_get_and_download(self, bot, video_note):
-        new_file = bot.get_file(video_note.file_id)
+    @pytest.mark.asyncio
+    async def test_get_and_download(self, bot, video_note):
+        new_file = await bot.get_file(video_note.file_id)
 
         assert new_file.file_size == self.file_size
         assert new_file.file_id == video_note.file_id
@@ -124,17 +126,19 @@ class TestVideoNote:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_resend(self, bot, chat_id, video_note):
-        message = bot.send_video_note(chat_id, video_note.file_id)
+    @pytest.mark.asyncio
+    async def test_resend(self, bot, chat_id, video_note):
+        message = await bot.send_video_note(chat_id, video_note.file_id)
 
         assert message.video_note == video_note
 
-    def test_send_with_video_note(self, monkeypatch, bot, chat_id, video_note):
-        def test(url, data, **kwargs):
+    @pytest.mark.asyncio
+    async def test_send_with_video_note(self, monkeypatch, bot, chat_id, video_note):
+        async def test(url, data, **kwargs):
             return data['video_note'] == video_note.file_id
 
         monkeypatch.setattr(bot.request, 'post', test)
-        message = bot.send_video_note(chat_id, video_note=video_note)
+        message = await bot.send_video_note(chat_id, video_note=video_note)
         assert message
 
     def test_de_json(self, bot):
@@ -163,18 +167,19 @@ class TestVideoNote:
         assert video_note_dict['duration'] == video_note.duration
         assert video_note_dict['file_size'] == video_note.file_size
 
-    def test_send_video_note_local_files(self, monkeypatch, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_send_video_note_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
         expected = (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
         file = 'tests/data/telegram.jpg'
 
-        def make_assertion(_, data, *args, **kwargs):
+        async def make_assertion(_, data, *args, **kwargs):
             nonlocal test_flag
             test_flag = data.get('video_note') == expected and data.get('thumb') == expected
 
         monkeypatch.setattr(bot, '_post', make_assertion)
-        bot.send_video_note(chat_id, file, thumb=file)
+        await bot.send_video_note(chat_id, file, thumb=file)
         assert test_flag
 
     @flaky(3, 1)
@@ -188,13 +193,14 @@ class TestVideoNote:
         ],
         indirect=['default_bot'],
     )
-    def test_send_video_note_default_allow_sending_without_reply(
+    @pytest.mark.asyncio
+    async def test_send_video_note_default_allow_sending_without_reply(
         self, default_bot, chat_id, video_note, custom
     ):
-        reply_to_message = default_bot.send_message(chat_id, 'test')
-        reply_to_message.delete()
+        reply_to_message = await default_bot.send_message(chat_id, 'test')
+        await reply_to_message.delete()
         if custom is not None:
-            message = default_bot.send_video_note(
+            message = await default_bot.send_video_note(
                 chat_id,
                 video_note,
                 allow_sending_without_reply=custom,
@@ -202,31 +208,34 @@ class TestVideoNote:
             )
             assert message.reply_to_message is None
         elif default_bot.defaults.allow_sending_without_reply:
-            message = default_bot.send_video_note(
+            message = await default_bot.send_video_note(
                 chat_id, video_note, reply_to_message_id=reply_to_message.message_id
             )
             assert message.reply_to_message is None
         else:
             with pytest.raises(BadRequest, match='message not found'):
-                default_bot.send_video_note(
+                await default_bot.send_video_note(
                     chat_id, video_note, reply_to_message_id=reply_to_message.message_id
                 )
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_error_send_empty_file(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
-            bot.send_video_note(chat_id, open(os.devnull, 'rb'))
+            await bot.send_video_note(chat_id, open(os.devnull, 'rb'))
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_error_send_empty_file_id(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
-            bot.send_video_note(chat_id, '')
+            await bot.send_video_note(chat_id, '')
 
-    def test_error_without_required_args(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_error_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
-            bot.send_video_note(chat_id=chat_id)
+            await bot.send_video_note(chat_id=chat_id)
 
     @pytest.mark.asyncio
     async def test_get_file_instance_method(self, monkeypatch, video_note):

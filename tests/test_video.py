@@ -84,8 +84,9 @@ class TestVideo:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_all_args(self, bot, chat_id, video_file, video, thumb_file):
-        message = bot.send_video(
+    @pytest.mark.asyncio
+    async def test_send_all_args(self, bot, chat_id, video_file, video, thumb_file):
+        message = await bot.send_video(
             chat_id,
             video_file,
             duration=self.duration,
@@ -128,8 +129,9 @@ class TestVideo:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_get_and_download(self, bot, video):
-        new_file = bot.get_file(video.file_id)
+    @pytest.mark.asyncio
+    async def test_get_and_download(self, bot, video):
+        new_file = await bot.get_file(video.file_id)
 
         assert new_file.file_size == self.file_size
         assert new_file.file_id == video.file_id
@@ -142,8 +144,9 @@ class TestVideo:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_mp4_file_url(self, bot, chat_id, video):
-        message = bot.send_video(chat_id, self.video_file_url, caption=self.caption)
+    @pytest.mark.asyncio
+    async def test_send_mp4_file_url(self, bot, chat_id, video):
+        message = await bot.send_video(chat_id, self.video_file_url, caption=self.caption)
 
         assert isinstance(message.video, Video)
         assert isinstance(message.video.file_id, str)
@@ -168,51 +171,58 @@ class TestVideo:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_video_caption_entities(self, bot, chat_id, video):
+    @pytest.mark.asyncio
+    async def test_send_video_caption_entities(self, bot, chat_id, video):
         test_string = 'Italic Bold Code'
         entities = [
             MessageEntity(MessageEntity.ITALIC, 0, 6),
             MessageEntity(MessageEntity.ITALIC, 7, 4),
             MessageEntity(MessageEntity.ITALIC, 12, 4),
         ]
-        message = bot.send_video(chat_id, video, caption=test_string, caption_entities=entities)
+        message = await bot.send_video(
+            chat_id, video, caption=test_string, caption_entities=entities
+        )
 
         assert message.caption == test_string
         assert message.caption_entities == entities
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_resend(self, bot, chat_id, video):
-        message = bot.send_video(chat_id, video.file_id)
+    @pytest.mark.asyncio
+    async def test_resend(self, bot, chat_id, video):
+        message = await bot.send_video(chat_id, video.file_id)
 
         assert message.video == video
 
-    def test_send_with_video(self, monkeypatch, bot, chat_id, video):
-        def test(url, data, **kwargs):
+    @pytest.mark.asyncio
+    async def test_send_with_video(self, monkeypatch, bot, chat_id, video):
+        async def test(url, data, **kwargs):
             return data['video'] == video.file_id
 
         monkeypatch.setattr(bot.request, 'post', test)
-        message = bot.send_video(chat_id, video=video)
+        message = await bot.send_video(chat_id, video=video)
         assert message
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    def test_send_video_default_parse_mode_1(self, default_bot, chat_id, video):
+    @pytest.mark.asyncio
+    async def test_send_video_default_parse_mode_1(self, default_bot, chat_id, video):
         test_string = 'Italic Bold Code'
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_video(chat_id, video, caption=test_markdown_string)
+        message = await default_bot.send_video(chat_id, video, caption=test_markdown_string)
         assert message.caption_markdown == test_markdown_string
         assert message.caption == test_string
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    def test_send_video_default_parse_mode_2(self, default_bot, chat_id, video):
+    @pytest.mark.asyncio
+    async def test_send_video_default_parse_mode_2(self, default_bot, chat_id, video):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_video(
+        message = await default_bot.send_video(
             chat_id, video, caption=test_markdown_string, parse_mode=None
         )
         assert message.caption == test_markdown_string
@@ -221,27 +231,29 @@ class TestVideo:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    def test_send_video_default_parse_mode_3(self, default_bot, chat_id, video):
+    @pytest.mark.asyncio
+    async def test_send_video_default_parse_mode_3(self, default_bot, chat_id, video):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_video(
+        message = await default_bot.send_video(
             chat_id, video, caption=test_markdown_string, parse_mode='HTML'
         )
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
-    def test_send_video_local_files(self, monkeypatch, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_send_video_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
         expected = (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
         file = 'tests/data/telegram.jpg'
 
-        def make_assertion(_, data, *args, **kwargs):
+        async def make_assertion(_, data, *args, **kwargs):
             nonlocal test_flag
             test_flag = data.get('video') == expected and data.get('thumb') == expected
 
         monkeypatch.setattr(bot, '_post', make_assertion)
-        bot.send_video(chat_id, file, thumb=file)
+        await bot.send_video(chat_id, file, thumb=file)
         assert test_flag
 
     @flaky(3, 1)
@@ -255,13 +267,14 @@ class TestVideo:
         ],
         indirect=['default_bot'],
     )
-    def test_send_video_default_allow_sending_without_reply(
+    @pytest.mark.asyncio
+    async def test_send_video_default_allow_sending_without_reply(
         self, default_bot, chat_id, video, custom
     ):
-        reply_to_message = default_bot.send_message(chat_id, 'test')
-        reply_to_message.delete()
+        reply_to_message = await default_bot.send_message(chat_id, 'test')
+        await reply_to_message.delete()
         if custom is not None:
-            message = default_bot.send_video(
+            message = await default_bot.send_video(
                 chat_id,
                 video,
                 allow_sending_without_reply=custom,
@@ -269,13 +282,13 @@ class TestVideo:
             )
             assert message.reply_to_message is None
         elif default_bot.defaults.allow_sending_without_reply:
-            message = default_bot.send_video(
+            message = await default_bot.send_video(
                 chat_id, video, reply_to_message_id=reply_to_message.message_id
             )
             assert message.reply_to_message is None
         else:
             with pytest.raises(BadRequest, match='message not found'):
-                default_bot.send_video(
+                await default_bot.send_video(
                     chat_id, video, reply_to_message_id=reply_to_message.message_id
                 )
 
@@ -316,19 +329,22 @@ class TestVideo:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_error_send_empty_file(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
-            bot.send_video(chat_id, open(os.devnull, 'rb'))
+            await bot.send_video(chat_id, open(os.devnull, 'rb'))
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_error_send_empty_file_id(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
-            bot.send_video(chat_id, '')
+            await bot.send_video(chat_id, '')
 
-    def test_error_without_required_args(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_error_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
-            bot.send_video(chat_id=chat_id)
+            await bot.send_video(chat_id=chat_id)
 
     @pytest.mark.asyncio
     async def test_get_file_instance_method(self, monkeypatch, video):

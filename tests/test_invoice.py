@@ -75,8 +75,9 @@ class TestInvoice:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_required_args_only(self, bot, chat_id, provider_token):
-        message = bot.send_invoice(
+    @pytest.mark.asyncio
+    async def test_send_required_args_only(self, bot, chat_id, provider_token):
+        message = await bot.send_invoice(
             chat_id,
             self.title,
             self.description,
@@ -95,8 +96,9 @@ class TestInvoice:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_all_args(self, bot, chat_id, provider_token):
-        message = bot.send_invoice(
+    @pytest.mark.asyncio
+    async def test_send_all_args(self, bot, chat_id, provider_token):
+        message = await bot.send_invoice(
             chat_id,
             self.title,
             self.description,
@@ -159,13 +161,14 @@ class TestInvoice:
         ],
         indirect=['default_bot'],
     )
-    def test_send_invoice_default_allow_sending_without_reply(
+    @pytest.mark.asyncio
+    async def test_send_invoice_default_allow_sending_without_reply(
         self, default_bot, chat_id, custom, provider_token
     ):
-        reply_to_message = default_bot.send_message(chat_id, 'test')
-        reply_to_message.delete()
+        reply_to_message = await default_bot.send_message(chat_id, 'test')
+        await reply_to_message.delete()
         if custom is not None:
-            message = default_bot.send_invoice(
+            message = await default_bot.send_invoice(
                 chat_id,
                 self.title,
                 self.description,
@@ -179,7 +182,7 @@ class TestInvoice:
             )
             assert message.reply_to_message is None
         elif default_bot.defaults.allow_sending_without_reply:
-            message = default_bot.send_invoice(
+            message = await default_bot.send_invoice(
                 chat_id,
                 self.title,
                 self.description,

@@ -61,15 +61,16 @@ class TestContact:
         assert contact.last_name == self.last_name
         assert contact.user_id == self.user_id
 
-    def test_send_with_contact(self, monkeypatch, bot, chat_id, contact):
-        def test(url, data, **kwargs):
+    @pytest.mark.asyncio
+    async def test_send_with_contact(self, monkeypatch, bot, chat_id, contact):
+        async def test(url, data, **kwargs):
             phone = data['phone_number'] == contact.phone_number
             first = data['first_name'] == contact.first_name
             last = data['last_name'] == contact.last_name
             return phone and first and last
 
         monkeypatch.setattr(bot.request, 'post', test)
-        message = bot.send_contact(contact=contact, chat_id=chat_id)
+        message = await bot.send_contact(contact=contact, chat_id=chat_id)
         assert message
 
     @flaky(3, 1)
@@ -90,7 +91,7 @@ class TestContact:
         reply_to_message = await default_bot.send_message(chat_id, 'test')
         await reply_to_message.delete()
         if custom is not None:
-            message = default_bot.send_contact(
+            message = await default_bot.send_contact(
                 chat_id,
                 contact=contact,
                 allow_sending_without_reply=custom,
@@ -98,19 +99,20 @@ class TestContact:
             )
             assert message.reply_to_message is None
         elif default_bot.defaults.allow_sending_without_reply:
-            message = default_bot.send_contact(
+            message = await default_bot.send_contact(
                 chat_id, contact=contact, reply_to_message_id=reply_to_message.message_id
             )
             assert message.reply_to_message is None
         else:
             with pytest.raises(BadRequest, match='message not found'):
-                default_bot.send_contact(
+                await default_bot.send_contact(
                     chat_id, contact=contact, reply_to_message_id=reply_to_message.message_id
                 )
 
-    def test_send_contact_without_required(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_send_contact_without_required(self, bot, chat_id):
         with pytest.raises(ValueError, match='Either contact or phone_number and first_name'):
-            bot.send_contact(chat_id=chat_id)
+            await bot.send_contact(chat_id=chat_id)
 
     def test_to_dict(self, contact):
         contact_dict = contact.to_dict()

@@ -247,7 +247,7 @@ class TestBot:
     @pytest.mark.asyncio
     async def test_delete_message(self, bot, chat_id):
         message = await bot.send_message(chat_id, text='will be deleted')
-        time.sleep(2)
+        asyncio.sleep(2)
 
         assert await bot.delete_message(chat_id=chat_id, message_id=message.message_id) is True
 

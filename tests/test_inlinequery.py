@@ -85,7 +85,7 @@ class TestInlineQuery:
     @pytest.mark.asyncio
     async def test_answer_error(self, inline_query):
         with pytest.raises(TypeError, match='mutually exclusive'):
-            inline_query.answer(results=[], auto_pagination=True, current_offset='foobar')
+            await inline_query.answer(results=[], auto_pagination=True, current_offset='foobar')
 
     @pytest.mark.asyncio
     async def test_answer_auto_pagination(self, monkeypatch, inline_query):

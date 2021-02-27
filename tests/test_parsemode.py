@@ -32,8 +32,9 @@ class TestParseMode:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_message_with_parse_mode_markdown(self, bot, chat_id):
-        message = bot.send_message(
+    @pytest.mark.asyncio
+    async def test_send_message_with_parse_mode_markdown(self, bot, chat_id):
+        message = await bot.send_message(
             chat_id=chat_id, text=self.markdown_text, parse_mode=ParseMode.MARKDOWN
         )
 
@@ -41,7 +42,10 @@ class TestParseMode:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_message_with_parse_mode_html(self, bot, chat_id):
-        message = bot.send_message(chat_id=chat_id, text=self.html_text, parse_mode=ParseMode.HTML)
+    @pytest.mark.asyncio
+    async def test_send_message_with_parse_mode_html(self, bot, chat_id):
+        message = await bot.send_message(
+            chat_id=chat_id, text=self.html_text, parse_mode=ParseMode.HTML
+        )
 
         assert message.text == self.formatted_text_formatted

@@ -93,8 +93,9 @@ class TestPhoto:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_photo_all_args(self, bot, chat_id, photo_file, thumb, photo):
-        message = bot.send_photo(
+    @pytest.mark.asyncio
+    async def test_send_photo_all_args(self, bot, chat_id, photo_file, thumb, photo):
+        message = await bot.send_photo(
             chat_id,
             photo_file,
             caption=self.caption,
@@ -134,8 +135,11 @@ class TestPhoto:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_photo_parse_mode_markdown(self, bot, chat_id, photo_file, thumb, photo):
-        message = bot.send_photo(chat_id, photo_file, caption=self.caption, parse_mode='Markdown')
+    @pytest.mark.asyncio
+    async def test_send_photo_parse_mode_markdown(self, bot, chat_id, photo_file, thumb, photo):
+        message = await bot.send_photo(
+            chat_id, photo_file, caption=self.caption, parse_mode='Markdown'
+        )
         assert isinstance(message.photo[0], PhotoSize)
         assert isinstance(message.photo[0].file_id, str)
         assert isinstance(message.photo[0].file_unique_id, str)
@@ -159,8 +163,11 @@ class TestPhoto:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_photo_parse_mode_html(self, bot, chat_id, photo_file, thumb, photo):
-        message = bot.send_photo(chat_id, photo_file, caption=self.caption, parse_mode='HTML')
+    @pytest.mark.asyncio
+    async def test_send_photo_parse_mode_html(self, bot, chat_id, photo_file, thumb, photo):
+        message = await bot.send_photo(
+            chat_id, photo_file, caption=self.caption, parse_mode='HTML'
+        )
         assert isinstance(message.photo[0], PhotoSize)
         assert isinstance(message.photo[0].file_id, str)
         assert isinstance(message.photo[0].file_unique_id, str)
@@ -184,17 +191,18 @@ class TestPhoto:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_photo_caption_entities(self, bot, chat_id, photo_file, thumb, photo):
+    @pytest.mark.asyncio
+    async def test_send_photo_caption_entities(self, bot, chat_id, photo_file, thumb, photo):
         test_string = 'Italic Bold Code'
         entities = [
             MessageEntity(MessageEntity.ITALIC, 0, 6),
             MessageEntity(MessageEntity.ITALIC, 7, 4),
             MessageEntity(MessageEntity.ITALIC, 12, 4),
         ]
-        message = bot.send_photo(
+        message = await bot.send_photo(
             chat_id, photo_file, caption=test_string, caption_entities=entities
         )
-        # message = bot.send_photo(
+        # message = await bot.send_photo(
         #     chat_id, photo_file, caption=test_string, caption_entities=entities
         # )
 
@@ -204,21 +212,27 @@ class TestPhoto:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    def test_send_photo_default_parse_mode_1(self, default_bot, chat_id, photo_file, thumb, photo):
+    @pytest.mark.asyncio
+    async def test_send_photo_default_parse_mode_1(
+        self, default_bot, chat_id, photo_file, thumb, photo
+    ):
         test_string = 'Italic Bold Code'
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_photo(chat_id, photo_file, caption=test_markdown_string)
+        message = await default_bot.send_photo(chat_id, photo_file, caption=test_markdown_string)
         assert message.caption_markdown == test_markdown_string
         assert message.caption == test_string
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    def test_send_photo_default_parse_mode_2(self, default_bot, chat_id, photo_file, thumb, photo):
+    @pytest.mark.asyncio
+    async def test_send_photo_default_parse_mode_2(
+        self, default_bot, chat_id, photo_file, thumb, photo
+    ):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_photo(
+        message = await default_bot.send_photo(
             chat_id, photo_file, caption=test_markdown_string, parse_mode=None
         )
         assert message.caption == test_markdown_string
@@ -227,27 +241,31 @@ class TestPhoto:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    def test_send_photo_default_parse_mode_3(self, default_bot, chat_id, photo_file, thumb, photo):
+    @pytest.mark.asyncio
+    async def test_send_photo_default_parse_mode_3(
+        self, default_bot, chat_id, photo_file, thumb, photo
+    ):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_photo(
+        message = await default_bot.send_photo(
             chat_id, photo_file, caption=test_markdown_string, parse_mode='HTML'
         )
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
-    def test_send_photo_local_files(self, monkeypatch, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_send_photo_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
         expected = (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
         file = 'tests/data/telegram.jpg'
 
-        def make_assertion(_, data, *args, **kwargs):
+        async def make_assertion(_, data, *args, **kwargs):
             nonlocal test_flag
             test_flag = data.get('photo') == expected
 
         monkeypatch.setattr(bot, '_post', make_assertion)
-        bot.send_photo(chat_id, file)
+        await bot.send_photo(chat_id, file)
         assert test_flag
 
     @flaky(3, 1)
@@ -261,13 +279,14 @@ class TestPhoto:
         ],
         indirect=['default_bot'],
     )
-    def test_send_photo_default_allow_sending_without_reply(
+    @pytest.mark.asyncio
+    async def test_send_photo_default_allow_sending_without_reply(
         self, default_bot, chat_id, photo_file, thumb, photo, custom
     ):
-        reply_to_message = default_bot.send_message(chat_id, 'test')
-        reply_to_message.delete()
+        reply_to_message = await default_bot.send_message(chat_id, 'test')
+        await reply_to_message.delete()
         if custom is not None:
-            message = default_bot.send_photo(
+            message = await default_bot.send_photo(
                 chat_id,
                 photo_file,
                 allow_sending_without_reply=custom,
@@ -275,20 +294,21 @@ class TestPhoto:
             )
             assert message.reply_to_message is None
         elif default_bot.defaults.allow_sending_without_reply:
-            message = default_bot.send_photo(
+            message = await default_bot.send_photo(
                 chat_id, photo_file, reply_to_message_id=reply_to_message.message_id
             )
             assert message.reply_to_message is None
         else:
             with pytest.raises(BadRequest, match='message not found'):
-                default_bot.send_photo(
+                await default_bot.send_photo(
                     chat_id, photo_file, reply_to_message_id=reply_to_message.message_id
                 )
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_get_and_download(self, bot, photo):
-        new_file = bot.getFile(photo.file_id)
+    @pytest.mark.asyncio
+    async def test_get_and_download(self, bot, photo):
+        new_file = await bot.getFile(photo.file_id)
 
         assert new_file.file_size == photo.file_size
         assert new_file.file_unique_id == photo.file_unique_id
@@ -300,8 +320,9 @@ class TestPhoto:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_url_jpg_file(self, bot, chat_id, thumb, photo):
-        message = bot.send_photo(chat_id, photo=self.photo_file_url)
+    @pytest.mark.asyncio
+    async def test_send_url_jpg_file(self, bot, chat_id, thumb, photo):
+        message = await bot.send_photo(chat_id, photo=self.photo_file_url)
 
         assert isinstance(message.photo[0], PhotoSize)
         assert isinstance(message.photo[0].file_id, str)
@@ -323,8 +344,9 @@ class TestPhoto:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_url_png_file(self, bot, chat_id):
-        message = bot.send_photo(
+    @pytest.mark.asyncio
+    async def test_send_url_png_file(self, bot, chat_id):
+        message = await bot.send_photo(
             photo='http://dummyimage.com/600x400/000/fff.png&text=telegram', chat_id=chat_id
         )
 
@@ -338,8 +360,9 @@ class TestPhoto:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_url_gif_file(self, bot, chat_id):
-        message = bot.send_photo(
+    @pytest.mark.asyncio
+    async def test_send_url_gif_file(self, bot, chat_id):
+        message = await bot.send_photo(
             photo='http://dummyimage.com/600x400/000/fff.png&text=telegram', chat_id=chat_id
         )
 
@@ -371,7 +394,8 @@ class TestPhoto:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_bytesio_jpg_file(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_send_bytesio_jpg_file(self, bot, chat_id):
         file_name = 'tests/data/telegram_no_standard_header.jpg'
 
         # raw image bytes
@@ -387,7 +411,7 @@ class TestPhoto:
 
         # send raw photo
         raw_bytes = BytesIO(open(file_name, 'rb').read())
-        message = bot.send_photo(chat_id, photo=raw_bytes)
+        message = await bot.send_photo(chat_id, photo=raw_bytes)
         photo = message.photo[-1]
         assert isinstance(photo.file_id, str)
         assert isinstance(photo.file_unique_id, str)
@@ -398,18 +422,20 @@ class TestPhoto:
         assert photo.height == 720
         assert photo.file_size == 33372
 
-    def test_send_with_photosize(self, monkeypatch, bot, chat_id, photo):
-        def test(url, data, **kwargs):
+    @pytest.mark.asyncio
+    async def test_send_with_photosize(self, monkeypatch, bot, chat_id, photo):
+        async def test(url, data, **kwargs):
             return data['photo'] == photo.file_id
 
         monkeypatch.setattr(bot.request, 'post', test)
-        message = bot.send_photo(photo=photo, chat_id=chat_id)
+        message = await bot.send_photo(photo=photo, chat_id=chat_id)
         assert message
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_resend(self, bot, chat_id, photo):
-        message = bot.send_photo(chat_id=chat_id, photo=photo.file_id)
+    @pytest.mark.asyncio
+    async def test_resend(self, bot, chat_id, photo):
+        message = await bot.send_photo(chat_id=chat_id, photo=photo.file_id)
 
         thumb, photo = message.photo
 
@@ -459,19 +485,22 @@ class TestPhoto:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_error_send_empty_file(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
-            bot.send_photo(chat_id=chat_id, photo=open(os.devnull, 'rb'))
+            await bot.send_photo(chat_id=chat_id, photo=open(os.devnull, 'rb'))
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_error_send_empty_file_id(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
-            bot.send_photo(chat_id=chat_id, photo='')
+            await bot.send_photo(chat_id=chat_id, photo='')
 
-    def test_error_without_required_args(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_error_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
-            bot.send_photo(chat_id=chat_id)
+            await bot.send_photo(chat_id=chat_id)
 
     @pytest.mark.asyncio
     async def test_get_file_instance_method(self, monkeypatch, photo):

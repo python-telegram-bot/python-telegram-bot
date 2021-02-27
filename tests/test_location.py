@@ -65,8 +65,9 @@ class TestLocation:
     @flaky(3, 1)
     @pytest.mark.xfail
     @pytest.mark.timeout(10)
-    def test_send_live_location(self, bot, chat_id):
-        message = bot.send_location(
+    @pytest.mark.asyncio
+    async def test_send_live_location(self, bot, chat_id):
+        message = await bot.send_location(
             chat_id=chat_id,
             latitude=52.223880,
             longitude=5.166146,
@@ -83,7 +84,7 @@ class TestLocation:
         assert message.location.heading == 90
         assert message.location.proximity_alert_radius == 1000
 
-        message2 = bot.edit_message_live_location(
+        message2 = await bot.edit_message_live_location(
             message.chat_id,
             message.message_id,
             latitude=52.223098,
@@ -154,13 +155,14 @@ class TestLocation:
         ],
         indirect=['default_bot'],
     )
-    def test_send_location_default_allow_sending_without_reply(
+    @pytest.mark.asyncio
+    async def test_send_location_default_allow_sending_without_reply(
         self, default_bot, chat_id, location, custom
     ):
-        reply_to_message = default_bot.send_message(chat_id, 'test')
-        reply_to_message.delete()
+        reply_to_message = await default_bot.send_message(chat_id, 'test')
+        await reply_to_message.delete()
         if custom is not None:
-            message = default_bot.send_location(
+            message = await default_bot.send_location(
                 chat_id,
                 location=location,
                 allow_sending_without_reply=custom,
@@ -168,13 +170,13 @@ class TestLocation:
             )
             assert message.reply_to_message is None
         elif default_bot.defaults.allow_sending_without_reply:
-            message = default_bot.send_location(
+            message = await default_bot.send_location(
                 chat_id, location=location, reply_to_message_id=reply_to_message.message_id
             )
             assert message.reply_to_message is None
         else:
             with pytest.raises(BadRequest, match='message not found'):
-                default_bot.send_location(
+                await default_bot.send_location(
                     chat_id, location=location, reply_to_message_id=reply_to_message.message_id
                 )
 
@@ -187,21 +189,25 @@ class TestLocation:
         monkeypatch.setattr(bot.request, 'post', test)
         assert bot.edit_message_live_location(None, None, location=location)
 
-    def test_send_location_without_required(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_send_location_without_required(self, bot, chat_id):
         with pytest.raises(ValueError, match='Either location or latitude and longitude'):
-            bot.send_location(chat_id=chat_id)
+            await bot.send_location(chat_id=chat_id)
 
-    def test_edit_location_without_required(self, bot):
+    @pytest.mark.asyncio
+    async def test_edit_location_without_required(self, bot):
         with pytest.raises(ValueError, match='Either location or latitude and longitude'):
-            bot.edit_message_live_location(chat_id=2, message_id=3)
+            await bot.edit_message_live_location(chat_id=2, message_id=3)
 
-    def test_send_location_with_all_args(self, bot, location):
+    @pytest.mark.asyncio
+    async def test_send_location_with_all_args(self, bot, location):
         with pytest.raises(ValueError, match='Not both'):
-            bot.send_location(chat_id=1, latitude=2.5, longitude=4.6, location=location)
+            await bot.send_location(chat_id=1, latitude=2.5, longitude=4.6, location=location)
 
-    def test_edit_location_with_all_args(self, bot, location):
+    @pytest.mark.asyncio
+    async def test_edit_location_with_all_args(self, bot, location):
         with pytest.raises(ValueError, match='Not both'):
-            bot.edit_message_live_location(
+            await bot.edit_message_live_location(
                 chat_id=1, message_id=7, latitude=2.5, longitude=4.6, location=location
             )
 

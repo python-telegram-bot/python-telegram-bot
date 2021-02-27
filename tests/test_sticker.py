@@ -39,7 +39,7 @@ def sticker_file():
 @pytest.mark.asyncio
 async def sticker(bot, chat_id):
     with open('tests/data/telegram.webp', 'rb') as f:
-        return await (bot.send_sticker(chat_id, sticker=f, timeout=50)).sticker
+        return (await bot.send_sticker(chat_id, sticker=f, timeout=50)).sticker
 
 
 @pytest.fixture(scope='function')
@@ -100,8 +100,9 @@ class TestSticker:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_all_args(self, bot, chat_id, sticker_file, sticker):
-        message = bot.send_sticker(chat_id, sticker=sticker_file, disable_notification=False)
+    @pytest.mark.asyncio
+    async def test_send_all_args(self, bot, chat_id, sticker_file, sticker):
+        message = await bot.send_sticker(chat_id, sticker=sticker_file, disable_notification=False)
 
         assert isinstance(message.sticker, Sticker)
         assert isinstance(message.sticker.file_id, str)
@@ -124,8 +125,9 @@ class TestSticker:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_get_and_download(self, bot, sticker):
-        new_file = bot.get_file(sticker.file_id)
+    @pytest.mark.asyncio
+    async def test_get_and_download(self, bot, sticker):
+        new_file = await bot.get_file(sticker.file_id)
 
         assert new_file.file_size == sticker.file_size
         assert new_file.file_id == sticker.file_id
@@ -138,23 +140,26 @@ class TestSticker:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_resend(self, bot, chat_id, sticker):
-        message = bot.send_sticker(chat_id=chat_id, sticker=sticker.file_id)
+    @pytest.mark.asyncio
+    async def test_resend(self, bot, chat_id, sticker):
+        message = await bot.send_sticker(chat_id=chat_id, sticker=sticker.file_id)
 
         assert message.sticker == sticker
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_on_server_emoji(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_send_on_server_emoji(self, bot, chat_id):
         server_file_id = 'CAADAQADHAADyIsGAAFZfq1bphjqlgI'
-        message = bot.send_sticker(chat_id=chat_id, sticker=server_file_id)
+        message = await bot.send_sticker(chat_id=chat_id, sticker=server_file_id)
         sticker = message.sticker
         assert sticker.emoji == self.emoji
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_from_url(self, bot, chat_id):
-        message = bot.send_sticker(chat_id=chat_id, sticker=self.sticker_file_url)
+    @pytest.mark.asyncio
+    async def test_send_from_url(self, bot, chat_id):
+        message = await bot.send_sticker(chat_id=chat_id, sticker=self.sticker_file_url)
         sticker = message.sticker
 
         assert isinstance(message.sticker, Sticker)
@@ -198,12 +203,13 @@ class TestSticker:
         assert json_sticker.file_size == self.file_size
         assert json_sticker.thumb == sticker.thumb
 
-    def test_send_with_sticker(self, monkeypatch, bot, chat_id, sticker):
+    @pytest.mark.asyncio
+    async def test_send_with_sticker(self, monkeypatch, bot, chat_id, sticker):
         def test(url, data, **kwargs):
             return data['sticker'] == sticker.file_id
 
         monkeypatch.setattr(bot.request, 'post', test)
-        message = bot.send_sticker(sticker=sticker, chat_id=chat_id)
+        message = await bot.send_sticker(sticker=sticker, chat_id=chat_id)
         assert message
 
     def test_send_sticker_local_files(self, monkeypatch, bot, chat_id):
@@ -231,13 +237,14 @@ class TestSticker:
         ],
         indirect=['default_bot'],
     )
-    def test_send_sticker_default_allow_sending_without_reply(
+    @pytest.mark.asyncio
+    async def test_send_sticker_default_allow_sending_without_reply(
         self, default_bot, chat_id, sticker, custom
     ):
-        reply_to_message = default_bot.send_message(chat_id, 'test')
+        reply_to_message = await default_bot.send_message(chat_id, 'test')
         reply_to_message.delete()
         if custom is not None:
-            message = default_bot.send_sticker(
+            message = await default_bot.send_sticker(
                 chat_id,
                 sticker,
                 allow_sending_without_reply=custom,
@@ -245,7 +252,7 @@ class TestSticker:
             )
             assert message.reply_to_message is None
         elif default_bot.defaults.allow_sending_without_reply:
-            message = default_bot.send_sticker(
+            message = await default_bot.send_sticker(
                 chat_id, sticker, reply_to_message_id=reply_to_message.message_id
             )
             assert message.reply_to_message is None
@@ -309,8 +316,8 @@ class TestSticker:
 
 
 @pytest.fixture(scope='function')
-def sticker_set(bot):
-    ss = bot.get_sticker_set(f'test_by_{bot.username}')
+async def sticker_set(bot):
+    ss = await bot.get_sticker_set(f'test_by_{bot.username}')
     if len(ss.stickers) > 100:
         try:
             for i in range(1, 50):
@@ -321,8 +328,8 @@ def sticker_set(bot):
 
 
 @pytest.fixture(scope='function')
-def animated_sticker_set(bot):
-    ss = bot.get_sticker_set(f'animated_test_by_{bot.username}')
+async def animated_sticker_set(bot):
+    ss = await bot.get_sticker_set(f'animated_test_by_{bot.username}')
     if len(ss.stickers) > 100:
         try:
             for i in range(1, 50):

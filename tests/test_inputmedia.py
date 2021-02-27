@@ -403,8 +403,9 @@ def media_group(photo, thumb):  # noqa: F811
 class TestSendMediaGroup:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_media_group_photo(self, bot, chat_id, media_group):
-        messages = bot.send_media_group(chat_id, media_group)
+    @pytest.mark.asyncio
+    async def test_send_media_group_photo(self, bot, chat_id, media_group):
+        messages = await bot.send_media_group(chat_id, media_group)
         assert isinstance(messages, list)
         assert len(messages) == 3
         assert all([isinstance(mes, Message) for mes in messages])
@@ -416,9 +417,10 @@ class TestSendMediaGroup:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_media_group_all_args(self, bot, chat_id, media_group):
-        m1 = bot.send_message(chat_id, text="test")
-        messages = bot.send_media_group(
+    @pytest.mark.asyncio
+    async def test_send_media_group_all_args(self, bot, chat_id, media_group):
+        m1 = await bot.send_message(chat_id, text="test")
+        messages = await bot.send_media_group(
             chat_id, media_group, disable_notification=True, reply_to_message_id=m1.message_id
         )
         assert isinstance(messages, list)
@@ -432,7 +434,8 @@ class TestSendMediaGroup:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_media_group_custom_filename(
+    @pytest.mark.asyncio
+    async def test_send_media_group_custom_filename(
         self,
         bot,
         chat_id,
@@ -456,7 +459,7 @@ class TestSendMediaGroup:
             InputMediaVideo(video_file, filename='custom_filename'),
         ]
 
-        assert bot.send_media_group(chat_id, media)[0].text is True
+        assert (await bot.send_media_group(chat_id, media))[0].text is True
 
     def test_send_media_group_with_thumbs(
         self, bot, chat_id, video_file, photo_file, monkeypatch  # noqa: F811
@@ -510,13 +513,14 @@ class TestSendMediaGroup:
         ],
         indirect=['default_bot'],
     )
-    def test_send_media_group_default_allow_sending_without_reply(
+    @pytest.mark.asyncio
+    async def test_send_media_group_default_allow_sending_without_reply(
         self, default_bot, chat_id, media_group, custom
     ):
-        reply_to_message = default_bot.send_message(chat_id, 'test')
-        reply_to_message.delete()
+        reply_to_message = await default_bot.send_message(chat_id, 'test')
+        await reply_to_message.delete()
         if custom is not None:
-            messages = default_bot.send_media_group(
+            messages = await default_bot.send_media_group(
                 chat_id,
                 media_group,
                 allow_sending_without_reply=custom,
@@ -524,32 +528,36 @@ class TestSendMediaGroup:
             )
             assert [m.reply_to_message is None for m in messages]
         elif default_bot.defaults.allow_sending_without_reply:
-            messages = default_bot.send_media_group(
+            messages = await default_bot.send_media_group(
                 chat_id, media_group, reply_to_message_id=reply_to_message.message_id
             )
             assert [m.reply_to_message is None for m in messages]
         else:
             with pytest.raises(BadRequest, match='message not found'):
-                default_bot.send_media_group(
+                await default_bot.send_media_group(
                     chat_id, media_group, reply_to_message_id=reply_to_message.message_id
                 )
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_edit_message_media(self, bot, chat_id, media_group):
-        messages = bot.send_media_group(chat_id, media_group)
+    @pytest.mark.asyncio
+    async def test_edit_message_media(self, bot, chat_id, media_group):
+        messages = await bot.send_media_group(chat_id, media_group)
         cid = messages[-1].chat.id
         mid = messages[-1].message_id
-        new_message = bot.edit_message_media(chat_id=cid, message_id=mid, media=media_group[0])
+        new_message = await bot.edit_message_media(
+            chat_id=cid, message_id=mid, media=media_group[0]
+        )
         assert isinstance(new_message, Message)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_edit_message_media_new_file(self, bot, chat_id, media_group, thumb_file):
-        messages = bot.send_media_group(chat_id, media_group)
+    @pytest.mark.asyncio
+    async def test_edit_message_media_new_file(self, bot, chat_id, media_group, thumb_file):
+        messages = await bot.send_media_group(chat_id, media_group)
         cid = messages[-1].chat.id
         mid = messages[-1].message_id
-        new_message = bot.edit_message_media(
+        new_message = await bot.edit_message_media(
             chat_id=cid, message_id=mid, media=InputMediaPhoto(thumb_file)
         )
         assert isinstance(new_message, Message)
@@ -560,7 +568,8 @@ class TestSendMediaGroup:
         'default_bot', [{'parse_mode': ParseMode.HTML}], indirect=True, ids=['HTML-Bot']
     )
     @pytest.mark.parametrize('media_type', ['animation', 'document', 'audio', 'photo', 'video'])
-    def test_edit_message_media_default_parse_mode(
+    @pytest.mark.asyncio
+    async def test_edit_message_media_default_parse_mode(
         self,
         chat_id,
         default_bot,
@@ -599,9 +608,9 @@ class TestSendMediaGroup:
             if med_type == 'video':
                 return InputMediaVideo(video, **kwargs)
 
-        message = default_bot.send_photo(chat_id, photo)
+        message = await default_bot.send_photo(chat_id, photo)
 
-        message = default_bot.edit_message_media(
+        message = await default_bot.edit_message_media(
             message.chat_id,
             message.message_id,
             media=build_media(parse_mode=ParseMode.HTML, med_type=media_type),
@@ -610,9 +619,9 @@ class TestSendMediaGroup:
         assert message.caption_entities == test_entities
 
         # Remove caption to avoid "Message not changed"
-        message.edit_caption()
+        await message.edit_caption()
 
-        message = default_bot.edit_message_media(
+        message = await default_bot.edit_message_media(
             message.chat_id,
             message.message_id,
             media=build_media(parse_mode=ParseMode.MARKDOWN_V2, med_type=media_type),
@@ -623,7 +632,7 @@ class TestSendMediaGroup:
         # Remove caption to avoid "Message not changed"
         message.edit_caption()
 
-        message = default_bot.edit_message_media(
+        message = await default_bot.edit_message_media(
             message.chat_id,
             message.message_id,
             media=build_media(parse_mode=None, med_type=media_type),

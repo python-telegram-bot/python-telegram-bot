@@ -66,8 +66,9 @@ class TestVenue:
         assert venue.google_place_id == self.google_place_id
         assert venue.google_place_type == self.google_place_type
 
-    def test_send_with_venue(self, monkeypatch, bot, chat_id, venue):
-        def test(url, data, **kwargs):
+    @pytest.mark.asyncio
+    async def test_send_with_venue(self, monkeypatch, bot, chat_id, venue):
+        async def test(url, data, **kwargs):
             return (
                 data['longitude'] == self.location.longitude
                 and data['latitude'] == self.location.latitude
@@ -80,7 +81,7 @@ class TestVenue:
             )
 
         monkeypatch.setattr(bot.request, 'post', test)
-        message = bot.send_venue(chat_id, venue=venue)
+        message = await bot.send_venue(chat_id, venue=venue)
         assert message
 
     @flaky(3, 1)
@@ -94,13 +95,14 @@ class TestVenue:
         ],
         indirect=['default_bot'],
     )
-    def test_send_venue_default_allow_sending_without_reply(
+    @pytest.mark.asyncio
+    async def test_send_venue_default_allow_sending_without_reply(
         self, default_bot, chat_id, venue, custom
     ):
-        reply_to_message = default_bot.send_message(chat_id, 'test')
-        reply_to_message.delete()
+        reply_to_message = await default_bot.send_message(chat_id, 'test')
+        await reply_to_message.delete()
         if custom is not None:
-            message = default_bot.send_venue(
+            message = await default_bot.send_venue(
                 chat_id,
                 venue=venue,
                 allow_sending_without_reply=custom,
@@ -108,19 +110,20 @@ class TestVenue:
             )
             assert message.reply_to_message is None
         elif default_bot.defaults.allow_sending_without_reply:
-            message = default_bot.send_venue(
+            message = await default_bot.send_venue(
                 chat_id, venue=venue, reply_to_message_id=reply_to_message.message_id
             )
             assert message.reply_to_message is None
         else:
             with pytest.raises(BadRequest, match='message not found'):
-                default_bot.send_venue(
+                await default_bot.send_venue(
                     chat_id, venue=venue, reply_to_message_id=reply_to_message.message_id
                 )
 
-    def test_send_venue_without_required(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_send_venue_without_required(self, bot, chat_id):
         with pytest.raises(ValueError, match='Either venue or latitude, longitude, address and'):
-            bot.send_venue(chat_id=chat_id)
+            await bot.send_venue(chat_id=chat_id)
 
     def test_to_dict(self, venue):
         venue_dict = venue.to_dict()
