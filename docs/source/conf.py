@@ -35,7 +35,7 @@ extensions = [
 ]
 # Don't show type hints in the signature - that just makes it hardly readable
 # and we document the types anyway
-autodoc_typehints = 'description'
+autodoc_typehints = 'none'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
