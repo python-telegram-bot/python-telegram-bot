@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import inspect
 import time
 import datetime as dtm
 from pathlib import Path
@@ -56,7 +57,7 @@ from telegram.utils.helpers import (
     escape_markdown,
     to_timestamp,
 )
-from tests.conftest import expect_bad_request
+from tests.conftest import expect_bad_request, check_defaults_handling
 from tests.bots import FALLBACKS
 
 
@@ -198,6 +199,72 @@ class TestBot:
         assert to_dict_bot["first_name"] == bot.first_name
         if bot.last_name:
             assert to_dict_bot["last_name"] == bot.last_name
+
+    @pytest.mark.parametrize(
+        'bot_method_name',
+        argvalues=[
+            name
+            for name, _ in inspect.getmembers(Bot, predicate=inspect.isfunction)
+            if not name.startswith('_')
+            and name
+            not in [
+                'de_json',
+                'de_list',
+                'to_dict',
+                'to_json',
+                'parse_data',
+                'get_updates',
+                'getUpdates',
+            ]
+        ],
+    )
+    def test_defaults_handling(self, bot_method_name, bot):
+        """
+        Here we check that the bot methods handle tg.ext.Defaults correctly. As for most defaults,
+        we can't really check the effect, we just check if we're passing the correct kwargs to
+        Request.post. As bot method tests a scattered across the different test files, we do
+        this here in one place.
+
+        The same test is also run for all the shortcuts (Message.reply_text) etc in the
+        corresponding tests.
+
+        Finally, there are some tests for Defaults.{parse_mode, quote, allow_sending_without_reply}
+        at the appropriate places, as those are the only things we can actually check.
+        """
+        bot_method = getattr(bot, bot_method_name)
+        assert check_defaults_handling(bot_method, bot)
+
+    def test_ext_bot_signature(self):
+        """
+        Here we make sure that all methods of ext.Bot have the same signature as the corresponding
+        methods of tg.Bot.
+        """
+        # Some methods of ext.Bot
+        global_extra_args = set()
+        extra_args_per_method = {'__init__': {'arbitrary_callback_data'}}
+
+        for name, method in inspect.getmembers(Bot, predicate=inspect.isfunction):
+            ext_signature = inspect.signature(method)
+            signature = inspect.signature(getattr(Bot, name))
+
+            assert (
+                ext_signature.return_annotation == signature.return_annotation
+            ), f'Wrong return annotation for method {name}'
+            assert set(signature.parameters) == set(
+                ext_signature.parameters
+            ) - global_extra_args - extra_args_per_method.get(
+                name, set()
+            ), f'Wrong set of parameters for method {name}'
+            for param_name, param in signature.parameters.items():
+                assert (
+                    param.annotation == ext_signature.parameters[param_name].annotation
+                ), f'Wrong annotation for parameter {param_name} of method {name}'
+                assert (
+                    param.default == ext_signature.parameters[param_name].default
+                ), f'Wrong default value for parameter {param_name} of method {name}'
+                assert (
+                    param.kind == ext_signature.parameters[param_name].kind
+                ), f'Wrong parameter kind for parameter {param_name} of method {name}'
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -376,7 +443,7 @@ class TestBot:
         assert message_quiz.poll.explanation_entities == explanation_entities
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
+    @pytest.mark.timeout(15)
     @pytest.mark.parametrize(['open_period', 'close_date'], [(5, None), (None, True)])
     def test_send_open_period(self, bot, super_group_id, open_period, close_date):
         question = 'Is this a test?'
@@ -1847,8 +1914,8 @@ class TestBot:
         'default_bot',
         [
             ({'parse_mode': ParseMode.HTML, 'allow_sending_without_reply': True}),
-            ({'parse_mode': False, 'allow_sending_without_reply': True}),
-            ({'parse_mode': False, 'allow_sending_without_reply': False}),
+            ({'parse_mode': None, 'allow_sending_without_reply': True}),
+            ({'parse_mode': None, 'allow_sending_without_reply': False}),
         ],
         indirect=['default_bot'],
     )

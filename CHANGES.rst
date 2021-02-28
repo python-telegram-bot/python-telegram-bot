@@ -2,6 +2,31 @@
 Changelog
 =========
 
+Version 13.3
+============
+*Released 2021-02-19*
+
+**Major Changes:**
+
+- Make ``cryptography`` Dependency Optional & Refactor Some Tests (`#2386`_, `#2370`_)
+- Deprecate ``MessageQueue`` (`#2393`_)
+
+**Bug Fixes:**
+
+- Refactor ``Defaults`` Integration (`#2363`_)
+- Add Missing ``telegram.SecureValue`` to init and Docs (`#2398`_)
+
+**Minor changes:**
+
+- Doc Fixes (`#2359`_)
+
+.. _`#2386`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2386
+.. _`#2370`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2370
+.. _`#2393`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2393
+.. _`#2363`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2363
+.. _`#2398`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2398
+.. _`#2359`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2359
+
 Version 13.2
 ============
 *Released 2021-02-02*

@@ -13,11 +13,11 @@ We have a vibrant community of developers helping each other in our `Telegram gr
 *Stay tuned for library updates and new releases on our* `Telegram Channel <https://telegram.me/pythontelegrambotchannel>`_.
 
 .. image:: https://img.shields.io/pypi/v/python-telegram-bot-raw.svg
-   :target: https://pypi.org/project/python-telegram-bot/
+   :target: https://pypi.org/project/python-telegram-bot-raw/
    :alt: PyPi Package Version
 
 .. image:: https://img.shields.io/pypi/pyversions/python-telegram-bot-raw.svg
-   :target: https://pypi.org/project/python-telegram-bot/
+   :target: https://pypi.org/project/python-telegram-bot-raw/
    :alt: Supported Python versions
 
 .. image:: https://img.shields.io/badge/Bot%20API-5.0-blue?logo=telegram
@@ -25,10 +25,10 @@ We have a vibrant community of developers helping each other in our `Telegram gr
    :alt: Supported Bot API versions
 
 .. image:: https://img.shields.io/pypi/dm/python-telegram-bot-raw
-   :target: https://pypistats.org/packages/python-telegram-bot
+   :target: https://pypistats.org/packages/python-telegram-bot-raw
    :alt: PyPi Package Monthly Download
 
-.. image:: https://img.shields.io/badge/docs-latest-af1a97.svg
+.. image:: https://readthedocs.org/projects/python-telegram-bot/badge/?version=stable
    :target: https://python-telegram-bot.readthedocs.io/
    :alt: Documentation Status
 
@@ -136,6 +136,15 @@ Note
 ----
 
 Installing the `.tar.gz` archive available on PyPi directly via `pip` will *not* work as expected, as `pip` does not recognize that it should use `setup-raw.py` instead of `setup.py`.
+
+---------------------
+Optional Dependencies
+---------------------
+
+PTB can be installed with optional dependencies:
+
+* ``pip install python-telegram-bot-raw[passport]`` installs the `cryptography <https://cryptography.io>`_ library. Use this, if you want to use Telegram Passport related functionality.
+* ``pip install python-telegram-bot-raw[ujson]`` installs the `ujson <https://pypi.org/project/ujson/>`_ library. It will then be used for JSON de- & encoding, which can bring speed up compared to the standard `json <https://docs.python.org/3/library/json.html>`_ library.
 
 ===============
 Getting started

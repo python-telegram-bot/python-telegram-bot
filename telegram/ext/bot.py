@@ -17,10 +17,9 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=C0112
 """This module contains an object that represents a Telegram Bot with convenience extensions."""
 from copy import copy
-from typing import Union, cast, List, Callable, Optional, Tuple, TypeVar
+from typing import Union, cast, List, Callable, Optional, Tuple, TypeVar, TYPE_CHECKING
 
 import telegram.bot
 from telegram import (
@@ -30,14 +29,18 @@ from telegram import (
     Poll,
     MessageEntity,
     MessageId,
-    InlineQueryResult,
     Update,
     Chat,
 )
+
 from telegram.ext.utils.callbackdatacache import CallbackDataCache
-from telegram.utils.request import Request
-from telegram.utils.types import JSONDict
-from .defaults import Defaults
+from telegram.utils.types import JSONDict, ODVInput, DVInput
+from ..utils.helpers import DEFAULT_NONE
+
+if TYPE_CHECKING:
+    from telegram import InlineQueryResult
+    from telegram.utils.request import Request
+    from .defaults import Defaults
 
 T = TypeVar('T', bound=object)
 
@@ -63,10 +66,10 @@ class Bot(telegram.bot.Bot):
         token: str,
         base_url: str = None,
         base_file_url: str = None,
-        request: Request = None,
+        request: 'Request' = None,
         private_key: bytes = None,
         private_key_password: bytes = None,
-        defaults: Defaults = None,
+        defaults: 'Defaults' = None,
         arbitrary_callback_data: Union[bool, int] = False,
     ):
         super().__init__(
@@ -113,10 +116,10 @@ class Bot(telegram.bot.Bot):
         endpoint: str,
         data: JSONDict,
         reply_to_message_id: Union[str, int] = None,
-        disable_notification: bool = None,
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: ReplyMarkup = None,
-        allow_sending_without_reply: bool = None,
-        timeout: float = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> Union[bool, Message]:
         # We override this method to call self._replace_keyboard and self._insert_callback_data.
@@ -142,7 +145,6 @@ class Bot(telegram.bot.Bot):
         allowed_updates: List[str] = None,
         api_kwargs: JSONDict = None,
     ) -> List[Update]:
-        """"""  # hide from docs
         updates = super().get_updates(
             offset=offset,
             limit=limit,
@@ -165,11 +167,11 @@ class Bot(telegram.bot.Bot):
     def _effective_inline_results(
         self,
         results: Union[
-            List[InlineQueryResult], Callable[[int], Optional[List[InlineQueryResult]]]
+            List['InlineQueryResult'], Callable[[int], Optional[List['InlineQueryResult']]]
         ],
         next_offset: str = None,
         current_offset: str = None,
-    ) -> Tuple[List[InlineQueryResult], Optional[str]]:
+    ) -> Tuple[List['InlineQueryResult'], Optional[str]]:
         """
         This method is called by Bot.answer_inline_query to build the actual results list.
         Overriding this to call self._replace_keyboard suffices
@@ -201,10 +203,9 @@ class Bot(telegram.bot.Bot):
         chat_id: Union[int, str],
         message_id: Union[int, str],
         reply_markup: InlineKeyboardMarkup = None,
-        timeout: float = None,
+        timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> Poll:
-        """"""  # hide from decs
         # We override this method to call self._replace_keyboard and self._insert_callback_data
         result = super().stop_poll(
             chat_id=chat_id,
@@ -221,16 +222,15 @@ class Bot(telegram.bot.Bot):
         from_chat_id: Union[str, int],
         message_id: Union[str, int],
         caption: str = None,
-        parse_mode: str = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
-        disable_notification: bool = False,
+        disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Union[int, str] = None,
-        allow_sending_without_reply: bool = False,
+        allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
         reply_markup: ReplyMarkup = None,
-        timeout: float = None,
+        timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> MessageId:
-        """"""  # hide from docs
         # We override this method to call self._replace_keyboard and self._insert_callback_data
         result = super().copy_message(
             chat_id=chat_id,
@@ -249,9 +249,11 @@ class Bot(telegram.bot.Bot):
         return self._insert_callback_data(result)
 
     def get_chat(
-        self, chat_id: Union[str, int], timeout: float = None, api_kwargs: JSONDict = None
+        self,
+        chat_id: Union[str, int],
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
     ) -> Chat:
-        """"""  # hide from docs
         # We override this method to call self._insert_callback_data
         result = super().get_chat(chat_id=chat_id, timeout=timeout, api_kwargs=api_kwargs)
         return self._insert_callback_data(result)

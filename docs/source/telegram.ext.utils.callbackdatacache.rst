@@ -1,6 +1,6 @@
-Module telegram.ext.utils.callbackdatacache
-===========================================
+telegram.ext.utils.callbackdatacache.CallbackDataCache
+======================================================
 
-.. automodule:: telegram.ext.utils.callbackdatacache
+.. autoclass:: telegram.ext.utils.callbackdatacache.CallbackDataCache
     :members:
     :show-inheritance:

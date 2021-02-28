@@ -317,7 +317,7 @@ class BasePersistence(ABC):
 
     @abstractmethod
     def get_user_data(self) -> DefaultDict[int, Dict[object, object]]:
-        """ "Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
+        """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``user_data`` if stored, or an empty
         ``defaultdict(dict)``.
 
@@ -327,7 +327,7 @@ class BasePersistence(ABC):
 
     @abstractmethod
     def get_chat_data(self) -> DefaultDict[int, Dict[object, object]]:
-        """ "Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
+        """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``chat_data`` if stored, or an empty
         ``defaultdict(dict)``.
 
@@ -337,7 +337,7 @@ class BasePersistence(ABC):
 
     @abstractmethod
     def get_bot_data(self) -> Dict[object, object]:
-        """ "Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
+        """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``bot_data`` if stored, or an empty
         :obj:`dict`.
 
@@ -358,7 +358,7 @@ class BasePersistence(ABC):
 
     @abstractmethod
     def get_conversations(self, name: str) -> ConversationDict:
-        """ "Will be called by :class:`telegram.ext.Dispatcher` when a
+        """Will be called by :class:`telegram.ext.Dispatcher` when a
         :class:`telegram.ext.ConversationHandler` is added if
         :attr:`telegram.ext.ConversationHandler.persistent` is :obj:`True`.
         It should return the conversations for the handler with `name` or an empty :obj:`dict`

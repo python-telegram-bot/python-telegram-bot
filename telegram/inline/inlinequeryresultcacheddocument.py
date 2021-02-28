@@ -22,7 +22,8 @@
 from typing import TYPE_CHECKING, Any, Union, Tuple, List
 
 from telegram import InlineQueryResult, MessageEntity
-from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
+from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.types import ODVInput
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
@@ -83,7 +84,7 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
         caption: str = None,
         reply_markup: 'ReplyMarkup' = None,
         input_message_content: 'InputMessageContent' = None,
-        parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
         **_kwargs: Any,
     ):

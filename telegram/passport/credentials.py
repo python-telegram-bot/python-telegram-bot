@@ -25,12 +25,21 @@ except ImportError:
 from base64 import b64decode
 from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Union, no_type_check
 
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric.padding import MGF1, OAEP
-from cryptography.hazmat.primitives.ciphers import Cipher
-from cryptography.hazmat.primitives.ciphers.algorithms import AES
-from cryptography.hazmat.primitives.ciphers.modes import CBC
-from cryptography.hazmat.primitives.hashes import SHA1, SHA256, SHA512, Hash
+try:
+    from cryptography.hazmat.backends import default_backend
+    from cryptography.hazmat.primitives.asymmetric.padding import MGF1, OAEP
+    from cryptography.hazmat.primitives.ciphers import Cipher
+    from cryptography.hazmat.primitives.ciphers.algorithms import AES
+    from cryptography.hazmat.primitives.ciphers.modes import CBC
+    from cryptography.hazmat.primitives.hashes import SHA1, SHA256, SHA512, Hash
+
+    CRYPTO_INSTALLED = True
+except ImportError:
+    default_backend = None
+    MGF1, OAEP, Cipher, AES, CBC = (None, None, None, None, None)  # type: ignore[misc]
+    SHA1, SHA256, SHA512, Hash = (None, None, None, None)  # type: ignore[misc]
+
+    CRYPTO_INSTALLED = False
 
 from telegram import TelegramError, TelegramObject
 from telegram.utils.types import JSONDict
@@ -74,6 +83,11 @@ def decrypt(secret, hash, data):
         :obj:`bytes`: The decrypted data as bytes.
 
     """
+    if not CRYPTO_INSTALLED:
+        raise RuntimeError(
+            'To use Telegram Passports, PTB must be installed via `pip install '
+            'python-telegram-bot[passport]`.'
+        )
     # Make a SHA512 hash of secret + update
     digest = Hash(SHA512(), backend=default_backend())
     digest.update(secret + hash)
@@ -153,6 +167,11 @@ class EncryptedCredentials(TelegramObject):
                 private/public key but can also suggest malformed/tampered data.
         """
         if self._decrypted_secret is None:
+            if not CRYPTO_INSTALLED:
+                raise RuntimeError(
+                    'To use Telegram Passports, PTB must be installed via `pip install '
+                    'python-telegram-bot[passport]`.'
+                )
             # Try decrypting according to step 1 at
             # https://core.telegram.org/passport#decrypting-data
             # We make sure to base64 decode the secret first.
