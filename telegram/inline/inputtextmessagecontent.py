@@ -21,8 +21,8 @@
 from typing import Any, Union, Tuple, List
 
 from telegram import InputMessageContent, MessageEntity
-from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
-from telegram.utils.types import JSONDict
+from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.types import JSONDict, ODVInput
 
 
 class InputTextMessageContent(InputMessageContent):
@@ -62,8 +62,8 @@ class InputTextMessageContent(InputMessageContent):
     def __init__(
         self,
         message_text: str,
-        parse_mode: Union[str, DefaultValue] = DEFAULT_NONE,
-        disable_web_page_preview: Union[bool, DefaultValue] = DEFAULT_NONE,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
         **_kwargs: Any,
     ):

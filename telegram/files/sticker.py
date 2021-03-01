@@ -21,7 +21,8 @@
 from typing import TYPE_CHECKING, Any, List, Optional, ClassVar
 
 from telegram import PhotoSize, TelegramObject, constants
-from telegram.utils.types import JSONDict
+from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
     from telegram import Bot, File
@@ -115,7 +116,9 @@ class Sticker(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def get_file(self, timeout: float = None, api_kwargs: JSONDict = None) -> 'File':
+    def get_file(
+        self, timeout: ODVInput[float] = DEFAULT_NONE, api_kwargs: JSONDict = None
+    ) -> 'File':
         """Convenience wrapper over :attr:`telegram.Bot.get_file`
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.get_file`.

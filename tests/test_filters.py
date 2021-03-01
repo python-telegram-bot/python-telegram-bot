@@ -547,7 +547,7 @@ class TestFilters:
         assert not Filters.document.audio(update)
 
         update.message.document.mime_type = (
-            "application/vnd.openxmlformats-officedocument." "wordprocessingml.document"
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         )
         assert Filters.document.docx(update)
         assert Filters.document.application(update)

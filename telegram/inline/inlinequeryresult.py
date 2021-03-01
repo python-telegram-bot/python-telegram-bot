@@ -49,14 +49,6 @@ class InlineQueryResult(TelegramObject):
 
         self._id_attrs = (self.id,)
 
-    @property
-    def _has_parse_mode(self) -> bool:
-        return hasattr(self, 'parse_mode')
-
-    @property
-    def _has_input_message_content(self) -> bool:
-        return hasattr(self, 'input_message_content')
-
     def to_dict(self) -> JSONDict:
         data = super().to_dict()
 

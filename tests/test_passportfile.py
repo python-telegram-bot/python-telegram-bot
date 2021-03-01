@@ -20,7 +20,7 @@
 import pytest
 
 from telegram import PassportFile, PassportElementError, Bot, File
-from tests.conftest import check_shortcut_signature, check_shortcut_call
+from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
 
 
 @pytest.fixture(scope='class')
@@ -56,16 +56,14 @@ class TestPassportFile:
         assert passport_file_dict['file_date'] == passport_file.file_date
 
     def test_get_file_instance_method(self, monkeypatch, passport_file):
-        get_file = passport_file.bot.get_file
-
         def make_assertion(*_, **kwargs):
-            result = kwargs['file_id'] == passport_file.file_id and check_shortcut_call(
-                kwargs, get_file
-            )
+            result = kwargs['file_id'] == passport_file.file_id
             # we need to be a bit hacky here, b/c PF.get_file needs Bot.get_file to return a File
             return File(file_id=result, file_unique_id=result)
 
         assert check_shortcut_signature(PassportFile.get_file, Bot.get_file, ['file_id'], [])
+        assert check_shortcut_call(passport_file.get_file, passport_file.bot, 'get_file')
+        assert check_defaults_handling(passport_file.get_file, passport_file.bot)
 
         monkeypatch.setattr(passport_file.bot, 'get_file', make_assertion)
         assert passport_file.get_file().file_id == 'True'

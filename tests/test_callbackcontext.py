@@ -143,7 +143,7 @@ class TestCallbackContext:
         callback_context = CallbackContext.from_update(update, cdp)
 
         with pytest.raises(AttributeError):
-            callback_context.chat_data = {"test": 123}
+            callback_context.bot_data = {"test": 123}
         with pytest.raises(AttributeError):
             callback_context.user_data = {}
         with pytest.raises(AttributeError):

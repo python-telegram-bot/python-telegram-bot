@@ -29,11 +29,3 @@ class InputMessageContent(TelegramObject):
     :class:`telegram.InputVenueMessageContent` for more details.
 
     """
-
-    @property
-    def _has_parse_mode(self) -> bool:
-        return hasattr(self, 'parse_mode')
-
-    @property
-    def _has_disable_web_page_preview(self) -> bool:
-        return hasattr(self, 'disable_web_page_preview')
