@@ -13,18 +13,32 @@ repos:
     rev: 3.8.4
     hooks:
     -   id: flake8
--   repo: https://github.com/PyCQA/pylint
-    rev: pylint-2.6.0
+-   repo: local
     hooks:
     -   id: pylint
+        name: pylint
+        entry: pylint
+        language: system
         files: ^(telegram|examples)/.*\.py$
         args:
         - --rcfile=setup.cfg
--   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.800
+-   repo: local
     hooks:
-    -   id: mypy
-        files: ^(telegram|examples)/.*\.py$
+      - id: mypy-ptb
+        name: mypy-ptb
+        entry: mypy
+        language: system
+        files: ^telegram/.*\.py$
+-   repo: local
+    hooks:
+       - id: mypy-examples
+         name: mypy-examples
+         entry: mypy
+         language: system
+         files: ^examples/.*\.py$
+         args:
+             - --no-strict-optional
+             - --follow-imports=silent
 -   repo: https://github.com/asottile/pyupgrade
     rev: v2.10.0
     hooks:

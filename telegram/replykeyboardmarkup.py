@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ReplyKeyboardMarkup."""
 
-from typing import Any, List, Union
+from typing import Any, List, Union, Sequence
 
 from telegram import KeyboardButton, ReplyMarkup
 from telegram.utils.types import JSONDict
@@ -67,7 +67,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
 
     def __init__(
         self,
-        keyboard: List[List[Union[str, KeyboardButton]]],
+        keyboard: Sequence[Sequence[Union[str, KeyboardButton]]],
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,

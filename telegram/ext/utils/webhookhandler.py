@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=E0401, C0114
+# pylint: disable=C0114
 
 import asyncio
 import logging
@@ -140,7 +140,7 @@ class WebhookAppClass(tornado.web.Application):
     def __init__(self, webhook_path: str, bot: 'Bot', update_queue: Queue):
         self.shared_objects = {"bot": bot, "update_queue": update_queue}
         handlers = [(rf"{webhook_path}/?", WebhookHandler, self.shared_objects)]  # noqa
-        tornado.web.Application.__init__(self, handlers)
+        tornado.web.Application.__init__(self, handlers)  # type: ignore
 
     def log_request(self, handler: tornado.web.RequestHandler) -> None:
         pass
@@ -149,7 +149,7 @@ class WebhookAppClass(tornado.web.Application):
 # WebhookHandler, process webhook calls
 # pylint: disable=W0223
 class WebhookHandler(tornado.web.RequestHandler):
-    SUPPORTED_METHODS = ["POST"]
+    SUPPORTED_METHODS = ["POST"]  # type: ignore
 
     def __init__(
         self,

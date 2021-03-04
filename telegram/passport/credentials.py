@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=C0114, E0401, W0622
+# pylint: disable=C0114, W0622
 try:
     import ujson as json
 except ImportError:
@@ -179,7 +179,7 @@ class EncryptedCredentials(TelegramObject):
             # is the default for OAEP, the algorithm is the default for PHP which is what
             # Telegram's backend servers run.
             try:
-                self._decrypted_secret = self.bot.private_key.decrypt(
+                self._decrypted_secret = self.bot.private_key.decrypt(  # type: ignore
                     b64decode(self.secret),
                     OAEP(mgf=MGF1(algorithm=SHA1()), algorithm=SHA1(), label=None),
                 )

@@ -17,7 +17,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=E0401
 """This module contains an object that represents a Telegram Bot."""
 
 import functools
@@ -35,6 +34,7 @@ from typing import (
     no_type_check,
     Dict,
     cast,
+    Sequence,
 )
 
 try:
@@ -1990,7 +1990,7 @@ class Bot(TelegramObject):
         self,
         inline_query_id: str,
         results: Union[
-            List['InlineQueryResult'], Callable[[int], Optional[List['InlineQueryResult']]]
+            Sequence['InlineQueryResult'], Callable[[int], Optional[Sequence['InlineQueryResult']]]
         ],
         cache_time: int = 300,
         is_personal: bool = None,
@@ -2103,7 +2103,7 @@ class Bot(TelegramObject):
             if callable(results):
                 callable_output = results(current_offset_int)
                 if not callable_output:
-                    effective_results = []
+                    effective_results: Sequence['InlineQueryResult'] = []
                 else:
                     effective_results = callable_output
                     next_offset = str(current_offset_int + 1)
