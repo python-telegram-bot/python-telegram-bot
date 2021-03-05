@@ -1126,6 +1126,29 @@ class TestConversationHandler:
         assert handler.conversations.get((self.group.id, user1.id)) is None
         assert self.is_timeout
 
+    def test_conversation_timeout_warning_only_shown_once(self, recwarn):
+        ConversationHandler(
+            entry_points=self.entry_points,
+            states={
+                self.THIRSTY: [
+                    ConversationHandler(
+                        entry_points=self.entry_points,
+                        states={
+                            self.BREWING: [CommandHandler('startCoding', self.code)],
+                        },
+                        fallbacks=self.fallbacks,
+                    )
+                ]
+            },
+            fallbacks=self.fallbacks,
+            conversation_timeout=100,
+        )
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message) == (
+            "Setting `conversation_timeout` may lead to unexpected "
+            "behaviour when using nested conversation handlers."
+        )
+
     def test_per_message_warning_is_only_shown_once(self, recwarn):
         ConversationHandler(
             entry_points=self.entry_points,

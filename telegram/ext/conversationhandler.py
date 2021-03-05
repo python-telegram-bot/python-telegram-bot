@@ -291,6 +291,15 @@ class ConversationHandler(Handler[Update]):
                     )
                     break
 
+        if self.conversation_timeout:
+            for handler in all_handlers:
+                if isinstance(handler, self.__class__):
+                    warnings.warn(
+                        "Setting `conversation_timeout` may lead to unexpected "
+                        "behaviour when using nested conversation handlers."
+                    )
+                    break
+
         if self.run_async:
             for handler in all_handlers:
                 handler.run_async = True
@@ -613,7 +622,7 @@ class ConversationHandler(Handler[Update]):
         # handlers in this case
         state = self.conversations[context.conversation_key]
         if isinstance(state, tuple) and isinstance(state[1], Promise):
-            if state.done and state.result() == self.END:
+            if state[1].done and state[1].result() == self.END:
                 return
 
         with self._timeout_jobs_lock:
