@@ -241,7 +241,10 @@ class Dispatcher:
         # https://docs.python.org/3/tutorial/classes.html#private-variables), so we have to make
         # it mangled so they don't raise TelegramDeprecationWarning unnecessarily
         if key.startswith('__'):
-            key = f"_Dispatcher{key}"
+            key = f"_{self.__class__.__name__}{key}"
+        if issubclass(self.__class__, Dispatcher) and self.__class__.__name__ != 'Dispatcher':
+            object.__setattr__(self, key, value)
+            return
         set_new_attribute_deprecated(self, key, value)
 
     @property
@@ -397,7 +400,7 @@ class Dispatcher:
                 if self.__stop_event.is_set():
                     self.logger.debug('orderly stopping')
                     break
-                if self.exception_event.is_set():
+                if self.__exception_event.is_set():
                     self.logger.critical('stopping due to exception in another thread')
                     break
                 continue

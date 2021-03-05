@@ -81,6 +81,14 @@ class TestUpdater:
         assert len(mro_slots(updater)) == len(set(mro_slots(updater))), "duplicate slot"
         updater.custom, updater.running = 'should give warning', updater.running
         assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
+        class CustomUpdater(Updater):
+            pass
+
+        a = CustomUpdater(updater.bot.token)
+        a.my_custom = 'no error!'
+        assert len(recwarn) == 1
+
         updater.__setattr__('__test', 'mangled success')
         assert getattr(updater, '_Updater__test', 'e') == 'mangled success', "mangling failed"
 

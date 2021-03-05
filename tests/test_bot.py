@@ -113,6 +113,13 @@ class TestBot:
         inst.custom, inst.base_url = 'should give warning', inst.base_url
         assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
+        class CustomBot(Bot):
+            pass
+
+        a = CustomBot(inst.token)
+        a.my_custom = 'no error!'
+        assert len(recwarn) == 1
+
     @pytest.mark.parametrize(
         'token',
         argvalues=[

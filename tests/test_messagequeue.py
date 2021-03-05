@@ -35,21 +35,6 @@ class TestDelayQueue:
     margin_ms = 0
     testtimes = []
 
-    def test_slot_behaviour(self, recwarn, mro_slots):
-        q = mq.DelayQueue(burst_limit=self.burst_limit, time_limit_ms=self.time_limit_ms)
-        for at in q.__slots__:
-            at = f"_DelayQueue{at}" if at.startswith('__') and not at.endswith('__') else at
-            if at in ('_native_id', '_invoke_excepthook'):  # Threading didn't have this < py3.8
-                assert True
-            else:
-                assert getattr(q, at, 'err') != 'err', f"got extra slot '{at}'"
-        assert not q.__dict__, f"got missing slot(s): {q.__dict__}"
-        q.custom, q.burst_limit = 'should give warning', self.burst_limit
-        assert len(recwarn) == 2 and 'custom' in str(recwarn[1].message), recwarn.list
-        q.__setattr__('__test', 'mangled success')
-        assert getattr(q, '_DelayQueue__test', 'e') == 'mangled success', "mangling failed"
-        q.stop()  # Important to make sure tests gracefully exit
-
     def call(self):
         self.testtimes.append(perf_counter())
 
@@ -82,17 +67,3 @@ class TestDelayQueue:
             else:
                 fails.append(part)
         assert not fails
-
-
-class TestMessageQueue:
-    def test_slot_behaviour(self, recwarn, mro_slots):
-        q = mq.MessageQueue()
-        for at in q.__slots__:
-            if at in ('_native_id', '_invoke_excepthook'):  # Threading didn't have this < py3.8
-                assert True
-            else:
-                assert getattr(q, at, 'err') != 'err', f"got extra slot '{at}'"
-        assert not q.__dict__, f"got missing slot(s): {q.__dict__}"
-        q.custom, q._all_delayq = 'should give warning', q._all_delayq
-        assert len(recwarn) == 3 and 'custom' in str(recwarn[2].message), recwarn.list
-        q.stop()

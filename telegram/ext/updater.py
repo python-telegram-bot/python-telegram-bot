@@ -239,7 +239,10 @@ class Updater:
 
     def __setattr__(self, key: str, value: object) -> None:
         if key.startswith('__'):
-            key = f"_Updater{key}"
+            key = f"_{self.__class__.__name__}{key}"
+        if issubclass(self.__class__, Updater) and self.__class__.__name__ != 'Updater':
+            object.__setattr__(self, key, value)
+            return
         set_new_attribute_deprecated(self, key, value)
 
     def _init_thread(self, target: Callable, name: str, *args: object, **kwargs: object) -> None:

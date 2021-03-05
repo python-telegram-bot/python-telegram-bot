@@ -29,7 +29,6 @@ from typing import TYPE_CHECKING, Callable, List, NoReturn
 
 from telegram.ext.utils.promise import Promise
 from telegram.utils.deprecate import TelegramDeprecationWarning
-from telegram.utils.deprecate import set_new_attribute_deprecated
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -80,29 +79,6 @@ class DelayQueue(threading.Thread):
 
     """
 
-    # __dict__ already present in threading.Thread, so not included here
-    __slots__ = (
-        '_queue',
-        'burst_limit',
-        'time_limit',
-        'exc_route',
-        '__exit_req',
-        'daemon',
-        # The following slots are set by Threading, since the superclass doesn't have slots.
-        '_target',
-        '_name',
-        '_args',
-        '_kwargs',
-        '_daemonic',
-        '_ident',
-        '_native_id',
-        '_tstate_lock',
-        '_started',
-        '_is_stopped',
-        '_initialized',
-        '_stderr',
-        '_invoke_excepthook',
-    )
     _instcnt = 0  # instance counter
 
     def __init__(
@@ -132,11 +108,6 @@ class DelayQueue(threading.Thread):
         self.daemon = False
         if autostart:  # immediately start processing
             super().start()
-
-    def __setattr__(self, key: str, value: object) -> None:
-        if key.startswith('__'):
-            key = f"_DelayQueue{key}"
-        set_new_attribute_deprecated(self, key, value)
 
     def run(self) -> None:
         """
@@ -248,8 +219,6 @@ class MessageQueue:
 
     """
 
-    __slots__ = ('_all_delayq', '_group_delayq', '__dict__')
-
     def __init__(
         self,
         all_burst_limit: int = 30,
@@ -278,9 +247,6 @@ class MessageQueue:
             exc_route=exc_route,
             autostart=autostart,
         )
-
-    def __setattr__(self, key: str, value: object) -> None:
-        set_new_attribute_deprecated(self, key, value)
 
     def start(self) -> None:
         """Method is used to manually start the ``MessageQueue`` processing."""

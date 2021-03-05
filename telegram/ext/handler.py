@@ -131,6 +131,8 @@ class Handler(Generic[UT], ABC):
 
     def __setattr__(self, key: str, value: object) -> None:
         # See comment on BaseFilter to know why this was done.
+        if key.startswith('__'):
+            key = f"_{self.__class__.__name__}{key}"
         if issubclass(self.__class__, Handler) and not self.__class__.__module__.startswith(
             'telegram.ext.'
         ):

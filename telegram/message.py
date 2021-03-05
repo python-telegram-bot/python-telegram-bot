@@ -72,15 +72,13 @@ if TYPE_CHECKING:
         LabeledPrice,
     )
 
-_UNDEFINED = object()
-
 
 class Message(TelegramObject):
     # fmt: off
     """This object represents a message.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`message_id` and :attr:`chat` are equal.
+    considered equal, if their :attr:`message_Aid` and :attr:`chat` are equal.
 
     Note:
         In Python `from` is a reserved word, use `from_user` instead.
@@ -490,7 +488,7 @@ class Message(TelegramObject):
         self.reply_markup = reply_markup
         self.bot = bot
 
-        self._effective_attachment = _UNDEFINED
+        self._effective_attachment = DEFAULT_NONE
 
         self._id_attrs = (self.message_id, self.chat)
 
@@ -596,7 +594,7 @@ class Message(TelegramObject):
             :obj:`None` if no attachment was sent.
 
         """
-        if self._effective_attachment is not _UNDEFINED:
+        if self._effective_attachment is not DEFAULT_NONE:
             return self._effective_attachment  # type: ignore
 
         for i in Message.ATTACHMENT_TYPES:

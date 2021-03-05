@@ -635,7 +635,6 @@ class TestMessage:
             'location',
             'venue',
             'invoice',
-            'invoice',
             'successful_payment',
         ):
             item = getattr(message_params, i, None)

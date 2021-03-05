@@ -118,8 +118,8 @@ class BaseFilter(ABC):
 
     def __new__(cls, *args: object, **kwargs: object) -> 'BaseFilter':  # pylint: disable=W0613
         instance = super().__new__(cls)
-        object.__setattr__(instance, '_name', None)
-        object.__setattr__(instance, '_data_filter', False)
+        instance._name = None
+        instance._data_filter = False
 
         return instance
 

@@ -169,8 +169,7 @@ def dp(_dp):
     _dp.groups = []
     _dp.error_handlers = {}
     # For some reason if we setattr with the name mangled, then some tests(like async) run forever,
-    # due to threads not acquiring, (blocking). This adds these attributes to the
-    # __dict__, without raising a TGDeprecation warning.
+    # due to threads not acquiring, (blocking). This adds these attributes to the __dict__.
     object.__setattr__(_dp, '__stop_event', Event())
     object.__setattr__(_dp, '__exception_event', Event())
     object.__setattr__(_dp, '__async_queue', Queue())
@@ -218,7 +217,10 @@ def pytest_configure(config):
 
 
 def make_bot(bot_info, **kwargs):
-    return Bot(bot_info['token'], private_key=PRIVATE_KEY, **kwargs)
+    class DictBot(Bot):  # Subclass Bot to allow monkey patching of attributes and functions, would
+        pass  # come into effect when we __dict__ is dropped from slots
+
+    return DictBot(bot_info['token'], private_key=PRIVATE_KEY, **kwargs)
 
 
 CMD_PATTERN = re.compile(r'/[\da-z_]{1,32}(?:@\w{1,32})?')

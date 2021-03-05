@@ -208,6 +208,12 @@ class Bot(TelegramObject):
                 private_key, password=private_key_password, backend=default_backend()
             )
 
+    def __setattr__(self, key: str, value: object) -> None:
+        if issubclass(self.__class__, Bot) and self.__class__.__name__ != 'Bot':
+            object.__setattr__(self, key, value)
+            return
+        super().__setattr__(key, value)
+
     def _insert_defaults(
         self, data: Dict[str, object], timeout: ODVInput[float]
     ) -> Optional[float]:
