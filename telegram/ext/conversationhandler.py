@@ -608,10 +608,18 @@ class ConversationHandler(Handler[Update]):
         context = job.context  # type:ignore[union-attr,assignment]
         callback_context = context.callback_context
 
+        # async conversations can return CH.END without telling the
+        # current timeout handlers, make sure to not call timeout
+        # handlers in this case
+        state = self.conversations[context.conversation_key]
+        if isinstance(state, tuple) and isinstance(state[1], Promise):
+            if state.done and state.result() == self.END:
+                return
+
         with self._timeout_jobs_lock:
             found_job = self.timeout_jobs[context.conversation_key]
             if found_job is not job:
-                # The timeout has been canceled in handle_update
+                # The timeout has been cancelled in handle_update
                 return
             del self.timeout_jobs[context.conversation_key]
 
