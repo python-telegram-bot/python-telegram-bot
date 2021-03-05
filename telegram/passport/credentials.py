@@ -23,7 +23,7 @@ except ImportError:
     import json  # type: ignore[no-redef]
 
 from base64 import b64decode
-from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Union, no_type_check
+from typing import TYPE_CHECKING, Any, List, Optional, no_type_check
 
 try:
     from cryptography.hazmat.backends import default_backend
@@ -41,26 +41,11 @@ except ImportError:
 
     CRYPTO_INSTALLED = False
 
-from telegram import TelegramError, TelegramObject
+from telegram import TelegramObject, TelegramDecryptionError
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
     from telegram import Bot
-
-
-class TelegramDecryptionError(TelegramError):
-    """
-    Something went wrong with decryption.
-    """
-
-    __slots__ = ('_msg',)
-
-    def __init__(self, message: Union[str, Exception]):
-        super().__init__(f"TelegramDecryptionError: {message}")
-        self._msg = str(message)
-
-    def __reduce__(self) -> Tuple[type, Tuple[str]]:
-        return self.__class__, (self._msg,)
 
 
 @no_type_check
