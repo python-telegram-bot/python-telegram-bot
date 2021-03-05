@@ -161,7 +161,7 @@ class User(TelegramObject):
         """
         Shortcut for::
 
-            bot.send_message(update.effective_user.id, *args, **kwargs)
+            bot.get_user_profile_photos(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.get_user_profile_photos`.
