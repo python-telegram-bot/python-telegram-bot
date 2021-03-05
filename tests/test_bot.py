@@ -99,7 +99,6 @@ def inline_results():
 
 @pytest.fixture(scope='function')
 def inst(request, bot_info, default_bot):
-    # We make a new bot since the 'bot' fixture is polluted with monkeypatch setattr's
     return Bot(bot_info['token']) if request.param == 'bot' else default_bot
 
 

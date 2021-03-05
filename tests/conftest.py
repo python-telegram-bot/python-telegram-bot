@@ -84,7 +84,10 @@ def bot_info():
 
 @pytest.fixture(scope='session')
 def bot(bot_info):
-    return make_bot(bot_info)
+    class DictBot(Bot):  # Subclass Bot to allow monkey patching of attributes and functions, would
+        pass  # come into effect when we __dict__ is dropped from slots
+
+    return DictBot(bot_info['token'], private_key=PRIVATE_KEY)
 
 
 DEFAULT_BOTS = {}
@@ -217,10 +220,7 @@ def pytest_configure(config):
 
 
 def make_bot(bot_info, **kwargs):
-    class DictBot(Bot):  # Subclass Bot to allow monkey patching of attributes and functions, would
-        pass  # come into effect when we __dict__ is dropped from slots
-
-    return DictBot(bot_info['token'], private_key=PRIVATE_KEY, **kwargs)
+    return Bot(bot_info['token'], private_key=PRIVATE_KEY, **kwargs)
 
 
 CMD_PATTERN = re.compile(r'/[\da-z_]{1,32}(?:@\w{1,32})?')
