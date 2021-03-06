@@ -244,10 +244,11 @@ class Updater:
         self,
         poll_interval: float = 0.0,
         timeout: float = 10,
-        clean: bool = False,
+        clean: bool = None,
         bootstrap_retries: int = -1,
         read_latency: float = 2.0,
         allowed_updates: List[str] = None,
+        drop_pending_updates: bool = None,
     ) -> Optional[Queue]:
         """Starts polling updates from Telegram.
 
@@ -255,8 +256,12 @@ class Updater:
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
                 Telegram in seconds. Default is 0.0.
             timeout (:obj:`float`, optional): Passed to :attr:`telegram.Bot.get_updates`.
-            clean (:obj:`bool`, optional): Whether to clean any pending updates on Telegram servers
-                before actually starting to poll. Default is :obj:`False`.
+            drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
+                Telegram servers before actually starting to poll. Default is :obj:`False`.
+            clean (:obj:`bool`, optional): Alias for ``drop_pending_updates``.
+
+                .. deprecated:: v13.4
+                    Use ``drop_pending_updates`` instead.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 `Updater` will retry on failures on the Telegram server.
 
@@ -274,6 +279,19 @@ class Updater:
             :obj:`Queue`: The update queue that can be filled from the main thread.
 
         """
+        if (clean is not None) and (drop_pending_updates is not None):
+            raise TypeError('`clean` and `drop_pending_updates` are mutually exclusive.')
+
+        if clean is not None:
+            warnings.warn(
+                'The argument `clean` of `start_polling` is deprecated. Please use '
+                '`drop_pending_updates` instead.',
+                category=TelegramDeprecationWarning,
+                stacklevel=2,
+            )
+
+        drop_pending_updates = drop_pending_updates if drop_pending_updates is not None else clean
+
         with self.__lock:
             if not self.running:
                 self.running = True
@@ -290,7 +308,7 @@ class Updater:
                     timeout,
                     read_latency,
                     bootstrap_retries,
-                    clean,
+                    drop_pending_updates,
                     allowed_updates,
                     ready=polling_ready,
                 )
@@ -310,11 +328,13 @@ class Updater:
         url_path: str = '',
         cert: str = None,
         key: str = None,
-        clean: bool = False,
+        clean: bool = None,
         bootstrap_retries: int = 0,
         webhook_url: str = None,
         allowed_updates: List[str] = None,
         force_event_loop: bool = False,
+        drop_pending_updates: bool = None,
+        ip_address: str = None,
     ) -> Optional[Queue]:
         """
         Starts a small http server to listen for updates via webhook. If cert
@@ -338,8 +358,12 @@ class Updater:
             url_path (:obj:`str`, optional): Path inside url.
             cert (:obj:`str`, optional): Path to the SSL certificate file.
             key (:obj:`str`, optional): Path to the SSL key file.
-            clean (:obj:`bool`, optional): Whether to clean any pending updates on Telegram servers
-                before actually starting the webhook. Default is :obj:`False`.
+            drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
+                Telegram servers before actually starting to poll. Default is :obj:`False`.
+            clean (:obj:`bool`, optional): Alias for ``drop_pending_updates``.
+
+                .. deprecated:: v13.4
+                    Use ``drop_pending_updates`` instead.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 `Updater` will retry on failures on the Telegram server.
 
@@ -349,6 +373,8 @@ class Updater:
 
             webhook_url (:obj:`str`, optional): Explicitly specify the webhook url. Useful behind
                 NAT, reverse proxy, etc. Default is derived from `listen`, `port` & `url_path`.
+            ip_address (:obj:`str`, optional): The fixed IP address which will be used to send
+                webhook requests instead of the IP address resolved through DNS.
             allowed_updates (List[:obj:`str`], optional): Passed to
                 :attr:`telegram.Bot.set_webhook`.
             force_event_loop (:obj:`bool`, optional): Force using the current event loop. See above
@@ -358,6 +384,19 @@ class Updater:
             :obj:`Queue`: The update queue that can be filled from the main thread.
 
         """
+        if (clean is not None) and (drop_pending_updates is not None):
+            raise TypeError('`clean` and `drop_pending_updates` are mutually exclusive.')
+
+        if clean is not None:
+            warnings.warn(
+                'The argument `clean` of `start_webhook` is deprecated. Please use '
+                '`drop_pending_updates` instead.',
+                category=TelegramDeprecationWarning,
+                stacklevel=2,
+            )
+
+        drop_pending_updates = drop_pending_updates if drop_pending_updates is not None else clean
+
         with self.__lock:
             if not self.running:
                 self.running = True
@@ -376,11 +415,12 @@ class Updater:
                     cert,
                     key,
                     bootstrap_retries,
-                    clean,
+                    drop_pending_updates,
                     webhook_url,
                     allowed_updates,
                     ready=webhook_ready,
                     force_event_loop=force_event_loop,
+                    ip_address=ip_address,
                 )
 
                 self.logger.debug('Waiting for Dispatcher and Webhook to start')
@@ -398,7 +438,7 @@ class Updater:
         timeout,
         read_latency,
         bootstrap_retries,
-        clean,
+        drop_pending_updates,
         allowed_updates,
         ready=None,
     ):  # pragma: no cover
@@ -408,7 +448,12 @@ class Updater:
 
         self.logger.debug('Updater thread started (polling)')
 
-        self._bootstrap(bootstrap_retries, clean=clean, webhook_url='', allowed_updates=None)
+        self._bootstrap(
+            bootstrap_retries,
+            drop_pending_updates=drop_pending_updates,
+            webhook_url='',
+            allowed_updates=None,
+        )
 
         self.logger.debug('Bootstrap done')
 
@@ -504,14 +549,20 @@ class Updater:
         cert,
         key,
         bootstrap_retries,
-        clean,
+        drop_pending_updates,
         webhook_url,
         allowed_updates,
         ready=None,
         force_event_loop=False,
+        ip_address=None,
     ):
         self.logger.debug('Updater thread started (webhook)')
+
+        # Note that we only use the SSL certificate for the WebhookServer, if the key is also
+        # present. This is because the WebhookServer may not actually be in charge of performing
+        # the SSL handshake, e.g. in case a reverse proxy is used
         use_ssl = cert is not None and key is not None
+
         if not url_path.startswith('/'):
             url_path = f'/{url_path}'
 
@@ -532,23 +583,18 @@ class Updater:
         # Create and start server
         self.httpd = WebhookServer(listen, port, app, ssl_ctx)
 
-        if use_ssl:
-            # DO NOT CHANGE: Only set webhook if SSL is handled by library
-            if not webhook_url:
-                webhook_url = self._gen_webhook_url(listen, port, url_path)
+        if not webhook_url:
+            webhook_url = self._gen_webhook_url(listen, port, url_path)
 
-            self._bootstrap(
-                max_retries=bootstrap_retries,
-                clean=clean,
-                webhook_url=webhook_url,
-                cert=open(cert, 'rb'),
-                allowed_updates=allowed_updates,
-            )
-        elif clean:
-            self.logger.warning(
-                "cleaning updates is not supported if "
-                "SSL-termination happens elsewhere; skipping"
-            )
+        # We pass along the cert to the webhook if present.
+        self._bootstrap(
+            max_retries=bootstrap_retries,
+            drop_pending_updates=drop_pending_updates,
+            webhook_url=webhook_url,
+            allowed_updates=allowed_updates,
+            cert=open(cert, 'rb') if cert is not None else None,
+            ip_address=ip_address,
+        )
 
         self.httpd.serve_forever(force_event_loop=force_event_loop, ready=ready)
 
@@ -558,24 +604,34 @@ class Updater:
 
     @no_type_check
     def _bootstrap(
-        self, max_retries, clean, webhook_url, allowed_updates, cert=None, bootstrap_interval=5
+        self,
+        max_retries,
+        drop_pending_updates,
+        webhook_url,
+        allowed_updates,
+        cert=None,
+        bootstrap_interval=5,
+        ip_address=None,
     ):
         retries = [0]
 
         def bootstrap_del_webhook():
-            self.bot.delete_webhook()
-            return False
-
-        def bootstrap_clean_updates():
-            self.logger.debug('Cleaning updates from Telegram server')
-            updates = self.bot.get_updates()
-            while updates:
-                updates = self.bot.get_updates(updates[-1].update_id + 1)
+            self.logger.debug('Deleting webhook')
+            if drop_pending_updates:
+                self.logger.debug('Dropping pending updates from Telegram server')
+            self.bot.delete_webhook(drop_pending_updates=drop_pending_updates)
             return False
 
         def bootstrap_set_webhook():
+            self.logger.debug('Setting webhook')
+            if drop_pending_updates:
+                self.logger.debug('Dropping pending updates from Telegram server')
             self.bot.set_webhook(
-                url=webhook_url, certificate=cert, allowed_updates=allowed_updates
+                url=webhook_url,
+                certificate=cert,
+                allowed_updates=allowed_updates,
+                ip_address=ip_address,
+                drop_pending_updates=drop_pending_updates,
             )
             return False
 
@@ -589,11 +645,11 @@ class Updater:
                 self.logger.error('Failed bootstrap phase after %s retries (%s)', retries[0], exc)
                 raise exc
 
-        # Cleaning pending messages is done by polling for them - so we need to delete webhook if
-        # one is configured.
-        # We also take this chance to delete pre-configured webhook if this is a polling Updater.
-        # NOTE: We don't know ahead if a webhook is configured, so we just delete.
-        if clean or not webhook_url:
+        # Dropping pending updates from TG can be efficiently done with the drop_pending_updates
+        # parameter of delete/start_webhook, even in the case of polling. Also we want to make
+        # sure that no webhook is configured in case of polling, so we just always call
+        # delete_webhook for polling
+        if drop_pending_updates or not webhook_url:
             self._network_loop_retry(
                 bootstrap_del_webhook,
                 bootstrap_onerr_cb,
@@ -601,17 +657,6 @@ class Updater:
                 bootstrap_interval,
             )
             retries[0] = 0
-
-        # Clean pending messages, if requested.
-        if clean:
-            self._network_loop_retry(
-                bootstrap_clean_updates,
-                bootstrap_onerr_cb,
-                'bootstrap clean updates',
-                bootstrap_interval,
-            )
-            retries[0] = 0
-            sleep(1)
 
         # Restore/set webhook settings, if needed. Again, we don't know ahead if a webhook is set,
         # so we set it anyhow.

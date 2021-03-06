@@ -247,7 +247,7 @@ class TestUpdater:
                 cert=None,
                 key=None,
                 bootstrap_retries=0,
-                clean=False,
+                drop_pending_updates=False,
                 webhook_url=None,
                 allowed_updates=None,
             )
@@ -274,7 +274,7 @@ class TestUpdater:
                     cert=None,
                     key=None,
                     bootstrap_retries=0,
-                    clean=False,
+                    drop_pending_updates=False,
                     webhook_url=None,
                     allowed_updates=None,
                 )
@@ -307,7 +307,7 @@ class TestUpdater:
                 cert=None,
                 key=None,
                 bootstrap_retries=0,
-                clean=False,
+                drop_pending_updates=False,
                 webhook_url=None,
                 allowed_updates=None,
                 force_event_loop=True,
@@ -328,7 +328,7 @@ class TestUpdater:
                 cert='./tests/test_updater.py',
                 key='./tests/test_updater.py',
                 bootstrap_retries=0,
-                clean=False,
+                drop_pending_updates=False,
                 webhook_url=None,
                 allowed_updates=None,
             )
