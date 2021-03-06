@@ -240,7 +240,7 @@ class Updater:
     def __setattr__(self, key: str, value: object) -> None:
         if key.startswith('__'):
             key = f"_{self.__class__.__name__}{key}"
-        if issubclass(self.__class__, Updater) and self.__class__.__name__ != 'Updater':
+        if issubclass(self.__class__, Updater) and self.__class__ is not Updater:
             object.__setattr__(self, key, value)
             return
         set_new_attribute_deprecated(self, key, value)

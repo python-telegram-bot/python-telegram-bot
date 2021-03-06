@@ -62,7 +62,7 @@ class TestDispatcher:
         assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
         class CustomDispatcher(Dispatcher):
-            pass
+            pass  # Tests that setting custom attrs of Dispatcher subclass doesn't raise warning
 
         a = CustomDispatcher(None, None)
         a.my_custom = 'no error!'

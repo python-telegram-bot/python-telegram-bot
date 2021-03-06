@@ -78,7 +78,7 @@ class Message(TelegramObject):
     """This object represents a message.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`message_Aid` and :attr:`chat` are equal.
+    considered equal, if their :attr:`message_id` and :attr:`chat` are equal.
 
     Note:
         In Python `from` is a reserved word, use `from_user` instead.

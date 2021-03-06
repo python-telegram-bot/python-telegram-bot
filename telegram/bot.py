@@ -209,7 +209,7 @@ class Bot(TelegramObject):
             )
 
     def __setattr__(self, key: str, value: object) -> None:
-        if issubclass(self.__class__, Bot) and self.__class__.__name__ != 'Bot':
+        if issubclass(self.__class__, Bot) and self.__class__ is not Bot:
             object.__setattr__(self, key, value)
             return
         super().__setattr__(key, value)

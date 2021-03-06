@@ -29,6 +29,7 @@ excluded = {
     'DispatcherHandlerStop',
     'Days',
     'telegram.deprecate',
+    'TelegramDecryptionError',
 }  # These modules/classes intentionally don't have __dict__.
 
 

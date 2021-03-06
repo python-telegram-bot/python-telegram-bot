@@ -113,7 +113,7 @@ class TestBot:
         assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
         class CustomBot(Bot):
-            pass
+            pass  # Tests that setting custom attributes of Bot subclass doesn't raise warning
 
         a = CustomBot(inst.token)
         a.my_custom = 'no error!'

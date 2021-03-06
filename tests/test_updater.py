@@ -83,7 +83,7 @@ class TestUpdater:
         assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
         class CustomUpdater(Updater):
-            pass
+            pass  # Tests that setting custom attributes of Updater subclass doesn't raise warning
 
         a = CustomUpdater(updater.bot.token)
         a.my_custom = 'no error!'

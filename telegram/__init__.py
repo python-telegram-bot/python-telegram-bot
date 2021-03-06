@@ -46,7 +46,7 @@ from .replymarkup import ReplyMarkup
 from .replykeyboardmarkup import ReplyKeyboardMarkup
 from .replykeyboardremove import ReplyKeyboardRemove
 from .forcereply import ForceReply
-from .error import TelegramError, TelegramDecryptionError
+from .error import TelegramError
 from .files.inputfile import InputFile
 from .files.file import File
 from .parsemode import ParseMode
@@ -141,6 +141,7 @@ from .passport.credentials import (
     SecureData,
     SecureValue,
     FileCredentials,
+    TelegramDecryptionError,
 )
 from .bot import Bot
 from .version import __version__  # noqa: F401

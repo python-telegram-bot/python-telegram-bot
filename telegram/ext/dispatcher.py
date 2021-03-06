@@ -242,7 +242,7 @@ class Dispatcher:
         # it mangled so they don't raise TelegramDeprecationWarning unnecessarily
         if key.startswith('__'):
             key = f"_{self.__class__.__name__}{key}"
-        if issubclass(self.__class__, Dispatcher) and self.__class__.__name__ != 'Dispatcher':
+        if issubclass(self.__class__, Dispatcher) and self.__class__ is not Dispatcher:
             object.__setattr__(self, key, value)
             return
         set_new_attribute_deprecated(self, key, value)
