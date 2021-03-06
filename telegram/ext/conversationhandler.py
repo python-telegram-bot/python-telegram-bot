@@ -145,9 +145,10 @@ class ConversationHandler(Handler[Update]):
             :attr:`ConversationHandler.TIMEOUT`.
 
             Note:
-                * `conversation_timeout` with `run_async` may fail, if the :obj:`Promise` takes longer to
-                  finish.
-                * Using `conversation_timeout` with nested conversations may cause unexpected behaviour.
+                * `conversation_timeout` with `run_async` may fail, if the :obj:`Promise`
+                  takes longer to finish.
+                * Using `conversation_timeout` with nested conversations may cause unexpected
+                  behaviour.
 
         name (:obj:`str`, optional): The name for this conversationhandler. Required for
             persistence.
@@ -450,7 +451,7 @@ class ConversationHandler(Handler[Update]):
         finally:
             if res is None and old_state is None:
                 res = self.END
-            return res
+        return res
 
     def check_update(self, update: object) -> CheckUpdateType:  # pylint: disable=R0911
         """
