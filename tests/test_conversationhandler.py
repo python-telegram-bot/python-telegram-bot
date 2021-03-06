@@ -789,6 +789,56 @@ class TestConversationHandler:
         sleep(0.7)
         assert handler.conversations.get((self.group.id, user1.id)) is None
 
+    def test_timeout_not_triggered_on_conv_end_async(self, bot, dp, user1):
+        def timeout(*a, **kw):
+            self.test_flag = True
+
+        self.states.update({ConversationHandler.TIMEOUT: [TypeHandler(Update, timeout)]})
+        handler = ConversationHandler(
+            entry_points=self.entry_points,
+            states=self.states,
+            fallbacks=self.fallbacks,
+            conversation_timeout=0.75,
+            run_async=True,
+        )
+        dp.add_handler(handler)
+
+        message = Message(
+            0,
+            None,
+            self.group,
+            from_user=user1,
+            text='/start',
+            entities=[
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+            ],
+            bot=bot,
+        )
+        # start the conversation
+        dp.process_update(Update(update_id=0, message=message))
+        sleep(0.1)
+        message.text = '/brew'
+        message.entities[0].length = len('/brew')
+        dp.process_update(Update(update_id=1, message=message))
+        sleep(0.1)
+        message.text = '/pourCoffee'
+        message.entities[0].length = len('/pourCoffee')
+        dp.process_update(Update(update_id=2, message=message))
+        sleep(0.1)
+        message.text = '/end'
+        message.entities[0].length = len('/end')
+        dp.process_update(Update(update_id=3, message=message))
+        sleep(0.1)
+        message.text = 'resolve promise pls'
+        message.entities[0].length = len('resolve promise pls')
+        dp.process_update(Update(update_id=4, message=message))
+        sleep(0.1)
+        # assert promise got resolved
+        assert handler.conversations.get((self.group.id, user1.id)) is None
+        sleep(1)
+        # assert timeout handler didn't got called
+        assert self.test_flag is False
+
     def test_conversation_timeout_dispatcher_handler_stop(self, dp, bot, user1, caplog):
         handler = ConversationHandler(
             entry_points=self.entry_points,

@@ -143,6 +143,12 @@ class ConversationHandler(Handler[Update]):
             received update and the corresponding ``context`` will be handled by ALL the handler's
             who's :attr:`check_update` method returns :obj:`True` that are in the state
             :attr:`ConversationHandler.TIMEOUT`.
+
+            Note:
+                * `conversation_timeout` with `run_async` may fail, if the :obj:`Promise` takes longer to
+                  finish.
+                * Using `conversation_timeout` with nested conversations may cause unexpected behaviour.
+
         name (:obj:`str`, optional): The name for this conversationhandler. Required for
             persistence.
         persistent (:obj:`bool`, optional): If the conversations dict for this handler should be
@@ -432,6 +438,20 @@ class ConversationHandler(Handler[Update]):
 
         return tuple(key)
 
+    def _resovle_promomise(self, state: Tuple) -> object:
+        old_state, new_state = state
+        try:
+            res = new_state.result(0)
+            res = res if res is not None else old_state
+        except Exception as exc:
+            self.logger.exception("Promise function raised exception")
+            self.logger.exception("%s", exc)
+            res = old_state
+        finally:
+            if res is None and old_state is None:
+                res = self.END
+            return res
+
     def check_update(self, update: object) -> CheckUpdateType:  # pylint: disable=R0911
         """
         Determines whether an update should be handled by this conversationhandler, and if so in
@@ -464,21 +484,14 @@ class ConversationHandler(Handler[Update]):
         if isinstance(state, tuple) and len(state) == 2 and isinstance(state[1], Promise):
             self.logger.debug('waiting for promise...')
 
-            old_state, new_state = state
-            if new_state.done.wait(0):
-                try:
-                    res = new_state.result(0)
-                    res = res if res is not None else old_state
-                except Exception as exc:
-                    self.logger.exception("Promise function raised exception")
-                    self.logger.exception("%s", exc)
-                    res = old_state
-                finally:
-                    if res is None and old_state is None:
-                        res = self.END
-                    self.update_state(res, key)
-                    with self._conversations_lock:
-                        state = self.conversations.get(key)
+            # check if promise is finished or not
+            if state[1].done.wait(0):
+                res = self._resovle_promomise(state)
+                self.update_state(res, key)
+                with self._conversations_lock:
+                    state = self.conversations.get(key)
+
+            # if not then handle WAITING state instead
             else:
                 hdlrs = self.states.get(self.WAITING, [])
                 for hdlr in hdlrs:
@@ -621,9 +634,12 @@ class ConversationHandler(Handler[Update]):
         # current timeout handlers, make sure to not call timeout
         # handlers in this case
         state = self.conversations[context.conversation_key]
-        if isinstance(state, tuple) and isinstance(state[1], Promise):
-            if state[1].done and state[1].result() == self.END:
-                return
+        if (
+            isinstance(state, tuple)
+            and isinstance(state[1], Promise)
+            and self._resovle_promomise(state) == self.END
+        ):
+            return
 
         with self._timeout_jobs_lock:
             found_job = self.timeout_jobs[context.conversation_key]
