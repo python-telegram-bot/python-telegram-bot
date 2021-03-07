@@ -753,6 +753,48 @@ class TestConversationHandler:
         assert not handler.check_update(Update(0, pre_checkout_query=pre_checkout_query))
         assert not handler.check_update(Update(0, shipping_query=shipping_query))
 
+    def test_promise_exception(self, dp, bot, user1, caplog):
+        def conv_entry(*a, **kw):
+            return 1
+
+        def raise_error(*a, **kw):
+            raise Exception("Oh no")
+
+        handler = ConversationHandler(
+            entry_points=[CommandHandler("start", conv_entry)],
+            states={1: [MessageHandler(Filters.all, raise_error)]},
+            fallbacks=self.fallbacks,
+            run_async=True,
+        )
+        dp.add_handler(handler)
+
+        message = Message(
+            0,
+            None,
+            self.group,
+            from_user=user1,
+            text='/start',
+            entities=[
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+            ],
+            bot=bot,
+        )
+        # start the conversation
+        dp.process_update(Update(update_id=0, message=message))
+        sleep(0.1)
+        message.text = "error"
+        dp.process_update(Update(update_id=0, message=message))
+        sleep(0.1)
+        message.text = "resolve promise pls"
+        caplog.clear()
+        with caplog.at_level(logging.ERROR):
+            dp.process_update(Update(update_id=0, message=message))
+            sleep(0.5)
+        assert len(caplog.records) == 3
+        assert caplog.records[0].message == "Promise function raised exception"
+        # assert res is old state
+        assert handler.conversations.get((self.group.id, user1.id))[0] == 1
+
     def test_conversation_timeout(self, dp, bot, user1):
         handler = ConversationHandler(
             entry_points=self.entry_points,
