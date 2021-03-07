@@ -145,10 +145,13 @@ class ConversationHandler(Handler[Update]):
             :attr:`ConversationHandler.TIMEOUT`.
 
             Note:
-                * `conversation_timeout` with `run_async` may fail, if the :obj:`Promise`
-                  takes longer to finish.
-                * Using `conversation_timeout` with nested conversations may cause unexpected
-                  behaviour.
+                * `conversation_timeout` with `run_async` may fail, if the
+                  :class:`telegram.ext.utils.promise.Promise` takes longer to finish than the
+                  timeout.
+                * Using `conversation_timeout` with nested conversations is currently not
+                  supported. You can still try to use it, but it will likely behave differently
+                  from what you expect.
+
 
         name (:obj:`str`, optional): The name for this conversationhandler. Required for
             persistence.
@@ -302,8 +305,9 @@ class ConversationHandler(Handler[Update]):
             for handler in all_handlers:
                 if isinstance(handler, self.__class__):
                     warnings.warn(
-                        "Setting `conversation_timeout` may lead to unexpected "
-                        "behaviour when using nested conversation handlers."
+                        "Using `conversation_timeout` with nested conversations is currently not "
+                        "supported. You can still try to use it, but it will likely behave "
+                        "differently from what you expect."
                     )
                     break
 

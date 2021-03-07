@@ -758,7 +758,7 @@ class TestConversationHandler:
             return 1
 
         def raise_error(*a, **kw):
-            raise Exception("Oh no")
+            raise Exception("promise exception")
 
         handler = ConversationHandler(
             entry_points=[CommandHandler("start", conv_entry)],
@@ -792,7 +792,7 @@ class TestConversationHandler:
             sleep(0.5)
         assert len(caplog.records) == 3
         assert caplog.records[0].message == "Promise function raised exception"
-        assert caplog.records[1].message == "Oh no"
+        assert caplog.records[1].message == "promise exception"
         # assert res is old state
         assert handler.conversations.get((self.group.id, user1.id))[0] == 1
 
@@ -1227,19 +1227,29 @@ class TestConversationHandler:
                     ConversationHandler(
                         entry_points=self.entry_points,
                         states={
-                            self.BREWING: [CommandHandler('startCoding', self.code)],
+                            self.BREWING: [CommandHandler('pourCoffee', self.drink)],
                         },
                         fallbacks=self.fallbacks,
                     )
-                ]
+                ],
+                self.DRINKING: [
+                    ConversationHandler(
+                        entry_points=self.entry_points,
+                        states={
+                            self.CODING: [CommandHandler('startCoding', self.code)],
+                        },
+                        fallbacks=self.fallbacks,
+                    )
+                ],
             },
             fallbacks=self.fallbacks,
             conversation_timeout=100,
         )
         assert len(recwarn) == 1
         assert str(recwarn[0].message) == (
-            "Setting `conversation_timeout` may lead to unexpected "
-            "behaviour when using nested conversation handlers."
+            "Using `conversation_timeout` with nested conversations is currently not "
+            "supported. You can still try to use it, but it will likely behave "
+            "differently from what you expect."
         )
 
     def test_per_message_warning_is_only_shown_once(self, recwarn):
