@@ -792,6 +792,7 @@ class TestConversationHandler:
             sleep(0.5)
         assert len(caplog.records) == 3
         assert caplog.records[0].message == "Promise function raised exception"
+        assert caplog.records[1].message == "Oh no"
         # assert res is old state
         assert handler.conversations.get((self.group.id, user1.id))[0] == 1
 
