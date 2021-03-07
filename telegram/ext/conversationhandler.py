@@ -443,7 +443,7 @@ class ConversationHandler(Handler[Update]):
 
         return tuple(key)
 
-    def _resovle_promomise(self, state: Tuple) -> object:
+    def _resolve_promise(self, state: Tuple) -> object:
         old_state, new_state = state
         try:
             res = new_state.result(0)
@@ -491,7 +491,7 @@ class ConversationHandler(Handler[Update]):
 
             # check if promise is finished or not
             if state[1].done.wait(0):
-                res = self._resovle_promomise(state)
+                res = self._resolve_promise(state)
                 self.update_state(res, key)
                 with self._conversations_lock:
                     state = self.conversations.get(key)
@@ -642,7 +642,7 @@ class ConversationHandler(Handler[Update]):
         if (
             isinstance(state, tuple)
             and isinstance(state[1], Promise)
-            and self._resovle_promomise(state) == self.END
+            and self._resolve_promise(state) == self.END
         ):
             return
 
