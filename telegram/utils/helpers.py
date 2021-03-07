@@ -17,7 +17,10 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains helper functions."""
-
+import os
+os.getcwd()
+import sys
+sys.path.append('C:\\Users\\User\\Documents\\GitHub\\python-telegram-bot\\')
 import datetime as dtm  # dtm = "DateTime Module"
 import re
 import signal
