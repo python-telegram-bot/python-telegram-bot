@@ -179,7 +179,7 @@ class EncryptedCredentials(TelegramObject):
             # is the default for OAEP, the algorithm is the default for PHP which is what
             # Telegram's backend servers run.
             try:
-                self._decrypted_secret = self.bot.private_key.decrypt(  # type: ignore
+                self._decrypted_secret = self.bot.private_key.decrypt(
                     b64decode(self.secret),
                     OAEP(mgf=MGF1(algorithm=SHA1()), algorithm=SHA1(), label=None),
                 )
