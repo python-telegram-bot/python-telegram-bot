@@ -81,13 +81,12 @@ class TestPhoto:
         assert thumb.file_unique_id != ''
 
     def test_expected_values(self, photo, thumb):
+        # We used to test for file_size as well, but TG apparently at some point apparently changed
+        # the compression method and it's not really our job anyway ...
         assert photo.width == self.width
         assert photo.height == self.height
-        # For some reason something changed at some point, that's why we allow two values here …
-        assert photo.file_size in [self.file_size, 27662]
         assert thumb.width == 320
         assert thumb.height == 320
-        assert thumb.file_size == 9331
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
