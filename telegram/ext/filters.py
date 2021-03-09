@@ -1077,8 +1077,8 @@ officedocument.wordprocessingml.document")``.
         left_chat_member: Messages that contain
             :attr:`telegram.Message.left_chat_member`.
         migrate: Messages that contain
-            :attr:`telegram.Message.migrate_from_chat_id` or
-            :attr: `telegram.Message.migrate_from_chat_id`.
+            :attr:`telegram.Message.migrate_to_chat_id` or
+            :attr:`telegram.Message.migrate_from_chat_id`.
         new_chat_members: Messages that contain
             :attr:`telegram.Message.new_chat_members`.
         new_chat_photo: Messages that contain
