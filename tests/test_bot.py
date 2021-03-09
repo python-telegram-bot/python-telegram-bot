@@ -1837,7 +1837,7 @@ class TestBot:
         reply_to_message = default_bot.send_message(chat_id, 'test')
         reply_to_message.delete()
         if not default_bot.defaults.allow_sending_without_reply:
-            with pytest.raises(BadRequest, match='Reply message not found'):
+            with pytest.raises(BadRequest, match='not found'):
                 default_bot.copy_message(
                     chat_id,
                     from_chat_id=chat_id,
