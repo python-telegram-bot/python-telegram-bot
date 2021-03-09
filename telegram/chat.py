@@ -320,6 +320,7 @@ class Chat(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         until_date: Union[int, datetime] = None,
         api_kwargs: JSONDict = None,
+        revoke_messages: bool = None,
     ) -> bool:
         """Shortcut for::
 
@@ -343,6 +344,7 @@ class Chat(TelegramObject):
             timeout=timeout,
             until_date=until_date,
             api_kwargs=api_kwargs,
+            revoke_messages=revoke_messages,
         )
 
     def unban_member(
@@ -384,6 +386,7 @@ class Chat(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         is_anonymous: bool = None,
+        can_manage_chat: bool = None,
     ) -> bool:
         """Shortcut for::
 
@@ -412,6 +415,7 @@ class Chat(TelegramObject):
             timeout=timeout,
             api_kwargs=api_kwargs,
             is_anonymous=is_anonymous,
+            can_manage_chat=can_manage_chat,
         )
 
     def restrict_member(
