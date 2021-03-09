@@ -46,7 +46,7 @@ class ChatInviteLink(TelegramObject):
 
     Attributes:
         invite_link (:obj:`str`): The invite link. If the link was created by another chat
-            administrator, then the second part of the link will be replaced with “…”.
+            administrator, then the second part of the link will be replaced with ``'…'``.
         creator (:class:`telegram.User`): Creator of the link.
         is_primary (:obj:`bool`): True, if the link is primary.
         is_revoked (:obj:`bool`): True, if the link is revoked.
