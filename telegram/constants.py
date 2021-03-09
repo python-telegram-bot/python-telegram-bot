@@ -182,12 +182,14 @@ DICE_DARTS: str = '🎯'
 DICE_BASKETBALL: str = '🏀'
 DICE_FOOTBALL: str = '⚽'
 DICE_SLOT_MACHINE: str = '🎰'
+DICE_BOWLING: str = '🎳'
 DICE_ALL_EMOJI: List[str] = [
     DICE_DICE,
     DICE_DARTS,
     DICE_BASKETBALL,
     DICE_FOOTBALL,
     DICE_SLOT_MACHINE,
+    DICE_BOWLING,
 ]
 
 MESSAGEENTITY_MENTION: str = 'mention'

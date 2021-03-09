@@ -2256,25 +2256,33 @@ class Bot(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         until_date: Union[int, datetime] = None,
         api_kwargs: JSONDict = None,
+        revoke_messages: bool = None,
     ) -> bool:
         """
-        Use this method to kick a user from a group or a supergroup or a channel. In the case of
+        Use this method to kick a user from a group, supergroup or a channel. In the case of
         supergroups and channels, the user will not be able to return to the group on their own
         using invite links, etc., unless unbanned first. The bot must be an administrator in the
-        group for this to work.
+        chat for this to work and must have the appropriate admin rights.
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or  username
-                of the target channel (in the format @channelusername).
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target group or username
+                of the target supergroup or channel (in the format @channelusername).
             user_id (:obj:`int`): Unique identifier of the target user.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
             until_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the user will
                 be unbanned, unix time. If user is banned for more than 366 days or less than 30
-                seconds from the current time they are considered to be banned forever.
+                seconds from the current time they are considered to be banned forever. Applied
+                for supergroups and channels only.
                 For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
                 bot will be used.
+            revoke_messages (:obj:`bool`, optional): Pass :obj:`True` to delete all messages from
+                the chat for the user that is being removed. If :obj:`False`, the user will be able
+                to see messages in the group that were sent before the user was removed.
+                Always :obj:`True` for supergroups and channels.
+
+                .. versionadded:: 13.4
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
@@ -2293,6 +2301,9 @@ class Bot(TelegramObject):
                     until_date, tzinfo=self.defaults.tzinfo if self.defaults else None
                 )
             data['until_date'] = until_date
+
+        if revoke_messages is not None:
+            data['revoke_messages'] = revoke_messages
 
         result = self._post('kickChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
 
@@ -3589,6 +3600,7 @@ class Bot(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         is_anonymous: bool = None,
+        can_manage_chat: bool = None,
     ) -> bool:
         """
         Use this method to promote or demote a user in a supergroup or a channel. The bot must be
@@ -3597,16 +3609,22 @@ class Bot(TelegramObject):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target supergroup (in the format @supergroupusername).
+                of the target channel (in the format @channelusername).
             user_id (:obj:`int`): Unique identifier of the target user.
             is_anonymous (:obj:`bool`, optional): Pass :obj:`True`, if the administrator's presence
                 in the chat is hidden.
+            can_manage_chat (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
+                access the chat event log, chat statistics, message statistics in channels, see
+                channel members, see anonymous administrators in supergroups and ignore slow mode.
+                Implied by any other administrator privilege.
+
+                .. versionadded:: 13.4
             can_change_info (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 change chat title, photo and other settings.
             can_post_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 create channel posts, channels only.
             can_edit_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
-                edit messages of other users, channels only.
+                edit messages of other users and can pin messages, channels only.
             can_delete_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 delete messages of other users.
             can_invite_users (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
@@ -3652,6 +3670,8 @@ class Bot(TelegramObject):
             data['can_pin_messages'] = can_pin_messages
         if can_promote_members is not None:
             data['can_promote_members'] = can_promote_members
+        if can_manage_chat is not None:
+            data['can_manage_chat'] = can_manage_chat
 
         result = self._post('promoteChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
 
@@ -4771,15 +4791,18 @@ class Bot(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
     ) -> Message:
         """
-        Use this method to send an animated emoji, which will have a random value. On success, the
-        sent Message is returned.
+        Use this method to send an animated emoji that will display a random value.
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target private chat.
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
             emoji (:obj:`str`, optional): Emoji on which the dice throw animation is based.
-                Currently, must be one of “🎲”, “🎯”, “🏀”, “⚽”, or “🎰”. Dice can have values 1-6
-                for “🎲” and “🎯”, values 1-5 for “🏀” and “⚽”, and values 1-64 for “🎰”. Defaults
-                to “🎲”.
+                Currently, must be one of “🎲”, “🎯”, “🏀”, “⚽”, "🎳", or “🎰”. Dice can have
+                values 1-6 for “🎲”, “🎯” and "🎳", values 1-5 for “🏀” and “⚽”, and values 1-64
+                for “🎰”. Defaults to “🎲”.
+
+                .. versionchanged:: 13.4
+                   Added the "🎳" emoji.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the

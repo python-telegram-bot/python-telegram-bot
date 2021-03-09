@@ -868,13 +868,14 @@ class TestBot:
         assert bot.token not in resulting_path
         assert resulting_path == path
 
-    # TODO: Needs improvement. No feasable way to test until bots can add members.
+    # TODO: Needs improvement. No feasible way to test until bots can add members.
     def test_kick_chat_member(self, monkeypatch, bot):
         def test(url, data, *args, **kwargs):
             chat_id = data['chat_id'] == 2
             user_id = data['user_id'] == 32
             until_date = data.get('until_date', 1577887200) == 1577887200
-            return chat_id and user_id and until_date
+            revoke_msgs = data.get('revoke_messages', True) is True
+            return chat_id and user_id and until_date and revoke_msgs
 
         monkeypatch.setattr(bot.request, 'post', test)
         until = from_timestamp(1577887200)
@@ -882,6 +883,7 @@ class TestBot:
         assert bot.kick_chat_member(2, 32)
         assert bot.kick_chat_member(2, 32, until_date=until)
         assert bot.kick_chat_member(2, 32, until_date=1577887200)
+        assert bot.kick_chat_member(2, 32, revoke_messages=True)
 
     def test_kick_chat_member_default_tz(self, monkeypatch, tz_bot):
         until = dtm.datetime(2020, 1, 11, 16, 13)
@@ -1512,6 +1514,7 @@ class TestBot:
                 can_restrict_members=True,
                 can_pin_messages=True,
                 can_promote_members=True,
+                can_manage_chat=True,
             )
 
     @flaky(3, 1)

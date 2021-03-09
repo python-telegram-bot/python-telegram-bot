@@ -1831,6 +1831,7 @@ officedocument.wordprocessingml.document")``.
         basketball = _DiceEmoji('🏀', 'basketball')
         football = _DiceEmoji('⚽')
         slot_machine = _DiceEmoji('🎰')
+        bowling = _DiceEmoji('🎳', 'bowling')
 
     dice = _Dice()
     """Dice Messages. If an integer or a list of integers is passed, it filters messages to only
@@ -1863,6 +1864,11 @@ officedocument.wordprocessingml.document")``.
             as for :attr:`Filters.dice`.
         slot_machine: Dice messages with the emoji 🎰. Passing a list of integers is supported just
             as for :attr:`Filters.dice`.
+        bowling: Dice messages with the emoji 🎳. Passing a list of integers is supported just
+            as for :attr:`Filters.dice`.
+
+            .. versionadded:: 13.4
+
     """
 
     class language(MessageFilter):
