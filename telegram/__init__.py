@@ -24,6 +24,7 @@ from .user import User
 from .files.chatphoto import ChatPhoto
 from .chat import Chat
 from .chatlocation import ChatLocation
+from .chatinvitelink import ChatInviteLink
 from .chatmember import ChatMember
 from .chatpermissions import ChatPermissions
 from .files.photosize import PhotoSize
@@ -157,6 +158,7 @@ __all__ = (  # Keep this alphabetically ordered
     'CallbackQuery',
     'Chat',
     'ChatAction',
+    'ChatInviteLink',
     'ChatLocation',
     'ChatMember',
     'ChatPermissions',

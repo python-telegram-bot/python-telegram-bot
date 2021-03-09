@@ -13,6 +13,7 @@ telegram package
     telegram.callbackquery
     telegram.chat
     telegram.chataction
+    telegram.chatinvitelink
     telegram.chatlocation
     telegram.chatmember
     telegram.chatpermissions

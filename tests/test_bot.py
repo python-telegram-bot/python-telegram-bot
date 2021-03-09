@@ -1524,6 +1524,33 @@ class TestBot:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    def test_advanced_chat_invite_links(self, bot, channel_id):
+        # we are testing this all in one function in order to save api calls
+        timestamp = dtm.datetime.utcnow()
+        add_seconds = dtm.timedelta(0, 70)
+        time_in_future = timestamp + add_seconds
+        invite_link = bot.create_chat_invite_link(
+            channel_id, expire_date=time_in_future, member_limit=10
+        )
+        assert invite_link.invite_link != ''
+        assert invite_link.expire_date == to_timestamp(time_in_future)
+        assert invite_link.member_limit == 10
+
+        add_seconds = dtm.timedelta(0, 80)
+        time_in_future = timestamp + add_seconds
+        edited_invite_link = bot.edit_chat_invite_link(
+            channel_id, invite_link.invite_link, expire_date=time_in_future, member_limit=20
+        )
+        assert edited_invite_link.invite_link == invite_link.invite_link
+        assert edited_invite_link.expire_date == to_timestamp(time_in_future)
+        assert edited_invite_link.member_limit == 20
+
+        revoked_invite_link = bot.revoke_chat_invite_link(channel_id, invite_link.invite_link)
+        assert revoked_invite_link.invite_link == invite_link.invite_link
+        assert revoked_invite_link.is_revoked is True
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     def test_set_chat_photo(self, bot, channel_id):
         def func():
             assert bot.set_chat_photo(channel_id, f)
