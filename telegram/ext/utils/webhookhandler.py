@@ -95,7 +95,7 @@ class WebhookServer:
                 not force_event_loop
                 and os.name == 'nt'
                 and sys.version_info >= (3, 8)
-                and isinstance(loop, asyncio.ProactorEventLoop)
+                and isinstance(loop, asyncio.ProactorEventLoop)  # type: ignore[attr-defined]
             ):
                 raise TypeError(
                     '`ProactorEventLoop` is incompatible with '
@@ -123,7 +123,7 @@ class WebhookServer:
                 and (
                     isinstance(
                         asyncio.get_event_loop_policy(),
-                        asyncio.WindowsProactorEventLoopPolicy,  # pylint: disable  # type: ignore
+                        asyncio.WindowsProactorEventLoopPolicy,  # type: ignore # pylint: disable
                     )
                 )
             ):  # pylint: disable=E1101
