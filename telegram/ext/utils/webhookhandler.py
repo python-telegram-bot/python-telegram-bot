@@ -123,7 +123,7 @@ class WebhookServer:
                 and (
                     isinstance(
                         asyncio.get_event_loop_policy(),
-                        asyncio.WindowsProactorEventLoopPolicy,  # pylint: disable=E1101
+                        asyncio.WindowsProactorEventLoopPolicy,  # pylint: disable  # type: ignore
                     )
                 )
             ):  # pylint: disable=E1101
