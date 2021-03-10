@@ -201,10 +201,13 @@ class Message(TelegramObject):
             Live Location.
         voice_chat_started (:class:`telegram.VoiceChatStarted`, Optional): Service message about
             a voice chat started in the chat.
+            .. versionadded:: 13.4
         voice_chat_ended (:class: `telegram.VoiceChatEnded`, Optional): Service message about a
             voice chat ended in the chat.
+            .. versionadded:: 13.4
         voice_chat_participants_invited (:class:`telegram.VoiceChatParticipantsInvited` Optional):
             Service message about new members invited to a voice chat.
+            .. versionadded:: 13.4
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. ``login_url`` buttons are represented as ordinary url buttons.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
@@ -292,10 +295,13 @@ class Message(TelegramObject):
             Live Location.
         voice_chat_started (:class:`telegram.VoiceChatStarted`, Optional): Represents a service
             message about voice chat started in the chat.
+            .. versionadded:: 13.4
         voice_chat_ended (:class: `telegram.VoiceChatEnded`, Optional): Represents a service
             message about a voice chat ended in the chat.
+            .. versionadded:: 13.4
         voice_chat_participants_invited (:class:`telegram.VoiceChatParticipantsInvited` Optional):
             Represents a service message about new members invited to a voice chat.
+            .. versionadded:: 13.4
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.

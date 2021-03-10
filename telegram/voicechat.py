@@ -32,6 +32,7 @@ class VoiceChatStarted(TelegramObject):
     """
     This object represents a service message about a voice
     chat started in the chat. Currently holds no information.
+    .. versionadded:: 13.4
     """
 
     def __init__(self, **_kwargs: Any):
@@ -65,6 +66,7 @@ class VoiceChatParticipantsInvited(TelegramObject):
     """
     This object represents a service message about
     new members invited to a voice chat.
+    .. versionadded:: 13.4
 
     Args:
         users (List[:class:`telegram.User`]):  New members that
