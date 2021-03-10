@@ -44,7 +44,7 @@ def update():
 
 @pytest.fixture(scope='function', params=MessageEntity.ALL_TYPES)
 def message_entity(request):
-    return MessageEntity(request.param, 0, 0, url='', user='')
+    return MessageEntity(request.param, 0, 0, url='', user=User(1, 'first_name', False))
 
 
 @pytest.fixture(
