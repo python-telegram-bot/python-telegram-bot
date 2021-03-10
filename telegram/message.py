@@ -47,6 +47,9 @@ from telegram import (
     Video,
     VideoNote,
     Voice,
+    VoiceChatStarted,
+    VoiceChatEnded,
+    VoiceChatParticipantsInvited,
     ProximityAlertTriggered,
     ReplyMarkup,
 )
@@ -196,6 +199,12 @@ class Message(TelegramObject):
         proximity_alert_triggered (:class:`telegram.ProximityAlertTriggered`, optional): Service
             message. A user in the chat triggered another user's proximity alert while sharing
             Live Location.
+        voice_chat_started (:class:`telegram.VoiceChatStarted`, Optional): Service message about
+            a voice chat started in the chat.
+        voice_chat_ended (:class: `telegram.VoiceChatEnded`, Optional): Service message about a
+            voice chat ended in the chat.
+        voice_chat_participants_invited (:class:`telegram.VoiceChatParticipantsInvited` Optional):
+            Service message about new members invited to a voice chat.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. ``login_url`` buttons are represented as ordinary url buttons.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
@@ -281,6 +290,12 @@ class Message(TelegramObject):
         proximity_alert_triggered (:class:`telegram.ProximityAlertTriggered`): Optional. Service
             message. A user in the chat triggered another user's proximity alert while sharing
             Live Location.
+        voice_chat_started (:class:`telegram.VoiceChatStarted`, Optional): Represents a service
+            message about voice chat started in the chat.
+        voice_chat_ended (:class: `telegram.VoiceChatEnded`, Optional): Represents a service
+            message about a voice chat ended in the chat.
+        voice_chat_participants_invited (:class:`telegram.VoiceChatParticipantsInvited` Optional):
+            Represents a service message about new members invited to a voice chat.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
@@ -323,6 +338,9 @@ class Message(TelegramObject):
         'dice',
         'passport_data',
         'proximity_alert_triggered',
+        'voice_chat_started',
+        'voice_chat_ended',
+        'voice_chat_participants_invited',
     ] + ATTACHMENT_TYPES
 
     def __init__(
@@ -378,6 +396,9 @@ class Message(TelegramObject):
         dice: Dice = None,
         via_bot: User = None,
         proximity_alert_triggered: ProximityAlertTriggered = None,
+        voice_chat_started: VoiceChatStarted = None,
+        voice_chat_ended: VoiceChatEnded = None,
+        voice_chat_participants_invited: VoiceChatParticipantsInvited = None,
         sender_chat: Chat = None,
         **_kwargs: Any,
     ):
@@ -433,6 +454,9 @@ class Message(TelegramObject):
         self.dice = dice
         self.via_bot = via_bot
         self.proximity_alert_triggered = proximity_alert_triggered
+        self.voice_chat_started = voice_chat_started
+        self.voice_chat_ended = voice_chat_ended
+        self.voice_chat_participants_invited = voice_chat_participants_invited
         self.reply_markup = reply_markup
         self.bot = bot
 
@@ -500,7 +524,11 @@ class Message(TelegramObject):
             data.get('proximity_alert_triggered'), bot
         )
         data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
-
+        data['voice_chat_started'] = VoiceChatStarted.de_json(data.get('voice_chat_started'), bot)
+        data['voice_chat_ended'] = VoiceChatEnded.de_json(data.get('voice_chat_ended'), bot)
+        data['voice_chat_participants_invited'] = VoiceChatParticipantsInvited.de_json(
+            data.get('voice_chat_participants_invited'), bot
+        )
         return cls(bot=bot, **data)
 
     @property

@@ -55,6 +55,7 @@ from .messageentity import MessageEntity
 from .messageid import MessageId
 from .games.game import Game
 from .poll import Poll, PollOption, PollAnswer
+from .voicechat import VoiceChatStarted, VoiceChatEnded, VoiceChatParticipantsInvited
 from .loginurl import LoginUrl
 from .proximityalerttriggered import ProximityAlertTriggered
 from .games.callbackgame import CallbackGame
@@ -274,5 +275,8 @@ __all__ = (  # Keep this alphabetically ordered
     'Video',
     'VideoNote',
     'Voice',
+    'VoiceChatStarted',
+    'VoiceChatEnded',
+    'VoiceChatParticipantsInvited',
     'WebhookInfo',
 )

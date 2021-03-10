@@ -58,6 +58,9 @@ telegram package
     telegram.video
     telegram.videonote
     telegram.voice
+    telegram.voicechatstarted
+    telegram.voicechatended
+    telegram.voicechatparticipantsinvited
     telegram.webhookinfo
 
 Stickers

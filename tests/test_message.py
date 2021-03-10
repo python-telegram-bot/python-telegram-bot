@@ -48,6 +48,9 @@ from telegram import (
     Dice,
     Bot,
     ChatAction,
+    VoiceChatStarted,
+    VoiceChatEnded,
+    VoiceChatParticipantsInvited,
 )
 from telegram.ext import Defaults
 from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
@@ -166,6 +169,13 @@ def message(bot):
                 User(1, 'John', False), User(2, 'Doe', False), 42
             )
         },
+        {'voice_chat_started': VoiceChatStarted()},
+        {'voice_chat_ended': VoiceChatEnded(100)},
+        {
+            'voice_chat_participants_invited': VoiceChatParticipantsInvited(
+                [User(1, 'Rem', False), User(2, 'Emilia', False)]
+            )
+        },
         {'sender_chat': Chat(-123, 'discussion_channel')},
     ],
     ids=[
@@ -211,6 +221,9 @@ def message(bot):
         'dice',
         'via_bot',
         'proximity_alert_triggered',
+        'voice_chat_started',
+        'voice_chat_ended',
+        'voice_chat_participants_invited',
         'sender_chat',
     ],
 )
