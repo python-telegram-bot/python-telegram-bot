@@ -26,6 +26,7 @@ from .chat import Chat
 from .chatlocation import ChatLocation
 from .chatinvitelink import ChatInviteLink
 from .chatmember import ChatMember
+from .chatmemberupdated import ChatMemberUpdated
 from .chatpermissions import ChatPermissions
 from .files.photosize import PhotoSize
 from .files.audio import Audio
@@ -161,6 +162,7 @@ __all__ = (  # Keep this alphabetically ordered
     'ChatInviteLink',
     'ChatLocation',
     'ChatMember',
+    'ChatMemberUpdated',
     'ChatPermissions',
     'ChatPhoto',
     'ChosenInlineResult',
