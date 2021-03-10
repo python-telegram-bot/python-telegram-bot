@@ -1565,7 +1565,7 @@ class TestBot:
 
     # TODO: Add bot to group to test there too
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
+    @pytest.mark.timeout(20)
     def test_pin_and_unpin_message(self, bot, super_group_id):
         message1 = bot.send_message(super_group_id, text="test_pin_message_1")
         message2 = bot.send_message(super_group_id, text="test_pin_message_2")
@@ -1574,13 +1574,16 @@ class TestBot:
         assert bot.pin_chat_message(
             chat_id=super_group_id, message_id=message1.message_id, disable_notification=True
         )
+        time.sleep(1)
 
         bot.pin_chat_message(
             chat_id=super_group_id, message_id=message2.message_id, disable_notification=True
         )
+        time.sleep(1)
         bot.pin_chat_message(
             chat_id=super_group_id, message_id=message3.message_id, disable_notification=True
         )
+        time.sleep(1)
 
         chat = bot.get_chat(super_group_id)
         assert chat.pinned_message == message3
@@ -1834,7 +1837,7 @@ class TestBot:
         reply_to_message = default_bot.send_message(chat_id, 'test')
         reply_to_message.delete()
         if not default_bot.defaults.allow_sending_without_reply:
-            with pytest.raises(BadRequest, match='Reply message not found'):
+            with pytest.raises(BadRequest, match='not found'):
                 default_bot.copy_message(
                     chat_id,
                     from_chat_id=chat_id,
