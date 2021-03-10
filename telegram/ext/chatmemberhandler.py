@@ -30,7 +30,9 @@ RT = TypeVar('RT')
 
 
 class ChatMemberHandler(Handler[Update]):
-    """Handler class to handle Telegram updates that contain a chat member update..
+    """Handler class to handle Telegram updates that contain a chat member update.
+
+    .. versionadded:: 13.4
 
     Note:
         :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you

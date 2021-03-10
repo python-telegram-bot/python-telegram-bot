@@ -78,12 +78,16 @@ class Update(TelegramObject):
         my_chat_member (:class:`telegram.ChatMemberUpdated`, optional): The bot's chat member
             status was updated in a chat. For private chats, this update is received only when the
             bot is blocked or unblocked by the user.
+
+            .. versionadded:: 13.4
         chat_member (:class:`telegram.ChatMemberUpdated`, optional): A chat member's status was
             updated in a chat. The bot must be an administrator in the chat and must explicitly
             specify ``'chat_member'`` in the list of ``'allowed_updates'`` to receive these
             updates (see :meth:`telegram.Bot.get_updates`, :meth:`telegram.Bot.set_webhook`,
             :meth:`telegram.ext.Updater.start_polling` and
             :meth:`telegram.ext.Updater.start_webhook`).
+
+            .. versionadded:: 13.4
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
@@ -107,12 +111,16 @@ class Update(TelegramObject):
         my_chat_member (:class:`telegram.ChatMemberUpdated`): Optional. The bot's chat member
             status was updated in a chat. For private chats, this update is received only when the
             bot is blocked or unblocked by the user.
+
+            .. versionadded:: 13.4
         chat_member (:class:`telegram.ChatMemberUpdated`): Optional. A chat member's status was
             updated in a chat. The bot must be an administrator in the chat and must explicitly
             specify ``'chat_member'`` in the list of ``'allowed_updates'`` to receive these
             updates (see :meth:`telegram.Bot.get_updates`, :meth:`telegram.Bot.set_webhook`,
             :meth:`telegram.ext.Updater.start_polling` and
             :meth:`telegram.ext.Updater.start_webhook`).
+
+            .. versionadded:: 13.4
 
     """
 
