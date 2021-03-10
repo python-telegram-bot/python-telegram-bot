@@ -216,7 +216,7 @@ class Chat(TelegramObject):
         return None
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: 'Bot') -> Optional['Chat']:
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Chat']:
         data = cls.parse_data(data)
 
         if not data:
