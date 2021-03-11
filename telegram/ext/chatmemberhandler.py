@@ -97,8 +97,12 @@ class ChatMemberHandler(Handler[Update]):
     """
 
     MY_CHAT_MEMBER: ClassVar[int] = -1
+    """:obj:`int`: Used as a constant to handle only :attr:`telegram.Update.my_chat_member`."""
     CHAT_MEMBER: ClassVar[int] = 0
+    """:obj:`int`: Used as a constant to handle only :attr:`telegram.Update.chat_member`."""
     ANY_CHAT_MEMBER: ClassVar[int] = 1
+    """:obj:`int`: Used as a constant to handle bot :attr:`telegram.Update.my_chat_member`
+    and :attr:`telegram.Update.chat_member`."""
 
     def __init__(
         self,

@@ -16,6 +16,7 @@ telegram package
     telegram.chatinvitelink
     telegram.chatlocation
     telegram.chatmember
+    telegram.chatmemberupdated
     telegram.chatpermissions
     telegram.chatphoto
     telegram.constants
