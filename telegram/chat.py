@@ -91,6 +91,9 @@ class Chat(TelegramObject):
         slow_mode_delay (:obj:`int`, optional): For supergroups, the minimum allowed delay between
             consecutive messages sent by each unprivileged user.
             Returned only in :meth:`telegram.Bot.get_chat`.
+        message_auto_delete_time (:obj:`int`, optional): The time after which all messages sent to
+            the chat will be automatically deleted; in seconds. Returned only in
+            :meth:`telegram.Bot.get_chat`.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         sticker_set_name (:obj:`str`, optional): For supergroups, name of group sticker set.
             Returned only in :meth:`telegram.Bot.get_chat`.
@@ -121,6 +124,9 @@ class Chat(TelegramObject):
             for groups and supergroups. Returned only in :meth:`telegram.Bot.get_chat`.
         slow_mode_delay (:obj:`int`): Optional. For supergroups, the minimum allowed delay between
             consecutive messages sent by each unprivileged user. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+        message_auto_delete_time (:obj:`int`): Optional. The time after which all messages sent to
+            the chat will be automatically deleted; in seconds. Returned only in
             :meth:`telegram.Bot.get_chat`.
         sticker_set_name (:obj:`str`): Optional. For supergroups, name of Group sticker set.
         can_set_sticker_set (:obj:`bool`): Optional. :obj:`True`, if the bot can change group the
@@ -162,6 +168,7 @@ class Chat(TelegramObject):
         bio: str = None,
         linked_chat_id: int = None,
         location: ChatLocation = None,
+        message_auto_delete_time: int = None,
         **_kwargs: Any,
     ):
         # Required
@@ -181,6 +188,9 @@ class Chat(TelegramObject):
         self.pinned_message = pinned_message
         self.permissions = permissions
         self.slow_mode_delay = slow_mode_delay
+        self.message_auto_delete_time = (
+            int(message_auto_delete_time) if message_auto_delete_time is not None else None
+        )
         self.sticker_set_name = sticker_set_name
         self.can_set_sticker_set = can_set_sticker_set
         self.linked_chat_id = linked_chat_id

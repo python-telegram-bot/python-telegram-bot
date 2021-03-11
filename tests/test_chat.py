@@ -37,6 +37,7 @@ def chat(bot):
         can_set_sticker_set=TestChat.can_set_sticker_set,
         permissions=TestChat.permissions,
         slow_mode_delay=TestChat.slow_mode_delay,
+        message_auto_delete_time=TestChat.message_auto_delete_time,
         bio=TestChat.bio,
         linked_chat_id=TestChat.linked_chat_id,
         location=TestChat.location,
@@ -57,6 +58,7 @@ class TestChat:
         can_invite_users=True,
     )
     slow_mode_delay = 30
+    message_auto_delete_time = 42
     bio = "I'm a Barbie Girl in a Barbie World"
     linked_chat_id = 11880
     location = ChatLocation(Location(123, 456), 'Barbie World')
@@ -72,6 +74,7 @@ class TestChat:
             'can_set_sticker_set': self.can_set_sticker_set,
             'permissions': self.permissions.to_dict(),
             'slow_mode_delay': self.slow_mode_delay,
+            'message_auto_delete_time': self.message_auto_delete_time,
             'bio': self.bio,
             'linked_chat_id': self.linked_chat_id,
             'location': self.location.to_dict(),
@@ -87,6 +90,7 @@ class TestChat:
         assert chat.can_set_sticker_set == self.can_set_sticker_set
         assert chat.permissions == self.permissions
         assert chat.slow_mode_delay == self.slow_mode_delay
+        assert chat.message_auto_delete_time == self.message_auto_delete_time
         assert chat.bio == self.bio
         assert chat.linked_chat_id == self.linked_chat_id
         assert chat.location.location == self.location.location
@@ -103,6 +107,7 @@ class TestChat:
         assert chat_dict['all_members_are_administrators'] == chat.all_members_are_administrators
         assert chat_dict['permissions'] == chat.permissions.to_dict()
         assert chat_dict['slow_mode_delay'] == chat.slow_mode_delay
+        assert chat_dict['message_auto_delete_time'] == chat.message_auto_delete_time
         assert chat_dict['bio'] == chat.bio
         assert chat_dict['linked_chat_id'] == chat.linked_chat_id
         assert chat_dict['location'] == chat.location.to_dict()
