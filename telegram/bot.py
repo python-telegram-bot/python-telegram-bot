@@ -2723,10 +2723,11 @@ class Bot(TelegramObject):
                 updates you want your bot to receive. For example, specify ["message",
                 "edited_channel_post", "callback_query"] to only receive updates of these types.
                 See :class:`telegram.Update` for a complete list of available update types.
-                Specify an empty list to receive all updates regardless of type (default). If not
-                specified, the previous setting will be used. Please note that this parameter
-                doesn't affect updates created before the call to the get_updates, so unwanted
-                updates may be received for a short period of time.
+                Specify an empty list to receive all updates except
+                :attr:`telegram.Update.chat_member` (default). If not specified, the previous
+                setting will be used. Please note that this parameter doesn't affect updates
+                created before the call to the get_updates, so unwanted updates may be received for
+                a short period of time.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
@@ -2811,10 +2812,11 @@ class Bot(TelegramObject):
                 updates you want your bot to receive. For example, specify ["message",
                 "edited_channel_post", "callback_query"] to only receive updates of these types.
                 See :class:`telegram.Update` for a complete list of available update types.
-                Specify an empty list to receive all updates regardless of type (default). If not
-                specified, the previous setting will be used. Please note that this parameter
-                doesn't affect updates created before the call to the set_webhook, so unwanted
-                updates may be received for a short period of time.
+                Specify an empty list to receive all updates except
+                :attr:`telegram.Update.chat_member` (default). If not specified, the previous
+                setting will be used. Please note that this parameter doesn't affect updates
+                created before the call to the set_webhook, so unwanted updates may be received for
+                a short period of time.
             drop_pending_updates (:obj:`bool`, optional): Pass :obj:`True` to drop all pending
                 updates.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
