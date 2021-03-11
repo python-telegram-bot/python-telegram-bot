@@ -63,7 +63,7 @@ class TestPhoto:
     width = 800
     height = 800
     caption = '<b>PhotoTest</b> - *Caption*'
-    photo_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram_new.jpg'
+    photo_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.jpg'
     file_size = 29176
 
     def test_creation(self, thumb, photo):
@@ -81,12 +81,12 @@ class TestPhoto:
         assert thumb.file_unique_id != ''
 
     def test_expected_values(self, photo, thumb):
+        # We used to test for file_size as well, but TG apparently at some point apparently changed
+        # the compression method and it's not really our job anyway ...
         assert photo.width == self.width
         assert photo.height == self.height
-        assert photo.file_size == self.file_size
         assert thumb.width == 320
         assert thumb.height == 320
-        assert thumb.file_size == 9331
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -191,9 +191,6 @@ class TestPhoto:
         message = bot.send_photo(
             chat_id, photo_file, caption=test_string, caption_entities=entities
         )
-        # message = bot.send_photo(
-        #     chat_id, photo_file, caption=test_string, caption_entities=entities
-        # )
 
         assert message.caption == test_string
         assert message.caption_entities == entities
@@ -305,18 +302,16 @@ class TestPhoto:
         assert isinstance(message.photo[0].file_unique_id, str)
         assert message.photo[0].file_id != ''
         assert message.photo[0].file_unique_id != ''
-        assert message.photo[0].width == thumb.width
-        assert message.photo[0].height == thumb.height
-        assert message.photo[0].file_size == thumb.file_size
+        # We used to test for width, height and file_size, but TG apparently started to treat
+        # sending by URL and sending by upload differently and it's not really our job anyway ...
 
         assert isinstance(message.photo[1], PhotoSize)
         assert isinstance(message.photo[1].file_id, str)
         assert isinstance(message.photo[1].file_unique_id, str)
         assert message.photo[1].file_id != ''
         assert message.photo[1].file_unique_id != ''
-        assert message.photo[1].width == photo.width
-        assert message.photo[1].height == photo.height
-        assert message.photo[1].file_size == photo.file_size
+        # We used to test for width, height and file_size, but TG apparently started to treat
+        # sending by URL and sending by upload differently and it's not really our job anyway ...
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
