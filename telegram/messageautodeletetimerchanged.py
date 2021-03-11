@@ -30,13 +30,15 @@ class MessageAutoDeleteTimerChanged(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`message_auto_delete_time` is equal.
 
+    .. versionadded:: 13.4
+
     Args:
-        message_auto_delete_time (:class:`telegram.int`): New auto-delete time for messages in the
+        message_auto_delete_time (:obj:`int`): New auto-delete time for messages in the
             chat.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        message_auto_delete_time (:class:`telegram.int`): New auto-delete time for messages in the
+        message_auto_delete_time (:obj:`int`): New auto-delete time for messages in the
             chat.
 
     """

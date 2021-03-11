@@ -1097,6 +1097,8 @@ officedocument.wordprocessingml.document")``.
             :attr:`telegram.Message.new_chat_title`.
         message_auto_delete_timer_changed: Messages that contain
             :attr:`message_auto_delete_timer_changed`.
+
+            .. versionadded:: 13.4
         pinned_message: Messages that contain
             :attr:`telegram.Message.pinned_message`.
         proximity_alert_triggered: Messages that contain

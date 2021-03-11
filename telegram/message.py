@@ -171,6 +171,8 @@ class Message(TelegramObject):
             :attr:`reply_to_message` if someone replies to a very first message in a channel.
         message_auto_delete_timer_changed (:class:`telegram.MessageAutoDeleteTimerChanged`, \
             optional): Service message: auto-delete timer settings changed in the chat.
+
+            .. versionadded:: 13.4
         migrate_to_chat_id (:obj:`int`, optional): The group has been migrated to a supergroup with
             the specified identifier. This number may be greater than 32 bits and some programming
             languages may have difficulty/silent defects in interpreting it. But it is smaller than
@@ -206,17 +208,14 @@ class Message(TelegramObject):
             a voice chat started in the chat.
 
             .. versionadded:: 13.4
-
         voice_chat_ended (:class:`telegram.VoiceChatEnded`, optional): Service message about a
             voice chat ended in the chat.
 
             .. versionadded:: 13.4
-
         voice_chat_participants_invited (:class:`telegram.VoiceChatParticipantsInvited` optional):
             Service message about new members invited to a voice chat.
 
             .. versionadded:: 13.4
-
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. ``login_url`` buttons are represented as ordinary url buttons.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
@@ -280,6 +279,8 @@ class Message(TelegramObject):
         channel_chat_created (:obj:`bool`): Optional. The channel has been created.
         message_auto_delete_timer_changed (:class:`telegram.MessageAutoDeleteTimerChanged`):
             Optional. Service message: auto-delete timer settings changed in the chat.
+
+            .. versionadded:: 13.4
         migrate_to_chat_id (:obj:`int`): Optional. The group has been migrated to a supergroup with
             the specified identifier.
         migrate_from_chat_id (:obj:`int`): Optional. The supergroup has been migrated from a group
@@ -308,17 +309,14 @@ class Message(TelegramObject):
             message about voice chat started in the chat.
 
             .. versionadded:: 13.4
-
         voice_chat_ended (:class:`telegram.VoiceChatEnded`): Optional. Represents a service
             message about a voice chat ended in the chat.
 
             .. versionadded:: 13.4
-
         voice_chat_participants_invited (:class:`telegram.VoiceChatParticipantsInvited`): Optional.
             Represents a service message about new members invited to a voice chat.
 
             .. versionadded:: 13.4
-
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.

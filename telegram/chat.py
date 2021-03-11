@@ -94,6 +94,8 @@ class Chat(TelegramObject):
         message_auto_delete_time (:obj:`int`, optional): The time after which all messages sent to
             the chat will be automatically deleted; in seconds. Returned only in
             :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: 13.4
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         sticker_set_name (:obj:`str`, optional): For supergroups, name of group sticker set.
             Returned only in :meth:`telegram.Bot.get_chat`.
@@ -128,6 +130,8 @@ class Chat(TelegramObject):
         message_auto_delete_time (:obj:`int`): Optional. The time after which all messages sent to
             the chat will be automatically deleted; in seconds. Returned only in
             :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: 13.4
         sticker_set_name (:obj:`str`): Optional. For supergroups, name of Group sticker set.
         can_set_sticker_set (:obj:`bool`): Optional. :obj:`True`, if the bot can change group the
             sticker set.
