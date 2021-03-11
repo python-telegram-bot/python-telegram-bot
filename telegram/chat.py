@@ -387,6 +387,7 @@ class Chat(TelegramObject):
         api_kwargs: JSONDict = None,
         is_anonymous: bool = None,
         can_manage_chat: bool = None,
+        can_manage_voice_chats: bool = None,
     ) -> bool:
         """Shortcut for::
 
@@ -416,6 +417,7 @@ class Chat(TelegramObject):
             api_kwargs=api_kwargs,
             is_anonymous=is_anonymous,
             can_manage_chat=can_manage_chat,
+            can_manage_voice_chats=can_manage_voice_chats,
         )
 
     def restrict_member(
