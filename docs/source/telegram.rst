@@ -40,6 +40,7 @@ telegram package
     telegram.location
     telegram.loginurl
     telegram.message
+    telegram.messageautodeletetimerchanged
     telegram.messageid
     telegram.messageentity
     telegram.parsemode

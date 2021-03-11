@@ -52,6 +52,7 @@ from telegram import (
     VoiceChatParticipantsInvited,
     ProximityAlertTriggered,
     ReplyMarkup,
+    MessageAutoDeleteTimerChanged,
 )
 from telegram.utils.helpers import (
     escape_markdown,
@@ -168,6 +169,8 @@ class Message(TelegramObject):
             created. This field can't be received in a message coming through updates, because bot
             can't be a member of a channel when it is created. It can only be found in
             :attr:`reply_to_message` if someone replies to a very first message in a channel.
+        message_auto_delete_timer_changed (:class:`telegram.MessageAutoDeleteTimerChanged`, \
+            optional): Service message: auto-delete timer settings changed in the chat.
         migrate_to_chat_id (:obj:`int`, optional): The group has been migrated to a supergroup with
             the specified identifier. This number may be greater than 32 bits and some programming
             languages may have difficulty/silent defects in interpreting it. But it is smaller than
@@ -275,6 +278,8 @@ class Message(TelegramObject):
         group_chat_created (:obj:`bool`): Optional. The group has been created.
         supergroup_chat_created (:obj:`bool`): Optional. The supergroup has been created.
         channel_chat_created (:obj:`bool`): Optional. The channel has been created.
+        message_auto_delete_timer_changed (:class:`telegram.MessageAutoDeleteTimerChanged`):
+            Optional. Service message: auto-delete timer settings changed in the chat.
         migrate_to_chat_id (:obj:`int`): Optional. The group has been migrated to a supergroup with
             the specified identifier.
         migrate_from_chat_id (:obj:`int`): Optional. The supergroup has been migrated from a group
@@ -349,6 +354,7 @@ class Message(TelegramObject):
         'group_chat_created',
         'supergroup_chat_created',
         'channel_chat_created',
+        'message_auto_delete_timer_changed',
         'migrate_to_chat_id',
         'migrate_from_chat_id',
         'pinned_message',
@@ -418,6 +424,7 @@ class Message(TelegramObject):
         voice_chat_started: VoiceChatStarted = None,
         voice_chat_ended: VoiceChatEnded = None,
         voice_chat_participants_invited: VoiceChatParticipantsInvited = None,
+        message_auto_delete_timer_changed: MessageAutoDeleteTimerChanged = None,
         **_kwargs: Any,
     ):
         # Required
@@ -457,6 +464,7 @@ class Message(TelegramObject):
         self.migrate_to_chat_id = migrate_to_chat_id
         self.migrate_from_chat_id = migrate_from_chat_id
         self.channel_chat_created = bool(channel_chat_created)
+        self.message_auto_delete_timer_changed = message_auto_delete_timer_changed
         self.pinned_message = pinned_message
         self.forward_from_message_id = forward_from_message_id
         self.invoice = invoice
@@ -531,6 +539,9 @@ class Message(TelegramObject):
         data['new_chat_members'] = User.de_list(data.get('new_chat_members'), bot)
         data['left_chat_member'] = User.de_json(data.get('left_chat_member'), bot)
         data['new_chat_photo'] = PhotoSize.de_list(data.get('new_chat_photo'), bot)
+        data['message_auto_delete_timer_changed'] = MessageAutoDeleteTimerChanged.de_json(
+            data.get('message_auto_delete_timer_changed'), bot
+        )
         data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
         data['invoice'] = Invoice.de_json(data.get('invoice'), bot)
         data['successful_payment'] = SuccessfulPayment.de_json(data.get('successful_payment'), bot)

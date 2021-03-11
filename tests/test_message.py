@@ -51,6 +51,7 @@ from telegram import (
     VoiceChatStarted,
     VoiceChatEnded,
     VoiceChatParticipantsInvited,
+    MessageAutoDeleteTimerChanged,
 )
 from telegram.ext import Defaults
 from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
@@ -118,6 +119,7 @@ def message(bot):
         {'group_chat_created': True},
         {'supergroup_chat_created': True},
         {'channel_chat_created': True},
+        {'message_auto_delete_timer_changed': MessageAutoDeleteTimerChanged(42)},
         {'migrate_to_chat_id': -12345},
         {'migrate_from_chat_id': -54321},
         {'pinned_message': Message(7, None, None, None)},
@@ -205,6 +207,7 @@ def message(bot):
         'group_created',
         'supergroup_created',
         'channel_created',
+        'message_auto_delete_timer_changed',
         'migrated_to',
         'migrated_from',
         'pinned',

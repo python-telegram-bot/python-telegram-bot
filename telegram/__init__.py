@@ -71,6 +71,7 @@ from .passport.encryptedpassportelement import EncryptedPassportElement
 from .passport.passportdata import PassportData
 from .inline.inlinekeyboardbutton import InlineKeyboardButton
 from .inline.inlinekeyboardmarkup import InlineKeyboardMarkup
+from .messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
 from .message import Message
 from .callbackquery import CallbackQuery
 from .choseninlineresult import ChosenInlineResult
@@ -231,6 +232,7 @@ __all__ = (  # Keep this alphabetically ordered
     'MAX_MESSAGE_LENGTH',
     'MaskPosition',
     'Message',
+    'MessageAutoDeleteTimerChanged',
     'MessageEntity',
     'MessageId',
     'OrderInfo',

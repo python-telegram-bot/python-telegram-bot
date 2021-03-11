@@ -1005,6 +1005,15 @@ officedocument.wordprocessingml.document")``.
             :attr: `telegram.Message.supergroup_chat_created` or
             :attr: `telegram.Message.channel_chat_created`."""
 
+        class _MessageAutoDeleteTimerChanged(MessageFilter):
+            name = 'MessageAutoDeleteTimerChanged'
+
+            def filter(self, message: Message) -> bool:
+                return bool(message.message_auto_delete_timer_changed)
+
+        message_auto_delete_timer_changed = _MessageAutoDeleteTimerChanged()
+        """Messages that contain :attr:`message_auto_delete_timer_changed`"""
+
         class _Migrate(MessageFilter):
             name = 'Filters.status_update.migrate'
 
@@ -1052,6 +1061,7 @@ officedocument.wordprocessingml.document")``.
                 or self.new_chat_photo(message)
                 or self.delete_chat_photo(message)
                 or self.chat_created(message)
+                or self.message_auto_delete_timer_changed(message)
                 or self.migrate(message)
                 or self.pinned_message(message)
                 or self.connected_website(message)
@@ -1085,6 +1095,8 @@ officedocument.wordprocessingml.document")``.
             :attr:`telegram.Message.new_chat_photo`.
         new_chat_title: Messages that contain
             :attr:`telegram.Message.new_chat_title`.
+        message_auto_delete_timer_changed: Messages that contain
+            :attr:`message_auto_delete_timer_changed`.
         pinned_message: Messages that contain
             :attr:`telegram.Message.pinned_message`.
         proximity_alert_triggered: Messages that contain

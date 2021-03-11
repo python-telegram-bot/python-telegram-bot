@@ -828,6 +828,11 @@ class TestFilters:
         assert Filters.status_update.chat_created(update)
         update.message.channel_chat_created = False
 
+        update.message.message_auto_delete_timer_changed = True
+        assert Filters.status_update(update)
+        assert Filters.status_update.message_auto_delete_timer_changed(update)
+        update.message.message_auto_delete_timer_changed = False
+
         update.message.migrate_to_chat_id = 100
         assert Filters.status_update(update)
         assert Filters.status_update.migrate(update)
