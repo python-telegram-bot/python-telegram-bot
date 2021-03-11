@@ -199,15 +199,21 @@ class Message(TelegramObject):
         proximity_alert_triggered (:class:`telegram.ProximityAlertTriggered`, optional): Service
             message. A user in the chat triggered another user's proximity alert while sharing
             Live Location.
-        voice_chat_started (:class:`telegram.VoiceChatStarted`, Optional): Service message about
+        voice_chat_started (:class:`telegram.VoiceChatStarted`, optional): Service message about
             a voice chat started in the chat.
+
             .. versionadded:: 13.4
-        voice_chat_ended (:class: `telegram.VoiceChatEnded`, Optional): Service message about a
+
+        voice_chat_ended (:class:`telegram.VoiceChatEnded`, optional): Service message about a
             voice chat ended in the chat.
+
             .. versionadded:: 13.4
-        voice_chat_participants_invited (:class:`telegram.VoiceChatParticipantsInvited` Optional):
+
+        voice_chat_participants_invited (:class:`telegram.VoiceChatParticipantsInvited` optional):
             Service message about new members invited to a voice chat.
+
             .. versionadded:: 13.4
+
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. ``login_url`` buttons are represented as ordinary url buttons.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
@@ -293,15 +299,21 @@ class Message(TelegramObject):
         proximity_alert_triggered (:class:`telegram.ProximityAlertTriggered`): Optional. Service
             message. A user in the chat triggered another user's proximity alert while sharing
             Live Location.
-        voice_chat_started (:class:`telegram.VoiceChatStarted`, Optional): Represents a service
+        voice_chat_started (:class:`telegram.VoiceChatStarted`): Optional. Represents a service
             message about voice chat started in the chat.
+
             .. versionadded:: 13.4
-        voice_chat_ended (:class: `telegram.VoiceChatEnded`, Optional): Represents a service
+
+        voice_chat_ended (:class:`telegram.VoiceChatEnded`): Optional. Represents a service
             message about a voice chat ended in the chat.
+
             .. versionadded:: 13.4
-        voice_chat_participants_invited (:class:`telegram.VoiceChatParticipantsInvited` Optional):
+
+        voice_chat_participants_invited (:class:`telegram.VoiceChatParticipantsInvited`): Optional.
             Represents a service message about new members invited to a voice chat.
+
             .. versionadded:: 13.4
+
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
@@ -402,10 +414,10 @@ class Message(TelegramObject):
         dice: Dice = None,
         via_bot: User = None,
         proximity_alert_triggered: ProximityAlertTriggered = None,
+        sender_chat: Chat = None,
         voice_chat_started: VoiceChatStarted = None,
         voice_chat_ended: VoiceChatEnded = None,
         voice_chat_participants_invited: VoiceChatParticipantsInvited = None,
-        sender_chat: Chat = None,
         **_kwargs: Any,
     ):
         # Required

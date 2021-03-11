@@ -1515,6 +1515,7 @@ class TestBot:
                 can_pin_messages=True,
                 can_promote_members=True,
                 can_manage_chat=True,
+                can_manage_voice_chats=True,
             )
 
     @flaky(3, 1)

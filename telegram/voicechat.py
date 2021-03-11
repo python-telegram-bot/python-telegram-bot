@@ -32,6 +32,7 @@ class VoiceChatStarted(TelegramObject):
     """
     This object represents a service message about a voice
     chat started in the chat. Currently holds no information.
+
     .. versionadded:: 13.4
     """
 
@@ -47,6 +48,7 @@ class VoiceChatEnded(TelegramObject):
     Objects of this class are comparable in terms of equality.
     Two objects of this class are considered equal, if their
     :attr:`duration` are equal.
+
     .. versionadded:: 13.4
 
     Args:
@@ -66,6 +68,7 @@ class VoiceChatParticipantsInvited(TelegramObject):
     """
     This object represents a service message about
     new members invited to a voice chat.
+
     .. versionadded:: 13.4
 
     Args:
@@ -90,7 +93,7 @@ class VoiceChatParticipantsInvited(TelegramObject):
         if not data:
             return None
 
-        data['users'] = [User.de_json(u, bot) for u in data.get('users', [])]
+        data['users'] = User.de_list(data.get('users', []), bot)
         return cls(**data)
 
     def to_dict(self) -> JSONDict:

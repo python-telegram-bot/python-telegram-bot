@@ -3601,6 +3601,7 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
         is_anonymous: bool = None,
         can_manage_chat: bool = None,
+        can_manage_voice_chats: bool = None,
     ) -> bool:
         """
         Use this method to promote or demote a user in a supergroup or a channel. The bot must be
@@ -3619,6 +3620,12 @@ class Bot(TelegramObject):
                 Implied by any other administrator privilege.
 
                 .. versionadded:: 13.4
+
+            can_manage_voice_chats (:obj:`bool`, optional): Pass :obj:`True`, if the administrator
+                can manage voice chats, supergroups only.
+
+                .. versionadded:: 13.4
+
             can_change_info (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 change chat title, photo and other settings.
             can_post_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
@@ -3672,6 +3679,8 @@ class Bot(TelegramObject):
             data['can_promote_members'] = can_promote_members
         if can_manage_chat is not None:
             data['can_manage_chat'] = can_manage_chat
+        if can_manage_voice_chats is not None:
+            data['can_manage_voice_chats'] = can_manage_voice_chats
 
         result = self._post('promoteChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
 
