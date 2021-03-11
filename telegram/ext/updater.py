@@ -263,7 +263,7 @@ class Updater:
                 .. deprecated:: v13.4
                     Use ``drop_pending_updates`` instead.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
-                `Updater` will retry on failures on the Telegram server.
+                :class:`telegram.ext.Updater` will retry on failures on the Telegram server.
 
                 * < 0 - retry indefinitely (default)
                 *   0 - no retries
@@ -272,7 +272,7 @@ class Updater:
             allowed_updates (List[:obj:`str`], optional): Passed to
                 :attr:`telegram.Bot.get_updates`.
             read_latency (:obj:`float` | :obj:`int`, optional): Grace time in seconds for receiving
-                the reply from server. Will be added to the `timeout` value and used as the read
+                the reply from server. Will be added to the ``timeout`` value and used as the read
                 timeout from server (Default: 2).
 
         Returns:
@@ -341,7 +341,7 @@ class Updater:
         and key are not provided, the webhook will be started directly on
         http://listen:port/url_path, so SSL can be handled by another
         application. Else, the webhook will be started on
-        https://listen:port/url_path
+        https://listen:port/url_path. Also calls :meth:`telegram.Bot.set_webhook` as required.
 
         Note:
             Due to an incompatibility of the Tornado library PTB uses for the webhook with Python
@@ -365,14 +365,15 @@ class Updater:
                 .. deprecated:: v13.4
                     Use ``drop_pending_updates`` instead.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
-                `Updater` will retry on failures on the Telegram server.
+                :class:`telegram.ext.Updater` will retry on failures on the Telegram server.
 
                 * < 0 - retry indefinitely (default)
                 *   0 - no retries
                 * > 0 - retry up to X times
 
             webhook_url (:obj:`str`, optional): Explicitly specify the webhook url. Useful behind
-                NAT, reverse proxy, etc. Default is derived from `listen`, `port` & `url_path`.
+                NAT, reverse proxy, etc. Default is derived from ``listen``, ``port`` &
+                ``url_path``.
             ip_address (:obj:`str`, optional): The fixed IP address which will be used to send
                 webhook requests instead of the IP address resolved through DNS.
             allowed_updates (List[:obj:`str`], optional): Passed to
