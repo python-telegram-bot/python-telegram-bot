@@ -841,7 +841,7 @@ class TestConversationHandler:
             entry_points=self.entry_points,
             states=self.states,
             fallbacks=self.fallbacks,
-            conversation_timeout=0.75,
+            conversation_timeout=0.5,
             run_async=True,
         )
         dp.add_handler(handler)
@@ -871,13 +871,6 @@ class TestConversationHandler:
         message.text = '/end'
         message.entities[0].length = len('/end')
         dp.process_update(Update(update_id=3, message=message))
-        sleep(0.1)
-        message.text = 'resolve promise pls'
-        message.entities[0].length = len('resolve promise pls')
-        dp.process_update(Update(update_id=4, message=message))
-        sleep(0.1)
-        # assert promise got resolved
-        assert handler.conversations.get((self.group.id, user1.id)) is None
         sleep(1)
         # assert timeout handler didn't got called
         assert self.test_flag is False
