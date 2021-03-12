@@ -60,7 +60,7 @@ class VoiceChatEnded(TelegramObject):
     """
 
     def __init__(self, duration: int, **_kwargs: Any) -> None:
-        self.duration = duration
+        self.duration = int(duration) if duration is not None else None
         self._id_attrs = (self.duration,)
 
 
@@ -68,6 +68,10 @@ class VoiceChatParticipantsInvited(TelegramObject):
     """
     This object represents a service message about
     new members invited to a voice chat.
+
+    Objects of this class are comparable in terms of equality.
+    Two objects of this class are considered equal, if their
+    :attr:`users` are equal.
 
     .. versionadded:: 13.4
 
@@ -83,6 +87,10 @@ class VoiceChatParticipantsInvited(TelegramObject):
 
     def __init__(self, users: List[User], **_kwargs: Any) -> None:
         self.users = users
+        self._id_attrs = self.users  # type: ignore
+
+    def __hash__(self) -> int:
+        return hash(tuple(self.users))
 
     @classmethod
     def de_json(
