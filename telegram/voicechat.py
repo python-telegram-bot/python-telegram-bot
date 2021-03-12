@@ -87,7 +87,7 @@ class VoiceChatParticipantsInvited(TelegramObject):
 
     def __init__(self, users: List[User], **_kwargs: Any) -> None:
         self.users = users
-        self._id_attrs = self.users  # type: ignore
+        self._id_attrs = (self.users,)
 
     def __hash__(self) -> int:
         return hash(tuple(self.users))
