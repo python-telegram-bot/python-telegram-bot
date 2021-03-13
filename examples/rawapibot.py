@@ -39,7 +39,7 @@ def main() -> NoReturn:
             sleep(1)
         except Unauthorized:
             # The user has removed or blocked the bot.
-            UPDATE_ID += 1  # type: ignore[operator]
+            UPDATE_ID += 1
 
 
 def echo(bot: telegram.Bot) -> None:

@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineQuery."""
 
-from typing import TYPE_CHECKING, Any, Optional, List, Union, Callable, ClassVar
+from typing import TYPE_CHECKING, Any, Optional, Union, Callable, ClassVar, Sequence
 
 from telegram import Location, TelegramObject, User, constants
 from telegram.utils.helpers import DEFAULT_NONE
@@ -97,7 +97,7 @@ class InlineQuery(TelegramObject):
     def answer(
         self,
         results: Union[
-            List['InlineQueryResult'], Callable[[int], Optional[List['InlineQueryResult']]]
+            Sequence['InlineQueryResult'], Callable[[int], Optional[Sequence['InlineQueryResult']]]
         ],
         cache_time: int = 300,
         is_personal: bool = None,

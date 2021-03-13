@@ -72,6 +72,7 @@ class TestUpdater:
     err_handler_called = Event()
     cb_handler_called = Event()
     offset = 0
+    test_flag = False
 
     @pytest.fixture(autouse=True)
     def reset(self):
@@ -80,6 +81,7 @@ class TestUpdater:
         self.attempts = 0
         self.err_handler_called.clear()
         self.cb_handler_called.clear()
+        self.test_flag = False
 
     def error_handler(self, bot, update, error):
         self.received = error.message
@@ -247,7 +249,7 @@ class TestUpdater:
                 cert=None,
                 key=None,
                 bootstrap_retries=0,
-                clean=False,
+                drop_pending_updates=False,
                 webhook_url=None,
                 allowed_updates=None,
             )
@@ -274,7 +276,7 @@ class TestUpdater:
                     cert=None,
                     key=None,
                     bootstrap_retries=0,
-                    clean=False,
+                    drop_pending_updates=False,
                     webhook_url=None,
                     allowed_updates=None,
                 )
@@ -307,7 +309,7 @@ class TestUpdater:
                 cert=None,
                 key=None,
                 bootstrap_retries=0,
-                clean=False,
+                drop_pending_updates=False,
                 webhook_url=None,
                 allowed_updates=None,
                 force_event_loop=True,
@@ -328,7 +330,7 @@ class TestUpdater:
                 cert='./tests/test_updater.py',
                 key='./tests/test_updater.py',
                 bootstrap_retries=0,
-                clean=False,
+                drop_pending_updates=False,
                 webhook_url=None,
                 allowed_updates=None,
             )
@@ -356,6 +358,42 @@ class TestUpdater:
         sleep(0.2)
         assert q.get(False) == update
         updater.stop()
+
+    def test_webhook_ssl_just_for_telegram(self, monkeypatch, updater):
+        q = Queue()
+
+        def set_webhook(**kwargs):
+            self.test_flag.append(bool(kwargs.get('certificate')))
+            return True
+
+        orig_wh_server_init = WebhookServer.__init__
+
+        def webhook_server_init(*args):
+            self.test_flag = [args[-1] is None]
+            orig_wh_server_init(*args)
+
+        monkeypatch.setattr(updater.bot, 'set_webhook', set_webhook)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr('telegram.ext.Dispatcher.process_update', lambda _, u: q.put(u))
+        monkeypatch.setattr(
+            'telegram.ext.utils.webhookhandler.WebhookServer.__init__', webhook_server_init
+        )
+
+        ip = '127.0.0.1'
+        port = randrange(1024, 49152)  # Select random port
+        updater.start_webhook(ip, port, webhook_url=None, cert='./tests/test_updater.py')
+        sleep(0.2)
+
+        # Now, we send an update to the server via urlopen
+        update = Update(
+            1,
+            message=Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Webhook 2'),
+        )
+        self._send_webhook_msg(ip, port, update.to_json())
+        sleep(0.2)
+        assert q.get(False) == update
+        updater.stop()
+        assert self.test_flag == [True, True]
 
     @pytest.mark.parametrize(('error',), argvalues=[(TelegramError(''),)], ids=('TelegramError',))
     def test_bootstrap_retries_success(self, monkeypatch, updater, error):
@@ -391,41 +429,63 @@ class TestUpdater:
             updater._bootstrap(retries, False, 'path', None, bootstrap_interval=0)
         assert self.attempts == attempts
 
-    def test_bootstrap_clean_updates(self, monkeypatch, updater):
-        clean = True
-        expected_id = 4
-        self.offset = 0
+    @pytest.mark.parametrize('drop_pending_updates', (True, False))
+    def test_bootstrap_clean_updates(self, monkeypatch, updater, drop_pending_updates):
+        # As dropping pending updates is done by passing `drop_pending_updates` to
+        # set_webhook, we just check that we pass the correct value
+        self.test_flag = False
 
-        def get_updates(*args, **kwargs):
-            # we're hitting this func twice
-            # 1. no args, return list of updates
-            # 2. with 1 arg, int => if int == expected_id => test successful
+        def delete_webhook(**kwargs):
+            self.test_flag = kwargs.get('drop_pending_updates') == drop_pending_updates
 
-            # case 2
-            # 2nd call from bootstrap____clean
-            # we should be called with offset = 4
-            # save value passed in self.offset for assert down below
-            if len(args) > 0:
-                self.offset = int(args[0])
-                return []
-
-            class FakeUpdate:
-                def __init__(self, update_id):
-                    self.update_id = update_id
-
-            # case 1
-            # return list of obj's
-
-            # build list of fake updates
-            # returns list of 4 objects with
-            # update_id's 0, 1, 2 and 3
-            return [FakeUpdate(i) for i in range(0, expected_id)]
-
-        monkeypatch.setattr(updater.bot, 'get_updates', get_updates)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', delete_webhook)
 
         updater.running = True
-        updater._bootstrap(1, clean, None, None, bootstrap_interval=0)
-        assert self.offset == expected_id
+        updater._bootstrap(
+            1,
+            drop_pending_updates=drop_pending_updates,
+            webhook_url=None,
+            allowed_updates=None,
+            bootstrap_interval=0,
+        )
+        assert self.test_flag is True
+
+    def test_clean_deprecation_warning_webhook(self, recwarn, updater, monkeypatch):
+        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
+        # prevent api calls from @info decorator when updater.bot.id is used in thread names
+        monkeypatch.setattr(updater.bot, '_bot', User(id=123, first_name='bot', is_bot=True))
+        monkeypatch.setattr(updater.bot, '_commands', [])
+
+        ip = '127.0.0.1'
+        port = randrange(1024, 49152)  # Select random port
+        updater.start_webhook(ip, port, clean=True)
+        updater.stop()
+        assert len(recwarn) == 2
+        assert str(recwarn[0].message).startswith('Old Handler API')
+        assert str(recwarn[1].message).startswith('The argument `clean` of')
+
+    def test_clean_deprecation_warning_polling(self, recwarn, updater, monkeypatch):
+        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
+        # prevent api calls from @info decorator when updater.bot.id is used in thread names
+        monkeypatch.setattr(updater.bot, '_bot', User(id=123, first_name='bot', is_bot=True))
+        monkeypatch.setattr(updater.bot, '_commands', [])
+
+        updater.start_polling(clean=True)
+        updater.stop()
+        assert len(recwarn) == 2
+        for msg in recwarn:
+            print(msg)
+        assert str(recwarn[0].message).startswith('Old Handler API')
+        assert str(recwarn[1].message).startswith('The argument `clean` of')
+
+    def test_clean_drop_pending_mutually_exclusive(self, updater):
+        with pytest.raises(TypeError, match='`clean` and `drop_pending_updates` are mutually'):
+            updater.start_polling(clean=True, drop_pending_updates=False)
+
+        with pytest.raises(TypeError, match='`clean` and `drop_pending_updates` are mutually'):
+            updater.start_webhook(clean=True, drop_pending_updates=False)
 
     @flaky(3, 1)
     def test_webhook_invalid_posts(self, updater):

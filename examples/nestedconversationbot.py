@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=W0613, C0116
-# type: ignore[union-attr]
+# pylint: disable=C0116
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -16,6 +15,7 @@ bot.
 """
 
 import logging
+from typing import Tuple, Dict, Any
 
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 from telegram.ext import (
@@ -64,14 +64,14 @@ END = ConversationHandler.END
 
 
 # Helper
-def _name_switcher(level):
+def _name_switcher(level: str) -> Tuple[str, str]:
     if level == PARENTS:
         return 'Father', 'Mother'
     return 'Brother', 'Sister'
 
 
 # Top level conversation callbacks
-def start(update: Update, context: CallbackContext) -> None:
+def start(update: Update, context: CallbackContext) -> str:
     """Select an action: Adding parent/child or show data."""
     text = (
         'You may add a familiy member, yourself show the gathered data or end the '
@@ -103,7 +103,7 @@ def start(update: Update, context: CallbackContext) -> None:
     return SELECTING_ACTION
 
 
-def adding_self(update: Update, context: CallbackContext) -> None:
+def adding_self(update: Update, context: CallbackContext) -> str:
     """Add information about youself."""
     context.user_data[CURRENT_LEVEL] = SELF
     text = 'Okay, please tell me about yourself.'
@@ -116,10 +116,10 @@ def adding_self(update: Update, context: CallbackContext) -> None:
     return DESCRIBING_SELF
 
 
-def show_data(update: Update, context: CallbackContext) -> None:
+def show_data(update: Update, context: CallbackContext) -> str:
     """Pretty print gathered data."""
 
-    def prettyprint(user_data, level):
+    def prettyprint(user_data: Dict[str, Any], level: str) -> str:
         people = user_data.get(level)
         if not people:
             return '\nNo information yet.'
@@ -151,14 +151,14 @@ def show_data(update: Update, context: CallbackContext) -> None:
     return SHOWING
 
 
-def stop(update: Update, context: CallbackContext) -> None:
+def stop(update: Update, _: CallbackContext) -> int:
     """End Conversation by command."""
     update.message.reply_text('Okay, bye.')
 
     return END
 
 
-def end(update: Update, context: CallbackContext) -> None:
+def end(update: Update, _: CallbackContext) -> int:
     """End conversation from InlineKeyboardButton."""
     update.callback_query.answer()
 
@@ -169,7 +169,7 @@ def end(update: Update, context: CallbackContext) -> None:
 
 
 # Second level conversation callbacks
-def select_level(update: Update, context: CallbackContext) -> None:
+def select_level(update: Update, _: CallbackContext) -> str:
     """Choose to add a parent or a child."""
     text = 'You may add a parent or a child. Also you can show the gathered data or go back.'
     buttons = [
@@ -190,7 +190,7 @@ def select_level(update: Update, context: CallbackContext) -> None:
     return SELECTING_LEVEL
 
 
-def select_gender(update: Update, context: CallbackContext) -> None:
+def select_gender(update: Update, context: CallbackContext) -> str:
     """Choose to add mother or father."""
     level = update.callback_query.data
     context.user_data[CURRENT_LEVEL] = level
@@ -217,7 +217,7 @@ def select_gender(update: Update, context: CallbackContext) -> None:
     return SELECTING_GENDER
 
 
-def end_second_level(update: Update, context: CallbackContext) -> None:
+def end_second_level(update: Update, context: CallbackContext) -> int:
     """Return to top level conversation."""
     context.user_data[START_OVER] = True
     start(update, context)
@@ -226,7 +226,7 @@ def end_second_level(update: Update, context: CallbackContext) -> None:
 
 
 # Third level callbacks
-def select_feature(update: Update, context: CallbackContext) -> None:
+def select_feature(update: Update, context: CallbackContext) -> str:
     """Select a feature to update for the person."""
     buttons = [
         [
@@ -253,7 +253,7 @@ def select_feature(update: Update, context: CallbackContext) -> None:
     return SELECTING_FEATURE
 
 
-def ask_for_input(update: Update, context: CallbackContext) -> None:
+def ask_for_input(update: Update, context: CallbackContext) -> str:
     """Prompt user to input data for selected feature."""
     context.user_data[CURRENT_FEATURE] = update.callback_query.data
     text = 'Okay, tell me.'
@@ -264,7 +264,7 @@ def ask_for_input(update: Update, context: CallbackContext) -> None:
     return TYPING
 
 
-def save_input(update: Update, context: CallbackContext) -> None:
+def save_input(update: Update, context: CallbackContext) -> str:
     """Save input for feature and return to feature selection."""
     user_data = context.user_data
     user_data[FEATURES][user_data[CURRENT_FEATURE]] = update.message.text
@@ -274,7 +274,7 @@ def save_input(update: Update, context: CallbackContext) -> None:
     return select_feature(update, context)
 
 
-def end_describing(update: Update, context: CallbackContext) -> None:
+def end_describing(update: Update, context: CallbackContext) -> int:
     """End gathering of features and return to parent conversation."""
     user_data = context.user_data
     level = user_data[CURRENT_LEVEL]
@@ -292,14 +292,14 @@ def end_describing(update: Update, context: CallbackContext) -> None:
     return END
 
 
-def stop_nested(update: Update, context: CallbackContext) -> None:
+def stop_nested(update: Update, _: CallbackContext) -> str:
     """Completely end conversation from within nested conversation."""
     update.message.reply_text('Okay, bye.')
 
     return STOPPING
 
 
-def main():
+def main() -> None:
     # Create the Updater and pass it your bot's token.
     updater = Updater("TOKEN")
 
