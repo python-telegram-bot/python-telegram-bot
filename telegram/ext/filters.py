@@ -1051,6 +1051,33 @@ officedocument.wordprocessingml.document")``.
         proximity_alert_triggered = _ProximityAlertTriggered()
         """Messages that contain :attr:`telegram.Message.proximity_alert_triggered`."""
 
+        class _VoiceChatStarted(MessageFilter):
+            name = 'Filters.status_update.voice_chat_started'
+
+            def filter(self, message: Message) -> bool:
+                return bool(message.voice_chat_started)
+
+        voice_chat_started = _VoiceChatStarted()
+        """Messages that contain :attr:`telegram.Message.voice_chat_started`."""
+
+        class _VoiceChatEnded(MessageFilter):
+            name = 'Filters.status_update.voice_chat_ended'
+
+            def filter(self, message: Message) -> bool:
+                return bool(message.voice_chat_ended)
+
+        voice_chat_ended = _VoiceChatEnded()
+        """Messages that contain :attr:`telegram.Message.voice_chat_ended`."""
+
+        class _VoiceChatParticipantsInvited(MessageFilter):
+            name = 'Filters.status_update.voice_chat_participants_invited'
+
+            def filter(self, message: Message) -> bool:
+                return bool(message.voice_chat_participants_invited)
+
+        voice_chat_participants_invited = _VoiceChatParticipantsInvited()
+        """Messages that contain :attr:`telegram.Message.voice_chat_participants_invited`."""
+
         name = 'Filters.status_update'
 
         def filter(self, message: Update) -> bool:
@@ -1066,6 +1093,9 @@ officedocument.wordprocessingml.document")``.
                 or self.pinned_message(message)
                 or self.connected_website(message)
                 or self.proximity_alert_triggered(message)
+                or self.voice_chat_started(message)
+                or self.voice_chat_ended(message)
+                or self.voice_chat_participants_invited(message)
             )
 
     status_update = _StatusUpdate()
@@ -1103,6 +1133,19 @@ officedocument.wordprocessingml.document")``.
             :attr:`telegram.Message.pinned_message`.
         proximity_alert_triggered: Messages that contain
             :attr:`telegram.Message.proximity_alert_triggered`.
+        voice_chat_started: Messages that contain
+            :attr:`telegram.Message.voice_chat_started`.
+
+            .. versionadded:: 13.4
+        voice_chat_ended: Messages that contain
+            :attr:`telegram.Message.voice_chat_ended`.
+
+            .. versionadded:: 13.4
+        voice_chat_participants_invited: Messages that contain
+            :attr:`telegram.Message.voice_chat_participants_invited`.
+
+            .. versionadded:: 13.4
+
     """
 
     class _Forwarded(MessageFilter):

@@ -858,6 +858,21 @@ class TestFilters:
         assert Filters.status_update.proximity_alert_triggered(update)
         update.message.proximity_alert_triggered = None
 
+        update.message.voice_chat_started = 'hello'
+        assert Filters.status_update(update)
+        assert Filters.status_update.voice_chat_started(update)
+        update.message.voice_chat_started = None
+
+        update.message.voice_chat_ended = 'bye'
+        assert Filters.status_update(update)
+        assert Filters.status_update.voice_chat_ended(update)
+        update.message.voice_chat_ended = None
+
+        update.message.voice_chat_participants_invited = 'invited'
+        assert Filters.status_update(update)
+        assert Filters.status_update.voice_chat_participants_invited(update)
+        update.message.voice_chat_participants_invited = None
+
     def test_filters_forwarded(self, update):
         assert not Filters.forwarded(update)
         update.message.forward_date = datetime.datetime.utcnow()
