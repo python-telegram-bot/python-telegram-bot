@@ -255,12 +255,14 @@ class Updater:
         Args:
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
                 Telegram in seconds. Default is 0.0.
-            timeout (:obj:`float`, optional): Passed to :attr:`telegram.Bot.get_updates`.
+            timeout (:obj:`float`, optional): Passed to :meth:`telegram.Bot.get_updates`.
             drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
                 Telegram servers before actually starting to poll. Default is :obj:`False`.
+
+                .. versionadded :: 13.4
             clean (:obj:`bool`, optional): Alias for ``drop_pending_updates``.
 
-                .. deprecated:: v13.4
+                .. deprecated:: 13.4
                     Use ``drop_pending_updates`` instead.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 :class:`telegram.ext.Updater` will retry on failures on the Telegram server.
@@ -270,7 +272,7 @@ class Updater:
                 * > 0 - retry up to X times
 
             allowed_updates (List[:obj:`str`], optional): Passed to
-                :attr:`telegram.Bot.get_updates`.
+                :meth:`telegram.Bot.get_updates`.
             read_latency (:obj:`float` | :obj:`int`, optional): Grace time in seconds for receiving
                 the reply from server. Will be added to the ``timeout`` value and used as the read
                 timeout from server (Default: 2).
@@ -360,9 +362,11 @@ class Updater:
             key (:obj:`str`, optional): Path to the SSL key file.
             drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
                 Telegram servers before actually starting to poll. Default is :obj:`False`.
+
+                .. versionadded :: 13.4
             clean (:obj:`bool`, optional): Alias for ``drop_pending_updates``.
 
-                .. deprecated:: v13.4
+                .. deprecated:: 13.4
                     Use ``drop_pending_updates`` instead.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 :class:`telegram.ext.Updater` will retry on failures on the Telegram server.
@@ -374,10 +378,11 @@ class Updater:
             webhook_url (:obj:`str`, optional): Explicitly specify the webhook url. Useful behind
                 NAT, reverse proxy, etc. Default is derived from ``listen``, ``port`` &
                 ``url_path``.
-            ip_address (:obj:`str`, optional): The fixed IP address which will be used to send
-                webhook requests instead of the IP address resolved through DNS.
+            ip_address (:obj:`str`, optional): Passed to :meth:`telegram.Bot.set_webhook`.
+
+                .. versionadded :: 13.4
             allowed_updates (List[:obj:`str`], optional): Passed to
-                :attr:`telegram.Bot.set_webhook`.
+                :meth:`telegram.Bot.set_webhook`.
             force_event_loop (:obj:`bool`, optional): Force using the current event loop. See above
                 note for details. Defaults to :obj:`False`
 
