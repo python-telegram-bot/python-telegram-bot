@@ -211,6 +211,7 @@ class TestChatMemberHandler:
     def test_other_update_types(self, false_update):
         handler = ChatMemberHandler(self.callback_basic)
         assert not handler.check_update(false_update)
+        assert not handler.check_update(True)
 
     def test_context(self, cdp, chat_member):
         handler = ChatMemberHandler(self.callback_context)
