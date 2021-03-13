@@ -561,6 +561,62 @@ class TestChat:
         monkeypatch.setattr(chat.bot, 'copy_message', make_assertion)
         assert chat.copy_message(chat_id='test_copy', message_id=42)
 
+    def test_export_invite_link(self, monkeypatch, chat):
+        def make_assertion(*_, **kwargs):
+            return kwargs['chat_id'] == chat.id
+
+        assert check_shortcut_signature(
+            Chat.export_invite_link, Bot.export_chat_invite_link, ['chat_id'], []
+        )
+        assert check_shortcut_call(chat.export_invite_link, chat.bot, 'export_chat_invite_link')
+        assert check_defaults_handling(chat.export_invite_link, chat.bot)
+
+        monkeypatch.setattr(chat.bot, 'export_chat_invite_link', make_assertion)
+        assert chat.export_invite_link()
+
+    def test_create_invite_link(self, monkeypatch, chat):
+        def make_assertion(*_, **kwargs):
+            return kwargs['chat_id'] == chat.id
+
+        assert check_shortcut_signature(
+            Chat.create_invite_link, Bot.create_chat_invite_link, ['chat_id'], []
+        )
+        assert check_shortcut_call(chat.create_invite_link, chat.bot, 'create_chat_invite_link')
+        assert check_defaults_handling(chat.create_invite_link, chat.bot)
+
+        monkeypatch.setattr(chat.bot, 'create_chat_invite_link', make_assertion)
+        assert chat.create_invite_link()
+
+    def test_edit_invite_link(self, monkeypatch, chat):
+        link = "ThisIsALink"
+
+        def make_assertion(*_, **kwargs):
+            return kwargs['chat_id'] == chat.id and kwargs['invite_link'] == link
+
+        assert check_shortcut_signature(
+            Chat.edit_invite_link, Bot.edit_chat_invite_link, ['chat_id'], []
+        )
+        assert check_shortcut_call(chat.edit_invite_link, chat.bot, 'edit_chat_invite_link')
+        assert check_defaults_handling(chat.edit_invite_link, chat.bot)
+
+        monkeypatch.setattr(chat.bot, 'edit_chat_invite_link', make_assertion)
+        assert chat.edit_invite_link(invite_link=link)
+
+    def test_revoke_invite_link(self, monkeypatch, chat):
+        link = "ThisIsALink"
+
+        def make_assertion(*_, **kwargs):
+            return kwargs['chat_id'] == chat.id and kwargs['invite_link'] == link
+
+        assert check_shortcut_signature(
+            Chat.revoke_invite_link, Bot.revoke_chat_invite_link, ['chat_id'], []
+        )
+        assert check_shortcut_call(chat.revoke_invite_link, chat.bot, 'revoke_chat_invite_link')
+        assert check_defaults_handling(chat.revoke_invite_link, chat.bot)
+
+        monkeypatch.setattr(chat.bot, 'revoke_chat_invite_link', make_assertion)
+        assert chat.revoke_invite_link(invite_link=link)
+
     def test_equality(self):
         a = Chat(self.id_, self.title, self.type_)
         b = Chat(self.id_, self.title, self.type_)

@@ -32,6 +32,7 @@ if TYPE_CHECKING:
     from telegram import (
         Bot,
         ChatMember,
+        ChatInviteLink,
         Message,
         MessageId,
         ReplyMarkup,
@@ -1410,4 +1411,107 @@ class Chat(TelegramObject):
             reply_markup=reply_markup,
             timeout=timeout,
             api_kwargs=api_kwargs,
+        )
+
+    def export_invite_link(
+        self,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> str:
+        """Shortcut for::
+
+            bot.export_chat_invite_link(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.export_chat_invite_link`.
+
+        .. versionadded:: 13.4
+
+        Returns:
+            :obj:`str`: New invite link on success.
+
+        """
+        return self.bot.export_chat_invite_link(
+            chat_id=self.id, timeout=timeout, api_kwargs=api_kwargs
+        )
+
+    def create_invite_link(
+        self,
+        expire_date: Union[int, datetime] = None,
+        member_limit: int = None,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> 'ChatInviteLink':
+        """Shortcut for::
+
+            bot.create_chat_invite_link(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.create_chat_invite_link`.
+
+        .. versionadded:: 13.4
+
+        Returns:
+            :class:`telegram.ChatInviteLink`
+
+        """
+        return self.bot.create_chat_invite_link(
+            chat_id=self.id,
+            expire_date=expire_date,
+            member_limit=member_limit,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    def edit_invite_link(
+        self,
+        invite_link: str,
+        expire_date: Union[int, datetime] = None,
+        member_limit: int = None,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> 'ChatInviteLink':
+        """Shortcut for::
+
+            bot.edit_chat_invite_link(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.edit_chat_invite_link`.
+
+        .. versionadded:: 13.4
+
+        Returns:
+            :class:`telegram.ChatInviteLink`
+
+        """
+        return self.bot.edit_chat_invite_link(
+            chat_id=self.id,
+            invite_link=invite_link,
+            expire_date=expire_date,
+            member_limit=member_limit,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    def revoke_invite_link(
+        self,
+        invite_link: str,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> 'ChatInviteLink':
+        """Shortcut for::
+
+            bot.revoke_chat_invite_link(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.revoke_chat_invite_link`.
+
+        .. versionadded:: 13.4
+
+        Returns:
+            :class:`telegram.ChatInviteLink`
+
+        """
+        return self.bot.revoke_chat_invite_link(
+            chat_id=self.id, invite_link=invite_link, timeout=timeout, api_kwargs=api_kwargs
         )
