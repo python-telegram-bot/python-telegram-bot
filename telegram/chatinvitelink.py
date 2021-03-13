@@ -32,13 +32,13 @@ class ChatInviteLink(TelegramObject):
     """This object represents an invite link for a chat.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`invite_link` and :attr:`status` are equal.
+    considered equal, if their :attr:`invite_link` and :attr:`creator` are equal.
 
     Args:
         invite_link (:obj:`str`): The invite link.
         creator (:class:`telegram.User`): Creator of the link.
-        is_primary (:obj:`bool`): True, if the link is primary.
-        is_revoked (:obj:`bool`): True, if the link is revoked.
+        is_primary (:obj:`bool`): :obj:`True`, if the link is primary.
+        is_revoked (:obj:`bool`): :obj:`True`, if the link is revoked.
         expire_date (:class:`datetime.datetime`, optional): Date when the link will expire or
             has been expired.
         member_limit (:obj:`int`, optional): Maximum number of users that can be members of the
@@ -48,8 +48,8 @@ class ChatInviteLink(TelegramObject):
         invite_link (:obj:`str`): The invite link. If the link was created by another chat
             administrator, then the second part of the link will be replaced with ``'…'``.
         creator (:class:`telegram.User`): Creator of the link.
-        is_primary (:obj:`bool`): True, if the link is primary.
-        is_revoked (:obj:`bool`): True, if the link is revoked.
+        is_primary (:obj:`bool`): :obj:`True`, if the link is primary.
+        is_revoked (:obj:`bool`): :obj:`True`, if the link is revoked.
         expire_date (:class:`datetime.datetime`): Optional. Date when the link will expire or
             has been expired.
         member_limit (:obj:`int`): Optional. Maximum number of users that can be members
@@ -77,7 +77,7 @@ class ChatInviteLink(TelegramObject):
 
         # Optionals
         self.expire_date = expire_date
-        self.member_limit = member_limit
+        self.member_limit = int(member_limit) if member_limit is not None else None
 
         self._id_attrs = (self.invite_link, self.creator)
 

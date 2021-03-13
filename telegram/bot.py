@@ -3834,13 +3834,13 @@ class Bot(TelegramObject):
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
+        .. versionadded:: 13.4
+
         Returns:
             :class:`telegram.ChatInviteLink`
 
         Raises:
             :class:`telegram.error.TelegramError`
-
-        .. versionadded:: 13.4
 
         """
         data: JSONDict = {
@@ -3891,13 +3891,13 @@ class Bot(TelegramObject):
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
+        .. versionadded:: 13.4
+
         Returns:
             :class:`telegram.ChatInviteLink`
 
         Raises:
             :class:`telegram.error.TelegramError`
-
-        .. versionadded:: 13.4
 
         """
         data: JSONDict = {'chat_id': chat_id, 'invite_link': invite_link}
@@ -3939,13 +3939,13 @@ class Bot(TelegramObject):
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
+        .. versionadded:: 13.4
+
         Returns:
             :class:`telegram.ChatInviteLink`
 
         Raises:
             :class:`telegram.error.TelegramError`
-
-        .. versionadded:: 13.4
 
         """
         data: JSONDict = {'chat_id': chat_id, 'invite_link': invite_link}
