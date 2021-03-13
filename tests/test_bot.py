@@ -23,6 +23,7 @@ from pathlib import Path
 from platform import python_implementation
 
 import pytest
+import pytz
 from flaky import flaky
 
 from telegram import (
@@ -1499,7 +1500,7 @@ class TestBot:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_promote_chat_member(self, bot, channel_id):
+    def test_promote_chat_member(self, bot, channel_id, monkeypatch):
         # TODO: Add bot to supergroup so this can be tested properly / give bot perms
         with pytest.raises(BadRequest, match='Not enough rights'):
             assert bot.promote_chat_member(
@@ -1518,6 +1519,42 @@ class TestBot:
                 can_manage_voice_chats=True,
             )
 
+        # Test that we pass the correct params to TG
+        def make_assertion(*args, **_):
+            data = args[1]
+            return (
+                data.get('chat_id') == channel_id
+                and data.get('user_id') == 95205500
+                and data.get('is_anonymous') == 1
+                and data.get('can_change_info') == 2
+                and data.get('can_post_messages') == 3
+                and data.get('can_edit_messages') == 4
+                and data.get('can_delete_messages') == 5
+                and data.get('can_invite_users') == 6
+                and data.get('can_restrict_members') == 7
+                and data.get('can_pin_messages') == 8
+                and data.get('can_promote_members') == 9
+                and data.get('can_manage_chat') == 10
+                and data.get('can_manage_voice_chats') == 11
+            )
+
+        monkeypatch.setattr(bot, '_post', make_assertion)
+        assert bot.promote_chat_member(
+            channel_id,
+            95205500,
+            is_anonymous=1,
+            can_change_info=2,
+            can_post_messages=3,
+            can_edit_messages=4,
+            can_delete_messages=5,
+            can_invite_users=6,
+            can_restrict_members=7,
+            can_pin_messages=8,
+            can_promote_members=9,
+            can_manage_chat=10,
+            can_manage_voice_chats=11,
+        )
+
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_export_chat_invite_link(self, bot, channel_id):
@@ -1533,24 +1570,58 @@ class TestBot:
         timestamp = dtm.datetime.utcnow()
         add_seconds = dtm.timedelta(0, 70)
         time_in_future = timestamp + add_seconds
+        aware_time_in_future = pytz.UTC.localize(time_in_future)
         invite_link = bot.create_chat_invite_link(
             channel_id, expire_date=time_in_future, member_limit=10
         )
         assert invite_link.invite_link != ''
         assert not invite_link.invite_link.endswith('...')
-        assert invite_link.expire_date == to_timestamp(time_in_future)
+        assert pytest.approx(invite_link.expire_date == aware_time_in_future)
         assert invite_link.member_limit == 10
 
         add_seconds = dtm.timedelta(0, 80)
         time_in_future = timestamp + add_seconds
+        aware_time_in_future = pytz.UTC.localize(time_in_future)
+
         edited_invite_link = bot.edit_chat_invite_link(
             channel_id, invite_link.invite_link, expire_date=time_in_future, member_limit=20
         )
         assert edited_invite_link.invite_link == invite_link.invite_link
-        assert edited_invite_link.expire_date == to_timestamp(time_in_future)
+        assert pytest.approx(edited_invite_link.expire_date == aware_time_in_future)
         assert edited_invite_link.member_limit == 20
 
         revoked_invite_link = bot.revoke_chat_invite_link(channel_id, invite_link.invite_link)
+        assert revoked_invite_link.invite_link == invite_link.invite_link
+        assert revoked_invite_link.is_revoked is True
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_advanced_chat_invite_links_default_tzinfo(self, tz_bot, channel_id):
+        # we are testing this all in one function in order to save api calls
+        add_seconds = dtm.timedelta(0, 70)
+        aware_expire_date = dtm.datetime.now(tz=tz_bot.defaults.tzinfo) + add_seconds
+        time_in_future = aware_expire_date.replace(tzinfo=None)
+
+        invite_link = tz_bot.create_chat_invite_link(
+            channel_id, expire_date=time_in_future, member_limit=10
+        )
+        assert invite_link.invite_link != ''
+        assert not invite_link.invite_link.endswith('...')
+        assert pytest.approx(invite_link.expire_date == aware_expire_date)
+        assert invite_link.member_limit == 10
+
+        add_seconds = dtm.timedelta(0, 80)
+        aware_expire_date += add_seconds
+        time_in_future = aware_expire_date.replace(tzinfo=None)
+
+        edited_invite_link = tz_bot.edit_chat_invite_link(
+            channel_id, invite_link.invite_link, expire_date=time_in_future, member_limit=20
+        )
+        assert edited_invite_link.invite_link == invite_link.invite_link
+        assert pytest.approx(edited_invite_link.expire_date == aware_expire_date)
+        assert edited_invite_link.member_limit == 20
+
+        revoked_invite_link = tz_bot.revoke_chat_invite_link(channel_id, invite_link.invite_link)
         assert revoked_invite_link.invite_link == invite_link.invite_link
         assert revoked_invite_link.is_revoked is True
 
