@@ -88,7 +88,13 @@ Attributes:
     DICE_BASKETBALL (:obj:`str`): '🏀'
     DICE_FOOTBALL (:obj:`str`): '⚽'
     DICE_SLOT_MACHINE (:obj:`str`): '🎰'
+    DICE_BOWLING (:obj:`str`): '🎳'
+
+        .. versionadded:: 13.4
     DICE_ALL_EMOJI (List[:obj:`str`]): List of all supported base emoji.
+
+        .. versionchanged:: 13.4
+            Added :attr:`DICE_BOWLING`
 
 :class:`telegram.MessageEntity`:
 

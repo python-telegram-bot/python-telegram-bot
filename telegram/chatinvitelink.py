@@ -32,7 +32,10 @@ class ChatInviteLink(TelegramObject):
     """This object represents an invite link for a chat.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`invite_link` and :attr:`creator` are equal.
+    considered equal, if their :attr:`invite_link`, :attr:`creator`, :attr:`is_primary` and
+    :attr:`is_revoked` are equal.
+
+    .. versionadded:: 13.4
 
     Args:
         invite_link (:obj:`str`): The invite link.
@@ -54,8 +57,6 @@ class ChatInviteLink(TelegramObject):
             has been expired.
         member_limit (:obj:`int`): Optional. Maximum number of users that can be members
             of the chat simultaneously after joining the chat via this invite link; 1-99999.
-
-    .. versionadded:: 13.4
 
     """
 

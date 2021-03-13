@@ -298,7 +298,7 @@ class Bot(TelegramObject):
         if result is True:
             return result
 
-        return Message.de_json(result, self)  # type: ignore[arg-type,return-value]
+        return Message.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @property
     def request(self) -> Request:
@@ -407,7 +407,7 @@ class Bot(TelegramObject):
         """
         result = self._post('getMe', timeout=timeout, api_kwargs=api_kwargs)
 
-        self._bot = User.de_json(result, self)  # type: ignore
+        self._bot = User.de_json(result, self)  # type: ignore[return-value, arg-type]
 
         return self._bot  # type: ignore[return-value]
 
@@ -2186,7 +2186,7 @@ class Bot(TelegramObject):
 
         result = self._post('getUserProfilePhotos', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        return UserProfilePhotos.de_json(result, self)  # type: ignore
+        return UserProfilePhotos.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @log
     def get_file(
@@ -2246,7 +2246,7 @@ class Bot(TelegramObject):
                 self.base_file_url, result['file_path']  # type: ignore[index]
             )
 
-        return File.de_json(result, self)  # type: ignore
+        return File.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @log
     def kick_chat_member(
@@ -2962,7 +2962,7 @@ class Bot(TelegramObject):
 
         result = self._post('getChat', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        return Chat.de_json(result, self)  # type: ignore
+        return Chat.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @log
     def get_chat_administrators(
@@ -3061,7 +3061,7 @@ class Bot(TelegramObject):
 
         result = self._post('getChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        return ChatMember.de_json(result, self)  # type: ignore
+        return ChatMember.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @log
     def set_chat_sticker_set(
@@ -3146,7 +3146,7 @@ class Bot(TelegramObject):
         """
         result = self._post('getWebhookInfo', None, timeout=timeout, api_kwargs=api_kwargs)
 
-        return WebhookInfo.de_json(result, self)  # type: ignore
+        return WebhookInfo.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @log
     def set_game_score(
@@ -3817,7 +3817,9 @@ class Bot(TelegramObject):
         """
         Use this method to create an additional invite link for a chat. The bot must be an
         administrator in the chat for this to work and must have the appropriate admin rights.
-        The link can be revoked using the method :attr:`revokeChatInviteLink`.
+        The link can be revoked using the method :meth:`revoke_chat_invite_link`.
+
+        .. versionadded:: 13.4
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -3833,8 +3835,6 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. versionadded:: 13.4
 
         Returns:
             :class:`telegram.ChatInviteLink`
@@ -3859,7 +3859,7 @@ class Bot(TelegramObject):
 
         result = self._post('createChatInviteLink', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        return ChatInviteLink.de_json(result, self)  # type: ignore
+        return ChatInviteLink.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @log
     def edit_chat_invite_link(
@@ -3874,6 +3874,8 @@ class Bot(TelegramObject):
         """
         Use this method to edit a non-primary invite link created by the bot. The bot must be an
         administrator in the chat for this to work and must have the appropriate admin rights.
+
+        .. versionadded:: 13.4
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -3890,8 +3892,6 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. versionadded:: 13.4
 
         Returns:
             :class:`telegram.ChatInviteLink`
@@ -3914,7 +3914,7 @@ class Bot(TelegramObject):
 
         result = self._post('editChatInviteLink', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        return ChatInviteLink.de_json(result, self)  # type: ignore
+        return ChatInviteLink.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @log
     def revoke_chat_invite_link(
@@ -3929,6 +3929,8 @@ class Bot(TelegramObject):
         revoked, a new link is automatically generated. The bot must be an administrator in the
         chat for this to work and must have the appropriate admin rights.
 
+        .. versionadded:: 13.4
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
@@ -3938,8 +3940,6 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. versionadded:: 13.4
 
         Returns:
             :class:`telegram.ChatInviteLink`
@@ -3952,7 +3952,7 @@ class Bot(TelegramObject):
 
         result = self._post('revokeChatInviteLink', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        return ChatInviteLink.de_json(result, self)  # type: ignore
+        return ChatInviteLink.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @log
     def set_chat_photo(
@@ -4249,7 +4249,7 @@ class Bot(TelegramObject):
 
         result = self._post('getStickerSet', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        return StickerSet.de_json(result, self)  # type: ignore
+        return StickerSet.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @log
     def upload_sticker_file(
@@ -4294,7 +4294,7 @@ class Bot(TelegramObject):
 
         result = self._post('uploadStickerFile', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        return File.de_json(result, self)  # type: ignore
+        return File.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @log
     def create_new_sticker_set(
@@ -4787,7 +4787,7 @@ class Bot(TelegramObject):
 
         result = self._post('stopPoll', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        return Poll.de_json(result, self)  # type: ignore
+        return Poll.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @log
     def send_dice(
@@ -5043,7 +5043,7 @@ class Bot(TelegramObject):
                 data['reply_markup'] = reply_markup
 
         result = self._post('copyMessage', data, timeout=timeout, api_kwargs=api_kwargs)
-        return MessageId.de_json(result, self)  # type: ignore
+        return MessageId.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     def to_dict(self) -> JSONDict:
         data: JSONDict = {'id': self.id, 'username': self.username, 'first_name': self.first_name}

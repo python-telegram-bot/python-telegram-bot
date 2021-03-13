@@ -81,10 +81,8 @@ class Chat(TelegramObject):
             :meth:`telegram.Bot.get_chat`.
         description (:obj:`str`, optional): Description, for groups, supergroups and channel chats.
             Returned only in :meth:`telegram.Bot.get_chat`.
-        invite_link (:obj:`str`, optional): Chat invite link, for groups, supergroups and channel
-            chats. Each administrator in a chat generates their own invite links, so the bot must
-            first generate the link using ``export_chat_invite_link()``. Returned only
-            in :meth:`telegram.Bot.get_chat`.
+        invite_link (:obj:`str`, optional): Primary invite link, for groups, supergroups and
+            channel. Returned only in :meth:`telegram.Bot.get_chat`.
         pinned_message (:class:`telegram.Message`, optional): The most recent pinned message
             (by sending date). Returned only in :meth:`telegram.Bot.get_chat`.
         permissions (:class:`telegram.ChatPermissions`): Optional. Default chat member permissions,
@@ -120,7 +118,8 @@ class Chat(TelegramObject):
         bio (:obj:`str`): Optional. Bio of the other party in a private chat. Returned only in
             :meth:`telegram.Bot.get_chat`.
         description (:obj:`str`): Optional. Description, for groups, supergroups and channel chats.
-        invite_link (:obj:`str`): Optional. Chat invite link, for supergroups and channel chats.
+        invite_link (:obj:`str`): Optional. Primary invite link, for groups, supergroups and
+            channel. Returned only in :meth:`telegram.Bot.get_chat`.
         pinned_message (:class:`telegram.Message`): Optional. The most recent pinned message
             (by sending date). Returned only in :meth:`telegram.Bot.get_chat`.
         permissions (:class:`telegram.ChatPermissions`): Optional. Default chat member permissions,

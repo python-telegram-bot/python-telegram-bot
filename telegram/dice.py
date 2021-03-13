@@ -81,6 +81,10 @@ class Dice(TelegramObject):
     SLOT_MACHINE: ClassVar[str] = constants.DICE_SLOT_MACHINE
     """:const:`telegram.constants.DICE_SLOT_MACHINE`"""
     BOWLING: ClassVar[str] = constants.DICE_BOWLING
-    """:const:`telegram.constants.DICE_BOWLING`"""
+    """
+    :const:`telegram.constants.DICE_BOWLING`
+
+    .. versionadded:: 13.4
+    """
     ALL_EMOJI: ClassVar[List[str]] = constants.DICE_ALL_EMOJI
     """:const:`telegram.constants.DICE_ALL_EMOJI`"""

@@ -204,16 +204,16 @@ class Message(TelegramObject):
         proximity_alert_triggered (:class:`telegram.ProximityAlertTriggered`, optional): Service
             message. A user in the chat triggered another user's proximity alert while sharing
             Live Location.
-        voice_chat_started (:class:`telegram.VoiceChatStarted`, optional): Service message about
-            a voice chat started in the chat.
+        voice_chat_started (:class:`telegram.VoiceChatStarted`, optional): Service message: voice
+            chat started.
 
             .. versionadded:: 13.4
-        voice_chat_ended (:class:`telegram.VoiceChatEnded`, optional): Service message about a
-            voice chat ended in the chat.
+        voice_chat_ended (:class:`telegram.VoiceChatEnded`, optional): Service message: voice chat
+            ended.
 
             .. versionadded:: 13.4
         voice_chat_participants_invited (:class:`telegram.VoiceChatParticipantsInvited` optional):
-            Service message about new members invited to a voice chat.
+            Service message: new participants invited to a voice chat.
 
             .. versionadded:: 13.4
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
@@ -305,16 +305,16 @@ class Message(TelegramObject):
         proximity_alert_triggered (:class:`telegram.ProximityAlertTriggered`): Optional. Service
             message. A user in the chat triggered another user's proximity alert while sharing
             Live Location.
-        voice_chat_started (:class:`telegram.VoiceChatStarted`): Optional. Represents a service
-            message about voice chat started in the chat.
+        voice_chat_started (:class:`telegram.VoiceChatStarted`): Optional. Service message: voice
+            chat started
 
             .. versionadded:: 13.4
-        voice_chat_ended (:class:`telegram.VoiceChatEnded`): Optional. Represents a service
-            message about a voice chat ended in the chat.
+        voice_chat_ended (:class:`telegram.VoiceChatEnded`): Optional. Service message: voice chat
+            ended.
 
             .. versionadded:: 13.4
         voice_chat_participants_invited (:class:`telegram.VoiceChatParticipantsInvited`): Optional.
-            Represents a service message about new members invited to a voice chat.
+            Service message: new participants invited to a voice chat.
 
             .. versionadded:: 13.4
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
