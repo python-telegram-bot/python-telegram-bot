@@ -62,7 +62,7 @@ class TestVoiceChatEnded:
         a = VoiceChatEnded(100)
         b = VoiceChatEnded(100)
         c = VoiceChatEnded(50)
-        d = VoiceChatEnded(25)
+        d = VoiceChatStarted()
 
         assert a == b
         assert hash(a) == hash(b)
@@ -99,6 +99,7 @@ class TestVoiceChatParticipantsInvited:
         b = VoiceChatParticipantsInvited([user1])
         c = VoiceChatParticipantsInvited([user1, user2])
         d = VoiceChatParticipantsInvited([user2])
+        e = VoiceChatStarted()
 
         assert a == b
         assert hash(a) == hash(b)
@@ -108,3 +109,6 @@ class TestVoiceChatParticipantsInvited:
 
         assert a != d
         assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)

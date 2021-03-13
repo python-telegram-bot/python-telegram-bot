@@ -1478,7 +1478,7 @@ class TestFilters:
         assert Filters.dice.bowling([4, 5])(update)
         assert not Filters.dice.dice(update)
         assert not Filters.dice.darts(update)
-        assert not Filters.dice.football([4])(update)
+        assert not Filters.dice.bowling([4])(update)
 
     def test_language_filter_single(self, update):
         update.message.from_user.language_code = 'en_US'

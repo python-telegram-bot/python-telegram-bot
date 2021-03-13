@@ -1537,6 +1537,7 @@ class TestBot:
             channel_id, expire_date=time_in_future, member_limit=10
         )
         assert invite_link.invite_link != ''
+        assert not invite_link.invite_link.endswith('...')
         assert invite_link.expire_date == to_timestamp(time_in_future)
         assert invite_link.member_limit == 10
 

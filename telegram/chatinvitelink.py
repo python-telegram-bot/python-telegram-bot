@@ -90,7 +90,7 @@ class ChatInviteLink(TelegramObject):
             return None
 
         data['creator'] = User.de_json(data.get('creator'), bot)
-        data['until_date'] = from_timestamp(data.get('expire_date', None))
+        data['expire_date'] = from_timestamp(data.get('expire_date', None))
 
         return cls(**data)
 
