@@ -79,7 +79,7 @@ class ChatInviteLink(TelegramObject):
         self.expire_date = expire_date
         self.member_limit = int(member_limit) if member_limit is not None else None
 
-        self._id_attrs = (self.invite_link, self.creator)
+        self._id_attrs = (self.invite_link, self.creator, self.is_primary, self.is_revoked)
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['ChatInviteLink']:

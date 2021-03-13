@@ -90,6 +90,7 @@ class TestChatInviteLink:
         b = ChatInviteLink("link", User(1, '', False), True, True)
         d = ChatInviteLink("link", User(2, '', False), False, True)
         d2 = ChatInviteLink("notalink", User(1, '', False), False, True)
+        d3 = ChatInviteLink("notalink", User(1, '', False), True, True)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -100,3 +101,6 @@ class TestChatInviteLink:
 
         assert a != d2
         assert hash(a) != hash(d2)
+
+        assert d2 != d3
+        assert hash(d2) != hash(d3)
