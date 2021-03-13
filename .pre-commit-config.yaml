@@ -1,6 +1,6 @@
 # Make sure that
 #   * the revs specified here match requirements-dev.txt
-#   * the makefile checks the same files as pre-commit
+#   * the additional_dependencies here match requirements.txt
 repos:
 -   repo: https://github.com/psf/black
     rev: 20.8b1
@@ -14,21 +14,43 @@ repos:
     hooks:
     -   id: flake8
 -   repo: https://github.com/PyCQA/pylint
-    rev: pylint-2.6.0
+    rev: pylint-2.7.2
     hooks:
     -   id: pylint
         files: ^(telegram|examples)/.*\.py$
         args:
-        - --rcfile=setup.cfg
+          - --rcfile=setup.cfg
+        additional_dependencies:
+          - certifi
+          - tornado>=5.1
+          - APScheduler==3.6.3
+          - . # this basically does `pip install -e .`
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.800
+    rev: v0.812
     hooks:
     -   id: mypy
-        files: ^(telegram|examples)/.*\.py$
+        name: mypy-ptb
+        files: ^telegram/.*\.py$
+        additional_dependencies:
+          - certifi
+          - tornado>=5.1
+          - APScheduler==3.6.3
+          - . # this basically does `pip install -e .`
+    -   id: mypy
+        name: mypy-examples
+        files: ^examples/.*\.py$
+        args:
+          - --no-strict-optional
+          - --follow-imports=silent
+        additional_dependencies:
+          - certifi
+          - tornado>=5.1
+          - APScheduler==3.6.3
+          - . # this basically does `pip install -e .`
 -   repo: https://github.com/asottile/pyupgrade
     rev: v2.10.0
     hooks:
     -   id: pyupgrade
         files: ^(telegram|examples|tests)/.*\.py$
         args:
-            - --py36-plus
+          - --py36-plus

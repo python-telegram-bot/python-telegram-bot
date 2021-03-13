@@ -30,7 +30,7 @@ except ImportError:
 
 from typing import Any, Union
 
-import certifi  # pylint: disable=E0401
+import certifi
 
 try:
     import telegram.vendor.ptb_urllib3.urllib3 as urllib3

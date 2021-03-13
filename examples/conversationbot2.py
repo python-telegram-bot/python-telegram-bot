@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=W0613, C0116
-# type: ignore[union-attr]
+# pylint: disable=C0116
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -54,7 +53,7 @@ def facts_to_str(user_data: Dict[str, str]) -> str:
     return "\n".join(facts).join(['\n', '\n'])
 
 
-def start(update: Update, context: CallbackContext) -> int:
+def start(update: Update, _: CallbackContext) -> int:
     update.message.reply_text(
         "Hi! My name is Doctor Botter. I will hold a more complex conversation with you. "
         "Why don't you tell me something about yourself?",
@@ -72,9 +71,9 @@ def regular_choice(update: Update, context: CallbackContext) -> int:
     return TYPING_REPLY
 
 
-def custom_choice(update: Update, context: CallbackContext) -> int:
+def custom_choice(update: Update, _: CallbackContext) -> int:
     update.message.reply_text(
-        'Alright, please send me the category first, ' 'for example "Most impressive skill"'
+        'Alright, please send me the category first, for example "Most impressive skill"'
     )
 
     return TYPING_CHOICE

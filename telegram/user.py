@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=C0103,W0622
+# pylint: disable=W0622
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2021
@@ -111,7 +111,7 @@ class User(TelegramObject):
         **_kwargs: Any,
     ):
         # Required
-        self.id = int(id)
+        self.id = int(id)  # pylint: disable=C0103
         self.first_name = first_name
         self.is_bot = is_bot
         # Optionals

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=E0611,E0213,E1102,C0103,E1101,R0913,R0904
+# pylint: disable=E0611,E0213,E1102,E1101,R0913,R0904
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2021
@@ -17,7 +17,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=E0401
 """This module contains an object that represents a Telegram Bot."""
 
 import functools
@@ -35,6 +34,7 @@ from typing import (
     no_type_check,
     Dict,
     cast,
+    Sequence,
 )
 
 try:
@@ -324,7 +324,7 @@ class Bot(TelegramObject):
         return self._bot
 
     @property
-    def id(self) -> int:
+    def id(self) -> int:  # pylint: disable=C0103
         """:obj:`int`: Unique identifier for this bot."""
 
         return self.bot.id
@@ -1445,12 +1445,12 @@ class Bot(TelegramObject):
             'allow_sending_without_reply': allow_sending_without_reply,
         }
 
-        for m in data['media']:
-            if m.parse_mode == DEFAULT_NONE:
+        for med in data['media']:
+            if med.parse_mode == DEFAULT_NONE:
                 if self.defaults:
-                    m.parse_mode = DefaultValue.get_value(self.defaults.parse_mode)
+                    med.parse_mode = DefaultValue.get_value(self.defaults.parse_mode)
                 else:
-                    m.parse_mode = None
+                    med.parse_mode = None
 
         if reply_to_message_id:
             data['reply_to_message_id'] = reply_to_message_id
@@ -1990,7 +1990,7 @@ class Bot(TelegramObject):
         self,
         inline_query_id: str,
         results: Union[
-            List['InlineQueryResult'], Callable[[int], Optional[List['InlineQueryResult']]]
+            Sequence['InlineQueryResult'], Callable[[int], Optional[Sequence['InlineQueryResult']]]
         ],
         cache_time: int = 300,
         is_personal: bool = None,
@@ -2103,7 +2103,7 @@ class Bot(TelegramObject):
             if callable(results):
                 callable_output = results(current_offset_int)
                 if not callable_output:
-                    effective_results = []
+                    effective_results: Sequence['InlineQueryResult'] = []
                 else:
                     effective_results = callable_output
                     next_offset = str(current_offset_int + 1)
@@ -3388,7 +3388,7 @@ class Bot(TelegramObject):
         )
 
     @log
-    def answer_shipping_query(
+    def answer_shipping_query(  # pylint: disable=C0103
         self,
         shipping_query_id: str,
         ok: bool,
@@ -3453,7 +3453,7 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
-    def answer_pre_checkout_query(
+    def answer_pre_checkout_query(  # pylint: disable=C0103
         self,
         pre_checkout_query_id: str,
         ok: bool,

@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=W0613, C0116
-# type: ignore[union-attr]
+# pylint: disable=C0116
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -28,7 +27,7 @@ BOT_TOKEN = "TOKEN"
 DEVELOPER_CHAT_ID = 123456789
 
 
-def error_handler(update: Update, context: CallbackContext) -> None:
+def error_handler(update: object, context: CallbackContext) -> None:
     """Log the error and send a telegram message to notify the developer."""
     # Log the error before we do anything else, so we can see it even if something breaks.
     logger.error(msg="Exception while handling an update:", exc_info=context.error)
@@ -40,9 +39,10 @@ def error_handler(update: Update, context: CallbackContext) -> None:
 
     # Build the message with some markup and additional information about what happened.
     # You might need to add some logic to deal with messages longer than the 4096 character limit.
+    update_str = update.to_dict() if isinstance(update, Update) else str(update)
     message = (
         f'An exception was raised while handling an update\n'
-        f'<pre>update = {html.escape(json.dumps(update.to_dict(), indent=2, ensure_ascii=False))}'
+        f'<pre>update = {html.escape(json.dumps(update_str, indent=2, ensure_ascii=False))}'
         '</pre>\n\n'
         f'<pre>context.chat_data = {html.escape(str(context.chat_data))}</pre>\n\n'
         f'<pre>context.user_data = {html.escape(str(context.user_data))}</pre>\n\n'
@@ -53,19 +53,19 @@ def error_handler(update: Update, context: CallbackContext) -> None:
     context.bot.send_message(chat_id=DEVELOPER_CHAT_ID, text=message, parse_mode=ParseMode.HTML)
 
 
-def bad_command(update: Update, context: CallbackContext) -> None:
+def bad_command(_: Update, context: CallbackContext) -> None:
     """Raise an error to trigger the error handler."""
-    context.bot.wrong_method_name()
+    context.bot.wrong_method_name()  # type: ignore[attr-defined]
 
 
-def start(update: Update, context: CallbackContext) -> None:
+def start(update: Update, _: CallbackContext) -> None:
     update.effective_message.reply_html(
         'Use /bad_command to cause an error.\n'
         f'Your chat id is <code>{update.effective_chat.id}</code>.'
     )
 
 
-def main():
+def main() -> None:
     # Create the Updater and pass it your bot's token.
     updater = Updater(BOT_TOKEN)
 

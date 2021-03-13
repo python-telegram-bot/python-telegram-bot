@@ -1,3 +1,5 @@
+# Make sure to install those as additional_dependencies in the
+# pre-commit hooks for pylint & mypy
 certifi
 # only telegram.ext: # Keep this line here; used in setup(-raw).py
 tornado>=5.1
