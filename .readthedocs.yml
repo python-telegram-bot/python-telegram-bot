@@ -17,6 +17,6 @@ formats:
 python:
    version: 3
    install:
-     - method: pip
+     - method: setuptools
        path: .
      - requirements: docs/requirements-docs.txt
