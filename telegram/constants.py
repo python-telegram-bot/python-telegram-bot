@@ -21,6 +21,10 @@ The following constants were extracted from the
 `Telegram Bots API <https://core.telegram.org/bots/api>`_.
 
 Attributes:
+    BOT_API_VERSION (:obj:`str`): `5.1`. Telegram Bot API version supported by this
+        version of `python-telegram-bot`. Also available as ``telegram.bot_api_version``.
+
+        .. versionadded:: 13.4
     MAX_MESSAGE_LENGTH (:obj:`int`): 4096
     MAX_CAPTION_LENGTH (:obj:`int`): 1024
     SUPPORTED_WEBHOOK_PORTS (List[:obj:`int`]): [443, 80, 88, 8443]
@@ -88,7 +92,13 @@ Attributes:
     DICE_BASKETBALL (:obj:`str`): '🏀'
     DICE_FOOTBALL (:obj:`str`): '⚽'
     DICE_SLOT_MACHINE (:obj:`str`): '🎰'
+    DICE_BOWLING (:obj:`str`): '🎳'
+
+        .. versionadded:: 13.4
     DICE_ALL_EMOJI (List[:obj:`str`]): List of all supported base emoji.
+
+        .. versionchanged:: 13.4
+            Added :attr:`DICE_BOWLING`
 
 :class:`telegram.MessageEntity`:
 
@@ -136,6 +146,7 @@ Attributes:
 """
 from typing import List
 
+BOT_API_VERSION: str = '5.1'
 MAX_MESSAGE_LENGTH: int = 4096
 MAX_CAPTION_LENGTH: int = 1024
 ANONYMOUS_ADMIN_ID: int = 1087968824
@@ -182,12 +193,14 @@ DICE_DARTS: str = '🎯'
 DICE_BASKETBALL: str = '🏀'
 DICE_FOOTBALL: str = '⚽'
 DICE_SLOT_MACHINE: str = '🎰'
+DICE_BOWLING: str = '🎳'
 DICE_ALL_EMOJI: List[str] = [
     DICE_DICE,
     DICE_DARTS,
     DICE_BASKETBALL,
     DICE_FOOTBALL,
     DICE_SLOT_MACHINE,
+    DICE_BOWLING,
 ]
 
 MESSAGEENTITY_MENTION: str = 'mention'

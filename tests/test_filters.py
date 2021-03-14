@@ -44,7 +44,7 @@ def update():
 
 @pytest.fixture(scope='function', params=MessageEntity.ALL_TYPES)
 def message_entity(request):
-    return MessageEntity(request.param, 0, 0, url='', user='')
+    return MessageEntity(request.param, 0, 0, url='', user=User(1, 'first_name', False))
 
 
 @pytest.fixture(
@@ -828,6 +828,11 @@ class TestFilters:
         assert Filters.status_update.chat_created(update)
         update.message.channel_chat_created = False
 
+        update.message.message_auto_delete_timer_changed = True
+        assert Filters.status_update(update)
+        assert Filters.status_update.message_auto_delete_timer_changed(update)
+        update.message.message_auto_delete_timer_changed = False
+
         update.message.migrate_to_chat_id = 100
         assert Filters.status_update(update)
         assert Filters.status_update.migrate(update)
@@ -852,6 +857,21 @@ class TestFilters:
         assert Filters.status_update(update)
         assert Filters.status_update.proximity_alert_triggered(update)
         update.message.proximity_alert_triggered = None
+
+        update.message.voice_chat_started = 'hello'
+        assert Filters.status_update(update)
+        assert Filters.status_update.voice_chat_started(update)
+        update.message.voice_chat_started = None
+
+        update.message.voice_chat_ended = 'bye'
+        assert Filters.status_update(update)
+        assert Filters.status_update.voice_chat_ended(update)
+        update.message.voice_chat_ended = None
+
+        update.message.voice_chat_participants_invited = 'invited'
+        assert Filters.status_update(update)
+        assert Filters.status_update.voice_chat_participants_invited(update)
+        update.message.voice_chat_participants_invited = None
 
     def test_filters_forwarded(self, update):
         assert not Filters.forwarded(update)
@@ -1452,6 +1472,13 @@ class TestFilters:
         assert not Filters.dice.dice(update)
         assert not Filters.dice.darts(update)
         assert not Filters.dice.slot_machine([4])(update)
+
+        update.message.dice = Dice(5, '🎳')
+        assert Filters.dice.bowling(update)
+        assert Filters.dice.bowling([4, 5])(update)
+        assert not Filters.dice.dice(update)
+        assert not Filters.dice.darts(update)
+        assert not Filters.dice.bowling([4])(update)
 
     def test_language_filter_single(self, update):
         update.message.from_user.language_code = 'en_US'

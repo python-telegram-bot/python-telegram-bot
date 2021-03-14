@@ -1005,6 +1005,15 @@ officedocument.wordprocessingml.document")``.
             :attr: `telegram.Message.supergroup_chat_created` or
             :attr: `telegram.Message.channel_chat_created`."""
 
+        class _MessageAutoDeleteTimerChanged(MessageFilter):
+            name = 'MessageAutoDeleteTimerChanged'
+
+            def filter(self, message: Message) -> bool:
+                return bool(message.message_auto_delete_timer_changed)
+
+        message_auto_delete_timer_changed = _MessageAutoDeleteTimerChanged()
+        """Messages that contain :attr:`message_auto_delete_timer_changed`"""
+
         class _Migrate(MessageFilter):
             name = 'Filters.status_update.migrate'
 
@@ -1042,6 +1051,33 @@ officedocument.wordprocessingml.document")``.
         proximity_alert_triggered = _ProximityAlertTriggered()
         """Messages that contain :attr:`telegram.Message.proximity_alert_triggered`."""
 
+        class _VoiceChatStarted(MessageFilter):
+            name = 'Filters.status_update.voice_chat_started'
+
+            def filter(self, message: Message) -> bool:
+                return bool(message.voice_chat_started)
+
+        voice_chat_started = _VoiceChatStarted()
+        """Messages that contain :attr:`telegram.Message.voice_chat_started`."""
+
+        class _VoiceChatEnded(MessageFilter):
+            name = 'Filters.status_update.voice_chat_ended'
+
+            def filter(self, message: Message) -> bool:
+                return bool(message.voice_chat_ended)
+
+        voice_chat_ended = _VoiceChatEnded()
+        """Messages that contain :attr:`telegram.Message.voice_chat_ended`."""
+
+        class _VoiceChatParticipantsInvited(MessageFilter):
+            name = 'Filters.status_update.voice_chat_participants_invited'
+
+            def filter(self, message: Message) -> bool:
+                return bool(message.voice_chat_participants_invited)
+
+        voice_chat_participants_invited = _VoiceChatParticipantsInvited()
+        """Messages that contain :attr:`telegram.Message.voice_chat_participants_invited`."""
+
         name = 'Filters.status_update'
 
         def filter(self, message: Update) -> bool:
@@ -1052,10 +1088,14 @@ officedocument.wordprocessingml.document")``.
                 or self.new_chat_photo(message)
                 or self.delete_chat_photo(message)
                 or self.chat_created(message)
+                or self.message_auto_delete_timer_changed(message)
                 or self.migrate(message)
                 or self.pinned_message(message)
                 or self.connected_website(message)
                 or self.proximity_alert_triggered(message)
+                or self.voice_chat_started(message)
+                or self.voice_chat_ended(message)
+                or self.voice_chat_participants_invited(message)
             )
 
     status_update = _StatusUpdate()
@@ -1085,10 +1125,27 @@ officedocument.wordprocessingml.document")``.
             :attr:`telegram.Message.new_chat_photo`.
         new_chat_title: Messages that contain
             :attr:`telegram.Message.new_chat_title`.
+        message_auto_delete_timer_changed: Messages that contain
+            :attr:`message_auto_delete_timer_changed`.
+
+            .. versionadded:: 13.4
         pinned_message: Messages that contain
             :attr:`telegram.Message.pinned_message`.
         proximity_alert_triggered: Messages that contain
             :attr:`telegram.Message.proximity_alert_triggered`.
+        voice_chat_started: Messages that contain
+            :attr:`telegram.Message.voice_chat_started`.
+
+            .. versionadded:: 13.4
+        voice_chat_ended: Messages that contain
+            :attr:`telegram.Message.voice_chat_ended`.
+
+            .. versionadded:: 13.4
+        voice_chat_participants_invited: Messages that contain
+            :attr:`telegram.Message.voice_chat_participants_invited`.
+
+            .. versionadded:: 13.4
+
     """
 
     class _Forwarded(MessageFilter):
@@ -1831,6 +1888,7 @@ officedocument.wordprocessingml.document")``.
         basketball = _DiceEmoji('🏀', 'basketball')
         football = _DiceEmoji('⚽')
         slot_machine = _DiceEmoji('🎰')
+        bowling = _DiceEmoji('🎳', 'bowling')
 
     dice = _Dice()
     """Dice Messages. If an integer or a list of integers is passed, it filters messages to only
@@ -1863,6 +1921,11 @@ officedocument.wordprocessingml.document")``.
             as for :attr:`Filters.dice`.
         slot_machine: Dice messages with the emoji 🎰. Passing a list of integers is supported just
             as for :attr:`Filters.dice`.
+        bowling: Dice messages with the emoji 🎳. Passing a list of integers is supported just
+            as for :attr:`Filters.dice`.
+
+            .. versionadded:: 13.4
+
     """
 
     class language(MessageFilter):

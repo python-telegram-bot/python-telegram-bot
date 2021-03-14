@@ -47,8 +47,12 @@ from telegram import (
     Video,
     VideoNote,
     Voice,
+    VoiceChatStarted,
+    VoiceChatEnded,
+    VoiceChatParticipantsInvited,
     ProximityAlertTriggered,
     ReplyMarkup,
+    MessageAutoDeleteTimerChanged,
 )
 from telegram.utils.helpers import (
     escape_markdown,
@@ -83,7 +87,7 @@ class Message(TelegramObject):
     considered equal, if their :attr:`message_id` and :attr:`chat` are equal.
 
     Note:
-        In Python `from` is a reserved word, use `from_user` instead.
+        In Python ``from`` is a reserved word, use ``from_user`` instead.
 
     Args:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -165,6 +169,10 @@ class Message(TelegramObject):
             created. This field can't be received in a message coming through updates, because bot
             can't be a member of a channel when it is created. It can only be found in
             :attr:`reply_to_message` if someone replies to a very first message in a channel.
+        message_auto_delete_timer_changed (:class:`telegram.MessageAutoDeleteTimerChanged`, \
+            optional): Service message: auto-delete timer settings changed in the chat.
+
+            .. versionadded:: 13.4
         migrate_to_chat_id (:obj:`int`, optional): The group has been migrated to a supergroup with
             the specified identifier. This number may be greater than 32 bits and some programming
             languages may have difficulty/silent defects in interpreting it. But it is smaller than
@@ -196,6 +204,18 @@ class Message(TelegramObject):
         proximity_alert_triggered (:class:`telegram.ProximityAlertTriggered`, optional): Service
             message. A user in the chat triggered another user's proximity alert while sharing
             Live Location.
+        voice_chat_started (:class:`telegram.VoiceChatStarted`, optional): Service message: voice
+            chat started.
+
+            .. versionadded:: 13.4
+        voice_chat_ended (:class:`telegram.VoiceChatEnded`, optional): Service message: voice chat
+            ended.
+
+            .. versionadded:: 13.4
+        voice_chat_participants_invited (:class:`telegram.VoiceChatParticipantsInvited` optional):
+            Service message: new participants invited to a voice chat.
+
+            .. versionadded:: 13.4
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. ``login_url`` buttons are represented as ordinary url buttons.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
@@ -257,6 +277,10 @@ class Message(TelegramObject):
         group_chat_created (:obj:`bool`): Optional. The group has been created.
         supergroup_chat_created (:obj:`bool`): Optional. The supergroup has been created.
         channel_chat_created (:obj:`bool`): Optional. The channel has been created.
+        message_auto_delete_timer_changed (:class:`telegram.MessageAutoDeleteTimerChanged`):
+            Optional. Service message: auto-delete timer settings changed in the chat.
+
+            .. versionadded:: 13.4
         migrate_to_chat_id (:obj:`int`): Optional. The group has been migrated to a supergroup with
             the specified identifier.
         migrate_from_chat_id (:obj:`int`): Optional. The supergroup has been migrated from a group
@@ -281,6 +305,18 @@ class Message(TelegramObject):
         proximity_alert_triggered (:class:`telegram.ProximityAlertTriggered`): Optional. Service
             message. A user in the chat triggered another user's proximity alert while sharing
             Live Location.
+        voice_chat_started (:class:`telegram.VoiceChatStarted`): Optional. Service message: voice
+            chat started
+
+            .. versionadded:: 13.4
+        voice_chat_ended (:class:`telegram.VoiceChatEnded`): Optional. Service message: voice chat
+            ended.
+
+            .. versionadded:: 13.4
+        voice_chat_participants_invited (:class:`telegram.VoiceChatParticipantsInvited`): Optional.
+            Service message: new participants invited to a voice chat.
+
+            .. versionadded:: 13.4
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
@@ -316,6 +352,7 @@ class Message(TelegramObject):
         'group_chat_created',
         'supergroup_chat_created',
         'channel_chat_created',
+        'message_auto_delete_timer_changed',
         'migrate_to_chat_id',
         'migrate_from_chat_id',
         'pinned_message',
@@ -323,6 +360,9 @@ class Message(TelegramObject):
         'dice',
         'passport_data',
         'proximity_alert_triggered',
+        'voice_chat_started',
+        'voice_chat_ended',
+        'voice_chat_participants_invited',
     ] + ATTACHMENT_TYPES
 
     def __init__(
@@ -379,6 +419,10 @@ class Message(TelegramObject):
         via_bot: User = None,
         proximity_alert_triggered: ProximityAlertTriggered = None,
         sender_chat: Chat = None,
+        voice_chat_started: VoiceChatStarted = None,
+        voice_chat_ended: VoiceChatEnded = None,
+        voice_chat_participants_invited: VoiceChatParticipantsInvited = None,
+        message_auto_delete_timer_changed: MessageAutoDeleteTimerChanged = None,
         **_kwargs: Any,
     ):
         # Required
@@ -418,6 +462,7 @@ class Message(TelegramObject):
         self.migrate_to_chat_id = migrate_to_chat_id
         self.migrate_from_chat_id = migrate_from_chat_id
         self.channel_chat_created = bool(channel_chat_created)
+        self.message_auto_delete_timer_changed = message_auto_delete_timer_changed
         self.pinned_message = pinned_message
         self.forward_from_message_id = forward_from_message_id
         self.invoice = invoice
@@ -433,6 +478,9 @@ class Message(TelegramObject):
         self.dice = dice
         self.via_bot = via_bot
         self.proximity_alert_triggered = proximity_alert_triggered
+        self.voice_chat_started = voice_chat_started
+        self.voice_chat_ended = voice_chat_ended
+        self.voice_chat_participants_invited = voice_chat_participants_invited
         self.reply_markup = reply_markup
         self.bot = bot
 
@@ -489,6 +537,9 @@ class Message(TelegramObject):
         data['new_chat_members'] = User.de_list(data.get('new_chat_members'), bot)
         data['left_chat_member'] = User.de_json(data.get('left_chat_member'), bot)
         data['new_chat_photo'] = PhotoSize.de_list(data.get('new_chat_photo'), bot)
+        data['message_auto_delete_timer_changed'] = MessageAutoDeleteTimerChanged.de_json(
+            data.get('message_auto_delete_timer_changed'), bot
+        )
         data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
         data['invoice'] = Invoice.de_json(data.get('invoice'), bot)
         data['successful_payment'] = SuccessfulPayment.de_json(data.get('successful_payment'), bot)
@@ -500,7 +551,11 @@ class Message(TelegramObject):
             data.get('proximity_alert_triggered'), bot
         )
         data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
-
+        data['voice_chat_started'] = VoiceChatStarted.de_json(data.get('voice_chat_started'), bot)
+        data['voice_chat_ended'] = VoiceChatEnded.de_json(data.get('voice_chat_ended'), bot)
+        data['voice_chat_participants_invited'] = VoiceChatParticipantsInvited.de_json(
+            data.get('voice_chat_participants_invited'), bot
+        )
         return cls(bot=bot, **data)
 
     @property

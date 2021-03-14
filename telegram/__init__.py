@@ -24,7 +24,9 @@ from .user import User
 from .files.chatphoto import ChatPhoto
 from .chat import Chat
 from .chatlocation import ChatLocation
+from .chatinvitelink import ChatInviteLink
 from .chatmember import ChatMember
+from .chatmemberupdated import ChatMemberUpdated
 from .chatpermissions import ChatPermissions
 from .files.photosize import PhotoSize
 from .files.audio import Audio
@@ -54,6 +56,7 @@ from .messageentity import MessageEntity
 from .messageid import MessageId
 from .games.game import Game
 from .poll import Poll, PollOption, PollAnswer
+from .voicechat import VoiceChatStarted, VoiceChatEnded, VoiceChatParticipantsInvited
 from .loginurl import LoginUrl
 from .proximityalerttriggered import ProximityAlertTriggered
 from .games.callbackgame import CallbackGame
@@ -68,6 +71,7 @@ from .passport.encryptedpassportelement import EncryptedPassportElement
 from .passport.passportdata import PassportData
 from .inline.inlinekeyboardbutton import InlineKeyboardButton
 from .inline.inlinekeyboardmarkup import InlineKeyboardMarkup
+from .messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
 from .message import Message
 from .callbackquery import CallbackQuery
 from .choseninlineresult import ChosenInlineResult
@@ -144,7 +148,7 @@ from .passport.credentials import (
     TelegramDecryptionError,
 )
 from .bot import Bot
-from .version import __version__  # noqa: F401
+from .version import __version__, bot_api_version  # noqa: F401
 
 __author__ = 'devs@python-telegram-bot.org'
 
@@ -157,8 +161,10 @@ __all__ = (  # Keep this alphabetically ordered
     'CallbackQuery',
     'Chat',
     'ChatAction',
+    'ChatInviteLink',
     'ChatLocation',
     'ChatMember',
+    'ChatMemberUpdated',
     'ChatPermissions',
     'ChatPhoto',
     'ChosenInlineResult',
@@ -226,6 +232,7 @@ __all__ = (  # Keep this alphabetically ordered
     'MAX_MESSAGE_LENGTH',
     'MaskPosition',
     'Message',
+    'MessageAutoDeleteTimerChanged',
     'MessageEntity',
     'MessageId',
     'OrderInfo',
@@ -272,5 +279,8 @@ __all__ = (  # Keep this alphabetically ordered
     'Video',
     'VideoNote',
     'Voice',
+    'VoiceChatStarted',
+    'VoiceChatEnded',
+    'VoiceChatParticipantsInvited',
     'WebhookInfo',
 )

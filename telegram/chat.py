@@ -32,6 +32,7 @@ if TYPE_CHECKING:
     from telegram import (
         Bot,
         ChatMember,
+        ChatInviteLink,
         Message,
         MessageId,
         ReplyMarkup,
@@ -80,10 +81,8 @@ class Chat(TelegramObject):
             :meth:`telegram.Bot.get_chat`.
         description (:obj:`str`, optional): Description, for groups, supergroups and channel chats.
             Returned only in :meth:`telegram.Bot.get_chat`.
-        invite_link (:obj:`str`, optional): Chat invite link, for groups, supergroups and channel
-            chats. Each administrator in a chat generates their own invite links, so the bot must
-            first generate the link using ``export_chat_invite_link()``. Returned only
-            in :meth:`telegram.Bot.get_chat`.
+        invite_link (:obj:`str`, optional): Primary invite link, for groups, supergroups and
+            channel. Returned only in :meth:`telegram.Bot.get_chat`.
         pinned_message (:class:`telegram.Message`, optional): The most recent pinned message
             (by sending date). Returned only in :meth:`telegram.Bot.get_chat`.
         permissions (:class:`telegram.ChatPermissions`): Optional. Default chat member permissions,
@@ -91,6 +90,11 @@ class Chat(TelegramObject):
         slow_mode_delay (:obj:`int`, optional): For supergroups, the minimum allowed delay between
             consecutive messages sent by each unprivileged user.
             Returned only in :meth:`telegram.Bot.get_chat`.
+        message_auto_delete_time (:obj:`int`, optional): The time after which all messages sent to
+            the chat will be automatically deleted; in seconds. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: 13.4
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         sticker_set_name (:obj:`str`, optional): For supergroups, name of group sticker set.
             Returned only in :meth:`telegram.Bot.get_chat`.
@@ -114,7 +118,8 @@ class Chat(TelegramObject):
         bio (:obj:`str`): Optional. Bio of the other party in a private chat. Returned only in
             :meth:`telegram.Bot.get_chat`.
         description (:obj:`str`): Optional. Description, for groups, supergroups and channel chats.
-        invite_link (:obj:`str`): Optional. Chat invite link, for supergroups and channel chats.
+        invite_link (:obj:`str`): Optional. Primary invite link, for groups, supergroups and
+            channel. Returned only in :meth:`telegram.Bot.get_chat`.
         pinned_message (:class:`telegram.Message`): Optional. The most recent pinned message
             (by sending date). Returned only in :meth:`telegram.Bot.get_chat`.
         permissions (:class:`telegram.ChatPermissions`): Optional. Default chat member permissions,
@@ -122,6 +127,11 @@ class Chat(TelegramObject):
         slow_mode_delay (:obj:`int`): Optional. For supergroups, the minimum allowed delay between
             consecutive messages sent by each unprivileged user. Returned only in
             :meth:`telegram.Bot.get_chat`.
+        message_auto_delete_time (:obj:`int`): Optional. The time after which all messages sent to
+            the chat will be automatically deleted; in seconds. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: 13.4
         sticker_set_name (:obj:`str`): Optional. For supergroups, name of Group sticker set.
         can_set_sticker_set (:obj:`bool`): Optional. :obj:`True`, if the bot can change group the
             sticker set.
@@ -162,6 +172,7 @@ class Chat(TelegramObject):
         bio: str = None,
         linked_chat_id: int = None,
         location: ChatLocation = None,
+        message_auto_delete_time: int = None,
         **_kwargs: Any,
     ):
         # Required
@@ -181,6 +192,9 @@ class Chat(TelegramObject):
         self.pinned_message = pinned_message
         self.permissions = permissions
         self.slow_mode_delay = slow_mode_delay
+        self.message_auto_delete_time = (
+            int(message_auto_delete_time) if message_auto_delete_time is not None else None
+        )
         self.sticker_set_name = sticker_set_name
         self.can_set_sticker_set = can_set_sticker_set
         self.linked_chat_id = linked_chat_id
@@ -216,7 +230,7 @@ class Chat(TelegramObject):
         return None
 
     @classmethod
-    def de_json(cls, data: JSONDict, bot: 'Bot') -> Optional['Chat']:
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Chat']:
         data = cls.parse_data(data)
 
         if not data:
@@ -320,6 +334,7 @@ class Chat(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         until_date: Union[int, datetime] = None,
         api_kwargs: JSONDict = None,
+        revoke_messages: bool = None,
     ) -> bool:
         """Shortcut for::
 
@@ -343,6 +358,7 @@ class Chat(TelegramObject):
             timeout=timeout,
             until_date=until_date,
             api_kwargs=api_kwargs,
+            revoke_messages=revoke_messages,
         )
 
     def unban_member(
@@ -384,6 +400,8 @@ class Chat(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         is_anonymous: bool = None,
+        can_manage_chat: bool = None,
+        can_manage_voice_chats: bool = None,
     ) -> bool:
         """Shortcut for::
 
@@ -412,6 +430,8 @@ class Chat(TelegramObject):
             timeout=timeout,
             api_kwargs=api_kwargs,
             is_anonymous=is_anonymous,
+            can_manage_chat=can_manage_chat,
+            can_manage_voice_chats=can_manage_voice_chats,
         )
 
     def restrict_member(
@@ -1390,4 +1410,107 @@ class Chat(TelegramObject):
             reply_markup=reply_markup,
             timeout=timeout,
             api_kwargs=api_kwargs,
+        )
+
+    def export_invite_link(
+        self,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> str:
+        """Shortcut for::
+
+            bot.export_chat_invite_link(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.export_chat_invite_link`.
+
+        .. versionadded:: 13.4
+
+        Returns:
+            :obj:`str`: New invite link on success.
+
+        """
+        return self.bot.export_chat_invite_link(
+            chat_id=self.id, timeout=timeout, api_kwargs=api_kwargs
+        )
+
+    def create_invite_link(
+        self,
+        expire_date: Union[int, datetime] = None,
+        member_limit: int = None,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> 'ChatInviteLink':
+        """Shortcut for::
+
+            bot.create_chat_invite_link(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.create_chat_invite_link`.
+
+        .. versionadded:: 13.4
+
+        Returns:
+            :class:`telegram.ChatInviteLink`
+
+        """
+        return self.bot.create_chat_invite_link(
+            chat_id=self.id,
+            expire_date=expire_date,
+            member_limit=member_limit,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    def edit_invite_link(
+        self,
+        invite_link: str,
+        expire_date: Union[int, datetime] = None,
+        member_limit: int = None,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> 'ChatInviteLink':
+        """Shortcut for::
+
+            bot.edit_chat_invite_link(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.edit_chat_invite_link`.
+
+        .. versionadded:: 13.4
+
+        Returns:
+            :class:`telegram.ChatInviteLink`
+
+        """
+        return self.bot.edit_chat_invite_link(
+            chat_id=self.id,
+            invite_link=invite_link,
+            expire_date=expire_date,
+            member_limit=member_limit,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    def revoke_invite_link(
+        self,
+        invite_link: str,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> 'ChatInviteLink':
+        """Shortcut for::
+
+            bot.revoke_chat_invite_link(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.revoke_chat_invite_link`.
+
+        .. versionadded:: 13.4
+
+        Returns:
+            :class:`telegram.ChatInviteLink`
+
+        """
+        return self.bot.revoke_chat_invite_link(
+            chat_id=self.id, invite_link=invite_link, timeout=timeout, api_kwargs=api_kwargs
         )

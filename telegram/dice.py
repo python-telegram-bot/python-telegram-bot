@@ -45,13 +45,17 @@ class Dice(TelegramObject):
         3 indicates that the goal was missed. However, this behaviour is undocumented and might
         be changed by Telegram.
 
+        If :attr:`emoji` is "🎳", a value of 6 knocks all the pins, while a value of 1 means all
+        the pins were missed. However, this behaviour is undocumented and might be changed by
+        Telegram.
+
         If :attr:`emoji` is "🎰", each value corresponds to a unique combination of symbols, which
         can be found at our `wiki <https://git.io/JkeC6>`_. However, this behaviour is undocumented
         and might be changed by Telegram.
 
     Args:
-        value (:obj:`int`): Value of the dice. 1-6 for dice and darts, 1-5 for basketball and
-            football/soccer ball, 1-64 for slot machine.
+        value (:obj:`int`): Value of the dice. 1-6 for dice, darts and bowling balls, 1-5 for
+            basketball and football/soccer ball, 1-64 for slot machine.
         emoji (:obj:`str`): Emoji on which the dice throw animation is based.
 
     Attributes:
@@ -76,5 +80,11 @@ class Dice(TelegramObject):
     """:const:`telegram.constants.DICE_FOOTBALL`"""
     SLOT_MACHINE: ClassVar[str] = constants.DICE_SLOT_MACHINE
     """:const:`telegram.constants.DICE_SLOT_MACHINE`"""
+    BOWLING: ClassVar[str] = constants.DICE_BOWLING
+    """
+    :const:`telegram.constants.DICE_BOWLING`
+
+    .. versionadded:: 13.4
+    """
     ALL_EMOJI: ClassVar[List[str]] = constants.DICE_ALL_EMOJI
     """:const:`telegram.constants.DICE_ALL_EMOJI`"""

@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import time
 
 import pytest
 
@@ -31,10 +32,20 @@ from telegram import (
     PreCheckoutQuery,
     Poll,
     PollOption,
+    ChatMemberUpdated,
+    ChatMember,
 )
 from telegram.poll import PollAnswer
+from telegram.utils.helpers import from_timestamp
 
 message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
+chat_member_updated = ChatMemberUpdated(
+    Chat(1, 'chat'),
+    User(1, '', False),
+    from_timestamp(int(time.time())),
+    ChatMember(User(1, '', False), ChatMember.CREATOR),
+    ChatMember(User(1, '', False), ChatMember.CREATOR),
+)
 
 params = [
     {'message': message},
@@ -49,6 +60,8 @@ params = [
     {'callback_query': CallbackQuery(1, User(1, '', False), 'chat')},
     {'poll': Poll('id', '?', [PollOption('.', 1)], False, False, False, Poll.REGULAR, True)},
     {'poll_answer': PollAnswer("id", User(1, '', False), [1])},
+    {'my_chat_member': chat_member_updated},
+    {'chat_member': chat_member_updated},
 ]
 
 all_types = (
@@ -63,6 +76,8 @@ all_types = (
     'pre_checkout_query',
     'poll',
     'poll_answer',
+    'my_chat_member',
+    'chat_member',
 )
 
 ids = all_types + ('callback_query_without_message',)
@@ -146,6 +161,8 @@ class TestUpdate:
             or update.pre_checkout_query is not None
             or update.poll is not None
             or update.poll_answer is not None
+            or update.my_chat_member is not None
+            or update.chat_member is not None
         ):
             assert eff_message.message_id == message.message_id
         else:

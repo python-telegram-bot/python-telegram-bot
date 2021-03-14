@@ -48,6 +48,10 @@ from telegram import (
     Dice,
     Bot,
     ChatAction,
+    VoiceChatStarted,
+    VoiceChatEnded,
+    VoiceChatParticipantsInvited,
+    MessageAutoDeleteTimerChanged,
 )
 from telegram.ext import Defaults
 from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
@@ -115,6 +119,7 @@ def message(bot):
         {'group_chat_created': True},
         {'supergroup_chat_created': True},
         {'channel_chat_created': True},
+        {'message_auto_delete_timer_changed': MessageAutoDeleteTimerChanged(42)},
         {'migrate_to_chat_id': -12345},
         {'migrate_from_chat_id': -54321},
         {'pinned_message': Message(7, None, None, None)},
@@ -166,6 +171,13 @@ def message(bot):
                 User(1, 'John', False), User(2, 'Doe', False), 42
             )
         },
+        {'voice_chat_started': VoiceChatStarted()},
+        {'voice_chat_ended': VoiceChatEnded(100)},
+        {
+            'voice_chat_participants_invited': VoiceChatParticipantsInvited(
+                [User(1, 'Rem', False), User(2, 'Emilia', False)]
+            )
+        },
         {'sender_chat': Chat(-123, 'discussion_channel')},
     ],
     ids=[
@@ -195,6 +207,7 @@ def message(bot):
         'group_created',
         'supergroup_created',
         'channel_created',
+        'message_auto_delete_timer_changed',
         'migrated_to',
         'migrated_from',
         'pinned',
@@ -211,6 +224,9 @@ def message(bot):
         'dice',
         'via_bot',
         'proximity_alert_triggered',
+        'voice_chat_started',
+        'voice_chat_ended',
+        'voice_chat_participants_invited',
         'sender_chat',
     ],
 )
