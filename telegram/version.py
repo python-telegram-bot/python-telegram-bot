@@ -18,4 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=C0114
 
+from telegram import constants
+
 __version__ = '13.3'
+bot_api_version = constants.BOT_API_VERSION  # pylint: disable=C0103
