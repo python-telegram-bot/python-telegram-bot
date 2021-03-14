@@ -1565,14 +1565,17 @@ class TestBot:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_advanced_chat_invite_links(self, bot, channel_id):
+    @pytest.mark.parametrize('datetime', argvalues=[True, False], ids=['datetime', 'integer'])
+    def test_advanced_chat_invite_links(self, bot, channel_id, datetime):
         # we are testing this all in one function in order to save api calls
         timestamp = dtm.datetime.utcnow()
         add_seconds = dtm.timedelta(0, 70)
         time_in_future = timestamp + add_seconds
+        expire_time = time_in_future if datetime else to_timestamp(time_in_future)
         aware_time_in_future = pytz.UTC.localize(time_in_future)
+
         invite_link = bot.create_chat_invite_link(
-            channel_id, expire_date=time_in_future, member_limit=10
+            channel_id, expire_date=expire_time, member_limit=10
         )
         assert invite_link.invite_link != ''
         assert not invite_link.invite_link.endswith('...')
@@ -1581,10 +1584,11 @@ class TestBot:
 
         add_seconds = dtm.timedelta(0, 80)
         time_in_future = timestamp + add_seconds
+        expire_time = time_in_future if datetime else to_timestamp(time_in_future)
         aware_time_in_future = pytz.UTC.localize(time_in_future)
 
         edited_invite_link = bot.edit_chat_invite_link(
-            channel_id, invite_link.invite_link, expire_date=time_in_future, member_limit=20
+            channel_id, invite_link.invite_link, expire_date=expire_time, member_limit=20
         )
         assert edited_invite_link.invite_link == invite_link.invite_link
         assert pytest.approx(edited_invite_link.expire_date == aware_time_in_future)
