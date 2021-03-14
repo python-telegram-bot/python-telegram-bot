@@ -144,7 +144,7 @@ from .passport.credentials import (
     TelegramDecryptionError,
 )
 from .bot import Bot
-from .version import __version__  # noqa: F401
+from .version import __version__, bot_api_version  # noqa: F401
 
 __author__ = 'devs@python-telegram-bot.org'
 
