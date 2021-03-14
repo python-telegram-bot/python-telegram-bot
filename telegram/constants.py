@@ -22,7 +22,9 @@ The following constants were extracted from the
 
 Attributes:
     BOT_API_VERSION (:obj:`str`): `5.1`. Telegram Bot API version supported by this
-        version of `python-telegram-bot`. Also available as `telegram.bot_api_version`.
+        version of `python-telegram-bot`. Also available as ``telegram.bot_api_version``.
+        
+        .. versionadded:: 13.4
     MAX_MESSAGE_LENGTH (:obj:`int`): 4096
     MAX_CAPTION_LENGTH (:obj:`int`): 1024
     SUPPORTED_WEBHOOK_PORTS (List[:obj:`int`]): [443, 80, 88, 8443]
