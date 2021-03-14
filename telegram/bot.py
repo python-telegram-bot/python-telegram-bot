@@ -1574,7 +1574,7 @@ class Bot(TelegramObject):
     ) -> Union[Message, bool]:
         """Use this method to edit live location messages sent by the bot or via the bot
         (for inline bots). A location can be edited until its :attr:`live_period` expires or
-        editing is explicitly disabled by a call to :attr:`stop_message_live_location`.
+        editing is explicitly disabled by a call to :meth:`stop_message_live_location`.
 
         Note:
             You can either supply a :obj:`latitude` and :obj:`longitude` or a :obj:`location`.
@@ -2200,7 +2200,7 @@ class Bot(TelegramObject):
         """
         Use this method to get basic info about a file and prepare it for downloading. For the
         moment, bots can download files of up to 20MB in size. The file can then be downloaded
-        with :attr:`telegram.File.download`. It is guaranteed that the link will be
+        with :meth:`telegram.File.download`. It is guaranteed that the link will be
         valid for at least 1 hour. When the link expires, a new one can be requested by
         calling get_file again.
 
@@ -3074,7 +3074,7 @@ class Bot(TelegramObject):
         """Use this method to set a new group sticker set for a supergroup.
         The bot must be an administrator in the chat for this to work and must have the appropriate
         admin rights. Use the field :attr:`telegram.Chat.can_set_sticker_set` optionally returned
-        in :attr:`get_chat` requests to check if the bot can use this method.
+        in :meth:`get_chat` requests to check if the bot can use this method.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -3106,7 +3106,7 @@ class Bot(TelegramObject):
         """Use this method to delete a group sticker set from a supergroup. The bot must be an
         administrator in the chat for this to work and must have the appropriate admin rights.
         Use the field :attr:`telegram.Chat.can_set_sticker_set` optionally returned in
-        :attr:`get_chat` requests to check if the bot can use this method.
+        :meth:`get_chat` requests to check if the bot can use this method.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -3541,7 +3541,7 @@ class Bot(TelegramObject):
         :obj:`True` for all boolean parameters to lift restrictions from a user.
 
         Note:
-            Since Bot API 4.4, :attr:`restrict_chat_member` takes the new user permissions in a
+            Since Bot API 4.4, :meth:`restrict_chat_member` takes the new user permissions in a
             single argument of type :class:`telegram.ChatPermissions`. The old way of passing
             parameters will not keep working forever.
 
@@ -4261,7 +4261,7 @@ class Bot(TelegramObject):
     ) -> File:
         """
         Use this method to upload a .png file with a sticker for later use in
-        :attr:`create_new_sticker_set` and :attr:`add_sticker_to_set` methods (can be used multiple
+        :meth:`create_new_sticker_set` and :meth:`add_sticker_to_set` methods (can be used multiple
         times).
 
         Note:
@@ -5061,107 +5061,107 @@ class Bot(TelegramObject):
 
     # camelCase aliases
     getMe = get_me
-    """Alias for :attr:`get_me`"""
+    """Alias for :meth:`get_me`"""
     sendMessage = send_message
-    """Alias for :attr:`send_message`"""
+    """Alias for :meth:`send_message`"""
     deleteMessage = delete_message
-    """Alias for :attr:`delete_message`"""
+    """Alias for :meth:`delete_message`"""
     forwardMessage = forward_message
-    """Alias for :attr:`forward_message`"""
+    """Alias for :meth:`forward_message`"""
     sendPhoto = send_photo
-    """Alias for :attr:`send_photo`"""
+    """Alias for :meth:`send_photo`"""
     sendAudio = send_audio
-    """Alias for :attr:`send_audio`"""
+    """Alias for :meth:`send_audio`"""
     sendDocument = send_document
-    """Alias for :attr:`send_document`"""
+    """Alias for :meth:`send_document`"""
     sendSticker = send_sticker
-    """Alias for :attr:`send_sticker`"""
+    """Alias for :meth:`send_sticker`"""
     sendVideo = send_video
-    """Alias for :attr:`send_video`"""
+    """Alias for :meth:`send_video`"""
     sendAnimation = send_animation
-    """Alias for :attr:`send_animation`"""
+    """Alias for :meth:`send_animation`"""
     sendVoice = send_voice
-    """Alias for :attr:`send_voice`"""
+    """Alias for :meth:`send_voice`"""
     sendVideoNote = send_video_note
-    """Alias for :attr:`send_video_note`"""
+    """Alias for :meth:`send_video_note`"""
     sendMediaGroup = send_media_group
-    """Alias for :attr:`send_media_group`"""
+    """Alias for :meth:`send_media_group`"""
     sendLocation = send_location
-    """Alias for :attr:`send_location`"""
+    """Alias for :meth:`send_location`"""
     editMessageLiveLocation = edit_message_live_location
-    """Alias for :attr:`edit_message_live_location`"""
+    """Alias for :meth:`edit_message_live_location`"""
     stopMessageLiveLocation = stop_message_live_location
-    """Alias for :attr:`stop_message_live_location`"""
+    """Alias for :meth:`stop_message_live_location`"""
     sendVenue = send_venue
-    """Alias for :attr:`send_venue`"""
+    """Alias for :meth:`send_venue`"""
     sendContact = send_contact
-    """Alias for :attr:`send_contact`"""
+    """Alias for :meth:`send_contact`"""
     sendGame = send_game
-    """Alias for :attr:`send_game`"""
+    """Alias for :meth:`send_game`"""
     sendChatAction = send_chat_action
-    """Alias for :attr:`send_chat_action`"""
+    """Alias for :meth:`send_chat_action`"""
     answerInlineQuery = answer_inline_query
-    """Alias for :attr:`answer_inline_query`"""
+    """Alias for :meth:`answer_inline_query`"""
     getUserProfilePhotos = get_user_profile_photos
-    """Alias for :attr:`get_user_profile_photos`"""
+    """Alias for :meth:`get_user_profile_photos`"""
     getFile = get_file
-    """Alias for :attr:`get_file`"""
+    """Alias for :meth:`get_file`"""
     kickChatMember = kick_chat_member
-    """Alias for :attr:`kick_chat_member`"""
+    """Alias for :meth:`kick_chat_member`"""
     unbanChatMember = unban_chat_member
-    """Alias for :attr:`unban_chat_member`"""
+    """Alias for :meth:`unban_chat_member`"""
     answerCallbackQuery = answer_callback_query
-    """Alias for :attr:`answer_callback_query`"""
+    """Alias for :meth:`answer_callback_query`"""
     editMessageText = edit_message_text
-    """Alias for :attr:`edit_message_text`"""
+    """Alias for :meth:`edit_message_text`"""
     editMessageCaption = edit_message_caption
-    """Alias for :attr:`edit_message_caption`"""
+    """Alias for :meth:`edit_message_caption`"""
     editMessageMedia = edit_message_media
-    """Alias for :attr:`edit_message_media`"""
+    """Alias for :meth:`edit_message_media`"""
     editMessageReplyMarkup = edit_message_reply_markup
-    """Alias for :attr:`edit_message_reply_markup`"""
+    """Alias for :meth:`edit_message_reply_markup`"""
     getUpdates = get_updates
-    """Alias for :attr:`get_updates`"""
+    """Alias for :meth:`get_updates`"""
     setWebhook = set_webhook
-    """Alias for :attr:`set_webhook`"""
+    """Alias for :meth:`set_webhook`"""
     deleteWebhook = delete_webhook
-    """Alias for :attr:`delete_webhook`"""
+    """Alias for :meth:`delete_webhook`"""
     leaveChat = leave_chat
-    """Alias for :attr:`leave_chat`"""
+    """Alias for :meth:`leave_chat`"""
     getChat = get_chat
-    """Alias for :attr:`get_chat`"""
+    """Alias for :meth:`get_chat`"""
     getChatAdministrators = get_chat_administrators
-    """Alias for :attr:`get_chat_administrators`"""
+    """Alias for :meth:`get_chat_administrators`"""
     getChatMember = get_chat_member
-    """Alias for :attr:`get_chat_member`"""
+    """Alias for :meth:`get_chat_member`"""
     setChatStickerSet = set_chat_sticker_set
-    """Alias for :attr:`set_chat_sticker_set`"""
+    """Alias for :meth:`set_chat_sticker_set`"""
     deleteChatStickerSet = delete_chat_sticker_set
-    """Alias for :attr:`delete_chat_sticker_set`"""
+    """Alias for :meth:`delete_chat_sticker_set`"""
     getChatMembersCount = get_chat_members_count
-    """Alias for :attr:`get_chat_members_count`"""
+    """Alias for :meth:`get_chat_members_count`"""
     getWebhookInfo = get_webhook_info
-    """Alias for :attr:`get_webhook_info`"""
+    """Alias for :meth:`get_webhook_info`"""
     setGameScore = set_game_score
-    """Alias for :attr:`set_game_score`"""
+    """Alias for :meth:`set_game_score`"""
     getGameHighScores = get_game_high_scores
-    """Alias for :attr:`get_game_high_scores`"""
+    """Alias for :meth:`get_game_high_scores`"""
     sendInvoice = send_invoice
-    """Alias for :attr:`send_invoice`"""
+    """Alias for :meth:`send_invoice`"""
     answerShippingQuery = answer_shipping_query
-    """Alias for :attr:`answer_shipping_query`"""
+    """Alias for :meth:`answer_shipping_query`"""
     answerPreCheckoutQuery = answer_pre_checkout_query
-    """Alias for :attr:`answer_pre_checkout_query`"""
+    """Alias for :meth:`answer_pre_checkout_query`"""
     restrictChatMember = restrict_chat_member
-    """Alias for :attr:`restrict_chat_member`"""
+    """Alias for :meth:`restrict_chat_member`"""
     promoteChatMember = promote_chat_member
-    """Alias for :attr:`promote_chat_member`"""
+    """Alias for :meth:`promote_chat_member`"""
     setChatPermissions = set_chat_permissions
-    """Alias for :attr:`set_chat_permissions`"""
+    """Alias for :meth:`set_chat_permissions`"""
     setChatAdministratorCustomTitle = set_chat_administrator_custom_title
-    """Alias for :attr:`set_chat_administrator_custom_title`"""
+    """Alias for :meth:`set_chat_administrator_custom_title`"""
     exportChatInviteLink = export_chat_invite_link
-    """Alias for :attr:`export_chat_invite_link`"""
+    """Alias for :meth:`export_chat_invite_link`"""
     createChatInviteLink = create_chat_invite_link
     """Alias for :attr:`create_chat_invite_link`"""
     editChatInviteLink = edit_chat_invite_link
@@ -5169,46 +5169,46 @@ class Bot(TelegramObject):
     revokeChatInviteLink = revoke_chat_invite_link
     """Alias for :attr:`revoke_chat_invite_link`"""
     setChatPhoto = set_chat_photo
-    """Alias for :attr:`set_chat_photo`"""
+    """Alias for :meth:`set_chat_photo`"""
     deleteChatPhoto = delete_chat_photo
-    """Alias for :attr:`delete_chat_photo`"""
+    """Alias for :meth:`delete_chat_photo`"""
     setChatTitle = set_chat_title
-    """Alias for :attr:`set_chat_title`"""
+    """Alias for :meth:`set_chat_title`"""
     setChatDescription = set_chat_description
-    """Alias for :attr:`set_chat_description`"""
+    """Alias for :meth:`set_chat_description`"""
     pinChatMessage = pin_chat_message
-    """Alias for :attr:`pin_chat_message`"""
+    """Alias for :meth:`pin_chat_message`"""
     unpinChatMessage = unpin_chat_message
-    """Alias for :attr:`unpin_chat_message`"""
+    """Alias for :meth:`unpin_chat_message`"""
     unpinAllChatMessages = unpin_all_chat_messages
-    """Alias for :attr:`unpin_all_chat_messages`"""
+    """Alias for :meth:`unpin_all_chat_messages`"""
     getStickerSet = get_sticker_set
-    """Alias for :attr:`get_sticker_set`"""
+    """Alias for :meth:`get_sticker_set`"""
     uploadStickerFile = upload_sticker_file
-    """Alias for :attr:`upload_sticker_file`"""
+    """Alias for :meth:`upload_sticker_file`"""
     createNewStickerSet = create_new_sticker_set
-    """Alias for :attr:`create_new_sticker_set`"""
+    """Alias for :meth:`create_new_sticker_set`"""
     addStickerToSet = add_sticker_to_set
-    """Alias for :attr:`add_sticker_to_set`"""
+    """Alias for :meth:`add_sticker_to_set`"""
     setStickerPositionInSet = set_sticker_position_in_set
-    """Alias for :attr:`set_sticker_position_in_set`"""
+    """Alias for :meth:`set_sticker_position_in_set`"""
     deleteStickerFromSet = delete_sticker_from_set
-    """Alias for :attr:`delete_sticker_from_set`"""
+    """Alias for :meth:`delete_sticker_from_set`"""
     setStickerSetThumb = set_sticker_set_thumb
-    """Alias for :attr:`set_sticker_set_thumb`"""
+    """Alias for :meth:`set_sticker_set_thumb`"""
     setPassportDataErrors = set_passport_data_errors
-    """Alias for :attr:`set_passport_data_errors`"""
+    """Alias for :meth:`set_passport_data_errors`"""
     sendPoll = send_poll
-    """Alias for :attr:`send_poll`"""
+    """Alias for :meth:`send_poll`"""
     stopPoll = stop_poll
-    """Alias for :attr:`stop_poll`"""
+    """Alias for :meth:`stop_poll`"""
     sendDice = send_dice
-    """Alias for :attr:`send_dice`"""
+    """Alias for :meth:`send_dice`"""
     getMyCommands = get_my_commands
-    """Alias for :attr:`get_my_commands`"""
+    """Alias for :meth:`get_my_commands`"""
     setMyCommands = set_my_commands
-    """Alias for :attr:`set_my_commands`"""
+    """Alias for :meth:`set_my_commands`"""
     logOut = log_out
-    """Alias for :attr:`log_out`"""
+    """Alias for :meth:`log_out`"""
     copyMessage = copy_message
-    """Alias for :attr:`copy_message`"""
+    """Alias for :meth:`copy_message`"""

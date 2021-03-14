@@ -50,6 +50,8 @@ Instructions for making a code change
 
 The central development branch is ``master``, which should be clean and ready for release at any time. In general, all changes should be done as feature branches based off of ``master``.
 
+If you want to do solely documentation changes, base them and PR to the branch ``doc-fixes``. This branch also has its own `RTD build`_.
+
 Here's how to make a one-off code change.
 
 1. **Choose a descriptive branch name.** It should be lowercase, hyphen-separated, and a noun describing the change (so, ``fuzzy-rules``, but not ``implement-fuzzy-rules``). Also, it shouldn't start with ``hotfix`` or ``release``.
@@ -250,3 +252,4 @@ break the API classes. For example:
 .. _`here`: https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html
 .. _`Black`: https://black.readthedocs.io/en/stable/index.html
 .. _`popular editors`: https://black.readthedocs.io/en/stable/editor_integration.html
+.. _`RTD build`: https://python-telegram-bot.readthedocs.io/en/doc-fixes

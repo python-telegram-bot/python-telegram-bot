@@ -24,7 +24,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = '1.7.9'
+needs_sphinx = '3.5.2'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -35,7 +35,7 @@ extensions = [
 ]
 # Don't show type hints in the signature - that just makes it hardly readable
 # and we document the types anyway
-autodoc_typehints = 'description'
+autodoc_typehints = 'none'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

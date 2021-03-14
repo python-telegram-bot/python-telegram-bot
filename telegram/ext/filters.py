@@ -1117,8 +1117,8 @@ officedocument.wordprocessingml.document")``.
         left_chat_member: Messages that contain
             :attr:`telegram.Message.left_chat_member`.
         migrate: Messages that contain
-            :attr:`telegram.Message.migrate_from_chat_id` or
-            :attr: `telegram.Message.migrate_from_chat_id`.
+            :attr:`telegram.Message.migrate_to_chat_id` or
+            :attr:`telegram.Message.migrate_from_chat_id`.
         new_chat_members: Messages that contain
             :attr:`telegram.Message.new_chat_members`.
         new_chat_photo: Messages that contain
@@ -1738,15 +1738,21 @@ officedocument.wordprocessingml.document")``.
         username.
 
         Examples:
-            * To filter for messages forwarded from a channel with ID ``-1234``, use
-              ``MessageHandler(Filters.sender_chat(-1234), callback_method)``.
+            * To filter for messages forwarded to a discussion group from a channel with ID
+              ``-1234``, use ``MessageHandler(Filters.sender_chat(-1234), callback_method)``.
             * To filter for messages of anonymous admins in a super group with username
               ``@anonymous``, use
               ``MessageHandler(Filters.sender_chat(username='anonymous'), callback_method)``.
-            * To filter for messages forwarded from *any* channel, use
+            * To filter for messages forwarded to a discussion group from *any* channel, use
               ``MessageHandler(Filters.sender_chat.channel, callback_method)``.
             * To filter for messages of anonymous admins in *any* super group, use
               ``MessageHandler(Filters.sender_chat.super_group, callback_method)``.
+
+        Note:
+            Remember, ``sender_chat`` is also set for messages in a channel as the channel itself,
+            so when your bot is an admin in a channel and the linked discussion group, you would
+            receive the message twice (once from inside the channel, once inside the discussion
+            group).
 
         Warning:
             :attr:`chat_ids` will return a *copy* of the saved chat ids as :class:`frozenset`. This
