@@ -35,6 +35,7 @@ repos:
           - certifi
           - tornado>=5.1
           - APScheduler==3.6.3
+          - cachetools==4.2.1
           - . # this basically does `pip install -e .`
     -   id: mypy
         name: mypy-examples
@@ -46,6 +47,7 @@ repos:
           - certifi
           - tornado>=5.1
           - APScheduler==3.6.3
+          - cachetools==4.2.1
           - . # this basically does `pip install -e .`
 -   repo: https://github.com/asottile/pyupgrade
     rev: v2.10.0
