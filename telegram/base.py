@@ -46,15 +46,13 @@ class TelegramObject:
 
     @staticmethod
     def parse_data(data: Optional[JSONDict]) -> Optional[JSONDict]:
-        if not data:
-            return None
-        return data.copy()
+        return None if data is None else data.copy()
 
     @classmethod
     def de_json(cls: Type[TO], data: Optional[JSONDict], bot: 'Bot') -> Optional[TO]:
         data = cls.parse_data(data)
 
-        if not data:
+        if data is None:
             return None
 
         if cls == TelegramObject:

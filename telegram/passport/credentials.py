@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=C0114, E0401, W0622
+# pylint: disable=C0114, W0622
 try:
     import ujson as json
 except ImportError:

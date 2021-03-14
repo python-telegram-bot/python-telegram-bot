@@ -31,6 +31,10 @@ class InlineQueryResult(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`id` is equal.
 
+    Note:
+        All URLs passed in inline query results will be available to end users and therefore must
+        be assumed to be public.
+
     Args:
         type (:obj:`str`): Type of the result.
         id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.

@@ -13,8 +13,10 @@ telegram package
     telegram.callbackquery
     telegram.chat
     telegram.chataction
+    telegram.chatinvitelink
     telegram.chatlocation
     telegram.chatmember
+    telegram.chatmemberupdated
     telegram.chatpermissions
     telegram.chatphoto
     telegram.constants
@@ -38,6 +40,7 @@ telegram package
     telegram.location
     telegram.loginurl
     telegram.message
+    telegram.messageautodeletetimerchanged
     telegram.messageid
     telegram.messageentity
     telegram.parsemode
@@ -57,6 +60,9 @@ telegram package
     telegram.video
     telegram.videonote
     telegram.voice
+    telegram.voicechatstarted
+    telegram.voicechatended
+    telegram.voicechatparticipantsinvited
     telegram.webhookinfo
 
 Stickers

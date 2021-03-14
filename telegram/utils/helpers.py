@@ -51,7 +51,7 @@ if TYPE_CHECKING:
 # in PTB-Raw we don't have pytz, so we make a little workaround here
 DTM_UTC = dtm.timezone.utc
 try:
-    import pytz  # pylint: disable=E0401
+    import pytz
 
     UTC = pytz.utc
 except ImportError:

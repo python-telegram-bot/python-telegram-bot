@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=W0613, C0116
-# type: ignore[union-attr]
+# pylint: disable=C0116
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -24,7 +23,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def msg(update: Update, context: CallbackContext) -> None:
+def msg(update: Update, _: CallbackContext) -> None:
     # If we received any passport data
     passport_data = update.message.passport_data
     if passport_data:
@@ -65,19 +64,19 @@ def msg(update: Update, context: CallbackContext) -> None:
                     actual_file.download()
             if data.type in ('passport', 'driver_license', 'identity_card', 'internal_passport'):
                 if data.front_side:
-                    file = data.front_side.get_file()
-                    print(data.type, file)
-                    file.download()
+                    front_file = data.front_side.get_file()
+                    print(data.type, front_file)
+                    front_file.download()
             if data.type in ('driver_license' and 'identity_card'):
                 if data.reverse_side:
-                    file = data.reverse_side.get_file()
-                    print(data.type, file)
-                    file.download()
+                    reverse_file = data.reverse_side.get_file()
+                    print(data.type, reverse_file)
+                    reverse_file.download()
             if data.type in ('passport', 'driver_license', 'identity_card', 'internal_passport'):
                 if data.selfie:
-                    file = data.selfie.get_file()
-                    print(data.type, file)
-                    file.download()
+                    selfie_file = data.selfie.get_file()
+                    print(data.type, selfie_file)
+                    selfie_file.download()
             if data.type in (
                 'passport',
                 'driver_license',
@@ -96,7 +95,7 @@ def msg(update: Update, context: CallbackContext) -> None:
                     actual_file.download()
 
 
-def main():
+def main() -> None:
     """Start the bot."""
     # Create the Updater and pass it your token and private key
     updater = Updater("TOKEN", private_key=open('private.key', 'rb').read())
