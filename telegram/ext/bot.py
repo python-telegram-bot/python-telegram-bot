@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Bot with convenience extensions."""
 from copy import copy
-from typing import Union, cast, List, Callable, Optional, Tuple, TypeVar, TYPE_CHECKING
+from typing import Union, cast, List, Callable, Optional, Tuple, TypeVar, TYPE_CHECKING, Sequence
 
 import telegram.bot
 from telegram import (
@@ -164,14 +164,14 @@ class Bot(telegram.bot.Bot):
 
         return updates
 
-    def _effective_inline_results(
+    def _effective_inline_results(  # pylint: disable=R0201
         self,
         results: Union[
-            List['InlineQueryResult'], Callable[[int], Optional[List['InlineQueryResult']]]
+            Sequence['InlineQueryResult'], Callable[[int], Optional[Sequence['InlineQueryResult']]]
         ],
         next_offset: str = None,
         current_offset: str = None,
-    ) -> Tuple[List['InlineQueryResult'], Optional[str]]:
+    ) -> Tuple[Sequence['InlineQueryResult'], Optional[str]]:
         """
         This method is called by Bot.answer_inline_query to build the actual results list.
         Overriding this to call self._replace_keyboard suffices

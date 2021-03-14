@@ -132,8 +132,8 @@ class CallbackDataCache:
         The data that needs to be persisted to allow caching callback data across bot reboots.
         """
         # While building a list/dict from the LRUCaches has linear runtime (in the number of
-        # entries), the runtime is bounded unless and it has the big upside of not throwing a
-        # highly customized data structure at users trying to implement a custom pers class
+        # entries), the runtime is bounded by maxsize and it has the big upside of not throwing a
+        # highly customized data structure at users trying to implement a custom persistence class
         with self.__lock:
             return list(data.to_tuple() for data in self._keyboard_data.values()), dict(
                 self._callback_queries.items()

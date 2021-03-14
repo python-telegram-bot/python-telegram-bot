@@ -40,8 +40,8 @@ from .files.videonote import VideoNote
 from .chataction import ChatAction
 from .dice import Dice
 from .userprofilephotos import UserProfilePhotos
-from .keyboardbutton import KeyboardButton
 from .keyboardbuttonpolltype import KeyboardButtonPollType
+from .keyboardbutton import KeyboardButton
 from .replymarkup import ReplyMarkup
 from .replykeyboardmarkup import ReplyKeyboardMarkup
 from .replykeyboardremove import ReplyKeyboardRemove

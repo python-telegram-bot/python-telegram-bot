@@ -111,12 +111,6 @@ Here's how to make a one-off code change.
 
      .. code-block::
 
-        $ make test
-
-     If you don't have ``make``, do:
-
-     .. code-block::
-
         $ pytest -v
 
      To run ``test_official`` (particularly useful if you made API changes), run
@@ -127,17 +121,17 @@ Here's how to make a one-off code change.
 
      prior to running the tests.
 
-   - To actually make the commit (this will trigger tests for yapf, lint and pep8 automatically):
+   - If you want run style & type checks before committing run
+
+     .. code-block::
+
+        $ pre-commit run -a
+
+   - To actually make the commit (this will trigger tests style & type checks automatically):
 
      .. code-block:: bash
 
         $ git add your-file-changed.py
-
-   - yapf may change code formatting, make sure to re-add them to your commit.
-
-     .. code-block:: bash
-
-      $ git commit -a -m "your-commit-message-here"
 
    - Finally, push it to your GitHub fork, run:
 
@@ -196,7 +190,7 @@ Style commandments
 Assert comparison order
 #######################
 
-- assert statements should compare in **actual** == **expected** order.
+Assert statements should compare in **actual** == **expected** order.
 For example (assuming ``test_call`` is the thing being tested):
 
 .. code-block:: python

@@ -497,7 +497,7 @@ class Filters:
             def filter(self, message: Message) -> bool:
                 return bool(
                     message.entities
-                    and any([e.type == MessageEntity.BOT_COMMAND for e in message.entities])
+                    and any(e.type == MessageEntity.BOT_COMMAND for e in message.entities)
                 )
 
         def __call__(  # type: ignore[override]
@@ -1896,7 +1896,7 @@ officedocument.wordprocessingml.document")``.
             """"""  # remove method from docs
             return bool(
                 message.from_user.language_code
-                and any([message.from_user.language_code.startswith(x) for x in self.lang])
+                and any(message.from_user.language_code.startswith(x) for x in self.lang)
             )
 
     class _UpdateType(UpdateFilter):
