@@ -21,6 +21,7 @@ The following constants were extracted from the
 `Telegram Bots API <https://core.telegram.org/bots/api>`_.
 
 Attributes:
+    BOT_API_VERSION (:obj:`float`): `5.1`. Bot API version supported by PTB
     MAX_MESSAGE_LENGTH (:obj:`int`): 4096
     MAX_CAPTION_LENGTH (:obj:`int`): 1024
     SUPPORTED_WEBHOOK_PORTS (List[:obj:`int`]): [443, 80, 88, 8443]
@@ -136,6 +137,7 @@ Attributes:
 """
 from typing import List
 
+BOT_API_VERSION: float = 5.1
 MAX_MESSAGE_LENGTH: int = 4096
 MAX_CAPTION_LENGTH: int = 1024
 ANONYMOUS_ADMIN_ID: int = 1087968824
