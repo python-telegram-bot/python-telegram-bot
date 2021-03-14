@@ -2,6 +2,16 @@
 Changelog
 =========
 
+Version 13.4.1
+==============
+*Released 2021-03-14*
+
+**Hot fix release:**
+
+- Fixed a bug in ``setup.py`` (`#2431`_)
+
+.. _`#2431`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2431
+
 Version 13.4
 ============
 *Released 2021-03-14*
