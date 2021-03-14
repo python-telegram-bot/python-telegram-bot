@@ -2,6 +2,31 @@
 Changelog
 =========
 
+Version 13.4
+============
+*Released 2021-03-14*
+
+**Major Changes:**
+
+- Full support of Bot API 5.1 (`#2424`_)
+
+**Minor changes, CI improvements, doc fixes and type hinting:**
+
+- Improve ``Updater.set_webhook`` (`#2419`_)
+- Doc Fixes (`#2404`_)
+- Type Hinting Fixes (`#2425`_)
+- Update ``pre-commit`` Settings (`#2415`_)
+- Fix Logging for Vendored ``urllib3`` (`#2427`_)
+- Stabilize Tests (`#2409`_)
+
+.. _`#2424`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2424
+.. _`#2419`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2419
+.. _`#2404`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2404
+.. _`#2425`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2425
+.. _`#2415`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2415
+.. _`#2427`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2427
+.. _`#2409`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2409
+
 Version 13.3
 ============
 *Released 2021-02-19*
