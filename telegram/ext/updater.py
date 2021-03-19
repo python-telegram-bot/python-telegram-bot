@@ -345,6 +345,10 @@ class Updater:
         application. Else, the webhook will be started on
         https://listen:port/url_path. Also calls :meth:`telegram.Bot.set_webhook` as required.
 
+        .. versionchanged:: 13.4
+            :meth:`start_webhook` now *always* calls :meth:`telegram.Bot.set_webhook`, so pass
+            ``webhook_url`` instead of calling ``updater.bot.set_webhook(webhook_url)`` manually.
+
         Note:
             Due to an incompatibility of the Tornado library PTB uses for the webhook with Python
             3.8+ on Windows machines, PTB will attempt to set the event loop to
