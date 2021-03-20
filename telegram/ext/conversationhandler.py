@@ -21,6 +21,7 @@
 
 import logging
 import warnings
+import functools
 from threading import Lock
 from typing import TYPE_CHECKING, Dict, List, NoReturn, Optional, Tuple, cast, ClassVar
 
@@ -457,6 +458,21 @@ class ConversationHandler(Handler[Update]):
                 res = self.END
         return res
 
+    def _schedule_job(
+        self,
+        new_state: object,
+        dispatcher: 'Dispatcher',
+        update: Update,
+        context: Optional[CallbackContext],
+        conversation_key: Tuple[int, ...],
+    ) -> None:
+        if new_state != self.END:
+            self.timeout_jobs[conversation_key] = dispatcher.job_queue.run_once(
+                self._trigger_timeout,  # type: ignore[arg-type]
+                self.conversation_timeout,
+                context=_ConversationTimeoutContext(conversation_key, update, dispatcher, context),
+            )
+
     def check_update(self, update: object) -> CheckUpdateType:  # pylint: disable=R0911
         """
         Determines whether an update should be handled by this conversationhandler, and if so in
@@ -578,15 +594,20 @@ class ConversationHandler(Handler[Update]):
             new_state = exception.state
             raise_dp_handler_stop = True
         with self._timeout_jobs_lock:
-            if self.conversation_timeout and new_state != self.END and dispatcher.job_queue:
+            if self.conversation_timeout and dispatcher.job_queue:
                 # Add the new timeout job
-                self.timeout_jobs[conversation_key] = dispatcher.job_queue.run_once(
-                    self._trigger_timeout,  # type: ignore[arg-type]
-                    self.conversation_timeout,
-                    context=_ConversationTimeoutContext(
-                        conversation_key, update, dispatcher, context
-                    ),
-                )
+                if isinstance(new_state, Promise):
+                    new_state.add_done_callback(
+                        functools.partial(
+                            self._schedule_job,
+                            dispatcher=dispatcher,
+                            update=update,
+                            context=context,
+                            conversation_key=conversation_key,
+                        )
+                    )
+                else:
+                    self._schedule_job(new_state, dispatcher, update, context, conversation_key)
 
         if isinstance(self.map_to_parent, dict) and new_state in self.map_to_parent:
             self.update_state(self.END, conversation_key)
@@ -634,17 +655,6 @@ class ConversationHandler(Handler[Update]):
 
         context = job.context  # type:ignore[union-attr,assignment]
         callback_context = context.callback_context
-
-        # async conversations can return CH.END without telling the
-        # current timeout handlers, make sure to not call timeout
-        # handlers in this case
-        state = self.conversations[context.conversation_key]
-        if (
-            isinstance(state, tuple)
-            and isinstance(state[1], Promise)
-            and self._resolve_promise(state) == self.END
-        ):
-            return
 
         with self._timeout_jobs_lock:
             found_job = self.timeout_jobs[context.conversation_key]

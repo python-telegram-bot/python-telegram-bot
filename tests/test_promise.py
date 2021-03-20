@@ -63,3 +63,16 @@ class TestPromise:
 
         with pytest.raises(TelegramError, match='Error'):
             promise.result()
+
+    def test_done_callback(self):
+        def callback():
+            return "done!"
+
+        def done_callback(_):
+            self.test_flag = True
+
+        promise = Promise(callback, [], {})
+        promise.run()
+        promise.add_done_callback(done_callback)
+        assert promise.result() == "done!"
+        assert self.test_flag is True
