@@ -21,6 +21,7 @@
 
 import logging
 import warnings
+import functools
 from threading import Lock
 from typing import TYPE_CHECKING, Dict, List, NoReturn, Optional, Tuple, cast, ClassVar
 
@@ -143,6 +144,16 @@ class ConversationHandler(Handler[Update]):
             received update and the corresponding ``context`` will be handled by ALL the handler's
             who's :attr:`check_update` method returns :obj:`True` that are in the state
             :attr:`ConversationHandler.TIMEOUT`.
+
+            Note:
+                * `conversation_timeout` with `run_async` may fail, if the
+                  :class:`telegram.ext.utils.promise.Promise` takes longer to finish than the
+                  timeout.
+                * Using `conversation_timeout` with nested conversations is currently not
+                  supported. You can still try to use it, but it will likely behave differently
+                  from what you expect.
+
+
         name (:obj:`str`, optional): The name for this conversationhandler. Required for
             persistence.
         persistent (:obj:`bool`, optional): If the conversations dict for this handler should be
@@ -291,6 +302,16 @@ class ConversationHandler(Handler[Update]):
                     )
                     break
 
+        if self.conversation_timeout:
+            for handler in all_handlers:
+                if isinstance(handler, self.__class__):
+                    warnings.warn(
+                        "Using `conversation_timeout` with nested conversations is currently not "
+                        "supported. You can still try to use it, but it will likely behave "
+                        "differently from what you expect."
+                    )
+                    break
+
         if self.run_async:
             for handler in all_handlers:
                 handler.run_async = True
@@ -423,6 +444,35 @@ class ConversationHandler(Handler[Update]):
 
         return tuple(key)
 
+    def _resolve_promise(self, state: Tuple) -> object:
+        old_state, new_state = state
+        try:
+            res = new_state.result(0)
+            res = res if res is not None else old_state
+        except Exception as exc:
+            self.logger.exception("Promise function raised exception")
+            self.logger.exception("%s", exc)
+            res = old_state
+        finally:
+            if res is None and old_state is None:
+                res = self.END
+        return res
+
+    def _schedule_job(
+        self,
+        new_state: object,
+        dispatcher: 'Dispatcher',
+        update: Update,
+        context: Optional[CallbackContext],
+        conversation_key: Tuple[int, ...],
+    ) -> None:
+        if new_state != self.END:
+            self.timeout_jobs[conversation_key] = dispatcher.job_queue.run_once(
+                self._trigger_timeout,  # type: ignore[arg-type]
+                self.conversation_timeout,
+                context=_ConversationTimeoutContext(conversation_key, update, dispatcher, context),
+            )
+
     def check_update(self, update: object) -> CheckUpdateType:  # pylint: disable=R0911
         """
         Determines whether an update should be handled by this conversationhandler, and if so in
@@ -455,21 +505,14 @@ class ConversationHandler(Handler[Update]):
         if isinstance(state, tuple) and len(state) == 2 and isinstance(state[1], Promise):
             self.logger.debug('waiting for promise...')
 
-            old_state, new_state = state
-            if new_state.done.wait(0):
-                try:
-                    res = new_state.result(0)
-                    res = res if res is not None else old_state
-                except Exception as exc:
-                    self.logger.exception("Promise function raised exception")
-                    self.logger.exception("%s", exc)
-                    res = old_state
-                finally:
-                    if res is None and old_state is None:
-                        res = self.END
-                    self.update_state(res, key)
-                    with self._conversations_lock:
-                        state = self.conversations.get(key)
+            # check if promise is finished or not
+            if state[1].done.wait(0):
+                res = self._resolve_promise(state)
+                self.update_state(res, key)
+                with self._conversations_lock:
+                    state = self.conversations.get(key)
+
+            # if not then handle WAITING state instead
             else:
                 hdlrs = self.states.get(self.WAITING, [])
                 for hdlr in hdlrs:
@@ -551,15 +594,20 @@ class ConversationHandler(Handler[Update]):
             new_state = exception.state
             raise_dp_handler_stop = True
         with self._timeout_jobs_lock:
-            if self.conversation_timeout and new_state != self.END and dispatcher.job_queue:
+            if self.conversation_timeout and dispatcher.job_queue:
                 # Add the new timeout job
-                self.timeout_jobs[conversation_key] = dispatcher.job_queue.run_once(
-                    self._trigger_timeout,  # type: ignore[arg-type]
-                    self.conversation_timeout,
-                    context=_ConversationTimeoutContext(
-                        conversation_key, update, dispatcher, context
-                    ),
-                )
+                if isinstance(new_state, Promise):
+                    new_state.add_done_callback(
+                        functools.partial(
+                            self._schedule_job,
+                            dispatcher=dispatcher,
+                            update=update,
+                            context=context,
+                            conversation_key=conversation_key,
+                        )
+                    )
+                else:
+                    self._schedule_job(new_state, dispatcher, update, context, conversation_key)
 
         if isinstance(self.map_to_parent, dict) and new_state in self.map_to_parent:
             self.update_state(self.END, conversation_key)
@@ -611,7 +659,7 @@ class ConversationHandler(Handler[Update]):
         with self._timeout_jobs_lock:
             found_job = self.timeout_jobs[context.conversation_key]
             if found_job is not job:
-                # The timeout has been canceled in handle_update
+                # The timeout has been cancelled in handle_update
                 return
             del self.timeout_jobs[context.conversation_key]
 
