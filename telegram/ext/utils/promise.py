@@ -77,17 +77,15 @@ class Promise:
         """Calls the :attr:`pooled_function` callable."""
 
         try:
-            if self._done_callback:
-                self._result = self._done_callback(self.result())
-                self._done_callback = None
-            else:
-                self._result = self.pooled_function(*self.args, **self.kwargs)
+            self._result = self.pooled_function(*self.args, **self.kwargs)
 
         except Exception as exc:
             self._exception = exc
 
         finally:
             self.done.set()
+            if self._done_callback:
+                self._done_callback(self.result())
 
     def __call__(self) -> None:
         self.run()

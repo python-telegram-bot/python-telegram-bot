@@ -467,9 +467,11 @@ class ConversationHandler(Handler[Update]):
         conversation_key: Tuple[int, ...],
     ) -> None:
         if new_state != self.END:
-            self.timeout_jobs[conversation_key] = dispatcher.job_queue.run_once(
+            self.timeout_jobs[
+                conversation_key
+            ] = dispatcher.job_queue.run_once(  # type:ignore[union-attr]
                 self._trigger_timeout,  # type: ignore[arg-type]
-                self.conversation_timeout,
+                self.conversation_timeout,  # type: ignore[arg-type]
                 context=_ConversationTimeoutContext(conversation_key, update, dispatcher, context),
             )
 
