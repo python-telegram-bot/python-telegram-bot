@@ -85,7 +85,10 @@ class Promise:
         finally:
             self.done.set()
             if self._done_callback:
-                self._done_callback(self.result())
+                try:
+                    self._done_callback(self.result())
+                except Exception:
+                    pass
 
     def __call__(self) -> None:
         self.run()
@@ -115,6 +118,8 @@ class Promise:
 
         Args:
             callback (:obj:`callable`): The callable that will be called when promise is done.
+            callback will be called by passing ``Promise.result()`` as only positional argument.
+
         """
         if self.done.wait(0):
             callback(self.result())

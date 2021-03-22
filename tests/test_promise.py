@@ -64,7 +64,7 @@ class TestPromise:
         with pytest.raises(TelegramError, match='Error'):
             promise.result()
 
-    def test_done_callback(self):
+    def test_done_cb_after_run(self):
         def callback():
             return "done!"
 
@@ -76,3 +76,45 @@ class TestPromise:
         promise.add_done_callback(done_callback)
         assert promise.result() == "done!"
         assert self.test_flag is True
+
+    def test_done_cb_after_run_excp(self):
+        def callback():
+            return "done!"
+
+        def done_callback(_):
+            raise Exception("Error!")
+
+        promise = Promise(callback, [], {})
+        promise.run()
+        assert promise.result() == "done!"
+        with pytest.raises(Exception) as err:
+            promise.add_done_callback(done_callback)
+            assert str(err) == "Error!"
+
+    def test_done_cb_before_run(self):
+        def callback():
+            return "done!"
+
+        def done_callback(_):
+            self.test_flag = True
+
+        promise = Promise(callback, [], {})
+        promise.add_done_callback(done_callback)
+        assert promise.result(0) != "done!"
+        assert self.test_flag is False
+        promise.run()
+        assert promise.result() == "done!"
+        assert self.test_flag is True
+
+    def test_done_cb_before_run_excp(self):
+        def callback():
+            return "done!"
+
+        def done_callback(_):
+            raise Exception("Error!")
+
+        promise = Promise(callback, [], {})
+        promise.add_done_callback(done_callback)
+        assert promise.result(0) != "done!"
+        promise.run()
+        assert promise.result() == "done!"
