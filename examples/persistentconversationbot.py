@@ -17,7 +17,7 @@ bot.
 import logging
 from typing import Dict
 
-from telegram import ReplyKeyboardMarkup, Update
+from telegram import ReplyKeyboardMarkup, Update, ReplyKeyboardRemove
 from telegram.ext import (
     Updater,
     CommandHandler,
@@ -88,7 +88,7 @@ def regular_choice(update: Update, context: CallbackContext) -> int:
 
 def custom_choice(update: Update, _: CallbackContext) -> int:
     update.message.reply_text(
-        'Alright, please send me the category first, ' 'for example "Most impressive skill"'
+        'Alright, please send me the category first, for example "Most impressive skill"'
     )
 
     return TYPING_CHOICE
@@ -122,7 +122,8 @@ def done(update: Update, context: CallbackContext) -> int:
         del context.user_data['choice']
 
     update.message.reply_text(
-        "I learned these facts about you:" f"{facts_to_str(context.user_data)} Until next time!"
+        "I learned these facts about you:" f"{facts_to_str(context.user_data)}Until next time!",
+        reply_markup=ReplyKeyboardRemove(),
     )
     return ConversationHandler.END
 
