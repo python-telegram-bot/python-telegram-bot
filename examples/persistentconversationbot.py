@@ -17,7 +17,7 @@ bot.
 import logging
 from typing import Dict
 
-from telegram import ReplyKeyboardMarkup, Update, ReplyKeyboardRemove
+from telegram import ReplyKeyboardMarkup, Update, ReplyKeyboardRemove, ForceReply
 from telegram.ext import (
     Updater,
     CommandHandler,
@@ -77,18 +77,19 @@ def regular_choice(update: Update, context: CallbackContext) -> int:
     context.user_data['choice'] = text
     if context.user_data.get(text):
         reply_text = (
-            f'Your {text}, I already know the following about that: {context.user_data[text]}'
+            f'Your {text}? I already know the following about that: {context.user_data[text]}'
         )
     else:
         reply_text = f'Your {text}? Yes, I would love to hear about that!'
-    update.message.reply_text(reply_text)
+    update.message.reply_text(reply_text, reply_markup=ForceReply(selective=True))
 
     return TYPING_REPLY
 
 
 def custom_choice(update: Update, _: CallbackContext) -> int:
     update.message.reply_text(
-        'Alright, please send me the category first, for example "Most impressive skill"'
+        'Alright, please send me the category first, for example "Most impressive skill"',
+        reply_markup=ForceReply(selective=True),  # force a reply from the user
     )
 
     return TYPING_CHOICE
