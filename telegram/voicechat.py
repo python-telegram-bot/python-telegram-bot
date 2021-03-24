@@ -36,6 +36,8 @@ class VoiceChatStarted(TelegramObject):
     .. versionadded:: 13.4
     """
 
+    __slots__ = ()
+
     def __init__(self, **_kwargs: Any):
         pass
 
@@ -58,6 +60,8 @@ class VoiceChatEnded(TelegramObject):
         duration (:obj:`int`): Voice chat duration in seconds.
 
     """
+
+    __slots__ = ('duration', '_id_attrs')
 
     def __init__(self, duration: int, **_kwargs: Any) -> None:
         self.duration = int(duration) if duration is not None else None
@@ -84,6 +88,8 @@ class VoiceChatParticipantsInvited(TelegramObject):
             were invited to the voice chat.
 
     """
+
+    __slots__ = ('users', '_id_attrs')
 
     def __init__(self, users: List[User], **_kwargs: Any) -> None:
         self.users = users

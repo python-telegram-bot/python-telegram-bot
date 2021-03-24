@@ -375,6 +375,10 @@ class Message(TelegramObject):
         'invoice',
         'video_note',
         '_effective_attachment',
+        'message_auto_delete_timer_changed',
+        'voice_chat_ended',
+        'voice_chat_participants_invited',
+        'voice_chat_started',
         '_id_attrs',
     )
 

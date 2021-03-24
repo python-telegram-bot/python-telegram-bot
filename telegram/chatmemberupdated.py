@@ -62,6 +62,16 @@ class ChatMemberUpdated(TelegramObject):
 
     """
 
+    __slots__ = (
+        'chat',
+        'from_user',
+        'date',
+        'old_chat_member',
+        'new_chat_member',
+        'invite_link',
+        '_id_attrs',
+    )
+
     def __init__(
         self,
         chat: Chat,

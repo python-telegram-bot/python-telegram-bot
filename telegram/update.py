@@ -140,6 +140,8 @@ class Update(TelegramObject):
         '_effective_user',
         '_effective_chat',
         '_effective_message',
+        'my_chat_member',
+        'chat_member',
         '_id_attrs',
     )
 

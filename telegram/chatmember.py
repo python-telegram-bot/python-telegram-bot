@@ -158,6 +158,8 @@ class ChatMember(TelegramObject):
         'status',
         'can_change_info',
         'can_pin_messages',
+        'can_manage_chat',
+        'can_manage_voice_chats',
         'until_date',
         '_id_attrs',
     )

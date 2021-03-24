@@ -163,6 +163,7 @@ class Chat(TelegramObject):
         'photo',
         'linked_chat_id',
         'all_members_are_administrators',
+        'message_auto_delete_time',
         '_id_attrs',
     )
 
