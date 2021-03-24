@@ -53,8 +53,9 @@ def get_setup_kwargs(raw=False):
 
     fn = os.path.join('telegram', 'version.py')
     with open(fn) as fh:
-        code = compile(fh.read(), fn, 'exec')
-        exec(code)
+        for line in fh.readlines():
+            if line.startswith('__version__'):
+                exec(line)
 
     with open(readme, 'r', encoding='utf-8') as fd:
 

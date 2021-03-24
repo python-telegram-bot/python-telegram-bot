@@ -1,3 +1,3 @@
-sphinx>=1.7.9
-sphinx_rtd_theme
+sphinx==3.5.2
+sphinx_rtd_theme==0.5.1
 sphinx-pypi-upload

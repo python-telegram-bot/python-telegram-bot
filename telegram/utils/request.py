@@ -30,7 +30,7 @@ except ImportError:
 
 from typing import Any, Union
 
-import certifi  # pylint: disable=E0401
+import certifi
 
 try:
     import telegram.vendor.ptb_urllib3.urllib3 as urllib3
@@ -86,7 +86,7 @@ def _render_part(self: RequestField, name: str, value: str) -> str:  # pylint: d
 
 RequestField._render_part = _render_part  # type: ignore  # pylint: disable=W0212
 
-logging.getLogger('urllib3').setLevel(logging.WARNING)
+logging.getLogger('telegram.vendor.ptb_urllib3.urllib3').setLevel(logging.WARNING)
 
 USER_AGENT = 'Python Telegram Bot (https://github.com/python-telegram-bot/python-telegram-bot)'
 

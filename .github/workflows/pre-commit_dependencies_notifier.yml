@@ -1,0 +1,17 @@
+name: Warning maintainers
+on:
+  pull_request:
+    paths:
+      - requirements.txt
+      - requirements-dev.txt
+      - .pre-commit-config.yaml
+jobs:
+  job:
+    runs-on: ubuntu-latest
+    name: about pre-commit and dependency change
+    steps:
+      - name: running the check
+        uses: Poolitzer/notifier-action@master
+        with:
+          notify-message: Hey! Looks like you edited the (dev) requirements or the pre-commit hooks. I'm just a friendly reminder to keep the pre-commit hook versions in sync with the dev requirements and the additional dependencies for the hooks in sync with the requirements :)
+          repo-token: ${{ secrets.GITHUB_TOKEN }}

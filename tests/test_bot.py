@@ -23,6 +23,7 @@ from pathlib import Path
 from platform import python_implementation
 
 import pytest
+import pytz
 from flaky import flaky
 
 from telegram import (
@@ -892,14 +893,15 @@ class TestBot:
         assert resulting_path == path
         monkeypatch.delattr(bot, '_post')
 
-    # TODO: Needs improvement. No feasable way to test until bots can add members.
+    # TODO: Needs improvement. No feasible way to test until bots can add members.
     @pytest.mark.filterwarnings("ignore:.*custom attributes")
     def test_kick_chat_member(self, monkeypatch, bot):
         def test(url, data, *args, **kwargs):
             chat_id = data['chat_id'] == 2
             user_id = data['user_id'] == 32
             until_date = data.get('until_date', 1577887200) == 1577887200
-            return chat_id and user_id and until_date
+            revoke_msgs = data.get('revoke_messages', True) is True
+            return chat_id and user_id and until_date and revoke_msgs
 
         monkeypatch.setattr(bot.request, 'post', test)
         until = from_timestamp(1577887200)
@@ -907,6 +909,7 @@ class TestBot:
         assert bot.kick_chat_member(2, 32)
         assert bot.kick_chat_member(2, 32, until_date=until)
         assert bot.kick_chat_member(2, 32, until_date=1577887200)
+        assert bot.kick_chat_member(2, 32, revoke_messages=True)
         monkeypatch.delattr(bot.request, 'post')
 
     def test_kick_chat_member_default_tz(self, monkeypatch, tz_bot):
@@ -1523,7 +1526,7 @@ class TestBot:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_promote_chat_member(self, bot, channel_id):
+    def test_promote_chat_member(self, bot, channel_id, monkeypatch):
         # TODO: Add bot to supergroup so this can be tested properly / give bot perms
         with pytest.raises(BadRequest, match='Not enough rights'):
             assert bot.promote_chat_member(
@@ -1538,7 +1541,45 @@ class TestBot:
                 can_restrict_members=True,
                 can_pin_messages=True,
                 can_promote_members=True,
+                can_manage_chat=True,
+                can_manage_voice_chats=True,
             )
+
+        # Test that we pass the correct params to TG
+        def make_assertion(*args, **_):
+            data = args[1]
+            return (
+                data.get('chat_id') == channel_id
+                and data.get('user_id') == 95205500
+                and data.get('is_anonymous') == 1
+                and data.get('can_change_info') == 2
+                and data.get('can_post_messages') == 3
+                and data.get('can_edit_messages') == 4
+                and data.get('can_delete_messages') == 5
+                and data.get('can_invite_users') == 6
+                and data.get('can_restrict_members') == 7
+                and data.get('can_pin_messages') == 8
+                and data.get('can_promote_members') == 9
+                and data.get('can_manage_chat') == 10
+                and data.get('can_manage_voice_chats') == 11
+            )
+
+        monkeypatch.setattr(bot, '_post', make_assertion)
+        assert bot.promote_chat_member(
+            channel_id,
+            95205500,
+            is_anonymous=1,
+            can_change_info=2,
+            can_post_messages=3,
+            can_edit_messages=4,
+            can_delete_messages=5,
+            can_invite_users=6,
+            can_restrict_members=7,
+            can_pin_messages=8,
+            can_promote_members=9,
+            can_manage_chat=10,
+            can_manage_voice_chats=11,
+        )
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -1547,6 +1588,72 @@ class TestBot:
         invite_link = bot.export_chat_invite_link(channel_id)
         assert isinstance(invite_link, str)
         assert invite_link != ''
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize('datetime', argvalues=[True, False], ids=['datetime', 'integer'])
+    def test_advanced_chat_invite_links(self, bot, channel_id, datetime):
+        # we are testing this all in one function in order to save api calls
+        timestamp = dtm.datetime.utcnow()
+        add_seconds = dtm.timedelta(0, 70)
+        time_in_future = timestamp + add_seconds
+        expire_time = time_in_future if datetime else to_timestamp(time_in_future)
+        aware_time_in_future = pytz.UTC.localize(time_in_future)
+
+        invite_link = bot.create_chat_invite_link(
+            channel_id, expire_date=expire_time, member_limit=10
+        )
+        assert invite_link.invite_link != ''
+        assert not invite_link.invite_link.endswith('...')
+        assert pytest.approx(invite_link.expire_date == aware_time_in_future)
+        assert invite_link.member_limit == 10
+
+        add_seconds = dtm.timedelta(0, 80)
+        time_in_future = timestamp + add_seconds
+        expire_time = time_in_future if datetime else to_timestamp(time_in_future)
+        aware_time_in_future = pytz.UTC.localize(time_in_future)
+
+        edited_invite_link = bot.edit_chat_invite_link(
+            channel_id, invite_link.invite_link, expire_date=expire_time, member_limit=20
+        )
+        assert edited_invite_link.invite_link == invite_link.invite_link
+        assert pytest.approx(edited_invite_link.expire_date == aware_time_in_future)
+        assert edited_invite_link.member_limit == 20
+
+        revoked_invite_link = bot.revoke_chat_invite_link(channel_id, invite_link.invite_link)
+        assert revoked_invite_link.invite_link == invite_link.invite_link
+        assert revoked_invite_link.is_revoked is True
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_advanced_chat_invite_links_default_tzinfo(self, tz_bot, channel_id):
+        # we are testing this all in one function in order to save api calls
+        add_seconds = dtm.timedelta(0, 70)
+        aware_expire_date = dtm.datetime.now(tz=tz_bot.defaults.tzinfo) + add_seconds
+        time_in_future = aware_expire_date.replace(tzinfo=None)
+
+        invite_link = tz_bot.create_chat_invite_link(
+            channel_id, expire_date=time_in_future, member_limit=10
+        )
+        assert invite_link.invite_link != ''
+        assert not invite_link.invite_link.endswith('...')
+        assert pytest.approx(invite_link.expire_date == aware_expire_date)
+        assert invite_link.member_limit == 10
+
+        add_seconds = dtm.timedelta(0, 80)
+        aware_expire_date += add_seconds
+        time_in_future = aware_expire_date.replace(tzinfo=None)
+
+        edited_invite_link = tz_bot.edit_chat_invite_link(
+            channel_id, invite_link.invite_link, expire_date=time_in_future, member_limit=20
+        )
+        assert edited_invite_link.invite_link == invite_link.invite_link
+        assert pytest.approx(edited_invite_link.expire_date == aware_expire_date)
+        assert edited_invite_link.member_limit == 20
+
+        revoked_invite_link = tz_bot.revoke_chat_invite_link(channel_id, invite_link.invite_link)
+        assert revoked_invite_link.invite_link == invite_link.invite_link
+        assert revoked_invite_link.is_revoked is True
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -1591,7 +1698,7 @@ class TestBot:
 
     # TODO: Add bot to group to test there too
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
+    @pytest.mark.timeout(20)
     def test_pin_and_unpin_message(self, bot, super_group_id):
         message1 = bot.send_message(super_group_id, text="test_pin_message_1")
         message2 = bot.send_message(super_group_id, text="test_pin_message_2")
@@ -1600,13 +1707,16 @@ class TestBot:
         assert bot.pin_chat_message(
             chat_id=super_group_id, message_id=message1.message_id, disable_notification=True
         )
+        time.sleep(1)
 
         bot.pin_chat_message(
             chat_id=super_group_id, message_id=message2.message_id, disable_notification=True
         )
+        time.sleep(1)
         bot.pin_chat_message(
             chat_id=super_group_id, message_id=message3.message_id, disable_notification=True
         )
+        time.sleep(1)
 
         chat = bot.get_chat(super_group_id)
         assert chat.pinned_message == message3
@@ -1860,7 +1970,7 @@ class TestBot:
         reply_to_message = default_bot.send_message(chat_id, 'test')
         reply_to_message.delete()
         if not default_bot.defaults.allow_sending_without_reply:
-            with pytest.raises(BadRequest, match='Reply message not found'):
+            with pytest.raises(BadRequest, match='not found'):
                 default_bot.copy_message(
                     chat_id,
                     from_chat_id=chat_id,

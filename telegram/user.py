@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=C0103,W0622
+# pylint: disable=W0622
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2021
@@ -125,7 +125,7 @@ class User(TelegramObject):
         **_kwargs: Any,
     ):
         # Required
-        self.id = int(id)
+        self.id = int(id)  # pylint: disable=C0103
         self.first_name = first_name
         self.is_bot = is_bot
         # Optionals
@@ -175,7 +175,7 @@ class User(TelegramObject):
         """
         Shortcut for::
 
-            bot.send_message(update.effective_user.id, *args, **kwargs)
+            bot.get_user_profile_photos(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.get_user_profile_photos`.
@@ -235,7 +235,7 @@ class User(TelegramObject):
 
     def pin_message(
         self,
-        message_id: Union[str, int],
+        message_id: int,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
@@ -264,7 +264,7 @@ class User(TelegramObject):
         self,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        message_id: Union[str, int] = None,
+        message_id: int = None,
     ) -> bool:
         """Shortcut for::
 
@@ -315,7 +315,7 @@ class User(TelegramObject):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: 'ReplyMarkup' = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
@@ -351,7 +351,7 @@ class User(TelegramObject):
         photo: Union[FileInput, 'PhotoSize'],
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: 'ReplyMarkup' = None,
         timeout: DVInput[float] = DEFAULT_20,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
@@ -391,7 +391,7 @@ class User(TelegramObject):
             Union['InputMediaAudio', 'InputMediaDocument', 'InputMediaPhoto', 'InputMediaVideo']
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         timeout: DVInput[float] = DEFAULT_20,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -424,7 +424,7 @@ class User(TelegramObject):
         title: str = None,
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: 'ReplyMarkup' = None,
         timeout: DVInput[float] = DEFAULT_20,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
@@ -495,7 +495,7 @@ class User(TelegramObject):
         first_name: str = None,
         last_name: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: 'ReplyMarkup' = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         contact: 'Contact' = None,
@@ -531,7 +531,7 @@ class User(TelegramObject):
     def send_dice(
         self,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: 'ReplyMarkup' = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         emoji: str = None,
@@ -565,7 +565,7 @@ class User(TelegramObject):
         filename: str = None,
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: 'ReplyMarkup' = None,
         timeout: DVInput[float] = DEFAULT_20,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
@@ -606,7 +606,7 @@ class User(TelegramObject):
         self,
         game_short_name: str,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: 'InlineKeyboardMarkup' = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
@@ -652,7 +652,7 @@ class User(TelegramObject):
         need_shipping_address: bool = None,
         is_flexible: bool = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: 'InlineKeyboardMarkup' = None,
         provider_data: Union[str, object] = None,
         send_phone_number_to_provider: bool = None,
@@ -705,7 +705,7 @@ class User(TelegramObject):
         latitude: float = None,
         longitude: float = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: 'ReplyMarkup' = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         location: 'Location' = None,
@@ -753,7 +753,7 @@ class User(TelegramObject):
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: 'ReplyMarkup' = None,
         timeout: DVInput[float] = DEFAULT_20,
         api_kwargs: JSONDict = None,
@@ -794,7 +794,7 @@ class User(TelegramObject):
         self,
         sticker: Union[FileInput, 'Sticker'],
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: 'ReplyMarkup' = None,
         timeout: DVInput[float] = DEFAULT_20,
         api_kwargs: JSONDict = None,
@@ -827,7 +827,7 @@ class User(TelegramObject):
         duration: int = None,
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: 'ReplyMarkup' = None,
         timeout: DVInput[float] = DEFAULT_20,
         width: int = None,
@@ -878,7 +878,7 @@ class User(TelegramObject):
         address: str = None,
         foursquare_id: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: 'ReplyMarkup' = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         venue: 'Venue' = None,
@@ -923,7 +923,7 @@ class User(TelegramObject):
         duration: int = None,
         length: int = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: 'ReplyMarkup' = None,
         timeout: DVInput[float] = DEFAULT_20,
         thumb: FileInput = None,
@@ -962,7 +962,7 @@ class User(TelegramObject):
         duration: int = None,
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: 'ReplyMarkup' = None,
         timeout: DVInput[float] = DEFAULT_20,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
@@ -1008,7 +1008,7 @@ class User(TelegramObject):
         correct_option_id: int = None,
         is_closed: bool = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: 'ReplyMarkup' = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         explanation: str = None,
@@ -1054,12 +1054,12 @@ class User(TelegramObject):
     def send_copy(
         self,
         from_chat_id: Union[str, int],
-        message_id: Union[str, int],
+        message_id: int,
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[Tuple['MessageEntity', ...], List['MessageEntity']] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
         reply_markup: 'ReplyMarkup' = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1093,12 +1093,12 @@ class User(TelegramObject):
     def copy_message(
         self,
         chat_id: Union[int, str],
-        message_id: Union[str, int],
+        message_id: int,
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[Tuple['MessageEntity', ...], List['MessageEntity']] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
         reply_markup: 'ReplyMarkup' = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
