@@ -147,9 +147,9 @@ class ConversationHandler(Handler[Update]):
             :attr:`ConversationHandler.TIMEOUT`.
 
             Note:
-                * Using `conversation_timeout` with nested conversations is currently not
-                  supported. You can still try to use it, but it will likely behave differently
-                  from what you expect.
+                 Using `conversation_timeout` with nested conversations is currently not
+                 supported. You can still try to use it, but it will likely behave differently
+                 from what you expect.
 
 
         name (:obj:`str`, optional): The name for this conversationhandler. Required for
@@ -471,14 +471,16 @@ class ConversationHandler(Handler[Update]):
                 # both job_queue & conversation_timeout are checked before calling _schedule_job
                 j_queue = dispatcher.job_queue
                 self.timeout_jobs[conversation_key] = j_queue.run_once(  # type: ignore[union-attr]
-                    self._trigger_timeout,  # type: ignore[arg-type]
+                    self._trigger_timeout,
                     self.conversation_timeout,  # type: ignore[arg-type]
                     context=_ConversationTimeoutContext(
                         conversation_key, update, dispatcher, context
                     ),
                 )
             except Exception as exc:
-                self.logger.exception("Failed to add timeout job due to exception")
+                self.logger.exception(
+                    "Failed to schedule timeout job due to the following exception:"
+                )
                 self.logger.exception("%s", exc)
 
     def check_update(self, update: object) -> CheckUpdateType:  # pylint: disable=R0911
@@ -620,7 +622,9 @@ class ConversationHandler(Handler[Update]):
                             new_state, dispatcher, update, context, conversation_key
                         )
                 else:
-                    self.logger.warning("`conversation_timeout` can't work without JobQueue!")
+                    self.logger.warning(
+                        "Ignoring `conversation_timeout` because the Dispatcher has no JobQueue."
+                    )
 
         if isinstance(self.map_to_parent, dict) and new_state in self.map_to_parent:
             self.update_state(self.END, conversation_key)
@@ -658,7 +662,7 @@ class ConversationHandler(Handler[Update]):
                 if self.persistent and self.persistence and self.name:
                     self.persistence.update_conversation(self.name, key, new_state)
 
-    def _trigger_timeout(self, context: _ConversationTimeoutContext, job: 'Job' = None) -> None:
+    def _trigger_timeout(self, context: CallbackContext, job: 'Job' = None) -> None:
         self.logger.debug('conversation timeout was triggered!')
 
         # Backward compatibility with bots that do not use CallbackContext
@@ -666,27 +670,24 @@ class ConversationHandler(Handler[Update]):
         if isinstance(context, CallbackContext):
             job = context.job
 
-        context = job.context  # type:ignore[union-attr,assignment]
-        callback_context = context.callback_context
+        callback_context = cntxt.callback_context
 
         with self._timeout_jobs_lock:
-            found_job = self.timeout_jobs[context.conversation_key]
+            found_job = self.timeout_jobs[cntxt.conversation_key]
             if found_job is not job:
                 # The timeout has been cancelled in handle_update
                 return
-            del self.timeout_jobs[context.conversation_key]
+            del self.timeout_jobs[cntxt.conversation_key]
 
         handlers = self.states.get(self.TIMEOUT, [])
         for handler in handlers:
-            check = handler.check_update(context.update)
+            check = handler.check_update(cntxt.update)
             if check is not None and check is not False:
                 try:
-                    handler.handle_update(
-                        context.update, context.dispatcher, check, callback_context
-                    )
+                    handler.handle_update(cntxt.update, cntxt.dispatcher, check, callback_context)
                 except DispatcherHandlerStop:
                     self.logger.warning(
                         'DispatcherHandlerStop in TIMEOUT state of '
                         'ConversationHandler has no effect. Ignoring.'
                     )
-        self.update_state(self.END, context.conversation_key)
+        self.update_state(self.END, cntxt.conversation_key)

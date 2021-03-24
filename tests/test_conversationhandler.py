@@ -782,7 +782,10 @@ class TestConversationHandler:
             dp.process_update(Update(update_id=0, message=message))
             sleep(0.5)
         assert len(caplog.records) == 1
-        assert caplog.records[0].message == "`conversation_timeout` can't work without JobQueue!"
+        assert (
+            caplog.records[0].message
+            == "Ignoring `conversation_timeout` because the Dispatcher has no JobQueue."
+        )
         # now set dp.job_queue back to it's original value
         dp.job_queue = jqueue
 
@@ -815,7 +818,10 @@ class TestConversationHandler:
             dp.process_update(Update(update_id=0, message=message))
             sleep(0.5)
         assert len(caplog.records) == 2
-        assert caplog.records[0].message == "Failed to add timeout job due to exception"
+        assert (
+            caplog.records[0].message
+            == "Failed to schedule timeout job due to the following exception:"
+        )
         assert caplog.records[1].message == "job error"
 
     def test_promise_exception(self, dp, bot, user1, caplog):

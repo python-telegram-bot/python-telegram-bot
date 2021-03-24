@@ -116,5 +116,8 @@ class TestPromise:
         promise = Promise(callback, [], {})
         promise.add_done_callback(done_callback)
         assert promise.result(0) != "done!"
-        promise.run()
+        try:
+            promise.run()
+        except Exception:
+            pytest.fail()
         assert promise.result() == "done!"
