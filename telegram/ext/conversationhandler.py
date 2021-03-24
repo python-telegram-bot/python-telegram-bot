@@ -667,9 +667,8 @@ class ConversationHandler(Handler[Update]):
 
         # Backward compatibility with bots that do not use CallbackContext
         if isinstance(context, CallbackContext):
-            ctxt = cast(
-                _ConversationTimeoutContext, context.job.context  # type: ignore[union-attr]
-            )
+            job = context.job
+            ctxt = cast(_ConversationTimeoutContext, job.context)  # type: ignore[union-attr]
         else:
             ctxt = cast(_ConversationTimeoutContext, job.context)
 
