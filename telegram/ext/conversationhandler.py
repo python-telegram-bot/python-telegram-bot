@@ -666,28 +666,32 @@ class ConversationHandler(Handler[Update]):
         self.logger.debug('conversation timeout was triggered!')
 
         # Backward compatibility with bots that do not use CallbackContext
-        callback_context = None
         if isinstance(context, CallbackContext):
-            job = context.job
+            ctxt = cast(
+                _ConversationTimeoutContext, context.job.context  # type: ignore[union-attr]
+            )
+        else:
+            ctxt = cast(_ConversationTimeoutContext, job.context)
 
-        callback_context = cntxt.callback_context
+        callback_context = ctxt.callback_context
 
         with self._timeout_jobs_lock:
-            found_job = self.timeout_jobs[cntxt.conversation_key]
+            found_job = self.timeout_jobs[ctxt.conversation_key]
             if found_job is not job:
                 # The timeout has been cancelled in handle_update
                 return
-            del self.timeout_jobs[cntxt.conversation_key]
+            del self.timeout_jobs[ctxt.conversation_key]
 
         handlers = self.states.get(self.TIMEOUT, [])
         for handler in handlers:
-            check = handler.check_update(cntxt.update)
+            check = handler.check_update(ctxt.update)
             if check is not None and check is not False:
                 try:
-                    handler.handle_update(cntxt.update, cntxt.dispatcher, check, callback_context)
+                    handler.handle_update(ctxt.update, ctxt.dispatcher, check, callback_context)
                 except DispatcherHandlerStop:
                     self.logger.warning(
                         'DispatcherHandlerStop in TIMEOUT state of '
                         'ConversationHandler has no effect. Ignoring.'
                     )
-        self.update_state(self.END, cntxt.conversation_key)
+
+        self.update_state(self.END, ctxt.conversation_key)
