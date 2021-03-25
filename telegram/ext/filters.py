@@ -1732,6 +1732,89 @@ officedocument.wordprocessingml.document")``.
             """
             return super().remove_chat_ids(chat_id)
 
+    class forwarded_from(_ChatUserBaseFilter):
+        # pylint: disable=W0235
+        """Filters messages to allow only those which are forwarded from the specified chat ID(s)
+        or username(s).
+
+        .. versionadded:: 13.5
+
+        Examples:
+            ``MessageHandler(Filters.forwarded_from(chat_id=1234), callback_method)``
+
+        Warning:
+            :attr:`chat_ids` will give a *copy* of the saved chat ids as :class:`frozenset`. This
+            is to ensure thread safety. To add/remove a chat, you should use :meth:`add_usernames`,
+            :meth:`add_chat_ids`, :meth:`remove_usernames` and :meth:`remove_chat_ids`. Only update
+            the entire set by ``filter.chat_ids/usernames = new_set``, if you are entirely sure
+            that it is not causing race conditions, as this will complete replace the current set
+            of allowed chats.
+
+        Args:
+            chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                Which chat ID(s) to allow through.
+            username(:class:`telegram.utils.types.SLT[str]`, optional):
+                Which username(s) to allow through. Leading ``'@'`` s in usernames will be
+                discarded.
+            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
+                is specified in :attr:`chat_ids` and :attr:`usernames`. Defaults to :obj:`False`.
+
+        Raises:
+            RuntimeError: If both chat_id and username are present.
+
+        Attributes:
+            chat_ids(set(:obj:`int`), optional): Which chat ID(s) to allow through.
+            usernames(set(:obj:`str`), optional): Which username(s) (without leading ``'@'``) to
+                allow through.
+            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
+                is specified in :attr:`chat_ids` and :attr:`usernames`.
+        """
+
+        def get_chat_or_user(self, message: Message) -> Union[User, Chat, None]:
+            return message.forward_from or message.forward_from_chat
+
+        def add_usernames(self, username: SLT[str]) -> None:
+            """
+            Add one or more chats to the allowed usernames.
+
+            Args:
+                username(:class:`telegram.utils.types.SLT[str]`, optional):
+                    Which username(s) to allow through.
+                    Leading ``'@'`` s in usernames will be discarded.
+            """
+            return super().add_usernames(username)
+
+        def add_chat_ids(self, chat_id: SLT[int]) -> None:
+            """
+            Add one or more chats to the allowed chat ids.
+
+            Args:
+                chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                    Which chat ID(s) to allow through.
+            """
+            return super().add_chat_ids(chat_id)
+
+        def remove_usernames(self, username: SLT[str]) -> None:
+            """
+            Remove one or more chats from allowed usernames.
+
+            Args:
+                username(:class:`telegram.utils.types.SLT[str]`, optional):
+                    Which username(s) to disallow through.
+                    Leading ``'@'`` s in usernames will be discarded.
+            """
+            return super().remove_usernames(username)
+
+        def remove_chat_ids(self, chat_id: SLT[int]) -> None:
+            """
+            Remove one or more chats from allowed chat ids.
+
+            Args:
+                chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                    Which chat ID(s) to disallow through.
+            """
+            return super().remove_chat_ids(chat_id)
+
     class sender_chat(_ChatUserBaseFilter):
         # pylint: disable=W0235
         """Filters messages to allow only those which are from a specified sender chats chat ID or
