@@ -1735,12 +1735,20 @@ officedocument.wordprocessingml.document")``.
     class forwarded_from(_ChatUserBaseFilter):
         # pylint: disable=W0235
         """Filters messages to allow only those which are forwarded from the specified chat ID(s)
-        or username(s).
+        or username(s) using :attr:`telegram.Message.forwarded_from` and
+        :attr:`telegram.Message.forwarded_from_chat`.
 
         .. versionadded:: 13.5
 
         Examples:
             ``MessageHandler(Filters.forwarded_from(chat_id=1234), callback_method)``
+
+        Note:
+            When a user has disallowed adding a link to their account while forwarding their
+            messages, this filter will *not* work since both
+            :attr:`telegram.Message.forwarded_from` and
+            :attr:`telegram.Message.forwarded_from_chat` are :obj:`None`. However, this behaviour
+            is undocumented and might be changed by Telegram.
 
         Warning:
             :attr:`chat_ids` will give a *copy* of the saved chat ids as :class:`frozenset`. This

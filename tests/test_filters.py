@@ -1240,7 +1240,7 @@ class TestFilters:
 
     def test_filters_forwarded_from_init(self):
         with pytest.raises(RuntimeError, match='in conjunction with'):
-            Filters.chat(chat_id=1, username='chat')
+            Filters.forwarded_from(chat_id=1, username='chat')
 
     def test_filters_forwarded_from_allow_empty(self, update):
         assert not Filters.forwarded_from()(update)
