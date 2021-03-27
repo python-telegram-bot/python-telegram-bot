@@ -617,7 +617,7 @@ class ConversationHandler(Handler[Update]):
                                 conversation_key=conversation_key,
                             )
                         )
-                    else:
+                    elif new_state != self.END:
                         self._schedule_job(
                             new_state, dispatcher, update, context, conversation_key
                         )

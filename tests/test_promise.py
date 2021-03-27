@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import logging
 import pytest
 
 from telegram import TelegramError
@@ -106,7 +107,7 @@ class TestPromise:
         assert promise.result() == "done!"
         assert self.test_flag is True
 
-    def test_done_cb_before_run_excp(self):
+    def test_done_cb_before_run_excp(self, caplog):
         def callback():
             return "done!"
 
@@ -116,8 +117,13 @@ class TestPromise:
         promise = Promise(callback, [], {})
         promise.add_done_callback(done_callback)
         assert promise.result(0) != "done!"
-        try:
+        caplog.clear()
+        with caplog.at_level(logging.WARNING):
             promise.run()
-        except Exception:
-            pytest.fail()
+        assert len(caplog.records) == 2
+        assert caplog.records[0].message == (
+            "`done_callback` of a Promise raised the following exception."
+            " The exception won't be handled by error handlers."
+        )
+        assert caplog.records[1].message.startswith("Full traceback:")
         assert promise.result() == "done!"

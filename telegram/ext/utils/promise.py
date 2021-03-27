@@ -87,8 +87,12 @@ class Promise:
             if self._done_callback:
                 try:
                     self._done_callback(self.result())
-                except Exception:
-                    pass
+                except Exception as exc:
+                    logger.warning(
+                        "`done_callback` of a Promise raised the following exception."
+                        " The exception won't be handled by error handlers."
+                    )
+                    logger.warning("Full traceback:", exc_info=exc)
 
     def __call__(self) -> None:
         self.run()
