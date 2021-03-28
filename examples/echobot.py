@@ -17,9 +17,8 @@ bot.
 
 import logging
 
-from telegram import Update, ForceReply, ParseMode
+from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
-from telegram.utils.helpers import mention_markdown
 
 # Enable logging
 logging.basicConfig(
@@ -30,14 +29,13 @@ logger = logging.getLogger(__name__)
 
 
 # Define a few command handlers. These usually take the two arguments update and
-# context. Error handlers also receive the raised TelegramError object in error.
+# context.
 def start(update: Update, _: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
     user = update.effective_user
-    update.message.reply_text(
-        f'Hi {mention_markdown(user_id=user.id, name=user.name, version=2)}',
+    update.message.reply_markdown_v2(
+        f'Hi {user.mention_markdown_v2()}!',
         reply_markup=ForceReply(selective=True),
-        parse_mode=ParseMode.MARKDOWN_V2,
     )
 
 
