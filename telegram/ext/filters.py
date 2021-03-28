@@ -1735,8 +1735,8 @@ officedocument.wordprocessingml.document")``.
     class forwarded_from(_ChatUserBaseFilter):
         # pylint: disable=W0235
         """Filters messages to allow only those which are forwarded from the specified chat ID(s)
-        or username(s) using :attr:`telegram.Message.forwarded_from` and
-        :attr:`telegram.Message.forwarded_from_chat`.
+        or username(s) based on :attr:`telegram.Message.forward_from` and
+        :attr:`telegram.Message.forward_from_chat`.
 
         .. versionadded:: 13.5
 
@@ -1760,7 +1760,7 @@ officedocument.wordprocessingml.document")``.
 
         Args:
             chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
-                Which chat ID(s) to allow through.
+                Which chat/user ID(s) to allow through.
             username(:class:`telegram.utils.types.SLT[str]`, optional):
                 Which username(s) to allow through. Leading ``'@'`` s in usernames will be
                 discarded.
@@ -1771,7 +1771,7 @@ officedocument.wordprocessingml.document")``.
             RuntimeError: If both chat_id and username are present.
 
         Attributes:
-            chat_ids(set(:obj:`int`), optional): Which chat ID(s) to allow through.
+            chat_ids(set(:obj:`int`), optional): Which chat/user ID(s) to allow through.
             usernames(set(:obj:`str`), optional): Which username(s) (without leading ``'@'``) to
                 allow through.
             allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
@@ -1798,7 +1798,7 @@ officedocument.wordprocessingml.document")``.
 
             Args:
                 chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
-                    Which chat ID(s) to allow through.
+                    Which chat/user ID(s) to allow through.
             """
             return super().add_chat_ids(chat_id)
 
@@ -1819,7 +1819,7 @@ officedocument.wordprocessingml.document")``.
 
             Args:
                 chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
-                    Which chat ID(s) to disallow through.
+                    Which chat/user ID(s) to disallow through.
             """
             return super().remove_chat_ids(chat_id)
 
