@@ -42,6 +42,10 @@ def help_command(update: Update, _: CallbackContext) -> None:
 def inlinequery(update: Update, _: CallbackContext) -> None:
     """Handle the inline query."""
     query = update.inline_query.query
+
+    if query == "":
+        return
+
     results = [
         InlineQueryResultArticle(
             id=str(uuid4()),
@@ -78,7 +82,7 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("help", help_command))
 
-    # on noncommand i.e message - echo the message on Telegram
+    # on non command i.e message - echo the message on Telegram
     dispatcher.add_handler(InlineQueryHandler(inlinequery))
 
     # Start the Bot

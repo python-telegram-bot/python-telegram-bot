@@ -17,8 +17,9 @@ bot.
 
 import logging
 
-from telegram import Update
+from telegram import Update, ForceReply, ParseMode
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from telegram.utils.helpers import mention_markdown
 
 # Enable logging
 logging.basicConfig(
@@ -32,7 +33,12 @@ logger = logging.getLogger(__name__)
 # context. Error handlers also receive the raised TelegramError object in error.
 def start(update: Update, _: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
-    update.message.reply_text('Hi!')
+    user = update.effective_user
+    update.message.reply_text(
+        f'Hi {mention_markdown(user_id=user.id, name=user.name, version=2)}',
+        reply_markup=ForceReply(selective=True),
+        parse_mode=ParseMode.MARKDOWN_V2,
+    )
 
 
 def help_command(update: Update, _: CallbackContext) -> None:
@@ -57,7 +63,7 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("help", help_command))
 
-    # on noncommand i.e message - echo the message on Telegram
+    # on non command i.e message - echo the message on Telegram
     dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
 
     # Start the Bot
