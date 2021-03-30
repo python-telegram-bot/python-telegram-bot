@@ -202,7 +202,7 @@ class Handler(Generic[UT], ABC):
             check_result: The result from check_update
 
         """
-        optional_args: Dict[str, object] = dict()
+        optional_args: Dict[str, object] = {}
 
         if self.pass_update_queue:
             optional_args['update_queue'] = dispatcher.update_queue

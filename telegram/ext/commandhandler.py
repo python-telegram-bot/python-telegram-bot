@@ -354,9 +354,9 @@ class PrefixHandler(CommandHandler):
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
 
-        self._prefix: List[str] = list()
-        self._command: List[str] = list()
-        self._commands: List[str] = list()
+        self._prefix: List[str] = []
+        self._command: List[str] = []
+        self._commands: List[str] = []
 
         super().__init__(
             'nocommand',
