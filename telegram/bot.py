@@ -3458,6 +3458,8 @@ class Bot(TelegramObject):
 
         if ok:
             if not shipping_options:
+                # not using an assert statement directly here since they are removed in
+                # the optimized bytecode
                 raise AssertionError
             data['shipping_options'] = [option.to_dict() for option in shipping_options]
         if error_message is not None:
