@@ -423,7 +423,7 @@ class TestBot:
         assert new_message.poll.is_closed
 
     @flaky(5, 1)
-    @pytest.mark.timeout(10)
+    @pytest.mark.timeout(20)
     def test_send_close_date_default_tz(self, tz_bot, super_group_id):
         question = 'Is this a test?'
         answers = ['Yes', 'No', 'Maybe']
