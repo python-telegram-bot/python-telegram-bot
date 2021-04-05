@@ -119,7 +119,7 @@ class Request:
         read_timeout: float = 5.0,
     ):
         if urllib3_proxy_kwargs is None:
-            urllib3_proxy_kwargs = dict()
+            urllib3_proxy_kwargs = {}
 
         self._connect_timeout = connect_timeout
 

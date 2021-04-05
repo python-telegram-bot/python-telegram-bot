@@ -99,7 +99,7 @@ class TestConversationHandler:
     def reset(self):
         self.raise_dp_handler_stop = False
         self.test_flag = False
-        self.current_state = dict()
+        self.current_state = {}
         self.entry_points = [CommandHandler('start', self.start)]
         self.states = {
             self.THIRSTY: [CommandHandler('brew', self.brew), CommandHandler('wait', self.start)],
