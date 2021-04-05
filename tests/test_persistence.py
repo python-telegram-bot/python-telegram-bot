@@ -960,9 +960,15 @@ class TestPickelPersistence:
         assert not pickle_persistence.conversations['name1'] == conversation1
         pickle_persistence.update_conversation('name1', (123, 123), 5)
         assert pickle_persistence.conversations['name1'] == conversation1
+        assert pickle_persistence.get_conversations('name1') == conversation1
         with open('pickletest_conversations', 'rb') as f:
             conversations_test = defaultdict(dict, pickle.load(f))
         assert conversations_test['name1'] == conversation1
+
+        pickle_persistence.conversations = None
+        pickle_persistence.update_conversation('name1', (123, 123), 5)
+        assert pickle_persistence.conversations['name1'] == {(123, 123): 5}
+        assert pickle_persistence.get_conversations('name1') == {(123, 123): 5}
 
     def test_updating_single_file(self, pickle_persistence, good_pickle_files):
         pickle_persistence.single_file = True
@@ -999,9 +1005,15 @@ class TestPickelPersistence:
         assert not pickle_persistence.conversations['name1'] == conversation1
         pickle_persistence.update_conversation('name1', (123, 123), 5)
         assert pickle_persistence.conversations['name1'] == conversation1
+        assert pickle_persistence.get_conversations('name1') == conversation1
         with open('pickletest', 'rb') as f:
             conversations_test = defaultdict(dict, pickle.load(f)['conversations'])
         assert conversations_test['name1'] == conversation1
+
+        pickle_persistence.conversations = None
+        pickle_persistence.update_conversation('name1', (123, 123), 5)
+        assert pickle_persistence.conversations['name1'] == {(123, 123): 5}
+        assert pickle_persistence.get_conversations('name1') == {(123, 123): 5}
 
     def test_save_on_flush_multi_files(self, pickle_persistence, good_pickle_files):
         # Should run without error
