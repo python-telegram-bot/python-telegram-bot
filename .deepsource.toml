@@ -1,0 +1,18 @@
+version = 1
+
+test_patterns = ["tests/**"]
+
+exclude_patterns = [
+    # Ignore everything but telegram/ and examples/
+    "!(telegram|examples)/**",
+    # But do ignore telegram/vendor
+    "telegram/vendor/**",
+]
+
+[[analyzers]]
+name = "python"
+enabled = true
+
+  [analyzers.meta]
+  runtime_version = "3.x.x"
+  max_line_length = 99
