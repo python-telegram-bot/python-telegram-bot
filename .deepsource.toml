@@ -3,10 +3,11 @@ version = 1
 test_patterns = ["tests/**"]
 
 exclude_patterns = [
-    # Ignore everything but telegram/ and examples/
-    "!(telegram|examples)/**",
-    # But do ignore telegram/vendor
+    "tests/**",
+    "docs/**",
     "telegram/vendor/**",
+    "setup.py",
+    "setup-raw.py"
 ]
 
 [[analyzers]]
