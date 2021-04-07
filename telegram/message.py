@@ -322,6 +322,7 @@ class Message(TelegramObject):
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     """
+
     # fmt: on
 
     _effective_attachment = _UNDEFINED
@@ -494,7 +495,8 @@ class Message(TelegramObject):
     @property
     def link(self) -> Optional[str]:
         """:obj:`str`: Convenience property. If the chat of the message is not
-        a private chat or normal group, returns a t.me link of the message."""
+        a private chat or normal group, returns a t.me link of the message.
+        """
         if self.chat.type not in [Chat.PRIVATE, Chat.GROUP]:
             if self.chat.username:
                 to_link = self.chat.username

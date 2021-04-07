@@ -17,7 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the :class:`telegram.ext.utils.promise.Promise` class for backwards
-compatibility."""
+compatibility.
+"""
 import warnings
 
 import telegram.ext.utils.promise as promise

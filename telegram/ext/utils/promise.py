@@ -109,5 +109,6 @@ class Promise:
     @property
     def exception(self) -> Optional[Exception]:
         """The exception raised by :attr:`pooled_function` or ``None`` if no exception has been
-        raised (yet)."""
+        raised (yet).
+        """
         return self._exception

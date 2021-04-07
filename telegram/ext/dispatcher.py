@@ -632,9 +632,8 @@ class Dispatcher:
             self.logger.debug('The callback is already registered as an error handler. Ignoring.')
             return
 
-        if run_async is DEFAULT_FALSE and self.bot.defaults:
-            if self.bot.defaults.run_async:
-                run_async = True
+        if run_async is DEFAULT_FALSE and self.bot.defaults and self.bot.defaults.run_async:
+            run_async = True
 
         self.error_handlers[callback] = run_async
 

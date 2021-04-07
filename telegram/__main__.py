@@ -29,7 +29,7 @@ from .constants import BOT_API_VERSION
 
 def _git_revision() -> Optional[str]:
     try:
-        output = subprocess.check_output(
+        output = subprocess.check_output(  # skipcq: BAN-B607
             ["git", "describe", "--long", "--tags"], stderr=subprocess.STDOUT
         )
     except (subprocess.SubprocessError, OSError):

@@ -541,9 +541,9 @@ class Updater:
         if current_interval == 0:
             current_interval = 1
         elif current_interval < 30:
-            current_interval += current_interval / 2
-        elif current_interval > 30:
-            current_interval = 30
+            current_interval = 1.5 * current_interval
+        else:
+            current_interval = min(30.0, current_interval)
         return current_interval
 
     @no_type_check

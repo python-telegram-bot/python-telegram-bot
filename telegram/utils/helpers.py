@@ -186,9 +186,7 @@ def _datetime_to_float_timestamp(dt_obj: dtm.datetime) -> float:
 
 
 def _localize(datetime: dtm.datetime, tzinfo: dtm.tzinfo) -> dtm.datetime:
-    """
-    Localize the datetime, where UTC is handled depending on whether pytz is available or not
-    """
+    """Localize the datetime, where UTC is handled depending on whether pytz is available or not"""
     if tzinfo is DTM_UTC:
         return datetime.replace(tzinfo=DTM_UTC)
     return tzinfo.localize(datetime)  # type: ignore[attr-defined]

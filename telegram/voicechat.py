@@ -36,7 +36,7 @@ class VoiceChatStarted(TelegramObject):
     .. versionadded:: 13.4
     """
 
-    def __init__(self, **_kwargs: Any):
+    def __init__(self, **_kwargs: Any):  # skipcq: PTC-W0049
         pass
 
 

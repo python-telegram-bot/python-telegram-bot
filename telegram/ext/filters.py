@@ -115,7 +115,7 @@ class BaseFilter(ABC):
 
     @abstractmethod
     def __call__(self, update: Update) -> Optional[Union[bool, Dict]]:
-        pass
+        ...
 
     def __and__(self, other: 'BaseFilter') -> 'BaseFilter':
         return MergedFilter(self, and_filter=other)
@@ -650,10 +650,6 @@ class Filters:
             """
 
             def __init__(self, category: Optional[str]):
-                """Initialize the category you want to filter
-
-                Args:
-                    category (str, optional): category of the media you want to filter"""
                 self.category = category
                 self.name = f"Filters.document.category('{self.category}')"
 
@@ -683,10 +679,6 @@ class Filters:
             """
 
             def __init__(self, mimetype: Optional[str]):
-                """Initialize the category you want to filter
-
-                Args:
-                    mimetype (str, optional): mime_type of the media you want to filter"""
                 self.mimetype = mimetype
                 self.name = f"Filters.document.mime_type('{self.mimetype}')"
 
@@ -1332,7 +1324,7 @@ officedocument.wordprocessingml.document")``.
 
         @abstractmethod
         def get_chat_or_user(self, message: Message) -> Union[Chat, User, None]:
-            pass
+            ...
 
         @staticmethod
         def _parse_chat_id(chat_id: SLT[int]) -> Set[int]:

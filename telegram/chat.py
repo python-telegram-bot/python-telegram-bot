@@ -224,7 +224,8 @@ class Chat(TelegramObject):
     @property
     def link(self) -> Optional[str]:
         """:obj:`str`: Convenience property. If the chat has a :attr:`username`, returns a t.me
-        link of the chat."""
+        link of the chat.
+        """
         if self.username:
             return f"https://t.me/{self.username}"
         return None

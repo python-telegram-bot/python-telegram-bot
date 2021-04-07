@@ -73,7 +73,7 @@ from telegram.utils.types import JSONDict
 
 
 def _render_part(self: RequestField, name: str, value: str) -> str:  # pylint: disable=W0613
-    """
+    r"""
     Monkey patch urllib3.urllib3.fields.RequestField to make it *not* support RFC2231 compliant
     Content-Disposition headers since telegram servers don't understand it. Instead just escape
     \\ and " and replace any \n and \r with a space.

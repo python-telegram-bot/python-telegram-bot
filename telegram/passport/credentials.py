@@ -49,9 +49,7 @@ if TYPE_CHECKING:
 
 
 class TelegramDecryptionError(TelegramError):
-    """
-    Something went wrong with decryption.
-    """
+    """Something went wrong with decryption."""
 
     def __init__(self, message: Union[str, Exception]):
         super().__init__(f"TelegramDecryptionError: {message}")
