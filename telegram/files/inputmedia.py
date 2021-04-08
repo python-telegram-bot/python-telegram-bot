@@ -46,6 +46,7 @@ class InputMedia(TelegramObject):
     caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...], None] = None
 
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
         if self.caption_entities:

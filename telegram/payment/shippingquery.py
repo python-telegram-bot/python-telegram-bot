@@ -74,7 +74,8 @@ class ShippingQuery(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['ShippingQuery']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None

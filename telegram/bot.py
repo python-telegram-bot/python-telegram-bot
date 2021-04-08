@@ -5036,6 +5036,7 @@ class Bot(TelegramObject):
         return MessageId.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {'id': self.id, 'username': self.username, 'first_name': self.first_name}
 
         if self.last_name:

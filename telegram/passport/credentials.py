@@ -221,7 +221,8 @@ class Credentials(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Credentials']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None
@@ -292,7 +293,8 @@ class SecureData(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['SecureData']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None
@@ -365,7 +367,8 @@ class SecureValue(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['SecureValue']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None
@@ -380,6 +383,7 @@ class SecureValue(TelegramObject):
         return cls(bot=bot, **data)
 
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
         data['files'] = [p.to_dict() for p in self.files]
@@ -420,6 +424,7 @@ class DataCredentials(_CredentialsBase):
         super().__init__(data_hash, secret, **_kwargs)
 
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
         del data['file_hash']
@@ -446,6 +451,7 @@ class FileCredentials(_CredentialsBase):
         super().__init__(file_hash, secret, **_kwargs)
 
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
         del data['data_hash']

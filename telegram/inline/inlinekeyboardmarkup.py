@@ -50,6 +50,7 @@ class InlineKeyboardMarkup(ReplyMarkup):
         self.inline_keyboard = inline_keyboard
 
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
         data['inline_keyboard'] = []
@@ -60,7 +61,8 @@ class InlineKeyboardMarkup(ReplyMarkup):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['InlineKeyboardMarkup']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None

@@ -83,7 +83,7 @@ class PassportFile(TelegramObject):
     def de_json_decrypted(
         cls, data: Optional[JSONDict], bot: 'Bot', credentials: 'FileCredentials'
     ) -> Optional['PassportFile']:
-        data = cls.parse_data(data)
+        data = cls._parse_data(data)
 
         if not data:
             return None
