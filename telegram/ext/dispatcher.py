@@ -417,7 +417,6 @@ class Dispatcher:
                 The update to process.
 
         """
-
         # An error happened while polling
         if isinstance(update, TelegramError):
             try:

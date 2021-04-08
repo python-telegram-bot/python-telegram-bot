@@ -179,7 +179,7 @@ class EncryptedCredentials(TelegramObject):
             try:
                 self._decrypted_secret = self.bot.private_key.decrypt(
                     b64decode(self.secret),
-                    OAEP(mgf=MGF1(algorithm=SHA1()), algorithm=SHA1(), label=None),
+                    OAEP(mgf=MGF1(algorithm=SHA1()), algorithm=SHA1(), label=None),  # skipcq
                 )
             except ValueError as exception:
                 # If decryption fails raise exception

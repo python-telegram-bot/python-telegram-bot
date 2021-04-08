@@ -676,7 +676,6 @@ class Updater:
 
     def stop(self) -> None:
         """Stops the polling/webhook thread, the dispatcher and the job queue."""
-
         self.job_queue.stop()
         with self.__lock:
             if self.running or self.dispatcher.has_running_threads:

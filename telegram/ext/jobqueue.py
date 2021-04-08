@@ -563,7 +563,7 @@ class Job:
         self._removed = False
         self._enabled = False
 
-        self.job = cast(APSJob, job)
+        self.job = cast(APSJob, job)  # skipcq: PTC-W0052
 
     def run(self, dispatcher: 'Dispatcher') -> None:
         """Executes the callback function independently of the jobs schedule."""

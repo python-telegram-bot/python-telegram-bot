@@ -204,7 +204,6 @@ class Request:
             dict: A JSON parsed as Python dict with results - on error this dict will be empty.
 
         """
-
         decoded_s = json_data.decode('utf-8', 'replace')
         try:
             data = json.loads(decoded_s)

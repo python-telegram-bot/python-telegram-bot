@@ -150,7 +150,6 @@ class DelayQueue(threading.Thread):
                 Defaults to :obj:`None`.
 
         """
-
         self.__exit_req = True  # gently request
         self._queue.put(None)  # put something to unfreeze if frozen
         super().join(timeout=timeout)
@@ -162,7 +161,6 @@ class DelayQueue(threading.Thread):
         by subclasses.
 
         """
-
         raise exc
 
     def __call__(self, func: Callable, *args: object, **kwargs: object) -> None:
@@ -281,7 +279,6 @@ class MessageQueue:
             :obj:`callable`: Used as ``promise`` argument.
 
         """
-
         if not is_group_msg:  # ignore middle group delay
             self._all_delayq(promise)
         else:  # use middle group delay

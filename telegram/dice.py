@@ -70,7 +70,7 @@ class Dice(TelegramObject):
 
         self._id_attrs = (self.value, self.emoji)
 
-    DICE: ClassVar[str] = constants.DICE_DICE
+    DICE: ClassVar[str] = constants.DICE_DICE  # skipcq: PTC-W0052
     """:const:`telegram.constants.DICE_DICE`"""
     DARTS: ClassVar[str] = constants.DICE_DARTS
     """:const:`telegram.constants.DICE_DARTS`"""

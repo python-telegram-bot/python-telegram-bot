@@ -74,7 +74,6 @@ class Promise:
 
     def run(self) -> None:
         """Calls the :attr:`pooled_function` callable."""
-
         try:
             self._result = self.pooled_function(*self.args, **self.kwargs)
 

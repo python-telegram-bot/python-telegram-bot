@@ -157,7 +157,6 @@ class InlineQueryHandler(Handler[Update]):
             :obj:`bool`
 
         """
-
         if isinstance(update, Update) and update.inline_query:
             if self.pattern:
                 if update.inline_query.query:
