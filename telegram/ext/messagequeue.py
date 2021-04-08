@@ -113,7 +113,6 @@ class DelayQueue(threading.Thread):
         automatically called by autostart argument.
 
         """
-
         times: List[float] = []  # used to store each callable processing time
         while True:
             item = self._queue.get()
@@ -173,7 +172,6 @@ class DelayQueue(threading.Thread):
             **kwargs (:obj:`dict`): Arbitrary keyword-arguments to `func`.
 
         """
-
         if not self.is_alive() or self.__exit_req:
             raise DelayQueueError('Could not process callback in stopped thread')
         self._queue.put((func, args, kwargs))

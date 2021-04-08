@@ -72,7 +72,6 @@ class TelegramObject:
             :obj:`str`
 
         """
-
         return json.dumps(self.to_dict())
 
     def to_dict(self) -> JSONDict:
