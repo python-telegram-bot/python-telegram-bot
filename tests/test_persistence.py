@@ -1168,9 +1168,6 @@ class TestPickelPersistence:
         h2 = MessageHandler(None, second, pass_user_data=True, pass_chat_data=True)
         dp.add_handler(h1)
         dp.process_update(update)
-        del dp
-        del u
-        del pickle_persistence
         pickle_persistence_2 = PicklePersistence(
             filename='pickletest',
             store_user_data=True,
@@ -1192,9 +1189,6 @@ class TestPickelPersistence:
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
         dp.bot_data['test'] = 'Working3!'
         u._signal_handler(signal.SIGINT, None)
-        del dp
-        del u
-        del pickle_persistence
         pickle_persistence_2 = PicklePersistence(
             filename='pickletest',
             store_user_data=True,
@@ -1214,9 +1208,6 @@ class TestPickelPersistence:
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
         dp.bot_data['my_test3'] = 'Working3!'
         u._signal_handler(signal.SIGINT, None)
-        del dp
-        del u
-        del pickle_persistence_only_bot
         pickle_persistence_2 = PicklePersistence(
             filename='pickletest',
             store_user_data=False,
@@ -1236,9 +1227,6 @@ class TestPickelPersistence:
         dp.user_data[4242424242]['my_test'] = 'Working!'
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
         u._signal_handler(signal.SIGINT, None)
-        del dp
-        del u
-        del pickle_persistence_only_chat
         pickle_persistence_2 = PicklePersistence(
             filename='pickletest',
             store_user_data=False,
@@ -1258,9 +1246,6 @@ class TestPickelPersistence:
         dp.user_data[4242424242]['my_test'] = 'Working!'
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
         u._signal_handler(signal.SIGINT, None)
-        del dp
-        del u
-        del pickle_persistence_only_user
         pickle_persistence_2 = PicklePersistence(
             filename='pickletest',
             store_user_data=True,
@@ -1585,12 +1570,9 @@ class TestDictPersistence:
         h2 = MessageHandler(None, second, pass_user_data=True, pass_chat_data=True)
         dp.add_handler(h1)
         dp.process_update(update)
-        del dp
-        del u
         user_data = dict_persistence.user_data_json
         chat_data = dict_persistence.chat_data_json
         bot_data = dict_persistence.bot_data_json
-        del dict_persistence
         dict_persistence_2 = DictPersistence(
             user_data_json=user_data, chat_data_json=chat_data, bot_data_json=bot_data
         )

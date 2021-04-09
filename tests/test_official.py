@@ -135,7 +135,7 @@ def check_object(h4):
     ignored = IGNORED_PARAMETERS.copy()
     if name == 'InputFile':
         return
-    elif name == 'InlineQueryResult':
+    if name == 'InlineQueryResult':
         ignored |= {'id', 'type'}
     elif name == 'User':
         ignored |= {'type'}  # TODO: Deprecation
