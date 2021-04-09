@@ -195,4 +195,9 @@ class File(TelegramObject):
         return buf
 
     def set_credentials(self, credentials: 'FileCredentials') -> None:
+        """Sets the passport credentials for the file.
+
+        Args:
+            credentials (:class:`telegram.FileCredentials`): The credentials.
+        """
         self._credentials = credentials

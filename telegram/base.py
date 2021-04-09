@@ -81,7 +81,6 @@ class TelegramObject:
             A list of Telegram objects.
 
         """
-
         if not data:
             return []
 

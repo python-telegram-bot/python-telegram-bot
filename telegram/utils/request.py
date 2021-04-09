@@ -194,6 +194,7 @@ class Request:
         return self._con_pool_size
 
     def stop(self) -> None:
+        """Performs cleanup on shutdown."""
         self._con_pool.clear()  # type: ignore
 
     @staticmethod

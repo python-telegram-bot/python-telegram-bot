@@ -61,21 +61,24 @@ def msg(update: Update, _: CallbackContext) -> None:
                 actual_file = file.get_file()
                 print(actual_file)
                 actual_file.download()
-        if data.type in ('passport', 'driver_license', 'identity_card', 'internal_passport'):
-            if data.front_side:
-                front_file = data.front_side.get_file()
-                print(data.type, front_file)
-                front_file.download()
-        if data.type in ('driver_license' and 'identity_card'):
-            if data.reverse_side:
-                reverse_file = data.reverse_side.get_file()
-                print(data.type, reverse_file)
-                reverse_file.download()
-        if data.type in ('passport', 'driver_license', 'identity_card', 'internal_passport'):
-            if data.selfie:
-                selfie_file = data.selfie.get_file()
-                print(data.type, selfie_file)
-                selfie_file.download()
+        if (
+            data.type in ('passport', 'driver_license', 'identity_card', 'internal_passport')
+            and data.front_side
+        ):
+            front_file = data.front_side.get_file()
+            print(data.type, front_file)
+            front_file.download()
+        if data.type in ('driver_license' and 'identity_card') and data.reverse_side:
+            reverse_file = data.reverse_side.get_file()
+            print(data.type, reverse_file)
+            reverse_file.download()
+        if (
+            data.type in ('passport', 'driver_license', 'identity_card', 'internal_passport')
+            and data.selfie
+        ):
+            selfie_file = data.selfie.get_file()
+            print(data.type, selfie_file)
+            selfie_file.download()
         if data.type in (
             'passport',
             'driver_license',
