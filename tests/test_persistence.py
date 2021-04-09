@@ -1268,10 +1268,10 @@ class TestPickelPersistence:
 
         start = CommandHandler('start', start)
 
-        def next(update, context):
+        def next_callback(update, context):
             return NEXT2
 
-        next = MessageHandler(None, next)
+        next_handler = MessageHandler(None, next_callback)
 
         def next2(update, context):
             return ConversationHandler.END
@@ -1279,7 +1279,7 @@ class TestPickelPersistence:
         next2 = MessageHandler(None, next2)
 
         ch = ConversationHandler(
-            [start], {NEXT: [next], NEXT2: [next2]}, [], name='name2', persistent=True
+            [start], {NEXT: [next_handler], NEXT2: [next2]}, [], name='name2', persistent=True
         )
         dp.add_handler(ch)
         assert ch.conversations[ch._get_key(update)] == 1
@@ -1303,10 +1303,10 @@ class TestPickelPersistence:
 
         start = CommandHandler('start', start)
 
-        def next(update, context):
+        def next_callback(update, context):
             return NEXT2
 
-        next = MessageHandler(None, next)
+        next_handler = MessageHandler(None, next_callback)
 
         def next2(update, context):
             return ConversationHandler.END
@@ -1314,7 +1314,7 @@ class TestPickelPersistence:
         next2 = MessageHandler(None, next2)
 
         nested_ch = ConversationHandler(
-            [next],
+            [next_handler],
             {NEXT2: [next2]},
             [],
             name='name3',
@@ -1593,10 +1593,10 @@ class TestDictPersistence:
 
         start = CommandHandler('start', start)
 
-        def next(update, context):
+        def next_callback(update, context):
             return NEXT2
 
-        next = MessageHandler(None, next)
+        next_handler = MessageHandler(None, next_callback)
 
         def next2(update, context):
             return ConversationHandler.END
@@ -1604,7 +1604,7 @@ class TestDictPersistence:
         next2 = MessageHandler(None, next2)
 
         ch = ConversationHandler(
-            [start], {NEXT: [next], NEXT2: [next2]}, [], name='name2', persistent=True
+            [start], {NEXT: [next_handler], NEXT2: [next2]}, [], name='name2', persistent=True
         )
         dp.add_handler(ch)
         assert ch.conversations[ch._get_key(update)] == 1
@@ -1627,10 +1627,10 @@ class TestDictPersistence:
 
         start = CommandHandler('start', start)
 
-        def next(update, context):
+        def next_callback(update, context):
             return NEXT2
 
-        next = MessageHandler(None, next)
+        next_handler = MessageHandler(None, next_callback)
 
         def next2(update, context):
             return ConversationHandler.END
@@ -1638,7 +1638,7 @@ class TestDictPersistence:
         next2 = MessageHandler(None, next2)
 
         nested_ch = ConversationHandler(
-            [next],
+            [next_handler],
             {NEXT2: [next2]},
             [],
             name='name3',
