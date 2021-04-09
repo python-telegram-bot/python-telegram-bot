@@ -1191,7 +1191,7 @@ class TestPickelPersistence:
         dp.user_data[4242424242]['my_test'] = 'Working!'
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
         dp.bot_data['test'] = 'Working3!'
-        u.signal_handler(signal.SIGINT, None)
+        u._signal_handler(signal.SIGINT, None)
         del dp
         del u
         del pickle_persistence
@@ -1213,7 +1213,7 @@ class TestPickelPersistence:
         dp.user_data[4242424242]['my_test'] = 'Working!'
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
         dp.bot_data['my_test3'] = 'Working3!'
-        u.signal_handler(signal.SIGINT, None)
+        u._signal_handler(signal.SIGINT, None)
         del dp
         del u
         del pickle_persistence_only_bot
@@ -1235,7 +1235,7 @@ class TestPickelPersistence:
         u.running = True
         dp.user_data[4242424242]['my_test'] = 'Working!'
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
-        u.signal_handler(signal.SIGINT, None)
+        u._signal_handler(signal.SIGINT, None)
         del dp
         del u
         del pickle_persistence_only_chat
@@ -1257,7 +1257,7 @@ class TestPickelPersistence:
         u.running = True
         dp.user_data[4242424242]['my_test'] = 'Working!'
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
-        u.signal_handler(signal.SIGINT, None)
+        u._signal_handler(signal.SIGINT, None)
         del dp
         del u
         del pickle_persistence_only_user

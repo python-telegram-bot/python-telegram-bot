@@ -38,11 +38,6 @@ if TYPE_CHECKING:
     import apscheduler.job  # noqa: F401
 
 
-class Days:
-    MON, TUE, WED, THU, FRI, SAT, SUN = range(7)
-    EVERY_DAY = tuple(range(7))
-
-
 class JobQueue:
     """This class allows you to periodically perform tasks with the bot. It is a convenience
     wrapper for the APScheduler library.
@@ -391,7 +386,7 @@ class JobQueue:
         self,
         callback: Callable[['CallbackContext'], None],
         time: datetime.time,
-        days: Tuple[int, ...] = Days.EVERY_DAY,
+        days: Tuple[int, ...] = tuple(range(7)),
         context: object = None,
         name: str = None,
         job_kwargs: JSONDict = None,
@@ -498,9 +493,7 @@ class JobQueue:
             self.scheduler.shutdown()
 
     def jobs(self) -> Tuple['Job', ...]:
-        """
-        Returns a tuple of all *pending/scheduled* jobs that are currently in the ``JobQueue``.
-        """
+        """Returns a tuple of all *scheduled* jobs that are currently in the ``JobQueue``."""
         return tuple(Job.from_aps_job(job, self) for job in self.scheduler.get_jobs())
 
     def get_jobs_by_name(self, name: str) -> Tuple['Job', ...]:

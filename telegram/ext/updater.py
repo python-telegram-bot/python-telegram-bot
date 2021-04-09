@@ -719,7 +719,7 @@ class Updater:
         self.__threads = []
 
     @no_type_check
-    def signal_handler(self, signum, frame) -> None:
+    def _signal_handler(self, signum, frame) -> None:
         self.is_idle = False
         if self.running:
             self.logger.info(
@@ -749,7 +749,7 @@ class Updater:
 
         """
         for sig in stop_signals:
-            signal(sig, self.signal_handler)
+            signal(sig, self._signal_handler)
 
         self.is_idle = True
 

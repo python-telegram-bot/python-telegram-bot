@@ -180,6 +180,18 @@ class EncryptedPassportElement(TelegramObject):
     def de_json_decrypted(
         cls, data: Optional[JSONDict], bot: 'Bot', credentials: 'Credentials'
     ) -> Optional['EncryptedPassportElement']:
+        """Variant of :meth:`telegram.TelegramObject.de_json` that also takes into account
+        passport credentials.
+
+        Args:
+            data (Dict[:obj:`str`, ...]): The JSON data.
+            bot (:class:`telegram.Bot`): The bot associated with this object.
+            credentials (:class:`telegram.FileCredentials`): The credentials
+
+        Returns:
+            :class:`telegram.EncryptedPassportElement`:
+
+        """
         if not data:
             return None
 

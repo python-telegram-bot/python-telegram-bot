@@ -28,10 +28,11 @@ RT = TypeVar('RT')
 # seem like it's the user that issued the warning
 # We name it something else so that you don't get confused when you attempt to suppress it
 class TelegramDeprecationWarning(Warning):
-    pass
+    """Custom warning class for deprecations in this library."""
 
 
 def warn_deprecate_obj(old: str, new: str, stacklevel: int = 3) -> None:
+    """Issues a :class:`TelegramDeprecationWarning` with a proper description."""
     warnings.warn(
         f'{old} is being deprecated, please use {new} from now on.',
         category=TelegramDeprecationWarning,
@@ -40,7 +41,7 @@ def warn_deprecate_obj(old: str, new: str, stacklevel: int = 3) -> None:
 
 
 def deprecate(func: Callable[..., RT], old: str, new: str) -> Callable[..., RT]:
-    """Warn users invoking old to switch to the new function."""
+    """Warn users invoking old to switch to the new function. Use as decorator."""
 
     def wrapped(*args: object, **kwargs: object) -> RT:
         warn_deprecate_obj(old, new)

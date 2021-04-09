@@ -182,6 +182,7 @@ class StickerSet(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['StickerSet']:
+        """See :meth:`telegram.TelegramObject.de_json`."""
         if not data:
             return None
 

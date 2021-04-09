@@ -96,6 +96,7 @@ class VoiceChatParticipantsInvited(TelegramObject):
     def de_json(
         cls, data: Optional[JSONDict], bot: 'Bot'
     ) -> Optional['VoiceChatParticipantsInvited']:
+        """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
