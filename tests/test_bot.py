@@ -216,11 +216,13 @@ class TestBot:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_forward_message(self, bot, chat_id, message):
-        message = bot.forward_message(chat_id, from_chat_id=chat_id, message_id=message.message_id)
+        forward_message = bot.forward_message(
+            chat_id, from_chat_id=chat_id, message_id=message.message_id
+        )
 
-        assert message.text == message.text
-        assert message.forward_from.username == message.from_user.username
-        assert isinstance(message.forward_date, dtm.datetime)
+        assert forward_message.text == message.text
+        assert forward_message.forward_from.username == message.from_user.username
+        assert isinstance(forward_message.forward_date, dtm.datetime)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

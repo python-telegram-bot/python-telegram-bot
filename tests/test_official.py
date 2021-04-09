@@ -121,9 +121,9 @@ def check_object(h4):
             name.startswith('InlineQueryResult') or name.startswith('InputMedia')
         ) and field == 'type':
             continue
-        elif name.startswith('PassportElementError') and field == 'source':
-            continue
-        elif field == 'remove_keyboard':
+        elif (
+            name.startswith('PassportElementError') and field == 'source'
+        ) or field == 'remove_keyboard':
             continue
 
         param = sig.parameters.get(field)

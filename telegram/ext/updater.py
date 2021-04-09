@@ -593,14 +593,17 @@ class Updater:
             webhook_url = self._gen_webhook_url(listen, port, url_path)
 
         # We pass along the cert to the webhook if present.
+        cert_file = open(cert, 'rb') if cert is not None else None
         self._bootstrap(
             max_retries=bootstrap_retries,
             drop_pending_updates=drop_pending_updates,
             webhook_url=webhook_url,
             allowed_updates=allowed_updates,
-            cert=open(cert, 'rb') if cert is not None else None,
+            cert=cert_file,
             ip_address=ip_address,
         )
+        if cert_file is not None:
+            cert_file.close()
 
         self.httpd.serve_forever(force_event_loop=force_event_loop, ready=ready)
 
