@@ -633,6 +633,8 @@ class TestBot:
     )
     def test_send_chat_action(self, bot, chat_id, chat_action):
         assert bot.send_chat_action(chat_id, chat_action)
+        with pytest.raises(BadRequest, match='Wrong parameter action'):
+            bot.send_chat_action(chat_action, 'unknown action')
 
     # TODO: Needs improvement. We need incoming inline query to test answer.
     def test_answer_inline_query(self, monkeypatch, bot):
