@@ -3624,7 +3624,7 @@ class Bot(TelegramObject):
                 .. versionadded:: 13.4
 
             can_manage_voice_chats (:obj:`bool`, optional): Pass :obj:`True`, if the administrator
-                can manage voice chats, supergroups only.
+                can manage voice chats.
 
                 .. versionadded:: 13.4
 
