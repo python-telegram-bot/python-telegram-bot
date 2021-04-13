@@ -97,6 +97,17 @@ class TestDispatcher:
         ):
             self.received = context.error.message
 
+    def test_less_than_one_worker_warning(self, dp, caplog):
+        with caplog.at_level(logging.WARNING):
+            Dispatcher(
+                dp.bot, dp.update_queue, job_queue=dp.job_queue, workers=0, use_context=True
+            )
+        assert len(caplog.records) == 1
+        assert (
+            caplog.records[-1].getMessage()
+            == 'You must need to have atleast one worker for `run_async` to work properly.'
+        )
+
     def test_one_context_per_update(self, cdp):
         def one(update, context):
             if update.message.text == 'test':

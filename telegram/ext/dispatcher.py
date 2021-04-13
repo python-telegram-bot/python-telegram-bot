@@ -162,6 +162,11 @@ class Dispatcher:
                 stacklevel=3,
             )
 
+        if self.workers < 1:
+            self.logger.warning(
+                'You must need to have atleast one worker for `run_async` to work properly.'
+            )
+
         self.user_data: DefaultDict[int, Dict[object, object]] = defaultdict(dict)
         self.chat_data: DefaultDict[int, Dict[object, object]] = defaultdict(dict)
         self.bot_data = {}
