@@ -105,7 +105,7 @@ class TestDispatcher:
         assert len(caplog.records) == 1
         assert (
             caplog.records[-1].getMessage()
-            == 'You must need to have atleast one worker for `run_async` to work properly.'
+            == 'Asynchronous callbacks can not be processed without at least one worker thread.'
         )
 
     def test_one_context_per_update(self, cdp):

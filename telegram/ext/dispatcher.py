@@ -164,7 +164,7 @@ class Dispatcher:
 
         if self.workers < 1:
             self.logger.warning(
-                'You must need to have atleast one worker for `run_async` to work properly.'
+                'Asynchronous callbacks can not be processed without at least one worker thread.'
             )
 
         self.user_data: DefaultDict[int, Dict[object, object]] = defaultdict(dict)
