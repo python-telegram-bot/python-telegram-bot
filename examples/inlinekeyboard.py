@@ -3,7 +3,8 @@
 # This program is dedicated to the public domain under the CC0 license.
 
 """
-Basic example for a bot that uses inline keyboards.
+Basic example for a bot that uses inline keyboards. For an in-depth explanation, check out
+ https://git.io/JOmFw.
 """
 import logging
 
