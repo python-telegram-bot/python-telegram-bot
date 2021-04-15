@@ -97,14 +97,11 @@ class TestDispatcher:
         ):
             self.received = context.error.message
 
-    def test_less_than_one_worker_warning(self, dp, caplog):
-        with caplog.at_level(logging.WARNING):
-            Dispatcher(
-                dp.bot, dp.update_queue, job_queue=dp.job_queue, workers=0, use_context=True
-            )
-        assert len(caplog.records) == 1
+    def test_less_than_one_worker_warning(self, dp, recwarn):
+        Dispatcher(dp.bot, dp.update_queue, job_queue=dp.job_queue, workers=0, use_context=True)
+        assert len(recwarn) == 1
         assert (
-            caplog.records[-1].getMessage()
+            str(recwarn[0].message)
             == 'Asynchronous callbacks can not be processed without at least one worker thread.'
         )
 

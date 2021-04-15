@@ -163,7 +163,7 @@ class Dispatcher:
             )
 
         if self.workers < 1:
-            self.logger.warning(
+            warnings.warn(
                 'Asynchronous callbacks can not be processed without at least one worker thread.'
             )
 
