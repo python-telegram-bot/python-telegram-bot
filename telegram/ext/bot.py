@@ -115,7 +115,7 @@ class Bot(telegram.bot.Bot):
         self,
         endpoint: str,
         data: JSONDict,
-        reply_to_message_id: Union[str, int] = None,
+        reply_to_message_id: int = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: ReplyMarkup = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,

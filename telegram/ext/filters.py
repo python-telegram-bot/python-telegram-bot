@@ -1005,6 +1005,15 @@ officedocument.wordprocessingml.document")``.
             :attr: `telegram.Message.supergroup_chat_created` or
             :attr: `telegram.Message.channel_chat_created`."""
 
+        class _MessageAutoDeleteTimerChanged(MessageFilter):
+            name = 'MessageAutoDeleteTimerChanged'
+
+            def filter(self, message: Message) -> bool:
+                return bool(message.message_auto_delete_timer_changed)
+
+        message_auto_delete_timer_changed = _MessageAutoDeleteTimerChanged()
+        """Messages that contain :attr:`message_auto_delete_timer_changed`"""
+
         class _Migrate(MessageFilter):
             name = 'Filters.status_update.migrate'
 
@@ -1042,6 +1051,33 @@ officedocument.wordprocessingml.document")``.
         proximity_alert_triggered = _ProximityAlertTriggered()
         """Messages that contain :attr:`telegram.Message.proximity_alert_triggered`."""
 
+        class _VoiceChatStarted(MessageFilter):
+            name = 'Filters.status_update.voice_chat_started'
+
+            def filter(self, message: Message) -> bool:
+                return bool(message.voice_chat_started)
+
+        voice_chat_started = _VoiceChatStarted()
+        """Messages that contain :attr:`telegram.Message.voice_chat_started`."""
+
+        class _VoiceChatEnded(MessageFilter):
+            name = 'Filters.status_update.voice_chat_ended'
+
+            def filter(self, message: Message) -> bool:
+                return bool(message.voice_chat_ended)
+
+        voice_chat_ended = _VoiceChatEnded()
+        """Messages that contain :attr:`telegram.Message.voice_chat_ended`."""
+
+        class _VoiceChatParticipantsInvited(MessageFilter):
+            name = 'Filters.status_update.voice_chat_participants_invited'
+
+            def filter(self, message: Message) -> bool:
+                return bool(message.voice_chat_participants_invited)
+
+        voice_chat_participants_invited = _VoiceChatParticipantsInvited()
+        """Messages that contain :attr:`telegram.Message.voice_chat_participants_invited`."""
+
         name = 'Filters.status_update'
 
         def filter(self, message: Update) -> bool:
@@ -1052,10 +1088,14 @@ officedocument.wordprocessingml.document")``.
                 or self.new_chat_photo(message)
                 or self.delete_chat_photo(message)
                 or self.chat_created(message)
+                or self.message_auto_delete_timer_changed(message)
                 or self.migrate(message)
                 or self.pinned_message(message)
                 or self.connected_website(message)
                 or self.proximity_alert_triggered(message)
+                or self.voice_chat_started(message)
+                or self.voice_chat_ended(message)
+                or self.voice_chat_participants_invited(message)
             )
 
     status_update = _StatusUpdate()
@@ -1077,18 +1117,35 @@ officedocument.wordprocessingml.document")``.
         left_chat_member: Messages that contain
             :attr:`telegram.Message.left_chat_member`.
         migrate: Messages that contain
-            :attr:`telegram.Message.migrate_from_chat_id` or
-            :attr: `telegram.Message.migrate_from_chat_id`.
+            :attr:`telegram.Message.migrate_to_chat_id` or
+            :attr:`telegram.Message.migrate_from_chat_id`.
         new_chat_members: Messages that contain
             :attr:`telegram.Message.new_chat_members`.
         new_chat_photo: Messages that contain
             :attr:`telegram.Message.new_chat_photo`.
         new_chat_title: Messages that contain
             :attr:`telegram.Message.new_chat_title`.
+        message_auto_delete_timer_changed: Messages that contain
+            :attr:`message_auto_delete_timer_changed`.
+
+            .. versionadded:: 13.4
         pinned_message: Messages that contain
             :attr:`telegram.Message.pinned_message`.
         proximity_alert_triggered: Messages that contain
             :attr:`telegram.Message.proximity_alert_triggered`.
+        voice_chat_started: Messages that contain
+            :attr:`telegram.Message.voice_chat_started`.
+
+            .. versionadded:: 13.4
+        voice_chat_ended: Messages that contain
+            :attr:`telegram.Message.voice_chat_ended`.
+
+            .. versionadded:: 13.4
+        voice_chat_participants_invited: Messages that contain
+            :attr:`telegram.Message.voice_chat_participants_invited`.
+
+            .. versionadded:: 13.4
+
     """
 
     class _Forwarded(MessageFilter):
@@ -1675,21 +1732,118 @@ officedocument.wordprocessingml.document")``.
             """
             return super().remove_chat_ids(chat_id)
 
+    class forwarded_from(_ChatUserBaseFilter):
+        # pylint: disable=W0235
+        """Filters messages to allow only those which are forwarded from the specified chat ID(s)
+        or username(s) based on :attr:`telegram.Message.forward_from` and
+        :attr:`telegram.Message.forward_from_chat`.
+
+        .. versionadded:: 13.5
+
+        Examples:
+            ``MessageHandler(Filters.forwarded_from(chat_id=1234), callback_method)``
+
+        Note:
+            When a user has disallowed adding a link to their account while forwarding their
+            messages, this filter will *not* work since both
+            :attr:`telegram.Message.forwarded_from` and
+            :attr:`telegram.Message.forwarded_from_chat` are :obj:`None`. However, this behaviour
+            is undocumented and might be changed by Telegram.
+
+        Warning:
+            :attr:`chat_ids` will give a *copy* of the saved chat ids as :class:`frozenset`. This
+            is to ensure thread safety. To add/remove a chat, you should use :meth:`add_usernames`,
+            :meth:`add_chat_ids`, :meth:`remove_usernames` and :meth:`remove_chat_ids`. Only update
+            the entire set by ``filter.chat_ids/usernames = new_set``, if you are entirely sure
+            that it is not causing race conditions, as this will complete replace the current set
+            of allowed chats.
+
+        Args:
+            chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                Which chat/user ID(s) to allow through.
+            username(:class:`telegram.utils.types.SLT[str]`, optional):
+                Which username(s) to allow through. Leading ``'@'`` s in usernames will be
+                discarded.
+            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
+                is specified in :attr:`chat_ids` and :attr:`usernames`. Defaults to :obj:`False`.
+
+        Raises:
+            RuntimeError: If both chat_id and username are present.
+
+        Attributes:
+            chat_ids(set(:obj:`int`), optional): Which chat/user ID(s) to allow through.
+            usernames(set(:obj:`str`), optional): Which username(s) (without leading ``'@'``) to
+                allow through.
+            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
+                is specified in :attr:`chat_ids` and :attr:`usernames`.
+        """
+
+        def get_chat_or_user(self, message: Message) -> Union[User, Chat, None]:
+            return message.forward_from or message.forward_from_chat
+
+        def add_usernames(self, username: SLT[str]) -> None:
+            """
+            Add one or more chats to the allowed usernames.
+
+            Args:
+                username(:class:`telegram.utils.types.SLT[str]`, optional):
+                    Which username(s) to allow through.
+                    Leading ``'@'`` s in usernames will be discarded.
+            """
+            return super().add_usernames(username)
+
+        def add_chat_ids(self, chat_id: SLT[int]) -> None:
+            """
+            Add one or more chats to the allowed chat ids.
+
+            Args:
+                chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                    Which chat/user ID(s) to allow through.
+            """
+            return super().add_chat_ids(chat_id)
+
+        def remove_usernames(self, username: SLT[str]) -> None:
+            """
+            Remove one or more chats from allowed usernames.
+
+            Args:
+                username(:class:`telegram.utils.types.SLT[str]`, optional):
+                    Which username(s) to disallow through.
+                    Leading ``'@'`` s in usernames will be discarded.
+            """
+            return super().remove_usernames(username)
+
+        def remove_chat_ids(self, chat_id: SLT[int]) -> None:
+            """
+            Remove one or more chats from allowed chat ids.
+
+            Args:
+                chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                    Which chat/user ID(s) to disallow through.
+            """
+            return super().remove_chat_ids(chat_id)
+
     class sender_chat(_ChatUserBaseFilter):
         # pylint: disable=W0235
         """Filters messages to allow only those which are from a specified sender chats chat ID or
         username.
 
         Examples:
-            * To filter for messages forwarded from a channel with ID ``-1234``, use
-              ``MessageHandler(Filters.sender_chat(-1234), callback_method)``.
+            * To filter for messages forwarded to a discussion group from a channel with ID
+              ``-1234``, use ``MessageHandler(Filters.sender_chat(-1234), callback_method)``.
             * To filter for messages of anonymous admins in a super group with username
               ``@anonymous``, use
               ``MessageHandler(Filters.sender_chat(username='anonymous'), callback_method)``.
-            * To filter for messages forwarded from *any* channel, use
+            * To filter for messages forwarded to a discussion group from *any* channel, use
               ``MessageHandler(Filters.sender_chat.channel, callback_method)``.
             * To filter for messages of anonymous admins in *any* super group, use
               ``MessageHandler(Filters.sender_chat.super_group, callback_method)``.
+
+        Note:
+            Remember, ``sender_chat`` is also set for messages in a channel as the channel itself,
+            so when your bot is an admin in a channel and the linked discussion group, you would
+            receive the message twice (once from inside the channel, once inside the discussion
+            group).
 
         Warning:
             :attr:`chat_ids` will return a *copy* of the saved chat ids as :class:`frozenset`. This
@@ -1831,6 +1985,7 @@ officedocument.wordprocessingml.document")``.
         basketball = _DiceEmoji('🏀', 'basketball')
         football = _DiceEmoji('⚽')
         slot_machine = _DiceEmoji('🎰')
+        bowling = _DiceEmoji('🎳', 'bowling')
 
     dice = _Dice()
     """Dice Messages. If an integer or a list of integers is passed, it filters messages to only
@@ -1863,6 +2018,11 @@ officedocument.wordprocessingml.document")``.
             as for :attr:`Filters.dice`.
         slot_machine: Dice messages with the emoji 🎰. Passing a list of integers is supported just
             as for :attr:`Filters.dice`.
+        bowling: Dice messages with the emoji 🎳. Passing a list of integers is supported just
+            as for :attr:`Filters.dice`.
+
+            .. versionadded:: 13.4
+
     """
 
     class language(MessageFilter):

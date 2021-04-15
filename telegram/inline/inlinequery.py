@@ -38,7 +38,7 @@ class InlineQuery(TelegramObject):
     considered equal, if their :attr:`id` is equal.
 
     Note:
-        * In Python `from` is a reserved word, use `from_user` instead.
+        * In Python ``from`` is a reserved word, use ``from_user`` instead.
 
     Args:
         id (:obj:`str`): Unique identifier for this query.
@@ -125,7 +125,7 @@ class InlineQuery(TelegramObject):
                 Defaults to :obj:`False`.
 
         Raises:
-            TypeError: If both :attr:`current_offset` and attr:`auto_pagination` are supplied.
+            TypeError: If both :attr:`current_offset` and :attr:`auto_pagination` are supplied.
         """
         if current_offset and auto_pagination:
             # We raise TypeError instead of ValueError for backwards compatibility with versions

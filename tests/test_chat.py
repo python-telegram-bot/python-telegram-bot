@@ -37,6 +37,7 @@ def chat(bot):
         can_set_sticker_set=TestChat.can_set_sticker_set,
         permissions=TestChat.permissions,
         slow_mode_delay=TestChat.slow_mode_delay,
+        message_auto_delete_time=TestChat.message_auto_delete_time,
         bio=TestChat.bio,
         linked_chat_id=TestChat.linked_chat_id,
         location=TestChat.location,
@@ -57,6 +58,7 @@ class TestChat:
         can_invite_users=True,
     )
     slow_mode_delay = 30
+    message_auto_delete_time = 42
     bio = "I'm a Barbie Girl in a Barbie World"
     linked_chat_id = 11880
     location = ChatLocation(Location(123, 456), 'Barbie World')
@@ -72,6 +74,7 @@ class TestChat:
             'can_set_sticker_set': self.can_set_sticker_set,
             'permissions': self.permissions.to_dict(),
             'slow_mode_delay': self.slow_mode_delay,
+            'message_auto_delete_time': self.message_auto_delete_time,
             'bio': self.bio,
             'linked_chat_id': self.linked_chat_id,
             'location': self.location.to_dict(),
@@ -87,6 +90,7 @@ class TestChat:
         assert chat.can_set_sticker_set == self.can_set_sticker_set
         assert chat.permissions == self.permissions
         assert chat.slow_mode_delay == self.slow_mode_delay
+        assert chat.message_auto_delete_time == self.message_auto_delete_time
         assert chat.bio == self.bio
         assert chat.linked_chat_id == self.linked_chat_id
         assert chat.location.location == self.location.location
@@ -103,6 +107,7 @@ class TestChat:
         assert chat_dict['all_members_are_administrators'] == chat.all_members_are_administrators
         assert chat_dict['permissions'] == chat.permissions.to_dict()
         assert chat_dict['slow_mode_delay'] == chat.slow_mode_delay
+        assert chat_dict['message_auto_delete_time'] == chat.message_auto_delete_time
         assert chat_dict['bio'] == chat.bio
         assert chat_dict['linked_chat_id'] == chat.linked_chat_id
         assert chat_dict['location'] == chat.location.to_dict()
@@ -208,7 +213,7 @@ class TestChat:
         def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == chat.id
             user_id = kwargs['user_id'] == 42
-            o_i_b = kwargs.get('only_if_banned', None) == only_if_banned
+            o_i_b = kwargs.get('only_if_banned') == only_if_banned
             return chat_id and user_id and o_i_b
 
         assert check_shortcut_signature(Chat.unban_member, Bot.unban_chat_member, ['chat_id'], [])
@@ -223,7 +228,7 @@ class TestChat:
         def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == chat.id
             user_id = kwargs['user_id'] == 42
-            o_i_b = kwargs.get('is_anonymous', None) == is_anonymous
+            o_i_b = kwargs.get('is_anonymous') == is_anonymous
             return chat_id and user_id and o_i_b
 
         assert check_shortcut_signature(
@@ -241,7 +246,7 @@ class TestChat:
         def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == chat.id
             user_id = kwargs['user_id'] == 42
-            o_i_b = kwargs.get('permissions', None) == permissions
+            o_i_b = kwargs.get('permissions') == permissions
             return chat_id and user_id and o_i_b
 
         assert check_shortcut_signature(
@@ -555,6 +560,62 @@ class TestChat:
 
         monkeypatch.setattr(chat.bot, 'copy_message', make_assertion)
         assert chat.copy_message(chat_id='test_copy', message_id=42)
+
+    def test_export_invite_link(self, monkeypatch, chat):
+        def make_assertion(*_, **kwargs):
+            return kwargs['chat_id'] == chat.id
+
+        assert check_shortcut_signature(
+            Chat.export_invite_link, Bot.export_chat_invite_link, ['chat_id'], []
+        )
+        assert check_shortcut_call(chat.export_invite_link, chat.bot, 'export_chat_invite_link')
+        assert check_defaults_handling(chat.export_invite_link, chat.bot)
+
+        monkeypatch.setattr(chat.bot, 'export_chat_invite_link', make_assertion)
+        assert chat.export_invite_link()
+
+    def test_create_invite_link(self, monkeypatch, chat):
+        def make_assertion(*_, **kwargs):
+            return kwargs['chat_id'] == chat.id
+
+        assert check_shortcut_signature(
+            Chat.create_invite_link, Bot.create_chat_invite_link, ['chat_id'], []
+        )
+        assert check_shortcut_call(chat.create_invite_link, chat.bot, 'create_chat_invite_link')
+        assert check_defaults_handling(chat.create_invite_link, chat.bot)
+
+        monkeypatch.setattr(chat.bot, 'create_chat_invite_link', make_assertion)
+        assert chat.create_invite_link()
+
+    def test_edit_invite_link(self, monkeypatch, chat):
+        link = "ThisIsALink"
+
+        def make_assertion(*_, **kwargs):
+            return kwargs['chat_id'] == chat.id and kwargs['invite_link'] == link
+
+        assert check_shortcut_signature(
+            Chat.edit_invite_link, Bot.edit_chat_invite_link, ['chat_id'], []
+        )
+        assert check_shortcut_call(chat.edit_invite_link, chat.bot, 'edit_chat_invite_link')
+        assert check_defaults_handling(chat.edit_invite_link, chat.bot)
+
+        monkeypatch.setattr(chat.bot, 'edit_chat_invite_link', make_assertion)
+        assert chat.edit_invite_link(invite_link=link)
+
+    def test_revoke_invite_link(self, monkeypatch, chat):
+        link = "ThisIsALink"
+
+        def make_assertion(*_, **kwargs):
+            return kwargs['chat_id'] == chat.id and kwargs['invite_link'] == link
+
+        assert check_shortcut_signature(
+            Chat.revoke_invite_link, Bot.revoke_chat_invite_link, ['chat_id'], []
+        )
+        assert check_shortcut_call(chat.revoke_invite_link, chat.bot, 'revoke_chat_invite_link')
+        assert check_defaults_handling(chat.revoke_invite_link, chat.bot)
+
+        monkeypatch.setattr(chat.bot, 'revoke_chat_invite_link', make_assertion)
+        assert chat.revoke_invite_link(invite_link=link)
 
     def test_equality(self):
         a = Chat(self.id_, self.title, self.type_)

@@ -44,6 +44,7 @@ from .messagequeue import MessageQueue
 from .messagequeue import DelayQueue
 from .pollanswerhandler import PollAnswerHandler
 from .pollhandler import PollHandler
+from .chatmemberhandler import ChatMemberHandler
 from .defaults import Defaults
 
 __all__ = (
@@ -80,5 +81,6 @@ __all__ = (
     'PrefixHandler',
     'PollAnswerHandler',
     'PollHandler',
+    'ChatMemberHandler',
     'Defaults',
 )

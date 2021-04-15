@@ -47,7 +47,7 @@ class CallbackQuery(TelegramObject):
     considered equal, if their :attr:`id` is equal.
 
     Note:
-        * In Python `from` is a reserved word, use `from_user` instead.
+        * In Python ``from`` is a reserved word, use ``from_user`` instead.
         * Exactly one of the fields :attr:`data` or :attr:`game_short_name` will be present.
         * After the user presses an inline button, Telegram clients will display a progress bar
           until you call :attr:`answer`. It is, therefore, necessary to react
@@ -602,7 +602,7 @@ class CallbackQuery(TelegramObject):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[Tuple['MessageEntity', ...], List['MessageEntity']] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
         reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,

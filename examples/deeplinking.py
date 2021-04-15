@@ -44,7 +44,7 @@ USING_ENTITIES = "using-entities-here"
 USING_KEYBOARD = "using-keyboard-here"
 SO_COOL = "so-cool"
 
-# Callback data to pass in 3rd level deeplinking
+# Callback data to pass in 3rd level deep-linking
 KEYBOARD_CALLBACKDATA = "keyboard-callback-data"
 
 
@@ -62,7 +62,7 @@ def deep_linked_level_1(update: Update, context: CallbackContext) -> None:
     url = helpers.create_deep_linked_url(bot.username, SO_COOL)
     text = (
         "Awesome, you just accessed hidden functionality! "
-        " Now let's get back to the private chat."
+        "Now let's get back to the private chat."
     )
     keyboard = InlineKeyboardMarkup.from_button(
         InlineKeyboardButton(text="Continue here!", url=url)
@@ -127,7 +127,7 @@ def main() -> None:
         CommandHandler("start", deep_linked_level_3, Filters.regex(USING_ENTITIES), pass_args=True)
     )
 
-    # Possible with inline keyboard buttons aswell
+    # Possible with inline keyboard buttons as well
     dispatcher.add_handler(
         CommandHandler("start", deep_linked_level_4, Filters.regex(USING_KEYBOARD))
     )

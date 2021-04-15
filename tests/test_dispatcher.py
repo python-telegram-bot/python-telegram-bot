@@ -577,7 +577,7 @@ class TestDispatcher:
                 raise Exception
 
             def get_bot_data(self):
-                return dict()
+                return {}
 
             def update_bot_data(self, data):
                 raise Exception

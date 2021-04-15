@@ -79,7 +79,7 @@ class BaseTest:
 
     def make_callback_for(self, pass_keyword):
         def callback(bot, update, **kwargs):
-            self.test_flag = kwargs.get(keyword, None) is not None
+            self.test_flag = kwargs.get(keyword) is not None
 
         keyword = pass_keyword[5:]
         return callback

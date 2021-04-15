@@ -86,6 +86,7 @@ from telegram import (
     Voice,
     WebhookInfo,
     InlineKeyboardMarkup,
+    ChatInviteLink,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import InvalidToken, TelegramError
@@ -277,7 +278,7 @@ class Bot(TelegramObject):
         self,
         endpoint: str,
         data: JSONDict,
-        reply_to_message_id: Union[str, int] = None,
+        reply_to_message_id: int = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: ReplyMarkup = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -311,7 +312,7 @@ class Bot(TelegramObject):
         if result is True:
             return result
 
-        return Message.de_json(result, self)  # type: ignore[arg-type,return-value]
+        return Message.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @property
     def request(self) -> Request:
@@ -420,7 +421,7 @@ class Bot(TelegramObject):
         """
         result = self._post('getMe', timeout=timeout, api_kwargs=api_kwargs)
 
-        self._bot = User.de_json(result, self)  # type: ignore
+        self._bot = User.de_json(result, self)  # type: ignore[return-value, arg-type]
 
         return self._bot  # type: ignore[return-value]
 
@@ -432,7 +433,7 @@ class Bot(TelegramObject):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
@@ -500,7 +501,7 @@ class Bot(TelegramObject):
     def delete_message(
         self,
         chat_id: Union[str, int],
-        message_id: Union[str, int],
+        message_id: int,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
@@ -546,7 +547,7 @@ class Bot(TelegramObject):
         self,
         chat_id: Union[int, str],
         from_chat_id: Union[str, int],
-        message_id: Union[str, int],
+        message_id: int,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
@@ -594,11 +595,11 @@ class Bot(TelegramObject):
     @log
     def send_photo(
         self,
-        chat_id: int,
+        chat_id: Union[int, str],
         photo: Union[FileInput, 'PhotoSize'],
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
         timeout: DVInput[float] = DEFAULT_20,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
@@ -691,7 +692,7 @@ class Bot(TelegramObject):
         title: str = None,
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
         timeout: DVInput[float] = DEFAULT_20,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
@@ -810,7 +811,7 @@ class Bot(TelegramObject):
         filename: str = None,
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
         timeout: DVInput[float] = DEFAULT_20,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
@@ -917,7 +918,7 @@ class Bot(TelegramObject):
         chat_id: Union[int, str],
         sticker: Union[FileInput, 'Sticker'],
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
         timeout: DVInput[float] = DEFAULT_20,
         api_kwargs: JSONDict = None,
@@ -983,7 +984,7 @@ class Bot(TelegramObject):
         duration: int = None,
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
         timeout: DVInput[float] = DEFAULT_20,
         width: int = None,
@@ -1109,7 +1110,7 @@ class Bot(TelegramObject):
         duration: int = None,
         length: int = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
         timeout: DVInput[float] = DEFAULT_20,
         thumb: FileInput = None,
@@ -1212,7 +1213,7 @@ class Bot(TelegramObject):
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
         timeout: DVInput[float] = DEFAULT_20,
         api_kwargs: JSONDict = None,
@@ -1325,7 +1326,7 @@ class Bot(TelegramObject):
         duration: int = None,
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
         timeout: DVInput[float] = DEFAULT_20,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
@@ -1423,7 +1424,7 @@ class Bot(TelegramObject):
             Union['InputMediaAudio', 'InputMediaDocument', 'InputMediaPhoto', 'InputMediaVideo']
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         timeout: DVInput[float] = DEFAULT_20,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1480,7 +1481,7 @@ class Bot(TelegramObject):
         latitude: float = None,
         longitude: float = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         location: Location = None,
@@ -1573,8 +1574,8 @@ class Bot(TelegramObject):
     def edit_message_live_location(
         self,
         chat_id: Union[str, int] = None,
-        message_id: Union[str, int] = None,
-        inline_message_id: Union[str, int] = None,
+        message_id: int = None,
+        inline_message_id: int = None,
         latitude: float = None,
         longitude: float = None,
         location: Location = None,
@@ -1587,7 +1588,7 @@ class Bot(TelegramObject):
     ) -> Union[Message, bool]:
         """Use this method to edit live location messages sent by the bot or via the bot
         (for inline bots). A location can be edited until its :attr:`live_period` expires or
-        editing is explicitly disabled by a call to :attr:`stop_message_live_location`.
+        editing is explicitly disabled by a call to :meth:`stop_message_live_location`.
 
         Note:
             You can either supply a :obj:`latitude` and :obj:`longitude` or a :obj:`location`.
@@ -1662,8 +1663,8 @@ class Bot(TelegramObject):
     def stop_message_live_location(
         self,
         chat_id: Union[str, int] = None,
-        message_id: Union[str, int] = None,
-        inline_message_id: Union[str, int] = None,
+        message_id: int = None,
+        inline_message_id: int = None,
         reply_markup: InlineKeyboardMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
@@ -1718,7 +1719,7 @@ class Bot(TelegramObject):
         address: str = None,
         foursquare_id: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         venue: Venue = None,
@@ -1828,7 +1829,7 @@ class Bot(TelegramObject):
         first_name: str = None,
         last_name: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         contact: Contact = None,
@@ -1912,7 +1913,7 @@ class Bot(TelegramObject):
         chat_id: Union[int, str],
         game_short_name: str,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: InlineKeyboardMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
@@ -2228,7 +2229,7 @@ class Bot(TelegramObject):
 
         result = self._post('getUserProfilePhotos', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        return UserProfilePhotos.de_json(result, self)  # type: ignore
+        return UserProfilePhotos.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @log
     def get_file(
@@ -2242,7 +2243,7 @@ class Bot(TelegramObject):
         """
         Use this method to get basic info about a file and prepare it for downloading. For the
         moment, bots can download files of up to 20MB in size. The file can then be downloaded
-        with :attr:`telegram.File.download`. It is guaranteed that the link will be
+        with :meth:`telegram.File.download`. It is guaranteed that the link will be
         valid for at least 1 hour. When the link expires, a new one can be requested by
         calling get_file again.
 
@@ -2288,7 +2289,7 @@ class Bot(TelegramObject):
                 self.base_file_url, result['file_path']  # type: ignore[index]
             )
 
-        return File.de_json(result, self)  # type: ignore
+        return File.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @log
     def kick_chat_member(
@@ -2298,25 +2299,33 @@ class Bot(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         until_date: Union[int, datetime] = None,
         api_kwargs: JSONDict = None,
+        revoke_messages: bool = None,
     ) -> bool:
         """
-        Use this method to kick a user from a group or a supergroup or a channel. In the case of
+        Use this method to kick a user from a group, supergroup or a channel. In the case of
         supergroups and channels, the user will not be able to return to the group on their own
         using invite links, etc., unless unbanned first. The bot must be an administrator in the
-        group for this to work.
+        chat for this to work and must have the appropriate admin rights.
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or  username
-                of the target channel (in the format @channelusername).
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target group or username
+                of the target supergroup or channel (in the format @channelusername).
             user_id (:obj:`int`): Unique identifier of the target user.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
             until_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the user will
                 be unbanned, unix time. If user is banned for more than 366 days or less than 30
-                seconds from the current time they are considered to be banned forever.
+                seconds from the current time they are considered to be banned forever. Applied
+                for supergroups and channels only.
                 For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
                 bot will be used.
+            revoke_messages (:obj:`bool`, optional): Pass :obj:`True` to delete all messages from
+                the chat for the user that is being removed. If :obj:`False`, the user will be able
+                to see messages in the group that were sent before the user was removed.
+                Always :obj:`True` for supergroups and channels.
+
+                .. versionadded:: 13.4
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
@@ -2335,6 +2344,9 @@ class Bot(TelegramObject):
                     until_date, tzinfo=self.defaults.tzinfo if self.defaults else None
                 )
             data['until_date'] = until_date
+
+        if revoke_messages is not None:
+            data['revoke_messages'] = revoke_messages
 
         result = self._post('kickChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
 
@@ -2452,8 +2464,8 @@ class Bot(TelegramObject):
         self,
         text: str,
         chat_id: Union[str, int] = None,
-        message_id: Union[str, int] = None,
-        inline_message_id: Union[str, int] = None,
+        message_id: int = None,
+        inline_message_id: int = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: InlineKeyboardMarkup = None,
@@ -2523,8 +2535,8 @@ class Bot(TelegramObject):
     def edit_message_caption(
         self,
         chat_id: Union[str, int] = None,
-        message_id: Union[str, int] = None,
-        inline_message_id: Union[str, int] = None,
+        message_id: int = None,
+        inline_message_id: int = None,
         caption: str = None,
         reply_markup: InlineKeyboardMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2598,8 +2610,8 @@ class Bot(TelegramObject):
     def edit_message_media(
         self,
         chat_id: Union[str, int] = None,
-        message_id: Union[str, int] = None,
-        inline_message_id: Union[str, int] = None,
+        message_id: int = None,
+        inline_message_id: int = None,
         media: 'InputMedia' = None,
         reply_markup: InlineKeyboardMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2665,8 +2677,8 @@ class Bot(TelegramObject):
     def edit_message_reply_markup(
         self,
         chat_id: Union[str, int] = None,
-        message_id: Union[str, int] = None,
-        inline_message_id: Union[str, int] = None,
+        message_id: int = None,
+        inline_message_id: int = None,
         reply_markup: Optional['InlineKeyboardMarkup'] = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
@@ -2754,10 +2766,11 @@ class Bot(TelegramObject):
                 updates you want your bot to receive. For example, specify ["message",
                 "edited_channel_post", "callback_query"] to only receive updates of these types.
                 See :class:`telegram.Update` for a complete list of available update types.
-                Specify an empty list to receive all updates regardless of type (default). If not
-                specified, the previous setting will be used. Please note that this parameter
-                doesn't affect updates created before the call to the get_updates, so unwanted
-                updates may be received for a short period of time.
+                Specify an empty list to receive all updates except
+                :attr:`telegram.Update.chat_member` (default). If not specified, the previous
+                setting will be used. Please note that this parameter doesn't affect updates
+                created before the call to the get_updates, so unwanted updates may be received for
+                a short period of time.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
@@ -2846,10 +2859,11 @@ class Bot(TelegramObject):
                 updates you want your bot to receive. For example, specify ["message",
                 "edited_channel_post", "callback_query"] to only receive updates of these types.
                 See :class:`telegram.Update` for a complete list of available update types.
-                Specify an empty list to receive all updates regardless of type (default). If not
-                specified, the previous setting will be used. Please note that this parameter
-                doesn't affect updates created before the call to the set_webhook, so unwanted
-                updates may be received for a short period of time.
+                Specify an empty list to receive all updates except
+                :attr:`telegram.Update.chat_member` (default). If not specified, the previous
+                setting will be used. Please note that this parameter doesn't affect updates
+                created before the call to the set_webhook, so unwanted updates may be received for
+                a short period of time.
             drop_pending_updates (:obj:`bool`, optional): Pass :obj:`True` to drop all pending
                 updates.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -2995,7 +3009,7 @@ class Bot(TelegramObject):
 
         result = self._post('getChat', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        return Chat.de_json(result, self)  # type: ignore
+        return Chat.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @log
     def get_chat_administrators(
@@ -3094,7 +3108,7 @@ class Bot(TelegramObject):
 
         result = self._post('getChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        return ChatMember.de_json(result, self)  # type: ignore
+        return ChatMember.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @log
     def set_chat_sticker_set(
@@ -3107,7 +3121,7 @@ class Bot(TelegramObject):
         """Use this method to set a new group sticker set for a supergroup.
         The bot must be an administrator in the chat for this to work and must have the appropriate
         admin rights. Use the field :attr:`telegram.Chat.can_set_sticker_set` optionally returned
-        in :attr:`get_chat` requests to check if the bot can use this method.
+        in :meth:`get_chat` requests to check if the bot can use this method.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -3139,7 +3153,7 @@ class Bot(TelegramObject):
         """Use this method to delete a group sticker set from a supergroup. The bot must be an
         administrator in the chat for this to work and must have the appropriate admin rights.
         Use the field :attr:`telegram.Chat.can_set_sticker_set` optionally returned in
-        :attr:`get_chat` requests to check if the bot can use this method.
+        :meth:`get_chat` requests to check if the bot can use this method.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -3179,7 +3193,7 @@ class Bot(TelegramObject):
         """
         result = self._post('getWebhookInfo', None, timeout=timeout, api_kwargs=api_kwargs)
 
-        return WebhookInfo.de_json(result, self)  # type: ignore
+        return WebhookInfo.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @log
     def set_game_score(
@@ -3187,8 +3201,8 @@ class Bot(TelegramObject):
         user_id: Union[int, str],
         score: int,
         chat_id: Union[str, int] = None,
-        message_id: Union[str, int] = None,
-        inline_message_id: Union[str, int] = None,
+        message_id: int = None,
+        inline_message_id: int = None,
         force: bool = None,
         disable_edit_message: bool = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3250,8 +3264,8 @@ class Bot(TelegramObject):
         self,
         user_id: Union[int, str],
         chat_id: Union[str, int] = None,
-        message_id: Union[str, int] = None,
-        inline_message_id: Union[str, int] = None,
+        message_id: int = None,
+        inline_message_id: int = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> List[GameHighScore]:
@@ -3314,7 +3328,7 @@ class Bot(TelegramObject):
         need_shipping_address: bool = None,
         is_flexible: bool = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: InlineKeyboardMarkup = None,
         provider_data: Union[str, object] = None,
         send_phone_number_to_provider: bool = None,
@@ -3490,7 +3504,10 @@ class Bot(TelegramObject):
         data: JSONDict = {'shipping_query_id': shipping_query_id, 'ok': ok}
 
         if ok:
-            assert shipping_options
+            if not shipping_options:
+                # not using an assert statement directly here since they are removed in
+                # the optimized bytecode
+                raise AssertionError
             data['shipping_options'] = [option.to_dict() for option in shipping_options]
         if error_message is not None:
             data['error_message'] = error_message
@@ -3574,7 +3591,7 @@ class Bot(TelegramObject):
         :obj:`True` for all boolean parameters to lift restrictions from a user.
 
         Note:
-            Since Bot API 4.4, :attr:`restrict_chat_member` takes the new user permissions in a
+            Since Bot API 4.4, :meth:`restrict_chat_member` takes the new user permissions in a
             single argument of type :class:`telegram.ChatPermissions`. The old way of passing
             parameters will not keep working forever.
 
@@ -3635,6 +3652,8 @@ class Bot(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         is_anonymous: bool = None,
+        can_manage_chat: bool = None,
+        can_manage_voice_chats: bool = None,
     ) -> bool:
         """
         Use this method to promote or demote a user in a supergroup or a channel. The bot must be
@@ -3643,16 +3662,28 @@ class Bot(TelegramObject):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target supergroup (in the format @supergroupusername).
+                of the target channel (in the format @channelusername).
             user_id (:obj:`int`): Unique identifier of the target user.
             is_anonymous (:obj:`bool`, optional): Pass :obj:`True`, if the administrator's presence
                 in the chat is hidden.
+            can_manage_chat (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
+                access the chat event log, chat statistics, message statistics in channels, see
+                channel members, see anonymous administrators in supergroups and ignore slow mode.
+                Implied by any other administrator privilege.
+
+                .. versionadded:: 13.4
+
+            can_manage_voice_chats (:obj:`bool`, optional): Pass :obj:`True`, if the administrator
+                can manage voice chats, supergroups only.
+
+                .. versionadded:: 13.4
+
             can_change_info (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 change chat title, photo and other settings.
             can_post_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 create channel posts, channels only.
             can_edit_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
-                edit messages of other users, channels only.
+                edit messages of other users and can pin messages, channels only.
             can_delete_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 delete messages of other users.
             can_invite_users (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
@@ -3698,6 +3729,10 @@ class Bot(TelegramObject):
             data['can_pin_messages'] = can_pin_messages
         if can_promote_members is not None:
             data['can_promote_members'] = can_promote_members
+        if can_manage_chat is not None:
+            data['can_manage_chat'] = can_manage_chat
+        if can_manage_voice_chats is not None:
+            data['can_manage_voice_chats'] = can_manage_voice_chats
 
         result = self._post('promoteChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
 
@@ -3787,9 +3822,9 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
     ) -> str:
         """
-        Use this method to generate a new invite link for a chat; any previously generated link
-        is revoked. The bot must be an administrator in the chat for this to work and must have
-        the appropriate admin rights.
+        Use this method to generate a new primary invite link for a chat; any previously generated
+        link is revoked. The bot must be an administrator in the chat for this to work and must
+        have the appropriate admin rights.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -3799,6 +3834,13 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+
+        Note:
+            Each administrator in a chat generates their own invite links. Bots can't use invite
+            links generated by other administrators. If you want your bot to work with invite
+            links, it will need to generate its own link using :meth:`export_chat_invite_link` or
+            by calling the :meth:`get_chat` method. If your bot needs to generate a new primary
+            invite link replacing its previous one, use :attr:`export_chat_invite_link` again.
 
         Returns:
             :obj:`str`: New invite link on success.
@@ -3812,6 +3854,155 @@ class Bot(TelegramObject):
         result = self._post('exportChatInviteLink', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
+
+    @log
+    def create_chat_invite_link(
+        self,
+        chat_id: Union[str, int],
+        expire_date: Union[int, datetime] = None,
+        member_limit: int = None,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> ChatInviteLink:
+        """
+        Use this method to create an additional invite link for a chat. The bot must be an
+        administrator in the chat for this to work and must have the appropriate admin rights.
+        The link can be revoked using the method :meth:`revoke_chat_invite_link`.
+
+        .. versionadded:: 13.4
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            expire_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the link will
+                expire.
+                For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
+                bot will be used.
+            member_limit (:obj:`int`, optional): Maximum number of users that can be members of
+                the chat simultaneously after joining the chat via this invite link; 1-99999.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :class:`telegram.ChatInviteLink`
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {
+            'chat_id': chat_id,
+        }
+
+        if expire_date is not None:
+            if isinstance(expire_date, datetime):
+                expire_date = to_timestamp(
+                    expire_date, tzinfo=self.defaults.tzinfo if self.defaults else None
+                )
+            data['expire_date'] = expire_date
+
+        if member_limit is not None:
+            data['member_limit'] = member_limit
+
+        result = self._post('createChatInviteLink', data, timeout=timeout, api_kwargs=api_kwargs)
+
+        return ChatInviteLink.de_json(result, self)  # type: ignore[return-value, arg-type]
+
+    @log
+    def edit_chat_invite_link(
+        self,
+        chat_id: Union[str, int],
+        invite_link: str,
+        expire_date: Union[int, datetime] = None,
+        member_limit: int = None,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> ChatInviteLink:
+        """
+        Use this method to edit a non-primary invite link created by the bot. The bot must be an
+        administrator in the chat for this to work and must have the appropriate admin rights.
+
+        .. versionadded:: 13.4
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            invite_link (:obj:`str`): The invite link to edit.
+            expire_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the link will
+                expire.
+                For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
+                bot will be used.
+            member_limit (:obj:`int`, optional): Maximum number of users that can be members of
+                the chat simultaneously after joining the chat via this invite link; 1-99999.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :class:`telegram.ChatInviteLink`
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {'chat_id': chat_id, 'invite_link': invite_link}
+
+        if expire_date is not None:
+            if isinstance(expire_date, datetime):
+                expire_date = to_timestamp(
+                    expire_date, tzinfo=self.defaults.tzinfo if self.defaults else None
+                )
+            data['expire_date'] = expire_date
+
+        if member_limit is not None:
+            data['member_limit'] = member_limit
+
+        result = self._post('editChatInviteLink', data, timeout=timeout, api_kwargs=api_kwargs)
+
+        return ChatInviteLink.de_json(result, self)  # type: ignore[return-value, arg-type]
+
+    @log
+    def revoke_chat_invite_link(
+        self,
+        chat_id: Union[str, int],
+        invite_link: str,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> ChatInviteLink:
+        """
+        Use this method to revoke an invite link created by the bot. If the primary link is
+        revoked, a new link is automatically generated. The bot must be an administrator in the
+        chat for this to work and must have the appropriate admin rights.
+
+        .. versionadded:: 13.4
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            invite_link (:obj:`str`): The invite link to edit.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :class:`telegram.ChatInviteLink`
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {'chat_id': chat_id, 'invite_link': invite_link}
+
+        result = self._post('revokeChatInviteLink', data, timeout=timeout, api_kwargs=api_kwargs)
+
+        return ChatInviteLink.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @log
     def set_chat_photo(
@@ -3962,7 +4153,7 @@ class Bot(TelegramObject):
     def pin_chat_message(
         self,
         chat_id: Union[str, int],
-        message_id: Union[str, int],
+        message_id: int,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
@@ -4009,7 +4200,7 @@ class Bot(TelegramObject):
         chat_id: Union[str, int],
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        message_id: Union[str, int] = None,
+        message_id: int = None,
     ) -> bool:
         """
         Use this method to remove a message from the list of pinned messages in a chat. If the
@@ -4108,7 +4299,7 @@ class Bot(TelegramObject):
 
         result = self._post('getStickerSet', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        return StickerSet.de_json(result, self)  # type: ignore
+        return StickerSet.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @log
     def upload_sticker_file(
@@ -4120,7 +4311,7 @@ class Bot(TelegramObject):
     ) -> File:
         """
         Use this method to upload a .png file with a sticker for later use in
-        :attr:`create_new_sticker_set` and :attr:`add_sticker_to_set` methods (can be used multiple
+        :meth:`create_new_sticker_set` and :meth:`add_sticker_to_set` methods (can be used multiple
         times).
 
         Note:
@@ -4153,7 +4344,7 @@ class Bot(TelegramObject):
 
         result = self._post('uploadStickerFile', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        return File.de_json(result, self)  # type: ignore
+        return File.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @log
     def create_new_sticker_set(
@@ -4493,7 +4684,7 @@ class Bot(TelegramObject):
         correct_option_id: int = None,
         is_closed: bool = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         explanation: str = None,
@@ -4606,7 +4797,7 @@ class Bot(TelegramObject):
     def stop_poll(
         self,
         chat_id: Union[int, str],
-        message_id: Union[int, str],
+        message_id: int,
         reply_markup: InlineKeyboardMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
@@ -4646,14 +4837,14 @@ class Bot(TelegramObject):
 
         result = self._post('stopPoll', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        return Poll.de_json(result, self)  # type: ignore
+        return Poll.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @log
     def send_dice(
         self,
         chat_id: Union[int, str],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         emoji: str = None,
@@ -4661,15 +4852,18 @@ class Bot(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
     ) -> Message:
         """
-        Use this method to send an animated emoji, which will have a random value. On success, the
-        sent Message is returned.
+        Use this method to send an animated emoji that will display a random value.
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target private chat.
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
             emoji (:obj:`str`, optional): Emoji on which the dice throw animation is based.
-                Currently, must be one of “🎲”, “🎯”, “🏀”, “⚽”, or “🎰”. Dice can have values 1-6
-                for “🎲” and “🎯”, values 1-5 for “🏀” and “⚽”, and values 1-64 for “🎰”. Defaults
-                to “🎲”.
+                Currently, must be one of “🎲”, “🎯”, “🏀”, “⚽”, "🎳", or “🎰”. Dice can have
+                values 1-6 for “🎲”, “🎯” and "🎳", values 1-5 for “🏀” and “⚽”, and values 1-64
+                for “🎰”. Defaults to “🎲”.
+
+                .. versionchanged:: 13.4
+                   Added the "🎳" emoji.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
@@ -4826,12 +5020,12 @@ class Bot(TelegramObject):
         self,
         chat_id: Union[int, str],
         from_chat_id: Union[str, int],
-        message_id: Union[str, int],
+        message_id: int,
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[Tuple['MessageEntity', ...], List['MessageEntity']] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
         reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4899,7 +5093,7 @@ class Bot(TelegramObject):
                 data['reply_markup'] = reply_markup
 
         result = self._post('copyMessage', data, timeout=timeout, api_kwargs=api_kwargs)
-        return MessageId.de_json(result, self)  # type: ignore
+        return MessageId.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     def to_dict(self) -> JSONDict:
         data: JSONDict = {'id': self.id, 'username': self.username, 'first_name': self.first_name}
@@ -4917,148 +5111,154 @@ class Bot(TelegramObject):
 
     # camelCase aliases
     getMe = get_me
-    """Alias for :attr:`get_me`"""
+    """Alias for :meth:`get_me`"""
     sendMessage = send_message
-    """Alias for :attr:`send_message`"""
+    """Alias for :meth:`send_message`"""
     deleteMessage = delete_message
-    """Alias for :attr:`delete_message`"""
+    """Alias for :meth:`delete_message`"""
     forwardMessage = forward_message
-    """Alias for :attr:`forward_message`"""
+    """Alias for :meth:`forward_message`"""
     sendPhoto = send_photo
-    """Alias for :attr:`send_photo`"""
+    """Alias for :meth:`send_photo`"""
     sendAudio = send_audio
-    """Alias for :attr:`send_audio`"""
+    """Alias for :meth:`send_audio`"""
     sendDocument = send_document
-    """Alias for :attr:`send_document`"""
+    """Alias for :meth:`send_document`"""
     sendSticker = send_sticker
-    """Alias for :attr:`send_sticker`"""
+    """Alias for :meth:`send_sticker`"""
     sendVideo = send_video
-    """Alias for :attr:`send_video`"""
+    """Alias for :meth:`send_video`"""
     sendAnimation = send_animation
-    """Alias for :attr:`send_animation`"""
+    """Alias for :meth:`send_animation`"""
     sendVoice = send_voice
-    """Alias for :attr:`send_voice`"""
+    """Alias for :meth:`send_voice`"""
     sendVideoNote = send_video_note
-    """Alias for :attr:`send_video_note`"""
+    """Alias for :meth:`send_video_note`"""
     sendMediaGroup = send_media_group
-    """Alias for :attr:`send_media_group`"""
+    """Alias for :meth:`send_media_group`"""
     sendLocation = send_location
-    """Alias for :attr:`send_location`"""
+    """Alias for :meth:`send_location`"""
     editMessageLiveLocation = edit_message_live_location
-    """Alias for :attr:`edit_message_live_location`"""
+    """Alias for :meth:`edit_message_live_location`"""
     stopMessageLiveLocation = stop_message_live_location
-    """Alias for :attr:`stop_message_live_location`"""
+    """Alias for :meth:`stop_message_live_location`"""
     sendVenue = send_venue
-    """Alias for :attr:`send_venue`"""
+    """Alias for :meth:`send_venue`"""
     sendContact = send_contact
-    """Alias for :attr:`send_contact`"""
+    """Alias for :meth:`send_contact`"""
     sendGame = send_game
-    """Alias for :attr:`send_game`"""
+    """Alias for :meth:`send_game`"""
     sendChatAction = send_chat_action
-    """Alias for :attr:`send_chat_action`"""
+    """Alias for :meth:`send_chat_action`"""
     answerInlineQuery = answer_inline_query
-    """Alias for :attr:`answer_inline_query`"""
+    """Alias for :meth:`answer_inline_query`"""
     getUserProfilePhotos = get_user_profile_photos
-    """Alias for :attr:`get_user_profile_photos`"""
+    """Alias for :meth:`get_user_profile_photos`"""
     getFile = get_file
-    """Alias for :attr:`get_file`"""
+    """Alias for :meth:`get_file`"""
     kickChatMember = kick_chat_member
-    """Alias for :attr:`kick_chat_member`"""
+    """Alias for :meth:`kick_chat_member`"""
     unbanChatMember = unban_chat_member
-    """Alias for :attr:`unban_chat_member`"""
+    """Alias for :meth:`unban_chat_member`"""
     answerCallbackQuery = answer_callback_query
-    """Alias for :attr:`answer_callback_query`"""
+    """Alias for :meth:`answer_callback_query`"""
     editMessageText = edit_message_text
-    """Alias for :attr:`edit_message_text`"""
+    """Alias for :meth:`edit_message_text`"""
     editMessageCaption = edit_message_caption
-    """Alias for :attr:`edit_message_caption`"""
+    """Alias for :meth:`edit_message_caption`"""
     editMessageMedia = edit_message_media
-    """Alias for :attr:`edit_message_media`"""
+    """Alias for :meth:`edit_message_media`"""
     editMessageReplyMarkup = edit_message_reply_markup
-    """Alias for :attr:`edit_message_reply_markup`"""
+    """Alias for :meth:`edit_message_reply_markup`"""
     getUpdates = get_updates
-    """Alias for :attr:`get_updates`"""
+    """Alias for :meth:`get_updates`"""
     setWebhook = set_webhook
-    """Alias for :attr:`set_webhook`"""
+    """Alias for :meth:`set_webhook`"""
     deleteWebhook = delete_webhook
-    """Alias for :attr:`delete_webhook`"""
+    """Alias for :meth:`delete_webhook`"""
     leaveChat = leave_chat
-    """Alias for :attr:`leave_chat`"""
+    """Alias for :meth:`leave_chat`"""
     getChat = get_chat
-    """Alias for :attr:`get_chat`"""
+    """Alias for :meth:`get_chat`"""
     getChatAdministrators = get_chat_administrators
-    """Alias for :attr:`get_chat_administrators`"""
+    """Alias for :meth:`get_chat_administrators`"""
     getChatMember = get_chat_member
-    """Alias for :attr:`get_chat_member`"""
+    """Alias for :meth:`get_chat_member`"""
     setChatStickerSet = set_chat_sticker_set
-    """Alias for :attr:`set_chat_sticker_set`"""
+    """Alias for :meth:`set_chat_sticker_set`"""
     deleteChatStickerSet = delete_chat_sticker_set
-    """Alias for :attr:`delete_chat_sticker_set`"""
+    """Alias for :meth:`delete_chat_sticker_set`"""
     getChatMembersCount = get_chat_members_count
-    """Alias for :attr:`get_chat_members_count`"""
+    """Alias for :meth:`get_chat_members_count`"""
     getWebhookInfo = get_webhook_info
-    """Alias for :attr:`get_webhook_info`"""
+    """Alias for :meth:`get_webhook_info`"""
     setGameScore = set_game_score
-    """Alias for :attr:`set_game_score`"""
+    """Alias for :meth:`set_game_score`"""
     getGameHighScores = get_game_high_scores
-    """Alias for :attr:`get_game_high_scores`"""
+    """Alias for :meth:`get_game_high_scores`"""
     sendInvoice = send_invoice
-    """Alias for :attr:`send_invoice`"""
+    """Alias for :meth:`send_invoice`"""
     answerShippingQuery = answer_shipping_query
-    """Alias for :attr:`answer_shipping_query`"""
+    """Alias for :meth:`answer_shipping_query`"""
     answerPreCheckoutQuery = answer_pre_checkout_query
-    """Alias for :attr:`answer_pre_checkout_query`"""
+    """Alias for :meth:`answer_pre_checkout_query`"""
     restrictChatMember = restrict_chat_member
-    """Alias for :attr:`restrict_chat_member`"""
+    """Alias for :meth:`restrict_chat_member`"""
     promoteChatMember = promote_chat_member
-    """Alias for :attr:`promote_chat_member`"""
+    """Alias for :meth:`promote_chat_member`"""
     setChatPermissions = set_chat_permissions
-    """Alias for :attr:`set_chat_permissions`"""
+    """Alias for :meth:`set_chat_permissions`"""
     setChatAdministratorCustomTitle = set_chat_administrator_custom_title
-    """Alias for :attr:`set_chat_administrator_custom_title`"""
+    """Alias for :meth:`set_chat_administrator_custom_title`"""
     exportChatInviteLink = export_chat_invite_link
-    """Alias for :attr:`export_chat_invite_link`"""
+    """Alias for :meth:`export_chat_invite_link`"""
+    createChatInviteLink = create_chat_invite_link
+    """Alias for :attr:`create_chat_invite_link`"""
+    editChatInviteLink = edit_chat_invite_link
+    """Alias for :attr:`edit_chat_invite_link`"""
+    revokeChatInviteLink = revoke_chat_invite_link
+    """Alias for :attr:`revoke_chat_invite_link`"""
     setChatPhoto = set_chat_photo
-    """Alias for :attr:`set_chat_photo`"""
+    """Alias for :meth:`set_chat_photo`"""
     deleteChatPhoto = delete_chat_photo
-    """Alias for :attr:`delete_chat_photo`"""
+    """Alias for :meth:`delete_chat_photo`"""
     setChatTitle = set_chat_title
-    """Alias for :attr:`set_chat_title`"""
+    """Alias for :meth:`set_chat_title`"""
     setChatDescription = set_chat_description
-    """Alias for :attr:`set_chat_description`"""
+    """Alias for :meth:`set_chat_description`"""
     pinChatMessage = pin_chat_message
-    """Alias for :attr:`pin_chat_message`"""
+    """Alias for :meth:`pin_chat_message`"""
     unpinChatMessage = unpin_chat_message
-    """Alias for :attr:`unpin_chat_message`"""
+    """Alias for :meth:`unpin_chat_message`"""
     unpinAllChatMessages = unpin_all_chat_messages
-    """Alias for :attr:`unpin_all_chat_messages`"""
+    """Alias for :meth:`unpin_all_chat_messages`"""
     getStickerSet = get_sticker_set
-    """Alias for :attr:`get_sticker_set`"""
+    """Alias for :meth:`get_sticker_set`"""
     uploadStickerFile = upload_sticker_file
-    """Alias for :attr:`upload_sticker_file`"""
+    """Alias for :meth:`upload_sticker_file`"""
     createNewStickerSet = create_new_sticker_set
-    """Alias for :attr:`create_new_sticker_set`"""
+    """Alias for :meth:`create_new_sticker_set`"""
     addStickerToSet = add_sticker_to_set
-    """Alias for :attr:`add_sticker_to_set`"""
+    """Alias for :meth:`add_sticker_to_set`"""
     setStickerPositionInSet = set_sticker_position_in_set
-    """Alias for :attr:`set_sticker_position_in_set`"""
+    """Alias for :meth:`set_sticker_position_in_set`"""
     deleteStickerFromSet = delete_sticker_from_set
-    """Alias for :attr:`delete_sticker_from_set`"""
+    """Alias for :meth:`delete_sticker_from_set`"""
     setStickerSetThumb = set_sticker_set_thumb
-    """Alias for :attr:`set_sticker_set_thumb`"""
+    """Alias for :meth:`set_sticker_set_thumb`"""
     setPassportDataErrors = set_passport_data_errors
-    """Alias for :attr:`set_passport_data_errors`"""
+    """Alias for :meth:`set_passport_data_errors`"""
     sendPoll = send_poll
-    """Alias for :attr:`send_poll`"""
+    """Alias for :meth:`send_poll`"""
     stopPoll = stop_poll
-    """Alias for :attr:`stop_poll`"""
+    """Alias for :meth:`stop_poll`"""
     sendDice = send_dice
-    """Alias for :attr:`send_dice`"""
+    """Alias for :meth:`send_dice`"""
     getMyCommands = get_my_commands
-    """Alias for :attr:`get_my_commands`"""
+    """Alias for :meth:`get_my_commands`"""
     setMyCommands = set_my_commands
-    """Alias for :attr:`set_my_commands`"""
+    """Alias for :meth:`set_my_commands`"""
     logOut = log_out
-    """Alias for :attr:`log_out`"""
+    """Alias for :meth:`log_out`"""
     copyMessage = copy_message
-    """Alias for :attr:`copy_message`"""
+    """Alias for :meth:`copy_message`"""
