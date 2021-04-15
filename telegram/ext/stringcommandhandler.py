@@ -32,6 +32,9 @@ RT = TypeVar('RT')
 
 class StringCommandHandler(Handler[str]):
     """Handler class to handle string commands. Commands are string updates that start with ``/``.
+    The handler will add a ``list`` to the
+    :class:`CallbackContext` named :attr:`CallbackContext.args`. It will contain a list of strings,
+    which is the text following the command split on single whitespace characters.
 
     Note:
         This handler is not used to handle Telegram :attr:`telegram.Update`, but strings manually
@@ -122,6 +125,9 @@ class StringCommandHandler(Handler[str]):
         update: str = None,
         check_result: Optional[List[str]] = None,
     ) -> Dict[str, object]:
+        """Provide text after the command to the callback the ``args`` argument as list, split on
+        single whitespaces.
+        """
         optional_args = super().collect_optional_args(dispatcher, update, check_result)
         if self.pass_args:
             optional_args['args'] = check_result
@@ -134,4 +140,7 @@ class StringCommandHandler(Handler[str]):
         dispatcher: 'Dispatcher',
         check_result: Optional[List[str]],
     ) -> None:
+        """Add text after the command to :attr:`CallbackContext.args` as list, split on single
+        whitespaces.
+        """
         context.args = check_result

@@ -221,6 +221,9 @@ class CommandHandler(Handler[Update]):
         update: Update = None,
         check_result: Optional[Union[bool, Tuple[List[str], Optional[bool]]]] = None,
     ) -> Dict[str, object]:
+        """Provide text after the command to the callback the ``args`` argument as list, split on
+        single whitespaces.
+        """
         optional_args = super().collect_optional_args(dispatcher, update)
         if self.pass_args and isinstance(check_result, tuple):
             optional_args['args'] = check_result[0]
@@ -233,6 +236,9 @@ class CommandHandler(Handler[Update]):
         dispatcher: 'Dispatcher',
         check_result: Optional[Union[bool, Tuple[List[str], Optional[bool]]]],
     ) -> None:
+        """Add text after the command to :attr:`CallbackContext.args` as list, split on single
+        whitespaces and add output of data filters to :attr:`CallbackContext` as well.
+        """
         if isinstance(check_result, tuple):
             context.args = check_result[0]
             if isinstance(check_result[1], dict):
@@ -438,15 +444,3 @@ class PrefixHandler(CommandHandler):
                     return text_list[1:], filter_result
                 return False
         return None
-
-    def collect_additional_context(
-        self,
-        context: 'CallbackContext',
-        update: Update,
-        dispatcher: 'Dispatcher',
-        check_result: Optional[Union[bool, Tuple[List[str], Optional[bool]]]],
-    ) -> None:
-        if isinstance(check_result, tuple):
-            context.args = check_result[0]
-            if isinstance(check_result[1], dict):
-                context.update(check_result[1])
