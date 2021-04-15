@@ -248,6 +248,7 @@ class MessageQueue:
         self._group_delayq.start()
 
     def stop(self, timeout: float = None) -> None:
+        """Stops the ``MessageQueue``."""
         self._group_delayq.stop(timeout=timeout)
         self._all_delayq.stop(timeout=timeout)
 

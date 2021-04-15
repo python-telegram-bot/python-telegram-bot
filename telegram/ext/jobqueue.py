@@ -494,7 +494,10 @@ class JobQueue:
 
     def jobs(self) -> Tuple['Job', ...]:
         """Returns a tuple of all *scheduled* jobs that are currently in the ``JobQueue``."""
-        return tuple(Job.from_aps_job(job, self) for job in self.scheduler.get_jobs())
+        return tuple(
+            Job._from_aps_job(job, self)  # pylint: disable=W0212
+            for job in self.scheduler.get_jobs()
+        )
 
     def get_jobs_by_name(self, name: str) -> Tuple['Job', ...]:
         """Returns a tuple of all *pending/scheduled* jobs with the given name that are currently
@@ -612,7 +615,7 @@ class Job:
         return self.job.next_run_time
 
     @classmethod
-    def from_aps_job(cls, job: APSJob, job_queue: JobQueue) -> 'Job':
+    def _from_aps_job(cls, job: APSJob, job_queue: JobQueue) -> 'Job':
         # context based callbacks
         if len(job.args) == 1:
             context = job.args[0].job.context
