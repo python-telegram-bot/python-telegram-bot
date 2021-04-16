@@ -1895,6 +1895,8 @@ officedocument.wordprocessingml.document")``.
                 is specified in :attr:`chat_ids` and :attr:`usernames`.
         """
 
+        __slots__ = ()
+
         def get_chat_or_user(self, message: Message) -> Union[User, Chat, None]:
             return message.forward_from or message.forward_from_chat
 
