@@ -444,7 +444,7 @@ class TestBot:
         assert new_message.poll.is_closed
 
     @flaky(5, 1)
-    @pytest.mark.timeout(10)
+    @pytest.mark.timeout(20)
     def test_send_close_date_default_tz(self, tz_bot, super_group_id):
         question = 'Is this a test?'
         answers = ['Yes', 'No', 'Maybe']
@@ -1467,6 +1467,9 @@ class TestBot:
 
         with pytest.raises(TelegramError, match='should not be empty and there should not be'):
             bot.answer_shipping_query(1, True)
+
+        with pytest.raises(AssertionError):
+            bot.answer_shipping_query(1, True, shipping_options=[])
 
     # TODO: Needs improvement. Need incoming pre checkout queries to test
     def test_answer_pre_checkout_query_ok(self, monkeypatch, bot):

@@ -85,7 +85,7 @@ class TelegramObject:
         return json.dumps(self.to_dict())
 
     def to_dict(self) -> JSONDict:
-        data = dict()
+        data = {}
 
         # We want to get all attributes for the class, using self.__slots__ only includes the
         # attributes used by that class itself, and not its superclass(es). Hence we get its MRO

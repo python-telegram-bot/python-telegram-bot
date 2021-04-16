@@ -264,9 +264,9 @@ class ConversationHandler(Handler[Update]):
         Set by dispatcher"""
         self._map_to_parent = map_to_parent
 
-        self.timeout_jobs: Dict[Tuple[int, ...], 'Job'] = dict()
+        self.timeout_jobs: Dict[Tuple[int, ...], 'Job'] = {}
         self._timeout_jobs_lock = Lock()
-        self._conversations: ConversationDict = dict()
+        self._conversations: ConversationDict = {}
         self._conversations_lock = Lock()
 
         self.logger = logging.getLogger(__name__)
@@ -280,7 +280,7 @@ class ConversationHandler(Handler[Update]):
                 "since message IDs are not globally unique."
             )
 
-        all_handlers: List[Handler] = list()
+        all_handlers: List[Handler] = []
         all_handlers.extend(entry_points)
         all_handlers.extend(fallbacks)
 
@@ -430,7 +430,7 @@ class ConversationHandler(Handler[Update]):
         chat = update.effective_chat
         user = update.effective_user
 
-        key = list()
+        key = []
 
         if self.per_chat:
             key.append(chat.id)  # type: ignore[union-attr]
@@ -615,6 +615,11 @@ class ConversationHandler(Handler[Update]):
                     )
 
         elif new_state is not None:
+            if new_state not in self.states:
+                warnings.warn(
+                    f"Handler returned state {new_state} which is unknown to the "
+                    f"ConversationHandler{' ' + self.name if self.name is not None else ''}."
+                )
             with self._conversations_lock:
                 self.conversations[key] = new_state
                 if self.persistent and self.persistence and self.name:

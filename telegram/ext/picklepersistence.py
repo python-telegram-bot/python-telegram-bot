@@ -116,7 +116,7 @@ class PicklePersistence(BasePersistence):
                 self.bot_data = data.get('bot_data', {})
                 self.conversations = data['conversations']
         except OSError:
-            self.conversations = dict()
+            self.conversations = {}
             self.user_data = defaultdict(dict)
             self.chat_data = defaultdict(dict)
             self.bot_data = {}
@@ -243,7 +243,7 @@ class PicklePersistence(BasePersistence):
             new_state (:obj:`tuple` | :obj:`any`): The new state for the given key.
         """
         if not self.conversations:
-            self.conversations = dict()
+            self.conversations = {}
         if self.conversations.setdefault(name, {}).get(key) == new_state:
             return
         self.conversations[name][key] = new_state
