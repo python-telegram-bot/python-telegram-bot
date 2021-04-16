@@ -64,7 +64,7 @@ def set_timer(update: Update, context: CallbackContext) -> None:
             return
 
         job_removed = remove_job_if_exists(str(chat_id), context)
-        context.job_queue.run_once(alarm, due, context=chat_id, name=str(chat_id))
+        context.job_queue.run_repeating(alarm, due, context=chat_id, name=str(chat_id))
 
         text = 'Timer successfully set!'
         if job_removed:
@@ -79,7 +79,10 @@ def unset(update: Update, context: CallbackContext) -> None:
     """Remove the job if the user changed their mind."""
     chat_id = update.message.chat_id
     job_removed = remove_job_if_exists(str(chat_id), context)
-    text = 'Timer successfully cancelled!' if job_removed else 'You have no active timer.'
+    if job_removed:
+        text = 'Timer successfully cancelled!'
+    else
+        'You have no active timer.'
     update.message.reply_text(text)
 
 
