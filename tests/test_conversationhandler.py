@@ -441,6 +441,7 @@ class TestConversationHandler:
                 2: [TypeHandler(Update, lambda u, c: -1)],
             },
             fallbacks=self.fallbacks,
+            name="xyz",
         )
         dp.add_handler(handler)
         message = Message(
@@ -460,7 +461,7 @@ class TestConversationHandler:
         sleep(0.5)
         assert len(recwarn) == 1
         assert str(recwarn[0].message) == (
-            "Handler returned state which is unknown to the ConversationHandler."
+            "Handler returned state 69 which is unknown to the ConversationHandler xyz."
         )
 
     def test_conversation_handler_per_chat(self, dp, bot, user1, user2):
