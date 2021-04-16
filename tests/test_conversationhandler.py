@@ -433,6 +433,37 @@ class TestConversationHandler:
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.THIRSTY
 
+    def test_unknown_state_warning(self, dp, bot, user1, recwarn):
+        handler = ConversationHandler(
+            entry_points=[CommandHandler("start", lambda u, c: 1)],
+            states={
+                1: [TypeHandler(Update, lambda u, c: 69)],
+                2: [TypeHandler(Update, lambda u, c: -1)],
+            },
+            fallbacks=self.fallbacks,
+            name="xyz",
+        )
+        dp.add_handler(handler)
+        message = Message(
+            0,
+            None,
+            self.group,
+            from_user=user1,
+            text='/start',
+            entities=[
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+            ],
+            bot=bot,
+        )
+        dp.process_update(Update(update_id=0, message=message))
+        sleep(0.5)
+        dp.process_update(Update(update_id=1, message=message))
+        sleep(0.5)
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message) == (
+            "Handler returned state 69 which is unknown to the ConversationHandler xyz."
+        )
+
     def test_conversation_handler_per_chat(self, dp, bot, user1, user2):
         handler = ConversationHandler(
             entry_points=self.entry_points,

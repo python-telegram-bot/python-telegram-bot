@@ -97,6 +97,14 @@ class TestDispatcher:
         ):
             self.received = context.error.message
 
+    def test_less_than_one_worker_warning(self, dp, recwarn):
+        Dispatcher(dp.bot, dp.update_queue, job_queue=dp.job_queue, workers=0, use_context=True)
+        assert len(recwarn) == 1
+        assert (
+            str(recwarn[0].message)
+            == 'Asynchronous callbacks can not be processed without at least one worker thread.'
+        )
+
     def test_one_context_per_update(self, cdp):
         def one(update, context):
             if update.message.text == 'test':

@@ -592,6 +592,11 @@ class ConversationHandler(Handler[Update]):
                     )
 
         elif new_state is not None:
+            if new_state not in self.states:
+                warnings.warn(
+                    f"Handler returned state {new_state} which is unknown to the "
+                    f"ConversationHandler{' ' + self.name if self.name is not None else ''}."
+                )
             with self._conversations_lock:
                 self.conversations[key] = new_state
                 if self.persistent and self.persistence and self.name:
