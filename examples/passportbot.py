@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 def msg(update: Update, _: CallbackContext) -> None:
+    """Downloads and prints the received passport data."""
     # Retrieve passport data
     passport_data = update.message.passport_data
     # If our nonce doesn't match what we think, this Update did not originate from us

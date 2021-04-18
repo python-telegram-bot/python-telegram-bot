@@ -150,6 +150,28 @@ class CallbackContext:
         async_args: Union[List, Tuple] = None,
         async_kwargs: Dict[str, object] = None,
     ) -> 'CallbackContext':
+        """
+        Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the error
+        handlers.
+
+        .. seealso:: :meth:`telegram.ext.Dispatcher.add_error_handler`
+
+        Args:
+            update (:obj:`any` | :class:`telegram.Update`): The update associated with the error.
+                May be :obj:`None`, e.g. for errors in job callbacks.
+            error (:obj:`Exception`): The error.
+            dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher associated with this
+                context.
+            async_args (List[:obj:`object`]): Optional. Positional arguments of the function that
+                raised the error. Pass only when the raising function was run asynchronously using
+                :meth:`telegram.ext.Dispatcher.run_async`.
+            async_kwargs (Dict[:obj:`str`, :obj:`object`]): Optional. Keyword arguments of the
+                function that raised the error. Pass only when the raising function was run
+                asynchronously using :meth:`telegram.ext.Dispatcher.run_async`.
+
+        Returns:
+            :class:`telegram.ext.CallbackContext`
+        """
         self = cls.from_update(update, dispatcher)
         self.error = error
         self.async_args = async_args
@@ -158,6 +180,20 @@ class CallbackContext:
 
     @classmethod
     def from_update(cls, update: object, dispatcher: 'Dispatcher') -> 'CallbackContext':
+        """
+        Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the
+        handlers.
+
+        .. seealso:: :meth:`telegram.ext.Dispatcher.add_handler`
+
+        Args:
+            update (:obj:`any` | :class:`telegram.Update`): The update.
+            dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher associated with this
+                context.
+
+        Returns:
+            :class:`telegram.ext.CallbackContext`
+        """
         self = cls(dispatcher)
 
         if update is not None and isinstance(update, Update):
@@ -172,6 +208,20 @@ class CallbackContext:
 
     @classmethod
     def from_job(cls, job: 'Job', dispatcher: 'Dispatcher') -> 'CallbackContext':
+        """
+        Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to a
+        job callback.
+
+        .. seealso:: :meth:`telegram.ext.JobQueue`
+
+        Args:
+            job (:class:`telegram.ext.Job`): The job.
+            dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher associated with this
+                context.
+
+        Returns:
+            :class:`telegram.ext.CallbackContext`
+        """
         self = cls(dispatcher)
         self.job = job
         return self

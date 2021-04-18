@@ -116,7 +116,7 @@ if TYPE_CHECKING:
 RT = TypeVar('RT')
 
 
-def log(
+def log(  # skipcq: PY-D0003
     func: Callable[..., RT], *args: object, **kwargs: object  # pylint: disable=W0613
 ) -> Callable[..., RT]:
     logger = logging.getLogger(func.__module__)
