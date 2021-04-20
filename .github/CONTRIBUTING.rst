@@ -73,7 +73,7 @@ Here's how to make a one-off code change.
 
    - Provide static typing with signature annotations. The documentation of `MyPy`_ will be a good start, the cheat sheet is `here`_. We also have some custom type aliases in ``telegram.utils.helpers.typing``.
 
-   - Document your code. This step is pretty important to us, so it has its own section below: _`Documenting`.
+   - Document your code. This step is pretty important to us, so it has its own `section`_.
 
    - For consistency, please conform to `Google Python Style Guide`_ and `Google Python Style Docstrings`_.
 
@@ -278,3 +278,4 @@ break the API classes. For example:
 .. _`RTD`: https://python-telegram-bot.readthedocs.io/
 .. _`RTD build`: https://python-telegram-bot.readthedocs.io/en/doc-fixes
 .. _`CSI`: https://standards.mousepawmedia.com/csi.html
+.. _`section`: documenting
