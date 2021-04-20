@@ -73,7 +73,7 @@ Here's how to make a one-off code change.
 
    - Provide static typing with signature annotations. The documentation of `MyPy`_ will be a good start, the cheat sheet is `here`_. We also have some custom type aliases in ``telegram.utils.helpers.typing``.
 
-   - Document your code. This step is pretty important to us, so it has its own section below. :ref:`Documenting`
+   - Document your code. This step is pretty important to us, so it has its own section below: _`Documenting`.
 
    - For consistency, please conform to `Google Python Style Guide`_ and `Google Python Style Docstrings`_.
 
@@ -167,7 +167,7 @@ Here's how to make a one-off code change.
 7. **Celebrate.** Congratulations, you have contributed to ``python-telegram-bot``!
 
 Documenting
------------
+===========
 
 The documentation of this project is separated in two sections: User facing and dev facing.
 
@@ -178,31 +178,31 @@ Dev facing, on the other side, is for the devs/maintainers of this project. This
 doc strings don't have a separate documentation site they generate, instead, they document the actual code.
 
 User facing documentation
-=========================
+-------------------------
 We use `sphinx`_ to generate static HTML docs. To build them, first make sure you have the required dependencies:
 
- .. code-block:: bash
+.. code-block:: bash
 
-    $ pip install -r docs/requirements-docs.txt
+$ pip install -r docs/requirements-docs.txt
 
- then run the following from the PTB root directory:
+then run the following from the PTB root directory:
 
- .. code-block:: bash
+.. code-block:: bash
 
-    $ make -C docs html
+$ make -C docs html
 
- or, if you don't have ``make`` available (e.g. on Windows):
+or, if you don't have ``make`` available (e.g. on Windows):
 
- .. code-block:: bash
+.. code-block:: bash
 
-    $ sphinx-build docs/source docs/build/html
+$ sphinx-build docs/source docs/build/html
 
- Once the process terminates, you can view the built documentation by opening ``docs/build/html/index.html`` with a browser.
+Once the process terminates, you can view the built documentation by opening ``docs/build/html/index.html`` with a browser.
 
 - Add ``.. versionadded:: version``, ``.. versionchanged:: version`` or ``.. deprecated:: version`` to the associated documentation of your changes, depending on what kind of change you made. This only applies if the change you made is visible to an end user. The directives should be added to class/method descriptions if their general behaviour changed and to the description of all arguments & attributes that changed.
 
 Dev facing documentation
-========================
+------------------------
 We adhere to the `CSI`_ standard. Again, remember, this documentation is not fully implemented in the project, yet. We still ask you to add it to your code changes and this way, we will slowly document the whole project this way.
 The idea behind this is to make it very easy for you/a random maintainer or even a totally foreign person to drop anywhere into the code and more or less immediately understand what a particular line does. This will make it easier
 for new or old devs who are out of the loop to make relevant changes if said lines don't do what they are supposed to. Even though implementing this will mean a lot of comments, we still believe in it being a very meaningful addition to our project.
