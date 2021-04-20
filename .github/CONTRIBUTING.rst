@@ -278,4 +278,4 @@ break the API classes. For example:
 .. _`RTD`: https://python-telegram-bot.readthedocs.io/
 .. _`RTD build`: https://python-telegram-bot.readthedocs.io/en/doc-fixes
 .. _`CSI`: https://standards.mousepawmedia.com/csi.html
-.. _`section`: documenting
+.. _`section`: #documenting
