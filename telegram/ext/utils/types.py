@@ -26,5 +26,5 @@ CDCData = Tuple[List[Tuple[str, float, Dict[str, Any]]], Dict[str, str]]
 """
 Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`any`]]], \
     Dict[:obj:`str`, :obj:`str`]]: Data returned by
-    :attr:`telegram.ext.utils.callbackdatacache.CallbackDataCache.persistence_data`.
+    :attr:`telegram.ext.CallbackDataCache.persistence_data`.
 """

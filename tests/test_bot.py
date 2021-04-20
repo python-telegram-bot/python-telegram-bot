@@ -52,7 +52,7 @@ from telegram import (
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.ext import Bot as ExtBot
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
-from telegram.ext.utils.callbackdatacache import InvalidCallbackData
+from telegram.ext.callbackdatacache import InvalidCallbackData
 from telegram.utils.helpers import (
     from_timestamp,
     escape_markdown,
@@ -135,7 +135,7 @@ class TestBot:
     def test_callback_data_maxsize(self, bot, acd_in, maxsize, acd):
         bot = ExtBot(bot.token, arbitrary_callback_data=acd_in)
         assert bot.arbitrary_callback_data == acd
-        assert bot.callback_data.maxsize == maxsize
+        assert bot.callback_data_cache.maxsize == maxsize
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -2082,13 +2082,13 @@ class TestBot:
 
             assert inline_keyboard[0][1] == no_replace_button
             assert inline_keyboard[0][0] == replace_button
-            keyboard = list(bot.callback_data._keyboard_data)[0]
-            data = list(bot.callback_data._keyboard_data[keyboard].button_data.values())[0]
+            keyboard = list(bot.callback_data_cache._keyboard_data)[0]
+            data = list(bot.callback_data_cache._keyboard_data[keyboard].button_data.values())[0]
             assert data == 'replace_test'
         finally:
             bot.arbitrary_callback_data = False
-            bot.callback_data.clear_callback_data()
-            bot.callback_data.clear_callback_queries()
+            bot.callback_data_cache.clear_callback_data()
+            bot.callback_data_cache.clear_callback_queries()
 
     def test_replace_callback_data_stop_poll(self, bot, chat_id):
         poll_message = bot.send_poll(chat_id=chat_id, question='test', options=['1', '2'])
@@ -2111,13 +2111,13 @@ class TestBot:
 
             assert inline_keyboard[0][1] == no_replace_button
             assert inline_keyboard[0][0] == replace_button
-            keyboard = list(bot.callback_data._keyboard_data)[0]
-            data = list(bot.callback_data._keyboard_data[keyboard].button_data.values())[0]
+            keyboard = list(bot.callback_data_cache._keyboard_data)[0]
+            data = list(bot.callback_data_cache._keyboard_data[keyboard].button_data.values())[0]
             assert data == 'replace_test'
         finally:
             bot.arbitrary_callback_data = False
-            bot.callback_data.clear_callback_data()
-            bot.callback_data.clear_callback_queries()
+            bot.callback_data_cache.clear_callback_data()
+            bot.callback_data_cache.clear_callback_queries()
 
     def test_replace_callback_data_copy_message(self, bot, chat_id):
         original_message = bot.send_message(chat_id=chat_id, text='original')
@@ -2142,13 +2142,13 @@ class TestBot:
 
             assert inline_keyboard[0][1] == no_replace_button
             assert inline_keyboard[0][0] == replace_button
-            keyboard = list(bot.callback_data._keyboard_data)[0]
-            data = list(bot.callback_data._keyboard_data[keyboard].button_data.values())[0]
+            keyboard = list(bot.callback_data_cache._keyboard_data)[0]
+            data = list(bot.callback_data_cache._keyboard_data[keyboard].button_data.values())[0]
             assert data == 'replace_test'
         finally:
             bot.arbitrary_callback_data = False
-            bot.callback_data.clear_callback_data()
-            bot.callback_data.clear_callback_queries()
+            bot.callback_data_cache.clear_callback_data()
+            bot.callback_data_cache.clear_callback_queries()
 
     # TODO: Needs improvement. We need incoming inline query to test answer.
     def test_replace_callback_data_answer_inline_query(self, monkeypatch, bot, chat_id):
@@ -2169,7 +2169,8 @@ class TestBot:
                 inline_keyboard[0][0].callback_data[32:],
             )
             assertion_3 = (
-                bot.callback_data._keyboard_data[keyboard].button_data[button] == 'replace_test'
+                bot.callback_data_cache._keyboard_data[keyboard].button_data[button]
+                == 'replace_test'
             )
             return assertion_1 and assertion_2 and assertion_3
 
@@ -2198,8 +2199,8 @@ class TestBot:
 
         finally:
             bot.arbitrary_callback_data = False
-            bot.callback_data.clear_callback_data()
-            bot.callback_data.clear_callback_queries()
+            bot.callback_data_cache.clear_callback_data()
+            bot.callback_data_cache.clear_callback_queries()
 
     def test_get_chat_arbitrary_callback_data(self, super_group_id, bot):
         try:
@@ -2213,8 +2214,8 @@ class TestBot:
             )
             message.pin()
 
-            keyboard = list(bot.callback_data._keyboard_data)[0]
-            data = list(bot.callback_data._keyboard_data[keyboard].button_data.values())[0]
+            keyboard = list(bot.callback_data_cache._keyboard_data)[0]
+            data = list(bot.callback_data_cache._keyboard_data[keyboard].button_data.values())[0]
             assert data == 'callback_data'
 
             chat = bot.get_chat(super_group_id)
@@ -2222,6 +2223,6 @@ class TestBot:
             assert chat.pinned_message.reply_markup == reply_markup
         finally:
             bot.arbitrary_callback_data = False
-            bot.callback_data.clear_callback_data()
-            bot.callback_data.clear_callback_queries()
+            bot.callback_data_cache.clear_callback_data()
+            bot.callback_data_cache.clear_callback_queries()
             bot.unpin_all_chat_messages(super_group_id)

@@ -19,7 +19,7 @@
 import signal
 from threading import Lock
 
-from telegram.ext.utils.callbackdatacache import CallbackDataCache
+from telegram.ext.callbackdatacache import CallbackDataCache
 from telegram.utils.helpers import encode_conversations_to_json
 
 try:
@@ -63,8 +63,8 @@ def change_directory(tmp_path):
 @pytest.fixture(autouse=True)
 def reset_callback_data_cache(bot):
     yield
-    bot.callback_data.clear_callback_data()
-    bot.callback_data.clear_callback_queries()
+    bot.callback_data_cache.clear_callback_data()
+    bot.callback_data_cache.clear_callback_queries()
     bot.arbitrary_callback_data = False
 
 
@@ -285,7 +285,7 @@ class TestBasePersistence:
         assert u.dispatcher.bot_data == bot_data
         assert u.dispatcher.chat_data == chat_data
         assert u.dispatcher.user_data == user_data
-        assert u.dispatcher.bot.callback_data.persistence_data == callback_data
+        assert u.dispatcher.bot.callback_data_cache.persistence_data == callback_data
         u.dispatcher.chat_data[442233]['test5'] = 'test6'
         assert u.dispatcher.chat_data[442233]['test5'] == 'test6'
 
@@ -335,7 +335,7 @@ class TestBasePersistence:
             context.user_data[1] = 'test7'
             context.chat_data[2] = 'test8'
             context.bot_data['test0'] = 'test0'
-            context.bot.callback_data.put('test0')
+            context.bot.callback_data_cache.put('test0')
 
         known_user = MessageHandler(
             Filters.user(user_id=12345),
@@ -404,7 +404,7 @@ class TestBasePersistence:
         assert dp.user_data[54321][1] == 'test7'
         assert dp.chat_data[-987654][2] == 'test8'
         assert dp.bot_data['test0'] == 'test0'
-        assert assert_data_in_cache(dp.bot.callback_data, 'test0')
+        assert assert_data_in_cache(dp.bot.callback_data_cache, 'test0')
 
     def test_dispatcher_integration_handlers_run_async(
         self, cdp, caplog, bot, base_persistence, chat_data, user_data, bot_data
@@ -1436,7 +1436,7 @@ class TestPicklePersistence:
             context.user_data['test1'] = 'test2'
             context.chat_data['test3'] = 'test4'
             context.bot_data['test1'] = 'test0'
-            context.bot.callback_data['test1'] = 'test0'
+            context.bot.callback_data_cache['test1'] = 'test0'
 
         def second(update, context):
             if not context.user_data['test1'] == 'test2':
@@ -1445,7 +1445,7 @@ class TestPicklePersistence:
                 pytest.fail()
             if not context.bot_data['test1'] == 'test0':
                 pytest.fail()
-            if not context.bot.callback_data['test1'] == 'test0':
+            if not context.bot.callback_data_cache['test1'] == 'test0':
                 pytest.fail()
 
         h1 = MessageHandler(None, first, pass_user_data=True, pass_chat_data=True)
@@ -1476,15 +1476,17 @@ class TestPicklePersistence:
         dp.user_data[4242424242]['my_test'] = 'Working!'
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
         dp.bot_data['test'] = 'Working3!'
-        dp.bot.callback_data._callback_queries['test'] = 'Working4!'
+        dp.bot.callback_data_cache._callback_queries['test'] = 'Working4!'
         u.signal_handler(signal.SIGINT, None)
         del dp
         del u
         del pickle_persistence
         pickle_persistence_2 = PicklePersistence(
             filename='pickletest',
+            store_bot_data=True,
             store_user_data=True,
             store_chat_data=True,
+            store_callback_data=True,
             single_file=False,
             on_flush=False,
         )
@@ -1501,7 +1503,7 @@ class TestPicklePersistence:
         dp.user_data[4242424242]['my_test'] = 'Working!'
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
         dp.bot_data['my_test3'] = 'Working3!'
-        dp.bot.callback_data._callback_queries['test'] = 'Working4!'
+        dp.bot.callback_data_cache._callback_queries['test'] = 'Working4!'
         u.signal_handler(signal.SIGINT, None)
         del dp
         del u
@@ -1527,7 +1529,7 @@ class TestPicklePersistence:
         dp.user_data[4242424242]['my_test'] = 'Working!'
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
         dp.bot_data['my_test3'] = 'Working3!'
-        dp.bot.callback_data._callback_queries['test'] = 'Working4!'
+        dp.bot.callback_data_cache._callback_queries['test'] = 'Working4!'
         u.signal_handler(signal.SIGINT, None)
         del dp
         del u
@@ -1553,7 +1555,7 @@ class TestPicklePersistence:
         dp.user_data[4242424242]['my_test'] = 'Working!'
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
         dp.bot_data['my_test3'] = 'Working3!'
-        dp.bot.callback_data._callback_queries['test'] = 'Working4!'
+        dp.bot.callback_data_cache._callback_queries['test'] = 'Working4!'
         u.signal_handler(signal.SIGINT, None)
         del dp
         del u
@@ -1579,7 +1581,7 @@ class TestPicklePersistence:
         dp.user_data[4242424242]['my_test'] = 'Working!'
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
         dp.bot_data['my_test3'] = 'Working3!'
-        dp.bot.callback_data._callback_queries['test'] = 'Working4!'
+        dp.bot.callback_data_cache._callback_queries['test'] = 'Working4!'
         u.signal_handler(signal.SIGINT, None)
         del dp
         del u
@@ -1691,7 +1693,7 @@ class TestPicklePersistence:
             context.bot_data['test1'] = '456'
             context.dispatcher.chat_data[123]['test2'] = '789'
             context.dispatcher.user_data[789]['test3'] = '123'
-            context.bot.callback_data._callback_queries['test'] = 'Working4!'
+            context.bot.callback_data_cache._callback_queries['test'] = 'Working4!'
 
         cdp.persistence = pickle_persistence
         job_queue.set_dispatcher(cdp)
@@ -2066,7 +2068,7 @@ class TestDictPersistence:
             context.bot_data['test1'] = '456'
             context.dispatcher.chat_data[123]['test2'] = '789'
             context.dispatcher.user_data[789]['test3'] = '123'
-            context.bot.callback_data._callback_queries['test'] = 'Working4!'
+            context.bot.callback_data_cache._callback_queries['test'] = 'Working4!'
 
         dict_persistence = DictPersistence(store_callback_data=True)
         cdp.persistence = dict_persistence

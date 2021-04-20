@@ -32,7 +32,7 @@ from telegram.error import (
     RetryAfter,
     Conflict,
 )
-from telegram.ext.utils.callbackdatacache import InvalidCallbackData
+from telegram.ext.callbackdatacache import InvalidCallbackData
 
 
 class TestErrors:

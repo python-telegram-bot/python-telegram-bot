@@ -44,7 +44,7 @@ from telegram.ext import BasePersistence
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.handler import Handler
 import telegram.ext.bot
-from telegram.ext.utils.callbackdatacache import CallbackDataCache
+from telegram.ext.callbackdatacache import CallbackDataCache
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.ext.utils.promise import Promise
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
@@ -202,8 +202,10 @@ class Dispatcher:
                 if persistent_data is not None:
                     if not isinstance(persistent_data, tuple) and len(persistent_data) != 2:
                         raise ValueError('callback_data must be a 2-tuple')
-                    self.bot.callback_data = CallbackDataCache(
-                        self.bot, self.bot.callback_data.maxsize, persistent_data=persistent_data
+                    self.bot.callback_data_cache = CallbackDataCache(
+                        self.bot,
+                        self.bot.callback_data_cache.maxsize,
+                        persistent_data=persistent_data,
                     )
         else:
             self.persistence = None
@@ -582,7 +584,9 @@ class Dispatcher:
             if self.persistence.store_callback_data:
                 self.bot = cast(telegram.ext.bot.Bot, self.bot)
                 try:
-                    self.persistence.update_callback_data(self.bot.callback_data.persistence_data)
+                    self.persistence.update_callback_data(
+                        self.bot.callback_data_cache.persistence_data
+                    )
                 except Exception as exc:
                     try:
                         self.dispatch_error(update, exc)

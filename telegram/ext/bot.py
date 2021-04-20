@@ -33,7 +33,7 @@ from telegram import (
     Chat,
 )
 
-from telegram.ext.utils.callbackdatacache import CallbackDataCache
+from telegram.ext.callbackdatacache import CallbackDataCache
 from telegram.utils.types import JSONDict, ODVInput, DVInput
 from ..utils.helpers import DEFAULT_NONE
 
@@ -58,6 +58,13 @@ class Bot(telegram.bot.Bot):
             allow arbitrary objects as callback data for :class:`telegram.InlineKeyboardButton`.
             Pass an integer to specify the maximum number objects cached in memory. For more
             details, please see our wiki. Defaults to :obj:`False`.
+
+    Attributes:
+        arbitrary_callback_data (:obj:`bool` | :obj:`int`, optional): Whether this bot instance
+            allows to use arbitrary objects as callback data for
+            :class:`telegram.InlineKeyboardButton`.
+        callback_data_cache (:class:`telegram.ext.CallbackDataCache`): The cache for objects passed
+            as callback data for :class:`telegram.InlineKeyboardButton`.
 
     """
 
@@ -89,14 +96,14 @@ class Bot(telegram.bot.Bot):
         else:
             maxsize = 1024
             self.arbitrary_callback_data = arbitrary_callback_data
-        self.callback_data: CallbackDataCache = CallbackDataCache(bot=self, maxsize=maxsize)
+        self.callback_data_cache: CallbackDataCache = CallbackDataCache(bot=self, maxsize=maxsize)
 
     def _replace_keyboard(self, reply_markup: Optional[ReplyMarkup]) -> Optional[ReplyMarkup]:
         # If the reply_markup is an inline keyboard and we allow arbitrary callback data, let the
         # CallbackDataCache build a new keyboard with the data replaced. Otherwise return the input
         if isinstance(reply_markup, ReplyMarkup):
             if self.arbitrary_callback_data and isinstance(reply_markup, InlineKeyboardMarkup):
-                return self.callback_data.process_keyboard(reply_markup)
+                return self.callback_data_cache.process_keyboard(reply_markup)
 
         return reply_markup
 
@@ -104,11 +111,13 @@ class Bot(telegram.bot.Bot):
         if not self.arbitrary_callback_data:
             return obj
         if isinstance(obj, Message):
-            return self.callback_data.process_message(message=obj)  # type: ignore[return-value]
+            return self.callback_data_cache.process_message(  # type: ignore[return-value]
+                message=obj
+            )
         # If the pinned message was not sent by this bot, replacing callback data in the inline
         # keyboard will only give InvalidCallbackData
         if isinstance(obj, Chat) and obj.pinned_message and obj.pinned_message.from_user == self:
-            obj.pinned_message = self.callback_data.process_message(obj.pinned_message)
+            obj.pinned_message = self.callback_data_cache.process_message(obj.pinned_message)
         return obj
 
     def _message(
@@ -160,7 +169,7 @@ class Bot(telegram.bot.Bot):
             # We also don't have to worry about effective_chat.pinned_message, as that's only
             # returned in get_chat
             if update.callback_query:
-                self.callback_data.process_callback_query(update.callback_query)
+                self.callback_data_cache.process_callback_query(update.callback_query)
 
         return updates
 

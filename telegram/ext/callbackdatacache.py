@@ -1,4 +1,23 @@
 #!/usr/bin/env python
+
+#
+#  A library that provides a Python interface to the Telegram Bot API
+#  Copyright (C) 2015-2021
+#  Leandro Toledo de Souza <devs@python-telegram-bot.org>
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU Lesser Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU Lesser Public License for more details.
+#
+#  You should have received a copy of the GNU Lesser Public License
+#  along with this program.  If not, see [http://www.gnu.org/licenses/].
+
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2021
@@ -91,14 +110,14 @@ class CallbackDataCache:
     If necessary, will drop the least recently used items.
 
     Args:
-        bot: (:class:`telegram.ext.Bot`): The bot this cache is for.
+        bot (:class:`telegram.ext.Bot`): The bot this cache is for.
         maxsize (:obj:`int`, optional): Maximum number of items in each of the internal mappings.
             Defaults to 1024.
         persistent_data (:obj:`telegram.ext.utils.types.CDCData`, optional): Data to initialize
             the cache with, as returned by :meth:`telegram.ext.BasePersistence.get_callback_data`.
 
     Attributes:
-        bot: (:class:`telegram.Bot`): The bot this cache is for.
+        bot (:class:`telegram.ext.Bot`): The bot this cache is for.
         maxsize (:obj:`int`): maximum size of the cache.
 
     """
@@ -128,8 +147,8 @@ class CallbackDataCache:
 
     @property
     def persistence_data(self) -> CDCData:
-        """
-        The data that needs to be persisted to allow caching callback data across bot reboots.
+        """:obj:`telegram.ext.utils.types.CDCData`: The data that needs to be persisted to allow
+        caching callback data across bot reboots.
         """
         # While building a list/dict from the LRUCaches has linear runtime (in the number of
         # entries), the runtime is bounded by maxsize and it has the big upside of not throwing a
@@ -212,7 +231,7 @@ class CallbackDataCache:
         """
         Replaces the data in the inline keyboard attached to the message with the cached
         objects, if necessary. If the data could not be found,
-        :class:`telegram.ext.utils.callbackdatacache.InvalidButtonData` will be inserted.
+        :class:`telegram.ext.InvalidButtonData` will be inserted.
         Also considers :attr:`message.reply_to_message` and :attr:`message.pinned_message`, if
         present and if they were sent by the bot itself.
 
@@ -267,8 +286,8 @@ class CallbackDataCache:
         """
         Replaces the data in the callback query and the attached messages keyboard with the cached
         objects, if necessary. If the data could not be found,
-        :class:`telegram.ext.utils.callbackdatacache.InvalidButtonData` will be inserted.
-        If :attr:`callback_query.data` or `attr:`callback_query.message` is present, this also
+        :class:`telegram.ext.InvalidButtonData` will be inserted.
+        If :attr:`callback_query.data` or :attr:`callback_query.message` is present, this also
         saves the callback queries ID in order to be able to resolve it to the stored data.
 
         Warning:

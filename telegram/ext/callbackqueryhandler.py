@@ -59,8 +59,8 @@ class CallbackQueryHandler(Handler[Update]):
           original ``callback_data`` for the incoming :class:`telegram.CallbackQuery`` can not be
           found. This is the case when either a malicious client tempered with the
           ``callback_data`` or the data was simply dropped from cache or not persisted. In these
-          cases, an instance of :class:`telegram.ext.utils.callbackdatacache.InvalidCallbackData`
-          will be set as ``callback_data``.
+          cases, an instance of :class:`telegram.ext.InvalidCallbackData` will be set as
+          ``callback_data``.
 
     Warning:
         When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom

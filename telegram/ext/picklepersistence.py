@@ -150,6 +150,7 @@ class PicklePersistence(BasePersistence):
     @staticmethod
     def dump_file(filename: str, data: object) -> None:
         with open(filename, "wb") as file:
+            print('dumping', filename)
             pickle.dump(data, file)
 
     def get_user_data(self) -> DefaultDict[int, Dict[object, object]]:
@@ -349,7 +350,13 @@ class PicklePersistence(BasePersistence):
     def flush(self) -> None:
         """Will save all data in memory to pickle file(s)."""
         if self.single_file:
-            if self.user_data or self.chat_data or self.bot_data or self.conversations:
+            if (
+                self.user_data
+                or self.chat_data
+                or self.bot_data
+                or self.callback_data
+                or self.conversations
+            ):
                 self.dump_singlefile()
         else:
             if self.user_data:

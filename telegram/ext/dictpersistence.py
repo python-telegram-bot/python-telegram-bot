@@ -343,7 +343,7 @@ class DictPersistence(BasePersistence):
 
         Args:
             data (:class:`telegram.utils.types.CDCData`:): The relevant data to restore
-                :attr:`telegram.ext.dispatcher.bot.callback_data`.
+                :attr:`telegram.ext.dispatcher.bot.callback_data_cache`.
         """
         if self._callback_data == data:
             return

@@ -54,7 +54,7 @@ class CallbackQuery(TelegramObject):
           by calling :attr:`telegram.Bot.answer_callback_query` even if no notification to the user
           is needed (e.g., without specifying any of the optional parameters).
         * If you're using :attr:`Bot.arbitrary_callback_data`, :attr:`data` may be be an instance
-          of :class:`telegram.error.InvalidCallbackData`. This will be the case, if the data
+          of :class:`telegram.ext.InvalidCallbackData`. This will be the case, if the data
           associated with the button triggering the :class:`telegram.CallbackQuery` was already
           deleted or if :attr:`data` was manipulated by a malicious client.
 

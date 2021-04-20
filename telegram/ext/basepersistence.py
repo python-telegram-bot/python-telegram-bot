@@ -418,7 +418,7 @@ class BasePersistence(ABC):
 
         Args:
             data (:class:`telegram.utils.types.CDCData`:): The relevant data to restore
-                :attr:`telegram.ext.dispatcher.bot.callback_data`.
+                :attr:`telegram.ext.dispatcher.bot.callback_data_cache`.
         """
         raise NotImplementedError
 

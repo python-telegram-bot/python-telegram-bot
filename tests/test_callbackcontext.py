@@ -196,8 +196,8 @@ class TestCallbackContext:
                 InlineKeyboardButton('test', callback_data='callback_data')
             ),
         )
-        keyboard_uuid = cdp.bot.callback_data.persistence_data[0][0][0]
-        button_uuid = list(cdp.bot.callback_data.persistence_data[0][0][2])[0]
+        keyboard_uuid = cdp.bot.callback_data_cache.persistence_data[0][0][0]
+        button_uuid = list(cdp.bot.callback_data_cache.persistence_data[0][0][2])[0]
         callback_data = keyboard_uuid + button_uuid
         callback_query = CallbackQuery(
             id='1',
@@ -205,14 +205,14 @@ class TestCallbackContext:
             chat_instance=None,
             data=callback_data,
         )
-        cdp.bot.callback_data.process_callback_query(callback_query)
+        cdp.bot.callback_data_cache.process_callback_query(callback_query)
 
         try:
-            assert len(cdp.bot.callback_data.persistence_data[0]) == 1
-            assert list(cdp.bot.callback_data.persistence_data[1]) == ['1']
+            assert len(cdp.bot.callback_data_cache.persistence_data[0]) == 1
+            assert list(cdp.bot.callback_data_cache.persistence_data[1]) == ['1']
 
             callback_context.drop_callback_data(callback_query)
-            assert cdp.bot.callback_data.persistence_data == ([], {})
+            assert cdp.bot.callback_data_cache.persistence_data == ([], {})
         finally:
-            cdp.bot.callback_data.clear_callback_data()
-            cdp.bot.callback_data.clear_callback_queries()
+            cdp.bot.callback_data_cache.clear_callback_data()
+            cdp.bot.callback_data_cache.clear_callback_queries()

@@ -40,7 +40,7 @@ class InlineKeyboardButton(TelegramObject):
           work.
         * If your bot allows for arbitrary callback data, in keyboards returned in a response
           from telegram, :attr:`callback_data` maybe be an instance of
-          :class:`telegram.error.InvalidCallbackData`. This will be the case, if the data
+          :class:`telegram.ext.InvalidCallbackData`. This will be the case, if the data
           associated with the button was already deleted.
 
     Args:

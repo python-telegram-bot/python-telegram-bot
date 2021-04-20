@@ -47,11 +47,18 @@ Persistence
     telegram.ext.picklepersistence
     telegram.ext.dictpersistence
 
+Arbitrary Callback Data
+-----------------------
+
+.. toctree::
+
+    telegram.ext.callbackdatacache
+    telegram.ext.invalidcallbackdata
+
 utils
 -----
 
 .. toctree::
 
-    telegram.ext.utils.callbackdatacache
     telegram.ext.utils.promise
     telegram.ext.utils.types
