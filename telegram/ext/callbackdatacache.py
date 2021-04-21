@@ -101,12 +101,14 @@ class KeyboardData:
 
 
 class CallbackDataCache:
-    """A custom cache for storing the callback data of a :class:`telegram.ext.Bot.`. Internally, it
+    """A custom cache for storing the callback data of a :class:`telegram.ext.Bot`. Internally, it
     keeps to mappings with fixed maximum size:
 
         * One for mapping the data received in callback queries to the cached objects
         * One for mapping the IDs of received callback queries to the cached objects
 
+    The second mapping allows to manually drop data that has been cached for keyboards of messages
+    sent via inline mode.
     If necessary, will drop the least recently used items.
 
     Args:
@@ -276,6 +278,8 @@ class CallbackDataCache:
                         callback_data=callback_data,
                     )
 
+                    # This is lazy loaded. The firsts time we find a button
+                    # we load the associated keyboard - afterwards, there is
                     if not keyboard_uuid:
                         if not isinstance(callback_data, InvalidCallbackData):
                             keyboard_uuid = self.extract_uuids(button_data)[0]
@@ -330,6 +334,7 @@ class CallbackDataCache:
             # we don't want to update in that case
             keyboard_data = self._keyboard_data[keyboard]
             button_data = keyboard_data.button_data[button]
+            # Update the timestamp for the LRU
             keyboard_data.update()
             return button_data
         except KeyError:
