@@ -173,13 +173,19 @@ class Bot(telegram.bot.Bot):
         for update in updates:
             if update.callback_query:
                 self.callback_data_cache.process_callback_query(update.callback_query)
-            if update.message:
-                if update.message.via_bot:
-                    self.callback_data_cache.process_message(update.message)
-                if update.message.reply_to_message:
-                    self.callback_data_cache.process_message(update.message.reply_to_message)
-                if update.message.pinned_message:
-                    self.callback_data_cache.process_message(update.message.pinned_message)
+            # elif instead of if, as effective_message includes callback_query.message
+            # and that has already been processed
+            elif update.effective_message:
+                if update.effective_message.via_bot:
+                    self.callback_data_cache.process_message(update.effective_message)
+                if update.effective_message.reply_to_message:
+                    self.callback_data_cache.process_message(
+                        update.effective_message.reply_to_message
+                    )
+                if update.effective_message.pinned_message:
+                    self.callback_data_cache.process_message(
+                        update.effective_message.pinned_message
+                    )
 
         return updates
 
