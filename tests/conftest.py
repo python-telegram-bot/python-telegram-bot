@@ -21,6 +21,7 @@ import functools
 import inspect
 import os
 import re
+import threading
 from collections import defaultdict
 from queue import Queue
 from threading import Thread, Event
@@ -337,6 +338,46 @@ def tzinfo(request):
 @pytest.fixture()
 def timezone(tzinfo):
     return tzinfo
+
+
+timed_out = False
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_call(item):
+    marker = item.get_closest_marker("timeout")  # Check if function has timeout marker
+    max_time = 10  # Default timeout if timeout arg not specified
+    if marker:
+        max_time = marker.args[0] if marker.args else 10  # Get timeout arg
+        timeout_setup(item, max_time)  # Set and start timer
+    yield  # This executes the test function and later the code after this is run.
+    if marker:
+        timeout_teardown(item)  # Cancel timer if timeout didn't exceed.
+        if timed_out:  # xfail test if exceeded!
+            pytest.xfail(reason=f"Timeout of {max_time}s exceeded.")
+
+
+def timeout_setup(item, max_time):
+    global timed_out
+
+    def xfail_test():
+        global timed_out
+        timed_out = True
+
+    timer = threading.Timer(max_time, xfail_test)
+
+    def cancel_timer():
+        timer.cancel()
+        timer.join()
+
+    item.cancel_timeout = cancel_timer
+    timer.start()
+
+
+def timeout_teardown(item):
+    cancel = getattr(item, "cancel_timeout", None)
+    if cancel:
+        cancel()
 
 
 def expect_bad_request(func, message, reason):
