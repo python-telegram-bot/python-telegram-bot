@@ -47,16 +47,14 @@ class CommandHandler(Handler[Update]):
     use ``~Filters.update.edited_message`` in the filter argument.
 
     Note:
-        :class:`telegram.ext.CommandHandler` does *not* handle (edited) channel posts.
+        * :class:`CommandHandler` does *not* handle (edited) channel posts.
+        * :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a :obj:`dict` you
+          can use to keep any data in will be sent to the :attr:`callback` function. Related to
+          either the user or the chat that the update was sent in. For each update from the same
+          user or in the same chat, it will be the same :obj:`dict`.
 
-    Note:
-        :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a :obj:`dict` you
-        can use to keep any data in will be sent to the :attr:`callback` function. Related to
-        either the user or the chat that the update was sent in. For each update from the same user
-        or in the same chat, it will be the same :obj:`dict`.
-
-        Note that this is DEPRECATED, and you should use context based callbacks. See
-        https://git.io/fxJuV for more info.
+          Note that this is DEPRECATED, and you should use context based callbacks. See
+          https://git.io/fxJuV for more info.
 
     Warning:
         When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
@@ -107,7 +105,7 @@ class CommandHandler(Handler[Update]):
             Defaults to :obj:`False`.
 
     Raises:
-        ValueError - when command is too long or has illegal chars.
+        ValueError: when command is too long or has illegal chars.
 
     Attributes:
         command (:class:`telegram.utils.types.SLT[str]`):
@@ -248,50 +246,40 @@ class PrefixHandler(CommandHandler):
     :class:`CallbackContext` named :attr:`CallbackContext.args`. It will contain a list of strings,
     which is the text following the command split on single or consecutive whitespace characters.
 
-    Examples::
+    Examples:
 
         Single prefix and command:
 
-            PrefixHandler('!', 'test', callback) will respond to '!test'.
+        .. code:: python
+
+            PrefixHandler('!', 'test', callback)  # will respond to '!test'.
 
         Multiple prefixes, single command:
 
-            PrefixHandler(['!', '#'], 'test', callback) will respond to '!test' and
-            '#test'.
+        .. code:: python
+
+            PrefixHandler(['!', '#'], 'test', callback)  # will respond to '!test' and '#test'.
 
         Multiple prefixes and commands:
 
-            PrefixHandler(['!', '#'], ['test', 'help`], callback) will respond to '!test',
-            '#test', '!help' and '#help'.
+        .. code:: python
+
+            PrefixHandler(['!', '#'], ['test', 'help'], callback)  # will respond to '!test', \
+'#test', '!help' and '#help'.
 
 
     By default the handler listens to messages as well as edited messages. To change this behavior
-    use ~``Filters.update.edited_message``.
-
-    Attributes:
-        callback (:obj:`callable`): The callback function for this handler.
-        filters (:class:`telegram.ext.BaseFilter`): Optional. Only allow updates with these
-            Filters.
-        pass_args (:obj:`bool`): Determines whether the handler should be passed
-            ``args``.
-        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
-            passed to the callback function.
-        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
-            the callback function.
-        pass_user_data (:obj:`bool`): Determines whether ``user_data`` will be passed to
-            the callback function.
-        pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
-            the callback function.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
+    use ``~Filters.update.edited_message``.
 
     Note:
-        :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
-        can use to keep any data in will be sent to the :attr:`callback` function. Related to
-        either the user or the chat that the update was sent in. For each update from the same user
-        or in the same chat, it will be the same ``dict``.
+        * :class:`PrefixHandler` does *not* handle (edited) channel posts.
+        * :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a :obj:`dict` you
+          can use to keep any data in will be sent to the :attr:`callback` function. Related to
+          either the user or the chat that the update was sent in. For each update from the same
+          user or in the same chat, it will be the same :obj:`dict`.
 
-        Note that this is DEPRECATED, and you should use context based callbacks. See
-        https://git.io/fxJuV for more info.
+          Note that this is DEPRECATED, and you should use context based callbacks. See
+          https://git.io/fxJuV for more info.
 
     Warning:
         When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
@@ -337,6 +325,22 @@ class PrefixHandler(CommandHandler):
             DEPRECATED: Please switch to context based callbacks.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
             Defaults to :obj:`False`.
+
+    Attributes:
+        callback (:obj:`callable`): The callback function for this handler.
+        filters (:class:`telegram.ext.BaseFilter`): Optional. Only allow updates with these
+            Filters.
+        pass_args (:obj:`bool`): Determines whether the handler should be passed
+            ``args``.
+        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
+            passed to the callback function.
+        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
+            the callback function.
+        pass_user_data (:obj:`bool`): Determines whether ``user_data`` will be passed to
+            the callback function.
+        pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
+            the callback function.
+        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     """
 
