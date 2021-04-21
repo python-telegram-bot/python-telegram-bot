@@ -48,6 +48,7 @@ from telegram import (
     CallbackQuery,
     Message,
     Chat,
+    InlineQueryResultVoice,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.ext import Bot as ExtBot
@@ -2090,7 +2091,7 @@ class TestBot:
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
 
-    def test_replace_callback_data_stop_poll(self, bot, chat_id):
+    def test_replace_callback_data_stop_poll_and_repl_to_message(self, bot, chat_id):
         poll_message = bot.send_poll(chat_id=chat_id, question='test', options=['1', '2'])
         try:
             bot.arbitrary_callback_data = True
@@ -2172,7 +2173,8 @@ class TestBot:
                 bot.callback_data_cache._keyboard_data[keyboard].button_data[button]
                 == 'replace_test'
             )
-            return assertion_1 and assertion_2 and assertion_3
+            assertion_4 = 'reply_markup' not in data['results'][1]
+            return assertion_1 and assertion_2 and assertion_3 and assertion_4
 
         try:
             bot.arbitrary_callback_data = True
@@ -2192,6 +2194,11 @@ class TestBot:
             results = [
                 InlineQueryResultArticle(
                     '11', 'first', InputTextMessageContent('first'), reply_markup=reply_markup
+                ),
+                InlineQueryResultVoice(
+                    '22',
+                    'https://python-telegram-bot.org/static/testfiles/telegram.ogg',
+                    title='second',
                 ),
             ]
 
@@ -2221,6 +2228,87 @@ class TestBot:
             chat = bot.get_chat(super_group_id)
             assert chat.pinned_message == message
             assert chat.pinned_message.reply_markup == reply_markup
+        finally:
+            bot.arbitrary_callback_data = False
+            bot.callback_data_cache.clear_callback_data()
+            bot.callback_data_cache.clear_callback_queries()
+            bot.unpin_all_chat_messages(super_group_id)
+
+    def test_arbitrary_callback_data_pinned_message_reply_to_message(
+        self, super_group_id, bot, monkeypatch
+    ):
+        bot.arbitrary_callback_data = True
+        reply_markup = InlineKeyboardMarkup.from_button(
+            InlineKeyboardButton(text='text', callback_data='callback_data')
+        )
+
+        message = Message(
+            1, None, None, reply_markup=bot.callback_data_cache.process_keyboard(reply_markup)
+        )
+
+        def post(*args, **kwargs):
+            return [
+                Update(
+                    17,
+                    message=Message(
+                        1, None, None, pinned_message=message, reply_to_message=message
+                    ),
+                ).to_dict()
+            ]
+
+        try:
+            monkeypatch.setattr(bot.request, 'post', post)
+            bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
+            updates = bot.get_updates(timeout=1)
+
+            assert isinstance(updates, list)
+            assert len(updates) == 1
+            for message in (
+                updates[0].message.pinned_message,
+                updates[0].message.reply_to_message,
+            ):
+                assert message.reply_markup.inline_keyboard[0][0].callback_data == 'callback_data'
+        finally:
+            bot.arbitrary_callback_data = False
+            bot.callback_data_cache.clear_callback_data()
+            bot.callback_data_cache.clear_callback_queries()
+            bot.unpin_all_chat_messages(super_group_id)
+
+    @pytest.mark.parametrize('self_sender', [True, False])
+    def test_arbitrary_callback_data_via_bot(self, super_group_id, bot, monkeypatch, self_sender):
+        bot.arbitrary_callback_data = True
+        reply_markup = InlineKeyboardMarkup.from_button(
+            InlineKeyboardButton(text='text', callback_data='callback_data')
+        )
+
+        reply_markup = bot.callback_data_cache.process_keyboard(reply_markup)
+        message = Message(
+            1,
+            None,
+            None,
+            reply_markup=reply_markup,
+            via_bot=bot.bot if self_sender else User(1, 'first', False),
+        )
+
+        def post(*args, **kwargs):
+            return [Update(17, message=message).to_dict()]
+
+        try:
+            monkeypatch.setattr(bot.request, 'post', post)
+            bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
+            updates = bot.get_updates(timeout=1)
+
+            assert isinstance(updates, list)
+            assert len(updates) == 1
+
+            message = updates[0].message
+            if self_sender:
+                assert message.reply_markup.inline_keyboard[0][0].callback_data == 'callback_data'
+            else:
+                assert (
+                    message.reply_markup.inline_keyboard[0][0].callback_data
+                    == reply_markup.inline_keyboard[0][0].callback_data
+                )
         finally:
             bot.arbitrary_callback_data = False
             bot.callback_data_cache.clear_callback_data()

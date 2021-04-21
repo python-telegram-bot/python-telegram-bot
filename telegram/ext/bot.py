@@ -111,12 +111,13 @@ class Bot(telegram.bot.Bot):
         if not self.arbitrary_callback_data:
             return obj
         if isinstance(obj, Message):
+            for message in (obj.pinned_message, obj.reply_to_message):
+                if message:
+                    self.callback_data_cache.process_message(message)
             return self.callback_data_cache.process_message(  # type: ignore[return-value]
                 message=obj
             )
-        # If the pinned message was not sent by this bot, replacing callback data in the inline
-        # keyboard will only give InvalidCallbackData
-        if isinstance(obj, Chat) and obj.pinned_message and obj.pinned_message.from_user == self:
+        if isinstance(obj, Chat) and obj.pinned_message:
             obj.pinned_message = self.callback_data_cache.process_message(obj.pinned_message)
         return obj
 
@@ -163,13 +164,22 @@ class Bot(telegram.bot.Bot):
             api_kwargs=api_kwargs,
         )
 
+        # The only incoming updates that can directly contain a message sent by the bot itself are:
+        # * CallbackQueries
+        # * Messages where the pinned_message is sent by the bot
+        # * Messages where the reply_to_message is sent by the bot
+        # * Messages where via_bot is the bot
+        # Finally there is effective_chat.pinned message, but that's only returned in get_chat
         for update in updates:
-            # CallbackQueries are the only updates that can directly contain a message sent by
-            # the bot itself. All other incoming messages are from users or other bots
-            # We also don't have to worry about effective_chat.pinned_message, as that's only
-            # returned in get_chat
             if update.callback_query:
                 self.callback_data_cache.process_callback_query(update.callback_query)
+            if update.message:
+                if update.message.via_bot:
+                    self.callback_data_cache.process_message(update.message)
+                if update.message.reply_to_message:
+                    self.callback_data_cache.process_message(update.message.reply_to_message)
+                if update.message.pinned_message:
+                    self.callback_data_cache.process_message(update.message.pinned_message)
 
         return updates
 
@@ -194,7 +204,8 @@ class Bot(telegram.bot.Bot):
             return effective_results, next_offset
         results = []
         for result in effective_results:
-            # Not all InlineQueryResults have a reply_markup, so we need to check
+            # All currently existingInlineQueryResults have a reply_markup, but future ones
+            # might not have. Better be save than sorry
             if not hasattr(result, 'reply_markup'):
                 results.append(result)
             else:

@@ -23,7 +23,7 @@ from datetime import datetime
 import pytest
 import pytz
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, Message
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, Message, User
 from telegram.ext.callbackdatacache import (
     CallbackDataCache,
     KeyboardData,
@@ -114,6 +114,7 @@ class TestCallbackDataCache:
     @pytest.mark.parametrize('message', [True, False])
     @pytest.mark.parametrize('invalid', [True, False])
     def test_process_callback_query(self, callback_data_cache, data, message, invalid):
+        """This also tests large parts of process_message"""
         changing_button_1 = InlineKeyboardButton('changing', callback_data='some data 1')
         changing_button_2 = InlineKeyboardButton('changing', callback_data='some data 2')
         non_changing_button = InlineKeyboardButton('non-changing', url='https://ptb.org')
@@ -125,14 +126,15 @@ class TestCallbackDataCache:
         if invalid:
             callback_data_cache.clear_callback_data()
 
+        effective_message = Message(message_id=1, date=None, chat=None, reply_markup=out)
+        effective_message.reply_to_message = deepcopy(effective_message)
+        effective_message.pinned_message = deepcopy(effective_message)
         callback_query = CallbackQuery(
             '1',
             from_user=None,
             chat_instance=None,
             data=out.inline_keyboard[0][1].callback_data if data else None,
-            message=Message(message_id=1, date=None, chat=None, reply_markup=out)
-            if message
-            else None,
+            message=effective_message if message else None,
         )
         result = callback_data_cache.process_callback_query(callback_query)
 
@@ -142,60 +144,81 @@ class TestCallbackDataCache:
             else:
                 assert result.data is None
             if message:
-                assert result.message.reply_markup == reply_markup
+                for msg in (
+                    result.message,
+                    result.message.reply_to_message,
+                    result.message.pinned_message,
+                ):
+                    assert msg.reply_markup == reply_markup
         else:
             if data:
                 assert isinstance(result.data, InvalidCallbackData)
             else:
                 assert result.data is None
             if message:
-                assert isinstance(
-                    result.message.reply_markup.inline_keyboard[0][1].callback_data,
-                    InvalidCallbackData,
-                )
-                assert isinstance(
-                    result.message.reply_markup.inline_keyboard[0][2].callback_data,
-                    InvalidCallbackData,
-                )
+                for msg in (
+                    result.message,
+                    result.message.reply_to_message,
+                    result.message.pinned_message,
+                ):
+                    assert isinstance(
+                        msg.reply_markup.inline_keyboard[0][1].callback_data,
+                        InvalidCallbackData,
+                    )
+                    assert isinstance(
+                        msg.reply_markup.inline_keyboard[0][2].callback_data,
+                        InvalidCallbackData,
+                    )
 
-    @pytest.mark.parametrize('from_user', ('bot', 'notbot'))
-    def test_process_nested_messages(self, callback_data_cache, bot, from_user):
-        """
-        We only test the handling of {reply_to, pinned}_message here, is the message itself is
-        already tested in test_process_callback_query
-        """
+    @pytest.mark.parametrize('pass_from_user', [True, False])
+    @pytest.mark.parametrize('pass_via_bot', [True, False])
+    def test_process_message_wrong_sender(self, pass_from_user, pass_via_bot, callback_data_cache):
         reply_markup = InlineKeyboardMarkup.from_button(
             InlineKeyboardButton('test', callback_data='callback_data')
         )
-        user = bot if from_user == 'bot' else None
+        user = User(1, 'first', False)
         message = Message(
-            message_id=1,
-            date=None,
-            chat=None,
-            pinned_message=Message(1, None, None, reply_markup=reply_markup, from_user=user),
-            reply_to_message=Message(
-                1, None, None, reply_markup=deepcopy(reply_markup), from_user=user
-            ),
+            1,
+            None,
+            None,
+            from_user=user if pass_from_user else None,
+            via_bot=user if pass_via_bot else None,
+            reply_markup=reply_markup,
         )
         result = callback_data_cache.process_message(message)
-        if from_user == 'bot':
-            assert isinstance(
-                result.pinned_message.reply_markup.inline_keyboard[0][0].callback_data,
-                InvalidCallbackData,
-            )
-            assert isinstance(
-                result.reply_to_message.reply_markup.inline_keyboard[0][0].callback_data,
-                InvalidCallbackData,
-            )
+        if pass_from_user or pass_via_bot:
+            # Here we can determine that the message is not from our bot, so no replacing
+            assert result.reply_markup.inline_keyboard[0][0].callback_data == 'callback_data'
         else:
-            assert (
-                result.pinned_message.reply_markup.inline_keyboard[0][0].callback_data
-                == 'callback_data'
+            # Here we have no chance to know, so InvalidCallbackData
+            assert isinstance(
+                result.reply_markup.inline_keyboard[0][0].callback_data, InvalidCallbackData
             )
-            assert (
-                result.reply_to_message.reply_markup.inline_keyboard[0][0].callback_data
-                == 'callback_data'
-            )
+
+    @pytest.mark.parametrize('pass_from_user', [True, False])
+    def test_process_message_inline_mode(self, pass_from_user, callback_data_cache):
+        """Check that via_bot tells us correctly that our bot sent the message, even if
+        from_user is not our bot."""
+        reply_markup = InlineKeyboardMarkup.from_button(
+            InlineKeyboardButton('test', callback_data='callback_data')
+        )
+        user = User(1, 'first', False)
+        message = Message(
+            1,
+            None,
+            None,
+            from_user=user if pass_from_user else None,
+            via_bot=callback_data_cache.bot.bot,
+            reply_markup=callback_data_cache.process_keyboard(reply_markup),
+        )
+        result = callback_data_cache.process_message(message)
+        # Here we can determine that the message is not from our bot, so no replacing
+        assert result.reply_markup.inline_keyboard[0][0].callback_data == 'callback_data'
+
+    def test_process_message_no_reply_markup(self, callback_data_cache):
+        message = Message(1, None, None)
+        result = callback_data_cache.process_message(message)
+        assert result.reply_markup is None
 
     def test_drop_data(self, callback_data_cache):
         changing_button_1 = InlineKeyboardButton('changing', callback_data='some data 1')

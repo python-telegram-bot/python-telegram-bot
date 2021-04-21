@@ -51,6 +51,7 @@ from telegram import (
     TelegramError,
     CallbackQuery,
     Message,
+    User,
 )
 from telegram.utils.helpers import to_float_timestamp
 from telegram.ext.utils.types import CDCData
@@ -234,18 +235,29 @@ class CallbackDataCache:
         Replaces the data in the inline keyboard attached to the message with the cached
         objects, if necessary. If the data could not be found,
         :class:`telegram.ext.InvalidButtonData` will be inserted.
-        Also considers :attr:`message.reply_to_message` and :attr:`message.pinned_message`, if
-        present and if they were sent by the bot itself.
+
+        Note:
+            Checks :attr:`Message.via_bot` and :attr:`Message.from_user` to check if the reply
+            markup (if any) was actually sent by this caches bot. If it was not, the message will
+            be returned unchanged.
+
+            Note that his will fail for channel posts, as :attr:`Message.from_user` is
+            :obj:`None` for those! In the corresponding reply markups the callback data will be
+            replaced by :class:`InvalidButtonData`.
 
         Warning:
+            * Does *not* consider :attr:`message.reply_to_message` and
+              :attr:`message.pinned_message`. Pass them to these method separately.
             * *In place*, i.e. the passed :class:`telegram.Message` will be changed!
-            * Pass only messages that were sent by this caches bot!
 
         Args:
             message (:class:`telegram.Message`): The message.
 
         Returns:
-            The callback query with inserted data.
+            The message with inserted data.
+
+        Raises:
+            RuntimeError: If the messages was not sent by this caches bot.
 
         """
         with self.__lock:
@@ -255,12 +267,17 @@ class CallbackDataCache:
         """
         As documented in process_message, but as second output gives the keyboards uuid, if any
         """
-        if message.reply_to_message and message.reply_to_message.from_user == self.bot:
-            self.__process_message(message.reply_to_message)
-        if message.pinned_message and message.pinned_message.from_user == self.bot:
-            self.__process_message(message.pinned_message)
-
         if not message.reply_markup:
+            return message, None
+
+        if message.via_bot:
+            sender: Optional[User] = message.via_bot
+        elif message.from_user:
+            sender = message.from_user
+        else:
+            sender = None
+
+        if sender is not None and sender != self.bot.bot:
             return message, None
 
         keyboard_uuid = None
@@ -321,7 +338,15 @@ class CallbackDataCache:
             # Get the cached callback data for the inline keyboard attached to the
             # CallbackQuery.
             if callback_query.message:
+                # No need to check that callback_query.message is from our bot - otherwise
+                # we wouldn't get the callback query in the first place
                 _, keyboard_uuid = self.__process_message(callback_query.message)
+                for message in (
+                    callback_query.message.pinned_message,
+                    callback_query.message.reply_to_message,
+                ):
+                    if message:
+                        self.__process_message(message)
                 if not mapped and keyboard_uuid:
                     self._callback_queries[callback_query.id] = keyboard_uuid
 
