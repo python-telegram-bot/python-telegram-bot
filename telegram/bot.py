@@ -545,9 +545,9 @@ class Bot(TelegramObject):
                 of the target channel (in the format @channelusername).
             from_chat_id (:obj:`int` | :obj:`str`): Unique identifier for the chat where the
                 original message was sent (or channel username in the format @channelusername).
+            message_id (:obj:`int`): Message identifier in the chat specified in from_chat_id.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
-            message_id (:obj:`int`): Message identifier in the chat specified in from_chat_id.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
