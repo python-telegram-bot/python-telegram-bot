@@ -2328,7 +2328,7 @@ class Bot(TelegramObject):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+                of the target supergroup or channel (in the format ``@channelusername``).
             user_id (:obj:`int`): Unique identifier of the target user.
             only_if_banned (:obj:`bool`, optional): Do nothing if the user is not banned.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -2976,7 +2976,7 @@ class Bot(TelegramObject):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+                of the target supergroup or channel (in the format ``@channelusername``).
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -3010,7 +3010,7 @@ class Bot(TelegramObject):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+                of the target supergroup or channel (in the format ``@channelusername``).
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -3042,7 +3042,7 @@ class Bot(TelegramObject):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+                of the target supergroup or channel (in the format ``@channelusername``).
             user_id (:obj:`int`): Unique identifier of the target user.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
