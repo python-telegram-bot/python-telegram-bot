@@ -614,8 +614,27 @@ class TestBot:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_chat_action(self, bot, chat_id):
-        assert bot.send_chat_action(chat_id, ChatAction.TYPING)
+    @pytest.mark.parametrize(
+        'chat_action',
+        [
+            ChatAction.FIND_LOCATION,
+            ChatAction.RECORD_AUDIO,
+            ChatAction.RECORD_VIDEO,
+            ChatAction.RECORD_VIDEO_NOTE,
+            ChatAction.RECORD_VOICE,
+            ChatAction.TYPING,
+            ChatAction.UPLOAD_AUDIO,
+            ChatAction.UPLOAD_DOCUMENT,
+            ChatAction.UPLOAD_PHOTO,
+            ChatAction.UPLOAD_VIDEO,
+            ChatAction.UPLOAD_VIDEO_NOTE,
+            ChatAction.UPLOAD_VOICE,
+        ],
+    )
+    def test_send_chat_action(self, bot, chat_id, chat_action):
+        assert bot.send_chat_action(chat_id, chat_action)
+        with pytest.raises(BadRequest, match='Wrong parameter action'):
+            bot.send_chat_action(chat_id, 'unknown action')
 
     # TODO: Needs improvement. We need incoming inline query to test answer.
     def test_answer_inline_query(self, monkeypatch, bot):
