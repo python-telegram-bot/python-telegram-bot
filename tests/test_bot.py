@@ -2121,6 +2121,8 @@ class TestBot:
             bot.callback_data_cache.clear_callback_queries()
 
     def test_replace_callback_data_copy_message(self, bot, chat_id):
+        """This also tests that data is inserted into the buttons of message.reply_to_message
+        where message is the return value of a bot method"""
         original_message = bot.send_message(chat_id=chat_id, text='original')
         try:
             bot.arbitrary_callback_data = True
@@ -2150,6 +2152,8 @@ class TestBot:
             bot.arbitrary_callback_data = False
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
+
+    # def test_replace_callback_data_reply_to_m
 
     # TODO: Needs improvement. We need incoming inline query to test answer.
     def test_replace_callback_data_answer_inline_query(self, monkeypatch, bot, chat_id):
@@ -2234,8 +2238,15 @@ class TestBot:
             bot.callback_data_cache.clear_callback_queries()
             bot.unpin_all_chat_messages(super_group_id)
 
+    # In the following tests we check that get_updates inserts callback data correctly if necessary
+    # The same must be done in the webhook updater. This is tested over at test_updater.py, but
+    # here we test more extensively.
+
+    @pytest.mark.parametrize(
+        'message_type', ['channel_post', 'edited_channel_post', 'message', 'edited_message']
+    )
     def test_arbitrary_callback_data_pinned_message_reply_to_message(
-        self, super_group_id, bot, monkeypatch
+        self, super_group_id, bot, monkeypatch, message_type
     ):
         bot.arbitrary_callback_data = True
         reply_markup = InlineKeyboardMarkup.from_button(
@@ -2245,16 +2256,23 @@ class TestBot:
         message = Message(
             1, None, None, reply_markup=bot.callback_data_cache.process_keyboard(reply_markup)
         )
+        # We do to_dict -> de_json to make sure those aren't the same objects
+        message.pinned_message = Message.de_json(message.to_dict(), bot)
 
         def post(*args, **kwargs):
-            return [
-                Update(
-                    17,
-                    message=Message(
-                        1, None, None, pinned_message=message, reply_to_message=message
-                    ),
-                ).to_dict()
-            ]
+            update = Update(
+                17,
+                **{
+                    message_type: Message(
+                        1,
+                        None,
+                        None,
+                        pinned_message=message,
+                        reply_to_message=Message.de_json(message.to_dict(), bot),
+                    )
+                },
+            )
+            return [update.to_dict()]
 
         try:
             monkeypatch.setattr(bot.request, 'post', post)
@@ -2263,19 +2281,34 @@ class TestBot:
 
             assert isinstance(updates, list)
             assert len(updates) == 1
-            for message in (
-                updates[0].message.pinned_message,
-                updates[0].message.reply_to_message,
-            ):
-                assert message.reply_markup.inline_keyboard[0][0].callback_data == 'callback_data'
+
+            effective_message = updates[0][message_type]
+            assert (
+                effective_message.reply_to_message.reply_markup.inline_keyboard[0][0].callback_data
+                == 'callback_data'
+            )
+            assert (
+                effective_message.pinned_message.reply_markup.inline_keyboard[0][0].callback_data
+                == 'callback_data'
+            )
+
+            pinned_message = effective_message.reply_to_message.pinned_message
+            assert (
+                pinned_message.reply_markup.inline_keyboard[0][0].callback_data == 'callback_data'
+            )
+
         finally:
             bot.arbitrary_callback_data = False
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
-            bot.unpin_all_chat_messages(super_group_id)
 
+    @pytest.mark.parametrize(
+        'message_type', ['channel_post', 'edited_channel_post', 'message', 'edited_message']
+    )
     @pytest.mark.parametrize('self_sender', [True, False])
-    def test_arbitrary_callback_data_via_bot(self, super_group_id, bot, monkeypatch, self_sender):
+    def test_arbitrary_callback_data_via_bot(
+        self, super_group_id, bot, monkeypatch, self_sender, message_type
+    ):
         bot.arbitrary_callback_data = True
         reply_markup = InlineKeyboardMarkup.from_button(
             InlineKeyboardButton(text='text', callback_data='callback_data')
@@ -2291,7 +2324,7 @@ class TestBot:
         )
 
         def post(*args, **kwargs):
-            return [Update(17, message=message).to_dict()]
+            return [Update(17, **{message_type: message}).to_dict()]
 
         try:
             monkeypatch.setattr(bot.request, 'post', post)
@@ -2301,7 +2334,7 @@ class TestBot:
             assert isinstance(updates, list)
             assert len(updates) == 1
 
-            message = updates[0].message
+            message = updates[0][message_type]
             if self_sender:
                 assert message.reply_markup.inline_keyboard[0][0].callback_data == 'callback_data'
             else:
@@ -2313,4 +2346,3 @@ class TestBot:
             bot.arbitrary_callback_data = False
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
-            bot.unpin_all_chat_messages(super_group_id)

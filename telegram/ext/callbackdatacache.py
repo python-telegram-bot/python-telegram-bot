@@ -237,17 +237,17 @@ class CallbackDataCache:
         :class:`telegram.ext.InvalidButtonData` will be inserted.
 
         Note:
-            Checks :attr:`Message.via_bot` and :attr:`Message.from_user` to check if the reply
-            markup (if any) was actually sent by this caches bot. If it was not, the message will
-            be returned unchanged.
+            Checks :attr:`telegram.Message.via_bot` and :attr:`telegram.Message.from_user` to check
+            if the reply markup (if any) was actually sent by this caches bot. If it was not, the
+            message will be returned unchanged.
 
-            Note that his will fail for channel posts, as :attr:`Message.from_user` is
+            Note that his will fail for channel posts, as :attr:`telegram.Message.from_user` is
             :obj:`None` for those! In the corresponding reply markups the callback data will be
             replaced by :class:`InvalidButtonData`.
 
         Warning:
-            * Does *not* consider :attr:`message.reply_to_message` and
-              :attr:`message.pinned_message`. Pass them to these method separately.
+            * Does *not* consider :attr:`telegram.Message.reply_to_message` and
+              :attr:`telegram.Message.pinned_message`. Pass them to these method separately.
             * *In place*, i.e. the passed :class:`telegram.Message` will be changed!
 
         Args:
@@ -311,6 +311,11 @@ class CallbackDataCache:
         If :attr:`callback_query.data` or :attr:`callback_query.message` is present, this also
         saves the callback queries ID in order to be able to resolve it to the stored data.
 
+        Note:
+            Also considers inserts data into the buttons of
+            :attr:`telegram.Message.reply_to_message` and :attr:`telegram.Message.pinned_message`
+            if necessary.
+
         Warning:
             *In place*, i.e. the passed :class:`telegram.CallbackQuery` will be changed!
 
@@ -338,8 +343,6 @@ class CallbackDataCache:
             # Get the cached callback data for the inline keyboard attached to the
             # CallbackQuery.
             if callback_query.message:
-                # No need to check that callback_query.message is from our bot - otherwise
-                # we wouldn't get the callback query in the first place
                 _, keyboard_uuid = self.__process_message(callback_query.message)
                 for message in (
                     callback_query.message.pinned_message,

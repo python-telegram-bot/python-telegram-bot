@@ -31,6 +31,7 @@ from telegram import (
     MessageId,
     Update,
     Chat,
+    CallbackQuery,
 )
 
 from telegram.ext.callbackdatacache import CallbackDataCache
@@ -42,7 +43,7 @@ if TYPE_CHECKING:
     from telegram.utils.request import Request
     from .defaults import Defaults
 
-T = TypeVar('T', bound=object)
+HandledTypes = TypeVar('HandledTypes', bound=Union[Message, CallbackQuery, Chat])
 
 
 class Bot(telegram.bot.Bot):
@@ -107,18 +108,67 @@ class Bot(telegram.bot.Bot):
 
         return reply_markup
 
-    def _insert_callback_data(self, obj: T) -> T:
+    def insert_callback_data(self, update: Update) -> None:
+        """If this bot allows for arbitrary callback data, this inserts the cached data into all
+        corresponding buttons within this update.
+
+        Note:
+            Checks :attr:`telegram.Message.via_bot` and :attr:`telegram.Message.from_user` to check
+            if the reply markup (if any) was actually sent by this caches bot. If it was not, the
+            message will be returned unchanged.
+
+            Note that his will fail for channel posts, as :attr:`telegram.Message.from_user` is
+            :obj:`None` for those! In the corresponding reply markups the callback data will be
+            replaced by :class:`InvalidButtonData`.
+
+        Warning:
+            *In place*, i.e. the passed :class:`telegram.Message` will be changed!
+
+        Args:
+            update (:class`telegram.Update`): The update.
+
+        """
+        # The only incoming updates that can directly contain a message sent by the bot itself are:
+        # * CallbackQueries
+        # * Messages where the pinned_message is sent by the bot
+        # * Messages where the reply_to_message is sent by the bot
+        # * Messages where via_bot is the bot
+        # Finally there is effective_chat.pinned message, but that's only returned in get_chat
+        if update.callback_query:
+            self._insert_callback_data(update.callback_query)
+        # elif instead of if, as effective_message includes callback_query.message
+        # and that has already been processed
+        elif update.effective_message:
+            self._insert_callback_data(update.effective_message)
+
+    def _insert_callback_data(self, obj: HandledTypes) -> HandledTypes:
         if not self.arbitrary_callback_data:
             return obj
+
+        if isinstance(obj, CallbackQuery):
+            return self.callback_data_cache.process_callback_query(  # type: ignore[return-value]
+                obj
+            )
+
         if isinstance(obj, Message):
-            for message in (obj.pinned_message, obj.reply_to_message):
-                if message:
-                    self.callback_data_cache.process_message(message)
+            if obj.reply_to_message:
+                # reply_to_message can't contain further reply_to_messages, so no need to check
+                self.callback_data_cache.process_message(obj.reply_to_message)
+                if obj.reply_to_message.pinned_message:
+                    # pinned messages can't contain reply_to_message, no need to check
+                    self.callback_data_cache.process_message(obj.reply_to_message.pinned_message)
+            if obj.pinned_message:
+                # pinned messages can't contain reply_to_message, no need to check
+                self.callback_data_cache.process_message(obj.pinned_message)
+
+            # Finally, handle the message itself
             return self.callback_data_cache.process_message(  # type: ignore[return-value]
                 message=obj
             )
+
         if isinstance(obj, Chat) and obj.pinned_message:
-            obj.pinned_message = self.callback_data_cache.process_message(obj.pinned_message)
+            self.callback_data_cache.process_message(obj.pinned_message)
+
         return obj
 
     def _message(
@@ -144,7 +194,9 @@ class Bot(telegram.bot.Bot):
             timeout=timeout,
             api_kwargs=api_kwargs,
         )
-        return self._insert_callback_data(result)
+        if isinstance(result, Message):
+            self._insert_callback_data(result)
+        return result
 
     def get_updates(
         self,
@@ -164,28 +216,8 @@ class Bot(telegram.bot.Bot):
             api_kwargs=api_kwargs,
         )
 
-        # The only incoming updates that can directly contain a message sent by the bot itself are:
-        # * CallbackQueries
-        # * Messages where the pinned_message is sent by the bot
-        # * Messages where the reply_to_message is sent by the bot
-        # * Messages where via_bot is the bot
-        # Finally there is effective_chat.pinned message, but that's only returned in get_chat
         for update in updates:
-            if update.callback_query:
-                self.callback_data_cache.process_callback_query(update.callback_query)
-            # elif instead of if, as effective_message includes callback_query.message
-            # and that has already been processed
-            elif update.effective_message:
-                if update.effective_message.via_bot:
-                    self.callback_data_cache.process_message(update.effective_message)
-                if update.effective_message.reply_to_message:
-                    self.callback_data_cache.process_message(
-                        update.effective_message.reply_to_message
-                    )
-                if update.effective_message.pinned_message:
-                    self.callback_data_cache.process_message(
-                        update.effective_message.pinned_message
-                    )
+            self.insert_callback_data(update)
 
         return updates
 
@@ -232,15 +264,14 @@ class Bot(telegram.bot.Bot):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> Poll:
-        # We override this method to call self._replace_keyboard and self._insert_callback_data
-        result = super().stop_poll(
+        # We override this method to call self._replace_keyboard
+        return super().stop_poll(
             chat_id=chat_id,
             message_id=message_id,
             reply_markup=self._replace_keyboard(reply_markup),
             timeout=timeout,
             api_kwargs=api_kwargs,
         )
-        return self._insert_callback_data(result)
 
     def copy_message(
         self,
@@ -257,8 +288,8 @@ class Bot(telegram.bot.Bot):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> MessageId:
-        # We override this method to call self._replace_keyboard and self._insert_callback_data
-        result = super().copy_message(
+        # We override this method to call self._replace_keyboard
+        return super().copy_message(
             chat_id=chat_id,
             from_chat_id=from_chat_id,
             message_id=message_id,
@@ -272,7 +303,6 @@ class Bot(telegram.bot.Bot):
             timeout=timeout,
             api_kwargs=api_kwargs,
         )
-        return self._insert_callback_data(result)
 
     def get_chat(
         self,

@@ -36,9 +36,18 @@ from urllib.error import HTTPError
 
 import pytest
 
-from telegram import TelegramError, Message, User, Chat, Update, Bot
+from telegram import (
+    TelegramError,
+    Message,
+    User,
+    Chat,
+    Update,
+    Bot,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+)
 from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter
-from telegram.ext import Updater, Dispatcher, DictPersistence, Defaults
+from telegram.ext import Updater, Dispatcher, DictPersistence, Defaults, InvalidCallbackData
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.ext.utils.webhookhandler import WebhookServer
 
@@ -211,6 +220,59 @@ class TestUpdater:
             sleep(0.2)
             assert not updater.httpd.is_running
             updater.stop()
+
+    @pytest.mark.parametrize('invalid_data', [True, False])
+    def test_webhook_arbitrary_callback_data(self, monkeypatch, updater, invalid_data):
+        """Here we only test one simple setup. telegram.ext.Bot.insert_callback_data is tested
+        extensively in test_bot.py in conjunction with get_updates."""
+        updater.bot.arbitrary_callback_data = True
+        try:
+            q = Queue()
+            monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
+            monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
+            monkeypatch.setattr('telegram.ext.Dispatcher.process_update', lambda _, u: q.put(u))
+
+            ip = '127.0.0.1'
+            port = randrange(1024, 49152)  # Select random port
+            updater.start_webhook(ip, port, url_path='TOKEN')
+            sleep(0.2)
+            try:
+                # Now, we send an update to the server via urlopen
+                reply_markup = InlineKeyboardMarkup.from_button(
+                    InlineKeyboardButton(text='text', callback_data='callback_data')
+                )
+                if not invalid_data:
+                    reply_markup = updater.bot.callback_data_cache.process_keyboard(reply_markup)
+
+                message = Message(
+                    1,
+                    None,
+                    None,
+                    reply_markup=reply_markup,
+                )
+                update = Update(1, message=message)
+                self._send_webhook_msg(ip, port, update.to_json(), 'TOKEN')
+                sleep(0.2)
+                received_update = q.get(False)
+                assert received_update == update
+
+                button = received_update.message.reply_markup.inline_keyboard[0][0]
+                if invalid_data:
+                    assert isinstance(button.callback_data, InvalidCallbackData)
+                else:
+                    assert button.callback_data == 'callback_data'
+
+                # Test multiple shutdown() calls
+                updater.httpd.shutdown()
+            finally:
+                updater.httpd.shutdown()
+                sleep(0.2)
+                assert not updater.httpd.is_running
+                updater.stop()
+        finally:
+            updater.bot.arbitrary_callback_data = False
+            updater.bot.callback_data_cache.clear_callback_data()
+            updater.bot.callback_data_cache.clear_callback_queries()
 
     def test_start_webhook_no_warning_or_error_logs(self, caplog, updater, monkeypatch):
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
