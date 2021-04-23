@@ -25,6 +25,9 @@ Below you can find a reference of all the classes and methods in python-telegram
 Apart from the `telegram.ext` package the objects should reflect the types defined in the `official telegram bot api documentation <https://core.telegram.org/bots/api>`_.
 
 .. toctree::
+   telegram.ext
+
+.. toctree::
    telegram
 
 Changelog
