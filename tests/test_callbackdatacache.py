@@ -136,30 +136,30 @@ class TestCallbackDataCache:
             data=out.inline_keyboard[0][1].callback_data if data else None,
             message=effective_message if message else None,
         )
-        result = callback_data_cache.process_callback_query(callback_query)
+        callback_data_cache.process_callback_query(callback_query)
 
         if not invalid:
             if data:
-                assert result.data == 'some data 1'
+                assert callback_query.data == 'some data 1'
             else:
-                assert result.data is None
+                assert callback_query.data is None
             if message:
                 for msg in (
-                    result.message,
-                    result.message.reply_to_message,
-                    result.message.pinned_message,
+                    callback_query.message,
+                    callback_query.message.reply_to_message,
+                    callback_query.message.pinned_message,
                 ):
                     assert msg.reply_markup == reply_markup
         else:
             if data:
-                assert isinstance(result.data, InvalidCallbackData)
+                assert isinstance(callback_query.data, InvalidCallbackData)
             else:
-                assert result.data is None
+                assert callback_query.data is None
             if message:
                 for msg in (
-                    result.message,
-                    result.message.reply_to_message,
-                    result.message.pinned_message,
+                    callback_query.message,
+                    callback_query.message.reply_to_message,
+                    callback_query.message.pinned_message,
                 ):
                     assert isinstance(
                         msg.reply_markup.inline_keyboard[0][1].callback_data,
@@ -185,14 +185,14 @@ class TestCallbackDataCache:
             via_bot=user if pass_via_bot else None,
             reply_markup=reply_markup,
         )
-        result = callback_data_cache.process_message(message)
+        callback_data_cache.process_message(message)
         if pass_from_user or pass_via_bot:
             # Here we can determine that the message is not from our bot, so no replacing
-            assert result.reply_markup.inline_keyboard[0][0].callback_data == 'callback_data'
+            assert message.reply_markup.inline_keyboard[0][0].callback_data == 'callback_data'
         else:
             # Here we have no chance to know, so InvalidCallbackData
             assert isinstance(
-                result.reply_markup.inline_keyboard[0][0].callback_data, InvalidCallbackData
+                message.reply_markup.inline_keyboard[0][0].callback_data, InvalidCallbackData
             )
 
     @pytest.mark.parametrize('pass_from_user', [True, False])
@@ -211,14 +211,14 @@ class TestCallbackDataCache:
             via_bot=callback_data_cache.bot.bot,
             reply_markup=callback_data_cache.process_keyboard(reply_markup),
         )
-        result = callback_data_cache.process_message(message)
+        callback_data_cache.process_message(message)
         # Here we can determine that the message is not from our bot, so no replacing
-        assert result.reply_markup.inline_keyboard[0][0].callback_data == 'callback_data'
+        assert message.reply_markup.inline_keyboard[0][0].callback_data == 'callback_data'
 
     def test_process_message_no_reply_markup(self, callback_data_cache):
         message = Message(1, None, None)
-        result = callback_data_cache.process_message(message)
-        assert result.reply_markup is None
+        callback_data_cache.process_message(message)
+        assert message.reply_markup is None
 
     def test_drop_data(self, callback_data_cache):
         changing_button_1 = InlineKeyboardButton('changing', callback_data='some data 1')

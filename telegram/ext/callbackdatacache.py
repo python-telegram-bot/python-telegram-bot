@@ -230,7 +230,7 @@ class CallbackDataCache:
         # Extract the uuids as put in __put_button
         return callback_data[:32], callback_data[32:]
 
-    def process_message(self, message: Message) -> Message:
+    def process_message(self, message: Message) -> None:
         """
         Replaces the data in the inline keyboard attached to the message with the cached
         objects, if necessary. If the data could not be found,
@@ -253,22 +253,19 @@ class CallbackDataCache:
         Args:
             message (:class:`telegram.Message`): The message.
 
-        Returns:
-            The message with inserted data.
-
-        Raises:
-            RuntimeError: If the messages was not sent by this caches bot.
-
         """
         with self.__lock:
-            return self.__process_message(message)[0]
+            self.__process_message(message)
 
-    def __process_message(self, message: Message) -> Tuple[Message, Optional[str]]:
+    def __process_message(self, message: Message) -> Optional[str]:
         """
-        As documented in process_message, but as second output gives the keyboards uuid, if any
+        As documented in process_message, but as second output gives the keyboards uuid, if any.
+        Returns the uuid of the attached keyboard, if any. Relevant for process_callback_query.
+
+        **IN PLACE**
         """
         if not message.reply_markup:
-            return message, None
+            return None
 
         if message.via_bot:
             sender: Optional[User] = message.via_bot
@@ -278,22 +275,17 @@ class CallbackDataCache:
             sender = None
 
         if sender is not None and sender != self.bot.bot:
-            return message, None
+            return None
 
         keyboard_uuid = None
 
         for row in message.reply_markup.inline_keyboard:
-            for idx, button in enumerate(row):
+            for button in row:
                 if button.callback_data:
                     button_data = button.callback_data
                     callback_data = self.__get_button_data(button_data)
-
-                    # We create new buttons instead of overriding the callback_data to make
-                    # sure the _id_attrs change, too
-                    row[idx] = InlineKeyboardButton(
-                        text=button.text,
-                        callback_data=callback_data,
-                    )
+                    # update_callback_data makes sure that the _id_attrs are updated
+                    button.update_callback_data(callback_data)
 
                     # This is lazy loaded. The firsts time we find a button
                     # we load the associated keyboard - afterwards, there is
@@ -301,9 +293,9 @@ class CallbackDataCache:
                         if not isinstance(callback_data, InvalidCallbackData):
                             keyboard_uuid = self.extract_uuids(button_data)[0]
 
-        return message, keyboard_uuid
+        return keyboard_uuid
 
-    def process_callback_query(self, callback_query: CallbackQuery) -> CallbackQuery:
+    def process_callback_query(self, callback_query: CallbackQuery) -> None:
         """
         Replaces the data in the callback query and the attached messages keyboard with the cached
         objects, if necessary. If the data could not be found,
@@ -321,9 +313,6 @@ class CallbackDataCache:
 
         Args:
             callback_query (:class:`telegram.CallbackQuery`): The callback query.
-
-        Returns:
-            The callback query with inserted data.
 
         """
         with self.__lock:
@@ -343,7 +332,7 @@ class CallbackDataCache:
             # Get the cached callback data for the inline keyboard attached to the
             # CallbackQuery.
             if callback_query.message:
-                _, keyboard_uuid = self.__process_message(callback_query.message)
+                keyboard_uuid = self.__process_message(callback_query.message)
                 for message in (
                     callback_query.message.pinned_message,
                     callback_query.message.reply_to_message,
@@ -352,8 +341,6 @@ class CallbackDataCache:
                         self.__process_message(message)
                 if not mapped and keyboard_uuid:
                     self._callback_queries[callback_query.id] = keyboard_uuid
-
-            return callback_query
 
     def __get_button_data(self, callback_data: str) -> Any:
         keyboard, button = self.extract_uuids(callback_data)

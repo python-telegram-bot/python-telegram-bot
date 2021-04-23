@@ -146,9 +146,8 @@ class Bot(telegram.bot.Bot):
             return obj
 
         if isinstance(obj, CallbackQuery):
-            return self.callback_data_cache.process_callback_query(  # type: ignore[return-value]
-                obj
-            )
+            self.callback_data_cache.process_callback_query(obj)
+            return obj  # type: ignore[return-value]
 
         if isinstance(obj, Message):
             if obj.reply_to_message:
@@ -162,9 +161,8 @@ class Bot(telegram.bot.Bot):
                 self.callback_data_cache.process_message(obj.pinned_message)
 
             # Finally, handle the message itself
-            return self.callback_data_cache.process_message(  # type: ignore[return-value]
-                message=obj
-            )
+            self.callback_data_cache.process_message(message=obj)
+            return obj  # type: ignore[return-value]
 
         if isinstance(obj, Chat) and obj.pinned_message:
             self.callback_data_cache.process_message(obj.pinned_message)

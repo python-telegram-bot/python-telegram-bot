@@ -43,6 +43,11 @@ class InlineKeyboardButton(TelegramObject):
           :class:`telegram.ext.InvalidCallbackData`. This will be the case, if the data
           associated with the button was already deleted.
 
+    Warning:
+        If your bot allows your arbitrary callback data, buttons whose callback data is a
+        non-hashable object will be come unhashable. Trying to evaluate ``hash(button)`` will
+        result in a ``TypeError``.
+
     Args:
         text (:obj:`str`): Label text on the button.
         url (:obj:`str`): HTTP or tg:// url to be opened when button is pressed.
@@ -112,7 +117,10 @@ class InlineKeyboardButton(TelegramObject):
         self.switch_inline_query_current_chat = switch_inline_query_current_chat
         self.callback_game = callback_game
         self.pay = pay
+        self._id_attrs = ()
+        self._set_id_attrs()
 
+    def _set_id_attrs(self) -> None:
         self._id_attrs = (
             self.text,
             self.url,
@@ -123,3 +131,14 @@ class InlineKeyboardButton(TelegramObject):
             self.callback_game,
             self.pay,
         )
+
+    def update_callback_data(self, callback_data: object) -> None:
+        """
+        Sets :attr:`callback_data` to the passed object. Intended to be used by
+        :class:`telegram.ext.CallbackDataCache`.
+
+        Args:
+            callback_data (:obj:`obj`): The new callback data.
+        """
+        self.callback_data = callback_data
+        self._set_id_attrs()
