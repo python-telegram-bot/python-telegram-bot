@@ -140,6 +140,10 @@ Passport
     telegram.passportelementerrorfiles
     telegram.passportelementerrordatafield
     telegram.passportelementerrorfile
+    telegram.passportelementerrorselfie
+    telegram.passportelementerrortranslationfile
+    telegram.passportelementerrortranslationfiles
+    telegram.passportelementerrorunspecified
     telegram.credentials
     telegram.datacredentials
     telegram.securedata
