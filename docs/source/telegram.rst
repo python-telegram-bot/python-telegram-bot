@@ -135,11 +135,10 @@ Passport
 
     telegram.passportelementerror
     telegram.passportelementerrorfile
+    telegram.passportelementerrorfiles
     telegram.passportelementerrorreverseside
     telegram.passportelementerrorfrontside
-    telegram.passportelementerrorfiles
     telegram.passportelementerrordatafield
-    telegram.passportelementerrorfile
     telegram.passportelementerrorselfie
     telegram.passportelementerrortranslationfile
     telegram.passportelementerrortranslationfiles
