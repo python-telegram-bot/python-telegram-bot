@@ -1,6 +1,3 @@
-.. include:: telegram.ext.rst
-
-
 telegram package
 ================
 
@@ -156,4 +153,12 @@ Passport
     telegram.encryptedpassportelement
     telegram.encryptedcredentials
 
-.. include:: telegram.utils.rst
+utils
+-----
+
+.. toctree::
+
+    telegram.utils.helpers
+    telegram.utils.promise
+    telegram.utils.request
+    telegram.utils.types
