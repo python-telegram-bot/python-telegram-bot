@@ -289,7 +289,7 @@ class Request:
 
         Args:
             url (:obj:`str`): The web location we want to retrieve.
-            data (:obj:`dict[str, str|int]`, optional): A dict of key/value pairs.
+            data (Dict[:obj:`str`, :obj:`str` | :obj:`int`], optional): A dict of key/value pairs.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
