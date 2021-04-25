@@ -83,7 +83,7 @@ class Game(TelegramObject):
         self.photo = photo
         # Optionals
         self.text = text
-        self.text_entities = text_entities or list()
+        self.text_entities = text_entities or []
         self.animation = animation
 
         self._id_attrs = (self.title, self.description, self.photo)

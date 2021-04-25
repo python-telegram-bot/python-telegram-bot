@@ -213,7 +213,7 @@ class TestChat:
         def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == chat.id
             user_id = kwargs['user_id'] == 42
-            o_i_b = kwargs.get('only_if_banned', None) == only_if_banned
+            o_i_b = kwargs.get('only_if_banned') == only_if_banned
             return chat_id and user_id and o_i_b
 
         assert check_shortcut_signature(Chat.unban_member, Bot.unban_chat_member, ['chat_id'], [])
@@ -228,7 +228,7 @@ class TestChat:
         def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == chat.id
             user_id = kwargs['user_id'] == 42
-            o_i_b = kwargs.get('is_anonymous', None) == is_anonymous
+            o_i_b = kwargs.get('is_anonymous') == is_anonymous
             return chat_id and user_id and o_i_b
 
         assert check_shortcut_signature(
@@ -246,7 +246,7 @@ class TestChat:
         def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == chat.id
             user_id = kwargs['user_id'] == 42
-            o_i_b = kwargs.get('permissions', None) == permissions
+            o_i_b = kwargs.get('permissions') == permissions
             return chat_id and user_id and o_i_b
 
         assert check_shortcut_signature(

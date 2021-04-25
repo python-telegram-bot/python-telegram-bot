@@ -162,6 +162,11 @@ class Dispatcher:
                 stacklevel=3,
             )
 
+        if self.workers < 1:
+            warnings.warn(
+                'Asynchronous callbacks can not be processed without at least one worker thread.'
+            )
+
         self.user_data: DefaultDict[int, Dict[object, object]] = defaultdict(dict)
         self.chat_data: DefaultDict[int, Dict[object, object]] = defaultdict(dict)
         self.bot_data = {}
@@ -511,7 +516,7 @@ class Dispatcher:
             handler.conversations = self.persistence.get_conversations(handler.name)
 
         if group not in self.handlers:
-            self.handlers[group] = list()
+            self.handlers[group] = []
             self.groups.append(group)
             self.groups = sorted(self.groups)
 

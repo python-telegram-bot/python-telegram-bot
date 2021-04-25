@@ -17,7 +17,7 @@ bot.
 import logging
 from typing import Dict
 
-from telegram import ReplyKeyboardMarkup, Update
+from telegram import ReplyKeyboardMarkup, Update, ReplyKeyboardRemove
 from telegram.ext import (
     Updater,
     CommandHandler,
@@ -47,7 +47,7 @@ markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 
 
 def facts_to_str(user_data: Dict[str, str]) -> str:
-    facts = list()
+    facts = []
 
     for key, value in user_data.items():
         facts.append(f'{key} - {value}')
@@ -77,7 +77,7 @@ def regular_choice(update: Update, context: CallbackContext) -> int:
     context.user_data['choice'] = text
     if context.user_data.get(text):
         reply_text = (
-            f'Your {text}, I already know the following about that: {context.user_data[text]}'
+            f'Your {text}? I already know the following about that: {context.user_data[text]}'
         )
     else:
         reply_text = f'Your {text}? Yes, I would love to hear about that!'
@@ -88,7 +88,7 @@ def regular_choice(update: Update, context: CallbackContext) -> int:
 
 def custom_choice(update: Update, _: CallbackContext) -> int:
     update.message.reply_text(
-        'Alright, please send me the category first, ' 'for example "Most impressive skill"'
+        'Alright, please send me the category first, for example "Most impressive skill"'
     )
 
     return TYPING_CHOICE
@@ -122,7 +122,8 @@ def done(update: Update, context: CallbackContext) -> int:
         del context.user_data['choice']
 
     update.message.reply_text(
-        "I learned these facts about you:" f"{facts_to_str(context.user_data)} Until next time!"
+        "I learned these facts about you:" f"{facts_to_str(context.user_data)}Until next time!",
+        reply_markup=ReplyKeyboardRemove(),
     )
     return ConversationHandler.END
 

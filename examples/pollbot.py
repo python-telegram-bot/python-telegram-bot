@@ -4,7 +4,7 @@
 
 """
 Basic example for a bot that works with polls. Only 3 people are allowed to interact with each
-poll/quiz the bot generates. The preview command generates a closed poll/quiz, excatly like the
+poll/quiz the bot generates. The preview command generates a closed poll/quiz, exactly like the
 one the user sends the bot
 """
 import logging
