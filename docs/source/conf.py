@@ -52,7 +52,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Python Telegram Bot'
+project = u'python-telegram-bot'
 copyright = u'2015-2021, Leandro Toledo'
 author = u'Leandro Toledo'
 
@@ -208,7 +208,7 @@ html_static_path = ['_static']
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'PythonTelegramBotdoc'
+htmlhelp_basename = 'python-telegram-bot-doc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -233,7 +233,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  (master_doc, 'PythonTelegramBot.tex', u'Python Telegram Bot Documentation',
+  (master_doc, 'python-telegram-bot.tex', u'python-telegram-bot Documentation',
    author, 'manual'),
 ]
 
@@ -263,7 +263,7 @@ latex_logo = 'ptb-logo_1024.png'
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'pythontelegrambot', u'Python Telegram Bot Documentation',
+    (master_doc, 'python-telegram-bot', u'python-telegram-bot Documentation',
      [author], 1)
 ]
 
@@ -277,8 +277,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  (master_doc, 'PythonTelegramBot', u'Python Telegram Bot Documentation',
-   author, 'PythonTelegramBot', "We have made you a wrapper you can't refuse",
+  (master_doc, 'python-telegram-bot', u'python-telegram-bot Documentation',
+   author, 'python-telegram-bot', "We have made you a wrapper you can't refuse",
    'Miscellaneous'),
 ]
 
