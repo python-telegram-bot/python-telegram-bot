@@ -131,7 +131,7 @@ class TestErrors:
         """
 
         def make_assertion(cls):
-            assert {sc for sc in cls.__subclasses__()} == covered_subclasses[cls]
+            assert set(cls.__subclasses__()) == covered_subclasses[cls]
             for subcls in cls.__subclasses__():
                 make_assertion(subcls)
 

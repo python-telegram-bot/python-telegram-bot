@@ -17,7 +17,7 @@ bot.
 import logging
 from typing import Dict
 
-from telegram import ReplyKeyboardMarkup, Update
+from telegram import ReplyKeyboardMarkup, Update, ReplyKeyboardRemove
 from telegram.ext import (
     Updater,
     CommandHandler,
@@ -102,7 +102,8 @@ def done(update: Update, context: CallbackContext) -> int:
         del user_data['choice']
 
     update.message.reply_text(
-        f"I learned these facts about you: {facts_to_str(user_data)} Until next time!"
+        f"I learned these facts about you: {facts_to_str(user_data)}Until next time!",
+        reply_markup=ReplyKeyboardRemove(),
     )
 
     user_data.clear()

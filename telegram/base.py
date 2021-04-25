@@ -76,7 +76,7 @@ class TelegramObject:
         return json.dumps(self.to_dict())
 
     def to_dict(self) -> JSONDict:
-        data = dict()
+        data = {}
 
         for key in iter(self.__dict__):
             if key == 'bot' or key.startswith('_'):

@@ -74,9 +74,10 @@ def _name_switcher(level: str) -> Tuple[str, str]:
 def start(update: Update, context: CallbackContext) -> str:
     """Select an action: Adding parent/child or show data."""
     text = (
-        'You may add a familiy member, yourself show the gathered data or end the '
-        'conversation. To abort, simply type /stop.'
+        "You may choose to add a family member, yourself, show the gathered data, or end the "
+        "conversation. To abort, simply type /stop."
     )
+
     buttons = [
         [
             InlineKeyboardButton(text='Add family member', callback_data=str(ADDING_MEMBER)),
@@ -89,13 +90,13 @@ def start(update: Update, context: CallbackContext) -> str:
     ]
     keyboard = InlineKeyboardMarkup(buttons)
 
-    # If we're starting over we don't need do send a new message
+    # If we're starting over we don't need to send a new message
     if context.user_data.get(START_OVER):
         update.callback_query.answer()
         update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
     else:
         update.message.reply_text(
-            'Hi, I\'m FamiliyBot and here to help you gather information' 'about your family.'
+            "Hi, I'm Family Bot and I'm here to help you gather information about your family."
         )
         update.message.reply_text(text=text, reply_markup=keyboard)
 
@@ -104,7 +105,7 @@ def start(update: Update, context: CallbackContext) -> str:
 
 
 def adding_self(update: Update, context: CallbackContext) -> str:
-    """Add information about youself."""
+    """Add information about yourself."""
     context.user_data[CURRENT_LEVEL] = SELF
     text = 'Okay, please tell me about yourself.'
     button = InlineKeyboardButton(text='Add info', callback_data=str(MALE))
@@ -137,9 +138,9 @@ def show_data(update: Update, context: CallbackContext) -> str:
         return text
 
     user_data = context.user_data
-    text = 'Yourself:' + prettyprint(user_data, SELF)
-    text += '\n\nParents:' + prettyprint(user_data, PARENTS)
-    text += '\n\nChildren:' + prettyprint(user_data, CHILDREN)
+    text = f"Yourself:{prettyprint(user_data, SELF)}"
+    text += f"\n\nParents:{prettyprint(user_data, PARENTS)}"
+    text += f"\n\nChildren:{prettyprint(user_data, CHILDREN)}"
 
     buttons = [[InlineKeyboardButton(text='Back', callback_data=str(END))]]
     keyboard = InlineKeyboardMarkup(buttons)
@@ -201,8 +202,8 @@ def select_gender(update: Update, context: CallbackContext) -> str:
 
     buttons = [
         [
-            InlineKeyboardButton(text='Add ' + male, callback_data=str(MALE)),
-            InlineKeyboardButton(text='Add ' + female, callback_data=str(FEMALE)),
+            InlineKeyboardButton(text=f'Add {male}', callback_data=str(MALE)),
+            InlineKeyboardButton(text=f'Add {female}', callback_data=str(FEMALE)),
         ],
         [
             InlineKeyboardButton(text='Show data', callback_data=str(SHOWING)),
@@ -326,7 +327,7 @@ def main() -> None:
         map_to_parent={
             # Return to second level menu
             END: SELECTING_LEVEL,
-            # End conversation alltogether
+            # End conversation altogether
             STOPPING: STOPPING,
         },
     )
@@ -350,13 +351,13 @@ def main() -> None:
             SHOWING: SHOWING,
             # Return to top level menu
             END: SELECTING_ACTION,
-            # End conversation alltogether
+            # End conversation altogether
             STOPPING: END,
         },
     )
 
     # Set up top level ConversationHandler (selecting action)
-    # Because the states of the third level conversation map to the ones of the econd level
+    # Because the states of the third level conversation map to the ones of the second level
     # conversation, we need to make sure the top level conversation can also handle them
     selection_handlers = [
         add_member_conv,

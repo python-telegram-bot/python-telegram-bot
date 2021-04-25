@@ -28,8 +28,11 @@ logger = logging.getLogger(__name__)
 
 
 def start_callback(update: Update, _: CallbackContext) -> None:
-    msg = "Use /shipping to get an invoice for shipping-payment, "
-    msg += "or /noshipping for an invoice without shipping."
+    msg = (
+        "Use /shipping to get an invoice for shipping-payment, or /noshipping for an "
+        "invoice without shipping."
+    )
+
     update.message.reply_text(msg)
 
 

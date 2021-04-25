@@ -423,7 +423,7 @@ class TestBot:
         assert new_message.poll.is_closed
 
     @flaky(5, 1)
-    @pytest.mark.timeout(10)
+    @pytest.mark.timeout(20)
     def test_send_close_date_default_tz(self, tz_bot, super_group_id):
         question = 'Is this a test?'
         answers = ['Yes', 'No', 'Maybe']
@@ -614,8 +614,27 @@ class TestBot:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_chat_action(self, bot, chat_id):
-        assert bot.send_chat_action(chat_id, ChatAction.TYPING)
+    @pytest.mark.parametrize(
+        'chat_action',
+        [
+            ChatAction.FIND_LOCATION,
+            ChatAction.RECORD_AUDIO,
+            ChatAction.RECORD_VIDEO,
+            ChatAction.RECORD_VIDEO_NOTE,
+            ChatAction.RECORD_VOICE,
+            ChatAction.TYPING,
+            ChatAction.UPLOAD_AUDIO,
+            ChatAction.UPLOAD_DOCUMENT,
+            ChatAction.UPLOAD_PHOTO,
+            ChatAction.UPLOAD_VIDEO,
+            ChatAction.UPLOAD_VIDEO_NOTE,
+            ChatAction.UPLOAD_VOICE,
+        ],
+    )
+    def test_send_chat_action(self, bot, chat_id, chat_action):
+        assert bot.send_chat_action(chat_id, chat_action)
+        with pytest.raises(BadRequest, match='Wrong parameter action'):
+            bot.send_chat_action(chat_id, 'unknown action')
 
     # TODO: Needs improvement. We need incoming inline query to test answer.
     def test_answer_inline_query(self, monkeypatch, bot):
@@ -1441,6 +1460,9 @@ class TestBot:
 
         with pytest.raises(TelegramError, match='should not be empty and there should not be'):
             bot.answer_shipping_query(1, True)
+
+        with pytest.raises(AssertionError):
+            bot.answer_shipping_query(1, True, shipping_options=[])
 
     # TODO: Needs improvement. Need incoming pre checkout queries to test
     def test_answer_pre_checkout_query_ok(self, monkeypatch, bot):

@@ -139,7 +139,7 @@ def four(update: Update, _: CallbackContext) -> int:
     keyboard = [
         [
             InlineKeyboardButton("2", callback_data=str(TWO)),
-            InlineKeyboardButton("4", callback_data=str(FOUR)),
+            InlineKeyboardButton("3", callback_data=str(THREE)),
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -188,8 +188,7 @@ def main() -> None:
         fallbacks=[CommandHandler('start', start)],
     )
 
-    # Add ConversationHandler to dispatcher that will be used for handling
-    # updates
+    # Add ConversationHandler to dispatcher that will be used for handling updates
     dispatcher.add_handler(conv_handler)
 
     # Start the Bot
