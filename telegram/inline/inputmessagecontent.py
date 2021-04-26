@@ -25,6 +25,7 @@ class InputMessageContent(TelegramObject):
     """Base class for Telegram InputMessageContent Objects.
 
     See: :class:`telegram.InputContactMessageContent`,
+    :class:`telegram.InputInvoiceMessageContent`,
     :class:`telegram.InputLocationMessageContent`, :class:`telegram.InputTextMessageContent` and
     :class:`telegram.InputVenueMessageContent` for more details.
 

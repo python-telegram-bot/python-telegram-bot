@@ -106,6 +106,7 @@ Inline Mode
     telegram.inputlocationmessagecontent
     telegram.inputvenuemessagecontent
     telegram.inputcontactmessagecontent
+    telegram.inputinvoicemessagecontent
     telegram.choseninlineresult
 
 Payments

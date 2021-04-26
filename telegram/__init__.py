@@ -101,8 +101,9 @@ from .inline.inlinequeryresultgame import InlineQueryResultGame
 from .inline.inputtextmessagecontent import InputTextMessageContent
 from .inline.inputlocationmessagecontent import InputLocationMessageContent
 from .inline.inputvenuemessagecontent import InputVenueMessageContent
-from .inline.inputcontactmessagecontent import InputContactMessageContent
 from .payment.labeledprice import LabeledPrice
+from .inline.inputinvoicemessagecontent import InputInvoiceMessageContent
+from .inline.inputcontactmessagecontent import InputContactMessageContent
 from .payment.shippingoption import ShippingOption
 from .payment.precheckoutquery import PreCheckoutQuery
 from .payment.shippingquery import ShippingQuery
@@ -207,6 +208,7 @@ __all__ = (  # Keep this alphabetically ordered
     'InlineQueryResultVoice',
     'InputContactMessageContent',
     'InputFile',
+    'InputInvoiceMessageContent',
     'InputLocationMessageContent',
     'InputMedia',
     'InputMediaAnimation',
