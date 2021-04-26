@@ -62,6 +62,7 @@ telegram package
     telegram.voice
     telegram.voicechatstarted
     telegram.voicechatended
+    telegram.voicechatscheduled
     telegram.voicechatparticipantsinvited
     telegram.webhookinfo
 
