@@ -53,6 +53,7 @@ from telegram import (
     ProximityAlertTriggered,
     ReplyMarkup,
     MessageAutoDeleteTimerChanged,
+    VoiceChatScheduled,
 )
 from telegram.utils.helpers import (
     escape_markdown,
@@ -204,6 +205,10 @@ class Message(TelegramObject):
         proximity_alert_triggered (:class:`telegram.ProximityAlertTriggered`, optional): Service
             message. A user in the chat triggered another user's proximity alert while sharing
             Live Location.
+        voice_chat_scheduled (:class:`telegram.VoiceChatScheduled`, optional): Service message:
+            voice chat scheduled.
+
+            .. versionadded:: 13.5
         voice_chat_started (:class:`telegram.VoiceChatStarted`, optional): Service message: voice
             chat started.
 
@@ -305,6 +310,10 @@ class Message(TelegramObject):
         proximity_alert_triggered (:class:`telegram.ProximityAlertTriggered`): Optional. Service
             message. A user in the chat triggered another user's proximity alert while sharing
             Live Location.
+        voice_chat_scheduled (:class:`telegram.VoiceChatScheduled`): Optional. Service message:
+            voice chat scheduled.
+
+            .. versionadded:: 13.5
         voice_chat_started (:class:`telegram.VoiceChatStarted`): Optional. Service message: voice
             chat started
 
@@ -360,6 +369,7 @@ class Message(TelegramObject):
         'dice',
         'passport_data',
         'proximity_alert_triggered',
+        'voice_chat_scheduled',
         'voice_chat_started',
         'voice_chat_ended',
         'voice_chat_participants_invited',
@@ -423,6 +433,7 @@ class Message(TelegramObject):
         voice_chat_ended: VoiceChatEnded = None,
         voice_chat_participants_invited: VoiceChatParticipantsInvited = None,
         message_auto_delete_timer_changed: MessageAutoDeleteTimerChanged = None,
+        voice_chat_scheduled: VoiceChatScheduled = None,
         **_kwargs: Any,
     ):
         # Required
@@ -478,6 +489,7 @@ class Message(TelegramObject):
         self.dice = dice
         self.via_bot = via_bot
         self.proximity_alert_triggered = proximity_alert_triggered
+        self.voice_chat_scheduled = voice_chat_scheduled
         self.voice_chat_started = voice_chat_started
         self.voice_chat_ended = voice_chat_ended
         self.voice_chat_participants_invited = voice_chat_participants_invited
@@ -551,6 +563,9 @@ class Message(TelegramObject):
             data.get('proximity_alert_triggered'), bot
         )
         data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
+        data['voice_chat_scheduled'] = VoiceChatScheduled.de_json(
+            data.get('voice_chat_scheduled'), bot
+        )
         data['voice_chat_started'] = VoiceChatStarted.de_json(data.get('voice_chat_started'), bot)
         data['voice_chat_ended'] = VoiceChatEnded.de_json(data.get('voice_chat_ended'), bot)
         data['voice_chat_participants_invited'] = VoiceChatParticipantsInvited.de_json(

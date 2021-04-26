@@ -52,6 +52,7 @@ from telegram import (
     VoiceChatEnded,
     VoiceChatParticipantsInvited,
     MessageAutoDeleteTimerChanged,
+    VoiceChatScheduled,
 )
 from telegram.ext import Defaults
 from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
@@ -171,6 +172,7 @@ def message(bot):
                 User(1, 'John', False), User(2, 'Doe', False), 42
             )
         },
+        {'voice_chat_scheduled': VoiceChatScheduled(datetime.utcnow())},
         {'voice_chat_started': VoiceChatStarted()},
         {'voice_chat_ended': VoiceChatEnded(100)},
         {
@@ -224,6 +226,7 @@ def message(bot):
         'dice',
         'via_bot',
         'proximity_alert_triggered',
+        'voice_chat_scheduled',
         'voice_chat_started',
         'voice_chat_ended',
         'voice_chat_participants_invited',
