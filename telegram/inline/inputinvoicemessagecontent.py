@@ -60,10 +60,10 @@ class InputInvoiceMessageContent(InputMessageContent):
             positive, passed in a strictly increased order and must not exceed max_tip_amount.
         provider_data (:obj:`str`, optional): A JSON-serialized object for data about the invoice,
             which will be shared with the payment provider. A detailed description of the required
-                fields should be provided by the payment provider.
+            fields should be provided by the payment provider.
         photo_url (:obj:`str`, optional): URL of the product photo for the invoice. Can be a photo
             of the goods or a marketing image for a service. People like it better when they see
-                what they are paying for.
+            what they are paying for.
         photo_size (:obj:`int`, optional): Photo size.
         photo_width (:obj:`int`, optional): Photo width.
         photo_height (:obj:`int`, optional): Photo height.
@@ -106,10 +106,10 @@ class InputInvoiceMessageContent(InputMessageContent):
             positive, passed in a strictly increased order and must not exceed max_tip_amount.
         provider_data (:obj:`str`): Optional. A JSON-serialized object for data about the invoice,
             which will be shared with the payment provider. A detailed description of the required
-                fields should be provided by the payment provider.
+            fields should be provided by the payment provider.
         photo_url (:obj:`str`): Optional. URL of the product photo for the invoice. Can be a photo
             of the goods or a marketing image for a service. People like it better when they see
-                what they are paying for.
+            what they are paying for.
         photo_size (:obj:`int`): Optional. Photo size.
         photo_width (:obj:`int`): Optional. Photo width.
         photo_height (:obj:`int`): Optional. Photo height.

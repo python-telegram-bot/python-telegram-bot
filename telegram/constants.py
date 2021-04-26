@@ -59,6 +59,9 @@ Attributes:
     CHAT_GROUP (:obj:`str`): 'group'
     CHAT_SUPERGROUP (:obj:`str`): 'supergroup'
     CHAT_CHANNEL (:obj:`str`): 'channel'
+    CHAT_SENDER (:obj:`str`): 'sender'. Only relevant for :attr:`telegram.InlineQuery.chat_type`.
+
+        .. versionadded:: 13.5
 
 :class:`telegram.ChatAction`:
 
@@ -177,6 +180,7 @@ MAX_MESSAGE_ENTITIES: int = 100
 MAX_INLINE_QUERY_RESULTS: int = 50
 MAX_ANSWER_CALLBACK_QUERY_TEXT_LENGTH: int = 200
 
+CHAT_SENDER: str = 'sender'
 CHAT_PRIVATE: str = 'private'
 CHAT_GROUP: str = 'group'
 CHAT_SUPERGROUP: str = 'supergroup'

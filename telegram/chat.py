@@ -143,6 +143,11 @@ class Chat(TelegramObject):
 
     """
 
+    SENDER: ClassVar[str] = constants.CHAT_SENDER
+    """:const:`telegram.constants.CHAT_SENDER`
+
+    .. versionadded:: 13.5
+    """
     PRIVATE: ClassVar[str] = constants.CHAT_PRIVATE
     """:const:`telegram.constants.CHAT_PRIVATE`"""
     GROUP: ClassVar[str] = constants.CHAT_GROUP
