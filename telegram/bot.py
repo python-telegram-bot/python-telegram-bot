@@ -538,7 +538,7 @@ class Bot(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> Message:
-        """Use this method to forward messages of any kind.
+        """Use this method to forward messages of any kind. Service messages can't be forwarded.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -3295,7 +3295,8 @@ class Bot(TelegramObject):
         """Use this method to send invoices.
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target private chat.
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format ``@channelusername``).
             title (:obj:`str`): Product name, 1-32 characters.
             description (:obj:`str`): Product description, 1-255 characters.
             payload (:obj:`str`): Bot-defined invoice payload, 1-128 bytes. This will not be
@@ -3321,8 +3322,12 @@ class Bot(TelegramObject):
                 ``max_tip_amount``.
 
                 .. versionadded:: 13.5
-            start_parameter (:obj:`str`, optional): Unique deep-linking parameter that can be used
-                to generate this invoice when used as a start parameter.
+            start_parameter (:obj:`str`, optional): Unique deep-linking parameter. If left empty,
+                *forwarded copies* of the sent message will have a *Pay* button, allowing
+                multiple users to pay directly from the forwarded message, using the same invoice.
+                If non-empty, forwarded copies of the sent message will have a *URL* button with a
+                deep link to the bot (instead of a *Pay* button), with the value used as the
+                start parameter.
 
                 .. versionchanged:: 13.5
                     As of Bot API 5.2, this parameter is optional.
@@ -5010,9 +5015,9 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
     ) -> MessageId:
         """
-        Use this method to copy messages of any kind. The method is analogous to the method
-        forwardMessages, but the copied message doesn't have a link to the original message.
-        Returns the MessageId of the sent message on success.
+        Use this method to copy messages of any kind. Service messages and invoice messages can't
+        be copied. The method is analogous to the method :meth:`forward_message`, but the copied
+        message doesn't have a link to the original message.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
