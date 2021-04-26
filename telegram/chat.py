@@ -922,9 +922,9 @@ class Chat(TelegramObject):
         description: str,
         payload: str,
         provider_token: str,
-        start_parameter: str,
         currency: str,
         prices: List['LabeledPrice'],
+        start_parameter: str = None,
         photo_url: str = None,
         photo_size: int = None,
         photo_width: int = None,
@@ -943,12 +943,17 @@ class Chat(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        max_tip_amount: int = None,
+        suggested_tip_amounts: List[int] = None,
     ) -> 'Message':
         """Shortcut for::
 
             bot.send_invoice(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_invoice`.
+
+        .. versionchanged:: 13.5
+            As of Bot API 5.2, this parameter is optional.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -960,9 +965,9 @@ class Chat(TelegramObject):
             description=description,
             payload=payload,
             provider_token=provider_token,
-            start_parameter=start_parameter,
             currency=currency,
             prices=prices,
+            start_parameter=start_parameter,
             photo_url=photo_url,
             photo_size=photo_size,
             photo_width=photo_width,
@@ -981,6 +986,8 @@ class Chat(TelegramObject):
             timeout=timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
+            max_tip_amount=max_tip_amount,
+            suggested_tip_amounts=suggested_tip_amounts,
         )
 
     def send_location(

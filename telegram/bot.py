@@ -3268,9 +3268,9 @@ class Bot(TelegramObject):
         description: str,
         payload: str,
         provider_token: str,
-        start_parameter: str,
         currency: str,
         prices: List['LabeledPrice'],
+        start_parameter: str = None,
         photo_url: str = None,
         photo_size: int = None,
         photo_width: int = None,
@@ -3289,6 +3289,8 @@ class Bot(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        max_tip_amount: int = None,
+        suggested_tip_amounts: List[int] = None,
     ) -> Message:
         """Use this method to send invoices.
 
@@ -3300,12 +3302,30 @@ class Bot(TelegramObject):
                 displayed to the user, use for your internal processes.
             provider_token (:obj:`str`): Payments provider token, obtained via
                 `@BotFather <https://t.me/BotFather>`_.
-            start_parameter (:obj:`str`): Unique deep-linking parameter that can be used to
-                generate this invoice when used as a start parameter.
             currency (:obj:`str`): Three-letter ISO 4217 currency code.
             prices (List[:class:`telegram.LabeledPrice`)]: Price breakdown, a JSON-serialized list
                 of components (e.g. product price, tax, discount, delivery cost, delivery tax,
                 bonus, etc.).
+            max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the
+                smallest units of the currency (integer, not float/double). For example, for a
+                maximum tip of US$ 1.45 pass ``max_tip_amount = 145``. See the exp parameter in
+                `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_, it
+                shows the number of digits past the decimal point for each currency (2 for the
+                majority of currencies). Defaults to ``0``.
+
+                .. versionadded:: 13.5
+            suggested_tip_amounts (List[:obj:`int`], optional): A JSON-serialized array of
+                suggested amounts of tips in the smallest units of the currency (integer, not
+                float/double). At most 4 suggested tip amounts can be specified. The suggested tip
+                amounts must be positive, passed in a strictly increased order and must not exceed
+                ``max_tip_amount``.
+
+                .. versionadded:: 13.5
+            start_parameter (:obj:`str`, optional): Unique deep-linking parameter that can be used
+                to generate this invoice when used as a start parameter.
+
+                .. versionchanged:: 13.5
+                    As of Bot API 5.2, this parameter is optional.
             provider_data (:obj:`str` | :obj:`object`, optional): JSON-serialized data about the
                 invoice, which will be shared with the payment provider. A detailed description of
                 required fields should be provided by the payment provider. When an object is
@@ -3358,10 +3378,15 @@ class Bot(TelegramObject):
             'description': description,
             'payload': payload,
             'provider_token': provider_token,
-            'start_parameter': start_parameter,
             'currency': currency,
             'prices': [p.to_dict() for p in prices],
         }
+        if max_tip_amount is not None:
+            data['max_tip_amount'] = max_tip_amount
+        if suggested_tip_amounts is not None:
+            data['suggested_tip_amounts'] = suggested_tip_amounts
+        if start_parameter is not None:
+            data['start_parameter'] = start_parameter
         if provider_data is not None:
             if isinstance(provider_data, str):
                 data['provider_data'] = provider_data
