@@ -130,7 +130,7 @@ def greet_chat_members(update: Update, _: CallbackContext) -> None:
         )
     elif was_member and not is_member:
         update.effective_chat.send_message(
-            f"{member_name} is no longer with use. Thanks a lot, {cause_name} ...",
+            f"{member_name} is no longer with us. Thanks a lot, {cause_name} ...",
             parse_mode=ParseMode.HTML,
         )
 
