@@ -155,7 +155,7 @@ Attributes:
     STICKER_FOREHEAD (:obj:`str`): 'forehead'
     STICKER_EYES (:obj:`str`): 'eyes'
     STICKER_MOUTH (:obj:`str`): 'mouth'
-    STICKER_CHIN (:obj:`str`): 'chin'́
+    STICKER_CHIN (:obj:`str`): 'chin'
 
 :class:`telegram.Update`:
 

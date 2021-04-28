@@ -41,7 +41,7 @@ def extract_status_change(
 
     if status_change is None:
         return None
-    # We first check if the bot was a chat member before and if it it now
+
     old_status, new_status = status_change
     was_member = (
         old_status
@@ -72,7 +72,7 @@ def track_chats(update: Update, context: CallbackContext) -> None:
         return
     was_member, is_member = result
 
-    # Let's check how is responsible for the change
+    # Let's check who is responsible for the change
     cause_name = update.effective_user.full_name
 
     # Handle chat types differently:
@@ -106,15 +106,15 @@ def show_chats(update: Update, context: CallbackContext) -> None:
     group_ids = ", ".join(str(gid) for gid in context.bot_data.setdefault("group_ids", set()))
     channel_ids = ", ".join(str(cid) for cid in context.bot_data.setdefault("channel_ids", set()))
     text = (
-        f"@{context.bot.bot.username} is currently in a conversation with the user IDs {user_ids}."
+        f"@{context.bot.username} is currently in a conversation with the user IDs {user_ids}."
         f" Moreover it is a member of the groups with IDs {group_ids} "
-        f"and administrator in the channels IDs {channel_ids}."
+        f"and administrator in the channels with IDs {channel_ids}."
     )
     update.effective_message.reply_text(text)
 
 
 def greet_chat_members(update: Update, _: CallbackContext) -> None:
-    """Greets new users in chats and announce if someone leaves"""
+    """Greets new users in chats and announces when someone leaves"""
     result = extract_status_change(update.chat_member)
     if result is None:
         return
