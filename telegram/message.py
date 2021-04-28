@@ -1669,7 +1669,7 @@ class Message(TelegramObject):
         .. versionadded:: 13.2
 
         .. versionchanged:: 13.5
-            As of Bot API 5.2, this parameter is optional.
+            As of Bot API 5.2, the parameter :attr:`start_parameter` is optional.
 
         Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the invoice is sent as an actual

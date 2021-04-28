@@ -958,7 +958,7 @@ class Chat(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_invoice`.
 
         .. versionchanged:: 13.5
-            As of Bot API 5.2, this parameter is optional.
+            As of Bot API 5.2, the parameter :attr:`start_parameter` is optional.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.

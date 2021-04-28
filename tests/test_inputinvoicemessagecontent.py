@@ -181,7 +181,7 @@ class TestInputInvoiceMessageContent:
             == input_invoice_message_content.is_flexible
         )
 
-    def test_do_json(self, bot):
+    def test_de_json(self, bot):
         assert InputInvoiceMessageContent.de_json({}, bot=bot) is None
 
         json_dict = {

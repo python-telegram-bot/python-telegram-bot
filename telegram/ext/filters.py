@@ -1052,7 +1052,7 @@ officedocument.wordprocessingml.document")``.
         """Messages that contain :attr:`telegram.Message.proximity_alert_triggered`."""
 
         class _VoiceChatScheduled(MessageFilter):
-            name = 'Filters.status_update.voice_chat_started'
+            name = 'Filters.status_update.voice_chat_scheduled'
 
             def filter(self, message: Message) -> bool:
                 return bool(message.voice_chat_scheduled)
@@ -1144,7 +1144,7 @@ officedocument.wordprocessingml.document")``.
         proximity_alert_triggered: Messages that contain
             :attr:`telegram.Message.proximity_alert_triggered`.
         voice_chat_schedule: Messages that contain
-            :attr:`telegram.Message.voice_chat_schedule`.
+            :attr:`telegram.Message.voice_chat_scheduled`.
 
             .. versionadded:: 13.5
         voice_chat_started: Messages that contain

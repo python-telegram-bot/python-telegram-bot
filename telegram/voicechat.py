@@ -122,12 +122,12 @@ class VoiceChatScheduled(TelegramObject):
     considered equal, if their :attr:`start_date` are equal.
 
     Args:
-        start_date ((:class:`datetime.datetime`): Point in time (Unix timestamp) when the voice
+        start_date (:obj:`datetime.datetime`): Point in time (Unix timestamp) when the voice
             chat is supposed to be started by a chat administrator
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        start_date ((:class:`datetime.datetime`): Point in time (Unix timestamp) when the voice
+        start_date (:obj:`datetime.datetime`): Point in time (Unix timestamp) when the voice
             chat is supposed to be started by a chat administrator
 
     """

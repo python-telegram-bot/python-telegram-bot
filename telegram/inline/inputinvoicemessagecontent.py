@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the classes that represent Telegram InputInvoiceMessageContent."""
+"""This module contains a class that represents a Telegram InputInvoiceMessageContent."""
 
 from typing import Any, List, Optional, TYPE_CHECKING
 
@@ -33,7 +33,7 @@ class InputInvoiceMessageContent(InputMessageContent):
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`title`, :attr:`description`, :attr:`payload`,
-    :attr:`provider_token`, :attr:`currencies` and :attr:`prices` are equal.
+    :attr:`provider_token`, :attr:`currency` and :attr:`prices` are equal.
 
     .. versionadded:: 13.5
 
@@ -51,13 +51,15 @@ class InputInvoiceMessageContent(InputMessageContent):
             etc.)
         max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the smallest
             units of the currency (integer, not float/double). For example, for a maximum tip of
-            US$ 1.45 pass ``max_tip_amount = 145``. See the exp parameter in currencies.json, it
+            US$ 1.45 pass ``max_tip_amount = 145``. See the ``exp`` parameter in
+            `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_, it
             shows the number of digits past the decimal point for each currency (2 for the majority
             of currencies). Defaults to ``0``.
         suggested_tip_amounts (List[:obj:`int`], optional): A JSON-serialized array of suggested
             amounts of tip in the smallest units of the currency (integer, not float/double). At
             most 4 suggested tip amounts can be specified. The suggested tip amounts must be
-            positive, passed in a strictly increased order and must not exceed max_tip_amount.
+            positive, passed in a strictly increased order and must not exceed
+            :attr:`max_tip_amount`.
         provider_data (:obj:`str`, optional): A JSON-serialized object for data about the invoice,
             which will be shared with the payment provider. A detailed description of the required
             fields should be provided by the payment provider.
@@ -93,23 +95,14 @@ class InputInvoiceMessageContent(InputMessageContent):
         currency (:obj:`str`): Three-letter ISO 4217 currency code, see more on
             `currencies <https://core.telegram.org/bots/payments#supported-currencies>`_
         prices (List[:class:`telegram.LabeledPrice`]): Price breakdown, a JSON-serialized list of
-            components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus,
-            etc.)
+            components.
         max_tip_amount (:obj:`int`): Optional. The maximum accepted amount for tips in the smallest
-            units of the currency (integer, not float/double). For example, for a maximum tip of
-            US$ 1.45 pass ``max_tip_amount = 145``. See the exp parameter in currencies.json, it
-            shows the number of digits past the decimal point for each currency (2 for the majority
-            of currencies). Defaults to ``0``.
+            units of the currency (integer, not float/double).
         suggested_tip_amounts (List[:obj:`int`]): Optional. A JSON-serialized array of suggested
-            amounts of tip in the smallest units of the currency (integer, not float/double). At
-            most 4 suggested tip amounts can be specified. The suggested tip amounts must be
-            positive, passed in a strictly increased order and must not exceed max_tip_amount.
+            amounts of tip in the smallest units of the currency (integer, not float/double).
         provider_data (:obj:`str`): Optional. A JSON-serialized object for data about the invoice,
-            which will be shared with the payment provider. A detailed description of the required
-            fields should be provided by the payment provider.
-        photo_url (:obj:`str`): Optional. URL of the product photo for the invoice. Can be a photo
-            of the goods or a marketing image for a service. People like it better when they see
-            what they are paying for.
+            which will be shared with the payment provider.
+        photo_url (:obj:`str`): Optional. URL of the product photo for the invoice.
         photo_size (:obj:`int`): Optional. Photo size.
         photo_width (:obj:`int`): Optional. Photo width.
         photo_height (:obj:`int`): Optional. Photo height.
