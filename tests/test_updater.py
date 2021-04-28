@@ -450,7 +450,6 @@ class TestUpdater:
         )
         assert self.test_flag is True
 
-    @flaky(3, 1)
     def test_clean_deprecation_warning_webhook(self, recwarn, updater, monkeypatch):
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
         monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
@@ -466,7 +465,6 @@ class TestUpdater:
         assert str(recwarn[0].message).startswith('Old Handler API')
         assert str(recwarn[1].message).startswith('The argument `clean` of')
 
-    @flaky(3, 1)
     def test_clean_deprecation_warning_polling(self, recwarn, updater, monkeypatch):
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
         monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
