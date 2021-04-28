@@ -13,4 +13,5 @@ pytest==6.2.2
 
 flaky
 beautifulsoup4
+pytest-timeout
 wheel
