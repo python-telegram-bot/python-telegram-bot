@@ -162,6 +162,11 @@ class Dispatcher:
                 stacklevel=3,
             )
 
+        if self.workers < 1:
+            warnings.warn(
+                'Asynchronous callbacks can not be processed without at least one worker thread.'
+            )
+
         self.user_data: DefaultDict[int, Dict[object, object]] = defaultdict(dict)
         self.chat_data: DefaultDict[int, Dict[object, object]] = defaultdict(dict)
         self.bot_data = {}
