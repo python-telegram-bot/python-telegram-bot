@@ -1143,7 +1143,7 @@ officedocument.wordprocessingml.document")``.
             :attr:`telegram.Message.pinned_message`.
         proximity_alert_triggered: Messages that contain
             :attr:`telegram.Message.proximity_alert_triggered`.
-        voice_chat_schedule: Messages that contain
+        voice_chat_scheduled: Messages that contain
             :attr:`telegram.Message.voice_chat_scheduled`.
 
             .. versionadded:: 13.5
