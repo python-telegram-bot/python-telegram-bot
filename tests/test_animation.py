@@ -72,7 +72,6 @@ class TestAnimation:
         assert isinstance(animation.thumb, PhotoSize)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_all_args(self, bot, chat_id, animation_file, animation, thumb_file):
         message = bot.send_animation(
             chat_id,
@@ -98,7 +97,6 @@ class TestAnimation:
         assert message.animation.thumb.height == self.height
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_animation_custom_filename(self, bot, chat_id, animation_file, monkeypatch):
         def make_assertion(url, data, **kwargs):
             return data['animation'].filename == 'custom_filename'
@@ -108,7 +106,6 @@ class TestAnimation:
         assert bot.send_animation(chat_id, animation_file, filename='custom_filename')
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_get_and_download(self, bot, animation):
         new_file = bot.get_file(animation.file_id)
 
@@ -121,7 +118,6 @@ class TestAnimation:
         assert os.path.isfile('game.gif')
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_animation_url_file(self, bot, chat_id, animation):
         message = bot.send_animation(
             chat_id=chat_id, animation=self.animation_file_url, caption=self.caption
@@ -141,7 +137,6 @@ class TestAnimation:
         assert message.animation.file_size == animation.file_size
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_animation_caption_entities(self, bot, chat_id, animation):
         test_string = 'Italic Bold Code'
         entities = [
@@ -157,7 +152,6 @@ class TestAnimation:
         assert message.caption_entities == entities
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_animation_default_parse_mode_1(self, default_bot, chat_id, animation_file):
         test_string = 'Italic Bold Code'
@@ -168,7 +162,6 @@ class TestAnimation:
         assert message.caption == test_string
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_animation_default_parse_mode_2(self, default_bot, chat_id, animation_file):
         test_markdown_string = '_Italic_ *Bold* `Code`'
@@ -180,7 +173,6 @@ class TestAnimation:
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_animation_default_parse_mode_3(self, default_bot, chat_id, animation_file):
         test_markdown_string = '_Italic_ *Bold* `Code`'
@@ -206,7 +198,6 @@ class TestAnimation:
         assert test_flag
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize(
         'default_bot,custom',
         [
@@ -241,7 +232,6 @@ class TestAnimation:
                 )
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_resend(self, bot, chat_id, animation):
         message = bot.send_animation(chat_id, animation.file_id)
 
@@ -290,7 +280,6 @@ class TestAnimation:
         assert animation_dict['file_size'] == animation.file_size
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_error_send_empty_file(self, bot, chat_id):
         animation_file = open(os.devnull, 'rb')
 
@@ -298,7 +287,6 @@ class TestAnimation:
             bot.send_animation(chat_id=chat_id, animation=animation_file)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.send_animation(chat_id=chat_id, animation='')

@@ -66,7 +66,6 @@ class TestVoice:
         assert voice.file_size == self.file_size
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_all_args(self, bot, chat_id, voice_file, voice):
         message = bot.send_voice(
             chat_id,
@@ -88,7 +87,6 @@ class TestVoice:
         assert message.caption == self.caption.replace('*', '')
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_voice_custom_filename(self, bot, chat_id, voice_file, monkeypatch):
         def make_assertion(url, data, **kwargs):
             return data['voice'].filename == 'custom_filename'
@@ -98,7 +96,6 @@ class TestVoice:
         assert bot.send_voice(chat_id, voice_file, filename='custom_filename')
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_get_and_download(self, bot, voice):
         new_file = bot.get_file(voice.file_id)
 
@@ -112,7 +109,6 @@ class TestVoice:
         assert os.path.isfile('telegram.ogg')
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_ogg_url_file(self, bot, chat_id, voice):
         message = bot.sendVoice(chat_id, self.voice_file_url, duration=self.duration)
 
@@ -126,7 +122,6 @@ class TestVoice:
         assert message.voice.file_size == voice.file_size
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_resend(self, bot, chat_id, voice):
         message = bot.sendVoice(chat_id, voice.file_id)
 
@@ -141,7 +136,6 @@ class TestVoice:
         assert message
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_voice_caption_entities(self, bot, chat_id, voice_file):
         test_string = 'Italic Bold Code'
         entities = [
@@ -157,7 +151,6 @@ class TestVoice:
         assert message.caption_entities == entities
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_voice_default_parse_mode_1(self, default_bot, chat_id, voice):
         test_string = 'Italic Bold Code'
@@ -168,7 +161,6 @@ class TestVoice:
         assert message.caption == test_string
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_voice_default_parse_mode_2(self, default_bot, chat_id, voice):
         test_markdown_string = '_Italic_ *Bold* `Code`'
@@ -180,7 +172,6 @@ class TestVoice:
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_voice_default_parse_mode_3(self, default_bot, chat_id, voice):
         test_markdown_string = '_Italic_ *Bold* `Code`'
@@ -206,7 +197,6 @@ class TestVoice:
         assert test_flag
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize(
         'default_bot,custom',
         [
@@ -268,13 +258,11 @@ class TestVoice:
         assert voice_dict['file_size'] == voice.file_size
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.sendVoice(chat_id, open(os.devnull, 'rb'))
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.sendVoice(chat_id, '')
