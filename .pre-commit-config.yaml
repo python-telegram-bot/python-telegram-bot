@@ -22,7 +22,7 @@ repos:
           - --rcfile=setup.cfg
         additional_dependencies:
           - certifi
-          - tornado>=5.1
+          - tornado>=6.1
           - APScheduler==3.6.3
           - . # this basically does `pip install -e .`
 -   repo: https://github.com/pre-commit/mirrors-mypy
@@ -33,7 +33,7 @@ repos:
         files: ^telegram/.*\.py$
         additional_dependencies:
           - certifi
-          - tornado>=5.1
+          - tornado>=6.1
           - APScheduler==3.6.3
           - . # this basically does `pip install -e .`
     -   id: mypy
@@ -44,7 +44,7 @@ repos:
           - --follow-imports=silent
         additional_dependencies:
           - certifi
-          - tornado>=5.1
+          - tornado>=6.1
           - APScheduler==3.6.3
           - . # this basically does `pip install -e .`
 -   repo: https://github.com/asottile/pyupgrade
