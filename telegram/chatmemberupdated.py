@@ -134,6 +134,8 @@ class ChatMemberUpdated(TelegramObject):
             To determine, if the :attr:`telegram.ChatMember.user` attribute has changed, *every*
             attribute of the user will be checked.
 
+        .. versionadded:: 13.5
+
         Returns:
             Dict[:obj:`str`, Tuple[:obj:`obj`, :obj:`obj`]]: A dictionary mapping attribute names
             to tuples of the form ``(old_value, new_value)``
