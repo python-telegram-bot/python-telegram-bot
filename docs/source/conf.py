@@ -305,4 +305,5 @@ def autodoc_skip_member(app, what, name, obj, skip, options):
 
 
 def setup(app):
+    app.add_css_file("dark.css")
     app.connect('autodoc-skip-member', autodoc_skip_member)
