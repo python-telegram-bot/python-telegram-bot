@@ -3294,6 +3294,14 @@ class Bot(TelegramObject):
     ) -> Message:
         """Use this method to send invoices.
 
+        Warning:
+            As of API 5.2 :attr:`start_parameter` is an optional argument and therefore the order
+            of the arguments had to be changed. Use keyword arguments to make sure that the
+            arguments are passed correctly.
+
+        .. versionchanged:: 13.5
+            As of Bot API 5.2, the parameter :attr:`start_parameter` is optional.
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).

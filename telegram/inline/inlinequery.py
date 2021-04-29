@@ -46,9 +46,10 @@ class InlineQuery(TelegramObject):
         query (:obj:`str`): Text of the query (up to 256 characters).
         offset (:obj:`str`): Offset of the results to be returned, can be controlled by the bot.
         chat_type (:obj:`str`, optional): Type of the chat, from which the inline query was sent.
-            Can be either ``'sender'`` for a private chat with the inline query sender,
-            ``'private'``, ``'group'``, ``'supergroup'``, or ``'channel'``. The chat type should be
-            always known for requests sent from official clients and most third-party clients,
+            Can be either :attr:`telegram.Chat.SENDER` for a private chat with the inline query
+            sender, :attr:`telegram.Chat.PRIVATE`, :attr:`telegram.Chat.GROUP`,
+            :attr:`telegram.Chat.SUPERGROUP` or :attr:`telegram.Chat.CHANNEL`. The chat type should
+            be always known for requests sent from official clients and most third-party clients,
             unless the request was sent from a secret chat.
 
             .. versionadded:: 13.5

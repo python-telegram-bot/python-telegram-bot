@@ -315,7 +315,7 @@ class Message(TelegramObject):
 
             .. versionadded:: 13.5
         voice_chat_started (:class:`telegram.VoiceChatStarted`): Optional. Service message: voice
-            chat started
+            chat started.
 
             .. versionadded:: 13.4
         voice_chat_ended (:class:`telegram.VoiceChatEnded`): Optional. Service message: voice chat
