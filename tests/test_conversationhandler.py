@@ -20,6 +20,7 @@ import logging
 from time import sleep
 
 import pytest
+from flaky import flaky
 
 from telegram import (
     CallbackQuery,
@@ -1064,6 +1065,7 @@ class TestConversationHandler:
         assert handler.conversations.get((self.group.id, user1.id)) is None
         assert self.is_timeout
 
+    @flaky(3, 1)
     def test_conversation_timeout_keeps_extending(self, dp, bot, user1):
         handler = ConversationHandler(
             entry_points=self.entry_points,

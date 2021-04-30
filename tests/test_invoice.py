@@ -76,7 +76,6 @@ class TestInvoice:
         assert invoice_dict['total_amount'] == invoice.total_amount
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_required_args_only(self, bot, chat_id, provider_token):
         message = bot.send_invoice(
             chat_id=chat_id,
@@ -95,7 +94,6 @@ class TestInvoice:
         assert message.invoice.total_amount == self.total_amount
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_all_args(self, bot, chat_id, provider_token):
         message = bot.send_invoice(
             chat_id,
@@ -152,7 +150,6 @@ class TestInvoice:
         )
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize(
         'default_bot,custom',
         [
