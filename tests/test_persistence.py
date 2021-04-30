@@ -256,8 +256,10 @@ class TestBasePersistence:
         base_persistence.get_user_data = get_user_data
         base_persistence.get_chat_data = get_chat_data
         base_persistence.get_bot_data = get_bot_data
-        # base_persistence.update_chat_data = lambda x: x
-        # base_persistence.update_user_data = lambda x: x
+        base_persistence.refresh_bot_data = lambda x: x
+        base_persistence.refresh_chat_data = lambda x, y: x
+        base_persistence.refresh_user_data = lambda x, y: x
+
         updater = Updater(bot=bot, persistence=base_persistence, use_context=True)
         dp = updater.dispatcher
 
@@ -362,6 +364,10 @@ class TestBasePersistence:
         base_persistence.get_user_data = get_user_data
         base_persistence.get_chat_data = get_chat_data
         base_persistence.get_bot_data = get_bot_data
+        base_persistence.refresh_bot_data = lambda x: x
+        base_persistence.refresh_chat_data = lambda x, y: x
+        base_persistence.refresh_user_data = lambda x, y: x
+
         cdp.persistence = base_persistence
         cdp.user_data = user_data
         cdp.chat_data = chat_data
@@ -1382,23 +1388,17 @@ class TestPicklePersistence:
         assert user_data[789] == {'test3': '123'}
 
     @pytest.mark.parametrize('singlefile', [True, False])
-    @pytest.mark.parametrize('udm', [defaultdict, CustomMapping])
-    @pytest.mark.parametrize('cdm', [defaultdict, CustomMapping])
     @pytest.mark.parametrize('ud', [int, float, complex])
     @pytest.mark.parametrize('cd', [int, float, complex])
     @pytest.mark.parametrize('bd', [int, float, complex])
-    def test_with_context_customizer(self, ud, cd, bd, udm, cdm, singlefile):
-        cc = ContextTypes(
-            user_data=ud, chat_data=cd, bot_data=bd, user_data_mapping=udm, chat_data_mapping=cdm
-        )
+    def test_with_context_customizer(self, ud, cd, bd, singlefile):
+        cc = ContextTypes(user_data=ud, chat_data=cd, bot_data=bd)
         persistence = PicklePersistence(
             'pickletest', single_file=singlefile, context_customizer=cc
         )
 
-        assert isinstance(persistence.get_user_data(), udm)
         assert isinstance(persistence.get_user_data()[1], ud)
         assert persistence.get_user_data()[1] == 0
-        assert isinstance(persistence.get_chat_data(), cdm)
         assert isinstance(persistence.get_chat_data()[1], cd)
         assert persistence.get_chat_data()[1] == 0
         assert isinstance(persistence.get_bot_data(), bd)
@@ -1417,10 +1417,8 @@ class TestPicklePersistence:
         persistence = PicklePersistence(
             'pickletest', single_file=singlefile, context_customizer=cc
         )
-        assert isinstance(persistence.get_user_data(), udm)
         assert isinstance(persistence.get_user_data()[1], ud)
         assert persistence.get_user_data()[1] == 1
-        assert isinstance(persistence.get_chat_data(), cdm)
         assert isinstance(persistence.get_chat_data()[1], cd)
         assert persistence.get_chat_data()[1] == 1
         assert isinstance(persistence.get_bot_data(), bd)

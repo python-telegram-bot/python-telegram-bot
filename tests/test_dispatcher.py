@@ -734,6 +734,15 @@ class TestDispatcher:
             def update_conversation(self, name, key, new_state):
                 pass
 
+            def refresh_bot_data(self, bot_data):
+                pass
+
+            def refresh_user_data(self, user_id, user_data):
+                pass
+
+            def refresh_chat_data(self, chat_id, chat_data):
+                pass
+
         def callback(update, context):
             pass
 
@@ -792,6 +801,15 @@ class TestDispatcher:
                 pass
 
             def get_chat_data(self):
+                pass
+
+            def refresh_bot_data(self, bot_data):
+                pass
+
+            def refresh_user_data(self, user_id, user_data):
+                pass
+
+            def refresh_chat_data(self, chat_id, chat_data):
                 pass
 
         def callback(update, context):
@@ -912,26 +930,16 @@ class TestDispatcher:
             dp.bot.defaults = None
 
     def test_custom_context_init(self, bot):
-        class CustomUserMapping(defaultdict):
-            pass
-
-        class CustomChatMapping(defaultdict):
-            pass
-
         cc = ContextTypes(
             context=CustomContext,
             user_data=int,
             chat_data=float,
             bot_data=complex,
-            user_data_mapping=CustomUserMapping,
-            chat_data_mapping=CustomChatMapping,
         )
 
         dispatcher = Dispatcher(bot, Queue(), context_customizer=cc)
 
-        assert isinstance(dispatcher.user_data, CustomUserMapping)
         assert isinstance(dispatcher.user_data[1], int)
-        assert isinstance(dispatcher.chat_data, CustomChatMapping)
         assert isinstance(dispatcher.chat_data[1], float)
         assert isinstance(dispatcher.bot_data, complex)
 
