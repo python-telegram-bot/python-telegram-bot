@@ -22,7 +22,7 @@ from queue import Queue
 from typing import TYPE_CHECKING, Dict, List, Match, NoReturn, Optional, Tuple, Union, Generic
 
 from telegram import Update
-from telegram.utils.types import UD, CD, BD
+from telegram.ext.utils.types import UD, CD, BD
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -87,9 +87,8 @@ class CallbackContext(Generic[UD, CD, BD]):
                 'CallbackContext should not be used with a non context aware ' 'dispatcher!'
             )
         self._dispatcher = dispatcher
-        self._bot_data = dispatcher.bot_data
-        self._chat_data: Optional[CD] = None
-        self._user_data: Optional[UD] = None
+        self._chat_id_and_data: Optional[Tuple[int, CD]] = None
+        self._user_id_and_data: Optional[Tuple[int, UD]] = None
         self.args: Optional[List[str]] = None
         self.matches: Optional[List[Match]] = None
         self.error: Optional[Exception] = None
@@ -108,7 +107,7 @@ class CallbackContext(Generic[UD, CD, BD]):
         bot_data (:obj:`dict`): Optional. A dict that can be used to keep any data in. For each
             update it will be the same :obj:`dict`.
         """
-        return self._bot_data
+        return self.dispatcher.bot_data
 
     @bot_data.setter
     def bot_data(self, value: object) -> NoReturn:
@@ -129,7 +128,9 @@ class CallbackContext(Generic[UD, CD, BD]):
                 <https://github.com/python-telegram-bot/python-telegram-bot/wiki/
                 Storing-user--and-chat-related-data#chat-migration>`_.
         """
-        return self._chat_data
+        if self._chat_id_and_data:
+            return self._chat_id_and_data[1]
+        return None
 
     @chat_data.setter
     def chat_data(self, value: object) -> NoReturn:
@@ -143,13 +144,31 @@ class CallbackContext(Generic[UD, CD, BD]):
         user_data (:obj:`dict`): Optional. A dict that can be used to keep any data in. For each
             update from the same user it will be the same :obj:`dict`.
         """
-        return self._user_data
+        if self._user_id_and_data:
+            return self._user_id_and_data[1]
+        return None
 
     @user_data.setter
     def user_data(self, value: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to user_data, see https://git.io/Jt6ic"
         )
+
+    def refresh_data(self) -> None:
+        """
+        If :attr:`dispatcher` uses persistence, calls
+        :meth:`telegram.ext.BasePersistence.refresh_bot_data` on :attr:`bot_data`,
+        :meth:`telegram.ext.BasePersistence.refresh_chat_data` on :attr:`chat_data`,
+        :meth:`telegram.ext.BasePersistence.refresh_user_data` on :attr:`user_data`, if
+        appropriate.
+        """
+        if self.dispatcher.persistence:
+            if self.dispatcher.persistence.store_bot_data:
+                self.dispatcher.persistence.refresh_bot_data(self.bot_data)
+            if self.dispatcher.persistence.store_chat_data and self._chat_id_and_data is not None:
+                self.dispatcher.persistence.refresh_chat_data(*self._chat_id_and_data)
+            if self.dispatcher.persistence.store_user_data and self._user_id_and_data is not None:
+                self.dispatcher.persistence.refresh_user_data(*self._user_id_and_data)
 
     @classmethod
     def from_error(
@@ -213,9 +232,15 @@ class CallbackContext(Generic[UD, CD, BD]):
             user = update.effective_user
 
             if chat:
-                self._chat_data = dispatcher.chat_data[chat.id]  # pylint: disable=W0212
+                self._chat_id_and_data = (
+                    chat.id,
+                    dispatcher.chat_data[chat.id],  # pylint: disable=W0212
+                )
             if user:
-                self._user_data = dispatcher.user_data[user.id]  # pylint: disable=W0212
+                self._user_id_and_data = (
+                    user.id,
+                    dispatcher.user_data[user.id],  # pylint: disable=W0212
+                )
         return self
 
     @classmethod

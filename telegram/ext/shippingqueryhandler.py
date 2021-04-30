@@ -21,7 +21,7 @@
 
 from telegram import Update
 from .handler import Handler
-from ..utils.types import CCT
+from .utils.types import CCT
 
 
 class ShippingQueryHandler(Handler[Update, CCT]):

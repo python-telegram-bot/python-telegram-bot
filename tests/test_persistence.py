@@ -45,7 +45,7 @@ from telegram.ext import (
     DictPersistence,
     TypeHandler,
     JobQueue,
-    ContextCustomizer,
+    ContextTypes,
 )
 
 
@@ -1388,7 +1388,7 @@ class TestPicklePersistence:
     @pytest.mark.parametrize('cd', [int, float, complex])
     @pytest.mark.parametrize('bd', [int, float, complex])
     def test_with_context_customizer(self, ud, cd, bd, udm, cdm, singlefile):
-        cc = ContextCustomizer(
+        cc = ContextTypes(
             user_data=ud, chat_data=cd, bot_data=bd, user_data_mapping=udm, chat_data_mapping=cdm
         )
         persistence = PicklePersistence(

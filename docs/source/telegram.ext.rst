@@ -13,7 +13,7 @@ telegram.ext package
     telegram.ext.messagequeue
     telegram.ext.delayqueue
     telegram.ext.callbackcontext
-    telegram.ext.contextcustomizer
+    telegram.ext.contexttypes
     telegram.ext.defaults
 
 Handlers
@@ -55,3 +55,4 @@ utils
 .. toctree::
 
     telegram.ext.utils.promise
+    telegram.ext.utils.types

@@ -29,7 +29,7 @@ import pytest
 import pytz
 from apscheduler.schedulers import SchedulerNotRunningError
 from flaky import flaky
-from telegram.ext import JobQueue, Updater, Job, CallbackContext, Dispatcher, ContextCustomizer
+from telegram.ext import JobQueue, Updater, Job, CallbackContext, Dispatcher, ContextTypes
 
 
 class CustomContext(CallbackContext):
@@ -520,7 +520,7 @@ class TestJobQueue:
         dispatcher = Dispatcher(
             bot,
             Queue(),
-            context_customizer=ContextCustomizer(
+            context_customizer=ContextTypes(
                 context=CustomContext, bot_data=int, user_data=float, chat_data=complex
             ),
         )

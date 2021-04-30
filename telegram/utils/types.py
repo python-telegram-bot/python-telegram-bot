@@ -28,14 +28,11 @@ from typing import (
     Tuple,
     TypeVar,
     Union,
-    Mapping,
-    DefaultDict,
 )
 
 if TYPE_CHECKING:
     from telegram import InputFile  # noqa: F401
     from telegram.utils.helpers import DefaultValue  # noqa: F401
-    from telegram.ext import CallbackContext  # noqa: F401
 
 FileLike = Union[IO, 'InputFile']
 """Either an open file handler or a :class:`telegram.InputFile`."""
@@ -61,21 +58,3 @@ as ``Union[DefaultValue, type]``."""
 RT = TypeVar("RT")
 SLT = Union[RT, List[RT], Tuple[RT, ...]]
 """Single instance or list/tuple of instances."""
-
-CCT = TypeVar('CCT', bound='CallbackContext')
-"""An instance of :class:`telegram.ext.CallbackContext` or a custom subclass."""
-
-UD = TypeVar('UD')
-"""Type of the user data for a single user."""
-CD = TypeVar('CD')
-"""Type of the chat data for a single user."""
-BD = TypeVar('BD')
-"""Type of the bot data."""
-UDM = TypeVar('UDM', bound=Mapping)
-"""Type of the user data mapping."""
-CDM = TypeVar('CDM', bound=Mapping)
-"""Type of the chat data mapping."""
-
-DDType = TypeVar('DDType')
-IntDD = DefaultDict[int, DDType]
-"""Type for default dicts with integer keys and generic value."""

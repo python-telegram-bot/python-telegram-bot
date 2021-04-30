@@ -35,7 +35,7 @@ from telegram import Update
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 from .handler import Handler
-from ..utils.types import CCT
+from .utils.types import CCT
 
 if TYPE_CHECKING:
     from telegram.ext import Dispatcher

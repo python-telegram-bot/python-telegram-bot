@@ -23,7 +23,7 @@ from typing import Optional, TypeVar, Union
 from telegram import Update
 
 from .handler import Handler
-from ..utils.types import CCT
+from .utils.types import CCT
 
 RT = TypeVar('RT')
 

@@ -21,6 +21,7 @@
 import logging
 import warnings
 import weakref
+from collections import defaultdict
 from functools import wraps
 from queue import Empty, Queue
 from threading import BoundedSemaphore, Event, Lock, Thread, current_thread
@@ -37,17 +38,18 @@ from typing import (
     TypeVar,
     overload,
     cast,
+    DefaultDict,
 )
 from uuid import uuid4
 
 from telegram import TelegramError, Update
-from telegram.ext import BasePersistence, ContextCustomizer
+from telegram.ext import BasePersistence, ContextTypes
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.handler import Handler
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.ext.utils.promise import Promise
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
-from telegram.utils.types import CCT, UD, CD, BD, UDM, CDM, IntDD  # pylint: disable=W0611
+from telegram.ext.utils.types import CCT, UD, CD, BD
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -117,7 +119,7 @@ class DispatcherHandlerStop(Exception):
         self.state = state
 
 
-class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
+class Dispatcher(Generic[CCT, UD, CD, BD]):
     """This class dispatches all kinds of updates to its registered handlers.
 
     Args:
@@ -149,7 +151,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
         bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
             store data that should be persistent over restarts.
-        context_customizer (:class:`telegram.ext.ContextCustomizer`): Container for the types used
+        context_customizer (:class:`telegram.ext.ContextTypes`): Container for the types used
             in the ``context`` interface.
 
     """
@@ -161,8 +163,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
 
     @overload
     def __init__(
-        self: 'Dispatcher[CallbackContext[Dict, Dict, Dict], Dict, Dict, Dict, '
-        'IntDD[Dict], IntDD[Dict]]',
+        self: 'Dispatcher[CallbackContext[Dict, Dict, Dict], Dict, Dict, Dict]',
         bot: 'Bot',
         update_queue: Queue,
         workers: int = 4,
@@ -175,7 +176,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
 
     @overload
     def __init__(
-        self: 'Dispatcher[CCT, UD, CD, BD, UDM, CDM]',
+        self: 'Dispatcher[CCT, UD, CD, BD]',
         bot: 'Bot',
         update_queue: Queue,
         workers: int = 4,
@@ -183,7 +184,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
         job_queue: 'JobQueue' = None,
         persistence: BasePersistence = None,
         use_context: bool = True,
-        context_customizer: ContextCustomizer[CCT, UD, CD, BD, UDM, CDM] = None,
+        context_customizer: ContextTypes[CCT, UD, CD, BD] = None,
     ):
         ...
 
@@ -196,7 +197,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
         job_queue: 'JobQueue' = None,
         persistence: BasePersistence = None,
         use_context: bool = True,
-        context_customizer: ContextCustomizer[CCT, UD, CD, BD, UDM, CDM] = None,
+        context_customizer: ContextTypes[CCT, UD, CD, BD] = None,
     ):
         self.bot = bot
         self.update_queue = update_queue
@@ -204,7 +205,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
         self.workers = workers
         self.use_context = use_context
         self.context_customizer = cast(
-            ContextCustomizer[CCT, UD, CD, BD, UDM, CDM], context_customizer or ContextCustomizer()
+            ContextTypes[CCT, UD, CD, BD], context_customizer or ContextTypes()
         )
 
         if not use_context:
@@ -219,12 +220,8 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
                 'Asynchronous callbacks can not be processed without at least one worker thread.'
             )
 
-        self.user_data = self.context_customizer.user_data_mapping(  # type: ignore[call-arg]
-            self.context_customizer.user_data
-        )
-        self.chat_data = self.context_customizer.chat_data_mapping(  # type: ignore[call-arg]
-            self.context_customizer.chat_data
-        )
+        self.user_data: DefaultDict[int, UD] = defaultdict(self.context_customizer.user_data)
+        self.chat_data: DefaultDict[int, CD] = defaultdict(self.context_customizer.chat_data)
         self.bot_data = self.context_customizer.bot_data()
         self.persistence: Optional[BasePersistence] = None
         self._update_persistence_lock = Lock()
@@ -234,19 +231,13 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
             self.persistence = persistence
             self.persistence.set_bot(self.bot)
             if self.persistence.store_user_data:
-                self.user_data = self.persistence.get_user_data()  # type: ignore[assignment]
-                if not isinstance(self.user_data, self.context_customizer.user_data_mapping):
-                    raise ValueError(
-                        f"user_data must be of type "
-                        f"{self.context_customizer.user_data_mapping.__name__}"
-                    )
+                self.user_data = self.persistence.get_user_data()
+                if not isinstance(self.user_data, defaultdict):
+                    raise ValueError("user_data must be of type defaultdict")
             if self.persistence.store_chat_data:
-                self.chat_data = self.persistence.get_chat_data()  # type: ignore[assignment]
-                if not isinstance(self.chat_data, self.context_customizer.chat_data_mapping):
-                    raise ValueError(
-                        f"chat_data must be of type "
-                        f"{self.context_customizer.chat_data_mapping.__name__}"
-                    )
+                self.chat_data = self.persistence.get_chat_data()
+                if not isinstance(self.chat_data, defaultdict):
+                    raise ValueError("chat_data must be of type defaultdict")
             if self.persistence.store_bot_data:
                 self.bot_data = self.persistence.get_bot_data()
                 if not isinstance(self.bot_data, self.context_customizer.bot_data):
@@ -507,6 +498,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
                     if check is not None and check is not False:
                         if not context and self.use_context:
                             context = self.context_customizer.context.from_update(update, self)
+                            context.refresh_data()
                         handled = True
                         sync_modes.append(handler.run_async)
                         handler.handle_update(update, self, check, context)

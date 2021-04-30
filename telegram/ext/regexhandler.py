@@ -26,7 +26,7 @@ from telegram import Update
 from telegram.ext import Filters, MessageHandler
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
-from telegram.utils.types import CCT
+from telegram.ext.utils.types import CCT
 
 if TYPE_CHECKING:
     from telegram.ext import Dispatcher

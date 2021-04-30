@@ -20,14 +20,15 @@
 import warnings
 from abc import ABC, abstractmethod
 from copy import copy
-from typing import Dict, Optional, Tuple, cast, ClassVar, Generic, Mapping
+from typing import Dict, Optional, Tuple, cast, ClassVar, Generic, Mapping, DefaultDict
 
 from telegram import Bot
 
-from telegram.utils.types import ConversationDict, CD, UD, BD, UDM, CDM
+from telegram.utils.types import ConversationDict
+from telegram.ext.utils.types import UD, CD, BD
 
 
-class BasePersistence(Generic[UD, CD, BD, UDM, CDM], ABC):
+class BasePersistence(Generic[UD, CD, BD], ABC):
     """Interface class for adding persistence to your bot.
     Subclass this object for different implementations of a persistent bot.
 
@@ -35,10 +36,13 @@ class BasePersistence(Generic[UD, CD, BD, UDM, CDM], ABC):
 
     * :meth:`get_bot_data`
     * :meth:`update_bot_data`
+    * :meth:`refresh_bot_data`
     * :meth:`get_chat_data`
     * :meth:`update_chat_data`
+    * :meth:`refresh_chat_data`
     * :meth:`get_user_data`
     * :meth:`update_user_data`
+    * :meth:`refresh_user_data`
     * :meth:`get_conversations`
     * :meth:`update_conversation`
     * :meth:`flush`
@@ -290,33 +294,33 @@ class BasePersistence(Generic[UD, CD, BD, UDM, CDM], ABC):
         return obj
 
     @abstractmethod
-    def get_user_data(self) -> Mapping[int, UD]:
+    def get_user_data(self) -> DefaultDict[int, UD]:
         """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``user_data`` if stored, or an empty
-        ``Mapping`` with integer keys.
+        :obj:`defaultdict(telegram.ext.utils.types.UD)` with integer keys.
 
         Returns:
-            :obj:`Mapping[int, UD]`: The restored user data.
+            DefaultDict[:obj:`int`, :class:`telegram.ext.utils.types.UD`]: The restored user data.
         """
 
     @abstractmethod
-    def get_chat_data(self) -> Mapping[int, CD]:
+    def get_chat_data(self) -> DefaultDict[int, CD]:
         """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``chat_data`` if stored, or an empty
-        ``Mapping`` with integer keys.
+        :obj:`defaultdict(telegram.ext.utils.types.CD)` with integer keys.
 
         Returns:
-            :obj:`Mapping[int, Any]`: The restored chat data.
+            DefaultDict[:obj:`int`, :class:`telegram.ext.utils.types.CD`]: The restored chat data.
         """
 
     @abstractmethod
     def get_bot_data(self) -> BD:
         """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``bot_data`` if stored, or an empty
-        :obj:`dict`.
+        :class:`telegram.ext.utils.types.BD`.
 
         Returns:
-            :obj:`dict`: The restored bot data.
+            :class:`telegram.ext.utils.types.BD`: The restored user data.
         """
 
     @abstractmethod
@@ -353,7 +357,8 @@ class BasePersistence(Generic[UD, CD, BD, UDM, CDM], ABC):
 
         Args:
             user_id (:obj:`int`): The user the data might have been changed for.
-            data (:obj:`UD`): The :attr:`telegram.ext.dispatcher.user_data` [user_id].
+            data (:class:`telegram.ext.utils.types.UD`): The
+                :attr:`telegram.ext.dispatcher.user_data` ``[user_id]``.
         """
 
     @abstractmethod
@@ -363,7 +368,8 @@ class BasePersistence(Generic[UD, CD, BD, UDM, CDM], ABC):
 
         Args:
             chat_id (:obj:`int`): The chat the data might have been changed for.
-            data (:obj:`CD`): The :attr:`telegram.ext.dispatcher.chat_data` [chat_id].
+            data (:class:`telegram.ext.utils.types.CD`): The
+                :attr:`telegram.ext.dispatcher.chat_data` ``[chat_id]``.
         """
 
     @abstractmethod
@@ -372,8 +378,41 @@ class BasePersistence(Generic[UD, CD, BD, UDM, CDM], ABC):
         handled an update.
 
         Args:
-            data (:obj:`BD`): The :attr:`telegram.ext.dispatcher.bot_data` .
+            data (:class:`telegram.ext.utils.types.BD`): The
+                :attr:`telegram.ext.dispatcher.bot_data`.
         """
+
+    def refresh_user_data(self, user_id: int, user_data: UD) -> None:
+        """Will be called by the :class:`telegram.ext.Dispatcher` before passing the
+        :attr:`user_data` to a callback. Can be used to update data stored in :attr:`user_data`
+        from an external source.
+
+        Args:
+            user_id (:obj:`int`): The user ID this :attr:`user_data` is associated with.
+            user_data (:class:`telegram.ext.utils.types.UD`): The ``user_data`` of a single user.
+        """
+        raise NotImplementedError
+
+    def refresh_chat_data(self, chat_id: int, chat_data: CD) -> None:
+        """Will be called by the :class:`telegram.ext.Dispatcher` before passing the
+        :attr:`chat_data` to a callback. Can be used to update data stored in :attr:`chat_data`
+        from an external source.
+
+        Args:
+            chat_id (:obj:`int`): The chat ID this :attr:`chat_data` is associated with.
+            chat_data (:class:`telegram.ext.utils.types.CD`): The ``chat_data`` of a single chat.
+        """
+        raise NotImplementedError
+
+    def refresh_bot_data(self, bot_data: BD) -> None:
+        """Will be called by the :class:`telegram.ext.Dispatcher` before passing the
+        :attr:`bot_data` to a callback. Can be used to update data stored in :attr:`bot_data`
+        from an external source.
+
+        Args:
+            bot_data (:class:`telegram.ext.utils.types.BD`): The ``bot_data``.
+        """
+        raise NotImplementedError
 
     def flush(self) -> None:
         """Will be called by :class:`telegram.ext.Updater` upon receiving a stop signal. Gives the

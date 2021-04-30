@@ -32,7 +32,7 @@ from telegram.ext import (
     CallbackContext,
     JobQueue,
     BasePersistence,
-    ContextCustomizer,
+    ContextTypes,
 )
 from telegram.ext.dispatcher import run_async, Dispatcher, DispatcherHandlerStop
 from telegram.utils.deprecate import TelegramDeprecationWarning
@@ -918,7 +918,7 @@ class TestDispatcher:
         class CustomChatMapping(defaultdict):
             pass
 
-        cc = ContextCustomizer(
+        cc = ContextTypes(
             context=CustomContext,
             user_data=int,
             chat_data=float,
@@ -947,7 +947,7 @@ class TestDispatcher:
         dispatcher = Dispatcher(
             bot,
             Queue(),
-            context_customizer=ContextCustomizer(
+            context_customizer=ContextTypes(
                 context=CustomContext, bot_data=int, user_data=float, chat_data=complex
             ),
         )
@@ -970,7 +970,7 @@ class TestDispatcher:
         dispatcher = Dispatcher(
             bot,
             Queue(),
-            context_customizer=ContextCustomizer(
+            context_customizer=ContextTypes(
                 context=CustomContext, bot_data=int, user_data=float, chat_data=complex
             ),
         )

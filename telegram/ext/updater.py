@@ -41,19 +41,18 @@ from typing import (
 
 from telegram import Bot, TelegramError
 from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized
-from telegram.ext import Dispatcher, JobQueue, ContextCustomizer
+from telegram.ext import Dispatcher, JobQueue, ContextTypes
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import get_signal_name
 from telegram.utils.request import Request
-from telegram.utils.types import CCT, UD, BD, UDM, CDM, CD
+from telegram.ext.utils.types import CCT, UD, CD, BD
 from telegram.ext.utils.webhookhandler import WebhookAppClass, WebhookServer
 
 if TYPE_CHECKING:
-    from collections import defaultdict
     from telegram.ext import BasePersistence, Defaults, CallbackContext
 
 
-class Updater(Generic[CCT, UD, CD, BD, UDM, CDM]):
+class Updater(Generic[CCT, UD, CD, BD]):
     """
     This class, which employs the :class:`telegram.ext.Dispatcher`, provides a frontend to
     :class:`telegram.Bot` to the programmer, so they can focus on coding the bot. Its purpose is to
@@ -99,10 +98,10 @@ class Updater(Generic[CCT, UD, CD, BD, UDM, CDM]):
             used).
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
             be used if not set explicitly in the bot methods.
-        context_customizer (:class:`telegram.ext.ContextCustomizer`, optional): Pass an instance
-            of :class:`telegram.ext.ContextCustomizer` to customize the the types used in the
+        context_customizer (:class:`telegram.ext.ContextTypes`, optional): Pass an instance
+            of :class:`telegram.ext.ContextTypes` to customize the the types used in the
             ``context`` interface. If not passed, the defaults documented in
-            :class:`telegram.ext.ContextCustomizer` will be used.
+            :class:`telegram.ext.ContextTypes` will be used.
 
     Raises:
         ValueError: If both :attr:`token` and :attr:`bot` are passed or none of them.
@@ -127,7 +126,7 @@ class Updater(Generic[CCT, UD, CD, BD, UDM, CDM]):
 
     @overload
     def __init__(
-        self: 'Updater[CallbackContext, dict, dict, dict, defaultdict, defaultdict]',
+        self: 'Updater[CallbackContext, dict, dict, dict]',
         token: str = None,
         base_url: str = None,
         workers: int = 4,
@@ -145,7 +144,7 @@ class Updater(Generic[CCT, UD, CD, BD, UDM, CDM]):
 
     @overload
     def __init__(
-        self: 'Updater[CCT, UD, CD, BD, UDM, CDM]',
+        self: 'Updater[CCT, UD, CD, BD]',
         token: str = None,
         base_url: str = None,
         workers: int = 4,
@@ -158,15 +157,15 @@ class Updater(Generic[CCT, UD, CD, BD, UDM, CDM]):
         defaults: 'Defaults' = None,
         use_context: bool = True,
         base_file_url: str = None,
-        context_customizer: ContextCustomizer[CCT, UD, CD, BD, UDM, CDM] = None,
+        context_customizer: ContextTypes[CCT, UD, CD, BD] = None,
     ):
         ...
 
     @overload
     def __init__(
-        self: 'Updater[CCT, UD, CD, BD, UDM, CDM]',
+        self: 'Updater[CCT, UD, CD, BD]',
         user_sig_handler: Callable = None,
-        dispatcher: Dispatcher[CCT, UD, CD, BD, UDM, CDM] = None,
+        dispatcher: Dispatcher[CCT, UD, CD, BD] = None,
     ):
         ...
 
@@ -185,7 +184,7 @@ class Updater(Generic[CCT, UD, CD, BD, UDM, CDM]):
         use_context: bool = True,
         dispatcher=None,
         base_file_url: str = None,
-        context_customizer: ContextCustomizer[CCT, UD, CD, BD, UDM, CDM] = None,
+        context_customizer: ContextTypes[CCT, UD, CD, BD] = None,
     ):
 
         if defaults and bot:

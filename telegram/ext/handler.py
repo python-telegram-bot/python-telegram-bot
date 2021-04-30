@@ -24,7 +24,7 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, TypeVar, Union,
 from telegram import Update
 from telegram.ext.utils.promise import Promise
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
-from telegram.utils.types import CCT
+from telegram.ext.utils.types import CCT
 
 if TYPE_CHECKING:
     from telegram.ext import Dispatcher
@@ -211,9 +211,13 @@ class Handler(Generic[UT, CCT], ABC):
             optional_args['job_queue'] = dispatcher.job_queue
         if self.pass_user_data and isinstance(update, Update):
             user = update.effective_user
-            optional_args['user_data'] = dispatcher.user_data[user.id if user else None]
+            optional_args['user_data'] = dispatcher.user_data[
+                user.id if user else None  # type: ignore[index]
+            ]
         if self.pass_chat_data and isinstance(update, Update):
             chat = update.effective_chat
-            optional_args['chat_data'] = dispatcher.chat_data[chat.id if chat else None]
+            optional_args['chat_data'] = dispatcher.chat_data[
+                chat.id if chat else None  # type: ignore[index]
+            ]
 
         return optional_args
