@@ -21,7 +21,7 @@ The following constants were extracted from the
 `Telegram Bots API <https://core.telegram.org/bots/api>`_.
 
 Attributes:
-    BOT_API_VERSION (:obj:`str`): `5.1`. Telegram Bot API version supported by this
+    BOT_API_VERSION (:obj:`str`): `5.2`. Telegram Bot API version supported by this
         version of `python-telegram-bot`. Also available as ``telegram.bot_api_version``.
 
         .. versionadded:: 13.4
@@ -59,6 +59,10 @@ Attributes:
     CHAT_GROUP (:obj:`str`): ``'group'``
     CHAT_SUPERGROUP (:obj:`str`): ``'supergroup'``
     CHAT_CHANNEL (:obj:`str`): ``'channel'``
+    CHAT_SENDER (:obj:`str`): ``'sender'``. Only relevant for
+        :attr:`telegram.InlineQuery.chat_type`.
+
+        .. versionadded:: 13.5
 
 :class:`telegram.ChatAction`:
 
@@ -67,8 +71,7 @@ Attributes:
     CHATACTION_RECORD_AUDIO (:obj:`str`): ``'record_audio'``
 
         .. deprecated:: 13.5
-           Deprecated by Telegram. Use :const:`CHATACTION_RECORD_VOICE` instead, as backwards
-           compatibility is not guaranteed by Telegram.
+           Deprecated by Telegram. Use :const:`CHATACTION_RECORD_VOICE` instead.
     CHATACTION_RECORD_VOICE (:obj:`str`): ``'record_voice'``
 
         .. versionadded:: 13.5
@@ -78,8 +81,7 @@ Attributes:
     CHATACTION_UPLOAD_AUDIO (:obj:`str`): ``'upload_audio'``
 
         .. deprecated:: 13.5
-           Deprecated by Telegram. Use :const:`CHATACTION_UPLOAD_VOICE` instead, as backwards
-           compatibility is not guaranteed by Telegram.
+           Deprecated by Telegram. Use :const:`CHATACTION_UPLOAD_VOICE` instead.
     CHATACTION_UPLOAD_VOICE (:obj:`str`): ``'upload_voice'``
 
         .. versionadded:: 13.5
@@ -149,7 +151,7 @@ Attributes:
     MAX_POLL_QUESTION_LENGTH (:obj:`int`): 300
     MAX_POLL_OPTION_LENGTH (:obj:`int`): 100
 
-:class:`telegram.files.MaskPosition`:
+:class:`telegram.MaskPosition`:
 
 Attributes:
     STICKER_FOREHEAD (:obj:`str`): ``'forehead'``
@@ -157,10 +159,56 @@ Attributes:
     STICKER_MOUTH (:obj:`str`): ``'mouth'``
     STICKER_CHIN (:obj:`str`): ``'chin'``
 
+:class:`telegram.Update`:
+
+Attributes:
+    UPDATE_MESSAGE (:obj:`str`): ``'message'``
+
+        .. versionadded:: 13.5
+    UPDATE_EDITED_MESSAGE (:obj:`str`): ``'edited_message'``
+
+        .. versionadded:: 13.5
+    UPDATE_CHANNEL_POST (:obj:`str`): ``'channel_post'``
+
+        .. versionadded:: 13.5
+    UPDATE_EDITED_CHANNEL_POST (:obj:`str`): ``'edited_channel_post'``
+
+        .. versionadded:: 13.5
+    UPDATE_INLINE_QUERY (:obj:`str`): ``'inline_query'``
+
+        .. versionadded:: 13.5
+    UPDATE_CHOSEN_INLINE_RESULT (:obj:`str`): ``'chosen_inline_result'``
+
+        .. versionadded:: 13.5
+    UPDATE_CALLBACK_QUERY (:obj:`str`): ``'callback_query'``
+
+        .. versionadded:: 13.5
+    UPDATE_SHIPPING_QUERY (:obj:`str`): ``'shipping_query'``
+
+        .. versionadded:: 13.5
+    UPDATE_PRE_CHECKOUT_QUERY (:obj:`str`): ``'pre_checkout_query'``
+
+        .. versionadded:: 13.5
+    UPDATE_POLL (:obj:`str`): ``'poll'``
+
+        .. versionadded:: 13.5
+    UPDATE_POLL_ANSWER (:obj:`str`): ``'poll_answer'``
+
+        .. versionadded:: 13.5
+    UPDATE_MY_CHAT_MEMBER (:obj:`str`): ``'my_chat_member'``
+
+        .. versionadded:: 13.5
+    UPDATE_CHAT_MEMBER (:obj:`str`): ``'chat_member'``
+
+        .. versionadded:: 13.5
+    UPDATE_ALL_TYPES (List[:obj:`str`]): List of all update types.
+
+        .. versionadded:: 13.5
+
 """
 from typing import List
 
-BOT_API_VERSION: str = '5.1'
+BOT_API_VERSION: str = '5.2'
 MAX_MESSAGE_LENGTH: int = 4096
 MAX_CAPTION_LENGTH: int = 1024
 ANONYMOUS_ADMIN_ID: int = 1087968824
@@ -179,6 +227,7 @@ MAX_MESSAGE_ENTITIES: int = 100
 MAX_INLINE_QUERY_RESULTS: int = 50
 MAX_ANSWER_CALLBACK_QUERY_TEXT_LENGTH: int = 200
 
+CHAT_SENDER: str = 'sender'
 CHAT_PRIVATE: str = 'private'
 CHAT_GROUP: str = 'group'
 CHAT_SUPERGROUP: str = 'supergroup'
@@ -265,3 +314,32 @@ STICKER_FOREHEAD: str = 'forehead'
 STICKER_EYES: str = 'eyes'
 STICKER_MOUTH: str = 'mouth'
 STICKER_CHIN: str = 'chin'
+
+UPDATE_MESSAGE = 'message'
+UPDATE_EDITED_MESSAGE = 'edited_message'
+UPDATE_CHANNEL_POST = 'channel_post'
+UPDATE_EDITED_CHANNEL_POST = 'edited_channel_post'
+UPDATE_INLINE_QUERY = 'inline_query'
+UPDATE_CHOSEN_INLINE_RESULT = 'chosen_inline_result'
+UPDATE_CALLBACK_QUERY = 'callback_query'
+UPDATE_SHIPPING_QUERY = 'shipping_query'
+UPDATE_PRE_CHECKOUT_QUERY = 'pre_checkout_query'
+UPDATE_POLL = 'poll'
+UPDATE_POLL_ANSWER = 'poll_answer'
+UPDATE_MY_CHAT_MEMBER = 'my_chat_member'
+UPDATE_CHAT_MEMBER = 'chat_member'
+UPDATE_ALL_TYPES = [
+    UPDATE_MESSAGE,
+    UPDATE_EDITED_MESSAGE,
+    UPDATE_CHANNEL_POST,
+    UPDATE_EDITED_CHANNEL_POST,
+    UPDATE_INLINE_QUERY,
+    UPDATE_CHOSEN_INLINE_RESULT,
+    UPDATE_CALLBACK_QUERY,
+    UPDATE_SHIPPING_QUERY,
+    UPDATE_PRE_CHECKOUT_QUERY,
+    UPDATE_POLL,
+    UPDATE_POLL_ANSWER,
+    UPDATE_MY_CHAT_MEMBER,
+    UPDATE_CHAT_MEMBER,
+]

@@ -53,6 +53,8 @@ __all__ = [
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.types import SLT
 
+DataDict = Dict[str, list]
+
 
 class BaseFilter(ABC):
     """Base class for all Filters.
@@ -114,7 +116,7 @@ class BaseFilter(ABC):
     data_filter = False
 
     @abstractmethod
-    def __call__(self, update: Update) -> Optional[Union[bool, Dict]]:
+    def __call__(self, update: Update) -> Optional[Union[bool, DataDict]]:
         pass
 
     def __and__(self, other: 'BaseFilter') -> 'BaseFilter':
@@ -160,11 +162,11 @@ class MessageFilter(BaseFilter, ABC):
 
     """
 
-    def __call__(self, update: Update) -> Optional[Union[bool, Dict]]:
+    def __call__(self, update: Update) -> Optional[Union[bool, DataDict]]:
         return self.filter(update.effective_message)
 
     @abstractmethod
-    def filter(self, message: Message) -> Optional[Union[bool, Dict]]:
+    def filter(self, message: Message) -> Optional[Union[bool, DataDict]]:
         """This method must be overwritten.
 
         Args:
@@ -193,11 +195,11 @@ class UpdateFilter(BaseFilter, ABC):
 
     """
 
-    def __call__(self, update: Update) -> Optional[Union[bool, Dict]]:
+    def __call__(self, update: Update) -> Optional[Union[bool, DataDict]]:
         return self.filter(update)
 
     @abstractmethod
-    def filter(self, update: Update) -> Optional[Union[bool, Dict]]:
+    def filter(self, update: Update) -> Optional[Union[bool, DataDict]]:
         """This method must be overwritten.
 
         Args:
@@ -260,7 +262,7 @@ class MergedFilter(UpdateFilter):
             self.data_filter = True
 
     @staticmethod
-    def _merge(base_output: Union[bool, Dict], comp_output: Union[bool, Dict]) -> Dict:
+    def _merge(base_output: Union[bool, Dict], comp_output: Union[bool, Dict]) -> DataDict:
         base = base_output if isinstance(base_output, dict) else {}
         comp = comp_output if isinstance(comp_output, dict) else {}
         for k in comp.keys():
@@ -276,7 +278,7 @@ class MergedFilter(UpdateFilter):
                 base[k] = comp_value
         return base
 
-    def filter(self, update: Update) -> Union[bool, Dict]:  # pylint: disable=R0911
+    def filter(self, update: Update) -> Union[bool, DataDict]:  # pylint: disable=R0911
         base_output = self.base_filter(update)
         # We need to check if the filters are data filters and if so return the merged data.
         # If it's not a data filter or an or_filter but no matches return bool
@@ -331,7 +333,7 @@ class XORFilter(UpdateFilter):
         self.xor_filter = xor_filter
         self.merged_filter = (base_filter & ~xor_filter) | (~base_filter & xor_filter)
 
-    def filter(self, update: Update) -> Optional[Union[bool, Dict]]:
+    def filter(self, update: Update) -> Optional[Union[bool, DataDict]]:
         return self.merged_filter(update)
 
     @property
@@ -1051,6 +1053,15 @@ officedocument.wordprocessingml.document")``.
         proximity_alert_triggered = _ProximityAlertTriggered()
         """Messages that contain :attr:`telegram.Message.proximity_alert_triggered`."""
 
+        class _VoiceChatScheduled(MessageFilter):
+            name = 'Filters.status_update.voice_chat_scheduled'
+
+            def filter(self, message: Message) -> bool:
+                return bool(message.voice_chat_scheduled)
+
+        voice_chat_scheduled = _VoiceChatScheduled()
+        """Messages that contain :attr:`telegram.Message.voice_chat_scheduled`."""
+
         class _VoiceChatStarted(MessageFilter):
             name = 'Filters.status_update.voice_chat_started'
 
@@ -1093,6 +1104,7 @@ officedocument.wordprocessingml.document")``.
                 or self.pinned_message(message)
                 or self.connected_website(message)
                 or self.proximity_alert_triggered(message)
+                or self.voice_chat_scheduled(message)
                 or self.voice_chat_started(message)
                 or self.voice_chat_ended(message)
                 or self.voice_chat_participants_invited(message)
@@ -1133,6 +1145,10 @@ officedocument.wordprocessingml.document")``.
             :attr:`telegram.Message.pinned_message`.
         proximity_alert_triggered: Messages that contain
             :attr:`telegram.Message.proximity_alert_triggered`.
+        voice_chat_scheduled: Messages that contain
+            :attr:`telegram.Message.voice_chat_scheduled`.
+
+            .. versionadded:: 13.5
         voice_chat_started: Messages that contain
             :attr:`telegram.Message.voice_chat_started`.
 
