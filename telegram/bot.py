@@ -538,7 +538,7 @@ class Bot(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> Message:
-        """Use this method to forward messages of any kind.
+        """Use this method to forward messages of any kind. Service messages can't be forwarded.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -3268,9 +3268,9 @@ class Bot(TelegramObject):
         description: str,
         payload: str,
         provider_token: str,
-        start_parameter: str,
         currency: str,
         prices: List['LabeledPrice'],
+        start_parameter: str = None,
         photo_url: str = None,
         photo_size: int = None,
         photo_width: int = None,
@@ -3289,23 +3289,56 @@ class Bot(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        max_tip_amount: int = None,
+        suggested_tip_amounts: List[int] = None,
     ) -> Message:
         """Use this method to send invoices.
 
+        Warning:
+            As of API 5.2 :attr:`start_parameter` is an optional argument and therefore the order
+            of the arguments had to be changed. Use keyword arguments to make sure that the
+            arguments are passed correctly.
+
+        .. versionchanged:: 13.5
+            As of Bot API 5.2, the parameter :attr:`start_parameter` is optional.
+
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target private chat.
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format ``@channelusername``).
             title (:obj:`str`): Product name, 1-32 characters.
             description (:obj:`str`): Product description, 1-255 characters.
             payload (:obj:`str`): Bot-defined invoice payload, 1-128 bytes. This will not be
                 displayed to the user, use for your internal processes.
             provider_token (:obj:`str`): Payments provider token, obtained via
                 `@BotFather <https://t.me/BotFather>`_.
-            start_parameter (:obj:`str`): Unique deep-linking parameter that can be used to
-                generate this invoice when used as a start parameter.
             currency (:obj:`str`): Three-letter ISO 4217 currency code.
             prices (List[:class:`telegram.LabeledPrice`)]: Price breakdown, a JSON-serialized list
                 of components (e.g. product price, tax, discount, delivery cost, delivery tax,
                 bonus, etc.).
+            max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the
+                smallest units of the currency (integer, not float/double). For example, for a
+                maximum tip of US$ 1.45 pass ``max_tip_amount = 145``. See the exp parameter in
+                `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_, it
+                shows the number of digits past the decimal point for each currency (2 for the
+                majority of currencies). Defaults to ``0``.
+
+                .. versionadded:: 13.5
+            suggested_tip_amounts (List[:obj:`int`], optional): A JSON-serialized array of
+                suggested amounts of tips in the smallest units of the currency (integer, not
+                float/double). At most 4 suggested tip amounts can be specified. The suggested tip
+                amounts must be positive, passed in a strictly increased order and must not exceed
+                ``max_tip_amount``.
+
+                .. versionadded:: 13.5
+            start_parameter (:obj:`str`, optional): Unique deep-linking parameter. If left empty,
+                *forwarded copies* of the sent message will have a *Pay* button, allowing
+                multiple users to pay directly from the forwarded message, using the same invoice.
+                If non-empty, forwarded copies of the sent message will have a *URL* button with a
+                deep link to the bot (instead of a *Pay* button), with the value used as the
+                start parameter.
+
+                .. versionchanged:: 13.5
+                    As of Bot API 5.2, this parameter is optional.
             provider_data (:obj:`str` | :obj:`object`, optional): JSON-serialized data about the
                 invoice, which will be shared with the payment provider. A detailed description of
                 required fields should be provided by the payment provider. When an object is
@@ -3358,10 +3391,15 @@ class Bot(TelegramObject):
             'description': description,
             'payload': payload,
             'provider_token': provider_token,
-            'start_parameter': start_parameter,
             'currency': currency,
             'prices': [p.to_dict() for p in prices],
         }
+        if max_tip_amount is not None:
+            data['max_tip_amount'] = max_tip_amount
+        if suggested_tip_amounts is not None:
+            data['suggested_tip_amounts'] = suggested_tip_amounts
+        if start_parameter is not None:
+            data['start_parameter'] = start_parameter
         if provider_data is not None:
             if isinstance(provider_data, str):
                 data['provider_data'] = provider_data
@@ -4985,9 +5023,9 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
     ) -> MessageId:
         """
-        Use this method to copy messages of any kind. The method is analogous to the method
-        forwardMessages, but the copied message doesn't have a link to the original message.
-        Returns the MessageId of the sent message on success.
+        Use this method to copy messages of any kind. Service messages and invoice messages can't
+        be copied. The method is analogous to the method :meth:`forward_message`, but the copied
+        message doesn't have a link to the original message.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username

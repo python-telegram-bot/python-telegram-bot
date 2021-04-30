@@ -21,7 +21,7 @@ The following constants were extracted from the
 `Telegram Bots API <https://core.telegram.org/bots/api>`_.
 
 Attributes:
-    BOT_API_VERSION (:obj:`str`): `5.1`. Telegram Bot API version supported by this
+    BOT_API_VERSION (:obj:`str`): `5.2`. Telegram Bot API version supported by this
         version of `python-telegram-bot`. Also available as ``telegram.bot_api_version``.
 
         .. versionadded:: 13.4
@@ -59,6 +59,9 @@ Attributes:
     CHAT_GROUP (:obj:`str`): 'group'
     CHAT_SUPERGROUP (:obj:`str`): 'supergroup'
     CHAT_CHANNEL (:obj:`str`): 'channel'
+    CHAT_SENDER (:obj:`str`): 'sender'. Only relevant for :attr:`telegram.InlineQuery.chat_type`.
+
+        .. versionadded:: 13.5
 
 :class:`telegram.ChatAction`:
 
@@ -67,8 +70,7 @@ Attributes:
     CHATACTION_RECORD_AUDIO (:obj:`str`): 'record_audio'
 
         .. deprecated:: 13.5
-           Deprecated by Telegram. Use :const:`CHATACTION_RECORD_VOICE` instead, as backwards
-           compatibility is not guaranteed by Telegram.
+           Deprecated by Telegram. Use :const:`CHATACTION_RECORD_VOICE` instead.
     CHATACTION_RECORD_VOICE (:obj:`str`): 'record_voice'
 
         .. versionadded:: 13.5
@@ -78,8 +80,7 @@ Attributes:
     CHATACTION_UPLOAD_AUDIO (:obj:`str`): 'upload_audio'
 
         .. deprecated:: 13.5
-           Deprecated by Telegram. Use :const:`CHATACTION_UPLOAD_VOICE` instead, as backwards
-           compatibility is not guaranteed by Telegram.
+           Deprecated by Telegram. Use :const:`CHATACTION_UPLOAD_VOICE` instead.
     CHATACTION_UPLOAD_VOICE (:obj:`str`): 'upload_voice'
 
         .. versionadded:: 13.5
@@ -160,7 +161,7 @@ Attributes:
 """
 from typing import List
 
-BOT_API_VERSION: str = '5.1'
+BOT_API_VERSION: str = '5.2'
 MAX_MESSAGE_LENGTH: int = 4096
 MAX_CAPTION_LENGTH: int = 1024
 ANONYMOUS_ADMIN_ID: int = 1087968824
@@ -179,6 +180,7 @@ MAX_MESSAGE_ENTITIES: int = 100
 MAX_INLINE_QUERY_RESULTS: int = 50
 MAX_ANSWER_CALLBACK_QUERY_TEXT_LENGTH: int = 200
 
+CHAT_SENDER: str = 'sender'
 CHAT_PRIVATE: str = 'private'
 CHAT_GROUP: str = 'group'
 CHAT_SUPERGROUP: str = 'supergroup'

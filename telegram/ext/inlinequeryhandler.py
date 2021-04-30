@@ -28,6 +28,7 @@ from typing import (
     TypeVar,
     Union,
     cast,
+    List,
 )
 
 from telegram import Update
@@ -56,8 +57,11 @@ class InlineQueryHandler(Handler[Update]):
         https://git.io/fxJuV for more info.
 
     Warning:
-        When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
-        attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
+        * When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
+          attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
+        * :attr:`telegram.InlineQuery.chat_type` will not be set for inline queries from secret
+          chats and may not be set for inline queries coming from third-party clients. These
+          updates won't be handled, if :attr:`chat_types` is passed.
 
     Args:
         callback (:obj:`callable`): The callback function for this handler. Will be called when
@@ -81,6 +85,10 @@ class InlineQueryHandler(Handler[Update]):
         pattern (:obj:`str` | :obj:`Pattern`, optional): Regex pattern. If not :obj:`None`,
             ``re.match`` is used on :attr:`telegram.InlineQuery.query` to determine if an update
             should be handled by this handler.
+        chat_types (List[:obj:`str`], optional): List of allowed chat types. If passed, will only
+            handle inline queries with the appropriate :attr:`telegram.InlineQuery.chat_type`.
+
+            .. versionadded:: 13.5
         pass_groups (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groups()`` as a keyword argument called ``groups``.
             Default is :obj:`False`
@@ -106,6 +114,9 @@ class InlineQueryHandler(Handler[Update]):
             the callback function.
         pattern (:obj:`str` | :obj:`Pattern`): Optional. Regex pattern to test
             :attr:`telegram.InlineQuery.query` against.
+        chat_types (List[:obj:`str`], optional): List of allowed chat types.
+
+            .. versionadded:: 13.5
         pass_groups (:obj:`bool`): Determines whether ``groups`` will be passed to the
             callback function.
         pass_groupdict (:obj:`bool`): Determines whether ``groupdict``. will be passed to
@@ -129,6 +140,7 @@ class InlineQueryHandler(Handler[Update]):
         pass_user_data: bool = False,
         pass_chat_data: bool = False,
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
+        chat_types: List[str] = None,
     ):
         super().__init__(
             callback,
@@ -143,6 +155,7 @@ class InlineQueryHandler(Handler[Update]):
             pattern = re.compile(pattern)
 
         self.pattern = pattern
+        self.chat_types = chat_types
         self.pass_groups = pass_groups
         self.pass_groupdict = pass_groupdict
 
@@ -159,6 +172,10 @@ class InlineQueryHandler(Handler[Update]):
         """
 
         if isinstance(update, Update) and update.inline_query:
+            if (self.chat_types is not None) and (
+                update.inline_query.chat_type not in self.chat_types
+            ):
+                return False
             if self.pattern:
                 if update.inline_query.query:
                     match = re.match(self.pattern, update.inline_query.query)

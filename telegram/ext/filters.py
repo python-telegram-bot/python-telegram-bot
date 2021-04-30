@@ -1051,6 +1051,15 @@ officedocument.wordprocessingml.document")``.
         proximity_alert_triggered = _ProximityAlertTriggered()
         """Messages that contain :attr:`telegram.Message.proximity_alert_triggered`."""
 
+        class _VoiceChatScheduled(MessageFilter):
+            name = 'Filters.status_update.voice_chat_scheduled'
+
+            def filter(self, message: Message) -> bool:
+                return bool(message.voice_chat_scheduled)
+
+        voice_chat_scheduled = _VoiceChatScheduled()
+        """Messages that contain :attr:`telegram.Message.voice_chat_scheduled`."""
+
         class _VoiceChatStarted(MessageFilter):
             name = 'Filters.status_update.voice_chat_started'
 
@@ -1093,6 +1102,7 @@ officedocument.wordprocessingml.document")``.
                 or self.pinned_message(message)
                 or self.connected_website(message)
                 or self.proximity_alert_triggered(message)
+                or self.voice_chat_scheduled(message)
                 or self.voice_chat_started(message)
                 or self.voice_chat_ended(message)
                 or self.voice_chat_participants_invited(message)
@@ -1133,6 +1143,10 @@ officedocument.wordprocessingml.document")``.
             :attr:`telegram.Message.pinned_message`.
         proximity_alert_triggered: Messages that contain
             :attr:`telegram.Message.proximity_alert_triggered`.
+        voice_chat_scheduled: Messages that contain
+            :attr:`telegram.Message.voice_chat_scheduled`.
+
+            .. versionadded:: 13.5
         voice_chat_started: Messages that contain
             :attr:`telegram.Message.voice_chat_started`.
 

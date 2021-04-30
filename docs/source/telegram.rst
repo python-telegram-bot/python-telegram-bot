@@ -62,6 +62,7 @@ telegram package
     telegram.voice
     telegram.voicechatstarted
     telegram.voicechatended
+    telegram.voicechatscheduled
     telegram.voicechatparticipantsinvited
     telegram.webhookinfo
 
@@ -106,6 +107,7 @@ Inline Mode
     telegram.inputlocationmessagecontent
     telegram.inputvenuemessagecontent
     telegram.inputcontactmessagecontent
+    telegram.inputinvoicemessagecontent
     telegram.choseninlineresult
 
 Payments

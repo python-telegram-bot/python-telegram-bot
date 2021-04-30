@@ -44,7 +44,6 @@ def start_with_shipping_callback(update: Update, context: CallbackContext) -> No
     payload = "Custom-Payload"
     # In order to get a provider_token see https://core.telegram.org/bots/payments#getting-a-token
     provider_token = "PROVIDER_TOKEN"
-    start_parameter = "test-payment"
     currency = "USD"
     # price in dollars
     price = 1
@@ -60,7 +59,6 @@ def start_with_shipping_callback(update: Update, context: CallbackContext) -> No
         description,
         payload,
         provider_token,
-        start_parameter,
         currency,
         prices,
         need_name=True,
@@ -79,7 +77,6 @@ def start_without_shipping_callback(update: Update, context: CallbackContext) ->
     payload = "Custom-Payload"
     # In order to get a provider_token see https://core.telegram.org/bots/payments#getting-a-token
     provider_token = "PROVIDER_TOKEN"
-    start_parameter = "test-payment"
     currency = "USD"
     # price in dollars
     price = 1
@@ -89,7 +86,7 @@ def start_without_shipping_callback(update: Update, context: CallbackContext) ->
     # optionally pass need_name=True, need_phone_number=True,
     # need_email=True, need_shipping_address=True, is_flexible=True
     context.bot.send_invoice(
-        chat_id, title, description, payload, provider_token, start_parameter, currency, prices
+        chat_id, title, description, payload, provider_token, currency, prices
     )
 
 
