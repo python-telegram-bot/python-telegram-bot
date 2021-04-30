@@ -55,59 +55,60 @@ as attributes of those classes:
 :class:`telegram.Chat`:
 
 Attributes:
-    CHAT_PRIVATE (:obj:`str`): 'private'
-    CHAT_GROUP (:obj:`str`): 'group'
-    CHAT_SUPERGROUP (:obj:`str`): 'supergroup'
-    CHAT_CHANNEL (:obj:`str`): 'channel'
-    CHAT_SENDER (:obj:`str`): 'sender'. Only relevant for :attr:`telegram.InlineQuery.chat_type`.
+    CHAT_PRIVATE (:obj:`str`): ``'private'``
+    CHAT_GROUP (:obj:`str`): ``'group'``
+    CHAT_SUPERGROUP (:obj:`str`): ``'supergroup'``
+    CHAT_CHANNEL (:obj:`str`): ``'channel'``
+    CHAT_SENDER (:obj:`str`): ``'sender'``. Only relevant for
+        :attr:`telegram.InlineQuery.chat_type`.
 
         .. versionadded:: 13.5
 
 :class:`telegram.ChatAction`:
 
 Attributes:
-    CHATACTION_FIND_LOCATION (:obj:`str`): 'find_location'
-    CHATACTION_RECORD_AUDIO (:obj:`str`): 'record_audio'
+    CHATACTION_FIND_LOCATION (:obj:`str`): ``'find_location'``
+    CHATACTION_RECORD_AUDIO (:obj:`str`): ``'record_audio'``
 
         .. deprecated:: 13.5
            Deprecated by Telegram. Use :const:`CHATACTION_RECORD_VOICE` instead.
-    CHATACTION_RECORD_VOICE (:obj:`str`): 'record_voice'
+    CHATACTION_RECORD_VOICE (:obj:`str`): ``'record_voice'``
 
         .. versionadded:: 13.5
-    CHATACTION_RECORD_VIDEO (:obj:`str`): 'record_video'
-    CHATACTION_RECORD_VIDEO_NOTE (:obj:`str`): 'record_video_note'
-    CHATACTION_TYPING (:obj:`str`): 'typing'
-    CHATACTION_UPLOAD_AUDIO (:obj:`str`): 'upload_audio'
+    CHATACTION_RECORD_VIDEO (:obj:`str`): ``'record_video'``
+    CHATACTION_RECORD_VIDEO_NOTE (:obj:`str`): ``'record_video_note'``
+    CHATACTION_TYPING (:obj:`str`): ``'typing'``
+    CHATACTION_UPLOAD_AUDIO (:obj:`str`): ``'upload_audio'``
 
         .. deprecated:: 13.5
            Deprecated by Telegram. Use :const:`CHATACTION_UPLOAD_VOICE` instead.
-    CHATACTION_UPLOAD_VOICE (:obj:`str`): 'upload_voice'
+    CHATACTION_UPLOAD_VOICE (:obj:`str`): ``'upload_voice'``
 
         .. versionadded:: 13.5
-    CHATACTION_UPLOAD_DOCUMENT (:obj:`str`): 'upload_document'
-    CHATACTION_UPLOAD_PHOTO (:obj:`str`): 'upload_photo'
-    CHATACTION_UPLOAD_VIDEO (:obj:`str`): 'upload_video'
-    CHATACTION_UPLOAD_VIDEO_NOTE (:obj:`str`): 'upload_video_note'
+    CHATACTION_UPLOAD_DOCUMENT (:obj:`str`): ``'upload_document'``
+    CHATACTION_UPLOAD_PHOTO (:obj:`str`): ``'upload_photo'``
+    CHATACTION_UPLOAD_VIDEO (:obj:`str`): ``'upload_video'``
+    CHATACTION_UPLOAD_VIDEO_NOTE (:obj:`str`): ``'upload_video_note'``
 
 :class:`telegram.ChatMember`:
 
 Attributes:
-    CHATMEMBER_ADMINISTRATOR (:obj:`str`): 'administrator'
-    CHATMEMBER_CREATOR (:obj:`str`): 'creator'
-    CHATMEMBER_KICKED (:obj:`str`): 'kicked'
-    CHATMEMBER_LEFT (:obj:`str`): 'left'
-    CHATMEMBER_MEMBER (:obj:`str`): 'member'
-    CHATMEMBER_RESTRICTED (:obj:`str`): 'restricted'
+    CHATMEMBER_ADMINISTRATOR (:obj:`str`): ``'administrator'``
+    CHATMEMBER_CREATOR (:obj:`str`): ``'creator'``
+    CHATMEMBER_KICKED (:obj:`str`): ``'kicked'``
+    CHATMEMBER_LEFT (:obj:`str`): ``'left'``
+    CHATMEMBER_MEMBER (:obj:`str`): ``'member'``
+    CHATMEMBER_RESTRICTED (:obj:`str`): ``'restricted'``
 
 :class:`telegram.Dice`:
 
 Attributes:
-    DICE_DICE (:obj:`str`): '🎲'
-    DICE_DARTS (:obj:`str`): '🎯'
-    DICE_BASKETBALL (:obj:`str`): '🏀'
-    DICE_FOOTBALL (:obj:`str`): '⚽'
-    DICE_SLOT_MACHINE (:obj:`str`): '🎰'
-    DICE_BOWLING (:obj:`str`): '🎳'
+    DICE_DICE (:obj:`str`): ``'🎲'``
+    DICE_DARTS (:obj:`str`): ``'🎯'``
+    DICE_BASKETBALL (:obj:`str`): ``'🏀'``
+    DICE_FOOTBALL (:obj:`str`): ``'⚽'``
+    DICE_SLOT_MACHINE (:obj:`str`): ``'🎰'``
+    DICE_BOWLING (:obj:`str`): ``'🎳'``
 
         .. versionadded:: 13.4
     DICE_ALL_EMOJI (List[:obj:`str`]): List of all supported base emoji.
@@ -118,45 +119,45 @@ Attributes:
 :class:`telegram.MessageEntity`:
 
 Attributes:
-    MESSAGEENTITY_MENTION (:obj:`str`): 'mention'
-    MESSAGEENTITY_HASHTAG (:obj:`str`): 'hashtag'
-    MESSAGEENTITY_CASHTAG (:obj:`str`): 'cashtag'
-    MESSAGEENTITY_PHONE_NUMBER (:obj:`str`): 'phone_number'
-    MESSAGEENTITY_BOT_COMMAND (:obj:`str`): 'bot_command'
-    MESSAGEENTITY_URL (:obj:`str`): 'url'
-    MESSAGEENTITY_EMAIL (:obj:`str`): 'email'
-    MESSAGEENTITY_BOLD (:obj:`str`): 'bold'
-    MESSAGEENTITY_ITALIC (:obj:`str`): 'italic'
-    MESSAGEENTITY_CODE (:obj:`str`): 'code'
-    MESSAGEENTITY_PRE (:obj:`str`): 'pre'
-    MESSAGEENTITY_TEXT_LINK (:obj:`str`): 'text_link'
-    MESSAGEENTITY_TEXT_MENTION (:obj:`str`): 'text_mention'
-    MESSAGEENTITY_UNDERLINE (:obj:`str`): 'underline'
-    MESSAGEENTITY_STRIKETHROUGH (:obj:`str`): 'strikethrough'
+    MESSAGEENTITY_MENTION (:obj:`str`): ``'mention'``
+    MESSAGEENTITY_HASHTAG (:obj:`str`): ``'hashtag'``
+    MESSAGEENTITY_CASHTAG (:obj:`str`): ``'cashtag'``
+    MESSAGEENTITY_PHONE_NUMBER (:obj:`str`): ``'phone_number'``
+    MESSAGEENTITY_BOT_COMMAND (:obj:`str`): ``'bot_command'``
+    MESSAGEENTITY_URL (:obj:`str`): ``'url'``
+    MESSAGEENTITY_EMAIL (:obj:`str`): ``'email'``
+    MESSAGEENTITY_BOLD (:obj:`str`): ``'bold'``
+    MESSAGEENTITY_ITALIC (:obj:`str`): ``'italic'``
+    MESSAGEENTITY_CODE (:obj:`str`): ``'code'``
+    MESSAGEENTITY_PRE (:obj:`str`): ``'pre'``
+    MESSAGEENTITY_TEXT_LINK (:obj:`str`): ``'text_link'``
+    MESSAGEENTITY_TEXT_MENTION (:obj:`str`): ``'text_mention'``
+    MESSAGEENTITY_UNDERLINE (:obj:`str`): ``'underline'``
+    MESSAGEENTITY_STRIKETHROUGH (:obj:`str`): ``'strikethrough'``
     MESSAGEENTITY_ALL_TYPES (List[:obj:`str`]): List of all the types of message entity.
 
 :class:`telegram.ParseMode`:
 
 Attributes:
-    PARSEMODE_MARKDOWN (:obj:`str`): 'Markdown'
-    PARSEMODE_MARKDOWN_V2 (:obj:`str`): 'MarkdownV2'
-    PARSEMODE_HTML (:obj:`str`): 'HTML'
+    PARSEMODE_MARKDOWN (:obj:`str`): ``'Markdown'``
+    PARSEMODE_MARKDOWN_V2 (:obj:`str`): ``'MarkdownV2'``
+    PARSEMODE_HTML (:obj:`str`): ``'HTML'``
 
 :class:`telegram.Poll`:
 
 Attributes:
-    POLL_REGULAR (:obj:`str`): 'regular'
-    POLL_QUIZ (:obj:`str`): 'quiz'
+    POLL_REGULAR (:obj:`str`): ``'regular'``
+    POLL_QUIZ (:obj:`str`): ``'quiz'``
     MAX_POLL_QUESTION_LENGTH (:obj:`int`): 300
     MAX_POLL_OPTION_LENGTH (:obj:`int`): 100
 
 :class:`telegram.MaskPosition`:
 
 Attributes:
-    STICKER_FOREHEAD (:obj:`str`): 'forehead'
-    STICKER_EYES (:obj:`str`): 'eyes'
-    STICKER_MOUTH (:obj:`str`): 'mouth'
-    STICKER_CHIN (:obj:`str`): 'chin'
+    STICKER_FOREHEAD (:obj:`str`): ``'forehead'``
+    STICKER_EYES (:obj:`str`): ``'eyes'``
+    STICKER_MOUTH (:obj:`str`): ``'mouth'``
+    STICKER_CHIN (:obj:`str`): ``'chin'``
 
 :class:`telegram.Update`:
 

@@ -254,7 +254,7 @@ class Updater:
 
         Args:
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
-                Telegram in seconds. Default is 0.0.
+                Telegram in seconds. Default is ``0.0``.
             timeout (:obj:`float`, optional): Passed to :meth:`telegram.Bot.get_updates`.
             drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
                 Telegram servers before actually starting to poll. Default is :obj:`False`.
@@ -275,7 +275,7 @@ class Updater:
                 :meth:`telegram.Bot.get_updates`.
             read_latency (:obj:`float` | :obj:`int`, optional): Grace time in seconds for receiving
                 the reply from server. Will be added to the ``timeout`` value and used as the read
-                timeout from server (Default: 2).
+                timeout from server (Default: ``2``).
 
         Returns:
             :obj:`Queue`: The update queue that can be filled from the main thread.
@@ -339,11 +339,15 @@ class Updater:
         ip_address: str = None,
     ) -> Optional[Queue]:
         """
-        Starts a small http server to listen for updates via webhook. If cert
-        and key are not provided, the webhook will be started directly on
+        Starts a small http server to listen for updates via webhook. If :attr:`cert`
+        and :attr:`key` are not provided, the webhook will be started directly on
         http://listen:port/url_path, so SSL can be handled by another
         application. Else, the webhook will be started on
         https://listen:port/url_path. Also calls :meth:`telegram.Bot.set_webhook` as required.
+
+        .. versionchanged:: 13.4
+            :meth:`start_webhook` now *always* calls :meth:`telegram.Bot.set_webhook`, so pass
+            ``webhook_url`` instead of calling ``updater.bot.set_webhook(webhook_url)`` manually.
 
         Note:
             Due to an incompatibility of the Tornado library PTB uses for the webhook with Python
@@ -742,8 +746,8 @@ class Updater:
 
         Args:
             stop_signals (:obj:`list` | :obj:`tuple`): List containing signals from the signal
-                module that should be subscribed to. Updater.stop() will be called on receiving one
-                of those signals. Defaults to (``SIGINT``, ``SIGTERM``, ``SIGABRT``).
+                module that should be subscribed to. :meth:`Updater.stop()` will be called on
+                receiving one of those signals. Defaults to (``SIGINT``, ``SIGTERM``, ``SIGABRT``).
 
         """
         for sig in stop_signals:
