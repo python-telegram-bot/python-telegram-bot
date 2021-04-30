@@ -150,13 +150,59 @@ Attributes:
     MAX_POLL_QUESTION_LENGTH (:obj:`int`): 300
     MAX_POLL_OPTION_LENGTH (:obj:`int`): 100
 
-:class:`telegram.files.MaskPosition`:
+:class:`telegram.MaskPosition`:
 
 Attributes:
     STICKER_FOREHEAD (:obj:`str`): 'forehead'
     STICKER_EYES (:obj:`str`): 'eyes'
     STICKER_MOUTH (:obj:`str`): 'mouth'
     STICKER_CHIN (:obj:`str`): 'chin'
+
+:class:`telegram.Update`:
+
+Attributes:
+    UPDATE_MESSAGE (:obj:`str`): ``'message'``
+
+        .. versionadded:: 13.5
+    UPDATE_EDITED_MESSAGE (:obj:`str`): ``'edited_message'``
+
+        .. versionadded:: 13.5
+    UPDATE_CHANNEL_POST (:obj:`str`): ``'channel_post'``
+
+        .. versionadded:: 13.5
+    UPDATE_EDITED_CHANNEL_POST (:obj:`str`): ``'edited_channel_post'``
+
+        .. versionadded:: 13.5
+    UPDATE_INLINE_QUERY (:obj:`str`): ``'inline_query'``
+
+        .. versionadded:: 13.5
+    UPDATE_CHOSEN_INLINE_RESULT (:obj:`str`): ``'chosen_inline_result'``
+
+        .. versionadded:: 13.5
+    UPDATE_CALLBACK_QUERY (:obj:`str`): ``'callback_query'``
+
+        .. versionadded:: 13.5
+    UPDATE_SHIPPING_QUERY (:obj:`str`): ``'shipping_query'``
+
+        .. versionadded:: 13.5
+    UPDATE_PRE_CHECKOUT_QUERY (:obj:`str`): ``'pre_checkout_query'``
+
+        .. versionadded:: 13.5
+    UPDATE_POLL (:obj:`str`): ``'poll'``
+
+        .. versionadded:: 13.5
+    UPDATE_POLL_ANSWER (:obj:`str`): ``'poll_answer'``
+
+        .. versionadded:: 13.5
+    UPDATE_MY_CHAT_MEMBER (:obj:`str`): ``'my_chat_member'``
+
+        .. versionadded:: 13.5
+    UPDATE_CHAT_MEMBER (:obj:`str`): ``'chat_member'``
+
+        .. versionadded:: 13.5
+    UPDATE_ALL_TYPES (List[:obj:`str`]): List of all update types.
+
+        .. versionadded:: 13.5
 
 """
 from typing import List
@@ -267,3 +313,32 @@ STICKER_FOREHEAD: str = 'forehead'
 STICKER_EYES: str = 'eyes'
 STICKER_MOUTH: str = 'mouth'
 STICKER_CHIN: str = 'chin'
+
+UPDATE_MESSAGE = 'message'
+UPDATE_EDITED_MESSAGE = 'edited_message'
+UPDATE_CHANNEL_POST = 'channel_post'
+UPDATE_EDITED_CHANNEL_POST = 'edited_channel_post'
+UPDATE_INLINE_QUERY = 'inline_query'
+UPDATE_CHOSEN_INLINE_RESULT = 'chosen_inline_result'
+UPDATE_CALLBACK_QUERY = 'callback_query'
+UPDATE_SHIPPING_QUERY = 'shipping_query'
+UPDATE_PRE_CHECKOUT_QUERY = 'pre_checkout_query'
+UPDATE_POLL = 'poll'
+UPDATE_POLL_ANSWER = 'poll_answer'
+UPDATE_MY_CHAT_MEMBER = 'my_chat_member'
+UPDATE_CHAT_MEMBER = 'chat_member'
+UPDATE_ALL_TYPES = [
+    UPDATE_MESSAGE,
+    UPDATE_EDITED_MESSAGE,
+    UPDATE_CHANNEL_POST,
+    UPDATE_EDITED_CHANNEL_POST,
+    UPDATE_INLINE_QUERY,
+    UPDATE_CHOSEN_INLINE_RESULT,
+    UPDATE_CALLBACK_QUERY,
+    UPDATE_SHIPPING_QUERY,
+    UPDATE_PRE_CHECKOUT_QUERY,
+    UPDATE_POLL,
+    UPDATE_POLL_ANSWER,
+    UPDATE_MY_CHAT_MEMBER,
+    UPDATE_CHAT_MEMBER,
+]

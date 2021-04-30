@@ -46,5 +46,8 @@ A basic example of a bot that can accept payments. Don't forget to enable and co
 ### [`errorhandlerbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/errorhandlerbot.py)
 A basic example on how to set up a custom error handler.
 
+### [`chatmemberbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/chatmemberbot.py)
+A basic example on how `(my_)chat_member` updates can be used. 
+
 ## Pure API
 The [`rawapibot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/rawapibot.py) example uses only the pure, "bare-metal" API wrapper.
