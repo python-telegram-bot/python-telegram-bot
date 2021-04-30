@@ -69,6 +69,7 @@ class Promise:
         self.update = update
         self.error_handling = error_handling
         self.done = Event()
+        self._done_callback: Optional[Callable] = None
         self._result: Optional[RT] = None
         self._exception: Optional[Exception] = None
 
@@ -83,6 +84,15 @@ class Promise:
 
         finally:
             self.done.set()
+            if self._done_callback:
+                try:
+                    self._done_callback(self.result())
+                except Exception as exc:
+                    logger.warning(
+                        "`done_callback` of a Promise raised the following exception."
+                        " The exception won't be handled by error handlers."
+                    )
+                    logger.warning("Full traceback:", exc_info=exc)
 
     def __call__(self) -> None:
         self.run()
@@ -105,6 +115,20 @@ class Promise:
         if self._exception is not None:
             raise self._exception  # pylint: disable=raising-bad-type
         return self._result
+
+    def add_done_callback(self, callback: Callable) -> None:
+        """
+        Callback to be run when :class:`telegram.ext.utils.promise.Promise` becomes done.
+
+        Args:
+            callback (:obj:`callable`): The callable that will be called when promise is done.
+            callback will be called by passing ``Promise.result()`` as only positional argument.
+
+        """
+        if self.done.wait(0):
+            callback(self.result())
+        else:
+            self._done_callback = callback
 
     @property
     def exception(self) -> Optional[Exception]:

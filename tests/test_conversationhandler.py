@@ -784,6 +784,125 @@ class TestConversationHandler:
         assert not handler.check_update(Update(0, pre_checkout_query=pre_checkout_query))
         assert not handler.check_update(Update(0, shipping_query=shipping_query))
 
+    def test_no_jobqueue_warning(self, dp, bot, user1, caplog):
+        handler = ConversationHandler(
+            entry_points=self.entry_points,
+            states=self.states,
+            fallbacks=self.fallbacks,
+            conversation_timeout=0.5,
+        )
+        # save dp.job_queue in temp variable jqueue
+        # and then set dp.job_queue to None.
+        jqueue = dp.job_queue
+        dp.job_queue = None
+        dp.add_handler(handler)
+
+        message = Message(
+            0,
+            None,
+            self.group,
+            from_user=user1,
+            text='/start',
+            entities=[
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+            ],
+            bot=bot,
+        )
+
+        with caplog.at_level(logging.WARNING):
+            dp.process_update(Update(update_id=0, message=message))
+            sleep(0.5)
+        assert len(caplog.records) == 1
+        assert (
+            caplog.records[0].message
+            == "Ignoring `conversation_timeout` because the Dispatcher has no JobQueue."
+        )
+        # now set dp.job_queue back to it's original value
+        dp.job_queue = jqueue
+
+    def test_schedule_job_exception(self, dp, bot, user1, monkeypatch, caplog):
+        def mocked_run_once(*a, **kw):
+            raise Exception("job error")
+
+        monkeypatch.setattr(dp.job_queue, "run_once", mocked_run_once)
+        handler = ConversationHandler(
+            entry_points=self.entry_points,
+            states=self.states,
+            fallbacks=self.fallbacks,
+            conversation_timeout=100,
+        )
+        dp.add_handler(handler)
+
+        message = Message(
+            0,
+            None,
+            self.group,
+            from_user=user1,
+            text='/start',
+            entities=[
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+            ],
+            bot=bot,
+        )
+
+        with caplog.at_level(logging.ERROR):
+            dp.process_update(Update(update_id=0, message=message))
+            sleep(0.5)
+        assert len(caplog.records) == 2
+        assert (
+            caplog.records[0].message
+            == "Failed to schedule timeout job due to the following exception:"
+        )
+        assert caplog.records[1].message == "job error"
+
+    def test_promise_exception(self, dp, bot, user1, caplog):
+        """
+        Here we make sure that when a run_async handle raises an
+        exception, the state isn't changed.
+        """
+
+        def conv_entry(*a, **kw):
+            return 1
+
+        def raise_error(*a, **kw):
+            raise Exception("promise exception")
+
+        handler = ConversationHandler(
+            entry_points=[CommandHandler("start", conv_entry)],
+            states={1: [MessageHandler(Filters.all, raise_error)]},
+            fallbacks=self.fallbacks,
+            run_async=True,
+        )
+        dp.add_handler(handler)
+
+        message = Message(
+            0,
+            None,
+            self.group,
+            from_user=user1,
+            text='/start',
+            entities=[
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+            ],
+            bot=bot,
+        )
+        # start the conversation
+        dp.process_update(Update(update_id=0, message=message))
+        sleep(0.1)
+        message.text = "error"
+        dp.process_update(Update(update_id=0, message=message))
+        sleep(0.1)
+        message.text = "resolve promise pls"
+        caplog.clear()
+        with caplog.at_level(logging.ERROR):
+            dp.process_update(Update(update_id=0, message=message))
+            sleep(0.5)
+        assert len(caplog.records) == 3
+        assert caplog.records[0].message == "Promise function raised exception"
+        assert caplog.records[1].message == "promise exception"
+        # assert res is old state
+        assert handler.conversations.get((self.group.id, user1.id))[0] == 1
+
     def test_conversation_timeout(self, dp, bot, user1):
         handler = ConversationHandler(
             entry_points=self.entry_points,
@@ -819,6 +938,49 @@ class TestConversationHandler:
         assert handler.conversations.get((self.group.id, user1.id)) == self.BREWING
         sleep(0.7)
         assert handler.conversations.get((self.group.id, user1.id)) is None
+
+    def test_timeout_not_triggered_on_conv_end_async(self, bot, dp, user1):
+        def timeout(*a, **kw):
+            self.test_flag = True
+
+        self.states.update({ConversationHandler.TIMEOUT: [TypeHandler(Update, timeout)]})
+        handler = ConversationHandler(
+            entry_points=self.entry_points,
+            states=self.states,
+            fallbacks=self.fallbacks,
+            conversation_timeout=0.5,
+            run_async=True,
+        )
+        dp.add_handler(handler)
+
+        message = Message(
+            0,
+            None,
+            self.group,
+            from_user=user1,
+            text='/start',
+            entities=[
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+            ],
+            bot=bot,
+        )
+        # start the conversation
+        dp.process_update(Update(update_id=0, message=message))
+        sleep(0.1)
+        message.text = '/brew'
+        message.entities[0].length = len('/brew')
+        dp.process_update(Update(update_id=1, message=message))
+        sleep(0.1)
+        message.text = '/pourCoffee'
+        message.entities[0].length = len('/pourCoffee')
+        dp.process_update(Update(update_id=2, message=message))
+        sleep(0.1)
+        message.text = '/end'
+        message.entities[0].length = len('/end')
+        dp.process_update(Update(update_id=3, message=message))
+        sleep(1)
+        # assert timeout handler didn't got called
+        assert self.test_flag is False
 
     def test_conversation_timeout_dispatcher_handler_stop(self, dp, bot, user1, caplog):
         handler = ConversationHandler(
@@ -1156,6 +1318,39 @@ class TestConversationHandler:
         sleep(0.7)
         assert handler.conversations.get((self.group.id, user1.id)) is None
         assert self.is_timeout
+
+    def test_conversation_timeout_warning_only_shown_once(self, recwarn):
+        ConversationHandler(
+            entry_points=self.entry_points,
+            states={
+                self.THIRSTY: [
+                    ConversationHandler(
+                        entry_points=self.entry_points,
+                        states={
+                            self.BREWING: [CommandHandler('pourCoffee', self.drink)],
+                        },
+                        fallbacks=self.fallbacks,
+                    )
+                ],
+                self.DRINKING: [
+                    ConversationHandler(
+                        entry_points=self.entry_points,
+                        states={
+                            self.CODING: [CommandHandler('startCoding', self.code)],
+                        },
+                        fallbacks=self.fallbacks,
+                    )
+                ],
+            },
+            fallbacks=self.fallbacks,
+            conversation_timeout=100,
+        )
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message) == (
+            "Using `conversation_timeout` with nested conversations is currently not "
+            "supported. You can still try to use it, but it will likely behave "
+            "differently from what you expect."
+        )
 
     def test_per_message_warning_is_only_shown_once(self, recwarn):
         ConversationHandler(
