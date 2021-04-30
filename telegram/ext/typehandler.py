@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the TypeHandler class."""
 
-from typing import Any, Callable, Type, TypeVar, Union
+from typing import Callable, Type, TypeVar, Union
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 from .handler import Handler
@@ -91,7 +91,7 @@ class TypeHandler(Handler[UT, CCT]):
         self.type = type
         self.strict = strict
 
-    def check_update(self, update: Any) -> bool:
+    def check_update(self, update: object) -> bool:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:

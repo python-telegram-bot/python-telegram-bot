@@ -140,7 +140,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD, UDM, CDM]):
         self.user_data: Optional[MutableMapping[int, UD]] = None
         self.chat_data: Optional[MutableMapping[int, CD]] = None
         self.bot_data: Optional[BD] = None
-        self.conversations: Optional[Dict[str, Dict[Tuple, Any]]] = None
+        self.conversations: Optional[Dict[str, Dict[Tuple, object]]] = None
         self.context_customizer = cast(
             ContextCustomizer[Any, UD, CD, BD, UDM, CDM], context_customizer or ContextCustomizer()
         )
@@ -164,7 +164,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD, UDM, CDM]):
                 self.bot_data = data.get('bot_data', self.context_customizer.bot_data())
                 self.conversations = data['conversations']
         except OSError:
-            self.conversations = dict()
+            self.conversations = {}
             self.user_data = self.context_customizer.user_data_mapping(  # type: ignore[call-arg]
                 self.context_customizer.user_data
             )
@@ -200,7 +200,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD, UDM, CDM]):
             pickle.dump(data, file)
 
     @staticmethod
-    def dump_file(filename: str, data: Any) -> None:
+    def dump_file(filename: str, data: object) -> None:
         with open(filename, "wb") as file:
             pickle.dump(data, file)
 
@@ -303,7 +303,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD, UDM, CDM]):
             new_state (:obj:`tuple` | :obj:`any`): The new state for the given key.
         """
         if not self.conversations:
-            self.conversations = dict()
+            self.conversations = {}
         if self.conversations.setdefault(name, {}).get(key) == new_state:
             return
         self.conversations[name][key] = new_state

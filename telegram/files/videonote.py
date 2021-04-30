@@ -18,10 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram VideoNote."""
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Optional, Any
 
 from telegram import PhotoSize, TelegramObject
-from telegram.utils.types import JSONDict
+from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
     from telegram import Bot, File
@@ -94,7 +95,9 @@ class VideoNote(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def get_file(self, timeout: float = None, api_kwargs: JSONDict = None) -> 'File':
+    def get_file(
+        self, timeout: ODVInput[float] = DEFAULT_NONE, api_kwargs: JSONDict = None
+    ) -> 'File':
         """Convenience wrapper over :attr:`telegram.Bot.get_file`
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.get_file`.
@@ -103,7 +106,7 @@ class VideoNote(TelegramObject):
             :class:`telegram.File`
 
         Raises:
-            :class:`telegram.TelegramError`
+            :class:`telegram.error.TelegramError`
 
         """
         return self.bot.get_file(file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs)

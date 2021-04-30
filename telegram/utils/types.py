@@ -33,7 +33,8 @@ from typing import (
 )
 
 if TYPE_CHECKING:
-    from telegram import InputFile
+    from telegram import InputFile  # noqa: F401
+    from telegram.utils.helpers import DefaultValue  # noqa: F401
     from telegram.ext import CallbackContext  # noqa: F401
 
 FileLike = Union[IO, 'InputFile']
@@ -48,6 +49,14 @@ JSONDict = Dict[str, Any]
 
 ConversationDict = Dict[Tuple[int, ...], Optional[object]]
 """Dicts as maintained by the :class:`telegram.ext.ConversationHandler`."""
+
+DVType = TypeVar('DVType')
+ODVInput = Optional[Union['DefaultValue[DVType]', DVType]]
+"""Generic type for bot method parameters which can have defaults. ``ODVInput[type]`` is the same
+as ``Optional[Union[DefaultValue, type]]``."""
+DVInput = Union['DefaultValue[DVType]', DVType]
+"""Generic type for bot method parameters which can have defaults. ``DVInput[type]`` is the same
+as ``Union[DefaultValue, type]``."""
 
 RT = TypeVar("RT")
 SLT = Union[RT, List[RT], Tuple[RT, ...]]

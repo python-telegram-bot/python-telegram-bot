@@ -29,6 +29,8 @@ from telegram import (
     PreCheckoutQuery,
     ShippingQuery,
     TelegramObject,
+    ChatMemberUpdated,
+    constants,
 )
 from telegram.poll import PollAnswer
 from telegram.utils.types import JSONDict
@@ -74,6 +76,19 @@ class Update(TelegramObject):
         poll_answer (:class:`telegram.PollAnswer`, optional): A user changed their answer
             in a non-anonymous poll. Bots receive new votes only in polls that were sent
             by the bot itself.
+        my_chat_member (:class:`telegram.ChatMemberUpdated`, optional): The bot's chat member
+            status was updated in a chat. For private chats, this update is received only when the
+            bot is blocked or unblocked by the user.
+
+            .. versionadded:: 13.4
+        chat_member (:class:`telegram.ChatMemberUpdated`, optional): A chat member's status was
+            updated in a chat. The bot must be an administrator in the chat and must explicitly
+            specify ``'chat_member'`` in the list of ``'allowed_updates'`` to receive these
+            updates (see :meth:`telegram.Bot.get_updates`, :meth:`telegram.Bot.set_webhook`,
+            :meth:`telegram.ext.Updater.start_polling` and
+            :meth:`telegram.ext.Updater.start_webhook`).
+
+            .. versionadded:: 13.4
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
@@ -94,8 +109,78 @@ class Update(TelegramObject):
         poll_answer (:class:`telegram.PollAnswer`): Optional. A user changed their answer
             in a non-anonymous poll. Bots receive new votes only in polls that were sent
             by the bot itself.
+        my_chat_member (:class:`telegram.ChatMemberUpdated`): Optional. The bot's chat member
+            status was updated in a chat. For private chats, this update is received only when the
+            bot is blocked or unblocked by the user.
+
+            .. versionadded:: 13.4
+        chat_member (:class:`telegram.ChatMemberUpdated`): Optional. A chat member's status was
+            updated in a chat. The bot must be an administrator in the chat and must explicitly
+            specify ``'chat_member'`` in the list of ``'allowed_updates'`` to receive these
+            updates (see :meth:`telegram.Bot.get_updates`, :meth:`telegram.Bot.set_webhook`,
+            :meth:`telegram.ext.Updater.start_polling` and
+            :meth:`telegram.ext.Updater.start_webhook`).
+
+            .. versionadded:: 13.4
 
     """
+
+    MESSAGE = constants.UPDATE_MESSAGE
+    """:const:`telegram.constants.UPDATE_MESSAGE`
+
+    .. versionadded:: 13.5"""
+    EDITED_MESSAGE = constants.UPDATE_EDITED_MESSAGE
+    """:const:`telegram.constants.UPDATE_EDITED_MESSAGE`
+
+    .. versionadded:: 13.5"""
+    CHANNEL_POST = constants.UPDATE_CHANNEL_POST
+    """:const:`telegram.constants.UPDATE_CHANNEL_POST`
+
+    .. versionadded:: 13.5"""
+    EDITED_CHANNEL_POST = constants.UPDATE_EDITED_CHANNEL_POST
+    """:const:`telegram.constants.UPDATE_EDITED_CHANNEL_POST`
+
+    .. versionadded:: 13.5"""
+    INLINE_QUERY = constants.UPDATE_INLINE_QUERY
+    """:const:`telegram.constants.UPDATE_INLINE_QUERY`
+
+    .. versionadded:: 13.5"""
+    CHOSEN_INLINE_RESULT = constants.UPDATE_CHOSEN_INLINE_RESULT
+    """:const:`telegram.constants.UPDATE_CHOSEN_INLINE_RESULT`
+
+    .. versionadded:: 13.5"""
+    CALLBACK_QUERY = constants.UPDATE_CALLBACK_QUERY
+    """:const:`telegram.constants.UPDATE_CALLBACK_QUERY`
+
+    .. versionadded:: 13.5"""
+    SHIPPING_QUERY = constants.UPDATE_SHIPPING_QUERY
+    """:const:`telegram.constants.UPDATE_SHIPPING_QUERY`
+
+    .. versionadded:: 13.5"""
+    PRE_CHECKOUT_QUERY = constants.UPDATE_PRE_CHECKOUT_QUERY
+    """:const:`telegram.constants.UPDATE_PRE_CHECKOUT_QUERY`
+
+    .. versionadded:: 13.5"""
+    POLL = constants.UPDATE_POLL
+    """:const:`telegram.constants.UPDATE_POLL`
+
+    .. versionadded:: 13.5"""
+    POLL_ANSWER = constants.UPDATE_POLL_ANSWER
+    """:const:`telegram.constants.UPDATE_POLL_ANSWER`
+
+    .. versionadded:: 13.5"""
+    MY_CHAT_MEMBER = constants.UPDATE_MY_CHAT_MEMBER
+    """:const:`telegram.constants.UPDATE_MY_CHAT_MEMBER`
+
+    .. versionadded:: 13.5"""
+    CHAT_MEMBER = constants.UPDATE_CHAT_MEMBER
+    """:const:`telegram.constants.UPDATE_CHAT_MEMBER`
+
+    .. versionadded:: 13.5"""
+    ALL_TYPES = constants.UPDATE_ALL_TYPES
+    """:const:`telegram.constants.UPDATE_ALL_TYPES`
+
+    .. versionadded:: 13.5"""
 
     def __init__(
         self,
@@ -111,6 +196,8 @@ class Update(TelegramObject):
         pre_checkout_query: PreCheckoutQuery = None,
         poll: Poll = None,
         poll_answer: PollAnswer = None,
+        my_chat_member: ChatMemberUpdated = None,
+        chat_member: ChatMemberUpdated = None,
         **_kwargs: Any,
     ):
         # Required
@@ -127,6 +214,8 @@ class Update(TelegramObject):
         self.edited_channel_post = edited_channel_post
         self.poll = poll
         self.poll_answer = poll_answer
+        self.my_chat_member = my_chat_member
+        self.chat_member = chat_member
 
         self._effective_user: Optional['User'] = None
         self._effective_chat: Optional['Chat'] = None
@@ -170,6 +259,12 @@ class Update(TelegramObject):
         elif self.poll_answer:
             user = self.poll_answer.user
 
+        elif self.my_chat_member:
+            user = self.my_chat_member.from_user
+
+        elif self.chat_member:
+            user = self.chat_member.from_user
+
         self._effective_user = user
         return user
 
@@ -202,6 +297,12 @@ class Update(TelegramObject):
 
         elif self.edited_channel_post:
             chat = self.edited_channel_post.chat
+
+        elif self.my_chat_member:
+            chat = self.my_chat_member.chat
+
+        elif self.chat_member:
+            chat = self.chat_member.chat
 
         self._effective_chat = chat
         return chat
@@ -259,5 +360,7 @@ class Update(TelegramObject):
         data['edited_channel_post'] = Message.de_json(data.get('edited_channel_post'), bot)
         data['poll'] = Poll.de_json(data.get('poll'), bot)
         data['poll_answer'] = PollAnswer.de_json(data.get('poll_answer'), bot)
+        data['my_chat_member'] = ChatMemberUpdated.de_json(data.get('my_chat_member'), bot)
+        data['chat_member'] = ChatMemberUpdated.de_json(data.get('chat_member'), bot)
 
         return cls(**data)

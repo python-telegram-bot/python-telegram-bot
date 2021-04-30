@@ -115,7 +115,6 @@ class TestErrors:
         ],
     )
     def test_errors_pickling(self, exception, attributes):
-        print(exception)
         pickled = pickle.dumps(exception)
         unpickled = pickle.loads(pickled)
         assert type(unpickled) is type(exception)
@@ -132,7 +131,7 @@ class TestErrors:
         """
 
         def make_assertion(cls):
-            assert {sc for sc in cls.__subclasses__()} == covered_subclasses[cls]
+            assert set(cls.__subclasses__()) == covered_subclasses[cls]
             for subcls in cls.__subclasses__():
                 make_assertion(subcls)
 

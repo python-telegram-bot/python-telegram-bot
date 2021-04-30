@@ -23,7 +23,7 @@ except ImportError:
     import json  # type: ignore[no-redef]
 
 import warnings
-from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Type, TypeVar
+from typing import TYPE_CHECKING, List, Optional, Tuple, Type, TypeVar
 
 from telegram.utils.types import JSONDict
 
@@ -36,28 +36,23 @@ TO = TypeVar('TO', bound='TelegramObject', covariant=True)
 class TelegramObject:
     """Base class for most telegram objects."""
 
-    # def __init__(self, *args: Any, **_kwargs: Any):
-    #     pass
-
-    _id_attrs: Tuple[Any, ...] = ()
+    _id_attrs: Tuple[object, ...] = ()
 
     def __str__(self) -> str:
         return str(self.to_dict())
 
-    def __getitem__(self, item: str) -> Any:
+    def __getitem__(self, item: str) -> object:
         return self.__dict__[item]
 
     @staticmethod
     def parse_data(data: Optional[JSONDict]) -> Optional[JSONDict]:
-        if not data:
-            return None
-        return data.copy()
+        return None if data is None else data.copy()
 
     @classmethod
     def de_json(cls: Type[TO], data: Optional[JSONDict], bot: 'Bot') -> Optional[TO]:
         data = cls.parse_data(data)
 
-        if not data:
+        if data is None:
             return None
 
         if cls == TelegramObject:
@@ -81,7 +76,7 @@ class TelegramObject:
         return json.dumps(self.to_dict())
 
     def to_dict(self) -> JSONDict:
-        data = dict()
+        data = {}
 
         for key in iter(self.__dict__):
             if key == 'bot' or key.startswith('_'):

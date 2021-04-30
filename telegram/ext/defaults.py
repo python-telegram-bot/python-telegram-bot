@@ -16,13 +16,14 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=R0201, E0401
+# pylint: disable=R0201
 """This module contains the class Defaults, which allows to pass default values to Updater."""
-from typing import Any, NoReturn, Optional, Union
+from typing import NoReturn, Optional, Dict, Any
 
 import pytz
 
-from telegram.utils.helpers import DEFAULT_NONE, DefaultValue
+from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.types import ODVInput
 
 
 class Defaults:
@@ -47,6 +48,9 @@ class Defaults:
             appearing throughout PTB, i.e. if a timezone naive date(time) object is passed
             somewhere, it will be assumed to be in ``tzinfo``. Must be a timezone provided by the
             ``pytz`` module. Defaults to UTC.
+
+            Note:
+                Will *not* be used for :meth:`telegram.Bot.get_updates`!
         run_async (:obj:`bool`, optional): Default setting for the ``run_async`` parameter of
             handlers and error handlers registered through :meth:`Dispatcher.add_handler` and
             :meth:`Dispatcher.add_error_handler`. Defaults to :obj:`False`.
@@ -54,6 +58,8 @@ class Defaults:
     Attributes:
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or URLs in your bot's message.
+        explanation_parse_mode (:obj:`str`): Optional. Alias for :attr:`parse_mode`, used for
+            the corresponding parameter of :meth:`telegram.Bot.send_poll`.
         disable_notification (:obj:`bool`): Optional. Sends the message silently. Users will
             receive a notification with no sound.
         disable_web_page_preview (:obj:`bool`): Optional. Disables link previews for links in this
@@ -80,7 +86,7 @@ class Defaults:
         disable_web_page_preview: bool = None,
         # Timeout needs special treatment, since the bot methods have two different
         # default values for timeout (None and 20s)
-        timeout: Union[float, DefaultValue] = DEFAULT_NONE,
+        timeout: ODVInput[float] = DEFAULT_NONE,
         quote: bool = None,
         tzinfo: pytz.BaseTzInfo = pytz.utc,
         run_async: bool = False,
@@ -95,12 +101,43 @@ class Defaults:
         self._tzinfo = tzinfo
         self._run_async = run_async
 
+        # Gather all defaults that actually have a default value
+        self._api_defaults = {}
+        for kwarg in (
+            'parse_mode',
+            'explanation_parse_mode',
+            'disable_notification',
+            'disable_web_page_preview',
+            'allow_sending_without_reply',
+        ):
+            value = getattr(self, kwarg)
+            if value not in [None, DEFAULT_NONE]:
+                self._api_defaults[kwarg] = value
+        # Special casing, as None is a valid default value
+        if self.timeout != DEFAULT_NONE:
+            self._api_defaults['timeout'] = self.timeout
+
+    @property
+    def api_defaults(self) -> Dict[str, Any]:
+        return self._api_defaults
+
     @property
     def parse_mode(self) -> Optional[str]:
         return self._parse_mode
 
     @parse_mode.setter
-    def parse_mode(self, value: Any) -> NoReturn:
+    def parse_mode(self, value: object) -> NoReturn:
+        raise AttributeError(
+            "You can not assign a new value to defaults after because it would "
+            "not have any effect."
+        )
+
+    @property
+    def explanation_parse_mode(self) -> Optional[str]:
+        return self._parse_mode
+
+    @explanation_parse_mode.setter
+    def explanation_parse_mode(self, value: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to defaults after because it would "
             "not have any effect."
@@ -111,7 +148,7 @@ class Defaults:
         return self._disable_notification
 
     @disable_notification.setter
-    def disable_notification(self, value: Any) -> NoReturn:
+    def disable_notification(self, value: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to defaults after because it would "
             "not have any effect."
@@ -122,7 +159,7 @@ class Defaults:
         return self._disable_web_page_preview
 
     @disable_web_page_preview.setter
-    def disable_web_page_preview(self, value: Any) -> NoReturn:
+    def disable_web_page_preview(self, value: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to defaults after because it would "
             "not have any effect."
@@ -133,18 +170,18 @@ class Defaults:
         return self._allow_sending_without_reply
 
     @allow_sending_without_reply.setter
-    def allow_sending_without_reply(self, value: Any) -> NoReturn:
+    def allow_sending_without_reply(self, value: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to defaults after because it would "
             "not have any effect."
         )
 
     @property
-    def timeout(self) -> Union[float, DefaultValue]:
+    def timeout(self) -> ODVInput[float]:
         return self._timeout
 
     @timeout.setter
-    def timeout(self, value: Any) -> NoReturn:
+    def timeout(self, value: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to defaults after because it would "
             "not have any effect."
@@ -155,7 +192,7 @@ class Defaults:
         return self._quote
 
     @quote.setter
-    def quote(self, value: Any) -> NoReturn:
+    def quote(self, value: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to defaults after because it would "
             "not have any effect."
@@ -166,7 +203,7 @@ class Defaults:
         return self._tzinfo
 
     @tzinfo.setter
-    def tzinfo(self, value: Any) -> NoReturn:
+    def tzinfo(self, value: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to defaults after because it would "
             "not have any effect."
@@ -177,7 +214,7 @@ class Defaults:
         return self._run_async
 
     @run_async.setter
-    def run_async(self, value: Any) -> NoReturn:
+    def run_async(self, value: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to defaults after because it would "
             "not have any effect."

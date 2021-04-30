@@ -25,7 +25,12 @@ from flaky import flaky
 from telegram import Sticker, TelegramError, PhotoSize, InputFile, MessageEntity, Bot
 from telegram.error import BadRequest
 from telegram.utils.helpers import escape_markdown
-from tests.conftest import expect_bad_request, check_shortcut_call, check_shortcut_signature
+from tests.conftest import (
+    expect_bad_request,
+    check_shortcut_call,
+    check_shortcut_signature,
+    check_defaults_handling,
+)
 
 
 @pytest.fixture(scope='function')
@@ -58,7 +63,7 @@ class TestPhoto:
     width = 800
     height = 800
     caption = '<b>PhotoTest</b> - *Caption*'
-    photo_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram_new.jpg'
+    photo_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.jpg'
     file_size = 29176
 
     def test_creation(self, thumb, photo):
@@ -76,15 +81,14 @@ class TestPhoto:
         assert thumb.file_unique_id != ''
 
     def test_expected_values(self, photo, thumb):
+        # We used to test for file_size as well, but TG apparently at some point apparently changed
+        # the compression method and it's not really our job anyway ...
         assert photo.width == self.width
         assert photo.height == self.height
-        assert photo.file_size == self.file_size
         assert thumb.width == 320
         assert thumb.height == 320
-        assert thumb.file_size == 9331
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_photo_all_args(self, bot, chat_id, photo_file, thumb, photo):
         message = bot.send_photo(
             chat_id,
@@ -115,7 +119,6 @@ class TestPhoto:
         assert message.caption == TestPhoto.caption.replace('*', '')
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_photo_custom_filename(self, bot, chat_id, photo_file, monkeypatch):
         def make_assertion(url, data, **kwargs):
             return data['photo'].filename == 'custom_filename'
@@ -125,7 +128,6 @@ class TestPhoto:
         assert bot.send_photo(chat_id, photo_file, filename='custom_filename')
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_photo_parse_mode_markdown(self, bot, chat_id, photo_file, thumb, photo):
         message = bot.send_photo(chat_id, photo_file, caption=self.caption, parse_mode='Markdown')
         assert isinstance(message.photo[0], PhotoSize)
@@ -150,7 +152,6 @@ class TestPhoto:
         assert len(message.caption_entities) == 1
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_photo_parse_mode_html(self, bot, chat_id, photo_file, thumb, photo):
         message = bot.send_photo(chat_id, photo_file, caption=self.caption, parse_mode='HTML')
         assert isinstance(message.photo[0], PhotoSize)
@@ -175,7 +176,6 @@ class TestPhoto:
         assert len(message.caption_entities) == 1
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_photo_caption_entities(self, bot, chat_id, photo_file, thumb, photo):
         test_string = 'Italic Bold Code'
         entities = [
@@ -186,15 +186,11 @@ class TestPhoto:
         message = bot.send_photo(
             chat_id, photo_file, caption=test_string, caption_entities=entities
         )
-        # message = bot.send_photo(
-        #     chat_id, photo_file, caption=test_string, caption_entities=entities
-        # )
 
         assert message.caption == test_string
         assert message.caption_entities == entities
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_photo_default_parse_mode_1(self, default_bot, chat_id, photo_file, thumb, photo):
         test_string = 'Italic Bold Code'
@@ -205,7 +201,6 @@ class TestPhoto:
         assert message.caption == test_string
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_photo_default_parse_mode_2(self, default_bot, chat_id, photo_file, thumb, photo):
         test_markdown_string = '_Italic_ *Bold* `Code`'
@@ -217,7 +212,6 @@ class TestPhoto:
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_photo_default_parse_mode_3(self, default_bot, chat_id, photo_file, thumb, photo):
         test_markdown_string = '_Italic_ *Bold* `Code`'
@@ -243,7 +237,6 @@ class TestPhoto:
         assert test_flag
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize(
         'default_bot,custom',
         [
@@ -278,7 +271,6 @@ class TestPhoto:
                 )
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_get_and_download(self, bot, photo):
         new_file = bot.getFile(photo.file_id)
 
@@ -291,7 +283,6 @@ class TestPhoto:
         assert os.path.isfile('telegram.jpg') is True
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_url_jpg_file(self, bot, chat_id, thumb, photo):
         message = bot.send_photo(chat_id, photo=self.photo_file_url)
 
@@ -300,21 +291,18 @@ class TestPhoto:
         assert isinstance(message.photo[0].file_unique_id, str)
         assert message.photo[0].file_id != ''
         assert message.photo[0].file_unique_id != ''
-        assert message.photo[0].width == thumb.width
-        assert message.photo[0].height == thumb.height
-        assert message.photo[0].file_size == thumb.file_size
+        # We used to test for width, height and file_size, but TG apparently started to treat
+        # sending by URL and sending by upload differently and it's not really our job anyway ...
 
         assert isinstance(message.photo[1], PhotoSize)
         assert isinstance(message.photo[1].file_id, str)
         assert isinstance(message.photo[1].file_unique_id, str)
         assert message.photo[1].file_id != ''
         assert message.photo[1].file_unique_id != ''
-        assert message.photo[1].width == photo.width
-        assert message.photo[1].height == photo.height
-        assert message.photo[1].file_size == photo.file_size
+        # We used to test for width, height and file_size, but TG apparently started to treat
+        # sending by URL and sending by upload differently and it's not really our job anyway ...
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_url_png_file(self, bot, chat_id):
         message = bot.send_photo(
             photo='http://dummyimage.com/600x400/000/fff.png&text=telegram', chat_id=chat_id
@@ -329,7 +317,6 @@ class TestPhoto:
         assert photo.file_unique_id != ''
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_url_gif_file(self, bot, chat_id):
         message = bot.send_photo(
             photo='http://dummyimage.com/600x400/000/fff.png&text=telegram', chat_id=chat_id
@@ -344,7 +331,6 @@ class TestPhoto:
         assert photo.file_unique_id != ''
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_file_unicode_filename(self, bot, chat_id):
         """
         Regression test for https://github.com/python-telegram-bot/python-telegram-bot/issues/1202
@@ -361,7 +347,6 @@ class TestPhoto:
         assert photo.file_unique_id != ''
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_bytesio_jpg_file(self, bot, chat_id):
         file_name = 'tests/data/telegram_no_standard_header.jpg'
 
@@ -398,7 +383,6 @@ class TestPhoto:
         assert message
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_resend(self, bot, chat_id, photo):
         message = bot.send_photo(chat_id=chat_id, photo=photo.file_id)
 
@@ -449,13 +433,11 @@ class TestPhoto:
         assert photo_dict['file_size'] == photo.file_size
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.send_photo(chat_id=chat_id, photo=open(os.devnull, 'rb'))
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.send_photo(chat_id=chat_id, photo='')
@@ -465,14 +447,14 @@ class TestPhoto:
             bot.send_photo(chat_id=chat_id)
 
     def test_get_file_instance_method(self, monkeypatch, photo):
-        get_file = photo.bot.get_file
-
         def make_assertion(*_, **kwargs):
-            return kwargs['file_id'] == photo.file_id and check_shortcut_call(kwargs, get_file)
+            return kwargs['file_id'] == photo.file_id
 
         assert check_shortcut_signature(PhotoSize.get_file, Bot.get_file, ['file_id'], [])
+        assert check_shortcut_call(photo.get_file, photo.bot, 'get_file')
+        assert check_defaults_handling(photo.get_file, photo.bot)
 
-        monkeypatch.setattr('telegram.Bot.get_file', make_assertion)
+        monkeypatch.setattr(photo.bot, 'get_file', make_assertion)
         assert photo.get_file()
 
     def test_equality(self, photo):

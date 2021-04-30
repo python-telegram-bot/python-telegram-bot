@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=W0613, C0116
-# type: ignore[union-attr]
+# pylint: disable=C0116
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -24,79 +23,78 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def msg(update: Update, context: CallbackContext) -> None:
-    # If we received any passport data
+def msg(update: Update, _: CallbackContext) -> None:
+    # Retrieve passport data
     passport_data = update.message.passport_data
-    if passport_data:
-        # If our nonce doesn't match what we think, this Update did not originate from us
-        # Ideally you would randomize the nonce on the server
-        if passport_data.decrypted_credentials.nonce != 'thisisatest':
-            return
+    # If our nonce doesn't match what we think, this Update did not originate from us
+    # Ideally you would randomize the nonce on the server
+    if passport_data.decrypted_credentials.nonce != 'thisisatest':
+        return
 
-        # Print the decrypted credential data
-        # For all elements
-        # Print their decrypted data
-        # Files will be downloaded to current directory
-        for data in passport_data.decrypted_data:  # This is where the data gets decrypted
-            if data.type == 'phone_number':
-                print('Phone: ', data.phone_number)
-            elif data.type == 'email':
-                print('Email: ', data.email)
-            if data.type in (
-                'personal_details',
-                'passport',
-                'driver_license',
-                'identity_card',
-                'internal_passport',
-                'address',
-            ):
-                print(data.type, data.data)
-            if data.type in (
-                'utility_bill',
-                'bank_statement',
-                'rental_agreement',
-                'passport_registration',
-                'temporary_registration',
-            ):
-                print(data.type, len(data.files), 'files')
-                for file in data.files:
-                    actual_file = file.get_file()
-                    print(actual_file)
-                    actual_file.download()
-            if data.type in ('passport', 'driver_license', 'identity_card', 'internal_passport'):
-                if data.front_side:
-                    file = data.front_side.get_file()
-                    print(data.type, file)
-                    file.download()
-            if data.type in ('driver_license' and 'identity_card'):
-                if data.reverse_side:
-                    file = data.reverse_side.get_file()
-                    print(data.type, file)
-                    file.download()
-            if data.type in ('passport', 'driver_license', 'identity_card', 'internal_passport'):
-                if data.selfie:
-                    file = data.selfie.get_file()
-                    print(data.type, file)
-                    file.download()
-            if data.type in (
-                'passport',
-                'driver_license',
-                'identity_card',
-                'internal_passport',
-                'utility_bill',
-                'bank_statement',
-                'rental_agreement',
-                'passport_registration',
-                'temporary_registration',
-            ):
-                print(data.type, len(data.translation), 'translation')
-                for file in data.translation:
-                    actual_file = file.get_file()
-                    print(actual_file)
-                    actual_file.download()
+    # Print the decrypted credential data
+    # For all elements
+    # Print their decrypted data
+    # Files will be downloaded to current directory
+    for data in passport_data.decrypted_data:  # This is where the data gets decrypted
+        if data.type == 'phone_number':
+            print('Phone: ', data.phone_number)
+        elif data.type == 'email':
+            print('Email: ', data.email)
+        if data.type in (
+            'personal_details',
+            'passport',
+            'driver_license',
+            'identity_card',
+            'internal_passport',
+            'address',
+        ):
+            print(data.type, data.data)
+        if data.type in (
+            'utility_bill',
+            'bank_statement',
+            'rental_agreement',
+            'passport_registration',
+            'temporary_registration',
+        ):
+            print(data.type, len(data.files), 'files')
+            for file in data.files:
+                actual_file = file.get_file()
+                print(actual_file)
+                actual_file.download()
+        if data.type in ('passport', 'driver_license', 'identity_card', 'internal_passport'):
+            if data.front_side:
+                front_file = data.front_side.get_file()
+                print(data.type, front_file)
+                front_file.download()
+        if data.type in ('driver_license' and 'identity_card'):
+            if data.reverse_side:
+                reverse_file = data.reverse_side.get_file()
+                print(data.type, reverse_file)
+                reverse_file.download()
+        if data.type in ('passport', 'driver_license', 'identity_card', 'internal_passport'):
+            if data.selfie:
+                selfie_file = data.selfie.get_file()
+                print(data.type, selfie_file)
+                selfie_file.download()
+        if data.type in (
+            'passport',
+            'driver_license',
+            'identity_card',
+            'internal_passport',
+            'utility_bill',
+            'bank_statement',
+            'rental_agreement',
+            'passport_registration',
+            'temporary_registration',
+        ):
+            print(data.type, len(data.translation), 'translation')
+            for file in data.translation:
+                actual_file = file.get_file()
+                print(actual_file)
+                actual_file.download()
 
 
-def main():
+def main() -> None:
     """Start the bot."""
     # Create the Updater and pass it your token and private key
     updater = Updater("TOKEN", private_key=open('private.key', 'rb').read())

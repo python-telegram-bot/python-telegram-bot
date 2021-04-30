@@ -38,13 +38,15 @@ def update():
             from_user=User(0, 'Testuser', False),
             via_bot=User(0, "Testbot", True),
             sender_chat=Chat(0, 'Channel'),
+            forward_from=User(0, "HAL9000", False),
+            forward_from_chat=Chat(0, "Channel"),
         ),
     )
 
 
 @pytest.fixture(scope='function', params=MessageEntity.ALL_TYPES)
 def message_entity(request):
-    return MessageEntity(request.param, 0, 0, url='', user='')
+    return MessageEntity(request.param, 0, 0, url='', user=User(1, 'first_name', False))
 
 
 @pytest.fixture(
@@ -547,7 +549,7 @@ class TestFilters:
         assert not Filters.document.audio(update)
 
         update.message.document.mime_type = (
-            "application/vnd.openxmlformats-officedocument." "wordprocessingml.document"
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         )
         assert Filters.document.docx(update)
         assert Filters.document.application(update)
@@ -828,6 +830,11 @@ class TestFilters:
         assert Filters.status_update.chat_created(update)
         update.message.channel_chat_created = False
 
+        update.message.message_auto_delete_timer_changed = True
+        assert Filters.status_update(update)
+        assert Filters.status_update.message_auto_delete_timer_changed(update)
+        update.message.message_auto_delete_timer_changed = False
+
         update.message.migrate_to_chat_id = 100
         assert Filters.status_update(update)
         assert Filters.status_update.migrate(update)
@@ -852,6 +859,26 @@ class TestFilters:
         assert Filters.status_update(update)
         assert Filters.status_update.proximity_alert_triggered(update)
         update.message.proximity_alert_triggered = None
+
+        update.message.voice_chat_scheduled = 'scheduled'
+        assert Filters.status_update(update)
+        assert Filters.status_update.voice_chat_scheduled(update)
+        update.message.voice_chat_scheduled = None
+
+        update.message.voice_chat_started = 'hello'
+        assert Filters.status_update(update)
+        assert Filters.status_update.voice_chat_started(update)
+        update.message.voice_chat_started = None
+
+        update.message.voice_chat_ended = 'bye'
+        assert Filters.status_update(update)
+        assert Filters.status_update.voice_chat_ended(update)
+        update.message.voice_chat_ended = None
+
+        update.message.voice_chat_participants_invited = 'invited'
+        assert Filters.status_update(update)
+        assert Filters.status_update.voice_chat_participants_invited(update)
+        update.message.voice_chat_participants_invited = None
 
     def test_filters_forwarded(self, update):
         assert not Filters.forwarded(update)
@@ -1216,6 +1243,255 @@ class TestFilters:
         with pytest.raises(RuntimeError, match='Cannot set name'):
             f.name = 'foo'
 
+    def test_filters_forwarded_from_init(self):
+        with pytest.raises(RuntimeError, match='in conjunction with'):
+            Filters.forwarded_from(chat_id=1, username='chat')
+
+    def test_filters_forwarded_from_allow_empty(self, update):
+        assert not Filters.forwarded_from()(update)
+        assert Filters.forwarded_from(allow_empty=True)(update)
+
+    def test_filters_forwarded_from_id(self, update):
+        # Test with User id-
+        assert not Filters.forwarded_from(chat_id=1)(update)
+        update.message.forward_from.id = 1
+        assert Filters.forwarded_from(chat_id=1)(update)
+        update.message.forward_from.id = 2
+        assert Filters.forwarded_from(chat_id=[1, 2])(update)
+        assert not Filters.forwarded_from(chat_id=[3, 4])(update)
+        update.message.forward_from = None
+        assert not Filters.forwarded_from(chat_id=[3, 4])(update)
+
+        # Test with Chat id-
+        update.message.forward_from_chat.id = 4
+        assert Filters.forwarded_from(chat_id=[4])(update)
+        assert Filters.forwarded_from(chat_id=[3, 4])(update)
+
+        update.message.forward_from_chat.id = 2
+        assert not Filters.forwarded_from(chat_id=[3, 4])(update)
+        assert Filters.forwarded_from(chat_id=2)(update)
+
+    def test_filters_forwarded_from_username(self, update):
+        # For User username
+        assert not Filters.forwarded_from(username='chat')(update)
+        assert not Filters.forwarded_from(username='Testchat')(update)
+        update.message.forward_from.username = 'chat@'
+        assert Filters.forwarded_from(username='@chat@')(update)
+        assert Filters.forwarded_from(username='chat@')(update)
+        assert Filters.forwarded_from(username=['chat1', 'chat@', 'chat2'])(update)
+        assert not Filters.forwarded_from(username=['@username', '@chat_2'])(update)
+        update.message.forward_from = None
+        assert not Filters.forwarded_from(username=['@username', '@chat_2'])(update)
+
+        # For Chat username
+        assert not Filters.forwarded_from(username='chat')(update)
+        assert not Filters.forwarded_from(username='Testchat')(update)
+        update.message.forward_from_chat.username = 'chat@'
+        assert Filters.forwarded_from(username='@chat@')(update)
+        assert Filters.forwarded_from(username='chat@')(update)
+        assert Filters.forwarded_from(username=['chat1', 'chat@', 'chat2'])(update)
+        assert not Filters.forwarded_from(username=['@username', '@chat_2'])(update)
+        update.message.forward_from_chat = None
+        assert not Filters.forwarded_from(username=['@username', '@chat_2'])(update)
+
+    def test_filters_forwarded_from_change_id(self, update):
+        f = Filters.forwarded_from(chat_id=1)
+        # For User ids-
+        assert f.chat_ids == {1}
+        update.message.forward_from.id = 1
+        assert f(update)
+        update.message.forward_from.id = 2
+        assert not f(update)
+        f.chat_ids = 2
+        assert f.chat_ids == {2}
+        assert f(update)
+
+        # For Chat ids-
+        f = Filters.forwarded_from(chat_id=1)  # reset this
+        update.message.forward_from = None  # and change this to None, only one of them can be True
+        assert f.chat_ids == {1}
+        update.message.forward_from_chat.id = 1
+        assert f(update)
+        update.message.forward_from_chat.id = 2
+        assert not f(update)
+        f.chat_ids = 2
+        assert f.chat_ids == {2}
+        assert f(update)
+
+        with pytest.raises(RuntimeError, match='username in conjunction'):
+            f.usernames = 'chat'
+
+    def test_filters_forwarded_from_change_username(self, update):
+        # For User usernames
+        f = Filters.forwarded_from(username='chat')
+        update.message.forward_from.username = 'chat'
+        assert f(update)
+        update.message.forward_from.username = 'User'
+        assert not f(update)
+        f.usernames = 'User'
+        assert f(update)
+
+        # For Chat usernames
+        update.message.forward_from = None
+        f = Filters.forwarded_from(username='chat')
+        update.message.forward_from_chat.username = 'chat'
+        assert f(update)
+        update.message.forward_from_chat.username = 'User'
+        assert not f(update)
+        f.usernames = 'User'
+        assert f(update)
+
+        with pytest.raises(RuntimeError, match='chat_id in conjunction'):
+            f.chat_ids = 1
+
+    def test_filters_forwarded_from_add_chat_by_name(self, update):
+        chats = ['chat_a', 'chat_b', 'chat_c']
+        f = Filters.forwarded_from()
+
+        # For User usernames
+        for chat in chats:
+            update.message.forward_from.username = chat
+            assert not f(update)
+
+        f.add_usernames('chat_a')
+        f.add_usernames(['chat_b', 'chat_c'])
+
+        for chat in chats:
+            update.message.forward_from.username = chat
+            assert f(update)
+
+        # For Chat usernames
+        update.message.forward_from = None
+        f = Filters.forwarded_from()
+        for chat in chats:
+            update.message.forward_from_chat.username = chat
+            assert not f(update)
+
+        f.add_usernames('chat_a')
+        f.add_usernames(['chat_b', 'chat_c'])
+
+        for chat in chats:
+            update.message.forward_from_chat.username = chat
+            assert f(update)
+
+        with pytest.raises(RuntimeError, match='chat_id in conjunction'):
+            f.add_chat_ids(1)
+
+    def test_filters_forwarded_from_add_chat_by_id(self, update):
+        chats = [1, 2, 3]
+        f = Filters.forwarded_from()
+
+        # For User ids
+        for chat in chats:
+            update.message.forward_from.id = chat
+            assert not f(update)
+
+        f.add_chat_ids(1)
+        f.add_chat_ids([2, 3])
+
+        for chat in chats:
+            update.message.forward_from.username = chat
+            assert f(update)
+
+        # For Chat ids-
+        update.message.forward_from = None
+        f = Filters.forwarded_from()
+        for chat in chats:
+            update.message.forward_from_chat.id = chat
+            assert not f(update)
+
+        f.add_chat_ids(1)
+        f.add_chat_ids([2, 3])
+
+        for chat in chats:
+            update.message.forward_from_chat.username = chat
+            assert f(update)
+
+        with pytest.raises(RuntimeError, match='username in conjunction'):
+            f.add_usernames('chat')
+
+    def test_filters_forwarded_from_remove_chat_by_name(self, update):
+        chats = ['chat_a', 'chat_b', 'chat_c']
+        f = Filters.forwarded_from(username=chats)
+
+        with pytest.raises(RuntimeError, match='chat_id in conjunction'):
+            f.remove_chat_ids(1)
+
+        # For User usernames
+        for chat in chats:
+            update.message.forward_from.username = chat
+            assert f(update)
+
+        f.remove_usernames('chat_a')
+        f.remove_usernames(['chat_b', 'chat_c'])
+
+        for chat in chats:
+            update.message.forward_from.username = chat
+            assert not f(update)
+
+        # For Chat usernames
+        update.message.forward_from = None
+        f = Filters.forwarded_from(username=chats)
+        for chat in chats:
+            update.message.forward_from_chat.username = chat
+            assert f(update)
+
+        f.remove_usernames('chat_a')
+        f.remove_usernames(['chat_b', 'chat_c'])
+
+        for chat in chats:
+            update.message.forward_from_chat.username = chat
+            assert not f(update)
+
+    def test_filters_forwarded_from_remove_chat_by_id(self, update):
+        chats = [1, 2, 3]
+        f = Filters.forwarded_from(chat_id=chats)
+
+        with pytest.raises(RuntimeError, match='username in conjunction'):
+            f.remove_usernames('chat')
+
+        # For User ids
+        for chat in chats:
+            update.message.forward_from.id = chat
+            assert f(update)
+
+        f.remove_chat_ids(1)
+        f.remove_chat_ids([2, 3])
+
+        for chat in chats:
+            update.message.forward_from.username = chat
+            assert not f(update)
+
+        # For Chat ids
+        update.message.forward_from = None
+        f = Filters.forwarded_from(chat_id=chats)
+        for chat in chats:
+            update.message.forward_from_chat.id = chat
+            assert f(update)
+
+        f.remove_chat_ids(1)
+        f.remove_chat_ids([2, 3])
+
+        for chat in chats:
+            update.message.forward_from_chat.username = chat
+            assert not f(update)
+
+    def test_filters_forwarded_from_repr(self):
+        f = Filters.forwarded_from([1, 2])
+        assert str(f) == 'Filters.forwarded_from(1, 2)'
+        f.remove_chat_ids(1)
+        f.remove_chat_ids(2)
+        assert str(f) == 'Filters.forwarded_from()'
+        f.add_usernames('@foobar')
+        assert str(f) == 'Filters.forwarded_from(foobar)'
+        f.add_usernames('@barfoo')
+        assert str(f).startswith('Filters.forwarded_from(')
+        # we don't know the exact order
+        assert 'barfoo' in str(f) and 'foobar' in str(f)
+
+        with pytest.raises(RuntimeError, match='Cannot set name'):
+            f.name = 'foo'
+
     def test_filters_sender_chat_init(self):
         with pytest.raises(RuntimeError, match='in conjunction with'):
             Filters.sender_chat(chat_id=1, username='chat')
@@ -1452,6 +1728,13 @@ class TestFilters:
         assert not Filters.dice.dice(update)
         assert not Filters.dice.darts(update)
         assert not Filters.dice.slot_machine([4])(update)
+
+        update.message.dice = Dice(5, '🎳')
+        assert Filters.dice.bowling(update)
+        assert Filters.dice.bowling([4, 5])(update)
+        assert not Filters.dice.dice(update)
+        assert not Filters.dice.darts(update)
+        assert not Filters.dice.bowling([4])(update)
 
     def test_language_filter_single(self, update):
         update.message.from_user.language_code = 'en_US'

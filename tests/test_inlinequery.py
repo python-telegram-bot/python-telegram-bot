@@ -19,8 +19,8 @@
 
 import pytest
 
-from telegram import User, Location, InlineQuery, Update, Bot
-from tests.conftest import check_shortcut_signature, check_shortcut_call
+from telegram import User, Location, InlineQuery, Update, Bot, Chat
+from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
 
 
 @pytest.fixture(scope='class')
@@ -31,6 +31,7 @@ def inline_query(bot):
         TestInlineQuery.query,
         TestInlineQuery.offset,
         location=TestInlineQuery.location,
+        chat_type=TestInlineQuery.chat_type,
         bot=bot,
     )
 
@@ -41,6 +42,7 @@ class TestInlineQuery:
     query = 'query text'
     offset = 'offset'
     location = Location(8.8, 53.1)
+    chat_type = Chat.SENDER
 
     def test_de_json(self, bot):
         json_dict = {
@@ -49,6 +51,7 @@ class TestInlineQuery:
             'query': self.query,
             'offset': self.offset,
             'location': self.location.to_dict(),
+            'chat_type': self.chat_type,
         }
         inline_query_json = InlineQuery.de_json(json_dict, bot)
 
@@ -57,6 +60,7 @@ class TestInlineQuery:
         assert inline_query_json.location == self.location
         assert inline_query_json.query == self.query
         assert inline_query_json.offset == self.offset
+        assert inline_query_json.chat_type == self.chat_type
 
     def test_to_dict(self, inline_query):
         inline_query_dict = inline_query.to_dict()
@@ -67,18 +71,17 @@ class TestInlineQuery:
         assert inline_query_dict['location'] == inline_query.location.to_dict()
         assert inline_query_dict['query'] == inline_query.query
         assert inline_query_dict['offset'] == inline_query.offset
+        assert inline_query_dict['chat_type'] == inline_query.chat_type
 
     def test_answer(self, monkeypatch, inline_query):
-        answer_inline_query = inline_query.bot.answer_inline_query
-
         def make_assertion(*_, **kwargs):
-            return kwargs['inline_query_id'] == inline_query.id and check_shortcut_call(
-                kwargs, answer_inline_query
-            )
+            return kwargs['inline_query_id'] == inline_query.id
 
         assert check_shortcut_signature(
             InlineQuery.answer, Bot.answer_inline_query, ['inline_query_id'], ['auto_pagination']
         )
+        assert check_shortcut_call(inline_query.answer, inline_query.bot, 'answer_inline_query')
+        assert check_defaults_handling(inline_query.answer, inline_query.bot)
 
         monkeypatch.setattr(inline_query.bot, 'answer_inline_query', make_assertion)
         assert inline_query.answer(results=[])

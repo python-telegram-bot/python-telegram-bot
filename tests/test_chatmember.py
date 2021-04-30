@@ -69,6 +69,8 @@ class TestChatMember:
             'can_send_polls': False,
             'can_send_other_messages': True,
             'can_add_web_page_previews': False,
+            'can_manage_chat': True,
+            'can_manage_voice_chats': True,
         }
 
         chat_member = ChatMember.de_json(json_dict, bot)
@@ -91,6 +93,8 @@ class TestChatMember:
         assert chat_member.can_send_polls is False
         assert chat_member.can_send_other_messages is True
         assert chat_member.can_add_web_page_previews is False
+        assert chat_member.can_manage_chat is True
+        assert chat_member.can_manage_voice_chats is True
 
     def test_to_dict(self, chat_member):
         chat_member_dict = chat_member.to_dict()

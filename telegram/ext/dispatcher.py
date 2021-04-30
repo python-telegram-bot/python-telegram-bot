@@ -27,7 +27,6 @@ from threading import BoundedSemaphore, Event, Lock, Thread, current_thread
 from time import sleep
 from typing import (
     TYPE_CHECKING,
-    Any,
     Callable,
     Dict,
     List,
@@ -46,7 +45,7 @@ from telegram.ext import BasePersistence, ContextCustomizer
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.handler import Handler
 from telegram.utils.deprecate import TelegramDeprecationWarning
-from telegram.utils.promise import Promise
+from telegram.ext.utils.promise import Promise
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 from telegram.utils.types import CCT, UD, CD, BD, UDM, CDM, IntDD  # pylint: disable=W0611
 
@@ -60,8 +59,8 @@ UT = TypeVar('UT')
 
 
 def run_async(
-    func: Callable[[Update, CallbackContext], Any]
-) -> Callable[[Update, CallbackContext], Any]:
+    func: Callable[[Update, CallbackContext], object]
+) -> Callable[[Update, CallbackContext], object]:
     """
     Function decorator that will run the function in a new thread.
 
@@ -79,7 +78,7 @@ def run_async(
     """
 
     @wraps(func)
-    def async_func(*args: Any, **kwargs: Any) -> Any:
+    def async_func(*args: object, **kwargs: object) -> object:
         warnings.warn(
             'The @run_async decorator is deprecated. Use the `run_async` parameter of '
             'your Handler or `Dispatcher.run_async` instead.',
@@ -95,7 +94,7 @@ def run_async(
 
 class DispatcherHandlerStop(Exception):
     """
-    Raise this in handler to prevent execution any other handler (even in different group).
+    Raise this in handler to prevent execution of any other handler (even in different group).
 
     In order to use this exception in a :class:`telegram.ext.ConversationHandler`, pass the
     optional ``state`` parameter instead of returning the next state:
@@ -215,6 +214,11 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
                 stacklevel=3,
             )
 
+        if self.workers < 1:
+            warnings.warn(
+                'Asynchronous callbacks can not be processed without at least one worker thread.'
+            )
+
         self.user_data = self.context_customizer.user_data_mapping(  # type: ignore[call-arg]
             self.context_customizer.user_data
         )
@@ -271,7 +275,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
         # For backward compatibility, we allow a "singleton" mode for the dispatcher. When there's
         # only one instance of Dispatcher, it will be possible to use the `run_async` decorator.
         with self.__singleton_lock:
-            if self.__singleton_semaphore.acquire(blocking=False):
+            if self.__singleton_semaphore.acquire(blocking=False):  # pylint: disable=R1732
                 self._set_singleton(self)
             else:
                 self._set_singleton(None)
@@ -353,7 +357,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
                 self.logger.exception('An uncaught error was raised while handling the error.')
 
     def run_async(
-        self, func: Callable[..., Any], *args: Any, update: Any = None, **kwargs: Any
+        self, func: Callable[..., object], *args: object, update: object = None, **kwargs: object
     ) -> Promise:
         """
         Queue a function (with given args/kwargs) to be run asynchronously. Exceptions raised
@@ -382,11 +386,11 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
 
     def _run_async(
         self,
-        func: Callable[..., Any],
-        *args: Any,
-        update: Any = None,
+        func: Callable[..., object],
+        *args: object,
+        update: object = None,
         error_handling: bool = True,
-        **kwargs: Any,
+        **kwargs: object,
     ) -> Promise:
         # TODO: Remove error_handling parameter once we drop the @run_async decorator
         promise = Promise(func, args, kwargs, update=update, error_handling=error_handling)
@@ -468,17 +472,18 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
     def has_running_threads(self) -> bool:
         return self.running or bool(self.__async_threads)
 
-    def process_update(self, update: Any) -> None:
+    def process_update(self, update: object) -> None:
         """Processes a single update and updates the persistence.
 
         Note:
             If the update is handled by least one synchronously running handlers (i.e.
-            ``run_async=False`), :meth:`update_persistence` is called *once* after all handlers
+            ``run_async=False``), :meth:`update_persistence` is called *once* after all handlers
             synchronous handlers are done. Each asynchronously running handler will trigger
             :meth:`update_persistence` on its own.
 
         Args:
-            update (:class:`telegram.Update` | :obj:`object` | :class:`telegram.TelegramError`):
+            update (:class:`telegram.Update` | :obj:`object` | \
+                :class:`telegram.error.TelegramError`):
                 The update to process.
 
         """
@@ -584,7 +589,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
             )
 
         if group not in self.handlers:
-            self.handlers[group] = list()
+            self.handlers[group] = []
             self.groups.append(group)
             self.groups = sorted(self.groups)
 
@@ -604,7 +609,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
                 del self.handlers[group]
                 self.groups.remove(group)
 
-    def update_persistence(self, update: Any = None) -> None:
+    def update_persistence(self, update: object = None) -> None:
         """Update :attr:`user_data`, :attr:`chat_data` and :attr:`bot_data` in :attr:`persistence`.
 
         Args:
@@ -614,7 +619,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
         with self._update_persistence_lock:
             self.__update_persistence(update)
 
-    def __update_persistence(self, update: Any = None) -> None:
+    def __update_persistence(self, update: object = None) -> None:
         if self.persistence:
             # We use list() here in order to decouple chat_ids from self.chat_data, as dict view
             # objects will change, when the dict does and we want to loop over chat_ids
@@ -692,7 +697,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
             callback (:obj:`callable`): The callback function for this error handler. Will be
                 called when an error is raised. Callback signature for context based API:
 
-                ``def callback(update: Update, context: CallbackContext)``
+                ``def callback(update: object, context: CallbackContext)``
 
                 The error that happened will be present in context.error.
             run_async (:obj:`bool`, optional): Whether this handlers callback should be run
@@ -721,12 +726,12 @@ class Dispatcher(Generic[CCT, UD, CD, BD, UDM, CDM]):
         self.error_handlers.pop(callback, None)
 
     def dispatch_error(
-        self, update: Optional[Any], error: Exception, promise: Promise = None
+        self, update: Optional[object], error: Exception, promise: Promise = None
     ) -> None:
         """Dispatches an error.
 
         Args:
-            update (:obj:`Any` | :class:`telegram.Update`): The update that caused the error.
+            update (:obj:`object` | :class:`telegram.Update`): The update that caused the error.
             error (:obj:`Exception`): The error that was raised.
             promise (:class:`telegram.utils.Promise`, optional): The promise whose pooled function
                 raised the error.

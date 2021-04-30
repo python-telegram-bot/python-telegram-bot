@@ -20,7 +20,7 @@
 import warnings
 from abc import ABC, abstractmethod
 from copy import copy
-from typing import Any, Dict, Optional, Tuple, cast, ClassVar, Generic, Mapping
+from typing import Dict, Optional, Tuple, cast, ClassVar, Generic, Mapping
 
 from telegram import Bot
 
@@ -75,7 +75,9 @@ class BasePersistence(Generic[UD, CD, BD, UDM, CDM], ABC):
             persistence class.
     """
 
-    def __new__(cls, *args: Any, **kwargs: Any) -> 'BasePersistence':  # pylint: disable=W0613
+    def __new__(
+        cls, *args: object, **kwargs: object  # pylint: disable=W0613
+    ) -> 'BasePersistence':
         instance = super().__new__(cls)
         get_user_data = instance.get_user_data
         get_chat_data = instance.get_chat_data
@@ -146,7 +148,7 @@ class BasePersistence(Generic[UD, CD, BD, UDM, CDM], ABC):
         return cls._replace_bot(obj, {})
 
     @classmethod
-    def _replace_bot(cls, obj: object, memo: Dict[int, Any]) -> object:  # pylint: disable=R0911
+    def _replace_bot(cls, obj: object, memo: Dict[int, object]) -> object:  # pylint: disable=R0911
         obj_id = id(obj)
         if obj_id in memo:
             return memo[obj_id]
@@ -223,7 +225,7 @@ class BasePersistence(Generic[UD, CD, BD, UDM, CDM], ABC):
         """
         return self._insert_bot(obj, {})
 
-    def _insert_bot(self, obj: object, memo: Dict[int, Any]) -> object:  # pylint: disable=R0911
+    def _insert_bot(self, obj: object, memo: Dict[int, object]) -> object:  # pylint: disable=R0911
         obj_id = id(obj)
         if obj_id in memo:
             return memo[obj_id]
@@ -289,7 +291,7 @@ class BasePersistence(Generic[UD, CD, BD, UDM, CDM], ABC):
 
     @abstractmethod
     def get_user_data(self) -> Mapping[int, UD]:
-        """ "Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
+        """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``user_data`` if stored, or an empty
         ``Mapping`` with integer keys.
 
@@ -299,7 +301,7 @@ class BasePersistence(Generic[UD, CD, BD, UDM, CDM], ABC):
 
     @abstractmethod
     def get_chat_data(self) -> Mapping[int, CD]:
-        """ "Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
+        """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``chat_data`` if stored, or an empty
         ``Mapping`` with integer keys.
 
@@ -309,7 +311,7 @@ class BasePersistence(Generic[UD, CD, BD, UDM, CDM], ABC):
 
     @abstractmethod
     def get_bot_data(self) -> BD:
-        """ "Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
+        """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``bot_data`` if stored, or an empty
         :obj:`dict`.
 
@@ -319,7 +321,7 @@ class BasePersistence(Generic[UD, CD, BD, UDM, CDM], ABC):
 
     @abstractmethod
     def get_conversations(self, name: str) -> ConversationDict:
-        """ "Will be called by :class:`telegram.ext.Dispatcher` when a
+        """Will be called by :class:`telegram.ext.Dispatcher` when a
         :class:`telegram.ext.ConversationHandler` is added if
         :attr:`telegram.ext.ConversationHandler.persistent` is :obj:`True`.
         It should return the conversations for the handler with `name` or an empty :obj:`dict`

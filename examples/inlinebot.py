@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=W0613, C0116
-# type: ignore[union-attr]
+# pylint: disable=C0116
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -30,32 +29,38 @@ logger = logging.getLogger(__name__)
 
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
-def start(update: Update, context: CallbackContext) -> None:
+def start(update: Update, _: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
     update.message.reply_text('Hi!')
 
 
-def help_command(update: Update, context: CallbackContext) -> None:
+def help_command(update: Update, _: CallbackContext) -> None:
     """Send a message when the command /help is issued."""
     update.message.reply_text('Help!')
 
 
-def inlinequery(update: Update, context: CallbackContext) -> None:
+def inlinequery(update: Update, _: CallbackContext) -> None:
     """Handle the inline query."""
     query = update.inline_query.query
+
+    if query == "":
+        return
+
     results = [
         InlineQueryResultArticle(
-            id=uuid4(), title="Caps", input_message_content=InputTextMessageContent(query.upper())
+            id=str(uuid4()),
+            title="Caps",
+            input_message_content=InputTextMessageContent(query.upper()),
         ),
         InlineQueryResultArticle(
-            id=uuid4(),
+            id=str(uuid4()),
             title="Bold",
             input_message_content=InputTextMessageContent(
                 f"*{escape_markdown(query)}*", parse_mode=ParseMode.MARKDOWN
             ),
         ),
         InlineQueryResultArticle(
-            id=uuid4(),
+            id=str(uuid4()),
             title="Italic",
             input_message_content=InputTextMessageContent(
                 f"_{escape_markdown(query)}_", parse_mode=ParseMode.MARKDOWN
@@ -68,9 +73,7 @@ def inlinequery(update: Update, context: CallbackContext) -> None:
 
 def main() -> None:
     # Create the Updater and pass it your bot's token.
-    # Make sure to set use_context=True to use the new context based callbacks
-    # Post version 12 this will no longer be necessary
-    updater = Updater("TOKEN", use_context=True)
+    updater = Updater("TOKEN")
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
@@ -79,7 +82,7 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("help", help_command))
 
-    # on noncommand i.e message - echo the message on Telegram
+    # on non command i.e message - echo the message on Telegram
     dispatcher.add_handler(InlineQueryHandler(inlinequery))
 
     # Start the Bot

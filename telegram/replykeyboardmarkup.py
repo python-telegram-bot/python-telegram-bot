@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ReplyKeyboardMarkup."""
 
-from typing import Any, List, Union
+from typing import Any, List, Union, Sequence
 
 from telegram import KeyboardButton, ReplyMarkup
 from telegram.utils.types import JSONDict
@@ -67,7 +67,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
 
     def __init__(
         self,
-        keyboard: List[List[Union[str, KeyboardButton]]],
+        keyboard: Sequence[Sequence[Union[str, KeyboardButton]]],
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
@@ -89,18 +89,14 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         self.one_time_keyboard = bool(one_time_keyboard)
         self.selective = bool(selective)
 
+        self._id_attrs = (self.keyboard,)
+
     def to_dict(self) -> JSONDict:
         data = super().to_dict()
 
         data['keyboard'] = []
         for row in self.keyboard:
-            button_row: List[Union[JSONDict, str]] = []
-            for button in row:
-                if isinstance(button, KeyboardButton):
-                    button_row.append(button.to_dict())  # telegram.KeyboardButton
-                else:
-                    button_row.append(button)  # str
-            data['keyboard'].append(button_row)
+            data['keyboard'].append([button.to_dict() for button in row])
         return data
 
     @classmethod
@@ -110,7 +106,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
-        **kwargs: Any,
+        **kwargs: object,
     ) -> 'ReplyKeyboardMarkup':
         """Shortcut for::
 
@@ -155,7 +151,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
-        **kwargs: Any,
+        **kwargs: object,
     ) -> 'ReplyKeyboardMarkup':
         """Shortcut for::
 
@@ -201,7 +197,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
-        **kwargs: Any,
+        **kwargs: object,
     ) -> 'ReplyKeyboardMarkup':
         """Shortcut for::
 
@@ -240,19 +236,6 @@ class ReplyKeyboardMarkup(ReplyMarkup):
             selective=selective,
             **kwargs,
         )
-
-    def __eq__(self, other: object) -> bool:
-        if isinstance(other, self.__class__):
-            if len(self.keyboard) != len(other.keyboard):
-                return False
-            for idx, row in enumerate(self.keyboard):
-                if len(row) != len(other.keyboard[idx]):
-                    return False
-                for jdx, button in enumerate(row):
-                    if button != other.keyboard[idx][jdx]:
-                        return False
-            return True
-        return super().__eq__(other)
 
     def __hash__(self) -> int:
         return hash(

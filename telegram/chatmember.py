@@ -46,6 +46,18 @@ class ChatMember(TelegramObject):
             restrictions will be lifted for this user.
         can_be_edited (:obj:`bool`, optional): Administrators only. :obj:`True`, if the bot is
             allowed to edit administrator privileges of that user.
+        can_manage_chat (:obj:`bool`, optional): Administrators only. :obj:`True`, if the
+            administrator can access the chat event log, chat statistics, message statistics in
+            channels, see channel members, see anonymous administrators in supergroups and ignore
+            slow mode. Implied by any other administrator privilege.
+
+            .. versionadded:: 13.4
+
+        can_manage_voice_chats (:obj:`bool`, optional): Administrators only. :obj:`True`, if the
+            administrator can manage voice chats.
+
+            .. versionadded:: 13.4
+
         can_change_info (:obj:`bool`, optional): Administrators and restricted only. :obj:`True`,
             if the user can change the chat title, photo and other settings.
         can_post_messages (:obj:`bool`, optional): Administrators only. :obj:`True`, if the
@@ -87,6 +99,17 @@ class ChatMember(TelegramObject):
             for this user.
         can_be_edited (:obj:`bool`): Optional. If the bot is allowed to edit administrator
             privileges of that user.
+        can_manage_chat (:obj:`bool`): Optional. If the administrator can access the chat event
+            log, chat statistics, message statistics in channels, see channel members, see
+            anonymous administrators in supergroups and ignore slow mode.
+
+            .. versionadded:: 13.4
+
+        can_manage_voice_chats (:obj:`bool`): Optional. if the administrator can manage
+            voice chats.
+
+            .. versionadded:: 13.4
+
         can_change_info (:obj:`bool`): Optional. If the user can change the chat title, photo and
             other settings.
         can_post_messages (:obj:`bool`): Optional. If the administrator can post in the channel.
@@ -150,6 +173,8 @@ class ChatMember(TelegramObject):
         is_member: bool = None,
         custom_title: str = None,
         is_anonymous: bool = None,
+        can_manage_chat: bool = None,
+        can_manage_voice_chats: bool = None,
         **_kwargs: Any,
     ):
         # Required
@@ -175,6 +200,8 @@ class ChatMember(TelegramObject):
         self.can_send_other_messages = can_send_other_messages
         self.can_add_web_page_previews = can_add_web_page_previews
         self.is_member = is_member
+        self.can_manage_chat = can_manage_chat
+        self.can_manage_voice_chats = can_manage_voice_chats
 
         self._id_attrs = (self.user, self.status)
 
