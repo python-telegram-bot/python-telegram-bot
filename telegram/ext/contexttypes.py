@@ -29,6 +29,8 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
     Convenience class to gather customizable types of the :class:`telegram.ext.CallbackContext`
     interface.
 
+    .. versionadded:: 13.6
+
     Args:
         context (:obj:`type`, optional): Determines the type of the ``context`` argument of all
             (error-)handler callbacks and job callbacks. Must be a subclass of

@@ -1409,11 +1409,9 @@ class TestPicklePersistence:
     @pytest.mark.parametrize('ud', [int, float, complex])
     @pytest.mark.parametrize('cd', [int, float, complex])
     @pytest.mark.parametrize('bd', [int, float, complex])
-    def test_with_context_customizer(self, ud, cd, bd, singlefile):
+    def test_with_context_types(self, ud, cd, bd, singlefile):
         cc = ContextTypes(user_data=ud, chat_data=cd, bot_data=bd)
-        persistence = PicklePersistence(
-            'pickletest', single_file=singlefile, context_customizer=cc
-        )
+        persistence = PicklePersistence('pickletest', single_file=singlefile, context_types=cc)
 
         assert isinstance(persistence.get_user_data()[1], ud)
         assert persistence.get_user_data()[1] == 0
@@ -1432,9 +1430,7 @@ class TestPicklePersistence:
         assert persistence.get_bot_data() == 1
 
         persistence.flush()
-        persistence = PicklePersistence(
-            'pickletest', single_file=singlefile, context_customizer=cc
-        )
+        persistence = PicklePersistence('pickletest', single_file=singlefile, context_types=cc)
         assert isinstance(persistence.get_user_data()[1], ud)
         assert persistence.get_user_data()[1] == 1
         assert isinstance(persistence.get_chat_data()[1], cd)

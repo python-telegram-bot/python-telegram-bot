@@ -134,10 +134,12 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         use_context (:obj:`bool`, optional): If set to :obj:`True` uses the context based callback
             API (ignored if `dispatcher` argument is used). Defaults to :obj:`True`.
             **New users**: set this to :obj:`True`.
-        context_customizer (:class:`telegram.ext.ContextCustomizer`, optional): Pass an instance
-            of :class:`telegram.ext.ContextCustomizer` to customize the the types used in the
+        context_types (:class:`telegram.ext.ContextTypes`, optional): Pass an instance
+            of :class:`telegram.ext.ContextTypes` to customize the the types used in the
             ``context`` interface. If not passed, the defaults documented in
-            :class:`telegram.ext.ContextCustomizer` will be used.
+            :class:`telegram.ext.ContextTypes` will be used.
+
+            .. versionadded:: 13.6
 
     Attributes:
         bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
@@ -151,8 +153,10 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
             store data that should be persistent over restarts.
-        context_customizer (:class:`telegram.ext.ContextTypes`): Container for the types used
+        context_types (:class:`telegram.ext.ContextTypes`): Container for the types used
             in the ``context`` interface.
+
+            .. versionadded:: 13.6
 
     """
 
@@ -184,7 +188,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         job_queue: 'JobQueue' = None,
         persistence: BasePersistence = None,
         use_context: bool = True,
-        context_customizer: ContextTypes[CCT, UD, CD, BD] = None,
+        context_types: ContextTypes[CCT, UD, CD, BD] = None,
     ):
         ...
 
@@ -197,16 +201,14 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         job_queue: 'JobQueue' = None,
         persistence: BasePersistence = None,
         use_context: bool = True,
-        context_customizer: ContextTypes[CCT, UD, CD, BD] = None,
+        context_types: ContextTypes[CCT, UD, CD, BD] = None,
     ):
         self.bot = bot
         self.update_queue = update_queue
         self.job_queue = job_queue
         self.workers = workers
         self.use_context = use_context
-        self.context_customizer = cast(
-            ContextTypes[CCT, UD, CD, BD], context_customizer or ContextTypes()
-        )
+        self.context_types = cast(ContextTypes[CCT, UD, CD, BD], context_types or ContextTypes())
 
         if not use_context:
             warnings.warn(
@@ -220,9 +222,9 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                 'Asynchronous callbacks can not be processed without at least one worker thread.'
             )
 
-        self.user_data: DefaultDict[int, UD] = defaultdict(self.context_customizer.user_data)
-        self.chat_data: DefaultDict[int, CD] = defaultdict(self.context_customizer.chat_data)
-        self.bot_data = self.context_customizer.bot_data()
+        self.user_data: DefaultDict[int, UD] = defaultdict(self.context_types.user_data)
+        self.chat_data: DefaultDict[int, CD] = defaultdict(self.context_types.chat_data)
+        self.bot_data = self.context_types.bot_data()
         self.persistence: Optional[BasePersistence] = None
         self._update_persistence_lock = Lock()
         if persistence:
@@ -240,9 +242,9 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                     raise ValueError("chat_data must be of type defaultdict")
             if self.persistence.store_bot_data:
                 self.bot_data = self.persistence.get_bot_data()
-                if not isinstance(self.bot_data, self.context_customizer.bot_data):
+                if not isinstance(self.bot_data, self.context_types.bot_data):
                     raise ValueError(
-                        f"bot_data must be of type {self.context_customizer.bot_data.__name__}"
+                        f"bot_data must be of type {self.context_types.bot_data.__name__}"
                     )
 
         else:
@@ -497,7 +499,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                     check = handler.check_update(update)
                     if check is not None and check is not False:
                         if not context and self.use_context:
-                            context = self.context_customizer.context.from_update(update, self)
+                            context = self.context_types.context.from_update(update, self)
                             context.refresh_data()
                         handled = True
                         sync_modes.append(handler.run_async)
@@ -735,7 +737,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         if self.error_handlers:
             for callback, run_async in self.error_handlers.items():  # pylint: disable=W0621
                 if self.use_context:
-                    context = self.context_customizer.context.from_error(
+                    context = self.context_types.context.from_error(
                         update, error, self, async_args=async_args, async_kwargs=async_kwargs
                     )
                     if run_async:

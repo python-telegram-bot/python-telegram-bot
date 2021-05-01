@@ -98,10 +98,12 @@ class Updater(Generic[CCT, UD, CD, BD]):
             used).
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
             be used if not set explicitly in the bot methods.
-        context_customizer (:class:`telegram.ext.ContextTypes`, optional): Pass an instance
+        context_types (:class:`telegram.ext.ContextTypes`, optional): Pass an instance
             of :class:`telegram.ext.ContextTypes` to customize the the types used in the
             ``context`` interface. If not passed, the defaults documented in
             :class:`telegram.ext.ContextTypes` will be used.
+
+            .. versionadded:: 13.6
 
     Raises:
         ValueError: If both :attr:`token` and :attr:`bot` are passed or none of them.
@@ -157,7 +159,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
         defaults: 'Defaults' = None,
         use_context: bool = True,
         base_file_url: str = None,
-        context_customizer: ContextTypes[CCT, UD, CD, BD] = None,
+        context_types: ContextTypes[CCT, UD, CD, BD] = None,
     ):
         ...
 
@@ -184,7 +186,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
         use_context: bool = True,
         dispatcher=None,
         base_file_url: str = None,
-        context_customizer: ContextTypes[CCT, UD, CD, BD] = None,
+        context_types: ContextTypes[CCT, UD, CD, BD] = None,
     ):
 
         if defaults and bot:
@@ -209,8 +211,8 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 raise ValueError('`dispatcher` and `persistence` are mutually exclusive')
             if use_context != dispatcher.use_context:
                 raise ValueError('`dispatcher` and `use_context` are mutually exclusive')
-            if context_customizer is not None:
-                raise ValueError('`dispatcher` and `context_customizer` are mutually exclusive')
+            if context_types is not None:
+                raise ValueError('`dispatcher` and `context_types` are mutually exclusive')
             if workers is not None:
                 raise ValueError('`dispatcher` and `workers` are mutually exclusive')
 
@@ -259,7 +261,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 exception_event=self.__exception_event,
                 persistence=persistence,
                 use_context=use_context,
-                context_customizer=context_customizer,
+                context_types=context_types,
             )
             self.job_queue.set_dispatcher(self.dispatcher)
         else:

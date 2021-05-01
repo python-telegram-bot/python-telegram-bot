@@ -937,7 +937,7 @@ class TestDispatcher:
             bot_data=complex,
         )
 
-        dispatcher = Dispatcher(bot, Queue(), context_customizer=cc)
+        dispatcher = Dispatcher(bot, Queue(), context_types=cc)
 
         assert isinstance(dispatcher.user_data[1], int)
         assert isinstance(dispatcher.chat_data[1], float)
@@ -955,7 +955,7 @@ class TestDispatcher:
         dispatcher = Dispatcher(
             bot,
             Queue(),
-            context_customizer=ContextTypes(
+            context_types=ContextTypes(
                 context=CustomContext, bot_data=int, user_data=float, chat_data=complex
             ),
         )
@@ -978,7 +978,7 @@ class TestDispatcher:
         dispatcher = Dispatcher(
             bot,
             Queue(),
-            context_customizer=ContextTypes(
+            context_types=ContextTypes(
                 context=CustomContext, bot_data=int, user_data=float, chat_data=complex
             ),
         )

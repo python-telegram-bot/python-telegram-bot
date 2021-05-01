@@ -63,10 +63,12 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             :meth:`flush` is called and keep data in memory until that happens. When
             :obj:`False` will store data on any transaction *and* on call to :meth:`flush`.
             Default is :obj:`False`.
-        context_customizer (:class:`telegram.ext.ContextCustomizer`, optional): Pass an instance
-            of :class:`telegram.ext.ContextCustomizer` to customize the the types used in the
+        context_types (:class:`telegram.ext.ContextTypes`, optional): Pass an instance
+            of :class:`telegram.ext.ContextTypes` to customize the the types used in the
             ``context`` interface. If not passed, the defaults documented in
-            :class:`telegram.ext.ContextCustomizer` will be used.
+            :class:`telegram.ext.ContextTypes` will be used.
+
+            .. versionadded:: 13.6
 
     Attributes:
         filename (:obj:`str`): The filename for storing the pickle files. When :attr:`single_file`
@@ -84,8 +86,10 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             :meth:`flush` is called and keep data in memory until that happens. When
             :obj:`False` will store data on any transaction *and* on call to :meth:`flush`.
             Default is :obj:`False`.
-        context_customizer (:class:`telegram.ext.ContextTypes`): Container for the types used
+        context_types (:class:`telegram.ext.ContextTypes`): Container for the types used
             in the ``context`` interface.
+
+            .. versionadded:: 13.6
     """
 
     @overload
@@ -109,7 +113,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         store_bot_data: bool = True,
         single_file: bool = True,
         on_flush: bool = False,
-        context_customizer: ContextTypes[Any, UD, CD, BD] = None,
+        context_types: ContextTypes[Any, UD, CD, BD] = None,
     ):
         ...
 
@@ -121,7 +125,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         store_bot_data: bool = True,
         single_file: bool = True,
         on_flush: bool = False,
-        context_customizer: ContextTypes[Any, UD, CD, BD] = None,
+        context_types: ContextTypes[Any, UD, CD, BD] = None,
     ):
         super().__init__(
             store_user_data=store_user_data,
@@ -135,25 +139,23 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         self.chat_data: Optional[DefaultDict[int, CD]] = None
         self.bot_data: Optional[BD] = None
         self.conversations: Optional[Dict[str, Dict[Tuple, object]]] = None
-        self.context_customizer = cast(
-            ContextTypes[Any, UD, CD, BD], context_customizer or ContextTypes()
-        )
+        self.context_types = cast(ContextTypes[Any, UD, CD, BD], context_types or ContextTypes())
 
     def load_singlefile(self) -> None:
         try:
             filename = self.filename
             with open(self.filename, "rb") as file:
                 data = pickle.load(file)
-                self.user_data = defaultdict(self.context_customizer.user_data, data['user_data'])
-                self.chat_data = defaultdict(self.context_customizer.chat_data, data['chat_data'])
+                self.user_data = defaultdict(self.context_types.user_data, data['user_data'])
+                self.chat_data = defaultdict(self.context_types.chat_data, data['chat_data'])
                 # For backwards compatibility with files not containing bot data
-                self.bot_data = data.get('bot_data', self.context_customizer.bot_data())
+                self.bot_data = data.get('bot_data', self.context_types.bot_data())
                 self.conversations = data['conversations']
         except OSError:
             self.conversations = {}
-            self.user_data = defaultdict(self.context_customizer.user_data)
-            self.chat_data = defaultdict(self.context_customizer.chat_data)
-            self.bot_data = self.context_customizer.bot_data()
+            self.user_data = defaultdict(self.context_types.user_data)
+            self.chat_data = defaultdict(self.context_types.chat_data)
+            self.bot_data = self.context_types.bot_data()
         except pickle.UnpicklingError as exc:
             raise TypeError(f"File {filename} does not contain valid pickle data") from exc
         except Exception as exc:
@@ -198,9 +200,9 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             filename = f"{self.filename}_user_data"
             data = self.load_file(filename)
             if not data:
-                data = defaultdict(self.context_customizer.user_data)
+                data = defaultdict(self.context_types.user_data)
             else:
-                data = defaultdict(self.context_customizer.user_data, data)
+                data = defaultdict(self.context_types.user_data, data)
             self.user_data = data
         else:
             self.load_singlefile()
@@ -218,9 +220,9 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             filename = f"{self.filename}_chat_data"
             data = self.load_file(filename)
             if not data:
-                data = defaultdict(self.context_customizer.chat_data)
+                data = defaultdict(self.context_types.chat_data)
             else:
-                data = defaultdict(self.context_customizer.chat_data, data)
+                data = defaultdict(self.context_types.chat_data, data)
             self.chat_data = data
         else:
             self.load_singlefile()
@@ -239,7 +241,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             filename = f"{self.filename}_bot_data"
             data = self.load_file(filename)
             if not data:
-                data = self.context_customizer.bot_data()
+                data = self.context_types.bot_data()
             self.bot_data = data
         else:
             self.load_singlefile()
@@ -298,7 +300,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
                 :attr:`telegram.ext.dispatcher.user_data` ``[user_id]``.
         """
         if self.user_data is None:
-            self.user_data = defaultdict(self.context_customizer.user_data)
+            self.user_data = defaultdict(self.context_types.user_data)
         if self.user_data.get(user_id) == data:
             return
         self.user_data[user_id] = data
@@ -318,7 +320,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
                 :attr:`telegram.ext.dispatcher.chat_data` ``[chat_id]``.
         """
         if self.chat_data is None:
-            self.chat_data = defaultdict(self.context_customizer.chat_data)
+            self.chat_data = defaultdict(self.context_types.chat_data)
         if self.chat_data.get(chat_id) == data:
             return
         self.chat_data[chat_id] = data

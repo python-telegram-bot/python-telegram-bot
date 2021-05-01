@@ -520,7 +520,7 @@ class TestJobQueue:
         dispatcher = Dispatcher(
             bot,
             Queue(),
-            context_customizer=ContextTypes(
+            context_types=ContextTypes(
                 context=CustomContext, bot_data=int, user_data=float, chat_data=complex
             ),
         )
