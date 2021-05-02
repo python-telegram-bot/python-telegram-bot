@@ -12,6 +12,9 @@ telegram.ext package
     telegram.ext.jobqueue
     telegram.ext.messagequeue
     telegram.ext.delayqueue
+    telegram.ext.callbackcontext
+    telegram.ext.contexttypes
+    telegram.ext.defaults
 
 Handlers
 --------
@@ -52,3 +55,4 @@ utils
 .. toctree::
 
     telegram.ext.utils.promise
+    telegram.ext.utils.types

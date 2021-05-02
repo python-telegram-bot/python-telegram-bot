@@ -18,11 +18,21 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains custom typing aliases."""
 from pathlib import Path
-from typing import IO, TYPE_CHECKING, Any, Dict, List, Optional, Tuple, TypeVar, Union
+from typing import (
+    IO,
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    List,
+    Optional,
+    Tuple,
+    TypeVar,
+    Union,
+)
 
 if TYPE_CHECKING:
-    from telegram import InputFile
-    from telegram.utils.helpers import DefaultValue
+    from telegram import InputFile  # noqa: F401
+    from telegram.utils.helpers import DefaultValue  # noqa: F401
 
 FileLike = Union[IO, 'InputFile']
 """Either an open file handler or a :class:`telegram.InputFile`."""

@@ -26,9 +26,10 @@ from telegram import Update
 from telegram.ext import Filters, MessageHandler
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
+from telegram.ext.utils.types import CCT
 
 if TYPE_CHECKING:
-    from telegram.ext import CallbackContext, Dispatcher
+    from telegram.ext import Dispatcher
 
 RT = TypeVar('RT')
 
@@ -111,7 +112,7 @@ class RegexHandler(MessageHandler):
     def __init__(
         self,
         pattern: Union[str, Pattern],
-        callback: Callable[[Update, 'CallbackContext'], RT],
+        callback: Callable[[Update, CCT], RT],
         pass_groups: bool = False,
         pass_groupdict: bool = False,
         pass_update_queue: bool = False,

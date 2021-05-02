@@ -23,11 +23,12 @@ from typing import Optional, TypeVar, Union
 from telegram import Update
 
 from .handler import Handler
+from .utils.types import CCT
 
 RT = TypeVar('RT')
 
 
-class ChosenInlineResultHandler(Handler[Update]):
+class ChosenInlineResultHandler(Handler[Update, CCT]):
     """Handler class to handle Telegram updates that contain a chosen inline result.
 
     Note:
