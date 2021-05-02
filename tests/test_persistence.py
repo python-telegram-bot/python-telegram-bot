@@ -45,6 +45,7 @@ from telegram.ext import (
     DictPersistence,
     TypeHandler,
     JobQueue,
+    ContextTypes,
 )
 
 
@@ -169,6 +170,12 @@ def job_queue(bot):
 
 
 class TestBasePersistence:
+    test_flag = False
+
+    @pytest.fixture(scope='function', autouse=True)
+    def reset(self):
+        self.test_flag = False
+
     def test_creation(self, base_persistence):
         assert base_persistence.store_chat_data
         assert base_persistence.store_user_data
@@ -184,6 +191,14 @@ class TestBasePersistence:
             ),
         ):
             BasePersistence()
+
+    def test_not_implemented_errors(self, base_persistence):
+        with pytest.raises(NotImplementedError, match='refresh_bot_data'):
+            base_persistence.refresh_bot_data(True)
+        with pytest.raises(NotImplementedError, match='refresh_chat_data'):
+            base_persistence.refresh_chat_data(1, True)
+        with pytest.raises(NotImplementedError, match='refresh_user_data'):
+            base_persistence.refresh_user_data(1, True)
 
     def test_implementation(self, updater, base_persistence):
         dp = updater.dispatcher
@@ -240,8 +255,17 @@ class TestBasePersistence:
         u.dispatcher.chat_data[442233]['test5'] = 'test6'
         assert u.dispatcher.chat_data[442233]['test5'] == 'test6'
 
+    @pytest.mark.parametrize('run_async', [True, False], ids=['synchronous', 'run_async'])
     def test_dispatcher_integration_handlers(
-        self, caplog, bot, base_persistence, chat_data, user_data, bot_data
+        self,
+        cdp,
+        caplog,
+        bot,
+        base_persistence,
+        chat_data,
+        user_data,
+        bot_data,
+        run_async,
     ):
         def get_user_data():
             return user_data
@@ -255,112 +279,10 @@ class TestBasePersistence:
         base_persistence.get_user_data = get_user_data
         base_persistence.get_chat_data = get_chat_data
         base_persistence.get_bot_data = get_bot_data
-        # base_persistence.update_chat_data = lambda x: x
-        # base_persistence.update_user_data = lambda x: x
-        updater = Updater(bot=bot, persistence=base_persistence, use_context=True)
-        dp = updater.dispatcher
+        base_persistence.refresh_bot_data = lambda x: x
+        base_persistence.refresh_chat_data = lambda x, y: x
+        base_persistence.refresh_user_data = lambda x, y: x
 
-        def callback_known_user(update, context):
-            if not context.user_data['test1'] == 'test2':
-                pytest.fail('user_data corrupt')
-            if not context.bot_data == bot_data:
-                pytest.fail('bot_data corrupt')
-
-        def callback_known_chat(update, context):
-            if not context.chat_data['test3'] == 'test4':
-                pytest.fail('chat_data corrupt')
-            if not context.bot_data == bot_data:
-                pytest.fail('bot_data corrupt')
-
-        def callback_unknown_user_or_chat(update, context):
-            if not context.user_data == {}:
-                pytest.fail('user_data corrupt')
-            if not context.chat_data == {}:
-                pytest.fail('chat_data corrupt')
-            if not context.bot_data == bot_data:
-                pytest.fail('bot_data corrupt')
-            context.user_data[1] = 'test7'
-            context.chat_data[2] = 'test8'
-            context.bot_data['test0'] = 'test0'
-
-        known_user = MessageHandler(
-            Filters.user(user_id=12345),
-            callback_known_user,
-            pass_chat_data=True,
-            pass_user_data=True,
-        )
-        known_chat = MessageHandler(
-            Filters.chat(chat_id=-67890),
-            callback_known_chat,
-            pass_chat_data=True,
-            pass_user_data=True,
-        )
-        unknown = MessageHandler(
-            Filters.all, callback_unknown_user_or_chat, pass_chat_data=True, pass_user_data=True
-        )
-        dp.add_handler(known_user)
-        dp.add_handler(known_chat)
-        dp.add_handler(unknown)
-        user1 = User(id=12345, first_name='test user', is_bot=False)
-        user2 = User(id=54321, first_name='test user', is_bot=False)
-        chat1 = Chat(id=-67890, type='group')
-        chat2 = Chat(id=-987654, type='group')
-        m = Message(1, None, chat2, from_user=user1)
-        u = Update(0, m)
-        with caplog.at_level(logging.ERROR):
-            dp.process_update(u)
-        rec = caplog.records[-1]
-        assert rec.getMessage() == 'No error handlers are registered, logging exception.'
-        assert rec.levelname == 'ERROR'
-        rec = caplog.records[-2]
-        assert rec.getMessage() == 'No error handlers are registered, logging exception.'
-        assert rec.levelname == 'ERROR'
-        rec = caplog.records[-3]
-        assert rec.getMessage() == 'No error handlers are registered, logging exception.'
-        assert rec.levelname == 'ERROR'
-        m.from_user = user2
-        m.chat = chat1
-        u = Update(1, m)
-        dp.process_update(u)
-        m.chat = chat2
-        u = Update(2, m)
-
-        def save_bot_data(data):
-            if 'test0' not in data:
-                pytest.fail()
-
-        def save_chat_data(data):
-            if -987654 not in data:
-                pytest.fail()
-
-        def save_user_data(data):
-            if 54321 not in data:
-                pytest.fail()
-
-        base_persistence.update_chat_data = save_chat_data
-        base_persistence.update_user_data = save_user_data
-        base_persistence.update_bot_data = save_bot_data
-        dp.process_update(u)
-
-        assert dp.user_data[54321][1] == 'test7'
-        assert dp.chat_data[-987654][2] == 'test8'
-        assert dp.bot_data['test0'] == 'test0'
-
-    def test_dispatcher_integration_handlers_run_async(
-        self, cdp, caplog, bot, base_persistence, chat_data, user_data, bot_data
-    ):
-        def get_user_data():
-            return user_data
-
-        def get_chat_data():
-            return chat_data
-
-        def get_bot_data():
-            return bot_data
-
-        base_persistence.get_user_data = get_user_data
-        base_persistence.get_chat_data = get_chat_data
-        base_persistence.get_bot_data = get_bot_data
         cdp.persistence = base_persistence
         cdp.user_data = user_data
         cdp.chat_data = chat_data
@@ -394,21 +316,21 @@ class TestBasePersistence:
             callback_known_user,
             pass_chat_data=True,
             pass_user_data=True,
-            run_async=True,
+            run_async=run_async,
         )
         known_chat = MessageHandler(
             Filters.chat(chat_id=-67890),
             callback_known_chat,
             pass_chat_data=True,
             pass_user_data=True,
-            run_async=True,
+            run_async=run_async,
         )
         unknown = MessageHandler(
             Filters.all,
             callback_unknown_user_or_chat,
             pass_chat_data=True,
             pass_user_data=True,
-            run_async=True,
+            run_async=run_async,
         )
         cdp.add_handler(known_user)
         cdp.add_handler(known_chat)
@@ -423,12 +345,16 @@ class TestBasePersistence:
             cdp.process_update(u)
 
         sleep(0.1)
-        rec = caplog.records[-1]
-        assert rec.getMessage() == 'No error handlers are registered, logging exception.'
-        assert rec.levelname == 'ERROR'
-        rec = caplog.records[-2]
-        assert rec.getMessage() == 'No error handlers are registered, logging exception.'
-        assert rec.levelname == 'ERROR'
+
+        # In base_persistence.update_*_data we currently just raise NotImplementedError
+        # This makes sure that this doesn't break the processing and is properly handled by
+        # the error handler
+        # We override `update_*_data` further below.
+        assert len(caplog.records) == 3
+        for rec in caplog.records:
+            assert rec.getMessage() == 'No error handlers are registered, logging exception.'
+            assert rec.levelname == 'ERROR'
+
         m.from_user = user2
         m.chat = chat1
         u = Update(1, m)
@@ -458,6 +384,105 @@ class TestBasePersistence:
         assert cdp.user_data[54321][1] == 'test7'
         assert cdp.chat_data[-987654][2] == 'test8'
         assert cdp.bot_data['test0'] == 'test0'
+
+    @pytest.mark.parametrize(
+        'store_user_data', [True, False], ids=['store_user_data-True', 'store_user_data-False']
+    )
+    @pytest.mark.parametrize(
+        'store_chat_data', [True, False], ids=['store_chat_data-True', 'store_chat_data-False']
+    )
+    @pytest.mark.parametrize(
+        'store_bot_data', [True, False], ids=['store_bot_data-True', 'store_bot_data-False']
+    )
+    @pytest.mark.parametrize('run_async', [True, False], ids=['synchronous', 'run_async'])
+    def test_persistence_dispatcher_integration_refresh_data(
+        self,
+        cdp,
+        base_persistence,
+        chat_data,
+        bot_data,
+        user_data,
+        store_bot_data,
+        store_chat_data,
+        store_user_data,
+        run_async,
+    ):
+        base_persistence.refresh_bot_data = lambda x: x.setdefault(
+            'refreshed', x.get('refreshed', 0) + 1
+        )
+        # x is the user/chat_id
+        base_persistence.refresh_chat_data = lambda x, y: y.setdefault('refreshed', x)
+        base_persistence.refresh_user_data = lambda x, y: y.setdefault('refreshed', x)
+        base_persistence.store_bot_data = store_bot_data
+        base_persistence.store_chat_data = store_chat_data
+        base_persistence.store_user_data = store_user_data
+        cdp.persistence = base_persistence
+
+        self.test_flag = True
+
+        def callback_with_user_and_chat(update, context):
+            if store_user_data:
+                if context.user_data.get('refreshed') != update.effective_user.id:
+                    self.test_flag = 'user_data was not refreshed'
+            else:
+                if 'refreshed' in context.user_data:
+                    self.test_flag = 'user_data was wrongly refreshed'
+            if store_chat_data:
+                if context.chat_data.get('refreshed') != update.effective_chat.id:
+                    self.test_flag = 'chat_data was not refreshed'
+            else:
+                if 'refreshed' in context.chat_data:
+                    self.test_flag = 'chat_data was wrongly refreshed'
+            if store_bot_data:
+                if context.bot_data.get('refreshed') != 1:
+                    self.test_flag = 'bot_data was not refreshed'
+            else:
+                if 'refreshed' in context.bot_data:
+                    self.test_flag = 'bot_data was wrongly refreshed'
+
+        def callback_without_user_and_chat(_, context):
+            if store_bot_data:
+                if context.bot_data.get('refreshed') != 1:
+                    self.test_flag = 'bot_data was not refreshed'
+            else:
+                if 'refreshed' in context.bot_data:
+                    self.test_flag = 'bot_data was wrongly refreshed'
+
+        with_user_and_chat = MessageHandler(
+            Filters.user(user_id=12345),
+            callback_with_user_and_chat,
+            pass_chat_data=True,
+            pass_user_data=True,
+            run_async=run_async,
+        )
+        without_user_and_chat = MessageHandler(
+            Filters.all,
+            callback_without_user_and_chat,
+            pass_chat_data=True,
+            pass_user_data=True,
+            run_async=run_async,
+        )
+        cdp.add_handler(with_user_and_chat)
+        cdp.add_handler(without_user_and_chat)
+        user = User(id=12345, first_name='test user', is_bot=False)
+        chat = Chat(id=-987654, type='group')
+        m = Message(1, None, chat, from_user=user)
+
+        # has user and chat
+        u = Update(0, m)
+        cdp.process_update(u)
+
+        assert self.test_flag is True
+
+        # has neither user nor hat
+        m.from_user = None
+        m.chat = None
+        u = Update(1, m)
+        cdp.process_update(u)
+
+        assert self.test_flag is True
+
+        sleep(0.1)
 
     def test_persistence_dispatcher_arbitrary_update_types(self, dp, base_persistence, caplog):
         # Updates used with TypeHandler doesn't necessarily have the proper attributes for
@@ -775,7 +800,11 @@ def update(bot):
     return Update(0, message=message)
 
 
-class TestPickelPersistence:
+class CustomMapping(defaultdict):
+    pass
+
+
+class TestPicklePersistence:
     def test_no_files_present_multi_file(self, pickle_persistence):
         assert pickle_persistence.get_user_data() == defaultdict(dict)
         assert pickle_persistence.get_user_data() == defaultdict(dict)
@@ -1375,6 +1404,39 @@ class TestPickelPersistence:
         assert chat_data[123] == {'test2': '789'}
         user_data = pickle_persistence.get_user_data()
         assert user_data[789] == {'test3': '123'}
+
+    @pytest.mark.parametrize('singlefile', [True, False])
+    @pytest.mark.parametrize('ud', [int, float, complex])
+    @pytest.mark.parametrize('cd', [int, float, complex])
+    @pytest.mark.parametrize('bd', [int, float, complex])
+    def test_with_context_types(self, ud, cd, bd, singlefile):
+        cc = ContextTypes(user_data=ud, chat_data=cd, bot_data=bd)
+        persistence = PicklePersistence('pickletest', single_file=singlefile, context_types=cc)
+
+        assert isinstance(persistence.get_user_data()[1], ud)
+        assert persistence.get_user_data()[1] == 0
+        assert isinstance(persistence.get_chat_data()[1], cd)
+        assert persistence.get_chat_data()[1] == 0
+        assert isinstance(persistence.get_bot_data(), bd)
+        assert persistence.get_bot_data() == 0
+
+        persistence.user_data = None
+        persistence.chat_data = None
+        persistence.update_user_data(1, ud(1))
+        persistence.update_chat_data(1, cd(1))
+        persistence.update_bot_data(bd(1))
+        assert persistence.get_user_data()[1] == 1
+        assert persistence.get_chat_data()[1] == 1
+        assert persistence.get_bot_data() == 1
+
+        persistence.flush()
+        persistence = PicklePersistence('pickletest', single_file=singlefile, context_types=cc)
+        assert isinstance(persistence.get_user_data()[1], ud)
+        assert persistence.get_user_data()[1] == 1
+        assert isinstance(persistence.get_chat_data()[1], cd)
+        assert persistence.get_chat_data()[1] == 1
+        assert isinstance(persistence.get_bot_data(), bd)
+        assert persistence.get_bot_data() == 1
 
 
 @pytest.fixture(scope='function')

@@ -27,15 +27,16 @@ from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.types import SLT
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
+from .utils.types import CCT
 from .handler import Handler
 
 if TYPE_CHECKING:
-    from telegram.ext import CallbackContext, Dispatcher
+    from telegram.ext import Dispatcher
 
 RT = TypeVar('RT')
 
 
-class CommandHandler(Handler[Update]):
+class CommandHandler(Handler[Update, CCT]):
     """Handler class to handle Telegram commands.
 
     Commands are Telegram messages that start with ``/``, optionally followed by an ``@`` and the
@@ -132,7 +133,7 @@ class CommandHandler(Handler[Update]):
     def __init__(
         self,
         command: SLT[str],
-        callback: Callable[[Update, 'CallbackContext'], RT],
+        callback: Callable[[Update, CCT], RT],
         filters: BaseFilter = None,
         allow_edited: bool = None,
         pass_args: bool = False,
@@ -226,7 +227,7 @@ class CommandHandler(Handler[Update]):
 
     def collect_additional_context(
         self,
-        context: 'CallbackContext',
+        context: CCT,
         update: Update,
         dispatcher: 'Dispatcher',
         check_result: Optional[Union[bool, Tuple[List[str], Optional[bool]]]],
@@ -348,7 +349,7 @@ class PrefixHandler(CommandHandler):
         self,
         prefix: SLT[str],
         command: SLT[str],
-        callback: Callable[[Update, 'CallbackContext'], RT],
+        callback: Callable[[Update, CCT], RT],
         filters: BaseFilter = None,
         pass_args: bool = False,
         pass_update_queue: bool = False,
@@ -445,7 +446,7 @@ class PrefixHandler(CommandHandler):
 
     def collect_additional_context(
         self,
-        context: 'CallbackContext',
+        context: CCT,
         update: Update,
         dispatcher: 'Dispatcher',
         check_result: Optional[Union[bool, Tuple[List[str], Optional[bool]]]],

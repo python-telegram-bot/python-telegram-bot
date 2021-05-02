@@ -21,6 +21,10 @@ import pytest
 from telegram import Update, Message, Chat, User, TelegramError
 from telegram.ext import CallbackContext
 
+"""
+CallbackContext.refresh_data is tested in TestBasePersistence
+"""
+
 
 class TestCallbackContext:
     def test_non_context_dp(self, dp):
