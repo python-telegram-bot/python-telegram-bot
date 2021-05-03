@@ -16,9 +16,17 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+import datetime as dtm
 import pytest
 
-from telegram import VoiceChatStarted, VoiceChatEnded, VoiceChatParticipantsInvited, User
+from telegram import (
+    VoiceChatStarted,
+    VoiceChatEnded,
+    VoiceChatParticipantsInvited,
+    User,
+    VoiceChatScheduled,
+)
+from telegram.utils.helpers import to_timestamp
 
 
 @pytest.fixture(scope='class')
@@ -112,3 +120,40 @@ class TestVoiceChatParticipantsInvited:
 
         assert a != e
         assert hash(a) != hash(e)
+
+
+class TestVoiceChatScheduled:
+    start_date = dtm.datetime.utcnow()
+
+    def test_expected_values(self):
+        assert pytest.approx(VoiceChatScheduled(start_date=self.start_date) == self.start_date)
+
+    def test_de_json(self, bot):
+        assert VoiceChatScheduled.de_json({}, bot=bot) is None
+
+        json_dict = {'start_date': to_timestamp(self.start_date)}
+        voice_chat_scheduled = VoiceChatScheduled.de_json(json_dict, bot)
+
+        assert pytest.approx(voice_chat_scheduled.start_date == self.start_date)
+
+    def test_to_dict(self):
+        voice_chat_scheduled = VoiceChatScheduled(self.start_date)
+        voice_chat_scheduled_dict = voice_chat_scheduled.to_dict()
+
+        assert isinstance(voice_chat_scheduled_dict, dict)
+        assert voice_chat_scheduled_dict["start_date"] == to_timestamp(self.start_date)
+
+    def test_equality(self):
+        a = VoiceChatScheduled(self.start_date)
+        b = VoiceChatScheduled(self.start_date)
+        c = VoiceChatScheduled(dtm.datetime.utcnow() + dtm.timedelta(seconds=5))
+        d = VoiceChatStarted()
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)

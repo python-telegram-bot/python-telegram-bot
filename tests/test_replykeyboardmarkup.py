@@ -40,14 +40,12 @@ class TestReplyKeyboardMarkup:
     selective = True
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_message_with_reply_keyboard_markup(self, bot, chat_id, reply_keyboard_markup):
         message = bot.send_message(chat_id, 'Text', reply_markup=reply_keyboard_markup)
 
         assert message.text == 'Text'
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_message_with_data_markup(self, bot, chat_id):
         message = bot.send_message(chat_id, 'text 2', reply_markup={'keyboard': [['1', '2']]})
 

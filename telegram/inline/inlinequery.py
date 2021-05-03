@@ -38,25 +38,36 @@ class InlineQuery(TelegramObject):
     considered equal, if their :attr:`id` is equal.
 
     Note:
-        * In Python ``from`` is a reserved word, use ``from_user`` instead.
+        In Python ``from`` is a reserved word, use ``from_user`` instead.
 
     Args:
         id (:obj:`str`): Unique identifier for this query.
         from_user (:class:`telegram.User`): Sender.
-        location (:class:`telegram.Location`, optional): Sender location, only for bots that
-            request user location.
         query (:obj:`str`): Text of the query (up to 256 characters).
         offset (:obj:`str`): Offset of the results to be returned, can be controlled by the bot.
+        chat_type (:obj:`str`, optional): Type of the chat, from which the inline query was sent.
+            Can be either :attr:`telegram.Chat.SENDER` for a private chat with the inline query
+            sender, :attr:`telegram.Chat.PRIVATE`, :attr:`telegram.Chat.GROUP`,
+            :attr:`telegram.Chat.SUPERGROUP` or :attr:`telegram.Chat.CHANNEL`. The chat type should
+            be always known for requests sent from official clients and most third-party clients,
+            unless the request was sent from a secret chat.
+
+            .. versionadded:: 13.5
+        location (:class:`telegram.Location`, optional): Sender location, only for bots that
+            request user location.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         id (:obj:`str`): Unique identifier for this query.
         from_user (:class:`telegram.User`): Sender.
-        location (:class:`telegram.Location`): Optional. Sender location, only for bots that
-            request user location.
         query (:obj:`str`): Text of the query (up to 256 characters).
         offset (:obj:`str`): Offset of the results to be returned, can be controlled by the bot.
+        location (:class:`telegram.Location`): Optional. Sender location, only for bots that
+            request user location.
+        chat_type (:obj:`str`, optional): Type of the chat, from which the inline query was sent.
+
+            .. versionadded:: 13.5
 
     """
 
@@ -68,6 +79,7 @@ class InlineQuery(TelegramObject):
         offset: str,
         location: Location = None,
         bot: 'Bot' = None,
+        chat_type: str = None,
         **_kwargs: Any,
     ):
         # Required
@@ -78,6 +90,7 @@ class InlineQuery(TelegramObject):
 
         # Optional
         self.location = location
+        self.chat_type = chat_type
 
         self.bot = bot
         self._id_attrs = (self.id,)

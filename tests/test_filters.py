@@ -860,6 +860,11 @@ class TestFilters:
         assert Filters.status_update.proximity_alert_triggered(update)
         update.message.proximity_alert_triggered = None
 
+        update.message.voice_chat_scheduled = 'scheduled'
+        assert Filters.status_update(update)
+        assert Filters.status_update.voice_chat_scheduled(update)
+        update.message.voice_chat_scheduled = None
+
         update.message.voice_chat_started = 'hello'
         assert Filters.status_update(update)
         assert Filters.status_update.voice_chat_started(update)

@@ -242,3 +242,23 @@ class TestCallbackQueryHandler:
 
         cdp.process_update(inline_query)
         assert self.test_flag
+
+    @pytest.mark.parametrize('chat_types', [[Chat.SENDER], [Chat.SENDER, Chat.SUPERGROUP], []])
+    @pytest.mark.parametrize(
+        'chat_type,result', [(Chat.SENDER, True), (Chat.CHANNEL, False), (None, False)]
+    )
+    def test_chat_types(self, cdp, inline_query, chat_types, chat_type, result):
+        try:
+            inline_query.inline_query.chat_type = chat_type
+
+            handler = InlineQueryHandler(self.callback_context, chat_types=chat_types)
+            cdp.add_handler(handler)
+            cdp.process_update(inline_query)
+
+            if not chat_types:
+                assert self.test_flag is False
+            else:
+                assert self.test_flag == result
+
+        finally:
+            inline_query.chat_type = None

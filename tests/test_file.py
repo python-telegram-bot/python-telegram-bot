@@ -81,7 +81,6 @@ class TestFile:
         assert file_dict['file_size'] == file.file_size
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_error_get_empty_file_id(self, bot):
         with pytest.raises(TelegramError):
             bot.get_file(file_id='')

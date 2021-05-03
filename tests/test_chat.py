@@ -416,18 +416,9 @@ class TestChat:
             description = kwargs['description'] == 'description'
             payload = kwargs['payload'] == 'payload'
             provider_token = kwargs['provider_token'] == 'provider_token'
-            start_parameter = kwargs['start_parameter'] == 'start_parameter'
             currency = kwargs['currency'] == 'currency'
             prices = kwargs['prices'] == 'prices'
-            args = (
-                title
-                and description
-                and payload
-                and provider_token
-                and start_parameter
-                and currency
-                and prices
-            )
+            args = title and description and payload and provider_token and currency and prices
             return kwargs['chat_id'] == chat.id and args
 
         assert check_shortcut_signature(Chat.send_invoice, Bot.send_invoice, ['chat_id'], [])
@@ -440,7 +431,6 @@ class TestChat:
             'description',
             'payload',
             'provider_token',
-            'start_parameter',
             'currency',
             'prices',
         )

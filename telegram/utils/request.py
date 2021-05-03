@@ -93,20 +93,21 @@ USER_AGENT = 'Python Telegram Bot (https://github.com/python-telegram-bot/python
 class Request:
     """
     Helper class for python-telegram-bot which provides methods to perform POST & GET towards
-    telegram servers.
+    Telegram servers.
 
     Args:
-        con_pool_size (int): Number of connections to keep in the connection pool.
-        proxy_url (str): The URL to the proxy server. For example: `http://127.0.0.1:3128`.
-        urllib3_proxy_kwargs (dict): Arbitrary arguments passed as-is to `urllib3.ProxyManager`.
-            This value will be ignored if proxy_url is not set.
-        connect_timeout (int|float): The maximum amount of time (in seconds) to wait for a
-            connection attempt to a server to succeed. None will set an infinite timeout for
-            connection attempts. (default: 5.)
-        read_timeout (int|float): The maximum amount of time (in seconds) to wait between
-            consecutive read operations for a response from the server. None will set an infinite
-            timeout. This value is usually overridden by the various ``telegram.Bot`` methods.
-            (default: 5.)
+        con_pool_size (:obj:`int`): Number of connections to keep in the connection pool.
+        proxy_url (:obj:`str`): The URL to the proxy server. For example: `http://127.0.0.1:3128`.
+        urllib3_proxy_kwargs (:obj:`dict`): Arbitrary arguments passed as-is to
+            :obj:`urllib3.ProxyManager`. This value will be ignored if :attr:`proxy_url` is not
+            set.
+        connect_timeout (:obj:`int` | :obj:`float`): The maximum amount of time (in seconds) to
+            wait for a connection attempt to a server to succeed. :obj:`None` will set an
+            infinite timeout for connection attempts. Defaults to ``5.0``.
+        read_timeout (:obj:`int` | :obj:`float`): The maximum amount of time (in seconds) to wait
+            between consecutive read operations for a response from the server. :obj:`None` will
+            set an infinite timeout. This value is usually overridden by the various
+            :class:`telegram.Bot` methods. Defaults to ``5.0``.
 
     """
 
@@ -231,7 +232,7 @@ class Request:
 
         Args:
             args: unnamed arguments, passed to urllib3 request.
-            kwargs: keyword arguments, passed tp urllib3 request.
+            kwargs: keyword arguments, passed to urllib3 request.
 
         Returns:
             bytes: A non-parsed JSON text.
@@ -288,7 +289,7 @@ class Request:
 
         Args:
             url (:obj:`str`): The web location we want to retrieve.
-            data (dict[str, str|int], optional): A dict of key/value pairs.
+            data (Dict[:obj:`str`, :obj:`str` | :obj:`int`], optional): A dict of key/value pairs.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -376,10 +377,10 @@ class Request:
         """Download a file by its URL.
 
         Args:
-            url (str): The web location we want to retrieve.
-            timeout (:obj:`int` | :obj:`float`): If this value is specified, use it as the read
-                timeout from the server (instead of the one specified during creation of the
-                connection pool).
+            url (:obj:`str`): The web location we want to retrieve.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
             filename (:obj:`str`): The filename within the path to download the file.
 
         """
