@@ -100,8 +100,9 @@ class CallbackContext:
 
     @property
     def bot_data(self) -> Dict:
-        """:obj:`dict`): Optional. A dict that can be used to keep any data in. For each
-        update it will be the same ``dict``."""
+        """:obj:`dict`: Optional. A dict that can be used to keep any data in. For each
+        update it will be the same ``dict``.
+        """
         return self._bot_data
 
     @bot_data.setter
@@ -112,14 +113,15 @@ class CallbackContext:
 
     @property
     def chat_data(self) -> Optional[Dict]:
-        """:obj:`dict`): Optional. A dict that can be used to keep any data in. For each
+        """:obj:`dict`: Optional. A dict that can be used to keep any data in. For each
         update from the same chat id it will be the same ``dict``.
 
         Warning:
             When a group chat migrates to a supergroup, its chat id will change and the
             ``chat_data`` needs to be transferred. For details see our `wiki page
             <https://github.com/python-telegram-bot/python-telegram-bot/wiki/
-            Storing-user--and-chat-related-data#chat-migration>`_."""
+            Storing-user--and-chat-related-data#chat-migration>`_.
+        """
         return self._chat_data
 
     @chat_data.setter
@@ -131,7 +133,8 @@ class CallbackContext:
     @property
     def user_data(self) -> Optional[Dict]:
         """:obj:`dict`: Optional. A dict that can be used to keep any data in. For each
-        update from the same user it will be the same ``dict``."""
+        update from the same user it will be the same ``dict``.
+        """
         return self._user_data
 
     @user_data.setter

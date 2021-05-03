@@ -95,13 +95,14 @@ class Defaults:
             self._api_defaults['timeout'] = self.timeout
 
     @property
-    def api_defaults(self) -> Dict[str, Any]:
+    def api_defaults(self) -> Dict[str, Any]:  # skip-cq: PY-D0003
         return self._api_defaults
 
     @property
     def parse_mode(self) -> Optional[str]:
         """:obj:`str`: Optional. Send Markdown or HTML, if you want Telegram apps to show
-        bold, italic, fixed-width text or URLs in your bot's message."""
+        bold, italic, fixed-width text or URLs in your bot's message.
+        """
         return self._parse_mode
 
     @parse_mode.setter
@@ -114,7 +115,8 @@ class Defaults:
     @property
     def explanation_parse_mode(self) -> Optional[str]:
         """:obj:`str`: Optional. Alias for :attr:`parse_mode`, used for
-        the corresponding parameter of :meth:`telegram.Bot.send_poll`."""
+        the corresponding parameter of :meth:`telegram.Bot.send_poll`.
+        """
         return self._parse_mode
 
     @explanation_parse_mode.setter
@@ -127,7 +129,8 @@ class Defaults:
     @property
     def disable_notification(self) -> Optional[bool]:
         """:obj:`bool`): Optional. Sends the message silently. Users will
-        receive a notification with no sound."""
+        receive a notification with no sound.
+        """
         return self._disable_notification
 
     @disable_notification.setter
@@ -140,7 +143,8 @@ class Defaults:
     @property
     def disable_web_page_preview(self) -> Optional[bool]:
         """:obj:`bool`: Optional. Disables link previews for links in this
-        message."""
+        message.
+        """
         return self._disable_web_page_preview
 
     @disable_web_page_preview.setter
@@ -153,7 +157,8 @@ class Defaults:
     @property
     def allow_sending_without_reply(self) -> Optional[bool]:
         """:obj:`bool`: Optional. Pass :obj:`True`, if the message
-        should be sent even if the specified replied-to message is not found."""
+        should be sent even if the specified replied-to message is not found.
+        """
         return self._allow_sending_without_reply
 
     @allow_sending_without_reply.setter
@@ -167,7 +172,8 @@ class Defaults:
     def timeout(self) -> ODVInput[float]:
         """:obj:`int` | :obj:`float`: Optional. If this value is specified, use it as the
         read timeout from the server (instead of the one specified during creation of the
-        connection pool)."""
+        connection pool).
+        """
         return self._timeout
 
     @timeout.setter
@@ -181,7 +187,8 @@ class Defaults:
     def quote(self) -> Optional[bool]:
         """:obj:`bool`: Optional. If set to :obj:`True`, the reply is sent as an actual reply
         to the message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter will
-        be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats."""
+        be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+        """
         return self._quote
 
     @quote.setter
@@ -194,7 +201,8 @@ class Defaults:
     @property
     def tzinfo(self) -> pytz.BaseTzInfo:
         """:obj:`tzinfo`: A timezone to be used for all date(time) objects appearing
-        throughout PTB."""
+        throughout PTB.
+        """
         return self._tzinfo
 
     @tzinfo.setter
@@ -208,7 +216,8 @@ class Defaults:
     def run_async(self) -> bool:
         """:obj:`bool`: Optional. Default setting for the ``run_async`` parameter of
         handlers and error handlers registered through :meth:`Dispatcher.add_handler` and
-        :meth:`Dispatcher.add_error_handler`."""
+        :meth:`Dispatcher.add_error_handler`.
+        """
         return self._run_async
 
     @run_async.setter
