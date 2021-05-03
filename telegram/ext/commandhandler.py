@@ -244,7 +244,7 @@ class CommandHandler(Handler[Update]):
 
 
 class PrefixHandler(CommandHandler):
-    """Handler class to handle custom prefix commands
+    """Handler class to handle custom prefix commands.
 
     This is a intermediate handler between :class:`MessageHandler` and :class:`CommandHandler`.
     It supports configurable commands with the same options as CommandHandler. It will respond to

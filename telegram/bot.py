@@ -301,7 +301,7 @@ class Bot(TelegramObject):
         return Message.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @property
-    def request(self) -> Request:
+    def request(self) -> Request:  # skip-cq: PY-D0003
         return self._request
 
     @staticmethod
