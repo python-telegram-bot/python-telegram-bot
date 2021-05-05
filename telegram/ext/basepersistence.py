@@ -20,7 +20,7 @@
 import warnings
 from abc import ABC, abstractmethod
 from copy import copy
-from typing import Dict, Optional, Tuple, cast, ClassVar, Generic, Mapping, DefaultDict
+from typing import Dict, Optional, Tuple, cast, ClassVar, Generic, DefaultDict
 
 from telegram import Bot
 
@@ -91,10 +91,10 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         update_chat_data = instance.update_chat_data
         update_bot_data = instance.update_bot_data
 
-        def get_user_data_insert_bot() -> Mapping[int, UD]:
+        def get_user_data_insert_bot() -> DefaultDict[int, UD]:
             return instance.insert_bot(get_user_data())
 
-        def get_chat_data_insert_bot() -> Mapping[int, CD]:
+        def get_chat_data_insert_bot() -> DefaultDict[int, CD]:
             return instance.insert_bot(get_chat_data())
 
         def get_bot_data_insert_bot() -> BD:
