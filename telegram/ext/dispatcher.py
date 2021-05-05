@@ -629,6 +629,9 @@ class Dispatcher:
                 The error that happened will be present in context.error.
             run_async (:obj:`bool`, optional): Whether this handlers callback should be run
                 asynchronously using :meth:`run_async`. Defaults to :obj:`False`.
+
+        Note:
+            See https://git.io/fxJuV for more info about switching to context based API.
         """
         if callback in self.error_handlers:
             self.logger.debug('The callback is already registered as an error handler. Ignoring.')
