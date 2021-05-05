@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import logging
 import pytest
 
 from telegram import TelegramError
@@ -63,3 +64,66 @@ class TestPromise:
 
         with pytest.raises(TelegramError, match='Error'):
             promise.result()
+
+    def test_done_cb_after_run(self):
+        def callback():
+            return "done!"
+
+        def done_callback(_):
+            self.test_flag = True
+
+        promise = Promise(callback, [], {})
+        promise.run()
+        promise.add_done_callback(done_callback)
+        assert promise.result() == "done!"
+        assert self.test_flag is True
+
+    def test_done_cb_after_run_excp(self):
+        def callback():
+            return "done!"
+
+        def done_callback(_):
+            raise Exception("Error!")
+
+        promise = Promise(callback, [], {})
+        promise.run()
+        assert promise.result() == "done!"
+        with pytest.raises(Exception) as err:
+            promise.add_done_callback(done_callback)
+            assert str(err) == "Error!"
+
+    def test_done_cb_before_run(self):
+        def callback():
+            return "done!"
+
+        def done_callback(_):
+            self.test_flag = True
+
+        promise = Promise(callback, [], {})
+        promise.add_done_callback(done_callback)
+        assert promise.result(0) != "done!"
+        assert self.test_flag is False
+        promise.run()
+        assert promise.result() == "done!"
+        assert self.test_flag is True
+
+    def test_done_cb_before_run_excp(self, caplog):
+        def callback():
+            return "done!"
+
+        def done_callback(_):
+            raise Exception("Error!")
+
+        promise = Promise(callback, [], {})
+        promise.add_done_callback(done_callback)
+        assert promise.result(0) != "done!"
+        caplog.clear()
+        with caplog.at_level(logging.WARNING):
+            promise.run()
+        assert len(caplog.records) == 2
+        assert caplog.records[0].message == (
+            "`done_callback` of a Promise raised the following exception."
+            " The exception won't be handled by error handlers."
+        )
+        assert caplog.records[1].message.startswith("Full traceback:")
+        assert promise.result() == "done!"

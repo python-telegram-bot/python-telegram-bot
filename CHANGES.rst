@@ -2,6 +2,50 @@
 Changelog
 =========
 
+Version 13.5
+============
+*Released 2021-04-30*
+
+**Major Changes:**
+
+- Full support of Bot API 5.2 (`#2489`_).
+
+  .. note::
+     The ``start_parameter`` argument of ``Bot.send_invoice`` and the corresponding shortcuts is now optional, so the order of
+     parameters had to be changed. Make sure to update your method calls accordingly.
+
+- Update ``ChatActions``, Deprecating ``ChatAction.RECORD_AUDIO`` and ``ChatAction.UPLOAD_AUDIO`` (`#2460`_)
+
+**New Features:**
+
+- Convenience Utilities & Example for Handling ``ChatMemberUpdated`` (`#2490`_)
+- ``Filters.forwarded_from`` (`#2446`_)
+
+**Minor changes, CI improvements, Doc fixes and Type hinting:**
+
+- Improve Timeouts in ``ConversationHandler`` (`#2417`_)
+- Stabilize CI (`#2480`_)
+- Doc Fixes (`#2437`_)
+- Improve Type Hints of Data Filters (`#2456`_)
+- Add Two ``UserWarnings`` (`#2464`_)
+- Improve Code Quality (`#2450`_)
+- Update Fallback Test-Bots (`#2451`_)
+- Improve Examples (`#2441`_, `#2448`_)
+
+.. _`#2489`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2489
+.. _`#2460`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2460
+.. _`#2490`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2490
+.. _`#2446`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2446
+.. _`#2417`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2417
+.. _`#2480`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2480
+.. _`#2437`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2437
+.. _`#2456`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2456
+.. _`#2464`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2464
+.. _`#2450`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2450
+.. _`#2451`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2451
+.. _`#2441`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2441
+.. _`#2448`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2448
+
 Version 13.4.1
 ==============
 *Released 2021-03-14*

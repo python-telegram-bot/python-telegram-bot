@@ -44,6 +44,8 @@ class TestInvoice:
     start_parameter = 'start_parameter'
     currency = 'EUR'
     total_amount = sum([p.amount for p in prices])
+    max_tip_amount = 42
+    suggested_tip_amounts = [13, 42]
 
     def test_de_json(self, bot):
         invoice_json = Invoice.de_json(
@@ -74,27 +76,24 @@ class TestInvoice:
         assert invoice_dict['total_amount'] == invoice.total_amount
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_required_args_only(self, bot, chat_id, provider_token):
         message = bot.send_invoice(
-            chat_id,
-            self.title,
-            self.description,
-            self.payload,
-            provider_token,
-            self.start_parameter,
-            self.currency,
-            self.prices,
+            chat_id=chat_id,
+            title=self.title,
+            description=self.description,
+            payload=self.payload,
+            provider_token=provider_token,
+            currency=self.currency,
+            prices=self.prices,
         )
 
         assert message.invoice.currency == self.currency
-        assert message.invoice.start_parameter == self.start_parameter
+        assert message.invoice.start_parameter == ''
         assert message.invoice.description == self.description
         assert message.invoice.title == self.title
         assert message.invoice.total_amount == self.total_amount
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_all_args(self, bot, chat_id, provider_token):
         message = bot.send_invoice(
             chat_id,
@@ -102,9 +101,11 @@ class TestInvoice:
             self.description,
             self.payload,
             provider_token,
-            self.start_parameter,
             self.currency,
             self.prices,
+            max_tip_amount=self.max_tip_amount,
+            suggested_tip_amounts=self.suggested_tip_amounts,
+            start_parameter=self.start_parameter,
             provider_data=self.provider_data,
             photo_url='https://raw.githubusercontent.com/'
             'python-telegram-bot/logos/master/'
@@ -142,14 +143,13 @@ class TestInvoice:
             self.description,
             self.payload,
             provider_token,
-            self.start_parameter,
             self.currency,
             self.prices,
             provider_data={'test_data': 123456789},
+            start_parameter=self.start_parameter,
         )
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize(
         'default_bot,custom',
         [
@@ -171,7 +171,6 @@ class TestInvoice:
                 self.description,
                 self.payload,
                 provider_token,
-                self.start_parameter,
                 self.currency,
                 self.prices,
                 allow_sending_without_reply=custom,
@@ -185,7 +184,6 @@ class TestInvoice:
                 self.description,
                 self.payload,
                 provider_token,
-                self.start_parameter,
                 self.currency,
                 self.prices,
                 reply_to_message_id=reply_to_message.message_id,
@@ -199,7 +197,6 @@ class TestInvoice:
                     self.description,
                     self.payload,
                     provider_token,
-                    self.start_parameter,
                     self.currency,
                     self.prices,
                     reply_to_message_id=reply_to_message.message_id,

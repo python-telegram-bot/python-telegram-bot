@@ -53,6 +53,7 @@ from telegram import (
     ProximityAlertTriggered,
     ReplyMarkup,
     MessageAutoDeleteTimerChanged,
+    VoiceChatScheduled,
 )
 from telegram.utils.helpers import (
     escape_markdown,
@@ -204,6 +205,10 @@ class Message(TelegramObject):
         proximity_alert_triggered (:class:`telegram.ProximityAlertTriggered`, optional): Service
             message. A user in the chat triggered another user's proximity alert while sharing
             Live Location.
+        voice_chat_scheduled (:class:`telegram.VoiceChatScheduled`, optional): Service message:
+            voice chat scheduled.
+
+            .. versionadded:: 13.5
         voice_chat_started (:class:`telegram.VoiceChatStarted`, optional): Service message: voice
             chat started.
 
@@ -305,8 +310,12 @@ class Message(TelegramObject):
         proximity_alert_triggered (:class:`telegram.ProximityAlertTriggered`): Optional. Service
             message. A user in the chat triggered another user's proximity alert while sharing
             Live Location.
+        voice_chat_scheduled (:class:`telegram.VoiceChatScheduled`): Optional. Service message:
+            voice chat scheduled.
+
+            .. versionadded:: 13.5
         voice_chat_started (:class:`telegram.VoiceChatStarted`): Optional. Service message: voice
-            chat started
+            chat started.
 
             .. versionadded:: 13.4
         voice_chat_ended (:class:`telegram.VoiceChatEnded`): Optional. Service message: voice chat
@@ -360,6 +369,7 @@ class Message(TelegramObject):
         'dice',
         'passport_data',
         'proximity_alert_triggered',
+        'voice_chat_scheduled',
         'voice_chat_started',
         'voice_chat_ended',
         'voice_chat_participants_invited',
@@ -423,6 +433,7 @@ class Message(TelegramObject):
         voice_chat_ended: VoiceChatEnded = None,
         voice_chat_participants_invited: VoiceChatParticipantsInvited = None,
         message_auto_delete_timer_changed: MessageAutoDeleteTimerChanged = None,
+        voice_chat_scheduled: VoiceChatScheduled = None,
         **_kwargs: Any,
     ):
         # Required
@@ -478,6 +489,7 @@ class Message(TelegramObject):
         self.dice = dice
         self.via_bot = via_bot
         self.proximity_alert_triggered = proximity_alert_triggered
+        self.voice_chat_scheduled = voice_chat_scheduled
         self.voice_chat_started = voice_chat_started
         self.voice_chat_ended = voice_chat_ended
         self.voice_chat_participants_invited = voice_chat_participants_invited
@@ -551,6 +563,9 @@ class Message(TelegramObject):
             data.get('proximity_alert_triggered'), bot
         )
         data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
+        data['voice_chat_scheduled'] = VoiceChatScheduled.de_json(
+            data.get('voice_chat_scheduled'), bot
+        )
         data['voice_chat_started'] = VoiceChatStarted.de_json(data.get('voice_chat_started'), bot)
         data['voice_chat_ended'] = VoiceChatEnded.de_json(data.get('voice_chat_ended'), bot)
         data['voice_chat_participants_invited'] = VoiceChatParticipantsInvited.de_json(
@@ -1620,9 +1635,9 @@ class Message(TelegramObject):
         description: str,
         payload: str,
         provider_token: str,
-        start_parameter: str,
         currency: str,
         prices: List['LabeledPrice'],
+        start_parameter: str = None,
         photo_url: str = None,
         photo_size: int = None,
         photo_width: int = None,
@@ -1642,6 +1657,8 @@ class Message(TelegramObject):
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
+        max_tip_amount: int = None,
+        suggested_tip_amounts: List[int] = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1649,13 +1666,21 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_invoice`.
 
+        Warning:
+            As of API 5.2 :attr:`start_parameter` is an optional argument and therefore the order
+            of the arguments had to be changed. Use keyword arguments to make sure that the
+            arguments are passed correctly.
+
+        .. versionadded:: 13.2
+
+        .. versionchanged:: 13.5
+            As of Bot API 5.2, the parameter :attr:`start_parameter` is optional.
+
         Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the invoice is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False`
                 in private chats.
-
-        .. versionadded:: 13.2
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -1668,9 +1693,9 @@ class Message(TelegramObject):
             description=description,
             payload=payload,
             provider_token=provider_token,
-            start_parameter=start_parameter,
             currency=currency,
             prices=prices,
+            start_parameter=start_parameter,
             photo_url=photo_url,
             photo_size=photo_size,
             photo_width=photo_width,
@@ -1689,6 +1714,8 @@ class Message(TelegramObject):
             timeout=timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
+            max_tip_amount=max_tip_amount,
+            suggested_tip_amounts=suggested_tip_amounts,
         )
 
     def forward(

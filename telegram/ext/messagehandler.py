@@ -179,7 +179,7 @@ class MessageHandler(Handler[Update]):
                     Filters.update.edited_message | Filters.update.edited_channel_post
                 )
 
-    def check_update(self, update: object) -> Optional[Union[bool, Dict[str, object]]]:
+    def check_update(self, update: object) -> Optional[Union[bool, Dict[str, list]]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:

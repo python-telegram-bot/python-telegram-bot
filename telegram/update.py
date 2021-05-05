@@ -30,6 +30,7 @@ from telegram import (
     ShippingQuery,
     TelegramObject,
     ChatMemberUpdated,
+    constants,
 )
 from telegram.poll import PollAnswer
 from telegram.utils.types import JSONDict
@@ -123,6 +124,63 @@ class Update(TelegramObject):
             .. versionadded:: 13.4
 
     """
+
+    MESSAGE = constants.UPDATE_MESSAGE
+    """:const:`telegram.constants.UPDATE_MESSAGE`
+
+    .. versionadded:: 13.5"""
+    EDITED_MESSAGE = constants.UPDATE_EDITED_MESSAGE
+    """:const:`telegram.constants.UPDATE_EDITED_MESSAGE`
+
+    .. versionadded:: 13.5"""
+    CHANNEL_POST = constants.UPDATE_CHANNEL_POST
+    """:const:`telegram.constants.UPDATE_CHANNEL_POST`
+
+    .. versionadded:: 13.5"""
+    EDITED_CHANNEL_POST = constants.UPDATE_EDITED_CHANNEL_POST
+    """:const:`telegram.constants.UPDATE_EDITED_CHANNEL_POST`
+
+    .. versionadded:: 13.5"""
+    INLINE_QUERY = constants.UPDATE_INLINE_QUERY
+    """:const:`telegram.constants.UPDATE_INLINE_QUERY`
+
+    .. versionadded:: 13.5"""
+    CHOSEN_INLINE_RESULT = constants.UPDATE_CHOSEN_INLINE_RESULT
+    """:const:`telegram.constants.UPDATE_CHOSEN_INLINE_RESULT`
+
+    .. versionadded:: 13.5"""
+    CALLBACK_QUERY = constants.UPDATE_CALLBACK_QUERY
+    """:const:`telegram.constants.UPDATE_CALLBACK_QUERY`
+
+    .. versionadded:: 13.5"""
+    SHIPPING_QUERY = constants.UPDATE_SHIPPING_QUERY
+    """:const:`telegram.constants.UPDATE_SHIPPING_QUERY`
+
+    .. versionadded:: 13.5"""
+    PRE_CHECKOUT_QUERY = constants.UPDATE_PRE_CHECKOUT_QUERY
+    """:const:`telegram.constants.UPDATE_PRE_CHECKOUT_QUERY`
+
+    .. versionadded:: 13.5"""
+    POLL = constants.UPDATE_POLL
+    """:const:`telegram.constants.UPDATE_POLL`
+
+    .. versionadded:: 13.5"""
+    POLL_ANSWER = constants.UPDATE_POLL_ANSWER
+    """:const:`telegram.constants.UPDATE_POLL_ANSWER`
+
+    .. versionadded:: 13.5"""
+    MY_CHAT_MEMBER = constants.UPDATE_MY_CHAT_MEMBER
+    """:const:`telegram.constants.UPDATE_MY_CHAT_MEMBER`
+
+    .. versionadded:: 13.5"""
+    CHAT_MEMBER = constants.UPDATE_CHAT_MEMBER
+    """:const:`telegram.constants.UPDATE_CHAT_MEMBER`
+
+    .. versionadded:: 13.5"""
+    ALL_TYPES = constants.UPDATE_ALL_TYPES
+    """:const:`telegram.constants.UPDATE_ALL_TYPES`
+
+    .. versionadded:: 13.5"""
 
     def __init__(
         self,

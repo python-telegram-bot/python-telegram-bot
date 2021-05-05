@@ -15,14 +15,17 @@ On our wiki you will also find guides like how to use handlers, webhooks, emoji,
 Examples
 ========
 
-A great way to learn is by looking at examples. Ours can be found at our `github in the examples folder <https://github.com/python-telegram-bot/python-telegram-bot/tree/master/examples>`_.
+A great way to learn is by looking at examples. Ours can be found in our `examples folder on Github <https://github.com/python-telegram-bot/python-telegram-bot/tree/master/examples>`_.
 
 
 Reference
 =========
 
 Below you can find a reference of all the classes and methods in python-telegram-bot.
-Apart from the `telegram.ext` package the objects should reflect the types defined in the `official telegram bot api documentation <https://core.telegram.org/bots/api>`_.
+Apart from the `telegram.ext` package the objects should reflect the types defined in the `official Telegram Bot API documentation <https://core.telegram.org/bots/api>`_.
+
+.. toctree::
+   telegram.ext
 
 .. toctree::
    telegram

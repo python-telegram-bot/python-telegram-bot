@@ -46,7 +46,7 @@ class WebhookInfo(TelegramObject):
         max_connections (:obj:`int`, optional): Maximum allowed number of simultaneous HTTPS
             connections to the webhook for update delivery.
         allowed_updates (List[:obj:`str`], optional): A list of update types the bot is subscribed
-            to. Defaults to all update types.
+            to. Defaults to all update types, except :attr:`telegram.Update.chat_member`.
 
     Attributes:
         url (:obj:`str`): Webhook URL.
@@ -58,7 +58,7 @@ class WebhookInfo(TelegramObject):
         max_connections (:obj:`int`): Optional. Maximum allowed number of simultaneous HTTPS
             connections.
         allowed_updates (List[:obj:`str`]): Optional. A list of update types the bot is subscribed
-            to.
+            to. Defaults to all update types, except :attr:`telegram.Update.chat_member`.
 
     """
 

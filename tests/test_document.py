@@ -69,7 +69,6 @@ class TestDocument:
         assert document.thumb.height == self.thumb_height
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_all_args(self, bot, chat_id, document_file, document, thumb_file):
         message = bot.send_document(
             chat_id,
@@ -95,7 +94,6 @@ class TestDocument:
         assert message.document.thumb.height == self.thumb_height
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_get_and_download(self, bot, document):
         new_file = bot.get_file(document.file_id)
 
@@ -109,7 +107,6 @@ class TestDocument:
         assert os.path.isfile('telegram.png')
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_url_gif_file(self, bot, chat_id):
         message = bot.send_document(chat_id, self.document_file_url)
 
@@ -126,7 +123,6 @@ class TestDocument:
         assert document.file_size == 3878
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_resend(self, bot, chat_id, document):
         message = bot.send_document(chat_id=chat_id, document=document.file_id)
 
@@ -153,7 +149,6 @@ class TestDocument:
         assert message
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_document_caption_entities(self, bot, chat_id, document):
         test_string = 'Italic Bold Code'
         entities = [
@@ -169,7 +164,6 @@ class TestDocument:
         assert message.caption_entities == entities
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_document_default_parse_mode_1(self, default_bot, chat_id, document):
         test_string = 'Italic Bold Code'
@@ -180,7 +174,6 @@ class TestDocument:
         assert message.caption == test_string
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_document_default_parse_mode_2(self, default_bot, chat_id, document):
         test_markdown_string = '_Italic_ *Bold* `Code`'
@@ -192,7 +185,6 @@ class TestDocument:
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_document_default_parse_mode_3(self, default_bot, chat_id, document):
         test_markdown_string = '_Italic_ *Bold* `Code`'
@@ -204,7 +196,6 @@ class TestDocument:
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize(
         'default_bot,custom',
         [
@@ -281,14 +272,12 @@ class TestDocument:
         assert document_dict['file_size'] == document.file_size
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_error_send_empty_file(self, bot, chat_id):
         with open(os.devnull, 'rb') as f:
             with pytest.raises(TelegramError):
                 bot.send_document(chat_id=chat_id, document=f)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.send_document(chat_id=chat_id, document='')

@@ -49,6 +49,8 @@ class InlineKeyboardMarkup(ReplyMarkup):
         # Required
         self.inline_keyboard = inline_keyboard
 
+        self._id_attrs = (self.inline_keyboard,)
+
     def to_dict(self) -> JSONDict:
         data = super().to_dict()
 
@@ -127,19 +129,6 @@ class InlineKeyboardMarkup(ReplyMarkup):
         """
         button_grid = [[button] for button in button_column]
         return cls(button_grid, **kwargs)
-
-    def __eq__(self, other: object) -> bool:
-        if isinstance(other, self.__class__):
-            if len(self.inline_keyboard) != len(other.inline_keyboard):
-                return False
-            for idx, row in enumerate(self.inline_keyboard):
-                if len(row) != len(other.inline_keyboard[idx]):
-                    return False
-                for jdx, button in enumerate(row):
-                    if button != other.inline_keyboard[idx][jdx]:
-                        return False
-            return True
-        return super().__eq__(other)
 
     def __hash__(self) -> int:
         return hash(tuple(tuple(button for button in row) for row in self.inline_keyboard))
