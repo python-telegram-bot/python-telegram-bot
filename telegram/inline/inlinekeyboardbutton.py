@@ -40,7 +40,7 @@ class InlineKeyboardButton(TelegramObject):
 
     Args:
         text (:obj:`str`): Label text on the button.
-        url (:obj:`str`): HTTP or tg:// url to be opened when button is pressed.
+        url (:obj:`str`, optional): HTTP or tg:// url to be opened when button is pressed.
         login_url (:class:`telegram.LoginUrl`, optional): An HTTP URL used to automatically
             authorize the user. Can be used as a replacement for the Telegram Login Widget.
         callback_data (:obj:`str`, optional): Data to be sent in a callback query to the bot when
