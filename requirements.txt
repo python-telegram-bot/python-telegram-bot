@@ -2,6 +2,6 @@
 # pre-commit hooks for pylint & mypy
 certifi
 # only telegram.ext: # Keep this line here; used in setup(-raw).py
-tornado>=5.1
+tornado>=6.1
 APScheduler==3.6.3
 pytz>=2018.6
