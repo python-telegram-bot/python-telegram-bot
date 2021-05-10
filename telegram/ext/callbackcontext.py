@@ -19,7 +19,19 @@
 # pylint: disable=R0201
 """This module contains the CallbackContext class."""
 from queue import Queue
-from typing import TYPE_CHECKING, Dict, List, Match, NoReturn, Optional, Tuple, Union, Generic
+from typing import (
+    TYPE_CHECKING,
+    Dict,
+    List,
+    Match,
+    NoReturn,
+    Optional,
+    Tuple,
+    Union,
+    Generic,
+    Type,
+    TypeVar,
+)
 
 from telegram import Update
 from telegram.ext.utils.types import UD, CD, BD
@@ -27,6 +39,8 @@ from telegram.ext.utils.types import UD, CD, BD
 if TYPE_CHECKING:
     from telegram import Bot
     from telegram.ext import Dispatcher, Job, JobQueue
+
+CC = TypeVar('CC', bound='CallbackContext')
 
 
 class CallbackContext(Generic[UD, CD, BD]):
@@ -172,13 +186,13 @@ class CallbackContext(Generic[UD, CD, BD]):
 
     @classmethod
     def from_error(
-        cls,
+        cls: Type[CC],
         update: object,
         error: Exception,
         dispatcher: 'Dispatcher',
         async_args: Union[List, Tuple] = None,
         async_kwargs: Dict[str, object] = None,
-    ) -> 'CallbackContext':
+    ) -> CC:
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the error
         handlers.
@@ -209,7 +223,7 @@ class CallbackContext(Generic[UD, CD, BD]):
         return self
 
     @classmethod
-    def from_update(cls, update: object, dispatcher: 'Dispatcher') -> 'CallbackContext':
+    def from_update(cls: Type[CC], update: object, dispatcher: 'Dispatcher') -> CC:
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the
         handlers.
@@ -244,7 +258,7 @@ class CallbackContext(Generic[UD, CD, BD]):
         return self
 
     @classmethod
-    def from_job(cls, job: 'Job', dispatcher: 'Dispatcher') -> 'CallbackContext':
+    def from_job(cls: Type[CC], job: 'Job', dispatcher: 'Dispatcher') -> CC:
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to a
         job callback.
