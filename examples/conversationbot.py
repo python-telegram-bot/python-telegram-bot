@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=C0116
+# pylint: disable=C0116,W0613
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -36,7 +36,11 @@ logger = logging.getLogger(__name__)
 GENDER, PHOTO, LOCATION, BIO = range(4)
 
 
-def start(update: Update, _: CallbackContext) -> int:
+# Best practice would be to replace context with an underscore,
+# since context is an unused local variable.
+# This being an example and not having context present confusing beginners,
+# we decided to have it present as context.
+def start(update: Update, context: CallbackContext) -> int:
     reply_keyboard = [['Boy', 'Girl', 'Other']]
 
     update.message.reply_text(
@@ -49,7 +53,8 @@ def start(update: Update, _: CallbackContext) -> int:
     return GENDER
 
 
-def gender(update: Update, _: CallbackContext) -> int:
+# Best practice: see at start()
+def gender(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     logger.info("Gender of %s: %s", user.first_name, update.message.text)
     update.message.reply_text(
@@ -61,7 +66,8 @@ def gender(update: Update, _: CallbackContext) -> int:
     return PHOTO
 
 
-def photo(update: Update, _: CallbackContext) -> int:
+# Best practice: see at start()
+def photo(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     photo_file = update.message.photo[-1].get_file()
     photo_file.download('user_photo.jpg')
@@ -73,7 +79,8 @@ def photo(update: Update, _: CallbackContext) -> int:
     return LOCATION
 
 
-def skip_photo(update: Update, _: CallbackContext) -> int:
+# Best practice: see at start()
+def skip_photo(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     logger.info("User %s did not send a photo.", user.first_name)
     update.message.reply_text(
@@ -83,7 +90,8 @@ def skip_photo(update: Update, _: CallbackContext) -> int:
     return LOCATION
 
 
-def location(update: Update, _: CallbackContext) -> int:
+# Best practice: see at start()
+def location(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     user_location = update.message.location
     logger.info(
@@ -96,7 +104,8 @@ def location(update: Update, _: CallbackContext) -> int:
     return BIO
 
 
-def skip_location(update: Update, _: CallbackContext) -> int:
+# Best practice: see at start()
+def skip_location(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     logger.info("User %s did not send a location.", user.first_name)
     update.message.reply_text(
@@ -106,7 +115,8 @@ def skip_location(update: Update, _: CallbackContext) -> int:
     return BIO
 
 
-def bio(update: Update, _: CallbackContext) -> int:
+# Best practice: see at start()
+def bio(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     logger.info("Bio of %s: %s", user.first_name, update.message.text)
     update.message.reply_text('Thank you! I hope we can talk again some day.')
@@ -114,7 +124,8 @@ def bio(update: Update, _: CallbackContext) -> int:
     return ConversationHandler.END
 
 
-def cancel(update: Update, _: CallbackContext) -> int:
+# Best practice: see at start()
+def cancel(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)
     update.message.reply_text(

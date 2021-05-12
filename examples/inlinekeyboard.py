@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=C0116
+# pylint: disable=C0116,W0613
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -17,7 +17,11 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def start(update: Update, _: CallbackContext) -> None:
+# Best practice would be to replace context with an underscore,
+# since context is an unused local variable.
+# This being an example and not having context present confusing beginners,
+# we decided to have it present as context.
+def start(update: Update, context: CallbackContext) -> None:
     keyboard = [
         [
             InlineKeyboardButton("Option 1", callback_data='1'),
@@ -31,7 +35,8 @@ def start(update: Update, _: CallbackContext) -> None:
     update.message.reply_text('Please choose:', reply_markup=reply_markup)
 
 
-def button(update: Update, _: CallbackContext) -> None:
+# Best practice: see at start()
+def button(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
 
     # CallbackQueries need to be answered, even if no notification to the user is needed
@@ -41,7 +46,8 @@ def button(update: Update, _: CallbackContext) -> None:
     query.edit_message_text(text=f"Selected option: {query.data}")
 
 
-def help_command(update: Update, _: CallbackContext) -> None:
+# Best practice: see at start()
+def help_command(update: Update, context: CallbackContext) -> None:
     update.message.reply_text("Use /start to test this bot.")
 
 

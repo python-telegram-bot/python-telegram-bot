@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=C0116
+# pylint: disable=C0116,W0613
 # This program is dedicated to the public domain under the CC0 license.
 
 """Bot that explains Telegram's "Deep Linking Parameters" functionality.
@@ -78,7 +78,11 @@ def deep_linked_level_2(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 
-def deep_linked_level_3(update: Update, _: CallbackContext) -> None:
+# Best practice would be to replace context with an underscore,
+# since context is an unused local variable.
+# This being an example and not having context present confusing beginners,
+# we decided to have it present as context.
+def deep_linked_level_3(update: Update, context: CallbackContext) -> None:
     """Reached through the USING_ENTITIES payload"""
     update.message.reply_text(
         "It is also possible to make deep-linking using InlineKeyboardButtons.",

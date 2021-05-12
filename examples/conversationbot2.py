@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=C0116
+# pylint: disable=C0116,W0613
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -53,7 +53,11 @@ def facts_to_str(user_data: Dict[str, str]) -> str:
     return "\n".join(facts).join(['\n', '\n'])
 
 
-def start(update: Update, _: CallbackContext) -> int:
+# Best practice would be to replace context with an underscore,
+# since context is an unused local variable.
+# This being an example and not having context present confusing beginners,
+# we decided to have it present as context.
+def start(update: Update, context: CallbackContext) -> int:
     update.message.reply_text(
         "Hi! My name is Doctor Botter. I will hold a more complex conversation with you. "
         "Why don't you tell me something about yourself?",
@@ -71,7 +75,8 @@ def regular_choice(update: Update, context: CallbackContext) -> int:
     return TYPING_REPLY
 
 
-def custom_choice(update: Update, _: CallbackContext) -> int:
+# Best practice: see at start()
+def custom_choice(update: Update, context: CallbackContext) -> int:
     update.message.reply_text(
         'Alright, please send me the category first, for example "Most impressive skill"'
     )

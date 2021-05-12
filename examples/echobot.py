@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=C0116
+# pylint: disable=C0116,W0613
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -29,8 +29,11 @@ logger = logging.getLogger(__name__)
 
 
 # Define a few command handlers. These usually take the two arguments update and
-# context.
-def start(update: Update, _: CallbackContext) -> None:
+# context. Best practice would be to replace context with an underscore,
+# since context is an unused local variable.
+# This being an example and not having context present confusing beginners,
+# we decided to have it present as context.
+def start(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
     user = update.effective_user
     update.message.reply_markdown_v2(
@@ -39,12 +42,14 @@ def start(update: Update, _: CallbackContext) -> None:
     )
 
 
-def help_command(update: Update, _: CallbackContext) -> None:
+# Best practice: see at start()
+def help_command(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /help is issued."""
     update.message.reply_text('Help!')
 
 
-def echo(update: Update, _: CallbackContext) -> None:
+# Best practice: see at start()
+def echo(update: Update, context: CallbackContext) -> None:
     """Echo the user message."""
     update.message.reply_text(update.message.text)
 

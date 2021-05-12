@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=C0116
+# pylint: disable=C0116,W0613
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -23,7 +23,11 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def msg(update: Update, _: CallbackContext) -> None:
+# Best practice would be to replace context with an underscore,
+# since context is an unused local variable.
+# This being an example and not having context present confusing beginners,
+# we decided to have it present as context.
+def msg(update: Update, context: CallbackContext) -> None:
     # Retrieve passport data
     passport_data = update.message.passport_data
     # If our nonce doesn't match what we think, this Update did not originate from us

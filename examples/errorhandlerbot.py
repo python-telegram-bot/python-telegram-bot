@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=C0116
+# pylint: disable=C0116,W0613
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -53,12 +53,17 @@ def error_handler(update: object, context: CallbackContext) -> None:
     context.bot.send_message(chat_id=DEVELOPER_CHAT_ID, text=message, parse_mode=ParseMode.HTML)
 
 
-def bad_command(_: Update, context: CallbackContext) -> None:
+# Best practice: see at start(), just with update ;P
+def bad_command(update: Update, context: CallbackContext) -> None:
     """Raise an error to trigger the error handler."""
     context.bot.wrong_method_name()  # type: ignore[attr-defined]
 
 
-def start(update: Update, _: CallbackContext) -> None:
+# Best practice would be to replace context with an underscore,
+# since context is an unused local variable.
+# This being an example and not having context present confusing beginners,
+# we decided to have it present as context.
+def start(update: Update, context: CallbackContext) -> None:
     update.effective_message.reply_html(
         'Use /bad_command to cause an error.\n'
         f'Your chat id is <code>{update.effective_chat.id}</code>.'

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=C0116
+# pylint: disable=C0116,W0613
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -27,7 +27,11 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def start_callback(update: Update, _: CallbackContext) -> None:
+# Best practice would be to replace context with an underscore,
+# since context is an unused local variable.
+# This being an example and not having context present confusing beginners,
+# we decided to have it present as context.
+def start_callback(update: Update, context: CallbackContext) -> None:
     msg = (
         "Use /shipping to get an invoice for shipping-payment, or /noshipping for an "
         "invoice without shipping."
@@ -90,7 +94,8 @@ def start_without_shipping_callback(update: Update, context: CallbackContext) ->
     )
 
 
-def shipping_callback(update: Update, _: CallbackContext) -> None:
+# Best practice: see at start_callback()
+def shipping_callback(update: Update, context: CallbackContext) -> None:
     query = update.shipping_query
     # check the payload, is this from your bot?
     if query.invoice_payload != 'Custom-Payload':
@@ -108,7 +113,8 @@ def shipping_callback(update: Update, _: CallbackContext) -> None:
 
 
 # after (optional) shipping, it's the pre-checkout
-def precheckout_callback(update: Update, _: CallbackContext) -> None:
+# Best practice: see at start_callback()
+def precheckout_callback(update: Update, context: CallbackContext) -> None:
     query = update.pre_checkout_query
     # check the payload, is this from your bot?
     if query.invoice_payload != 'Custom-Payload':
@@ -119,7 +125,8 @@ def precheckout_callback(update: Update, _: CallbackContext) -> None:
 
 
 # finally, after contacting the payment provider...
-def successful_payment_callback(update: Update, _: CallbackContext) -> None:
+# Best practice: see at start_callback()
+def successful_payment_callback(update: Update, context: CallbackContext) -> None:
     # do something after successfully receiving payment?
     update.message.reply_text("Thank you for your payment!")
 
