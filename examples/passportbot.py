@@ -23,10 +23,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-# Best practice would be to replace context with an underscore,
-# since context is an unused local variable.
-# This being an example and not having context present confusing beginners,
-# we decided to have it present as context.
 def msg(update: Update, context: CallbackContext) -> None:
     # Retrieve passport data
     passport_data = update.message.passport_data

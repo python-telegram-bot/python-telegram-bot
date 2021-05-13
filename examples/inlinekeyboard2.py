@@ -37,10 +37,6 @@ FIRST, SECOND = range(2)
 ONE, TWO, THREE, FOUR = range(4)
 
 
-# Best practice would be to replace context with an underscore,
-# since context is an unused local variable.
-# This being an example and not having context present confusing beginners,
-# we decided to have it present as context.
 def start(update: Update, context: CallbackContext) -> int:
     """Send message on `/start`."""
     # Get user that sent /start and log his name
@@ -63,7 +59,6 @@ def start(update: Update, context: CallbackContext) -> int:
     return FIRST
 
 
-# Best practice: see at start()
 def start_over(update: Update, context: CallbackContext) -> int:
     """Prompt same text & keyboard as `start` does but not as new message"""
     # Get CallbackQuery from Update
@@ -85,7 +80,6 @@ def start_over(update: Update, context: CallbackContext) -> int:
     return FIRST
 
 
-# Best practice: see at start()
 def one(update: Update, context: CallbackContext) -> int:
     """Show new choice of buttons"""
     query = update.callback_query
@@ -103,7 +97,6 @@ def one(update: Update, context: CallbackContext) -> int:
     return FIRST
 
 
-# Best practice: see at start()
 def two(update: Update, context: CallbackContext) -> int:
     """Show new choice of buttons"""
     query = update.callback_query
@@ -121,7 +114,6 @@ def two(update: Update, context: CallbackContext) -> int:
     return FIRST
 
 
-# Best practice: see at start()
 def three(update: Update, context: CallbackContext) -> int:
     """Show new choice of buttons"""
     query = update.callback_query
@@ -140,7 +132,6 @@ def three(update: Update, context: CallbackContext) -> int:
     return SECOND
 
 
-# Best practice: see at start()
 def four(update: Update, context: CallbackContext) -> int:
     """Show new choice of buttons"""
     query = update.callback_query
@@ -158,7 +149,6 @@ def four(update: Update, context: CallbackContext) -> int:
     return FIRST
 
 
-# Best practice: see at start()
 def end(update: Update, context: CallbackContext) -> int:
     """Returns `ConversationHandler.END`, which tells the
     ConversationHandler that the conversation is over"""

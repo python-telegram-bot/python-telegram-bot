@@ -53,10 +53,6 @@ def facts_to_str(user_data: Dict[str, str]) -> str:
     return "\n".join(facts).join(['\n', '\n'])
 
 
-# Best practice would be to replace context with an underscore,
-# since context is an unused local variable.
-# This being an example and not having context present confusing beginners,
-# we decided to have it present as context.
 def start(update: Update, context: CallbackContext) -> int:
     update.message.reply_text(
         "Hi! My name is Doctor Botter. I will hold a more complex conversation with you. "
@@ -75,7 +71,6 @@ def regular_choice(update: Update, context: CallbackContext) -> int:
     return TYPING_REPLY
 
 
-# Best practice: see at start()
 def custom_choice(update: Update, context: CallbackContext) -> int:
     update.message.reply_text(
         'Alright, please send me the category first, for example "Most impressive skill"'

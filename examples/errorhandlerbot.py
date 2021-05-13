@@ -53,16 +53,11 @@ def error_handler(update: object, context: CallbackContext) -> None:
     context.bot.send_message(chat_id=DEVELOPER_CHAT_ID, text=message, parse_mode=ParseMode.HTML)
 
 
-# Best practice: see at start(), just with update ;P
 def bad_command(update: Update, context: CallbackContext) -> None:
     """Raise an error to trigger the error handler."""
     context.bot.wrong_method_name()  # type: ignore[attr-defined]
 
 
-# Best practice would be to replace context with an underscore,
-# since context is an unused local variable.
-# This being an example and not having context present confusing beginners,
-# we decided to have it present as context.
 def start(update: Update, context: CallbackContext) -> None:
     update.effective_message.reply_html(
         'Use /bad_command to cause an error.\n'

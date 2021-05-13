@@ -152,10 +152,6 @@ def show_data(update: Update, context: CallbackContext) -> str:
     return SHOWING
 
 
-# Best practice would be to replace context with an underscore,
-# since context is an unused local variable.
-# This being an example and not having context present confusing beginners,
-# we decided to have it present as context.
 def stop(update: Update, context: CallbackContext) -> int:
     """End Conversation by command."""
     update.message.reply_text('Okay, bye.')
@@ -163,7 +159,6 @@ def stop(update: Update, context: CallbackContext) -> int:
     return END
 
 
-# Best practice: see at stop()
 def end(update: Update, context: CallbackContext) -> int:
     """End conversation from InlineKeyboardButton."""
     update.callback_query.answer()
@@ -175,7 +170,6 @@ def end(update: Update, context: CallbackContext) -> int:
 
 
 # Second level conversation callbacks
-# Best practice: see at stop()
 def select_level(update: Update, context: CallbackContext) -> str:
     """Choose to add a parent or a child."""
     text = 'You may add a parent or a child. Also you can show the gathered data or go back.'
@@ -299,7 +293,6 @@ def end_describing(update: Update, context: CallbackContext) -> int:
     return END
 
 
-# Best practice: see at stop()
 def stop_nested(update: Update, context: CallbackContext) -> str:
     """Completely end conversation from within nested conversation."""
     update.message.reply_text('Okay, bye.')

@@ -113,10 +113,6 @@ def show_chats(update: Update, context: CallbackContext) -> None:
     update.effective_message.reply_text(text)
 
 
-# Best practice would be to replace context with an underscore,
-# since context is an unused local variable.
-# This being an example and not having context present confusing beginners,
-# we decided to have it present as context.
 def greet_chat_members(update: Update, context: CallbackContext) -> None:
     """Greets new users in chats and announces when someone leaves"""
     result = extract_status_change(update.chat_member)

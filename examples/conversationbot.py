@@ -36,10 +36,6 @@ logger = logging.getLogger(__name__)
 GENDER, PHOTO, LOCATION, BIO = range(4)
 
 
-# Best practice would be to replace context with an underscore,
-# since context is an unused local variable.
-# This being an example and not having context present confusing beginners,
-# we decided to have it present as context.
 def start(update: Update, context: CallbackContext) -> int:
     reply_keyboard = [['Boy', 'Girl', 'Other']]
 
@@ -53,7 +49,6 @@ def start(update: Update, context: CallbackContext) -> int:
     return GENDER
 
 
-# Best practice: see at start()
 def gender(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     logger.info("Gender of %s: %s", user.first_name, update.message.text)
@@ -66,7 +61,6 @@ def gender(update: Update, context: CallbackContext) -> int:
     return PHOTO
 
 
-# Best practice: see at start()
 def photo(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     photo_file = update.message.photo[-1].get_file()
@@ -79,7 +73,6 @@ def photo(update: Update, context: CallbackContext) -> int:
     return LOCATION
 
 
-# Best practice: see at start()
 def skip_photo(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     logger.info("User %s did not send a photo.", user.first_name)
@@ -90,7 +83,6 @@ def skip_photo(update: Update, context: CallbackContext) -> int:
     return LOCATION
 
 
-# Best practice: see at start()
 def location(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     user_location = update.message.location
@@ -104,7 +96,6 @@ def location(update: Update, context: CallbackContext) -> int:
     return BIO
 
 
-# Best practice: see at start()
 def skip_location(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     logger.info("User %s did not send a location.", user.first_name)
@@ -115,7 +106,6 @@ def skip_location(update: Update, context: CallbackContext) -> int:
     return BIO
 
 
-# Best practice: see at start()
 def bio(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     logger.info("Bio of %s: %s", user.first_name, update.message.text)
@@ -124,7 +114,6 @@ def bio(update: Update, context: CallbackContext) -> int:
     return ConversationHandler.END
 
 
-# Best practice: see at start()
 def cancel(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)

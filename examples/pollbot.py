@@ -34,10 +34,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-# Best practice would be to replace context with an underscore,
-# since context is an unused local variable.
-# This being an example and not having context present confusing beginners,
-# we decided to have it present as context.
 def start(update: Update, context: CallbackContext) -> None:
     """Inform user about what this bot can do"""
     update.message.reply_text(
@@ -124,7 +120,6 @@ def receive_quiz_answer(update: Update, context: CallbackContext) -> None:
         context.bot.stop_poll(quiz_data["chat_id"], quiz_data["message_id"])
 
 
-# Best practice: see at start()
 def preview(update: Update, context: CallbackContext) -> None:
     """Ask user to create a poll and display a preview of it"""
     # using this without a type lets the user chooses what he wants (quiz or poll)
@@ -136,7 +131,6 @@ def preview(update: Update, context: CallbackContext) -> None:
     )
 
 
-# Best practice: see at start()
 def receive_poll(update: Update, context: CallbackContext) -> None:
     """On receiving polls, reply to it by a closed poll copying the received poll"""
     actual_poll = update.effective_message.poll
@@ -151,7 +145,6 @@ def receive_poll(update: Update, context: CallbackContext) -> None:
     )
 
 
-# Best practice: see at start()
 def help_handler(update: Update, context: CallbackContext) -> None:
     """Display a help message"""
     update.message.reply_text("Use /quiz, /poll or /preview to test this bot.")

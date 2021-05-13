@@ -17,10 +17,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-# Best practice would be to replace context with an underscore,
-# since context is an unused local variable.
-# This being an example and not having context present confusing beginners,
-# we decided to have it present as context.
 def start(update: Update, context: CallbackContext) -> None:
     keyboard = [
         [
@@ -35,7 +31,6 @@ def start(update: Update, context: CallbackContext) -> None:
     update.message.reply_text('Please choose:', reply_markup=reply_markup)
 
 
-# Best practice: see at start()
 def button(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
 
@@ -46,7 +41,6 @@ def button(update: Update, context: CallbackContext) -> None:
     query.edit_message_text(text=f"Selected option: {query.data}")
 
 
-# Best practice: see at start()
 def help_command(update: Update, context: CallbackContext) -> None:
     update.message.reply_text("Use /start to test this bot.")
 
