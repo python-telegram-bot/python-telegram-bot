@@ -27,7 +27,7 @@ from telegram.utils.types import ConversationDict
 
 
 class PicklePersistence(BasePersistence):
-    """Using python's builtin pickle for making you bot persistent.
+    """Using python's builtin pickle for making your bot persistent.
 
     Warning:
         :class:`PicklePersistence` will try to replace :class:`telegram.Bot` instances by
@@ -43,7 +43,7 @@ class PicklePersistence(BasePersistence):
             is :obj:`False` this will be used as a prefix.
         store_user_data (:obj:`bool`, optional): Whether user_data should be saved by this
             persistence class. Default is :obj:`True`.
-        store_chat_data (:obj:`bool`, optional): Whether user_data should be saved by this
+        store_chat_data (:obj:`bool`, optional): Whether chat_data should be saved by this
             persistence class. Default is :obj:`True`.
         store_bot_data (:obj:`bool`, optional): Whether bot_data should be saved by this
             persistence class. Default is :obj:`True` .
@@ -60,7 +60,7 @@ class PicklePersistence(BasePersistence):
             is :obj:`False` this will be used as a prefix.
         store_user_data (:obj:`bool`): Optional. Whether user_data should be saved by this
             persistence class.
-        store_chat_data (:obj:`bool`): Optional. Whether user_data should be saved by this
+        store_chat_data (:obj:`bool`): Optional. Whether chat_data should be saved by this
             persistence class.
         store_bot_data (:obj:`bool`): Optional. Whether bot_data should be saved by this
             persistence class.
@@ -201,7 +201,7 @@ class PicklePersistence(BasePersistence):
         return deepcopy(self.bot_data)  # type: ignore[arg-type]
 
     def get_conversations(self, name: str) -> ConversationDict:
-        """Returns the conversations from the pickle file if it exsists or an empty dict.
+        """Returns the conversations from the pickle file if it exists or an empty dict.
 
         Args:
             name (:obj:`str`): The handlers name.
