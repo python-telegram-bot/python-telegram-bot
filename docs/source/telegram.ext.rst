@@ -7,7 +7,6 @@ telegram.ext package
     telegram.ext.dispatcher
     telegram.ext.dispatcherhandlerstop
     telegram.ext.callbackcontext
-    telegram.ext.defaults
     telegram.ext.job
     telegram.ext.jobqueue
     telegram.ext.messagequeue

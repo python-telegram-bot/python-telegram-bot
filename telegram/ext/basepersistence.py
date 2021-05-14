@@ -410,7 +410,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
             chat_data (:class:`telegram.ext.utils.types.CD`): The ``chat_data`` of a single chat.
         """
         raise NotImplementedError(
-            'refresh_chat_data ist not implemented for this persistence class.'
+            'refresh_chat_data is not implemented for this persistence class.'
         )
 
     def refresh_bot_data(self, bot_data: BD) -> None:
@@ -424,7 +424,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
             bot_data (:class:`telegram.ext.utils.types.BD`): The ``bot_data``.
         """
         raise NotImplementedError(
-            'refresh_bot_data ist not implemented for this persistence class.'
+            'refresh_bot_data is not implemented for this persistence class.'
         )
 
     def flush(self) -> None:
