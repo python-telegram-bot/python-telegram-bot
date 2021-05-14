@@ -135,6 +135,10 @@ class TestCallbackQueryHandler:
         callback_query.callback_query.data = 'nothing here'
         assert not handler.check_update(callback_query)
 
+        callback_query.callback_query.data = False
+        callback_query.callback_query.game_short_name = "this is a short game name"
+        assert not handler.check_update(callback_query)
+
     def test_with_passing_group_dict(self, dp, callback_query):
         handler = CallbackQueryHandler(
             self.callback_group, pattern='(?P<begin>.*)est(?P<end>.*)', pass_groups=True
