@@ -90,7 +90,6 @@ class TestVideo:
         assert video.mime_type == self.mime_type
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_all_args(self, bot, chat_id, video_file, video, thumb_file):
         message = bot.send_video(
             chat_id,
@@ -124,7 +123,6 @@ class TestVideo:
         assert message.video.file_name == self.file_name
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_video_custom_filename(self, bot, chat_id, video_file, monkeypatch):
         def make_assertion(url, data, **kwargs):
             return data['video'].filename == 'custom_filename'
@@ -134,7 +132,6 @@ class TestVideo:
         assert bot.send_video(chat_id, video_file, filename='custom_filename')
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_get_and_download(self, bot, video):
         new_file = bot.get_file(video.file_id)
 
@@ -148,7 +145,6 @@ class TestVideo:
         assert os.path.isfile('telegram.mp4')
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_mp4_file_url(self, bot, chat_id, video):
         message = bot.send_video(chat_id, self.video_file_url, caption=self.caption)
 
@@ -174,7 +170,6 @@ class TestVideo:
         assert message.caption == self.caption
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_video_caption_entities(self, bot, chat_id, video):
         test_string = 'Italic Bold Code'
         entities = [
@@ -188,7 +183,6 @@ class TestVideo:
         assert message.caption_entities == entities
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_resend(self, bot, chat_id, video):
         message = bot.send_video(chat_id, video.file_id)
 
@@ -203,7 +197,6 @@ class TestVideo:
         assert message
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_video_default_parse_mode_1(self, default_bot, chat_id, video):
         test_string = 'Italic Bold Code'
@@ -214,7 +207,6 @@ class TestVideo:
         assert message.caption == test_string
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_video_default_parse_mode_2(self, default_bot, chat_id, video):
         test_markdown_string = '_Italic_ *Bold* `Code`'
@@ -226,7 +218,6 @@ class TestVideo:
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_video_default_parse_mode_3(self, default_bot, chat_id, video):
         test_markdown_string = '_Italic_ *Bold* `Code`'
@@ -253,7 +244,6 @@ class TestVideo:
         monkeypatch.delattr(bot, '_post')
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize(
         'default_bot,custom',
         [
@@ -323,13 +313,11 @@ class TestVideo:
         assert video_dict['file_name'] == video.file_name
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.send_video(chat_id, open(os.devnull, 'rb'))
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.send_video(chat_id, '')

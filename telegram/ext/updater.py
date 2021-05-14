@@ -280,7 +280,7 @@ class Updater:
 
         Args:
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
-                Telegram in seconds. Default is 0.0.
+                Telegram in seconds. Default is ``0.0``.
             timeout (:obj:`float`, optional): Passed to :meth:`telegram.Bot.get_updates`.
             drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
                 Telegram servers before actually starting to poll. Default is :obj:`False`.
@@ -301,7 +301,7 @@ class Updater:
                 :meth:`telegram.Bot.get_updates`.
             read_latency (:obj:`float` | :obj:`int`, optional): Grace time in seconds for receiving
                 the reply from server. Will be added to the ``timeout`` value and used as the read
-                timeout from server (Default: 2).
+                timeout from server (Default: ``2``).
 
         Returns:
             :obj:`Queue`: The update queue that can be filled from the main thread.
@@ -360,25 +360,20 @@ class Updater:
         bootstrap_retries: int = 0,
         webhook_url: str = None,
         allowed_updates: List[str] = None,
-        force_event_loop: bool = False,
+        force_event_loop: bool = None,
         drop_pending_updates: bool = None,
         ip_address: str = None,
     ) -> Optional[Queue]:
         """
-        Starts a small http server to listen for updates via webhook. If cert
-        and key are not provided, the webhook will be started directly on
+        Starts a small http server to listen for updates via webhook. If :attr:`cert`
+        and :attr:`key` are not provided, the webhook will be started directly on
         http://listen:port/url_path, so SSL can be handled by another
         application. Else, the webhook will be started on
         https://listen:port/url_path. Also calls :meth:`telegram.Bot.set_webhook` as required.
 
-        Note:
-            Due to an incompatibility of the Tornado library PTB uses for the webhook with Python
-            3.8+ on Windows machines, PTB will attempt to set the event loop to
-            :attr:`asyncio.SelectorEventLoop` and raise an exception, if an incompatible event loop
-            has already been specified. See this `thread`_ for more details. To suppress the
-            exception, set :attr:`force_event_loop` to :obj:`True`.
-
-            .. _thread: https://github.com/tornadoweb/tornado/issues/2608
+        .. versionchanged:: 13.4
+            :meth:`start_webhook` now *always* calls :meth:`telegram.Bot.set_webhook`, so pass
+            ``webhook_url`` instead of calling ``updater.bot.set_webhook(webhook_url)`` manually.
 
         Args:
             listen (:obj:`str`, optional): IP-Address to listen on. Default ``127.0.0.1``.
@@ -409,8 +404,12 @@ class Updater:
                 .. versionadded :: 13.4
             allowed_updates (List[:obj:`str`], optional): Passed to
                 :meth:`telegram.Bot.set_webhook`.
-            force_event_loop (:obj:`bool`, optional): Force using the current event loop. See above
-                note for details. Defaults to :obj:`False`
+            force_event_loop (:obj:`bool`, optional): Legacy parameter formerly used for a
+                workaround on Windows + Python 3.8+. No longer has any effect.
+
+                .. deprecated:: 13.6
+                   Since version 13.6, ``tornade>=6.1`` is required, which resolves the former
+                   issue.
 
         Returns:
             :obj:`Queue`: The update queue that can be filled from the main thread.
@@ -423,6 +422,14 @@ class Updater:
             warnings.warn(
                 'The argument `clean` of `start_webhook` is deprecated. Please use '
                 '`drop_pending_updates` instead.',
+                category=TelegramDeprecationWarning,
+                stacklevel=2,
+            )
+
+        if force_event_loop is not None:
+            warnings.warn(
+                'The argument `force_event_loop` of `start_webhook` is deprecated and no longer '
+                'has any effect.',
                 category=TelegramDeprecationWarning,
                 stacklevel=2,
             )
@@ -451,7 +458,6 @@ class Updater:
                     webhook_url,
                     allowed_updates,
                     ready=webhook_ready,
-                    force_event_loop=force_event_loop,
                     ip_address=ip_address,
                 )
 
@@ -585,7 +591,6 @@ class Updater:
         webhook_url,
         allowed_updates,
         ready=None,
-        force_event_loop=False,
         ip_address=None,
     ):
         self.logger.debug('Updater thread started (webhook)')
@@ -628,7 +633,7 @@ class Updater:
             ip_address=ip_address,
         )
 
-        self.httpd.serve_forever(force_event_loop=force_event_loop, ready=ready)
+        self.httpd.serve_forever(ready=ready)
 
     @staticmethod
     def _gen_webhook_url(listen: str, port: int, url_path: str) -> str:
@@ -768,8 +773,8 @@ class Updater:
 
         Args:
             stop_signals (:obj:`list` | :obj:`tuple`): List containing signals from the signal
-                module that should be subscribed to. Updater.stop() will be called on receiving one
-                of those signals. Defaults to (``SIGINT``, ``SIGTERM``, ``SIGABRT``).
+                module that should be subscribed to. :meth:`Updater.stop()` will be called on
+                receiving one of those signals. Defaults to (``SIGINT``, ``SIGTERM``, ``SIGABRT``).
 
         """
         for sig in stop_signals:

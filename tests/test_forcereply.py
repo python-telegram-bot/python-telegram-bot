@@ -41,7 +41,6 @@ class TestForceReply:
         assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_message_with_force_reply(self, bot, chat_id, force_reply):
         message = bot.send_message(chat_id, 'text', reply_markup=force_reply)
 

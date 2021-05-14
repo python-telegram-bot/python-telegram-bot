@@ -71,7 +71,6 @@ class TestLocation:
 
     @flaky(3, 1)
     @pytest.mark.xfail
-    @pytest.mark.timeout(10)
     def test_send_live_location(self, bot, chat_id):
         message = bot.send_location(
             chat_id=chat_id,
@@ -151,7 +150,6 @@ class TestLocation:
         assert bot.send_location(location=location, chat_id=chat_id)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize(
         'default_bot,custom',
         [

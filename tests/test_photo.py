@@ -97,7 +97,6 @@ class TestPhoto:
         assert thumb.height == 320
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_photo_all_args(self, bot, chat_id, photo_file, thumb, photo):
         message = bot.send_photo(
             chat_id,
@@ -128,7 +127,6 @@ class TestPhoto:
         assert message.caption == TestPhoto.caption.replace('*', '')
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_photo_custom_filename(self, bot, chat_id, photo_file, monkeypatch):
         def make_assertion(url, data, **kwargs):
             return data['photo'].filename == 'custom_filename'
@@ -138,7 +136,6 @@ class TestPhoto:
         assert bot.send_photo(chat_id, photo_file, filename='custom_filename')
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_photo_parse_mode_markdown(self, bot, chat_id, photo_file, thumb, photo):
         message = bot.send_photo(chat_id, photo_file, caption=self.caption, parse_mode='Markdown')
         assert isinstance(message.photo[0], PhotoSize)
@@ -163,7 +160,6 @@ class TestPhoto:
         assert len(message.caption_entities) == 1
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_photo_parse_mode_html(self, bot, chat_id, photo_file, thumb, photo):
         message = bot.send_photo(chat_id, photo_file, caption=self.caption, parse_mode='HTML')
         assert isinstance(message.photo[0], PhotoSize)
@@ -188,7 +184,6 @@ class TestPhoto:
         assert len(message.caption_entities) == 1
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_photo_caption_entities(self, bot, chat_id, photo_file, thumb, photo):
         test_string = 'Italic Bold Code'
         entities = [
@@ -204,7 +199,6 @@ class TestPhoto:
         assert message.caption_entities == entities
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_photo_default_parse_mode_1(self, default_bot, chat_id, photo_file, thumb, photo):
         test_string = 'Italic Bold Code'
@@ -215,7 +209,6 @@ class TestPhoto:
         assert message.caption == test_string
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_photo_default_parse_mode_2(self, default_bot, chat_id, photo_file, thumb, photo):
         test_markdown_string = '_Italic_ *Bold* `Code`'
@@ -227,7 +220,6 @@ class TestPhoto:
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_photo_default_parse_mode_3(self, default_bot, chat_id, photo_file, thumb, photo):
         test_markdown_string = '_Italic_ *Bold* `Code`'
@@ -254,7 +246,6 @@ class TestPhoto:
         monkeypatch.delattr(bot, '_post')
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize(
         'default_bot,custom',
         [
@@ -289,7 +280,6 @@ class TestPhoto:
                 )
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_get_and_download(self, bot, photo):
         new_file = bot.getFile(photo.file_id)
 
@@ -302,7 +292,6 @@ class TestPhoto:
         assert os.path.isfile('telegram.jpg') is True
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_url_jpg_file(self, bot, chat_id, thumb, photo):
         message = bot.send_photo(chat_id, photo=self.photo_file_url)
 
@@ -323,7 +312,6 @@ class TestPhoto:
         # sending by URL and sending by upload differently and it's not really our job anyway ...
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_url_png_file(self, bot, chat_id):
         message = bot.send_photo(
             photo='http://dummyimage.com/600x400/000/fff.png&text=telegram', chat_id=chat_id
@@ -338,7 +326,6 @@ class TestPhoto:
         assert photo.file_unique_id != ''
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_url_gif_file(self, bot, chat_id):
         message = bot.send_photo(
             photo='http://dummyimage.com/600x400/000/fff.png&text=telegram', chat_id=chat_id
@@ -353,7 +340,6 @@ class TestPhoto:
         assert photo.file_unique_id != ''
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_file_unicode_filename(self, bot, chat_id):
         """
         Regression test for https://github.com/python-telegram-bot/python-telegram-bot/issues/1202
@@ -370,7 +356,6 @@ class TestPhoto:
         assert photo.file_unique_id != ''
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_bytesio_jpg_file(self, bot, chat_id):
         file_name = 'tests/data/telegram_no_standard_header.jpg'
 
@@ -407,7 +392,6 @@ class TestPhoto:
         assert message
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_resend(self, bot, chat_id, photo):
         message = bot.send_photo(chat_id=chat_id, photo=photo.file_id)
 
@@ -458,13 +442,11 @@ class TestPhoto:
         assert photo_dict['file_size'] == photo.file_size
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.send_photo(chat_id=chat_id, photo=open(os.devnull, 'rb'))
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.send_photo(chat_id=chat_id, photo='')

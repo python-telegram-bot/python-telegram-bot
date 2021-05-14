@@ -447,7 +447,6 @@ def media_group(photo, thumb):  # noqa: F811
 
 class TestSendMediaGroup:
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_media_group_photo(self, bot, chat_id, media_group):
         messages = bot.send_media_group(chat_id, media_group)
         assert isinstance(messages, list)
@@ -460,7 +459,6 @@ class TestSendMediaGroup:
         )
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_media_group_all_args(self, bot, chat_id, media_group):
         m1 = bot.send_message(chat_id, text="test")
         messages = bot.send_media_group(
@@ -476,7 +474,6 @@ class TestSendMediaGroup:
         )
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_media_group_custom_filename(
         self,
         bot,
@@ -519,7 +516,6 @@ class TestSendMediaGroup:
             bot.send_media_group(chat_id, [input_video, input_video])
 
     @flaky(3, 1)  # noqa: F811
-    @pytest.mark.timeout(10)  # noqa: F811
     def test_send_media_group_new_files(
         self, bot, chat_id, video_file, photo_file, animation_file  # noqa: F811
     ):  # noqa: F811
@@ -544,7 +540,6 @@ class TestSendMediaGroup:
         assert all([mes.media_group_id == messages[0].media_group_id for mes in messages])
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize(
         'default_bot,custom',
         [
@@ -579,7 +574,6 @@ class TestSendMediaGroup:
                 )
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_edit_message_media(self, bot, chat_id, media_group):
         messages = bot.send_media_group(chat_id, media_group)
         cid = messages[-1].chat.id
@@ -588,7 +582,6 @@ class TestSendMediaGroup:
         assert isinstance(new_message, Message)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_edit_message_media_new_file(self, bot, chat_id, media_group, thumb_file):
         messages = bot.send_media_group(chat_id, media_group)
         cid = messages[-1].chat.id
@@ -599,7 +592,6 @@ class TestSendMediaGroup:
         assert isinstance(new_message, Message)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize(
         'default_bot', [{'parse_mode': ParseMode.HTML}], indirect=True, ids=['HTML-Bot']
     )

@@ -105,7 +105,6 @@ class TestSticker:
         assert sticker.thumb.file_size == self.thumb_file_size
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_all_args(self, bot, chat_id, sticker_file, sticker):
         message = bot.send_sticker(chat_id, sticker=sticker_file, disable_notification=False)
 
@@ -129,7 +128,6 @@ class TestSticker:
         assert message.sticker.thumb.file_size == sticker.thumb.file_size
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_get_and_download(self, bot, sticker):
         new_file = bot.get_file(sticker.file_id)
 
@@ -143,14 +141,12 @@ class TestSticker:
         assert os.path.isfile('telegram.webp')
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_resend(self, bot, chat_id, sticker):
         message = bot.send_sticker(chat_id=chat_id, sticker=sticker.file_id)
 
         assert message.sticker == sticker
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_on_server_emoji(self, bot, chat_id):
         server_file_id = 'CAADAQADHAADyIsGAAFZfq1bphjqlgI'
         message = bot.send_sticker(chat_id=chat_id, sticker=server_file_id)
@@ -158,7 +154,6 @@ class TestSticker:
         assert sticker.emoji == self.emoji
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_from_url(self, bot, chat_id):
         message = bot.send_sticker(chat_id=chat_id, sticker=self.sticker_file_url)
         sticker = message.sticker
@@ -228,7 +223,6 @@ class TestSticker:
         monkeypatch.delattr(bot, '_post')
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize(
         'default_bot,custom',
         [
@@ -275,13 +269,11 @@ class TestSticker:
         assert sticker_dict['thumb'] == sticker.thumb.to_dict()
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.send_sticker(chat_id, open(os.devnull, 'rb'))
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.send_sticker(chat_id, '')
@@ -373,7 +365,6 @@ class TestStickerSet:
         assert sticker_set.thumb == sticker.thumb
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_bot_methods_1_png(self, bot, chat_id, sticker_file):
         with open('tests/data/telegram_sticker.png', 'rb') as f:
             file = bot.upload_sticker_file(95205500, f)
@@ -391,7 +382,6 @@ class TestStickerSet:
         )
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_bot_methods_1_tgs(self, bot, chat_id):
         assert bot.add_sticker_to_set(
             chat_id,
@@ -411,19 +401,16 @@ class TestStickerSet:
         assert sticker_set_dict['stickers'][0] == sticker_set.stickers[0].to_dict()
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_bot_methods_2_png(self, bot, sticker_set):
         file_id = sticker_set.stickers[0].file_id
         assert bot.set_sticker_position_in_set(file_id, 1)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_bot_methods_2_tgs(self, bot, animated_sticker_set):
         file_id = animated_sticker_set.stickers[0].file_id
         assert bot.set_sticker_position_in_set(file_id, 1)
 
     @flaky(10, 1)
-    @pytest.mark.timeout(10)
     def test_bot_methods_3_png(self, bot, chat_id, sticker_set_thumb_file):
         sleep(1)
         assert bot.set_sticker_set_thumb(
@@ -431,7 +418,6 @@ class TestStickerSet:
         )
 
     @flaky(10, 1)
-    @pytest.mark.timeout(10)
     def test_bot_methods_3_tgs(self, bot, chat_id, animated_sticker_file, animated_sticker_set):
         sleep(1)
         assert bot.set_sticker_set_thumb(
@@ -442,14 +428,12 @@ class TestStickerSet:
         assert bot.set_sticker_set_thumb(f'animated_test_by_{bot.username}', chat_id, file_id)
 
     @flaky(10, 1)
-    @pytest.mark.timeout(10)
     def test_bot_methods_4_png(self, bot, sticker_set):
         sleep(1)
         file_id = sticker_set.stickers[-1].file_id
         assert bot.delete_sticker_from_set(file_id)
 
     @flaky(10, 1)
-    @pytest.mark.timeout(10)
     def test_bot_methods_4_tgs(self, bot, animated_sticker_set):
         sleep(1)
         file_id = animated_sticker_set.stickers[-1].file_id
