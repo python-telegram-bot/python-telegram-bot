@@ -92,6 +92,7 @@ class TestFilters:
             if inspect.isabstract(cls) or name in {'__class__', '__base__'}:
                 continue
 
+            assert '__slots__' in cls.__dict__, f"Filter {name!r} doesn't have __slots__"
             # get no. of args minus the 'self' argument
             args = len(inspect.signature(cls.__init__).parameters) - 1
             if cls.__base__.__name__ == '_ChatUserBaseFilter':  # Special case, only 1 arg needed
