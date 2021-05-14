@@ -271,7 +271,7 @@ class PrefixHandler(CommandHandler):
         .. code:: python
 
             PrefixHandler(['!', '#'], ['test', 'help'], callback)  # will respond to '!test', \
-'#test', '!help' and '#help'.
+            '#test', '!help' and '#help'.
 
 
     By default the handler listens to messages as well as edited messages. To change this behavior
