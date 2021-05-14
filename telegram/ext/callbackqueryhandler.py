@@ -157,6 +157,7 @@ class CallbackQueryHandler(Handler[Update]):
             :obj:`bool`
 
         """
+        # testing a suspicion
         if isinstance(update, Update) and update.callback_query:
             if self.pattern:
                 if update.callback_query.data:
