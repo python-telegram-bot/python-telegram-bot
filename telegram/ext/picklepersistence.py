@@ -64,7 +64,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             :obj:`False` will store data on any transaction *and* on call to :meth:`flush`.
             Default is :obj:`False`.
         context_types (:class:`telegram.ext.ContextTypes`, optional): Pass an instance
-            of :class:`telegram.ext.ContextTypes` to customize the the types used in the
+            of :class:`telegram.ext.ContextTypes` to customize the types used in the
             ``context`` interface. If not passed, the defaults documented in
             :class:`telegram.ext.ContextTypes` will be used.
 

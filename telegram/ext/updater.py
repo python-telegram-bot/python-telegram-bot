@@ -99,7 +99,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
             be used if not set explicitly in the bot methods.
         context_types (:class:`telegram.ext.ContextTypes`, optional): Pass an instance
-            of :class:`telegram.ext.ContextTypes` to customize the the types used in the
+            of :class:`telegram.ext.ContextTypes` to customize the types used in the
             ``context`` interface. If not passed, the defaults documented in
             :class:`telegram.ext.ContextTypes` will be used.
 

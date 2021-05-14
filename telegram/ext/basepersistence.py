@@ -321,7 +321,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         :class:`telegram.ext.utils.types.BD`.
 
         Returns:
-            :class:`telegram.ext.utils.types.BD`: The restored user data.
+            :class:`telegram.ext.utils.types.BD`: The restored bot data.
         """
 
     @abstractmethod
@@ -388,18 +388,22 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         :attr:`user_data` to a callback. Can be used to update data stored in :attr:`user_data`
         from an external source.
 
+        .. versionadded:: 13.6
+
         Args:
             user_id (:obj:`int`): The user ID this :attr:`user_data` is associated with.
             user_data (:class:`telegram.ext.utils.types.UD`): The ``user_data`` of a single user.
         """
         raise NotImplementedError(
-            'refresh_user_data ist not implemented for this persistence class.'
+            'refresh_user_data is not implemented for this persistence class.'
         )
 
     def refresh_chat_data(self, chat_id: int, chat_data: CD) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` before passing the
         :attr:`chat_data` to a callback. Can be used to update data stored in :attr:`chat_data`
         from an external source.
+
+        .. versionadded:: 13.6
 
         Args:
             chat_id (:obj:`int`): The chat ID this :attr:`chat_data` is associated with.
@@ -413,6 +417,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         """Will be called by the :class:`telegram.ext.Dispatcher` before passing the
         :attr:`bot_data` to a callback. Can be used to update data stored in :attr:`bot_data`
         from an external source.
+
+        .. versionadded:: 13.6
 
         Args:
             bot_data (:class:`telegram.ext.utils.types.BD`): The ``bot_data``.
