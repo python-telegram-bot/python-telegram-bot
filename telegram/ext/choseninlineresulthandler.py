@@ -134,10 +134,9 @@ class ChosenInlineResultHandler(Handler[Update]):
         """
         if isinstance(update, Update) and update.chosen_inline_result:
             if self.pattern:
-                if update.chosen_inline_result.result_id:
-                    match = re.match(self.pattern, update.chosen_inline_result.result_id)
-                    if match:
-                        return match
+                match = re.match(self.pattern, update.chosen_inline_result.result_id)
+                if match:
+                    return match
             else:
                 return True
         return None
