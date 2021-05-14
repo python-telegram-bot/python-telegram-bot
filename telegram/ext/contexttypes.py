@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=R0201
 """This module contains the auxiliary class ContextTypes."""
-from typing import Type, Any, NoReturn, Generic, overload, Dict  # pylint: disable=W0611
+from typing import Type, Generic, overload, Dict  # pylint: disable=W0611
 
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.utils.types import CCT, UD, CD, BD
@@ -168,6 +168,8 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
         if not issubclass(context, CallbackContext):
             raise ValueError('context must be a subclass of CallbackContext.')
 
+        # We make all those only accessible via properties because we don't currently support
+        # changing this at runtime, so overriding the attributes doesn't make sense
         self._context = context
         self._bot_data = bot_data
         self._chat_data = chat_data
@@ -177,30 +179,14 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
     def context(self) -> Type[CCT]:
         return self._context
 
-    @context.setter
-    def context(self, value: Any) -> NoReturn:
-        raise AttributeError("You can not assign a new value to ContextTypes attributes.")
-
     @property
     def bot_data(self) -> Type[BD]:
         return self._bot_data
-
-    @bot_data.setter
-    def bot_data(self, value: Any) -> NoReturn:
-        raise AttributeError("You can not assign a new value to ContextTypes attributes.")
 
     @property
     def chat_data(self) -> Type[CD]:
         return self._chat_data
 
-    @chat_data.setter
-    def chat_data(self, value: Any) -> NoReturn:
-        raise AttributeError("You can not assign a new value to ContextTypes attributes.")
-
     @property
     def user_data(self) -> Type[UD]:
         return self._user_data
-
-    @user_data.setter
-    def user_data(self, value: Any) -> NoReturn:
-        raise AttributeError("You can not assign a new value to ContextTypes attributes.")
