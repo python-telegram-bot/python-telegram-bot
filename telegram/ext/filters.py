@@ -1095,6 +1095,7 @@ officedocument.wordprocessingml.document")``.
             :attr: `telegram.Message.channel_chat_created`."""
 
         class _MessageAutoDeleteTimerChanged(MessageFilter):
+            __slots__ = ()
             name = 'MessageAutoDeleteTimerChanged'
 
             def filter(self, message: Message) -> bool:
@@ -1145,6 +1146,7 @@ officedocument.wordprocessingml.document")``.
         """Messages that contain :attr:`telegram.Message.proximity_alert_triggered`."""
 
         class _VoiceChatScheduled(MessageFilter):
+            __slots__ = ()
             name = 'Filters.status_update.voice_chat_scheduled'
 
             def filter(self, message: Message) -> bool:
@@ -1154,6 +1156,7 @@ officedocument.wordprocessingml.document")``.
         """Messages that contain :attr:`telegram.Message.voice_chat_scheduled`."""
 
         class _VoiceChatStarted(MessageFilter):
+            __slots__ = ()
             name = 'Filters.status_update.voice_chat_started'
 
             def filter(self, message: Message) -> bool:
@@ -1163,6 +1166,7 @@ officedocument.wordprocessingml.document")``.
         """Messages that contain :attr:`telegram.Message.voice_chat_started`."""
 
         class _VoiceChatEnded(MessageFilter):
+            __slots__ = ()
             name = 'Filters.status_update.voice_chat_ended'
 
             def filter(self, message: Message) -> bool:
@@ -1172,6 +1176,7 @@ officedocument.wordprocessingml.document")``.
         """Messages that contain :attr:`telegram.Message.voice_chat_ended`."""
 
         class _VoiceChatParticipantsInvited(MessageFilter):
+            __slots__ = ()
             name = 'Filters.status_update.voice_chat_participants_invited'
 
             def filter(self, message: Message) -> bool:

@@ -138,6 +138,8 @@ class VoiceChatScheduled(TelegramObject):
 
     """
 
+    __slots__ = ('start_date', '_id_attrs')
+
     def __init__(self, start_date: dtm.datetime, **_kwargs: Any) -> None:
         self.start_date = start_date
 

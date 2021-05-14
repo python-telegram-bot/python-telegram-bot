@@ -388,6 +388,7 @@ class Message(TelegramObject):
         'voice_chat_ended',
         'voice_chat_participants_invited',
         'voice_chat_started',
+        'voice_chat_scheduled',
         '_id_attrs',
     )
 

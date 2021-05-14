@@ -152,6 +152,15 @@ class TestVoiceChatParticipantsInvited:
 class TestVoiceChatScheduled:
     start_date = dtm.datetime.utcnow()
 
+    def test_slot_behaviour(self, recwarn, mro_slots):
+        inst = VoiceChatScheduled(self.start_date)
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.custom, inst.start_date = 'should give warning', self.start_date
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     def test_expected_values(self):
         assert pytest.approx(VoiceChatScheduled(start_date=self.start_date) == self.start_date)
 

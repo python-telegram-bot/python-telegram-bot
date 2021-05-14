@@ -62,6 +62,7 @@ class Promise:
         'update',
         'error_handling',
         'done',
+        '_done_callback',
         '_result',
         '_exception',
         '__dict__',
