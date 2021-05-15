@@ -99,6 +99,14 @@ def game_bot():
     return Bot(FALLBACKS[0]["token"])
 
 
+cond = False
+
+if GITHUB_ACTION:
+    cond = True
+
+xfail = pytest.mark.xfail(cond, reason='Can fail due to race conditions')
+
+
 class TestBot:
     @pytest.mark.parametrize(
         'token',
@@ -1274,7 +1282,7 @@ class TestBot:
                     chat_id, game_short_name, reply_to_message_id=reply_to_message.message_id
                 )
 
-    @pytest.mark.xfail(GITHUB_ACTION, reason='Can fail due to race conditions')
+    @xfail
     def test_set_game_score_1(self, game_bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
         # First, test setting a score.
@@ -1293,7 +1301,7 @@ class TestBot:
         assert message.game.photo[0].file_size == game.game.photo[0].file_size
         assert message.game.text != game.game.text
 
-    @pytest.mark.xfail(GITHUB_ACTION, reason='Can fail due to race conditions')
+    @xfail
     def test_set_game_score_2(self, game_bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
         # Test setting a score higher than previous
@@ -1314,7 +1322,7 @@ class TestBot:
         assert message.game.photo[0].file_size == game.game.photo[0].file_size
         assert message.game.text == game.game.text
 
-    @pytest.mark.xfail(GITHUB_ACTION, reason='Can fail due to race conditions')
+    @xfail
     def test_set_game_score_3(self, game_bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
         # Test setting a score lower than previous (should raise error)
@@ -1328,7 +1336,7 @@ class TestBot:
                 user_id=chat_id, score=score, chat_id=game.chat_id, message_id=game.message_id
             )
 
-    @pytest.mark.xfail(GITHUB_ACTION, reason='Can fail due to race conditions')
+    @xfail
     def test_set_game_score_4(self, game_bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
         # Test force setting a lower score
@@ -1354,7 +1362,7 @@ class TestBot:
         game2 = game_bot.send_game(chat_id, game_short_name)
         assert str(score) in game2.game.text
 
-    @pytest.mark.xfail(GITHUB_ACTION, reason='Can fail due to race conditions')
+    @xfail
     def test_get_game_high_scores(self, game_bot, chat_id):
         # We need a game to get the scores for
         game_short_name = 'test_game'
