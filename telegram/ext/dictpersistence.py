@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the DictPersistence class."""
-from copy import deepcopy
 
 from typing import DefaultDict, Dict, Optional, Tuple
 from collections import defaultdict
@@ -191,7 +190,7 @@ class DictPersistence(BasePersistence):
             pass
         else:
             self._user_data = defaultdict(dict)
-        return deepcopy(self.user_data)  # type: ignore[arg-type]
+        return self.user_data  # type: ignore[return-value]
 
     def get_chat_data(self) -> DefaultDict[int, Dict[object, object]]:
         """Returns the chat_data created from the ``chat_data_json`` or an empty
@@ -204,7 +203,7 @@ class DictPersistence(BasePersistence):
             pass
         else:
             self._chat_data = defaultdict(dict)
-        return deepcopy(self.chat_data)  # type: ignore[arg-type]
+        return self.chat_data  # type: ignore[return-value]
 
     def get_bot_data(self) -> Dict[object, object]:
         """Returns the bot_data created from the ``bot_data_json`` or an empty :obj:`dict`.
@@ -216,7 +215,7 @@ class DictPersistence(BasePersistence):
             pass
         else:
             self._bot_data = {}
-        return deepcopy(self.bot_data)  # type: ignore[arg-type]
+        return self.bot_data  # type: ignore[return-value]
 
     def get_conversations(self, name: str) -> ConversationDict:
         """Returns the conversations created from the ``conversations_json`` or an empty
@@ -284,7 +283,7 @@ class DictPersistence(BasePersistence):
         """
         if self._bot_data == data:
             return
-        self._bot_data = data.copy()
+        self._bot_data = data
         self._bot_data_json = None
 
     def refresh_user_data(self, user_id: int, user_data: Dict) -> None:

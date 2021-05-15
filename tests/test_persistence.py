@@ -133,12 +133,16 @@ def bot_data():
 
 @pytest.fixture(scope="function")
 def chat_data():
-    return defaultdict(dict, {-12345: {'test1': 'test2'}, -67890: {3: 'test4'}})
+    return defaultdict(
+        dict, {-12345: {'test1': 'test2', 'test3': {'test4': 'test5'}}, -67890: {3: 'test4'}}
+    )
 
 
 @pytest.fixture(scope="function")
 def user_data():
-    return defaultdict(dict, {12345: {'test1': 'test2'}, 67890: {3: 'test4'}})
+    return defaultdict(
+        dict, {12345: {'test1': 'test2', 'test3': {'test4': 'test5'}}, 67890: {3: 'test4'}}
+    )
 
 
 @pytest.fixture(scope='function')
@@ -958,25 +962,34 @@ class TestPicklePersistence:
 
     def test_updating_multi_file(self, pickle_persistence, good_pickle_files):
         user_data = pickle_persistence.get_user_data()
-        user_data[54321]['test9'] = 'test 10'
+        user_data[12345]['test3']['test4'] = 'test6'
         assert not pickle_persistence.user_data == user_data
-        pickle_persistence.update_user_data(54321, user_data[54321])
+        pickle_persistence.update_user_data(12345, user_data[12345])
+        user_data[12345]['test3']['test4'] = 'test7'
+        assert not pickle_persistence.user_data == user_data
+        pickle_persistence.update_user_data(12345, user_data[12345])
         assert pickle_persistence.user_data == user_data
         with open('pickletest_user_data', 'rb') as f:
             user_data_test = defaultdict(dict, pickle.load(f))
         assert user_data_test == user_data
 
         chat_data = pickle_persistence.get_chat_data()
-        chat_data[54321]['test9'] = 'test 10'
+        chat_data[-12345]['test3']['test4'] = 'test6'
         assert not pickle_persistence.chat_data == chat_data
-        pickle_persistence.update_chat_data(54321, chat_data[54321])
+        pickle_persistence.update_chat_data(-12345, chat_data[-12345])
+        chat_data[-12345]['test3']['test4'] = 'test7'
+        assert not pickle_persistence.chat_data == chat_data
+        pickle_persistence.update_chat_data(-12345, chat_data[-12345])
         assert pickle_persistence.chat_data == chat_data
         with open('pickletest_chat_data', 'rb') as f:
             chat_data_test = defaultdict(dict, pickle.load(f))
         assert chat_data_test == chat_data
 
         bot_data = pickle_persistence.get_bot_data()
-        bot_data['test6'] = 'test 7'
+        bot_data['test3']['test4'] = 'test6'
+        assert not pickle_persistence.bot_data == bot_data
+        pickle_persistence.update_bot_data(bot_data)
+        bot_data['test3']['test4'] = 'test7'
         assert not pickle_persistence.bot_data == bot_data
         pickle_persistence.update_bot_data(bot_data)
         assert pickle_persistence.bot_data == bot_data
@@ -1003,25 +1016,34 @@ class TestPicklePersistence:
         pickle_persistence.single_file = True
 
         user_data = pickle_persistence.get_user_data()
-        user_data[54321]['test9'] = 'test 10'
+        user_data[12345]['test3']['test4'] = 'test6'
         assert not pickle_persistence.user_data == user_data
-        pickle_persistence.update_user_data(54321, user_data[54321])
+        pickle_persistence.update_user_data(12345, user_data[12345])
+        user_data[12345]['test3']['test4'] = 'test7'
+        assert not pickle_persistence.user_data == user_data
+        pickle_persistence.update_user_data(12345, user_data[12345])
         assert pickle_persistence.user_data == user_data
         with open('pickletest', 'rb') as f:
             user_data_test = defaultdict(dict, pickle.load(f)['user_data'])
         assert user_data_test == user_data
 
         chat_data = pickle_persistence.get_chat_data()
-        chat_data[54321]['test9'] = 'test 10'
+        chat_data[-12345]['test3']['test4'] = 'test6'
         assert not pickle_persistence.chat_data == chat_data
-        pickle_persistence.update_chat_data(54321, chat_data[54321])
+        pickle_persistence.update_chat_data(-12345, chat_data[-12345])
+        chat_data[-12345]['test3']['test4'] = 'test7'
+        assert not pickle_persistence.chat_data == chat_data
+        pickle_persistence.update_chat_data(-12345, chat_data[-12345])
         assert pickle_persistence.chat_data == chat_data
         with open('pickletest', 'rb') as f:
             chat_data_test = defaultdict(dict, pickle.load(f)['chat_data'])
         assert chat_data_test == chat_data
 
         bot_data = pickle_persistence.get_bot_data()
-        bot_data['test6'] = 'test 7'
+        bot_data['test3']['test4'] = 'test6'
+        assert not pickle_persistence.bot_data == bot_data
+        pickle_persistence.update_bot_data(bot_data)
+        bot_data['test3']['test4'] = 'test7'
         assert not pickle_persistence.bot_data == bot_data
         pickle_persistence.update_bot_data(bot_data)
         assert pickle_persistence.bot_data == bot_data
@@ -1571,7 +1593,7 @@ class TestDictPersistence:
         assert dict_persistence.bot_data_json == bot_data_json
         assert dict_persistence.conversations_json == conversations_json
 
-    def test_json_changes(
+    def test_updating(
         self,
         user_data,
         user_data_json,
@@ -1588,35 +1610,59 @@ class TestDictPersistence:
             bot_data_json=bot_data_json,
             conversations_json=conversations_json,
         )
-        user_data_two = user_data.copy()
-        user_data_two.update({4: {5: 6}})
-        dict_persistence.update_user_data(4, {5: 6})
-        assert dict_persistence.user_data == user_data_two
-        assert dict_persistence.user_data_json != user_data_json
-        assert dict_persistence.user_data_json == json.dumps(user_data_two)
 
-        chat_data_two = chat_data.copy()
-        chat_data_two.update({7: {8: 9}})
-        dict_persistence.update_chat_data(7, {8: 9})
-        assert dict_persistence.chat_data == chat_data_two
-        assert dict_persistence.chat_data_json != chat_data_json
-        assert dict_persistence.chat_data_json == json.dumps(chat_data_two)
+        user_data = dict_persistence.get_user_data()
+        user_data[12345]['test3']['test4'] = 'test6'
+        assert not dict_persistence.user_data == user_data
+        assert not dict_persistence.user_data_json == json.dumps(user_data)
+        dict_persistence.update_user_data(12345, user_data[12345])
+        user_data[12345]['test3']['test4'] = 'test7'
+        assert not dict_persistence.user_data == user_data
+        assert not dict_persistence.user_data_json == json.dumps(user_data)
+        dict_persistence.update_user_data(12345, user_data[12345])
+        assert dict_persistence.user_data == user_data
+        assert dict_persistence.user_data_json == json.dumps(user_data)
 
-        bot_data_two = bot_data.copy()
-        bot_data_two.update({'7': {'8': '9'}})
-        bot_data['7'] = {'8': '9'}
+        chat_data = dict_persistence.get_chat_data()
+        chat_data[-12345]['test3']['test4'] = 'test6'
+        assert not dict_persistence.chat_data == chat_data
+        assert not dict_persistence.chat_data_json == json.dumps(chat_data)
+        dict_persistence.update_chat_data(-12345, chat_data[-12345])
+        chat_data[-12345]['test3']['test4'] = 'test7'
+        assert not dict_persistence.chat_data == chat_data
+        assert not dict_persistence.chat_data_json == json.dumps(chat_data)
+        dict_persistence.update_chat_data(-12345, chat_data[-12345])
+        assert dict_persistence.chat_data == chat_data
+        assert dict_persistence.chat_data_json == json.dumps(chat_data)
+
+        bot_data = dict_persistence.get_bot_data()
+        bot_data['test3']['test4'] = 'test6'
+        assert not dict_persistence.bot_data == bot_data
+        assert not dict_persistence.bot_data_json == json.dumps(bot_data)
         dict_persistence.update_bot_data(bot_data)
-        assert dict_persistence.bot_data == bot_data_two
-        assert dict_persistence.bot_data_json != bot_data_json
-        assert dict_persistence.bot_data_json == json.dumps(bot_data_two)
+        bot_data['test3']['test4'] = 'test7'
+        assert not dict_persistence.bot_data == bot_data
+        assert not dict_persistence.bot_data_json == json.dumps(bot_data)
+        dict_persistence.update_bot_data(bot_data)
+        assert dict_persistence.bot_data == bot_data
+        assert dict_persistence.bot_data_json == json.dumps(bot_data)
 
-        conversations_two = conversations.copy()
-        conversations_two.update({'name4': {(1, 2): 3}})
-        dict_persistence.update_conversation('name4', (1, 2), 3)
-        assert dict_persistence.conversations == conversations_two
-        assert dict_persistence.conversations_json != conversations_json
+        conversation1 = dict_persistence.get_conversations('name1')
+        conversation1[(123, 123)] = 5
+        assert not dict_persistence.conversations['name1'] == conversation1
+        dict_persistence.update_conversation('name1', (123, 123), 5)
+        assert dict_persistence.conversations['name1'] == conversation1
+        print(dict_persistence.conversations_json)
+        conversations['name1'][(123, 123)] = 5
+        assert dict_persistence.conversations_json == encode_conversations_to_json(conversations)
+        assert dict_persistence.get_conversations('name1') == conversation1
+
+        dict_persistence._conversations = None
+        dict_persistence.update_conversation('name1', (123, 123), 5)
+        assert dict_persistence.conversations['name1'] == {(123, 123): 5}
+        assert dict_persistence.get_conversations('name1') == {(123, 123): 5}
         assert dict_persistence.conversations_json == encode_conversations_to_json(
-            conversations_two
+            {"name1": {(123, 123): 5}}
         )
 
     def test_with_handler(self, bot, update):
