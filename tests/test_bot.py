@@ -53,10 +53,6 @@ from tests.conftest import expect_bad_request, check_defaults_handling
 from tests.bots import FALLBACKS
 
 
-BASE_TIME = time.time()
-HIGHSCORE_DELTA = 1450000000
-
-
 @pytest.fixture(scope='class')
 def message(bot, chat_id):
     to_reply_to = bot.send_message(
@@ -96,6 +92,11 @@ def inline_results_callback(page=None):
 @pytest.fixture(scope='class')
 def inline_results():
     return inline_results_callback()
+
+
+@pytest.fixture(scope='class')
+def game_bot():
+    return Bot(FALLBACKS[0]["token"])
 
 
 class TestBot:
@@ -1273,119 +1274,93 @@ class TestBot:
                     chat_id, game_short_name, reply_to_message_id=reply_to_message.message_id
                 )
 
-    @flaky(3, 1)
-    def test_set_game_score_1(self, bot, chat_id):
+    def test_set_game_score_1(self, game_bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
-
-        def func():
-            game_short_name = 'test_game'
-            game = bot.send_game(chat_id, game_short_name)
-
-            message = bot.set_game_score(
-                user_id=chat_id,
-                score=int(BASE_TIME) - HIGHSCORE_DELTA,
-                chat_id=game.chat_id,
-                message_id=game.message_id,
-            )
-
-            assert message.game.description == game.game.description
-            assert message.game.animation.file_id == game.game.animation.file_id
-            assert message.game.photo[0].file_size == game.game.photo[0].file_size
-            assert message.game.text != game.game.text
-
-        expect_bad_request(func, 'Bot_score_not_modified', 'This test is a diva for some reason.')
-
-    @flaky(3, 1)
-    def test_set_game_score_2(self, bot, chat_id):
-        # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
-
-        def func():
-            game_short_name = 'test_game'
-            game = bot.send_game(chat_id, game_short_name)
-
-            score = int(BASE_TIME) - HIGHSCORE_DELTA + 1
-
-            message = bot.set_game_score(
-                user_id=chat_id,
-                score=score,
-                chat_id=game.chat_id,
-                message_id=game.message_id,
-                disable_edit_message=True,
-            )
-
-            assert message.game.description == game.game.description
-            assert message.game.animation.file_id == game.game.animation.file_id
-            assert message.game.photo[0].file_size == game.game.photo[0].file_size
-            assert message.game.text == game.game.text
-
-        expect_bad_request(func, 'Bot_score_not_modified', 'This test can be flaky.')
-
-    @flaky(3, 1)
-    def test_set_game_score_3(self, bot, chat_id):
-        # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
+        # First, test setting a score.
         game_short_name = 'test_game'
-        game = bot.send_game(chat_id, game_short_name)
+        game = game_bot.send_game(chat_id, game_short_name)
 
-        score = int(BASE_TIME) - HIGHSCORE_DELTA - 1
+        message = game_bot.set_game_score(
+            user_id=chat_id,
+            score=60,
+            chat_id=game.chat_id,
+            message_id=game.message_id,
+        )
+
+        # We don't test for animation file id, since it actually changes when the score is updated
+        assert message.game.description == game.game.description
+        assert message.game.photo[0].file_size == game.game.photo[0].file_size
+        assert message.game.text != game.game.text
+
+    def test_set_game_score_2(self, game_bot, chat_id):
+        # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
+        # Test setting a score higher than previous
+        game_short_name = 'test_game'
+        game = game_bot.send_game(chat_id, game_short_name)
+
+        score = 61
+
+        message = game_bot.set_game_score(
+            user_id=chat_id,
+            score=score,
+            chat_id=game.chat_id,
+            message_id=game.message_id,
+            disable_edit_message=True,
+        )
+
+        assert message.game.description == game.game.description
+        assert message.game.photo[0].file_size == game.game.photo[0].file_size
+        assert message.game.text == game.game.text
+
+    def test_set_game_score_3(self, game_bot, chat_id):
+        # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
+        # Test setting a score lower than previous (should raise error)
+        game_short_name = 'test_game'
+        game = game_bot.send_game(chat_id, game_short_name)
+
+        score = 60  # Even a score equal to previous raises an error.
 
         with pytest.raises(BadRequest, match='Bot_score_not_modified'):
-            bot.set_game_score(
+            game_bot.set_game_score(
                 user_id=chat_id, score=score, chat_id=game.chat_id, message_id=game.message_id
             )
 
-    @flaky(3, 1)
-    def test_set_game_score_4(self, bot, chat_id):
+    def test_set_game_score_4(self, game_bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
-
-        def func():
-
-            game_short_name = 'test_game'
-            game = bot.send_game(chat_id, game_short_name)
-
-            score = int(BASE_TIME) - HIGHSCORE_DELTA - 2
-
-            message = bot.set_game_score(
-                user_id=chat_id,
-                score=score,
-                chat_id=game.chat_id,
-                message_id=game.message_id,
-                force=True,
-            )
-
-            assert message.game.description == game.game.description
-            assert message.game.animation.file_id == game.game.animation.file_id
-            assert message.game.photo[0].file_size == game.game.photo[0].file_size
-
-            # For some reason the returned message doesn't contain the updated score. need to fetch
-            # the game again...
-            game2 = bot.send_game(chat_id, game_short_name)
-            assert str(score) in game2.game.text
-
-        expect_bad_request(func, 'Bot_score_not_modified', 'This test can be flaky')
-
-    @flaky(3, 1)
-    def test_set_game_score_too_low_score(self, bot, chat_id):
-        # We need a game to set the score for
+        # Test force setting a lower score
         game_short_name = 'test_game'
-        game = bot.send_game(chat_id, game_short_name)
+        game = game_bot.send_game(chat_id, game_short_name)
+        time.sleep(2)
 
-        with pytest.raises(BadRequest):
-            bot.set_game_score(
-                user_id=chat_id, score=100, chat_id=game.chat_id, message_id=game.message_id
-            )
+        score = 50
 
-    @flaky(3, 1)
-    def test_get_game_high_scores(self, bot, chat_id):
+        message = game_bot.set_game_score(
+            user_id=chat_id,
+            score=score,
+            chat_id=game.chat_id,
+            message_id=game.message_id,
+            force=True,
+        )
+
+        assert message.game.description == game.game.description
+        assert message.game.photo[0].file_size == game.game.photo[0].file_size
+
+        # For some reason the returned message doesn't contain the updated score. need to fetch
+        # the game again... (the service message is also absent when running the test suite)
+        game2 = game_bot.send_game(chat_id, game_short_name)
+        assert str(score) in game2.game.text
+
+    def test_get_game_high_scores(self, game_bot, chat_id):
         # We need a game to get the scores for
         game_short_name = 'test_game'
-        game = bot.send_game(chat_id, game_short_name)
-        high_scores = bot.get_game_high_scores(chat_id, game.chat_id, game.message_id)
+        game = game_bot.send_game(chat_id, game_short_name)
+        high_scores = game_bot.get_game_high_scores(chat_id, game.chat_id, game.message_id)
         # We assume that the other game score tests ran within 20 sec
-        assert pytest.approx(high_scores[0].score, abs=20) == int(BASE_TIME) - HIGHSCORE_DELTA
+        assert high_scores[0].score == 50
 
     # send_invoice is tested in test_invoice
 
-    # TODO: Needs improvement. Need incoming shippping queries to test
+    # TODO: Needs improvement. Need incoming shipping queries to test
     def test_answer_shipping_query_ok(self, monkeypatch, bot):
         # For now just test that our internals pass the correct data
         def test(url, data, *args, **kwargs):
