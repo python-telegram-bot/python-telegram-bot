@@ -482,6 +482,8 @@ class TestUpdater:
         with caplog.at_level(logging.INFO):
             updater.idle()
 
+        # There is a chance of a conflict when getting updates since there can be many tests
+        # (bots) running simultaneously while testing in github actions.
         if caplog.records[-1].getMessage().startswith('Error while getting Updates: Conflict'):
             caplog.records.pop()  # For stability
 
