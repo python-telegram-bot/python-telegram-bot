@@ -94,17 +94,17 @@ def inline_results():
     return inline_results_callback()
 
 
-@pytest.fixture(scope='class')
-def game_bot():
-    return Bot(FALLBACKS[0]["token"])
-
-
-cond = False
+BASE_GAME_SCORE = 60  # Base game score for game tests
+cond = False  # This condition is only relevant for github actions game tests.
 
 if GITHUB_ACTION:
     cond = True
 
-xfail = pytest.mark.xfail(cond, reason='Can fail due to race conditions')
+xfail = pytest.mark.xfail(
+    cond,
+    reason='Can fail due to race conditions when multiple test suites '
+    'with the same bot token are run at the same time',
+)
 
 
 class TestBot:
@@ -1283,34 +1283,34 @@ class TestBot:
                 )
 
     @xfail
-    def test_set_game_score_1(self, game_bot, chat_id):
+    def test_set_game_score_1(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
         # First, test setting a score.
         game_short_name = 'test_game'
-        game = game_bot.send_game(chat_id, game_short_name)
+        game = bot.send_game(chat_id, game_short_name)
 
-        message = game_bot.set_game_score(
+        message = bot.set_game_score(
             user_id=chat_id,
-            score=60,
+            score=BASE_GAME_SCORE,  # Score value is relevant for other set_game_score_* tests!
             chat_id=game.chat_id,
             message_id=game.message_id,
         )
 
-        # We don't test for animation file id, since it actually changes when the score is updated
         assert message.game.description == game.game.description
         assert message.game.photo[0].file_size == game.game.photo[0].file_size
+        assert message.game.animation.file_unique_id == game.game.animation.file_unique_id
         assert message.game.text != game.game.text
 
     @xfail
-    def test_set_game_score_2(self, game_bot, chat_id):
+    def test_set_game_score_2(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
         # Test setting a score higher than previous
         game_short_name = 'test_game'
-        game = game_bot.send_game(chat_id, game_short_name)
+        game = bot.send_game(chat_id, game_short_name)
 
-        score = 61
+        score = BASE_GAME_SCORE + 1
 
-        message = game_bot.set_game_score(
+        message = bot.set_game_score(
             user_id=chat_id,
             score=score,
             chat_id=game.chat_id,
@@ -1320,33 +1320,34 @@ class TestBot:
 
         assert message.game.description == game.game.description
         assert message.game.photo[0].file_size == game.game.photo[0].file_size
+        assert message.game.animation.file_unique_id == game.game.animation.file_unique_id
         assert message.game.text == game.game.text
 
     @xfail
-    def test_set_game_score_3(self, game_bot, chat_id):
+    def test_set_game_score_3(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
         # Test setting a score lower than previous (should raise error)
         game_short_name = 'test_game'
-        game = game_bot.send_game(chat_id, game_short_name)
+        game = bot.send_game(chat_id, game_short_name)
 
-        score = 60  # Even a score equal to previous raises an error.
+        score = BASE_GAME_SCORE  # Even a score equal to previous raises an error.
 
         with pytest.raises(BadRequest, match='Bot_score_not_modified'):
-            game_bot.set_game_score(
+            bot.set_game_score(
                 user_id=chat_id, score=score, chat_id=game.chat_id, message_id=game.message_id
             )
 
     @xfail
-    def test_set_game_score_4(self, game_bot, chat_id):
+    def test_set_game_score_4(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
         # Test force setting a lower score
         game_short_name = 'test_game'
-        game = game_bot.send_game(chat_id, game_short_name)
+        game = bot.send_game(chat_id, game_short_name)
         time.sleep(2)
 
-        score = 50
+        score = BASE_GAME_SCORE - 10
 
-        message = game_bot.set_game_score(
+        message = bot.set_game_score(
             user_id=chat_id,
             score=score,
             chat_id=game.chat_id,
@@ -1356,20 +1357,21 @@ class TestBot:
 
         assert message.game.description == game.game.description
         assert message.game.photo[0].file_size == game.game.photo[0].file_size
+        assert message.game.animation.file_unique_id == game.game.animation.file_unique_id
 
         # For some reason the returned message doesn't contain the updated score. need to fetch
         # the game again... (the service message is also absent when running the test suite)
-        game2 = game_bot.send_game(chat_id, game_short_name)
+        game2 = bot.send_game(chat_id, game_short_name)
         assert str(score) in game2.game.text
 
     @xfail
-    def test_get_game_high_scores(self, game_bot, chat_id):
+    def test_get_game_high_scores(self, bot, chat_id):
         # We need a game to get the scores for
         game_short_name = 'test_game'
-        game = game_bot.send_game(chat_id, game_short_name)
-        high_scores = game_bot.get_game_high_scores(chat_id, game.chat_id, game.message_id)
+        game = bot.send_game(chat_id, game_short_name)
+        high_scores = bot.get_game_high_scores(chat_id, game.chat_id, game.message_id)
         # We assume that the other game score tests ran within 20 sec
-        assert high_scores[0].score == 50
+        assert high_scores[0].score == BASE_GAME_SCORE - 10
 
     # send_invoice is tested in test_invoice
 
