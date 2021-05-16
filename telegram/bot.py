@@ -3227,6 +3227,11 @@ class Bot(TelegramObject):
         Use this method to get data for high score tables. Will return the score of the specified
         user and several of their neighbors in a game.
 
+        Note:
+            This method will currently return scores for the target user, plus two of their
+            closest neighbors on each side. Will also return the top three users if the user and
+            his neighbors are not among them. Please note that this behavior is subject to change.
+
         Args:
             user_id (:obj:`int`): Target user id.
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
