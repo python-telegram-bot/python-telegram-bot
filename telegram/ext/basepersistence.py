@@ -137,8 +137,8 @@ class BasePersistence(ABC):
         Replaces all instances of :class:`telegram.Bot` that occur within the passed object with
         :attr:`REPLACED_BOT`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
         ``frozenset``, ``dict``, ``defaultdict`` and objects that have a ``__dict__`` or
-        ``__slot__`` attribute, excluding objects that can't be copied with `copy.copy` and
-        classes.
+        ``__slot__`` attribute, excluding classes and objects that can't be copied with
+        ``copy.copy``.
 
         Args:
             obj (:obj:`object`): The object
@@ -224,8 +224,8 @@ class BasePersistence(ABC):
         Replaces all instances of :attr:`REPLACED_BOT` that occur within the passed object with
         :attr:`bot`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
         ``frozenset``, ``dict``, ``defaultdict`` and objects that have a ``__dict__`` or
-        ``__slot__`` attribute, excluding objects that can't be copied with `copy.copy` and
-        classes.
+        ``__slot__`` attribute, excluding classes and objects that can't be copied with
+        ``copy.copy``.
 
         Args:
             obj (:obj:`object`): The object
@@ -262,7 +262,7 @@ class BasePersistence(ABC):
             # classes usually do have a __dict__, but it's not writable
             warnings.warn(
                 'BasePersistence.insert_bot does not handle classes. See '
-                'the docs of BasePersistence.replace_bot for more information.',
+                'the docs of BasePersistence.insert_bot for more information.',
                 RuntimeWarning,
             )
             return obj
