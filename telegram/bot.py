@@ -3425,7 +3425,7 @@ class Bot(TelegramObject):
         if is_flexible is not None:
             data['is_flexible'] = is_flexible
         if send_phone_number_to_provider is not None:
-            data['send_phone_number_to_provider'] = send_email_to_provider
+            data['send_phone_number_to_provider'] = send_phone_number_to_provider
         if send_email_to_provider is not None:
             data['send_email_to_provider'] = send_email_to_provider
 
