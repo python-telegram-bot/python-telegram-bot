@@ -152,7 +152,7 @@ def main() -> None:
 
     # Start the Bot
     # We pass 'allowed_updates' to *only* handle updates with '(my_)chat_member' or 'message'
-    # If you want to handle *all* updates, pass Update.ALL_TYPES
+    # If you want to handle *all* updates, pass allowed_updates=Update.ALL_TYPES
     updater.start_polling(
         allowed_updates=[Update.MESSAGE, Update.CHAT_MEMBER, Update.MY_CHAT_MEMBER]
     )
