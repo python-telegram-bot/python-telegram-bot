@@ -91,7 +91,7 @@ class ChosenInlineResultHandler(Handler[Update]):
         pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
             the callback function.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
-        pattern (:obj:`str` | `Pattern`): Optional. Regex pattern to test
+        pattern (`Pattern`): Optional. Regex pattern to test
             :attr:`telegram.ChosenInlineResult.result_id` against.
 
             ..versionadded:: 13.6
