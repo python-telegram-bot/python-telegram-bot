@@ -95,13 +95,9 @@ def inline_results():
 
 
 BASE_GAME_SCORE = 60  # Base game score for game tests
-cond = False  # This condition is only relevant for github actions game tests.
-
-if GITHUB_ACTION:
-    cond = True
 
 xfail = pytest.mark.xfail(
-    cond,
+    bool(GITHUB_ACTION),  # This condition is only relevant for github actions game tests.
     reason='Can fail due to race conditions when multiple test suites '
     'with the same bot token are run at the same time',
 )
