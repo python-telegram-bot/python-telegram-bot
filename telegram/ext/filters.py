@@ -2082,9 +2082,9 @@ officedocument.wordprocessingml.document")``.
             return bool(message.effective_attachment)
 
     attachment = _Attachment()
-    """Messages where :meth:`telegram.Message.effective_attachment` is not None.
+    """Messages that contain :meth:`telegram.Message.effective_attachment`.
 
-        See the documentation of that attribute when that is the case.
+
         .. versionadded:: 13.6"""
 
     class _UpdateType(UpdateFilter):

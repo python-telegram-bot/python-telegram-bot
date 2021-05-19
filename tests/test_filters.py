@@ -2177,7 +2177,7 @@ class TestFilters:
     def test_filters_attachment(self, update):
         assert not Filters.attachment(update)
         # we need to define a new Update (or rather, message class) here because
-        # effective_attachment is only evaluated once per class, and the filter relies on that
+        # effective_attachment is only evaluated once per instance, and the filter relies on that
         up = Update(
             0,
             Message(
