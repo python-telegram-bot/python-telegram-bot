@@ -49,12 +49,8 @@ from telegram import (
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
 from telegram.utils.helpers import from_timestamp, escape_markdown, to_timestamp
-from tests.conftest import expect_bad_request, check_defaults_handling
+from tests.conftest import expect_bad_request, check_defaults_handling, GITHUB_ACTION
 from tests.bots import FALLBACKS
-
-
-BASE_TIME = time.time()
-HIGHSCORE_DELTA = 1450000000
 
 
 @pytest.fixture(scope='class')
@@ -96,6 +92,15 @@ def inline_results_callback(page=None):
 @pytest.fixture(scope='class')
 def inline_results():
     return inline_results_callback()
+
+
+BASE_GAME_SCORE = 60  # Base game score for game tests
+
+xfail = pytest.mark.xfail(
+    bool(GITHUB_ACTION),  # This condition is only relevant for github actions game tests.
+    reason='Can fail due to race conditions when multiple test suites '
+    'with the same bot token are run at the same time',
+)
 
 
 class TestBot:
@@ -1273,35 +1278,33 @@ class TestBot:
                     chat_id, game_short_name, reply_to_message_id=reply_to_message.message_id
                 )
 
-    @flaky(3, 1)
+    @xfail
     def test_set_game_score_1(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
-
-        def func():
-            game_short_name = 'test_game'
-            game = bot.send_game(chat_id, game_short_name)
-
-            message = bot.set_game_score(
-                user_id=chat_id,
-                score=int(BASE_TIME) - HIGHSCORE_DELTA,
-                chat_id=game.chat_id,
-                message_id=game.message_id,
-            )
-
-            assert message.game.description == game.game.description
-            assert message.game.animation.file_id == game.game.animation.file_id
-            assert message.game.photo[0].file_size == game.game.photo[0].file_size
-            assert message.game.text != game.game.text
-
-        expect_bad_request(func, 'Bot_score_not_modified', 'This test is a diva for some reason.')
-
-    @flaky(3, 1)
-    def test_set_game_score_2(self, bot, chat_id):
-        # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
+        # First, test setting a score.
         game_short_name = 'test_game'
         game = bot.send_game(chat_id, game_short_name)
 
-        score = int(BASE_TIME) - HIGHSCORE_DELTA + 1
+        message = bot.set_game_score(
+            user_id=chat_id,
+            score=BASE_GAME_SCORE,  # Score value is relevant for other set_game_score_* tests!
+            chat_id=game.chat_id,
+            message_id=game.message_id,
+        )
+
+        assert message.game.description == game.game.description
+        assert message.game.photo[0].file_size == game.game.photo[0].file_size
+        assert message.game.animation.file_unique_id == game.game.animation.file_unique_id
+        assert message.game.text != game.game.text
+
+    @xfail
+    def test_set_game_score_2(self, bot, chat_id):
+        # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
+        # Test setting a score higher than previous
+        game_short_name = 'test_game'
+        game = bot.send_game(chat_id, game_short_name)
+
+        score = BASE_GAME_SCORE + 1
 
         message = bot.set_game_score(
             user_id=chat_id,
@@ -1312,30 +1315,33 @@ class TestBot:
         )
 
         assert message.game.description == game.game.description
-        assert message.game.animation.file_id == game.game.animation.file_id
         assert message.game.photo[0].file_size == game.game.photo[0].file_size
+        assert message.game.animation.file_unique_id == game.game.animation.file_unique_id
         assert message.game.text == game.game.text
 
-    @flaky(3, 1)
+    @xfail
     def test_set_game_score_3(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
+        # Test setting a score lower than previous (should raise error)
         game_short_name = 'test_game'
         game = bot.send_game(chat_id, game_short_name)
 
-        score = int(BASE_TIME) - HIGHSCORE_DELTA - 1
+        score = BASE_GAME_SCORE  # Even a score equal to previous raises an error.
 
         with pytest.raises(BadRequest, match='Bot_score_not_modified'):
             bot.set_game_score(
                 user_id=chat_id, score=score, chat_id=game.chat_id, message_id=game.message_id
             )
 
-    @flaky(3, 1)
+    @xfail
     def test_set_game_score_4(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
+        # Test force setting a lower score
         game_short_name = 'test_game'
         game = bot.send_game(chat_id, game_short_name)
+        time.sleep(2)
 
-        score = int(BASE_TIME) - HIGHSCORE_DELTA - 2
+        score = BASE_GAME_SCORE - 10
 
         message = bot.set_game_score(
             user_id=chat_id,
@@ -1346,37 +1352,26 @@ class TestBot:
         )
 
         assert message.game.description == game.game.description
-        assert message.game.animation.file_id == game.game.animation.file_id
         assert message.game.photo[0].file_size == game.game.photo[0].file_size
+        assert message.game.animation.file_unique_id == game.game.animation.file_unique_id
 
-        # For some reason the returned message does not contain the updated score. need to fetch
-        # the game again...
+        # For some reason the returned message doesn't contain the updated score. need to fetch
+        # the game again... (the service message is also absent when running the test suite)
         game2 = bot.send_game(chat_id, game_short_name)
         assert str(score) in game2.game.text
 
-    @flaky(3, 1)
-    def test_set_game_score_too_low_score(self, bot, chat_id):
-        # We need a game to set the score for
-        game_short_name = 'test_game'
-        game = bot.send_game(chat_id, game_short_name)
-
-        with pytest.raises(BadRequest):
-            bot.set_game_score(
-                user_id=chat_id, score=100, chat_id=game.chat_id, message_id=game.message_id
-            )
-
-    @flaky(3, 1)
+    @xfail
     def test_get_game_high_scores(self, bot, chat_id):
         # We need a game to get the scores for
         game_short_name = 'test_game'
         game = bot.send_game(chat_id, game_short_name)
         high_scores = bot.get_game_high_scores(chat_id, game.chat_id, game.message_id)
         # We assume that the other game score tests ran within 20 sec
-        assert pytest.approx(high_scores[0].score, abs=20) == int(BASE_TIME) - HIGHSCORE_DELTA
+        assert high_scores[0].score == BASE_GAME_SCORE - 10
 
     # send_invoice is tested in test_invoice
 
-    # TODO: Needs improvement. Need incoming shippping queries to test
+    # TODO: Needs improvement. Need incoming shipping queries to test
     def test_answer_shipping_query_ok(self, monkeypatch, bot):
         # For now just test that our internals pass the correct data
         def test(url, data, *args, **kwargs):
