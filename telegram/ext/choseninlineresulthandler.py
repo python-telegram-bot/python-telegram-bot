@@ -149,7 +149,8 @@ class ChosenInlineResultHandler(Handler[Update]):
         dispatcher: 'Dispatcher',
         check_result: Union[bool, Match],
     ) -> None:
-        """This function adds the matched regex pattern result to context.matches"""
+        """This function adds the matched regex pattern result to
+        :attr:`telegram.ext.CallbackContext.matches`."""
         if self.pattern:
             check_result = cast(Match, check_result)
             context.matches = [check_result]
