@@ -76,9 +76,10 @@ class ChosenInlineResultHandler(Handler[Update]):
             Defaults to :obj:`False`.
         pattern (:obj:`str` | `Pattern`, optional): Regex pattern. If not :obj:`None`, ``re.match``
             is used on :attr:`telegram.ChosenInlineResult.result_id` to determine if an update
-            should be handled by this handler.
+            should be handled by this handler. This is accessible in the callback as
+            `context.matches`.
 
-            ..versionadded:: 13.6
+            .. versionadded:: 13.6
 
     Attributes:
         callback (:obj:`callable`): The callback function for this handler.
@@ -94,7 +95,7 @@ class ChosenInlineResultHandler(Handler[Update]):
         pattern (`Pattern`): Optional. Regex pattern to test
             :attr:`telegram.ChosenInlineResult.result_id` against.
 
-            ..versionadded:: 13.6
+            .. versionadded:: 13.6
 
     """
 
@@ -148,6 +149,7 @@ class ChosenInlineResultHandler(Handler[Update]):
         dispatcher: 'Dispatcher',
         check_result: Union[bool, Match],
     ) -> None:
+        """This function adds the matched regex pattern result to context.matches"""
         if self.pattern:
             check_result = cast(Match, check_result)
             context.matches = [check_result]

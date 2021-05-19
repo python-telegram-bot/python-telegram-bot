@@ -111,6 +111,12 @@ class TestChosenInlineResultHandler:
             and isinstance(update.chosen_inline_result, ChosenInlineResult)
         )
 
+    def callback_context_pattern(self, update, context):
+        if context.matches[0].groups():
+            self.test_flag = context.matches[0].groups() == ('res', '_id')
+        if context.matches[0].groupdict():
+            self.test_flag = context.matches[0].groupdict() == {'begin': 'res', 'end': '_id'}
+
     def test_basic(self, dp, chosen_inline_result):
         handler = ChosenInlineResultHandler(self.callback_basic)
         dp.add_handler(handler)
@@ -188,12 +194,6 @@ class TestChosenInlineResultHandler:
         chosen_inline_result.chosen_inline_result.result_id = 'nothing here'
         assert not handler.check_update(chosen_inline_result)
         chosen_inline_result.chosen_inline_result.result_id = 'result_id'
-
-    def callback_context_pattern(self, update, context):
-        if context.matches[0].groups():
-            self.test_flag = context.matches[0].groups() == ('res', '_id')
-        if context.matches[0].groupdict():
-            self.test_flag = context.matches[0].groupdict() == {'begin': 'res', 'end': '_id'}
 
     def test_context_pattern(self, cdp, chosen_inline_result):
         handler = ChosenInlineResultHandler(
