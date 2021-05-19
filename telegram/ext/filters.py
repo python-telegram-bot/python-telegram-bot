@@ -2084,7 +2084,8 @@ officedocument.wordprocessingml.document")``.
     attachment = _Attachment()
     """Messages where :meth:`telegram.Message.effective_attachment` is not None.
 
-        See the documentation of that attribute when that is the case."""
+        See the documentation of that attribute when that is the case.
+        .. versionadded:: 13.6"""
 
     class _UpdateType(UpdateFilter):
         name = 'Filters.update'
