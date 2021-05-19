@@ -2075,6 +2075,18 @@ officedocument.wordprocessingml.document")``.
                 and any(message.from_user.language_code.startswith(x) for x in self.lang)
             )
 
+    class _Attachment(MessageFilter):
+        name = 'Filters.attachment'
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.effective_attachment)
+
+    attachment = _Attachment()
+    """Messages that contain :meth:`telegram.Message.effective_attachment`.
+
+
+        .. versionadded:: 13.6"""
+
     class _UpdateType(UpdateFilter):
         name = 'Filters.update'
 
