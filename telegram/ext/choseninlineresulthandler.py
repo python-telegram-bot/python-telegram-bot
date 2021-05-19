@@ -77,7 +77,7 @@ class ChosenInlineResultHandler(Handler[Update]):
         pattern (:obj:`str` | `Pattern`, optional): Regex pattern. If not :obj:`None`, ``re.match``
             is used on :attr:`telegram.ChosenInlineResult.result_id` to determine if an update
             should be handled by this handler. This is accessible in the callback as
-            `context.matches`.
+            :attr:`telegram.ext.CallbackContext.matches`.
 
             .. versionadded:: 13.6
 
