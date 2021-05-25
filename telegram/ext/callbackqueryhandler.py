@@ -105,7 +105,7 @@ class CallbackQueryHandler(Handler[Update]):
             passed to the callback function.
         pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
             the callback function.
-        pattern (:obj:`str` | `Pattern`): Optional. Regex pattern to test
+        pattern (`Pattern`): Optional. Regex pattern to test
             :attr:`telegram.CallbackQuery.data` against.
         pass_groups (:obj:`bool`): Determines whether ``groups`` will be passed to the
             callback function.
