@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# A library that provides a Python Interface to the Telegram Bot API
+# A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""A library that provides a Python Interface to the Telegram Bot API"""
+"""A library that provides a Python interface to the Telegram Bot API"""
 
 from .base import TelegramObject
 from .botcommand import BotCommand
