@@ -305,7 +305,9 @@ def sticker_set(bot):
         try:
             for i in range(1, 50):
                 bot.delete_sticker_from_set(ss.stickers[-i].file_id)
-        except BadRequest:
+        except BadRequest as e:
+            if e.message == 'Stickerset_not_modified':
+                return ss
             raise Exception('stickerset is growing too large.')
     return ss
 
@@ -317,7 +319,9 @@ def animated_sticker_set(bot):
         try:
             for i in range(1, 50):
                 bot.delete_sticker_from_set(ss.stickers[-i].file_id)
-        except BadRequest:
+        except BadRequest as e:
+            if e.message == 'Stickerset_not_modified':
+                return ss
             raise Exception('stickerset is growing too large.')
     return ss
 

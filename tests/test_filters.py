@@ -2173,3 +2173,18 @@ class TestFilters:
 
         with pytest.raises(RuntimeError, match='Cannot set name'):
             f.name = 'foo'
+
+    def test_filters_attachment(self, update):
+        assert not Filters.attachment(update)
+        # we need to define a new Update (or rather, message class) here because
+        # effective_attachment is only evaluated once per instance, and the filter relies on that
+        up = Update(
+            0,
+            Message(
+                0,
+                datetime.datetime.utcnow(),
+                Chat(0, 'private'),
+                document=Document("str", "other_str"),
+            ),
+        )
+        assert Filters.attachment(up)

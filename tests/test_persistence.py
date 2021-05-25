@@ -590,6 +590,33 @@ class TestBasePersistence:
             "BasePersistence.insert_bot does not handle objects that can not be copied."
         )
 
+    def test_bot_replace_insert_bot_classes(self, bot, bot_persistence, recwarn):
+        """Here check that classes are just returned verbatim."""
+        persistence = bot_persistence
+        persistence.set_bot(bot)
+
+        class CustomClass:
+            pass
+
+        persistence.update_bot_data({1: CustomClass})
+        assert persistence.bot_data[1] is CustomClass
+        persistence.update_chat_data(123, {1: CustomClass})
+        assert persistence.chat_data[123][1] is CustomClass
+        persistence.update_user_data(123, {1: CustomClass})
+        assert persistence.user_data[123][1] is CustomClass
+
+        assert persistence.get_bot_data()[1] is CustomClass
+        assert persistence.get_chat_data()[123][1] is CustomClass
+        assert persistence.get_user_data()[123][1] is CustomClass
+
+        assert len(recwarn) == 2
+        assert str(recwarn[0].message).startswith(
+            "BasePersistence.replace_bot does not handle classes."
+        )
+        assert str(recwarn[1].message).startswith(
+            "BasePersistence.insert_bot does not handle classes."
+        )
+
     def test_bot_replace_insert_bot_objects_with_faulty_equality(self, bot, bot_persistence):
         """Here check that trying to compare obj == self.REPLACED_BOT doesn't lead to problems."""
         persistence = bot_persistence
