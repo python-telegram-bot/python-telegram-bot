@@ -228,7 +228,12 @@ class CallbackContext:
         self.job = job
         return self
 
-    def update(self, data: Dict[str, object]) -> None:  # skipcq: PY-D0003
+    def update(self, data: Dict[str, object]) -> None:
+        """Updates ``self.__dict__`` with the passed data.
+
+        Args:
+            data (Dict[:obj:`str`, :obj:`object`]): The data.
+        """
         self.__dict__.update(data)
 
     @property

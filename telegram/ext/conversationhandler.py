@@ -44,7 +44,7 @@ if TYPE_CHECKING:
 CheckUpdateType = Optional[Tuple[Tuple[int, ...], Handler, object]]
 
 
-class _ConversationTimeoutContext:  # skipcq: PY-D0002
+class _ConversationTimeoutContext:
     def __init__(
         self,
         conversation_key: Tuple[int, ...],
