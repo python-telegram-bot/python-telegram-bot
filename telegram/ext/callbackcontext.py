@@ -120,7 +120,7 @@ class CallbackContext:
             When a group chat migrates to a supergroup, its chat id will change and the
             ``chat_data`` needs to be transferred. For details see our `wiki page
             <https://github.com/python-telegram-bot/python-telegram-bot/wiki/
-            Storing-user--and-chat-related-data#chat-migration>`_.
+            Storing-bot,-user-and-chat-related-data#chat-migration>`_.
         """
         return self._chat_data
 
@@ -159,8 +159,8 @@ class CallbackContext:
         .. seealso:: :meth:`telegram.ext.Dispatcher.add_error_handler`
 
         Args:
-            update (:obj:`any` | :class:`telegram.Update`): The update associated with the error.
-                May be :obj:`None`, e.g. for errors in job callbacks.
+            update (:obj:`object` | :class:`telegram.Update`): The update associated with the
+                error. May be :obj:`None`, e.g. for errors in job callbacks.
             error (:obj:`Exception`): The error.
             dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher associated with this
                 context.
@@ -189,7 +189,7 @@ class CallbackContext:
         .. seealso:: :meth:`telegram.ext.Dispatcher.add_handler`
 
         Args:
-            update (:obj:`any` | :class:`telegram.Update`): The update.
+            update (:obj:`object` | :class:`telegram.Update`): The update.
             dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher associated with this
                 context.
 

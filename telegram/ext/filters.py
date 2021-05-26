@@ -746,7 +746,7 @@ class Filters:
                 if file_extension is None:
                     self._file_extension = None
                     self.name = "Filters.document.file_extension(None)"
-                elif case_sensitive:
+                elif self.is_case_sensitive:
                     self._file_extension = f".{file_extension}"
                     self.name = (
                         f"Filters.document.file_extension({file_extension!r},"

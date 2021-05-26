@@ -128,7 +128,7 @@ class Defaults:
 
     @property
     def disable_notification(self) -> Optional[bool]:
-        """:obj:`bool`): Optional. Sends the message silently. Users will
+        """:obj:`bool`: Optional. Sends the message silently. Users will
         receive a notification with no sound.
         """
         return self._disable_notification

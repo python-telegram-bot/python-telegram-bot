@@ -71,7 +71,7 @@ class TelegramObject:
 
     @classmethod
     def de_list(cls: Type[TO], data: Optional[List[JSONDict]], bot: 'Bot') -> List[Optional[TO]]:
-        """Converts JSON data to a list of Telegram object.
+        """Converts JSON data to a list of Telegram objects.
 
         Args:
             data (Dict[:obj:`str`, ...]): The JSON data.
