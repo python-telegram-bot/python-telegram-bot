@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-""" This module contains the InlineQueryHandler class """
+"""This module contains the InlineQueryHandler class."""
 import re
 from typing import (
     TYPE_CHECKING,
@@ -171,7 +171,6 @@ class InlineQueryHandler(Handler[Update, CCT]):
             :obj:`bool`
 
         """
-
         if isinstance(update, Update) and update.inline_query:
             if (self.chat_types is not None) and (
                 update.inline_query.chat_type not in self.chat_types
@@ -192,6 +191,10 @@ class InlineQueryHandler(Handler[Update, CCT]):
         update: Update = None,
         check_result: Optional[Union[bool, Match]] = None,
     ) -> Dict[str, object]:
+        """Pass the results of ``re.match(pattern, query).{groups(), groupdict()}`` to the
+        callback as a keyword arguments called ``groups`` and ``groupdict``, respectively, if
+        needed.
+        """
         optional_args = super().collect_optional_args(dispatcher, update, check_result)
         if self.pattern:
             check_result = cast(Match, check_result)
@@ -208,6 +211,9 @@ class InlineQueryHandler(Handler[Update, CCT]):
         dispatcher: 'Dispatcher',
         check_result: Optional[Union[bool, Match]],
     ) -> None:
+        """Add the result of ``re.match(pattern, update.inline_query.query)`` to
+        :attr:`CallbackContext.matches` as list with one element.
+        """
         if self.pattern:
             check_result = cast(Match, check_result)
             context.matches = [check_result]

@@ -102,10 +102,10 @@ class TestUpdate:
 
         # Make sure only one thing in the update (other than update_id) is not None
         i = 0
-        for type in all_types:
-            if getattr(update, type) is not None:
+        for _type in all_types:
+            if getattr(update, _type) is not None:
                 i += 1
-                assert getattr(update, type) == paramdict[type]
+                assert getattr(update, _type) == paramdict[_type]
         assert i == 1
 
     def test_update_de_json_empty(self, bot):
@@ -118,9 +118,9 @@ class TestUpdate:
 
         assert isinstance(update_dict, dict)
         assert update_dict['update_id'] == update.update_id
-        for type in all_types:
-            if getattr(update, type) is not None:
-                assert update_dict[type] == getattr(update, type).to_dict()
+        for _type in all_types:
+            if getattr(update, _type) is not None:
+                assert update_dict[_type] == getattr(update, _type).to_dict()
 
     def test_effective_chat(self, update):
         # Test that it's sometimes None per docstring

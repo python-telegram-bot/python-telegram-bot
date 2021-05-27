@@ -44,7 +44,7 @@ from telegram.ext.utils.webhookhandler import WebhookServer
 
 signalskip = pytest.mark.skipif(
     sys.platform == 'win32',
-    reason='Can\'t send signals without stopping ' 'whole process on windows',
+    reason="Can't send signals without stopping whole process on windows",
 )
 
 
@@ -366,6 +366,10 @@ class TestUpdater:
         port = randrange(1024, 49152)  # Select random port
         updater.start_webhook(ip, port, clean=True, force_event_loop=False)
         updater.stop()
+
+        for warning in recwarn.list:
+            print(warning.message)
+
         assert len(recwarn) == 3
         assert str(recwarn[0].message).startswith('Old Handler API')
         assert str(recwarn[1].message).startswith('The argument `clean` of')
@@ -380,9 +384,9 @@ class TestUpdater:
 
         updater.start_polling(clean=True)
         updater.stop()
-        assert len(recwarn) == 2
         for msg in recwarn:
             print(msg)
+        assert len(recwarn) == 2
         assert str(recwarn[0].message).startswith('Old Handler API')
         assert str(recwarn[1].message).startswith('The argument `clean` of')
 
@@ -477,6 +481,11 @@ class TestUpdater:
 
         with caplog.at_level(logging.INFO):
             updater.idle()
+
+        # There is a chance of a conflict when getting updates since there can be many tests
+        # (bots) running simultaneously while testing in github actions.
+        if caplog.records[-1].getMessage().startswith('Error while getting Updates: Conflict'):
+            caplog.records.pop()  # For stability
 
         rec = caplog.records[-2]
         assert rec.getMessage().startswith(f'Received signal {signal.SIGTERM}')

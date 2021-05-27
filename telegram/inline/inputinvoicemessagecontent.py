@@ -196,6 +196,7 @@ class InputInvoiceMessageContent(InputMessageContent):
         )
 
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
         data['prices'] = [price.to_dict() for price in self.prices]
@@ -206,7 +207,8 @@ class InputInvoiceMessageContent(InputMessageContent):
     def de_json(
         cls, data: Optional[JSONDict], bot: 'Bot'
     ) -> Optional['InputInvoiceMessageContent']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None

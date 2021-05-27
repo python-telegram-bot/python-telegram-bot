@@ -273,9 +273,8 @@ class TestDocument:
 
     @flaky(3, 1)
     def test_error_send_empty_file(self, bot, chat_id):
-        with open(os.devnull, 'rb') as f:
-            with pytest.raises(TelegramError):
-                bot.send_document(chat_id=chat_id, document=f)
+        with open(os.devnull, 'rb') as f, pytest.raises(TelegramError):
+            bot.send_document(chat_id=chat_id, document=f)
 
     @flaky(3, 1)
     def test_error_send_empty_file_id(self, bot, chat_id):

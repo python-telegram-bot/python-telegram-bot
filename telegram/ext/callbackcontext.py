@@ -117,9 +117,8 @@ class CallbackContext(Generic[UD, CD, BD]):
 
     @property
     def bot_data(self) -> BD:
-        """
-        bot_data (:obj:`dict`): Optional. A dict that can be used to keep any data in. For each
-            update it will be the same :obj:`dict`.
+        """:obj:`dict`: Optional. A dict that can be used to keep any data in. For each
+        update it will be the same ``dict``.
         """
         return self.dispatcher.bot_data
 
@@ -131,16 +130,14 @@ class CallbackContext(Generic[UD, CD, BD]):
 
     @property
     def chat_data(self) -> Optional[CD]:
-        """
+        """:obj:`dict`: Optional. A dict that can be used to keep any data in. For each
+        update from the same chat id it will be the same ``dict``.
 
-        chat_data (:obj:`dict`): Optional. A dict that can be used to keep any data in. For each
-            update from the same chat id it will be the same :obj:`dict`.
-
-            Warning:
-                When a group chat migrates to a supergroup, its chat id will change and the
-                ``chat_data`` needs to be transferred. For details see our `wiki page
-                <https://github.com/python-telegram-bot/python-telegram-bot/wiki/
-                Storing-user--and-chat-related-data#chat-migration>`_.
+        Warning:
+            When a group chat migrates to a supergroup, its chat id will change and the
+            ``chat_data`` needs to be transferred. For details see our `wiki page
+            <https://github.com/python-telegram-bot/python-telegram-bot/wiki/
+            Storing-bot,-user-and-chat-related-data#chat-migration>`_.
         """
         if self._chat_id_and_data:
             return self._chat_id_and_data[1]
@@ -154,9 +151,8 @@ class CallbackContext(Generic[UD, CD, BD]):
 
     @property
     def user_data(self) -> Optional[UD]:
-        """
-        user_data (:obj:`dict`): Optional. A dict that can be used to keep any data in. For each
-            update from the same user it will be the same :obj:`dict`.
+        """:obj:`dict`: Optional. A dict that can be used to keep any data in. For each
+        update from the same user it will be the same ``dict``.
         """
         if self._user_id_and_data:
             return self._user_id_and_data[1]
@@ -200,8 +196,8 @@ class CallbackContext(Generic[UD, CD, BD]):
         .. seealso:: :meth:`telegram.ext.Dispatcher.add_error_handler`
 
         Args:
-            update (:obj:`any` | :class:`telegram.Update`): The update associated with the error.
-                May be :obj:`None`, e.g. for errors in job callbacks.
+            update (:obj:`object` | :class:`telegram.Update`): The update associated with the
+                error. May be :obj:`None`, e.g. for errors in job callbacks.
             error (:obj:`Exception`): The error.
             dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher associated with this
                 context.
@@ -214,7 +210,6 @@ class CallbackContext(Generic[UD, CD, BD]):
 
         Returns:
             :class:`telegram.ext.CallbackContext`
-
         """
         self = cls.from_update(update, dispatcher)
         self.error = error
@@ -237,7 +232,6 @@ class CallbackContext(Generic[UD, CD, BD]):
 
         Returns:
             :class:`telegram.ext.CallbackContext`
-
         """
         self = cls(dispatcher)
 
@@ -272,13 +266,17 @@ class CallbackContext(Generic[UD, CD, BD]):
 
         Returns:
             :class:`telegram.ext.CallbackContext`
-
         """
         self = cls(dispatcher)
         self.job = job
         return self
 
     def update(self, data: Dict[str, object]) -> None:
+        """Updates ``self.__dict__`` with the passed data.
+
+        Args:
+            data (Dict[:obj:`str`, :obj:`object`]): The data.
+        """
         self.__dict__.update(data)
 
     @property

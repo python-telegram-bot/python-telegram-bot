@@ -49,12 +49,8 @@ from telegram import (
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
 from telegram.utils.helpers import from_timestamp, escape_markdown, to_timestamp
-from tests.conftest import expect_bad_request, check_defaults_handling
+from tests.conftest import expect_bad_request, check_defaults_handling, GITHUB_ACTION
 from tests.bots import FALLBACKS
-
-
-BASE_TIME = time.time()
-HIGHSCORE_DELTA = 1450000000
 
 
 @pytest.fixture(scope='class')
@@ -85,7 +81,7 @@ def chat_permissions():
 def inline_results_callback(page=None):
     if not page:
         return [InlineQueryResultArticle(i, str(i), None) for i in range(1, 254)]
-    elif page <= 5:
+    if page <= 5:
         return [
             InlineQueryResultArticle(i, str(i), None)
             for i in range(page * 5 + 1, (page + 1) * 5 + 1)
@@ -96,6 +92,15 @@ def inline_results_callback(page=None):
 @pytest.fixture(scope='class')
 def inline_results():
     return inline_results_callback()
+
+
+BASE_GAME_SCORE = 60  # Base game score for game tests
+
+xfail = pytest.mark.xfail(
+    bool(GITHUB_ACTION),  # This condition is only relevant for github actions game tests.
+    reason='Can fail due to race conditions when multiple test suites '
+    'with the same bot token are run at the same time',
+)
 
 
 class TestBot:
@@ -212,11 +217,13 @@ class TestBot:
 
     @flaky(3, 1)
     def test_forward_message(self, bot, chat_id, message):
-        message = bot.forward_message(chat_id, from_chat_id=chat_id, message_id=message.message_id)
+        forward_message = bot.forward_message(
+            chat_id, from_chat_id=chat_id, message_id=message.message_id
+        )
 
-        assert message.text == message.text
-        assert message.forward_from.username == message.from_user.username
-        assert isinstance(message.forward_date, dtm.datetime)
+        assert forward_message.text == message.text
+        assert forward_message.forward_from.username == message.from_user.username
+        assert isinstance(forward_message.forward_date, dtm.datetime)
 
     @flaky(3, 1)
     def test_delete_message(self, bot, chat_id):
@@ -782,7 +789,7 @@ class TestBot:
         def make_assertion(url, data, *args, **kwargs):
             results = data['results']
             length_matches = len(results) == num_results
-            ids_match = all([int(res['id']) == id_offset + i for i, res in enumerate(results)])
+            ids_match = all(int(res['id']) == id_offset + i for i, res in enumerate(results))
             next_offset_matches = data['next_offset'] == str(expected_next_offset)
             return length_matches and ids_match and next_offset_matches
 
@@ -795,7 +802,7 @@ class TestBot:
         def make_assertion(url, data, *args, **kwargs):
             results = data['results']
             length_matches = len(results) == MAX_INLINE_QUERY_RESULTS
-            ids_match = all([int(res['id']) == 1 + i for i, res in enumerate(results)])
+            ids_match = all(int(res['id']) == 1 + i for i, res in enumerate(results))
             next_offset_matches = data['next_offset'] == '1'
             return length_matches and ids_match and next_offset_matches
 
@@ -808,7 +815,7 @@ class TestBot:
         def make_assertion(url, data, *args, **kwargs):
             results = data['results']
             length_matches = len(results) == 30
-            ids_match = all([int(res['id']) == 1 + i for i, res in enumerate(results)])
+            ids_match = all(int(res['id']) == 1 + i for i, res in enumerate(results))
             next_offset_matches = data['next_offset'] == ''
             return length_matches and ids_match and next_offset_matches
 
@@ -821,7 +828,7 @@ class TestBot:
         def make_assertion(url, data, *args, **kwargs):
             results = data['results']
             length = len(results) == 5
-            ids = all([int(res['id']) == 6 + i for i, res in enumerate(results)])
+            ids = all(int(res['id']) == 6 + i for i, res in enumerate(results))
             next_offset = data['next_offset'] == '2'
             return length and ids and next_offset
 
@@ -1273,35 +1280,33 @@ class TestBot:
                     chat_id, game_short_name, reply_to_message_id=reply_to_message.message_id
                 )
 
-    @flaky(3, 1)
+    @xfail
     def test_set_game_score_1(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
-
-        def func():
-            game_short_name = 'test_game'
-            game = bot.send_game(chat_id, game_short_name)
-
-            message = bot.set_game_score(
-                user_id=chat_id,
-                score=int(BASE_TIME) - HIGHSCORE_DELTA,
-                chat_id=game.chat_id,
-                message_id=game.message_id,
-            )
-
-            assert message.game.description == game.game.description
-            assert message.game.animation.file_id == game.game.animation.file_id
-            assert message.game.photo[0].file_size == game.game.photo[0].file_size
-            assert message.game.text != game.game.text
-
-        expect_bad_request(func, 'Bot_score_not_modified', 'This test is a diva for some reason.')
-
-    @flaky(3, 1)
-    def test_set_game_score_2(self, bot, chat_id):
-        # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
+        # First, test setting a score.
         game_short_name = 'test_game'
         game = bot.send_game(chat_id, game_short_name)
 
-        score = int(BASE_TIME) - HIGHSCORE_DELTA + 1
+        message = bot.set_game_score(
+            user_id=chat_id,
+            score=BASE_GAME_SCORE,  # Score value is relevant for other set_game_score_* tests!
+            chat_id=game.chat_id,
+            message_id=game.message_id,
+        )
+
+        assert message.game.description == game.game.description
+        assert message.game.photo[0].file_size == game.game.photo[0].file_size
+        assert message.game.animation.file_unique_id == game.game.animation.file_unique_id
+        assert message.game.text != game.game.text
+
+    @xfail
+    def test_set_game_score_2(self, bot, chat_id):
+        # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
+        # Test setting a score higher than previous
+        game_short_name = 'test_game'
+        game = bot.send_game(chat_id, game_short_name)
+
+        score = BASE_GAME_SCORE + 1
 
         message = bot.set_game_score(
             user_id=chat_id,
@@ -1312,30 +1317,33 @@ class TestBot:
         )
 
         assert message.game.description == game.game.description
-        assert message.game.animation.file_id == game.game.animation.file_id
         assert message.game.photo[0].file_size == game.game.photo[0].file_size
+        assert message.game.animation.file_unique_id == game.game.animation.file_unique_id
         assert message.game.text == game.game.text
 
-    @flaky(3, 1)
+    @xfail
     def test_set_game_score_3(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
+        # Test setting a score lower than previous (should raise error)
         game_short_name = 'test_game'
         game = bot.send_game(chat_id, game_short_name)
 
-        score = int(BASE_TIME) - HIGHSCORE_DELTA - 1
+        score = BASE_GAME_SCORE  # Even a score equal to previous raises an error.
 
         with pytest.raises(BadRequest, match='Bot_score_not_modified'):
             bot.set_game_score(
                 user_id=chat_id, score=score, chat_id=game.chat_id, message_id=game.message_id
             )
 
-    @flaky(3, 1)
+    @xfail
     def test_set_game_score_4(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
+        # Test force setting a lower score
         game_short_name = 'test_game'
         game = bot.send_game(chat_id, game_short_name)
+        time.sleep(2)
 
-        score = int(BASE_TIME) - HIGHSCORE_DELTA - 2
+        score = BASE_GAME_SCORE - 10
 
         message = bot.set_game_score(
             user_id=chat_id,
@@ -1346,37 +1354,26 @@ class TestBot:
         )
 
         assert message.game.description == game.game.description
-        assert message.game.animation.file_id == game.game.animation.file_id
         assert message.game.photo[0].file_size == game.game.photo[0].file_size
+        assert message.game.animation.file_unique_id == game.game.animation.file_unique_id
 
-        # For some reason the returned message does not contain the updated score. need to fetch
-        # the game again...
+        # For some reason the returned message doesn't contain the updated score. need to fetch
+        # the game again... (the service message is also absent when running the test suite)
         game2 = bot.send_game(chat_id, game_short_name)
         assert str(score) in game2.game.text
 
-    @flaky(3, 1)
-    def test_set_game_score_too_low_score(self, bot, chat_id):
-        # We need a game to set the score for
-        game_short_name = 'test_game'
-        game = bot.send_game(chat_id, game_short_name)
-
-        with pytest.raises(BadRequest):
-            bot.set_game_score(
-                user_id=chat_id, score=100, chat_id=game.chat_id, message_id=game.message_id
-            )
-
-    @flaky(3, 1)
+    @xfail
     def test_get_game_high_scores(self, bot, chat_id):
         # We need a game to get the scores for
         game_short_name = 'test_game'
         game = bot.send_game(chat_id, game_short_name)
         high_scores = bot.get_game_high_scores(chat_id, game.chat_id, game.message_id)
         # We assume that the other game score tests ran within 20 sec
-        assert pytest.approx(high_scores[0].score, abs=20) == int(BASE_TIME) - HIGHSCORE_DELTA
+        assert high_scores[0].score == BASE_GAME_SCORE - 10
 
     # send_invoice is tested in test_invoice
 
-    # TODO: Needs improvement. Need incoming shippping queries to test
+    # TODO: Needs improvement. Need incoming shipping queries to test
     def test_answer_shipping_query_ok(self, monkeypatch, bot):
         # For now just test that our internals pass the correct data
         def test(url, data, *args, **kwargs):
@@ -1915,14 +1912,13 @@ class TestBot:
                     reply_to_message_id=reply_to_message.message_id,
                 )
             return
-        else:
-            returned = default_bot.copy_message(
-                chat_id,
-                from_chat_id=chat_id,
-                message_id=media_message.message_id,
-                caption="<b>Test</b>",
-                reply_to_message_id=reply_to_message.message_id,
-            )
+        returned = default_bot.copy_message(
+            chat_id,
+            from_chat_id=chat_id,
+            message_id=media_message.message_id,
+            caption="<b>Test</b>",
+            reply_to_message_id=reply_to_message.message_id,
+        )
         # we send a temp message which replies to the returned message id in order to get a
         # message object
         temp_message = default_bot.send_message(

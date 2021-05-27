@@ -201,5 +201,6 @@ class MessageHandler(Handler[Update, CCT]):
         dispatcher: 'Dispatcher',
         check_result: Optional[Union[bool, Dict[str, object]]],
     ) -> None:
+        """Adds possible output of data filters to the :class:`CallbackContext`."""
         if isinstance(check_result, dict):
             context.update(check_result)
