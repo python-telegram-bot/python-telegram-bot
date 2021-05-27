@@ -65,9 +65,8 @@ class CustomContext(CallbackContext[dict, ChatData, dict]):
         # Make sure to call super()
         context = super().from_update(update, dispatcher)
 
-        if context.chat_data:
-            if isinstance(update, Update) and update.effective_message:
-                context._message_id = update.effective_message.message_id  # pylint: disable=W0212
+        if context.chat_data and isinstance(update, Update) and update.effective_message:
+            context._message_id = update.effective_message.message_id  # pylint: disable=W0212
 
         # Remember to return the object
         return context
