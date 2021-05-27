@@ -2,9 +2,7 @@
 # pylint: disable=C0116
 # This program is dedicated to the public domain under the CC0 license.
 
-"""
-This is a very simple example on how one could implement a custom error handler
-"""
+"""This is a very simple example on how one could implement a custom error handler."""
 import html
 import json
 import logging
@@ -66,6 +64,7 @@ def start(update: Update, _: CallbackContext) -> None:
 
 
 def main() -> None:
+    """Run the bot."""
     # Create the Updater and pass it your bot's token.
     updater = Updater(BOT_TOKEN)
 

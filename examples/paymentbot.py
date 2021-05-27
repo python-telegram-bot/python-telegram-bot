@@ -2,9 +2,7 @@
 # pylint: disable=C0116
 # This program is dedicated to the public domain under the CC0 license.
 
-"""
-Basic example for a bot that can receive payment from user.
-"""
+"""Basic example for a bot that can receive payment from user."""
 
 import logging
 
@@ -98,10 +96,9 @@ def shipping_callback(update: Update, _: CallbackContext) -> None:
         query.answer(ok=False, error_message="Something went wrong...")
         return
 
-    options = list()
-    # a single LabeledPrice
-    options.append(ShippingOption('1', 'Shipping Option A', [LabeledPrice('A', 100)]))
-    # an array of LabeledPrice objects
+    # First option has a single LabeledPrice
+    options = [ShippingOption('1', 'Shipping Option A', [LabeledPrice('A', 100)])]
+    # second option has an array of LabeledPrice objects
     price_list = [LabeledPrice('B1', 150), LabeledPrice('B2', 200)]
     options.append(ShippingOption('2', 'Shipping Option B', price_list))
     query.answer(ok=True, shipping_options=options)
@@ -125,6 +122,7 @@ def successful_payment_callback(update: Update, _: CallbackContext) -> None:
 
 
 def main() -> None:
+    """Run the bot."""
     # Create the Updater and pass it your bot's token.
     updater = Updater("TOKEN")
 

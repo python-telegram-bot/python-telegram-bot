@@ -73,6 +73,7 @@ def start(update: Update, context: CallbackContext) -> int:
 
 
 def regular_choice(update: Update, context: CallbackContext) -> int:
+    """Ask the user for info about the selected predefined choice."""
     text = update.message.text.lower()
     context.user_data['choice'] = text
     if context.user_data.get(text):
@@ -87,6 +88,7 @@ def regular_choice(update: Update, context: CallbackContext) -> int:
 
 
 def custom_choice(update: Update, _: CallbackContext) -> int:
+    """Ask the user for a description of a custom category."""
     update.message.reply_text(
         'Alright, please send me the category first, for example "Most impressive skill"'
     )
@@ -112,12 +114,14 @@ def received_information(update: Update, context: CallbackContext) -> int:
 
 
 def show_data(update: Update, context: CallbackContext) -> None:
+    """Display the gathered info."""
     update.message.reply_text(
         f"This is what you already told me: {facts_to_str(context.user_data)}"
     )
 
 
 def done(update: Update, context: CallbackContext) -> int:
+    """Display the gathered info and end the conversation."""
     if 'choice' in context.user_data:
         del context.user_data['choice']
 
@@ -129,6 +133,7 @@ def done(update: Update, context: CallbackContext) -> int:
 
 
 def main() -> None:
+    """Run the bot."""
     # Create the Updater and pass it your bot's token.
     persistence = PicklePersistence(filename='conversationbot')
     updater = Updater("TOKEN", persistence=persistence)
