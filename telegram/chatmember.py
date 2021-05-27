@@ -233,7 +233,8 @@ class ChatMember(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['ChatMember']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None
@@ -244,6 +245,7 @@ class ChatMember(TelegramObject):
         return cls(**data)
 
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
         data['until_date'] = to_timestamp(self.until_date)

@@ -127,7 +127,7 @@ class BaseFilter(ABC):
 
     @abstractmethod
     def __call__(self, update: Update) -> Optional[Union[bool, DataDict]]:
-        pass
+        ...
 
     def __and__(self, other: 'BaseFilter') -> 'BaseFilter':
         return MergedFilter(self, and_filter=other)
@@ -722,13 +722,13 @@ class Filters:
 
                 Args:
                     category (str, optional): category of the media you want to filter"""
-                self.name = f"Filters.document.category('{category}')"
-                self.category = category
+                self._category = category
+                self.name = f"Filters.document.category('{self._category}')"
 
             def filter(self, message: Message) -> bool:
                 """"""  # remove method from docs
                 if message.document:
-                    return message.document.mime_type.startswith(self.category)
+                    return message.document.mime_type.startswith(self._category)
                 return False
 
         application = category('application/')
@@ -753,10 +753,6 @@ class Filters:
             __slots__ = ('mimetype',)
 
             def __init__(self, mimetype: Optional[str]):
-                """Initialize the category you want to filter
-
-                Args:
-                    mimetype (str, optional): mime_type of the media you want to filter"""
                 self.mimetype = mimetype
                 self.name = f"Filters.document.mime_type('{self.mimetype}')"
 
@@ -822,29 +818,29 @@ class Filters:
                 """
                 self.is_case_sensitive = case_sensitive
                 if file_extension is None:
-                    self.file_extension = None
+                    self._file_extension = None
                     self.name = "Filters.document.file_extension(None)"
-                elif case_sensitive:
-                    self.file_extension = f".{file_extension}"
+                elif self.is_case_sensitive:
+                    self._file_extension = f".{file_extension}"
                     self.name = (
                         f"Filters.document.file_extension({file_extension!r},"
                         " case_sensitive=True)"
                     )
                 else:
-                    self.file_extension = f".{file_extension}".lower()
+                    self._file_extension = f".{file_extension}".lower()
                     self.name = f"Filters.document.file_extension({file_extension.lower()!r})"
 
             def filter(self, message: Message) -> bool:
                 """"""  # remove method from docs
                 if message.document is None:
                     return False
-                if self.file_extension is None:
+                if self._file_extension is None:
                     return "." not in message.document.file_name
                 if self.is_case_sensitive:
                     filename = message.document.file_name
                 else:
                     filename = message.document.file_name.lower()
-                return filename.endswith(self.file_extension)
+                return filename.endswith(self._file_extension)
 
         def filter(self, message: Message) -> bool:
             return bool(message.document)
@@ -1438,7 +1434,7 @@ officedocument.wordprocessingml.document")``.
         private: Updates sent in private chat
     """
 
-    class _ChatUserBaseFilter(MessageFilter):
+    class _ChatUserBaseFilter(MessageFilter, ABC):
         __slots__ = (
             'chat_id_name',
             'username_name',
@@ -1447,7 +1443,6 @@ officedocument.wordprocessingml.document")``.
             '_chat_ids',
             '_usernames',
         )
-
         def __init__(
             self,
             chat_id: SLT[int] = None,
@@ -1467,7 +1462,7 @@ officedocument.wordprocessingml.document")``.
 
         @abstractmethod
         def get_chat_or_user(self, message: Message) -> Union[Chat, User, None]:
-            pass
+            ...
 
         @staticmethod
         def _parse_chat_id(chat_id: SLT[int]) -> Set[int]:
@@ -2210,6 +2205,18 @@ officedocument.wordprocessingml.document")``.
                 message.from_user.language_code
                 and any(message.from_user.language_code.startswith(x) for x in self.lang)
             )
+
+    class _Attachment(MessageFilter):
+        name = 'Filters.attachment'
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.effective_attachment)
+
+    attachment = _Attachment()
+    """Messages that contain :meth:`telegram.Message.effective_attachment`.
+
+
+        .. versionadded:: 13.6"""
 
     class _UpdateType(UpdateFilter):
         __slots__ = ()

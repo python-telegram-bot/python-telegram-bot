@@ -40,7 +40,7 @@ class VoiceChatStarted(TelegramObject):
 
     __slots__ = ()
 
-    def __init__(self, **_kwargs: Any):
+    def __init__(self, **_kwargs: Any):  # skipcq: PTC-W0049
         pass
 
 
@@ -106,7 +106,8 @@ class VoiceChatParticipantsInvited(TelegramObject):
     def de_json(
         cls, data: Optional[JSONDict], bot: 'Bot'
     ) -> Optional['VoiceChatParticipantsInvited']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None
@@ -115,6 +116,7 @@ class VoiceChatParticipantsInvited(TelegramObject):
         return cls(**data)
 
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
         data["users"] = [u.to_dict() for u in self.users]
@@ -147,7 +149,8 @@ class VoiceChatScheduled(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['VoiceChatScheduled']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None
@@ -157,6 +160,7 @@ class VoiceChatScheduled(TelegramObject):
         return cls(**data, bot=bot)
 
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
         # Required

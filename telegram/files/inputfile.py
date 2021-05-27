@@ -82,7 +82,7 @@ class InputFile:
         set_new_attribute_deprecated(self, key, value)
 
     @property
-    def field_tuple(self) -> Tuple[str, bytes, str]:
+    def field_tuple(self) -> Tuple[str, bytes, str]:  # skipcq: PY-D0003
         return self.filename, self.input_file_content, self.mimetype
 
     @staticmethod
@@ -109,10 +109,11 @@ class InputFile:
             return None
 
     @staticmethod
-    def is_file(obj: object) -> bool:
+    def is_file(obj: object) -> bool:  # skipcq: PY-D0003
         return hasattr(obj, 'read')
 
     def to_dict(self) -> Optional[str]:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         if self.attach:
             return 'attach://' + self.attach
         return None

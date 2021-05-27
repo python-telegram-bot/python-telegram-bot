@@ -121,7 +121,8 @@ class Sticker(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Sticker']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None
@@ -206,6 +207,7 @@ class StickerSet(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['StickerSet']:
+        """See :meth:`telegram.TelegramObject.de_json`."""
         if not data:
             return None
 
@@ -215,6 +217,7 @@ class StickerSet(TelegramObject):
         return cls(bot=bot, **data)
 
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
         data['stickers'] = [s.to_dict() for s in data.get('stickers')]
@@ -276,7 +279,8 @@ class MaskPosition(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['MaskPosition']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if data is None:
             return None

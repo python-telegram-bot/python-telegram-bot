@@ -39,12 +39,6 @@ if TYPE_CHECKING:
     import apscheduler.job  # noqa: F401
 
 
-class Days:
-    __slots__ = ()
-    MON, TUE, WED, THU, FRI, SAT, SUN = range(7)
-    EVERY_DAY = tuple(range(7))
-
-
 class JobQueue:
     """This class allows you to periodically perform tasks with the bot. It is a convenience
     wrapper for the APScheduler library.
@@ -143,8 +137,7 @@ class JobQueue:
         """
         self._dispatcher = dispatcher
         if dispatcher.bot.defaults:
-            if dispatcher.bot.defaults:
-                self.scheduler.configure(timezone=dispatcher.bot.defaults.tzinfo or pytz.utc)
+            self.scheduler.configure(timezone=dispatcher.bot.defaults.tzinfo or pytz.utc)
 
     def run_once(
         self,
@@ -399,7 +392,7 @@ class JobQueue:
         self,
         callback: Callable[['CallbackContext'], None],
         time: datetime.time,
-        days: Tuple[int, ...] = Days.EVERY_DAY,
+        days: Tuple[int, ...] = tuple(range(7)),
         context: object = None,
         name: str = None,
         job_kwargs: JSONDict = None,
@@ -506,14 +499,16 @@ class JobQueue:
             self.scheduler.shutdown()
 
     def jobs(self) -> Tuple['Job', ...]:
-        """
-        Returns a tuple of all *pending/scheduled* jobs that are currently in the ``JobQueue``.
-        """
-        return tuple(Job.from_aps_job(job, self) for job in self.scheduler.get_jobs())
+        """Returns a tuple of all *scheduled* jobs that are currently in the ``JobQueue``."""
+        return tuple(
+            Job._from_aps_job(job, self)  # pylint: disable=W0212
+            for job in self.scheduler.get_jobs()
+        )
 
     def get_jobs_by_name(self, name: str) -> Tuple['Job', ...]:
         """Returns a tuple of all *pending/scheduled* jobs with the given name that are currently
-        in the ``JobQueue``"""
+        in the ``JobQueue``.
+        """
         return tuple(job for job in self.jobs() if job.name == name)
 
 
@@ -581,7 +576,7 @@ class Job:
         self._removed = False
         self._enabled = False
 
-        self.job = cast(APSJob, job)
+        self.job = cast(APSJob, job)  # skipcq: PTC-W0052
 
     def __setattr__(self, key: str, value: object) -> None:
         set_new_attribute_deprecated(self, key, value)
@@ -640,7 +635,7 @@ class Job:
         return self.job.next_run_time
 
     @classmethod
-    def from_aps_job(cls, job: APSJob, job_queue: JobQueue) -> 'Job':
+    def _from_aps_job(cls, job: APSJob, job_queue: JobQueue) -> 'Job':
         # context based callbacks
         if len(job.args) == 1:
             context = job.args[0].job.context

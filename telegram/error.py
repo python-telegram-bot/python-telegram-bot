@@ -39,6 +39,8 @@ def _lstrip_str(in_s: str, lstr: str) -> str:
 
 
 class TelegramError(Exception):
+    """Base class for Telegram errors."""
+
     # Apparently the base class Exception already has __dict__ in it, so its not included here
     __slots__ = ('message',)
 
@@ -61,10 +63,14 @@ class TelegramError(Exception):
 
 
 class Unauthorized(TelegramError):
+    """Raised when the bot has not enough rights to perform the requested action."""
+
     __slots__ = ()
 
 
 class InvalidToken(TelegramError):
+    """Raised when the token is invalid."""
+
     __slots__ = ()
 
     def __init__(self) -> None:
@@ -75,14 +81,20 @@ class InvalidToken(TelegramError):
 
 
 class NetworkError(TelegramError):
+    """Base class for exceptions due to networking errors."""
+
     __slots__ = ()
 
 
 class BadRequest(NetworkError):
+    """Raised when Telegram could not process the request correctly."""
+
     __slots__ = ()
 
 
 class TimedOut(NetworkError):
+    """Raised when a request took too long to finish."""
+
     __slots__ = ()
 
     def __init__(self) -> None:
@@ -94,6 +106,8 @@ class TimedOut(NetworkError):
 
 class ChatMigrated(TelegramError):
     """
+    Raised when the requested group chat migrated to supergroup and has a new chat id.
+
     Args:
         new_chat_id (:obj:`int`): The new chat id of the group.
 
@@ -111,6 +125,8 @@ class ChatMigrated(TelegramError):
 
 class RetryAfter(TelegramError):
     """
+    Raised when flood limits where exceeded.
+
     Args:
         retry_after (:obj:`int`): Time in seconds, after which the bot can retry the request.
 
@@ -127,13 +143,7 @@ class RetryAfter(TelegramError):
 
 
 class Conflict(TelegramError):
-    """
-    Raised when a long poll or webhook conflicts with another one.
-
-    Args:
-        msg (:obj:`str`): The message from telegrams server.
-
-    """
+    """Raised when a long poll or webhook conflicts with another one."""
 
     __slots__ = ()
 

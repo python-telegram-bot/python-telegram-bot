@@ -186,9 +186,7 @@ def _datetime_to_float_timestamp(dt_obj: dtm.datetime) -> float:
 
 
 def _localize(datetime: dtm.datetime, tzinfo: dtm.tzinfo) -> dtm.datetime:
-    """
-    Localize the datetime, where UTC is handled depending on whether pytz is available or not
-    """
+    """Localize the datetime, where UTC is handled depending on whether pytz is available or not"""
     if tzinfo is DTM_UTC:
         return datetime.replace(tzinfo=DTM_UTC)
     return tzinfo.localize(datetime)  # type: ignore[attr-defined]
@@ -250,7 +248,6 @@ def to_float_timestamp(
         ValueError: If ``t`` is a :obj:`datetime.datetime` and :obj:`reference_timestamp` is not
             :obj:`None`.
     """
-
     if reference_timestamp is None:
         reference_timestamp = time.time()
     elif isinstance(time_object, dtm.datetime):
@@ -369,7 +366,6 @@ def effective_message_type(entity: Union['Message', 'Update']) -> Optional[str]:
         :obj:`str`: One of ``Message.MESSAGE_TYPES``
 
     """
-
     # Importing on file-level yields cyclic Import Errors
     from telegram import Message, Update  # pylint: disable=C0415
 
@@ -482,7 +478,6 @@ def decode_user_chat_data_from_json(data: str) -> DefaultDict[int, Dict[object, 
     Returns:
         :obj:`dict`: The user/chat_data defaultdict after decoding
     """
-
     tmp: DefaultDict[int, Dict[object, object]] = defaultdict(dict)
     decoded_data = json.loads(data)
     for user, user_data in decoded_data.items():

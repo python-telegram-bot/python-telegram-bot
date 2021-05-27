@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 def msg(update: Update, _: CallbackContext) -> None:
+    """Downloads and prints the received passport data."""
     # Retrieve passport data
     passport_data = update.message.passport_data
     # If our nonce doesn't match what we think, this Update did not originate from us
@@ -61,21 +62,24 @@ def msg(update: Update, _: CallbackContext) -> None:
                 actual_file = file.get_file()
                 print(actual_file)
                 actual_file.download()
-        if data.type in ('passport', 'driver_license', 'identity_card', 'internal_passport'):
-            if data.front_side:
-                front_file = data.front_side.get_file()
-                print(data.type, front_file)
-                front_file.download()
-        if data.type in ('driver_license' and 'identity_card'):
-            if data.reverse_side:
-                reverse_file = data.reverse_side.get_file()
-                print(data.type, reverse_file)
-                reverse_file.download()
-        if data.type in ('passport', 'driver_license', 'identity_card', 'internal_passport'):
-            if data.selfie:
-                selfie_file = data.selfie.get_file()
-                print(data.type, selfie_file)
-                selfie_file.download()
+        if (
+            data.type in ('passport', 'driver_license', 'identity_card', 'internal_passport')
+            and data.front_side
+        ):
+            front_file = data.front_side.get_file()
+            print(data.type, front_file)
+            front_file.download()
+        if data.type in ('driver_license' and 'identity_card') and data.reverse_side:
+            reverse_file = data.reverse_side.get_file()
+            print(data.type, reverse_file)
+            reverse_file.download()
+        if (
+            data.type in ('passport', 'driver_license', 'identity_card', 'internal_passport')
+            and data.selfie
+        ):
+            selfie_file = data.selfie.get_file()
+            print(data.type, selfie_file)
+            selfie_file.download()
         if data.type in (
             'passport',
             'driver_license',
@@ -97,7 +101,8 @@ def msg(update: Update, _: CallbackContext) -> None:
 def main() -> None:
     """Start the bot."""
     # Create the Updater and pass it your token and private key
-    updater = Updater("TOKEN", private_key=open('private.key', 'rb').read())
+    with open('private.key', 'rb') as private_key:
+        updater = Updater("TOKEN", private_key=private_key.read())
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher

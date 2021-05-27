@@ -253,7 +253,7 @@ class Dispatcher:
         set_new_attribute_deprecated(self, key, value)
 
     @property
-    def exception_event(self) -> Event:
+    def exception_event(self) -> Event:  # skipcq: PY-D0003
         return self.__exception_event
 
     def _init_async_threads(self, base_name: str, workers: int) -> None:
@@ -441,7 +441,7 @@ class Dispatcher:
             self.logger.debug('async thread %s/%s has ended', i + 1, total)
 
     @property
-    def has_running_threads(self) -> bool:
+    def has_running_threads(self) -> bool:  # skipcq: PY-D0003
         return self.running or bool(self.__async_threads)
 
     def process_update(self, update: object) -> None:
@@ -459,7 +459,6 @@ class Dispatcher:
                 The update to process.
 
         """
-
         # An error happened while polling
         if isinstance(update, TelegramError):
             try:
@@ -674,9 +673,8 @@ class Dispatcher:
             self.logger.debug('The callback is already registered as an error handler. Ignoring.')
             return
 
-        if run_async is DEFAULT_FALSE and self.bot.defaults:
-            if self.bot.defaults.run_async:
-                run_async = True
+        if run_async is DEFAULT_FALSE and self.bot.defaults and self.bot.defaults.run_async:
+            run_async = True
 
         self.error_handlers[callback] = run_async
 

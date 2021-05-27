@@ -56,6 +56,7 @@ class InlineQueryResult(TelegramObject):
         self._id_attrs = (self.id,)
 
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
         # pylint: disable=E1101
