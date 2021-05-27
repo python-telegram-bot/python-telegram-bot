@@ -723,7 +723,6 @@ class Filters:
                 Args:
                     category (str, optional): category of the media you want to filter
                 """
-
                 self._category = category
                 self.name = f"Filters.document.category('{self._category}')"
 
