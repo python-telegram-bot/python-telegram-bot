@@ -715,7 +715,7 @@ class Filters:
                 of audio sent as file, for example 'audio/mpeg' or 'audio/x-wav'.
             """
 
-            __slots__ = ('category',)
+            __slots__ = ('_category',)
 
             def __init__(self, category: Optional[str]):
                 """Initialize the category you want to filter
@@ -804,7 +804,7 @@ class Filters:
                   filters files without a dot in the filename.
             """
 
-            __slots__ = ('file_extension', 'is_case_sensitive')
+            __slots__ = ('_file_extension', 'is_case_sensitive')
 
             def __init__(self, file_extension: Optional[str], case_sensitive: bool = False):
                 """Initialize the extension you want to filter.
@@ -1443,6 +1443,7 @@ officedocument.wordprocessingml.document")``.
             '_chat_ids',
             '_usernames',
         )
+
         def __init__(
             self,
             chat_id: SLT[int] = None,
@@ -2207,6 +2208,8 @@ officedocument.wordprocessingml.document")``.
             )
 
     class _Attachment(MessageFilter):
+        __slots__ = ()
+
         name = 'Filters.attachment'
 
         def filter(self, message: Message) -> bool:

@@ -26,6 +26,7 @@ import warnings
 # We name it something else so that you don't get confused when you attempt to suppress it
 class TelegramDeprecationWarning(Warning):
     """Custom warning class for deprecations in this library."""
+
     __slots__ = ()
 
 

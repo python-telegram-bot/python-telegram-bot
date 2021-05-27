@@ -99,7 +99,7 @@ class ChosenInlineResultHandler(Handler[Update]):
 
     """
 
-    __slots__ = ()
+    __slots__ = ('pattern',)
 
     def __init__(
         self,
