@@ -81,7 +81,8 @@ class CallbackQueryHandler(Handler[Update]):
             DEPRECATED: Please switch to context based callbacks.
         pattern (:obj:`str` | `Pattern`, optional): Regex pattern. If not :obj:`None`, ``re.match``
             is used on :attr:`telegram.CallbackQuery.data` to determine if an update should be
-            handled by this handler.
+            handled by this handler. If :attr:`telegram.CallbackQuery.data` is not present, the
+            :class:`telegram.CallbackQuery` update will not be handled.
         pass_groups (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groups()`` as a keyword argument called ``groups``.
             Default is :obj:`False`
