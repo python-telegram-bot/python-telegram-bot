@@ -34,6 +34,7 @@ logger = logging.getLogger(__name__)
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
 def start(update: Update, _: CallbackContext) -> None:
+    """Sends explanation on how to use the bot."""
     update.message.reply_text('Hi! Use /set <seconds> to set a timer')
 
 

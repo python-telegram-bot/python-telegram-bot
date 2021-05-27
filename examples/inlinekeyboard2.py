@@ -151,7 +151,8 @@ def four(update: Update, _: CallbackContext) -> int:
 
 def end(update: Update, _: CallbackContext) -> int:
     """Returns `ConversationHandler.END`, which tells the
-    ConversationHandler that the conversation is over"""
+    ConversationHandler that the conversation is over.
+    """
     query = update.callback_query
     query.answer()
     query.edit_message_text(text="See you next time!")
@@ -159,6 +160,7 @@ def end(update: Update, _: CallbackContext) -> int:
 
 
 def main() -> None:
+    """Run the bot."""
     # Create the Updater and pass it your bot's token.
     updater = Updater("TOKEN")
 
