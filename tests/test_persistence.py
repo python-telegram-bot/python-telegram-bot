@@ -1195,9 +1195,6 @@ class TestPickelPersistence:
         h2 = MessageHandler(None, second, pass_user_data=True, pass_chat_data=True)
         dp.add_handler(h1)
         dp.process_update(update)
-        del dp
-        del u
-        del pickle_persistence
         pickle_persistence_2 = PicklePersistence(
             filename='pickletest',
             store_user_data=True,
@@ -1218,10 +1215,7 @@ class TestPickelPersistence:
         dp.user_data[4242424242]['my_test'] = 'Working!'
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
         dp.bot_data['test'] = 'Working3!'
-        u.signal_handler(signal.SIGINT, None)
-        del dp
-        del u
-        del pickle_persistence
+        u._signal_handler(signal.SIGINT, None)
         pickle_persistence_2 = PicklePersistence(
             filename='pickletest',
             store_user_data=True,
@@ -1240,10 +1234,7 @@ class TestPickelPersistence:
         dp.user_data[4242424242]['my_test'] = 'Working!'
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
         dp.bot_data['my_test3'] = 'Working3!'
-        u.signal_handler(signal.SIGINT, None)
-        del dp
-        del u
-        del pickle_persistence_only_bot
+        u._signal_handler(signal.SIGINT, None)
         pickle_persistence_2 = PicklePersistence(
             filename='pickletest',
             store_user_data=False,
@@ -1262,10 +1253,7 @@ class TestPickelPersistence:
         u.running = True
         dp.user_data[4242424242]['my_test'] = 'Working!'
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
-        u.signal_handler(signal.SIGINT, None)
-        del dp
-        del u
-        del pickle_persistence_only_chat
+        u._signal_handler(signal.SIGINT, None)
         pickle_persistence_2 = PicklePersistence(
             filename='pickletest',
             store_user_data=False,
@@ -1284,10 +1272,7 @@ class TestPickelPersistence:
         u.running = True
         dp.user_data[4242424242]['my_test'] = 'Working!'
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
-        u.signal_handler(signal.SIGINT, None)
-        del dp
-        del u
-        del pickle_persistence_only_user
+        u._signal_handler(signal.SIGINT, None)
         pickle_persistence_2 = PicklePersistence(
             filename='pickletest',
             store_user_data=True,
@@ -1310,10 +1295,10 @@ class TestPickelPersistence:
 
         start = CommandHandler('start', start)
 
-        def next(update, context):
+        def next_callback(update, context):
             return NEXT2
 
-        next = MessageHandler(None, next)
+        next_handler = MessageHandler(None, next_callback)
 
         def next2(update, context):
             return ConversationHandler.END
@@ -1321,7 +1306,7 @@ class TestPickelPersistence:
         next2 = MessageHandler(None, next2)
 
         ch = ConversationHandler(
-            [start], {NEXT: [next], NEXT2: [next2]}, [], name='name2', persistent=True
+            [start], {NEXT: [next_handler], NEXT2: [next2]}, [], name='name2', persistent=True
         )
         dp.add_handler(ch)
         assert ch.conversations[ch._get_key(update)] == 1
@@ -1345,10 +1330,10 @@ class TestPickelPersistence:
 
         start = CommandHandler('start', start)
 
-        def next(update, context):
+        def next_callback(update, context):
             return NEXT2
 
-        next = MessageHandler(None, next)
+        next_handler = MessageHandler(None, next_callback)
 
         def next2(update, context):
             return ConversationHandler.END
@@ -1356,7 +1341,7 @@ class TestPickelPersistence:
         next2 = MessageHandler(None, next2)
 
         nested_ch = ConversationHandler(
-            [next],
+            [next_handler],
             {NEXT2: [next2]},
             [],
             name='name3',
@@ -1612,12 +1597,9 @@ class TestDictPersistence:
         h2 = MessageHandler(None, second, pass_user_data=True, pass_chat_data=True)
         dp.add_handler(h1)
         dp.process_update(update)
-        del dp
-        del u
         user_data = dict_persistence.user_data_json
         chat_data = dict_persistence.chat_data_json
         bot_data = dict_persistence.bot_data_json
-        del dict_persistence
         dict_persistence_2 = DictPersistence(
             user_data_json=user_data, chat_data_json=chat_data, bot_data_json=bot_data
         )
@@ -1638,10 +1620,10 @@ class TestDictPersistence:
 
         start = CommandHandler('start', start)
 
-        def next(update, context):
+        def next_callback(update, context):
             return NEXT2
 
-        next = MessageHandler(None, next)
+        next_handler = MessageHandler(None, next_callback)
 
         def next2(update, context):
             return ConversationHandler.END
@@ -1649,7 +1631,7 @@ class TestDictPersistence:
         next2 = MessageHandler(None, next2)
 
         ch = ConversationHandler(
-            [start], {NEXT: [next], NEXT2: [next2]}, [], name='name2', persistent=True
+            [start], {NEXT: [next_handler], NEXT2: [next2]}, [], name='name2', persistent=True
         )
         dp.add_handler(ch)
         assert ch.conversations[ch._get_key(update)] == 1
@@ -1672,10 +1654,10 @@ class TestDictPersistence:
 
         start = CommandHandler('start', start)
 
-        def next(update, context):
+        def next_callback(update, context):
             return NEXT2
 
-        next = MessageHandler(None, next)
+        next_handler = MessageHandler(None, next_callback)
 
         def next2(update, context):
             return ConversationHandler.END
@@ -1683,7 +1665,7 @@ class TestDictPersistence:
         next2 = MessageHandler(None, next2)
 
         nested_ch = ConversationHandler(
-            [next],
+            [next_handler],
             {NEXT2: [next2]},
             [],
             name='name3',

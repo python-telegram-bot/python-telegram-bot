@@ -116,7 +116,7 @@ if TYPE_CHECKING:
 RT = TypeVar('RT')
 
 
-def log(
+def log(  # skipcq: PY-D0003
     func: Callable[..., RT], *args: object, **kwargs: object  # pylint: disable=W0613
 ) -> Callable[..., RT]:
     logger = logging.getLogger(func.__module__)
@@ -301,7 +301,7 @@ class Bot(TelegramObject):
         return Message.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @property
-    def request(self) -> Request:
+    def request(self) -> Request:  # skip-cq: PY-D0003
         return self._request
 
     @staticmethod
@@ -319,7 +319,6 @@ class Bot(TelegramObject):
     @property
     def bot(self) -> User:
         """:class:`telegram.User`: User instance for the bot as returned by :meth:`get_me`."""
-
         if self._bot is None:
             self._bot = self.get_me()
         return self._bot
@@ -327,55 +326,46 @@ class Bot(TelegramObject):
     @property
     def id(self) -> int:  # pylint: disable=C0103
         """:obj:`int`: Unique identifier for this bot."""
-
         return self.bot.id
 
     @property
     def first_name(self) -> str:
         """:obj:`str`: Bot's first name."""
-
         return self.bot.first_name
 
     @property
     def last_name(self) -> str:
         """:obj:`str`: Optional. Bot's last name."""
-
         return self.bot.last_name  # type: ignore
 
     @property
     def username(self) -> str:
         """:obj:`str`: Bot's username."""
-
         return self.bot.username  # type: ignore
 
     @property
     def link(self) -> str:
         """:obj:`str`: Convenience property. Returns the t.me link of the bot."""
-
         return f"https://t.me/{self.username}"
 
     @property
     def can_join_groups(self) -> bool:
         """:obj:`bool`: Bot's :attr:`telegram.User.can_join_groups` attribute."""
-
         return self.bot.can_join_groups  # type: ignore
 
     @property
     def can_read_all_group_messages(self) -> bool:
         """:obj:`bool`: Bot's :attr:`telegram.User.can_read_all_group_messages` attribute."""
-
         return self.bot.can_read_all_group_messages  # type: ignore
 
     @property
     def supports_inline_queries(self) -> bool:
         """:obj:`bool`: Bot's :attr:`telegram.User.supports_inline_queries` attribute."""
-
         return self.bot.supports_inline_queries  # type: ignore
 
     @property
     def commands(self) -> List[BotCommand]:
         """List[:class:`BotCommand`]: Bot's commands."""
-
         if self._commands is None:
             self._commands = self.get_my_commands()
         return self._commands
@@ -383,7 +373,6 @@ class Bot(TelegramObject):
     @property
     def name(self) -> str:
         """:obj:`str`: Bot's @username."""
-
         return f'@{self.username}'
 
     @log
@@ -2606,7 +2595,6 @@ class Bot(TelegramObject):
         Raises:
             :class:`telegram.error.TelegramError`
         """
-
         if inline_message_id is None and (chat_id is None or message_id is None):
             raise ValueError(
                 'edit_message_media: Both chat_id and message_id are required when '
@@ -4257,7 +4245,6 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-
         data: JSONDict = {'chat_id': chat_id}
 
         return self._post(  # type: ignore[return-value]
@@ -5089,6 +5076,7 @@ class Bot(TelegramObject):
         return MessageId.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {'id': self.id, 'username': self.username, 'first_name': self.first_name}
 
         if self.last_name:

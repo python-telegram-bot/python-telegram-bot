@@ -185,10 +185,8 @@ class TestInvoice:
 
     def test_send_object_as_provider_data(self, monkeypatch, bot, chat_id, provider_token):
         def test(url, data, **kwargs):
-            return (
-                data['provider_data'] == '{"test_data": 123456789}'  # Depends if using
-                or data['provider_data'] == '{"test_data":123456789}'
-            )  # ujson or not
+            # depends on whether we're using ujson
+            return data['provider_data'] in ['{"test_data": 123456789}', '{"test_data":123456789}']
 
         monkeypatch.setattr(bot.request, 'post', test)
 

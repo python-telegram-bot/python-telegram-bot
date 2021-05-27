@@ -1,0 +1,20 @@
+version = 1
+
+test_patterns = ["tests/**"]
+
+exclude_patterns = [
+    "tests/**",
+    "docs/**",
+    "telegram/vendor/**",
+    "setup.py",
+    "setup-raw.py"
+]
+
+[[analyzers]]
+name = "python"
+enabled = true
+
+  [analyzers.meta]
+  runtime_version = "3.x.x"
+  max_line_length = 99
+  skip_doc_coverage = ["module", "magic", "init", "nonpublic"]

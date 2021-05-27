@@ -113,7 +113,6 @@ class DelayQueue(threading.Thread):
         automatically called by autostart argument.
 
         """
-
         times: List[float] = []  # used to store each callable processing time
         while True:
             item = self._queue.get()
@@ -150,7 +149,6 @@ class DelayQueue(threading.Thread):
                 Defaults to :obj:`None`.
 
         """
-
         self.__exit_req = True  # gently request
         self._queue.put(None)  # put something to unfreeze if frozen
         super().join(timeout=timeout)
@@ -162,7 +160,6 @@ class DelayQueue(threading.Thread):
         by subclasses.
 
         """
-
         raise exc
 
     def __call__(self, func: Callable, *args: object, **kwargs: object) -> None:
@@ -175,7 +172,6 @@ class DelayQueue(threading.Thread):
             **kwargs (:obj:`dict`): Arbitrary keyword-arguments to `func`.
 
         """
-
         if not self.is_alive() or self.__exit_req:
             raise DelayQueueError('Could not process callback in stopped thread')
         self._queue.put((func, args, kwargs))
@@ -252,6 +248,7 @@ class MessageQueue:
         self._group_delayq.start()
 
     def stop(self, timeout: float = None) -> None:
+        """Stops the ``MessageQueue``."""
         self._group_delayq.stop(timeout=timeout)
         self._all_delayq.stop(timeout=timeout)
 
@@ -281,7 +278,6 @@ class MessageQueue:
             :obj:`callable`: Used as ``promise`` argument.
 
         """
-
         if not is_group_msg:  # ignore middle group delay
             self._all_delayq(promise)
         else:  # use middle group delay

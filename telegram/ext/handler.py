@@ -149,9 +149,12 @@ class Handler(Generic[UT], ABC):
 
         """
         run_async = self.run_async
-        if self.run_async is DEFAULT_FALSE and dispatcher.bot.defaults:
-            if dispatcher.bot.defaults.run_async:
-                run_async = True
+        if (
+            self.run_async is DEFAULT_FALSE
+            and dispatcher.bot.defaults
+            and dispatcher.bot.defaults.run_async
+        ):
+            run_async = True
 
         if context:
             self.collect_additional_context(context, update, dispatcher, check_result)

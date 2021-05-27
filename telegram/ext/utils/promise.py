@@ -75,7 +75,6 @@ class Promise:
 
     def run(self) -> None:
         """Calls the :attr:`pooled_function` callable."""
-
         try:
             self._result = self.pooled_function(*self.args, **self.kwargs)
 
@@ -133,5 +132,6 @@ class Promise:
     @property
     def exception(self) -> Optional[Exception]:
         """The exception raised by :attr:`pooled_function` or ``None`` if no exception has been
-        raised (yet)."""
+        raised (yet).
+        """
         return self._exception
