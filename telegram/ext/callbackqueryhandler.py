@@ -164,8 +164,6 @@ class CallbackQueryHandler(Handler[Update]):
                     match = re.match(self.pattern, update.callback_query.data)
                     if match:
                         return match
-                else:
-                    return None
             else:
                 return True
         return None
