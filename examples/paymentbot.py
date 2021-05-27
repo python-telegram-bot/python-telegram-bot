@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 def start_callback(update: Update, _: CallbackContext) -> None:
+    """Displays info on how to use the bot."""
     msg = (
         "Use /shipping to get an invoice for shipping-payment, or /noshipping for an "
         "invoice without shipping."
@@ -35,6 +36,7 @@ def start_callback(update: Update, _: CallbackContext) -> None:
 
 
 def start_with_shipping_callback(update: Update, context: CallbackContext) -> None:
+    """Sends an invoice with shipping-payment."""
     chat_id = update.message.chat_id
     title = "Payment Example"
     description = "Payment Example using python-telegram-bot"
@@ -68,6 +70,7 @@ def start_with_shipping_callback(update: Update, context: CallbackContext) -> No
 
 
 def start_without_shipping_callback(update: Update, context: CallbackContext) -> None:
+    """Sends an invoice without shipping-payment."""
     chat_id = update.message.chat_id
     title = "Payment Example"
     description = "Payment Example using python-telegram-bot"
@@ -89,6 +92,7 @@ def start_without_shipping_callback(update: Update, context: CallbackContext) ->
 
 
 def shipping_callback(update: Update, _: CallbackContext) -> None:
+    """Answers the ShippingQuery with ShippingOptions"""
     query = update.shipping_query
     # check the payload, is this from your bot?
     if query.invoice_payload != 'Custom-Payload':
@@ -106,6 +110,7 @@ def shipping_callback(update: Update, _: CallbackContext) -> None:
 
 # after (optional) shipping, it's the pre-checkout
 def precheckout_callback(update: Update, _: CallbackContext) -> None:
+    """Answers the PreQecheckoutQuery"""
     query = update.pre_checkout_query
     # check the payload, is this from your bot?
     if query.invoice_payload != 'Custom-Payload':
@@ -117,6 +122,7 @@ def precheckout_callback(update: Update, _: CallbackContext) -> None:
 
 # finally, after contacting the payment provider...
 def successful_payment_callback(update: Update, _: CallbackContext) -> None:
+    """Confirms the successful payment."""
     # do something after successfully receiving payment?
     update.message.reply_text("Thank you for your payment!")
 

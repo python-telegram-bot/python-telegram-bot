@@ -57,6 +57,7 @@ def bad_command(_: Update, context: CallbackContext) -> None:
 
 
 def start(update: Update, _: CallbackContext) -> None:
+    """Displays info on how to trigger an error."""
     update.effective_message.reply_html(
         'Use /bad_command to cause an error.\n'
         f'Your chat id is <code>{update.effective_chat.id}</code>.'

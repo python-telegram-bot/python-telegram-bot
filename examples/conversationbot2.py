@@ -45,11 +45,13 @@ markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 
 
 def facts_to_str(user_data: Dict[str, str]) -> str:
+    """Helper function for formatting the gathered user info."""
     facts = [f'{key} - {value}' for key, value in user_data.items()]
     return "\n".join(facts).join(['\n', '\n'])
 
 
 def start(update: Update, _: CallbackContext) -> int:
+    """Start the conversation and ask user for input."""
     update.message.reply_text(
         "Hi! My name is Doctor Botter. I will hold a more complex conversation with you. "
         "Why don't you tell me something about yourself?",
@@ -60,6 +62,7 @@ def start(update: Update, _: CallbackContext) -> int:
 
 
 def regular_choice(update: Update, context: CallbackContext) -> int:
+    """Ask the user for info about the selected predefined choice."""
     text = update.message.text
     context.user_data['choice'] = text
     update.message.reply_text(f'Your {text.lower()}? Yes, I would love to hear about that!')
@@ -68,6 +71,7 @@ def regular_choice(update: Update, context: CallbackContext) -> int:
 
 
 def custom_choice(update: Update, _: CallbackContext) -> int:
+    """Ask the user for a description of a custom category."""
     update.message.reply_text(
         'Alright, please send me the category first, for example "Most impressive skill"'
     )
@@ -76,6 +80,7 @@ def custom_choice(update: Update, _: CallbackContext) -> int:
 
 
 def received_information(update: Update, context: CallbackContext) -> int:
+    """Store info provided by user and ask for the next category."""
     user_data = context.user_data
     text = update.message.text
     category = user_data['choice']
@@ -93,6 +98,7 @@ def received_information(update: Update, context: CallbackContext) -> int:
 
 
 def done(update: Update, context: CallbackContext) -> int:
+    """Display the gathered info and end the conversation."""
     user_data = context.user_data
     if 'choice' in user_data:
         del user_data['choice']

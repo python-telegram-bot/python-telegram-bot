@@ -28,7 +28,6 @@ from telegram.ext import (
     CallbackContext,
 )
 
-
 # Enable logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
@@ -47,15 +46,13 @@ markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 
 
 def facts_to_str(user_data: Dict[str, str]) -> str:
-    facts = []
-
-    for key, value in user_data.items():
-        facts.append(f'{key} - {value}')
-
+    """Helper function for formatting the gathered user info."""
+    facts = [f'{key} - {value}' for key, value in user_data.items()]
     return "\n".join(facts).join(['\n', '\n'])
 
 
 def start(update: Update, context: CallbackContext) -> int:
+    """Start the conversation, display any stored data and ask user for input."""
     reply_text = "Hi! My name is Doctor Botter."
     if context.user_data:
         reply_text += (
@@ -97,6 +94,7 @@ def custom_choice(update: Update, _: CallbackContext) -> int:
 
 
 def received_information(update: Update, context: CallbackContext) -> int:
+    """Store info provided by user and ask for the next category."""
     text = update.message.text
     category = context.user_data['choice']
     context.user_data[category] = text.lower()
@@ -105,8 +103,7 @@ def received_information(update: Update, context: CallbackContext) -> int:
     update.message.reply_text(
         "Neat! Just so you know, this is what you already told me:"
         f"{facts_to_str(context.user_data)}"
-        "You can tell me more, or change your opinion on "
-        "something.",
+        "You can tell me more, or change your opinion on something.",
         reply_markup=markup,
     )
 
@@ -126,7 +123,7 @@ def done(update: Update, context: CallbackContext) -> int:
         del context.user_data['choice']
 
     update.message.reply_text(
-        "I learned these facts about you:" f"{facts_to_str(context.user_data)}Until next time!",
+        f"I learned these facts about you: {facts_to_str(context.user_data)}Until next time!",
         reply_markup=ReplyKeyboardRemove(),
     )
     return ConversationHandler.END
