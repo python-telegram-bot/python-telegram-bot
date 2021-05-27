@@ -34,6 +34,8 @@ class TelegramDeprecationWarning(Warning):
 # Checks if a custom attribute is added by checking length of dictionary before & after
 # assigning attribute. This is the fastest way to do it (I hope!).
 def set_new_attribute_deprecated(self: object, key: str, value: object) -> None:
+    """Warns the user if they set custom attributes on PTB objects."""
+
     org = len(self.__dict__)
     object.__setattr__(self, key, value)
     new = len(self.__dict__)

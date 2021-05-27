@@ -721,7 +721,9 @@ class Filters:
                 """Initialize the category you want to filter
 
                 Args:
-                    category (str, optional): category of the media you want to filter"""
+                    category (str, optional): category of the media you want to filter
+                """
+
                 self._category = category
                 self.name = f"Filters.document.category('{self._category}')"
 
@@ -1619,6 +1621,7 @@ officedocument.wordprocessingml.document")``.
                 is specified in :attr:`user_ids` and :attr:`usernames`.
 
         """
+
         __slots__ = ()
 
         def __init__(
@@ -1719,6 +1722,7 @@ officedocument.wordprocessingml.document")``.
                 is specified in :attr:`bot_ids` and :attr:`usernames`.
 
         """
+
         __slots__ = ()
 
         def __init__(
@@ -1819,6 +1823,7 @@ officedocument.wordprocessingml.document")``.
                 is specified in :attr:`chat_ids` and :attr:`usernames`.
 
         """
+
         __slots__ = ()
 
         def get_chat_or_user(self, message: Message) -> Optional[Chat]:
@@ -2018,6 +2023,7 @@ officedocument.wordprocessingml.document")``.
                     ``Filters.sender_chat.channel``
 
         """
+
         __slots__ = ()
 
         def get_chat_or_user(self, message: Message) -> Optional[Chat]:
