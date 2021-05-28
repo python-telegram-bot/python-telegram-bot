@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=C0116
+# pylint: disable=C0116,W0613
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -72,7 +72,7 @@ class CustomContext(CallbackContext[dict, ChatData, dict]):
         return context
 
 
-def start(update: Update, _: CustomContext) -> None:
+def start(update: Update, context: CustomContext) -> None:
     """Display a message with a button."""
     update.message.reply_html(
         'This button was clicked <i>0</i> times.',
@@ -83,7 +83,7 @@ def start(update: Update, _: CustomContext) -> None:
 
 
 def count_click(update: Update, context: CustomContext) -> None:
-    """Update the click count for the  message."""
+    """Update the click count for the message."""
     context.message_clicks += 1
     update.callback_query.answer()
     update.effective_message.edit_text(

@@ -233,7 +233,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         :class:`telegram.ext.utils.types.BD`.
 
         Returns:
-            :class:`telegram.ext.utils.types.BD`: The restored user data.
+            :class:`telegram.ext.utils.types.BD`: The restored bot data.
         """
         if self.bot_data:
             pass
