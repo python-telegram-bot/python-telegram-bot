@@ -484,8 +484,10 @@ class TestUpdater:
 
         # There is a chance of a conflict when getting updates since there can be many tests
         # (bots) running simultaneously while testing in github actions.
-        if caplog.records[0].getMessage().startswith('Error while getting Updates: Conflict'):
-            caplog.records.pop()  # For stability
+        for idx, log in enumerate(caplog.records):
+            if log.getMessage().startswith('Error while getting Updates: Conflict'):
+                caplog.records.pop(idx)  # For stability
+                assert len(caplog.records) == 2, caplog.records
 
         rec = caplog.records[-2]
         assert rec.getMessage().startswith(f'Received signal {signal.SIGTERM}')
