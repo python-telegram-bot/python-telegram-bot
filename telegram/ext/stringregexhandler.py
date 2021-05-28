@@ -137,6 +137,10 @@ class StringRegexHandler(Handler[str]):
         update: str = None,
         check_result: Optional[Match] = None,
     ) -> Dict[str, object]:
+        """Pass the results of ``re.match(pattern, update).{groups(), groupdict()}`` to the
+        callback as a keyword arguments called ``groups`` and ``groupdict``, respectively, if
+        needed.
+        """
         optional_args = super().collect_optional_args(dispatcher, update, check_result)
         if self.pattern:
             if self.pass_groups and check_result:
@@ -152,5 +156,8 @@ class StringRegexHandler(Handler[str]):
         dispatcher: 'Dispatcher',
         check_result: Optional[Match],
     ) -> None:
+        """Add the result of ``re.match(pattern, update)`` to :attr:`CallbackContext.matches` as
+        list with one element.
+        """
         if self.pattern and check_result:
             context.matches = [check_result]

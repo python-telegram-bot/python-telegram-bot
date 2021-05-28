@@ -81,7 +81,8 @@ class CallbackQueryHandler(Handler[Update]):
             DEPRECATED: Please switch to context based callbacks.
         pattern (:obj:`str` | `Pattern`, optional): Regex pattern. If not :obj:`None`, ``re.match``
             is used on :attr:`telegram.CallbackQuery.data` to determine if an update should be
-            handled by this handler.
+            handled by this handler. If :attr:`telegram.CallbackQuery.data` is not present, the
+            :class:`telegram.CallbackQuery` update will not be handled.
         pass_groups (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groups()`` as a keyword argument called ``groups``.
             Default is :obj:`False`
@@ -173,6 +174,10 @@ class CallbackQueryHandler(Handler[Update]):
         update: Update = None,
         check_result: Union[bool, Match] = None,
     ) -> Dict[str, object]:
+        """Pass the results of ``re.match(pattern, data).{groups(), groupdict()}`` to the
+        callback as a keyword arguments called ``groups`` and ``groupdict``, respectively, if
+        needed.
+        """
         optional_args = super().collect_optional_args(dispatcher, update, check_result)
         if self.pattern:
             check_result = cast(Match, check_result)
@@ -189,6 +194,9 @@ class CallbackQueryHandler(Handler[Update]):
         dispatcher: 'Dispatcher',
         check_result: Union[bool, Match],
     ) -> None:
+        """Add the result of ``re.match(pattern, update.callback_query.data)`` to
+        :attr:`CallbackContext.matches` as list with one element.
+        """
         if self.pattern:
             check_result = cast(Match, check_result)
             context.matches = [check_result]

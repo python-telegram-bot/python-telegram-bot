@@ -38,6 +38,7 @@ logger = logging.getLogger(__name__)
 # This being an example and not having context present confusing beginners,
 # we decided to have it present as context.
 def start(update: Update, context: CallbackContext) -> None:
+    """Sends explanation on how to use the bot."""
     update.message.reply_text('Hi! Use /set <seconds> to set a timer')
 
 

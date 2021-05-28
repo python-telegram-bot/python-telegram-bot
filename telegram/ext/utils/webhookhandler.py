@@ -91,7 +91,7 @@ class WebhookAppClass(tornado.web.Application):
         handlers = [(rf"{webhook_path}/?", WebhookHandler, self.shared_objects)]  # noqa
         tornado.web.Application.__init__(self, handlers)  # type: ignore
 
-    def log_request(self, handler: tornado.web.RequestHandler) -> None:
+    def log_request(self, handler: tornado.web.RequestHandler) -> None:  # skipcq: PTC-W0049
         pass
 
 

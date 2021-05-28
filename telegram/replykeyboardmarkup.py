@@ -92,6 +92,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         self._id_attrs = (self.keyboard,)
 
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
         data['keyboard'] = []

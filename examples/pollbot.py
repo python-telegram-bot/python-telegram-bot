@@ -151,6 +151,7 @@ def help_handler(update: Update, context: CallbackContext) -> None:
 
 
 def main() -> None:
+    """Run bot."""
     # Create the Updater and pass it your bot's token.
     updater = Updater("TOKEN")
     dispatcher = updater.dispatcher

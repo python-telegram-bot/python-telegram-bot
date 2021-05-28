@@ -51,19 +51,6 @@ class CallbackContext:
          that you think you added will not be present.
 
     Attributes:
-        bot_data (:obj:`dict`): Optional. A dict that can be used to keep any data in. For each
-            update it will be the same ``dict``.
-        chat_data (:obj:`dict`): Optional. A dict that can be used to keep any data in. For each
-            update from the same chat id it will be the same ``dict``.
-
-            Warning:
-                When a group chat migrates to a supergroup, its chat id will change and the
-                ``chat_data`` needs to be transferred. For details see our `wiki page
-                <https://github.com/python-telegram-bot/python-telegram-bot/wiki/
-                Storing-user--and-chat-related-data#chat-migration>`_.
-
-        user_data (:obj:`dict`): Optional. A dict that can be used to keep any data in. For each
-            update from the same user it will be the same ``dict``.
         matches (List[:obj:`re match object`]): Optional. If the associated update originated from
             a regex-supported handler or had a :class:`Filters.regex`, this will contain a list of
             match objects for every pattern where ``re.search(pattern, string)`` returned a match.
@@ -113,6 +100,9 @@ class CallbackContext:
 
     @property
     def bot_data(self) -> Dict:
+        """:obj:`dict`: Optional. A dict that can be used to keep any data in. For each
+        update it will be the same ``dict``.
+        """
         return self._bot_data
 
     @bot_data.setter
@@ -123,6 +113,15 @@ class CallbackContext:
 
     @property
     def chat_data(self) -> Optional[Dict]:
+        """:obj:`dict`: Optional. A dict that can be used to keep any data in. For each
+        update from the same chat id it will be the same ``dict``.
+
+        Warning:
+            When a group chat migrates to a supergroup, its chat id will change and the
+            ``chat_data`` needs to be transferred. For details see our `wiki page
+            <https://github.com/python-telegram-bot/python-telegram-bot/wiki/
+            Storing-bot,-user-and-chat-related-data#chat-migration>`_.
+        """
         return self._chat_data
 
     @chat_data.setter
@@ -133,6 +132,9 @@ class CallbackContext:
 
     @property
     def user_data(self) -> Optional[Dict]:
+        """:obj:`dict`: Optional. A dict that can be used to keep any data in. For each
+        update from the same user it will be the same ``dict``.
+        """
         return self._user_data
 
     @user_data.setter
@@ -150,6 +152,28 @@ class CallbackContext:
         async_args: Union[List, Tuple] = None,
         async_kwargs: Dict[str, object] = None,
     ) -> 'CallbackContext':
+        """
+        Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the error
+        handlers.
+
+        .. seealso:: :meth:`telegram.ext.Dispatcher.add_error_handler`
+
+        Args:
+            update (:obj:`object` | :class:`telegram.Update`): The update associated with the
+                error. May be :obj:`None`, e.g. for errors in job callbacks.
+            error (:obj:`Exception`): The error.
+            dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher associated with this
+                context.
+            async_args (List[:obj:`object`]): Optional. Positional arguments of the function that
+                raised the error. Pass only when the raising function was run asynchronously using
+                :meth:`telegram.ext.Dispatcher.run_async`.
+            async_kwargs (Dict[:obj:`str`, :obj:`object`]): Optional. Keyword arguments of the
+                function that raised the error. Pass only when the raising function was run
+                asynchronously using :meth:`telegram.ext.Dispatcher.run_async`.
+
+        Returns:
+            :class:`telegram.ext.CallbackContext`
+        """
         self = cls.from_update(update, dispatcher)
         self.error = error
         self.async_args = async_args
@@ -158,6 +182,20 @@ class CallbackContext:
 
     @classmethod
     def from_update(cls, update: object, dispatcher: 'Dispatcher') -> 'CallbackContext':
+        """
+        Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the
+        handlers.
+
+        .. seealso:: :meth:`telegram.ext.Dispatcher.add_handler`
+
+        Args:
+            update (:obj:`object` | :class:`telegram.Update`): The update.
+            dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher associated with this
+                context.
+
+        Returns:
+            :class:`telegram.ext.CallbackContext`
+        """
         self = cls(dispatcher)
 
         if update is not None and isinstance(update, Update):
@@ -172,11 +210,30 @@ class CallbackContext:
 
     @classmethod
     def from_job(cls, job: 'Job', dispatcher: 'Dispatcher') -> 'CallbackContext':
+        """
+        Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to a
+        job callback.
+
+        .. seealso:: :meth:`telegram.ext.JobQueue`
+
+        Args:
+            job (:class:`telegram.ext.Job`): The job.
+            dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher associated with this
+                context.
+
+        Returns:
+            :class:`telegram.ext.CallbackContext`
+        """
         self = cls(dispatcher)
         self.job = job
         return self
 
     def update(self, data: Dict[str, object]) -> None:
+        """Updates ``self.__dict__`` with the passed data.
+
+        Args:
+            data (Dict[:obj:`str`, :obj:`object`]): The data.
+        """
         self.__dict__.update(data)
 
     @property

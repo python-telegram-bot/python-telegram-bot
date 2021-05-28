@@ -83,7 +83,19 @@ class PassportFile(TelegramObject):
     def de_json_decrypted(
         cls, data: Optional[JSONDict], bot: 'Bot', credentials: 'FileCredentials'
     ) -> Optional['PassportFile']:
-        data = cls.parse_data(data)
+        """Variant of :meth:`telegram.TelegramObject.de_json` that also takes into account
+        passport credentials.
+
+        Args:
+            data (Dict[:obj:`str`, ...]): The JSON data.
+            bot (:class:`telegram.Bot`): The bot associated with this object.
+            credentials (:class:`telegram.FileCredentials`): The credentials
+
+        Returns:
+            :class:`telegram.PassportFile`:
+
+        """
+        data = cls._parse_data(data)
 
         if not data:
             return None
@@ -96,6 +108,18 @@ class PassportFile(TelegramObject):
     def de_list_decrypted(
         cls, data: Optional[List[JSONDict]], bot: 'Bot', credentials: List['FileCredentials']
     ) -> List[Optional['PassportFile']]:
+        """Variant of :meth:`telegram.TelegramObject.de_list` that also takes into account
+        passport credentials.
+
+        Args:
+            data (Dict[:obj:`str`, ...]): The JSON data.
+            bot (:class:`telegram.Bot`): The bot associated with these objects.
+            credentials (:class:`telegram.FileCredentials`): The credentials
+
+        Returns:
+            List[:class:`telegram.PassportFile`]:
+
+        """
         if not data:
             return []
 
