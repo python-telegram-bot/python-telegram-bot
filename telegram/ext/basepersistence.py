@@ -416,9 +416,6 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
             user_id (:obj:`int`): The user ID this :attr:`user_data` is associated with.
             user_data (:class:`telegram.ext.utils.types.UD`): The ``user_data`` of a single user.
         """
-        raise NotImplementedError(
-            'refresh_user_data is not implemented for this persistence class.'
-        )
 
     def refresh_chat_data(self, chat_id: int, chat_data: CD) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` before passing the
@@ -431,9 +428,6 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
             chat_id (:obj:`int`): The chat ID this :attr:`chat_data` is associated with.
             chat_data (:class:`telegram.ext.utils.types.CD`): The ``chat_data`` of a single chat.
         """
-        raise NotImplementedError(
-            'refresh_chat_data is not implemented for this persistence class.'
-        )
 
     def refresh_bot_data(self, bot_data: BD) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` before passing the
@@ -445,9 +439,6 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         Args:
             bot_data (:class:`telegram.ext.utils.types.BD`): The ``bot_data``.
         """
-        raise NotImplementedError(
-            'refresh_bot_data is not implemented for this persistence class.'
-        )
 
     def flush(self) -> None:
         """Will be called by :class:`telegram.ext.Updater` upon receiving a stop signal. Gives the
