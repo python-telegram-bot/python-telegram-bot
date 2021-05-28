@@ -301,6 +301,7 @@ def stop_nested(update: Update, _: CallbackContext) -> str:
 
 
 def main() -> None:
+    """Run the bot."""
     # Create the Updater and pass it your bot's token.
     updater = Updater("TOKEN")
 

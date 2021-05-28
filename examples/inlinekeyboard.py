@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 def start(update: Update, _: CallbackContext) -> None:
+    """Sends a message with three inline buttons attached."""
     keyboard = [
         [
             InlineKeyboardButton("Option 1", callback_data='1'),
@@ -32,6 +33,7 @@ def start(update: Update, _: CallbackContext) -> None:
 
 
 def button(update: Update, _: CallbackContext) -> None:
+    """Parses the CallbackQuery and updates the message text."""
     query = update.callback_query
 
     # CallbackQueries need to be answered, even if no notification to the user is needed
@@ -42,10 +44,12 @@ def button(update: Update, _: CallbackContext) -> None:
 
 
 def help_command(update: Update, _: CallbackContext) -> None:
+    """Displays info on how to use the bot."""
     update.message.reply_text("Use /start to test this bot.")
 
 
 def main() -> None:
+    """Run the bot."""
     # Create the Updater and pass it your bot's token.
     updater = Updater("TOKEN")
 
