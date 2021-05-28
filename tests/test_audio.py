@@ -78,7 +78,6 @@ class TestAudio:
         assert audio.thumb.height == self.thumb_height
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_all_args(self, bot, chat_id, audio_file, thumb_file):
         message = bot.send_audio(
             chat_id,
@@ -110,7 +109,6 @@ class TestAudio:
         assert message.audio.thumb.height == self.thumb_height
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_audio_custom_filename(self, bot, chat_id, audio_file, monkeypatch):
         def make_assertion(url, data, **kwargs):
             return data['audio'].filename == 'custom_filename'
@@ -120,7 +118,6 @@ class TestAudio:
         assert bot.send_audio(chat_id, audio_file, filename='custom_filename')
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_get_and_download(self, bot, audio):
         new_file = bot.get_file(audio.file_id)
 
@@ -134,7 +131,6 @@ class TestAudio:
         assert os.path.isfile('telegram.mp3')
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_mp3_url_file(self, bot, chat_id, audio):
         message = bot.send_audio(chat_id=chat_id, audio=self.audio_file_url, caption=self.caption)
 
@@ -150,7 +146,6 @@ class TestAudio:
         assert message.audio.file_size == audio.file_size
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_resend(self, bot, chat_id, audio):
         message = bot.send_audio(chat_id=chat_id, audio=audio.file_id)
 
@@ -165,7 +160,6 @@ class TestAudio:
         assert message
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_audio_caption_entities(self, bot, chat_id, audio):
         test_string = 'Italic Bold Code'
         entities = [
@@ -179,7 +173,6 @@ class TestAudio:
         assert message.caption_entities == entities
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_audio_default_parse_mode_1(self, default_bot, chat_id, audio_file, thumb_file):
         test_string = 'Italic Bold Code'
@@ -190,7 +183,6 @@ class TestAudio:
         assert message.caption == test_string
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_audio_default_parse_mode_2(self, default_bot, chat_id, audio_file, thumb_file):
         test_markdown_string = '_Italic_ *Bold* `Code`'
@@ -202,7 +194,6 @@ class TestAudio:
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_audio_default_parse_mode_3(self, default_bot, chat_id, audio_file, thumb_file):
         test_markdown_string = '_Italic_ *Bold* `Code`'
@@ -264,7 +255,6 @@ class TestAudio:
         assert audio_dict['file_name'] == audio.file_name
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_error_send_empty_file(self, bot, chat_id):
         audio_file = open(os.devnull, 'rb')
 
@@ -272,7 +262,6 @@ class TestAudio:
             bot.send_audio(chat_id=chat_id, audio=audio_file)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.send_audio(chat_id=chat_id, audio='')

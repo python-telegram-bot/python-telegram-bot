@@ -97,6 +97,9 @@ class CallbackQueryHandler(Handler[Update]):
                   :obj:`None` to indicate, whether the update should be handled.
                 * a :obj:`type`. If :attr:`telegram.CallbackQuery.data` is an instance of that type
                   (or a subclass), the update will be handled.
+
+            If :attr:`telegram.CallbackQuery.data` is :obj:`None`, the
+            :class:`telegram.CallbackQuery` update will not be handled.
         pass_groups (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groups()`` as a keyword argument called ``groups``.
             Default is :obj:`False`
@@ -174,7 +177,9 @@ class CallbackQueryHandler(Handler[Update]):
         """
         if isinstance(update, Update) and update.callback_query:
             callback_data = update.callback_query.data
-            if self.pattern and callback_data is not None:
+            if self.pattern:
+                if callback_data is None:
+                    return False
                 if isinstance(self.pattern, type):
                     return isinstance(callback_data, self.pattern)
                 if callable(self.pattern):
@@ -192,6 +197,10 @@ class CallbackQueryHandler(Handler[Update]):
         update: Update = None,
         check_result: Union[bool, Match] = None,
     ) -> Dict[str, object]:
+        """Pass the results of ``re.match(pattern, data).{groups(), groupdict()}`` to the
+        callback as a keyword arguments called ``groups`` and ``groupdict``, respectively, if
+        needed.
+        """
         optional_args = super().collect_optional_args(dispatcher, update, check_result)
         if self.pattern and not callable(self.pattern):
             check_result = cast(Match, check_result)
@@ -208,6 +217,9 @@ class CallbackQueryHandler(Handler[Update]):
         dispatcher: 'Dispatcher',
         check_result: Union[bool, Match],
     ) -> None:
+        """Add the result of ``re.match(pattern, update.callback_query.data)`` to
+        :attr:`CallbackContext.matches` as list with one element.
+        """
         if self.pattern:
             check_result = cast(Match, check_result)
             context.matches = [check_result]

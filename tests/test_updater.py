@@ -53,7 +53,7 @@ from telegram.ext.utils.webhookhandler import WebhookServer
 
 signalskip = pytest.mark.skipif(
     sys.platform == 'win32',
-    reason='Can\'t send signals without stopping ' 'whole process on windows',
+    reason="Can't send signals without stopping whole process on windows",
 )
 
 
@@ -288,101 +288,6 @@ class TestUpdater:
             updater.stop()
         assert not caplog.records
 
-    @pytest.mark.skipif(
-        os.name != 'nt' or sys.version_info < (3, 8),
-        reason='Workaround only relevant on windows with py3.8+',
-    )
-    def test_start_webhook_ensure_event_loop(self, updater, monkeypatch):
-        def serve_forever(self, force_event_loop=False, ready=None):
-            with self.server_lock:
-                self.is_running = True
-                self._ensure_event_loop(force_event_loop=force_event_loop)
-
-                if ready is not None:
-                    ready.set()
-
-        monkeypatch.setattr(WebhookServer, 'serve_forever', serve_forever)
-        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
-        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
-
-        ip = '127.0.0.1'
-        port = randrange(1024, 49152)  # Select random port
-
-        with set_asyncio_event_loop(None):
-            updater._start_webhook(
-                ip,
-                port,
-                url_path='TOKEN',
-                cert=None,
-                key=None,
-                bootstrap_retries=0,
-                drop_pending_updates=False,
-                webhook_url=None,
-                allowed_updates=None,
-            )
-
-            assert isinstance(asyncio.get_event_loop(), asyncio.SelectorEventLoop)
-
-    @pytest.mark.skipif(
-        os.name != 'nt' or sys.version_info < (3, 8),
-        reason='Workaround only relevant on windows with py3.8+',
-    )
-    def test_start_webhook_force_event_loop_false(self, updater, monkeypatch):
-        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
-        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
-
-        ip = '127.0.0.1'
-        port = randrange(1024, 49152)  # Select random port
-
-        with set_asyncio_event_loop(asyncio.ProactorEventLoop()):
-            with pytest.raises(TypeError, match='`ProactorEventLoop` is incompatible'):
-                updater._start_webhook(
-                    ip,
-                    port,
-                    url_path='TOKEN',
-                    cert=None,
-                    key=None,
-                    bootstrap_retries=0,
-                    drop_pending_updates=False,
-                    webhook_url=None,
-                    allowed_updates=None,
-                )
-
-    @pytest.mark.skipif(
-        os.name != 'nt' or sys.version_info < (3, 8),
-        reason='Workaround only relevant on windows with py3.8+',
-    )
-    def test_start_webhook_force_event_loop_true(self, updater, monkeypatch):
-        def serve_forever(self, force_event_loop=False, ready=None):
-            with self.server_lock:
-                self.is_running = True
-                self._ensure_event_loop(force_event_loop=force_event_loop)
-
-                if ready is not None:
-                    ready.set()
-
-        monkeypatch.setattr(WebhookServer, 'serve_forever', serve_forever)
-        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
-        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
-
-        ip = '127.0.0.1'
-        port = randrange(1024, 49152)  # Select random port
-
-        with set_asyncio_event_loop(asyncio.ProactorEventLoop()):
-            updater._start_webhook(
-                ip,
-                port,
-                url_path='TOKEN',
-                cert=None,
-                key=None,
-                bootstrap_retries=0,
-                drop_pending_updates=False,
-                webhook_url=None,
-                allowed_updates=None,
-                force_event_loop=True,
-            )
-            assert isinstance(asyncio.get_event_loop(), asyncio.ProactorEventLoop)
-
     def test_webhook_ssl(self, monkeypatch, updater):
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
         monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
@@ -517,7 +422,7 @@ class TestUpdater:
         )
         assert self.test_flag is True
 
-    def test_clean_deprecation_warning_webhook(self, recwarn, updater, monkeypatch):
+    def test_deprecation_warnings_start_webhook(self, recwarn, updater, monkeypatch):
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
         monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
         # prevent api calls from @info decorator when updater.bot.id is used in thread names
@@ -526,11 +431,16 @@ class TestUpdater:
 
         ip = '127.0.0.1'
         port = randrange(1024, 49152)  # Select random port
-        updater.start_webhook(ip, port, clean=True)
+        updater.start_webhook(ip, port, clean=True, force_event_loop=False)
         updater.stop()
-        assert len(recwarn) == 2
+
+        for warning in recwarn.list:
+            print(warning.message)
+
+        assert len(recwarn) == 3
         assert str(recwarn[0].message).startswith('Old Handler API')
         assert str(recwarn[1].message).startswith('The argument `clean` of')
+        assert str(recwarn[2].message).startswith('The argument `force_event_loop` of')
 
     def test_clean_deprecation_warning_polling(self, recwarn, updater, monkeypatch):
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
@@ -541,9 +451,9 @@ class TestUpdater:
 
         updater.start_polling(clean=True)
         updater.stop()
-        assert len(recwarn) == 2
         for msg in recwarn:
             print(msg)
+        assert len(recwarn) == 2
         assert str(recwarn[0].message).startswith('Old Handler API')
         assert str(recwarn[1].message).startswith('The argument `clean` of')
 
@@ -638,6 +548,11 @@ class TestUpdater:
 
         with caplog.at_level(logging.INFO):
             updater.idle()
+
+        # There is a chance of a conflict when getting updates since there can be many tests
+        # (bots) running simultaneously while testing in github actions.
+        if caplog.records[0].getMessage().startswith('Error while getting Updates: Conflict'):
+            caplog.records.pop()  # For stability
 
         rec = caplog.records[-2]
         assert rec.getMessage().startswith(f'Received signal {signal.SIGTERM}')

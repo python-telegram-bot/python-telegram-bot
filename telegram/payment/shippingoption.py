@@ -60,6 +60,7 @@ class ShippingOption(TelegramObject):
         self._id_attrs = (self.id,)
 
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
         data['prices'] = [p.to_dict() for p in self.prices]

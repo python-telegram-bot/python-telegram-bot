@@ -1,6 +1,3 @@
-.. include:: telegram.ext.rst
-
-
 telegram package
 ================
 
@@ -62,6 +59,7 @@ telegram package
     telegram.voice
     telegram.voicechatstarted
     telegram.voicechatended
+    telegram.voicechatscheduled
     telegram.voicechatparticipantsinvited
     telegram.webhookinfo
 
@@ -106,6 +104,7 @@ Inline Mode
     telegram.inputlocationmessagecontent
     telegram.inputvenuemessagecontent
     telegram.inputcontactmessagecontent
+    telegram.inputinvoicemessagecontent
     telegram.choseninlineresult
 
 Payments
@@ -138,11 +137,14 @@ Passport
 
     telegram.passportelementerror
     telegram.passportelementerrorfile
+    telegram.passportelementerrorfiles
     telegram.passportelementerrorreverseside
     telegram.passportelementerrorfrontside
-    telegram.passportelementerrorfiles
     telegram.passportelementerrordatafield
-    telegram.passportelementerrorfile
+    telegram.passportelementerrorselfie
+    telegram.passportelementerrortranslationfile
+    telegram.passportelementerrortranslationfiles
+    telegram.passportelementerrorunspecified
     telegram.credentials
     telegram.datacredentials
     telegram.securedata
@@ -156,4 +158,12 @@ Passport
     telegram.encryptedpassportelement
     telegram.encryptedcredentials
 
-.. include:: telegram.utils.rst
+utils
+-----
+
+.. toctree::
+
+    telegram.utils.helpers
+    telegram.utils.promise
+    telegram.utils.request
+    telegram.utils.types

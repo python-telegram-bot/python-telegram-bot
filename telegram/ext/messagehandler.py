@@ -179,7 +179,7 @@ class MessageHandler(Handler[Update]):
                     Filters.update.edited_message | Filters.update.edited_channel_post
                 )
 
-    def check_update(self, update: object) -> Optional[Union[bool, Dict[str, object]]]:
+    def check_update(self, update: object) -> Optional[Union[bool, Dict[str, list]]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
@@ -200,5 +200,6 @@ class MessageHandler(Handler[Update]):
         dispatcher: 'Dispatcher',
         check_result: Optional[Union[bool, Dict[str, object]]],
     ) -> None:
+        """Adds possible output of data filters to the :class:`CallbackContext`."""
         if isinstance(check_result, dict):
             context.update(check_result)

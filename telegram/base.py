@@ -34,7 +34,7 @@ TO = TypeVar('TO', bound='TelegramObject', covariant=True)
 
 
 class TelegramObject:
-    """Base class for most telegram objects."""
+    """Base class for most Telegram objects."""
 
     _id_attrs: Tuple[object, ...] = ()
 
@@ -45,12 +45,22 @@ class TelegramObject:
         return self.__dict__[item]
 
     @staticmethod
-    def parse_data(data: Optional[JSONDict]) -> Optional[JSONDict]:
+    def _parse_data(data: Optional[JSONDict]) -> Optional[JSONDict]:
         return None if data is None else data.copy()
 
     @classmethod
     def de_json(cls: Type[TO], data: Optional[JSONDict], bot: 'Bot') -> Optional[TO]:
-        data = cls.parse_data(data)
+        """Converts JSON data to a Telegram object.
+
+        Args:
+            data (Dict[:obj:`str`, ...]): The JSON data.
+            bot (:class:`telegram.Bot`): The bot associated with this object.
+
+        Returns:
+            The Telegram object.
+
+        """
+        data = cls._parse_data(data)
 
         if data is None:
             return None
@@ -61,21 +71,35 @@ class TelegramObject:
 
     @classmethod
     def de_list(cls: Type[TO], data: Optional[List[JSONDict]], bot: 'Bot') -> List[Optional[TO]]:
+        """Converts JSON data to a list of Telegram objects.
+
+        Args:
+            data (Dict[:obj:`str`, ...]): The JSON data.
+            bot (:class:`telegram.Bot`): The bot associated with these objects.
+
+        Returns:
+            A list of Telegram objects.
+
+        """
         if not data:
             return []
 
         return [cls.de_json(d, bot) for d in data]
 
     def to_json(self) -> str:
-        """
+        """Gives a JSON representation of object.
+
         Returns:
             :obj:`str`
-
         """
-
         return json.dumps(self.to_dict())
 
     def to_dict(self) -> JSONDict:
+        """Gives representation of object as :obj:`dict`.
+
+        Returns:
+            :obj:`dict`
+        """
         data = {}
 
         for key in iter(self.__dict__):

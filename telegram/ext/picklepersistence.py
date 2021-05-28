@@ -102,7 +102,7 @@ class PicklePersistence(BasePersistence):
         self.callback_data: Optional[CDCData] = None
         self.conversations: Optional[Dict[str, Dict[Tuple, object]]] = None
 
-    def load_singlefile(self) -> None:
+    def _load_singlefile(self) -> None:
         try:
             filename = self.filename
             with open(self.filename, "rb") as file:
@@ -125,7 +125,7 @@ class PicklePersistence(BasePersistence):
             raise TypeError(f"Something went wrong unpickling {filename}") from exc
 
     @staticmethod
-    def load_file(filename: str) -> Any:
+    def _load_file(filename: str) -> Any:
         try:
             with open(filename, "rb") as file:
                 return pickle.load(file)
@@ -136,7 +136,7 @@ class PicklePersistence(BasePersistence):
         except Exception as exc:
             raise TypeError(f"Something went wrong unpickling {filename}") from exc
 
-    def dump_singlefile(self) -> None:
+    def _dump_singlefile(self) -> None:
         with open(self.filename, "wb") as file:
             data = {
                 'conversations': self.conversations,
@@ -148,7 +148,7 @@ class PicklePersistence(BasePersistence):
             pickle.dump(data, file)
 
     @staticmethod
-    def dump_file(filename: str, data: object) -> None:
+    def _dump_file(filename: str, data: object) -> None:
         with open(filename, "wb") as file:
             print('dumping', filename)
             pickle.dump(data, file)
@@ -163,14 +163,14 @@ class PicklePersistence(BasePersistence):
             pass
         elif not self.single_file:
             filename = f"{self.filename}_user_data"
-            data = self.load_file(filename)
+            data = self._load_file(filename)
             if not data:
                 data = defaultdict(dict)
             else:
                 data = defaultdict(dict, data)
             self.user_data = data
         else:
-            self.load_singlefile()
+            self._load_singlefile()
         return deepcopy(self.user_data)  # type: ignore[arg-type]
 
     def get_chat_data(self) -> DefaultDict[int, Dict[object, object]]:
@@ -183,14 +183,14 @@ class PicklePersistence(BasePersistence):
             pass
         elif not self.single_file:
             filename = f"{self.filename}_chat_data"
-            data = self.load_file(filename)
+            data = self._load_file(filename)
             if not data:
                 data = defaultdict(dict)
             else:
                 data = defaultdict(dict, data)
             self.chat_data = data
         else:
-            self.load_singlefile()
+            self._load_singlefile()
         return deepcopy(self.chat_data)  # type: ignore[arg-type]
 
     def get_bot_data(self) -> Dict[object, object]:
@@ -203,12 +203,12 @@ class PicklePersistence(BasePersistence):
             pass
         elif not self.single_file:
             filename = f"{self.filename}_bot_data"
-            data = self.load_file(filename)
+            data = self._load_file(filename)
             if not data:
                 data = {}
             self.bot_data = data
         else:
-            self.load_singlefile()
+            self._load_singlefile()
         return deepcopy(self.bot_data)  # type: ignore[arg-type]
 
     def get_callback_data(self) -> Optional[CDCData]:
@@ -223,12 +223,12 @@ class PicklePersistence(BasePersistence):
             pass
         elif not self.single_file:
             filename = f"{self.filename}_callback_data"
-            data = self.load_file(filename)
+            data = self._load_file(filename)
             if not data:
                 data = None
             self.callback_data = data
         else:
-            self.load_singlefile()
+            self._load_singlefile()
         return deepcopy(self.callback_data)
 
     def get_conversations(self, name: str) -> ConversationDict:
@@ -244,12 +244,12 @@ class PicklePersistence(BasePersistence):
             pass
         elif not self.single_file:
             filename = f"{self.filename}_conversations"
-            data = self.load_file(filename)
+            data = self._load_file(filename)
             if not data:
                 data = {name: {}}
             self.conversations = data
         else:
-            self.load_singlefile()
+            self._load_singlefile()
         return self.conversations.get(name, {}).copy()  # type: ignore[union-attr]
 
     def update_conversation(
@@ -271,9 +271,9 @@ class PicklePersistence(BasePersistence):
         if not self.on_flush:
             if not self.single_file:
                 filename = f"{self.filename}_conversations"
-                self.dump_file(filename, self.conversations)
+                self._dump_file(filename, self.conversations)
             else:
-                self.dump_singlefile()
+                self._dump_singlefile()
 
     def update_user_data(self, user_id: int, data: Dict) -> None:
         """Will update the user_data and depending on :attr:`on_flush` save the pickle file.
@@ -290,9 +290,9 @@ class PicklePersistence(BasePersistence):
         if not self.on_flush:
             if not self.single_file:
                 filename = f"{self.filename}_user_data"
-                self.dump_file(filename, self.user_data)
+                self._dump_file(filename, self.user_data)
             else:
-                self.dump_singlefile()
+                self._dump_singlefile()
 
     def update_chat_data(self, chat_id: int, data: Dict) -> None:
         """Will update the chat_data and depending on :attr:`on_flush` save the pickle file.
@@ -309,9 +309,9 @@ class PicklePersistence(BasePersistence):
         if not self.on_flush:
             if not self.single_file:
                 filename = f"{self.filename}_chat_data"
-                self.dump_file(filename, self.chat_data)
+                self._dump_file(filename, self.chat_data)
             else:
-                self.dump_singlefile()
+                self._dump_singlefile()
 
     def update_bot_data(self, data: Dict) -> None:
         """Will update the bot_data and depending on :attr:`on_flush` save the pickle file.
@@ -325,9 +325,9 @@ class PicklePersistence(BasePersistence):
         if not self.on_flush:
             if not self.single_file:
                 filename = f"{self.filename}_bot_data"
-                self.dump_file(filename, self.bot_data)
+                self._dump_file(filename, self.bot_data)
             else:
-                self.dump_singlefile()
+                self._dump_singlefile()
 
     def update_callback_data(self, data: CDCData) -> None:
         """Will update the callback_data (if changed) and depending on :attr:`on_flush` save the
@@ -343,9 +343,9 @@ class PicklePersistence(BasePersistence):
         if not self.on_flush:
             if not self.single_file:
                 filename = f"{self.filename}_callback_data"
-                self.dump_file(filename, self.callback_data)
+                self._dump_file(filename, self.callback_data)
             else:
-                self.dump_singlefile()
+                self._dump_singlefile()
 
     def flush(self) -> None:
         """Will save all data in memory to pickle file(s)."""
@@ -357,15 +357,15 @@ class PicklePersistence(BasePersistence):
                 or self.callback_data
                 or self.conversations
             ):
-                self.dump_singlefile()
+                self._dump_singlefile()
         else:
             if self.user_data:
-                self.dump_file(f"{self.filename}_user_data", self.user_data)
+                self._dump_file(f"{self.filename}_user_data", self.user_data)
             if self.chat_data:
-                self.dump_file(f"{self.filename}_chat_data", self.chat_data)
+                self._dump_file(f"{self.filename}_chat_data", self.chat_data)
             if self.bot_data:
-                self.dump_file(f"{self.filename}_bot_data", self.bot_data)
+                self._dump_file(f"{self.filename}_bot_data", self.bot_data)
             if self.callback_data:
-                self.dump_file(f"{self.filename}_callback_data", self.callback_data)
+                self._dump_file(f"{self.filename}_callback_data", self.callback_data)
             if self.conversations:
-                self.dump_file(f"{self.filename}_conversations", self.conversations)
+                self._dump_file(f"{self.filename}_conversations", self.conversations)

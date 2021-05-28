@@ -33,7 +33,7 @@ class InlineQueryResult(TelegramObject):
 
     Note:
         All URLs passed in inline query results will be available to end users and therefore must
-        be assumed to be public.
+        be assumed to be *public*.
 
     Args:
         type (:obj:`str`): Type of the result.
@@ -54,6 +54,7 @@ class InlineQueryResult(TelegramObject):
         self._id_attrs = (self.id,)
 
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
         # pylint: disable=E1101

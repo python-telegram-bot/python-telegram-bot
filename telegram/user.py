@@ -128,7 +128,8 @@ class User(TelegramObject):
     @property
     def name(self) -> str:
         """:obj:`str`: Convenience property. If available, returns the user's :attr:`username`
-        prefixed with "@". If :attr:`username` is not available, returns :attr:`full_name`."""
+        prefixed with "@". If :attr:`username` is not available, returns :attr:`full_name`.
+        """
         if self.username:
             return f'@{self.username}'
         return self.full_name
@@ -136,8 +137,8 @@ class User(TelegramObject):
     @property
     def full_name(self) -> str:
         """:obj:`str`: Convenience property. The user's :attr:`first_name`, followed by (if
-        available) :attr:`last_name`."""
-
+        available) :attr:`last_name`.
+        """
         if self.last_name:
             return f'{self.first_name} {self.last_name}'
         return self.first_name
@@ -145,8 +146,8 @@ class User(TelegramObject):
     @property
     def link(self) -> Optional[str]:
         """:obj:`str`: Convenience property. If :attr:`username` is available, returns a t.me link
-        of the user."""
-
+        of the user.
+        """
         if self.username:
             return f"https://t.me/{self.username}"
         return None
@@ -167,7 +168,6 @@ class User(TelegramObject):
         :meth:`telegram.Bot.get_user_profile_photos`.
 
         """
-
         return self.bot.get_user_profile_photos(
             user_id=self.id,
             offset=offset,
@@ -625,9 +625,9 @@ class User(TelegramObject):
         description: str,
         payload: str,
         provider_token: str,
-        start_parameter: str,
         currency: str,
         prices: List['LabeledPrice'],
+        start_parameter: str = None,
         photo_url: str = None,
         photo_size: int = None,
         photo_width: int = None,
@@ -646,12 +646,22 @@ class User(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        max_tip_amount: int = None,
+        suggested_tip_amounts: List[int] = None,
     ) -> 'Message':
         """Shortcut for::
 
             bot.send_message(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_invoice`.
+
+        Warning:
+            As of API 5.2 :attr:`start_parameter` is an optional argument and therefore the order
+            of the arguments had to be changed. Use keyword arguments to make sure that the
+            arguments are passed correctly.
+
+        .. versionchanged:: 13.5
+            As of Bot API 5.2, the parameter :attr:`start_parameter` is optional.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -663,9 +673,9 @@ class User(TelegramObject):
             description=description,
             payload=payload,
             provider_token=provider_token,
-            start_parameter=start_parameter,
             currency=currency,
             prices=prices,
+            start_parameter=start_parameter,
             photo_url=photo_url,
             photo_size=photo_size,
             photo_width=photo_width,
@@ -684,6 +694,8 @@ class User(TelegramObject):
             timeout=timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
+            max_tip_amount=max_tip_amount,
+            suggested_tip_amounts=suggested_tip_amounts,
         )
 
     def send_location(

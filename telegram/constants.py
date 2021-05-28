@@ -21,7 +21,7 @@ The following constants were extracted from the
 `Telegram Bots API <https://core.telegram.org/bots/api>`_.
 
 Attributes:
-    BOT_API_VERSION (:obj:`str`): `5.1`. Telegram Bot API version supported by this
+    BOT_API_VERSION (:obj:`str`): `5.2`. Telegram Bot API version supported by this
         version of `python-telegram-bot`. Also available as ``telegram.bot_api_version``.
 
         .. versionadded:: 13.4
@@ -55,44 +55,60 @@ as attributes of those classes:
 :class:`telegram.Chat`:
 
 Attributes:
-    CHAT_PRIVATE (:obj:`str`): 'private'
-    CHAT_GROUP (:obj:`str`): 'group'
-    CHAT_SUPERGROUP (:obj:`str`): 'supergroup'
-    CHAT_CHANNEL (:obj:`str`): 'channel'
+    CHAT_PRIVATE (:obj:`str`): ``'private'``
+    CHAT_GROUP (:obj:`str`): ``'group'``
+    CHAT_SUPERGROUP (:obj:`str`): ``'supergroup'``
+    CHAT_CHANNEL (:obj:`str`): ``'channel'``
+    CHAT_SENDER (:obj:`str`): ``'sender'``. Only relevant for
+        :attr:`telegram.InlineQuery.chat_type`.
+
+        .. versionadded:: 13.5
 
 :class:`telegram.ChatAction`:
 
 Attributes:
-    CHATACTION_FIND_LOCATION (:obj:`str`): 'find_location'
-    CHATACTION_RECORD_AUDIO (:obj:`str`): 'record_audio'
-    CHATACTION_RECORD_VIDEO (:obj:`str`): 'record_video'
-    CHATACTION_RECORD_VIDEO_NOTE (:obj:`str`): 'record_video_note'
-    CHATACTION_TYPING (:obj:`str`): 'typing'
-    CHATACTION_UPLOAD_AUDIO (:obj:`str`): 'upload_audio'
-    CHATACTION_UPLOAD_DOCUMENT (:obj:`str`): 'upload_document'
-    CHATACTION_UPLOAD_PHOTO (:obj:`str`): 'upload_photo'
-    CHATACTION_UPLOAD_VIDEO (:obj:`str`): 'upload_video'
-    CHATACTION_UPLOAD_VIDEO_NOTE (:obj:`str`): 'upload_video_note'
+    CHATACTION_FIND_LOCATION (:obj:`str`): ``'find_location'``
+    CHATACTION_RECORD_AUDIO (:obj:`str`): ``'record_audio'``
+
+        .. deprecated:: 13.5
+           Deprecated by Telegram. Use :const:`CHATACTION_RECORD_VOICE` instead.
+    CHATACTION_RECORD_VOICE (:obj:`str`): ``'record_voice'``
+
+        .. versionadded:: 13.5
+    CHATACTION_RECORD_VIDEO (:obj:`str`): ``'record_video'``
+    CHATACTION_RECORD_VIDEO_NOTE (:obj:`str`): ``'record_video_note'``
+    CHATACTION_TYPING (:obj:`str`): ``'typing'``
+    CHATACTION_UPLOAD_AUDIO (:obj:`str`): ``'upload_audio'``
+
+        .. deprecated:: 13.5
+           Deprecated by Telegram. Use :const:`CHATACTION_UPLOAD_VOICE` instead.
+    CHATACTION_UPLOAD_VOICE (:obj:`str`): ``'upload_voice'``
+
+        .. versionadded:: 13.5
+    CHATACTION_UPLOAD_DOCUMENT (:obj:`str`): ``'upload_document'``
+    CHATACTION_UPLOAD_PHOTO (:obj:`str`): ``'upload_photo'``
+    CHATACTION_UPLOAD_VIDEO (:obj:`str`): ``'upload_video'``
+    CHATACTION_UPLOAD_VIDEO_NOTE (:obj:`str`): ``'upload_video_note'``
 
 :class:`telegram.ChatMember`:
 
 Attributes:
-    CHATMEMBER_ADMINISTRATOR (:obj:`str`): 'administrator'
-    CHATMEMBER_CREATOR (:obj:`str`): 'creator'
-    CHATMEMBER_KICKED (:obj:`str`): 'kicked'
-    CHATMEMBER_LEFT (:obj:`str`): 'left'
-    CHATMEMBER_MEMBER (:obj:`str`): 'member'
-    CHATMEMBER_RESTRICTED (:obj:`str`): 'restricted'
+    CHATMEMBER_ADMINISTRATOR (:obj:`str`): ``'administrator'``
+    CHATMEMBER_CREATOR (:obj:`str`): ``'creator'``
+    CHATMEMBER_KICKED (:obj:`str`): ``'kicked'``
+    CHATMEMBER_LEFT (:obj:`str`): ``'left'``
+    CHATMEMBER_MEMBER (:obj:`str`): ``'member'``
+    CHATMEMBER_RESTRICTED (:obj:`str`): ``'restricted'``
 
 :class:`telegram.Dice`:
 
 Attributes:
-    DICE_DICE (:obj:`str`): '🎲'
-    DICE_DARTS (:obj:`str`): '🎯'
-    DICE_BASKETBALL (:obj:`str`): '🏀'
-    DICE_FOOTBALL (:obj:`str`): '⚽'
-    DICE_SLOT_MACHINE (:obj:`str`): '🎰'
-    DICE_BOWLING (:obj:`str`): '🎳'
+    DICE_DICE (:obj:`str`): ``'🎲'``
+    DICE_DARTS (:obj:`str`): ``'🎯'``
+    DICE_BASKETBALL (:obj:`str`): ``'🏀'``
+    DICE_FOOTBALL (:obj:`str`): ``'⚽'``
+    DICE_SLOT_MACHINE (:obj:`str`): ``'🎰'``
+    DICE_BOWLING (:obj:`str`): ``'🎳'``
 
         .. versionadded:: 13.4
     DICE_ALL_EMOJI (List[:obj:`str`]): List of all supported base emoji.
@@ -103,50 +119,96 @@ Attributes:
 :class:`telegram.MessageEntity`:
 
 Attributes:
-    MESSAGEENTITY_MENTION (:obj:`str`): 'mention'
-    MESSAGEENTITY_HASHTAG (:obj:`str`): 'hashtag'
-    MESSAGEENTITY_CASHTAG (:obj:`str`): 'cashtag'
-    MESSAGEENTITY_PHONE_NUMBER (:obj:`str`): 'phone_number'
-    MESSAGEENTITY_BOT_COMMAND (:obj:`str`): 'bot_command'
-    MESSAGEENTITY_URL (:obj:`str`): 'url'
-    MESSAGEENTITY_EMAIL (:obj:`str`): 'email'
-    MESSAGEENTITY_BOLD (:obj:`str`): 'bold'
-    MESSAGEENTITY_ITALIC (:obj:`str`): 'italic'
-    MESSAGEENTITY_CODE (:obj:`str`): 'code'
-    MESSAGEENTITY_PRE (:obj:`str`): 'pre'
-    MESSAGEENTITY_TEXT_LINK (:obj:`str`): 'text_link'
-    MESSAGEENTITY_TEXT_MENTION (:obj:`str`): 'text_mention'
-    MESSAGEENTITY_UNDERLINE (:obj:`str`): 'underline'
-    MESSAGEENTITY_STRIKETHROUGH (:obj:`str`): 'strikethrough'
+    MESSAGEENTITY_MENTION (:obj:`str`): ``'mention'``
+    MESSAGEENTITY_HASHTAG (:obj:`str`): ``'hashtag'``
+    MESSAGEENTITY_CASHTAG (:obj:`str`): ``'cashtag'``
+    MESSAGEENTITY_PHONE_NUMBER (:obj:`str`): ``'phone_number'``
+    MESSAGEENTITY_BOT_COMMAND (:obj:`str`): ``'bot_command'``
+    MESSAGEENTITY_URL (:obj:`str`): ``'url'``
+    MESSAGEENTITY_EMAIL (:obj:`str`): ``'email'``
+    MESSAGEENTITY_BOLD (:obj:`str`): ``'bold'``
+    MESSAGEENTITY_ITALIC (:obj:`str`): ``'italic'``
+    MESSAGEENTITY_CODE (:obj:`str`): ``'code'``
+    MESSAGEENTITY_PRE (:obj:`str`): ``'pre'``
+    MESSAGEENTITY_TEXT_LINK (:obj:`str`): ``'text_link'``
+    MESSAGEENTITY_TEXT_MENTION (:obj:`str`): ``'text_mention'``
+    MESSAGEENTITY_UNDERLINE (:obj:`str`): ``'underline'``
+    MESSAGEENTITY_STRIKETHROUGH (:obj:`str`): ``'strikethrough'``
     MESSAGEENTITY_ALL_TYPES (List[:obj:`str`]): List of all the types of message entity.
 
 :class:`telegram.ParseMode`:
 
 Attributes:
-    PARSEMODE_MARKDOWN (:obj:`str`): 'Markdown'
-    PARSEMODE_MARKDOWN_V2 (:obj:`str`): 'MarkdownV2'
-    PARSEMODE_HTML (:obj:`str`): 'HTML'
+    PARSEMODE_MARKDOWN (:obj:`str`): ``'Markdown'``
+    PARSEMODE_MARKDOWN_V2 (:obj:`str`): ``'MarkdownV2'``
+    PARSEMODE_HTML (:obj:`str`): ``'HTML'``
 
 :class:`telegram.Poll`:
 
 Attributes:
-    POLL_REGULAR (:obj:`str`): 'regular'
-    POLL_QUIZ (:obj:`str`): 'quiz'
+    POLL_REGULAR (:obj:`str`): ``'regular'``
+    POLL_QUIZ (:obj:`str`): ``'quiz'``
     MAX_POLL_QUESTION_LENGTH (:obj:`int`): 300
     MAX_POLL_OPTION_LENGTH (:obj:`int`): 100
 
-:class:`telegram.files.MaskPosition`:
+:class:`telegram.MaskPosition`:
 
 Attributes:
-    STICKER_FOREHEAD (:obj:`str`): 'forehead'
-    STICKER_EYES (:obj:`str`): 'eyes'
-    STICKER_MOUTH (:obj:`str`): 'mouth'
-    STICKER_CHIN (:obj:`str`): 'chin'
+    STICKER_FOREHEAD (:obj:`str`): ``'forehead'``
+    STICKER_EYES (:obj:`str`): ``'eyes'``
+    STICKER_MOUTH (:obj:`str`): ``'mouth'``
+    STICKER_CHIN (:obj:`str`): ``'chin'``
+
+:class:`telegram.Update`:
+
+Attributes:
+    UPDATE_MESSAGE (:obj:`str`): ``'message'``
+
+        .. versionadded:: 13.5
+    UPDATE_EDITED_MESSAGE (:obj:`str`): ``'edited_message'``
+
+        .. versionadded:: 13.5
+    UPDATE_CHANNEL_POST (:obj:`str`): ``'channel_post'``
+
+        .. versionadded:: 13.5
+    UPDATE_EDITED_CHANNEL_POST (:obj:`str`): ``'edited_channel_post'``
+
+        .. versionadded:: 13.5
+    UPDATE_INLINE_QUERY (:obj:`str`): ``'inline_query'``
+
+        .. versionadded:: 13.5
+    UPDATE_CHOSEN_INLINE_RESULT (:obj:`str`): ``'chosen_inline_result'``
+
+        .. versionadded:: 13.5
+    UPDATE_CALLBACK_QUERY (:obj:`str`): ``'callback_query'``
+
+        .. versionadded:: 13.5
+    UPDATE_SHIPPING_QUERY (:obj:`str`): ``'shipping_query'``
+
+        .. versionadded:: 13.5
+    UPDATE_PRE_CHECKOUT_QUERY (:obj:`str`): ``'pre_checkout_query'``
+
+        .. versionadded:: 13.5
+    UPDATE_POLL (:obj:`str`): ``'poll'``
+
+        .. versionadded:: 13.5
+    UPDATE_POLL_ANSWER (:obj:`str`): ``'poll_answer'``
+
+        .. versionadded:: 13.5
+    UPDATE_MY_CHAT_MEMBER (:obj:`str`): ``'my_chat_member'``
+
+        .. versionadded:: 13.5
+    UPDATE_CHAT_MEMBER (:obj:`str`): ``'chat_member'``
+
+        .. versionadded:: 13.5
+    UPDATE_ALL_TYPES (List[:obj:`str`]): List of all update types.
+
+        .. versionadded:: 13.5
 
 """
 from typing import List
 
-BOT_API_VERSION: str = '5.1'
+BOT_API_VERSION: str = '5.2'
 MAX_MESSAGE_LENGTH: int = 4096
 MAX_CAPTION_LENGTH: int = 1024
 ANONYMOUS_ADMIN_ID: int = 1087968824
@@ -165,6 +227,7 @@ MAX_MESSAGE_ENTITIES: int = 100
 MAX_INLINE_QUERY_RESULTS: int = 50
 MAX_ANSWER_CALLBACK_QUERY_TEXT_LENGTH: int = 200
 
+CHAT_SENDER: str = 'sender'
 CHAT_PRIVATE: str = 'private'
 CHAT_GROUP: str = 'group'
 CHAT_SUPERGROUP: str = 'supergroup'
@@ -172,10 +235,12 @@ CHAT_CHANNEL: str = 'channel'
 
 CHATACTION_FIND_LOCATION: str = 'find_location'
 CHATACTION_RECORD_AUDIO: str = 'record_audio'
+CHATACTION_RECORD_VOICE: str = 'record_voice'
 CHATACTION_RECORD_VIDEO: str = 'record_video'
 CHATACTION_RECORD_VIDEO_NOTE: str = 'record_video_note'
 CHATACTION_TYPING: str = 'typing'
 CHATACTION_UPLOAD_AUDIO: str = 'upload_audio'
+CHATACTION_UPLOAD_VOICE: str = 'upload_voice'
 CHATACTION_UPLOAD_DOCUMENT: str = 'upload_document'
 CHATACTION_UPLOAD_PHOTO: str = 'upload_photo'
 CHATACTION_UPLOAD_VIDEO: str = 'upload_video'
@@ -249,3 +314,32 @@ STICKER_FOREHEAD: str = 'forehead'
 STICKER_EYES: str = 'eyes'
 STICKER_MOUTH: str = 'mouth'
 STICKER_CHIN: str = 'chin'
+
+UPDATE_MESSAGE = 'message'
+UPDATE_EDITED_MESSAGE = 'edited_message'
+UPDATE_CHANNEL_POST = 'channel_post'
+UPDATE_EDITED_CHANNEL_POST = 'edited_channel_post'
+UPDATE_INLINE_QUERY = 'inline_query'
+UPDATE_CHOSEN_INLINE_RESULT = 'chosen_inline_result'
+UPDATE_CALLBACK_QUERY = 'callback_query'
+UPDATE_SHIPPING_QUERY = 'shipping_query'
+UPDATE_PRE_CHECKOUT_QUERY = 'pre_checkout_query'
+UPDATE_POLL = 'poll'
+UPDATE_POLL_ANSWER = 'poll_answer'
+UPDATE_MY_CHAT_MEMBER = 'my_chat_member'
+UPDATE_CHAT_MEMBER = 'chat_member'
+UPDATE_ALL_TYPES = [
+    UPDATE_MESSAGE,
+    UPDATE_EDITED_MESSAGE,
+    UPDATE_CHANNEL_POST,
+    UPDATE_EDITED_CHANNEL_POST,
+    UPDATE_INLINE_QUERY,
+    UPDATE_CHOSEN_INLINE_RESULT,
+    UPDATE_CALLBACK_QUERY,
+    UPDATE_SHIPPING_QUERY,
+    UPDATE_PRE_CHECKOUT_QUERY,
+    UPDATE_POLL,
+    UPDATE_POLL_ANSWER,
+    UPDATE_MY_CHAT_MEMBER,
+    UPDATE_CHAT_MEMBER,
+]

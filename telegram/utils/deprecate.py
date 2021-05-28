@@ -18,32 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module facilitates the deprecation of functions."""
 
-import warnings
-from typing import Callable, TypeVar
-
-RT = TypeVar('RT')
-
 
 # We use our own DeprecationWarning since they are muted by default and "UserWarning" makes it
 # seem like it's the user that issued the warning
 # We name it something else so that you don't get confused when you attempt to suppress it
 class TelegramDeprecationWarning(Warning):
-    pass
-
-
-def warn_deprecate_obj(old: str, new: str, stacklevel: int = 3) -> None:
-    warnings.warn(
-        f'{old} is being deprecated, please use {new} from now on.',
-        category=TelegramDeprecationWarning,
-        stacklevel=stacklevel,
-    )
-
-
-def deprecate(func: Callable[..., RT], old: str, new: str) -> Callable[..., RT]:
-    """Warn users invoking old to switch to the new function."""
-
-    def wrapped(*args: object, **kwargs: object) -> RT:
-        warn_deprecate_obj(old, new)
-        return func(*args, **kwargs)
-
-    return wrapped
+    """Custom warning class for deprecations in this library."""

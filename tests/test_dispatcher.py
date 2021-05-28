@@ -97,6 +97,14 @@ class TestDispatcher:
         ):
             self.received = context.error.message
 
+    def test_less_than_one_worker_warning(self, dp, recwarn):
+        Dispatcher(dp.bot, dp.update_queue, job_queue=dp.job_queue, workers=0, use_context=True)
+        assert len(recwarn) == 1
+        assert (
+            str(recwarn[0].message)
+            == 'Asynchronous callbacks can not be processed without at least one worker thread.'
+        )
+
     def test_one_context_per_update(self, cdp):
         def one(update, context):
             if update.message.text == 'test':
@@ -683,7 +691,7 @@ class TestDispatcher:
         assert self.received == 'Unauthorized.'
 
     def test_sensible_worker_thread_names(self, dp2):
-        thread_names = [thread.name for thread in getattr(dp2, '_Dispatcher__async_threads')]
+        thread_names = [thread.name for thread in dp2._Dispatcher__async_threads]
         print(thread_names)
         for thread_name in thread_names:
             assert thread_name.startswith(f"Bot:{dp2.bot.id}:worker:")

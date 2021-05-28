@@ -44,6 +44,8 @@ class TestInvoice:
     start_parameter = 'start_parameter'
     currency = 'EUR'
     total_amount = sum([p.amount for p in prices])
+    max_tip_amount = 42
+    suggested_tip_amounts = [13, 42]
 
     def test_de_json(self, bot):
         invoice_json = Invoice.de_json(
@@ -74,37 +76,36 @@ class TestInvoice:
         assert invoice_dict['total_amount'] == invoice.total_amount
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_required_args_only(self, bot, chat_id, provider_token):
         message = bot.send_invoice(
-            chat_id,
-            self.title,
-            self.description,
-            self.payload,
-            provider_token,
-            self.start_parameter,
-            self.currency,
-            self.prices,
+            chat_id=chat_id,
+            title=self.title,
+            description=self.description,
+            payload=self.payload,
+            provider_token=provider_token,
+            currency=self.currency,
+            prices=self.prices,
         )
 
         assert message.invoice.currency == self.currency
-        assert message.invoice.start_parameter == self.start_parameter
+        assert message.invoice.start_parameter == ''
         assert message.invoice.description == self.description
         assert message.invoice.title == self.title
         assert message.invoice.total_amount == self.total_amount
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_send_all_args(self, bot, chat_id, provider_token):
+    def test_send_all_args(self, bot, chat_id, provider_token, monkeypatch):
         message = bot.send_invoice(
             chat_id,
             self.title,
             self.description,
             self.payload,
             provider_token,
-            self.start_parameter,
             self.currency,
             self.prices,
+            max_tip_amount=self.max_tip_amount,
+            suggested_tip_amounts=self.suggested_tip_amounts,
+            start_parameter=self.start_parameter,
             provider_data=self.provider_data,
             photo_url='https://raw.githubusercontent.com/'
             'python-telegram-bot/logos/master/'
@@ -127,12 +128,65 @@ class TestInvoice:
         assert message.invoice.title == self.title
         assert message.invoice.total_amount == self.total_amount
 
+        # We do this next one as safety guard to make sure that we pass all of the optional
+        # parameters correctly because #2526 went unnoticed for 3 years …
+        def make_assertion(*args, **_):
+            kwargs = args[1]
+            return (
+                kwargs['chat_id'] == 'chat_id'
+                and kwargs['title'] == 'title'
+                and kwargs['description'] == 'description'
+                and kwargs['payload'] == 'payload'
+                and kwargs['provider_token'] == 'provider_token'
+                and kwargs['currency'] == 'currency'
+                and kwargs['prices'] == [p.to_dict() for p in self.prices]
+                and kwargs['max_tip_amount'] == 'max_tip_amount'
+                and kwargs['suggested_tip_amounts'] == 'suggested_tip_amounts'
+                and kwargs['start_parameter'] == 'start_parameter'
+                and kwargs['provider_data'] == 'provider_data'
+                and kwargs['photo_url'] == 'photo_url'
+                and kwargs['photo_size'] == 'photo_size'
+                and kwargs['photo_width'] == 'photo_width'
+                and kwargs['photo_height'] == 'photo_height'
+                and kwargs['need_name'] == 'need_name'
+                and kwargs['need_phone_number'] == 'need_phone_number'
+                and kwargs['need_email'] == 'need_email'
+                and kwargs['need_shipping_address'] == 'need_shipping_address'
+                and kwargs['send_phone_number_to_provider'] == 'send_phone_number_to_provider'
+                and kwargs['send_email_to_provider'] == 'send_email_to_provider'
+                and kwargs['is_flexible'] == 'is_flexible'
+            )
+
+        monkeypatch.setattr(bot, '_message', make_assertion)
+        assert bot.send_invoice(
+            chat_id='chat_id',
+            title='title',
+            description='description',
+            payload='payload',
+            provider_token='provider_token',
+            currency='currency',
+            prices=self.prices,
+            max_tip_amount='max_tip_amount',
+            suggested_tip_amounts='suggested_tip_amounts',
+            start_parameter='start_parameter',
+            provider_data='provider_data',
+            photo_url='photo_url',
+            photo_size='photo_size',
+            photo_width='photo_width',
+            photo_height='photo_height',
+            need_name='need_name',
+            need_phone_number='need_phone_number',
+            need_email='need_email',
+            need_shipping_address='need_shipping_address',
+            send_phone_number_to_provider='send_phone_number_to_provider',
+            send_email_to_provider='send_email_to_provider',
+            is_flexible='is_flexible',
+        )
+
     def test_send_object_as_provider_data(self, monkeypatch, bot, chat_id, provider_token):
         def test(url, data, **kwargs):
-            return (
-                data['provider_data'] == '{"test_data": 123456789}'  # Depends if using
-                or data['provider_data'] == '{"test_data":123456789}'
-            )  # ujson or not
+            # depends on whether we're using ujson
+            return data['provider_data'] in ['{"test_data": 123456789}', '{"test_data":123456789}']
 
         monkeypatch.setattr(bot.request, 'post', test)
 
@@ -142,14 +196,13 @@ class TestInvoice:
             self.description,
             self.payload,
             provider_token,
-            self.start_parameter,
             self.currency,
             self.prices,
             provider_data={'test_data': 123456789},
+            start_parameter=self.start_parameter,
         )
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize(
         'default_bot,custom',
         [
@@ -171,7 +224,6 @@ class TestInvoice:
                 self.description,
                 self.payload,
                 provider_token,
-                self.start_parameter,
                 self.currency,
                 self.prices,
                 allow_sending_without_reply=custom,
@@ -185,7 +237,6 @@ class TestInvoice:
                 self.description,
                 self.payload,
                 provider_token,
-                self.start_parameter,
                 self.currency,
                 self.prices,
                 reply_to_message_id=reply_to_message.message_id,
@@ -199,7 +250,6 @@ class TestInvoice:
                     self.description,
                     self.payload,
                     provider_token,
-                    self.start_parameter,
                     self.currency,
                     self.prices,
                     reply_to_message_id=reply_to_message.message_id,

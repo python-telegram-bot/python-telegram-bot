@@ -2,9 +2,7 @@
 # pylint: disable=C0116
 # This program is dedicated to the public domain under the CC0 license.
 
-"""
-This is a very simple example on how one could implement a custom error handler
-"""
+"""This is a very simple example on how one could implement a custom error handler."""
 import html
 import json
 import logging
@@ -59,6 +57,7 @@ def bad_command(_: Update, context: CallbackContext) -> None:
 
 
 def start(update: Update, _: CallbackContext) -> None:
+    """Displays info on how to trigger an error."""
     update.effective_message.reply_html(
         'Use /bad_command to cause an error.\n'
         f'Your chat id is <code>{update.effective_chat.id}</code>.'
@@ -66,6 +65,7 @@ def start(update: Update, _: CallbackContext) -> None:
 
 
 def main() -> None:
+    """Run the bot."""
     # Create the Updater and pass it your bot's token.
     updater = Updater(BOT_TOKEN)
 

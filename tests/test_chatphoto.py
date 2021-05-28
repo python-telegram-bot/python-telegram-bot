@@ -53,7 +53,6 @@ class TestChatPhoto:
     chatphoto_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.jpg'
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_all_args(self, bot, super_group_id, chatphoto_file, chat_photo, thumb_file):
         def func():
             assert bot.set_chat_photo(super_group_id, chatphoto_file)
@@ -61,7 +60,6 @@ class TestChatPhoto:
         expect_bad_request(func, 'Type of file mismatch', 'Telegram did not accept the file.')
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_get_and_download(self, bot, chat_photo):
         new_file = bot.get_file(chat_photo.small_file_id)
 
@@ -112,7 +110,6 @@ class TestChatPhoto:
         assert chat_photo_dict['big_file_unique_id'] == chat_photo.big_file_unique_id
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_error_send_empty_file(self, bot, super_group_id):
         chatphoto_file = open(os.devnull, 'rb')
 
@@ -120,7 +117,6 @@ class TestChatPhoto:
             bot.set_chat_photo(chat_id=super_group_id, photo=chatphoto_file)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_error_send_empty_file_id(self, bot, super_group_id):
         with pytest.raises(TelegramError):
             bot.set_chat_photo(chat_id=super_group_id, photo='')

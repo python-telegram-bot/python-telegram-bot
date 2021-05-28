@@ -96,10 +96,9 @@ def default_bot(request, bot_info):
     default_bot = DEFAULT_BOTS.get(defaults)
     if default_bot:
         return default_bot
-    else:
-        default_bot = make_bot(bot_info, **{'defaults': defaults})
-        DEFAULT_BOTS[defaults] = default_bot
-        return default_bot
+    default_bot = make_bot(bot_info, **{'defaults': defaults})
+    DEFAULT_BOTS[defaults] = default_bot
+    return default_bot
 
 
 @pytest.fixture(scope='function')
@@ -108,10 +107,9 @@ def tz_bot(timezone, bot_info):
     default_bot = DEFAULT_BOTS.get(defaults)
     if default_bot:
         return default_bot
-    else:
-        default_bot = make_bot(bot_info, **{'defaults': defaults})
-        DEFAULT_BOTS[defaults] = default_bot
-        return default_bot
+    default_bot = make_bot(bot_info, **{'defaults': defaults})
+    DEFAULT_BOTS[defaults] = default_bot
+    return default_bot
 
 
 @pytest.fixture(scope='session')

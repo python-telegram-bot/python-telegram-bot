@@ -135,6 +135,10 @@ class TestCallbackQueryHandler:
         callback_query.callback_query.data = 'nothing here'
         assert not handler.check_update(callback_query)
 
+        callback_query.callback_query.data = None
+        callback_query.callback_query.game_short_name = "this is a short game name"
+        assert not handler.check_update(callback_query)
+
     def test_with_callable_pattern(self, callback_query):
         class CallbackData:
             pass
@@ -156,6 +160,13 @@ class TestCallbackQueryHandler:
         handler = CallbackQueryHandler(self.callback_basic, pattern=CallbackData)
 
         callback_query.callback_query.data = CallbackData()
+        assert handler.check_update(callback_query)
+        callback_query.callback_query.data = 'callback_data'
+        assert not handler.check_update(callback_query)
+
+        handler = CallbackQueryHandler(self.callback_basic, pattern=bool)
+
+        callback_query.callback_query.data = False
         assert handler.check_update(callback_query)
         callback_query.callback_query.data = 'callback_data'
         assert not handler.check_update(callback_query)
