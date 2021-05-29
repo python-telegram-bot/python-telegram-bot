@@ -53,6 +53,14 @@ class TestVideoNote:
     videonote_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
     videonote_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
 
+    def test_slot_behaviour(self, video_note, recwarn, mro_slots):
+        for attr in video_note.__slots__:
+            assert getattr(video_note, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not video_note.__dict__, f"got missing slot(s): {video_note.__dict__}"
+        assert len(mro_slots(video_note)) == len(set(mro_slots(video_note))), "duplicate slot"
+        video_note.custom, video_note.length = 'should give warning', self.length
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     def test_creation(self, video_note):
         # Make sure file has been uploaded.
         assert isinstance(video_note, VideoNote)
@@ -171,6 +179,7 @@ class TestVideoNote:
         monkeypatch.setattr(bot, '_post', make_assertion)
         bot.send_video_note(chat_id, file, thumb=file)
         assert test_flag
+        monkeypatch.delattr(bot, '_post')
 
     @flaky(3, 1)
     @pytest.mark.parametrize(

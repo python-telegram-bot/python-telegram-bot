@@ -249,7 +249,7 @@ class Bot(telegram.bot.Bot):
                 # different places
                 new_result = copy(result)
                 markup = self._replace_keyboard(result.reply_markup)  # type: ignore[attr-defined]
-                new_result.reply_markup = markup  # type: ignore[attr-defined]
+                new_result.reply_markup = markup
                 results.append(new_result)
 
         return results, next_offset

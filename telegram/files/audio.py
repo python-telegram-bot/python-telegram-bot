@@ -69,6 +69,20 @@ class Audio(TelegramObject):
 
     """
 
+    __slots__ = (
+        'file_id',
+        'bot',
+        'file_size',
+        'file_name',
+        'thumb',
+        'title',
+        'duration',
+        'performer',
+        'mime_type',
+        'file_unique_id',
+        '_id_attrs',
+    )
+
     def __init__(
         self,
         file_id: str,

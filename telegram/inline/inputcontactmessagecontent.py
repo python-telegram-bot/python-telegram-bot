@@ -46,6 +46,8 @@ class InputContactMessageContent(InputMessageContent):
 
     """
 
+    __slots__ = ('vcard', 'first_name', 'last_name', 'phone_number', '_id_attrs')
+
     def __init__(
         self,
         phone_number: str,

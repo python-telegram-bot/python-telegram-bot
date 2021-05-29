@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 import os
 from time import sleep, perf_counter
 
@@ -67,4 +66,4 @@ class TestDelayQueue:
                 passes.append(part)
             else:
                 fails.append(part)
-        assert fails == []
+        assert not fails

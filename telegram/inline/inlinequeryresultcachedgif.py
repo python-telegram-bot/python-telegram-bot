@@ -73,6 +73,16 @@ class InlineQueryResultCachedGif(InlineQueryResult):
 
     """
 
+    __slots__ = (
+        'reply_markup',
+        'caption_entities',
+        'caption',
+        'title',
+        'input_message_content',
+        'parse_mode',
+        'gif_file_id',
+    )
+
     def __init__(
         self,
         id: str,  # pylint: disable=W0622

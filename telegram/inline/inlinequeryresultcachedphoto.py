@@ -76,6 +76,17 @@ class InlineQueryResultCachedPhoto(InlineQueryResult):
 
     """
 
+    __slots__ = (
+        'reply_markup',
+        'caption_entities',
+        'caption',
+        'title',
+        'description',
+        'parse_mode',
+        'photo_file_id',
+        'input_message_content',
+    )
+
     def __init__(
         self,
         id: str,  # pylint: disable=W0622

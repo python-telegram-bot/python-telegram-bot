@@ -77,6 +77,17 @@ class PicklePersistence(BasePersistence):
             Default is :obj:`False`.
     """
 
+    __slots__ = (
+        'filename',
+        'single_file',
+        'on_flush',
+        'user_data',
+        'chat_data',
+        'bot_data',
+        'callback_data',
+        'conversations',
+    )
+
     def __init__(
         self,
         filename: str,

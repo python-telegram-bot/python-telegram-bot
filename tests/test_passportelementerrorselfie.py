@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 import pytest
 
 from telegram import PassportElementErrorSelfie, PassportElementErrorDataField
@@ -36,6 +35,15 @@ class TestPassportElementErrorSelfie:
     type_ = 'test_type'
     file_hash = 'file_hash'
     message = 'Error message'
+
+    def test_slot_behaviour(self, passport_element_error_selfie, recwarn, mro_slots):
+        inst = passport_element_error_selfie
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.custom, inst.type = 'should give warning', self.type_
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_expected_values(self, passport_element_error_selfie):
         assert passport_element_error_selfie.source == self.source

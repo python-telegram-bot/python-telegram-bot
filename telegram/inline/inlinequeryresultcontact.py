@@ -66,6 +66,18 @@ class InlineQueryResultContact(InlineQueryResult):
 
     """
 
+    __slots__ = (
+        'reply_markup',
+        'thumb_width',
+        'thumb_height',
+        'vcard',
+        'first_name',
+        'last_name',
+        'phone_number',
+        'input_message_content',
+        'thumb_url',
+    )
+
     def __init__(
         self,
         id: str,  # pylint: disable=W0622

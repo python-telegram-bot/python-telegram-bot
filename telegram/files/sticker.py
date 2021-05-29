@@ -73,6 +73,21 @@ class Sticker(TelegramObject):
 
     """
 
+    __slots__ = (
+        'bot',
+        'width',
+        'file_id',
+        'is_animated',
+        'file_size',
+        'thumb',
+        'set_name',
+        'mask_position',
+        'height',
+        'file_unique_id',
+        'emoji',
+        '_id_attrs',
+    )
+
     def __init__(
         self,
         file_id: str,
@@ -160,6 +175,16 @@ class StickerSet(TelegramObject):
 
     """
 
+    __slots__ = (
+        'is_animated',
+        'contains_masks',
+        'thumb',
+        'title',
+        'stickers',
+        'name',
+        '_id_attrs',
+    )
+
     def __init__(
         self,
         name: str,
@@ -232,6 +257,8 @@ class MaskPosition(TelegramObject):
         scale (:obj:`float`): Mask scaling coefficient. For example, 2.0 means double size.
 
     """
+
+    __slots__ = ('point', 'scale', 'x_shift', 'y_shift', '_id_attrs')
 
     FOREHEAD: ClassVar[str] = constants.STICKER_FOREHEAD
     """:const:`telegram.constants.STICKER_FOREHEAD`"""

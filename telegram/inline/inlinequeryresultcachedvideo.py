@@ -75,6 +75,17 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
 
     """
 
+    __slots__ = (
+        'reply_markup',
+        'caption_entities',
+        'caption',
+        'title',
+        'description',
+        'parse_mode',
+        'input_message_content',
+        'video_file_id',
+    )
+
     def __init__(
         self,
         id: str,  # pylint: disable=W0622

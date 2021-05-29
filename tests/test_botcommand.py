@@ -31,6 +31,14 @@ class TestBotCommand:
     command = 'start'
     description = 'A command'
 
+    def test_slot_behaviour(self, bot_command, recwarn, mro_slots):
+        for attr in bot_command.__slots__:
+            assert getattr(bot_command, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not bot_command.__dict__, f"got missing slot(s): {bot_command.__dict__}"
+        assert len(mro_slots(bot_command)) == len(set(mro_slots(bot_command))), "duplicate slot"
+        bot_command.custom, bot_command.command = 'should give warning', self.command
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     def test_de_json(self, bot):
         json_dict = {'command': self.command, 'description': self.description}
         bot_command = BotCommand.de_json(json_dict, bot)

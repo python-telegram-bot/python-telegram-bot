@@ -40,6 +40,15 @@ def user2():
 
 
 class TestVoiceChatStarted:
+    def test_slot_behaviour(self, recwarn, mro_slots):
+        action = VoiceChatStarted()
+        for attr in action.__slots__:
+            assert getattr(action, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not action.__dict__, f"got missing slot(s): {action.__dict__}"
+        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
+        action.custom = 'should give warning'
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     def test_de_json(self):
         voice_chat_started = VoiceChatStarted.de_json({}, None)
         assert isinstance(voice_chat_started, VoiceChatStarted)
@@ -52,6 +61,15 @@ class TestVoiceChatStarted:
 
 class TestVoiceChatEnded:
     duration = 100
+
+    def test_slot_behaviour(self, recwarn, mro_slots):
+        action = VoiceChatEnded(8)
+        for attr in action.__slots__:
+            assert getattr(action, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not action.__dict__, f"got missing slot(s): {action.__dict__}"
+        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
+        action.custom = 'should give warning'
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_de_json(self):
         json_dict = {'duration': self.duration}
@@ -83,6 +101,15 @@ class TestVoiceChatEnded:
 
 
 class TestVoiceChatParticipantsInvited:
+    def test_slot_behaviour(self, recwarn, mro_slots):
+        action = VoiceChatParticipantsInvited([user1])
+        for attr in action.__slots__:
+            assert getattr(action, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not action.__dict__, f"got missing slot(s): {action.__dict__}"
+        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
+        action.custom = 'should give warning'
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     def test_de_json(self, user1, user2, bot):
         json_data = {"users": [user1.to_dict(), user2.to_dict()]}
         voice_chat_participants = VoiceChatParticipantsInvited.de_json(json_data, bot)
@@ -124,6 +151,15 @@ class TestVoiceChatParticipantsInvited:
 
 class TestVoiceChatScheduled:
     start_date = dtm.datetime.utcnow()
+
+    def test_slot_behaviour(self, recwarn, mro_slots):
+        inst = VoiceChatScheduled(self.start_date)
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.custom, inst.start_date = 'should give warning', self.start_date
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_expected_values(self):
         assert pytest.approx(VoiceChatScheduled(start_date=self.start_date) == self.start_date)
