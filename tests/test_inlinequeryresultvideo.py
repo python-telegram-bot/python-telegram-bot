@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 import pytest
 
 from telegram import (
@@ -65,6 +64,15 @@ class TestInlineQueryResultVideo:
     description = 'description'
     input_message_content = InputTextMessageContent('input_message_content')
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
+
+    def test_slot_behaviour(self, inline_query_result_video, recwarn, mro_slots):
+        inst = inline_query_result_video
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.custom, inst.id = 'should give warning', self.id_
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_expected_values(self, inline_query_result_video):
         assert inline_query_result_video.type == self.type_

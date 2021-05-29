@@ -71,6 +71,15 @@ def false_update(request):
 class TestStringRegexHandler:
     test_flag = False
 
+    def test_slot_behaviour(self, mro_slots, recwarn):
+        inst = StringRegexHandler('pfft', self.callback_basic)
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.custom, inst.callback = 'should give warning', self.callback_basic
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     @pytest.fixture(autouse=True)
     def reset(self):
         self.test_flag = False

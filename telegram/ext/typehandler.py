@@ -75,6 +75,8 @@ class TypeHandler(Handler[UT]):
 
     """
 
+    __slots__ = ('type', 'strict')
+
     def __init__(
         self,
         type: Type[UT],  # pylint: disable=W0622
@@ -90,8 +92,8 @@ class TypeHandler(Handler[UT]):
             pass_job_queue=pass_job_queue,
             run_async=run_async,
         )
-        self.type = type
-        self.strict = strict
+        self.type = type  # pylint: disable=E0237
+        self.strict = strict  # pylint: disable=E0237
 
     def check_update(self, update: object) -> bool:
         """Determines whether an update should be passed to this handlers :attr:`callback`.

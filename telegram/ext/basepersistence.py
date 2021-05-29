@@ -18,9 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the BasePersistence class."""
 import warnings
+from sys import version_info as py_ver
 from abc import ABC, abstractmethod
 from copy import copy
 from typing import DefaultDict, Dict, Optional, Tuple, cast, ClassVar
+
+from telegram.utils.deprecate import set_new_attribute_deprecated
 
 from telegram import Bot
 
@@ -75,6 +78,18 @@ class BasePersistence(ABC):
             persistence class.
     """
 
+    # Apparently Py 3.7 and below have '__dict__' in ABC
+    if py_ver < (3, 7):
+        __slots__ = ('store_user_data', 'store_chat_data', 'store_bot_data', 'bot')
+    else:
+        __slots__ = (
+            'store_user_data',  # type: ignore[assignment]
+            'store_chat_data',
+            'store_bot_data',
+            'bot',
+            '__dict__',
+        )
+
     def __new__(
         cls, *args: object, **kwargs: object  # pylint: disable=W0613
     ) -> 'BasePersistence':
@@ -104,12 +119,13 @@ class BasePersistence(ABC):
         def update_bot_data_replace_bot(data: Dict) -> None:
             return update_bot_data(instance.replace_bot(data))
 
-        instance.get_user_data = get_user_data_insert_bot
-        instance.get_chat_data = get_chat_data_insert_bot
-        instance.get_bot_data = get_bot_data_insert_bot
-        instance.update_user_data = update_user_data_replace_bot
-        instance.update_chat_data = update_chat_data_replace_bot
-        instance.update_bot_data = update_bot_data_replace_bot
+        # We want to ignore TGDeprecation warnings so we use obj.__setattr__. Adds to __dict__
+        object.__setattr__(instance, 'get_user_data', get_user_data_insert_bot)
+        object.__setattr__(instance, 'get_chat_data', get_chat_data_insert_bot)
+        object.__setattr__(instance, 'get_bot_data', get_bot_data_insert_bot)
+        object.__setattr__(instance, 'update_user_data', update_user_data_replace_bot)
+        object.__setattr__(instance, 'update_chat_data', update_chat_data_replace_bot)
+        object.__setattr__(instance, 'update_bot_data', update_bot_data_replace_bot)
         return instance
 
     def __init__(
@@ -122,6 +138,16 @@ class BasePersistence(ABC):
         self.store_chat_data = store_chat_data
         self.store_bot_data = store_bot_data
         self.bot: Bot = None  # type: ignore[assignment]
+
+    def __setattr__(self, key: str, value: object) -> None:
+        # Allow user defined subclasses to have custom attributes.
+        if issubclass(self.__class__, BasePersistence) and self.__class__.__name__ not in {
+            'DictPersistence',
+            'PicklePersistence',
+        }:
+            object.__setattr__(self, key, value)
+            return
+        set_new_attribute_deprecated(self, key, value)
 
     def set_bot(self, bot: Bot) -> None:
         """Set the Bot to be used by this persistence instance.

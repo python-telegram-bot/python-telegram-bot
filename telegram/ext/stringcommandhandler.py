@@ -85,6 +85,8 @@ class StringCommandHandler(Handler[str]):
 
     """
 
+    __slots__ = ('command', 'pass_args')
+
     def __init__(
         self,
         command: str,

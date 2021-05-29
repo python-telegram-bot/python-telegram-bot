@@ -30,6 +30,7 @@ import os
 import pickle
 from collections import defaultdict
 from time import sleep
+from sys import version_info as py_ver
 
 import pytest
 
@@ -92,6 +93,8 @@ def base_persistence():
 @pytest.fixture(scope="function")
 def bot_persistence():
     class BotPersistence(BasePersistence):
+        __slots__ = ()
+
         def __init__(self):
             super().__init__()
             self.bot_data = None
@@ -169,6 +172,17 @@ def job_queue(bot):
 
 
 class TestBasePersistence:
+    def test_slot_behaviour(self, bot_persistence, mro_slots, recwarn):
+        inst = bot_persistence
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        # assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
+        # The below test fails if the child class doesn't define __slots__ (not a cause of concern)
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.store_user_data, inst.custom = {}, "custom persistence shouldn't warn"
+        assert len(recwarn) == 0, recwarn.list
+        assert '__dict__' not in BasePersistence.__slots__ if py_ver < (3, 7) else True, 'has dict'
+
     def test_creation(self, base_persistence):
         assert base_persistence.store_chat_data
         assert base_persistence.store_user_data
@@ -802,7 +816,23 @@ def update(bot):
     return Update(0, message=message)
 
 
-class TestPickelPersistence:
+class TestPicklePersistence:
+    def test_slot_behaviour(self, mro_slots, recwarn, pickle_persistence):
+        inst = pickle_persistence
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        # assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.custom, inst.store_user_data = 'should give warning', {}
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
+    def test_pickle_behaviour_with_slots(self, pickle_persistence):
+        bot_data = pickle_persistence.get_bot_data()
+        bot_data['message'] = Message(3, None, Chat(2, type='supergroup'))
+        pickle_persistence.update_bot_data(bot_data)
+        retrieved = pickle_persistence.get_bot_data()
+        assert retrieved == bot_data
+
     def test_no_files_present_multi_file(self, pickle_persistence):
         assert pickle_persistence.get_user_data() == defaultdict(dict)
         assert pickle_persistence.get_user_data() == defaultdict(dict)
@@ -1412,6 +1442,15 @@ def conversations_json(conversations):
 
 
 class TestDictPersistence:
+    def test_slot_behaviour(self, mro_slots, recwarn):
+        inst = DictPersistence()
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        # assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.custom, inst.store_user_data = 'should give warning', {}
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     def test_no_json_given(self):
         dict_persistence = DictPersistence()
         assert dict_persistence.get_user_data() == defaultdict(dict)

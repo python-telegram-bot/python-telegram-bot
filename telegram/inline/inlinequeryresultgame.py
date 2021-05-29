@@ -45,6 +45,8 @@ class InlineQueryResultGame(InlineQueryResult):
 
     """
 
+    __slots__ = ('reply_markup', 'game_short_name')
+
     def __init__(
         self,
         id: str,  # pylint: disable=W0622

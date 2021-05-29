@@ -38,6 +38,8 @@ class VoiceChatStarted(TelegramObject):
     .. versionadded:: 13.4
     """
 
+    __slots__ = ()
+
     def __init__(self, **_kwargs: Any):  # skipcq: PTC-W0049
         pass
 
@@ -61,6 +63,8 @@ class VoiceChatEnded(TelegramObject):
         duration (:obj:`int`): Voice chat duration in seconds.
 
     """
+
+    __slots__ = ('duration', '_id_attrs')
 
     def __init__(self, duration: int, **_kwargs: Any) -> None:
         self.duration = int(duration) if duration is not None else None
@@ -88,6 +92,8 @@ class VoiceChatParticipantsInvited(TelegramObject):
             were invited to the voice chat.
 
     """
+
+    __slots__ = ('users', '_id_attrs')
 
     def __init__(self, users: List[User], **_kwargs: Any) -> None:
         self.users = users
@@ -133,6 +139,8 @@ class VoiceChatScheduled(TelegramObject):
             chat is supposed to be started by a chat administrator
 
     """
+
+    __slots__ = ('start_date', '_id_attrs')
 
     def __init__(self, start_date: dtm.datetime, **_kwargs: Any) -> None:
         self.start_date = start_date

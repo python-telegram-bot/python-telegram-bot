@@ -82,6 +82,20 @@ class InlineQueryResultPhoto(InlineQueryResult):
 
     """
 
+    __slots__ = (
+        'photo_url',
+        'reply_markup',
+        'caption_entities',
+        'photo_width',
+        'caption',
+        'title',
+        'description',
+        'parse_mode',
+        'input_message_content',
+        'photo_height',
+        'thumb_url',
+    )
+
     def __init__(
         self,
         id: str,  # pylint: disable=W0622

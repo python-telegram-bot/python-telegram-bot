@@ -58,6 +58,16 @@ class PassportFile(TelegramObject):
 
     """
 
+    __slots__ = (
+        'file_date',
+        'bot',
+        'file_id',
+        'file_size',
+        '_credentials',
+        'file_unique_id',
+        '_id_attrs',
+    )
+
     def __init__(
         self,
         file_id: str,

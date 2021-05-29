@@ -17,9 +17,11 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the base class for handlers as used by the Dispatcher."""
-
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, TypeVar, Union, Generic
+from sys import version_info as py_ver
+
+from telegram.utils.deprecate import set_new_attribute_deprecated
 
 from telegram import Update
 from telegram.ext.utils.promise import Promise
@@ -90,6 +92,27 @@ class Handler(Generic[UT], ABC):
 
     """
 
+    # Apparently Py 3.7 and below have '__dict__' in ABC
+    if py_ver < (3, 7):
+        __slots__ = (
+            'callback',
+            'pass_update_queue',
+            'pass_job_queue',
+            'pass_user_data',
+            'pass_chat_data',
+            'run_async',
+        )
+    else:
+        __slots__ = (
+            'callback',  # type: ignore[assignment]
+            'pass_update_queue',
+            'pass_job_queue',
+            'pass_user_data',
+            'pass_chat_data',
+            'run_async',
+            '__dict__',
+        )
+
     def __init__(
         self,
         callback: Callable[[UT, 'CallbackContext'], RT],
@@ -105,6 +128,17 @@ class Handler(Generic[UT], ABC):
         self.pass_user_data = pass_user_data
         self.pass_chat_data = pass_chat_data
         self.run_async = run_async
+
+    def __setattr__(self, key: str, value: object) -> None:
+        # See comment on BaseFilter to know why this was done.
+        if key.startswith('__'):
+            key = f"_{self.__class__.__name__}{key}"
+        if issubclass(self.__class__, Handler) and not self.__class__.__module__.startswith(
+            'telegram.ext.'
+        ):
+            object.__setattr__(self, key, value)
+            return
+        set_new_attribute_deprecated(self, key, value)
 
     @abstractmethod
     def check_update(self, update: object) -> Optional[Union[bool, object]]:

@@ -61,6 +61,17 @@ class VideoNote(TelegramObject):
 
     """
 
+    __slots__ = (
+        'bot',
+        'length',
+        'file_id',
+        'file_size',
+        'thumb',
+        'duration',
+        'file_unique_id',
+        '_id_attrs',
+    )
+
     def __init__(
         self,
         file_id: str,

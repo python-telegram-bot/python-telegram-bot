@@ -120,6 +120,8 @@ class MessageHandler(Handler[Update]):
 
     """
 
+    __slots__ = ('filters',)
+
     def __init__(
         self,
         filters: BaseFilter,

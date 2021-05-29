@@ -32,6 +32,14 @@ class TestForceReply:
     force_reply = True
     selective = True
 
+    def test_slot_behaviour(self, force_reply, recwarn, mro_slots):
+        for attr in force_reply.__slots__:
+            assert getattr(force_reply, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not force_reply.__dict__, f"got missing slot(s): {force_reply.__dict__}"
+        assert len(mro_slots(force_reply)) == len(set(mro_slots(force_reply))), "duplicate slot"
+        force_reply.custom, force_reply.force_reply = 'should give warning', self.force_reply
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     @flaky(3, 1)
     def test_send_message_with_force_reply(self, bot, chat_id, force_reply):
         message = bot.send_message(chat_id, 'text', reply_markup=force_reply)

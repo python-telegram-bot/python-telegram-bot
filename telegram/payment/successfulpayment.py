@@ -62,6 +62,17 @@ class SuccessfulPayment(TelegramObject):
 
     """
 
+    __slots__ = (
+        'invoice_payload',
+        'shipping_option_id',
+        'currency',
+        'order_info',
+        'telegram_payment_charge_id',
+        'provider_payment_charge_id',
+        'total_amount',
+        '_id_attrs',
+    )
+
     def __init__(
         self,
         currency: str,

@@ -129,6 +129,8 @@ class CommandHandler(Handler[Update]):
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
     """
 
+    __slots__ = ('command', 'filters', 'pass_args')
+
     def __init__(
         self,
         command: SLT[str],
@@ -349,6 +351,9 @@ class PrefixHandler(CommandHandler):
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     """
+
+    # 'prefix' is a class property, & 'command' is included in the superclass, so they're left out.
+    __slots__ = ('_prefix', '_command', '_commands')
 
     def __init__(
         self,

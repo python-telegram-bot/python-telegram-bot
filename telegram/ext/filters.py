@@ -23,6 +23,7 @@ import re
 import warnings
 
 from abc import ABC, abstractmethod
+from sys import version_info as py_ver
 from threading import Lock
 from typing import (
     Dict,
@@ -50,7 +51,7 @@ __all__ = [
     'XORFilter',
 ]
 
-from telegram.utils.deprecate import TelegramDeprecationWarning
+from telegram.utils.deprecate import TelegramDeprecationWarning, set_new_attribute_deprecated
 from telegram.utils.types import SLT
 
 DataDict = Dict[str, list]
@@ -112,8 +113,17 @@ class BaseFilter(ABC):
             (depends on the handler).
     """
 
-    _name = None
-    data_filter = False
+    if py_ver < (3, 7):
+        __slots__ = ('_name', '_data_filter')
+    else:
+        __slots__ = ('_name', '_data_filter', '__dict__')  # type: ignore[assignment]
+
+    def __new__(cls, *args: object, **kwargs: object) -> 'BaseFilter':  # pylint: disable=W0613
+        instance = super().__new__(cls)
+        instance._name = None
+        instance._data_filter = False
+
+        return instance
 
     @abstractmethod
     def __call__(self, update: Update) -> Optional[Union[bool, DataDict]]:
@@ -131,13 +141,33 @@ class BaseFilter(ABC):
     def __invert__(self) -> 'BaseFilter':
         return InvertedFilter(self)
 
+    def __setattr__(self, key: str, value: object) -> None:
+        # Allow setting custom attributes w/o warning for user defined custom filters.
+        # To differentiate between a custom and a PTB filter, we use this hacky but
+        # simple way of checking the module name where the class is defined from.
+        if (
+            issubclass(self.__class__, (UpdateFilter, MessageFilter))
+            and self.__class__.__module__ != __name__
+        ):  # __name__ is telegram.ext.filters
+            object.__setattr__(self, key, value)
+            return
+        set_new_attribute_deprecated(self, key, value)
+
+    @property
+    def data_filter(self) -> bool:
+        return self._data_filter
+
+    @data_filter.setter
+    def data_filter(self, value: bool) -> None:
+        self._data_filter = value
+
     @property
     def name(self) -> Optional[str]:
         return self._name
 
     @name.setter
     def name(self, name: Optional[str]) -> None:
-        self._name = name
+        self._name = name  # pylint: disable=E0237
 
     def __repr__(self) -> str:
         # We do this here instead of in a __init__ so filter don't have to call __init__ or super()
@@ -146,7 +176,7 @@ class BaseFilter(ABC):
         return self.name
 
 
-class MessageFilter(BaseFilter, ABC):
+class MessageFilter(BaseFilter):
     """Base class for all Message Filters. In contrast to :class:`UpdateFilter`, the object passed
     to :meth:`filter` is ``update.effective_message``.
 
@@ -161,6 +191,8 @@ class MessageFilter(BaseFilter, ABC):
             (depends on the handler).
 
     """
+
+    __slots__ = ()
 
     def __call__(self, update: Update) -> Optional[Union[bool, DataDict]]:
         return self.filter(update.effective_message)
@@ -178,7 +210,7 @@ class MessageFilter(BaseFilter, ABC):
         """
 
 
-class UpdateFilter(BaseFilter, ABC):
+class UpdateFilter(BaseFilter):
     """Base class for all Update Filters. In contrast to :class:`MessageFilter`, the object
     passed to :meth:`filter` is ``update``, which allows to create filters like
     :attr:`Filters.update.edited_message`.
@@ -194,6 +226,8 @@ class UpdateFilter(BaseFilter, ABC):
             (depends on the handler).
 
     """
+
+    __slots__ = ()
 
     def __call__(self, update: Update) -> Optional[Union[bool, DataDict]]:
         return self.filter(update)
@@ -219,6 +253,8 @@ class InvertedFilter(UpdateFilter):
 
     """
 
+    __slots__ = ('f',)
+
     def __init__(self, f: BaseFilter):
         self.f = f
 
@@ -243,6 +279,8 @@ class MergedFilter(UpdateFilter):
         or_filter: Optional filter to "or" with base_filter. Mutually exclusive with and_filter.
 
     """
+
+    __slots__ = ('base_filter', 'and_filter', 'or_filter')
 
     def __init__(
         self, base_filter: BaseFilter, and_filter: BaseFilter = None, or_filter: BaseFilter = None
@@ -328,6 +366,8 @@ class XORFilter(UpdateFilter):
 
     """
 
+    __slots__ = ('base_filter', 'xor_filter', 'merged_filter')
+
     def __init__(self, base_filter: BaseFilter, xor_filter: BaseFilter):
         self.base_filter = base_filter
         self.xor_filter = xor_filter
@@ -346,11 +386,15 @@ class XORFilter(UpdateFilter):
 
 
 class _DiceEmoji(MessageFilter):
+    __slots__ = ('emoji',)
+
     def __init__(self, emoji: str = None, name: str = None):
         self.name = f'Filters.dice.{name}' if name else 'Filters.dice'
         self.emoji = emoji
 
     class _DiceValues(MessageFilter):
+        __slots__ = ('values', 'emoji')
+
         def __init__(
             self,
             values: SLT[int],
@@ -393,7 +437,13 @@ class Filters:
 
     """
 
+    __slots__ = ('__dict__',)
+
+    def __setattr__(self, key: str, value: object) -> None:
+        set_new_attribute_deprecated(self, key, value)
+
     class _All(MessageFilter):
+        __slots__ = ()
         name = 'Filters.all'
 
         def filter(self, message: Message) -> bool:
@@ -403,9 +453,12 @@ class Filters:
     """All Messages."""
 
     class _Text(MessageFilter):
+        __slots__ = ()
         name = 'Filters.text'
 
         class _TextStrings(MessageFilter):
+            __slots__ = ('strings',)
+
             def __init__(self, strings: Union[List[str], Tuple[str]]):
                 self.strings = strings
                 self.name = f'Filters.text({strings})'
@@ -454,9 +507,12 @@ class Filters:
     """
 
     class _Caption(MessageFilter):
+        __slots__ = ()
         name = 'Filters.caption'
 
         class _CaptionStrings(MessageFilter):
+            __slots__ = ('strings',)
+
             def __init__(self, strings: Union[List[str], Tuple[str]]):
                 self.strings = strings
                 self.name = f'Filters.caption({strings})'
@@ -489,9 +545,12 @@ class Filters:
     """
 
     class _Command(MessageFilter):
+        __slots__ = ()
         name = 'Filters.command'
 
         class _CommandOnlyStart(MessageFilter):
+            __slots__ = ('only_start',)
+
             def __init__(self, only_start: bool):
                 self.only_start = only_start
                 self.name = f'Filters.command({only_start})'
@@ -564,6 +623,7 @@ class Filters:
             pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
         """
 
+        __slots__ = ('pattern',)
         data_filter = True
 
         def __init__(self, pattern: Union[str, Pattern]):
@@ -599,6 +659,7 @@ class Filters:
             pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
         """
 
+        __slots__ = ('pattern',)
         data_filter = True
 
         def __init__(self, pattern: Union[str, Pattern]):
@@ -617,6 +678,7 @@ class Filters:
             return {}
 
     class _Reply(MessageFilter):
+        __slots__ = ()
         name = 'Filters.reply'
 
         def filter(self, message: Message) -> bool:
@@ -626,6 +688,7 @@ class Filters:
     """Messages that are a reply to another message."""
 
     class _Audio(MessageFilter):
+        __slots__ = ()
         name = 'Filters.audio'
 
         def filter(self, message: Message) -> bool:
@@ -635,6 +698,7 @@ class Filters:
     """Messages that contain :class:`telegram.Audio`."""
 
     class _Document(MessageFilter):
+        __slots__ = ()
         name = 'Filters.document'
 
         class category(MessageFilter):
@@ -651,7 +715,14 @@ class Filters:
                 of audio sent as file, for example 'audio/mpeg' or 'audio/x-wav'.
             """
 
+            __slots__ = ('_category',)
+
             def __init__(self, category: Optional[str]):
+                """Initialize the category you want to filter
+
+                Args:
+                    category (str, optional): category of the media you want to filter
+                """
                 self._category = category
                 self.name = f"Filters.document.category('{self._category}')"
 
@@ -679,6 +750,8 @@ class Filters:
             Example:
                 ``Filters.document.mime_type('audio/mpeg')`` filters all audio in mp3 format.
             """
+
+            __slots__ = ('mimetype',)
 
             def __init__(self, mimetype: Optional[str]):
                 self.mimetype = mimetype
@@ -731,6 +804,8 @@ class Filters:
                 * ``Filters.document.file_extension(None)``
                   filters files without a dot in the filename.
             """
+
+            __slots__ = ('_file_extension', 'is_case_sensitive')
 
             def __init__(self, file_extension: Optional[str], case_sensitive: bool = False):
                 """Initialize the extension you want to filter.
@@ -850,6 +925,7 @@ officedocument.wordprocessingml.document")``.
     """
 
     class _Animation(MessageFilter):
+        __slots__ = ()
         name = 'Filters.animation'
 
         def filter(self, message: Message) -> bool:
@@ -859,6 +935,7 @@ officedocument.wordprocessingml.document")``.
     """Messages that contain :class:`telegram.Animation`."""
 
     class _Photo(MessageFilter):
+        __slots__ = ()
         name = 'Filters.photo'
 
         def filter(self, message: Message) -> bool:
@@ -868,6 +945,7 @@ officedocument.wordprocessingml.document")``.
     """Messages that contain :class:`telegram.PhotoSize`."""
 
     class _Sticker(MessageFilter):
+        __slots__ = ()
         name = 'Filters.sticker'
 
         def filter(self, message: Message) -> bool:
@@ -877,6 +955,7 @@ officedocument.wordprocessingml.document")``.
     """Messages that contain :class:`telegram.Sticker`."""
 
     class _Video(MessageFilter):
+        __slots__ = ()
         name = 'Filters.video'
 
         def filter(self, message: Message) -> bool:
@@ -886,6 +965,7 @@ officedocument.wordprocessingml.document")``.
     """Messages that contain :class:`telegram.Video`."""
 
     class _Voice(MessageFilter):
+        __slots__ = ()
         name = 'Filters.voice'
 
         def filter(self, message: Message) -> bool:
@@ -895,6 +975,7 @@ officedocument.wordprocessingml.document")``.
     """Messages that contain :class:`telegram.Voice`."""
 
     class _VideoNote(MessageFilter):
+        __slots__ = ()
         name = 'Filters.video_note'
 
         def filter(self, message: Message) -> bool:
@@ -904,6 +985,7 @@ officedocument.wordprocessingml.document")``.
     """Messages that contain :class:`telegram.VideoNote`."""
 
     class _Contact(MessageFilter):
+        __slots__ = ()
         name = 'Filters.contact'
 
         def filter(self, message: Message) -> bool:
@@ -913,6 +995,7 @@ officedocument.wordprocessingml.document")``.
     """Messages that contain :class:`telegram.Contact`."""
 
     class _Location(MessageFilter):
+        __slots__ = ()
         name = 'Filters.location'
 
         def filter(self, message: Message) -> bool:
@@ -922,6 +1005,7 @@ officedocument.wordprocessingml.document")``.
     """Messages that contain :class:`telegram.Location`."""
 
     class _Venue(MessageFilter):
+        __slots__ = ()
         name = 'Filters.venue'
 
         def filter(self, message: Message) -> bool:
@@ -939,7 +1023,10 @@ officedocument.wordprocessingml.document")``.
 
         """
 
+        __slots__ = ()
+
         class _NewChatMembers(MessageFilter):
+            __slots__ = ()
             name = 'Filters.status_update.new_chat_members'
 
             def filter(self, message: Message) -> bool:
@@ -949,6 +1036,7 @@ officedocument.wordprocessingml.document")``.
         """Messages that contain :attr:`telegram.Message.new_chat_members`."""
 
         class _LeftChatMember(MessageFilter):
+            __slots__ = ()
             name = 'Filters.status_update.left_chat_member'
 
             def filter(self, message: Message) -> bool:
@@ -958,6 +1046,7 @@ officedocument.wordprocessingml.document")``.
         """Messages that contain :attr:`telegram.Message.left_chat_member`."""
 
         class _NewChatTitle(MessageFilter):
+            __slots__ = ()
             name = 'Filters.status_update.new_chat_title'
 
             def filter(self, message: Message) -> bool:
@@ -967,6 +1056,7 @@ officedocument.wordprocessingml.document")``.
         """Messages that contain :attr:`telegram.Message.new_chat_title`."""
 
         class _NewChatPhoto(MessageFilter):
+            __slots__ = ()
             name = 'Filters.status_update.new_chat_photo'
 
             def filter(self, message: Message) -> bool:
@@ -976,6 +1066,7 @@ officedocument.wordprocessingml.document")``.
         """Messages that contain :attr:`telegram.Message.new_chat_photo`."""
 
         class _DeleteChatPhoto(MessageFilter):
+            __slots__ = ()
             name = 'Filters.status_update.delete_chat_photo'
 
             def filter(self, message: Message) -> bool:
@@ -985,6 +1076,7 @@ officedocument.wordprocessingml.document")``.
         """Messages that contain :attr:`telegram.Message.delete_chat_photo`."""
 
         class _ChatCreated(MessageFilter):
+            __slots__ = ()
             name = 'Filters.status_update.chat_created'
 
             def filter(self, message: Message) -> bool:
@@ -1000,6 +1092,7 @@ officedocument.wordprocessingml.document")``.
             :attr: `telegram.Message.channel_chat_created`."""
 
         class _MessageAutoDeleteTimerChanged(MessageFilter):
+            __slots__ = ()
             name = 'MessageAutoDeleteTimerChanged'
 
             def filter(self, message: Message) -> bool:
@@ -1009,6 +1102,7 @@ officedocument.wordprocessingml.document")``.
         """Messages that contain :attr:`message_auto_delete_timer_changed`"""
 
         class _Migrate(MessageFilter):
+            __slots__ = ()
             name = 'Filters.status_update.migrate'
 
             def filter(self, message: Message) -> bool:
@@ -1019,6 +1113,7 @@ officedocument.wordprocessingml.document")``.
             :attr:`telegram.Message.migrate_to_chat_id`."""
 
         class _PinnedMessage(MessageFilter):
+            __slots__ = ()
             name = 'Filters.status_update.pinned_message'
 
             def filter(self, message: Message) -> bool:
@@ -1028,6 +1123,7 @@ officedocument.wordprocessingml.document")``.
         """Messages that contain :attr:`telegram.Message.pinned_message`."""
 
         class _ConnectedWebsite(MessageFilter):
+            __slots__ = ()
             name = 'Filters.status_update.connected_website'
 
             def filter(self, message: Message) -> bool:
@@ -1037,6 +1133,7 @@ officedocument.wordprocessingml.document")``.
         """Messages that contain :attr:`telegram.Message.connected_website`."""
 
         class _ProximityAlertTriggered(MessageFilter):
+            __slots__ = ()
             name = 'Filters.status_update.proximity_alert_triggered'
 
             def filter(self, message: Message) -> bool:
@@ -1046,6 +1143,7 @@ officedocument.wordprocessingml.document")``.
         """Messages that contain :attr:`telegram.Message.proximity_alert_triggered`."""
 
         class _VoiceChatScheduled(MessageFilter):
+            __slots__ = ()
             name = 'Filters.status_update.voice_chat_scheduled'
 
             def filter(self, message: Message) -> bool:
@@ -1055,6 +1153,7 @@ officedocument.wordprocessingml.document")``.
         """Messages that contain :attr:`telegram.Message.voice_chat_scheduled`."""
 
         class _VoiceChatStarted(MessageFilter):
+            __slots__ = ()
             name = 'Filters.status_update.voice_chat_started'
 
             def filter(self, message: Message) -> bool:
@@ -1064,6 +1163,7 @@ officedocument.wordprocessingml.document")``.
         """Messages that contain :attr:`telegram.Message.voice_chat_started`."""
 
         class _VoiceChatEnded(MessageFilter):
+            __slots__ = ()
             name = 'Filters.status_update.voice_chat_ended'
 
             def filter(self, message: Message) -> bool:
@@ -1073,6 +1173,7 @@ officedocument.wordprocessingml.document")``.
         """Messages that contain :attr:`telegram.Message.voice_chat_ended`."""
 
         class _VoiceChatParticipantsInvited(MessageFilter):
+            __slots__ = ()
             name = 'Filters.status_update.voice_chat_participants_invited'
 
             def filter(self, message: Message) -> bool:
@@ -1157,6 +1258,7 @@ officedocument.wordprocessingml.document")``.
     """
 
     class _Forwarded(MessageFilter):
+        __slots__ = ()
         name = 'Filters.forwarded'
 
         def filter(self, message: Message) -> bool:
@@ -1166,6 +1268,7 @@ officedocument.wordprocessingml.document")``.
     """Messages that are forwarded."""
 
     class _Game(MessageFilter):
+        __slots__ = ()
         name = 'Filters.game'
 
         def filter(self, message: Message) -> bool:
@@ -1187,6 +1290,8 @@ officedocument.wordprocessingml.document")``.
                 in :class:`telegram.MessageEntity`.
 
         """
+
+        __slots__ = ('entity_type',)
 
         def __init__(self, entity_type: str):
             self.entity_type = entity_type
@@ -1210,6 +1315,8 @@ officedocument.wordprocessingml.document")``.
 
         """
 
+        __slots__ = ('entity_type',)
+
         def __init__(self, entity_type: str):
             self.entity_type = entity_type
             self.name = f'Filters.caption_entity({self.entity_type})'
@@ -1219,6 +1326,7 @@ officedocument.wordprocessingml.document")``.
             return any(entity.type == self.entity_type for entity in message.caption_entities)
 
     class _Private(MessageFilter):
+        __slots__ = ()
         name = 'Filters.private'
 
         def filter(self, message: Message) -> bool:
@@ -1239,6 +1347,7 @@ officedocument.wordprocessingml.document")``.
     """
 
     class _Group(MessageFilter):
+        __slots__ = ()
         name = 'Filters.group'
 
         def filter(self, message: Message) -> bool:
@@ -1259,9 +1368,11 @@ officedocument.wordprocessingml.document")``.
     """
 
     class _ChatType(MessageFilter):
+        __slots__ = ()
         name = 'Filters.chat_type'
 
         class _Channel(MessageFilter):
+            __slots__ = ()
             name = 'Filters.chat_type.channel'
 
             def filter(self, message: Message) -> bool:
@@ -1270,6 +1381,7 @@ officedocument.wordprocessingml.document")``.
         channel = _Channel()
 
         class _Group(MessageFilter):
+            __slots__ = ()
             name = 'Filters.chat_type.group'
 
             def filter(self, message: Message) -> bool:
@@ -1278,6 +1390,7 @@ officedocument.wordprocessingml.document")``.
         group = _Group()
 
         class _SuperGroup(MessageFilter):
+            __slots__ = ()
             name = 'Filters.chat_type.supergroup'
 
             def filter(self, message: Message) -> bool:
@@ -1286,6 +1399,7 @@ officedocument.wordprocessingml.document")``.
         supergroup = _SuperGroup()
 
         class _Groups(MessageFilter):
+            __slots__ = ()
             name = 'Filters.chat_type.groups'
 
             def filter(self, message: Message) -> bool:
@@ -1294,6 +1408,7 @@ officedocument.wordprocessingml.document")``.
         groups = _Groups()
 
         class _Private(MessageFilter):
+            __slots__ = ()
             name = 'Filters.chat_type.private'
 
             def filter(self, message: Message) -> bool:
@@ -1321,6 +1436,15 @@ officedocument.wordprocessingml.document")``.
     """
 
     class _ChatUserBaseFilter(MessageFilter, ABC):
+        __slots__ = (
+            'chat_id_name',
+            'username_name',
+            'allow_empty',
+            '__lock',
+            '_chat_ids',
+            '_usernames',
+        )
+
         def __init__(
             self,
             chat_id: SLT[int] = None,
@@ -1497,6 +1621,8 @@ officedocument.wordprocessingml.document")``.
 
         """
 
+        __slots__ = ()
+
         def __init__(
             self,
             user_id: SLT[int] = None,
@@ -1595,6 +1721,8 @@ officedocument.wordprocessingml.document")``.
                 is specified in :attr:`bot_ids` and :attr:`usernames`.
 
         """
+
+        __slots__ = ()
 
         def __init__(
             self,
@@ -1695,6 +1823,8 @@ officedocument.wordprocessingml.document")``.
 
         """
 
+        __slots__ = ()
+
         def get_chat_or_user(self, message: Message) -> Optional[Chat]:
             return message.chat
 
@@ -1785,6 +1915,8 @@ officedocument.wordprocessingml.document")``.
             allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
                 is specified in :attr:`chat_ids` and :attr:`usernames`.
         """
+
+        __slots__ = ()
 
         def get_chat_or_user(self, message: Message) -> Union[User, Chat, None]:
             return message.forward_from or message.forward_from_chat
@@ -1891,6 +2023,8 @@ officedocument.wordprocessingml.document")``.
 
         """
 
+        __slots__ = ()
+
         def get_chat_or_user(self, message: Message) -> Optional[Chat]:
             return message.sender_chat
 
@@ -1937,12 +2071,16 @@ officedocument.wordprocessingml.document")``.
             return super().remove_chat_ids(chat_id)
 
         class _SuperGroup(MessageFilter):
+            __slots__ = ()
+
             def filter(self, message: Message) -> bool:
                 if message.sender_chat:
                     return message.sender_chat.type == Chat.SUPERGROUP
                 return False
 
         class _Channel(MessageFilter):
+            __slots__ = ()
+
             def filter(self, message: Message) -> bool:
                 if message.sender_chat:
                     return message.sender_chat.type == Chat.CHANNEL
@@ -1952,6 +2090,7 @@ officedocument.wordprocessingml.document")``.
         channel = _Channel()
 
     class _Invoice(MessageFilter):
+        __slots__ = ()
         name = 'Filters.invoice'
 
         def filter(self, message: Message) -> bool:
@@ -1961,6 +2100,7 @@ officedocument.wordprocessingml.document")``.
     """Messages that contain :class:`telegram.Invoice`."""
 
     class _SuccessfulPayment(MessageFilter):
+        __slots__ = ()
         name = 'Filters.successful_payment'
 
         def filter(self, message: Message) -> bool:
@@ -1970,6 +2110,7 @@ officedocument.wordprocessingml.document")``.
     """Messages that confirm a :class:`telegram.SuccessfulPayment`."""
 
     class _PassportData(MessageFilter):
+        __slots__ = ()
         name = 'Filters.passport_data'
 
         def filter(self, message: Message) -> bool:
@@ -1979,6 +2120,7 @@ officedocument.wordprocessingml.document")``.
     """Messages that contain a :class:`telegram.PassportData`"""
 
     class _Poll(MessageFilter):
+        __slots__ = ()
         name = 'Filters.poll'
 
         def filter(self, message: Message) -> bool:
@@ -1988,6 +2130,7 @@ officedocument.wordprocessingml.document")``.
     """Messages that contain a :class:`telegram.Poll`."""
 
     class _Dice(_DiceEmoji):
+        __slots__ = ()
         dice = _DiceEmoji('🎲', 'dice')
         darts = _DiceEmoji('🎯', 'darts')
         basketball = _DiceEmoji('🏀', 'basketball')
@@ -2051,6 +2194,8 @@ officedocument.wordprocessingml.document")``.
 
         """
 
+        __slots__ = ('lang',)
+
         def __init__(self, lang: SLT[str]):
             if isinstance(lang, str):
                 lang = cast(str, lang)
@@ -2068,6 +2213,8 @@ officedocument.wordprocessingml.document")``.
             )
 
     class _Attachment(MessageFilter):
+        __slots__ = ()
+
         name = 'Filters.attachment'
 
         def filter(self, message: Message) -> bool:
@@ -2080,9 +2227,11 @@ officedocument.wordprocessingml.document")``.
         .. versionadded:: 13.6"""
 
     class _UpdateType(UpdateFilter):
+        __slots__ = ()
         name = 'Filters.update'
 
         class _Message(UpdateFilter):
+            __slots__ = ()
             name = 'Filters.update.message'
 
             def filter(self, update: Update) -> bool:
@@ -2091,6 +2240,7 @@ officedocument.wordprocessingml.document")``.
         message = _Message()
 
         class _EditedMessage(UpdateFilter):
+            __slots__ = ()
             name = 'Filters.update.edited_message'
 
             def filter(self, update: Update) -> bool:
@@ -2099,6 +2249,7 @@ officedocument.wordprocessingml.document")``.
         edited_message = _EditedMessage()
 
         class _Messages(UpdateFilter):
+            __slots__ = ()
             name = 'Filters.update.messages'
 
             def filter(self, update: Update) -> bool:
@@ -2107,6 +2258,7 @@ officedocument.wordprocessingml.document")``.
         messages = _Messages()
 
         class _ChannelPost(UpdateFilter):
+            __slots__ = ()
             name = 'Filters.update.channel_post'
 
             def filter(self, update: Update) -> bool:
@@ -2115,6 +2267,7 @@ officedocument.wordprocessingml.document")``.
         channel_post = _ChannelPost()
 
         class _EditedChannelPost(UpdateFilter):
+            __slots__ = ()
             name = 'Filters.update.edited_channel_post'
 
             def filter(self, update: Update) -> bool:
@@ -2123,6 +2276,7 @@ officedocument.wordprocessingml.document")``.
         edited_channel_post = _EditedChannelPost()
 
         class _ChannelPosts(UpdateFilter):
+            __slots__ = ()
             name = 'Filters.update.channel_posts'
 
             def filter(self, update: Update) -> bool:

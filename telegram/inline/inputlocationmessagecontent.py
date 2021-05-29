@@ -59,6 +59,8 @@ class InputLocationMessageContent(InputMessageContent):
 
     """
 
+    __slots__ = ('longitude', 'horizontal_accuracy', 'proximity_alert_radius', 'live_period',
+                 'latitude', 'heading', '_id_attrs')
     # fmt: on
 
     def __init__(

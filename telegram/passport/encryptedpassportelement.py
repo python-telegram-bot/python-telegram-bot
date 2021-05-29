@@ -118,6 +118,21 @@ class EncryptedPassportElement(TelegramObject):
 
     """
 
+    __slots__ = (
+        'selfie',
+        'files',
+        'type',
+        'translation',
+        'email',
+        'hash',
+        'phone_number',
+        'bot',
+        'reverse_side',
+        'front_side',
+        'data',
+        '_id_attrs',
+    )
+
     def __init__(
         self,
         type: str,  # pylint: disable=W0622

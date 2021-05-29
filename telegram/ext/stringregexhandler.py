@@ -91,6 +91,8 @@ class StringRegexHandler(Handler[str]):
 
     """
 
+    __slots__ = ('pass_groups', 'pass_groupdict', 'pattern')
+
     def __init__(
         self,
         pattern: Union[str, Pattern],

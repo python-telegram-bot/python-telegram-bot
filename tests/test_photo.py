@@ -66,6 +66,14 @@ class TestPhoto:
     photo_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.jpg'
     file_size = 29176
 
+    def test_slot_behaviour(self, photo, recwarn, mro_slots):
+        for attr in photo.__slots__:
+            assert getattr(photo, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not photo.__dict__, f"got missing slot(s): {photo.__dict__}"
+        assert len(mro_slots(photo)) == len(set(mro_slots(photo))), "duplicate slot"
+        photo.custom, photo.width = 'should give warning', self.width
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     def test_creation(self, thumb, photo):
         # Make sure file has been uploaded.
         assert isinstance(photo, PhotoSize)
@@ -235,6 +243,7 @@ class TestPhoto:
         monkeypatch.setattr(bot, '_post', make_assertion)
         bot.send_photo(chat_id, file)
         assert test_flag
+        monkeypatch.delattr(bot, '_post')
 
     @flaky(3, 1)
     @pytest.mark.parametrize(

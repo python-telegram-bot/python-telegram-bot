@@ -67,6 +67,16 @@ class Game(TelegramObject):
 
     """
 
+    __slots__ = (
+        'title',
+        'photo',
+        'description',
+        'text_entities',
+        'text',
+        'animation',
+        '_id_attrs',
+    )
+
     def __init__(
         self,
         title: str,

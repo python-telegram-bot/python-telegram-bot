@@ -123,6 +123,30 @@ class InputInvoiceMessageContent(InputMessageContent):
 
     """
 
+    __slots__ = (
+        'title',
+        'description',
+        'payload',
+        'provider_token',
+        'currency',
+        'prices',
+        'max_tip_amount',
+        'suggested_tip_amounts',
+        'provider_data',
+        'photo_url',
+        'photo_size',
+        'photo_width',
+        'photo_height',
+        'need_name',
+        'need_phone_number',
+        'need_email',
+        'need_shipping_address',
+        'send_phone_number_to_provider',
+        'send_email_to_provider',
+        'is_flexible',
+        '_id_attrs',
+    )
+
     def __init__(
         self,
         title: str,

@@ -85,6 +85,21 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
 
     """
 
+    __slots__ = (
+        'reply_markup',
+        'thumb_mime_type',
+        'caption_entities',
+        'mpeg4_duration',
+        'mpeg4_width',
+        'title',
+        'caption',
+        'parse_mode',
+        'input_message_content',
+        'mpeg4_url',
+        'mpeg4_height',
+        'thumb_url',
+    )
+
     def __init__(
         self,
         id: str,  # pylint: disable=W0622

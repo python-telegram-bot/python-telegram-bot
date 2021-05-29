@@ -79,6 +79,17 @@ class DictPersistence(BasePersistence):
             persistence class.
     """
 
+    __slots__ = (
+        '_user_data',
+        '_chat_data',
+        '_bot_data',
+        '_conversations',
+        '_user_data_json',
+        '_chat_data_json',
+        '_bot_data_json',
+        '_conversations_json',
+    )
+
     def __init__(
         self,
         store_user_data: bool = True,

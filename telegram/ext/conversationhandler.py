@@ -45,6 +45,9 @@ CheckUpdateType = Optional[Tuple[Tuple[int, ...], Handler, object]]
 
 
 class _ConversationTimeoutContext:
+    # '__dict__' is not included since this a private class
+    __slots__ = ('conversation_key', 'update', 'dispatcher', 'callback_context')
+
     def __init__(
         self,
         conversation_key: Tuple[int, ...],
@@ -181,6 +184,26 @@ class ConversationHandler(Handler[Update]):
             .. versionadded:: 13.2
 
     """
+
+    __slots__ = (
+        '_entry_points',
+        '_states',
+        '_fallbacks',
+        '_allow_reentry',
+        '_per_user',
+        '_per_chat',
+        '_per_message',
+        '_conversation_timeout',
+        '_name',
+        'persistent',
+        '_persistence',
+        '_map_to_parent',
+        'timeout_jobs',
+        '_timeout_jobs_lock',
+        '_conversations',
+        '_conversations_lock',
+        'logger',
+    )
 
     END: ClassVar[int] = -1
     """:obj:`int`: Used as a constant to return when a conversation is ended."""
