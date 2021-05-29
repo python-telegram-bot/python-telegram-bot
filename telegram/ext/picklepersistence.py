@@ -150,7 +150,6 @@ class PicklePersistence(BasePersistence):
     @staticmethod
     def _dump_file(filename: str, data: object) -> None:
         with open(filename, "wb") as file:
-            print('dumping', filename)
             pickle.dump(data, file)
 
     def get_user_data(self) -> DefaultDict[int, Dict[object, object]]:
