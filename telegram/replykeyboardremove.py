@@ -55,6 +55,8 @@ class ReplyKeyboardRemove(ReplyMarkup):
 
     """
 
+    __slots__ = ('selective', 'remove_keyboard')
+
     def __init__(self, selective: bool = False, **_kwargs: Any):
         # Required
         self.remove_keyboard = True

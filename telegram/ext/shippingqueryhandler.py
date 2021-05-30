@@ -82,6 +82,8 @@ class ShippingQueryHandler(Handler[Update, CCT]):
 
     """
 
+    __slots__ = ()
+
     def check_update(self, update: object) -> bool:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 

@@ -16,19 +16,14 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the classes that represent Telegram InputMessageContent."""
-
-from telegram import TelegramObject
+from telegram import ChatAction
 
 
-class InputMessageContent(TelegramObject):
-    """Base class for Telegram InputMessageContent Objects.
-
-    See: :class:`telegram.InputContactMessageContent`,
-    :class:`telegram.InputInvoiceMessageContent`,
-    :class:`telegram.InputLocationMessageContent`, :class:`telegram.InputTextMessageContent` and
-    :class:`telegram.InputVenueMessageContent` for more details.
-
-    """
-
-    __slots__ = ()
+def test_slot_behaviour(recwarn, mro_slots):
+    action = ChatAction()
+    for attr in action.__slots__:
+        assert getattr(action, attr, 'err') != 'err', f"got extra slot '{attr}'"
+    assert not action.__dict__, f"got missing slot(s): {action.__dict__}"
+    assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
+    action.custom = 'should give warning'
+    assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list

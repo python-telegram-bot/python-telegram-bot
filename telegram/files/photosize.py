@@ -58,6 +58,8 @@ class PhotoSize(TelegramObject):
 
     """
 
+    __slots__ = ('bot', 'width', 'file_id', 'file_size', 'height', 'file_unique_id', '_id_attrs')
+
     def __init__(
         self,
         file_id: str,

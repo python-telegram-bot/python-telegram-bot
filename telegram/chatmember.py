@@ -138,6 +138,32 @@ class ChatMember(TelegramObject):
 
     """
 
+    __slots__ = (
+        'is_member',
+        'can_restrict_members',
+        'can_delete_messages',
+        'custom_title',
+        'can_be_edited',
+        'can_post_messages',
+        'can_send_messages',
+        'can_edit_messages',
+        'can_send_media_messages',
+        'is_anonymous',
+        'can_add_web_page_previews',
+        'can_send_other_messages',
+        'can_invite_users',
+        'can_send_polls',
+        'user',
+        'can_promote_members',
+        'status',
+        'can_change_info',
+        'can_pin_messages',
+        'can_manage_chat',
+        'can_manage_voice_chats',
+        'until_date',
+        '_id_attrs',
+    )
+
     ADMINISTRATOR: ClassVar[str] = constants.CHATMEMBER_ADMINISTRATOR
     """:const:`telegram.constants.CHATMEMBER_ADMINISTRATOR`"""
     CREATOR: ClassVar[str] = constants.CHATMEMBER_CREATOR

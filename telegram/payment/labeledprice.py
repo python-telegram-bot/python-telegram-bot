@@ -45,6 +45,8 @@ class LabeledPrice(TelegramObject):
 
     """
 
+    __slots__ = ('label', '_id_attrs', 'amount')
+
     def __init__(self, label: str, amount: int, **_kwargs: Any):
         self.label = label
         self.amount = amount

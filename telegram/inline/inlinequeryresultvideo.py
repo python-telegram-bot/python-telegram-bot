@@ -92,6 +92,22 @@ class InlineQueryResultVideo(InlineQueryResult):
 
     """
 
+    __slots__ = (
+        'video_url',
+        'reply_markup',
+        'caption_entities',
+        'caption',
+        'title',
+        'description',
+        'video_duration',
+        'parse_mode',
+        'mime_type',
+        'input_message_content',
+        'video_height',
+        'video_width',
+        'thumb_url',
+    )
+
     def __init__(
         self,
         id: str,  # pylint: disable=W0622

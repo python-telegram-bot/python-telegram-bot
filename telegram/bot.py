@@ -158,6 +158,18 @@ class Bot(TelegramObject):
 
     """
 
+    __slots__ = (
+        'token',
+        'base_url',
+        'base_file_url',
+        'private_key',
+        'defaults',
+        '_bot',
+        '_commands',
+        '_request',
+        'logger',
+    )
+
     def __init__(
         self,
         token: str,
@@ -184,6 +196,7 @@ class Bot(TelegramObject):
         self._bot: Optional[User] = None
         self._commands: Optional[List[BotCommand]] = None
         self._request = request or Request()
+        self.private_key = None
         self.logger = logging.getLogger(__name__)
 
         if private_key:
@@ -195,6 +208,12 @@ class Bot(TelegramObject):
             self.private_key = serialization.load_pem_private_key(
                 private_key, password=private_key_password, backend=default_backend()
             )
+
+    def __setattr__(self, key: str, value: object) -> None:
+        if issubclass(self.__class__, Bot) and self.__class__ is not Bot:
+            object.__setattr__(self, key, value)
+            return
+        super().__setattr__(key, value)
 
     def _insert_defaults(
         self, data: Dict[str, object], timeout: ODVInput[float]

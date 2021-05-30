@@ -48,6 +48,8 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
 
     """
 
+    __slots__ = ('_context', '_bot_data', '_chat_data', '_user_data')
+
     @overload
     def __init__(
         self: 'ContextTypes[CallbackContext, Dict, Dict, Dict]',

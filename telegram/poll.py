@@ -48,6 +48,8 @@ class PollOption(TelegramObject):
 
     """
 
+    __slots__ = ('voter_count', 'text', '_id_attrs')
+
     def __init__(self, text: str, voter_count: int, **_kwargs: Any):
         self.text = text
         self.voter_count = voter_count
@@ -77,6 +79,8 @@ class PollAnswer(TelegramObject):
             May be empty if the user retracted their vote.
 
     """
+
+    __slots__ = ('option_ids', 'user', 'poll_id', '_id_attrs')
 
     def __init__(self, poll_id: str, user: User, option_ids: List[int], **_kwargs: Any):
         self.poll_id = poll_id
@@ -145,6 +149,23 @@ class Poll(TelegramObject):
             poll will be automatically closed. Converted to :obj:`datetime.datetime`.
 
     """
+
+    __slots__ = (
+        'total_voter_count',
+        'allows_multiple_answers',
+        'open_period',
+        'options',
+        'type',
+        'explanation_entities',
+        'is_anonymous',
+        'close_date',
+        'is_closed',
+        'id',
+        'explanation',
+        'question',
+        'correct_option_id',
+        '_id_attrs',
+    )
 
     def __init__(
         self,

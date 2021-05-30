@@ -85,6 +85,18 @@ class CallbackQuery(TelegramObject):
 
     """
 
+    __slots__ = (
+        'bot',
+        'game_short_name',
+        'message',
+        'chat_instance',
+        'id',
+        'from_user',
+        'inline_message_id',
+        'data',
+        '_id_attrs',
+    )
+
     def __init__(
         self,
         id: str,  # pylint: disable=W0622

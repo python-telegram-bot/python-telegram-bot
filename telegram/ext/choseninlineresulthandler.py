@@ -100,6 +100,8 @@ class ChosenInlineResultHandler(Handler[Update, CCT]):
 
     """
 
+    __slots__ = ('pattern',)
+
     def __init__(
         self,
         callback: Callable[[Update, 'CallbackContext'], RT],

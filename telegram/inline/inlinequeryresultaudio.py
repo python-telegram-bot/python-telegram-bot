@@ -74,6 +74,18 @@ class InlineQueryResultAudio(InlineQueryResult):
 
     """
 
+    __slots__ = (
+        'reply_markup',
+        'caption_entities',
+        'caption',
+        'title',
+        'parse_mode',
+        'audio_url',
+        'performer',
+        'input_message_content',
+        'audio_duration',
+    )
+
     def __init__(
         self,
         id: str,  # pylint: disable=W0622

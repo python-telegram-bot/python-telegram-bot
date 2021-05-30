@@ -91,6 +91,19 @@ class CallbackContext(Generic[UD, CD, BD]):
 
     """
 
+    __slots__ = (
+        '_dispatcher',
+        '_chat_id_and_data',
+        '_user_id_and_data',
+        'args',
+        'matches',
+        'error',
+        'job',
+        'async_args',
+        'async_kwargs',
+        '__dict__',
+    )
+
     def __init__(self, dispatcher: 'Dispatcher'):
         """
         Args:
@@ -272,12 +285,13 @@ class CallbackContext(Generic[UD, CD, BD]):
         return self
 
     def update(self, data: Dict[str, object]) -> None:
-        """Updates ``self.__dict__`` with the passed data.
+        """Updates ``self.__slots__`` with the passed data.
 
         Args:
             data (Dict[:obj:`str`, :obj:`object`]): The data.
         """
-        self.__dict__.update(data)
+        for key, value in data.items():
+            setattr(self, key, value)
 
     @property
     def bot(self) -> 'Bot':

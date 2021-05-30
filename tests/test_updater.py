@@ -74,6 +74,25 @@ class TestUpdater:
     offset = 0
     test_flag = False
 
+    def test_slot_behaviour(self, updater, mro_slots, recwarn):
+        for at in updater.__slots__:
+            at = f"_Updater{at}" if at.startswith('__') and not at.endswith('__') else at
+            assert getattr(updater, at, 'err') != 'err', f"got extra slot '{at}'"
+        assert not updater.__dict__, f"got missing slot(s): {updater.__dict__}"
+        assert len(mro_slots(updater)) == len(set(mro_slots(updater))), "duplicate slot"
+        updater.custom, updater.running = 'should give warning', updater.running
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
+        class CustomUpdater(Updater):
+            pass  # Tests that setting custom attributes of Updater subclass doesn't raise warning
+
+        a = CustomUpdater(updater.bot.token)
+        a.my_custom = 'no error!'
+        assert len(recwarn) == 1
+
+        updater.__setattr__('__test', 'mangled success')
+        assert getattr(updater, '_Updater__test', 'e') == 'mangled success', "mangling failed"
+
     @pytest.fixture(autouse=True)
     def reset(self):
         self.message_count = 0

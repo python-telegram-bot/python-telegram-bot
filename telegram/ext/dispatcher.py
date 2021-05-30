@@ -46,7 +46,7 @@ from telegram import TelegramError, Update
 from telegram.ext import BasePersistence, ContextTypes
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.handler import Handler
-from telegram.utils.deprecate import TelegramDeprecationWarning
+from telegram.utils.deprecate import TelegramDeprecationWarning, set_new_attribute_deprecated
 from telegram.ext.utils.promise import Promise
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 from telegram.ext.utils.types import CCT, UD, CD, BD
@@ -114,6 +114,8 @@ class DispatcherHandlerStop(Exception):
         state (:obj:`object`, optional): The next state of the conversation.
     """
 
+    __slots__ = ('state',)
+
     def __init__(self, state: object = None) -> None:
         super().__init__()
         self.state = state
@@ -159,6 +161,31 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
             .. versionadded:: 13.6
 
     """
+
+    # Allowing '__weakref__' creation here since we need it for the singleton
+    __slots__ = (
+        'workers',
+        'persistence',
+        'use_context',
+        'update_queue',
+        'job_queue',
+        'user_data',
+        'chat_data',
+        'bot_data',
+        '_update_persistence_lock',
+        'handlers',
+        'groups',
+        'error_handlers',
+        'running',
+        '__stop_event',
+        '__exception_event',
+        '__async_queue',
+        '__async_threads',
+        'bot',
+        '__dict__',
+        '__weakref__',
+        'context_types',
+    )
 
     __singleton_lock = Lock()
     __singleton_semaphore = BoundedSemaphore()
@@ -272,6 +299,17 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                 self._set_singleton(self)
             else:
                 self._set_singleton(None)
+
+    def __setattr__(self, key: str, value: object) -> None:
+        # Mangled names don't automatically apply in __setattr__ (see
+        # https://docs.python.org/3/tutorial/classes.html#private-variables), so we have to make
+        # it mangled so they don't raise TelegramDeprecationWarning unnecessarily
+        if key.startswith('__'):
+            key = f"_{self.__class__.__name__}{key}"
+        if issubclass(self.__class__, Dispatcher) and self.__class__ is not Dispatcher:
+            object.__setattr__(self, key, value)
+            return
+        set_new_attribute_deprecated(self, key, value)
 
     @property
     def exception_event(self) -> Event:  # skipcq: PY-D0003

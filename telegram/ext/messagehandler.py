@@ -121,6 +121,8 @@ class MessageHandler(Handler[Update, CCT]):
 
     """
 
+    __slots__ = ('filters',)
+
     def __init__(
         self,
         filters: BaseFilter,

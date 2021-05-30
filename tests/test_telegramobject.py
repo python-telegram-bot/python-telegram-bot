@@ -77,12 +77,23 @@ class TestTelegramObject:
 
     def test_to_dict_private_attribute(self):
         class TelegramObjectSubclass(TelegramObject):
+            __slots__ = ('a', '_b')  # Added slots so that the attrs are converted to dict
+
             def __init__(self):
                 self.a = 1
                 self._b = 2
 
         subclass_instance = TelegramObjectSubclass()
         assert subclass_instance.to_dict() == {'a': 1}
+
+    def test_slot_behaviour(self, recwarn, mro_slots):
+        inst = TelegramObject()
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.custom = 'should give warning'
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_meaningless_comparison(self, recwarn):
         expected_warning = "Objects of type TGO can not be meaningfully tested for equivalence."

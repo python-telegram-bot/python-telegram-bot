@@ -130,6 +130,8 @@ class InlineQueryHandler(Handler[Update, CCT]):
 
     """
 
+    __slots__ = ('pattern', 'chat_types', 'pass_groups', 'pass_groupdict')
+
     def __init__(
         self,
         callback: Callable[[Update, CCT], RT],

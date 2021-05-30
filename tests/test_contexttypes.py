@@ -26,6 +26,14 @@ class SubClass(CallbackContext):
 
 
 class TestContextTypes:
+    def test_slot_behaviour(self, mro_slots):
+        instance = ContextTypes()
+        for attr in instance.__slots__:
+            assert getattr(instance, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert len(mro_slots(instance)) == len(set(mro_slots(instance))), "duplicate slot"
+        with pytest.raises(AttributeError):
+            instance.custom
+
     def test_data_init(self):
         ct = ContextTypes(SubClass, int, float, bool)
         assert ct.context is SubClass

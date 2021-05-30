@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 import pytest
 from flaky import flaky
 
@@ -46,6 +45,14 @@ class TestInvoice:
     total_amount = sum([p.amount for p in prices])
     max_tip_amount = 42
     suggested_tip_amounts = [13, 42]
+
+    def test_slot_behaviour(self, invoice, mro_slots, recwarn):
+        for attr in invoice.__slots__:
+            assert getattr(invoice, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not invoice.__dict__, f"got missing slot(s): {invoice.__dict__}"
+        assert len(mro_slots(invoice)) == len(set(mro_slots(invoice))), "duplicate slot"
+        invoice.custom, invoice.title = 'should give warning', self.title
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_de_json(self, bot):
         invoice_json = Invoice.de_json(

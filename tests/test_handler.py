@@ -16,38 +16,28 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from flaky import flaky
 
-from telegram import ParseMode
+from sys import version_info as py_ver
+
+from telegram.ext import Handler
 
 
-class TestParseMode:
-    markdown_text = '*bold* _italic_ [link](http://google.com) [name](tg://user?id=123456789).'
-    html_text = (
-        '<b>bold</b> <i>italic</i> <a href="http://google.com">link</a> '
-        '<a href="tg://user?id=123456789">name</a>.'
-    )
-    formatted_text_formatted = 'bold italic link name.'
-
+class TestHandler:
     def test_slot_behaviour(self, recwarn, mro_slots):
-        inst = ParseMode()
+        class SubclassHandler(Handler):
+            __slots__ = ()
+
+            def __init__(self):
+                super().__init__(lambda x: None)
+
+            def check_update(self, update: object):
+                pass
+
+        inst = SubclassHandler()
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-        inst.custom = 'should give warning'
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
-
-    @flaky(3, 1)
-    def test_send_message_with_parse_mode_markdown(self, bot, chat_id):
-        message = bot.send_message(
-            chat_id=chat_id, text=self.markdown_text, parse_mode=ParseMode.MARKDOWN
-        )
-
-        assert message.text == self.formatted_text_formatted
-
-    @flaky(3, 1)
-    def test_send_message_with_parse_mode_html(self, bot, chat_id):
-        message = bot.send_message(chat_id=chat_id, text=self.html_text, parse_mode=ParseMode.HTML)
-
-        assert message.text == self.formatted_text_formatted
+        assert '__dict__' not in Handler.__slots__ if py_ver < (3, 7) else True, 'dict in abc'
+        inst.custom = 'should not give warning'
+        assert len(recwarn) == 0, recwarn.list

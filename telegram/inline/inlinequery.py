@@ -71,6 +71,8 @@ class InlineQuery(TelegramObject):
 
     """
 
+    __slots__ = ('bot', 'location', 'chat_type', 'id', 'offset', 'from_user', 'query', '_id_attrs')
+
     def __init__(
         self,
         id: str,  # pylint: disable=W0622

@@ -63,6 +63,14 @@ class TestChat:
     linked_chat_id = 11880
     location = ChatLocation(Location(123, 456), 'Barbie World')
 
+    def test_slot_behaviour(self, chat, recwarn, mro_slots):
+        for attr in chat.__slots__:
+            assert getattr(chat, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not chat.__dict__, f"got missing slot(s): {chat.__dict__}"
+        assert len(mro_slots(chat)) == len(set(mro_slots(chat))), "duplicate slot"
+        chat.custom, chat.id = 'should give warning', self.id_
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     def test_de_json(self, bot):
         json_dict = {
             'id': self.id_,

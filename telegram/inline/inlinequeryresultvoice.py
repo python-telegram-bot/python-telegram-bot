@@ -73,6 +73,17 @@ class InlineQueryResultVoice(InlineQueryResult):
 
     """
 
+    __slots__ = (
+        'reply_markup',
+        'caption_entities',
+        'voice_duration',
+        'caption',
+        'title',
+        'voice_url',
+        'parse_mode',
+        'input_message_content',
+    )
+
     def __init__(
         self,
         id: str,  # pylint: disable=W0622

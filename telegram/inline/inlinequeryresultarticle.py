@@ -63,6 +63,18 @@ class InlineQueryResultArticle(InlineQueryResult):
 
     """
 
+    __slots__ = (
+        'reply_markup',
+        'thumb_width',
+        'thumb_height',
+        'hide_url',
+        'url',
+        'title',
+        'description',
+        'input_message_content',
+        'thumb_url',
+    )
+
     def __init__(
         self,
         id: str,  # pylint: disable=W0622

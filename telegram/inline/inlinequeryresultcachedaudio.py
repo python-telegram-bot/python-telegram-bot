@@ -68,6 +68,15 @@ class InlineQueryResultCachedAudio(InlineQueryResult):
 
     """
 
+    __slots__ = (
+        'reply_markup',
+        'caption_entities',
+        'caption',
+        'parse_mode',
+        'audio_file_id',
+        'input_message_content',
+    )
+
     def __init__(
         self,
         id: str,  # pylint: disable=W0622

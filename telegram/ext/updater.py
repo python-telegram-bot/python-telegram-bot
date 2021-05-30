@@ -42,7 +42,7 @@ from typing import (
 from telegram import Bot, TelegramError
 from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized
 from telegram.ext import Dispatcher, JobQueue, ContextTypes
-from telegram.utils.deprecate import TelegramDeprecationWarning
+from telegram.utils.deprecate import TelegramDeprecationWarning, set_new_attribute_deprecated
 from telegram.utils.helpers import get_signal_name
 from telegram.utils.request import Request
 from telegram.ext.utils.types import CCT, UD, CD, BD
@@ -124,7 +124,24 @@ class Updater(Generic[CCT, UD, CD, BD]):
 
     """
 
-    _request = None
+    __slots__ = (
+        'persistence',
+        'dispatcher',
+        'user_sig_handler',
+        'bot',
+        'logger',
+        'update_queue',
+        'job_queue',
+        '__exception_event',
+        'last_update_id',
+        'running',
+        '_request',
+        'is_idle',
+        'httpd',
+        '__lock',
+        '__threads',
+        '__dict__',
+    )
 
     @overload
     def __init__(
@@ -217,6 +234,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 raise ValueError('`dispatcher` and `workers` are mutually exclusive')
 
         self.logger = logging.getLogger(__name__)
+        self._request = None
 
         if dispatcher is None:
             con_pool_size = workers + 4
@@ -286,6 +304,14 @@ class Updater(Generic[CCT, UD, CD, BD]):
         self.httpd = None
         self.__lock = Lock()
         self.__threads: List[Thread] = []
+
+    def __setattr__(self, key: str, value: object) -> None:
+        if key.startswith('__'):
+            key = f"_{self.__class__.__name__}{key}"
+        if issubclass(self.__class__, Updater) and self.__class__ is not Updater:
+            object.__setattr__(self, key, value)
+            return
+        set_new_attribute_deprecated(self, key, value)
 
     def _init_thread(self, target: Callable, name: str, *args: object, **kwargs: object) -> None:
         thr = Thread(

@@ -32,6 +32,15 @@ class TestUserProfilePhotos:
         ],
     ]
 
+    def test_slot_behaviour(self, recwarn, mro_slots):
+        inst = UserProfilePhotos(self.total_count, self.photos)
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.custom, inst.total_count = 'should give warning', self.total_count
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     def test_de_json(self, bot):
         json_dict = {'total_count': 2, 'photos': [[y.to_dict() for y in x] for x in self.photos]}
         user_profile_photos = UserProfilePhotos.de_json(json_dict, bot)

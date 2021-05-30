@@ -65,6 +65,20 @@ class Animation(TelegramObject):
 
     """
 
+    __slots__ = (
+        'bot',
+        'width',
+        'file_id',
+        'file_size',
+        'file_name',
+        'thumb',
+        'duration',
+        'mime_type',
+        'height',
+        'file_unique_id',
+        '_id_attrs',
+    )
+
     def __init__(
         self,
         file_id: str,

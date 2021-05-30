@@ -37,6 +37,14 @@ def chat_member(user):
 class TestChatMember:
     status = ChatMember.CREATOR
 
+    def test_slot_behaviour(self, chat_member, recwarn, mro_slots):
+        for attr in chat_member.__slots__:
+            assert getattr(chat_member, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not chat_member.__dict__, f"got missing slot(s): {chat_member.__dict__}"
+        assert len(mro_slots(chat_member)) == len(set(mro_slots(chat_member))), "duplicate slot"
+        chat_member.custom, chat_member.status = 'should give warning', self.status
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     def test_de_json_required_args(self, bot, user):
         json_dict = {'user': user.to_dict(), 'status': self.status}
 

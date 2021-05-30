@@ -92,6 +92,17 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             .. versionadded:: 13.6
     """
 
+    __slots__ = (
+        'filename',
+        'single_file',
+        'on_flush',
+        'user_data',
+        'chat_data',
+        'bot_data',
+        'conversations',
+        'context_types',
+    )
+
     @overload
     def __init__(
         self: 'PicklePersistence[Dict, Dict, Dict]',
