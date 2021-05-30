@@ -21,6 +21,7 @@
 import logging
 import ssl
 import warnings
+from sys import version_info as py_ver
 from queue import Queue
 from signal import SIGABRT, SIGINT, SIGTERM, signal
 from threading import Event, Lock, Thread, current_thread
@@ -124,24 +125,44 @@ class Updater(Generic[CCT, UD, CD, BD]):
 
     """
 
-    __slots__ = (
-        'persistence',
-        'dispatcher',
-        'user_sig_handler',
-        'bot',
-        'logger',
-        'update_queue',
-        'job_queue',
-        '__exception_event',
-        'last_update_id',
-        'running',
-        '_request',
-        'is_idle',
-        'httpd',
-        '__lock',
-        '__threads',
-        '__dict__',
-    )
+    # Apparently Py 3.7 and below have '__dict__' in ABC and Generic apparently is abstract
+    if py_ver < (3, 7):
+        __slots__ = (
+            'persistence',
+            'dispatcher',
+            'user_sig_handler',
+            'bot',
+            'logger',
+            'update_queue',
+            'job_queue',
+            '__exception_event',
+            'last_update_id',
+            'running',
+            '_request',
+            'is_idle',
+            'httpd',
+            '__lock',
+            '__threads',
+        )
+    else:
+        __slots__ = (
+            'persistence',  # type: ignore[assignment]
+            'dispatcher',
+            'user_sig_handler',
+            'bot',
+            'logger',
+            'update_queue',
+            'job_queue',
+            '__exception_event',
+            'last_update_id',
+            'running',
+            '_request',
+            'is_idle',
+            'httpd',
+            '__lock',
+            '__threads',
+            '__dict__',
+        )
 
     @overload
     def __init__(
