@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import os
 import importlib
 import importlib.util
 import os
@@ -63,4 +64,20 @@ def test_class_has_slots_and_dict(mro_slots):
 
 
 def get_slots(_class):
-    return [attr for cls in _class.__mro__ if hasattr(cls, '__slots__') for attr in cls.__slots__]
+    slots = [attr for cls in _class.__mro__ if hasattr(cls, '__slots__') for attr in cls.__slots__]
+
+    # We're a bit hacky here to handle cases correctly, where we can't read the parents slots from
+    # the mro
+    if '__dict__' not in slots:
+        try:
+
+            class Subclass(_class):
+                __slots__ = ('__dict__',)
+
+        except TypeError as exc:
+            if '__dict__ slot disallowed: we already got one' in str(exc):
+                slots.append('__dict__')
+            else:
+                raise exc
+
+    return slots
