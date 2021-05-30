@@ -112,9 +112,12 @@ class Bot(telegram.bot.Bot):
     def _replace_keyboard(self, reply_markup: Optional[ReplyMarkup]) -> Optional[ReplyMarkup]:
         # If the reply_markup is an inline keyboard and we allow arbitrary callback data, let the
         # CallbackDataCache build a new keyboard with the data replaced. Otherwise return the input
-        if isinstance(reply_markup, ReplyMarkup):
-            if self.arbitrary_callback_data and isinstance(reply_markup, InlineKeyboardMarkup):
-                return self.callback_data_cache.process_keyboard(reply_markup)
+        if (
+            isinstance(reply_markup, ReplyMarkup)
+            and self.arbitrary_callback_data
+            and isinstance(reply_markup, InlineKeyboardMarkup)
+        ):
+            return self.callback_data_cache.process_keyboard(reply_markup)
 
         return reply_markup
 

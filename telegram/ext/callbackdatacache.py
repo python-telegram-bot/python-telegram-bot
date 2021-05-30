@@ -93,14 +93,12 @@ class _KeyboardData:
         self.access_time = access_time or time.time()
 
     def update(self) -> None:
-        """
-        Updates the access time with the current time.
-        """
+        """Updates the access time with the current time."""
         self.access_time = time.time()
 
     def to_tuple(self) -> Tuple[str, float, Dict[str, Any]]:
-        """
-        Gives a tuple representation consisting of keyboard uuid, access time and button data.
+        """Gives a tuple representation consisting of the keyboard uuid, the access time and the
+        button data.
         """
         return self.keyboard_uuid, self.access_time, self.button_data
 
@@ -163,7 +161,7 @@ class CallbackDataCache:
         # entries), the runtime is bounded by maxsize and it has the big upside of not throwing a
         # highly customized data structure at users trying to implement a custom persistence class
         with self.__lock:
-            return list(data.to_tuple() for data in self._keyboard_data.values()), dict(
+            return [data.to_tuple() for data in self._keyboard_data.values()], dict(
                 self._callback_queries.items()
             )
 
@@ -295,9 +293,8 @@ class CallbackDataCache:
 
                     # This is lazy loaded. The firsts time we find a button
                     # we load the associated keyboard - afterwards, there is
-                    if not keyboard_uuid:
-                        if not isinstance(callback_data, InvalidCallbackData):
-                            keyboard_uuid = self.extract_uuids(button_data)[0]
+                    if not keyboard_uuid and not isinstance(callback_data, InvalidCallbackData):
+                        keyboard_uuid = self.extract_uuids(button_data)[0]
 
         return keyboard_uuid
 
@@ -404,9 +401,7 @@ class CallbackDataCache:
             self.__clear(self._keyboard_data, time_cutoff)
 
     def clear_callback_queries(self) -> None:
-        """
-        Clears the stored callback query IDs.
-        """
+        """Clears the stored callback query IDs."""
         with self.__lock:
             self.__clear(self._callback_queries)
 
