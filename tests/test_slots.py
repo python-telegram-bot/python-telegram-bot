@@ -19,7 +19,6 @@
 import os
 import importlib
 import importlib.util
-import os
 from glob import iglob
 
 import inspect
