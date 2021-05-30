@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import os
 import importlib
 import importlib.util
 from glob import iglob
@@ -34,11 +35,15 @@ excluded = {
 
 
 def test_class_has_slots_and_dict(mro_slots):
-    tg_paths = [p for p in iglob("../telegram/**/*.py", recursive=True) if '/vendor/' not in p]
+    tg_paths = [p for p in iglob("telegram/**/*.py", recursive=True) if 'vendor' not in p]
 
     for path in tg_paths:
-        split_path = path.split('/')
-        mod_name = f"telegram{'.ext.' if split_path[2] == 'ext' else '.'}{split_path[-1][:-3]}"
+        # windows uses backslashes:
+        if os.name == 'nt':
+            split_path = path.split('\\')
+        else:
+            split_path = path.split('/')
+        mod_name = f"telegram{'.ext.' if split_path[1] == 'ext' else '.'}{split_path[-1][:-3]}"
         spec = importlib.util.spec_from_file_location(mod_name, path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)  # Exec module to get classes in it.
@@ -55,4 +60,20 @@ def test_class_has_slots_and_dict(mro_slots):
 
 
 def get_slots(_class):
-    return [attr for cls in _class.__mro__ if hasattr(cls, '__slots__') for attr in cls.__slots__]
+    slots = [attr for cls in _class.__mro__ if hasattr(cls, '__slots__') for attr in cls.__slots__]
+
+    # We're a bit hacky here to handle cases correctly, where we can't read the parents slots from
+    # the mro
+    if '__dict__' not in slots:
+        try:
+
+            class Subclass(_class):
+                __slots__ = ('__dict__',)
+
+        except TypeError as exc:
+            if '__dict__ slot disallowed: we already got one' in str(exc):
+                slots.append('__dict__')
+            else:
+                raise exc
+
+    return slots
