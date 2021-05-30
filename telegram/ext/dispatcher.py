@@ -43,7 +43,7 @@ from telegram import TelegramError, Update
 from telegram.ext import BasePersistence
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.handler import Handler
-import telegram.ext.bot
+import telegram.ext.extbot
 from telegram.ext.callbackdatacache import CallbackDataCache
 from telegram.utils.deprecate import TelegramDeprecationWarning, set_new_attribute_deprecated
 from telegram.ext.utils.promise import Promise
@@ -228,7 +228,7 @@ class Dispatcher:
                 if not isinstance(self.bot_data, dict):
                     raise ValueError("bot_data must be of type dict")
             if self.persistence.store_callback_data:
-                self.bot = cast(telegram.ext.bot.Bot, self.bot)
+                self.bot = cast(telegram.ext.extbot.ExtBot, self.bot)
                 persistent_data = self.persistence.get_callback_data()
                 if persistent_data is not None:
                     if not isinstance(persistent_data, tuple) and len(persistent_data) != 2:
@@ -623,7 +623,7 @@ class Dispatcher:
                     user_ids = []
 
             if self.persistence.store_callback_data:
-                self.bot = cast(telegram.ext.bot.Bot, self.bot)
+                self.bot = cast(telegram.ext.extbot.ExtBot, self.bot)
                 try:
                     self.persistence.update_callback_data(
                         self.bot.callback_data_cache.persistence_data

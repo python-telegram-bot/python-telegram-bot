@@ -57,7 +57,7 @@ from telegram.utils.helpers import to_float_timestamp
 from telegram.ext.utils.types import CDCData
 
 if TYPE_CHECKING:
-    from telegram.ext import Bot
+    from telegram.ext import ExtBot
 
 
 class InvalidCallbackData(TelegramError):
@@ -115,14 +115,14 @@ class CallbackDataCache:
     If necessary, will drop the least recently used items.
 
     Args:
-        bot (:class:`telegram.ext.Bot`): The bot this cache is for.
+        bot (:class:`telegram.ext.ExtBot`): The bot this cache is for.
         maxsize (:obj:`int`, optional): Maximum number of items in each of the internal mappings.
             Defaults to 1024.
         persistent_data (:obj:`telegram.ext.utils.types.CDCData`, optional): Data to initialize
             the cache with, as returned by :meth:`telegram.ext.BasePersistence.get_callback_data`.
 
     Attributes:
-        bot (:class:`telegram.ext.Bot`): The bot this cache is for.
+        bot (:class:`telegram.ext.ExtBot`): The bot this cache is for.
         maxsize (:obj:`int`): maximum size of the cache.
 
     """
@@ -131,7 +131,7 @@ class CallbackDataCache:
 
     def __init__(
         self,
-        bot: 'Bot',
+        bot: 'ExtBot',
         maxsize: int = 1024,
         persistent_data: CDCData = None,
     ):

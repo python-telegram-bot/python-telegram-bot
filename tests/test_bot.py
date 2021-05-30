@@ -51,7 +51,7 @@ from telegram import (
     InlineQueryResultVoice,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
-from telegram.ext import Bot as ExtBot
+from telegram.ext import ExtBot
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
 from telegram.ext.callbackdatacache import InvalidCallbackData
 from telegram.utils.helpers import (

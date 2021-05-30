@@ -45,7 +45,15 @@ from telegram import (
     File,
     ChatPermissions,
 )
-from telegram.ext import Dispatcher, JobQueue, Updater, MessageFilter, Defaults, UpdateFilter, Bot
+from telegram.ext import (
+    Dispatcher,
+    JobQueue,
+    Updater,
+    MessageFilter,
+    Defaults,
+    UpdateFilter,
+    ExtBot,
+)
 from telegram.error import BadRequest
 from telegram.utils.helpers import DefaultValue, DEFAULT_NONE
 from tests.bots import get_bot
@@ -83,10 +91,12 @@ def bot_info():
 
 @pytest.fixture(scope='session')
 def bot(bot_info):
-    class DictBot(Bot):  # Subclass Bot to allow monkey patching of attributes and functions, would
+    class DictExtBot(
+        ExtBot
+    ):  # Subclass Bot to allow monkey patching of attributes and functions, would
         pass  # come into effect when we __dict__ is dropped from slots
 
-    return DictBot(bot_info['token'], private_key=PRIVATE_KEY)
+    return DictExtBot(bot_info['token'], private_key=PRIVATE_KEY)
 
 
 DEFAULT_BOTS = {}
@@ -220,7 +230,7 @@ def make_bot(bot_info, **kwargs):
     """
     Tests are executed on tg.ext.Bot, as that class only extends the functionality of tg.bot
     """
-    return Bot(bot_info['token'], private_key=PRIVATE_KEY, **kwargs)
+    return ExtBot(bot_info['token'], private_key=PRIVATE_KEY, **kwargs)
 
 
 CMD_PATTERN = re.compile(r'/[\da-z_]{1,32}(?:@\w{1,32})?')
@@ -446,7 +456,7 @@ def check_shortcut_signature(
 
 def check_shortcut_call(
     shortcut_method: Callable,
-    bot: Bot,
+    bot: ExtBot,
     bot_method_name: str,
     skip_params: Iterable[str] = None,
     shortcut_kwargs: Iterable[str] = None,
@@ -515,7 +525,7 @@ def check_shortcut_call(
 
 def check_defaults_handling(
     method: Callable,
-    bot: Bot,
+    bot: ExtBot,
     return_value=None,
 ) -> bool:
     """

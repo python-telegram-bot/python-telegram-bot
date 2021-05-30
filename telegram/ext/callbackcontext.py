@@ -22,7 +22,7 @@ from queue import Queue
 from typing import TYPE_CHECKING, Dict, List, Match, NoReturn, Optional, Tuple, Union
 
 from telegram import Update, CallbackQuery
-from telegram.ext import Bot as ExtBot
+from telegram.ext import ExtBot
 
 if TYPE_CHECKING:
     from telegram import Bot

@@ -26,7 +26,7 @@ from typing import DefaultDict, Dict, Optional, Tuple, cast, ClassVar
 from telegram.utils.deprecate import set_new_attribute_deprecated
 
 from telegram import Bot
-import telegram.ext.bot
+import telegram.ext.extbot
 
 from telegram.ext.utils.types import ConversationDict, CDCData
 
@@ -185,7 +185,7 @@ class BasePersistence(ABC):
         Args:
             bot (:class:`telegram.Bot`): The bot.
         """
-        if self.store_callback_data and not isinstance(bot, telegram.ext.bot.Bot):
+        if self.store_callback_data and not isinstance(bot, telegram.ext.extbot.ExtBot):
             raise TypeError('store_callback_data can only be used with telegram.ext.Bot.')
 
         self.bot = bot

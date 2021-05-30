@@ -46,8 +46,11 @@ if TYPE_CHECKING:
 HandledTypes = TypeVar('HandledTypes', bound=Union[Message, CallbackQuery, Chat])
 
 
-class Bot(telegram.bot.Bot):
+class ExtBot(telegram.bot.Bot):
     """This object represents a Telegram Bot with convenience extensions.
+
+    Warning:
+        Not to be confused with :class:`telegram.Bot`.
 
     For the documentation of the arguments, methods and attributes, please see
     :class:`telegram.Bot`.
@@ -74,7 +77,7 @@ class Bot(telegram.bot.Bot):
     # The ext_bot argument is a little hack to get warnings handled correctly.
     # It's not very clean, but the warnings will be dropped at some point anyway.
     def __setattr__(self, key: str, value: object, ext_bot: bool = True) -> None:
-        if issubclass(self.__class__, Bot) and self.__class__ is not Bot:
+        if issubclass(self.__class__, ExtBot) and self.__class__ is not ExtBot:
             object.__setattr__(self, key, value)
             return
         super().__setattr__(key, value, ext_bot=ext_bot)  # type: ignore[call-arg]

@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Extensions over the Telegram Bot API to facilitate bot making"""
 
-from .bot import Bot
+from .extbot import ExtBot
 from .basepersistence import BasePersistence
 from .picklepersistence import PicklePersistence
 from .dictpersistence import DictPersistence
@@ -51,7 +51,7 @@ from .callbackdatacache import CallbackDataCache, InvalidCallbackData
 __all__ = (
     'BaseFilter',
     'BasePersistence',
-    'Bot',
+    'ExtBot',
     'CallbackContext',
     'CallbackDataCache',
     'CallbackQueryHandler',
