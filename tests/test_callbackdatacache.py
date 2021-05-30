@@ -26,7 +26,7 @@ import pytz
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, Message, User
 from telegram.ext.callbackdatacache import (
     CallbackDataCache,
-    KeyboardData,
+    _KeyboardData,
     InvalidCallbackData,
 )
 
@@ -36,7 +36,45 @@ def callback_data_cache(bot):
     return CallbackDataCache(bot)
 
 
+class TestInvalidCallbackData:
+    def test_slot_behaviour(self, mro_slots, recwarn):
+        invalid_callback_data = InvalidCallbackData()
+        for attr in invalid_callback_data.__slots__:
+            assert getattr(invalid_callback_data, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert len(mro_slots(invalid_callback_data)) == len(
+            set(mro_slots(invalid_callback_data))
+        ), "duplicate slot"
+        with pytest.raises(AttributeError):
+            invalid_callback_data.custom
+
+
+class TestKeyboardData:
+    def test_slot_behaviour(self, mro_slots):
+        keyboard_data = _KeyboardData('uuid')
+        for attr in keyboard_data.__slots__:
+            assert getattr(keyboard_data, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert len(mro_slots(keyboard_data)) == len(
+            set(mro_slots(keyboard_data))
+        ), "duplicate slot"
+        with pytest.raises(AttributeError):
+            keyboard_data.custom = 42
+
+
 class TestCallbackDataCache:
+    def test_slot_behaviour(self, callback_data_cache, mro_slots):
+        for attr in callback_data_cache.__slots__:
+            attr = (
+                f"_CallbackDataCache{attr}"
+                if attr.startswith('__') and not attr.endswith('__')
+                else attr
+            )
+            assert getattr(callback_data_cache, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert len(mro_slots(callback_data_cache)) == len(
+            set(mro_slots(callback_data_cache))
+        ), "duplicate slot"
+        with pytest.raises(AttributeError):
+            callback_data_cache.custom = 42
+
     @pytest.mark.parametrize('maxsize', [1, 5, 2048])
     def test_init_maxsize(self, maxsize, bot):
         assert CallbackDataCache(bot).maxsize == 1024
@@ -45,7 +83,7 @@ class TestCallbackDataCache:
         assert cdc.bot is bot
 
     def test_init_and_access__persistent_data(self, bot):
-        keyboard_data = KeyboardData('123', 456, {'button': 678})
+        keyboard_data = _KeyboardData('123', 456, {'button': 678})
         persistent_data = ([keyboard_data.to_tuple()], {'id': '123'})
         cdc = CallbackDataCache(bot, persistent_data=persistent_data)
 

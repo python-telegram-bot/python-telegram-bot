@@ -69,6 +69,16 @@ class Bot(telegram.bot.Bot):
 
     """
 
+    __slots__ = ('arbitrary_callback_data', 'callback_data_cache')
+
+    # The ext_bot argument is a little hack to get warnings handled correctly.
+    # It's not very clean, but the warnings will be dropped at some point anyway.
+    def __setattr__(self, key: str, value: object, ext_bot: bool = True) -> None:
+        if issubclass(self.__class__, Bot) and self.__class__ is not Bot:
+            object.__setattr__(self, key, value)
+            return
+        super().__setattr__(key, value, ext_bot=ext_bot)  # type: ignore[call-arg]
+
     def __init__(
         self,
         token: str,

@@ -69,6 +69,8 @@ class InvalidCallbackData(TelegramError):
             be found.
     """
 
+    __slots__ = ('callback_data',)
+
     def __init__(self, callback_data: str = None) -> None:
         super().__init__(
             'The object belonging to this callback_data was deleted or the callback_data was '
@@ -80,7 +82,9 @@ class InvalidCallbackData(TelegramError):
         return self.__class__, (self.callback_data,)
 
 
-class KeyboardData:
+class _KeyboardData:
+    __slots__ = ('keyboard_uuid', 'button_data', 'access_time')
+
     def __init__(
         self, keyboard_uuid: str, access_time: float = None, button_data: Dict[str, Any] = None
     ):
@@ -125,6 +129,8 @@ class CallbackDataCache:
 
     """
 
+    __slots__ = ('bot', 'maxsize', '_keyboard_data', '_callback_queries', '__lock', 'logger')
+
     def __init__(
         self,
         bot: 'Bot',
@@ -135,7 +141,7 @@ class CallbackDataCache:
 
         self.bot = bot
         self.maxsize = maxsize
-        self._keyboard_data: MutableMapping[str, KeyboardData] = LRUCache(maxsize=maxsize)
+        self._keyboard_data: MutableMapping[str, _KeyboardData] = LRUCache(maxsize=maxsize)
         self._callback_queries: MutableMapping[str, str] = LRUCache(maxsize=maxsize)
         self.__lock = Lock()
 
@@ -144,7 +150,7 @@ class CallbackDataCache:
             for key, value in callback_queries.items():
                 self._callback_queries[key] = value
             for uuid, access_time, data in keyboard_data:
-                self._keyboard_data[uuid] = KeyboardData(
+                self._keyboard_data[uuid] = _KeyboardData(
                     keyboard_uuid=uuid, access_time=access_time, button_data=data
                 )
 
@@ -179,7 +185,7 @@ class CallbackDataCache:
 
     def __process_keyboard(self, reply_markup: InlineKeyboardMarkup) -> InlineKeyboardMarkup:
         keyboard_uuid = uuid4().hex
-        keyboard_data = KeyboardData(keyboard_uuid)
+        keyboard_data = _KeyboardData(keyboard_uuid)
 
         # Built a new nested list of buttons by replacing the callback data if needed
         buttons = [
@@ -205,7 +211,7 @@ class CallbackDataCache:
         return InlineKeyboardMarkup(buttons)
 
     @staticmethod
-    def __put_button(callback_data: Any, keyboard_data: KeyboardData) -> str:
+    def __put_button(callback_data: Any, keyboard_data: _KeyboardData) -> str:
         """
         Stores the data for a single button in :attr:`keyboard_data`.
         Returns the string that should be passed instead of the callback_data, which is
