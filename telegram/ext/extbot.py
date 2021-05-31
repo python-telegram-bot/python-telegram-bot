@@ -60,11 +60,11 @@ class ExtBot(telegram.bot.Bot):
             be used if not set explicitly in the bot methods.
         arbitrary_callback_data (:obj:`bool` | :obj:`int`, optional): Whether to
             allow arbitrary objects as callback data for :class:`telegram.InlineKeyboardButton`.
-            Pass an integer to specify the maximum number objects cached in memory. For more
-            details, please see our wiki. Defaults to :obj:`False`.
+            Pass an integer to specify the maximum number of objects cached in memory. For more
+            details, please see our `wiki <https://git.io/JGBDI>`_. Defaults to :obj:`False`.
 
     Attributes:
-        arbitrary_callback_data (:obj:`bool` | :obj:`int`, optional): Whether this bot instance
+        arbitrary_callback_data (:obj:`bool` | :obj:`int`): Whether this bot instance
             allows to use arbitrary objects as callback data for
             :class:`telegram.InlineKeyboardButton`.
         callback_data_cache (:class:`telegram.ext.CallbackDataCache`): The cache for objects passed
@@ -133,7 +133,7 @@ class ExtBot(telegram.bot.Bot):
             if the reply markup (if any) was actually sent by this caches bot. If it was not, the
             message will be returned unchanged.
 
-            Note that his will fail for channel posts, as :attr:`telegram.Message.from_user` is
+            Note that this will fail for channel posts, as :attr:`telegram.Message.from_user` is
             :obj:`None` for those! In the corresponding reply markups the callback data will be
             replaced by :class:`InvalidButtonData`.
 

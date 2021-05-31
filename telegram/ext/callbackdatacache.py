@@ -40,7 +40,7 @@ import logging
 import time
 from datetime import datetime
 from threading import Lock
-from typing import Dict, Any, Tuple, Union, Optional, MutableMapping, TYPE_CHECKING
+from typing import Dict, Tuple, Union, Optional, MutableMapping, TYPE_CHECKING
 from uuid import uuid4
 
 from cachetools import LRUCache  # pylint: disable=E0401
@@ -86,7 +86,7 @@ class _KeyboardData:
     __slots__ = ('keyboard_uuid', 'button_data', 'access_time')
 
     def __init__(
-        self, keyboard_uuid: str, access_time: float = None, button_data: Dict[str, Any] = None
+        self, keyboard_uuid: str, access_time: float = None, button_data: Dict[str, object] = None
     ):
         self.keyboard_uuid = keyboard_uuid
         self.button_data = button_data or {}
@@ -96,7 +96,7 @@ class _KeyboardData:
         """Updates the access time with the current time."""
         self.access_time = time.time()
 
-    def to_tuple(self) -> Tuple[str, float, Dict[str, Any]]:
+    def to_tuple(self) -> Tuple[str, float, Dict[str, object]]:
         """Gives a tuple representation consisting of the keyboard uuid, the access time and the
         button data.
         """
@@ -166,10 +166,9 @@ class CallbackDataCache:
             )
 
     def process_keyboard(self, reply_markup: InlineKeyboardMarkup) -> InlineKeyboardMarkup:
-        """
-        Registers the reply markup to the cache. If any of the buttons have :attr:`callback_data`,
-        stores that data and builds a new keyboard the the correspondingly replaced buttons.
-        Otherwise does nothing and returns the original reply markup.
+        """Registers the reply markup to the cache. If any of the buttons have
+        :attr:`callback_data`, stores that data and builds a new keyboard the the correspondingly
+        replaced buttons. Otherwise does nothing and returns the original reply markup.
 
         Args:
             reply_markup (:class:`telegram.InlineKeyboardMarkup`): The keyboard.
@@ -209,9 +208,8 @@ class CallbackDataCache:
         return InlineKeyboardMarkup(buttons)
 
     @staticmethod
-    def __put_button(callback_data: Any, keyboard_data: _KeyboardData) -> str:
-        """
-        Stores the data for a single button in :attr:`keyboard_data`.
+    def __put_button(callback_data: object, keyboard_data: _KeyboardData) -> str:
+        """Stores the data for a single button in :attr:`keyboard_data`.
         Returns the string that should be passed instead of the callback_data, which is
         ``keyboard_uuid + button_uuids``.
         """
@@ -221,8 +219,7 @@ class CallbackDataCache:
 
     @staticmethod
     def extract_uuids(callback_data: str) -> Tuple[str, str]:
-        """
-        Extracts the keyboard uuid and the button uuid form the given ``callback_data``.
+        """Extracts the keyboard uuid and the button uuid from the given ``callback_data``.
 
         Args:
             callback_data (:obj:`str`): The ``callback_data`` as present in the button.
@@ -235,8 +232,7 @@ class CallbackDataCache:
         return callback_data[:32], callback_data[32:]
 
     def process_message(self, message: Message) -> None:
-        """
-        Replaces the data in the inline keyboard attached to the message with the cached
+        """Replaces the data in the inline keyboard attached to the message with the cached
         objects, if necessary. If the data could not be found,
         :class:`telegram.ext.InvalidButtonData` will be inserted.
 
@@ -262,8 +258,7 @@ class CallbackDataCache:
             self.__process_message(message)
 
     def __process_message(self, message: Message) -> Optional[str]:
-        """
-        As documented in process_message, but as second output gives the keyboards uuid, if any.
+        """As documented in process_message, but as second output gives the keyboards uuid, if any.
         Returns the uuid of the attached keyboard, if any. Relevant for process_callback_query.
 
         **IN PLACE**
@@ -299,9 +294,8 @@ class CallbackDataCache:
         return keyboard_uuid
 
     def process_callback_query(self, callback_query: CallbackQuery) -> None:
-        """
-        Replaces the data in the callback query and the attached messages keyboard with the cached
-        objects, if necessary. If the data could not be found,
+        """Replaces the data in the callback query and the attached messages keyboard with the
+        cached objects, if necessary. If the data could not be found,
         :class:`telegram.ext.InvalidButtonData` will be inserted.
         If :attr:`callback_query.data` or :attr:`callback_query.message` is present, this also
         saves the callback queries ID in order to be able to resolve it to the stored data.
@@ -325,7 +319,7 @@ class CallbackDataCache:
                 data = callback_query.data
 
                 # Get the cached callback data for the CallbackQuery
-                callback_query.data = self.__get_button_data(data)
+                callback_query.data = self.__get_button_data(data)  # type: ignore[assignment]
 
                 # Map the callback queries ID to the keyboards UUID for later use
                 if not isinstance(callback_query.data, InvalidCallbackData):
@@ -345,7 +339,7 @@ class CallbackDataCache:
                 if not mapped and keyboard_uuid:
                     self._callback_queries[callback_query.id] = keyboard_uuid
 
-    def __get_button_data(self, callback_data: str) -> Any:
+    def __get_button_data(self, callback_data: str) -> object:
         keyboard, button = self.extract_uuids(callback_data)
         try:
             # we get the values before calling update() in case KeyErrors are raised
@@ -359,8 +353,7 @@ class CallbackDataCache:
             return InvalidCallbackData(callback_data)
 
     def drop_data(self, callback_query: CallbackQuery) -> None:
-        """
-        Deletes the data for the specified callback query.
+        """Deletes the data for the specified callback query.
 
         Note:
             Will *not* raise exceptions in case the callback data is not found in the cache.
@@ -387,8 +380,7 @@ class CallbackDataCache:
             return
 
     def clear_callback_data(self, time_cutoff: Union[float, datetime] = None) -> None:
-        """
-        Clears the stored callback data.
+        """Clears the stored callback data.
 
         Args:
             time_cutoff (:obj:`float` | :obj:`datetime.datetime`, optional): Pass a UNIX timestamp

@@ -53,8 +53,6 @@ class DictPersistence(BasePersistence):
         may lead to e.g. ``Chat not found`` errors. For the limitations on replacing bots see
         :meth:`telegram.ext.BasePersistence.replace_bot` and
         :meth:`telegram.ext.BasePersistence.insert_bot`.
-        store_callback_data (:obj:`bool`): Whether callback_data be saved by this
-            persistence class.
 
     Args:
         store_user_data (:obj:`bool`, optional): Whether user_data should be saved by this
@@ -82,6 +80,8 @@ class DictPersistence(BasePersistence):
         store_chat_data (:obj:`bool`): Whether chat_data should be saved by this
             persistence class.
         store_bot_data (:obj:`bool`): Whether bot_data should be saved by this
+            persistence class.
+        store_callback_data (:obj:`bool`): Whether callback_data be saved by this
             persistence class.
     """
 
