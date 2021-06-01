@@ -30,6 +30,7 @@ from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 
 from telegram import Update
+from telegram.ext import ExtBot
 from telegram.utils.deprecate import set_new_attribute_deprecated
 from telegram.utils.types import JSONDict
 
@@ -144,10 +145,8 @@ class WebhookHandler(tornado.web.RequestHandler):
         if update:
             self.logger.debug('Received Update with ID %d on Webhook', update.update_id)
             # handle arbitrary callback data, if necessary
-            # we can't do isinstance(self.bot, telegram.ext.Bot) here, because that class
-            # doesn't exist in ptb-raw
-            if hasattr(self.bot, 'insert_callback_data'):
-                self.bot.insert_callback_data(update)  # type: ignore[attr-defined]
+            if isinstance(self.bot, ExtBot):
+                self.bot.insert_callback_data(update)
             self.update_queue.put(update)
 
     def _validate_post(self) -> None:

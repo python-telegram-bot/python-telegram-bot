@@ -49,9 +49,9 @@ class PicklePersistence(BasePersistence):
             persistence class. Default is :obj:`True`.
         store_callback_data (:obj:`bool`, optional): Whether callback_data should be saved by this
             persistence class. Default is :obj:`False`.
-        single_file (:obj:`bool`, optional): When :obj:`False` will store 3 separate files of
-            `filename_user_data`, `filename_chat_data` and `filename_conversations`. Default is
-            :obj:`True`.
+        single_file (:obj:`bool`, optional): When :obj:`False` will store 5 separate files of
+            `filename_user_data`, `filename_chat_data`, `filename_bot_data`, `filename_chat_data`,
+            `filename_callback_data` and `filename_conversations`. Default is :obj:`True`.
         on_flush (:obj:`bool`, optional): When :obj:`True` will only save to file when
             :meth:`flush` is called and keep data in memory until that happens. When
             :obj:`False` will store data on any transaction *and* on call to :meth:`flush`.
@@ -68,9 +68,9 @@ class PicklePersistence(BasePersistence):
             persistence class.
         store_callback_data (:obj:`bool`): Optional. Whether callback_data be saved by this
             persistence class.
-        single_file (:obj:`bool`): Optional. When :obj:`False` will store 3 separate files of
-            `filename_user_data`, `filename_chat_data`, `filename_chat_data` and
-            `filename_conversations`. Default is :obj:`True`.
+        single_file (:obj:`bool`): Optional. When :obj:`False` will store 5 separate files of
+            `filename_user_data`, `filename_chat_data`, `filename_bot_data`, `filename_chat_data`,
+            `filename_callback_data` and `filename_conversations`. Default is :obj:`True`.
         on_flush (:obj:`bool`, optional): When :obj:`True` will only save to file when
             :meth:`flush` is called and keep data in memory until that happens. When
             :obj:`False` will store data on any transaction *and* on call to :meth:`flush`.
@@ -225,9 +225,8 @@ class PicklePersistence(BasePersistence):
         """Returns the callback data from the pickle file if it exists or :obj:`None`.
 
         Returns:
-            Optional[:class:`telegram.utils.types.CDCData`:]: The restored meta data as three-tuple
-                of :obj:`int`, dictionary and :class:`collections.deque` or :obj:`None`, if no data
-                was stored.
+            Optional[:class:`telegram.ext.utils.types.CDCData`]: The restored meta data or
+                :obj:`None`, if no data was stored.
         """
         if self.callback_data:
             pass
@@ -344,7 +343,7 @@ class PicklePersistence(BasePersistence):
         pickle file.
 
         Args:
-            data (:class:`telegram.utils.types.CDCData`:): The relevant data to restore
+            data (:class:`telegram.ext.utils.types.CDCData`:): The relevant data to restore
                 :attr:`telegram.ext.dispatcher.bot.callback_data`.
         """
         if self.callback_data == data:

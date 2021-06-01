@@ -19,6 +19,7 @@
 import inspect
 import time
 import datetime as dtm
+from collections import defaultdict
 from pathlib import Path
 from platform import python_implementation
 
@@ -120,7 +121,7 @@ def inst(request, bot_info, default_bot):
 
 class TestBot:
     """
-    Most are executed on tg.ext.Bot, as that class only extends the functionality of tg.bot
+    Most are executed on tg.ext.ExtBot, as that class only extends the functionality of tg.bot
     """
 
     @pytest.mark.parametrize('inst', ['bot', "default_bot"], indirect=True)
@@ -261,26 +262,28 @@ class TestBot:
 
     def test_ext_bot_signature(self):
         """
-        Here we make sure that all methods of ext.Bot have the same signature as the corresponding
-        methods of tg.Bot.
+        Here we make sure that all methods of ext.ExtBot have the same signature as the
+        corresponding methods of tg.Bot.
         """
-        # Some methods of ext.Bot
+        # Some methods of ext.ExtBot
         global_extra_args = set()
-        extra_args_per_method = {'__init__': {'arbitrary_callback_data'}}
+        extra_args_per_method = defaultdict(set, {'__init__': {'arbitrary_callback_data'}})
+        different_hints_per_method = defaultdict(set, {'__setattr__': {'ext_bot'}})
 
         for name, method in inspect.getmembers(Bot, predicate=inspect.isfunction):
-            ext_signature = inspect.signature(method)
-            signature = inspect.signature(getattr(Bot, name))
+            signature = inspect.signature(method)
+            ext_signature = inspect.signature(getattr(ExtBot, name))
 
             assert (
                 ext_signature.return_annotation == signature.return_annotation
             ), f'Wrong return annotation for method {name}'
-            assert set(signature.parameters) == set(
-                ext_signature.parameters
-            ) - global_extra_args - extra_args_per_method.get(
-                name, set()
+            assert (
+                set(signature.parameters)
+                == set(ext_signature.parameters) - global_extra_args - extra_args_per_method[name]
             ), f'Wrong set of parameters for method {name}'
             for param_name, param in signature.parameters.items():
+                if param_name in different_hints_per_method[name]:
+                    continue
                 assert (
                     param.annotation == ext_signature.parameters[param_name].annotation
                 ), f'Wrong annotation for parameter {param_name} of method {name}'
@@ -2133,8 +2136,6 @@ class TestBot:
             bot.arbitrary_callback_data = False
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
-
-    # def test_replace_callback_data_reply_to_m
 
     # TODO: Needs improvement. We need incoming inline query to test answer.
     def test_replace_callback_data_answer_inline_query(self, monkeypatch, bot, chat_id):

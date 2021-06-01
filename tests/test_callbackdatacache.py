@@ -318,15 +318,18 @@ class TestCallbackDataCache:
 
         if method == 'callback_data':
             callback_data_cache.clear_callback_data()
+            # callback_data was cleared, callback_queries weren't
             assert len(callback_data_cache.persistence_data[0]) == 0
             assert len(callback_data_cache.persistence_data[1]) == 100
         else:
             callback_data_cache.clear_callback_queries()
+            # callback_queries were cleared, callback_data wasn't
             assert len(callback_data_cache.persistence_data[0]) == 100
             assert len(callback_data_cache.persistence_data[1]) == 0
 
     @pytest.mark.parametrize('time_method', ['time', 'datetime', 'defaults'])
     def test_clear_cutoff(self, callback_data_cache, time_method, tz_bot):
+        # Fill the cache with some fake data
         for i in range(50):
             reply_markup = InlineKeyboardMarkup.from_button(
                 InlineKeyboardButton('changing', callback_data=str(i))
@@ -340,6 +343,7 @@ class TestCallbackDataCache:
             )
             callback_data_cache.process_callback_query(callback_query)
 
+        # sleep a bit before saving the time cutoff, to make test more reliable
         time.sleep(0.1)
         if time_method == 'time':
             cutoff = time.time()
@@ -350,6 +354,7 @@ class TestCallbackDataCache:
             callback_data_cache.bot = tz_bot
         time.sleep(0.1)
 
+        # more fake data after the time cutoff
         for i in range(50, 100):
             reply_markup = InlineKeyboardMarkup.from_button(
                 InlineKeyboardButton('changing', callback_data=str(i))

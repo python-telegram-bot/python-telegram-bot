@@ -1482,6 +1482,8 @@ class TestPicklePersistence:
     def test_with_handler(self, bot, update, bot_data, pickle_persistence, good_pickle_files):
         u = Updater(bot=bot, persistence=pickle_persistence, use_context=True)
         dp = u.dispatcher
+        bot.callback_data_cache.clear_callback_data()
+        bot.callback_data_cache.clear_callback_queries()
 
         def first(update, context):
             if not context.user_data == {}:
@@ -1490,10 +1492,12 @@ class TestPicklePersistence:
                 pytest.fail()
             if not context.bot_data == bot_data:
                 pytest.fail()
+            if not context.bot.callback_data_cache.persistence_data == ([], {}):
+                pytest.fail()
             context.user_data['test1'] = 'test2'
             context.chat_data['test3'] = 'test4'
             context.bot_data['test1'] = 'test0'
-            context.bot.callback_data_cache['test1'] = 'test0'
+            context.bot.callback_data_cache._callback_queries['test1'] = 'test0'
 
         def second(update, context):
             if not context.user_data['test1'] == 'test2':
@@ -1502,7 +1506,7 @@ class TestPicklePersistence:
                 pytest.fail()
             if not context.bot_data['test1'] == 'test0':
                 pytest.fail()
-            if not context.bot.callback_data_cache['test1'] == 'test0':
+            if not context.bot.callback_data_cache.persistence_data == ([], {'test1': 'test0'}):
                 pytest.fail()
 
         h1 = MessageHandler(None, first, pass_user_data=True, pass_chat_data=True)
@@ -1978,7 +1982,7 @@ class TestDictPersistence:
         )
 
     def test_with_handler(self, bot, update):
-        dict_persistence = DictPersistence()
+        dict_persistence = DictPersistence(store_callback_data=True)
         u = Updater(bot=bot, persistence=dict_persistence, use_context=True)
         dp = u.dispatcher
 
@@ -1989,10 +1993,12 @@ class TestDictPersistence:
                 pytest.fail()
             if not context.bot_data == {}:
                 pytest.fail()
+            if not context.bot.callback_data_cache.persistence_data == ([], {}):
+                pytest.fail()
             context.user_data['test1'] = 'test2'
             context.chat_data[3] = 'test4'
             context.bot_data['test1'] = 'test0'
-            context.callback_data['test1'] = 'test0'
+            context.bot.callback_data_cache._callback_queries['test1'] = 'test0'
 
         def second(update, context):
             if not context.user_data['test1'] == 'test2':
@@ -2001,11 +2007,11 @@ class TestDictPersistence:
                 pytest.fail()
             if not context.bot_data['test1'] == 'test0':
                 pytest.fail()
-            if not context.callback_data['test1'] == 'test0':
+            if not context.bot.callback_data_cache.persistence_data == ([], {'test1': 'test0'}):
                 pytest.fail()
 
-        h1 = MessageHandler(None, first, pass_user_data=True, pass_chat_data=True)
-        h2 = MessageHandler(None, second, pass_user_data=True, pass_chat_data=True)
+        h1 = MessageHandler(Filters.all, first)
+        h2 = MessageHandler(Filters.all, second)
         dp.add_handler(h1)
         dp.process_update(update)
         user_data = dict_persistence.user_data_json
@@ -2017,6 +2023,7 @@ class TestDictPersistence:
             chat_data_json=chat_data,
             bot_data_json=bot_data,
             callback_data_json=callback_data,
+            store_callback_data=True,
         )
 
         u = Updater(bot=bot, persistence=dict_persistence_2)

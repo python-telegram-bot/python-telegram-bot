@@ -53,7 +53,8 @@ class Updater:
     Note:
         * You must supply either a :attr:`bot` or a :attr:`token` argument.
         * If you supply a :attr:`bot`, you will need to pass :attr:`arbitrary_callback_data`,
-          and :attr:`defaults` to the bot instead of the :class:`telegram.ext.Updater`.
+          and :attr:`defaults` to the bot instead of the :class:`telegram.ext.Updater`. In this
+          case, you'll have to use the class :class:`telegram.ext.ExtBot`.
 
     Args:
         token (:obj:`str`, optional): The bot's token given by the @BotFather.

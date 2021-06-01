@@ -40,7 +40,7 @@ import logging
 import time
 from datetime import datetime
 from threading import Lock
-from typing import Dict, Tuple, Union, Optional, MutableMapping, TYPE_CHECKING
+from typing import Dict, Tuple, Union, Optional, MutableMapping, TYPE_CHECKING, cast
 from uuid import uuid4
 
 from cachetools import LRUCache  # pylint: disable=E0401
@@ -92,7 +92,7 @@ class _KeyboardData:
         self.button_data = button_data or {}
         self.access_time = access_time or time.time()
 
-    def update(self) -> None:
+    def update_access_time(self) -> None:
         """Updates the access time with the current time."""
         self.access_time = time.time()
 
@@ -104,8 +104,8 @@ class _KeyboardData:
 
 
 class CallbackDataCache:
-    """A custom cache for storing the callback data of a :class:`telegram.ext.Bot`. Internally, it
-    keeps to mappings with fixed maximum size:
+    """A custom cache for storing the callback data of a :class:`telegram.ext.ExtBot`. Internally,
+    it keeps two mappings with fixed maximum size:
 
         * One for mapping the data received in callback queries to the cached objects
         * One for mapping the IDs of received callback queries to the cached objects
@@ -217,6 +217,19 @@ class CallbackDataCache:
         keyboard_data.button_data[uuid] = callback_data
         return f'{keyboard_data.keyboard_uuid}{uuid}'
 
+    def __get_button_data(self, callback_data: str) -> object:
+        keyboard, button = self.extract_uuids(callback_data)
+        try:
+            # we get the values before calling update() in case KeyErrors are raised
+            # we don't want to update in that case
+            keyboard_data = self._keyboard_data[keyboard]
+            button_data = keyboard_data.button_data[button]
+            # Update the timestamp for the LRU
+            keyboard_data.update_access_time()
+            return button_data
+        except KeyError:
+            return InvalidCallbackData(callback_data)
+
     @staticmethod
     def extract_uuids(callback_data: str) -> Tuple[str, str]:
         """Extracts the keyboard uuid and the button uuid from the given ``callback_data``.
@@ -234,16 +247,16 @@ class CallbackDataCache:
     def process_message(self, message: Message) -> None:
         """Replaces the data in the inline keyboard attached to the message with the cached
         objects, if necessary. If the data could not be found,
-        :class:`telegram.ext.InvalidButtonData` will be inserted.
+        :class:`telegram.ext.InvalidCallbackData` will be inserted.
 
         Note:
             Checks :attr:`telegram.Message.via_bot` and :attr:`telegram.Message.from_user` to check
             if the reply markup (if any) was actually sent by this caches bot. If it was not, the
             message will be returned unchanged.
 
-            Note that his will fail for channel posts, as :attr:`telegram.Message.from_user` is
+            Note that this will fail for channel posts, as :attr:`telegram.Message.from_user` is
             :obj:`None` for those! In the corresponding reply markups the callback data will be
-            replaced by :class:`InvalidButtonData`.
+            replaced by :class:`telegram.ext.InvalidCallbackData`.
 
         Warning:
             * Does *not* consider :attr:`telegram.Message.reply_to_message` and
@@ -258,8 +271,8 @@ class CallbackDataCache:
             self.__process_message(message)
 
     def __process_message(self, message: Message) -> Optional[str]:
-        """As documented in process_message, but as second output gives the keyboards uuid, if any.
-        Returns the uuid of the attached keyboard, if any. Relevant for process_callback_query.
+        """As documented in process_message, but returns the uuid of the attached keyboard, if any,
+        which is relevant for process_callback_query.
 
         **IN PLACE**
         """
@@ -281,7 +294,7 @@ class CallbackDataCache:
         for row in message.reply_markup.inline_keyboard:
             for button in row:
                 if button.callback_data:
-                    button_data = button.callback_data
+                    button_data = cast(str, button.callback_data)
                     callback_data = self.__get_button_data(button_data)
                     # update_callback_data makes sure that the _id_attrs are updated
                     button.update_callback_data(callback_data)
@@ -296,7 +309,7 @@ class CallbackDataCache:
     def process_callback_query(self, callback_query: CallbackQuery) -> None:
         """Replaces the data in the callback query and the attached messages keyboard with the
         cached objects, if necessary. If the data could not be found,
-        :class:`telegram.ext.InvalidButtonData` will be inserted.
+        :class:`telegram.ext.InvalidCallbackData` will be inserted.
         If :attr:`callback_query.data` or :attr:`callback_query.message` is present, this also
         saves the callback queries ID in order to be able to resolve it to the stored data.
 
@@ -339,19 +352,6 @@ class CallbackDataCache:
                 if not mapped and keyboard_uuid:
                     self._callback_queries[callback_query.id] = keyboard_uuid
 
-    def __get_button_data(self, callback_data: str) -> object:
-        keyboard, button = self.extract_uuids(callback_data)
-        try:
-            # we get the values before calling update() in case KeyErrors are raised
-            # we don't want to update in that case
-            keyboard_data = self._keyboard_data[keyboard]
-            button_data = keyboard_data.button_data[button]
-            # Update the timestamp for the LRU
-            keyboard_data.update()
-            return button_data
-        except KeyError:
-            return InvalidCallbackData(callback_data)
-
     def drop_data(self, callback_query: CallbackQuery) -> None:
         """Deletes the data for the specified callback query.
 
@@ -390,7 +390,7 @@ class CallbackDataCache:
 
         """
         with self.__lock:
-            self.__clear(self._keyboard_data, time_cutoff)
+            self.__clear(self._keyboard_data, time_cutoff=time_cutoff)
 
     def clear_callback_queries(self) -> None:
         """Clears the stored callback query IDs."""

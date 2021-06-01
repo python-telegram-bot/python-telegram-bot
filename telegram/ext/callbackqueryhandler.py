@@ -89,12 +89,12 @@ class CallbackQueryHandler(Handler[Update]):
             Pattern to test :attr:`telegram.CallbackQuery.data` against. If a string or a regex
             pattern is passed, :meth:`re.match` is used on :attr:`telegram.CallbackQuery.data` to
             determine if an update should be handled by this handler. If your bot allows arbitrary
-            objects as ``callback_data``, non-strings will not be accepted. To filter arbitrary
+            objects as ``callback_data``, non-strings will be accepted. To filter arbitrary
             objects you may pass
 
                 * a callable, accepting exactly one argument, namely the
-                  :attr:`telegram.CallbackQuery.data`. It must return :obj:`True`, :obj:`False` or
-                  :obj:`None` to indicate, whether the update should be handled.
+                  :attr:`telegram.CallbackQuery.data`. It must return :obj:`True` or
+                  :obj:`False`/:obj:`None` to indicate, whether the update should be handled.
                 * a :obj:`type`. If :attr:`telegram.CallbackQuery.data` is an instance of that type
                   (or a subclass), the update will be handled.
 

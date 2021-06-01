@@ -110,7 +110,7 @@ class InlineKeyboardButton(TelegramObject):
         self,
         text: str,
         url: str = None,
-        callback_data: Any = None,
+        callback_data: object = None,
         switch_inline_query: str = None,
         switch_inline_query_current_chat: str = None,
         callback_game: 'CallbackGame' = None,

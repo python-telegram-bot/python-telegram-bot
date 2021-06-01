@@ -242,7 +242,7 @@ class TestUpdater:
 
     @pytest.mark.parametrize('invalid_data', [True, False])
     def test_webhook_arbitrary_callback_data(self, monkeypatch, updater, invalid_data):
-        """Here we only test one simple setup. telegram.ext.Bot.insert_callback_data is tested
+        """Here we only test one simple setup. telegram.ext.ExtBot.insert_callback_data is tested
         extensively in test_bot.py in conjunction with get_updates."""
         updater.bot.arbitrary_callback_data = True
         try:

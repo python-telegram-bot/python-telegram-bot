@@ -181,7 +181,7 @@ class TestCallbackContext:
 
         callback_context = CallbackContext.from_update(update, cdp)
 
-        with pytest.raises(RuntimeError, match='This telegram.ext.Bot instance does not'):
+        with pytest.raises(RuntimeError, match='This telegram.ext.ExtBot instance does not'):
             callback_context.drop_callback_data(None)
 
         try:

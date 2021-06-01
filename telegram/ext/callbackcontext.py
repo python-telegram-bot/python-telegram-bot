@@ -178,7 +178,7 @@ class CallbackContext:
         if isinstance(self.bot, ExtBot):
             if not self.bot.arbitrary_callback_data:
                 raise RuntimeError(
-                    'This telegram.ext.Bot instance does not use arbitrary callback data.'
+                    'This telegram.ext.ExtBot instance does not use arbitrary callback data.'
                 )
             self.bot.callback_data_cache.drop_data(callback_query)
         else:

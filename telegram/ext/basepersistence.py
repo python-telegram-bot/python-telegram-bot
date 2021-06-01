@@ -186,7 +186,7 @@ class BasePersistence(ABC):
             bot (:class:`telegram.Bot`): The bot.
         """
         if self.store_callback_data and not isinstance(bot, telegram.ext.extbot.ExtBot):
-            raise TypeError('store_callback_data can only be used with telegram.ext.Bot.')
+            raise TypeError('store_callback_data can only be used with telegram.ext.ExtBot.')
 
         self.bot = bot
 
@@ -401,9 +401,8 @@ class BasePersistence(ABC):
         persistence object. If callback data was stored, it should be returned.
 
         Returns:
-            Optional[:class:`telegram.utils.types.CDCData`:]: The restored meta data as three-tuple
-                of :obj:`int`, dictionary and :class:`collections.deque` or :obj:`None`, if no data
-                was stored.
+            Optional[:class:`telegram.ext.utils.types.CDCData`]:  The restored meta data or
+                :obj:`None`, if no data was stored.
         """
         raise NotImplementedError
 
@@ -468,7 +467,7 @@ class BasePersistence(ABC):
         handled an update.
 
         Args:
-            data (:class:`telegram.utils.types.CDCData`:): The relevant data to restore
+            data (:class:`telegram.ext.utils.types.CDCData`:): The relevant data to restore
                 :attr:`telegram.ext.dispatcher.bot.callback_data_cache`.
         """
         raise NotImplementedError

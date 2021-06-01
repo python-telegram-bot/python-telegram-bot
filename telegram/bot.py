@@ -161,7 +161,7 @@ class Bot(TelegramObject):
             .. deprecated:: 13.2
                Passing :class:`telegram.ext.Defaults` to :class:`telegram.Bot` is deprecated. If
                you want to use :class:`telegram.ext.Defaults`, please use
-               :class:`telegram.ext.Bot` instead.
+               :class:`telegram.ext.ExtBot` instead.
 
     """
 
@@ -194,7 +194,7 @@ class Bot(TelegramObject):
 
         if self.defaults:
             warnings.warn(
-                'Passing Defaults to telegram.Bot is deprecated. Use telegram.ext.Bot instead.',
+                'Passing Defaults to telegram.Bot is deprecated. Use telegram.ext.ExtBot instead.',
                 TelegramDeprecationWarning,
                 stacklevel=3,
             )
@@ -2020,7 +2020,7 @@ class Bot(TelegramObject):
     ) -> Tuple[Sequence['InlineQueryResult'], Optional[str]]:
         """
         Builds the effective results from the results input.
-        We make this a stand-alone method so tg.ext.Bot can wrap it.
+        We make this a stand-alone method so tg.ext.ExtBot can wrap it.
 
         Returns:
             Tuple of 1. the effective results and 2. correct the next_offset

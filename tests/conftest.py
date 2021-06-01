@@ -228,7 +228,7 @@ def pytest_configure(config):
 
 def make_bot(bot_info, **kwargs):
     """
-    Tests are executed on tg.ext.Bot, as that class only extends the functionality of tg.bot
+    Tests are executed on tg.ext.ExtBot, as that class only extends the functionality of tg.bot
     """
     return ExtBot(bot_info['token'], private_key=PRIVATE_KEY, **kwargs)
 

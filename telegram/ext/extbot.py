@@ -27,7 +27,6 @@ from telegram import (
     Message,
     InlineKeyboardMarkup,
     Poll,
-    MessageEntity,
     MessageId,
     Update,
     Chat,
@@ -39,7 +38,7 @@ from telegram.utils.types import JSONDict, ODVInput, DVInput
 from ..utils.helpers import DEFAULT_NONE
 
 if TYPE_CHECKING:
-    from telegram import InlineQueryResult
+    from telegram import InlineQueryResult, MessageEntity
     from telegram.utils.request import Request
     from .defaults import Defaults
 
@@ -115,11 +114,7 @@ class ExtBot(telegram.bot.Bot):
     def _replace_keyboard(self, reply_markup: Optional[ReplyMarkup]) -> Optional[ReplyMarkup]:
         # If the reply_markup is an inline keyboard and we allow arbitrary callback data, let the
         # CallbackDataCache build a new keyboard with the data replaced. Otherwise return the input
-        if (
-            isinstance(reply_markup, ReplyMarkup)
-            and self.arbitrary_callback_data
-            and isinstance(reply_markup, InlineKeyboardMarkup)
-        ):
+        if isinstance(reply_markup, InlineKeyboardMarkup) and self.arbitrary_callback_data:
             return self.callback_data_cache.process_keyboard(reply_markup)
 
         return reply_markup
@@ -135,7 +130,7 @@ class ExtBot(telegram.bot.Bot):
 
             Note that this will fail for channel posts, as :attr:`telegram.Message.from_user` is
             :obj:`None` for those! In the corresponding reply markups the callback data will be
-            replaced by :class:`InvalidButtonData`.
+            replaced by :class:`telegram.ext.InvalidCallbackData`.
 
         Warning:
             *In place*, i.e. the passed :class:`telegram.Message` will be changed!
@@ -273,7 +268,7 @@ class ExtBot(telegram.bot.Bot):
     def stop_poll(
         self,
         chat_id: Union[int, str],
-        message_id: Union[int, str],
+        message_id: int,
         reply_markup: InlineKeyboardMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
@@ -291,12 +286,12 @@ class ExtBot(telegram.bot.Bot):
         self,
         chat_id: Union[int, str],
         from_chat_id: Union[str, int],
-        message_id: Union[str, int],
+        message_id: int,
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
+        caption_entities: Union[Tuple['MessageEntity', ...], List['MessageEntity']] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Union[int, str] = None,
+        reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
         reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
