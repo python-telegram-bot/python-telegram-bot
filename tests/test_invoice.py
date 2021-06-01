@@ -42,7 +42,7 @@ class TestInvoice:
     description = 'description'
     start_parameter = 'start_parameter'
     currency = 'EUR'
-    total_amount = sum([p.amount for p in prices])
+    total_amount = sum(p.amount for p in prices)
     max_tip_amount = 42
     suggested_tip_amounts = [13, 42]
 
