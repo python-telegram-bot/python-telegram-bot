@@ -2002,11 +2002,11 @@ officedocument.wordprocessingml.document")``.
     Examples:
         To allow any dice message, simply use
         ``MessageHandler(Filters.dice, callback_method)``.
-        To allow dice messages only with the emoji 🎲, but any value, use
+        To allow only dice messages with the emoji 🎲, but any value, use
         ``MessageHandler(Filters.dice.dice, callback_method)``.
-        To allow only dice with the emoji 🎯 and with value 6, use
+        To allow only dice messages with the emoji 🎯 and with value 6, use
         ``MessageHandler(Filters.dice.darts(6), callback_method)``.
-        To allow only dice with the emoji football and value 5 `or` 6, use
+        To allow only dice messages with the emoji ⚽ and with value 5 `or` 6, use
         ``MessageHandler(Filters.dice.football([5, 6]), callback_method)``.
 
     Note:
