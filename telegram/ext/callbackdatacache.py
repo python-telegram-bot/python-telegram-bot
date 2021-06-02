@@ -64,8 +64,14 @@ class InvalidCallbackData(TelegramError):
     """
     Raised when the received callback data has been tempered with or deleted from cache.
 
+    .. versionadded:: 13.6
+
     Args:
         callback_data (:obj:`int`, optional): The button data of which the callback data could not
+            be found.
+
+    Attributes:
+        callback_data (:obj:`int`): Optional. The button data of which the callback data could not
             be found.
     """
 
@@ -113,6 +119,8 @@ class CallbackDataCache:
     The second mapping allows to manually drop data that has been cached for keyboards of messages
     sent via inline mode.
     If necessary, will drop the least recently used items.
+
+    .. versionadded:: 13.6
 
     Args:
         bot (:class:`telegram.ext.ExtBot`): The bot this cache is for.

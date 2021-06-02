@@ -16,15 +16,22 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains custom typing aliases."""
+"""This module contains custom typing aliases.
+
+.. versionadded:: 13.6
+"""
 from typing import Any, Dict, List, Optional, Tuple
 
 ConversationDict = Dict[Tuple[int, ...], Optional[object]]
-"""Dicts as maintained by the :class:`telegram.ext.ConversationHandler`."""
+"""Dicts as maintained by the :class:`telegram.ext.ConversationHandler`.
+
+    .. versionadded:: 13.6
+"""
 
 CDCData = Tuple[List[Tuple[str, float, Dict[str, Any]]], Dict[str, str]]
-"""
-Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`any`]]], \
+"""Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`any`]]], \
     Dict[:obj:`str`, :obj:`str`]]: Data returned by
     :attr:`telegram.ext.CallbackDataCache.persistence_data`.
+
+    .. versionadded:: 13.6
 """

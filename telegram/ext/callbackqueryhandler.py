@@ -62,6 +62,8 @@ class CallbackQueryHandler(Handler[Update]):
           cases, an instance of :class:`telegram.ext.InvalidCallbackData` will be set as
           ``callback_data``.
 
+          .. versionadded:: 13.6
+
     Warning:
         When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
@@ -100,6 +102,9 @@ class CallbackQueryHandler(Handler[Update]):
 
             If :attr:`telegram.CallbackQuery.data` is :obj:`None`, the
             :class:`telegram.CallbackQuery` update will not be handled.
+
+            .. versionchanged:: 13.6
+               Added support for arbitrary callback data.
         pass_groups (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groups()`` as a keyword argument called ``groups``.
             Default is :obj:`False`
@@ -125,6 +130,9 @@ class CallbackQueryHandler(Handler[Update]):
             the callback function.
         pattern (`Pattern` | :obj:`callable` | :obj:`type`): Optional. Regex pattern, callback or
             type to test :attr:`telegram.CallbackQuery.data` against.
+
+            .. versionchanged:: 13.6
+               Added support for arbitrary callback data.
         pass_groups (:obj:`bool`): Determines whether ``groups`` will be passed to the
             callback function.
         pass_groupdict (:obj:`bool`): Determines whether ``groupdict``. will be passed to

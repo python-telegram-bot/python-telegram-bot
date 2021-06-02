@@ -1822,16 +1822,27 @@ class TestDictPersistence:
         bad_user_data = '["this", "is", "json"]'
         bad_chat_data = '["this", "is", "json"]'
         bad_bot_data = '["this", "is", "json"]'
-        bad_callback_data = '["this", "is", "json"]'
         bad_conversations = '["this", "is", "json"]'
+        bad_callback_data_1 = '[[["str", 3.14, {"di": "ct"}]], "is"]'
+        bad_callback_data_2 = '[[["str", "non-float", {"di": "ct"}]], {"di": "ct"}]'
+        bad_callback_data_3 = '[[[{"not": "a str"}, 3.14, {"di": "ct"}]], {"di": "ct"}]'
+        bad_callback_data_4 = '[[["wrong", "length"]], {"di": "ct"}]'
+        bad_callback_data_5 = '["this", "is", "json"]'
         with pytest.raises(TypeError, match='user_data'):
             DictPersistence(user_data_json=bad_user_data)
         with pytest.raises(TypeError, match='chat_data'):
             DictPersistence(chat_data_json=bad_chat_data)
         with pytest.raises(TypeError, match='bot_data'):
             DictPersistence(bot_data_json=bad_bot_data)
-        with pytest.raises(TypeError, match='callback_data'):
-            DictPersistence(callback_data_json=bad_callback_data)
+        for bad_callback_data in [
+            bad_callback_data_1,
+            bad_callback_data_2,
+            bad_callback_data_3,
+            bad_callback_data_4,
+            bad_callback_data_5,
+        ]:
+            with pytest.raises(TypeError, match='callback_data'):
+                DictPersistence(callback_data_json=bad_callback_data)
         with pytest.raises(TypeError, match='conversations'):
             DictPersistence(conversations_json=bad_conversations)
 
@@ -1881,6 +1892,11 @@ class TestDictPersistence:
         assert conversation2[(890, 890)] == 2
         with pytest.raises(KeyError):
             conversation2[(123, 123)]
+
+    def test_good_json_input_callback_data_none(self):
+        dict_persistence = DictPersistence(callback_data_json='null')
+        assert dict_persistence.callback_data is None
+        assert dict_persistence.callback_data_json == 'null'
 
     def test_dict_outputs(
         self,

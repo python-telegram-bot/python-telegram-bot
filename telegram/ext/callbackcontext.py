@@ -162,6 +162,8 @@ class CallbackContext:
         """
         Deletes the cached data for the specified callback query.
 
+        .. versionadded:: 13.6
+
         Note:
             Will *not* raise exceptions in case the data is not found in the cache.
             *Will* raise :class:`KeyError` in case the callback query can not be found in the

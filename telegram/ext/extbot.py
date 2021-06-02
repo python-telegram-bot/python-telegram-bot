@@ -54,6 +54,8 @@ class ExtBot(telegram.bot.Bot):
     For the documentation of the arguments, methods and attributes, please see
     :class:`telegram.Bot`.
 
+    .. versionadded:: 13.6
+
     Args:
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
             be used if not set explicitly in the bot methods.

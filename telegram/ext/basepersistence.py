@@ -74,6 +74,8 @@ class BasePersistence(ABC):
         store_callback_data (:obj:`bool`, optional): Whether callback_data should be saved by this
             persistence class. Default is :obj:`False`.
 
+            .. versionadded:: 13.6
+
     Attributes:
         store_user_data (:obj:`bool`): Optional, Whether user_data should be saved by this
             persistence class.
@@ -83,6 +85,8 @@ class BasePersistence(ABC):
             persistence class.
         store_callback_data (:obj:`bool`): Optional. Whether callback_data should be saved by this
             persistence class.
+
+            .. versionadded:: 13.6
     """
 
     # Apparently Py 3.7 and below have '__dict__' in ABC
@@ -400,6 +404,8 @@ class BasePersistence(ABC):
         """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. If callback data was stored, it should be returned.
 
+        .. versionadded:: 13.6
+
         Returns:
             Optional[:class:`telegram.ext.utils.types.CDCData`]:  The restored meta data or
                 :obj:`None`, if no data was stored.
@@ -465,6 +471,8 @@ class BasePersistence(ABC):
     def update_callback_data(self, data: CDCData) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
         handled an update.
+
+        .. versionadded:: 13.6
 
         Args:
             data (:class:`telegram.ext.utils.types.CDCData`:): The relevant data to restore

@@ -158,7 +158,7 @@ class Bot(TelegramObject):
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
             be used if not set explicitly in the bot methods.
 
-            .. deprecated:: 13.2
+            .. deprecated:: 13.6
                Passing :class:`telegram.ext.Defaults` to :class:`telegram.Bot` is deprecated. If
                you want to use :class:`telegram.ext.Defaults`, please use
                :class:`telegram.ext.ExtBot` instead.

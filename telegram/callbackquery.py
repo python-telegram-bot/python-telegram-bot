@@ -58,6 +58,9 @@ class CallbackQuery(TelegramObject):
           associated with the button triggering the :class:`telegram.CallbackQuery` was already
           deleted or if :attr:`data` was manipulated by a malicious client.
 
+          .. versionadded:: 13.6
+
+
     Args:
         id (:obj:`str`): Unique identifier for this query.
         from_user (:class:`telegram.User`): Sender.

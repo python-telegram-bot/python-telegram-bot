@@ -49,6 +49,8 @@ class PicklePersistence(BasePersistence):
             persistence class. Default is :obj:`True`.
         store_callback_data (:obj:`bool`, optional): Whether callback_data should be saved by this
             persistence class. Default is :obj:`False`.
+
+            .. versionadded:: 13.6
         single_file (:obj:`bool`, optional): When :obj:`False` will store 5 separate files of
             `filename_user_data`, `filename_chat_data`, `filename_bot_data`, `filename_chat_data`,
             `filename_callback_data` and `filename_conversations`. Default is :obj:`True`.
@@ -68,6 +70,8 @@ class PicklePersistence(BasePersistence):
             persistence class.
         store_callback_data (:obj:`bool`): Optional. Whether callback_data be saved by this
             persistence class.
+
+            .. versionadded:: 13.6
         single_file (:obj:`bool`): Optional. When :obj:`False` will store 5 separate files of
             `filename_user_data`, `filename_chat_data`, `filename_bot_data`, `filename_chat_data`,
             `filename_callback_data` and `filename_conversations`. Default is :obj:`True`.
@@ -224,6 +228,8 @@ class PicklePersistence(BasePersistence):
     def get_callback_data(self) -> Optional[CDCData]:
         """Returns the callback data from the pickle file if it exists or :obj:`None`.
 
+        .. versionadded:: 13.6
+
         Returns:
             Optional[:class:`telegram.ext.utils.types.CDCData`]: The restored meta data or
                 :obj:`None`, if no data was stored.
@@ -341,6 +347,8 @@ class PicklePersistence(BasePersistence):
     def update_callback_data(self, data: CDCData) -> None:
         """Will update the callback_data (if changed) and depending on :attr:`on_flush` save the
         pickle file.
+
+        .. versionadded:: 13.6
 
         Args:
             data (:class:`telegram.ext.utils.types.CDCData`:): The relevant data to restore

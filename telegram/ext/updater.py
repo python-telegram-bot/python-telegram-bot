@@ -56,6 +56,8 @@ class Updater:
           and :attr:`defaults` to the bot instead of the :class:`telegram.ext.Updater`. In this
           case, you'll have to use the class :class:`telegram.ext.ExtBot`.
 
+          .. versionchanged:: 13.6
+
     Args:
         token (:obj:`str`, optional): The bot's token given by the @BotFather.
         base_url (:obj:`str`, optional): Base_url for the bot.
@@ -90,6 +92,8 @@ class Updater:
             allow arbitrary objects as callback data for :class:`telegram.InlineKeyboardButton`.
             Pass an integer to specify the maximum number of cached objects. For more details,
             please see our wiki. Defaults to :obj:`False`.
+
+            .. versionadded:: 13.6
 
     Raises:
         ValueError: If both :attr:`token` and :attr:`bot` are passed or none of them.

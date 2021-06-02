@@ -63,6 +63,8 @@ class DictPersistence(BasePersistence):
             persistence class. Default is :obj:`True`.
         store_callback_data (:obj:`bool`, optional): Whether callback_data should be saved by this
             persistence class. Default is :obj:`False`.
+
+            .. versionadded:: 13.6
         user_data_json (:obj:`str`, optional): Json string that will be used to reconstruct
             user_data on creating this persistence. Default is ``""``.
         chat_data_json (:obj:`str`, optional): Json string that will be used to reconstruct
@@ -71,6 +73,8 @@ class DictPersistence(BasePersistence):
             bot_data on creating this persistence. Default is ``""``.
         callback_data_json (:obj:`str`, optional): Json string that will be used to reconstruct
             callback_data on creating this persistence. Default is ``""``.
+
+            .. versionadded:: 13.6
         conversations_json (:obj:`str`, optional): Json string that will be used to reconstruct
             conversation on creating this persistence. Default is ``""``.
 
@@ -83,6 +87,8 @@ class DictPersistence(BasePersistence):
             persistence class.
         store_callback_data (:obj:`bool`): Whether callback_data be saved by this
             persistence class.
+
+            .. versionadded:: 13.6
     """
 
     __slots__ = (
@@ -149,19 +155,31 @@ class DictPersistence(BasePersistence):
         if callback_data_json:
             try:
                 data = json.loads(callback_data_json)
-                if data:
-                    self._callback_data = cast(CDCData, ([tuple(d) for d in data[0]], data[1]))
-                else:
-                    self._callback_data = None
-                self._callback_data_json = callback_data_json
             except (ValueError, AttributeError) as exc:
                 raise TypeError(
                     "Unable to deserialize callback_data_json. Not valid JSON"
                 ) from exc
-            # We don't check the elements of the tuple here, that would get a bit long …
-            if not isinstance(self._callback_data, tuple):
-                print(self._callback_data)
-                raise TypeError("callback_data_json must be serialized tuple")
+            # We are a bit more thorough with the checking of the format here, because it's
+            # more complicated than for the other things
+            try:
+                if data is None:
+                    self._callback_data = None
+                else:
+                    self._callback_data = cast(
+                        CDCData,
+                        ([(one, float(two), three) for one, two, three in data[0]], data[1]),
+                    )
+                self._callback_data_json = callback_data_json
+            except (ValueError, IndexError) as exc:
+                raise TypeError("callback_data_json is not in the required format") from exc
+            if self._callback_data is not None:
+                if not all(
+                    isinstance(entry[2], dict) and isinstance(entry[0], str)
+                    for entry in self._callback_data[0]
+                ):
+                    raise TypeError("callback_data_json is not in the required format")
+                if not isinstance(self._callback_data[1], dict):
+                    raise TypeError("callback_data_json is not in the required format")
 
         if conversations_json:
             try:
@@ -210,12 +228,18 @@ class DictPersistence(BasePersistence):
 
     @property
     def callback_data(self) -> Optional[CDCData]:
-        """:class:`telegram.ext.utils.types.CDCData`: The meta data on the stored callback data."""
+        """:class:`telegram.ext.utils.types.CDCData`: The meta data on the stored callback data.
+
+        .. versionadded:: 13.6
+        """
         return self._callback_data
 
     @property
     def callback_data_json(self) -> str:
-        """:obj:`str`: The meta data on the stored callback data as a JSON-string."""
+        """:obj:`str`: The meta data on the stored callback data as a JSON-string.
+
+        .. versionadded:: 13.6
+        """
         if self._callback_data_json:
             return self._callback_data_json
         return json.dumps(self.callback_data)
@@ -266,6 +290,8 @@ class DictPersistence(BasePersistence):
 
     def get_callback_data(self) -> Optional[CDCData]:
         """Returns the callback_data created from the ``callback_data_json`` or :obj:`None`.
+
+        .. versionadded:: 13.6
 
         Returns:
             Optional[:class:`telegram.ext.utils.types.CDCData`]: The restored meta data or
@@ -344,6 +370,8 @@ class DictPersistence(BasePersistence):
 
     def update_callback_data(self, data: CDCData) -> None:
         """Will update the callback_data (if changed).
+
+        .. versionadded:: 13.6
 
         Args:
             data (:class:`telegram.ext.utils.types.CDCData`:): The relevant data to restore

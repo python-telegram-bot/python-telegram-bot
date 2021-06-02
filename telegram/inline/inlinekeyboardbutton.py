@@ -43,10 +43,14 @@ class InlineKeyboardButton(TelegramObject):
           :class:`telegram.ext.InvalidCallbackData`. This will be the case, if the data
           associated with the button was already deleted.
 
+          .. versionadded:: 13.6
+
     Warning:
         If your bot allows your arbitrary callback data, buttons whose callback data is a
         non-hashable object will be come unhashable. Trying to evaluate ``hash(button)`` will
-        result in a ``TypeError``.
+        result in a :class:`TypeError`.
+
+        .. versionchanged:: 13.6
 
     Args:
         text (:obj:`str`): Label text on the button.
@@ -80,8 +84,8 @@ class InlineKeyboardButton(TelegramObject):
         url (:obj:`str`): Optional. HTTP or tg:// url to be opened when button is pressed.
         login_url (:class:`telegram.LoginUrl`): Optional. An HTTP URL used to automatically
             authorize the user. Can be used as a replacement for the Telegram Login Widget.
-        callback_data (:obj:`str` | :obj:`Any`): Optional. Data to be sent in a callback query to
-            the bot when button is pressed, UTF-8 1-64 bytes.
+        callback_data (:obj:`str` | :obj:`object`): Optional. Data to be sent in a callback query
+            to the bot when button is pressed, UTF-8 1-64 bytes.
         switch_inline_query (:obj:`str`): Optional. Will prompt the user to select one of their
             chats, open that chat and insert the bot's username and the specified inline query in
             the input field. Can be empty, in which case just the bot’s username will be inserted.
@@ -148,6 +152,8 @@ class InlineKeyboardButton(TelegramObject):
         """
         Sets :attr:`callback_data` to the passed object. Intended to be used by
         :class:`telegram.ext.CallbackDataCache`.
+
+        .. versionadded:: 13.6
 
         Args:
             callback_data (:obj:`obj`): The new callback data.
