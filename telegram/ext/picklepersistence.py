@@ -19,7 +19,6 @@
 """This module contains the PicklePersistence class."""
 import pickle
 from collections import defaultdict
-from copy import deepcopy
 from typing import Any, DefaultDict, Dict, Optional, Tuple
 
 from telegram.ext import BasePersistence
@@ -185,7 +184,7 @@ class PicklePersistence(BasePersistence):
             self.user_data = data
         else:
             self._load_singlefile()
-        return deepcopy(self.user_data)  # type: ignore[arg-type]
+        return self.user_data  # type: ignore[return-value]
 
     def get_chat_data(self) -> DefaultDict[int, Dict[object, object]]:
         """Returns the chat_data from the pickle file if it exists or an empty :obj:`defaultdict`.
@@ -205,7 +204,7 @@ class PicklePersistence(BasePersistence):
             self.chat_data = data
         else:
             self._load_singlefile()
-        return deepcopy(self.chat_data)  # type: ignore[arg-type]
+        return self.chat_data  # type: ignore[return-value]
 
     def get_bot_data(self) -> Dict[object, object]:
         """Returns the bot_data from the pickle file if it exists or an empty :obj:`dict`.
@@ -223,7 +222,7 @@ class PicklePersistence(BasePersistence):
             self.bot_data = data
         else:
             self._load_singlefile()
-        return deepcopy(self.bot_data)  # type: ignore[arg-type]
+        return self.bot_data  # type: ignore[return-value]
 
     def get_callback_data(self) -> Optional[CDCData]:
         """Returns the callback data from the pickle file if it exists or :obj:`None`.
@@ -244,7 +243,9 @@ class PicklePersistence(BasePersistence):
             self.callback_data = data
         else:
             self._load_singlefile()
-        return deepcopy(self.callback_data)
+        if self.callback_data is None:
+            return None
+        return self.callback_data[0], self.callback_data[1].copy()
 
     def get_conversations(self, name: str) -> ConversationDict:
         """Returns the conversations from the pickle file if it exsists or an empty dict.
@@ -336,7 +337,7 @@ class PicklePersistence(BasePersistence):
         """
         if self.bot_data == data:
             return
-        self.bot_data = data.copy()
+        self.bot_data = data
         if not self.on_flush:
             if not self.single_file:
                 filename = f"{self.filename}_bot_data"
@@ -356,7 +357,7 @@ class PicklePersistence(BasePersistence):
         """
         if self.callback_data == data:
             return
-        self.callback_data = (data[0].copy(), data[1].copy())
+        self.callback_data = (data[0], data[1].copy())
         if not self.on_flush:
             if not self.single_file:
                 filename = f"{self.filename}_callback_data"

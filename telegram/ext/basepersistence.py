@@ -111,6 +111,13 @@ class BasePersistence(ABC):
     def __new__(
         cls, *args: object, **kwargs: object  # pylint: disable=W0613
     ) -> 'BasePersistence':
+        """This overrides the get_* and update_* methods to use insert/replace_bot.
+        That has the side effect that we always pass deepcopied data to those methods, so in
+        Pickle/DictPersistence we don't have to worry about copying the data again.
+
+        Note: This doesn't hold for second tuple-entry of callback_data. That's a Dict[str, str],
+        so no bots to replace anyway.
+        """
         instance = super().__new__(cls)
         get_user_data = instance.get_user_data
         get_chat_data = instance.get_chat_data

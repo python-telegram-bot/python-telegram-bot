@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the DictPersistence class."""
-from copy import deepcopy
 
 from typing import DefaultDict, Dict, Optional, Tuple, cast
 from collections import defaultdict
@@ -265,7 +264,7 @@ class DictPersistence(BasePersistence):
         """
         if self.user_data is None:
             self._user_data = defaultdict(dict)
-        return deepcopy(self.user_data)  # type: ignore[arg-type]
+        return self.user_data  # type: ignore[return-value]
 
     def get_chat_data(self) -> DefaultDict[int, Dict[object, object]]:
         """Returns the chat_data created from the ``chat_data_json`` or an empty
@@ -276,7 +275,7 @@ class DictPersistence(BasePersistence):
         """
         if self.chat_data is None:
             self._chat_data = defaultdict(dict)
-        return deepcopy(self.chat_data)  # type: ignore[arg-type]
+        return self.chat_data  # type: ignore[return-value]
 
     def get_bot_data(self) -> Dict[object, object]:
         """Returns the bot_data created from the ``bot_data_json`` or an empty :obj:`dict`.
@@ -286,7 +285,7 @@ class DictPersistence(BasePersistence):
         """
         if self.bot_data is None:
             self._bot_data = {}
-        return deepcopy(self.bot_data)  # type: ignore[arg-type]
+        return self.bot_data  # type: ignore[return-value]
 
     def get_callback_data(self) -> Optional[CDCData]:
         """Returns the callback_data created from the ``callback_data_json`` or :obj:`None`.
@@ -299,7 +298,8 @@ class DictPersistence(BasePersistence):
         """
         if self.callback_data is None:
             self._callback_data = None
-        return deepcopy(self.callback_data)
+            return None
+        return self.callback_data[0], self.callback_data[1].copy()
 
     def get_conversations(self, name: str) -> ConversationDict:
         """Returns the conversations created from the ``conversations_json`` or an empty
@@ -365,7 +365,7 @@ class DictPersistence(BasePersistence):
         """
         if self._bot_data == data:
             return
-        self._bot_data = data.copy()
+        self._bot_data = data
         self._bot_data_json = None
 
     def update_callback_data(self, data: CDCData) -> None:
@@ -379,5 +379,5 @@ class DictPersistence(BasePersistence):
         """
         if self._callback_data == data:
             return
-        self._callback_data = (data[0].copy(), data[1].copy())
+        self._callback_data = (data[0], data[1].copy())
         self._callback_data_json = None
