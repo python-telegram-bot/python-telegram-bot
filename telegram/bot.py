@@ -3861,7 +3861,7 @@ class Bot(TelegramObject):
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
             expire_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the link will
-                expire.
+                expire. Integer input will be interpreted as Unix timestamp.
                 For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
                 bot will be used.
             member_limit (:obj:`int`, optional): Maximum number of users that can be members of
