@@ -362,18 +362,21 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     def refresh_user_data(self, user_id: int, user_data: UD) -> None:
         """Does nothing.
 
+        .. versionadded:: 13.6
         .. seealso:: :meth:`telegram.ext.BasePersistence.refresh_user_data`
         """
 
     def refresh_chat_data(self, chat_id: int, chat_data: CD) -> None:
         """Does nothing.
 
+        .. versionadded:: 13.6
         .. seealso:: :meth:`telegram.ext.BasePersistence.refresh_chat_data`
         """
 
     def refresh_bot_data(self, bot_data: BD) -> None:
         """Does nothing.
 
+        .. versionadded:: 13.6
         .. seealso:: :meth:`telegram.ext.BasePersistence.refresh_bot_data`
         """
 

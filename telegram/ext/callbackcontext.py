@@ -178,12 +178,13 @@ class CallbackContext(Generic[UD, CD, BD]):
         )
 
     def refresh_data(self) -> None:
-        """
-        If :attr:`dispatcher` uses persistence, calls
+        """If :attr:`dispatcher` uses persistence, calls
         :meth:`telegram.ext.BasePersistence.refresh_bot_data` on :attr:`bot_data`,
-        :meth:`telegram.ext.BasePersistence.refresh_chat_data` on :attr:`chat_data`,
+        :meth:`telegram.ext.BasePersistence.refresh_chat_data` on :attr:`chat_data` and
         :meth:`telegram.ext.BasePersistence.refresh_user_data` on :attr:`user_data`, if
         appropriate.
+
+        .. versionadded:: 13.6
         """
         if self.dispatcher.persistence:
             if self.dispatcher.persistence.store_bot_data:
@@ -239,7 +240,7 @@ class CallbackContext(Generic[UD, CD, BD]):
         .. seealso:: :meth:`telegram.ext.Dispatcher.add_handler`
 
         Args:
-            update (:obj:`any` | :class:`telegram.Update`): The update.
+            update (:obj:`object` | :class:`telegram.Update`): The update.
             dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher associated with this
                 context.
 

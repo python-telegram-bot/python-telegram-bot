@@ -16,17 +16,32 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains custom typing aliases."""
+"""This module contains custom typing aliases.
+
+.. versionadded:: 13.6
+"""
 from typing import TypeVar, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from telegram.ext import CallbackContext  # noqa: F401
 
 CCT = TypeVar('CCT', bound='CallbackContext')
-"""An instance of :class:`telegram.ext.CallbackContext` or a custom subclass."""
+"""An instance of :class:`telegram.ext.CallbackContext` or a custom subclass.
+
+.. versionadded:: 13.6
+"""
 UD = TypeVar('UD')
-"""Type of the user data for a single user."""
+"""Type of the user data for a single user.
+
+.. versionadded:: 13.6
+"""
 CD = TypeVar('CD')
-"""Type of the chat data for a single user."""
+"""Type of the chat data for a single user.
+
+.. versionadded:: 13.6
+"""
 BD = TypeVar('BD')
-"""Type of the bot data."""
+"""Type of the bot data.
+
+.. versionadded:: 13.6
+"""

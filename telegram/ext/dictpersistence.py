@@ -300,17 +300,20 @@ class DictPersistence(BasePersistence):
     def refresh_user_data(self, user_id: int, user_data: Dict) -> None:
         """Does nothing.
 
+        .. versionadded:: 13.6
         .. seealso:: :meth:`telegram.ext.BasePersistence.refresh_user_data`
         """
 
     def refresh_chat_data(self, chat_id: int, chat_data: Dict) -> None:
         """Does nothing.
 
+        .. versionadded:: 13.6
         .. seealso:: :meth:`telegram.ext.BasePersistence.refresh_chat_data`
         """
 
     def refresh_bot_data(self, bot_data: Dict) -> None:
         """Does nothing.
 
+        .. versionadded:: 13.6
         .. seealso:: :meth:`telegram.ext.BasePersistence.refresh_bot_data`
         """
