@@ -92,23 +92,23 @@ class Promise:
 
     def run(self) -> None:
         """Calls the :attr:`pooled_function` callable."""
+
         try:
             self._result = self.pooled_function(*self.args, **self.kwargs)
-
         except Exception as exc:
             self._exception = exc
-
         finally:
             self.done.set()
             if self._done_callback:
                 try:
-                    self._done_callback(self.result())
+                    self._done_callback(self._result, self._exception)
                 except Exception as exc:
                     logger.warning(
                         "`done_callback` of a Promise raised the following exception."
                         " The exception won't be handled by error handlers."
                     )
                     logger.warning("Full traceback:", exc_info=exc)
+
 
     def __call__(self) -> None:
         self.run()
@@ -134,21 +134,23 @@ class Promise:
 
     def add_done_callback(self, callback: Callable) -> None:
         """
-        Callback to be run when :class:`telegram.ext.utils.promise.Promise` becomes done.
+        Callback to be run when :class:`telegram.ext.utils.promise.Promise` becomes done
+        or throws an exception
 
         Args:
             callback (:obj:`callable`): The callable that will be called when promise is done.
-            callback will be called by passing ``Promise.result()`` as only positional argument.
+            callback will be called by passing ``Promise.result()`` and an instance of ``Exception``
+            occurred if any
 
         """
         if self.done.wait(0):
-            callback(self.result())
+            callback(self._result, self._exception)
         else:
             self._done_callback = callback
 
     @property
     def exception(self) -> Optional[Exception]:
         """The exception raised by :attr:`pooled_function` or ``None`` if no exception has been
-        raised (yet).
-        """
+        raised (yet)."""
         return self._exception
+    
