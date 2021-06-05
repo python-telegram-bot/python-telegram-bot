@@ -171,12 +171,14 @@ class DictPersistence(BasePersistence):
                 self._callback_data_json = callback_data_json
             except (ValueError, IndexError) as exc:
                 raise TypeError("callback_data_json is not in the required format") from exc
-            if self._callback_data is not None:
-                if not all(
+            if self._callback_data is not None and (
+                not all(
                     isinstance(entry[2], dict) and isinstance(entry[0], str)
                     for entry in self._callback_data[0]
-                ) or not isinstance(self._callback_data[1], dict):
-                    raise TypeError("callback_data_json is not in the required format")
+                )
+                or not isinstance(self._callback_data[1], dict)
+            ):
+                raise TypeError("callback_data_json is not in the required format")
 
         if conversations_json:
             try:
