@@ -100,7 +100,7 @@ class Promise:
 
         finally:
             self.done.set()
-            if self._done_callback:
+            if self._exception is None and self._done_callback:
                 try:
                     self._done_callback(self.result())
                 except Exception as exc:
@@ -135,6 +135,10 @@ class Promise:
     def add_done_callback(self, callback: Callable) -> None:
         """
         Callback to be run when :class:`telegram.ext.utils.promise.Promise` becomes done.
+
+        Note:
+            Callback won't be called if :attr:`pooled_function`
+            raises an exception.
 
         Args:
             callback (:obj:`callable`): The callable that will be called when promise is done.
