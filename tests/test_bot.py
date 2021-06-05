@@ -50,6 +50,7 @@ from telegram import (
     Message,
     Chat,
     InlineQueryResultVoice,
+    PollOption,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.ext import ExtBot
@@ -2224,6 +2225,37 @@ class TestBot:
     # The same must be done in the webhook updater. This is tested over at test_updater.py, but
     # here we test more extensively.
 
+    def test_arbitrary_callback_data_no_insert(self, monkeypatch, bot):
+        """Updates that don't need insertion shouldn.t fail obviously"""
+
+        def post(*args, **kwargs):
+            update = Update(
+                17,
+                poll=Poll(
+                    '42',
+                    'question',
+                    options=[PollOption('option', 0)],
+                    total_voter_count=0,
+                    is_closed=False,
+                    is_anonymous=True,
+                    type=Poll.REGULAR,
+                    allows_multiple_answers=False,
+                ),
+            )
+            return [update.to_dict()]
+
+        try:
+            bot.arbitrary_callback_data = True
+            monkeypatch.setattr(bot.request, 'post', post)
+            bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
+            updates = bot.get_updates(timeout=1)
+
+            assert len(updates) == 1
+            assert updates[0].update_id == 17
+            assert updates[0].poll.id == '42'
+        finally:
+            bot.arbitrary_callback_data = False
+
     @pytest.mark.parametrize(
         'message_type', ['channel_post', 'edited_channel_post', 'message', 'edited_message']
     )
@@ -2283,6 +2315,19 @@ class TestBot:
             bot.arbitrary_callback_data = False
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
+
+    def test_arbitrary_callback_data_get_chat_no_pinned_message(self, super_group_id, bot):
+        bot.arbitrary_callback_data = True
+        bot.unpin_all_chat_messages(super_group_id)
+
+        try:
+            chat = bot.get_chat(super_group_id)
+
+            assert isinstance(chat, Chat)
+            assert int(chat.id) == int(super_group_id)
+            assert chat.pinned_message is None
+        finally:
+            bot.arbitrary_callback_data = False
 
     @pytest.mark.parametrize(
         'message_type', ['channel_post', 'edited_channel_post', 'message', 'edited_message']

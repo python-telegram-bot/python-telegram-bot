@@ -47,7 +47,14 @@ from telegram import (
     InlineKeyboardButton,
 )
 from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter
-from telegram.ext import Updater, Dispatcher, DictPersistence, Defaults, InvalidCallbackData
+from telegram.ext import (
+    Updater,
+    Dispatcher,
+    DictPersistence,
+    Defaults,
+    InvalidCallbackData,
+    ExtBot,
+)
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.ext.utils.webhookhandler import WebhookServer
 
@@ -199,7 +206,15 @@ class TestUpdater:
         event.wait()
         assert self.err_handler_called.wait(0.5) is not True
 
-    def test_webhook(self, monkeypatch, updater):
+    @pytest.mark.parametrize('ext_bot', [True, False])
+    def test_webhook(self, monkeypatch, updater, ext_bot):
+        # Testing with both ExtBot and Bot to make sure any logic in WebhookHandler
+        # that depends on this distinction works
+        if ext_bot and not isinstance(updater.bot, ExtBot):
+            updater.bot = ExtBot(updater.bot.token)
+        if not ext_bot and not isinstance(updater.bot, Bot):
+            updater.bot = Bot(updater.bot.token)
+
         q = Queue()
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
         monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)

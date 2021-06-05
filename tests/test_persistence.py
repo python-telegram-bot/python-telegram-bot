@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import gzip
 import signal
 from threading import Lock
 
@@ -877,6 +878,23 @@ def bad_pickle_files():
 
 
 @pytest.fixture(scope='function')
+def invalid_pickle_files():
+    for name in [
+        'pickletest_user_data',
+        'pickletest_chat_data',
+        'pickletest_bot_data',
+        'pickletest_callback_data',
+        'pickletest_conversations',
+        'pickletest',
+    ]:
+        # Just a random way to trigger pickle.UnpicklingError
+        # see https://stackoverflow.com/a/44422239/10606962
+        with gzip.open(name, 'wb') as file:
+            pickle.dump([1, 2, 3], file)
+    yield True
+
+
+@pytest.fixture(scope='function')
 def good_pickle_files(user_data, chat_data, bot_data, callback_data, conversations):
     data = {
         'user_data': user_data,
@@ -998,6 +1016,18 @@ class TestPicklePersistence:
         with pytest.raises(TypeError, match='pickletest_conversations'):
             pickle_persistence.get_conversations('name')
 
+    def test_with_invalid_multi_file(self, pickle_persistence, invalid_pickle_files):
+        with pytest.raises(TypeError, match='pickletest_user_data does not contain'):
+            pickle_persistence.get_user_data()
+        with pytest.raises(TypeError, match='pickletest_chat_data does not contain'):
+            pickle_persistence.get_chat_data()
+        with pytest.raises(TypeError, match='pickletest_bot_data does not contain'):
+            pickle_persistence.get_bot_data()
+        with pytest.raises(TypeError, match='pickletest_callback_data does not contain'):
+            pickle_persistence.get_callback_data()
+        with pytest.raises(TypeError, match='pickletest_conversations does not contain'):
+            pickle_persistence.get_conversations('name')
+
     def test_with_bad_single_file(self, pickle_persistence, bad_pickle_files):
         pickle_persistence.single_file = True
         with pytest.raises(TypeError, match='pickletest'):
@@ -1009,6 +1039,19 @@ class TestPicklePersistence:
         with pytest.raises(TypeError, match='pickletest'):
             pickle_persistence.get_callback_data()
         with pytest.raises(TypeError, match='pickletest'):
+            pickle_persistence.get_conversations('name')
+
+    def test_with_invalid_single_file(self, pickle_persistence, invalid_pickle_files):
+        pickle_persistence.single_file = True
+        with pytest.raises(TypeError, match='pickletest does not contain'):
+            pickle_persistence.get_user_data()
+        with pytest.raises(TypeError, match='pickletest does not contain'):
+            pickle_persistence.get_chat_data()
+        with pytest.raises(TypeError, match='pickletest does not contain'):
+            pickle_persistence.get_bot_data()
+        with pytest.raises(TypeError, match='pickletest does not contain'):
+            pickle_persistence.get_callback_data()
+        with pytest.raises(TypeError, match='pickletest does not contain'):
             pickle_persistence.get_conversations('name')
 
     def test_with_good_multi_file(self, pickle_persistence, good_pickle_files):
@@ -1360,6 +1403,21 @@ class TestPicklePersistence:
         pickle_persistence.update_conversation('name1', (123, 123), 5)
         assert pickle_persistence.conversations['name1'] == {(123, 123): 5}
         assert pickle_persistence.get_conversations('name1') == {(123, 123): 5}
+
+    def test_updating_single_file_no_data(self, pickle_persistence):
+        pickle_persistence.single_file = True
+        assert not any(
+            [
+                pickle_persistence.user_data,
+                pickle_persistence.chat_data,
+                pickle_persistence.bot_data,
+                pickle_persistence.callback_data,
+                pickle_persistence.conversations,
+            ]
+        )
+        pickle_persistence.flush()
+        with pytest.raises(FileNotFoundError, match='pickletest'):
+            open('pickletest', 'rb')
 
     def test_save_on_flush_multi_files(self, pickle_persistence, good_pickle_files):
         # Should run without error
