@@ -175,7 +175,7 @@ class CallbackDataCache:
 
     def process_keyboard(self, reply_markup: InlineKeyboardMarkup) -> InlineKeyboardMarkup:
         """Registers the reply markup to the cache. If any of the buttons have
-        :attr:`callback_data`, stores that data and builds a new keyboard the the correspondingly
+        :attr:`callback_data`, stores that data and builds a new keyboard with the correspondingly
         replaced buttons. Otherwise does nothing and returns the original reply markup.
 
         Args:
@@ -225,7 +225,9 @@ class CallbackDataCache:
         keyboard_data.button_data[uuid] = callback_data
         return f'{keyboard_data.keyboard_uuid}{uuid}'
 
-    def __get_button_data(self, callback_data: str) -> object:
+    def __get_keyboard_uuid_and_button_data(
+        self, callback_data: str
+    ) -> Union[Tuple[str, object], Tuple[None, InvalidCallbackData]]:
         keyboard, button = self.extract_uuids(callback_data)
         try:
             # we get the values before calling update() in case KeyErrors are raised
@@ -234,9 +236,9 @@ class CallbackDataCache:
             button_data = keyboard_data.button_data[button]
             # Update the timestamp for the LRU
             keyboard_data.update_access_time()
-            return button_data
+            return keyboard, button_data
         except KeyError:
-            return InvalidCallbackData(callback_data)
+            return None, InvalidCallbackData(callback_data)
 
     @staticmethod
     def extract_uuids(callback_data: str) -> Tuple[str, str]:
@@ -303,14 +305,16 @@ class CallbackDataCache:
             for button in row:
                 if button.callback_data:
                     button_data = cast(str, button.callback_data)
-                    callback_data = self.__get_button_data(button_data)
+                    keyboard_id, callback_data = self.__get_keyboard_uuid_and_button_data(
+                        button_data
+                    )
                     # update_callback_data makes sure that the _id_attrs are updated
                     button.update_callback_data(callback_data)
 
                     # This is lazy loaded. The firsts time we find a button
                     # we load the associated keyboard - afterwards, there is
                     if not keyboard_uuid and not isinstance(callback_data, InvalidCallbackData):
-                        keyboard_uuid = self.extract_uuids(button_data)[0]
+                        keyboard_uuid = keyboard_id
 
         return keyboard_uuid
 
@@ -340,25 +344,24 @@ class CallbackDataCache:
                 data = callback_query.data
 
                 # Get the cached callback data for the CallbackQuery
-                callback_query.data = self.__get_button_data(data)  # type: ignore[assignment]
+                keyboard_uuid, button_data = self.__get_keyboard_uuid_and_button_data(data)
+                callback_query.data = button_data  # type: ignore[assignment]
 
                 # Map the callback queries ID to the keyboards UUID for later use
-                if not isinstance(callback_query.data, InvalidCallbackData):
-                    self._callback_queries[callback_query.id] = self.extract_uuids(data)[0]
-                mapped = True
+                if not mapped and not isinstance(button_data, InvalidCallbackData):
+                    self._callback_queries[callback_query.id] = keyboard_uuid  # type: ignore
+                    mapped = True
 
             # Get the cached callback data for the inline keyboard attached to the
             # CallbackQuery.
             if callback_query.message:
-                keyboard_uuid = self.__process_message(callback_query.message)
+                self.__process_message(callback_query.message)
                 for message in (
                     callback_query.message.pinned_message,
                     callback_query.message.reply_to_message,
                 ):
                     if message:
                         self.__process_message(message)
-                if not mapped and keyboard_uuid:
-                    self._callback_queries[callback_query.id] = keyboard_uuid
 
     def drop_data(self, callback_query: CallbackQuery) -> None:
         """Deletes the data for the specified callback query.

@@ -9,13 +9,12 @@ For detailed info on arbitrary callback data, see the wiki page at https://git.i
 import logging
 from typing import List, Tuple, cast
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, CallbackQuery
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import (
     Updater,
     CommandHandler,
     CallbackQueryHandler,
     CallbackContext,
-    ExtBot,
     InvalidCallbackData,
     PicklePersistence,
 )
@@ -42,10 +41,8 @@ def help_command(update: Update, context: CallbackContext) -> None:
 
 def clear(update: Update, context: CallbackContext) -> None:
     """Clears the callback data cache"""
-    # the cast ist just for type hinting
-    bot = cast(ExtBot, context.bot)
-    bot.callback_data_cache.clear_callback_data()
-    bot.callback_data_cache.clear_callback_queries()
+    context.bot.callback_data_cache.clear_callback_data()  # type: ignore[attr-defined]
+    context.bot.callback_data_cache.clear_callback_queries()  # type: ignore[attr-defined]
     update.effective_message.reply_text('All clear!')
 
 
@@ -58,10 +55,11 @@ def build_keyboard(current_list: List[int]) -> InlineKeyboardMarkup:
 
 def list_button(update: Update, context: CallbackContext) -> None:
     """Parses the CallbackQuery and updates the message text."""
-    # The calls to cast(…) are just for type checkers like mypy
-    query = cast(CallbackQuery, update.callback_query)
+    query = update.callback_query
     query.answer()
     # Get the data from the callback_data.
+    # If you're using a type checker like MyPy, you'll have to use typing.cast
+    # to make the checker get the expected type of the callback_data
     number, number_list = cast(Tuple[int, List[int]], query.data)
     # append the number to the list
     number_list.append(number)

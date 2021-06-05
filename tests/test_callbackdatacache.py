@@ -19,6 +19,7 @@
 import time
 from copy import deepcopy
 from datetime import datetime
+from uuid import uuid4
 
 import pytest
 import pytz
@@ -167,11 +168,14 @@ class TestCallbackDataCache:
         effective_message = Message(message_id=1, date=None, chat=None, reply_markup=out)
         effective_message.reply_to_message = deepcopy(effective_message)
         effective_message.pinned_message = deepcopy(effective_message)
+        cq_id = uuid4().hex
         callback_query = CallbackQuery(
-            '1',
+            cq_id,
             from_user=None,
             chat_instance=None,
+            # not all CallbackQueries have callback_data
             data=out.inline_keyboard[0][1].callback_data if data else None,
+            # CallbackQueries from inline messages don't have the message attached, so we test that
             message=effective_message if message else None,
         )
         callback_data_cache.process_callback_query(callback_query)
@@ -179,6 +183,12 @@ class TestCallbackDataCache:
         if not invalid:
             if data:
                 assert callback_query.data == 'some data 1'
+                # make sure that we stored the mapping CallbackQuery.id -> keyboard_uuid correctly
+                assert len(callback_data_cache._keyboard_data) == 1
+                assert (
+                    callback_data_cache._callback_queries[cq_id]
+                    == list(callback_data_cache._keyboard_data.keys())[0]
+                )
             else:
                 assert callback_query.data is None
             if message:

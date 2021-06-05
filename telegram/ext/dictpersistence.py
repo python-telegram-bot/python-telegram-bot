@@ -175,9 +175,7 @@ class DictPersistence(BasePersistence):
                 if not all(
                     isinstance(entry[2], dict) and isinstance(entry[0], str)
                     for entry in self._callback_data[0]
-                ):
-                    raise TypeError("callback_data_json is not in the required format")
-                if not isinstance(self._callback_data[1], dict):
+                ) or not isinstance(self._callback_data[1], dict):
                     raise TypeError("callback_data_json is not in the required format")
 
         if conversations_json:
