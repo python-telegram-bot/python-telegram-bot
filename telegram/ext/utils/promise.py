@@ -137,7 +137,7 @@ class Promise:
         Callback to be run when :class:`telegram.ext.utils.promise.Promise` becomes done.
 
         Note:
-            Callback won't be called if `:class:`telegram.ext.utils.promise.Promise`
+            Callback won't be called if :attr:`pooled_function`
             raises an exception.
 
         Args:
