@@ -152,11 +152,9 @@ def main() -> None:
     dispatcher.add_handler(ChatMemberHandler(greet_chat_members, ChatMemberHandler.CHAT_MEMBER))
 
     # Start the Bot
-    # We pass 'allowed_updates' to *only* handle updates with '(my_)chat_member' or 'message'
-    # If you want to handle *all* updates, pass allowed_updates=Update.ALL_TYPES
-    updater.start_polling(
-        allowed_updates=[Update.MESSAGE, Update.CHAT_MEMBER, Update.MY_CHAT_MEMBER]
-    )
+    # We pass 'allowed_updates' handle *all* updates including `chat_member` updates
+    # To reset this, simply pass `allowed_updates=[]`
+    updater.start_polling(allowed_updates=Update.ALL_TYPES)
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
