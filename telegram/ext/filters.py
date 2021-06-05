@@ -634,7 +634,7 @@ class Filters:
             self.name = f'Filters.regex({self.pattern})'
 
         def filter(self, message: Message) -> Optional[Dict[str, List[Match]]]:
-            """"""  # remove method from docs
+            """ """  # remove method from docs
             if message.text:
                 match = self.pattern.search(message.text)
                 if match:
@@ -670,7 +670,7 @@ class Filters:
             self.name = f'Filters.caption_regex({self.pattern})'
 
         def filter(self, message: Message) -> Optional[Dict[str, List[Match]]]:
-            """"""  # remove method from docs
+            """ """  # remove method from docs
             if message.caption:
                 match = self.pattern.search(message.caption)
                 if match:
@@ -727,7 +727,7 @@ class Filters:
                 self.name = f"Filters.document.category('{self._category}')"
 
             def filter(self, message: Message) -> bool:
-                """"""  # remove method from docs
+                """ """  # remove method from docs
                 if message.document:
                     return message.document.mime_type.startswith(self._category)
                 return False
@@ -758,7 +758,7 @@ class Filters:
                 self.name = f"Filters.document.mime_type('{self.mimetype}')"
 
             def filter(self, message: Message) -> bool:
-                """"""  # remove method from docs
+                """ """  # remove method from docs
                 if message.document:
                     return message.document.mime_type == self.mimetype
                 return False
@@ -832,7 +832,7 @@ class Filters:
                     self.name = f"Filters.document.file_extension({file_extension.lower()!r})"
 
             def filter(self, message: Message) -> bool:
-                """"""  # remove method from docs
+                """ """  # remove method from docs
                 if message.document is None:
                     return False
                 if self._file_extension is None:
@@ -1298,7 +1298,7 @@ officedocument.wordprocessingml.document")``.
             self.name = f'Filters.entity({self.entity_type})'
 
         def filter(self, message: Message) -> bool:
-            """"""  # remove method from docs
+            """ """  # remove method from docs
             return any(entity.type == self.entity_type for entity in message.entities)
 
     class caption_entity(MessageFilter):
@@ -1322,7 +1322,7 @@ officedocument.wordprocessingml.document")``.
             self.name = f'Filters.caption_entity({self.entity_type})'
 
         def filter(self, message: Message) -> bool:
-            """"""  # remove method from docs
+            """ """  # remove method from docs
             return any(entity.type == self.entity_type for entity in message.caption_entities)
 
     class _Private(MessageFilter):
@@ -1563,7 +1563,7 @@ officedocument.wordprocessingml.document")``.
                 self._chat_ids -= parsed_chat_id
 
         def filter(self, message: Message) -> bool:
-            """"""  # remove method from docs
+            """ """  # remove method from docs
             chat_or_user = self.get_chat_or_user(message)
             if chat_or_user:
                 if self.chat_ids:
@@ -2206,7 +2206,7 @@ officedocument.wordprocessingml.document")``.
             self.name = f'Filters.language({self.lang})'
 
         def filter(self, message: Message) -> bool:
-            """"""  # remove method from docs
+            """ """  # remove method from docs
             return bool(
                 message.from_user.language_code
                 and any(message.from_user.language_code.startswith(x) for x in self.lang)
