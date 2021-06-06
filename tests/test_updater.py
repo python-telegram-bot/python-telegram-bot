@@ -319,6 +319,42 @@ class TestUpdater:
         updater.stop()
         assert self.test_flag == [True, True]
 
+    @pytest.mark.parametrize('pass_max_connections', [True, False])
+    def test_webhook_max_connections(self, monkeypatch, updater, pass_max_connections):
+        q = Queue()
+        max_connections = 42
+
+        def set_webhook(**kwargs):
+            print(kwargs)
+            self.test_flag = kwargs.get('max_connections') == (
+                max_connections if pass_max_connections else 40
+            )
+            return True
+
+        monkeypatch.setattr(updater.bot, 'set_webhook', set_webhook)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr('telegram.ext.Dispatcher.process_update', lambda _, u: q.put(u))
+
+        ip = '127.0.0.1'
+        port = randrange(1024, 49152)  # Select random port
+        if pass_max_connections:
+            updater.start_webhook(ip, port, webhook_url=None, max_connections=max_connections)
+        else:
+            updater.start_webhook(ip, port, webhook_url=None)
+
+        sleep(0.2)
+
+        # Now, we send an update to the server via urlopen
+        update = Update(
+            1,
+            message=Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Webhook 2'),
+        )
+        self._send_webhook_msg(ip, port, update.to_json())
+        sleep(0.2)
+        assert q.get(False) == update
+        updater.stop()
+        assert self.test_flag is True
+
     @pytest.mark.parametrize(('error',), argvalues=[(TelegramError(''),)], ids=('TelegramError',))
     def test_bootstrap_retries_success(self, monkeypatch, updater, error):
         retries = 2

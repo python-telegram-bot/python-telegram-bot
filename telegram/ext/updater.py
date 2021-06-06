@@ -363,6 +363,7 @@ class Updater:
         force_event_loop: bool = None,
         drop_pending_updates: bool = None,
         ip_address: str = None,
+        max_connections: int = 40,
     ) -> Optional[Queue]:
         """
         Starts a small http server to listen for updates via webhook. If :attr:`cert`
@@ -410,6 +411,11 @@ class Updater:
                 .. deprecated:: 13.6
                    Since version 13.6, ``tornade>=6.1`` is required, which resolves the former
                    issue.
+
+            max_connections (:obj:`int`, optional): Passed to
+                :meth:`telegram.Bot.set_webhook`.
+
+                .. versionadded:: 13.6
 
         Returns:
             :obj:`Queue`: The update queue that can be filled from the main thread.
@@ -459,6 +465,7 @@ class Updater:
                     allowed_updates,
                     ready=webhook_ready,
                     ip_address=ip_address,
+                    max_connections=max_connections,
                 )
 
                 self.logger.debug('Waiting for Dispatcher and Webhook to start')
@@ -592,6 +599,7 @@ class Updater:
         allowed_updates,
         ready=None,
         ip_address=None,
+        max_connections: int = 40,
     ):
         self.logger.debug('Updater thread started (webhook)')
 
@@ -632,6 +640,7 @@ class Updater:
             allowed_updates=allowed_updates,
             cert=cert_file,
             ip_address=ip_address,
+            max_connections=max_connections,
         )
         if cert_file is not None:
             cert_file.close()
@@ -652,6 +661,7 @@ class Updater:
         cert=None,
         bootstrap_interval=5,
         ip_address=None,
+        max_connections: int = 40,
     ):
         retries = [0]
 
@@ -672,6 +682,7 @@ class Updater:
                 allowed_updates=allowed_updates,
                 ip_address=ip_address,
                 drop_pending_updates=drop_pending_updates,
+                max_connections=max_connections,
             )
             return False
 
