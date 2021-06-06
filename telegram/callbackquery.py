@@ -53,6 +53,13 @@ class CallbackQuery(TelegramObject):
           until you call :attr:`answer`. It is, therefore, necessary to react
           by calling :attr:`telegram.Bot.answer_callback_query` even if no notification to the user
           is needed (e.g., without specifying any of the optional parameters).
+        * If you're using :attr:`Bot.arbitrary_callback_data`, :attr:`data` may be an instance
+          of :class:`telegram.ext.InvalidCallbackData`. This will be the case, if the data
+          associated with the button triggering the :class:`telegram.CallbackQuery` was already
+          deleted or if :attr:`data` was manipulated by a malicious client.
+
+          .. versionadded:: 13.6
+
 
     Args:
         id (:obj:`str`): Unique identifier for this query.
@@ -77,7 +84,7 @@ class CallbackQuery(TelegramObject):
             the message with the callback button was sent.
         message (:class:`telegram.Message`): Optional. Message with the callback button that
             originated the query.
-        data (:obj:`str`): Optional. Data associated with the callback button.
+        data (:obj:`str` | :obj:`object`): Optional. Data associated with the callback button.
         inline_message_id (:obj:`str`): Optional. Identifier of the message sent via the bot in
                 inline mode, that originated the query.
         game_short_name (:obj:`str`): Optional. Short name of a Game to be returned.

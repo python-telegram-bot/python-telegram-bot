@@ -164,7 +164,6 @@ def message(bot):
                 ]
             },
         },
-        {'quote': True},
         {'dice': Dice(4, '🎲')},
         {'via_bot': User(9, 'A_Bot', True)},
         {
@@ -222,7 +221,6 @@ def message(bot):
         'passport_data',
         'poll',
         'reply_markup',
-        'default_quote',
         'dice',
         'via_bot',
         'proximity_alert_triggered',

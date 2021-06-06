@@ -78,7 +78,7 @@ class JobQueue:
     def _tz_now(self) -> datetime.datetime:
         return datetime.datetime.now(self.scheduler.timezone)
 
-    def _update_persistence(self, event: JobEvent) -> None:  # pylint: disable=W0613
+    def _update_persistence(self, _: JobEvent) -> None:
         self._dispatcher.update_persistence()
 
     def _dispatch_error(self, event: JobEvent) -> None:

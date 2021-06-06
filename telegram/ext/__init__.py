@@ -19,6 +19,7 @@
 # pylint: disable=C0413
 """Extensions over the Telegram Bot API to facilitate bot making"""
 
+from .extbot import ExtBot
 from .basepersistence import BasePersistence
 from .picklepersistence import PicklePersistence
 from .dictpersistence import DictPersistence
@@ -59,11 +60,13 @@ from .pollanswerhandler import PollAnswerHandler
 from .pollhandler import PollHandler
 from .chatmemberhandler import ChatMemberHandler
 from .defaults import Defaults
+from .callbackdatacache import CallbackDataCache, InvalidCallbackData
 
 __all__ = (
     'BaseFilter',
     'BasePersistence',
     'CallbackContext',
+    'CallbackDataCache',
     'CallbackQueryHandler',
     'ChatMemberHandler',
     'ChosenInlineResultHandler',
@@ -75,9 +78,11 @@ __all__ = (
     'DictPersistence',
     'Dispatcher',
     'DispatcherHandlerStop',
+    'ExtBot',
     'Filters',
     'Handler',
     'InlineQueryHandler',
+    'InvalidCallbackData',
     'Job',
     'JobQueue',
     'MessageFilter',

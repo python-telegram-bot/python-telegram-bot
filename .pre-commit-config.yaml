@@ -10,11 +10,11 @@ repos:
         - --diff
         - --check
 -   repo: https://gitlab.com/pycqa/flake8
-    rev: 3.9.1
+    rev: 3.9.2
     hooks:
     -   id: flake8
 -   repo: https://github.com/PyCQA/pylint
-    rev: v2.8.2
+    rev: v2.8.3
     hooks:
     -   id: pylint
         files: ^(telegram|examples)/.*\.py$
@@ -24,6 +24,7 @@ repos:
           - certifi
           - tornado>=6.1
           - APScheduler==3.6.3
+          - cachetools==4.2.2
           - . # this basically does `pip install -e .`
 -   repo: https://github.com/pre-commit/mirrors-mypy
     rev: v0.812
@@ -35,6 +36,7 @@ repos:
           - certifi
           - tornado>=6.1
           - APScheduler==3.6.3
+          - cachetools==4.2.2
           - . # this basically does `pip install -e .`
     -   id: mypy
         name: mypy-examples
@@ -46,9 +48,10 @@ repos:
           - certifi
           - tornado>=6.1
           - APScheduler==3.6.3
+          - cachetools==4.2.2
           - . # this basically does `pip install -e .`
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v2.13.0
+    rev: v2.19.1
     hooks:
     -   id: pyupgrade
         files: ^(telegram|examples|tests)/.*\.py$

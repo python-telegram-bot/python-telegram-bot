@@ -52,5 +52,8 @@ A basic example on how `(my_)chat_member` updates can be used.
 ### [`contexttypesbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/contexttypesbot.py)
 This example showcases how `telegram.ext.ContextTypes` can be used to customize the `context` argument of handler and job callbacks.
 
+### [`arbitrarycallbackdatabot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/arbitrarycallbackdatabot.py)
+This example showcases how PTBs "arbitrary callback data" feature can be used.
+
 ## Pure API
 The [`rawapibot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/rawapibot.py) example uses only the pure, "bare-metal" API wrapper.

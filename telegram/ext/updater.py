@@ -41,9 +41,9 @@ from typing import (
 
 from telegram import Bot, TelegramError
 from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized
-from telegram.ext import Dispatcher, JobQueue, ContextTypes
+from telegram.ext import Dispatcher, JobQueue, ContextTypes, ExtBot
 from telegram.utils.deprecate import TelegramDeprecationWarning, set_new_attribute_deprecated
-from telegram.utils.helpers import get_signal_name
+from telegram.utils.helpers import get_signal_name, DEFAULT_FALSE, DefaultValue
 from telegram.utils.request import Request
 from telegram.ext.utils.types import CCT, UD, CD, BD
 from telegram.ext.utils.webhookhandler import WebhookAppClass, WebhookServer
@@ -65,8 +65,11 @@ class Updater(Generic[CCT, UD, CD, BD]):
 
     Note:
         * You must supply either a :attr:`bot` or a :attr:`token` argument.
-        * If you supply a :attr:`bot`, you will need to pass :attr:`defaults` to *both* the bot and
-          the :class:`telegram.ext.Updater`.
+        * If you supply a :attr:`bot`, you will need to pass :attr:`arbitrary_callback_data`,
+          and :attr:`defaults` to the bot instead of the :class:`telegram.ext.Updater`. In this
+          case, you'll have to use the class :class:`telegram.ext.ExtBot`.
+
+          .. versionchanged:: 13.6
 
     Args:
         token (:obj:`str`, optional): The bot's token given by the @BotFather.
@@ -98,6 +101,12 @@ class Updater(Generic[CCT, UD, CD, BD]):
             used).
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
             be used if not set explicitly in the bot methods.
+        arbitrary_callback_data (:obj:`bool` | :obj:`int` | :obj:`None`, optional): Whether to
+            allow arbitrary objects as callback data for :class:`telegram.InlineKeyboardButton`.
+            Pass an integer to specify the maximum number of cached objects. For more details,
+            please see our wiki. Defaults to :obj:`False`.
+
+            .. versionadded:: 13.6
         context_types (:class:`telegram.ext.ContextTypes`, optional): Pass an instance
             of :class:`telegram.ext.ContextTypes` to customize the types used in the
             ``context`` interface. If not passed, the defaults documented in
@@ -158,6 +167,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
         defaults: 'Defaults' = None,
         use_context: bool = True,
         base_file_url: str = None,
+        arbitrary_callback_data: Union[DefaultValue, bool, int, None] = DEFAULT_FALSE,
     ):
         ...
 
@@ -176,6 +186,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
         defaults: 'Defaults' = None,
         use_context: bool = True,
         base_file_url: str = None,
+        arbitrary_callback_data: Union[DefaultValue, bool, int, None] = DEFAULT_FALSE,
         context_types: ContextTypes[CCT, UD, CD, BD] = None,
     ):
         ...
@@ -203,6 +214,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
         use_context: bool = True,
         dispatcher=None,
         base_file_url: str = None,
+        arbitrary_callback_data: Union[DefaultValue, bool, int, None] = DEFAULT_FALSE,
         context_types: ContextTypes[CCT, UD, CD, BD] = None,
     ):
 
@@ -211,6 +223,12 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 'Passing defaults to an Updater has no effect when a Bot is passed '
                 'as well. Pass them to the Bot instead.',
                 TelegramDeprecationWarning,
+                stacklevel=2,
+            )
+        if arbitrary_callback_data is not DEFAULT_FALSE and bot:
+            warnings.warn(
+                'Passing arbitrary_callback_data to an Updater has no '
+                'effect when a Bot is passed as well. Pass them to the Bot instead.',
                 stacklevel=2,
             )
 
@@ -258,7 +276,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 if 'con_pool_size' not in request_kwargs:
                     request_kwargs['con_pool_size'] = con_pool_size
                 self._request = Request(**request_kwargs)
-                self.bot = Bot(
+                self.bot = ExtBot(
                     token,  # type: ignore[arg-type]
                     base_url,
                     base_file_url=base_file_url,
@@ -266,6 +284,11 @@ class Updater(Generic[CCT, UD, CD, BD]):
                     private_key=private_key,
                     private_key_password=private_key_password,
                     defaults=defaults,
+                    arbitrary_callback_data=(
+                        False  # type: ignore[arg-type]
+                        if arbitrary_callback_data is DEFAULT_FALSE
+                        else arbitrary_callback_data
+                    ),
                 )
             self.update_queue: Queue = Queue()
             self.job_queue = JobQueue()

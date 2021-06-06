@@ -177,6 +177,7 @@ class TestDispatcher:
                 self.store_user_data = False
                 self.store_chat_data = False
                 self.store_bot_data = False
+                self.store_callback_data = False
 
         with pytest.raises(
             TypeError, match='persistence must be based on telegram.ext.BasePersistence'
@@ -599,6 +600,13 @@ class TestDispatcher:
                 self.store_user_data = True
                 self.store_chat_data = True
                 self.store_bot_data = True
+                self.store_callback_data = True
+
+            def get_callback_data(self):
+                return None
+
+            def update_callback_data(self, data):
+                raise Exception
 
             def get_bot_data(self):
                 return {}
@@ -652,7 +660,7 @@ class TestDispatcher:
         dp.add_handler(CommandHandler('start', start1))
         dp.add_error_handler(error)
         dp.process_update(update)
-        assert increment == ["error", "error", "error"]
+        assert increment == ["error", "error", "error", "error"]
 
     def test_flow_stop_in_error_handler(self, dp, bot):
         passed = []
@@ -724,9 +732,13 @@ class TestDispatcher:
                 self.store_user_data = True
                 self.store_chat_data = True
                 self.store_bot_data = True
+                self.store_callback_data = True
 
             def update(self, data):
                 raise Exception('PersistenceError')
+
+            def update_callback_data(self, data):
+                self.update(data)
 
             def update_bot_data(self, data):
                 self.update(data)
@@ -744,6 +756,9 @@ class TestDispatcher:
                 pass
 
             def get_user_data(self):
+                pass
+
+            def get_callback_data(self):
                 pass
 
             def get_conversations(self, name):

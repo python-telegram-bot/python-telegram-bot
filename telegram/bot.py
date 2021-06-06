@@ -21,6 +21,7 @@
 
 import functools
 import logging
+import warnings
 from datetime import datetime
 
 from typing import (
@@ -89,6 +90,7 @@ from telegram import (
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import InvalidToken, TelegramError
+from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import (
     DEFAULT_NONE,
     DefaultValue,
@@ -156,6 +158,11 @@ class Bot(TelegramObject):
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
             be used if not set explicitly in the bot methods.
 
+            .. deprecated:: 13.6
+               Passing :class:`telegram.ext.Defaults` to :class:`telegram.Bot` is deprecated. If
+               you want to use :class:`telegram.ext.Defaults`, please use
+               :class:`telegram.ext.ExtBot` instead.
+
     """
 
     __slots__ = (
@@ -185,6 +192,13 @@ class Bot(TelegramObject):
         # Gather default
         self.defaults = defaults
 
+        if self.defaults:
+            warnings.warn(
+                'Passing Defaults to telegram.Bot is deprecated. Use telegram.ext.ExtBot instead.',
+                TelegramDeprecationWarning,
+                stacklevel=3,
+            )
+
         if base_url is None:
             base_url = 'https://api.telegram.org/bot'
 
@@ -209,8 +223,10 @@ class Bot(TelegramObject):
                 private_key, password=private_key_password, backend=default_backend()
             )
 
-    def __setattr__(self, key: str, value: object) -> None:
-        if issubclass(self.__class__, Bot) and self.__class__ is not Bot:
+    # The ext_bot argument is a little hack to get warnings handled correctly.
+    # It's not very clean, but the warnings will be dropped at some point anyway.
+    def __setattr__(self, key: str, value: object, ext_bot: bool = False) -> None:
+        if issubclass(self.__class__, Bot) and self.__class__ is not Bot and not ext_bot:
             object.__setattr__(self, key, value)
             return
         super().__setattr__(key, value)
@@ -1994,6 +2010,62 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
+    def _effective_inline_results(  # pylint: disable=R0201
+        self,
+        results: Union[
+            Sequence['InlineQueryResult'], Callable[[int], Optional[Sequence['InlineQueryResult']]]
+        ],
+        next_offset: str = None,
+        current_offset: str = None,
+    ) -> Tuple[Sequence['InlineQueryResult'], Optional[str]]:
+        """
+        Builds the effective results from the results input.
+        We make this a stand-alone method so tg.ext.ExtBot can wrap it.
+
+        Returns:
+            Tuple of 1. the effective results and 2. correct the next_offset
+
+        """
+        if current_offset is not None and next_offset is not None:
+            raise ValueError('`current_offset` and `next_offset` are mutually exclusive!')
+
+        if current_offset is not None:
+            # Convert the string input to integer
+            if current_offset == '':
+                current_offset_int = 0
+            else:
+                current_offset_int = int(current_offset)
+
+            # for now set to empty string, stating that there are no more results
+            # might change later
+            next_offset = ''
+
+            if callable(results):
+                callable_output = results(current_offset_int)
+                if not callable_output:
+                    effective_results: Sequence['InlineQueryResult'] = []
+                else:
+                    effective_results = callable_output
+                    # the callback *might* return more results on the next call, so we increment
+                    # the page count
+                    next_offset = str(current_offset_int + 1)
+            else:
+                if len(results) > (current_offset_int + 1) * MAX_INLINE_QUERY_RESULTS:
+                    # we expect more results for the next page
+                    next_offset_int = current_offset_int + 1
+                    next_offset = str(next_offset_int)
+                    effective_results = results[
+                        current_offset_int
+                        * MAX_INLINE_QUERY_RESULTS : next_offset_int
+                        * MAX_INLINE_QUERY_RESULTS
+                    ]
+                else:
+                    effective_results = results[current_offset_int * MAX_INLINE_QUERY_RESULTS :]
+        else:
+            effective_results = results  # type: ignore[assignment]
+
+        return effective_results, next_offset
+
     @log
     def answer_inline_query(
         self,
@@ -2098,38 +2170,11 @@ class Bot(TelegramObject):
                     else:
                         res.input_message_content.disable_web_page_preview = None
 
-        if current_offset is not None and next_offset is not None:
-            raise ValueError('`current_offset` and `next_offset` are mutually exclusive!')
+        effective_results, next_offset = self._effective_inline_results(
+            results=results, next_offset=next_offset, current_offset=current_offset
+        )
 
-        if current_offset is not None:
-            if current_offset == '':
-                current_offset_int = 0
-            else:
-                current_offset_int = int(current_offset)
-
-            next_offset = ''
-
-            if callable(results):
-                callable_output = results(current_offset_int)
-                if not callable_output:
-                    effective_results: Sequence['InlineQueryResult'] = []
-                else:
-                    effective_results = callable_output
-                    next_offset = str(current_offset_int + 1)
-            else:
-                if len(results) > (current_offset_int + 1) * MAX_INLINE_QUERY_RESULTS:
-                    next_offset_int = current_offset_int + 1
-                    next_offset = str(next_offset_int)
-                    effective_results = results[
-                        current_offset_int
-                        * MAX_INLINE_QUERY_RESULTS : next_offset_int
-                        * MAX_INLINE_QUERY_RESULTS
-                    ]
-                else:
-                    effective_results = results[current_offset_int * MAX_INLINE_QUERY_RESULTS :]
-        else:
-            effective_results = results  # type: ignore[assignment]
-
+        # Apply defaults
         for result in effective_results:
             _set_defaults(result)
 
@@ -2765,18 +2810,22 @@ class Bot(TelegramObject):
         # * Long polling poses a different problem: the connection might have been dropped while
         #   waiting for the server to return and there's no way of knowing the connection had been
         #   dropped in real time.
-        result = self._post(
-            'getUpdates', data, timeout=float(read_latency) + float(timeout), api_kwargs=api_kwargs
+        result = cast(
+            List[JSONDict],
+            self._post(
+                'getUpdates',
+                data,
+                timeout=float(read_latency) + float(timeout),
+                api_kwargs=api_kwargs,
+            ),
         )
 
         if result:
-            self.logger.debug(
-                'Getting updates: %s', [u['update_id'] for u in result]  # type: ignore
-            )
+            self.logger.debug('Getting updates: %s', [u['update_id'] for u in result])
         else:
             self.logger.debug('No new updates found.')
 
-        return [Update.de_json(u, self) for u in result]  # type: ignore
+        return Update.de_list(result, self)  # type: ignore[return-value]
 
     @log
     def set_webhook(
