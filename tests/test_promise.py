@@ -136,3 +136,17 @@ class TestPromise:
         )
         assert caplog.records[1].message.startswith("Full traceback:")
         assert promise.result() == "done!"
+
+    def test_done_cb_not_run_on_excp(self):
+        def callback():
+            raise TelegramError('Error')
+
+        def done_callback(_):
+            self.test_flag = True
+
+        promise = Promise(callback, [], {})
+        promise.add_done_callback(done_callback)
+        promise.run()
+        assert isinstance(promise.exception, TelegramError)
+        assert promise.done
+        assert self.test_flag is False

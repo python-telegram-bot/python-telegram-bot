@@ -31,6 +31,7 @@ excluded = {
     'Days',
     'telegram.deprecate',
     'TelegramDecryptionError',
+    'ContextTypes',
     'CallbackDataCache',
     'InvalidCallbackData',
     '_KeyboardData',

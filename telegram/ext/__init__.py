@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+# pylint: disable=C0413
 """Extensions over the Telegram Bot API to facilitate bot making"""
 
 from .extbot import ExtBot
@@ -24,7 +25,20 @@ from .picklepersistence import PicklePersistence
 from .dictpersistence import DictPersistence
 from .handler import Handler
 from .callbackcontext import CallbackContext
+from .contexttypes import ContextTypes
 from .dispatcher import Dispatcher, DispatcherHandlerStop, run_async
+
+# https://bugs.python.org/issue41451, fixed on 3.7+, doesn't actually remove slots
+# try-except is just  here in case the __init__ is called twice (like in the tests)
+# this block is also the reason for the pylint-ignore at the top of the file
+try:
+    del Dispatcher.__slots__  # type: ignore[has-type]
+except AttributeError as exc:
+    if str(exc) == '__slots__':
+        pass
+    else:
+        raise exc
+
 from .jobqueue import JobQueue, Job
 from .updater import Updater
 from .callbackqueryhandler import CallbackQueryHandler
@@ -51,19 +65,20 @@ from .callbackdatacache import CallbackDataCache, InvalidCallbackData
 __all__ = (
     'BaseFilter',
     'BasePersistence',
-    'ExtBot',
     'CallbackContext',
     'CallbackDataCache',
     'CallbackQueryHandler',
     'ChatMemberHandler',
     'ChosenInlineResultHandler',
     'CommandHandler',
+    'ContextTypes',
     'ConversationHandler',
     'Defaults',
     'DelayQueue',
     'DictPersistence',
     'Dispatcher',
     'DispatcherHandlerStop',
+    'ExtBot',
     'Filters',
     'Handler',
     'InlineQueryHandler',

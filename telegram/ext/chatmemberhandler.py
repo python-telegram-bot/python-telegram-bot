@@ -17,19 +17,17 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the ChatMemberHandler classes."""
-from typing import ClassVar, TypeVar, Union, Callable, TYPE_CHECKING
+from typing import ClassVar, TypeVar, Union, Callable
 
 from telegram import Update
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 from .handler import Handler
-
-if TYPE_CHECKING:
-    from telegram.ext import CallbackContext
+from .utils.types import CCT
 
 RT = TypeVar('RT')
 
 
-class ChatMemberHandler(Handler[Update]):
+class ChatMemberHandler(Handler[Update, CCT]):
     """Handler class to handle Telegram updates that contain a chat member update.
 
     .. versionadded:: 13.4
@@ -107,7 +105,7 @@ class ChatMemberHandler(Handler[Update]):
 
     def __init__(
         self,
-        callback: Callable[[Update, 'CallbackContext'], RT],
+        callback: Callable[[Update, CCT], RT],
         chat_member_types: int = MY_CHAT_MEMBER,
         pass_update_queue: bool = False,
         pass_job_queue: bool = False,

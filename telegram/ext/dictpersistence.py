@@ -36,7 +36,7 @@ except ImportError:
 
 
 class DictPersistence(BasePersistence):
-    """Using python's dicts and json for making your bot persistent.
+    """Using Python's :obj:`dict` and ``json`` for making your bot persistent.
 
     Note:
         This class does *not* implement a :meth:`flush` method, meaning that data managed by
@@ -334,7 +334,7 @@ class DictPersistence(BasePersistence):
 
         Args:
             user_id (:obj:`int`): The user the data might have been changed for.
-            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.user_data` [user_id].
+            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.user_data` ``[user_id]``.
         """
         if self._user_data is None:
             self._user_data = defaultdict(dict)
@@ -348,7 +348,7 @@ class DictPersistence(BasePersistence):
 
         Args:
             chat_id (:obj:`int`): The chat the data might have been changed for.
-            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.chat_data` [chat_id].
+            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.chat_data` ``[chat_id]``.
         """
         if self._chat_data is None:
             self._chat_data = defaultdict(dict)
@@ -381,3 +381,24 @@ class DictPersistence(BasePersistence):
             return
         self._callback_data = (data[0], data[1].copy())
         self._callback_data_json = None
+
+    def refresh_user_data(self, user_id: int, user_data: Dict) -> None:
+        """Does nothing.
+
+        .. versionadded:: 13.6
+        .. seealso:: :meth:`telegram.ext.BasePersistence.refresh_user_data`
+        """
+
+    def refresh_chat_data(self, chat_id: int, chat_data: Dict) -> None:
+        """Does nothing.
+
+        .. versionadded:: 13.6
+        .. seealso:: :meth:`telegram.ext.BasePersistence.refresh_chat_data`
+        """
+
+    def refresh_bot_data(self, bot_data: Dict) -> None:
+        """Does nothing.
+
+        .. versionadded:: 13.6
+        .. seealso:: :meth:`telegram.ext.BasePersistence.refresh_bot_data`
+        """
