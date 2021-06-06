@@ -412,10 +412,10 @@ class Updater:
                    Since version 13.6, ``tornade>=6.1`` is required, which resolves the former
                    issue.
 
-            max_connections (:obj:`int`, optional): Maximum allowed number of simultaneous HTTPS
-                connections to the webhook for update delivery, 1-100.(upto 1000000 for local bot
-                API server) Defaults to ``40``. Use lower values to limit the load on your
-                bot's server, and higher values to increase your bot's throughput.
+            max_connections (:obj:`int`, optional): Passed to
+                :meth:`telegram.Bot.set_webhook`.
+
+                .. versionadded:: 13.6
 
         Returns:
             :obj:`Queue`: The update queue that can be filled from the main thread.
