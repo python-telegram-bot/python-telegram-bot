@@ -50,113 +50,129 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
 
     __slots__ = ('_context', '_bot_data', '_chat_data', '_user_data')
 
-    @overload
-    def __init__(
-        self: 'ContextTypes[CallbackContext, Dict, Dict, Dict]',
-    ):
-        ...
-
-    @overload
-    def __init__(self: 'ContextTypes[CCT, Dict, Dict, Dict]', context: Type[CCT]):
-        ...
-
-    @overload
-    def __init__(self: 'ContextTypes[CallbackContext, UD, Dict, Dict]', bot_data: Type[UD]):
-        ...
-
-    @overload
-    def __init__(self: 'ContextTypes[CallbackContext, Dict, CD, Dict]', chat_data: Type[CD]):
-        ...
-
-    @overload
-    def __init__(self: 'ContextTypes[CallbackContext, Dict, Dict, BD]', user_data: Type[BD]):
-        ...
+    # overload signatures generated with https://git.io/JtJPj
 
     @overload
     def __init__(
-        self: 'ContextTypes[CCT, UD, Dict, Dict]', context: Type[CCT], bot_data: Type[UD]
+        self: 'ContextTypes[CallbackContext[Dict, Dict, Dict], Dict, Dict, Dict]',
     ):
         ...
 
     @overload
     def __init__(
-        self: 'ContextTypes[CCT, Dict, CD, Dict]', context: Type[CCT], chat_data: Type[CD]
+        self: 'ContextTypes[CCT[Dict, Dict, Dict], Dict, Dict, Dict]', context: Type[CCT]
     ):
         ...
 
     @overload
     def __init__(
-        self: 'ContextTypes[CCT, Dict, Dict, BD]', context: Type[CCT], user_data: Type[BD]
+        self: 'ContextTypes[CallbackContext[UD, Dict, Dict], UD, Dict, Dict]', user_data: Type[UD]
     ):
         ...
 
     @overload
     def __init__(
-        self: 'ContextTypes[CallbackContext, UD, CD, Dict]',
-        bot_data: Type[UD],
-        chat_data: Type[CD],
+        self: 'ContextTypes[CallbackContext[Dict, CD, Dict], Dict, CD, Dict]', chat_data: Type[CD]
     ):
         ...
 
     @overload
     def __init__(
-        self: 'ContextTypes[CallbackContext, UD, Dict, BD]',
-        bot_data: Type[UD],
-        user_data: Type[BD],
+        self: 'ContextTypes[CallbackContext[Dict, Dict, BD], Dict, Dict, BD]', bot_data: Type[BD]
     ):
         ...
 
     @overload
     def __init__(
-        self: 'ContextTypes[CallbackContext, Dict, CD, BD]',
-        chat_data: Type[CD],
-        user_data: Type[BD],
-    ):
-        ...
-
-    @overload
-    def __init__(
-        self: 'ContextTypes[CCT, UD, CD, Dict]',
+        self: 'ContextTypes[CCT[UD, Dict, Dict], UD, Dict, Dict]',
         context: Type[CCT],
-        bot_data: Type[UD],
-        chat_data: Type[CD],
+        user_data: Type[UD],
     ):
         ...
 
     @overload
     def __init__(
-        self: 'ContextTypes[CCT, UD, Dict, BD]',
-        context: Type[CCT],
-        bot_data: Type[UD],
-        user_data: Type[BD],
-    ):
-        ...
-
-    @overload
-    def __init__(
-        self: 'ContextTypes[CCT, Dict, CD, BD]',
+        self: 'ContextTypes[CCT[Dict, CD, Dict], Dict, CD, Dict]',
         context: Type[CCT],
         chat_data: Type[CD],
-        user_data: Type[BD],
     ):
         ...
 
     @overload
     def __init__(
-        self: 'ContextTypes[CallbackContext, UD, CD, BD]',
-        bot_data: Type[UD],
-        chat_data: Type[CD],
-        user_data: Type[BD],
-    ):
-        ...
-
-    @overload
-    def __init__(
-        self: 'ContextTypes[CCT, UD, CD, BD]',
+        self: 'ContextTypes[CCT[Dict, Dict, BD], Dict, Dict, BD]',
         context: Type[CCT],
-        bot_data: Type[UD],
+        bot_data: Type[BD],
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self: 'ContextTypes[CallbackContext[UD, CD, Dict], UD, CD, Dict]',
+        user_data: Type[UD],
         chat_data: Type[CD],
-        user_data: Type[BD],
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self: 'ContextTypes[CallbackContext[UD, Dict, BD], UD, Dict, BD]',
+        user_data: Type[UD],
+        bot_data: Type[BD],
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self: 'ContextTypes[CallbackContext[Dict, CD, BD], Dict, CD, BD]',
+        chat_data: Type[CD],
+        bot_data: Type[BD],
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self: 'ContextTypes[CCT[UD, CD, Dict], UD, CD, Dict]',
+        context: Type[CCT],
+        user_data: Type[UD],
+        chat_data: Type[CD],
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self: 'ContextTypes[CCT[UD, Dict, BD], UD, Dict, BD]',
+        context: Type[CCT],
+        user_data: Type[UD],
+        bot_data: Type[BD],
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self: 'ContextTypes[CCT[Dict, CD, BD], Dict, CD, BD]',
+        context: Type[CCT],
+        chat_data: Type[CD],
+        bot_data: Type[BD],
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self: 'ContextTypes[CallbackContext[UD, CD, BD], UD, CD, BD]',
+        user_data: Type[UD],
+        chat_data: Type[CD],
+        bot_data: Type[BD],
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self: 'ContextTypes[CCT[UD, CD, BD], UD, CD, BD]',
+        context: Type[CCT],
+        user_data: Type[UD],
+        chat_data: Type[CD],
+        bot_data: Type[BD],
     ):
         ...
 
