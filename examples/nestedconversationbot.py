@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=C0116
+# pylint: disable=C0116,W0613
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -152,14 +152,14 @@ def show_data(update: Update, context: CallbackContext) -> str:
     return SHOWING
 
 
-def stop(update: Update, _: CallbackContext) -> int:
+def stop(update: Update, context: CallbackContext) -> int:
     """End Conversation by command."""
     update.message.reply_text('Okay, bye.')
 
     return END
 
 
-def end(update: Update, _: CallbackContext) -> int:
+def end(update: Update, context: CallbackContext) -> int:
     """End conversation from InlineKeyboardButton."""
     update.callback_query.answer()
 
@@ -170,7 +170,7 @@ def end(update: Update, _: CallbackContext) -> int:
 
 
 # Second level conversation callbacks
-def select_level(update: Update, _: CallbackContext) -> str:
+def select_level(update: Update, context: CallbackContext) -> str:
     """Choose to add a parent or a child."""
     text = 'You may add a parent or a child. Also you can show the gathered data or go back.'
     buttons = [
@@ -293,7 +293,7 @@ def end_describing(update: Update, context: CallbackContext) -> int:
     return END
 
 
-def stop_nested(update: Update, _: CallbackContext) -> str:
+def stop_nested(update: Update, context: CallbackContext) -> str:
     """Completely end conversation from within nested conversation."""
     update.message.reply_text('Okay, bye.')
 

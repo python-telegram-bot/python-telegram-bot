@@ -3283,6 +3283,11 @@ class Bot(TelegramObject):
         Use this method to get data for high score tables. Will return the score of the specified
         user and several of their neighbors in a game.
 
+        Note:
+            This method will currently return scores for the target user, plus two of their
+            closest neighbors on each side. Will also return the top three users if the user and
+            his neighbors are not among them. Please note that this behavior is subject to change.
+
         Args:
             user_id (:obj:`int`): Target user id.
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
@@ -3924,7 +3929,7 @@ class Bot(TelegramObject):
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
             expire_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the link will
-                expire.
+                expire. Integer input will be interpreted as Unix timestamp.
                 For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
                 bot will be used.
             member_limit (:obj:`int`, optional): Maximum number of users that can be members of

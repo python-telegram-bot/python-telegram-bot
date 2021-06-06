@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=C0116
+# pylint: disable=C0116,W0613
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -84,7 +84,7 @@ def regular_choice(update: Update, context: CallbackContext) -> int:
     return TYPING_REPLY
 
 
-def custom_choice(update: Update, _: CallbackContext) -> int:
+def custom_choice(update: Update, context: CallbackContext) -> int:
     """Ask the user for a description of a custom category."""
     update.message.reply_text(
         'Alright, please send me the category first, for example "Most impressive skill"'

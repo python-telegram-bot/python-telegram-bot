@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=C0116
+# pylint: disable=C0116,W0613
 # This program is dedicated to the public domain under the CC0 license.
 
 """Basic example for a bot that can receive payment from user."""
@@ -25,7 +25,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def start_callback(update: Update, _: CallbackContext) -> None:
+def start_callback(update: Update, context: CallbackContext) -> None:
     """Displays info on how to use the bot."""
     msg = (
         "Use /shipping to get an invoice for shipping-payment, or /noshipping for an "
@@ -91,7 +91,7 @@ def start_without_shipping_callback(update: Update, context: CallbackContext) ->
     )
 
 
-def shipping_callback(update: Update, _: CallbackContext) -> None:
+def shipping_callback(update: Update, context: CallbackContext) -> None:
     """Answers the ShippingQuery with ShippingOptions"""
     query = update.shipping_query
     # check the payload, is this from your bot?
@@ -109,7 +109,7 @@ def shipping_callback(update: Update, _: CallbackContext) -> None:
 
 
 # after (optional) shipping, it's the pre-checkout
-def precheckout_callback(update: Update, _: CallbackContext) -> None:
+def precheckout_callback(update: Update, context: CallbackContext) -> None:
     """Answers the PreQecheckoutQuery"""
     query = update.pre_checkout_query
     # check the payload, is this from your bot?
@@ -121,7 +121,7 @@ def precheckout_callback(update: Update, _: CallbackContext) -> None:
 
 
 # finally, after contacting the payment provider...
-def successful_payment_callback(update: Update, _: CallbackContext) -> None:
+def successful_payment_callback(update: Update, context: CallbackContext) -> None:
     """Confirms the successful payment."""
     # do something after successfully receiving payment?
     update.message.reply_text("Thank you for your payment!")

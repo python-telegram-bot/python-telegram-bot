@@ -33,8 +33,7 @@ class ChatAction:
     """:const:`telegram.constants.CHATACTION_RECORD_AUDIO`
 
         .. deprecated:: 13.5
-           Deprecated by Telegram. Use :attr:`RECORD_VOICE` instead, as backwards
-           compatibility is not guaranteed by Telegram.
+           Deprecated by Telegram. Use :attr:`RECORD_VOICE` instead.
     """
     RECORD_VOICE: ClassVar[str] = constants.CHATACTION_RECORD_VOICE
     """:const:`telegram.constants.CHATACTION_RECORD_VOICE`
@@ -51,8 +50,7 @@ class ChatAction:
     """:const:`telegram.constants.CHATACTION_UPLOAD_AUDIO`
 
         .. deprecated:: 13.5
-           Deprecated by Telegram. Use :attr:`UPLOAD_VOICE` instead, as backwards
-           compatibility is not guaranteed by Telegram.
+           Deprecated by Telegram. Use :attr:`UPLOAD_VOICE` instead.
     """
     UPLOAD_VOICE: ClassVar[str] = constants.CHATACTION_UPLOAD_VOICE
     """:const:`telegram.constants.CHATACTION_UPLOAD_VOICE`

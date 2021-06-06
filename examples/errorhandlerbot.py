@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=C0116
+# pylint: disable=C0116,W0613
 # This program is dedicated to the public domain under the CC0 license.
 
 """This is a very simple example on how one could implement a custom error handler."""
@@ -51,12 +51,12 @@ def error_handler(update: object, context: CallbackContext) -> None:
     context.bot.send_message(chat_id=DEVELOPER_CHAT_ID, text=message, parse_mode=ParseMode.HTML)
 
 
-def bad_command(_: Update, context: CallbackContext) -> None:
+def bad_command(update: Update, context: CallbackContext) -> None:
     """Raise an error to trigger the error handler."""
     context.bot.wrong_method_name()  # type: ignore[attr-defined]
 
 
-def start(update: Update, _: CallbackContext) -> None:
+def start(update: Update, context: CallbackContext) -> None:
     """Displays info on how to trigger an error."""
     update.effective_message.reply_html(
         'Use /bad_command to cause an error.\n'

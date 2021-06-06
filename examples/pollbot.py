@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=C0116
+# pylint: disable=C0116,W0613
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -34,7 +34,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def start(update: Update, _: CallbackContext) -> None:
+def start(update: Update, context: CallbackContext) -> None:
     """Inform user about what this bot can do"""
     update.message.reply_text(
         'Please select /poll to get a Poll, /quiz to get a Quiz or /preview'
@@ -120,7 +120,7 @@ def receive_quiz_answer(update: Update, context: CallbackContext) -> None:
         context.bot.stop_poll(quiz_data["chat_id"], quiz_data["message_id"])
 
 
-def preview(update: Update, _: CallbackContext) -> None:
+def preview(update: Update, context: CallbackContext) -> None:
     """Ask user to create a poll and display a preview of it"""
     # using this without a type lets the user chooses what he wants (quiz or poll)
     button = [[KeyboardButton("Press me!", request_poll=KeyboardButtonPollType())]]
@@ -131,7 +131,7 @@ def preview(update: Update, _: CallbackContext) -> None:
     )
 
 
-def receive_poll(update: Update, _: CallbackContext) -> None:
+def receive_poll(update: Update, context: CallbackContext) -> None:
     """On receiving polls, reply to it by a closed poll copying the received poll"""
     actual_poll = update.effective_message.poll
     # Only need to set the question and options, since all other parameters don't matter for
@@ -145,7 +145,7 @@ def receive_poll(update: Update, _: CallbackContext) -> None:
     )
 
 
-def help_handler(update: Update, _: CallbackContext) -> None:
+def help_handler(update: Update, context: CallbackContext) -> None:
     """Display a help message"""
     update.message.reply_text("Use /quiz, /poll or /preview to test this bot.")
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=C0116
+# pylint: disable=C0116,W0613
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -23,7 +23,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def msg(update: Update, _: CallbackContext) -> None:
+def msg(update: Update, context: CallbackContext) -> None:
     """Downloads and prints the received passport data."""
     # Retrieve passport data
     passport_data = update.message.passport_data

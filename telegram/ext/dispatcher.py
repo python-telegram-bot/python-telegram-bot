@@ -657,7 +657,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
 
         Args:
             update (:class:`telegram.Update`, optional): The update to process. If passed, only the
-            corresponding ``user_data`` and ``chat_data`` will be updated.
+                corresponding ``user_data`` and ``chat_data`` will be updated.
         """
         with self._update_persistence_lock:
             self.__update_persistence(update)

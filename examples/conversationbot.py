@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=C0116
+# pylint: disable=C0116,W0613
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 GENDER, PHOTO, LOCATION, BIO = range(4)
 
 
-def start(update: Update, _: CallbackContext) -> int:
+def start(update: Update, context: CallbackContext) -> int:
     """Starts the conversation and asks the user about their gender."""
     reply_keyboard = [['Boy', 'Girl', 'Other']]
 
@@ -50,7 +50,7 @@ def start(update: Update, _: CallbackContext) -> int:
     return GENDER
 
 
-def gender(update: Update, _: CallbackContext) -> int:
+def gender(update: Update, context: CallbackContext) -> int:
     """Stores the selected gender and asks for a photo."""
     user = update.message.from_user
     logger.info("Gender of %s: %s", user.first_name, update.message.text)
@@ -63,7 +63,7 @@ def gender(update: Update, _: CallbackContext) -> int:
     return PHOTO
 
 
-def photo(update: Update, _: CallbackContext) -> int:
+def photo(update: Update, context: CallbackContext) -> int:
     """Stores the photo and asks for a location."""
     user = update.message.from_user
     photo_file = update.message.photo[-1].get_file()
@@ -76,7 +76,7 @@ def photo(update: Update, _: CallbackContext) -> int:
     return LOCATION
 
 
-def skip_photo(update: Update, _: CallbackContext) -> int:
+def skip_photo(update: Update, context: CallbackContext) -> int:
     """Skips the photo and asks for a location."""
     user = update.message.from_user
     logger.info("User %s did not send a photo.", user.first_name)
@@ -87,7 +87,7 @@ def skip_photo(update: Update, _: CallbackContext) -> int:
     return LOCATION
 
 
-def location(update: Update, _: CallbackContext) -> int:
+def location(update: Update, context: CallbackContext) -> int:
     """Stores the location and asks for some info about the user."""
     user = update.message.from_user
     user_location = update.message.location
@@ -101,7 +101,7 @@ def location(update: Update, _: CallbackContext) -> int:
     return BIO
 
 
-def skip_location(update: Update, _: CallbackContext) -> int:
+def skip_location(update: Update, context: CallbackContext) -> int:
     """Skips the location and asks for info about the user."""
     user = update.message.from_user
     logger.info("User %s did not send a location.", user.first_name)
@@ -112,7 +112,7 @@ def skip_location(update: Update, _: CallbackContext) -> int:
     return BIO
 
 
-def bio(update: Update, _: CallbackContext) -> int:
+def bio(update: Update, context: CallbackContext) -> int:
     """Stores the info about the user and ends the conversation."""
     user = update.message.from_user
     logger.info("Bio of %s: %s", user.first_name, update.message.text)
@@ -121,7 +121,7 @@ def bio(update: Update, _: CallbackContext) -> int:
     return ConversationHandler.END
 
 
-def cancel(update: Update, _: CallbackContext) -> int:
+def cancel(update: Update, context: CallbackContext) -> int:
     """Cancels and ends the conversation."""
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)

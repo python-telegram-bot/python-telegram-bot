@@ -56,7 +56,7 @@ class DictPersistence(BasePersistence):
     Args:
         store_user_data (:obj:`bool`, optional): Whether user_data should be saved by this
             persistence class. Default is :obj:`True`.
-        store_chat_data (:obj:`bool`, optional): Whether user_data should be saved by this
+        store_chat_data (:obj:`bool`, optional): Whether chat_data should be saved by this
             persistence class. Default is :obj:`True`.
         store_bot_data (:obj:`bool`, optional): Whether bot_data should be saved by this
             persistence class. Default is :obj:`True`.
@@ -64,17 +64,17 @@ class DictPersistence(BasePersistence):
             persistence class. Default is :obj:`False`.
 
             .. versionadded:: 13.6
-        user_data_json (:obj:`str`, optional): Json string that will be used to reconstruct
+        user_data_json (:obj:`str`, optional): JSON string that will be used to reconstruct
             user_data on creating this persistence. Default is ``""``.
-        chat_data_json (:obj:`str`, optional): Json string that will be used to reconstruct
+        chat_data_json (:obj:`str`, optional): JSON string that will be used to reconstruct
             chat_data on creating this persistence. Default is ``""``.
-        bot_data_json (:obj:`str`, optional): Json string that will be used to reconstruct
+        bot_data_json (:obj:`str`, optional): JSON string that will be used to reconstruct
             bot_data on creating this persistence. Default is ``""``.
         callback_data_json (:obj:`str`, optional): Json string that will be used to reconstruct
             callback_data on creating this persistence. Default is ``""``.
 
             .. versionadded:: 13.6
-        conversations_json (:obj:`str`, optional): Json string that will be used to reconstruct
+        conversations_json (:obj:`str`, optional): JSON string that will be used to reconstruct
             conversation on creating this persistence. Default is ``""``.
 
     Attributes:

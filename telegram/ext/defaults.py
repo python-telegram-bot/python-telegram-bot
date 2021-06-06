@@ -42,6 +42,9 @@ class Defaults:
         timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as the
             read timeout from the server (instead of the one specified during creation of the
             connection pool).
+
+            Note:
+                Will *not* be used for :meth:`telegram.Bot.get_updates`!
         quote (:obj:`bool`, optional): If set to :obj:`True`, the reply is sent as an actual reply
             to the message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter will
             be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
@@ -49,9 +52,6 @@ class Defaults:
             appearing throughout PTB, i.e. if a timezone naive date(time) object is passed
             somewhere, it will be assumed to be in ``tzinfo``. Must be a timezone provided by the
             ``pytz`` module. Defaults to UTC.
-
-            Note:
-                Will *not* be used for :meth:`telegram.Bot.get_updates`!
         run_async (:obj:`bool`, optional): Default setting for the ``run_async`` parameter of
             handlers and error handlers registered through :meth:`Dispatcher.add_handler` and
             :meth:`Dispatcher.add_error_handler`. Defaults to :obj:`False`.
