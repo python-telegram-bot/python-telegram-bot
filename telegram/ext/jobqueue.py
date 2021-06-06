@@ -31,6 +31,7 @@ from apscheduler.job import Job as APSJob
 
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.utils.types import JSONDict
+from telegram.utils.deprecate import set_new_attribute_deprecated
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -49,6 +50,8 @@ class JobQueue:
 
     """
 
+    __slots__ = ('_dispatcher', 'logger', 'scheduler', '__dict__')
+
     def __init__(self) -> None:
         self._dispatcher: 'Dispatcher' = None  # type: ignore[assignment]
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -64,15 +67,18 @@ class JobQueue:
         logging.getLogger('apscheduler.executors.default').addFilter(aps_log_filter)
         self.scheduler.add_listener(self._dispatch_error, EVENT_JOB_ERROR)
 
+    def __setattr__(self, key: str, value: object) -> None:
+        set_new_attribute_deprecated(self, key, value)
+
     def _build_args(self, job: 'Job') -> List[Union[CallbackContext, 'Bot', 'Job']]:
         if self._dispatcher.use_context:
-            return [CallbackContext.from_job(job, self._dispatcher)]
+            return [self._dispatcher.context_types.context.from_job(job, self._dispatcher)]
         return [self._dispatcher.bot, job]
 
     def _tz_now(self) -> datetime.datetime:
         return datetime.datetime.now(self.scheduler.timezone)
 
-    def _update_persistence(self, event: JobEvent) -> None:  # pylint: disable=W0613
+    def _update_persistence(self, _: JobEvent) -> None:
         self._dispatcher.update_persistence()
 
     def _dispatch_error(self, event: JobEvent) -> None:
@@ -543,6 +549,17 @@ class Job:
         job (:class:`apscheduler.job.Job`): Optional. The APS Job this job is a wrapper for.
     """
 
+    __slots__ = (
+        'callback',
+        'context',
+        'name',
+        'job_queue',
+        '_removed',
+        '_enabled',
+        'job',
+        '__dict__',
+    )
+
     def __init__(
         self,
         callback: Callable[['CallbackContext'], None],
@@ -562,11 +579,14 @@ class Job:
 
         self.job = cast(APSJob, job)  # skipcq: PTC-W0052
 
+    def __setattr__(self, key: str, value: object) -> None:
+        set_new_attribute_deprecated(self, key, value)
+
     def run(self, dispatcher: 'Dispatcher') -> None:
         """Executes the callback function independently of the jobs schedule."""
         try:
             if dispatcher.use_context:
-                self.callback(CallbackContext.from_job(self, dispatcher))
+                self.callback(dispatcher.context_types.context.from_job(self, dispatcher))
             else:
                 self.callback(dispatcher.bot, self)  # type: ignore[arg-type,call-arg]
         except Exception as exc:

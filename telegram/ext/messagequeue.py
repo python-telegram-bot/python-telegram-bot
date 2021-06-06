@@ -40,6 +40,8 @@ curtime = time.perf_counter
 class DelayQueueError(RuntimeError):
     """Indicates processing errors."""
 
+    __slots__ = ()
+
 
 class DelayQueue(threading.Thread):
     """

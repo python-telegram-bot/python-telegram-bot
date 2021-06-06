@@ -32,6 +32,7 @@ from telegram.ext import (
     CallbackContext,
     JobQueue,
     BasePersistence,
+    ContextTypes,
 )
 from telegram.ext.dispatcher import run_async, Dispatcher, DispatcherHandlerStop
 from telegram.utils.deprecate import TelegramDeprecationWarning
@@ -45,12 +46,35 @@ def dp2(bot):
     yield from create_dp(bot)
 
 
+class CustomContext(CallbackContext):
+    pass
+
+
 class TestDispatcher:
     message_update = Update(
         1, message=Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
     )
     received = None
     count = 0
+
+    def test_slot_behaviour(self, dp2, recwarn, mro_slots):
+        for at in dp2.__slots__:
+            at = f"_Dispatcher{at}" if at.startswith('__') and not at.endswith('__') else at
+            assert getattr(dp2, at, 'err') != 'err', f"got extra slot '{at}'"
+        assert not dp2.__dict__, f"got missing slot(s): {dp2.__dict__}"
+        assert len(mro_slots(dp2)) == len(set(mro_slots(dp2))), "duplicate slot"
+        dp2.custom, dp2.running = 'should give warning', dp2.running
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
+        class CustomDispatcher(Dispatcher):
+            pass  # Tests that setting custom attrs of Dispatcher subclass doesn't raise warning
+
+        a = CustomDispatcher(None, None)
+        a.my_custom = 'no error!'
+        assert len(recwarn) == 1
+
+        dp2.__setattr__('__test', 'mangled success')
+        assert getattr(dp2, '_Dispatcher__test', 'e') == 'mangled success', "mangling failed"
 
     @pytest.fixture(autouse=True, name='reset')
     def reset_fixture(self):
@@ -153,6 +177,7 @@ class TestDispatcher:
                 self.store_user_data = False
                 self.store_chat_data = False
                 self.store_bot_data = False
+                self.store_callback_data = False
 
         with pytest.raises(
             TypeError, match='persistence must be based on telegram.ext.BasePersistence'
@@ -575,6 +600,13 @@ class TestDispatcher:
                 self.store_user_data = True
                 self.store_chat_data = True
                 self.store_bot_data = True
+                self.store_callback_data = True
+
+            def get_callback_data(self):
+                return None
+
+            def update_callback_data(self, data):
+                raise Exception
 
             def get_bot_data(self):
                 return {}
@@ -628,7 +660,7 @@ class TestDispatcher:
         dp.add_handler(CommandHandler('start', start1))
         dp.add_error_handler(error)
         dp.process_update(update)
-        assert increment == ["error", "error", "error"]
+        assert increment == ["error", "error", "error", "error"]
 
     def test_flow_stop_in_error_handler(self, dp, bot):
         passed = []
@@ -684,7 +716,6 @@ class TestDispatcher:
 
     def test_sensible_worker_thread_names(self, dp2):
         thread_names = [thread.name for thread in dp2._Dispatcher__async_threads]
-        print(thread_names)
         for thread_name in thread_names:
             assert thread_name.startswith(f"Bot:{dp2.bot.id}:worker:")
 
@@ -701,9 +732,13 @@ class TestDispatcher:
                 self.store_user_data = True
                 self.store_chat_data = True
                 self.store_bot_data = True
+                self.store_callback_data = True
 
             def update(self, data):
                 raise Exception('PersistenceError')
+
+            def update_callback_data(self, data):
+                self.update(data)
 
             def update_bot_data(self, data):
                 self.update(data)
@@ -723,10 +758,22 @@ class TestDispatcher:
             def get_user_data(self):
                 pass
 
+            def get_callback_data(self):
+                pass
+
             def get_conversations(self, name):
                 pass
 
             def update_conversation(self, name, key, new_state):
+                pass
+
+            def refresh_bot_data(self, bot_data):
+                pass
+
+            def refresh_user_data(self, user_id, user_data):
+                pass
+
+            def refresh_chat_data(self, chat_id, chat_data):
                 pass
 
         def callback(update, context):
@@ -787,6 +834,15 @@ class TestDispatcher:
                 pass
 
             def get_chat_data(self):
+                pass
+
+            def refresh_bot_data(self, bot_data):
+                pass
+
+            def refresh_user_data(self, user_id, user_data):
+                pass
+
+            def refresh_chat_data(self, chat_id, chat_data):
                 pass
 
         def callback(update, context):
@@ -905,3 +961,62 @@ class TestDispatcher:
             assert self.count == expected
         finally:
             dp.bot.defaults = None
+
+    def test_custom_context_init(self, bot):
+        cc = ContextTypes(
+            context=CustomContext,
+            user_data=int,
+            chat_data=float,
+            bot_data=complex,
+        )
+
+        dispatcher = Dispatcher(bot, Queue(), context_types=cc)
+
+        assert isinstance(dispatcher.user_data[1], int)
+        assert isinstance(dispatcher.chat_data[1], float)
+        assert isinstance(dispatcher.bot_data, complex)
+
+    def test_custom_context_error_handler(self, bot):
+        def error_handler(_, context):
+            self.received = (
+                type(context),
+                type(context.user_data),
+                type(context.chat_data),
+                type(context.bot_data),
+            )
+
+        dispatcher = Dispatcher(
+            bot,
+            Queue(),
+            context_types=ContextTypes(
+                context=CustomContext, bot_data=int, user_data=float, chat_data=complex
+            ),
+        )
+        dispatcher.add_error_handler(error_handler)
+        dispatcher.add_handler(MessageHandler(Filters.all, self.callback_raise_error))
+
+        dispatcher.process_update(self.message_update)
+        sleep(0.1)
+        assert self.received == (CustomContext, float, complex, int)
+
+    def test_custom_context_handler_callback(self, bot):
+        def callback(_, context):
+            self.received = (
+                type(context),
+                type(context.user_data),
+                type(context.chat_data),
+                type(context.bot_data),
+            )
+
+        dispatcher = Dispatcher(
+            bot,
+            Queue(),
+            context_types=ContextTypes(
+                context=CustomContext, bot_data=int, user_data=float, chat_data=complex
+            ),
+        )
+        dispatcher.add_handler(MessageHandler(Filters.all, callback))
+
+        dispatcher.process_update(self.message_update)
+        sleep(0.1)
+        assert self.received == (CustomContext, float, complex, int)

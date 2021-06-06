@@ -30,6 +30,15 @@ class TestPromise:
 
     test_flag = False
 
+    def test_slot_behaviour(self, recwarn, mro_slots):
+        inst = Promise(self.test_call, [], {})
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.custom, inst.args = 'should give warning', []
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     @pytest.fixture(autouse=True)
     def reset(self):
         self.test_flag = False
@@ -127,3 +136,17 @@ class TestPromise:
         )
         assert caplog.records[1].message.startswith("Full traceback:")
         assert promise.result() == "done!"
+
+    def test_done_cb_not_run_on_excp(self):
+        def callback():
+            raise TelegramError('Error')
+
+        def done_callback(_):
+            self.test_flag = True
+
+        promise = Promise(callback, [], {})
+        promise.add_done_callback(done_callback)
+        promise.run()
+        assert isinstance(promise.exception, TelegramError)
+        assert promise.done
+        assert self.test_flag is False

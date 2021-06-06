@@ -70,6 +70,16 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
 
     """
 
+    __slots__ = (
+        'reply_markup',
+        'caption_entities',
+        'caption',
+        'title',
+        'parse_mode',
+        'voice_file_id',
+        'input_message_content',
+    )
+
     def __init__(
         self,
         id: str,  # pylint: disable=W0622

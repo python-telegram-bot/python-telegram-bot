@@ -64,6 +64,8 @@ class Dice(TelegramObject):
 
     """
 
+    __slots__ = ('emoji', 'value', '_id_attrs')
+
     def __init__(self, value: int, emoji: str, **_kwargs: Any):
         self.value = value
         self.emoji = emoji

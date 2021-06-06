@@ -125,6 +125,27 @@ class Update(TelegramObject):
 
     """
 
+    __slots__ = (
+        'callback_query',
+        'chosen_inline_result',
+        'pre_checkout_query',
+        'inline_query',
+        'update_id',
+        'message',
+        'shipping_query',
+        'poll',
+        'poll_answer',
+        'channel_post',
+        'edited_channel_post',
+        'edited_message',
+        '_effective_user',
+        '_effective_chat',
+        '_effective_message',
+        'my_chat_member',
+        'chat_member',
+        '_id_attrs',
+    )
+
     MESSAGE = constants.UPDATE_MESSAGE
     """:const:`telegram.constants.UPDATE_MESSAGE`
 

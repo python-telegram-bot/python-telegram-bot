@@ -30,3 +30,5 @@ class InputMessageContent(TelegramObject):
     :class:`telegram.InputVenueMessageContent` for more details.
 
     """
+
+    __slots__ = ()

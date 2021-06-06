@@ -81,6 +81,15 @@ class TestChosenInlineResultHandler:
     def reset(self):
         self.test_flag = False
 
+    def test_slot_behaviour(self, recwarn, mro_slots):
+        handler = ChosenInlineResultHandler(self.callback_basic)
+        for attr in handler.__slots__:
+            assert getattr(handler, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not handler.__dict__, f"got missing slot(s): {handler.__dict__}"
+        assert len(mro_slots(handler)) == len(set(mro_slots(handler))), "duplicate slot"
+        handler.custom, handler.callback = 'should give warning', self.callback_basic
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     def callback_basic(self, bot, update):
         test_bot = isinstance(bot, Bot)
         test_update = isinstance(update, Update)

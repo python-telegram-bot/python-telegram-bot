@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 import pytest
 
 from telegram import OrderInfo, SuccessfulPayment
@@ -43,6 +42,15 @@ class TestSuccessfulPayment:
     order_info = OrderInfo()
     telegram_payment_charge_id = 'telegram_payment_charge_id'
     provider_payment_charge_id = 'provider_payment_charge_id'
+
+    def test_slot_behaviour(self, successful_payment, recwarn, mro_slots):
+        inst = successful_payment
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.custom, inst.currency = 'should give warning', self.currency
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_de_json(self, bot):
         json_dict = {

@@ -28,6 +28,15 @@ from telegram import InputFile
 class TestInputFile:
     png = os.path.join('tests', 'data', 'game.png')
 
+    def test_slot_behaviour(self, recwarn, mro_slots):
+        inst = InputFile(BytesIO(b'blah'), filename='tg.jpg')
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.custom, inst.filename = 'should give warning', inst.filename
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     def test_subprocess_pipe(self):
         if sys.platform == 'win32':
             cmd = ['type', self.png]

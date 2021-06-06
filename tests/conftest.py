@@ -19,6 +19,7 @@
 import datetime
 import functools
 import inspect
+
 import os
 import re
 from collections import defaultdict
@@ -31,7 +32,6 @@ import pytest
 import pytz
 
 from telegram import (
-    Bot,
     Message,
     User,
     Chat,
@@ -45,7 +45,15 @@ from telegram import (
     File,
     ChatPermissions,
 )
-from telegram.ext import Dispatcher, JobQueue, Updater, MessageFilter, Defaults, UpdateFilter
+from telegram.ext import (
+    Dispatcher,
+    JobQueue,
+    Updater,
+    MessageFilter,
+    Defaults,
+    UpdateFilter,
+    ExtBot,
+)
 from telegram.error import BadRequest
 from telegram.utils.helpers import DefaultValue, DEFAULT_NONE
 from tests.bots import get_bot
@@ -83,7 +91,12 @@ def bot_info():
 
 @pytest.fixture(scope='session')
 def bot(bot_info):
-    return make_bot(bot_info)
+    class DictExtBot(
+        ExtBot
+    ):  # Subclass Bot to allow monkey patching of attributes and functions, would
+        pass  # come into effect when we __dict__ is dropped from slots
+
+    return DictExtBot(bot_info['token'], private_key=PRIVATE_KEY)
 
 
 DEFAULT_BOTS = {}
@@ -165,10 +178,12 @@ def dp(_dp):
     _dp.handlers = {}
     _dp.groups = []
     _dp.error_handlers = {}
-    _dp.__stop_event = Event()
-    _dp.__exception_event = Event()
-    _dp.__async_queue = Queue()
-    _dp.__async_threads = set()
+    # For some reason if we setattr with the name mangled, then some tests(like async) run forever,
+    # due to threads not acquiring, (blocking). This adds these attributes to the __dict__.
+    object.__setattr__(_dp, '__stop_event', Event())
+    object.__setattr__(_dp, '__exception_event', Event())
+    object.__setattr__(_dp, '__async_queue', Queue())
+    object.__setattr__(_dp, '__async_threads', set())
     _dp.persistence = None
     _dp.use_context = False
     if _dp._Dispatcher__singleton_semaphore.acquire(blocking=0):
@@ -212,7 +227,10 @@ def pytest_configure(config):
 
 
 def make_bot(bot_info, **kwargs):
-    return Bot(bot_info['token'], private_key=PRIVATE_KEY, **kwargs)
+    """
+    Tests are executed on tg.ext.ExtBot, as that class only extends the functionality of tg.bot
+    """
+    return ExtBot(bot_info['token'], private_key=PRIVATE_KEY, **kwargs)
 
 
 CMD_PATTERN = re.compile(r'/[\da-z_]{1,32}(?:@\w{1,32})?')
@@ -337,6 +355,20 @@ def timezone(tzinfo):
     return tzinfo
 
 
+@pytest.fixture()
+def mro_slots():
+    def _mro_slots(_class):
+        return [
+            attr
+            for cls in _class.__class__.__mro__[:-1]
+            if hasattr(cls, '__slots__')  # ABC doesn't have slots in py 3.7 and below
+            for attr in cls.__slots__
+            if attr != '__dict__'
+        ]
+
+    return _mro_slots
+
+
 def expect_bad_request(func, message, reason):
     """
     Wrapper for testing bot functions expected to result in an :class:`telegram.error.BadRequest`.
@@ -424,7 +456,7 @@ def check_shortcut_signature(
 
 def check_shortcut_call(
     shortcut_method: Callable,
-    bot: Bot,
+    bot: ExtBot,
     bot_method_name: str,
     skip_params: Iterable[str] = None,
     shortcut_kwargs: Iterable[str] = None,
@@ -493,7 +525,7 @@ def check_shortcut_call(
 
 def check_defaults_handling(
     method: Callable,
-    bot: Bot,
+    bot: ExtBot,
     return_value=None,
 ) -> bool:
     """

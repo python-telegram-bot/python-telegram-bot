@@ -57,6 +57,14 @@ class TestFile:
     file_size = 28232
     file_content = 'Saint-Saëns'.encode()  # Intentionally contains unicode chars.
 
+    def test_slot_behaviour(self, file, recwarn, mro_slots):
+        for attr in file.__slots__:
+            assert getattr(file, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not file.__dict__, f"got missing slot(s): {file.__dict__}"
+        assert len(mro_slots(file)) == len(set(mro_slots(file))), "duplicate slot"
+        file.custom, file.file_id = 'should give warning', self.file_id
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     def test_de_json(self, bot):
         json_dict = {
             'file_id': self.file_id,

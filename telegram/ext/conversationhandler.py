@@ -37,7 +37,8 @@ from telegram.ext import (
     InlineQueryHandler,
 )
 from telegram.ext.utils.promise import Promise
-from telegram.utils.types import ConversationDict
+from telegram.ext.utils.types import ConversationDict
+from telegram.ext.utils.types import CCT
 
 if TYPE_CHECKING:
     from telegram.ext import Dispatcher, Job
@@ -45,6 +46,9 @@ CheckUpdateType = Optional[Tuple[Tuple[int, ...], Handler, object]]
 
 
 class _ConversationTimeoutContext:
+    # '__dict__' is not included since this a private class
+    __slots__ = ('conversation_key', 'update', 'dispatcher', 'callback_context')
+
     def __init__(
         self,
         conversation_key: Tuple[int, ...],
@@ -58,7 +62,7 @@ class _ConversationTimeoutContext:
         self.callback_context = callback_context
 
 
-class ConversationHandler(Handler[Update]):
+class ConversationHandler(Handler[Update, CCT]):
     """
     A handler to hold a conversation with a single or multiple users through Telegram updates by
     managing four collections of other handlers.
@@ -182,6 +186,26 @@ class ConversationHandler(Handler[Update]):
 
     """
 
+    __slots__ = (
+        '_entry_points',
+        '_states',
+        '_fallbacks',
+        '_allow_reentry',
+        '_per_user',
+        '_per_chat',
+        '_per_message',
+        '_conversation_timeout',
+        '_name',
+        'persistent',
+        '_persistence',
+        '_map_to_parent',
+        'timeout_jobs',
+        '_timeout_jobs_lock',
+        '_conversations',
+        '_conversations_lock',
+        'logger',
+    )
+
     END: ClassVar[int] = -1
     """:obj:`int`: Used as a constant to return when a conversation is ended."""
     TIMEOUT: ClassVar[int] = -2
@@ -192,9 +216,9 @@ class ConversationHandler(Handler[Update]):
     # pylint: disable=W0231
     def __init__(
         self,
-        entry_points: List[Handler],
-        states: Dict[object, List[Handler]],
-        fallbacks: List[Handler],
+        entry_points: List[Handler[Update, CCT]],
+        states: Dict[object, List[Handler[Update, CCT]]],
+        fallbacks: List[Handler[Update, CCT]],
         allow_reentry: bool = False,
         per_chat: bool = True,
         per_user: bool = True,

@@ -26,6 +26,8 @@ import os
 from typing import IO, Optional, Tuple, Union
 from uuid import uuid4
 
+from telegram.utils.deprecate import set_new_attribute_deprecated
+
 DEFAULT_MIME_TYPE = 'application/octet-stream'
 logger = logging.getLogger(__name__)
 
@@ -50,6 +52,8 @@ class InputFile:
 
     """
 
+    __slots__ = ('filename', 'attach', 'input_file_content', 'mimetype', '__dict__')
+
     def __init__(self, obj: Union[IO, bytes], filename: str = None, attach: bool = None):
         self.filename = None
         if isinstance(obj, bytes):
@@ -73,6 +77,9 @@ class InputFile:
 
         if not self.filename:
             self.filename = self.mimetype.replace('/', '.')
+
+    def __setattr__(self, key: str, value: object) -> None:
+        set_new_attribute_deprecated(self, key, value)
 
     @property
     def field_tuple(self) -> Tuple[str, bytes, str]:  # skipcq: PY-D0003

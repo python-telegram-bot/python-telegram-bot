@@ -60,6 +60,16 @@ class ChatInviteLink(TelegramObject):
 
     """
 
+    __slots__ = (
+        'invite_link',
+        'creator',
+        'is_primary',
+        'is_revoked',
+        'expire_date',
+        'member_limit',
+        '_id_attrs',
+    )
+
     def __init__(
         self,
         invite_link: str,

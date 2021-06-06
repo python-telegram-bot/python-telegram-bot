@@ -36,9 +36,25 @@ from urllib.error import HTTPError
 
 import pytest
 
-from telegram import TelegramError, Message, User, Chat, Update, Bot
+from telegram import (
+    TelegramError,
+    Message,
+    User,
+    Chat,
+    Update,
+    Bot,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+)
 from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter
-from telegram.ext import Updater, Dispatcher, DictPersistence, Defaults
+from telegram.ext import (
+    Updater,
+    Dispatcher,
+    DictPersistence,
+    Defaults,
+    InvalidCallbackData,
+    ExtBot,
+)
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.ext.utils.webhookhandler import WebhookServer
 
@@ -74,6 +90,25 @@ class TestUpdater:
     offset = 0
     test_flag = False
 
+    def test_slot_behaviour(self, updater, mro_slots, recwarn):
+        for at in updater.__slots__:
+            at = f"_Updater{at}" if at.startswith('__') and not at.endswith('__') else at
+            assert getattr(updater, at, 'err') != 'err', f"got extra slot '{at}'"
+        assert not updater.__dict__, f"got missing slot(s): {updater.__dict__}"
+        assert len(mro_slots(updater)) == len(set(mro_slots(updater))), "duplicate slot"
+        updater.custom, updater.running = 'should give warning', updater.running
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
+        class CustomUpdater(Updater):
+            pass  # Tests that setting custom attributes of Updater subclass doesn't raise warning
+
+        a = CustomUpdater(updater.bot.token)
+        a.my_custom = 'no error!'
+        assert len(recwarn) == 1
+
+        updater.__setattr__('__test', 'mangled success')
+        assert getattr(updater, '_Updater__test', 'e') == 'mangled success', "mangling failed"
+
     @pytest.fixture(autouse=True)
     def reset(self):
         self.message_count = 0
@@ -90,6 +125,11 @@ class TestUpdater:
     def callback(self, bot, update):
         self.received = update.message.text
         self.cb_handler_called.set()
+
+    def test_warn_arbitrary_callback_data(self, bot, recwarn):
+        Updater(bot=bot, arbitrary_callback_data=True)
+        assert len(recwarn) == 1
+        assert 'Passing arbitrary_callback_data to an Updater' in str(recwarn[0].message)
 
     @pytest.mark.parametrize(
         ('error',),
@@ -166,7 +206,15 @@ class TestUpdater:
         event.wait()
         assert self.err_handler_called.wait(0.5) is not True
 
-    def test_webhook(self, monkeypatch, updater):
+    @pytest.mark.parametrize('ext_bot', [True, False])
+    def test_webhook(self, monkeypatch, updater, ext_bot):
+        # Testing with both ExtBot and Bot to make sure any logic in WebhookHandler
+        # that depends on this distinction works
+        if ext_bot and not isinstance(updater.bot, ExtBot):
+            updater.bot = ExtBot(updater.bot.token)
+        if not ext_bot and not type(updater.bot) is Bot:
+            updater.bot = Bot(updater.bot.token)
+
         q = Queue()
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
         monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
@@ -206,6 +254,59 @@ class TestUpdater:
             sleep(0.2)
             assert not updater.httpd.is_running
             updater.stop()
+
+    @pytest.mark.parametrize('invalid_data', [True, False])
+    def test_webhook_arbitrary_callback_data(self, monkeypatch, updater, invalid_data):
+        """Here we only test one simple setup. telegram.ext.ExtBot.insert_callback_data is tested
+        extensively in test_bot.py in conjunction with get_updates."""
+        updater.bot.arbitrary_callback_data = True
+        try:
+            q = Queue()
+            monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
+            monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
+            monkeypatch.setattr('telegram.ext.Dispatcher.process_update', lambda _, u: q.put(u))
+
+            ip = '127.0.0.1'
+            port = randrange(1024, 49152)  # Select random port
+            updater.start_webhook(ip, port, url_path='TOKEN')
+            sleep(0.2)
+            try:
+                # Now, we send an update to the server via urlopen
+                reply_markup = InlineKeyboardMarkup.from_button(
+                    InlineKeyboardButton(text='text', callback_data='callback_data')
+                )
+                if not invalid_data:
+                    reply_markup = updater.bot.callback_data_cache.process_keyboard(reply_markup)
+
+                message = Message(
+                    1,
+                    None,
+                    None,
+                    reply_markup=reply_markup,
+                )
+                update = Update(1, message=message)
+                self._send_webhook_msg(ip, port, update.to_json(), 'TOKEN')
+                sleep(0.2)
+                received_update = q.get(False)
+                assert received_update == update
+
+                button = received_update.message.reply_markup.inline_keyboard[0][0]
+                if invalid_data:
+                    assert isinstance(button.callback_data, InvalidCallbackData)
+                else:
+                    assert button.callback_data == 'callback_data'
+
+                # Test multiple shutdown() calls
+                updater.httpd.shutdown()
+            finally:
+                updater.httpd.shutdown()
+                sleep(0.2)
+                assert not updater.httpd.is_running
+                updater.stop()
+        finally:
+            updater.bot.arbitrary_callback_data = False
+            updater.bot.callback_data_cache.clear_callback_data()
+            updater.bot.callback_data_cache.clear_callback_queries()
 
     def test_start_webhook_no_warning_or_error_logs(self, caplog, updater, monkeypatch):
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
@@ -299,6 +400,42 @@ class TestUpdater:
         assert q.get(False) == update
         updater.stop()
         assert self.test_flag == [True, True]
+
+    @pytest.mark.parametrize('pass_max_connections', [True, False])
+    def test_webhook_max_connections(self, monkeypatch, updater, pass_max_connections):
+        q = Queue()
+        max_connections = 42
+
+        def set_webhook(**kwargs):
+            print(kwargs)
+            self.test_flag = kwargs.get('max_connections') == (
+                max_connections if pass_max_connections else 40
+            )
+            return True
+
+        monkeypatch.setattr(updater.bot, 'set_webhook', set_webhook)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr('telegram.ext.Dispatcher.process_update', lambda _, u: q.put(u))
+
+        ip = '127.0.0.1'
+        port = randrange(1024, 49152)  # Select random port
+        if pass_max_connections:
+            updater.start_webhook(ip, port, webhook_url=None, max_connections=max_connections)
+        else:
+            updater.start_webhook(ip, port, webhook_url=None)
+
+        sleep(0.2)
+
+        # Now, we send an update to the server via urlopen
+        update = Update(
+            1,
+            message=Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Webhook 2'),
+        )
+        self._send_webhook_msg(ip, port, update.to_json())
+        sleep(0.2)
+        assert q.get(False) == update
+        updater.stop()
+        assert self.test_flag is True
 
     @pytest.mark.parametrize(('error',), argvalues=[(TelegramError(''),)], ids=('TelegramError',))
     def test_bootstrap_retries_success(self, monkeypatch, updater, error):
@@ -484,8 +621,10 @@ class TestUpdater:
 
         # There is a chance of a conflict when getting updates since there can be many tests
         # (bots) running simultaneously while testing in github actions.
-        if caplog.records[0].getMessage().startswith('Error while getting Updates: Conflict'):
-            caplog.records.pop()  # For stability
+        for idx, log in enumerate(caplog.records):
+            if log.getMessage().startswith('Error while getting Updates: Conflict'):
+                caplog.records.pop(idx)  # For stability
+                assert len(caplog.records) == 2, caplog.records
 
         rec = caplog.records[-2]
         assert rec.getMessage().startswith(f'Received signal {signal.SIGTERM}')
@@ -533,28 +672,33 @@ class TestUpdater:
         with pytest.raises(ValueError):
             Updater(bot=bot, private_key=b'key')
 
-    def test_mutual_exclude_bot_dispatcher(self):
-        dispatcher = Dispatcher(None, None)
+    def test_mutual_exclude_bot_dispatcher(self, bot):
+        dispatcher = Dispatcher(bot, None)
         bot = Bot('123:zyxw')
         with pytest.raises(ValueError):
             Updater(bot=bot, dispatcher=dispatcher)
 
-    def test_mutual_exclude_persistence_dispatcher(self):
-        dispatcher = Dispatcher(None, None)
+    def test_mutual_exclude_persistence_dispatcher(self, bot):
+        dispatcher = Dispatcher(bot, None)
         persistence = DictPersistence()
         with pytest.raises(ValueError):
             Updater(dispatcher=dispatcher, persistence=persistence)
 
-    def test_mutual_exclude_workers_dispatcher(self):
-        dispatcher = Dispatcher(None, None)
+    def test_mutual_exclude_workers_dispatcher(self, bot):
+        dispatcher = Dispatcher(bot, None)
         with pytest.raises(ValueError):
             Updater(dispatcher=dispatcher, workers=8)
 
-    def test_mutual_exclude_use_context_dispatcher(self):
-        dispatcher = Dispatcher(None, None)
+    def test_mutual_exclude_use_context_dispatcher(self, bot):
+        dispatcher = Dispatcher(bot, None)
         use_context = not dispatcher.use_context
         with pytest.raises(ValueError):
             Updater(dispatcher=dispatcher, use_context=use_context)
+
+    def test_mutual_exclude_custom_context_dispatcher(self):
+        dispatcher = Dispatcher(None, None)
+        with pytest.raises(ValueError):
+            Updater(dispatcher=dispatcher, context_types=True)
 
     def test_defaults_warning(self, bot):
         with pytest.warns(TelegramDeprecationWarning, match='no effect when a Bot is passed'):

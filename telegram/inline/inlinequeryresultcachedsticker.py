@@ -52,6 +52,8 @@ class InlineQueryResultCachedSticker(InlineQueryResult):
 
     """
 
+    __slots__ = ('reply_markup', 'input_message_content', 'sticker_file_id')
+
     def __init__(
         self,
         id: str,  # pylint: disable=W0622

@@ -5,3 +5,4 @@ certifi
 tornado>=6.1
 APScheduler==3.6.3
 pytz>=2018.6
+cachetools==4.2.2

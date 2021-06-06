@@ -60,11 +60,19 @@ def photo(_photo):
 
 
 class TestPhoto:
-    width = 800
-    height = 800
+    width = 320
+    height = 320
     caption = '<b>PhotoTest</b> - *Caption*'
     photo_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.jpg'
     file_size = 29176
+
+    def test_slot_behaviour(self, photo, recwarn, mro_slots):
+        for attr in photo.__slots__:
+            assert getattr(photo, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not photo.__dict__, f"got missing slot(s): {photo.__dict__}"
+        assert len(mro_slots(photo)) == len(set(mro_slots(photo))), "duplicate slot"
+        photo.custom, photo.width = 'should give warning', self.width
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_creation(self, thumb, photo):
         # Make sure file has been uploaded.
@@ -85,8 +93,8 @@ class TestPhoto:
         # the compression method and it's not really our job anyway ...
         assert photo.width == self.width
         assert photo.height == self.height
-        assert thumb.width == 320
-        assert thumb.height == 320
+        assert thumb.width == 90
+        assert thumb.height == 90
 
     @flaky(3, 1)
     def test_send_photo_all_args(self, bot, chat_id, photo_file, thumb, photo):
@@ -235,6 +243,7 @@ class TestPhoto:
         monkeypatch.setattr(bot, '_post', make_assertion)
         bot.send_photo(chat_id, file)
         assert test_flag
+        monkeypatch.delattr(bot, '_post')
 
     @flaky(3, 1)
     @pytest.mark.parametrize(
@@ -386,7 +395,7 @@ class TestPhoto:
     def test_resend(self, bot, chat_id, photo):
         message = bot.send_photo(chat_id=chat_id, photo=photo.file_id)
 
-        thumb, photo = message.photo
+        thumb, photo, _ = message.photo
 
         assert isinstance(message.photo[0], PhotoSize)
         assert isinstance(message.photo[0].file_id, str)

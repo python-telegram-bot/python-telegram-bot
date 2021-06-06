@@ -74,6 +74,14 @@ class TestSticker:
     sticker_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
     sticker_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
 
+    def test_slot_behaviour(self, sticker, mro_slots, recwarn):
+        for attr in sticker.__slots__:
+            assert getattr(sticker, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not sticker.__dict__, f"got missing slot(s): {sticker.__dict__}"
+        assert len(mro_slots(sticker)) == len(set(mro_slots(sticker))), "duplicate slot"
+        sticker.custom, sticker.emoji = 'should give warning', self.emoji
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     def test_creation(self, sticker):
         # Make sure file has been uploaded.
         assert isinstance(sticker, Sticker)
@@ -212,6 +220,7 @@ class TestSticker:
         monkeypatch.setattr(bot, '_post', make_assertion)
         bot.send_sticker(chat_id, file)
         assert test_flag
+        monkeypatch.delattr(bot, '_post')
 
     @flaky(3, 1)
     @pytest.mark.parametrize(
@@ -447,6 +456,7 @@ class TestStickerSet:
         monkeypatch.setattr(bot, '_post', make_assertion)
         bot.upload_sticker_file(chat_id, file)
         assert test_flag
+        monkeypatch.delattr(bot, '_post')
 
     def test_create_new_sticker_set_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
@@ -463,6 +473,7 @@ class TestStickerSet:
             chat_id, 'name', 'title', 'emoji', png_sticker=file, tgs_sticker=file
         )
         assert test_flag
+        monkeypatch.delattr(bot, '_post')
 
     def test_add_sticker_to_set_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
@@ -477,6 +488,7 @@ class TestStickerSet:
         monkeypatch.setattr(bot, '_post', make_assertion)
         bot.add_sticker_to_set(chat_id, 'name', 'emoji', png_sticker=file, tgs_sticker=file)
         assert test_flag
+        monkeypatch.delattr(bot, '_post')
 
     def test_set_sticker_set_thumb_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
@@ -491,6 +503,7 @@ class TestStickerSet:
         monkeypatch.setattr(bot, '_post', make_assertion)
         bot.set_sticker_set_thumb('name', chat_id, thumb=file)
         assert test_flag
+        monkeypatch.delattr(bot, '_post')
 
     def test_get_file_instance_method(self, monkeypatch, sticker):
         def make_assertion(*_, **kwargs):

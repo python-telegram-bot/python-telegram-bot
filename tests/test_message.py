@@ -164,7 +164,6 @@ def message(bot):
                 ]
             },
         },
-        {'quote': True},
         {'dice': Dice(4, '🎲')},
         {'via_bot': User(9, 'A_Bot', True)},
         {
@@ -222,7 +221,6 @@ def message(bot):
         'passport_data',
         'poll',
         'reply_markup',
-        'default_quote',
         'dice',
         'via_bot',
         'proximity_alert_triggered',
@@ -308,6 +306,14 @@ class TestMessage:
         caption=test_text_v2,
         caption_entities=[MessageEntity(**e) for e in test_entities_v2],
     )
+
+    def test_slot_behaviour(self, message, recwarn, mro_slots):
+        for attr in message.__slots__:
+            assert getattr(message, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not message.__dict__, f"got missing slot(s): {message.__dict__}"
+        assert len(mro_slots(message)) == len(set(mro_slots(message))), "duplicate slot"
+        message.custom, message.message_id = 'should give warning', self.id_
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_all_possibilities_de_json_and_to_dict(self, bot, message_params):
         new = Message.de_json(message_params.to_dict(), bot)
@@ -645,7 +651,6 @@ class TestMessage:
             'contact',
             'location',
             'venue',
-            'invoice',
             'invoice',
             'successful_payment',
         ):

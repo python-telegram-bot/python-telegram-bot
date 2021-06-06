@@ -30,6 +30,8 @@ from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 
 from telegram import Update
+from telegram.ext import ExtBot
+from telegram.utils.deprecate import set_new_attribute_deprecated
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -42,6 +44,18 @@ except ImportError:
 
 
 class WebhookServer:
+    __slots__ = (
+        'http_server',
+        'listen',
+        'port',
+        'loop',
+        'logger',
+        'is_running',
+        'server_lock',
+        'shutdown_lock',
+        '__dict__',
+    )
+
     def __init__(
         self, listen: str, port: int, webhook_app: 'WebhookAppClass', ssl_ctx: SSLContext
     ):
@@ -53,6 +67,9 @@ class WebhookServer:
         self.is_running = False
         self.server_lock = Lock()
         self.shutdown_lock = Lock()
+
+    def __setattr__(self, key: str, value: object) -> None:
+        set_new_attribute_deprecated(self, key, value)
 
     def serve_forever(self, ready: Event = None) -> None:
         with self.server_lock:
@@ -127,6 +144,9 @@ class WebhookHandler(tornado.web.RequestHandler):
         update = Update.de_json(data, self.bot)
         if update:
             self.logger.debug('Received Update with ID %d on Webhook', update.update_id)
+            # handle arbitrary callback data, if necessary
+            if isinstance(self.bot, ExtBot):
+                self.bot.insert_callback_data(update)
             self.update_queue.put(update)
 
     def _validate_post(self) -> None:

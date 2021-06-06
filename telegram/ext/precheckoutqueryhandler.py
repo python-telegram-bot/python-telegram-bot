@@ -22,9 +22,10 @@
 from telegram import Update
 
 from .handler import Handler
+from .utils.types import CCT
 
 
-class PreCheckoutQueryHandler(Handler[Update]):
+class PreCheckoutQueryHandler(Handler[Update, CCT]):
     """Handler class to handle Telegram PreCheckout callback queries.
 
     Note:
@@ -81,6 +82,8 @@ class PreCheckoutQueryHandler(Handler[Update]):
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     """
+
+    __slots__ = ()
 
     def check_update(self, update: object) -> bool:
         """Determines whether an update should be passed to this handlers :attr:`callback`.

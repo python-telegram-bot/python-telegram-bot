@@ -50,6 +50,14 @@ class TestCallbackQuery:
     inline_message_id = 'inline_message_id'
     game_short_name = 'the_game'
 
+    def test_slot_behaviour(self, callback_query, recwarn, mro_slots):
+        for attr in callback_query.__slots__:
+            assert getattr(callback_query, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not callback_query.__dict__, f"got missing slot(s): {callback_query.__dict__}"
+        assert len(mro_slots(callback_query)) == len(set(mro_slots(callback_query))), "same slot"
+        callback_query.custom, callback_query.id = 'should give warning', self.id_
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     @staticmethod
     def skip_params(callback_query: CallbackQuery):
         if callback_query.inline_message_id:

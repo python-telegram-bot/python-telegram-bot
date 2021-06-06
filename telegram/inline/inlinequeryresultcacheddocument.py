@@ -75,6 +75,17 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
 
     """
 
+    __slots__ = (
+        'reply_markup',
+        'caption_entities',
+        'document_file_id',
+        'caption',
+        'title',
+        'description',
+        'parse_mode',
+        'input_message_content',
+    )
+
     def __init__(
         self,
         id: str,  # pylint: disable=W0622

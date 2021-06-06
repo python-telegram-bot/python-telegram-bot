@@ -22,9 +22,10 @@
 from telegram import Update
 
 from .handler import Handler
+from .utils.types import CCT
 
 
-class PollAnswerHandler(Handler[Update]):
+class PollAnswerHandler(Handler[Update, CCT]):
     """Handler class to handle Telegram updates that contain a poll answer.
 
     Note:
@@ -81,6 +82,8 @@ class PollAnswerHandler(Handler[Update]):
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     """
+
+    __slots__ = ()
 
     def check_update(self, update: object) -> bool:
         """Determines whether an update should be passed to this handlers :attr:`callback`.

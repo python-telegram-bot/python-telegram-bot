@@ -46,6 +46,8 @@ class ShippingOption(TelegramObject):
 
     """
 
+    __slots__ = ('prices', 'title', 'id', '_id_attrs')
+
     def __init__(
         self,
         id: str,  # pylint: disable=W0622

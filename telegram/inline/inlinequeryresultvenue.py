@@ -79,6 +79,22 @@ class InlineQueryResultVenue(InlineQueryResult):
 
     """
 
+    __slots__ = (
+        'longitude',
+        'reply_markup',
+        'google_place_type',
+        'thumb_width',
+        'thumb_height',
+        'title',
+        'address',
+        'foursquare_id',
+        'foursquare_type',
+        'google_place_id',
+        'input_message_content',
+        'latitude',
+        'thumb_url',
+    )
+
     def __init__(
         self,
         id: str,  # pylint: disable=W0622

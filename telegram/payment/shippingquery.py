@@ -54,6 +54,8 @@ class ShippingQuery(TelegramObject):
 
     """
 
+    __slots__ = ('bot', 'invoice_payload', 'shipping_address', 'id', 'from_user', '_id_attrs')
+
     def __init__(
         self,
         id: str,  # pylint: disable=W0622

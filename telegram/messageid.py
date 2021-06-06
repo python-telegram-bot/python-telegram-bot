@@ -32,6 +32,8 @@ class MessageId(TelegramObject):
         message_id (:obj:`int`): Unique message identifier
     """
 
+    __slots__ = ('message_id', '_id_attrs')
+
     def __init__(self, message_id: int, **_kwargs: Any):
         self.message_id = int(message_id)
 

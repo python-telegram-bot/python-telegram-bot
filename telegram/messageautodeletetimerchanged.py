@@ -44,6 +44,8 @@ class MessageAutoDeleteTimerChanged(TelegramObject):
 
     """
 
+    __slots__ = ('message_auto_delete_time', '_id_attrs')
+
     def __init__(
         self,
         message_auto_delete_time: int,

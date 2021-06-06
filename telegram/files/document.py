@@ -60,6 +60,17 @@ class Document(TelegramObject):
 
     """
 
+    __slots__ = (
+        'bot',
+        'file_id',
+        'file_size',
+        'file_name',
+        'thumb',
+        'mime_type',
+        'file_unique_id',
+        '_id_attrs',
+    )
+
     _id_keys = ('file_id',)
 
     def __init__(

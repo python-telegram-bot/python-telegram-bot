@@ -88,6 +88,15 @@ def chat_member(bot, chat_member_updated):
 class TestChatMemberHandler:
     test_flag = False
 
+    def test_slot_behaviour(self, recwarn, mro_slots):
+        action = ChatMemberHandler(self.callback_basic)
+        for attr in action.__slots__:
+            assert getattr(action, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not action.__dict__, f"got missing slot(s): {action.__dict__}"
+        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
+        action.custom = 'should give warning'
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     @pytest.fixture(autouse=True)
     def reset(self):
         self.test_flag = False

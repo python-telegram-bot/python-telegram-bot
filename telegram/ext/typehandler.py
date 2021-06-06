@@ -18,19 +18,17 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the TypeHandler class."""
 
-from typing import TYPE_CHECKING, Callable, Type, TypeVar, Union
+from typing import Callable, Type, TypeVar, Union
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 from .handler import Handler
-
-if TYPE_CHECKING:
-    from telegram.ext import CallbackContext
+from .utils.types import CCT
 
 RT = TypeVar('RT')
 UT = TypeVar('UT')
 
 
-class TypeHandler(Handler[UT]):
+class TypeHandler(Handler[UT, CCT]):
     """Handler class to handle updates of custom types.
 
     Warning:
@@ -75,10 +73,12 @@ class TypeHandler(Handler[UT]):
 
     """
 
+    __slots__ = ('type', 'strict')
+
     def __init__(
         self,
         type: Type[UT],  # pylint: disable=W0622
-        callback: Callable[[UT, 'CallbackContext'], RT],
+        callback: Callable[[UT, CCT], RT],
         strict: bool = False,
         pass_update_queue: bool = False,
         pass_job_queue: bool = False,
@@ -90,8 +90,8 @@ class TypeHandler(Handler[UT]):
             pass_job_queue=pass_job_queue,
             run_async=run_async,
         )
-        self.type = type
-        self.strict = strict
+        self.type = type  # pylint: disable=E0237
+        self.strict = strict  # pylint: disable=E0237
 
     def check_update(self, update: object) -> bool:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
