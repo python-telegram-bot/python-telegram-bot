@@ -38,6 +38,7 @@ from telegram.ext import (
 )
 from telegram.ext.utils.promise import Promise
 from telegram.utils.types import ConversationDict
+from telegram.ext.utils.types import CCT
 
 if TYPE_CHECKING:
     from telegram.ext import Dispatcher, Job
@@ -61,7 +62,7 @@ class _ConversationTimeoutContext:
         self.callback_context = callback_context
 
 
-class ConversationHandler(Handler[Update]):
+class ConversationHandler(Handler[Update, CCT]):
     """
     A handler to hold a conversation with a single or multiple users through Telegram updates by
     managing four collections of other handlers.
@@ -215,9 +216,9 @@ class ConversationHandler(Handler[Update]):
     # pylint: disable=W0231
     def __init__(
         self,
-        entry_points: List[Handler],
-        states: Dict[object, List[Handler]],
-        fallbacks: List[Handler],
+        entry_points: List[Handler[Update, CCT]],
+        states: Dict[object, List[Handler[Update, CCT]]],
+        fallbacks: List[Handler[Update, CCT]],
         allow_reentry: bool = False,
         per_chat: bool = True,
         per_user: bool = True,

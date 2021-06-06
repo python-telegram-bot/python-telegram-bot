@@ -22,9 +22,10 @@
 from telegram import Update
 
 from .handler import Handler
+from .utils.types import CCT
 
 
-class PollHandler(Handler[Update]):
+class PollHandler(Handler[Update, CCT]):
     """Handler class to handle Telegram updates that contain a poll.
 
     Note:

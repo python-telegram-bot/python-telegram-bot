@@ -24,6 +24,7 @@ from telegram import Update
 
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 from .handler import Handler
+from .utils.types import CCT
 
 RT = TypeVar('RT')
 
@@ -31,7 +32,7 @@ if TYPE_CHECKING:
     from telegram.ext import CallbackContext, Dispatcher
 
 
-class ChosenInlineResultHandler(Handler[Update]):
+class ChosenInlineResultHandler(Handler[Update, CCT]):
     """Handler class to handle Telegram updates that contain a chosen inline result.
 
     Note:

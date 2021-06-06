@@ -18,19 +18,17 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the TypeHandler class."""
 
-from typing import TYPE_CHECKING, Callable, Type, TypeVar, Union
+from typing import Callable, Type, TypeVar, Union
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 from .handler import Handler
-
-if TYPE_CHECKING:
-    from telegram.ext import CallbackContext
+from .utils.types import CCT
 
 RT = TypeVar('RT')
 UT = TypeVar('UT')
 
 
-class TypeHandler(Handler[UT]):
+class TypeHandler(Handler[UT, CCT]):
     """Handler class to handle updates of custom types.
 
     Warning:
@@ -80,7 +78,7 @@ class TypeHandler(Handler[UT]):
     def __init__(
         self,
         type: Type[UT],  # pylint: disable=W0622
-        callback: Callable[[UT, 'CallbackContext'], RT],
+        callback: Callable[[UT, CCT], RT],
         strict: bool = False,
         pass_update_queue: bool = False,
         pass_job_queue: bool = False,

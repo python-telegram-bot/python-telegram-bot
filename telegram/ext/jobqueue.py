@@ -72,7 +72,7 @@ class JobQueue:
 
     def _build_args(self, job: 'Job') -> List[Union[CallbackContext, 'Bot', 'Job']]:
         if self._dispatcher.use_context:
-            return [CallbackContext.from_job(job, self._dispatcher)]
+            return [self._dispatcher.context_types.context.from_job(job, self._dispatcher)]
         return [self._dispatcher.bot, job]
 
     def _tz_now(self) -> datetime.datetime:
@@ -585,7 +585,7 @@ class Job:
         """Executes the callback function independently of the jobs schedule."""
         try:
             if dispatcher.use_context:
-                self.callback(CallbackContext.from_job(self, dispatcher))
+                self.callback(dispatcher.context_types.context.from_job(self, dispatcher))
             else:
                 self.callback(dispatcher.bot, self)  # type: ignore[arg-type,call-arg]
         except Exception as exc:

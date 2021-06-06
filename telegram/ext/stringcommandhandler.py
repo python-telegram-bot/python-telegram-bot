@@ -23,14 +23,15 @@ from typing import TYPE_CHECKING, Callable, Dict, List, Optional, TypeVar, Union
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 from .handler import Handler
+from .utils.types import CCT
 
 if TYPE_CHECKING:
-    from telegram.ext import CallbackContext, Dispatcher
+    from telegram.ext import Dispatcher
 
 RT = TypeVar('RT')
 
 
-class StringCommandHandler(Handler[str]):
+class StringCommandHandler(Handler[str, CCT]):
     """Handler class to handle string commands. Commands are string updates that start with ``/``.
     The handler will add a ``list`` to the
     :class:`CallbackContext` named :attr:`CallbackContext.args`. It will contain a list of strings,
@@ -90,7 +91,7 @@ class StringCommandHandler(Handler[str]):
     def __init__(
         self,
         command: str,
-        callback: Callable[[str, 'CallbackContext'], RT],
+        callback: Callable[[str, CCT], RT],
         pass_args: bool = False,
         pass_update_queue: bool = False,
         pass_job_queue: bool = False,
@@ -137,7 +138,7 @@ class StringCommandHandler(Handler[str]):
 
     def collect_additional_context(
         self,
-        context: 'CallbackContext',
+        context: CCT,
         update: str,
         dispatcher: 'Dispatcher',
         check_result: Optional[List[str]],

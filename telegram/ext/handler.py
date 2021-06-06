@@ -26,15 +26,16 @@ from telegram.utils.deprecate import set_new_attribute_deprecated
 from telegram import Update
 from telegram.ext.utils.promise import Promise
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
+from telegram.ext.utils.types import CCT
 
 if TYPE_CHECKING:
-    from telegram.ext import CallbackContext, Dispatcher
+    from telegram.ext import Dispatcher
 
 RT = TypeVar('RT')
 UT = TypeVar('UT')
 
 
-class Handler(Generic[UT], ABC):
+class Handler(Generic[UT, CCT], ABC):
     """The base class for all update handlers. Create custom handlers by inheriting from it.
 
     Note:
@@ -115,7 +116,7 @@ class Handler(Generic[UT], ABC):
 
     def __init__(
         self,
-        callback: Callable[[UT, 'CallbackContext'], RT],
+        callback: Callable[[UT, CCT], RT],
         pass_update_queue: bool = False,
         pass_job_queue: bool = False,
         pass_user_data: bool = False,
@@ -165,7 +166,7 @@ class Handler(Generic[UT], ABC):
         update: UT,
         dispatcher: 'Dispatcher',
         check_result: object,
-        context: 'CallbackContext' = None,
+        context: CCT = None,
     ) -> Union[RT, Promise]:
         """
         This method is called if it was determined that an update should indeed
@@ -205,7 +206,7 @@ class Handler(Generic[UT], ABC):
 
     def collect_additional_context(
         self,
-        context: 'CallbackContext',
+        context: CCT,
         update: UT,
         dispatcher: 'Dispatcher',
         check_result: Any,

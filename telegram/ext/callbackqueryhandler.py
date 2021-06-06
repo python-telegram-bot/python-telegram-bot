@@ -35,14 +35,15 @@ from telegram import Update
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 from .handler import Handler
+from .utils.types import CCT
 
 if TYPE_CHECKING:
-    from telegram.ext import CallbackContext, Dispatcher
+    from telegram.ext import Dispatcher
 
 RT = TypeVar('RT')
 
 
-class CallbackQueryHandler(Handler[Update]):
+class CallbackQueryHandler(Handler[Update, CCT]):
     """Handler class to handle Telegram callback queries. Optionally based on a regex.
 
     Read the documentation of the ``re`` module for more information.
@@ -124,7 +125,7 @@ class CallbackQueryHandler(Handler[Update]):
 
     def __init__(
         self,
-        callback: Callable[[Update, 'CallbackContext'], RT],
+        callback: Callable[[Update, CCT], RT],
         pass_update_queue: bool = False,
         pass_job_queue: bool = False,
         pattern: Union[str, Pattern] = None,
@@ -191,7 +192,7 @@ class CallbackQueryHandler(Handler[Update]):
 
     def collect_additional_context(
         self,
-        context: 'CallbackContext',
+        context: CCT,
         update: Update,
         dispatcher: 'Dispatcher',
         check_result: Union[bool, Match],

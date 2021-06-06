@@ -25,21 +25,34 @@ from queue import Queue
 from signal import SIGABRT, SIGINT, SIGTERM, signal
 from threading import Event, Lock, Thread, current_thread
 from time import sleep
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, Union, no_type_check
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Tuple,
+    Union,
+    no_type_check,
+    Generic,
+    overload,
+)
 
 from telegram import Bot, TelegramError
 from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized
-from telegram.ext import Dispatcher, JobQueue
+from telegram.ext import Dispatcher, JobQueue, ContextTypes
 from telegram.utils.deprecate import TelegramDeprecationWarning, set_new_attribute_deprecated
 from telegram.utils.helpers import get_signal_name
 from telegram.utils.request import Request
+from telegram.ext.utils.types import CCT, UD, CD, BD
 from telegram.ext.utils.webhookhandler import WebhookAppClass, WebhookServer
 
 if TYPE_CHECKING:
-    from telegram.ext import BasePersistence, Defaults
+    from telegram.ext import BasePersistence, Defaults, CallbackContext
 
 
-class Updater:
+class Updater(Generic[CCT, UD, CD, BD]):
     """
     This class, which employs the :class:`telegram.ext.Dispatcher`, provides a frontend to
     :class:`telegram.Bot` to the programmer, so they can focus on coding the bot. Its purpose is to
@@ -85,6 +98,12 @@ class Updater:
             used).
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
             be used if not set explicitly in the bot methods.
+        context_types (:class:`telegram.ext.ContextTypes`, optional): Pass an instance
+            of :class:`telegram.ext.ContextTypes` to customize the types used in the
+            ``context`` interface. If not passed, the defaults documented in
+            :class:`telegram.ext.ContextTypes` will be used.
+
+            .. versionadded:: 13.6
 
     Raises:
         ValueError: If both :attr:`token` and :attr:`bot` are passed or none of them.
@@ -124,7 +143,52 @@ class Updater:
         '__dict__',
     )
 
+    @overload
     def __init__(
+        self: 'Updater[CallbackContext, dict, dict, dict]',
+        token: str = None,
+        base_url: str = None,
+        workers: int = 4,
+        bot: Bot = None,
+        private_key: bytes = None,
+        private_key_password: bytes = None,
+        user_sig_handler: Callable = None,
+        request_kwargs: Dict[str, Any] = None,
+        persistence: 'BasePersistence' = None,  # pylint: disable=E0601
+        defaults: 'Defaults' = None,
+        use_context: bool = True,
+        base_file_url: str = None,
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self: 'Updater[CCT, UD, CD, BD]',
+        token: str = None,
+        base_url: str = None,
+        workers: int = 4,
+        bot: Bot = None,
+        private_key: bytes = None,
+        private_key_password: bytes = None,
+        user_sig_handler: Callable = None,
+        request_kwargs: Dict[str, Any] = None,
+        persistence: 'BasePersistence' = None,
+        defaults: 'Defaults' = None,
+        use_context: bool = True,
+        base_file_url: str = None,
+        context_types: ContextTypes[CCT, UD, CD, BD] = None,
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self: 'Updater[CCT, UD, CD, BD]',
+        user_sig_handler: Callable = None,
+        dispatcher: Dispatcher[CCT, UD, CD, BD] = None,
+    ):
+        ...
+
+    def __init__(  # type: ignore[no-untyped-def,misc]
         self,
         token: str = None,
         base_url: str = None,
@@ -137,8 +201,9 @@ class Updater:
         persistence: 'BasePersistence' = None,
         defaults: 'Defaults' = None,
         use_context: bool = True,
-        dispatcher: Dispatcher = None,
+        dispatcher=None,
         base_file_url: str = None,
+        context_types: ContextTypes[CCT, UD, CD, BD] = None,
     ):
 
         if defaults and bot:
@@ -161,10 +226,12 @@ class Updater:
                 raise ValueError('`dispatcher` and `bot` are mutually exclusive')
             if persistence is not None:
                 raise ValueError('`dispatcher` and `persistence` are mutually exclusive')
-            if workers is not None:
-                raise ValueError('`dispatcher` and `workers` are mutually exclusive')
             if use_context != dispatcher.use_context:
                 raise ValueError('`dispatcher` and `use_context` are mutually exclusive')
+            if context_types is not None:
+                raise ValueError('`dispatcher` and `context_types` are mutually exclusive')
+            if workers is not None:
+                raise ValueError('`dispatcher` and `workers` are mutually exclusive')
 
         self.logger = logging.getLogger(__name__)
         self._request = None
@@ -212,6 +279,7 @@ class Updater:
                 exception_event=self.__exception_event,
                 persistence=persistence,
                 use_context=use_context,
+                context_types=context_types,
             )
             self.job_queue.set_dispatcher(self.dispatcher)
         else:

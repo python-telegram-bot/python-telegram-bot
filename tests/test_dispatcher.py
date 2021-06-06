@@ -32,6 +32,7 @@ from telegram.ext import (
     CallbackContext,
     JobQueue,
     BasePersistence,
+    ContextTypes,
 )
 from telegram.ext.dispatcher import run_async, Dispatcher, DispatcherHandlerStop
 from telegram.utils.deprecate import TelegramDeprecationWarning
@@ -43,6 +44,10 @@ from collections import defaultdict
 @pytest.fixture(scope='function')
 def dp2(bot):
     yield from create_dp(bot)
+
+
+class CustomContext(CallbackContext):
+    pass
 
 
 class TestDispatcher:
@@ -747,6 +752,15 @@ class TestDispatcher:
             def update_conversation(self, name, key, new_state):
                 pass
 
+            def refresh_bot_data(self, bot_data):
+                pass
+
+            def refresh_user_data(self, user_id, user_data):
+                pass
+
+            def refresh_chat_data(self, chat_id, chat_data):
+                pass
+
         def callback(update, context):
             pass
 
@@ -805,6 +819,15 @@ class TestDispatcher:
                 pass
 
             def get_chat_data(self):
+                pass
+
+            def refresh_bot_data(self, bot_data):
+                pass
+
+            def refresh_user_data(self, user_id, user_data):
+                pass
+
+            def refresh_chat_data(self, chat_id, chat_data):
                 pass
 
         def callback(update, context):
@@ -923,3 +946,62 @@ class TestDispatcher:
             assert self.count == expected
         finally:
             dp.bot.defaults = None
+
+    def test_custom_context_init(self, bot):
+        cc = ContextTypes(
+            context=CustomContext,
+            user_data=int,
+            chat_data=float,
+            bot_data=complex,
+        )
+
+        dispatcher = Dispatcher(bot, Queue(), context_types=cc)
+
+        assert isinstance(dispatcher.user_data[1], int)
+        assert isinstance(dispatcher.chat_data[1], float)
+        assert isinstance(dispatcher.bot_data, complex)
+
+    def test_custom_context_error_handler(self, bot):
+        def error_handler(_, context):
+            self.received = (
+                type(context),
+                type(context.user_data),
+                type(context.chat_data),
+                type(context.bot_data),
+            )
+
+        dispatcher = Dispatcher(
+            bot,
+            Queue(),
+            context_types=ContextTypes(
+                context=CustomContext, bot_data=int, user_data=float, chat_data=complex
+            ),
+        )
+        dispatcher.add_error_handler(error_handler)
+        dispatcher.add_handler(MessageHandler(Filters.all, self.callback_raise_error))
+
+        dispatcher.process_update(self.message_update)
+        sleep(0.1)
+        assert self.received == (CustomContext, float, complex, int)
+
+    def test_custom_context_handler_callback(self, bot):
+        def callback(_, context):
+            self.received = (
+                type(context),
+                type(context.user_data),
+                type(context.chat_data),
+                type(context.bot_data),
+            )
+
+        dispatcher = Dispatcher(
+            bot,
+            Queue(),
+            context_types=ContextTypes(
+                context=CustomContext, bot_data=int, user_data=float, chat_data=complex
+            ),
+        )
+        dispatcher.add_handler(MessageHandler(Filters.all, callback))
+
+        dispatcher.process_update(self.message_update)
+        sleep(0.1)
+        assert self.received == (CustomContext, float, complex, int)

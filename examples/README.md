@@ -47,7 +47,10 @@ A basic example of a bot that can accept payments. Don't forget to enable and co
 A basic example on how to set up a custom error handler.
 
 ### [`chatmemberbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/chatmemberbot.py)
-A basic example on how `(my_)chat_member` updates can be used. 
+A basic example on how `(my_)chat_member` updates can be used.
+
+### [`contexttypesbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/contexttypesbot.py)
+This example showcases how `telegram.ext.ContextTypes` can be used to customize the `context` argument of handler and job callbacks.
 
 ## Pure API
 The [`rawapibot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/rawapibot.py) example uses only the pure, "bare-metal" API wrapper.

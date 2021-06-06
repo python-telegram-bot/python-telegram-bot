@@ -31,6 +31,7 @@ excluded = {
     'Days',
     'telegram.deprecate',
     'TelegramDecryptionError',
+    'ContextTypes',
 }  # These modules/classes intentionally don't have __dict__.
 
 
