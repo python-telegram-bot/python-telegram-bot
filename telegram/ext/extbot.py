@@ -101,8 +101,9 @@ class ExtBot(telegram.bot.Bot):
             request=request,
             private_key=private_key,
             private_key_password=private_key_password,
-            defaults=defaults,
         )
+        # We don't pass this to super().__init__ to avoid the deprecation warning
+        self.defaults = defaults
 
         # set up callback_data
         if not isinstance(arbitrary_callback_data, bool):

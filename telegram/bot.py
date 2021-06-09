@@ -192,11 +192,7 @@ class Bot(TelegramObject):
         # Gather default
         self.defaults = defaults
 
-        # We need to be a bit tricky here because
-        # 1. __init__ is called by the subclasses where Defaults is not deprecated
-        # 2. this must work in ptb-raw as well, were we can't import ExtBot
-        mro_names = ', '.join(str(cls) for cls in self.__class__.__mro__)
-        if self.defaults and 'telegram.ext.extbot.ExtBot' not in mro_names:
+        if self.defaults:
             warnings.warn(
                 'Passing Defaults to telegram.Bot is deprecated. Use telegram.ext.ExtBot instead.',
                 TelegramDeprecationWarning,
