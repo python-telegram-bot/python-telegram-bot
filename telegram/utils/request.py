@@ -121,6 +121,7 @@ class Request:
         urllib3_proxy_kwargs: JSONDict = None,
         connect_timeout: float = 5.0,
         read_timeout: float = 5.0,
+        **connection_pool_kw
     ):
         if urllib3_proxy_kwargs is None:
             urllib3_proxy_kwargs = {}
@@ -152,6 +153,7 @@ class Request:
             socket_options=sockopts,
             timeout=urllib3.Timeout(connect=self._connect_timeout, read=read_timeout, total=None),
         )
+        kwargs.update(connection_pool_kw)
 
         # Set a proxy according to the following order:
         # * proxy defined in proxy_url (+ urllib3_proxy_kwargs)
