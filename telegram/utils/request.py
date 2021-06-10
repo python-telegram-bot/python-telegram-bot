@@ -109,7 +109,11 @@ class Request:
             between consecutive read operations for a response from the server. :obj:`None` will
             set an infinite timeout. This value is usually overridden by the various
             :class:`telegram.Bot` methods. Defaults to ``5.0``.
+        connection_pool_kw: Additional keyword arguments to pass to the underlying connection pool.
 
+    .. versionchanged:: (TODO: Which version?)
+
+        Added ``connection_pool_kw`` argument.
     """
 
     __slots__ = ('_connect_timeout', '_con_pool_size', '_con_pool', '__dict__')
