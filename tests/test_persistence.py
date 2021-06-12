@@ -561,14 +561,15 @@ class TestBasePersistence:
 
     def test_bot_replace_insert_bot(self, bot, bot_persistence):
         class CustomSlottedClass:
-            __slots__ = ('bot',)
+            __slots__ = ('bot', '__dict__')
 
             def __init__(self):
                 self.bot = bot
+                self.not_in_dict = bot
 
             def __eq__(self, other):
                 if isinstance(other, CustomSlottedClass):
-                    return self.bot is other.bot
+                    return self.bot is other.bot and self.not_in_dict is other.not_in_dict
                 return False
 
         class CustomClass:
@@ -587,6 +588,7 @@ class TestBasePersistence:
                 cc = CustomClass()
                 cc.bot = BasePersistence.REPLACED_BOT
                 cc.slotted_object.bot = BasePersistence.REPLACED_BOT
+                cc.slotted_object.not_in_dict = BasePersistence.REPLACED_BOT
                 cc.list_ = [1, 2, BasePersistence.REPLACED_BOT]
                 cc.tuple_ = tuple(cc.list_)
                 cc.set_ = set(cc.list_)

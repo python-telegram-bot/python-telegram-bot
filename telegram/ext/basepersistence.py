@@ -280,7 +280,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
             for attr_name, attr in new_obj.__dict__.items():
                 setattr(new_obj, attr_name, cls._replace_bot(attr, memo))
             memo[obj_id] = new_obj
-            return new_obj
+            if not hasattr(obj, '__slots__'):
+                return new_obj
         if hasattr(obj, '__slots__'):
             for attr_name in new_obj.__slots__:
                 setattr(
@@ -368,7 +369,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
             for attr_name, attr in new_obj.__dict__.items():
                 setattr(new_obj, attr_name, self._insert_bot(attr, memo))
             memo[obj_id] = new_obj
-            return new_obj
+            if not hasattr(obj, '__slots__'):
+                return new_obj
         if hasattr(obj, '__slots__'):
             for attr_name in obj.__slots__:
                 setattr(
