@@ -276,12 +276,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
                 new_obj[cls._replace_bot(k, memo)] = cls._replace_bot(val, memo)
             memo[obj_id] = new_obj
             return new_obj
-        if hasattr(obj, '__dict__'):
-            for attr_name, attr in new_obj.__dict__.items():
-                setattr(new_obj, attr_name, cls._replace_bot(attr, memo))
-            memo[obj_id] = new_obj
-            if not hasattr(obj, '__slots__'):
-                return new_obj
+        # if '__dict__' in obj.__slots__, we already cover this here, that's why the
+        # __dict__ case comes below
         if hasattr(obj, '__slots__'):
             for attr_name in new_obj.__slots__:
                 setattr(
@@ -289,6 +285,11 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
                     attr_name,
                     cls._replace_bot(cls._replace_bot(getattr(new_obj, attr_name), memo), memo),
                 )
+            memo[obj_id] = new_obj
+            return new_obj
+        if hasattr(obj, '__dict__'):
+            for attr_name, attr in new_obj.__dict__.items():
+                setattr(new_obj, attr_name, cls._replace_bot(attr, memo))
             memo[obj_id] = new_obj
             return new_obj
 
@@ -365,12 +366,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
                 new_obj[self._insert_bot(k, memo)] = self._insert_bot(val, memo)
             memo[obj_id] = new_obj
             return new_obj
-        if hasattr(obj, '__dict__'):
-            for attr_name, attr in new_obj.__dict__.items():
-                setattr(new_obj, attr_name, self._insert_bot(attr, memo))
-            memo[obj_id] = new_obj
-            if not hasattr(obj, '__slots__'):
-                return new_obj
+        # if '__dict__' in obj.__slots__, we already cover this here, that's why the
+        # __dict__ case comes below
         if hasattr(obj, '__slots__'):
             for attr_name in obj.__slots__:
                 setattr(
@@ -378,6 +375,11 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
                     attr_name,
                     self._insert_bot(self._insert_bot(getattr(new_obj, attr_name), memo), memo),
                 )
+            memo[obj_id] = new_obj
+            return new_obj
+        if hasattr(obj, '__dict__'):
+            for attr_name, attr in new_obj.__dict__.items():
+                setattr(new_obj, attr_name, self._insert_bot(attr, memo))
             memo[obj_id] = new_obj
             return new_obj
 
