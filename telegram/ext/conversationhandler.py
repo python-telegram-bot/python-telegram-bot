@@ -350,11 +350,11 @@ class ConversationHandler(Handler[Update, CCT]):
 
     @property
     def allow_reentry(self) -> bool:
+        """:obj:`bool`: Determines if a user can restart a conversation with an entry point."""
         return self._allow_reentry
 
     @allow_reentry.setter
     def allow_reentry(self, value: object) -> NoReturn:
-        """:obj:`bool`: Determines if a user can restart a conversation with an entry point."""
         raise ValueError('You can not assign a new value to allow_reentry after initialization.')
 
     @property
