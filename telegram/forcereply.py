@@ -44,8 +44,8 @@ class ForceReply(ReplyMarkup):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        force_reply (:obj:`bool`): Shows reply interface to the user, as if they manually selected
-            the bots message and tapped 'Reply'. Defaults to :obj:`True`.
+        force_reply (:obj:`True`): Shows reply interface to the user, as if they manually selected
+            the bots message and tapped 'Reply'.
         selective (:obj:`bool`): Optional. Force reply from specific users only.
 
     """
