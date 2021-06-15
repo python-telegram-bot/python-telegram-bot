@@ -60,7 +60,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
 
             .. versionadded:: 13.6
         single_file (:obj:`bool`, optional): When :obj:`False` will store 5 separate files of
-            `filename_user_data`, `filename_chat_data`, `filename_bot_data`, `filename_chat_data`,
+            `filename_user_data`, `filename_bot_data`, `filename_chat_data`,
             `filename_callback_data` and `filename_conversations`. Default is :obj:`True`.
         on_flush (:obj:`bool`, optional): When :obj:`True` will only save to file when
             :meth:`flush` is called and keep data in memory until that happens. When
@@ -87,7 +87,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
 
             .. versionadded:: 13.6
         single_file (:obj:`bool`): Optional. When :obj:`False` will store 5 separate files of
-            `filename_user_data`, `filename_chat_data`, `filename_bot_data`, `filename_chat_data`,
+            `filename_user_data`, `filename_bot_data`, `filename_chat_data`,
             `filename_callback_data` and `filename_conversations`. Default is :obj:`True`.
         on_flush (:obj:`bool`, optional): When :obj:`True` will only save to file when
             :meth:`flush` is called and keep data in memory until that happens. When
@@ -281,7 +281,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
 
         Returns:
             Optional[:class:`telegram.ext.utils.types.CDCData`]: The restored meta data or
-                :obj:`None`, if no data was stored.
+            :obj:`None`, if no data was stored.
         """
         if self.callback_data:
             pass
@@ -347,7 +347,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         Args:
             user_id (:obj:`int`): The user the data might have been changed for.
             data (:class:`telegram.ext.utils.types.UD`): The
-                :attr:`telegram.ext.dispatcher.user_data` ``[user_id]``.
+                :attr:`telegram.ext.Dispatcher.user_data` ``[user_id]``.
         """
         if self.user_data is None:
             self.user_data = defaultdict(self.context_types.user_data)
@@ -367,7 +367,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         Args:
             chat_id (:obj:`int`): The chat the data might have been changed for.
             data (:class:`telegram.ext.utils.types.CD`): The
-                :attr:`telegram.ext.dispatcher.chat_data` ``[chat_id]``.
+                :attr:`telegram.ext.Dispatcher.chat_data` ``[chat_id]``.
         """
         if self.chat_data is None:
             self.chat_data = defaultdict(self.context_types.chat_data)
@@ -386,7 +386,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
 
         Args:
             data (:class:`telegram.ext.utils.types.BD`): The
-                :attr:`telegram.ext.dispatcher.bot_data`.
+                :attr:`telegram.ext.Dispatcher.bot_data`.
         """
         if self.bot_data == data:
             return
@@ -405,8 +405,8 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         .. versionadded:: 13.6
 
         Args:
-            data (:class:`telegram.ext.utils.types.CDCData`:): The relevant data to restore
-                :attr:`telegram.ext.dispatcher.bot.callback_data`.
+            data (:class:`telegram.ext.utils.types.CDCData`): The relevant data to restore
+                :class:`telegram.ext.CallbackDataCache`.
         """
         if self.callback_data == data:
             return

@@ -418,8 +418,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         .. versionadded:: 13.6
 
         Returns:
-            Optional[:class:`telegram.ext.utils.types.CDCData`]:  The restored meta data or
-                :obj:`None`, if no data was stored.
+            Optional[:class:`telegram.ext.utils.types.CDCData`]: The restored meta data or
+            :obj:`None`, if no data was stored.
         """
         raise NotImplementedError
 
@@ -441,8 +441,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     def update_conversation(
         self, name: str, key: Tuple[int, ...], new_state: Optional[object]
     ) -> None:
-        """Will be called when a :attr:`telegram.ext.ConversationHandler.update_state`
-        is called. This allows the storage of the new state in the persistence.
+        """Will be called when a :class:`telegram.ext.ConversationHandler` changes states.
+        This allows the storage of the new state in the persistence.
 
         Args:
             name (:obj:`str`): The handler's name.
@@ -458,7 +458,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         Args:
             user_id (:obj:`int`): The user the data might have been changed for.
             data (:class:`telegram.ext.utils.types.UD`): The
-                :attr:`telegram.ext.dispatcher.user_data` ``[user_id]``.
+                :attr:`telegram.ext.Dispatcher.user_data` ``[user_id]``.
         """
 
     @abstractmethod
@@ -469,7 +469,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         Args:
             chat_id (:obj:`int`): The chat the data might have been changed for.
             data (:class:`telegram.ext.utils.types.CD`): The
-                :attr:`telegram.ext.dispatcher.chat_data` ``[chat_id]``.
+                :attr:`telegram.ext.Dispatcher.chat_data` ``[chat_id]``.
         """
 
     @abstractmethod
@@ -479,7 +479,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         Args:
             data (:class:`telegram.ext.utils.types.BD`): The
-                :attr:`telegram.ext.dispatcher.bot_data`.
+                :attr:`telegram.ext.Dispatcher.bot_data`.
         """
 
     def refresh_user_data(self, user_id: int, user_data: UD) -> None:
@@ -524,8 +524,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         .. versionadded:: 13.6
 
         Args:
-            data (:class:`telegram.ext.utils.types.CDCData`:): The relevant data to restore
-                :attr:`telegram.ext.dispatcher.bot.callback_data_cache`.
+            data (:class:`telegram.ext.utils.types.CDCData`): The relevant data to restore
+                :class:`telegram.ext.CallbackDataCache`.
         """
         raise NotImplementedError
 
