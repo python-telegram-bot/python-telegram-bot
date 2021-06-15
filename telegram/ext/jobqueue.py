@@ -518,6 +518,9 @@ class Job:
     With the current backend APScheduler, :attr:`job` holds a :class:`apscheduler.job.Job`
     instance.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`id` is equal.
+
     Note:
         * All attributes and instance methods of :attr:`job` are also directly available as
           attributes/methods of the corresponding :class:`telegram.ext.Job` object.
