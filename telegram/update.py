@@ -334,8 +334,8 @@ class Update(TelegramObject):
         :class:`telegram.Message`: The message included in this update, no matter what kind of
             update this is. Will be :obj:`None` for :attr:`inline_query`,
             :attr:`chosen_inline_result`, :attr:`callback_query` from inline messages,
-            :attr:`shipping_query`, :attr:`pre_checkout_query`, :attr:`poll` and
-            :attr:`poll_answer`.
+            :attr:`shipping_query`, :attr:`pre_checkout_query`, :attr:`poll`,
+            :attr:`poll_answer`, :attr:`my_chat_member` and :attr:`chat_member`.
 
         """
         if self._effective_message:
