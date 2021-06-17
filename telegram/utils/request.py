@@ -125,7 +125,7 @@ class Request:
         urllib3_proxy_kwargs: JSONDict = None,
         connect_timeout: float = 5.0,
         read_timeout: float = 5.0,
-        **connection_pool_kw,
+        **connection_pool_kw: Any,
     ):
         if urllib3_proxy_kwargs is None:
             urllib3_proxy_kwargs = {}
