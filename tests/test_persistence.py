@@ -597,7 +597,6 @@ class TestBasePersistence:
                 cc.frozenset_ = frozenset(cc.list_)
                 cc.dict_ = {item: item for item in cc.list_}
                 cc.defaultdict_ = defaultdict(dict, cc.dict_)
-                cc.uuid_ = cc.uuid_
                 return cc
 
             def __eq__(self, other):
@@ -611,7 +610,6 @@ class TestBasePersistence:
                         and self.frozenset_ == other.frozenset_
                         and self.dict_ == other.dict_
                         and self.defaultdict_ == other.defaultdict_
-                        and self.uuid_ == other.uuid_
                     )
                 return False
 
