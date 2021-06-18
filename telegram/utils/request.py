@@ -28,7 +28,7 @@ try:
 except ImportError:
     import json  # type: ignore[no-redef]
 
-from typing import Any, Dict, Optional, Union
+from typing import Any, Union
 
 import certifi
 
@@ -123,7 +123,7 @@ class Request:
         urllib3_proxy_kwargs: JSONDict = None,
         connect_timeout: float = 5.0,
         read_timeout: float = 5.0,
-        connection_pool_kw: Optional[Dict[str, Any]] = None,
+        connection_pool_kw: JSONDict = None,
     ):
         if urllib3_proxy_kwargs is None:
             urllib3_proxy_kwargs = {}
