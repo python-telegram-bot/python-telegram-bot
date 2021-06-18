@@ -395,9 +395,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
                 memo[obj_id] = new_obj
                 return new_obj
         except Exception as e:
-            exception_description = str(e)
             warnings.warn(
-                f'Parsing of an object failed with the following exception: {exception_description}. '
+                f'Parsing of an object failed with the following exception: {e}. '
                 f'See the docs of BasePersistence.insert_bot for more information.',
                 RuntimeWarning,
             )
