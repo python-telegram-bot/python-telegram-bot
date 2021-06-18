@@ -691,7 +691,8 @@ class TestBasePersistence:
         )
 
     def test_bot_replace_insert_bot_unparsable_objects(self, bot, bot_persistence, recwarn):
-        """Here check that objects in __dict__ or __slots__ that can't be parsed are just returned verbatim."""
+        """Here check that objects in __dict__ or __slots__ that can't
+        be parsed are just returned verbatim."""
         persistence = bot_persistence
         persistence.set_bot(bot)
 

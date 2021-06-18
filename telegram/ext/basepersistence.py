@@ -212,8 +212,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         :attr:`REPLACED_BOT`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
         ``frozenset``, ``dict``, ``defaultdict`` and objects that have a ``__dict__`` or
         ``__slots__`` attribute, excluding classes and objects that can't be copied with
-        ``copy.copy``. If the parsing of an object fails, the object will be returned unchanged and the
-        error will be logged.
+        ``copy.copy``. If the parsing of an object fails, the object will be returned unchanged and
+         the error will be logged.
 
         Args:
             obj (:obj:`object`): The object
@@ -285,7 +285,9 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
                     setattr(
                         new_obj,
                         attr_name,
-                        cls._replace_bot(cls._replace_bot(getattr(new_obj, attr_name), memo), memo),
+                        cls._replace_bot(
+                            cls._replace_bot(getattr(new_obj, attr_name), memo), memo
+                        ),
                     )
                 memo[obj_id] = new_obj
                 return new_obj
@@ -294,9 +296,9 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
                     setattr(new_obj, attr_name, cls._replace_bot(attr, memo))
                 memo[obj_id] = new_obj
                 return new_obj
-        except Exception as e:
+        except Exception as exception:
             warnings.warn(
-                f'Parsing of an object failed with the following exception: {e}. '
+                f'Parsing of an object failed with the following exception: {exception}. '
                 f'See the docs of BasePersistence.insert_bot for more information.',
                 RuntimeWarning,
             )
@@ -311,8 +313,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         :attr:`bot`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
         ``frozenset``, ``dict``, ``defaultdict`` and objects that have a ``__dict__`` or
         ``__slots__`` attribute, excluding classes and objects that can't be copied with
-        ``copy.copy``. If the parsing of an object fails, the object will be returned unchanged and the
-        error will be logged.
+        ``copy.copy``. If the parsing of an object fails, the object will be returned unchanged and
+        the error will be logged.
 
         Args:
             obj (:obj:`object`): The object
@@ -385,7 +387,9 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
                     setattr(
                         new_obj,
                         attr_name,
-                        self._insert_bot(self._insert_bot(getattr(new_obj, attr_name), memo), memo),
+                        self._insert_bot(
+                            self._insert_bot(getattr(new_obj, attr_name), memo), memo
+                        ),
                     )
                 memo[obj_id] = new_obj
                 return new_obj
@@ -394,9 +398,9 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
                     setattr(new_obj, attr_name, self._insert_bot(attr, memo))
                 memo[obj_id] = new_obj
                 return new_obj
-        except Exception as e:
+        except Exception as exception:
             warnings.warn(
-                f'Parsing of an object failed with the following exception: {e}. '
+                f'Parsing of an object failed with the following exception: {exception}. '
                 f'See the docs of BasePersistence.insert_bot for more information.',
                 RuntimeWarning,
             )
