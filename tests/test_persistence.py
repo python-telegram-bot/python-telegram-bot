@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import gzip
 import signal
-import uuid
 from threading import Lock
 
 from telegram.ext.callbackdatacache import CallbackDataCache
@@ -583,7 +582,6 @@ class TestBasePersistence:
                 self.frozenset_ = frozenset(self.list_)
                 self.dict_ = {item: item for item in self.list_}
                 self.defaultdict_ = defaultdict(dict, self.dict_)
-                self.uuid_ = uuid.uuid4()
 
             @staticmethod
             def replace_bot():
