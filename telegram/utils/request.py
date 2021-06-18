@@ -28,7 +28,7 @@ try:
 except ImportError:
     import json  # type: ignore[no-redef]
 
-from typing import Any, Union
+from typing import Any, Dict, Optional, Union
 
 import certifi
 
@@ -111,9 +111,7 @@ class Request:
             :class:`telegram.Bot` methods. Defaults to ``5.0``.
         connection_pool_kw: Additional keyword arguments to pass to the underlying connection pool.
 
-    .. versionchanged:: (TODO: Which version?)
-
-        Added ``connection_pool_kw`` argument.
+            .. versionadded:: 13.6.1
     """
 
     __slots__ = ('_connect_timeout', '_con_pool_size', '_con_pool', '__dict__')
@@ -125,10 +123,13 @@ class Request:
         urllib3_proxy_kwargs: JSONDict = None,
         connect_timeout: float = 5.0,
         read_timeout: float = 5.0,
-        **connection_pool_kw: Any,
+        connection_pool_kw: Optional[Dict[str, Any]] = None,
     ):
         if urllib3_proxy_kwargs is None:
             urllib3_proxy_kwargs = {}
+
+        if connection_pool_kw is None:
+            connection_pool_kw = {}
 
         self._connect_timeout = connect_timeout
 
