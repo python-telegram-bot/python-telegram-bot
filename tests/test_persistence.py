@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import gzip
 import signal
+import uuid
 from threading import Lock
 
 from telegram.ext.callbackdatacache import CallbackDataCache
@@ -687,6 +688,36 @@ class TestBasePersistence:
         )
         assert str(recwarn[1].message).startswith(
             "BasePersistence.insert_bot does not handle objects that can not be copied."
+        )
+
+    def test_bot_replace_insert_bot_unparsable_objects(self, bot, bot_persistence, recwarn):
+        """Here check that objects in __dict__ or __slots__ that can't
+        be parsed are just returned verbatim."""
+        persistence = bot_persistence
+        persistence.set_bot(bot)
+
+        uuid_obj = uuid.uuid4()
+
+        persistence.update_bot_data({1: uuid_obj})
+        assert persistence.bot_data[1] is uuid_obj
+        persistence.update_chat_data(123, {1: uuid_obj})
+        assert persistence.chat_data[123][1] is uuid_obj
+        persistence.update_user_data(123, {1: uuid_obj})
+        assert persistence.user_data[123][1] is uuid_obj
+        persistence.update_callback_data(([('1', 2, {0: uuid_obj})], {'1': '2'}))
+        assert persistence.callback_data[0][0][2][0] is uuid_obj
+
+        assert persistence.get_bot_data()[1] is uuid_obj
+        assert persistence.get_chat_data()[123][1] is uuid_obj
+        assert persistence.get_user_data()[123][1] is uuid_obj
+        assert persistence.get_callback_data()[0][0][2][0] is uuid_obj
+
+        assert len(recwarn) == 2
+        assert str(recwarn[0].message).startswith(
+            "Parsing of an object failed with the following exception: "
+        )
+        assert str(recwarn[1].message).startswith(
+            "Parsing of an object failed with the following exception: "
         )
 
     def test_bot_replace_insert_bot_classes(self, bot, bot_persistence, recwarn):
