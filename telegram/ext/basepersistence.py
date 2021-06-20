@@ -299,7 +299,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         except Exception as exception:
             warnings.warn(
                 f'Parsing of an object failed with the following exception: {exception}. '
-                f'See the docs of BasePersistence.insert_bot for more information.',
+                f'See the docs of BasePersistence.replace_bot for more information.',
                 RuntimeWarning,
             )
             memo[obj_id] = obj
