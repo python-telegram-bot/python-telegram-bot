@@ -102,7 +102,7 @@ class TestJobQueue:
         self.received_error = str(error)
 
     def error_handler_context(self, update, context):
-        self.received_error = str(context.error)
+        self.received_error = (str(context.error), context.job)
 
     def error_handler_raise_error(self, *args):
         raise Exception('Failing bigly')
@@ -466,15 +466,24 @@ class TestJobQueue:
         job.run(dp)
         assert self.received_error is None
 
-    def test_dispatch_error_context(self, job_queue, cdp):
+    @pytest.mark.parametrize('repeating', [True, False])
+    def test_dispatch_error_context(self, job_queue, cdp, repeating):
         cdp.add_error_handler(self.error_handler_context)
 
-        job = job_queue.run_once(self.job_with_exception, 0.05)
-        sleep(0.1)
-        assert self.received_error == 'Test Error'
+        if repeating:
+            job = job_queue.run_repeating(self.job_with_exception, 0.1, last=0.5)
+        else:
+            job = job_queue.run_once(self.job_with_exception, 0.1)
+        sleep(0.15)
+
+        assert self.received_error[0] == 'Test Error'
+        # For non-repeating jobs, APS already dropped the jobs before the error is dispatched
+        assert self.received_error[1] == (job if repeating else None)
+
         self.received_error = None
         job.run(cdp)
-        assert self.received_error == 'Test Error'
+        assert self.received_error[0] == 'Test Error'
+        assert self.received_error[1] is job
 
         # Remove handler
         cdp.remove_error_handler(self.error_handler_context)

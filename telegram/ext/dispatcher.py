@@ -55,7 +55,7 @@ from telegram.ext.utils.types import CCT, UD, CD, BD
 
 if TYPE_CHECKING:
     from telegram import Bot
-    from telegram.ext import JobQueue
+    from telegram.ext import JobQueue, Job
 
 DEFAULT_GROUP: int = 0
 
@@ -784,7 +784,11 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         self.error_handlers.pop(callback, None)
 
     def dispatch_error(
-        self, update: Optional[object], error: Exception, promise: Promise = None
+        self,
+        update: Optional[object],
+        error: Exception,
+        promise: Promise = None,
+        job: 'Job' = None,
     ) -> None:
         """Dispatches an error.
 
@@ -793,6 +797,9 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
             error (:obj:`Exception`): The error that was raised.
             promise (:class:`telegram.utils.Promise`, optional): The promise whose pooled function
                 raised the error.
+            job (:class:`telegram.ext.Job`, optional): The job that caused the error.
+
+                .. versionadded:: 13.6.1
 
         """
         async_args = None if not promise else promise.args
@@ -802,7 +809,12 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
             for callback, run_async in self.error_handlers.items():  # pylint: disable=W0621
                 if self.use_context:
                     context = self.context_types.context.from_error(
-                        update, error, self, async_args=async_args, async_kwargs=async_kwargs
+                        update,
+                        error,
+                        self,
+                        async_args=async_args,
+                        async_kwargs=async_kwargs,
+                        job=job,
                     )
                     if run_async:
                         self.run_async(callback, update, context, update=update)

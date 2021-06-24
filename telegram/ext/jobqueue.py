@@ -83,7 +83,9 @@ class JobQueue:
 
     def _dispatch_error(self, event: JobEvent) -> None:
         try:
-            self._dispatcher.dispatch_error(None, event.exception)
+            aps_job = self.scheduler.get_job(event.job_id)
+            job = Job._from_aps_job(aps_job, self) if aps_job else None  # pylint: disable=W0212
+            self._dispatcher.dispatch_error(None, event.exception, job=job)
         # Errors should not stop the thread.
         except Exception:
             self.logger.exception(
@@ -591,7 +593,7 @@ class Job:
                 self.callback(dispatcher.bot, self)  # type: ignore[arg-type,call-arg]
         except Exception as exc:
             try:
-                dispatcher.dispatch_error(None, exc)
+                dispatcher.dispatch_error(None, exc, job=self)
             # Errors should not stop the thread.
             except Exception:
                 dispatcher.logger.exception(
