@@ -32,7 +32,7 @@ from .dispatcher import Dispatcher, DispatcherHandlerStop, run_async
 # try-except is just  here in case the __init__ is called twice (like in the tests)
 # this block is also the reason for the pylint-ignore at the top of the file
 try:
-    del Dispatcher.__slots__  # type: ignore[has-type]
+    del Dispatcher.__slots__
 except AttributeError as exc:
     if str(exc) == '__slots__':
         pass

@@ -21,7 +21,6 @@ from copy import deepcopy
 import pytest
 
 from telegram import (
-    BotCommand,
     Dice,
     BotCommandScope,
     BotCommandScopeDefault,
