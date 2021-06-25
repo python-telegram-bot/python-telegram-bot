@@ -205,6 +205,31 @@ Attributes:
 
         .. versionadded:: 13.5
 
+:class:`telegram.BotCommandScope`:
+
+Attributes:
+    BOT_COMMAND_SCOPE_DEFAULT (:obj:`str`): ``'default'``
+
+        ..versionadded:: 13.7
+    BOT_COMMAND_SCOPE_ALL_PRIVATE_CHATS (:obj:`str`): ``'all_private_chats'``
+
+        ..versionadded:: 13.7
+    BOT_COMMAND_SCOPE_ALL_GROUP_CHATS (:obj:`str`): ``'all_group_chats'``
+
+        ..versionadded:: 13.7
+    BOT_COMMAND_SCOPE_ALL_CHAT_ADMINISTRATORS (:obj:`str`): ``'all_chat_administrators'``
+
+        ..versionadded:: 13.7
+    BOT_COMMAND_SCOPE_CHAT (:obj:`str`): ``'chat'``
+
+        ..versionadded:: 13.7
+    BOT_COMMAND_SCOPE_CHAT_ADMINISTRATORS (:obj:`str`): ``'chat_administrators'``
+
+        ..versionadded:: 13.7
+    BOT_COMMAND_SCOPE_CHAT_MEMBER (:obj:`str`): ``'chat_member'``
+
+        ..versionadded:: 13.7
+
 """
 from typing import List
 
@@ -343,3 +368,11 @@ UPDATE_ALL_TYPES = [
     UPDATE_MY_CHAT_MEMBER,
     UPDATE_CHAT_MEMBER,
 ]
+
+BOT_COMMAND_SCOPE_DEFAULT = 'default'
+BOT_COMMAND_SCOPE_ALL_PRIVATE_CHATS = 'all_private_chats'
+BOT_COMMAND_SCOPE_ALL_GROUP_CHATS = 'all_group_chats'
+BOT_COMMAND_SCOPE_ALL_CHAT_ADMINISTRATORS = 'all_chat_administrators'
+BOT_COMMAND_SCOPE_CHAT = 'chat'
+BOT_COMMAND_SCOPE_CHAT_ADMINISTRATORS = 'chat_administrators'
+BOT_COMMAND_SCOPE_CHAT_MEMBER = 'chat_member'

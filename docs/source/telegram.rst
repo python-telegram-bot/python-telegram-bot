@@ -7,6 +7,14 @@ telegram package
     telegram.audio
     telegram.bot
     telegram.botcommand
+    telegram.botcommandscope
+    telegram.botcommandscopedefault
+    telegram.botcommandscopeallprivatechats
+    telegram.botcommandscopeallgroupchats
+    telegram.botcommandscopeallchatadministrators
+    telegram.botcommandscopechat
+    telegram.botcommandscopechatadministrators
+    telegram.botcommandscopechatmember
     telegram.callbackquery
     telegram.chat
     telegram.chataction

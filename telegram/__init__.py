@@ -153,6 +153,16 @@ from .passport.credentials import (
     FileCredentials,
     TelegramDecryptionError,
 )
+from .botcommandscope import (
+    BotCommandScope,
+    BotCommandScopeDefault,
+    BotCommandScopeAllPrivateChats,
+    BotCommandScopeAllGroupChats,
+    BotCommandScopeAllChatAdministrators,
+    BotCommandScopeChat,
+    BotCommandScopeChatAdministrators,
+    BotCommandScopeChatMember,
+)
 from .bot import Bot
 from .version import __version__, bot_api_version  # noqa: F401
 
@@ -163,6 +173,14 @@ __all__ = (  # Keep this alphabetically ordered
     'Audio',
     'Bot',
     'BotCommand',
+    'BotCommandScope',
+    'BotCommandScopeAllChatAdministrators',
+    'BotCommandScopeAllGroupChats',
+    'BotCommandScopeAllPrivateChats',
+    'BotCommandScopeChat',
+    'BotCommandScopeChatAdministrators',
+    'BotCommandScopeChatMember',
+    'BotCommandScopeDefault',
     'CallbackGame',
     'CallbackQuery',
     'Chat',
