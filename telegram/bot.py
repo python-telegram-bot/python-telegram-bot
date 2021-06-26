@@ -2316,6 +2316,62 @@ class Bot(TelegramObject):
         supergroups and channels, the user will not be able to return to the group on their own
         using invite links, etc., unless unbanned first. The bot must be an administrator in the
         chat for this to work and must have the appropriate admin rights.
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target group or username
+                of the target supergroup or channel (in the format ``@channelusername``).
+            user_id (:obj:`int`): Unique identifier of the target user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            until_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the user will
+                be unbanned, unix time. If user is banned for more than 366 days or less than 30
+                seconds from the current time they are considered to be banned forever. Applied
+                for supergroups and channels only.
+                For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
+                bot will be used.
+            revoke_messages (:obj:`bool`, optional): Pass :obj:`True` to delete all messages from
+                the chat for the user that is being removed. If :obj:`False`, the user will be able
+                to see messages in the group that were sent before the user was removed.
+                Always :obj:`True` for supergroups and channels.
+                .. versionadded:: 13.4
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        warnings.warn(
+            '`bot.kick_chat_member` is deprecated. Use `bot.ban_chat_member` instead.',
+            TelegramDeprecationWarning,
+            stacklevel=2,
+        )
+        return self.ban_chat_member(
+            chat_id=chat_id,
+            user_id=user_id,
+            timeout=timeout,
+            until_date=until_date,
+            api_kwargs=api_kwargs,
+            revoke_messages=revoke_messages,
+        )
+
+    @log
+    def ban_chat_member(
+        self,
+        chat_id: Union[str, int],
+        user_id: Union[str, int],
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        until_date: Union[int, datetime] = None,
+        api_kwargs: JSONDict = None,
+        revoke_messages: bool = None,
+    ) -> bool:
+        """
+        Use this method to ban a user from a group, supergroup or a channel. In the case of
+        supergroups and channels, the user will not be able to return to the group on their own
+        using invite links, etc., unless unbanned first. The bot must be an administrator in the
+        chat for this to work and must have the appropriate admin rights.
+
+         .. versionadded:: 13.7
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target group or username
@@ -2358,7 +2414,7 @@ class Bot(TelegramObject):
         if revoke_messages is not None:
             data['revoke_messages'] = revoke_messages
 
-        result = self._post('kickChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post('banChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -3072,6 +3128,38 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+        Returns:
+            :obj:`int`: Number of members in the chat.
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        warnings.warn(
+            '`bot.get_chat_members_count` is depreciated. '
+            'Use `bot.get_chat_member_count` instead.',
+            TelegramDeprecationWarning,
+            stacklevel=2,
+        )
+        return self.get_chat_member_count(chat_id=chat_id, timeout=timeout, api_kwargs=api_kwargs)
+
+    @log
+    def get_chat_member_count(
+        self,
+        chat_id: Union[str, int],
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> int:
+        """Use this method to get the number of members in a chat.
+
+         .. versionadded:: 13.7
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target supergroup or channel (in the format ``@channelusername``).
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`int`: Number of members in the chat.
@@ -3082,7 +3170,7 @@ class Bot(TelegramObject):
         """
         data: JSONDict = {'chat_id': chat_id}
 
-        result = self._post('getChatMembersCount', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post('getChatMemberCount', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -5210,6 +5298,8 @@ class Bot(TelegramObject):
     """Alias for :meth:`get_user_profile_photos`"""
     getFile = get_file
     """Alias for :meth:`get_file`"""
+    banChatMember = ban_chat_member
+    """Alias for :meth:`ban_chat_member`"""
     kickChatMember = kick_chat_member
     """Alias for :meth:`kick_chat_member`"""
     unbanChatMember = unban_chat_member
@@ -5242,6 +5332,8 @@ class Bot(TelegramObject):
     """Alias for :meth:`set_chat_sticker_set`"""
     deleteChatStickerSet = delete_chat_sticker_set
     """Alias for :meth:`delete_chat_sticker_set`"""
+    getChatMemberCount = get_chat_member_count
+    """Alias for :meth:`get_chat_member_count`"""
     getChatMembersCount = get_chat_members_count
     """Alias for :meth:`get_chat_members_count`"""
     getWebhookInfo = get_webhook_info

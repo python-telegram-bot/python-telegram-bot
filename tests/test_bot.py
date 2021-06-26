@@ -971,7 +971,7 @@ class TestBot:
 
     # TODO: Needs improvement. No feasible way to test until bots can add members.
     @pytest.mark.filterwarnings("ignore:.*custom attributes")
-    def test_kick_chat_member(self, monkeypatch, bot):
+    def test_ban_chat_member(self, monkeypatch, bot):
         def test(url, data, *args, **kwargs):
             chat_id = data['chat_id'] == 2
             user_id = data['user_id'] == 32
@@ -982,13 +982,13 @@ class TestBot:
         monkeypatch.setattr(bot.request, 'post', test)
         until = from_timestamp(1577887200)
 
-        assert bot.kick_chat_member(2, 32)
-        assert bot.kick_chat_member(2, 32, until_date=until)
-        assert bot.kick_chat_member(2, 32, until_date=1577887200)
-        assert bot.kick_chat_member(2, 32, revoke_messages=True)
+        assert bot.ban_chat_member(2, 32)
+        assert bot.ban_chat_member(2, 32, until_date=until)
+        assert bot.ban_chat_member(2, 32, until_date=1577887200)
+        assert bot.ban_chat_member(2, 32, revoke_messages=True)
         monkeypatch.delattr(bot.request, 'post')
 
-    def test_kick_chat_member_default_tz(self, monkeypatch, tz_bot):
+    def test_ban_chat_member_default_tz(self, monkeypatch, tz_bot):
         until = dtm.datetime(2020, 1, 11, 16, 13)
         until_timestamp = to_timestamp(until, tzinfo=tz_bot.defaults.tzinfo)
 
@@ -1000,9 +1000,21 @@ class TestBot:
 
         monkeypatch.setattr(tz_bot.request, 'post', test)
 
-        assert tz_bot.kick_chat_member(2, 32)
-        assert tz_bot.kick_chat_member(2, 32, until_date=until)
-        assert tz_bot.kick_chat_member(2, 32, until_date=until_timestamp)
+        assert tz_bot.ban_chat_member(2, 32)
+        assert tz_bot.ban_chat_member(2, 32, until_date=until)
+        assert tz_bot.ban_chat_member(2, 32, until_date=until_timestamp)
+
+    def test_kick_chat_member_warning(self, monkeypatch, bot, recwarn):
+        def test(url, data, *args, **kwargs):
+            chat_id = data['chat_id'] == 2
+            user_id = data['user_id'] == 32
+            return chat_id and user_id
+
+        monkeypatch.setattr(bot.request, 'post', test)
+        bot.kick_chat_member(2, 32)
+        assert len(recwarn) == 1
+        assert '`bot.kick_chat_member` is deprecated' in str(recwarn[0].message)
+        monkeypatch.delattr(bot.request, 'post')
 
     # TODO: Needs improvement.
     @pytest.mark.parametrize('only_if_banned', [True, False, None])
@@ -1340,10 +1352,15 @@ class TestBot:
             assert a.status in ('administrator', 'creator')
 
     @flaky(3, 1)
-    def test_get_chat_members_count(self, bot, channel_id):
-        count = bot.get_chat_members_count(channel_id)
+    def test_get_chat_member_count(self, bot, channel_id):
+        count = bot.get_chat_member_count(channel_id)
         assert isinstance(count, int)
         assert count > 3
+
+    def test_get_chat_members_count_warning(self, bot, channel_id, recwarn):
+        bot.get_chat_members_count(channel_id)
+        assert len(recwarn) == 1
+        assert '`bot.get_chat_members_count` is depreciated' in str(recwarn[0].message)
 
     @flaky(3, 1)
     def test_get_chat_member(self, bot, channel_id, chat_id):
