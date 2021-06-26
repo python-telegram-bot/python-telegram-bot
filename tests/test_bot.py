@@ -1363,6 +1363,11 @@ class TestBot:
         assert len(recwarn) == 1
         assert '`bot.get_chat_members_count` is depreciated' in str(recwarn[0].message)
 
+    def test_bot_command_property_warning(self, bot, recwarn):
+        _ = bot.commands
+        assert len(recwarn) == 1
+        assert 'Bot.commands has been deprecated since there can' in str(recwarn[0].message)
+
     @flaky(3, 1)
     def test_get_chat_member(self, bot, channel_id, chat_id):
         chat_member = bot.get_chat_member(channel_id, chat_id)
@@ -1984,6 +1989,9 @@ class TestBot:
         assert len(gotten_private_cmd) == len(private_cmds)
         assert gotten_private_cmd[0].command == private_cmds[0].command
 
+        assert len(bot.commands) == 2  # set from previous test. Makes sure this hasn't changed.
+        assert bot.commands[0].command == 'cmd1'
+
         # Delete command list from that supergroup and private chat-
         bot.delete_my_commands(private_scope)
         bot.delete_my_commands(group_scope, 'en')
@@ -1994,6 +2002,9 @@ class TestBot:
 
         assert len(deleted_grp_cmds) == 0 == len(group_cmds) - 1
         assert len(deleted_priv_cmds) == 0 == len(private_cmds) - 1
+
+        bot.delete_my_commands()  # Delete commands from default scope
+        assert not bot.commands  # Check if this has been updated to reflect the deletion.
 
     def test_log_out(self, monkeypatch, bot):
         # We don't actually make a request as to not break the test setup

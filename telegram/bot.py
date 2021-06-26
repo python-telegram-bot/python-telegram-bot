@@ -401,7 +401,20 @@ class Bot(TelegramObject):
 
     @property
     def commands(self) -> List[BotCommand]:
-        """List[:class:`BotCommand`]: Bot's commands."""
+        """
+        List[:class:`BotCommand`]: Bot's commands as available in the default scope.
+
+        .. deprecated:: 13.7
+            This property has been deprecated since there can be different commands available for
+            different scopes.
+        """
+        warnings.warn(
+            "Bot.commands has been deprecated since there can be different command "
+            "lists for different scopes.",
+            TelegramDeprecationWarning,
+            stacklevel=2,
+        )
+
         if self._commands is None:
             self._commands = self.get_my_commands()
         return self._commands
@@ -5096,9 +5109,11 @@ class Bot(TelegramObject):
 
         result = self._post('getMyCommands', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        self._commands = BotCommand.de_list(result, self)  # type: ignore[assignment,arg-type]
+        if (scope is None or scope.type == 'default') and language_code is None:
+            self._commands = BotCommand.de_list(result, self)  # type: ignore[assignment,arg-type]
+            return self._commands  # type: ignore[return-value]
 
-        return self._commands  # type: ignore[return-value]
+        return BotCommand.de_list(result, self)  # type: ignore[return-value,arg-type]
 
     @log
     def set_my_commands(
@@ -5152,9 +5167,10 @@ class Bot(TelegramObject):
 
         result = self._post('setMyCommands', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        # Set commands. No need to check for outcome.
+        # Set commands only for default scope. No need to check for outcome.
         # If request failed, we won't come this far
-        self._commands = cmds
+        if (scope is None or scope.type == 'default') and language_code is None:
+            self._commands = cmds
 
         return result  # type: ignore[return-value]
 
@@ -5202,6 +5218,9 @@ class Bot(TelegramObject):
             data['language_code'] = language_code
 
         result = self._post('deleteMyCommands', data, timeout=timeout, api_kwargs=api_kwargs)
+
+        if (scope is None or scope.type == 'default') and language_code is None:
+            self._commands = []
 
         return result  # type: ignore[return-value]
 
