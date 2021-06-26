@@ -29,6 +29,7 @@ def reply_keyboard_markup():
         resize_keyboard=TestReplyKeyboardMarkup.resize_keyboard,
         one_time_keyboard=TestReplyKeyboardMarkup.one_time_keyboard,
         selective=TestReplyKeyboardMarkup.selective,
+        input_field_placeholder=TestReplyKeyboardMarkup.input_field_placeholder,
     )
 
 
@@ -37,6 +38,7 @@ class TestReplyKeyboardMarkup:
     resize_keyboard = True
     one_time_keyboard = True
     selective = True
+    input_field_placeholder = 'lol a keyboard'
 
     def test_slot_behaviour(self, reply_keyboard_markup, mro_slots, recwarn):
         inst = reply_keyboard_markup
@@ -101,6 +103,7 @@ class TestReplyKeyboardMarkup:
         assert reply_keyboard_markup.resize_keyboard == self.resize_keyboard
         assert reply_keyboard_markup.one_time_keyboard == self.one_time_keyboard
         assert reply_keyboard_markup.selective == self.selective
+        assert reply_keyboard_markup.input_field_placeholder == self.input_field_placeholder
 
     def test_to_dict(self, reply_keyboard_markup):
         reply_keyboard_markup_dict = reply_keyboard_markup.to_dict()
@@ -122,6 +125,10 @@ class TestReplyKeyboardMarkup:
             == reply_keyboard_markup.one_time_keyboard
         )
         assert reply_keyboard_markup_dict['selective'] == reply_keyboard_markup.selective
+        assert (
+            reply_keyboard_markup_dict['input_field_placeholder']
+            == reply_keyboard_markup.input_field_placeholder
+        )
 
     def test_equality(self):
         a = ReplyKeyboardMarkup.from_column(['button1', 'button2', 'button3'])
