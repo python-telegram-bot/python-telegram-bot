@@ -65,8 +65,8 @@ class TestForceReply:
         assert force_reply_dict['input_field_placeholder'] == force_reply.input_field_placeholder
 
     def test_equality(self):
-        a = ForceReply(True, False, 'i will not go away')
-        b = ForceReply(False, False, 'i will not go away')
+        a = ForceReply(True, False)
+        b = ForceReply(False, False)
         c = ForceReply(True, True)
         d = ReplyKeyboardRemove()
 

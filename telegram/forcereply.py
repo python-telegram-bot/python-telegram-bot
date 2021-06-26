@@ -31,7 +31,7 @@ class ForceReply(ReplyMarkup):
     to sacrifice privacy mode.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`selective`, and :attr:`input_field_placeholder` are equal.
+    considered equal, if their :attr:`selective` is equal.
 
     Args:
         selective (:obj:`bool`, optional): Use this parameter if you want to force reply from
@@ -39,8 +39,8 @@ class ForceReply(ReplyMarkup):
 
             1) Users that are @mentioned in the :attr:`~telegram.Message.text` of the
                :class:`telegram.Message` object.
-            2) If the bot's message is a reply (has reply_to_message_id), sender of the original
-               message.
+            2) If the bot's message is a reply (has ``reply_to_message_id``), sender of the
+               original message.
 
         input_field_placeholder (:obj:`str`, optional): The placeholder to be shown in the input
             field when the reply is active; 1-64 characters.
@@ -75,4 +75,4 @@ class ForceReply(ReplyMarkup):
         self.selective = bool(selective)
         self.input_field_placeholder = input_field_placeholder
 
-        self._id_attrs = (self.selective, self.input_field_placeholder)
+        self._id_attrs = (self.selective,)

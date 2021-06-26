@@ -50,8 +50,8 @@ class ReplyKeyboardMarkup(ReplyMarkup):
 
             1) Users that are @mentioned in the :attr:`~telegram.Message.text` of the
                :class:`telegram.Message` object.
-            2) If the bot's message is a reply (has reply_to_message_id), sender of the original
-               message.
+            2) If the bot's message is a reply (has ``reply_to_message_id``), sender of the
+               original message.
 
             Defaults to :obj:`False`.
 
@@ -153,7 +153,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
                 to specific users only. Targets:
 
                 1) Users that are @mentioned in the text of the Message object.
-                2) If the bot's message is a reply (has reply_to_message_id), sender of the
+                2) If the bot's message is a reply (has ``reply_to_message_id``), sender of the
                    original message.
 
                 Defaults to :obj:`False`.
@@ -205,7 +205,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
                 to specific users only. Targets:
 
                 1) Users that are @mentioned in the text of the Message object.
-                2) If the bot's message is a reply (has reply_to_message_id), sender of the
+                2) If the bot's message is a reply (has ``reply_to_message_id``), sender of the
                    original message.
 
                 Defaults to :obj:`False`.
@@ -258,7 +258,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
                 to specific users only. Targets:
 
                 1) Users that are @mentioned in the text of the Message object.
-                2) If the bot's message is a reply (has reply_to_message_id), sender of the
+                2) If the bot's message is a reply (has ``reply_to_message_id``), sender of the
                    original message.
 
                 Defaults to :obj:`False`.
