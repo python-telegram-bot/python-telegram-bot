@@ -80,7 +80,7 @@ class BotCommandScope(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['BotCommandScope']:
-        """Converts JSON data to a the appropriate :class:`BotCommandScope` object, i.e. takes
+        """Converts JSON data to the appropriate :class:`BotCommandScope` object, i.e. takes
         care of selecting the correct subclass.
 
         Args:
