@@ -504,8 +504,13 @@ class TestUpdater:
         updater.start_webhook(ip, port, clean=True, force_event_loop=False)
         updater.stop()
 
-        for warning in recwarn.list:
-            print(warning.message)
+        for warning in recwarn:
+            print(warning)
+
+        try:  # This is for flaky tests (there's an unclosed socket sometimes)
+            recwarn.pop(ResourceWarning)  # internally iterates through recwarn.list and deletes it
+        except AssertionError:
+            pass
 
         assert len(recwarn) == 3
         assert str(recwarn[0].message).startswith('Old Handler API')
@@ -523,6 +528,12 @@ class TestUpdater:
         updater.stop()
         for msg in recwarn:
             print(msg)
+
+        try:  # This is for flaky tests (there's an unclosed socket sometimes)
+            recwarn.pop(ResourceWarning)  # internally iterates through recwarn.list and deletes it
+        except AssertionError:
+            pass
+
         assert len(recwarn) == 2
         assert str(recwarn[0].message).startswith('Old Handler API')
         assert str(recwarn[1].message).startswith('The argument `clean` of')
@@ -621,10 +632,17 @@ class TestUpdater:
 
         # There is a chance of a conflict when getting updates since there can be many tests
         # (bots) running simultaneously while testing in github actions.
-        for idx, log in enumerate(caplog.records):
-            if log.getMessage().startswith('Error while getting Updates: Conflict'):
+        records = caplog.records.copy()  # To avoid iterating and removing at same time
+        for idx, log in enumerate(records):
+            print(log)
+            msg = log.getMessage()
+            if msg.startswith('Error while getting Updates: Conflict'):
                 caplog.records.pop(idx)  # For stability
-                assert len(caplog.records) == 2, caplog.records
+
+            if msg.startswith('No error handlers are registered'):
+                caplog.records.pop(idx)
+
+        assert len(caplog.records) == 2, caplog.records
 
         rec = caplog.records[-2]
         assert rec.getMessage().startswith(f'Received signal {signal.SIGTERM}')

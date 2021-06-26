@@ -717,7 +717,6 @@ class TestBot:
             bot.send_chat_action(chat_id, 'unknown action')
 
     # TODO: Needs improvement. We need incoming inline query to test answer.
-    @pytest.mark.filterwarnings("ignore:.*custom attributes")
     def test_answer_inline_query(self, monkeypatch, bot):
         # For now just test that our internals pass the correct data
         def test(url, data, *args, **kwargs):
@@ -970,7 +969,6 @@ class TestBot:
         monkeypatch.delattr(bot, '_post')
 
     # TODO: Needs improvement. No feasible way to test until bots can add members.
-    @pytest.mark.filterwarnings("ignore:.*custom attributes")
     def test_kick_chat_member(self, monkeypatch, bot):
         def test(url, data, *args, **kwargs):
             chat_id = data['chat_id'] == 2
