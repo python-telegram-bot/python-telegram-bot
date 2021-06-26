@@ -42,4 +42,5 @@ def set_new_attribute_deprecated(self: object, key: str, value: object) -> None:
         warnings.warn(
             "Setting custom attributes on objects of the PTB library is deprecated.",
             TelegramDeprecationWarning,
+            stacklevel=2,
         )
