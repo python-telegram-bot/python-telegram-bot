@@ -5109,7 +5109,7 @@ class Bot(TelegramObject):
 
         result = self._post('getMyCommands', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        if (scope is None or scope.type == 'default') and language_code is None:
+        if (scope is None or scope.type == scope.DEFAULT) and language_code is None:
             self._commands = BotCommand.de_list(result, self)  # type: ignore[assignment,arg-type]
             return self._commands  # type: ignore[return-value]
 
@@ -5169,7 +5169,7 @@ class Bot(TelegramObject):
 
         # Set commands only for default scope. No need to check for outcome.
         # If request failed, we won't come this far
-        if (scope is None or scope.type == 'default') and language_code is None:
+        if (scope is None or scope.type == scope.DEFAULT) and language_code is None:
             self._commands = cmds
 
         return result  # type: ignore[return-value]
@@ -5219,7 +5219,7 @@ class Bot(TelegramObject):
 
         result = self._post('deleteMyCommands', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        if (scope is None or scope.type == 'default') and language_code is None:
+        if (scope is None or scope.type == scope.DEFAULT) and language_code is None:
             self._commands = []
 
         return result  # type: ignore[return-value]
