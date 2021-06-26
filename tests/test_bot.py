@@ -51,6 +51,7 @@ from telegram import (
     Chat,
     InlineQueryResultVoice,
     PollOption,
+    BotCommandScopeChat,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.ext import ExtBot, Defaults
@@ -1961,6 +1962,38 @@ class TestBot:
             assert bc[0].description == 'descr1'
             assert bc[1].command == 'cmd2'
             assert bc[1].description == 'descr2'
+
+    @flaky(3, 1)
+    def test_get_set_delete_my_commands_with_scope(self, bot, super_group_id, chat_id):
+        group_cmds = [BotCommand('group_cmd', 'visible to this supergroup only')]
+        private_cmds = [BotCommand('private_cmd', 'visible to this private chat only')]
+        group_scope = BotCommandScopeChat(super_group_id)
+        private_scope = BotCommandScopeChat(chat_id)
+
+        # Set supergroup command list with lang code and check if the same can be returned from api
+        bot.set_my_commands(group_cmds, scope=group_scope, language_code='en')
+        gotten_group_cmds = bot.get_my_commands(scope=group_scope, language_code='en')
+
+        assert len(gotten_group_cmds) == len(group_cmds)
+        assert gotten_group_cmds[0].command == group_cmds[0].command
+
+        # Set private command list and check if same can be returned from the api
+        bot.set_my_commands(private_cmds, scope=private_scope)
+        gotten_private_cmd = bot.get_my_commands(scope=private_scope)
+
+        assert len(gotten_private_cmd) == len(private_cmds)
+        assert gotten_private_cmd[0].command == private_cmds[0].command
+
+        # Delete command list from that supergroup and private chat-
+        bot.delete_my_commands(private_scope)
+        bot.delete_my_commands(group_scope, 'en')
+
+        # Check if its been deleted-
+        deleted_priv_cmds = bot.get_my_commands(scope=private_scope)
+        deleted_grp_cmds = bot.get_my_commands(scope=group_scope, language_code='en')
+
+        assert len(deleted_grp_cmds) == 0 == len(group_cmds) - 1
+        assert len(deleted_priv_cmds) == 0 == len(private_cmds) - 1
 
     def test_log_out(self, monkeypatch, bot):
         # We don't actually make a request as to not break the test setup
