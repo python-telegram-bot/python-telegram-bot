@@ -2326,37 +2326,9 @@ class Bot(TelegramObject):
         revoke_messages: bool = None,
     ) -> bool:
         """
-        Use this method to kick a user from a group, supergroup or a channel. In the case of
-        supergroups and channels, the user will not be able to return to the group on their own
-        using invite links, etc., unless unbanned first. The bot must be an administrator in the
-        chat for this to work and must have the appropriate admin rights.
+        Deprecated, use :func:`~telegram.Bot.ban_chat_member` instead.
 
-        Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target group or username
-                of the target supergroup or channel (in the format ``@channelusername``).
-            user_id (:obj:`int`): Unique identifier of the target user.
-            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
-                the read timeout from the server (instead of the one specified during creation of
-                the connection pool).
-            until_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the user will
-                be unbanned, unix time. If user is banned for more than 366 days or less than 30
-                seconds from the current time they are considered to be banned forever. Applied
-                for supergroups and channels only.
-                For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
-                bot will be used.
-            revoke_messages (:obj:`bool`, optional): Pass :obj:`True` to delete all messages from
-                the chat for the user that is being removed. If :obj:`False`, the user will be able
-                to see messages in the group that were sent before the user was removed.
-                Always :obj:`True` for supergroups and channels.
-                .. versionadded:: 13.4
-            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
-                Telegram API.
-
-        Returns:
-            :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
+        .. deprecated:: 13.7
 
         """
         warnings.warn(
@@ -3136,23 +3108,13 @@ class Bot(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> int:
-        """Use this method to get the number of members in a chat.
+        """
+        Deprecated, use :func:`~telegram.Bot.get_chat_member_count` instead.
 
-        Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target supergroup or channel (in the format ``@channelusername``).
-            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
-                the read timeout from the server (instead of the one specified during creation of
-                the connection pool).
-            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
-                Telegram API.
-        Returns:
-            :obj:`int`: Number of members in the chat.
-        Raises:
-            :class:`telegram.error.TelegramError`
+        .. deprecated:: 13.7
         """
         warnings.warn(
-            '`bot.get_chat_members_count` is depreciated. '
+            '`bot.get_chat_members_count` is deprecated. '
             'Use `bot.get_chat_member_count` instead.',
             TelegramDeprecationWarning,
             stacklevel=2,

@@ -1361,7 +1361,7 @@ class TestBot:
     def test_get_chat_members_count_warning(self, bot, channel_id, recwarn):
         bot.get_chat_members_count(channel_id)
         assert len(recwarn) == 1
-        assert '`bot.get_chat_members_count` is depreciated' in str(recwarn[0].message)
+        assert '`bot.get_chat_members_count` is deprecated' in str(recwarn[0].message)
 
     def test_bot_command_property_warning(self, bot, recwarn):
         _ = bot.commands
