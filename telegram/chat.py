@@ -162,7 +162,6 @@ class Chat(TelegramObject):
         'title',
         'photo',
         'linked_chat_id',
-        'all_members_are_administrators',
         'message_auto_delete_time',
         '_id_attrs',
     )
@@ -212,8 +211,6 @@ class Chat(TelegramObject):
         self.username = username
         self.first_name = first_name
         self.last_name = last_name
-        # TODO: Remove (also from tests), when Telegram drops this completely
-        self.all_members_are_administrators = _kwargs.get('all_members_are_administrators')
         self.photo = photo
         self.bio = bio
         self.description = description

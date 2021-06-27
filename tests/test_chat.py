@@ -31,7 +31,6 @@ def chat(bot):
         TestChat.title,
         TestChat.type_,
         username=TestChat.username,
-        all_members_are_administrators=TestChat.all_members_are_administrators,
         bot=bot,
         sticker_set_name=TestChat.sticker_set_name,
         can_set_sticker_set=TestChat.can_set_sticker_set,
@@ -49,7 +48,6 @@ class TestChat:
     title = 'ToledosPalaceBot - Group'
     type_ = 'group'
     username = 'username'
-    all_members_are_administrators = False
     sticker_set_name = 'stickers'
     can_set_sticker_set = False
     permissions = ChatPermissions(
@@ -77,7 +75,6 @@ class TestChat:
             'title': self.title,
             'type': self.type_,
             'username': self.username,
-            'all_members_are_administrators': self.all_members_are_administrators,
             'sticker_set_name': self.sticker_set_name,
             'can_set_sticker_set': self.can_set_sticker_set,
             'permissions': self.permissions.to_dict(),
@@ -93,7 +90,6 @@ class TestChat:
         assert chat.title == self.title
         assert chat.type == self.type_
         assert chat.username == self.username
-        assert chat.all_members_are_administrators == self.all_members_are_administrators
         assert chat.sticker_set_name == self.sticker_set_name
         assert chat.can_set_sticker_set == self.can_set_sticker_set
         assert chat.permissions == self.permissions
@@ -112,7 +108,6 @@ class TestChat:
         assert chat_dict['title'] == chat.title
         assert chat_dict['type'] == chat.type
         assert chat_dict['username'] == chat.username
-        assert chat_dict['all_members_are_administrators'] == chat.all_members_are_administrators
         assert chat_dict['permissions'] == chat.permissions.to_dict()
         assert chat_dict['slow_mode_delay'] == chat.slow_mode_delay
         assert chat_dict['message_auto_delete_time'] == chat.message_auto_delete_time
