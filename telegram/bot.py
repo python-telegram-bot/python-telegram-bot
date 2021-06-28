@@ -5087,7 +5087,9 @@ class Bot(TelegramObject):
         language_code: str = None,
     ) -> bool:
         """
-        Use this method to change the list of the bot's commands.
+        Use this method to change the list of the bot's commands. See the
+        `Telegram docs <https://core.telegram.org/bots#commands>`_ for more details about bot
+        commands.
 
         Args:
             commands (List[:class:`BotCommand` | (:obj:`str`, :obj:`str`)]): A JSON-serialized list
