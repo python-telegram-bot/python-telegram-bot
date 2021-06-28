@@ -104,7 +104,6 @@ class TestAnimation:
         assert message.animation.thumb.height == self.height
 
     @flaky(3, 1)
-    @pytest.mark.filterwarnings("ignore:.*custom attributes")
     def test_send_animation_custom_filename(self, bot, chat_id, animation_file, monkeypatch):
         def make_assertion(url, data, **kwargs):
             return data['animation'].filename == 'custom_filename'
