@@ -21,6 +21,12 @@ telegram package
     telegram.chatinvitelink
     telegram.chatlocation
     telegram.chatmember
+    telegram.chatmemberowner
+    telegram.chatmemberadministrator
+    telegram.chatmembermember
+    telegram.chatmemberrestricted
+    telegram.chatmemberleft
+    telegram.chatmemberbanned
     telegram.chatmemberupdated
     telegram.chatpermissions
     telegram.chatphoto

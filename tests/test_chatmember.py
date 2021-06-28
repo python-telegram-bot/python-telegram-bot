@@ -16,12 +16,21 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import datetime
+from copy import deepcopy
 
 import pytest
 
-from telegram import User, ChatMember
-from telegram.utils.helpers import to_timestamp
+from telegram import (
+    User,
+    ChatMember,
+    ChatMemberOwner,
+    ChatMemberAdministrator,
+    ChatMemberMember,
+    ChatMemberRestricted,
+    ChatMemberLeft,
+    ChatMemberBanned,
+    Dice,
+)
 
 
 @pytest.fixture(scope='class')
@@ -29,99 +38,92 @@ def user():
     return User(1, 'First name', False)
 
 
+@pytest.fixture(
+    scope="class",
+    params=[
+        (ChatMemberOwner, ChatMember.CREATOR),
+        (ChatMemberAdministrator, ChatMember.ADMINISTRATOR),
+        (ChatMemberMember, ChatMember.MEMBER),
+        (ChatMemberRestricted, ChatMember.RESTRICTED),
+        (ChatMemberLeft, ChatMember.LEFT),
+        (ChatMemberBanned, ChatMember.KICKED),
+    ],
+    ids=[
+        ChatMember.CREATOR,
+        ChatMember.ADMINISTRATOR,
+        ChatMember.MEMBER,
+        ChatMember.RESTRICTED,
+        ChatMember.LEFT,
+        ChatMember.KICKED,
+    ],
+)
+def chatmember_class_and_status(request):
+    return request.param
+
+
 @pytest.fixture(scope='class')
-def chat_member(user):
-    return ChatMember(user, TestChatMember.status)
+def chatmember_types(chatmember_class_and_status, user):
+    return chatmember_class_and_status[0](status=chatmember_class_and_status[1], user=user)
 
 
 class TestChatMember:
-    status = ChatMember.CREATOR
+    def test_slot_behaviour(self, chatmember_types, mro_slots):
+        for attr in chatmember_types.__slots__:
+            assert getattr(chatmember_types, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert len(mro_slots(chatmember_types)) == len(
+            set(mro_slots(chatmember_types))
+        ), "duplicate slot"
+        with pytest.raises(AttributeError):
+            chatmember_types.custom
 
-    def test_slot_behaviour(self, chat_member, recwarn, mro_slots):
-        for attr in chat_member.__slots__:
-            assert getattr(chat_member, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not chat_member.__dict__, f"got missing slot(s): {chat_member.__dict__}"
-        assert len(mro_slots(chat_member)) == len(set(mro_slots(chat_member))), "duplicate slot"
-        chat_member.custom, chat_member.status = 'should give warning', self.status
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+    def test_de_json(self, bot, chatmember_class_and_status, user):
+        cls = chatmember_class_and_status[0]
+        status = chatmember_class_and_status[1]
 
-    def test_de_json_required_args(self, bot, user):
-        json_dict = {'user': user.to_dict(), 'status': self.status}
+        assert cls.de_json({}, bot) is None
 
-        chat_member = ChatMember.de_json(json_dict, bot)
+        json_dict = {'status': status, 'user': user.to_dict()}
+        chatmember_type = ChatMember.de_json(json_dict, bot)
 
-        assert chat_member.user == user
-        assert chat_member.status == self.status
+        assert isinstance(chatmember_type, ChatMember)
+        assert isinstance(chatmember_type, cls)
+        assert chatmember_type.status == status
 
-    def test_de_json_all_args(self, bot, user):
-        time = datetime.datetime.utcnow()
-        custom_title = 'custom_title'
+    def test_de_json_invalid_status(self, bot, user):
+        json_dict = {'status': 'invalid', 'user': user.to_dict()}
+        chatmember_type = ChatMember.de_json(json_dict, bot)
 
-        json_dict = {
-            'user': user.to_dict(),
-            'status': self.status,
-            'custom_title': custom_title,
-            'is_anonymous': True,
-            'until_date': to_timestamp(time),
-            'can_be_edited': False,
-            'can_change_info': True,
-            'can_post_messages': False,
-            'can_edit_messages': True,
-            'can_delete_messages': True,
-            'can_invite_users': False,
-            'can_restrict_members': True,
-            'can_pin_messages': False,
-            'can_promote_members': True,
-            'can_send_messages': False,
-            'can_send_media_messages': True,
-            'can_send_polls': False,
-            'can_send_other_messages': True,
-            'can_add_web_page_previews': False,
-            'can_manage_chat': True,
-            'can_manage_voice_chats': True,
-        }
+        assert type(chatmember_type) is ChatMember
+        assert chatmember_type.status == 'invalid'
 
-        chat_member = ChatMember.de_json(json_dict, bot)
+    def test_to_dict(self, chatmember_types, user):
+        chatmember_dict = chatmember_types.to_dict()
 
-        assert chat_member.user == user
-        assert chat_member.status == self.status
-        assert chat_member.custom_title == custom_title
-        assert chat_member.is_anonymous is True
-        assert chat_member.can_be_edited is False
-        assert chat_member.can_change_info is True
-        assert chat_member.can_post_messages is False
-        assert chat_member.can_edit_messages is True
-        assert chat_member.can_delete_messages is True
-        assert chat_member.can_invite_users is False
-        assert chat_member.can_restrict_members is True
-        assert chat_member.can_pin_messages is False
-        assert chat_member.can_promote_members is True
-        assert chat_member.can_send_messages is False
-        assert chat_member.can_send_media_messages is True
-        assert chat_member.can_send_polls is False
-        assert chat_member.can_send_other_messages is True
-        assert chat_member.can_add_web_page_previews is False
-        assert chat_member.can_manage_chat is True
-        assert chat_member.can_manage_voice_chats is True
+        assert isinstance(chatmember_dict, dict)
+        assert chatmember_dict['status'] == chatmember_types.status
+        assert chatmember_dict['user'] == user.to_dict()
 
-    def test_to_dict(self, chat_member):
-        chat_member_dict = chat_member.to_dict()
-        assert isinstance(chat_member_dict, dict)
-        assert chat_member_dict['user'] == chat_member.user.to_dict()
-        assert chat_member['status'] == chat_member.status
-
-    def test_equality(self):
-        a = ChatMember(User(1, '', False), ChatMember.ADMINISTRATOR)
-        b = ChatMember(User(1, '', False), ChatMember.ADMINISTRATOR)
-        d = ChatMember(User(2, '', False), ChatMember.ADMINISTRATOR)
-        d2 = ChatMember(User(1, '', False), ChatMember.CREATOR)
+    def test_equality(self, chatmember_types, user):
+        a = ChatMember(status='status', user=user)
+        b = ChatMember(status='status', user=user)
+        c = chatmember_types
+        d = deepcopy(chatmember_types)
+        e = Dice(4, 'emoji')
 
         assert a == b
         assert hash(a) == hash(b)
-        assert a is not b
+
+        assert a != c
+        assert hash(a) != hash(c)
 
         assert a != d
         assert hash(a) != hash(d)
 
-        assert a != d2
-        assert hash(a) != hash(d2)
+        assert a != e
+        assert hash(a) != hash(e)
+
+        assert c == d
+        assert hash(c) == hash(d)
+
+        assert c != e
+        assert hash(c) != hash(e)

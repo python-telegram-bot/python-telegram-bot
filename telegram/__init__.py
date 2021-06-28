@@ -25,7 +25,15 @@ from .files.chatphoto import ChatPhoto
 from .chat import Chat
 from .chatlocation import ChatLocation
 from .chatinvitelink import ChatInviteLink
-from .chatmember import ChatMember
+from .chatmember import (
+    ChatMember,
+    ChatMemberOwner,
+    ChatMemberAdministrator,
+    ChatMemberMember,
+    ChatMemberRestricted,
+    ChatMemberLeft,
+    ChatMemberBanned,
+)
 from .chatmemberupdated import ChatMemberUpdated
 from .chatpermissions import ChatPermissions
 from .files.photosize import PhotoSize
@@ -188,6 +196,12 @@ __all__ = (  # Keep this alphabetically ordered
     'ChatInviteLink',
     'ChatLocation',
     'ChatMember',
+    'ChatMemberOwner',
+    'ChatMemberAdministrator',
+    'ChatMemberMember',
+    'ChatMemberRestricted',
+    'ChatMemberLeft',
+    'ChatMemberBanned',
     'ChatMemberUpdated',
     'ChatPermissions',
     'ChatPhoto',

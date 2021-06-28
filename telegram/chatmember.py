@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatMember."""
 import datetime
-from typing import TYPE_CHECKING, Any, Optional, ClassVar
+from typing import TYPE_CHECKING, Any, Optional, ClassVar, Dict, Type
 
 from telegram import TelegramObject, User, constants
 from telegram.utils.helpers import from_timestamp, to_timestamp
@@ -29,7 +29,15 @@ if TYPE_CHECKING:
 
 
 class ChatMember(TelegramObject):
-    """This object contains information about one member of a chat.
+    """Base class for Telegram ChatMember Objects..
+    Currently, the following 6 types of chat members are supported:
+
+    * :class:`telegram.ChatMemberOwner`
+    * :class:`telegram.ChatMemberAdministrator`
+    * :class:`telegram.ChatMemberMember`
+    * :class:`telegram.ChatMemberRestricted`
+    * :class:`telegram.ChatMemberLeft`
+    * :class:`telegram.ChatMemberBanned`
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`user` and :attr:`status` are equal.
@@ -242,7 +250,16 @@ class ChatMember(TelegramObject):
         data['user'] = User.de_json(data.get('user'), bot)
         data['until_date'] = from_timestamp(data.get('until_date', None))
 
-        return cls(**data)
+        _class_mapping: Dict[str, Type['ChatMember']] = {
+            cls.CREATOR: ChatMemberOwner,
+            cls.ADMINISTRATOR: ChatMemberAdministrator,
+            cls.MEMBER: ChatMemberMember,
+            cls.RESTRICTED: ChatMemberRestricted,
+            cls.LEFT: ChatMemberLeft,
+            cls.KICKED: ChatMemberBanned,
+        }
+
+        return _class_mapping.get(data['status'], cls)(**data, bot=bot)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
@@ -251,3 +268,341 @@ class ChatMember(TelegramObject):
         data['until_date'] = to_timestamp(self.until_date)
 
         return data
+
+
+class ChatMemberOwner(ChatMember):
+    """
+    Represents a chat member that owns the chat
+    and has all administrator privileges.
+
+    .. versionadded:: 13.7
+
+    Args:
+        status (:obj:`str`): The member's status in the chat,
+            always “creator”.
+        user (:class:`telegram.User`): Information about the user.
+        custom_title (:obj:`str`, optional): Custom title for this user.
+        is_anonymous (:obj:`bool`, optional):  :obj:`True`, if the
+            user's presence in the chat is hidden.
+
+    Attributes:
+        status (:obj:`str`): The member's status in the chat,
+            always “creator”.
+        user (:class:`telegram.User`): Information about the user.
+        custom_title (:obj:`str`): Optional. Custom title for
+            this user.
+        is_anonymous (:obj:`bool`): Optional. :obj:`True`, if the user's
+            presence in the chat is hidden.
+    """
+
+    __slots__ = ()
+
+    def __init__(
+        self,
+        status: str,
+        user: User,
+        custom_title: str = None,
+        is_anonymous: bool = None,
+        **_kwargs: Any,
+    ):
+        super().__init__(
+            user=user, status=status, custom_title=custom_title, is_anonymous=is_anonymous
+        )
+
+
+class ChatMemberAdministrator(ChatMember):
+    """
+    Represents a chat member that has some additional privileges.
+
+    .. versionadded:: 13.7
+
+    Args:
+        status (:obj:`str`): The member's status in the chat,
+            always “administrator”.
+        user (:class:`telegram.User`): Information about the user.
+        can_be_edited (:obj:`bool`, optional): :obj:`True`, if the bot
+            is allowed to edit administrator privileges of that user.
+        custom_title (:obj:`str`, optional): Custom title for this user.
+        is_anonymous (:obj:`bool`, optional): :obj:`True`, if the  user's
+            presence in the chat is hidden.
+        can_manage_chat (:obj:`bool`, optional): :obj:`True`, if the administrator
+            can access the chat event log, chat statistics, message statistics in
+            channels, see channel members, see anonymous administrators in supergroups
+            and ignore slow mode. Implied by any other administrator privilege.
+        can_post_messages (:obj:`bool`, optional): :obj:`True`, if the
+            administrator can post in the channel, channels only.
+        can_edit_messages (:obj:`bool`, optional): :obj:`True`, if the
+            administrator can edit messages of other users and can pin
+            messages; channels only.
+        can_delete_messages (:obj:`bool`, optional): :obj:`True`, if the
+            administrator can delete messages of other users.
+        can_manage_voice_chats (:obj:`bool`, optional): :obj:`True`, if the
+            administrator can manage voice chats.
+        can_restrict_members (:obj:`bool`, optional): :obj:`True`, if the
+            administrator can restrict, ban or unban chat members.
+        can_promote_members (:obj:`bool`, optional): :obj:`True`, if the administrator
+            can add new administrators with a subset of his own privileges or demote
+            administrators that he has promoted, directly or indirectly (promoted by
+            administrators that were appointed by the user).
+        can_change_info (:obj:`bool`, optional): :obj:`True`, if the user can change
+            the chat title, photo and other settings.
+        can_invite_users (:obj:`bool`, optional): :obj:`True`, if the user can invite
+            new users to the chat.
+        can_pin_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed
+            to pin messages; groups and supergroups only.
+
+    Attributes:
+        status (:obj:`str`): The member's status in the chat,
+            always “administrator”.
+        user (:class:`telegram.User`): Information about the user.
+        can_be_edited (:obj:`bool`): Optional. :obj:`True`, if the bot
+            is allowed to edit administrator privileges of that user.
+        custom_title (:obj:`str`): Optional. Custom title for this user.
+        is_anonymous (:obj:`bool`): Optional. :obj:`True`, if the  user's
+            presence in the chat is hidden.
+        can_manage_chat (:obj:`bool`): Optional. :obj:`True`, if the administrator
+            can access the chat event log, chat statistics, message statistics in
+            channels, see channel members, see anonymous administrators in supergroups
+            and ignore slow mode. Implied by any other administrator privilege.
+        can_post_messages (:obj:`bool`): Optional. :obj:`True`, if the
+            administrator can post in the channel, channels only.
+        can_edit_messages (:obj:`bool`): Optional. :obj:`True`, if the
+            administrator can edit messages of other users and can pin
+            messages; channels only.
+        can_delete_messages (:obj:`bool`): Optional. :obj:`True`, if the
+            administrator can delete messages of other users.
+        can_manage_voice_chats (:obj:`bool`): Optional. :obj:`True`, if the
+            administrator can manage voice chats.
+        can_restrict_members (:obj:`bool`): Optional. :obj:`True`, if the
+            administrator can restrict, ban or unban chat members.
+        can_promote_members (:obj:`bool`): Optional. :obj:`True`, if the administrator
+            can add new administrators with a subset of his own privileges or demote
+            administrators that he has promoted, directly or indirectly (promoted by
+            administrators that were appointed by the user).
+        can_change_info (:obj:`bool`): Optional. :obj:`True`, if the user can change
+            the chat title, photo and other settings.
+        can_invite_users (:obj:`bool`): Optional. :obj:`True`, if the user can invite
+            new users to the chat.
+        can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
+            to pin messages; groups and supergroups only.
+    """
+
+    __slots__ = ()
+
+    def __init__(
+        self,
+        status: str,
+        user: User,
+        can_be_edited: bool = None,
+        custom_title: str = None,
+        is_anonymous: bool = None,
+        can_manage_chat: bool = None,
+        can_post_messages: bool = None,
+        can_edit_messages: bool = None,
+        can_delete_messages: bool = None,
+        can_manage_voice_chats: bool = None,
+        can_restrict_members: bool = None,
+        can_promote_members: bool = None,
+        can_change_info: bool = None,
+        can_invite_users: bool = None,
+        can_pin_messages: bool = None,
+        **_kwargs: Any,
+    ):
+        super().__init__(
+            user=user,
+            status=status,
+            can_be_edited=can_be_edited,
+            custom_title=custom_title,
+            is_anonymous=is_anonymous,
+            can_manage_chat=can_manage_chat,
+            can_post_messages=can_post_messages,
+            can_edit_messages=can_edit_messages,
+            can_delete_messages=can_delete_messages,
+            can_manage_voice_chats=can_manage_voice_chats,
+            can_restrict_members=can_restrict_members,
+            can_promote_members=can_promote_members,
+            can_change_info=can_change_info,
+            can_invite_users=can_invite_users,
+            can_pin_messages=can_pin_messages,
+        )
+
+
+class ChatMemberMember(ChatMember):
+    """
+    Represents a chat member that has no additional
+    privileges or restrictions.
+
+    .. versionadded:: 13.7
+
+    Args:
+        status (:obj:`str`): The member's status in the chat,
+            always “member”.
+        user (:class:`telegram.User`): Information about the user.
+
+    Attributes:
+        status (:obj:`str`): The member's status in the chat,
+            always “member”.
+        user (:class:`telegram.User`): Information about the user.
+
+    """
+
+    __slots__ = ()
+
+    def __init__(self, status: str, user: User, **_kwargs: Any):
+        super().__init__(user=user, status=status)
+
+
+class ChatMemberRestricted(ChatMember):
+    """
+    Represents a chat member that is under certain restrictions
+    in the chat. Supergroups only.
+
+    .. versionadded:: 13.7
+
+    Args:
+        status (:obj:`str`): The member's status in the chat,
+            always “restricted”.
+        user (:class:`telegram.User`): Information about the user.
+        is_member (:obj:`bool`, optional): :obj:`True`, if the user is a
+            member of the chat at the moment of the request.
+        can_change_info (:obj:`bool`, optional): :obj:`True`, if the user can change
+            the chat title, photo and other settings.
+        can_invite_users (:obj:`bool`, optional): :obj:`True`, if the user can invite
+            new users to the chat.
+        can_pin_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed
+            to pin messages; groups and supergroups only.
+        can_send_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed
+            to send text messages, contacts, locations and venues.
+        can_send_media_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed
+            to send audios, documents, photos, videos, video notes and voice notes.
+        can_send_polls (:obj:`bool`, optional): :obj:`True`, if the user is allowed
+            to send polls.
+        can_send_other_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed
+            to send animations, games, stickers and use inline bots.
+        can_add_web_page_previews (:obj:`bool`, optional): :obj:`True`, if the user is
+           allowed to add web page previews to their messages.
+        until_date (:class:`datetime.datetime`, optional): Date when restrictions
+           will be lifted for this user.
+
+    Attributes:
+        status (:obj:`str`): The member's status in the chat,
+            always “restricted”.
+        user (:class:`telegram.User`): Information about the user.
+        is_member (:obj:`bool`): Optional. :obj:`True`, if the user is a
+            member of the chat at the moment of the request.
+        can_change_info (:obj:`bool`): Optional. :obj:`True`, if the user can change
+            the chat title, photo and other settings.
+        can_invite_users (:obj:`bool`): Optional. :obj:`True`, if the user can invite
+            new users to the chat.
+        can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
+            to pin messages; groups and supergroups only.
+        can_send_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
+            to send text messages, contacts, locations and venues.
+        can_send_media_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
+            to send audios, documents, photos, videos, video notes and voice notes.
+        can_send_polls (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
+            to send polls.
+        can_send_other_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
+            to send animations, games, stickers and use inline bots.
+        can_add_web_page_previews (:obj:`bool`): Optional. :obj:`True`, if the user is
+           allowed to add web page previews to their messages.
+        until_date (:class:`datetime.datetime`): Optional. Date when restrictions
+           will be lifted for this user.
+
+    """
+
+    __slots__ = ()
+
+    def __init__(
+        self,
+        status: str,
+        user: User,
+        is_member: bool = None,
+        can_change_info: bool = None,
+        can_invite_users: bool = None,
+        can_pin_messages: bool = None,
+        can_send_messages: bool = None,
+        can_send_media_messages: bool = None,
+        can_send_polls: bool = None,
+        can_send_other_messages: bool = None,
+        can_add_web_page_previews: bool = None,
+        until_date: datetime.datetime = None,
+        **_kwargs: Any,
+    ):
+        super().__init__(
+            user=user,
+            status=status,
+            is_member=is_member,
+            can_change_info=can_change_info,
+            can_invite_users=can_invite_users,
+            can_pin_messages=can_pin_messages,
+            can_send_messages=can_send_messages,
+            can_send_media_messages=can_send_media_messages,
+            can_send_polls=can_send_polls,
+            can_send_other_messages=can_send_other_messages,
+            can_add_web_page_previews=can_add_web_page_previews,
+            until_date=until_date,
+        )
+
+
+class ChatMemberLeft(ChatMember):
+    """
+    Represents a chat member that isn't currently a member of the chat,
+    but may join it themselves.
+
+    .. versionadded:: 13.7
+
+    Args:
+        status (:obj:`str`): The member's status in the chat,
+            always “left”.
+        user (:class:`telegram.User`): Information about the user.
+
+    Attributes:
+        status (:obj:`str`): The member's status in the chat,
+            always “left”.
+        user (:class:`telegram.User`): Information about the user.
+    """
+
+    __slots__ = ()
+
+    def __init__(self, status: str, user: User, **_kwargs: Any):
+        super().__init__(user=user, status=status)
+
+
+class ChatMemberBanned(ChatMember):
+    """
+    Represents a chat member that was banned in the chat and
+    can't return to the chat or view chat messages.
+
+    .. versionadded:: 13.7
+
+    Args:
+        status (:obj:`str`): The member's status in the chat,
+            always “kicked”.
+        user (:class:`telegram.User`): Information about the user.
+        until_date (:class:`datetime.datetime`, optional): Date when restrictions
+           will be lifted for this user.
+
+    Attributes:
+        status (:obj:`str`): The member's status in the chat,
+            always “kicked”.
+        user (:class:`telegram.User`): Information about the user.
+        until_date (:class:`datetime.datetime`): Optional. Date when restrictions
+           will be lifted for this user.
+
+    """
+
+    __slots__ = ()
+
+    def __init__(
+        self,
+        status: str,
+        user: User,
+        until_date: datetime.datetime = None,
+        **_kwargs: Any,
+    ):
+        super().__init__(
+            user=user,
+            status=status,
+            until_date=until_date,
+        )
