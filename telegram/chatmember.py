@@ -50,8 +50,10 @@ class ChatMember(TelegramObject):
 
     Args:
         user (:class:`telegram.User`): Information about the user.
-        status (:obj:`str`): The member's status in the chat. Can be 'creator', 'administrator',
-            'member', 'restricted', 'left' or 'kicked'.
+        status (:obj:`str`): The member's status in the chat. Can be
+            :attr:`~telegram.ChatMember.ADMINISTRATOR`, :attr:`~telegram.ChatMember.CREATOR`,
+            :attr:`~telegram.ChatMember.KICKED`, :attr:`~telegram.ChatMember.LEFT`,
+            :attr:`~telegram.ChatMember.MEMBER` or :attr:`~telegram.ChatMember.RESTRICTED`.
         custom_title (:obj:`str`, optional): Owner and administrators only.
             Custom title for this user.
 
