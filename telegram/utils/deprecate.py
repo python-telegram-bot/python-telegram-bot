@@ -40,6 +40,8 @@ def set_new_attribute_deprecated(self: object, key: str, value: object) -> None:
     new = len(self.__dict__)
     if new > org:
         warnings.warn(
-            "Setting custom attributes on objects of the PTB library is deprecated.",
+            f"Setting custom attributes such as {key!r} on objects such as "
+            f"{self.__class__.__name__!r} of the PTB library is deprecated.",
             TelegramDeprecationWarning,
+            stacklevel=3,
         )
