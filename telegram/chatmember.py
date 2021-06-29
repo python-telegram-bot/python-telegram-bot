@@ -71,11 +71,13 @@ class ChatMember(TelegramObject):
             channels, see channel members, see anonymous administrators in supergroups and ignore
             slow mode. Implied by any other administrator privilege.
 
+            .. versionadded:: 13.4
             .. deprecated:: 13.7
 
         can_manage_voice_chats (:obj:`bool`, optional): Administrators only. :obj:`True`, if the
             administrator can manage voice chats.
 
+            .. versionadded:: 13.4
             .. deprecated:: 13.7
 
         can_change_info (:obj:`bool`, optional): Administrators and restricted only. :obj:`True`,
@@ -176,11 +178,13 @@ class ChatMember(TelegramObject):
             log, chat statistics, message statistics in channels, see channel members, see
             anonymous administrators in supergroups and ignore slow mode.
 
+            .. versionadded:: 13.4
             .. deprecated:: 13.7
 
         can_manage_voice_chats (:obj:`bool`): Optional. if the administrator can manage
             voice chats.
 
+            .. versionadded:: 13.4
             .. deprecated:: 13.7
 
         can_change_info (:obj:`bool`): Optional. If the user can change the chat title, photo and
