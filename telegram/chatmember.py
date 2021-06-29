@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 
 
 class ChatMember(TelegramObject):
-    """Base class for Telegram ChatMember Objects..
+    """Base class for Telegram ChatMember Objects.
     Currently, the following 6 types of chat members are supported:
 
     * :class:`telegram.ChatMemberOwner`
@@ -48,101 +48,207 @@ class ChatMember(TelegramObject):
             'member', 'restricted', 'left' or 'kicked'.
         custom_title (:obj:`str`, optional): Owner and administrators only.
             Custom title for this user.
+
+            .. deprecated:: 13.7
+
         is_anonymous (:obj:`bool`, optional): Owner and administrators only. :obj:`True`, if the
             user's presence in the chat is hidden.
+
+            .. deprecated:: 13.7
+
         until_date (:class:`datetime.datetime`, optional): Restricted and kicked only. Date when
             restrictions will be lifted for this user.
+
+            .. deprecated:: 13.7
+
         can_be_edited (:obj:`bool`, optional): Administrators only. :obj:`True`, if the bot is
             allowed to edit administrator privileges of that user.
+
+            .. deprecated:: 13.7
+
         can_manage_chat (:obj:`bool`, optional): Administrators only. :obj:`True`, if the
             administrator can access the chat event log, chat statistics, message statistics in
             channels, see channel members, see anonymous administrators in supergroups and ignore
             slow mode. Implied by any other administrator privilege.
 
-            .. versionadded:: 13.4
+            .. deprecated:: 13.7
 
         can_manage_voice_chats (:obj:`bool`, optional): Administrators only. :obj:`True`, if the
             administrator can manage voice chats.
 
-            .. versionadded:: 13.4
+            .. deprecated:: 13.7
 
         can_change_info (:obj:`bool`, optional): Administrators and restricted only. :obj:`True`,
             if the user can change the chat title, photo and other settings.
+
+            .. deprecated:: 13.7
+
         can_post_messages (:obj:`bool`, optional): Administrators only. :obj:`True`, if the
             administrator can post in the channel, channels only.
+
+            .. deprecated:: 13.7
+
         can_edit_messages (:obj:`bool`, optional): Administrators only. :obj:`True`, if the
             administrator can edit messages of other users and can pin messages; channels only.
+
+            .. deprecated:: 13.7
+
         can_delete_messages (:obj:`bool`, optional): Administrators only. :obj:`True`, if the
             administrator can delete messages of other users.
+
+            .. deprecated:: 13.7
+
         can_invite_users (:obj:`bool`, optional): Administrators and restricted only. :obj:`True`,
             if the user can invite new users to the chat.
+
+            .. deprecated:: 13.7
+
         can_restrict_members (:obj:`bool`, optional): Administrators only. :obj:`True`, if the
             administrator can restrict, ban or unban chat members.
+
+            .. deprecated:: 13.7
+
         can_pin_messages (:obj:`bool`, optional): Administrators and restricted only. :obj:`True`,
             if the user can pin messages, groups and supergroups only.
+
+            .. deprecated:: 13.7
+
         can_promote_members (:obj:`bool`, optional): Administrators only. :obj:`True`, if the
             administrator can add new administrators with a subset of his own privileges or demote
             administrators that he has promoted, directly or indirectly (promoted by administrators
             that were appointed by the user).
+
+            .. deprecated:: 13.7
+
         is_member (:obj:`bool`, optional): Restricted only. :obj:`True`, if the user is a member of
             the chat at the moment of the request.
+
+            .. deprecated:: 13.7
+
         can_send_messages (:obj:`bool`, optional): Restricted only. :obj:`True`, if the user can
             send text messages, contacts, locations and venues.
+
+            .. deprecated:: 13.7
+
         can_send_media_messages (:obj:`bool`, optional): Restricted only. :obj:`True`, if the user
             can send audios, documents, photos, videos, video notes and voice notes.
+
+            .. deprecated:: 13.7
+
         can_send_polls (:obj:`bool`, optional): Restricted only. :obj:`True`, if the user is
             allowed to send polls.
+
+            .. deprecated:: 13.7
+
         can_send_other_messages (:obj:`bool`, optional): Restricted only. :obj:`True`, if the user
             can send animations, games, stickers and use inline bots.
+
+            .. deprecated:: 13.7
+
         can_add_web_page_previews (:obj:`bool`, optional): Restricted only. :obj:`True`, if user
             may add web page previews to his messages.
+
+            .. deprecated:: 13.7
 
     Attributes:
         user (:class:`telegram.User`): Information about the user.
         status (:obj:`str`): The member's status in the chat.
         custom_title (:obj:`str`): Optional. Custom title for owner and administrators.
+
+            .. deprecated:: 13.7
+
         is_anonymous (:obj:`bool`): Optional. :obj:`True`, if the user's presence in the chat is
             hidden.
+
+            .. deprecated:: 13.7
+
         until_date (:class:`datetime.datetime`): Optional. Date when restrictions will be lifted
             for this user.
+
+            .. deprecated:: 13.7
+
         can_be_edited (:obj:`bool`): Optional. If the bot is allowed to edit administrator
             privileges of that user.
+
+            .. deprecated:: 13.7
+
         can_manage_chat (:obj:`bool`): Optional. If the administrator can access the chat event
             log, chat statistics, message statistics in channels, see channel members, see
             anonymous administrators in supergroups and ignore slow mode.
 
-            .. versionadded:: 13.4
+            .. deprecated:: 13.7
 
         can_manage_voice_chats (:obj:`bool`): Optional. if the administrator can manage
             voice chats.
 
-            .. versionadded:: 13.4
+            .. deprecated:: 13.7
 
         can_change_info (:obj:`bool`): Optional. If the user can change the chat title, photo and
             other settings.
+
+            .. deprecated:: 13.7
+
         can_post_messages (:obj:`bool`): Optional. If the administrator can post in the channel.
+
+            .. deprecated:: 13.7
+
         can_edit_messages (:obj:`bool`): Optional. If the administrator can edit messages of other
             users.
+
+            .. deprecated:: 13.7
+
         can_delete_messages (:obj:`bool`): Optional. If the administrator can delete messages of
             other users.
+
+            .. deprecated:: 13.7
+
         can_invite_users (:obj:`bool`): Optional. If the user can invite new users to the chat.
+
+            .. deprecated:: 13.7
+
         can_restrict_members (:obj:`bool`): Optional. If the administrator can restrict, ban or
             unban chat members.
+
+            .. deprecated:: 13.7
+
         can_pin_messages (:obj:`bool`): Optional. If the user can pin messages.
+
+            .. deprecated:: 13.7
+
         can_promote_members (:obj:`bool`): Optional. If the administrator can add new
             administrators.
+
+            .. deprecated:: 13.7
+
         is_member (:obj:`bool`): Optional. Restricted only. :obj:`True`, if the user is a member of
             the chat at the moment of the request.
+
+            .. deprecated:: 13.7
+
         can_send_messages (:obj:`bool`): Optional. If the user can send text messages, contacts,
             locations and venues.
+
+            .. deprecated:: 13.7
+
         can_send_media_messages (:obj:`bool`): Optional. If the user can send media messages,
             implies can_send_messages.
+
+            .. deprecated:: 13.7
+
         can_send_polls (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to
             send polls.
+
+            .. deprecated:: 13.7
+
         can_send_other_messages (:obj:`bool`): Optional. If the user can send animations, games,
             stickers and use inline bots, implies can_send_media_messages.
+
+            .. deprecated:: 13.7
+
         can_add_web_page_previews (:obj:`bool`): Optional. If user may add web page previews to his
             messages, implies can_send_media_messages
+
+            .. deprecated:: 13.7
 
     """
 
@@ -259,7 +365,9 @@ class ChatMember(TelegramObject):
             cls.KICKED: ChatMemberBanned,
         }
 
-        return _class_mapping.get(data['status'], cls)(**data, bot=bot)
+        if cls is ChatMember:
+            return _class_mapping.get(data['status'], cls)(**data, bot=bot)
+        return cls(**data)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
@@ -278,16 +386,14 @@ class ChatMemberOwner(ChatMember):
     .. versionadded:: 13.7
 
     Args:
-        status (:obj:`str`): The member's status in the chat,
-            always “creator”.
         user (:class:`telegram.User`): Information about the user.
         custom_title (:obj:`str`, optional): Custom title for this user.
-        is_anonymous (:obj:`bool`, optional):  :obj:`True`, if the
+        is_anonymous (:obj:`bool`, optional): :obj:`True`, if the
             user's presence in the chat is hidden.
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
-            always “creator”.
+            always :attr:`telegram.ChatMember.CREATOR`.
         user (:class:`telegram.User`): Information about the user.
         custom_title (:obj:`str`): Optional. Custom title for
             this user.
@@ -299,14 +405,16 @@ class ChatMemberOwner(ChatMember):
 
     def __init__(
         self,
-        status: str,
         user: User,
         custom_title: str = None,
         is_anonymous: bool = None,
         **_kwargs: Any,
     ):
         super().__init__(
-            user=user, status=status, custom_title=custom_title, is_anonymous=is_anonymous
+            status=ChatMember.CREATOR,
+            user=user,
+            custom_title=custom_title,
+            is_anonymous=is_anonymous,
         )
 
 
@@ -317,8 +425,6 @@ class ChatMemberAdministrator(ChatMember):
     .. versionadded:: 13.7
 
     Args:
-        status (:obj:`str`): The member's status in the chat,
-            always “administrator”.
         user (:class:`telegram.User`): Information about the user.
         can_be_edited (:obj:`bool`, optional): :obj:`True`, if the bot
             is allowed to edit administrator privileges of that user.
@@ -353,7 +459,7 @@ class ChatMemberAdministrator(ChatMember):
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
-            always “administrator”.
+            always :attr:`telegram.ChatMember.ADMINISTRATOR`.
         user (:class:`telegram.User`): Information about the user.
         can_be_edited (:obj:`bool`): Optional. :obj:`True`, if the bot
             is allowed to edit administrator privileges of that user.
@@ -391,7 +497,6 @@ class ChatMemberAdministrator(ChatMember):
 
     def __init__(
         self,
-        status: str,
         user: User,
         can_be_edited: bool = None,
         custom_title: str = None,
@@ -409,8 +514,8 @@ class ChatMemberAdministrator(ChatMember):
         **_kwargs: Any,
     ):
         super().__init__(
+            status=ChatMember.ADMINISTRATOR,
             user=user,
-            status=status,
             can_be_edited=can_be_edited,
             custom_title=custom_title,
             is_anonymous=is_anonymous,
@@ -435,13 +540,11 @@ class ChatMemberMember(ChatMember):
     .. versionadded:: 13.7
 
     Args:
-        status (:obj:`str`): The member's status in the chat,
-            always “member”.
         user (:class:`telegram.User`): Information about the user.
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
-            always “member”.
+            always :attr:`telegram.ChatMember.MEMBER`.
         user (:class:`telegram.User`): Information about the user.
 
     """
@@ -449,7 +552,7 @@ class ChatMemberMember(ChatMember):
     __slots__ = ()
 
     def __init__(self, status: str, user: User, **_kwargs: Any):
-        super().__init__(user=user, status=status)
+        super().__init__(status=ChatMember.MEMBER, user=user)
 
 
 class ChatMemberRestricted(ChatMember):
@@ -460,8 +563,6 @@ class ChatMemberRestricted(ChatMember):
     .. versionadded:: 13.7
 
     Args:
-        status (:obj:`str`): The member's status in the chat,
-            always “restricted”.
         user (:class:`telegram.User`): Information about the user.
         is_member (:obj:`bool`, optional): :obj:`True`, if the user is a
             member of the chat at the moment of the request.
@@ -486,7 +587,7 @@ class ChatMemberRestricted(ChatMember):
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
-            always “restricted”.
+            always :attr:`telegram.ChatMember.RESTRICTED`.
         user (:class:`telegram.User`): Information about the user.
         is_member (:obj:`bool`): Optional. :obj:`True`, if the user is a
             member of the chat at the moment of the request.
@@ -515,7 +616,6 @@ class ChatMemberRestricted(ChatMember):
 
     def __init__(
         self,
-        status: str,
         user: User,
         is_member: bool = None,
         can_change_info: bool = None,
@@ -530,8 +630,8 @@ class ChatMemberRestricted(ChatMember):
         **_kwargs: Any,
     ):
         super().__init__(
+            status=ChatMember.RESTRICTED,
             user=user,
-            status=status,
             is_member=is_member,
             can_change_info=can_change_info,
             can_invite_users=can_invite_users,
@@ -553,20 +653,18 @@ class ChatMemberLeft(ChatMember):
     .. versionadded:: 13.7
 
     Args:
-        status (:obj:`str`): The member's status in the chat,
-            always “left”.
         user (:class:`telegram.User`): Information about the user.
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
-            always “left”.
+            always :attr:`telegram.ChatMember.LEFT`.
         user (:class:`telegram.User`): Information about the user.
     """
 
     __slots__ = ()
 
     def __init__(self, status: str, user: User, **_kwargs: Any):
-        super().__init__(user=user, status=status)
+        super().__init__(status=ChatMember.LEFT, user=user)
 
 
 class ChatMemberBanned(ChatMember):
@@ -577,15 +675,13 @@ class ChatMemberBanned(ChatMember):
     .. versionadded:: 13.7
 
     Args:
-        status (:obj:`str`): The member's status in the chat,
-            always “kicked”.
         user (:class:`telegram.User`): Information about the user.
         until_date (:class:`datetime.datetime`, optional): Date when restrictions
            will be lifted for this user.
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
-            always “kicked”.
+            always :attr:`telegram.ChatMember.KICKED`.
         user (:class:`telegram.User`): Information about the user.
         until_date (:class:`datetime.datetime`): Optional. Date when restrictions
            will be lifted for this user.
@@ -596,13 +692,12 @@ class ChatMemberBanned(ChatMember):
 
     def __init__(
         self,
-        status: str,
         user: User,
         until_date: datetime.datetime = None,
         **_kwargs: Any,
     ):
         super().__init__(
+            status=ChatMember.KICKED,
             user=user,
-            status=status,
             until_date=until_date,
         )
