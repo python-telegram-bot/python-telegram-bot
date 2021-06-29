@@ -42,6 +42,12 @@ class ChatMember(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`user` and :attr:`status` are equal.
 
+    Note:
+        As of Bot API 5.3, :class:`ChatMember` is nothing bot the base class for the subclasses
+        listed above and is no longer returned directly by :meth:`~telegram.Bot.get_chat`.
+        Therefore, most of the arguments and attributes were deprecated and you should no longer
+        use :class:`ChatMember` directly.
+
     Args:
         user (:class:`telegram.User`): Information about the user.
         status (:obj:`str`): The member's status in the chat. Can be 'creator', 'administrator',

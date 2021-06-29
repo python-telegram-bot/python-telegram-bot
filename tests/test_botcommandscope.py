@@ -113,14 +113,14 @@ def bot_command_scope(scope_class_and_type, chat_id):
 
 # All the scope types are very similar, so we test everything via parametrization
 class TestBotCommandScope:
-    def test_slot_behaviour(self, bot_command_scope, mro_slots):
+    def test_slot_behaviour(self, bot_command_scope, mro_slots, recwarn):
         for attr in bot_command_scope.__slots__:
             assert getattr(bot_command_scope, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(bot_command_scope)) == len(
             set(mro_slots(bot_command_scope))
         ), "duplicate slot"
-        with pytest.raises(AttributeError):
-            bot_command_scope.custom
+        bot_command_scope.custom, bot_command_scope.type = 'warning!', bot_command_scope.type
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_de_json(self, bot, scope_class_and_type, chat_id):
         cls = scope_class_and_type[0]
@@ -145,6 +145,12 @@ class TestBotCommandScope:
 
         assert type(bot_command_scope) is BotCommandScope
         assert bot_command_scope.type == 'invalid'
+
+    def test_de_json_subclass(self, scope_class, bot, chat_id):
+        """This makes sure that e.g. BotCommandScopeDefault(data) never returns a
+        BotCommandScopeChat instance."""
+        json_dict = {'type': 'invalid', 'chat_id': chat_id, 'user_id': 42}
+        assert type(scope_class.de_json(json_dict, bot)) is scope_class
 
     def test_to_dict(self, bot_command_scope):
         bot_command_scope_dict = bot_command_scope.to_dict()
