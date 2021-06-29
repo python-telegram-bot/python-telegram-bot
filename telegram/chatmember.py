@@ -561,7 +561,7 @@ class ChatMemberMember(ChatMember):
 
     __slots__ = ()
 
-    def __init__(self, status: str, user: User, **_kwargs: Any):
+    def __init__(self, user: User, **_kwargs: Any):
         super().__init__(status=ChatMember.MEMBER, user=user)
 
 
@@ -673,7 +673,7 @@ class ChatMemberLeft(ChatMember):
 
     __slots__ = ()
 
-    def __init__(self, status: str, user: User, **_kwargs: Any):
+    def __init__(self, user: User, **_kwargs: Any):
         super().__init__(status=ChatMember.LEFT, user=user)
 
 
