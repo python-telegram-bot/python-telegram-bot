@@ -326,9 +326,8 @@ class Chat(TelegramObject):
 
         .. deprecated:: 13.7
         """
-
         warnings.warn(
-            '`Chat.get_members_count` is deprecated. ' 'Use `Chat.get_member_count` instead.',
+            '`Chat.get_members_count` is deprecated. Use `Chat.get_member_count` instead.',
             TelegramDeprecationWarning,
             stacklevel=2,
         )
