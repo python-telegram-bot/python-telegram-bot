@@ -672,7 +672,7 @@ class Chat(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_media_group`.
 
         Returns:
-            List[:class:`telegram.Message`:] On success, instance representing the message posted.
+            List[:class:`telegram.Message`]: On success, instance representing the message posted.
 
         """
         return self.bot.send_media_group(
