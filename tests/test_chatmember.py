@@ -72,6 +72,7 @@ class TestChatMember:
     def test_slot_behaviour(self, chat_member_types, mro_slots, recwarn):
         for attr in chat_member_types.__slots__:
             assert getattr(chat_member_types, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not chat_member_types.__dict__, f"got missing slot(s): {chat_member_types.__dict__}"
         assert len(mro_slots(chat_member_types)) == len(
             set(mro_slots(chat_member_types))
         ), "duplicate slot"

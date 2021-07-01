@@ -116,6 +116,7 @@ class TestBotCommandScope:
     def test_slot_behaviour(self, bot_command_scope, mro_slots, recwarn):
         for attr in bot_command_scope.__slots__:
             assert getattr(bot_command_scope, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not bot_command_scope.__dict__, f"got missing slot(s): {bot_command_scope.__dict__}"
         assert len(mro_slots(bot_command_scope)) == len(
             set(mro_slots(bot_command_scope))
         ), "duplicate slot"
