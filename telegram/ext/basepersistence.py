@@ -213,7 +213,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         ``frozenset``, ``dict``, ``defaultdict`` and objects that have a ``__dict__`` or
         ``__slots__`` attribute, excluding classes and objects that can't be copied with
         ``copy.copy``. If the parsing of an object fails, the object will be returned unchanged and
-         the error will be logged.
+        the error will be logged.
 
         Args:
             obj (:obj:`object`): The object
