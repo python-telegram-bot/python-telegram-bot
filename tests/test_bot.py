@@ -53,7 +53,7 @@ from telegram import (
     PollOption,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
-from telegram.ext import ExtBot
+from telegram.ext import ExtBot, Defaults
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
 from telegram.ext.callbackdatacache import InvalidCallbackData
 from telegram.utils.helpers import (
@@ -63,6 +63,16 @@ from telegram.utils.helpers import (
 )
 from tests.conftest import expect_bad_request, check_defaults_handling, GITHUB_ACTION
 from tests.bots import FALLBACKS
+
+
+class ExtBotSubClass(ExtBot):
+    # used for test_defaults_warning below
+    pass
+
+
+class BotSubClass(Bot):
+    # used for test_defaults_warning below
+    pass
 
 
 @pytest.fixture(scope='class')
@@ -707,7 +717,6 @@ class TestBot:
             bot.send_chat_action(chat_id, 'unknown action')
 
     # TODO: Needs improvement. We need incoming inline query to test answer.
-    @pytest.mark.filterwarnings("ignore:.*custom attributes")
     def test_answer_inline_query(self, monkeypatch, bot):
         # For now just test that our internals pass the correct data
         def test(url, data, *args, **kwargs):
@@ -960,7 +969,6 @@ class TestBot:
         monkeypatch.delattr(bot, '_post')
 
     # TODO: Needs improvement. No feasible way to test until bots can add members.
-    @pytest.mark.filterwarnings("ignore:.*custom attributes")
     def test_kick_chat_member(self, monkeypatch, bot):
         def test(url, data, *args, **kwargs):
             chat_id = data['chat_id'] == 2
@@ -2373,3 +2381,15 @@ class TestBot:
             bot.arbitrary_callback_data = False
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
+
+    @pytest.mark.parametrize(
+        'cls,warn', [(Bot, True), (BotSubClass, True), (ExtBot, False), (ExtBotSubClass, False)]
+    )
+    def test_defaults_warning(self, bot, recwarn, cls, warn):
+        defaults = Defaults()
+        cls(bot.token, defaults=defaults)
+        if warn:
+            assert len(recwarn) == 1
+            assert 'Passing Defaults to telegram.Bot is deprecated.' in str(recwarn[-1].message)
+        else:
+            assert len(recwarn) == 0

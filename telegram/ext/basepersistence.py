@@ -212,7 +212,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         :attr:`REPLACED_BOT`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
         ``frozenset``, ``dict``, ``defaultdict`` and objects that have a ``__dict__`` or
         ``__slots__`` attribute, excluding classes and objects that can't be copied with
-        ``copy.copy``.
+        ``copy.copy``. If the parsing of an object fails, the object will be returned unchanged and
+         the error will be logged.
 
         Args:
             obj (:obj:`object`): The object
@@ -276,20 +277,33 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
                 new_obj[cls._replace_bot(k, memo)] = cls._replace_bot(val, memo)
             memo[obj_id] = new_obj
             return new_obj
-        if hasattr(obj, '__dict__'):
-            for attr_name, attr in new_obj.__dict__.items():
-                setattr(new_obj, attr_name, cls._replace_bot(attr, memo))
-            memo[obj_id] = new_obj
-            return new_obj
-        if hasattr(obj, '__slots__'):
-            for attr_name in new_obj.__slots__:
-                setattr(
-                    new_obj,
-                    attr_name,
-                    cls._replace_bot(cls._replace_bot(getattr(new_obj, attr_name), memo), memo),
-                )
-            memo[obj_id] = new_obj
-            return new_obj
+        # if '__dict__' in obj.__slots__, we already cover this here, that's why the
+        # __dict__ case comes below
+        try:
+            if hasattr(obj, '__slots__'):
+                for attr_name in new_obj.__slots__:
+                    setattr(
+                        new_obj,
+                        attr_name,
+                        cls._replace_bot(
+                            cls._replace_bot(getattr(new_obj, attr_name), memo), memo
+                        ),
+                    )
+                memo[obj_id] = new_obj
+                return new_obj
+            if hasattr(obj, '__dict__'):
+                for attr_name, attr in new_obj.__dict__.items():
+                    setattr(new_obj, attr_name, cls._replace_bot(attr, memo))
+                memo[obj_id] = new_obj
+                return new_obj
+        except Exception as exception:
+            warnings.warn(
+                f'Parsing of an object failed with the following exception: {exception}. '
+                f'See the docs of BasePersistence.replace_bot for more information.',
+                RuntimeWarning,
+            )
+            memo[obj_id] = obj
+            return obj
 
         return obj
 
@@ -299,7 +313,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         :attr:`bot`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
         ``frozenset``, ``dict``, ``defaultdict`` and objects that have a ``__dict__`` or
         ``__slots__`` attribute, excluding classes and objects that can't be copied with
-        ``copy.copy``.
+        ``copy.copy``. If the parsing of an object fails, the object will be returned unchanged and
+        the error will be logged.
 
         Args:
             obj (:obj:`object`): The object
@@ -364,20 +379,33 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
                 new_obj[self._insert_bot(k, memo)] = self._insert_bot(val, memo)
             memo[obj_id] = new_obj
             return new_obj
-        if hasattr(obj, '__dict__'):
-            for attr_name, attr in new_obj.__dict__.items():
-                setattr(new_obj, attr_name, self._insert_bot(attr, memo))
-            memo[obj_id] = new_obj
-            return new_obj
-        if hasattr(obj, '__slots__'):
-            for attr_name in obj.__slots__:
-                setattr(
-                    new_obj,
-                    attr_name,
-                    self._insert_bot(self._insert_bot(getattr(new_obj, attr_name), memo), memo),
-                )
-            memo[obj_id] = new_obj
-            return new_obj
+        # if '__dict__' in obj.__slots__, we already cover this here, that's why the
+        # __dict__ case comes below
+        try:
+            if hasattr(obj, '__slots__'):
+                for attr_name in obj.__slots__:
+                    setattr(
+                        new_obj,
+                        attr_name,
+                        self._insert_bot(
+                            self._insert_bot(getattr(new_obj, attr_name), memo), memo
+                        ),
+                    )
+                memo[obj_id] = new_obj
+                return new_obj
+            if hasattr(obj, '__dict__'):
+                for attr_name, attr in new_obj.__dict__.items():
+                    setattr(new_obj, attr_name, self._insert_bot(attr, memo))
+                memo[obj_id] = new_obj
+                return new_obj
+        except Exception as exception:
+            warnings.warn(
+                f'Parsing of an object failed with the following exception: {exception}. '
+                f'See the docs of BasePersistence.insert_bot for more information.',
+                RuntimeWarning,
+            )
+            memo[obj_id] = obj
+            return obj
 
         return obj
 
@@ -418,8 +446,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         .. versionadded:: 13.6
 
         Returns:
-            Optional[:class:`telegram.ext.utils.types.CDCData`]:  The restored meta data or
-                :obj:`None`, if no data was stored.
+            Optional[:class:`telegram.ext.utils.types.CDCData`]: The restored meta data or
+            :obj:`None`, if no data was stored.
         """
         raise NotImplementedError
 
@@ -441,8 +469,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     def update_conversation(
         self, name: str, key: Tuple[int, ...], new_state: Optional[object]
     ) -> None:
-        """Will be called when a :attr:`telegram.ext.ConversationHandler.update_state`
-        is called. This allows the storage of the new state in the persistence.
+        """Will be called when a :class:`telegram.ext.ConversationHandler` changes states.
+        This allows the storage of the new state in the persistence.
 
         Args:
             name (:obj:`str`): The handler's name.
@@ -458,7 +486,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         Args:
             user_id (:obj:`int`): The user the data might have been changed for.
             data (:class:`telegram.ext.utils.types.UD`): The
-                :attr:`telegram.ext.dispatcher.user_data` ``[user_id]``.
+                :attr:`telegram.ext.Dispatcher.user_data` ``[user_id]``.
         """
 
     @abstractmethod
@@ -469,7 +497,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         Args:
             chat_id (:obj:`int`): The chat the data might have been changed for.
             data (:class:`telegram.ext.utils.types.CD`): The
-                :attr:`telegram.ext.dispatcher.chat_data` ``[chat_id]``.
+                :attr:`telegram.ext.Dispatcher.chat_data` ``[chat_id]``.
         """
 
     @abstractmethod
@@ -479,7 +507,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         Args:
             data (:class:`telegram.ext.utils.types.BD`): The
-                :attr:`telegram.ext.dispatcher.bot_data`.
+                :attr:`telegram.ext.Dispatcher.bot_data`.
         """
 
     def refresh_user_data(self, user_id: int, user_data: UD) -> None:
@@ -524,8 +552,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         .. versionadded:: 13.6
 
         Args:
-            data (:class:`telegram.ext.utils.types.CDCData`:): The relevant data to restore
-                :attr:`telegram.ext.dispatcher.bot.callback_data_cache`.
+            data (:class:`telegram.ext.utils.types.CDCData`): The relevant data to restore
+                :class:`telegram.ext.CallbackDataCache`.
         """
         raise NotImplementedError
 

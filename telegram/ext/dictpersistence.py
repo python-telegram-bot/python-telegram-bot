@@ -294,7 +294,7 @@ class DictPersistence(BasePersistence):
 
         Returns:
             Optional[:class:`telegram.ext.utils.types.CDCData`]: The restored meta data or
-                :obj:`None`, if no data was stored.
+            :obj:`None`, if no data was stored.
         """
         if self.callback_data is None:
             self._callback_data = None
@@ -334,7 +334,7 @@ class DictPersistence(BasePersistence):
 
         Args:
             user_id (:obj:`int`): The user the data might have been changed for.
-            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.user_data` ``[user_id]``.
+            data (:obj:`dict`): The :attr:`telegram.ext.Dispatcher.user_data` ``[user_id]``.
         """
         if self._user_data is None:
             self._user_data = defaultdict(dict)
@@ -348,7 +348,7 @@ class DictPersistence(BasePersistence):
 
         Args:
             chat_id (:obj:`int`): The chat the data might have been changed for.
-            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.chat_data` ``[chat_id]``.
+            data (:obj:`dict`): The :attr:`telegram.ext.Dispatcher.chat_data` ``[chat_id]``.
         """
         if self._chat_data is None:
             self._chat_data = defaultdict(dict)
@@ -361,7 +361,7 @@ class DictPersistence(BasePersistence):
         """Will update the bot_data (if changed).
 
         Args:
-            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.bot_data`.
+            data (:obj:`dict`): The :attr:`telegram.ext.Dispatcher.bot_data`.
         """
         if self._bot_data == data:
             return
@@ -374,8 +374,8 @@ class DictPersistence(BasePersistence):
         .. versionadded:: 13.6
 
         Args:
-            data (:class:`telegram.ext.utils.types.CDCData`:): The relevant data to restore
-                :attr:`telegram.ext.dispatcher.bot.callback_data_cache`.
+            data (:class:`telegram.ext.utils.types.CDCData`): The relevant data to restore
+                :class:`telegram.ext.CallbackDataCache`.
         """
         if self._callback_data == data:
             return

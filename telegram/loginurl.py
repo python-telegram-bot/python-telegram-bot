@@ -29,7 +29,7 @@ class LoginUrl(TelegramObject):
     coming from Telegram. All the user needs to do is tap/click a button and confirm that they want
     to log in. Telegram apps support these buttons as of version 5.7.
 
-    Sample bot: `@discussbot <https://t.me/dicussbot>`_
+    Sample bot: `@discussbot <https://t.me/discussbot>`_
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`url` is equal.

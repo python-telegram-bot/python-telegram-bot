@@ -124,7 +124,7 @@ def main() -> None:
 
     # We can also pass on the deep-linking payload
     dispatcher.add_handler(
-        CommandHandler("start", deep_linked_level_3, Filters.regex(USING_ENTITIES), pass_args=True)
+        CommandHandler("start", deep_linked_level_3, Filters.regex(USING_ENTITIES))
     )
 
     # Possible with inline keyboard buttons as well

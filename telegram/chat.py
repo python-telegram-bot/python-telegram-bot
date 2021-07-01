@@ -284,7 +284,7 @@ class Chat(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.leave_chat`.
 
         Returns:
-            :obj:`bool` If the action was sent successfully.
+            :obj:`bool`: On success, :obj:`True` is returned.
 
         """
         return self.bot.leave_chat(
@@ -375,13 +375,7 @@ class Chat(TelegramObject):
         :meth:`telegram.Bot.kick_chat_member`.
 
         Returns:
-            :obj:`bool`: If the action was sent successfully.
-
-        Note:
-            This method will only work if the `All Members Are Admins` setting is off in the
-            target group. Otherwise members may only be removed by the group's creator or by the
-            member that added them.
-
+            :obj:`bool`: On success, :obj:`True` is returned.
         """
         return self.bot.kick_chat_member(
             chat_id=self.id,
@@ -406,7 +400,7 @@ class Chat(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.unban_chat_member`.
 
         Returns:
-            :obj:`bool`: If the action was sent successfully.
+            :obj:`bool`: On success, :obj:`True` is returned.
 
         """
         return self.bot.unban_chat_member(
@@ -444,7 +438,7 @@ class Chat(TelegramObject):
         .. versionadded:: 13.2
 
         Returns:
-            :obj:`bool`: If the action was sent successfully.
+            :obj:`bool`: On success, :obj:`True` is returned.
 
         """
         return self.bot.promote_chat_member(
@@ -483,7 +477,7 @@ class Chat(TelegramObject):
         .. versionadded:: 13.2
 
         Returns:
-            :obj:`bool`: If the action was sent successfully.
+            :obj:`bool`: On success, :obj:`True` is returned.
 
         """
         return self.bot.restrict_chat_member(
@@ -509,7 +503,7 @@ class Chat(TelegramObject):
         :meth:`telegram.Bot.set_chat_permissions`.
 
         Returns:
-            :obj:`bool`: If the action was sent successfully.
+            :obj:`bool`: On success, :obj:`True` is returned.
 
         """
         return self.bot.set_chat_permissions(
@@ -534,7 +528,7 @@ class Chat(TelegramObject):
         :meth:`telegram.Bot.set_chat_administrator_custom_title`.
 
         Returns:
-        :obj:`bool`: If the action was sent successfully.
+            :obj:`bool`: On success, :obj:`True` is returned.
 
         """
         return self.bot.set_chat_administrator_custom_title(
@@ -678,7 +672,7 @@ class Chat(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_media_group`.
 
         Returns:
-            List[:class:`telegram.Message`:] On success, instance representing the message posted.
+            List[:class:`telegram.Message`]: On success, instance representing the message posted.
 
         """
         return self.bot.send_media_group(
