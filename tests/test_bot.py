@@ -51,6 +51,7 @@ from telegram import (
     Chat,
     InlineQueryResultVoice,
     PollOption,
+    BotCommandScopeChat,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.ext import ExtBot, Defaults
@@ -969,7 +970,7 @@ class TestBot:
         monkeypatch.delattr(bot, '_post')
 
     # TODO: Needs improvement. No feasible way to test until bots can add members.
-    def test_kick_chat_member(self, monkeypatch, bot):
+    def test_ban_chat_member(self, monkeypatch, bot):
         def test(url, data, *args, **kwargs):
             chat_id = data['chat_id'] == 2
             user_id = data['user_id'] == 32
@@ -980,13 +981,13 @@ class TestBot:
         monkeypatch.setattr(bot.request, 'post', test)
         until = from_timestamp(1577887200)
 
-        assert bot.kick_chat_member(2, 32)
-        assert bot.kick_chat_member(2, 32, until_date=until)
-        assert bot.kick_chat_member(2, 32, until_date=1577887200)
-        assert bot.kick_chat_member(2, 32, revoke_messages=True)
+        assert bot.ban_chat_member(2, 32)
+        assert bot.ban_chat_member(2, 32, until_date=until)
+        assert bot.ban_chat_member(2, 32, until_date=1577887200)
+        assert bot.ban_chat_member(2, 32, revoke_messages=True)
         monkeypatch.delattr(bot.request, 'post')
 
-    def test_kick_chat_member_default_tz(self, monkeypatch, tz_bot):
+    def test_ban_chat_member_default_tz(self, monkeypatch, tz_bot):
         until = dtm.datetime(2020, 1, 11, 16, 13)
         until_timestamp = to_timestamp(until, tzinfo=tz_bot.defaults.tzinfo)
 
@@ -998,9 +999,21 @@ class TestBot:
 
         monkeypatch.setattr(tz_bot.request, 'post', test)
 
-        assert tz_bot.kick_chat_member(2, 32)
-        assert tz_bot.kick_chat_member(2, 32, until_date=until)
-        assert tz_bot.kick_chat_member(2, 32, until_date=until_timestamp)
+        assert tz_bot.ban_chat_member(2, 32)
+        assert tz_bot.ban_chat_member(2, 32, until_date=until)
+        assert tz_bot.ban_chat_member(2, 32, until_date=until_timestamp)
+
+    def test_kick_chat_member_warning(self, monkeypatch, bot, recwarn):
+        def test(url, data, *args, **kwargs):
+            chat_id = data['chat_id'] == 2
+            user_id = data['user_id'] == 32
+            return chat_id and user_id
+
+        monkeypatch.setattr(bot.request, 'post', test)
+        bot.kick_chat_member(2, 32)
+        assert len(recwarn) == 1
+        assert '`bot.kick_chat_member` is deprecated' in str(recwarn[0].message)
+        monkeypatch.delattr(bot.request, 'post')
 
     # TODO: Needs improvement.
     @pytest.mark.parametrize('only_if_banned', [True, False, None])
@@ -1338,10 +1351,20 @@ class TestBot:
             assert a.status in ('administrator', 'creator')
 
     @flaky(3, 1)
-    def test_get_chat_members_count(self, bot, channel_id):
-        count = bot.get_chat_members_count(channel_id)
+    def test_get_chat_member_count(self, bot, channel_id):
+        count = bot.get_chat_member_count(channel_id)
         assert isinstance(count, int)
         assert count > 3
+
+    def test_get_chat_members_count_warning(self, bot, channel_id, recwarn):
+        bot.get_chat_members_count(channel_id)
+        assert len(recwarn) == 1
+        assert '`bot.get_chat_members_count` is deprecated' in str(recwarn[0].message)
+
+    def test_bot_command_property_warning(self, bot, recwarn):
+        _ = bot.commands
+        assert len(recwarn) == 1
+        assert 'Bot.commands has been deprecated since there can' in str(recwarn[0].message)
 
     @flaky(3, 1)
     def test_get_chat_member(self, bot, channel_id, chat_id):
@@ -1942,6 +1965,44 @@ class TestBot:
             assert bc[0].description == 'descr1'
             assert bc[1].command == 'cmd2'
             assert bc[1].description == 'descr2'
+
+    @flaky(3, 1)
+    def test_get_set_delete_my_commands_with_scope(self, bot, super_group_id, chat_id):
+        group_cmds = [BotCommand('group_cmd', 'visible to this supergroup only')]
+        private_cmds = [BotCommand('private_cmd', 'visible to this private chat only')]
+        group_scope = BotCommandScopeChat(super_group_id)
+        private_scope = BotCommandScopeChat(chat_id)
+
+        # Set supergroup command list with lang code and check if the same can be returned from api
+        bot.set_my_commands(group_cmds, scope=group_scope, language_code='en')
+        gotten_group_cmds = bot.get_my_commands(scope=group_scope, language_code='en')
+
+        assert len(gotten_group_cmds) == len(group_cmds)
+        assert gotten_group_cmds[0].command == group_cmds[0].command
+
+        # Set private command list and check if same can be returned from the api
+        bot.set_my_commands(private_cmds, scope=private_scope)
+        gotten_private_cmd = bot.get_my_commands(scope=private_scope)
+
+        assert len(gotten_private_cmd) == len(private_cmds)
+        assert gotten_private_cmd[0].command == private_cmds[0].command
+
+        assert len(bot.commands) == 2  # set from previous test. Makes sure this hasn't changed.
+        assert bot.commands[0].command == 'cmd1'
+
+        # Delete command list from that supergroup and private chat-
+        bot.delete_my_commands(private_scope)
+        bot.delete_my_commands(group_scope, 'en')
+
+        # Check if its been deleted-
+        deleted_priv_cmds = bot.get_my_commands(scope=private_scope)
+        deleted_grp_cmds = bot.get_my_commands(scope=group_scope, language_code='en')
+
+        assert len(deleted_grp_cmds) == 0 == len(group_cmds) - 1
+        assert len(deleted_priv_cmds) == 0 == len(private_cmds) - 1
+
+        bot.delete_my_commands()  # Delete commands from default scope
+        assert not bot.commands  # Check if this has been updated to reflect the deletion.
 
     def test_log_out(self, monkeypatch, bot):
         # We don't actually make a request as to not break the test setup

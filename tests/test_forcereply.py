@@ -25,12 +25,17 @@ from telegram import ForceReply, ReplyKeyboardRemove
 
 @pytest.fixture(scope='class')
 def force_reply():
-    return ForceReply(TestForceReply.force_reply, TestForceReply.selective)
+    return ForceReply(
+        TestForceReply.force_reply,
+        TestForceReply.selective,
+        TestForceReply.input_field_placeholder,
+    )
 
 
 class TestForceReply:
     force_reply = True
     selective = True
+    input_field_placeholder = 'force replies can be annoying if not used properly'
 
     def test_slot_behaviour(self, force_reply, recwarn, mro_slots):
         for attr in force_reply.__slots__:
@@ -49,6 +54,7 @@ class TestForceReply:
     def test_expected(self, force_reply):
         assert force_reply.force_reply == self.force_reply
         assert force_reply.selective == self.selective
+        assert force_reply.input_field_placeholder == self.input_field_placeholder
 
     def test_to_dict(self, force_reply):
         force_reply_dict = force_reply.to_dict()
@@ -56,6 +62,7 @@ class TestForceReply:
         assert isinstance(force_reply_dict, dict)
         assert force_reply_dict['force_reply'] == force_reply.force_reply
         assert force_reply_dict['selective'] == force_reply.selective
+        assert force_reply_dict['input_field_placeholder'] == force_reply.input_field_placeholder
 
     def test_equality(self):
         a = ForceReply(True, False)

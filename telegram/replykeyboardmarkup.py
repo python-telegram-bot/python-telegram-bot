@@ -48,11 +48,17 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         selective (:obj:`bool`, optional): Use this parameter if you want to show the keyboard to
             specific users only. Targets:
 
-            1) Users that are @mentioned in the text of the Message object.
+            1) Users that are @mentioned in the :attr:`~telegram.Message.text` of the
+               :class:`telegram.Message` object.
             2) If the bot's message is a reply (has ``reply_to_message_id``), sender of the
                original message.
 
             Defaults to :obj:`False`.
+
+        input_field_placeholder (:obj:`str`, optional): The placeholder to be shown in the input
+            field when the keyboard is active; 1-64 characters.
+
+            .. versionadded:: 13.7
 
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -62,10 +68,21 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         one_time_keyboard (:obj:`bool`): Optional. Requests clients to hide the keyboard as soon as
             it's been used.
         selective (:obj:`bool`): Optional. Show the keyboard to specific users only.
+        input_field_placeholder (:obj:`str`): Optional. The placeholder shown in the input
+            field when the reply is active.
+
+            .. versionadded:: 13.7
 
     """
 
-    __slots__ = ('selective', 'keyboard', 'resize_keyboard', 'one_time_keyboard', '_id_attrs')
+    __slots__ = (
+        'selective',
+        'keyboard',
+        'resize_keyboard',
+        'one_time_keyboard',
+        'input_field_placeholder',
+        '_id_attrs',
+    )
 
     def __init__(
         self,
@@ -73,6 +90,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
+        input_field_placeholder: str = None,
         **_kwargs: Any,
     ):
         # Required
@@ -90,6 +108,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         self.resize_keyboard = bool(resize_keyboard)
         self.one_time_keyboard = bool(one_time_keyboard)
         self.selective = bool(selective)
+        self.input_field_placeholder = input_field_placeholder
 
         self._id_attrs = (self.keyboard,)
 
@@ -109,6 +128,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
+        input_field_placeholder: str = None,
         **kwargs: object,
     ) -> 'ReplyKeyboardMarkup':
         """Shortcut for::
@@ -133,10 +153,15 @@ class ReplyKeyboardMarkup(ReplyMarkup):
                 to specific users only. Targets:
 
                 1) Users that are @mentioned in the text of the Message object.
-                2) If the bot's message is a reply (has reply_to_message_id), sender of the
-                    original message.
+                2) If the bot's message is a reply (has ``reply_to_message_id``), sender of the
+                   original message.
 
                 Defaults to :obj:`False`.
+
+            input_field_placeholder (:obj:`str`): Optional. The placeholder shown in the input
+                field when the reply is active.
+
+                .. versionadded:: 13.7
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
         """
         return cls(
@@ -144,6 +169,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
             resize_keyboard=resize_keyboard,
             one_time_keyboard=one_time_keyboard,
             selective=selective,
+            input_field_placeholder=input_field_placeholder,
             **kwargs,
         )
 
@@ -154,6 +180,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
+        input_field_placeholder: str = None,
         **kwargs: object,
     ) -> 'ReplyKeyboardMarkup':
         """Shortcut for::
@@ -178,10 +205,15 @@ class ReplyKeyboardMarkup(ReplyMarkup):
                 to specific users only. Targets:
 
                 1) Users that are @mentioned in the text of the Message object.
-                2) If the bot's message is a reply (has reply_to_message_id), sender of the
-                    original message.
+                2) If the bot's message is a reply (has ``reply_to_message_id``), sender of the
+                   original message.
 
                 Defaults to :obj:`False`.
+
+            input_field_placeholder (:obj:`str`): Optional. The placeholder shown in the input
+                field when the reply is active.
+
+                .. versionadded:: 13.7
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         """
@@ -190,6 +222,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
             resize_keyboard=resize_keyboard,
             one_time_keyboard=one_time_keyboard,
             selective=selective,
+            input_field_placeholder=input_field_placeholder,
             **kwargs,
         )
 
@@ -200,6 +233,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
+        input_field_placeholder: str = None,
         **kwargs: object,
     ) -> 'ReplyKeyboardMarkup':
         """Shortcut for::
@@ -224,10 +258,15 @@ class ReplyKeyboardMarkup(ReplyMarkup):
                 to specific users only. Targets:
 
                 1) Users that are @mentioned in the text of the Message object.
-                2) If the bot's message is a reply (has reply_to_message_id), sender of the
-                    original message.
+                2) If the bot's message is a reply (has ``reply_to_message_id``), sender of the
+                   original message.
 
                 Defaults to :obj:`False`.
+
+            input_field_placeholder (:obj:`str`): Optional. The placeholder shown in the input
+                field when the reply is active.
+
+                .. versionadded:: 13.7
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         """
@@ -237,6 +276,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
             resize_keyboard=resize_keyboard,
             one_time_keyboard=one_time_keyboard,
             selective=selective,
+            input_field_placeholder=input_field_placeholder,
             **kwargs,
         )
 

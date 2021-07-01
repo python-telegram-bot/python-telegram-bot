@@ -57,6 +57,7 @@ from telegram import (
     Animation,
     Audio,
     BotCommand,
+    BotCommandScope,
     Chat,
     ChatMember,
     ChatPermissions,
@@ -400,7 +401,20 @@ class Bot(TelegramObject):
 
     @property
     def commands(self) -> List[BotCommand]:
-        """List[:class:`BotCommand`]: Bot's commands."""
+        """
+        List[:class:`BotCommand`]: Bot's commands as available in the default scope.
+
+        .. deprecated:: 13.7
+            This property has been deprecated since there can be different commands available for
+            different scopes.
+        """
+        warnings.warn(
+            "Bot.commands has been deprecated since there can be different command "
+            "lists for different scopes.",
+            TelegramDeprecationWarning,
+            stacklevel=2,
+        )
+
         if self._commands is None:
             self._commands = self.get_my_commands()
         return self._commands
@@ -2312,10 +2326,42 @@ class Bot(TelegramObject):
         revoke_messages: bool = None,
     ) -> bool:
         """
-        Use this method to kick a user from a group, supergroup or a channel. In the case of
+        Deprecated, use :func:`~telegram.Bot.ban_chat_member` instead.
+
+        .. deprecated:: 13.7
+
+        """
+        warnings.warn(
+            '`bot.kick_chat_member` is deprecated. Use `bot.ban_chat_member` instead.',
+            TelegramDeprecationWarning,
+            stacklevel=2,
+        )
+        return self.ban_chat_member(
+            chat_id=chat_id,
+            user_id=user_id,
+            timeout=timeout,
+            until_date=until_date,
+            api_kwargs=api_kwargs,
+            revoke_messages=revoke_messages,
+        )
+
+    @log
+    def ban_chat_member(
+        self,
+        chat_id: Union[str, int],
+        user_id: Union[str, int],
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        until_date: Union[int, datetime] = None,
+        api_kwargs: JSONDict = None,
+        revoke_messages: bool = None,
+    ) -> bool:
+        """
+        Use this method to ban a user from a group, supergroup or a channel. In the case of
         supergroups and channels, the user will not be able to return to the group on their own
         using invite links, etc., unless unbanned first. The bot must be an administrator in the
         chat for this to work and must have the appropriate admin rights.
+
+         .. versionadded:: 13.7
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target group or username
@@ -2358,7 +2404,7 @@ class Bot(TelegramObject):
         if revoke_messages is not None:
             data['revoke_messages'] = revoke_messages
 
-        result = self._post('kickChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post('banChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -3062,7 +3108,29 @@ class Bot(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> int:
+        """
+        Deprecated, use :func:`~telegram.Bot.get_chat_member_count` instead.
+
+        .. deprecated:: 13.7
+        """
+        warnings.warn(
+            '`bot.get_chat_members_count` is deprecated. '
+            'Use `bot.get_chat_member_count` instead.',
+            TelegramDeprecationWarning,
+            stacklevel=2,
+        )
+        return self.get_chat_member_count(chat_id=chat_id, timeout=timeout, api_kwargs=api_kwargs)
+
+    @log
+    def get_chat_member_count(
+        self,
+        chat_id: Union[str, int],
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> int:
         """Use this method to get the number of members in a chat.
+
+         .. versionadded:: 13.7
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -3082,7 +3150,7 @@ class Bot(TelegramObject):
         """
         data: JSONDict = {'chat_id': chat_id}
 
-        result = self._post('getChatMembersCount', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post('getChatMemberCount', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -4959,10 +5027,15 @@ class Bot(TelegramObject):
 
     @log
     def get_my_commands(
-        self, timeout: ODVInput[float] = DEFAULT_NONE, api_kwargs: JSONDict = None
+        self,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        scope: BotCommandScope = None,
+        language_code: str = None,
     ) -> List[BotCommand]:
         """
-        Use this method to get the current list of the bot's commands.
+        Use this method to get the current list of the bot's commands for the given scope and user
+        language.
 
         Args:
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -4970,19 +5043,39 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            scope (:class:`telegram.BotCommandScope`, optional): A JSON-serialized object,
+                describing scope of users. Defaults to :class:`telegram.BotCommandScopeDefault`.
+
+                .. versionadded:: 13.7
+
+            language_code (:obj:`str`, optional): A two-letter ISO 639-1 language code or an empty
+                string.
+
+                .. versionadded:: 13.7
 
         Returns:
-            List[:class:`telegram.BotCommand]`: On success, the commands set for the bot
+            List[:class:`telegram.BotCommand`]: On success, the commands set for the bot. An empty
+            list is returned if commands are not set.
 
         Raises:
             :class:`telegram.error.TelegramError`
 
         """
-        result = self._post('getMyCommands', timeout=timeout, api_kwargs=api_kwargs)
+        data: JSONDict = {}
 
-        self._commands = BotCommand.de_list(result, self)  # type: ignore[assignment,arg-type]
+        if scope:
+            data['scope'] = scope.to_dict()
 
-        return self._commands  # type: ignore[return-value]
+        if language_code:
+            data['language_code'] = language_code
+
+        result = self._post('getMyCommands', data, timeout=timeout, api_kwargs=api_kwargs)
+
+        if (scope is None or scope.type == scope.DEFAULT) and language_code is None:
+            self._commands = BotCommand.de_list(result, self)  # type: ignore[assignment,arg-type]
+            return self._commands  # type: ignore[return-value]
+
+        return BotCommand.de_list(result, self)  # type: ignore[return-value,arg-type]
 
     @log
     def set_my_commands(
@@ -4990,9 +5083,13 @@ class Bot(TelegramObject):
         commands: List[Union[BotCommand, Tuple[str, str]]],
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
+        scope: BotCommandScope = None,
+        language_code: str = None,
     ) -> bool:
         """
-        Use this method to change the list of the bot's commands.
+        Use this method to change the list of the bot's commands. See the
+        `Telegram docs <https://core.telegram.org/bots#commands>`_ for more details about bot
+        commands.
 
         Args:
             commands (List[:class:`BotCommand` | (:obj:`str`, :obj:`str`)]): A JSON-serialized list
@@ -5003,9 +5100,20 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            scope (:class:`telegram.BotCommandScope`, optional): A JSON-serialized object,
+                describing scope of users for which the commands are relevant. Defaults to
+                :class:`telegram.BotCommandScopeDefault`.
+
+                .. versionadded:: 13.7
+
+            language_code (:obj:`str`, optional): A two-letter ISO 639-1 language code. If empty,
+                commands will be applied to all users from the given scope, for whose language
+                there are no dedicated commands.
+
+                .. versionadded:: 13.7
 
         Returns:
-            :obj:`True`: On success
+            :obj:`bool`: On success, :obj:`True` is returned.
 
         Raises:
             :class:`telegram.error.TelegramError`
@@ -5015,11 +5123,68 @@ class Bot(TelegramObject):
 
         data: JSONDict = {'commands': [c.to_dict() for c in cmds]}
 
+        if scope:
+            data['scope'] = scope.to_dict()
+
+        if language_code:
+            data['language_code'] = language_code
+
         result = self._post('setMyCommands', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        # Set commands. No need to check for outcome.
+        # Set commands only for default scope. No need to check for outcome.
         # If request failed, we won't come this far
-        self._commands = cmds
+        if (scope is None or scope.type == scope.DEFAULT) and language_code is None:
+            self._commands = cmds
+
+        return result  # type: ignore[return-value]
+
+    @log
+    def delete_my_commands(
+        self,
+        scope: BotCommandScope = None,
+        language_code: str = None,
+        api_kwargs: JSONDict = None,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+    ) -> bool:
+        """
+        Use this method to delete the list of the bot's commands for the given scope and user
+        language. After deletion,
+        `higher level commands <https://core.telegram.org/bots/api#determining-list-of-commands>`_
+        will be shown to affected users.
+
+        .. versionadded:: 13.7
+
+        Args:
+            scope (:class:`telegram.BotCommandScope`, optional): A JSON-serialized object,
+                describing scope of users for which the commands are relevant. Defaults to
+                :class:`telegram.BotCommandScopeDefault`.
+            language_code (:obj:`str`, optional): A two-letter ISO 639-1 language code. If empty,
+                commands will be applied to all users from the given scope, for whose language
+                there are no dedicated commands.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {}
+
+        if scope:
+            data['scope'] = scope.to_dict()
+
+        if language_code:
+            data['language_code'] = language_code
+
+        result = self._post('deleteMyCommands', data, timeout=timeout, api_kwargs=api_kwargs)
+
+        if (scope is None or scope.type == scope.DEFAULT) and language_code is None:
+            self._commands = []
 
         return result  # type: ignore[return-value]
 
@@ -5210,6 +5375,8 @@ class Bot(TelegramObject):
     """Alias for :meth:`get_user_profile_photos`"""
     getFile = get_file
     """Alias for :meth:`get_file`"""
+    banChatMember = ban_chat_member
+    """Alias for :meth:`ban_chat_member`"""
     kickChatMember = kick_chat_member
     """Alias for :meth:`kick_chat_member`"""
     unbanChatMember = unban_chat_member
@@ -5242,6 +5409,8 @@ class Bot(TelegramObject):
     """Alias for :meth:`set_chat_sticker_set`"""
     deleteChatStickerSet = delete_chat_sticker_set
     """Alias for :meth:`delete_chat_sticker_set`"""
+    getChatMemberCount = get_chat_member_count
+    """Alias for :meth:`get_chat_member_count`"""
     getChatMembersCount = get_chat_members_count
     """Alias for :meth:`get_chat_members_count`"""
     getWebhookInfo = get_webhook_info
@@ -5312,6 +5481,8 @@ class Bot(TelegramObject):
     """Alias for :meth:`get_my_commands`"""
     setMyCommands = set_my_commands
     """Alias for :meth:`set_my_commands`"""
+    deleteMyCommands = delete_my_commands
+    """Alias for :meth:`delete_my_commands`"""
     logOut = log_out
     """Alias for :meth:`log_out`"""
     copyMessage = copy_message

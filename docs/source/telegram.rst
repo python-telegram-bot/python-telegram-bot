@@ -7,12 +7,26 @@ telegram package
     telegram.audio
     telegram.bot
     telegram.botcommand
+    telegram.botcommandscope
+    telegram.botcommandscopedefault
+    telegram.botcommandscopeallprivatechats
+    telegram.botcommandscopeallgroupchats
+    telegram.botcommandscopeallchatadministrators
+    telegram.botcommandscopechat
+    telegram.botcommandscopechatadministrators
+    telegram.botcommandscopechatmember
     telegram.callbackquery
     telegram.chat
     telegram.chataction
     telegram.chatinvitelink
     telegram.chatlocation
     telegram.chatmember
+    telegram.chatmemberowner
+    telegram.chatmemberadministrator
+    telegram.chatmembermember
+    telegram.chatmemberrestricted
+    telegram.chatmemberleft
+    telegram.chatmemberbanned
     telegram.chatmemberupdated
     telegram.chatpermissions
     telegram.chatphoto

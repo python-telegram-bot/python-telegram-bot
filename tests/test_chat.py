@@ -176,18 +176,27 @@ class TestChat:
         monkeypatch.setattr(chat.bot, 'get_chat_administrators', make_assertion)
         assert chat.get_administrators()
 
-    def test_get_members_count(self, monkeypatch, chat):
+    def test_get_member_count(self, monkeypatch, chat):
         def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id
 
         assert check_shortcut_signature(
-            Chat.get_members_count, Bot.get_chat_members_count, ['chat_id'], []
+            Chat.get_member_count, Bot.get_chat_member_count, ['chat_id'], []
         )
-        assert check_shortcut_call(chat.get_members_count, chat.bot, 'get_chat_members_count')
-        assert check_defaults_handling(chat.get_members_count, chat.bot)
+        assert check_shortcut_call(chat.get_member_count, chat.bot, 'get_chat_member_count')
+        assert check_defaults_handling(chat.get_member_count, chat.bot)
 
-        monkeypatch.setattr(chat.bot, 'get_chat_members_count', make_assertion)
+        monkeypatch.setattr(chat.bot, 'get_chat_member_count', make_assertion)
+        assert chat.get_member_count()
+
+    def test_get_members_count_warning(self, chat, monkeypatch, recwarn):
+        def make_assertion(*_, **kwargs):
+            return kwargs['chat_id'] == chat.id
+
+        monkeypatch.setattr(chat.bot, 'get_chat_member_count', make_assertion)
         assert chat.get_members_count()
+        assert len(recwarn) == 1
+        assert '`Chat.get_members_count` is deprecated' in str(recwarn[0].message)
 
     def test_get_member(self, monkeypatch, chat):
         def make_assertion(*_, **kwargs):
@@ -202,19 +211,31 @@ class TestChat:
         monkeypatch.setattr(chat.bot, 'get_chat_member', make_assertion)
         assert chat.get_member(user_id=42)
 
-    def test_kick_member(self, monkeypatch, chat):
+    def test_ban_member(self, monkeypatch, chat):
         def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == chat.id
             user_id = kwargs['user_id'] == 42
             until = kwargs['until_date'] == 43
             return chat_id and user_id and until
 
-        assert check_shortcut_signature(Chat.kick_member, Bot.kick_chat_member, ['chat_id'], [])
-        assert check_shortcut_call(chat.kick_member, chat.bot, 'kick_chat_member')
-        assert check_defaults_handling(chat.kick_member, chat.bot)
+        assert check_shortcut_signature(Chat.ban_member, Bot.ban_chat_member, ['chat_id'], [])
+        assert check_shortcut_call(chat.ban_member, chat.bot, 'ban_chat_member')
+        assert check_defaults_handling(chat.ban_member, chat.bot)
 
-        monkeypatch.setattr(chat.bot, 'kick_chat_member', make_assertion)
+        monkeypatch.setattr(chat.bot, 'ban_chat_member', make_assertion)
+        assert chat.ban_member(user_id=42, until_date=43)
+
+    def test_kick_member_warning(self, chat, monkeypatch, recwarn):
+        def make_assertion(*_, **kwargs):
+            chat_id = kwargs['chat_id'] == chat.id
+            user_id = kwargs['user_id'] == 42
+            until = kwargs['until_date'] == 43
+            return chat_id and user_id and until
+
+        monkeypatch.setattr(chat.bot, 'ban_chat_member', make_assertion)
         assert chat.kick_member(user_id=42, until_date=43)
+        assert len(recwarn) == 1
+        assert '`Chat.kick_member` is deprecated' in str(recwarn[0].message)
 
     @pytest.mark.parametrize('only_if_banned', [True, False, None])
     def test_unban_member(self, monkeypatch, chat, only_if_banned):

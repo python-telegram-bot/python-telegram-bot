@@ -21,7 +21,7 @@ The following constants were extracted from the
 `Telegram Bots API <https://core.telegram.org/bots/api>`_.
 
 Attributes:
-    BOT_API_VERSION (:obj:`str`): `5.2`. Telegram Bot API version supported by this
+    BOT_API_VERSION (:obj:`str`): `5.3`. Telegram Bot API version supported by this
         version of `python-telegram-bot`. Also available as ``telegram.bot_api_version``.
 
         .. versionadded:: 13.4
@@ -205,10 +205,35 @@ Attributes:
 
         .. versionadded:: 13.5
 
+:class:`telegram.BotCommandScope`:
+
+Attributes:
+    BOT_COMMAND_SCOPE_DEFAULT (:obj:`str`): ``'default'``
+
+        ..versionadded:: 13.7
+    BOT_COMMAND_SCOPE_ALL_PRIVATE_CHATS (:obj:`str`): ``'all_private_chats'``
+
+        ..versionadded:: 13.7
+    BOT_COMMAND_SCOPE_ALL_GROUP_CHATS (:obj:`str`): ``'all_group_chats'``
+
+        ..versionadded:: 13.7
+    BOT_COMMAND_SCOPE_ALL_CHAT_ADMINISTRATORS (:obj:`str`): ``'all_chat_administrators'``
+
+        ..versionadded:: 13.7
+    BOT_COMMAND_SCOPE_CHAT (:obj:`str`): ``'chat'``
+
+        ..versionadded:: 13.7
+    BOT_COMMAND_SCOPE_CHAT_ADMINISTRATORS (:obj:`str`): ``'chat_administrators'``
+
+        ..versionadded:: 13.7
+    BOT_COMMAND_SCOPE_CHAT_MEMBER (:obj:`str`): ``'chat_member'``
+
+        ..versionadded:: 13.7
+
 """
 from typing import List
 
-BOT_API_VERSION: str = '5.2'
+BOT_API_VERSION: str = '5.3'
 MAX_MESSAGE_LENGTH: int = 4096
 MAX_CAPTION_LENGTH: int = 1024
 ANONYMOUS_ADMIN_ID: int = 1087968824
@@ -343,3 +368,11 @@ UPDATE_ALL_TYPES = [
     UPDATE_MY_CHAT_MEMBER,
     UPDATE_CHAT_MEMBER,
 ]
+
+BOT_COMMAND_SCOPE_DEFAULT = 'default'
+BOT_COMMAND_SCOPE_ALL_PRIVATE_CHATS = 'all_private_chats'
+BOT_COMMAND_SCOPE_ALL_GROUP_CHATS = 'all_group_chats'
+BOT_COMMAND_SCOPE_ALL_CHAT_ADMINISTRATORS = 'all_chat_administrators'
+BOT_COMMAND_SCOPE_CHAT = 'chat'
+BOT_COMMAND_SCOPE_CHAT_ADMINISTRATORS = 'chat_administrators'
+BOT_COMMAND_SCOPE_CHAT_MEMBER = 'chat_member'

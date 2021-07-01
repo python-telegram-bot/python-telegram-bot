@@ -118,8 +118,12 @@ def check_object(h4):
         if field == 'from':
             field = 'from_user'
         elif (
-            name.startswith('InlineQueryResult') or name.startswith('InputMedia')
+            name.startswith('InlineQueryResult')
+            or name.startswith('InputMedia')
+            or name.startswith('BotCommandScope')
         ) and field == 'type':
+            continue
+        elif (name.startswith('ChatMember')) and field == 'status':
             continue
         elif (
             name.startswith('PassportElementError') and field == 'source'
@@ -136,7 +140,34 @@ def check_object(h4):
     if name == 'InputFile':
         return
     if name == 'InlineQueryResult':
-        ignored |= {'id', 'type'}
+        ignored |= {'id', 'type'}  # attributes common to all subclasses
+    if name == 'ChatMember':
+        ignored |= {'user', 'status'}  # attributes common to all subclasses
+    if name == 'ChatMember':
+        ignored |= {
+            'can_add_web_page_previews',  # for backwards compatibility
+            'can_be_edited',
+            'can_change_info',
+            'can_delete_messages',
+            'can_edit_messages',
+            'can_invite_users',
+            'can_manage_chat',
+            'can_manage_voice_chats',
+            'can_pin_messages',
+            'can_post_messages',
+            'can_promote_members',
+            'can_restrict_members',
+            'can_send_media_messages',
+            'can_send_messages',
+            'can_send_other_messages',
+            'can_send_polls',
+            'custom_title',
+            'is_anonymous',
+            'is_member',
+            'until_date',
+        }
+    if name == 'BotCommandScope':
+        ignored |= {'type'}  # attributes common to all subclasses
     elif name == 'User':
         ignored |= {'type'}  # TODO: Deprecation
     elif name in ('PassportFile', 'EncryptedPassportElement'):
