@@ -606,7 +606,7 @@ class TestSendMediaGroup:
         cid = messages[-1].chat.id
         mid = messages[-1].message_id
         new_message = bot.edit_message_media(
-            chat_id=cid, message_id=mid, InputMediaVideo(video_file, thumb=photo_file)
+            chat_id=cid, message_id=mid, media=InputMediaVideo(video_file, thumb=photo_file)
         )
         assert isinstance(new_message, Message)
 
