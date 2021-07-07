@@ -328,9 +328,13 @@ class Request:
                 # One media or multiple
                 if isinstance(val, InputMedia):
                     # Attach and set val to attached name
-                    data[key] = val.to_json()
+                    media_dict = val.to_dict()
                     if isinstance(val.media, InputFile):  # type: ignore
                         data[val.media.attach] = val.media.field_tuple  # type: ignore
+                        # if the file has a thumb, we also need to attach it to the data
+                        if "thumb" in media_dict:
+                            data[val.thumb.attach] = val.thumb.field_tuple
+                    data[key] = json.dumps(media_dict)
                 else:
                     # Attach and set val to attached name for all
                     media = []
