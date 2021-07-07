@@ -591,6 +591,26 @@ class TestSendMediaGroup:
         )
         assert isinstance(new_message, Message)
 
+    def test_edit_message_media_new_file_with_thumb(
+        self, bot, chat_id, media_group, video_file, photo_file, monkeypatch
+    ):
+        def test(*args, **kwargs):
+            data = kwargs['fields']
+            video_check = data[input_video.media.attach] == input_video.media.field_tuple
+            thumb_check = data[input_video.thumb.attach] == input_video.thumb.field_tuple
+            result = video_check and thumb_check
+            raise Exception(f"Test was {'successful' if result else 'failing'}")
+
+        monkeypatch.setattr('telegram.utils.request.Request._request_wrapper', test)
+        messages = bot.send_media_group(chat_id, media_group)
+        cid = messages[-1].chat.id
+        mid = messages[-1].message_id
+        new_message = bot.edit_message_media(
+            chat_id=cid, message_id=mid, InputMediaVideo(video_file, thumb=photo_file)
+        )
+        assert isinstance(new_message, Message)
+
+        
     @flaky(3, 1)
     @pytest.mark.parametrize(
         'default_bot', [{'parse_mode': ParseMode.HTML}], indirect=True, ids=['HTML-Bot']
