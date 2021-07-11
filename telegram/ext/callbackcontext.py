@@ -40,6 +40,7 @@ from telegram.ext.utils.types import UD, CD, BD
 if TYPE_CHECKING:
     from telegram import Bot
     from telegram.ext import Dispatcher, Job, JobQueue
+    from telegram.ext.utils.types import CCT
 
 CC = TypeVar('CC', bound='CallbackContext')
 
@@ -105,7 +106,7 @@ class CallbackContext(Generic[UD, CD, BD]):
         '__dict__',
     )
 
-    def __init__(self, dispatcher: 'Dispatcher'):
+    def __init__(self: 'CallbackContext[UD, CD, BD]', dispatcher: 'Dispatcher[CCT, UD, CD, BD]'):
         """
         Args:
             dispatcher (:class:`telegram.ext.Dispatcher`):
@@ -125,7 +126,7 @@ class CallbackContext(Generic[UD, CD, BD]):
         self.async_kwargs: Optional[Dict[str, object]] = None
 
     @property
-    def dispatcher(self) -> 'Dispatcher':
+    def dispatcher(self) -> 'Dispatcher[CCT, UD, CD, BD]':
         """:class:`telegram.ext.Dispatcher`: The dispatcher associated with this context."""
         return self._dispatcher
 
