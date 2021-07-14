@@ -3,9 +3,11 @@ on:
   pull_request:
     branches:
       - master
+      - v14
   push:
     branches: 
       - master
+      - v14
 
 jobs:
   pytest:
