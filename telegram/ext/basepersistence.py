@@ -277,8 +277,6 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
                 new_obj[cls._replace_bot(k, memo)] = cls._replace_bot(val, memo)
             memo[obj_id] = new_obj
             return new_obj
-        # if '__dict__' in obj.__slots__, we already cover this here, that's why the
-        # __dict__ case comes below
         try:
             if hasattr(obj, '__slots__'):
                 for attr_name in new_obj.__slots__:
@@ -290,7 +288,10 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
                         ),
                     )
                 memo[obj_id] = new_obj
-                return new_obj
+                if '__dict__' in obj.__slots__:
+                    # In this case, we have already covered the case that obj has __dict__
+                    # Note that obj may have a __dict__ even if it's not in __slots__!
+                    return new_obj
             if hasattr(obj, '__dict__'):
                 for attr_name, attr in new_obj.__dict__.items():
                     setattr(new_obj, attr_name, cls._replace_bot(attr, memo))
@@ -379,8 +380,6 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
                 new_obj[self._insert_bot(k, memo)] = self._insert_bot(val, memo)
             memo[obj_id] = new_obj
             return new_obj
-        # if '__dict__' in obj.__slots__, we already cover this here, that's why the
-        # __dict__ case comes below
         try:
             if hasattr(obj, '__slots__'):
                 for attr_name in obj.__slots__:
@@ -392,7 +391,10 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
                         ),
                     )
                 memo[obj_id] = new_obj
-                return new_obj
+                if '__dict__' in obj.__slots__:
+                    # In this case, we have already covered the case that obj has __dict__
+                    # Note that obj may have a __dict__ even if it's not in __slots__!
+                    return new_obj
             if hasattr(obj, '__dict__'):
                 for attr_name, attr in new_obj.__dict__.items():
                     setattr(new_obj, attr_name, self._insert_bot(attr, memo))
