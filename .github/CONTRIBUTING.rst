@@ -183,19 +183,19 @@ We use `sphinx`_ to generate static HTML docs. To build them, first make sure yo
 
 .. code-block:: bash
 
-$ pip install -r docs/requirements-docs.txt
+   $ pip install -r docs/requirements-docs.txt
 
 then run the following from the PTB root directory:
 
 .. code-block:: bash
 
-$ make -C docs html
+   $ make -C docs html
 
 or, if you don't have ``make`` available (e.g. on Windows):
 
 .. code-block:: bash
 
-$ sphinx-build docs/source docs/build/html
+   $ sphinx-build docs/source docs/build/html
 
 Once the process terminates, you can view the built documentation by opening ``docs/build/html/index.html`` with a browser.
 
@@ -277,5 +277,5 @@ break the API classes. For example:
 .. _`popular editors`: https://black.readthedocs.io/en/stable/editor_integration.html
 .. _`RTD`: https://python-telegram-bot.readthedocs.io/
 .. _`RTD build`: https://python-telegram-bot.readthedocs.io/en/doc-fixes
-.. _`CSI`: https://standards.mousepawmedia.com/csi.html
+.. _`CSI`: https://standards.mousepawmedia.com/en/stable/csi.html
 .. _`section`: #documenting
