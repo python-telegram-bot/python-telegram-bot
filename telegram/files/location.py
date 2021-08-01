@@ -27,7 +27,7 @@ class Location(TelegramObject):
     """This object represents a point on the map.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`longitute` and :attr:`latitude` are equal.
+    considered equal, if their :attr:`longitude` and :attr:`latitude` are equal.
 
     Args:
         longitude (:obj:`float`): Longitude as defined by sender.
