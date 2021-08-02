@@ -591,8 +591,8 @@ class TestSendMediaGroup:
         )
         assert isinstance(new_message, Message)
 
-    def test_edit_message_media_new_file_with_thumb(
-        self, bot, chat_id, media_group, video_file, photo_file, monkeypatch
+    def test_edit_message_media_with_thumb(
+        self, bot, chat_id, video_file, photo_file, monkeypatch  # noqa: F811
     ):
         def test(*args, **kwargs):
             data = kwargs['fields']
@@ -603,15 +603,9 @@ class TestSendMediaGroup:
 
         monkeypatch.setattr('telegram.utils.request.Request._request_wrapper', test)
         input_video = InputMediaVideo(video_file, thumb=photo_file)
-        messages = bot.send_media_group(chat_id, media_group)
-        cid = messages[-1].chat.id
-        mid = messages[-1].message_id
-        new_message = bot.edit_message_media(
-            chat_id=cid, message_id=mid, media=input_video
-        )
-        assert isinstance(new_message, Message)
+        with pytest.raises(Exception, match='Test was successful'):
+            bot.edit_message_media(chat_id=chat_id, message_id=123, media=input_video)
 
-        
     @flaky(3, 1)
     @pytest.mark.parametrize(
         'default_bot', [{'parse_mode': ParseMode.HTML}], indirect=True, ids=['HTML-Bot']
