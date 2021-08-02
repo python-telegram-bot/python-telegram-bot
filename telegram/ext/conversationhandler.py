@@ -612,7 +612,6 @@ class ConversationHandler(Handler[Update, CCT]):
                 the dispatcher.
 
         """
-        update = cast(Update, update)  # for mypy
         conversation_key, handler, check_result = check_result  # type: ignore[assignment,misc]
         raise_dp_handler_stop = False
 
