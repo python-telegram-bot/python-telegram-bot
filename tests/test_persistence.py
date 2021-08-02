@@ -32,6 +32,7 @@ import logging
 import os
 import pickle
 from collections import defaultdict
+from collections.abc import Container
 from time import sleep
 from sys import version_info as py_ver
 
@@ -566,17 +567,32 @@ class TestBasePersistence:
 
             def __init__(self):
                 self.bot = bot
-                self.not_in_dict = bot
+                self.not_in_slots = bot
 
             def __eq__(self, other):
                 if isinstance(other, CustomSlottedClass):
-                    return self.bot is other.bot and self.not_in_dict is other.not_in_dict
+                    return self.bot is other.bot and self.not_in_slots is other.not_in_slots
+                return False
+
+        class DictNotInSlots(Container):
+            """This classes parent has slots, but __dict__ is not in those slots."""
+
+            def __init__(self):
+                self.bot = bot
+
+            def __contains__(self, item):
+                return True
+
+            def __eq__(self, other):
+                if isinstance(other, DictNotInSlots):
+                    return self.bot is other.bot
                 return False
 
         class CustomClass:
             def __init__(self):
                 self.bot = bot
                 self.slotted_object = CustomSlottedClass()
+                self.dict_not_in_slots_object = DictNotInSlots()
                 self.list_ = [1, 2, bot]
                 self.tuple_ = tuple(self.list_)
                 self.set_ = set(self.list_)
@@ -589,7 +605,8 @@ class TestBasePersistence:
                 cc = CustomClass()
                 cc.bot = BasePersistence.REPLACED_BOT
                 cc.slotted_object.bot = BasePersistence.REPLACED_BOT
-                cc.slotted_object.not_in_dict = BasePersistence.REPLACED_BOT
+                cc.slotted_object.not_in_slots = BasePersistence.REPLACED_BOT
+                cc.dict_not_in_slots_object.bot = BasePersistence.REPLACED_BOT
                 cc.list_ = [1, 2, BasePersistence.REPLACED_BOT]
                 cc.tuple_ = tuple(cc.list_)
                 cc.set_ = set(cc.list_)
@@ -603,6 +620,7 @@ class TestBasePersistence:
                     return (
                         self.bot is other.bot
                         and self.slotted_object == other.slotted_object
+                        and self.dict_not_in_slots_object == other.dict_not_in_slots_object
                         and self.list_ == other.list_
                         and self.tuple_ == other.tuple_
                         and self.set_ == other.set_
