@@ -603,9 +603,7 @@ class TestSendMediaGroup:
 
         monkeypatch.setattr('telegram.utils.request.Request._request_wrapper', test)
         input_video = InputMediaVideo(video_file, thumb=photo_file)
-        print('test1')
         messages = bot.send_media_group(chat_id, media_group)
-        print('test2')
         cid = messages[-1].chat.id
         mid = messages[-1].message_id
         with pytest.raises(Exception, match='Test was successful'):
