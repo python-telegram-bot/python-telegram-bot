@@ -301,7 +301,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 workers=workers,
                 exception_event=self.__exception_event,
                 persistence=persistence,
-                use_context=use_context,
                 context_types=context_types,
             )
             self.job_queue.set_dispatcher(self.dispatcher)

@@ -320,7 +320,7 @@ class TestBasePersistence:
     @pytest.mark.parametrize('run_async', [True, False], ids=['synchronous', 'run_async'])
     def test_dispatcher_integration_handlers(
         self,
-        cdp,
+        dp,
         caplog,
         bot,
         base_persistence,
@@ -381,17 +381,14 @@ class TestBasePersistence:
         known_user = MessageHandler(
             Filters.user(user_id=12345),
             callback_known_user,
-            pass_chat_data=True,
-            pass_user_data=True,
         )
         known_chat = MessageHandler(
             Filters.chat(chat_id=-67890),
             callback_known_chat,
-            pass_chat_data=True,
-            pass_user_data=True,
         )
         unknown = MessageHandler(
-            Filters.all, callback_unknown_user_or_chat, pass_chat_data=True, pass_user_data=True
+            Filters.all,
+            callback_unknown_user_or_chat,
         )
         dp.add_handler(known_user)
         dp.add_handler(known_chat)
@@ -459,7 +456,7 @@ class TestBasePersistence:
     @pytest.mark.parametrize('run_async', [True, False], ids=['synchronous', 'run_async'])
     def test_persistence_dispatcher_integration_refresh_data(
         self,
-        cdp,
+        dp,
         base_persistence,
         chat_data,
         bot_data,
@@ -478,7 +475,7 @@ class TestBasePersistence:
         base_persistence.store_bot_data = store_bot_data
         base_persistence.store_chat_data = store_chat_data
         base_persistence.store_user_data = store_user_data
-        cdp.persistence = base_persistence
+        dp.persistence = base_persistence
 
         self.test_flag = True
 
@@ -513,26 +510,22 @@ class TestBasePersistence:
         with_user_and_chat = MessageHandler(
             Filters.user(user_id=12345),
             callback_with_user_and_chat,
-            pass_chat_data=True,
-            pass_user_data=True,
             run_async=run_async,
         )
         without_user_and_chat = MessageHandler(
             Filters.all,
             callback_without_user_and_chat,
-            pass_chat_data=True,
-            pass_user_data=True,
             run_async=run_async,
         )
-        cdp.add_handler(with_user_and_chat)
-        cdp.add_handler(without_user_and_chat)
+        dp.add_handler(with_user_and_chat)
+        dp.add_handler(without_user_and_chat)
         user = User(id=12345, first_name='test user', is_bot=False)
         chat = Chat(id=-987654, type='group')
         m = Message(1, None, chat, from_user=user)
 
         # has user and chat
         u = Update(0, m)
-        cdp.process_update(u)
+        dp.process_update(u)
 
         assert self.test_flag is True
 
@@ -540,7 +533,7 @@ class TestBasePersistence:
         m.from_user = None
         m.chat = None
         u = Update(1, m)
-        cdp.process_update(u)
+        dp.process_update(u)
 
         assert self.test_flag is True
 
@@ -1656,8 +1649,8 @@ class TestPicklePersistence:
             if not context.bot.callback_data_cache.persistence_data == ([], {'test1': 'test0'}):
                 pytest.fail()
 
-        h1 = MessageHandler(None, first, pass_user_data=True, pass_chat_data=True)
-        h2 = MessageHandler(None, second, pass_user_data=True, pass_chat_data=True)
+        h1 = MessageHandler(None, first)
+        h2 = MessageHandler(None, second)
         dp.add_handler(h1)
         dp.process_update(update)
         pickle_persistence_2 = PicklePersistence(
@@ -1879,8 +1872,8 @@ class TestPicklePersistence:
         assert nested_ch.conversations[nested_ch._get_key(update)] == 1
         assert nested_ch.conversations == pickle_persistence.conversations['name3']
 
-    def test_with_job(self, job_queue, cdp, pickle_persistence):
-        cdp.bot.arbitrary_callback_data = True
+    def test_with_job(self, job_queue, dp, pickle_persistence):
+        dp.bot.arbitrary_callback_data = True
 
         def job_callback(context):
             context.bot_data['test1'] = '456'
@@ -1888,8 +1881,8 @@ class TestPicklePersistence:
             context.dispatcher.user_data[789]['test3'] = '123'
             context.bot.callback_data_cache._callback_queries['test'] = 'Working4!'
 
-        cdp.persistence = pickle_persistence
-        job_queue.set_dispatcher(cdp)
+        dp.persistence = pickle_persistence
+        job_queue.set_dispatcher(dp)
         job_queue.start()
         job_queue.run_once(job_callback, 0.01)
         sleep(0.5)
@@ -2339,8 +2332,8 @@ class TestDictPersistence:
         assert nested_ch.conversations[nested_ch._get_key(update)] == 1
         assert nested_ch.conversations == dict_persistence.conversations['name3']
 
-    def test_with_job(self, job_queue, cdp):
-        cdp.bot.arbitrary_callback_data = True
+    def test_with_job(self, job_queue, dp):
+        dp.bot.arbitrary_callback_data = True
 
         def job_callback(context):
             context.bot_data['test1'] = '456'
@@ -2349,8 +2342,8 @@ class TestDictPersistence:
             context.bot.callback_data_cache._callback_queries['test'] = 'Working4!'
 
         dict_persistence = DictPersistence(store_callback_data=True)
-        cdp.persistence = dict_persistence
-        job_queue.set_dispatcher(cdp)
+        dp.persistence = dict_persistence
+        job_queue.set_dispatcher(dp)
         job_queue.start()
         job_queue.run_once(job_callback, 0.01)
         sleep(0.8)

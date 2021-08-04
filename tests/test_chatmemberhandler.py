@@ -222,9 +222,9 @@ class TestChatMemberHandler:
         assert not handler.check_update(false_update)
         assert not handler.check_update(True)
 
-    def test_context(self, cdp, chat_member):
+    def test_context(self, dp, chat_member):
         handler = ChatMemberHandler(self.callback_context)
-        cdp.add_handler(handler)
+        dp.add_handler(handler)
 
-        cdp.process_update(chat_member)
+        dp.process_update(chat_member)
         assert self.test_flag

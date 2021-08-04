@@ -33,7 +33,7 @@ class TestDefault:
         a.custom, a._parse_mode = 'should give warning', a._parse_mode
         assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
-    def test_data_assignment(self, cdp):
+    def test_data_assignment(self, dp):
         defaults = Defaults()
 
         with pytest.raises(AttributeError):

@@ -34,7 +34,6 @@ from telegram.utils.types import JSONDict
 from telegram.utils.deprecate import set_new_attribute_deprecated
 
 if TYPE_CHECKING:
-    from telegram import Bot
     from telegram.ext import Dispatcher
     import apscheduler.job  # noqa: F401
 
@@ -70,10 +69,8 @@ class JobQueue:
     def __setattr__(self, key: str, value: object) -> None:
         set_new_attribute_deprecated(self, key, value)
 
-    def _build_args(self, job: 'Job') -> List[Union[CallbackContext, 'Bot', 'Job']]:
-        if self._dispatcher.use_context:
-            return [self._dispatcher.context_types.context.from_job(job, self._dispatcher)]
-        return [self._dispatcher.bot, job]
+    def _build_args(self, job: 'Job') -> List[CallbackContext]:
+        return [self._dispatcher.context_types.context.from_job(job, self._dispatcher)]
 
     def _tz_now(self) -> datetime.datetime:
         return datetime.datetime.now(self.scheduler.timezone)
@@ -588,10 +585,7 @@ class Job:
     def run(self, dispatcher: 'Dispatcher') -> None:
         """Executes the callback function independently of the jobs schedule."""
         try:
-            if dispatcher.use_context:
-                self.callback(dispatcher.context_types.context.from_job(self, dispatcher))
-            else:
-                self.callback(dispatcher.bot, self)  # type: ignore[arg-type,call-arg]
+            self.callback(dispatcher.context_types.context.from_job(self, dispatcher))
         except Exception as exc:
             try:
                 dispatcher.dispatch_error(None, exc)
