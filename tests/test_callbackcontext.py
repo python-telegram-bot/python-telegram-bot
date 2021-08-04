@@ -47,10 +47,6 @@ class TestCallbackContext:
         c.args = c.args
         assert len(recwarn) == 0, recwarn.list
 
-    def test_non_context_dp(self, dp):
-        with pytest.raises(ValueError):
-            CallbackContext(dp)
-
     def test_from_job(self, dp):
         job = dp.job_queue.run_once(lambda x: x, 10)
 
