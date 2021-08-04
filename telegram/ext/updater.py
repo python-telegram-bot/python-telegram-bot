@@ -211,7 +211,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
         request_kwargs: Dict[str, Any] = None,
         persistence: 'BasePersistence' = None,
         defaults: 'Defaults' = None,
-        use_context: bool = True,
         dispatcher=None,
         base_file_url: str = None,
         arbitrary_callback_data: Union[DefaultValue, bool, int, None] = DEFAULT_FALSE,
@@ -244,8 +243,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 raise ValueError('`dispatcher` and `bot` are mutually exclusive')
             if persistence is not None:
                 raise ValueError('`dispatcher` and `persistence` are mutually exclusive')
-            if use_context != dispatcher.use_context:
-                raise ValueError('`dispatcher` and `use_context` are mutually exclusive')
             if context_types is not None:
                 raise ValueError('`dispatcher` and `context_types` are mutually exclusive')
             if workers is not None:

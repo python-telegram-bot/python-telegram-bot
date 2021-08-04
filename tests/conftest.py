@@ -194,7 +194,7 @@ def dp(_dp):
 
 @pytest.fixture(scope='function')
 def updater(bot):
-    up = Updater(bot=bot, workers=2, use_context=False)
+    up = Updater(bot=bot, workers=2)
     yield up
     if up.running:
         up.stop()
