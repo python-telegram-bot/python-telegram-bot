@@ -127,14 +127,11 @@ class TestInputMediaVideo:
     supports_streaming = True
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
 
-    def test_slot_behaviour(self, input_media_video, recwarn, mro_slots):
+    def test_slot_behaviour(self, input_media_video, mro_slots):
         inst = input_media_video
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-        inst.custom, inst.type = 'should give warning', self.type_
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_expected_values(self, input_media_video):
         assert input_media_video.type == self.type_
@@ -194,14 +191,11 @@ class TestInputMediaPhoto:
     parse_mode = 'Markdown'
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
 
-    def test_slot_behaviour(self, input_media_photo, recwarn, mro_slots):
+    def test_slot_behaviour(self, input_media_photo, mro_slots):
         inst = input_media_photo
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-        inst.custom, inst.type = 'should give warning', self.type_
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_expected_values(self, input_media_photo):
         assert input_media_photo.type == self.type_
@@ -249,14 +243,11 @@ class TestInputMediaAnimation:
     height = 30
     duration = 1
 
-    def test_slot_behaviour(self, input_media_animation, recwarn, mro_slots):
+    def test_slot_behaviour(self, input_media_animation, mro_slots):
         inst = input_media_animation
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-        inst.custom, inst.type = 'should give warning', self.type_
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_expected_values(self, input_media_animation):
         assert input_media_animation.type == self.type_
@@ -311,14 +302,11 @@ class TestInputMediaAudio:
     parse_mode = 'HTML'
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
 
-    def test_slot_behaviour(self, input_media_audio, recwarn, mro_slots):
+    def test_slot_behaviour(self, input_media_audio, mro_slots):
         inst = input_media_audio
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-        inst.custom, inst.type = 'should give warning', self.type_
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_expected_values(self, input_media_audio):
         assert input_media_audio.type == self.type_
@@ -377,14 +365,11 @@ class TestInputMediaDocument:
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
     disable_content_type_detection = True
 
-    def test_slot_behaviour(self, input_media_document, recwarn, mro_slots):
+    def test_slot_behaviour(self, input_media_document, mro_slots):
         inst = input_media_document
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-        inst.custom, inst.type = 'should give warning', self.type_
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_expected_values(self, input_media_document):
         assert input_media_document.type == self.type_

@@ -38,7 +38,7 @@ CallbackContext.refresh_data is tested in TestBasePersistence
 
 
 class TestCallbackContext:
-    def test_slot_behaviour(self, cdp, recwarn, mro_slots):
+    def test_slot_behaviour(self, cdp, mro_slots, recwarn):
         c = CallbackContext(cdp)
         for attr in c.__slots__:
             assert getattr(c, attr, 'err') != 'err', f"got extra slot '{attr}'"

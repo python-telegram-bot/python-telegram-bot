@@ -47,10 +47,7 @@ class TestWebhookInfo:
     def test_slot_behaviour(self, webhook_info, mro_slots, recwarn):
         for attr in webhook_info.__slots__:
             assert getattr(webhook_info, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not webhook_info.__dict__, f"got missing slot(s): {webhook_info.__dict__}"
         assert len(mro_slots(webhook_info)) == len(set(mro_slots(webhook_info))), "duplicate slot"
-        webhook_info.custom, webhook_info.url = 'should give warning', self.url
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_to_dict(self, webhook_info):
         webhook_info_dict = webhook_info.to_dict()
