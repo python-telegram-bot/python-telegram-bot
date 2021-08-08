@@ -44,7 +44,7 @@ class TestWebhookInfo:
     max_connections = 42
     allowed_updates = ['type1', 'type2']
 
-    def test_slot_behaviour(self, webhook_info, mro_slots, recwarn):
+    def test_slot_behaviour(self, webhook_info, mro_slots):
         for attr in webhook_info.__slots__:
             assert getattr(webhook_info, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(webhook_info)) == len(set(mro_slots(webhook_info))), "duplicate slot"
