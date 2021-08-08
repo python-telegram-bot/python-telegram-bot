@@ -26,7 +26,6 @@ import warnings
 from typing import TYPE_CHECKING, List, Optional, Tuple, Type, TypeVar
 
 from telegram.utils.types import JSONDict
-from telegram.utils.deprecate import set_new_attribute_deprecated
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -41,17 +40,13 @@ class TelegramObject:
 
     # Adding slots reduces memory usage & allows for faster attribute access.
     # Only instance variables should be added to __slots__.
-    # We add __dict__ here for backward compatibility & also to avoid repetition for subclasses.
-    __slots__ = ('__dict__',)
+    __slots__ = ()
 
     def __str__(self) -> str:
         return str(self.to_dict())
 
     def __getitem__(self, item: str) -> object:
         return getattr(self, item, None)
-
-    def __setattr__(self, key: str, value: object) -> None:
-        set_new_attribute_deprecated(self, key, value)
 
     @staticmethod
     def _parse_data(data: Optional[JSONDict]) -> Optional[JSONDict]:

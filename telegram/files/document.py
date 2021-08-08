@@ -71,8 +71,6 @@ class Document(TelegramObject):
         '_id_attrs',
     )
 
-    _id_keys = ('file_id',)
-
     def __init__(
         self,
         file_id: str,
