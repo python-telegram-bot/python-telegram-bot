@@ -557,6 +557,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         """
         raise NotImplementedError
 
+    @abstractmethod
     def flush(self) -> None:
         """Will be called by :class:`telegram.ext.Updater` upon receiving a stop signal. Gives the
         persistence a chance to finish up saving or close a database connection gracefully.

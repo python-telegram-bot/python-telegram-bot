@@ -98,6 +98,9 @@ class OwnPersistence(BasePersistence):
     def update_user_data(self, user_id, data):
         raise NotImplementedError
 
+    def flush(self) -> None:
+        raise NotImplementedError
+
 
 @pytest.fixture(scope="function")
 def base_persistence():
@@ -146,6 +149,9 @@ def bot_persistence():
             self.callback_data = data
 
         def update_conversation(self, name, key, new_state):
+            raise NotImplementedError
+
+        def flush(self) -> None:
             raise NotImplementedError
 
     return BotPersistence()
@@ -239,7 +245,7 @@ class TestBasePersistence:
         with pytest.raises(
             TypeError,
             match=(
-                'get_bot_data, get_chat_data, get_conversations, '
+                'flush, get_bot_data, get_chat_data, get_conversations, '
                 'get_user_data, update_bot_data, update_chat_data, '
                 'update_conversation, update_user_data'
             ),
