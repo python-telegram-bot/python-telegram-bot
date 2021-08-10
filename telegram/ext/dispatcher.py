@@ -523,6 +523,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                 self.logger.exception('An uncaught error was raised while handling the error.')
             return
 
+        context = None
         handled = False
         sync_modes = []
 
@@ -531,8 +532,9 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                 for handler in self.handlers[group]:
                     check = handler.check_update(update)
                     if check is not None and check is not False:
-                        context = self.context_types.context.from_update(update, self)
-                        context.refresh_data()
+                        if not context:
+                            context = self.context_types.context.from_update(update, self)
+                            context.refresh_data()
                         handled = True
                         sync_modes.append(handler.run_async)
                         handler.handle_update(update, self, check, context)
