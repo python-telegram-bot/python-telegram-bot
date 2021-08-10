@@ -599,7 +599,7 @@ class ConversationHandler(Handler[Update, CCT]):
         update: Update,
         dispatcher: 'Dispatcher',
         check_result: CheckUpdateType,
-        context: CallbackContext = None,
+        context: CallbackContext,
     ) -> Optional[object]:
         """Send the update to the callback for the current state and Handler
 

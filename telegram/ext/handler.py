@@ -116,7 +116,7 @@ class Handler(Generic[UT, CCT], ABC):
         update: UT,
         dispatcher: 'Dispatcher',
         check_result: object,
-        context: CCT = None,
+        context: CCT,
     ) -> Union[RT, Promise]:
         """
         This method is called if it was determined that an update should indeed
