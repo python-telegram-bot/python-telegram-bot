@@ -76,7 +76,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         store_bot_data (:obj:`bool`, optional): Whether bot_data should be saved by this
             persistence class. Default is :obj:`True`.
         store_callback_data (:obj:`bool`, optional): Whether callback_data should be saved by this
-            persistence class. Default is :obj:`False`.
+            persistence class. Default is :obj:`True`.
 
             .. versionadded:: 13.6
 
@@ -176,7 +176,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         store_user_data: bool = True,
         store_chat_data: bool = True,
         store_bot_data: bool = True,
-        store_callback_data: bool = False,
+        store_callback_data: bool = True,
     ):
         self.store_user_data = store_user_data
         self.store_chat_data = store_chat_data
