@@ -73,27 +73,7 @@ Here's how to make a one-off code change.
 
    - Provide static typing with signature annotations. The documentation of `MyPy`_ will be a good start, the cheat sheet is `here`_. We also have some custom type aliases in ``telegram.utils.helpers.typing``.
 
-   - Document your code. This project uses `sphinx`_ to generate static HTML docs. To build them, first make sure you have the required dependencies:
-
-     .. code-block:: bash
-
-        $ pip install -r docs/requirements-docs.txt
-
-     then run the following from the PTB root directory:
-   
-     .. code-block:: bash
-         
-        $ make -C docs html
-
-     or, if you don't have ``make`` available (e.g. on Windows):
-
-     .. code-block:: bash
-
-        $ sphinx-build docs/source docs/build/html
-
-     Once the process terminates, you can view the built documentation by opening ``docs/build/html/index.html`` with a browser.
-
-   - Add ``.. versionadded:: version``, ``.. versionchanged:: version`` or ``.. deprecated:: version`` to the associated documentation of your changes, depending on what kind of change you made. This only applies if the change you made is visible to an end user. The directives should be added to class/method descriptions if their general behaviour changed and to the description of all arguments & attributes that changed.
+   - Document your code. This step is pretty important to us, so it has its own `section`_.
 
    - For consistency, please conform to `Google Python Style Guide`_ and `Google Python Style Docstrings`_.
 
@@ -151,7 +131,7 @@ Here's how to make a one-off code change.
 
 5. **Address review comments until all reviewers give LGTM ('looks good to me').**
 
-   - When your reviewer has reviewed the code, you'll get an email. You'll need to respond in two ways:
+   - When your reviewer has reviewed the code, you'll get a notification. You'll need to respond in two ways:
 
        - Make a new commit addressing the comments you agree with, and push it to the same branch. Ideally, the commit message would explain what the commit does (e.g. "Fix lint error"), but if there are lots of disparate review comments, it's fine to refer to the original commit message and add something like "(address review comments)".
 
@@ -185,6 +165,49 @@ Here's how to make a one-off code change.
       $ git push origin --delete your-branch-name
 
 7. **Celebrate.** Congratulations, you have contributed to ``python-telegram-bot``!
+
+Documenting
+===========
+
+The documentation of this project is separated in two sections: User facing and dev facing.
+
+User facing docs are hosted at `RTD`_. They are the main way the users of our library are supposed to get information about the objects. They don't care about the internals, they just want to know
+what they have to pass to make it work, what it actually does. You can/should provide examples for non obvious cases (like the Filter module), and notes/warnings.
+
+Dev facing, on the other side, is for the devs/maintainers of this project. These
+doc strings don't have a separate documentation site they generate, instead, they document the actual code.
+
+User facing documentation
+-------------------------
+We use `sphinx`_ to generate static HTML docs. To build them, first make sure you have the required dependencies:
+
+.. code-block:: bash
+
+   $ pip install -r docs/requirements-docs.txt
+
+then run the following from the PTB root directory:
+
+.. code-block:: bash
+
+   $ make -C docs html
+
+or, if you don't have ``make`` available (e.g. on Windows):
+
+.. code-block:: bash
+
+   $ sphinx-build docs/source docs/build/html
+
+Once the process terminates, you can view the built documentation by opening ``docs/build/html/index.html`` with a browser.
+
+- Add ``.. versionadded:: version``, ``.. versionchanged:: version`` or ``.. deprecated:: version`` to the associated documentation of your changes, depending on what kind of change you made. This only applies if the change you made is visible to an end user. The directives should be added to class/method descriptions if their general behaviour changed and to the description of all arguments & attributes that changed.
+
+Dev facing documentation
+------------------------
+We adhere to the `CSI`_ standard. This documentation is not fully implemented in the project, yet, but new code changes should comply with the `CSI` standard.
+The idea behind this is to make it very easy for you/a random maintainer or even a totally foreign person to drop anywhere into the code and more or less immediately understand what a particular line does. This will make it easier
+for new to make relevant changes if said lines don't do what they are supposed to.
+
+
 
 Style commandments
 ------------------
@@ -252,4 +275,7 @@ break the API classes. For example:
 .. _`here`: https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html
 .. _`Black`: https://black.readthedocs.io/en/stable/index.html
 .. _`popular editors`: https://black.readthedocs.io/en/stable/editor_integration.html
+.. _`RTD`: https://python-telegram-bot.readthedocs.io/
 .. _`RTD build`: https://python-telegram-bot.readthedocs.io/en/doc-fixes
+.. _`CSI`: https://standards.mousepawmedia.com/en/stable/csi.html
+.. _`section`: #documenting
