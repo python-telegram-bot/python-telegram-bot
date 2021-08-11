@@ -151,13 +151,13 @@ class Conflict(TelegramError):
         return self.__class__, (self.message,)
 
 
-class TelegramDecryptionError(TelegramError):
+class PassportDecryptionError(TelegramError):
     """Something went wrong with decryption."""
 
     __slots__ = ('_msg',)
 
     def __init__(self, message: Union[str, Exception]):
-        super().__init__(f"TelegramDecryptionError: {message}")
+        super().__init__(f"PassportDecryptionError: {message}")
         self._msg = str(message)
 
     def __reduce__(self) -> Tuple[type, Tuple[str]]:

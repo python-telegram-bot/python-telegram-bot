@@ -41,7 +41,7 @@ except ImportError:
 
     CRYPTO_INSTALLED = False
 
-from telegram import TelegramObject, TelegramDecryptionError
+from telegram import TelegramObject, PassportDecryptionError
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -64,7 +64,7 @@ def decrypt(secret, hash, data):
             b64decode it.
 
     Raises:
-        :class:`TelegramDecryptionError`: Given hash does not match hash of decrypted data.
+        :class:`PassportDecryptionError`: Given hash does not match hash of decrypted data.
 
     Returns:
         :obj:`bytes`: The decrypted data as bytes.
@@ -92,7 +92,7 @@ def decrypt(secret, hash, data):
     # If the newly calculated hash did not match the one telegram gave us
     if data_hash != hash:
         # Raise a error that is caught inside telegram.PassportData and transformed into a warning
-        raise TelegramDecryptionError(f"Hashes are not equal! {data_hash} != {hash}")
+        raise PassportDecryptionError(f"Hashes are not equal! {data_hash} != {hash}")
     # Return data without padding
     return data[data[0] :]
 
@@ -160,7 +160,7 @@ class EncryptedCredentials(TelegramObject):
         :obj:`str`: Lazily decrypt and return secret.
 
         Raises:
-            telegram.TelegramDecryptionError: Decryption failed. Usually due to bad
+            telegram.PassportDecryptionError: Decryption failed. Usually due to bad
                 private/public key but can also suggest malformed/tampered data.
         """
         if self._decrypted_secret is None:
@@ -182,7 +182,7 @@ class EncryptedCredentials(TelegramObject):
                 )
             except ValueError as exception:
                 # If decryption fails raise exception
-                raise TelegramDecryptionError(exception) from exception
+                raise PassportDecryptionError(exception) from exception
         return self._decrypted_secret
 
     @property
@@ -193,7 +193,7 @@ class EncryptedCredentials(TelegramObject):
             `decrypted_data.nonce`.
 
         Raises:
-            telegram.TelegramDecryptionError: Decryption failed. Usually due to bad
+            telegram.PassportDecryptionError: Decryption failed. Usually due to bad
                 private/public key but can also suggest malformed/tampered data.
         """
         if self._decrypted_data is None:
