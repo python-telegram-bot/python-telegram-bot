@@ -171,10 +171,10 @@ Documenting
 
 The documentation of this project is separated in two sections: User facing and dev facing.
 
-User facing docs are hosted at `RTD`_. They are the main way the users of our library are supposed to get information about the objects. They don't care about the technical side, they just want to know
+User facing docs are hosted at `RTD`_. They are the main way the users of our library are supposed to get information about the objects. They don't care about the internals, they just want to know
 what they have to pass to make it work, what it actually does. You can/should provide examples for non obvious cases (like the Filter module), and notes/warnings.
 
-Dev facing, on the other side, is for the devs/maintainers of this project. This is a big part of the documentation we have neglected thus far, but not anymore! These
+Dev facing, on the other side, is for the devs/maintainers of this project. These
 doc strings don't have a separate documentation site they generate, instead, they document the actual code.
 
 User facing documentation
@@ -203,9 +203,9 @@ Once the process terminates, you can view the built documentation by opening ``d
 
 Dev facing documentation
 ------------------------
-We adhere to the `CSI`_ standard. Again, remember, this documentation is not fully implemented in the project, yet. We still ask you to add it to your code changes and this way, we will slowly document the whole project this way.
+We adhere to the `CSI`_ standard. This documentation is not fully implemented in the project, yet, but new code changes should comply with the `CSI` standard.
 The idea behind this is to make it very easy for you/a random maintainer or even a totally foreign person to drop anywhere into the code and more or less immediately understand what a particular line does. This will make it easier
-for new or old devs who are out of the loop to make relevant changes if said lines don't do what they are supposed to. Even though implementing this will mean a lot of comments, we still believe in it being a very meaningful addition to our project.
+for new to make relevant changes if said lines don't do what they are supposed to.
 
 
 
