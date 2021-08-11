@@ -446,6 +446,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         .. versionadded:: 13.6
 
+        .. versionchanged:: 14.0
+
         Returns:
             Optional[:class:`telegram.ext.utils.types.CDCData`]: The restored meta data or
             :obj:`None`, if no data was stored.
@@ -518,6 +520,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         .. versionadded:: 13.6
 
+        .. versionchanged:: 14.0
+
         Args:
             user_id (:obj:`int`): The user ID this :attr:`user_data` is associated with.
             user_data (:class:`telegram.ext.utils.types.UD`): The ``user_data`` of a single user.
@@ -530,6 +534,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         from an external source.
 
         .. versionadded:: 13.6
+
+        .. versionchanged:: 14.0
 
         Args:
             chat_id (:obj:`int`): The chat ID this :attr:`chat_data` is associated with.
@@ -544,6 +550,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         .. versionadded:: 13.6
 
+        .. versionchanged:: 14.0
+
         Args:
             bot_data (:class:`telegram.ext.utils.types.BD`): The ``bot_data``.
         """
@@ -555,6 +563,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         .. versionadded:: 13.6
 
+        .. versionchanged:: 14.0
+
         Args:
             data (:class:`telegram.ext.utils.types.CDCData`): The relevant data to restore
                 :class:`telegram.ext.CallbackDataCache`.
@@ -564,6 +574,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     def flush(self) -> None:
         """Will be called by :class:`telegram.ext.Updater` upon receiving a stop signal. Gives the
         persistence a chance to finish up saving or close a database connection gracefully.
+
+        .. versionchanged:: 14.0
         """
 
     REPLACED_BOT: ClassVar[str] = 'bot_instance_replaced_by_ptb_persistence'
