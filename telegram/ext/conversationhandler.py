@@ -693,8 +693,8 @@ class ConversationHandler(Handler[Update, CCT]):
     def _trigger_timeout(self, context: CallbackContext) -> None:
         self.logger.debug('conversation timeout was triggered!')
 
-        job = context.job
-        ctxt = cast(_ConversationTimeoutContext, job.context)  # type: ignore[union-attr]
+        job = cast(Job, context.job)
+        ctxt = cast(_ConversationTimeoutContext, job.context)
 
         callback_context = ctxt.callback_context
 
