@@ -30,7 +30,7 @@ excluded = {
     'DispatcherHandlerStop',
     'Days',
     'telegram.deprecate',
-    'TelegramDecryptionError',
+    'PassportDecryptionError',
     'ContextTypes',
     'CallbackDataCache',
     'InvalidCallbackData',

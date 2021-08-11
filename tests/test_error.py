@@ -21,7 +21,7 @@ from collections import defaultdict
 
 import pytest
 
-from telegram import TelegramError, TelegramDecryptionError
+from telegram import TelegramError, PassportDecryptionError
 from telegram.error import (
     Unauthorized,
     InvalidToken,
@@ -112,7 +112,7 @@ class TestErrors:
             (ChatMigrated(1234), ["message", "new_chat_id"]),
             (RetryAfter(12), ["message", "retry_after"]),
             (Conflict("test message"), ["message"]),
-            (TelegramDecryptionError("test message"), ["message"]),
+            (PassportDecryptionError("test message"), ["message"]),
             (InvalidCallbackData('test data'), ['callback_data']),
         ],
     )
@@ -147,7 +147,7 @@ class TestErrors:
                     ChatMigrated,
                     RetryAfter,
                     Conflict,
-                    TelegramDecryptionError,
+                    PassportDecryptionError,
                     InvalidCallbackData,
                 },
                 NetworkError: {BadRequest, TimedOut},
