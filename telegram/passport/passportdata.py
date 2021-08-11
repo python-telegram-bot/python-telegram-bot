@@ -95,7 +95,7 @@ class PassportData(TelegramObject):
             about documents and other Telegram Passport elements which were shared with the bot.
 
         Raises:
-            telegram.TelegramDecryptionError: Decryption failed. Usually due to bad
+            telegram.PassportDecryptionError: Decryption failed. Usually due to bad
                 private/public key but can also suggest malformed/tampered data.
         """
         if self._decrypted_data is None:
@@ -115,7 +115,7 @@ class PassportData(TelegramObject):
             `decrypted_data.payload`.
 
         Raises:
-            telegram.TelegramDecryptionError: Decryption failed. Usually due to bad
+            telegram.PassportDecryptionError: Decryption failed. Usually due to bad
                 private/public key but can also suggest malformed/tampered data.
         """
         return self.credentials.decrypted_data
