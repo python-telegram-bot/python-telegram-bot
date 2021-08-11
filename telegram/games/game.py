@@ -45,7 +45,7 @@ class Game(TelegramObject):
             game message. Can be automatically edited to include current high scores for the game
             when the bot calls :meth:`telegram.Bot.set_game_score`, or manually edited
             using :meth:`telegram.Bot.edit_message_text`.
-            1-4096 characters. Also found as ``telegram.constants.MAX_MESSAGE_LENGTH``.
+            0-4096 characters. Also found as ``telegram.constants.MAX_MESSAGE_LENGTH``.
         text_entities (List[:class:`telegram.MessageEntity`], optional): Special entities that
             appear in text, such as usernames, URLs, bot commands, etc.
         animation (:class:`telegram.Animation`, optional): Animation that will be displayed in the
@@ -66,6 +66,16 @@ class Game(TelegramObject):
             game message in chats. Upload via `BotFather <https://t.me/BotFather>`_.
 
     """
+
+    __slots__ = (
+        'title',
+        'photo',
+        'description',
+        'text_entities',
+        'text',
+        'animation',
+        '_id_attrs',
+    )
 
     def __init__(
         self,
@@ -90,7 +100,8 @@ class Game(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Game']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None
@@ -102,6 +113,7 @@ class Game(TelegramObject):
         return cls(**data)
 
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
         data['photo'] = [p.to_dict() for p in self.photo]

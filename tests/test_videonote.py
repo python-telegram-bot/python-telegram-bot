@@ -53,6 +53,14 @@ class TestVideoNote:
     videonote_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
     videonote_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
 
+    def test_slot_behaviour(self, video_note, recwarn, mro_slots):
+        for attr in video_note.__slots__:
+            assert getattr(video_note, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not video_note.__dict__, f"got missing slot(s): {video_note.__dict__}"
+        assert len(mro_slots(video_note)) == len(set(mro_slots(video_note))), "duplicate slot"
+        video_note.custom, video_note.length = 'should give warning', self.length
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     def test_creation(self, video_note):
         # Make sure file has been uploaded.
         assert isinstance(video_note, VideoNote)
@@ -73,7 +81,6 @@ class TestVideoNote:
         assert video_note.file_size == self.file_size
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_all_args(self, bot, chat_id, video_note_file, video_note, thumb_file):
         message = bot.send_video_note(
             chat_id,
@@ -98,7 +105,6 @@ class TestVideoNote:
         assert message.video_note.thumb.height == self.thumb_height
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_video_note_custom_filename(self, bot, chat_id, video_note_file, monkeypatch):
         def make_assertion(url, data, **kwargs):
             return data['video_note'].filename == 'custom_filename'
@@ -108,7 +114,6 @@ class TestVideoNote:
         assert bot.send_video_note(chat_id, video_note_file, filename='custom_filename')
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_get_and_download(self, bot, video_note):
         new_file = bot.get_file(video_note.file_id)
 
@@ -122,7 +127,6 @@ class TestVideoNote:
         assert os.path.isfile('telegram2.mp4')
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_resend(self, bot, chat_id, video_note):
         message = bot.send_video_note(chat_id, video_note.file_id)
 
@@ -175,9 +179,9 @@ class TestVideoNote:
         monkeypatch.setattr(bot, '_post', make_assertion)
         bot.send_video_note(chat_id, file, thumb=file)
         assert test_flag
+        monkeypatch.delattr(bot, '_post')
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize(
         'default_bot,custom',
         [
@@ -212,13 +216,11 @@ class TestVideoNote:
                 )
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.send_video_note(chat_id, open(os.devnull, 'rb'))
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.send_video_note(chat_id, '')

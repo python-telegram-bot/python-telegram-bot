@@ -58,6 +58,9 @@ class InputLocationMessageContent(InputMessageContent):
             proximity alerts about approaching another chat member, in meters.
 
     """
+
+    __slots__ = ('longitude', 'horizontal_accuracy', 'proximity_alert_radius', 'live_period',
+                 'latitude', 'heading', '_id_attrs')
     # fmt: on
 
     def __init__(

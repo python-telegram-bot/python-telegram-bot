@@ -49,9 +49,9 @@ if TYPE_CHECKING:
 
 
 class TelegramDecryptionError(TelegramError):
-    """
-    Something went wrong with decryption.
-    """
+    """Something went wrong with decryption."""
+
+    __slots__ = ('_msg',)
 
     def __init__(self, message: Union[str, Exception]):
         super().__init__(f"TelegramDecryptionError: {message}")
@@ -145,6 +145,16 @@ class EncryptedCredentials(TelegramObject):
 
     """
 
+    __slots__ = (
+        'hash',
+        'secret',
+        'bot',
+        'data',
+        '_id_attrs',
+        '_decrypted_secret',
+        '_decrypted_data',
+    )
+
     def __init__(self, data: str, hash: str, secret: str, bot: 'Bot' = None, **_kwargs: Any):
         # Required
         self.data = data
@@ -181,7 +191,7 @@ class EncryptedCredentials(TelegramObject):
             try:
                 self._decrypted_secret = self.bot.private_key.decrypt(
                     b64decode(self.secret),
-                    OAEP(mgf=MGF1(algorithm=SHA1()), algorithm=SHA1(), label=None),
+                    OAEP(mgf=MGF1(algorithm=SHA1()), algorithm=SHA1(), label=None),  # skipcq
                 )
             except ValueError as exception:
                 # If decryption fails raise exception
@@ -214,6 +224,8 @@ class Credentials(TelegramObject):
         nonce (:obj:`str`): Bot-specified nonce
     """
 
+    __slots__ = ('bot', 'nonce', 'secure_data')
+
     def __init__(self, secure_data: 'SecureData', nonce: str, bot: 'Bot' = None, **_kwargs: Any):
         # Required
         self.secure_data = secure_data
@@ -223,7 +235,8 @@ class Credentials(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Credentials']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None
@@ -261,6 +274,21 @@ class SecureData(TelegramObject):
             temporary registration.
     """
 
+    __slots__ = (
+        'bot',
+        'utility_bill',
+        'personal_details',
+        'temporary_registration',
+        'address',
+        'driver_license',
+        'rental_agreement',
+        'internal_passport',
+        'identity_card',
+        'bank_statement',
+        'passport',
+        'passport_registration',
+    )
+
     def __init__(
         self,
         personal_details: 'SecureValue' = None,
@@ -294,7 +322,8 @@ class SecureData(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['SecureData']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None
@@ -345,6 +374,8 @@ class SecureValue(TelegramObject):
 
     """
 
+    __slots__ = ('data', 'front_side', 'reverse_side', 'selfie', 'files', 'translation', 'bot')
+
     def __init__(
         self,
         data: 'DataCredentials' = None,
@@ -367,7 +398,8 @@ class SecureValue(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['SecureValue']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None
@@ -382,6 +414,7 @@ class SecureValue(TelegramObject):
         return cls(bot=bot, **data)
 
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
         data['files'] = [p.to_dict() for p in self.files]
@@ -392,6 +425,8 @@ class SecureValue(TelegramObject):
 
 class _CredentialsBase(TelegramObject):
     """Base class for DataCredentials and FileCredentials."""
+
+    __slots__ = ('hash', 'secret', 'file_hash', 'data_hash', 'bot')
 
     def __init__(self, hash: str, secret: str, bot: 'Bot' = None, **_kwargs: Any):
         self.hash = hash
@@ -418,10 +453,13 @@ class DataCredentials(_CredentialsBase):
         secret (:obj:`str`): Secret of encrypted data
     """
 
+    __slots__ = ()
+
     def __init__(self, data_hash: str, secret: str, **_kwargs: Any):
         super().__init__(data_hash, secret, **_kwargs)
 
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
         del data['file_hash']
@@ -444,10 +482,13 @@ class FileCredentials(_CredentialsBase):
         secret (:obj:`str`): Secret of encrypted file
     """
 
+    __slots__ = ()
+
     def __init__(self, file_hash: str, secret: str, **_kwargs: Any):
         super().__init__(file_hash, secret, **_kwargs)
 
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
         del data['data_hash']

@@ -86,6 +86,21 @@ class InlineQueryResultGif(InlineQueryResult):
 
     """
 
+    __slots__ = (
+        'reply_markup',
+        'gif_height',
+        'thumb_mime_type',
+        'caption_entities',
+        'gif_width',
+        'title',
+        'caption',
+        'parse_mode',
+        'gif_duration',
+        'input_message_content',
+        'gif_url',
+        'thumb_url',
+    )
+
     def __init__(
         self,
         id: str,  # pylint: disable=W0622

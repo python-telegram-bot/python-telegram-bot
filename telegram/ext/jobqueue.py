@@ -31,16 +31,12 @@ from apscheduler.job import Job as APSJob
 
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.utils.types import JSONDict
+from telegram.utils.deprecate import set_new_attribute_deprecated
 
 if TYPE_CHECKING:
     from telegram import Bot
     from telegram.ext import Dispatcher
     import apscheduler.job  # noqa: F401
-
-
-class Days:
-    MON, TUE, WED, THU, FRI, SAT, SUN = range(7)
-    EVERY_DAY = tuple(range(7))
 
 
 class JobQueue:
@@ -53,6 +49,8 @@ class JobQueue:
             DEPRECATED: Use :attr:`set_dispatcher` instead.
 
     """
+
+    __slots__ = ('_dispatcher', 'logger', 'scheduler', '__dict__')
 
     def __init__(self) -> None:
         self._dispatcher: 'Dispatcher' = None  # type: ignore[assignment]
@@ -69,15 +67,18 @@ class JobQueue:
         logging.getLogger('apscheduler.executors.default').addFilter(aps_log_filter)
         self.scheduler.add_listener(self._dispatch_error, EVENT_JOB_ERROR)
 
+    def __setattr__(self, key: str, value: object) -> None:
+        set_new_attribute_deprecated(self, key, value)
+
     def _build_args(self, job: 'Job') -> List[Union[CallbackContext, 'Bot', 'Job']]:
         if self._dispatcher.use_context:
-            return [CallbackContext.from_job(job, self._dispatcher)]
+            return [self._dispatcher.context_types.context.from_job(job, self._dispatcher)]
         return [self._dispatcher.bot, job]
 
     def _tz_now(self) -> datetime.datetime:
         return datetime.datetime.now(self.scheduler.timezone)
 
-    def _update_persistence(self, event: JobEvent) -> None:  # pylint: disable=W0613
+    def _update_persistence(self, _: JobEvent) -> None:
         self._dispatcher.update_persistence()
 
     def _dispatch_error(self, event: JobEvent) -> None:
@@ -136,8 +137,7 @@ class JobQueue:
         """
         self._dispatcher = dispatcher
         if dispatcher.bot.defaults:
-            if dispatcher.bot.defaults:
-                self.scheduler.configure(timezone=dispatcher.bot.defaults.tzinfo or pytz.utc)
+            self.scheduler.configure(timezone=dispatcher.bot.defaults.tzinfo or pytz.utc)
 
     def run_once(
         self,
@@ -218,6 +218,12 @@ class JobQueue:
     ) -> 'Job':
         """Creates a new ``Job`` that runs at specified intervals and adds it to the queue.
 
+        Note:
+            For a note about DST, please see the documentation of `APScheduler`_.
+
+        .. _`APScheduler`: https://apscheduler.readthedocs.io/en/stable/modules/triggers/cron.html
+                           #daylight-saving-time-behavior
+
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
                 job. Callback signature for context based API:
@@ -267,11 +273,6 @@ class JobQueue:
         Returns:
             :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
             queue.
-
-        Note:
-             `interval` is always respected "as-is". That means that if DST changes during that
-             interval, the job might not run at the time one would expect. It is always recommended
-             to pin servers to UTC time, then time related behaviour can always be expected.
 
         """
         if not job_kwargs:
@@ -392,12 +393,18 @@ class JobQueue:
         self,
         callback: Callable[['CallbackContext'], None],
         time: datetime.time,
-        days: Tuple[int, ...] = Days.EVERY_DAY,
+        days: Tuple[int, ...] = tuple(range(7)),
         context: object = None,
         name: str = None,
         job_kwargs: JSONDict = None,
     ) -> 'Job':
         """Creates a new ``Job`` that runs on a daily basis and adds it to the queue.
+
+        Note:
+            For a note about DST, please see the documentation of `APScheduler`_.
+
+        .. _`APScheduler`: https://apscheduler.readthedocs.io/en/stable/modules/triggers/cron.html
+                           #daylight-saving-time-behavior
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
@@ -421,12 +428,6 @@ class JobQueue:
         Returns:
             :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
             queue.
-
-        Note:
-            For a note about DST, please see the documentation of `APScheduler`_.
-
-        .. _`APScheduler`: https://apscheduler.readthedocs.io/en/stable/modules/triggers/cron.html
-                           #daylight-saving-time-behavior
 
         """
         if not job_kwargs:
@@ -499,14 +500,16 @@ class JobQueue:
             self.scheduler.shutdown()
 
     def jobs(self) -> Tuple['Job', ...]:
-        """
-        Returns a tuple of all *pending/scheduled* jobs that are currently in the ``JobQueue``.
-        """
-        return tuple(Job.from_aps_job(job, self) for job in self.scheduler.get_jobs())
+        """Returns a tuple of all *scheduled* jobs that are currently in the ``JobQueue``."""
+        return tuple(
+            Job._from_aps_job(job, self)  # pylint: disable=W0212
+            for job in self.scheduler.get_jobs()
+        )
 
     def get_jobs_by_name(self, name: str) -> Tuple['Job', ...]:
         """Returns a tuple of all *pending/scheduled* jobs with the given name that are currently
-        in the ``JobQueue``"""
+        in the ``JobQueue``.
+        """
         return tuple(job for job in self.jobs() if job.name == name)
 
 
@@ -514,6 +517,9 @@ class Job:
     """This class is a convenience wrapper for the jobs held in a :class:`telegram.ext.JobQueue`.
     With the current backend APScheduler, :attr:`job` holds a :class:`apscheduler.job.Job`
     instance.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`id` is equal.
 
     Note:
         * All attributes and instance methods of :attr:`job` are also directly available as
@@ -546,6 +552,17 @@ class Job:
         job (:class:`apscheduler.job.Job`): Optional. The APS Job this job is a wrapper for.
     """
 
+    __slots__ = (
+        'callback',
+        'context',
+        'name',
+        'job_queue',
+        '_removed',
+        '_enabled',
+        'job',
+        '__dict__',
+    )
+
     def __init__(
         self,
         callback: Callable[['CallbackContext'], None],
@@ -563,13 +580,16 @@ class Job:
         self._removed = False
         self._enabled = False
 
-        self.job = cast(APSJob, job)
+        self.job = cast(APSJob, job)  # skipcq: PTC-W0052
+
+    def __setattr__(self, key: str, value: object) -> None:
+        set_new_attribute_deprecated(self, key, value)
 
     def run(self, dispatcher: 'Dispatcher') -> None:
         """Executes the callback function independently of the jobs schedule."""
         try:
             if dispatcher.use_context:
-                self.callback(CallbackContext.from_job(self, dispatcher))
+                self.callback(dispatcher.context_types.context.from_job(self, dispatcher))
             else:
                 self.callback(dispatcher.bot, self)  # type: ignore[arg-type,call-arg]
         except Exception as exc:
@@ -619,7 +639,7 @@ class Job:
         return self.job.next_run_time
 
     @classmethod
-    def from_aps_job(cls, job: APSJob, job_queue: JobQueue) -> 'Job':
+    def _from_aps_job(cls, job: APSJob, job_queue: JobQueue) -> 'Job':
         # context based callbacks
         if len(job.args) == 1:
             context = job.args[0].job.context

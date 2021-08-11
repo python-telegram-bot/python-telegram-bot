@@ -29,7 +29,7 @@ from .constants import BOT_API_VERSION
 
 def _git_revision() -> Optional[str]:
     try:
-        output = subprocess.check_output(
+        output = subprocess.check_output(  # skipcq: BAN-B607
             ["git", "describe", "--long", "--tags"], stderr=subprocess.STDOUT
         )
     except (subprocess.SubprocessError, OSError):
@@ -37,7 +37,7 @@ def _git_revision() -> Optional[str]:
     return output.decode().strip()
 
 
-def print_ver_info() -> None:
+def print_ver_info() -> None:  # skipcq: PY-D0003
     git_revision = _git_revision()
     print(f'python-telegram-bot {telegram_ver}' + (f' ({git_revision})' if git_revision else ''))
     print(f'Bot API {BOT_API_VERSION}')
@@ -46,7 +46,7 @@ def print_ver_info() -> None:
     print(f'Python {sys_version}')
 
 
-def main() -> None:
+def main() -> None:  # skipcq: PY-D0003
     print_ver_info()
 
 

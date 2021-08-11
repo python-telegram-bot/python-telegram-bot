@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=C0116
+# pylint: disable=C0116,W0613
 # This program is dedicated to the public domain under the CC0 license.
 
 """Bot that explains Telegram's "Deep Linking Parameters" functionality.
@@ -78,7 +78,7 @@ def deep_linked_level_2(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 
-def deep_linked_level_3(update: Update, _: CallbackContext) -> None:
+def deep_linked_level_3(update: Update, context: CallbackContext) -> None:
     """Reached through the USING_ENTITIES payload"""
     update.message.reply_text(
         "It is also possible to make deep-linking using InlineKeyboardButtons.",
@@ -124,7 +124,7 @@ def main() -> None:
 
     # We can also pass on the deep-linking payload
     dispatcher.add_handler(
-        CommandHandler("start", deep_linked_level_3, Filters.regex(USING_ENTITIES), pass_args=True)
+        CommandHandler("start", deep_linked_level_3, Filters.regex(USING_ENTITIES))
     )
 
     # Possible with inline keyboard buttons as well

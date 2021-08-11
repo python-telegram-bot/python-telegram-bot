@@ -48,6 +48,8 @@ class PollOption(TelegramObject):
 
     """
 
+    __slots__ = ('voter_count', 'text', '_id_attrs')
+
     def __init__(self, text: str, voter_count: int, **_kwargs: Any):
         self.text = text
         self.voter_count = voter_count
@@ -78,6 +80,8 @@ class PollAnswer(TelegramObject):
 
     """
 
+    __slots__ = ('option_ids', 'user', 'poll_id', '_id_attrs')
+
     def __init__(self, poll_id: str, user: User, option_ids: List[int], **_kwargs: Any):
         self.poll_id = poll_id
         self.user = user
@@ -87,7 +91,8 @@ class PollAnswer(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['PollAnswer']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None
@@ -145,6 +150,23 @@ class Poll(TelegramObject):
 
     """
 
+    __slots__ = (
+        'total_voter_count',
+        'allows_multiple_answers',
+        'open_period',
+        'options',
+        'type',
+        'explanation_entities',
+        'is_anonymous',
+        'close_date',
+        'is_closed',
+        'id',
+        'explanation',
+        'question',
+        'correct_option_id',
+        '_id_attrs',
+    )
+
     def __init__(
         self,
         id: str,  # pylint: disable=W0622
@@ -180,7 +202,8 @@ class Poll(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Poll']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None
@@ -192,6 +215,7 @@ class Poll(TelegramObject):
         return cls(**data)
 
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
         data['options'] = [x.to_dict() for x in self.options]

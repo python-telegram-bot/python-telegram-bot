@@ -27,14 +27,15 @@ from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 from .handler import Handler
+from .utils.types import CCT
 
 if TYPE_CHECKING:
-    from telegram.ext import CallbackContext, Dispatcher
+    from telegram.ext import Dispatcher
 
 RT = TypeVar('RT')
 
 
-class MessageHandler(Handler[Update]):
+class MessageHandler(Handler[Update, CCT]):
     """Handler class to handle telegram messages. They might contain text, media or status updates.
 
     Note:
@@ -120,10 +121,12 @@ class MessageHandler(Handler[Update]):
 
     """
 
+    __slots__ = ('filters',)
+
     def __init__(
         self,
         filters: BaseFilter,
-        callback: Callable[[Update, 'CallbackContext'], RT],
+        callback: Callable[[Update, CCT], RT],
         pass_update_queue: bool = False,
         pass_job_queue: bool = False,
         pass_user_data: bool = False,
@@ -179,7 +182,7 @@ class MessageHandler(Handler[Update]):
                     Filters.update.edited_message | Filters.update.edited_channel_post
                 )
 
-    def check_update(self, update: object) -> Optional[Union[bool, Dict[str, object]]]:
+    def check_update(self, update: object) -> Optional[Union[bool, Dict[str, list]]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
@@ -195,10 +198,11 @@ class MessageHandler(Handler[Update]):
 
     def collect_additional_context(
         self,
-        context: 'CallbackContext',
+        context: CCT,
         update: Update,
         dispatcher: 'Dispatcher',
         check_result: Optional[Union[bool, Dict[str, object]]],
     ) -> None:
+        """Adds possible output of data filters to the :class:`CallbackContext`."""
         if isinstance(check_result, dict):
             context.update(check_result)

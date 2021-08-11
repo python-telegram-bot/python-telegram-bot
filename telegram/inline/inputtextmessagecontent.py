@@ -59,6 +59,8 @@ class InputTextMessageContent(InputMessageContent):
 
     """
 
+    __slots__ = ('disable_web_page_preview', 'parse_mode', 'entities', 'message_text', '_id_attrs')
+
     def __init__(
         self,
         message_text: str,
@@ -77,6 +79,7 @@ class InputTextMessageContent(InputMessageContent):
         self._id_attrs = (self.message_text,)
 
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
         if self.entities:

@@ -39,6 +39,11 @@ def _lstrip_str(in_s: str, lstr: str) -> str:
 
 
 class TelegramError(Exception):
+    """Base class for Telegram errors."""
+
+    # Apparently the base class Exception already has __dict__ in it, so its not included here
+    __slots__ = ('message',)
+
     def __init__(self, message: str):
         super().__init__()
 
@@ -58,10 +63,16 @@ class TelegramError(Exception):
 
 
 class Unauthorized(TelegramError):
-    pass
+    """Raised when the bot has not enough rights to perform the requested action."""
+
+    __slots__ = ()
 
 
 class InvalidToken(TelegramError):
+    """Raised when the token is invalid."""
+
+    __slots__ = ()
+
     def __init__(self) -> None:
         super().__init__('Invalid token')
 
@@ -70,14 +81,22 @@ class InvalidToken(TelegramError):
 
 
 class NetworkError(TelegramError):
-    pass
+    """Base class for exceptions due to networking errors."""
+
+    __slots__ = ()
 
 
 class BadRequest(NetworkError):
-    pass
+    """Raised when Telegram could not process the request correctly."""
+
+    __slots__ = ()
 
 
 class TimedOut(NetworkError):
+    """Raised when a request took too long to finish."""
+
+    __slots__ = ()
+
     def __init__(self) -> None:
         super().__init__('Timed out')
 
@@ -87,10 +106,14 @@ class TimedOut(NetworkError):
 
 class ChatMigrated(TelegramError):
     """
+    Raised when the requested group chat migrated to supergroup and has a new chat id.
+
     Args:
         new_chat_id (:obj:`int`): The new chat id of the group.
 
     """
+
+    __slots__ = ('new_chat_id',)
 
     def __init__(self, new_chat_id: int):
         super().__init__(f'Group migrated to supergroup. New chat id: {new_chat_id}')
@@ -102,10 +125,14 @@ class ChatMigrated(TelegramError):
 
 class RetryAfter(TelegramError):
     """
+    Raised when flood limits where exceeded.
+
     Args:
         retry_after (:obj:`int`): Time in seconds, after which the bot can retry the request.
 
     """
+
+    __slots__ = ('retry_after',)
 
     def __init__(self, retry_after: int):
         super().__init__(f'Flood control exceeded. Retry in {float(retry_after)} seconds')
@@ -116,13 +143,9 @@ class RetryAfter(TelegramError):
 
 
 class Conflict(TelegramError):
-    """
-    Raised when a long poll or webhook conflicts with another one.
+    """Raised when a long poll or webhook conflicts with another one."""
 
-    Args:
-        msg (:obj:`str`): The message from telegrams server.
-
-    """
+    __slots__ = ()
 
     def __reduce__(self) -> Tuple[type, Tuple[str]]:
         return self.__class__, (self.message,)

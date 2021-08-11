@@ -22,6 +22,8 @@ import pytest
 
 from telegram import Message, User, Chat, MessageEntity, Document, Update, Dice
 from telegram.ext import Filters, BaseFilter, MessageFilter, UpdateFilter
+from sys import version_info as py_ver
+import inspect
 import re
 
 from telegram.utils.deprecate import TelegramDeprecationWarning
@@ -59,6 +61,67 @@ def base_class(request):
 
 
 class TestFilters:
+    def test_all_filters_slot_behaviour(self, recwarn, mro_slots):
+        """
+        Use depth first search to get all nested filters, and instantiate them (which need it) with
+        the correct number of arguments, then test each filter separately. Also tests setting
+        custom attributes on custom filters.
+        """
+        # The total no. of filters excluding filters defined in __all__ is about 70 as of 16/2/21.
+        # Gather all the filters to test using DFS-
+        visited = []
+        classes = inspect.getmembers(Filters, predicate=inspect.isclass)  # List[Tuple[str, type]]
+        stack = classes.copy()
+        while stack:
+            cls = stack[-1][-1]  # get last element and its class
+            for inner_cls in inspect.getmembers(
+                cls,  # Get inner filters
+                lambda a: inspect.isclass(a) and not issubclass(a, cls.__class__),
+            ):
+                if inner_cls[1] not in visited:
+                    stack.append(inner_cls)
+                    visited.append(inner_cls[1])
+                    classes.append(inner_cls)
+                    break
+            else:
+                stack.pop()
+
+        # Now start the actual testing
+        for name, cls in classes:
+            # Can't instantiate abstract classes without overriding methods, so skip them for now
+            if inspect.isabstract(cls) or name in {'__class__', '__base__'}:
+                continue
+
+            assert '__slots__' in cls.__dict__, f"Filter {name!r} doesn't have __slots__"
+            # get no. of args minus the 'self' argument
+            args = len(inspect.signature(cls.__init__).parameters) - 1
+            if cls.__base__.__name__ == '_ChatUserBaseFilter':  # Special case, only 1 arg needed
+                inst = cls('1')
+            else:
+                inst = cls() if args < 1 else cls(*['blah'] * args)  # unpack variable no. of args
+
+            for attr in cls.__slots__:
+                assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}' for {name}"
+                assert not inst.__dict__, f"got missing slot(s): {inst.__dict__} for {name}"
+                assert len(mro_slots(inst)) == len(set(mro_slots(inst))), f"same slot in {name}"
+
+            with pytest.warns(TelegramDeprecationWarning, match='custom attributes') as warn:
+                inst.custom = 'should give warning'
+                if not warn:
+                    pytest.fail(f"Filter {name!r} didn't warn when setting custom attr")
+
+        assert '__dict__' not in BaseFilter.__slots__ if py_ver < (3, 7) else True, 'dict in abc'
+
+        class CustomFilter(MessageFilter):
+            def filter(self, message: Message):
+                pass
+
+        with pytest.warns(None):
+            CustomFilter().custom = 'allowed'  # Test setting custom attr to custom filters
+
+        with pytest.warns(TelegramDeprecationWarning, match='custom attributes'):
+            Filters().custom = 'raise warning'
+
     def test_filters_all(self, update):
         assert Filters.all(update)
 
@@ -133,19 +196,19 @@ class TestFilters:
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         result = (Filters.regex('deep') | Filters.regex(r'linked param'))(update)
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         result = (Filters.regex('not int') | Filters.regex(r'linked param'))(update)
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         result = (Filters.regex('not int') & Filters.regex(r'linked param'))(update)
         assert not result
 
@@ -158,19 +221,19 @@ class TestFilters:
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         result = (Filters.regex(r'linked param') & Filters.command)(update)
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         result = (Filters.regex(r'linked param') | Filters.command)(update)
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         # Should not give a match since it's a or filter and it short circuits
         result = (Filters.command | Filters.regex(r'linked param'))(update)
         assert result is True
@@ -178,91 +241,91 @@ class TestFilters:
     def test_regex_complex_merges(self, update):
         SRE_TYPE = type(re.match("", ""))
         update.message.text = 'test it out'
-        filter = Filters.regex('test') & (
+        test_filter = Filters.regex('test') & (
             (Filters.status_update | Filters.forwarded) | Filters.regex('out')
         )
-        result = filter(update)
+        result = test_filter(update)
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
         assert len(matches) == 2
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         update.message.forward_date = datetime.datetime.utcnow()
-        result = filter(update)
+        result = test_filter(update)
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         update.message.text = 'test it'
-        result = filter(update)
+        result = test_filter(update)
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         update.message.forward_date = None
-        result = filter(update)
+        result = test_filter(update)
         assert not result
         update.message.text = 'test it out'
-        result = filter(update)
+        result = test_filter(update)
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         update.message.pinned_message = True
-        result = filter(update)
+        result = test_filter(update)
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         update.message.text = 'it out'
-        result = filter(update)
+        result = test_filter(update)
         assert not result
 
         update.message.text = 'test it out'
         update.message.forward_date = None
         update.message.pinned_message = None
-        filter = (Filters.regex('test') | Filters.command) & (
+        test_filter = (Filters.regex('test') | Filters.command) & (
             Filters.regex('it') | Filters.status_update
         )
-        result = filter(update)
+        result = test_filter(update)
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
         assert len(matches) == 2
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         update.message.text = 'test'
-        result = filter(update)
+        result = test_filter(update)
         assert not result
         update.message.pinned_message = True
-        result = filter(update)
+        result = test_filter(update)
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
         assert len(matches) == 1
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         update.message.text = 'nothing'
-        result = filter(update)
+        result = test_filter(update)
         assert not result
         update.message.text = '/start'
         update.message.entities = [MessageEntity(MessageEntity.BOT_COMMAND, 0, 6)]
-        result = filter(update)
+        result = test_filter(update)
         assert result
         assert isinstance(result, bool)
         update.message.text = '/start it'
-        result = filter(update)
+        result = test_filter(update)
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
         assert len(matches) == 1
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
 
     def test_regex_inverted(self, update):
         update.message.text = '/start deep-linked param'
@@ -336,13 +399,13 @@ class TestFilters:
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         result = (Filters.caption_regex('deep') | Filters.caption_regex(r'linked param'))(update)
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         result = (Filters.caption_regex('not int') | Filters.caption_regex(r'linked param'))(
             update
         )
@@ -350,7 +413,7 @@ class TestFilters:
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         result = (Filters.caption_regex('not int') & Filters.caption_regex(r'linked param'))(
             update
         )
@@ -365,19 +428,19 @@ class TestFilters:
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         result = (Filters.caption_regex(r'linked param') & Filters.command)(update)
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         result = (Filters.caption_regex(r'linked param') | Filters.command)(update)
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         # Should not give a match since it's a or filter and it short circuits
         result = (Filters.command | Filters.caption_regex(r'linked param'))(update)
         assert result is True
@@ -385,130 +448,130 @@ class TestFilters:
     def test_caption_regex_complex_merges(self, update):
         SRE_TYPE = type(re.match("", ""))
         update.message.caption = 'test it out'
-        filter = Filters.caption_regex('test') & (
+        test_filter = Filters.caption_regex('test') & (
             (Filters.status_update | Filters.forwarded) | Filters.caption_regex('out')
         )
-        result = filter(update)
+        result = test_filter(update)
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
         assert len(matches) == 2
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         update.message.forward_date = datetime.datetime.utcnow()
-        result = filter(update)
+        result = test_filter(update)
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         update.message.caption = 'test it'
-        result = filter(update)
+        result = test_filter(update)
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         update.message.forward_date = None
-        result = filter(update)
+        result = test_filter(update)
         assert not result
         update.message.caption = 'test it out'
-        result = filter(update)
+        result = test_filter(update)
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         update.message.pinned_message = True
-        result = filter(update)
+        result = test_filter(update)
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         update.message.caption = 'it out'
-        result = filter(update)
+        result = test_filter(update)
         assert not result
 
         update.message.caption = 'test it out'
         update.message.forward_date = None
         update.message.pinned_message = None
-        filter = (Filters.caption_regex('test') | Filters.command) & (
+        test_filter = (Filters.caption_regex('test') | Filters.command) & (
             Filters.caption_regex('it') | Filters.status_update
         )
-        result = filter(update)
+        result = test_filter(update)
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
         assert len(matches) == 2
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         update.message.caption = 'test'
-        result = filter(update)
+        result = test_filter(update)
         assert not result
         update.message.pinned_message = True
-        result = filter(update)
+        result = test_filter(update)
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
         assert len(matches) == 1
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
         update.message.caption = 'nothing'
-        result = filter(update)
+        result = test_filter(update)
         assert not result
         update.message.caption = '/start'
         update.message.entities = [MessageEntity(MessageEntity.BOT_COMMAND, 0, 6)]
-        result = filter(update)
+        result = test_filter(update)
         assert result
         assert isinstance(result, bool)
         update.message.caption = '/start it'
-        result = filter(update)
+        result = test_filter(update)
         assert result
         assert isinstance(result, dict)
         matches = result['matches']
         assert isinstance(matches, list)
         assert len(matches) == 1
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert all(type(res) is SRE_TYPE for res in matches)
 
     def test_caption_regex_inverted(self, update):
         update.message.caption = '/start deep-linked param'
         update.message.entities = [MessageEntity(MessageEntity.BOT_COMMAND, 0, 5)]
-        filter = ~Filters.caption_regex(r'deep-linked param')
-        result = filter(update)
+        test_filter = ~Filters.caption_regex(r'deep-linked param')
+        result = test_filter(update)
         assert not result
         update.message.caption = 'not it'
-        result = filter(update)
+        result = test_filter(update)
         assert result
         assert isinstance(result, bool)
 
-        filter = ~Filters.caption_regex('linked') & Filters.command
+        test_filter = ~Filters.caption_regex('linked') & Filters.command
         update.message.caption = "it's linked"
-        result = filter(update)
+        result = test_filter(update)
         assert not result
         update.message.caption = '/start'
         update.message.entities = [MessageEntity(MessageEntity.BOT_COMMAND, 0, 6)]
-        result = filter(update)
+        result = test_filter(update)
         assert result
         update.message.caption = '/linked'
-        result = filter(update)
+        result = test_filter(update)
         assert not result
 
-        filter = ~Filters.caption_regex('linked') | Filters.command
+        test_filter = ~Filters.caption_regex('linked') | Filters.command
         update.message.caption = "it's linked"
         update.message.entities = []
-        result = filter(update)
+        result = test_filter(update)
         assert not result
         update.message.caption = '/start linked'
         update.message.entities = [MessageEntity(MessageEntity.BOT_COMMAND, 0, 6)]
-        result = filter(update)
+        result = test_filter(update)
         assert result
         update.message.caption = '/start'
-        result = filter(update)
+        result = test_filter(update)
         assert result
         update.message.caption = 'nothig'
         update.message.entities = []
-        result = filter(update)
+        result = test_filter(update)
         assert result
 
     def test_filters_reply(self, update):
@@ -859,6 +922,11 @@ class TestFilters:
         assert Filters.status_update(update)
         assert Filters.status_update.proximity_alert_triggered(update)
         update.message.proximity_alert_triggered = None
+
+        update.message.voice_chat_scheduled = 'scheduled'
+        assert Filters.status_update(update)
+        assert Filters.status_update.voice_chat_scheduled(update)
+        update.message.voice_chat_scheduled = None
 
         update.message.voice_chat_started = 'hello'
         assert Filters.status_update(update)
@@ -2168,3 +2236,18 @@ class TestFilters:
 
         with pytest.raises(RuntimeError, match='Cannot set name'):
             f.name = 'foo'
+
+    def test_filters_attachment(self, update):
+        assert not Filters.attachment(update)
+        # we need to define a new Update (or rather, message class) here because
+        # effective_attachment is only evaluated once per instance, and the filter relies on that
+        up = Update(
+            0,
+            Message(
+                0,
+                datetime.datetime.utcnow(),
+                Chat(0, 'private'),
+                document=Document("str", "other_str"),
+            ),
+        )
+        assert Filters.attachment(up)

@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 import pytest
 from flaky import flaky
 
@@ -30,6 +29,7 @@ def reply_keyboard_markup():
         resize_keyboard=TestReplyKeyboardMarkup.resize_keyboard,
         one_time_keyboard=TestReplyKeyboardMarkup.one_time_keyboard,
         selective=TestReplyKeyboardMarkup.selective,
+        input_field_placeholder=TestReplyKeyboardMarkup.input_field_placeholder,
     )
 
 
@@ -38,16 +38,24 @@ class TestReplyKeyboardMarkup:
     resize_keyboard = True
     one_time_keyboard = True
     selective = True
+    input_field_placeholder = 'lol a keyboard'
+
+    def test_slot_behaviour(self, reply_keyboard_markup, mro_slots, recwarn):
+        inst = reply_keyboard_markup
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.custom, inst.selective = 'should give warning', self.selective
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_message_with_reply_keyboard_markup(self, bot, chat_id, reply_keyboard_markup):
         message = bot.send_message(chat_id, 'Text', reply_markup=reply_keyboard_markup)
 
         assert message.text == 'Text'
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_message_with_data_markup(self, bot, chat_id):
         message = bot.send_message(chat_id, 'text 2', reply_markup={'keyboard': [['1', '2']]})
 
@@ -95,6 +103,7 @@ class TestReplyKeyboardMarkup:
         assert reply_keyboard_markup.resize_keyboard == self.resize_keyboard
         assert reply_keyboard_markup.one_time_keyboard == self.one_time_keyboard
         assert reply_keyboard_markup.selective == self.selective
+        assert reply_keyboard_markup.input_field_placeholder == self.input_field_placeholder
 
     def test_to_dict(self, reply_keyboard_markup):
         reply_keyboard_markup_dict = reply_keyboard_markup.to_dict()
@@ -116,6 +125,10 @@ class TestReplyKeyboardMarkup:
             == reply_keyboard_markup.one_time_keyboard
         )
         assert reply_keyboard_markup_dict['selective'] == reply_keyboard_markup.selective
+        assert (
+            reply_keyboard_markup_dict['input_field_placeholder']
+            == reply_keyboard_markup.input_field_placeholder
+        )
 
     def test_equality(self):
         a = ReplyKeyboardMarkup.from_column(['button1', 'button2', 'button3'])

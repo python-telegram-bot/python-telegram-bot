@@ -26,6 +26,8 @@ import os
 from typing import IO, Optional, Tuple, Union
 from uuid import uuid4
 
+from telegram.utils.deprecate import set_new_attribute_deprecated
+
 DEFAULT_MIME_TYPE = 'application/octet-stream'
 logger = logging.getLogger(__name__)
 
@@ -49,6 +51,8 @@ class InputFile:
         attach (:obj:`str`): Optional. Attach id for sending multiple files.
 
     """
+
+    __slots__ = ('filename', 'attach', 'input_file_content', 'mimetype', '__dict__')
 
     def __init__(self, obj: Union[IO, bytes], filename: str = None, attach: bool = None):
         self.filename = None
@@ -74,8 +78,11 @@ class InputFile:
         if not self.filename:
             self.filename = self.mimetype.replace('/', '.')
 
+    def __setattr__(self, key: str, value: object) -> None:
+        set_new_attribute_deprecated(self, key, value)
+
     @property
-    def field_tuple(self) -> Tuple[str, bytes, str]:
+    def field_tuple(self) -> Tuple[str, bytes, str]:  # skipcq: PY-D0003
         return self.filename, self.input_file_content, self.mimetype
 
     @staticmethod
@@ -102,10 +109,11 @@ class InputFile:
             return None
 
     @staticmethod
-    def is_file(obj: object) -> bool:
+    def is_file(obj: object) -> bool:  # skipcq: PY-D0003
         return hasattr(obj, 'read')
 
     def to_dict(self) -> Optional[str]:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         if self.attach:
             return 'attach://' + self.attach
         return None

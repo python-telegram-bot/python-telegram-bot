@@ -4,6 +4,8 @@ In this folder are small examples to show what a bot written with `python-telegr
 
 All examples are licensed under the [CC0 License](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/LICENSE.txt) and are therefore fully dedicated to the public domain. You can use them as the base for your own bots without worrying about copyrights.
 
+Do note that we ignore one pythonic convention. Best practice would dictate, in many handler callbacks function signatures, to replace the argument `context` with an underscore, since `context` is an unused local variable in those callbacks. However, since these are examples and not having a name for that argument confuses beginners, we decided to have it present.
+
 ### [`echobot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/echobot.py) 
 This is probably the base for most of the bots made with `python-telegram-bot`. It simply replies to each text message with a message that contains the same text.
 
@@ -23,7 +25,7 @@ A even more complex example of a bot that uses the nested `ConversationHandler`s
 A basic example of a bot store conversation state and user_data over multiple restarts.
 
 ### [`inlinekeyboard.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/inlinekeyboard.py)
-This example sheds some light on inline keyboards, callback queries and message editing.
+This example sheds some light on inline keyboards, callback queries and message editing. A wikipedia site explaining this examples lives at https://git.io/JOmFw.
 
 ### [`inlinekeyboard2.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/inlinekeyboard2.py)
 A more complex example about inline keyboards, callback queries and message editing. This example showcases how an interactive menu could be build using inline keyboards.
@@ -45,6 +47,15 @@ A basic example of a bot that can accept payments. Don't forget to enable and co
 
 ### [`errorhandlerbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/errorhandlerbot.py)
 A basic example on how to set up a custom error handler.
+
+### [`chatmemberbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/chatmemberbot.py)
+A basic example on how `(my_)chat_member` updates can be used.
+
+### [`contexttypesbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/contexttypesbot.py)
+This example showcases how `telegram.ext.ContextTypes` can be used to customize the `context` argument of handler and job callbacks.
+
+### [`arbitrarycallbackdatabot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/arbitrarycallbackdatabot.py)
+This example showcases how PTBs "arbitrary callback data" feature can be used.
 
 ## Pure API
 The [`rawapibot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/rawapibot.py) example uses only the pure, "bare-metal" API wrapper.

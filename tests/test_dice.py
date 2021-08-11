@@ -30,6 +30,14 @@ def dice(request):
 class TestDice:
     value = 4
 
+    def test_slot_behaviour(self, dice, recwarn, mro_slots):
+        for attr in dice.__slots__:
+            assert getattr(dice, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not dice.__dict__, f"got missing slot(s): {dice.__dict__}"
+        assert len(mro_slots(dice)) == len(set(mro_slots(dice))), "duplicate slot"
+        dice.custom, dice.value = 'should give warning', self.value
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     @pytest.mark.parametrize('emoji', Dice.ALL_EMOJI)
     def test_de_json(self, bot, emoji):
         json_dict = {'value': self.value, 'emoji': emoji}

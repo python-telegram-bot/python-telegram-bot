@@ -25,7 +25,15 @@ from .files.chatphoto import ChatPhoto
 from .chat import Chat
 from .chatlocation import ChatLocation
 from .chatinvitelink import ChatInviteLink
-from .chatmember import ChatMember
+from .chatmember import (
+    ChatMember,
+    ChatMemberOwner,
+    ChatMemberAdministrator,
+    ChatMemberMember,
+    ChatMemberRestricted,
+    ChatMemberLeft,
+    ChatMemberBanned,
+)
 from .chatmemberupdated import ChatMemberUpdated
 from .chatpermissions import ChatPermissions
 from .files.photosize import PhotoSize
@@ -56,7 +64,12 @@ from .messageentity import MessageEntity
 from .messageid import MessageId
 from .games.game import Game
 from .poll import Poll, PollOption, PollAnswer
-from .voicechat import VoiceChatStarted, VoiceChatEnded, VoiceChatParticipantsInvited
+from .voicechat import (
+    VoiceChatStarted,
+    VoiceChatEnded,
+    VoiceChatParticipantsInvited,
+    VoiceChatScheduled,
+)
 from .loginurl import LoginUrl
 from .proximityalerttriggered import ProximityAlertTriggered
 from .games.callbackgame import CallbackGame
@@ -101,8 +114,9 @@ from .inline.inlinequeryresultgame import InlineQueryResultGame
 from .inline.inputtextmessagecontent import InputTextMessageContent
 from .inline.inputlocationmessagecontent import InputLocationMessageContent
 from .inline.inputvenuemessagecontent import InputVenueMessageContent
-from .inline.inputcontactmessagecontent import InputContactMessageContent
 from .payment.labeledprice import LabeledPrice
+from .inline.inputinvoicemessagecontent import InputInvoiceMessageContent
+from .inline.inputcontactmessagecontent import InputContactMessageContent
 from .payment.shippingoption import ShippingOption
 from .payment.precheckoutquery import PreCheckoutQuery
 from .payment.shippingquery import ShippingQuery
@@ -147,6 +161,16 @@ from .passport.credentials import (
     FileCredentials,
     TelegramDecryptionError,
 )
+from .botcommandscope import (
+    BotCommandScope,
+    BotCommandScopeDefault,
+    BotCommandScopeAllPrivateChats,
+    BotCommandScopeAllGroupChats,
+    BotCommandScopeAllChatAdministrators,
+    BotCommandScopeChat,
+    BotCommandScopeChatAdministrators,
+    BotCommandScopeChatMember,
+)
 from .bot import Bot
 from .version import __version__, bot_api_version  # noqa: F401
 
@@ -157,6 +181,14 @@ __all__ = (  # Keep this alphabetically ordered
     'Audio',
     'Bot',
     'BotCommand',
+    'BotCommandScope',
+    'BotCommandScopeAllChatAdministrators',
+    'BotCommandScopeAllGroupChats',
+    'BotCommandScopeAllPrivateChats',
+    'BotCommandScopeChat',
+    'BotCommandScopeChatAdministrators',
+    'BotCommandScopeChatMember',
+    'BotCommandScopeDefault',
     'CallbackGame',
     'CallbackQuery',
     'Chat',
@@ -164,6 +196,12 @@ __all__ = (  # Keep this alphabetically ordered
     'ChatInviteLink',
     'ChatLocation',
     'ChatMember',
+    'ChatMemberOwner',
+    'ChatMemberAdministrator',
+    'ChatMemberMember',
+    'ChatMemberRestricted',
+    'ChatMemberLeft',
+    'ChatMemberBanned',
     'ChatMemberUpdated',
     'ChatPermissions',
     'ChatPhoto',
@@ -207,6 +245,7 @@ __all__ = (  # Keep this alphabetically ordered
     'InlineQueryResultVoice',
     'InputContactMessageContent',
     'InputFile',
+    'InputInvoiceMessageContent',
     'InputLocationMessageContent',
     'InputMedia',
     'InputMediaAnimation',
@@ -281,6 +320,7 @@ __all__ = (  # Keep this alphabetically ordered
     'Voice',
     'VoiceChatStarted',
     'VoiceChatEnded',
+    'VoiceChatScheduled',
     'VoiceChatParticipantsInvited',
     'WebhookInfo',
 )

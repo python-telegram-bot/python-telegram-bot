@@ -61,6 +61,8 @@ class ChosenInlineResult(TelegramObject):
 
     """
 
+    __slots__ = ('location', 'result_id', 'from_user', 'inline_message_id', '_id_attrs', 'query')
+
     def __init__(
         self,
         result_id: str,
@@ -82,7 +84,8 @@ class ChosenInlineResult(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['ChosenInlineResult']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None

@@ -79,6 +79,21 @@ class InlineQueryResultLocation(InlineQueryResult):
 
     """
 
+    __slots__ = (
+        'longitude',
+        'reply_markup',
+        'thumb_width',
+        'thumb_height',
+        'heading',
+        'title',
+        'live_period',
+        'proximity_alert_radius',
+        'input_message_content',
+        'latitude',
+        'horizontal_accuracy',
+        'thumb_url',
+    )
+
     def __init__(
         self,
         id: str,  # pylint: disable=W0622

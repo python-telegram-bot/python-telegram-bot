@@ -67,6 +67,18 @@ class PreCheckoutQuery(TelegramObject):
 
     """
 
+    __slots__ = (
+        'bot',
+        'invoice_payload',
+        'shipping_option_id',
+        'currency',
+        'order_info',
+        'total_amount',
+        'id',
+        'from_user',
+        '_id_attrs',
+    )
+
     def __init__(
         self,
         id: str,  # pylint: disable=W0622
@@ -93,7 +105,8 @@ class PreCheckoutQuery(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['PreCheckoutQuery']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None

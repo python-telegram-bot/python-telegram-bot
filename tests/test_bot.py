@@ -19,6 +19,7 @@
 import inspect
 import time
 import datetime as dtm
+from collections import defaultdict
 from pathlib import Path
 from platform import python_implementation
 
@@ -45,16 +46,34 @@ from telegram import (
     Dice,
     MessageEntity,
     ParseMode,
+    CallbackQuery,
+    Message,
+    Chat,
+    InlineQueryResultVoice,
+    PollOption,
+    BotCommandScopeChat,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
+from telegram.ext import ExtBot, Defaults
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
-from telegram.utils.helpers import from_timestamp, escape_markdown, to_timestamp
-from tests.conftest import expect_bad_request, check_defaults_handling
+from telegram.ext.callbackdatacache import InvalidCallbackData
+from telegram.utils.helpers import (
+    from_timestamp,
+    escape_markdown,
+    to_timestamp,
+)
+from tests.conftest import expect_bad_request, check_defaults_handling, GITHUB_ACTION
 from tests.bots import FALLBACKS
 
 
-BASE_TIME = time.time()
-HIGHSCORE_DELTA = 1450000000
+class ExtBotSubClass(ExtBot):
+    # used for test_defaults_warning below
+    pass
+
+
+class BotSubClass(Bot):
+    # used for test_defaults_warning below
+    pass
 
 
 @pytest.fixture(scope='class')
@@ -85,7 +104,7 @@ def chat_permissions():
 def inline_results_callback(page=None):
     if not page:
         return [InlineQueryResultArticle(i, str(i), None) for i in range(1, 254)]
-    elif page <= 5:
+    if page <= 5:
         return [
             InlineQueryResultArticle(i, str(i), None)
             for i in range(page * 5 + 1, (page + 1) * 5 + 1)
@@ -98,7 +117,41 @@ def inline_results():
     return inline_results_callback()
 
 
+BASE_GAME_SCORE = 60  # Base game score for game tests
+
+xfail = pytest.mark.xfail(
+    bool(GITHUB_ACTION),  # This condition is only relevant for github actions game tests.
+    reason='Can fail due to race conditions when multiple test suites '
+    'with the same bot token are run at the same time',
+)
+
+
+@pytest.fixture(scope='function')
+def inst(request, bot_info, default_bot):
+    return Bot(bot_info['token']) if request.param == 'bot' else default_bot
+
+
 class TestBot:
+    """
+    Most are executed on tg.ext.ExtBot, as that class only extends the functionality of tg.bot
+    """
+
+    @pytest.mark.parametrize('inst', ['bot', "default_bot"], indirect=True)
+    def test_slot_behaviour(self, inst, recwarn, mro_slots):
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inst.__dict__, f"got missing slots: {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.custom, inst.base_url = 'should give warning', inst.base_url
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
+        class CustomBot(Bot):
+            pass  # Tests that setting custom attributes of Bot subclass doesn't raise warning
+
+        a = CustomBot(inst.token)
+        a.my_custom = 'no error!'
+        assert len(recwarn) == 1
+
     @pytest.mark.parametrize(
         'token',
         argvalues=[
@@ -115,8 +168,16 @@ class TestBot:
         with pytest.raises(InvalidToken, match='Invalid token'):
             Bot(token)
 
+    @pytest.mark.parametrize(
+        'acd_in,maxsize,acd',
+        [(True, 1024, True), (False, 1024, False), (0, 0, True), (None, None, True)],
+    )
+    def test_callback_data_maxsize(self, bot, acd_in, maxsize, acd):
+        bot = ExtBot(bot.token, arbitrary_callback_data=acd_in)
+        assert bot.arbitrary_callback_data == acd
+        assert bot.callback_data_cache.maxsize == maxsize
+
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_invalid_token_server_response(self, monkeypatch):
         monkeypatch.setattr('telegram.Bot._validate_token', lambda x, y: True)
         bot = Bot('12')
@@ -132,7 +193,6 @@ class TestBot:
         bot.send_message(123, 'text', api_kwargs={'unknown_kwarg_1': 7, 'unknown_kwarg_2': 5})
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_get_me_and_properties(self, bot):
         get_me_bot = bot.get_me()
         commands = bot.get_my_commands()
@@ -168,7 +228,6 @@ class TestBot:
         assert hash(a) != hash(d)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_to_dict(self, bot):
         to_dict_bot = bot.to_dict()
 
@@ -213,17 +272,51 @@ class TestBot:
         bot_method = getattr(bot, bot_method_name)
         assert check_defaults_handling(bot_method, bot)
 
+    def test_ext_bot_signature(self):
+        """
+        Here we make sure that all methods of ext.ExtBot have the same signature as the
+        corresponding methods of tg.Bot.
+        """
+        # Some methods of ext.ExtBot
+        global_extra_args = set()
+        extra_args_per_method = defaultdict(set, {'__init__': {'arbitrary_callback_data'}})
+        different_hints_per_method = defaultdict(set, {'__setattr__': {'ext_bot'}})
+
+        for name, method in inspect.getmembers(Bot, predicate=inspect.isfunction):
+            signature = inspect.signature(method)
+            ext_signature = inspect.signature(getattr(ExtBot, name))
+
+            assert (
+                ext_signature.return_annotation == signature.return_annotation
+            ), f'Wrong return annotation for method {name}'
+            assert (
+                set(signature.parameters)
+                == set(ext_signature.parameters) - global_extra_args - extra_args_per_method[name]
+            ), f'Wrong set of parameters for method {name}'
+            for param_name, param in signature.parameters.items():
+                if param_name in different_hints_per_method[name]:
+                    continue
+                assert (
+                    param.annotation == ext_signature.parameters[param_name].annotation
+                ), f'Wrong annotation for parameter {param_name} of method {name}'
+                assert (
+                    param.default == ext_signature.parameters[param_name].default
+                ), f'Wrong default value for parameter {param_name} of method {name}'
+                assert (
+                    param.kind == ext_signature.parameters[param_name].kind
+                ), f'Wrong parameter kind for parameter {param_name} of method {name}'
+
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_forward_message(self, bot, chat_id, message):
-        message = bot.forward_message(chat_id, from_chat_id=chat_id, message_id=message.message_id)
+        forward_message = bot.forward_message(
+            chat_id, from_chat_id=chat_id, message_id=message.message_id
+        )
 
-        assert message.text == message.text
-        assert message.forward_from.username == message.from_user.username
-        assert isinstance(message.forward_date, dtm.datetime)
+        assert forward_message.text == message.text
+        assert forward_message.forward_from.username == message.from_user.username
+        assert isinstance(forward_message.forward_date, dtm.datetime)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_delete_message(self, bot, chat_id):
         message = bot.send_message(chat_id, text='will be deleted')
         time.sleep(2)
@@ -231,7 +324,6 @@ class TestBot:
         assert bot.delete_message(chat_id=chat_id, message_id=message.message_id) is True
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_delete_message_old_message(self, bot, chat_id):
         with pytest.raises(BadRequest):
             # Considering that the first message is old enough
@@ -242,7 +334,6 @@ class TestBot:
     # duplicate here.
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_venue(self, bot, chat_id):
         longitude = -46.788279
         latitude = -23.691288
@@ -294,7 +385,6 @@ class TestBot:
         assert message.venue.foursquare_type is None
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.xfail(raises=RetryAfter)
     @pytest.mark.skipif(
         python_implementation() == 'PyPy', reason='Unstable on pypy for some reason'
@@ -315,7 +405,6 @@ class TestBot:
     # TODO: Add bot to group to test polls too
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize(
         'reply_markup',
         [
@@ -390,7 +479,6 @@ class TestBot:
         assert message_quiz.poll.explanation_entities == explanation_entities
 
     @flaky(3, 1)
-    @pytest.mark.timeout(15)
     @pytest.mark.parametrize(['open_period', 'close_date'], [(5, None), (None, True)])
     def test_send_open_period(self, bot, super_group_id, open_period, close_date):
         question = 'Is this a test?'
@@ -423,7 +511,6 @@ class TestBot:
         assert new_message.poll.is_closed
 
     @flaky(5, 1)
-    @pytest.mark.timeout(20)
     def test_send_close_date_default_tz(self, tz_bot, super_group_id):
         question = 'Is this a test?'
         answers = ['Yes', 'No', 'Maybe']
@@ -455,7 +542,6 @@ class TestBot:
         assert new_message.poll.is_closed
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_poll_explanation_entities(self, bot, chat_id):
         test_string = 'Italic Bold Code'
         entities = [
@@ -477,7 +563,6 @@ class TestBot:
         assert message.poll.explanation_entities == entities
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_poll_default_parse_mode(self, default_bot, super_group_id):
         explanation = 'Italic Bold Code'
@@ -528,7 +613,6 @@ class TestBot:
         assert message.poll.explanation_entities == []
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize(
         'default_bot,custom',
         [
@@ -570,7 +654,6 @@ class TestBot:
                 )
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('emoji', Dice.ALL_EMOJI + [None])
     def test_send_dice(self, bot, chat_id, emoji):
         message = bot.send_dice(chat_id, emoji=emoji)
@@ -582,7 +665,6 @@ class TestBot:
             assert message.dice.emoji == emoji
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize(
         'default_bot,custom',
         [
@@ -613,9 +695,27 @@ class TestBot:
                 default_bot.send_dice(chat_id, reply_to_message_id=reply_to_message.message_id)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_send_chat_action(self, bot, chat_id):
-        assert bot.send_chat_action(chat_id, ChatAction.TYPING)
+    @pytest.mark.parametrize(
+        'chat_action',
+        [
+            ChatAction.FIND_LOCATION,
+            ChatAction.RECORD_AUDIO,
+            ChatAction.RECORD_VIDEO,
+            ChatAction.RECORD_VIDEO_NOTE,
+            ChatAction.RECORD_VOICE,
+            ChatAction.TYPING,
+            ChatAction.UPLOAD_AUDIO,
+            ChatAction.UPLOAD_DOCUMENT,
+            ChatAction.UPLOAD_PHOTO,
+            ChatAction.UPLOAD_VIDEO,
+            ChatAction.UPLOAD_VIDEO_NOTE,
+            ChatAction.UPLOAD_VOICE,
+        ],
+    )
+    def test_send_chat_action(self, bot, chat_id, chat_action):
+        assert bot.send_chat_action(chat_id, chat_action)
+        with pytest.raises(BadRequest, match='Wrong parameter action'):
+            bot.send_chat_action(chat_id, 'unknown action')
 
     # TODO: Needs improvement. We need incoming inline query to test answer.
     def test_answer_inline_query(self, monkeypatch, bot):
@@ -659,6 +759,7 @@ class TestBot:
             switch_pm_text='switch pm',
             switch_pm_parameter='start_pm',
         )
+        monkeypatch.delattr(bot.request, 'post')
 
     def test_answer_inline_query_no_default_parse_mode(self, monkeypatch, bot):
         def test(url, data, *args, **kwargs):
@@ -780,7 +881,7 @@ class TestBot:
         def make_assertion(url, data, *args, **kwargs):
             results = data['results']
             length_matches = len(results) == num_results
-            ids_match = all([int(res['id']) == id_offset + i for i, res in enumerate(results)])
+            ids_match = all(int(res['id']) == id_offset + i for i, res in enumerate(results))
             next_offset_matches = data['next_offset'] == str(expected_next_offset)
             return length_matches and ids_match and next_offset_matches
 
@@ -793,7 +894,7 @@ class TestBot:
         def make_assertion(url, data, *args, **kwargs):
             results = data['results']
             length_matches = len(results) == MAX_INLINE_QUERY_RESULTS
-            ids_match = all([int(res['id']) == 1 + i for i, res in enumerate(results)])
+            ids_match = all(int(res['id']) == 1 + i for i, res in enumerate(results))
             next_offset_matches = data['next_offset'] == '1'
             return length_matches and ids_match and next_offset_matches
 
@@ -806,7 +907,7 @@ class TestBot:
         def make_assertion(url, data, *args, **kwargs):
             results = data['results']
             length_matches = len(results) == 30
-            ids_match = all([int(res['id']) == 1 + i for i, res in enumerate(results)])
+            ids_match = all(int(res['id']) == 1 + i for i, res in enumerate(results))
             next_offset_matches = data['next_offset'] == ''
             return length_matches and ids_match and next_offset_matches
 
@@ -819,7 +920,7 @@ class TestBot:
         def make_assertion(url, data, *args, **kwargs):
             results = data['results']
             length = len(results) == 5
-            ids = all([int(res['id']) == 6 + i for i, res in enumerate(results)])
+            ids = all(int(res['id']) == 6 + i for i, res in enumerate(results))
             next_offset = data['next_offset'] == '2'
             return length and ids and next_offset
 
@@ -838,14 +939,12 @@ class TestBot:
         assert bot.answer_inline_query(1234, results=inline_results_callback, current_offset=6)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_get_user_profile_photos(self, bot, chat_id):
         user_profile_photos = bot.get_user_profile_photos(chat_id)
 
         assert user_profile_photos.photos[0][0].file_size == 5403
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_get_one_user_profile_photo(self, bot, chat_id):
         user_profile_photos = bot.get_user_profile_photos(chat_id, offset=0, limit=1)
         assert user_profile_photos.photos[0][0].file_size == 5403
@@ -868,9 +967,10 @@ class TestBot:
         resulting_path = bot.get_file('file_id').file_path
         assert bot.token not in resulting_path
         assert resulting_path == path
+        monkeypatch.delattr(bot, '_post')
 
     # TODO: Needs improvement. No feasible way to test until bots can add members.
-    def test_kick_chat_member(self, monkeypatch, bot):
+    def test_ban_chat_member(self, monkeypatch, bot):
         def test(url, data, *args, **kwargs):
             chat_id = data['chat_id'] == 2
             user_id = data['user_id'] == 32
@@ -881,12 +981,13 @@ class TestBot:
         monkeypatch.setattr(bot.request, 'post', test)
         until = from_timestamp(1577887200)
 
-        assert bot.kick_chat_member(2, 32)
-        assert bot.kick_chat_member(2, 32, until_date=until)
-        assert bot.kick_chat_member(2, 32, until_date=1577887200)
-        assert bot.kick_chat_member(2, 32, revoke_messages=True)
+        assert bot.ban_chat_member(2, 32)
+        assert bot.ban_chat_member(2, 32, until_date=until)
+        assert bot.ban_chat_member(2, 32, until_date=1577887200)
+        assert bot.ban_chat_member(2, 32, revoke_messages=True)
+        monkeypatch.delattr(bot.request, 'post')
 
-    def test_kick_chat_member_default_tz(self, monkeypatch, tz_bot):
+    def test_ban_chat_member_default_tz(self, monkeypatch, tz_bot):
         until = dtm.datetime(2020, 1, 11, 16, 13)
         until_timestamp = to_timestamp(until, tzinfo=tz_bot.defaults.tzinfo)
 
@@ -898,9 +999,21 @@ class TestBot:
 
         monkeypatch.setattr(tz_bot.request, 'post', test)
 
-        assert tz_bot.kick_chat_member(2, 32)
-        assert tz_bot.kick_chat_member(2, 32, until_date=until)
-        assert tz_bot.kick_chat_member(2, 32, until_date=until_timestamp)
+        assert tz_bot.ban_chat_member(2, 32)
+        assert tz_bot.ban_chat_member(2, 32, until_date=until)
+        assert tz_bot.ban_chat_member(2, 32, until_date=until_timestamp)
+
+    def test_kick_chat_member_warning(self, monkeypatch, bot, recwarn):
+        def test(url, data, *args, **kwargs):
+            chat_id = data['chat_id'] == 2
+            user_id = data['user_id'] == 32
+            return chat_id and user_id
+
+        monkeypatch.setattr(bot.request, 'post', test)
+        bot.kick_chat_member(2, 32)
+        assert len(recwarn) == 1
+        assert '`bot.kick_chat_member` is deprecated' in str(recwarn[0].message)
+        monkeypatch.delattr(bot.request, 'post')
 
     # TODO: Needs improvement.
     @pytest.mark.parametrize('only_if_banned', [True, False, None])
@@ -954,7 +1067,6 @@ class TestBot:
         )
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_edit_message_text(self, bot, message):
         message = bot.edit_message_text(
             text='new_text',
@@ -967,7 +1079,6 @@ class TestBot:
         assert message.text == 'new_text'
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_edit_message_text_entities(self, bot, message):
         test_string = 'Italic Bold Code'
         entities = [
@@ -986,7 +1097,6 @@ class TestBot:
         assert message.entities == entities
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_edit_message_text_default_parse_mode(self, default_bot, message):
         test_string = 'Italic Bold Code'
@@ -1032,7 +1142,6 @@ class TestBot:
         pass
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_edit_message_caption(self, bot, media_message):
         message = bot.edit_message_caption(
             caption='new_caption',
@@ -1043,7 +1152,6 @@ class TestBot:
         assert message.caption == 'new_caption'
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_edit_message_caption_entities(self, bot, media_message):
         test_string = 'Italic Bold Code'
         entities = [
@@ -1064,7 +1172,6 @@ class TestBot:
     # edit_message_media is tested in test_inputmedia
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_edit_message_caption_default_parse_mode(self, default_bot, media_message):
         test_string = 'Italic Bold Code'
@@ -1102,7 +1209,6 @@ class TestBot:
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_edit_message_caption_with_parse_mode(self, bot, media_message):
         message = bot.edit_message_caption(
             caption='new *caption*',
@@ -1122,7 +1228,6 @@ class TestBot:
         pass
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_edit_reply_markup(self, bot, message):
         new_markup = InlineKeyboardMarkup([[InlineKeyboardButton(text='test', callback_data='1')]])
         message = bot.edit_message_reply_markup(
@@ -1142,7 +1247,6 @@ class TestBot:
 
     # TODO: Actually send updates to the test bot so this can be tested properly
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_get_updates(self, bot):
         bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
         updates = bot.get_updates(timeout=1)
@@ -1151,8 +1255,42 @@ class TestBot:
         if updates:
             assert isinstance(updates[0], Update)
 
+    def test_get_updates_invalid_callback_data(self, bot, monkeypatch):
+        def post(*args, **kwargs):
+            return [
+                Update(
+                    17,
+                    callback_query=CallbackQuery(
+                        id=1,
+                        from_user=None,
+                        chat_instance=123,
+                        data='invalid data',
+                        message=Message(
+                            1,
+                            from_user=User(1, '', False),
+                            date=None,
+                            chat=Chat(1, ''),
+                            text='Webhook',
+                        ),
+                    ),
+                ).to_dict()
+            ]
+
+        bot.arbitrary_callback_data = True
+        try:
+            monkeypatch.setattr(bot.request, 'post', post)
+            bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
+            updates = bot.get_updates(timeout=1)
+
+            assert isinstance(updates, list)
+            assert len(updates) == 1
+            assert isinstance(updates[0].callback_query.data, InvalidCallbackData)
+
+        finally:
+            # Reset b/c bots scope is session
+            bot.arbitrary_callback_data = False
+
     @flaky(3, 1)
-    @pytest.mark.timeout(15)
     @pytest.mark.xfail
     def test_set_webhook_get_webhook_info_and_delete_webhook(self, bot):
         url = 'https://python-telegram-bot.org/test/webhook'
@@ -1189,7 +1327,6 @@ class TestBot:
         assert bot.delete_webhook(drop_pending_updates=drop_pending_updates)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_leave_chat(self, bot):
         with pytest.raises(BadRequest, match='Chat not found'):
             bot.leave_chat(-123456)
@@ -1198,7 +1335,6 @@ class TestBot:
             bot.leave_chat(-123456)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_get_chat(self, bot, super_group_id):
         chat = bot.get_chat(super_group_id)
 
@@ -1207,7 +1343,6 @@ class TestBot:
         assert chat.id == int(super_group_id)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_get_chat_administrators(self, bot, channel_id):
         admins = bot.get_chat_administrators(channel_id)
         assert isinstance(admins, list)
@@ -1216,14 +1351,22 @@ class TestBot:
             assert a.status in ('administrator', 'creator')
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_get_chat_members_count(self, bot, channel_id):
-        count = bot.get_chat_members_count(channel_id)
+    def test_get_chat_member_count(self, bot, channel_id):
+        count = bot.get_chat_member_count(channel_id)
         assert isinstance(count, int)
         assert count > 3
 
+    def test_get_chat_members_count_warning(self, bot, channel_id, recwarn):
+        bot.get_chat_members_count(channel_id)
+        assert len(recwarn) == 1
+        assert '`bot.get_chat_members_count` is deprecated' in str(recwarn[0].message)
+
+    def test_bot_command_property_warning(self, bot, recwarn):
+        _ = bot.commands
+        assert len(recwarn) == 1
+        assert 'Bot.commands has been deprecated since there can' in str(recwarn[0].message)
+
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_get_chat_member(self, bot, channel_id, chat_id):
         chat_member = bot.get_chat_member(channel_id, chat_id)
 
@@ -1240,7 +1383,6 @@ class TestBot:
         pass
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_game(self, bot, chat_id):
         game_short_name = 'test_game'
         message = bot.send_game(chat_id, game_short_name)
@@ -1251,11 +1393,10 @@ class TestBot:
         )
         assert message.game.animation.file_id != ''
         # We added some test bots later and for some reason the file size is not the same for them
-        # so we accept two different sizes here. Shouldn't be too much of
-        assert message.game.photo[0].file_size in [851, 4928]
+        # so we accept three different sizes here. Shouldn't be too much of
+        assert message.game.photo[0].file_size in [851, 4928, 850]
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize(
         'default_bot,custom',
         [
@@ -1290,37 +1431,33 @@ class TestBot:
                     chat_id, game_short_name, reply_to_message_id=reply_to_message.message_id
                 )
 
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
+    @xfail
     def test_set_game_score_1(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
-
-        def func():
-            game_short_name = 'test_game'
-            game = bot.send_game(chat_id, game_short_name)
-
-            message = bot.set_game_score(
-                user_id=chat_id,
-                score=int(BASE_TIME) - HIGHSCORE_DELTA,
-                chat_id=game.chat_id,
-                message_id=game.message_id,
-            )
-
-            assert message.game.description == game.game.description
-            assert message.game.animation.file_id == game.game.animation.file_id
-            assert message.game.photo[0].file_size == game.game.photo[0].file_size
-            assert message.game.text != game.game.text
-
-        expect_bad_request(func, 'Bot_score_not_modified', 'This test is a diva for some reason.')
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_set_game_score_2(self, bot, chat_id):
-        # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
+        # First, test setting a score.
         game_short_name = 'test_game'
         game = bot.send_game(chat_id, game_short_name)
 
-        score = int(BASE_TIME) - HIGHSCORE_DELTA + 1
+        message = bot.set_game_score(
+            user_id=chat_id,
+            score=BASE_GAME_SCORE,  # Score value is relevant for other set_game_score_* tests!
+            chat_id=game.chat_id,
+            message_id=game.message_id,
+        )
+
+        assert message.game.description == game.game.description
+        assert message.game.photo[0].file_size == game.game.photo[0].file_size
+        assert message.game.animation.file_unique_id == game.game.animation.file_unique_id
+        assert message.game.text != game.game.text
+
+    @xfail
+    def test_set_game_score_2(self, bot, chat_id):
+        # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
+        # Test setting a score higher than previous
+        game_short_name = 'test_game'
+        game = bot.send_game(chat_id, game_short_name)
+
+        score = BASE_GAME_SCORE + 1
 
         message = bot.set_game_score(
             user_id=chat_id,
@@ -1331,32 +1468,33 @@ class TestBot:
         )
 
         assert message.game.description == game.game.description
-        assert message.game.animation.file_id == game.game.animation.file_id
         assert message.game.photo[0].file_size == game.game.photo[0].file_size
+        assert message.game.animation.file_unique_id == game.game.animation.file_unique_id
         assert message.game.text == game.game.text
 
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
+    @xfail
     def test_set_game_score_3(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
+        # Test setting a score lower than previous (should raise error)
         game_short_name = 'test_game'
         game = bot.send_game(chat_id, game_short_name)
 
-        score = int(BASE_TIME) - HIGHSCORE_DELTA - 1
+        score = BASE_GAME_SCORE  # Even a score equal to previous raises an error.
 
         with pytest.raises(BadRequest, match='Bot_score_not_modified'):
             bot.set_game_score(
                 user_id=chat_id, score=score, chat_id=game.chat_id, message_id=game.message_id
             )
 
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
+    @xfail
     def test_set_game_score_4(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
+        # Test force setting a lower score
         game_short_name = 'test_game'
         game = bot.send_game(chat_id, game_short_name)
+        time.sleep(2)
 
-        score = int(BASE_TIME) - HIGHSCORE_DELTA - 2
+        score = BASE_GAME_SCORE - 10
 
         message = bot.set_game_score(
             user_id=chat_id,
@@ -1367,39 +1505,26 @@ class TestBot:
         )
 
         assert message.game.description == game.game.description
-        assert message.game.animation.file_id == game.game.animation.file_id
         assert message.game.photo[0].file_size == game.game.photo[0].file_size
+        assert message.game.animation.file_unique_id == game.game.animation.file_unique_id
 
-        # For some reason the returned message does not contain the updated score. need to fetch
-        # the game again...
+        # For some reason the returned message doesn't contain the updated score. need to fetch
+        # the game again... (the service message is also absent when running the test suite)
         game2 = bot.send_game(chat_id, game_short_name)
         assert str(score) in game2.game.text
 
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_set_game_score_too_low_score(self, bot, chat_id):
-        # We need a game to set the score for
-        game_short_name = 'test_game'
-        game = bot.send_game(chat_id, game_short_name)
-
-        with pytest.raises(BadRequest):
-            bot.set_game_score(
-                user_id=chat_id, score=100, chat_id=game.chat_id, message_id=game.message_id
-            )
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
+    @xfail
     def test_get_game_high_scores(self, bot, chat_id):
         # We need a game to get the scores for
         game_short_name = 'test_game'
         game = bot.send_game(chat_id, game_short_name)
         high_scores = bot.get_game_high_scores(chat_id, game.chat_id, game.message_id)
         # We assume that the other game score tests ran within 20 sec
-        assert pytest.approx(high_scores[0].score, abs=20) == int(BASE_TIME) - HIGHSCORE_DELTA
+        assert high_scores[0].score == BASE_GAME_SCORE - 10
 
     # send_invoice is tested in test_invoice
 
-    # TODO: Needs improvement. Need incoming shippping queries to test
+    # TODO: Needs improvement. Need incoming shipping queries to test
     def test_answer_shipping_query_ok(self, monkeypatch, bot):
         # For now just test that our internals pass the correct data
         def test(url, data, *args, **kwargs):
@@ -1474,7 +1599,6 @@ class TestBot:
             bot.answer_pre_checkout_query(1, False)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_restrict_chat_member(self, bot, channel_id, chat_permissions):
         # TODO: Add bot to supergroup so this can be tested properly
         with pytest.raises(BadRequest, match='Method is available only for supergroups'):
@@ -1502,7 +1626,6 @@ class TestBot:
         )
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_promote_chat_member(self, bot, channel_id, monkeypatch):
         # TODO: Add bot to supergroup so this can be tested properly / give bot perms
         with pytest.raises(BadRequest, match='Not enough rights'):
@@ -1559,7 +1682,6 @@ class TestBot:
         )
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_export_chat_invite_link(self, bot, channel_id):
         # Each link is unique apparently
         invite_link = bot.export_chat_invite_link(channel_id)
@@ -1567,7 +1689,6 @@ class TestBot:
         assert invite_link != ''
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('datetime', argvalues=[True, False], ids=['datetime', 'integer'])
     def test_advanced_chat_invite_links(self, bot, channel_id, datetime):
         # we are testing this all in one function in order to save api calls
@@ -1602,7 +1723,6 @@ class TestBot:
         assert revoked_invite_link.is_revoked is True
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_advanced_chat_invite_links_default_tzinfo(self, tz_bot, channel_id):
         # we are testing this all in one function in order to save api calls
         add_seconds = dtm.timedelta(0, 70)
@@ -1633,7 +1753,6 @@ class TestBot:
         assert revoked_invite_link.is_revoked is True
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_set_chat_photo(self, bot, channel_id):
         def func():
             assert bot.set_chat_photo(channel_id, f)
@@ -1656,7 +1775,6 @@ class TestBot:
         assert test_flag
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_delete_chat_photo(self, bot, channel_id):
         def func():
             assert bot.delete_chat_photo(channel_id)
@@ -1664,18 +1782,15 @@ class TestBot:
         expect_bad_request(func, 'Chat_not_modified', 'Chat photo was not set.')
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_set_chat_title(self, bot, channel_id):
         assert bot.set_chat_title(channel_id, '>>> telegram.Bot() - Tests')
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_set_chat_description(self, bot, channel_id):
         assert bot.set_chat_description(channel_id, 'Time: ' + str(time.time()))
 
     # TODO: Add bot to group to test there too
     @flaky(3, 1)
-    @pytest.mark.timeout(20)
     def test_pin_and_unpin_message(self, bot, super_group_id):
         message1 = bot.send_message(super_group_id, text="test_pin_message_1")
         message2 = bot.send_message(super_group_id, text="test_pin_message_2")
@@ -1754,7 +1869,6 @@ class TestBot:
             bot.send_photo(chat_id, open('tests/data/telegram.jpg', 'rb'))
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_message_entities(self, bot, chat_id):
         test_string = 'Italic Bold Code'
         entities = [
@@ -1767,7 +1881,6 @@ class TestBot:
         assert message.entities == entities
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_message_default_parse_mode(self, default_bot, chat_id):
         test_string = 'Italic Bold Code'
@@ -1786,7 +1899,6 @@ class TestBot:
         assert message.text_markdown == escape_markdown(test_markdown_string)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize(
         'default_bot,custom',
         [
@@ -1819,7 +1931,6 @@ class TestBot:
                 )
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_set_and_get_my_commands(self, bot):
         commands = [
             BotCommand('cmd1', 'descr1'),
@@ -1838,7 +1949,6 @@ class TestBot:
             assert bc[1].description == 'descr2'
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_set_and_get_my_commands_strings(self, bot):
         commands = [
             ['cmd1', 'descr1'],
@@ -1855,6 +1965,44 @@ class TestBot:
             assert bc[0].description == 'descr1'
             assert bc[1].command == 'cmd2'
             assert bc[1].description == 'descr2'
+
+    @flaky(3, 1)
+    def test_get_set_delete_my_commands_with_scope(self, bot, super_group_id, chat_id):
+        group_cmds = [BotCommand('group_cmd', 'visible to this supergroup only')]
+        private_cmds = [BotCommand('private_cmd', 'visible to this private chat only')]
+        group_scope = BotCommandScopeChat(super_group_id)
+        private_scope = BotCommandScopeChat(chat_id)
+
+        # Set supergroup command list with lang code and check if the same can be returned from api
+        bot.set_my_commands(group_cmds, scope=group_scope, language_code='en')
+        gotten_group_cmds = bot.get_my_commands(scope=group_scope, language_code='en')
+
+        assert len(gotten_group_cmds) == len(group_cmds)
+        assert gotten_group_cmds[0].command == group_cmds[0].command
+
+        # Set private command list and check if same can be returned from the api
+        bot.set_my_commands(private_cmds, scope=private_scope)
+        gotten_private_cmd = bot.get_my_commands(scope=private_scope)
+
+        assert len(gotten_private_cmd) == len(private_cmds)
+        assert gotten_private_cmd[0].command == private_cmds[0].command
+
+        assert len(bot.commands) == 2  # set from previous test. Makes sure this hasn't changed.
+        assert bot.commands[0].command == 'cmd1'
+
+        # Delete command list from that supergroup and private chat-
+        bot.delete_my_commands(private_scope)
+        bot.delete_my_commands(group_scope, 'en')
+
+        # Check if its been deleted-
+        deleted_priv_cmds = bot.get_my_commands(scope=private_scope)
+        deleted_grp_cmds = bot.get_my_commands(scope=group_scope, language_code='en')
+
+        assert len(deleted_grp_cmds) == 0 == len(group_cmds) - 1
+        assert len(deleted_priv_cmds) == 0 == len(private_cmds) - 1
+
+        bot.delete_my_commands()  # Delete commands from default scope
+        assert not bot.commands  # Check if this has been updated to reflect the deletion.
 
     def test_log_out(self, monkeypatch, bot):
         # We don't actually make a request as to not break the test setup
@@ -1875,7 +2023,6 @@ class TestBot:
         assert bot.close()
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize('json_keyboard', [True, False])
     def test_copy_message(self, monkeypatch, bot, chat_id, media_message, json_keyboard):
         keyboard = InlineKeyboardMarkup(
@@ -1908,7 +2055,6 @@ class TestBot:
         )
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_copy_message_without_reply(self, bot, chat_id, media_message):
         keyboard = InlineKeyboardMarkup(
             [[InlineKeyboardButton(text="test", callback_data="test2")]]
@@ -1933,7 +2079,6 @@ class TestBot:
         assert message.reply_markup == keyboard
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize(
         'default_bot',
         [
@@ -1956,14 +2101,13 @@ class TestBot:
                     reply_to_message_id=reply_to_message.message_id,
                 )
             return
-        else:
-            returned = default_bot.copy_message(
-                chat_id,
-                from_chat_id=chat_id,
-                message_id=media_message.message_id,
-                caption="<b>Test</b>",
-                reply_to_message_id=reply_to_message.message_id,
-            )
+        returned = default_bot.copy_message(
+            chat_id,
+            from_chat_id=chat_id,
+            message_id=media_message.message_id,
+            caption="<b>Test</b>",
+            reply_to_message_id=reply_to_message.message_id,
+        )
         # we send a temp message which replies to the returned message id in order to get a
         # message object
         temp_message = default_bot.send_message(
@@ -1974,3 +2118,339 @@ class TestBot:
             assert len(message.caption_entities) == 1
         else:
             assert len(message.caption_entities) == 0
+
+    def test_replace_callback_data_send_message(self, bot, chat_id):
+        try:
+            bot.arbitrary_callback_data = True
+            replace_button = InlineKeyboardButton(text='replace', callback_data='replace_test')
+            no_replace_button = InlineKeyboardButton(
+                text='no_replace', url='http://python-telegram-bot.org/'
+            )
+            reply_markup = InlineKeyboardMarkup.from_row(
+                [
+                    replace_button,
+                    no_replace_button,
+                ]
+            )
+            message = bot.send_message(chat_id=chat_id, text='test', reply_markup=reply_markup)
+            inline_keyboard = message.reply_markup.inline_keyboard
+
+            assert inline_keyboard[0][1] == no_replace_button
+            assert inline_keyboard[0][0] == replace_button
+            keyboard = list(bot.callback_data_cache._keyboard_data)[0]
+            data = list(bot.callback_data_cache._keyboard_data[keyboard].button_data.values())[0]
+            assert data == 'replace_test'
+        finally:
+            bot.arbitrary_callback_data = False
+            bot.callback_data_cache.clear_callback_data()
+            bot.callback_data_cache.clear_callback_queries()
+
+    def test_replace_callback_data_stop_poll_and_repl_to_message(self, bot, chat_id):
+        poll_message = bot.send_poll(chat_id=chat_id, question='test', options=['1', '2'])
+        try:
+            bot.arbitrary_callback_data = True
+            replace_button = InlineKeyboardButton(text='replace', callback_data='replace_test')
+            no_replace_button = InlineKeyboardButton(
+                text='no_replace', url='http://python-telegram-bot.org/'
+            )
+            reply_markup = InlineKeyboardMarkup.from_row(
+                [
+                    replace_button,
+                    no_replace_button,
+                ]
+            )
+            poll_message.stop_poll(reply_markup=reply_markup)
+            helper_message = poll_message.reply_text('temp', quote=True)
+            message = helper_message.reply_to_message
+            inline_keyboard = message.reply_markup.inline_keyboard
+
+            assert inline_keyboard[0][1] == no_replace_button
+            assert inline_keyboard[0][0] == replace_button
+            keyboard = list(bot.callback_data_cache._keyboard_data)[0]
+            data = list(bot.callback_data_cache._keyboard_data[keyboard].button_data.values())[0]
+            assert data == 'replace_test'
+        finally:
+            bot.arbitrary_callback_data = False
+            bot.callback_data_cache.clear_callback_data()
+            bot.callback_data_cache.clear_callback_queries()
+
+    def test_replace_callback_data_copy_message(self, bot, chat_id):
+        """This also tests that data is inserted into the buttons of message.reply_to_message
+        where message is the return value of a bot method"""
+        original_message = bot.send_message(chat_id=chat_id, text='original')
+        try:
+            bot.arbitrary_callback_data = True
+            replace_button = InlineKeyboardButton(text='replace', callback_data='replace_test')
+            no_replace_button = InlineKeyboardButton(
+                text='no_replace', url='http://python-telegram-bot.org/'
+            )
+            reply_markup = InlineKeyboardMarkup.from_row(
+                [
+                    replace_button,
+                    no_replace_button,
+                ]
+            )
+            message_id = original_message.copy(chat_id=chat_id, reply_markup=reply_markup)
+            helper_message = bot.send_message(
+                chat_id=chat_id, reply_to_message_id=message_id.message_id, text='temp'
+            )
+            message = helper_message.reply_to_message
+            inline_keyboard = message.reply_markup.inline_keyboard
+
+            assert inline_keyboard[0][1] == no_replace_button
+            assert inline_keyboard[0][0] == replace_button
+            keyboard = list(bot.callback_data_cache._keyboard_data)[0]
+            data = list(bot.callback_data_cache._keyboard_data[keyboard].button_data.values())[0]
+            assert data == 'replace_test'
+        finally:
+            bot.arbitrary_callback_data = False
+            bot.callback_data_cache.clear_callback_data()
+            bot.callback_data_cache.clear_callback_queries()
+
+    # TODO: Needs improvement. We need incoming inline query to test answer.
+    def test_replace_callback_data_answer_inline_query(self, monkeypatch, bot, chat_id):
+        # For now just test that our internals pass the correct data
+        def make_assertion(
+            endpoint,
+            data=None,
+            timeout=None,
+            api_kwargs=None,
+        ):
+            inline_keyboard = InlineKeyboardMarkup.de_json(
+                data['results'][0]['reply_markup'], bot
+            ).inline_keyboard
+            assertion_1 = inline_keyboard[0][1] == no_replace_button
+            assertion_2 = inline_keyboard[0][0] != replace_button
+            keyboard, button = (
+                inline_keyboard[0][0].callback_data[:32],
+                inline_keyboard[0][0].callback_data[32:],
+            )
+            assertion_3 = (
+                bot.callback_data_cache._keyboard_data[keyboard].button_data[button]
+                == 'replace_test'
+            )
+            assertion_4 = 'reply_markup' not in data['results'][1]
+            return assertion_1 and assertion_2 and assertion_3 and assertion_4
+
+        try:
+            bot.arbitrary_callback_data = True
+            replace_button = InlineKeyboardButton(text='replace', callback_data='replace_test')
+            no_replace_button = InlineKeyboardButton(
+                text='no_replace', url='http://python-telegram-bot.org/'
+            )
+            reply_markup = InlineKeyboardMarkup.from_row(
+                [
+                    replace_button,
+                    no_replace_button,
+                ]
+            )
+
+            bot.username  # call this here so `bot.get_me()` won't be called after mocking
+            monkeypatch.setattr(bot, '_post', make_assertion)
+            results = [
+                InlineQueryResultArticle(
+                    '11', 'first', InputTextMessageContent('first'), reply_markup=reply_markup
+                ),
+                InlineQueryResultVoice(
+                    '22',
+                    'https://python-telegram-bot.org/static/testfiles/telegram.ogg',
+                    title='second',
+                ),
+            ]
+
+            assert bot.answer_inline_query(chat_id, results=results)
+
+        finally:
+            bot.arbitrary_callback_data = False
+            bot.callback_data_cache.clear_callback_data()
+            bot.callback_data_cache.clear_callback_queries()
+
+    def test_get_chat_arbitrary_callback_data(self, super_group_id, bot):
+        try:
+            bot.arbitrary_callback_data = True
+            reply_markup = InlineKeyboardMarkup.from_button(
+                InlineKeyboardButton(text='text', callback_data='callback_data')
+            )
+
+            message = bot.send_message(
+                super_group_id, text='get_chat_arbitrary_callback_data', reply_markup=reply_markup
+            )
+            message.pin()
+
+            keyboard = list(bot.callback_data_cache._keyboard_data)[0]
+            data = list(bot.callback_data_cache._keyboard_data[keyboard].button_data.values())[0]
+            assert data == 'callback_data'
+
+            chat = bot.get_chat(super_group_id)
+            assert chat.pinned_message == message
+            assert chat.pinned_message.reply_markup == reply_markup
+        finally:
+            bot.arbitrary_callback_data = False
+            bot.callback_data_cache.clear_callback_data()
+            bot.callback_data_cache.clear_callback_queries()
+            bot.unpin_all_chat_messages(super_group_id)
+
+    # In the following tests we check that get_updates inserts callback data correctly if necessary
+    # The same must be done in the webhook updater. This is tested over at test_updater.py, but
+    # here we test more extensively.
+
+    def test_arbitrary_callback_data_no_insert(self, monkeypatch, bot):
+        """Updates that don't need insertion shouldn.t fail obviously"""
+
+        def post(*args, **kwargs):
+            update = Update(
+                17,
+                poll=Poll(
+                    '42',
+                    'question',
+                    options=[PollOption('option', 0)],
+                    total_voter_count=0,
+                    is_closed=False,
+                    is_anonymous=True,
+                    type=Poll.REGULAR,
+                    allows_multiple_answers=False,
+                ),
+            )
+            return [update.to_dict()]
+
+        try:
+            bot.arbitrary_callback_data = True
+            monkeypatch.setattr(bot.request, 'post', post)
+            bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
+            updates = bot.get_updates(timeout=1)
+
+            assert len(updates) == 1
+            assert updates[0].update_id == 17
+            assert updates[0].poll.id == '42'
+        finally:
+            bot.arbitrary_callback_data = False
+
+    @pytest.mark.parametrize(
+        'message_type', ['channel_post', 'edited_channel_post', 'message', 'edited_message']
+    )
+    def test_arbitrary_callback_data_pinned_message_reply_to_message(
+        self, super_group_id, bot, monkeypatch, message_type
+    ):
+        bot.arbitrary_callback_data = True
+        reply_markup = InlineKeyboardMarkup.from_button(
+            InlineKeyboardButton(text='text', callback_data='callback_data')
+        )
+
+        message = Message(
+            1, None, None, reply_markup=bot.callback_data_cache.process_keyboard(reply_markup)
+        )
+        # We do to_dict -> de_json to make sure those aren't the same objects
+        message.pinned_message = Message.de_json(message.to_dict(), bot)
+
+        def post(*args, **kwargs):
+            update = Update(
+                17,
+                **{
+                    message_type: Message(
+                        1,
+                        None,
+                        None,
+                        pinned_message=message,
+                        reply_to_message=Message.de_json(message.to_dict(), bot),
+                    )
+                },
+            )
+            return [update.to_dict()]
+
+        try:
+            monkeypatch.setattr(bot.request, 'post', post)
+            bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
+            updates = bot.get_updates(timeout=1)
+
+            assert isinstance(updates, list)
+            assert len(updates) == 1
+
+            effective_message = updates[0][message_type]
+            assert (
+                effective_message.reply_to_message.reply_markup.inline_keyboard[0][0].callback_data
+                == 'callback_data'
+            )
+            assert (
+                effective_message.pinned_message.reply_markup.inline_keyboard[0][0].callback_data
+                == 'callback_data'
+            )
+
+            pinned_message = effective_message.reply_to_message.pinned_message
+            assert (
+                pinned_message.reply_markup.inline_keyboard[0][0].callback_data == 'callback_data'
+            )
+
+        finally:
+            bot.arbitrary_callback_data = False
+            bot.callback_data_cache.clear_callback_data()
+            bot.callback_data_cache.clear_callback_queries()
+
+    def test_arbitrary_callback_data_get_chat_no_pinned_message(self, super_group_id, bot):
+        bot.arbitrary_callback_data = True
+        bot.unpin_all_chat_messages(super_group_id)
+
+        try:
+            chat = bot.get_chat(super_group_id)
+
+            assert isinstance(chat, Chat)
+            assert int(chat.id) == int(super_group_id)
+            assert chat.pinned_message is None
+        finally:
+            bot.arbitrary_callback_data = False
+
+    @pytest.mark.parametrize(
+        'message_type', ['channel_post', 'edited_channel_post', 'message', 'edited_message']
+    )
+    @pytest.mark.parametrize('self_sender', [True, False])
+    def test_arbitrary_callback_data_via_bot(
+        self, super_group_id, bot, monkeypatch, self_sender, message_type
+    ):
+        bot.arbitrary_callback_data = True
+        reply_markup = InlineKeyboardMarkup.from_button(
+            InlineKeyboardButton(text='text', callback_data='callback_data')
+        )
+
+        reply_markup = bot.callback_data_cache.process_keyboard(reply_markup)
+        message = Message(
+            1,
+            None,
+            None,
+            reply_markup=reply_markup,
+            via_bot=bot.bot if self_sender else User(1, 'first', False),
+        )
+
+        def post(*args, **kwargs):
+            return [Update(17, **{message_type: message}).to_dict()]
+
+        try:
+            monkeypatch.setattr(bot.request, 'post', post)
+            bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
+            updates = bot.get_updates(timeout=1)
+
+            assert isinstance(updates, list)
+            assert len(updates) == 1
+
+            message = updates[0][message_type]
+            if self_sender:
+                assert message.reply_markup.inline_keyboard[0][0].callback_data == 'callback_data'
+            else:
+                assert (
+                    message.reply_markup.inline_keyboard[0][0].callback_data
+                    == reply_markup.inline_keyboard[0][0].callback_data
+                )
+        finally:
+            bot.arbitrary_callback_data = False
+            bot.callback_data_cache.clear_callback_data()
+            bot.callback_data_cache.clear_callback_queries()
+
+    @pytest.mark.parametrize(
+        'cls,warn', [(Bot, True), (BotSubClass, True), (ExtBot, False), (ExtBotSubClass, False)]
+    )
+    def test_defaults_warning(self, bot, recwarn, cls, warn):
+        defaults = Defaults()
+        cls(bot.token, defaults=defaults)
+        if warn:
+            assert len(recwarn) == 1
+            assert 'Passing Defaults to telegram.Bot is deprecated.' in str(recwarn[-1].message)
+        else:
+            assert len(recwarn) == 0

@@ -81,6 +81,15 @@ class TestChosenInlineResultHandler:
     def reset(self):
         self.test_flag = False
 
+    def test_slot_behaviour(self, recwarn, mro_slots):
+        handler = ChosenInlineResultHandler(self.callback_basic)
+        for attr in handler.__slots__:
+            assert getattr(handler, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not handler.__dict__, f"got missing slot(s): {handler.__dict__}"
+        assert len(mro_slots(handler)) == len(set(mro_slots(handler))), "duplicate slot"
+        handler.custom, handler.callback = 'should give warning', self.callback_basic
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     def callback_basic(self, bot, update):
         test_bot = isinstance(bot, Bot)
         test_update = isinstance(update, Update)
@@ -110,6 +119,12 @@ class TestChosenInlineResultHandler:
             and isinstance(context.bot_data, dict)
             and isinstance(update.chosen_inline_result, ChosenInlineResult)
         )
+
+    def callback_context_pattern(self, update, context):
+        if context.matches[0].groups():
+            self.test_flag = context.matches[0].groups() == ('res', '_id')
+        if context.matches[0].groupdict():
+            self.test_flag = context.matches[0].groupdict() == {'begin': 'res', 'end': '_id'}
 
     def test_basic(self, dp, chosen_inline_result):
         handler = ChosenInlineResultHandler(self.callback_basic)
@@ -175,6 +190,30 @@ class TestChosenInlineResultHandler:
 
     def test_context(self, cdp, chosen_inline_result):
         handler = ChosenInlineResultHandler(self.callback_context)
+        cdp.add_handler(handler)
+
+        cdp.process_update(chosen_inline_result)
+        assert self.test_flag
+
+    def test_with_pattern(self, chosen_inline_result):
+        handler = ChosenInlineResultHandler(self.callback_basic, pattern='.*ult.*')
+
+        assert handler.check_update(chosen_inline_result)
+
+        chosen_inline_result.chosen_inline_result.result_id = 'nothing here'
+        assert not handler.check_update(chosen_inline_result)
+        chosen_inline_result.chosen_inline_result.result_id = 'result_id'
+
+    def test_context_pattern(self, cdp, chosen_inline_result):
+        handler = ChosenInlineResultHandler(
+            self.callback_context_pattern, pattern=r'(?P<begin>.*)ult(?P<end>.*)'
+        )
+        cdp.add_handler(handler)
+        cdp.process_update(chosen_inline_result)
+        assert self.test_flag
+
+        cdp.remove_handler(handler)
+        handler = ChosenInlineResultHandler(self.callback_context_pattern, pattern=r'(res)ult(.*)')
         cdp.add_handler(handler)
 
         cdp.process_update(chosen_inline_result)

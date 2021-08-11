@@ -59,6 +59,8 @@ class MessageEntity(TelegramObject):
 
     """
 
+    __slots__ = ('length', 'url', 'user', 'type', 'language', 'offset', '_id_attrs')
+
     def __init__(
         self,
         type: str,  # pylint: disable=W0622
@@ -82,7 +84,8 @@ class MessageEntity(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['MessageEntity']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None

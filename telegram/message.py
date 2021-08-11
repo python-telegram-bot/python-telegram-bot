@@ -53,6 +53,7 @@ from telegram import (
     ProximityAlertTriggered,
     ReplyMarkup,
     MessageAutoDeleteTimerChanged,
+    VoiceChatScheduled,
 )
 from telegram.utils.helpers import (
     escape_markdown,
@@ -75,8 +76,6 @@ if TYPE_CHECKING:
         InputMediaVideo,
         LabeledPrice,
     )
-
-_UNDEFINED = object()
 
 
 class Message(TelegramObject):
@@ -204,6 +203,10 @@ class Message(TelegramObject):
         proximity_alert_triggered (:class:`telegram.ProximityAlertTriggered`, optional): Service
             message. A user in the chat triggered another user's proximity alert while sharing
             Live Location.
+        voice_chat_scheduled (:class:`telegram.VoiceChatScheduled`, optional): Service message:
+            voice chat scheduled.
+
+            .. versionadded:: 13.5
         voice_chat_started (:class:`telegram.VoiceChatStarted`, optional): Service message: voice
             chat started.
 
@@ -305,8 +308,12 @@ class Message(TelegramObject):
         proximity_alert_triggered (:class:`telegram.ProximityAlertTriggered`): Optional. Service
             message. A user in the chat triggered another user's proximity alert while sharing
             Live Location.
+        voice_chat_scheduled (:class:`telegram.VoiceChatScheduled`): Optional. Service message:
+            voice chat scheduled.
+
+            .. versionadded:: 13.5
         voice_chat_started (:class:`telegram.VoiceChatStarted`): Optional. Service message: voice
-            chat started
+            chat started.
 
             .. versionadded:: 13.4
         voice_chat_ended (:class:`telegram.VoiceChatEnded`): Optional. Service message: voice chat
@@ -322,9 +329,69 @@ class Message(TelegramObject):
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     """
-    # fmt: on
 
-    _effective_attachment = _UNDEFINED
+    # fmt: on
+    __slots__ = (
+        'reply_markup',
+        'audio',
+        'contact',
+        'migrate_to_chat_id',
+        'forward_signature',
+        'chat',
+        'successful_payment',
+        'game',
+        'text',
+        'forward_sender_name',
+        'document',
+        'new_chat_title',
+        'forward_date',
+        'group_chat_created',
+        'media_group_id',
+        'caption',
+        'video',
+        'bot',
+        'entities',
+        'via_bot',
+        'new_chat_members',
+        'connected_website',
+        'animation',
+        'migrate_from_chat_id',
+        'forward_from',
+        'sticker',
+        'location',
+        'venue',
+        'edit_date',
+        'reply_to_message',
+        'passport_data',
+        'pinned_message',
+        'forward_from_chat',
+        'new_chat_photo',
+        'message_id',
+        'delete_chat_photo',
+        'from_user',
+        'author_signature',
+        'proximity_alert_triggered',
+        'sender_chat',
+        'dice',
+        'forward_from_message_id',
+        'caption_entities',
+        'voice',
+        'date',
+        'supergroup_chat_created',
+        'poll',
+        'left_chat_member',
+        'photo',
+        'channel_chat_created',
+        'invoice',
+        'video_note',
+        '_effective_attachment',
+        'message_auto_delete_timer_changed',
+        'voice_chat_ended',
+        'voice_chat_participants_invited',
+        'voice_chat_started',
+        'voice_chat_scheduled',
+        '_id_attrs',
+    )
 
     ATTACHMENT_TYPES: ClassVar[List[str]] = [
         'audio',
@@ -360,6 +427,7 @@ class Message(TelegramObject):
         'dice',
         'passport_data',
         'proximity_alert_triggered',
+        'voice_chat_scheduled',
         'voice_chat_started',
         'voice_chat_ended',
         'voice_chat_participants_invited',
@@ -423,6 +491,7 @@ class Message(TelegramObject):
         voice_chat_ended: VoiceChatEnded = None,
         voice_chat_participants_invited: VoiceChatParticipantsInvited = None,
         message_auto_delete_timer_changed: MessageAutoDeleteTimerChanged = None,
+        voice_chat_scheduled: VoiceChatScheduled = None,
         **_kwargs: Any,
     ):
         # Required
@@ -478,11 +547,14 @@ class Message(TelegramObject):
         self.dice = dice
         self.via_bot = via_bot
         self.proximity_alert_triggered = proximity_alert_triggered
+        self.voice_chat_scheduled = voice_chat_scheduled
         self.voice_chat_started = voice_chat_started
         self.voice_chat_ended = voice_chat_ended
         self.voice_chat_participants_invited = voice_chat_participants_invited
         self.reply_markup = reply_markup
         self.bot = bot
+
+        self._effective_attachment = DEFAULT_NONE
 
         self._id_attrs = (self.message_id, self.chat)
 
@@ -494,7 +566,8 @@ class Message(TelegramObject):
     @property
     def link(self) -> Optional[str]:
         """:obj:`str`: Convenience property. If the chat of the message is not
-        a private chat or normal group, returns a t.me link of the message."""
+        a private chat or normal group, returns a t.me link of the message.
+        """
         if self.chat.type not in [Chat.PRIVATE, Chat.GROUP]:
             if self.chat.username:
                 to_link = self.chat.username
@@ -506,7 +579,8 @@ class Message(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Message']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None
@@ -551,6 +625,9 @@ class Message(TelegramObject):
             data.get('proximity_alert_triggered'), bot
         )
         data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
+        data['voice_chat_scheduled'] = VoiceChatScheduled.de_json(
+            data.get('voice_chat_scheduled'), bot
+        )
         data['voice_chat_started'] = VoiceChatStarted.de_json(data.get('voice_chat_started'), bot)
         data['voice_chat_ended'] = VoiceChatEnded.de_json(data.get('voice_chat_ended'), bot)
         data['voice_chat_participants_invited'] = VoiceChatParticipantsInvited.de_json(
@@ -595,7 +672,7 @@ class Message(TelegramObject):
             :obj:`None` if no attachment was sent.
 
         """
-        if self._effective_attachment is not _UNDEFINED:
+        if self._effective_attachment is not DEFAULT_NONE:
             return self._effective_attachment  # type: ignore
 
         for i in Message.ATTACHMENT_TYPES:
@@ -608,12 +685,10 @@ class Message(TelegramObject):
         return self._effective_attachment  # type: ignore
 
     def __getitem__(self, item: str) -> Any:  # pylint: disable=R1710
-        if item in self.__dict__.keys():
-            return self.__dict__[item]
-        if item == 'chat_id':
-            return self.chat.id
+        return self.chat.id if item == 'chat_id' else super().__getitem__(item)
 
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
         # Required
@@ -1620,9 +1695,9 @@ class Message(TelegramObject):
         description: str,
         payload: str,
         provider_token: str,
-        start_parameter: str,
         currency: str,
         prices: List['LabeledPrice'],
+        start_parameter: str = None,
         photo_url: str = None,
         photo_size: int = None,
         photo_width: int = None,
@@ -1642,6 +1717,8 @@ class Message(TelegramObject):
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
+        max_tip_amount: int = None,
+        suggested_tip_amounts: List[int] = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1649,13 +1726,21 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_invoice`.
 
+        Warning:
+            As of API 5.2 :attr:`start_parameter` is an optional argument and therefore the order
+            of the arguments had to be changed. Use keyword arguments to make sure that the
+            arguments are passed correctly.
+
+        .. versionadded:: 13.2
+
+        .. versionchanged:: 13.5
+            As of Bot API 5.2, the parameter :attr:`start_parameter` is optional.
+
         Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the invoice is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False`
                 in private chats.
-
-        .. versionadded:: 13.2
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -1668,9 +1753,9 @@ class Message(TelegramObject):
             description=description,
             payload=payload,
             provider_token=provider_token,
-            start_parameter=start_parameter,
             currency=currency,
             prices=prices,
+            start_parameter=start_parameter,
             photo_url=photo_url,
             photo_size=photo_size,
             photo_width=photo_width,
@@ -1689,6 +1774,8 @@ class Message(TelegramObject):
             timeout=timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
+            max_tip_amount=max_tip_amount,
+            suggested_tip_amounts=suggested_tip_amounts,
         )
 
     def forward(

@@ -65,6 +65,14 @@ class TestUser:
     can_read_all_group_messages = True
     supports_inline_queries = False
 
+    def test_slot_behaviour(self, user, mro_slots, recwarn):
+        for attr in user.__slots__:
+            assert getattr(user, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not user.__dict__, f"got missing slot(s): {user.__dict__}"
+        assert len(mro_slots(user)) == len(set(mro_slots(user))), "duplicate slot"
+        user.custom, user.id = 'should give warning', self.id_
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     def test_de_json(self, json_dict, bot):
         user = User.de_json(json_dict, bot)
 
@@ -287,18 +295,9 @@ class TestUser:
             description = kwargs['description'] == 'description'
             payload = kwargs['payload'] == 'payload'
             provider_token = kwargs['provider_token'] == 'provider_token'
-            start_parameter = kwargs['start_parameter'] == 'start_parameter'
             currency = kwargs['currency'] == 'currency'
             prices = kwargs['prices'] == 'prices'
-            args = (
-                title
-                and description
-                and payload
-                and provider_token
-                and start_parameter
-                and currency
-                and prices
-            )
+            args = title and description and payload and provider_token and currency and prices
             return kwargs['chat_id'] == user.id and args
 
         assert check_shortcut_signature(User.send_invoice, Bot.send_invoice, ['chat_id'], [])
@@ -311,7 +310,6 @@ class TestUser:
             'description',
             'payload',
             'provider_token',
-            'start_parameter',
             'currency',
             'prices',
         )

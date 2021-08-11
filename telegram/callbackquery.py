@@ -53,6 +53,13 @@ class CallbackQuery(TelegramObject):
           until you call :attr:`answer`. It is, therefore, necessary to react
           by calling :attr:`telegram.Bot.answer_callback_query` even if no notification to the user
           is needed (e.g., without specifying any of the optional parameters).
+        * If you're using :attr:`Bot.arbitrary_callback_data`, :attr:`data` may be an instance
+          of :class:`telegram.ext.InvalidCallbackData`. This will be the case, if the data
+          associated with the button triggering the :class:`telegram.CallbackQuery` was already
+          deleted or if :attr:`data` was manipulated by a malicious client.
+
+          .. versionadded:: 13.6
+
 
     Args:
         id (:obj:`str`): Unique identifier for this query.
@@ -77,13 +84,25 @@ class CallbackQuery(TelegramObject):
             the message with the callback button was sent.
         message (:class:`telegram.Message`): Optional. Message with the callback button that
             originated the query.
-        data (:obj:`str`): Optional. Data associated with the callback button.
+        data (:obj:`str` | :obj:`object`): Optional. Data associated with the callback button.
         inline_message_id (:obj:`str`): Optional. Identifier of the message sent via the bot in
                 inline mode, that originated the query.
         game_short_name (:obj:`str`): Optional. Short name of a Game to be returned.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
 
     """
+
+    __slots__ = (
+        'bot',
+        'game_short_name',
+        'message',
+        'chat_instance',
+        'id',
+        'from_user',
+        'inline_message_id',
+        'data',
+        '_id_attrs',
+    )
 
     def __init__(
         self,
@@ -113,7 +132,8 @@ class CallbackQuery(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['CallbackQuery']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None
@@ -173,7 +193,7 @@ class CallbackQuery(TelegramObject):
                                 *args, **kwargs)
 
         For the documentation of the arguments, please see
-        :meth:`telegram.Bot.edit_message_text`.
+        :meth:`telegram.Bot.edit_message_text` and :meth:`telegram.Message.edit_text`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -223,7 +243,7 @@ class CallbackQuery(TelegramObject):
                                    *args, **kwargs)
 
         For the documentation of the arguments, please see
-        :meth:`telegram.Bot.edit_message_caption`.
+        :meth:`telegram.Bot.edit_message_caption` and :meth:`telegram.Message.edit_caption`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -275,7 +295,8 @@ class CallbackQuery(TelegramObject):
             )
 
         For the documentation of the arguments, please see
-        :meth:`telegram.Bot.edit_message_reply_markup`.
+        :meth:`telegram.Bot.edit_message_reply_markup` and
+        :meth:`telegram.Message.edit_reply_markup`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -314,7 +335,7 @@ class CallbackQuery(TelegramObject):
                                    *args, **kwargs)
 
         For the documentation of the arguments, please see
-        :meth:`telegram.Bot.edit_message_media`.
+        :meth:`telegram.Bot.edit_message_media` and :meth:`telegram.Message.edit_media`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -362,7 +383,8 @@ class CallbackQuery(TelegramObject):
             )
 
         For the documentation of the arguments, please see
-        :meth:`telegram.Bot.edit_message_live_location`.
+        :meth:`telegram.Bot.edit_message_live_location` and
+        :meth:`telegram.Message.edit_live_location`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -414,7 +436,8 @@ class CallbackQuery(TelegramObject):
             )
 
         For the documentation of the arguments, please see
-        :meth:`telegram.Bot.stop_message_live_location`.
+        :meth:`telegram.Bot.stop_message_live_location` and
+        :meth:`telegram.Message.stop_live_location`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -455,7 +478,7 @@ class CallbackQuery(TelegramObject):
                                *args, **kwargs)
 
         For the documentation of the arguments, please see
-        :meth:`telegram.Bot.set_game_score`.
+        :meth:`telegram.Bot.set_game_score` and :meth:`telegram.Message.set_game_score`.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
@@ -499,7 +522,7 @@ class CallbackQuery(TelegramObject):
                                      *args, **kwargs)
 
         For the documentation of the arguments, please see
-        :meth:`telegram.Bot.get_game_high_scores`.
+        :meth:`telegram.Bot.get_game_high_scores` and :meth:`telegram.Message.get_game_high_score`.
 
         Returns:
             List[:class:`telegram.GameHighScore`]
@@ -530,7 +553,7 @@ class CallbackQuery(TelegramObject):
             update.callback_query.message.delete(*args, **kwargs)
 
         For the documentation of the arguments, please see
-        :meth:`telegram.Bot.delete_message`.
+        :meth:`telegram.Message.delete`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -549,13 +572,10 @@ class CallbackQuery(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-             bot.pin_chat_message(chat_id=message.chat_id,
-                                  message_id=message.message_id,
-                                  *args,
-                                  **kwargs)
+             update.callback_query.message.pin(*args, **kwargs)
 
         For the documentation of the arguments, please see
-        :meth:`telegram.Bot.pin_chat_message`.
+        :meth:`telegram.Message.pin`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -574,13 +594,10 @@ class CallbackQuery(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-             bot.unpin_chat_message(chat_id=message.chat_id,
-                                    message_id=message.message_id,
-                                    *args,
-                                    **kwargs)
+             update.callback_query.message.unpin(*args, **kwargs)
 
         For the documentation of the arguments, please see
-        :meth:`telegram.Bot.unpin_chat_message`.
+        :meth:`telegram.Message.unpin`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -614,7 +631,7 @@ class CallbackQuery(TelegramObject):
                 **kwargs)
 
         For the documentation of the arguments, please see
-        :meth:`telegram.Bot.copy_message`.
+        :meth:`telegram.Message.copy`.
 
         Returns:
             :class:`telegram.MessageId`: On success, returns the MessageId of the sent message.

@@ -67,6 +67,16 @@ class File(TelegramObject):
 
     """
 
+    __slots__ = (
+        'bot',
+        'file_id',
+        'file_size',
+        'file_unique_id',
+        'file_path',
+        '_credentials',
+        '_id_attrs',
+    )
+
     def __init__(
         self,
         file_id: str,
@@ -195,4 +205,9 @@ class File(TelegramObject):
         return buf
 
     def set_credentials(self, credentials: 'FileCredentials') -> None:
+        """Sets the passport credentials for the file.
+
+        Args:
+            credentials (:class:`telegram.FileCredentials`): The credentials.
+        """
         self._credentials = credentials

@@ -18,10 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=C0114
 
-import asyncio
 import logging
-import os
-import sys
 from queue import Queue
 from ssl import SSLContext
 from threading import Event, Lock
@@ -33,6 +30,8 @@ from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 
 from telegram import Update
+from telegram.ext import ExtBot
+from telegram.utils.deprecate import set_new_attribute_deprecated
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -45,6 +44,18 @@ except ImportError:
 
 
 class WebhookServer:
+    __slots__ = (
+        'http_server',
+        'listen',
+        'port',
+        'loop',
+        'logger',
+        'is_running',
+        'server_lock',
+        'shutdown_lock',
+        '__dict__',
+    )
+
     def __init__(
         self, listen: str, port: int, webhook_app: 'WebhookAppClass', ssl_ctx: SSLContext
     ):
@@ -57,11 +68,14 @@ class WebhookServer:
         self.server_lock = Lock()
         self.shutdown_lock = Lock()
 
-    def serve_forever(self, force_event_loop: bool = False, ready: Event = None) -> None:
+    def __setattr__(self, key: str, value: object) -> None:
+        set_new_attribute_deprecated(self, key, value)
+
+    def serve_forever(self, ready: Event = None) -> None:
         with self.server_lock:
+            IOLoop().make_current()
             self.is_running = True
             self.logger.debug('Webhook Server started.')
-            self._ensure_event_loop(force_event_loop=force_event_loop)
             self.loop = IOLoop.current()
             self.http_server.listen(self.port, address=self.listen)
 
@@ -87,54 +101,6 @@ class WebhookServer:
             exc_info=True,
         )
 
-    def _ensure_event_loop(self, force_event_loop: bool = False) -> None:
-        """If there's no asyncio event loop set for the current thread - create one."""
-        try:
-            loop = asyncio.get_event_loop()
-            if (
-                not force_event_loop
-                and os.name == 'nt'
-                and sys.version_info >= (3, 8)
-                and isinstance(loop, asyncio.ProactorEventLoop)  # type: ignore[attr-defined]
-            ):
-                raise TypeError(
-                    '`ProactorEventLoop` is incompatible with '
-                    'Tornado. Please switch to `SelectorEventLoop`.'
-                )
-        except RuntimeError:
-            # Python 3.8 changed default asyncio event loop implementation on windows
-            # from SelectorEventLoop to ProactorEventLoop. At the time of this writing
-            # Tornado doesn't support ProactorEventLoop and suggests that end users
-            # change asyncio event loop policy to WindowsSelectorEventLoopPolicy.
-            # https://github.com/tornadoweb/tornado/issues/2608
-            # To avoid changing the global event loop policy, we manually construct
-            # a SelectorEventLoop instance instead of using asyncio.new_event_loop().
-            # Note that the fix is not applied in the main thread, as that can break
-            # user code in even more ways than changing the global event loop policy can,
-            # and because Updater always starts its webhook server in a separate thread.
-            # Ideally, we would want to check that Tornado actually raises the expected
-            # NotImplementedError, but it's not possible to cleanly recover from that
-            # exception in current Tornado version.
-            if (
-                os.name == 'nt'
-                and sys.version_info >= (3, 8)
-                # OS+version check makes hasattr check redundant, but just to be sure
-                and hasattr(asyncio, 'WindowsProactorEventLoopPolicy')
-                and (
-                    isinstance(
-                        asyncio.get_event_loop_policy(),
-                        asyncio.WindowsProactorEventLoopPolicy,  # type: ignore # pylint: disable
-                    )
-                )
-            ):  # pylint: disable=E1101
-                self.logger.debug(
-                    'Applying Tornado asyncio event loop fix for Python 3.8+ on Windows'
-                )
-                loop = asyncio.SelectorEventLoop()
-            else:
-                loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-
 
 class WebhookAppClass(tornado.web.Application):
     def __init__(self, webhook_path: str, bot: 'Bot', update_queue: Queue):
@@ -142,7 +108,7 @@ class WebhookAppClass(tornado.web.Application):
         handlers = [(rf"{webhook_path}/?", WebhookHandler, self.shared_objects)]  # noqa
         tornado.web.Application.__init__(self, handlers)  # type: ignore
 
-    def log_request(self, handler: tornado.web.RequestHandler) -> None:
+    def log_request(self, handler: tornado.web.RequestHandler) -> None:  # skipcq: PTC-W0049
         pass
 
 
@@ -178,6 +144,9 @@ class WebhookHandler(tornado.web.RequestHandler):
         update = Update.de_json(data, self.bot)
         if update:
             self.logger.debug('Received Update with ID %d on Webhook', update.update_id)
+            # handle arbitrary callback data, if necessary
+            if isinstance(self.bot, ExtBot):
+                self.bot.insert_callback_data(update)
             self.update_queue.put(update)
 
     def _validate_post(self) -> None:

@@ -54,6 +54,8 @@ class ShippingQuery(TelegramObject):
 
     """
 
+    __slots__ = ('bot', 'invoice_payload', 'shipping_address', 'id', 'from_user', '_id_attrs')
+
     def __init__(
         self,
         id: str,  # pylint: disable=W0622
@@ -74,7 +76,8 @@ class ShippingQuery(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['ShippingQuery']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None

@@ -21,9 +21,10 @@
 
 from telegram import Update
 from .handler import Handler
+from .utils.types import CCT
 
 
-class ShippingQueryHandler(Handler[Update]):
+class ShippingQueryHandler(Handler[Update, CCT]):
     """Handler class to handle Telegram shipping callback queries.
 
     Note:
@@ -80,6 +81,8 @@ class ShippingQueryHandler(Handler[Update]):
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     """
+
+    __slots__ = ()
 
     def check_update(self, update: object) -> bool:
         """Determines whether an update should be passed to this handlers :attr:`callback`.

@@ -45,11 +45,16 @@ class InlineKeyboardMarkup(ReplyMarkup):
 
     """
 
+    __slots__ = ('inline_keyboard', '_id_attrs')
+
     def __init__(self, inline_keyboard: List[List[InlineKeyboardButton]], **_kwargs: Any):
         # Required
         self.inline_keyboard = inline_keyboard
 
+        self._id_attrs = (self.inline_keyboard,)
+
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
         data['inline_keyboard'] = []
@@ -60,7 +65,8 @@ class InlineKeyboardMarkup(ReplyMarkup):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['InlineKeyboardMarkup']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None
@@ -127,19 +133,6 @@ class InlineKeyboardMarkup(ReplyMarkup):
         """
         button_grid = [[button] for button in button_column]
         return cls(button_grid, **kwargs)
-
-    def __eq__(self, other: object) -> bool:
-        if isinstance(other, self.__class__):
-            if len(self.inline_keyboard) != len(other.inline_keyboard):
-                return False
-            for idx, row in enumerate(self.inline_keyboard):
-                if len(row) != len(other.inline_keyboard[idx]):
-                    return False
-                for jdx, button in enumerate(row):
-                    if button != other.inline_keyboard[idx][jdx]:
-                        return False
-            return True
-        return super().__eq__(other)
 
     def __hash__(self) -> int:
         return hash(tuple(tuple(button for button in row) for row in self.inline_keyboard))

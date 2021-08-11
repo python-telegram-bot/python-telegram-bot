@@ -23,3 +23,5 @@ from telegram import TelegramObject
 
 class CallbackGame(TelegramObject):
     """A placeholder, currently holds no information. Use BotFather to set up your game."""
+
+    __slots__ = ()

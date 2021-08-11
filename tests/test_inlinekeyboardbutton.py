@@ -46,6 +46,15 @@ class TestInlineKeyboardButton:
     pay = 'pay'
     login_url = LoginUrl("http://google.com")
 
+    def test_slot_behaviour(self, inline_keyboard_button, recwarn, mro_slots):
+        inst = inline_keyboard_button
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.custom, inst.text = 'should give warning', self.text
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     def test_expected_values(self, inline_keyboard_button):
         assert inline_keyboard_button.text == self.text
         assert inline_keyboard_button.url == self.url
@@ -125,3 +134,26 @@ class TestInlineKeyboardButton:
 
         assert a != f
         assert hash(a) != hash(f)
+
+    @pytest.mark.parametrize('callback_data', ['foo', 1, ('da', 'ta'), object()])
+    def test_update_callback_data(self, callback_data):
+        button = InlineKeyboardButton(text='test', callback_data='data')
+        button_b = InlineKeyboardButton(text='test', callback_data='data')
+
+        assert button == button_b
+        assert hash(button) == hash(button_b)
+
+        button.update_callback_data(callback_data)
+        assert button.callback_data is callback_data
+        assert button != button_b
+        assert hash(button) != hash(button_b)
+
+        button_b.update_callback_data(callback_data)
+        assert button_b.callback_data is callback_data
+        assert button == button_b
+        assert hash(button) == hash(button_b)
+
+        button.update_callback_data({})
+        assert button.callback_data == {}
+        with pytest.raises(TypeError, match='unhashable'):
+            hash(button)

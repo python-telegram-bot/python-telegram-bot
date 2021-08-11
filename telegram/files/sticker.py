@@ -73,6 +73,21 @@ class Sticker(TelegramObject):
 
     """
 
+    __slots__ = (
+        'bot',
+        'width',
+        'file_id',
+        'is_animated',
+        'file_size',
+        'thumb',
+        'set_name',
+        'mask_position',
+        'height',
+        'file_unique_id',
+        'emoji',
+        '_id_attrs',
+    )
+
     def __init__(
         self,
         file_id: str,
@@ -106,7 +121,8 @@ class Sticker(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Sticker']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None
@@ -159,6 +175,16 @@ class StickerSet(TelegramObject):
 
     """
 
+    __slots__ = (
+        'is_animated',
+        'contains_masks',
+        'thumb',
+        'title',
+        'stickers',
+        'name',
+        '_id_attrs',
+    )
+
     def __init__(
         self,
         name: str,
@@ -181,6 +207,7 @@ class StickerSet(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['StickerSet']:
+        """See :meth:`telegram.TelegramObject.de_json`."""
         if not data:
             return None
 
@@ -190,6 +217,7 @@ class StickerSet(TelegramObject):
         return cls(bot=bot, **data)
 
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
         data['stickers'] = [s.to_dict() for s in data.get('stickers')]
@@ -230,6 +258,8 @@ class MaskPosition(TelegramObject):
 
     """
 
+    __slots__ = ('point', 'scale', 'x_shift', 'y_shift', '_id_attrs')
+
     FOREHEAD: ClassVar[str] = constants.STICKER_FOREHEAD
     """:const:`telegram.constants.STICKER_FOREHEAD`"""
     EYES: ClassVar[str] = constants.STICKER_EYES
@@ -249,7 +279,8 @@ class MaskPosition(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['MaskPosition']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if data is None:
             return None

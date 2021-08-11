@@ -17,17 +17,22 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the ChosenInlineResultHandler class."""
-
-from typing import Optional, TypeVar, Union
+import re
+from typing import Optional, TypeVar, Union, Callable, TYPE_CHECKING, Pattern, Match, cast
 
 from telegram import Update
 
+from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 from .handler import Handler
+from .utils.types import CCT
 
 RT = TypeVar('RT')
 
+if TYPE_CHECKING:
+    from telegram.ext import CallbackContext, Dispatcher
 
-class ChosenInlineResultHandler(Handler[Update]):
+
+class ChosenInlineResultHandler(Handler[Update, CCT]):
     """Handler class to handle Telegram updates that contain a chosen inline result.
 
     Note:
@@ -70,6 +75,12 @@ class ChosenInlineResultHandler(Handler[Update]):
             DEPRECATED: Please switch to context based callbacks.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
             Defaults to :obj:`False`.
+        pattern (:obj:`str` | `Pattern`, optional): Regex pattern. If not :obj:`None`, ``re.match``
+            is used on :attr:`telegram.ChosenInlineResult.result_id` to determine if an update
+            should be handled by this handler. This is accessible in the callback as
+            :attr:`telegram.ext.CallbackContext.matches`.
+
+            .. versionadded:: 13.6
 
     Attributes:
         callback (:obj:`callable`): The callback function for this handler.
@@ -82,8 +93,38 @@ class ChosenInlineResultHandler(Handler[Update]):
         pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
             the callback function.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
+        pattern (`Pattern`): Optional. Regex pattern to test
+            :attr:`telegram.ChosenInlineResult.result_id` against.
+
+            .. versionadded:: 13.6
 
     """
+
+    __slots__ = ('pattern',)
+
+    def __init__(
+        self,
+        callback: Callable[[Update, 'CallbackContext'], RT],
+        pass_update_queue: bool = False,
+        pass_job_queue: bool = False,
+        pass_user_data: bool = False,
+        pass_chat_data: bool = False,
+        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
+        pattern: Union[str, Pattern] = None,
+    ):
+        super().__init__(
+            callback,
+            pass_update_queue=pass_update_queue,
+            pass_job_queue=pass_job_queue,
+            pass_user_data=pass_user_data,
+            pass_chat_data=pass_chat_data,
+            run_async=run_async,
+        )
+
+        if isinstance(pattern, str):
+            pattern = re.compile(pattern)
+
+        self.pattern = pattern
 
     def check_update(self, update: object) -> Optional[Union[bool, object]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
@@ -95,4 +136,25 @@ class ChosenInlineResultHandler(Handler[Update]):
             :obj:`bool`
 
         """
-        return isinstance(update, Update) and update.chosen_inline_result
+        if isinstance(update, Update) and update.chosen_inline_result:
+            if self.pattern:
+                match = re.match(self.pattern, update.chosen_inline_result.result_id)
+                if match:
+                    return match
+            else:
+                return True
+        return None
+
+    def collect_additional_context(
+        self,
+        context: 'CallbackContext',
+        update: Update,
+        dispatcher: 'Dispatcher',
+        check_result: Union[bool, Match],
+    ) -> None:
+        """This function adds the matched regex pattern result to
+        :attr:`telegram.ext.CallbackContext.matches`.
+        """
+        if self.pattern:
+            check_result = cast(Match, check_result)
+            context.matches = [check_result]

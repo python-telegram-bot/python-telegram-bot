@@ -72,6 +72,15 @@ def callback_query(bot):
 class TestCallbackQueryHandler:
     test_flag = False
 
+    def test_slot_behaviour(self, recwarn, mro_slots):
+        handler = CallbackQueryHandler(self.callback_data_1, pass_user_data=True)
+        for attr in handler.__slots__:
+            assert getattr(handler, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not handler.__dict__, f"got missing slot(s): {handler.__dict__}"
+        assert len(mro_slots(handler)) == len(set(mro_slots(handler))), "duplicate slot"
+        handler.custom, handler.callback = 'should give warning', self.callback_basic
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     @pytest.fixture(autouse=True)
     def reset(self):
         self.test_flag = False
@@ -133,6 +142,42 @@ class TestCallbackQueryHandler:
         assert handler.check_update(callback_query)
 
         callback_query.callback_query.data = 'nothing here'
+        assert not handler.check_update(callback_query)
+
+        callback_query.callback_query.data = None
+        callback_query.callback_query.game_short_name = "this is a short game name"
+        assert not handler.check_update(callback_query)
+
+    def test_with_callable_pattern(self, callback_query):
+        class CallbackData:
+            pass
+
+        def pattern(callback_data):
+            return isinstance(callback_data, CallbackData)
+
+        handler = CallbackQueryHandler(self.callback_basic, pattern=pattern)
+
+        callback_query.callback_query.data = CallbackData()
+        assert handler.check_update(callback_query)
+        callback_query.callback_query.data = 'callback_data'
+        assert not handler.check_update(callback_query)
+
+    def test_with_type_pattern(self, callback_query):
+        class CallbackData:
+            pass
+
+        handler = CallbackQueryHandler(self.callback_basic, pattern=CallbackData)
+
+        callback_query.callback_query.data = CallbackData()
+        assert handler.check_update(callback_query)
+        callback_query.callback_query.data = 'callback_data'
+        assert not handler.check_update(callback_query)
+
+        handler = CallbackQueryHandler(self.callback_basic, pattern=bool)
+
+        callback_query.callback_query.data = False
+        assert handler.check_update(callback_query)
+        callback_query.callback_query.data = 'callback_data'
         assert not handler.check_update(callback_query)
 
     def test_with_passing_group_dict(self, dp, callback_query):
@@ -230,3 +275,18 @@ class TestCallbackQueryHandler:
 
         cdp.process_update(callback_query)
         assert self.test_flag
+
+    def test_context_callable_pattern(self, cdp, callback_query):
+        class CallbackData:
+            pass
+
+        def pattern(callback_data):
+            return isinstance(callback_data, CallbackData)
+
+        def callback(update, context):
+            assert context.matches is None
+
+        handler = CallbackQueryHandler(callback, pattern=pattern)
+        cdp.add_handler(handler)
+
+        cdp.process_update(callback_query)

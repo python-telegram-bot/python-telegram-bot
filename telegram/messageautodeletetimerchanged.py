@@ -17,7 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a change in the Telegram message auto
-deletion."""
+deletion.
+"""
 
 from typing import Any
 
@@ -42,6 +43,8 @@ class MessageAutoDeleteTimerChanged(TelegramObject):
             chat.
 
     """
+
+    __slots__ = ('message_auto_delete_time', '_id_attrs')
 
     def __init__(
         self,

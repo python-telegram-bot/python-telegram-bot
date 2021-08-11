@@ -22,6 +22,7 @@ import logging
 from threading import Event
 from typing import Callable, List, Optional, Tuple, TypeVar, Union
 
+from telegram.utils.deprecate import set_new_attribute_deprecated
 from telegram.utils.types import JSONDict
 
 RT = TypeVar('RT')
@@ -54,6 +55,19 @@ class Promise:
 
     """
 
+    __slots__ = (
+        'pooled_function',
+        'args',
+        'kwargs',
+        'update',
+        'error_handling',
+        'done',
+        '_done_callback',
+        '_result',
+        '_exception',
+        '__dict__',
+    )
+
     # TODO: Remove error_handling parameter once we drop the @run_async decorator
     def __init__(
         self,
@@ -69,12 +83,15 @@ class Promise:
         self.update = update
         self.error_handling = error_handling
         self.done = Event()
+        self._done_callback: Optional[Callable] = None
         self._result: Optional[RT] = None
         self._exception: Optional[Exception] = None
 
+    def __setattr__(self, key: str, value: object) -> None:
+        set_new_attribute_deprecated(self, key, value)
+
     def run(self) -> None:
         """Calls the :attr:`pooled_function` callable."""
-
         try:
             self._result = self.pooled_function(*self.args, **self.kwargs)
 
@@ -83,6 +100,15 @@ class Promise:
 
         finally:
             self.done.set()
+            if self._exception is None and self._done_callback:
+                try:
+                    self._done_callback(self.result())
+                except Exception as exc:
+                    logger.warning(
+                        "`done_callback` of a Promise raised the following exception."
+                        " The exception won't be handled by error handlers."
+                    )
+                    logger.warning("Full traceback:", exc_info=exc)
 
     def __call__(self) -> None:
         self.run()
@@ -106,8 +132,27 @@ class Promise:
             raise self._exception  # pylint: disable=raising-bad-type
         return self._result
 
+    def add_done_callback(self, callback: Callable) -> None:
+        """
+        Callback to be run when :class:`telegram.ext.utils.promise.Promise` becomes done.
+
+        Note:
+            Callback won't be called if :attr:`pooled_function`
+            raises an exception.
+
+        Args:
+            callback (:obj:`callable`): The callable that will be called when promise is done.
+            callback will be called by passing ``Promise.result()`` as only positional argument.
+
+        """
+        if self.done.wait(0):
+            callback(self.result())
+        else:
+            self._done_callback = callback
+
     @property
     def exception(self) -> Optional[Exception]:
         """The exception raised by :attr:`pooled_function` or ``None`` if no exception has been
-        raised (yet)."""
+        raised (yet).
+        """
         return self._exception

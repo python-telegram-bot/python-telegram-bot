@@ -81,8 +81,17 @@ def inline_query(bot):
     )
 
 
-class TestCallbackQueryHandler:
+class TestInlineQueryHandler:
     test_flag = False
+
+    def test_slot_behaviour(self, recwarn, mro_slots):
+        handler = InlineQueryHandler(self.callback_context)
+        for attr in handler.__slots__:
+            assert getattr(handler, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not handler.__dict__, f"got missing slot(s): {handler.__dict__}"
+        assert len(mro_slots(handler)) == len(set(mro_slots(handler))), "duplicate slot"
+        handler.custom, handler.callback = 'should give warning', self.callback_basic
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     @pytest.fixture(autouse=True)
     def reset(self):
@@ -242,3 +251,23 @@ class TestCallbackQueryHandler:
 
         cdp.process_update(inline_query)
         assert self.test_flag
+
+    @pytest.mark.parametrize('chat_types', [[Chat.SENDER], [Chat.SENDER, Chat.SUPERGROUP], []])
+    @pytest.mark.parametrize(
+        'chat_type,result', [(Chat.SENDER, True), (Chat.CHANNEL, False), (None, False)]
+    )
+    def test_chat_types(self, cdp, inline_query, chat_types, chat_type, result):
+        try:
+            inline_query.inline_query.chat_type = chat_type
+
+            handler = InlineQueryHandler(self.callback_context, chat_types=chat_types)
+            cdp.add_handler(handler)
+            cdp.process_update(inline_query)
+
+            if not chat_types:
+                assert self.test_flag is False
+            else:
+                assert self.test_flag == result
+
+        finally:
+            inline_query.chat_type = None

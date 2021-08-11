@@ -61,6 +61,17 @@ class VideoNote(TelegramObject):
 
     """
 
+    __slots__ = (
+        'bot',
+        'length',
+        'file_id',
+        'file_size',
+        'thumb',
+        'duration',
+        'file_unique_id',
+        '_id_attrs',
+    )
+
     def __init__(
         self,
         file_id: str,
@@ -86,7 +97,8 @@ class VideoNote(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['VideoNote']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None

@@ -35,16 +35,31 @@ class InlineKeyboardButton(TelegramObject):
     and :attr:`pay` are equal.
 
     Note:
-        You must use exactly one of the optional fields. Mind that :attr:`callback_game` is not
-        working as expected. Putting a game short name in it might, but is not guaranteed to work.
+        * You must use exactly one of the optional fields. Mind that :attr:`callback_game` is not
+          working as expected. Putting a game short name in it might, but is not guaranteed to
+          work.
+        * If your bot allows for arbitrary callback data, in keyboards returned in a response
+          from telegram, :attr:`callback_data` maybe be an instance of
+          :class:`telegram.ext.InvalidCallbackData`. This will be the case, if the data
+          associated with the button was already deleted.
+
+          .. versionadded:: 13.6
+
+    Warning:
+        If your bot allows your arbitrary callback data, buttons whose callback data is a
+        non-hashable object will be come unhashable. Trying to evaluate ``hash(button)`` will
+        result in a :class:`TypeError`.
+
+        .. versionchanged:: 13.6
 
     Args:
         text (:obj:`str`): Label text on the button.
-        url (:obj:`str`): HTTP or tg:// url to be opened when button is pressed.
+        url (:obj:`str`, optional): HTTP or tg:// url to be opened when button is pressed.
         login_url (:class:`telegram.LoginUrl`, optional): An HTTP URL used to automatically
             authorize the user. Can be used as a replacement for the Telegram Login Widget.
-        callback_data (:obj:`str`, optional): Data to be sent in a callback query to the bot when
-            button is pressed, UTF-8 1-64 bytes.
+        callback_data (:obj:`str` | :obj:`Any`, optional): Data to be sent in a callback query to
+            the bot when button is pressed, UTF-8 1-64 bytes. If the bot instance allows arbitrary
+            callback data, anything can be passed.
         switch_inline_query (:obj:`str`, optional): If set, pressing the button will prompt the
             user to select one of their chats, open that chat and insert the bot's username and the
             specified inline query in the input field. Can be empty, in which case just the bot's
@@ -69,8 +84,8 @@ class InlineKeyboardButton(TelegramObject):
         url (:obj:`str`): Optional. HTTP or tg:// url to be opened when button is pressed.
         login_url (:class:`telegram.LoginUrl`): Optional. An HTTP URL used to automatically
             authorize the user. Can be used as a replacement for the Telegram Login Widget.
-        callback_data (:obj:`str`): Optional. Data to be sent in a callback query to the bot when
-            button is pressed, UTF-8 1-64 bytes.
+        callback_data (:obj:`str` | :obj:`object`): Optional. Data to be sent in a callback query
+            to the bot when button is pressed, UTF-8 1-64 bytes.
         switch_inline_query (:obj:`str`): Optional. Will prompt the user to select one of their
             chats, open that chat and insert the bot's username and the specified inline query in
             the input field. Can be empty, in which case just the bot’s username will be inserted.
@@ -83,11 +98,23 @@ class InlineKeyboardButton(TelegramObject):
 
     """
 
+    __slots__ = (
+        'callback_game',
+        'url',
+        'switch_inline_query_current_chat',
+        'callback_data',
+        'pay',
+        'switch_inline_query',
+        'text',
+        '_id_attrs',
+        'login_url',
+    )
+
     def __init__(
         self,
         text: str,
         url: str = None,
-        callback_data: str = None,
+        callback_data: object = None,
         switch_inline_query: str = None,
         switch_inline_query_current_chat: str = None,
         callback_game: 'CallbackGame' = None,
@@ -106,7 +133,10 @@ class InlineKeyboardButton(TelegramObject):
         self.switch_inline_query_current_chat = switch_inline_query_current_chat
         self.callback_game = callback_game
         self.pay = pay
+        self._id_attrs = ()
+        self._set_id_attrs()
 
+    def _set_id_attrs(self) -> None:
         self._id_attrs = (
             self.text,
             self.url,
@@ -117,3 +147,16 @@ class InlineKeyboardButton(TelegramObject):
             self.callback_game,
             self.pay,
         )
+
+    def update_callback_data(self, callback_data: object) -> None:
+        """
+        Sets :attr:`callback_data` to the passed object. Intended to be used by
+        :class:`telegram.ext.CallbackDataCache`.
+
+        .. versionadded:: 13.6
+
+        Args:
+            callback_data (:obj:`obj`): The new callback data.
+        """
+        self.callback_data = callback_data
+        self._set_id_attrs()

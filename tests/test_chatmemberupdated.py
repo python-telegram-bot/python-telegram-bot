@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime
+import inspect
 
 import pytest
 import pytz
@@ -63,6 +64,15 @@ def chat_member_updated(user, chat, old_chat_member, new_chat_member, invite_lin
 class TestChatMemberUpdated:
     old_status = ChatMember.MEMBER
     new_status = ChatMember.ADMINISTRATOR
+
+    def test_slot_behaviour(self, recwarn, mro_slots, chat_member_updated):
+        action = chat_member_updated
+        for attr in action.__slots__:
+            assert getattr(action, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not action.__dict__, f"got missing slot(s): {action.__dict__}"
+        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
+        action.custom = 'should give warning'
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_de_json_required_args(self, bot, user, chat, old_chat_member, new_chat_member, time):
         json_dict = {
@@ -175,3 +185,41 @@ class TestChatMemberUpdated:
         for other in [c, d, e, f, g]:
             assert a != other
             assert hash(a) != hash(other)
+
+    def test_difference_required(self, user, chat):
+        old_chat_member = ChatMember(user, 'old_status')
+        new_chat_member = ChatMember(user, 'new_status')
+        chat_member_updated = ChatMemberUpdated(
+            chat, user, datetime.datetime.utcnow(), old_chat_member, new_chat_member
+        )
+        assert chat_member_updated.difference() == {'status': ('old_status', 'new_status')}
+
+        # We deliberately change an optional argument here to make sure that comparision doesn't
+        # just happens by id/required args
+        new_user = User(1, 'First name', False, last_name='last name')
+        new_chat_member.user = new_user
+        assert chat_member_updated.difference() == {
+            'status': ('old_status', 'new_status'),
+            'user': (user, new_user),
+        }
+
+    @pytest.mark.parametrize(
+        'optional_attribute',
+        # This gives the names of all optional arguments of ChatMember
+        [
+            name
+            for name, param in inspect.signature(ChatMember).parameters.items()
+            if name != 'self' and param.default != inspect.Parameter.empty
+        ],
+    )
+    def test_difference_optionals(self, optional_attribute, user, chat):
+        # we use datetimes here, because we need that for `until_date` and it doesn't matter for
+        # the other attributes
+        old_value = datetime.datetime(2020, 1, 1)
+        new_value = datetime.datetime(2021, 1, 1)
+        old_chat_member = ChatMember(user, 'status', **{optional_attribute: old_value})
+        new_chat_member = ChatMember(user, 'status', **{optional_attribute: new_value})
+        chat_member_updated = ChatMemberUpdated(
+            chat, user, datetime.datetime.utcnow(), old_chat_member, new_chat_member
+        )
+        assert chat_member_updated.difference() == {optional_attribute: (old_value, new_value)}

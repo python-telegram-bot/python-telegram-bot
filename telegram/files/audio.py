@@ -69,6 +69,20 @@ class Audio(TelegramObject):
 
     """
 
+    __slots__ = (
+        'file_id',
+        'bot',
+        'file_size',
+        'file_name',
+        'thumb',
+        'title',
+        'duration',
+        'performer',
+        'mime_type',
+        'file_unique_id',
+        '_id_attrs',
+    )
+
     def __init__(
         self,
         file_id: str,
@@ -100,7 +114,8 @@ class Audio(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Audio']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None

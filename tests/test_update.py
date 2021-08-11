@@ -91,6 +91,14 @@ def update(request):
 class TestUpdate:
     update_id = 868573637
 
+    def test_slot_behaviour(self, update, recwarn, mro_slots):
+        for attr in update.__slots__:
+            assert getattr(update, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not update.__dict__, f"got missing slot(s): {update.__dict__}"
+        assert len(mro_slots(update)) == len(set(mro_slots(update))), "duplicate slot"
+        update.custom, update.update_id = 'should give warning', self.update_id
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     @pytest.mark.parametrize('paramdict', argvalues=params, ids=ids)
     def test_de_json(self, bot, paramdict):
         json_dict = {'update_id': TestUpdate.update_id}
@@ -102,10 +110,10 @@ class TestUpdate:
 
         # Make sure only one thing in the update (other than update_id) is not None
         i = 0
-        for type in all_types:
-            if getattr(update, type) is not None:
+        for _type in all_types:
+            if getattr(update, _type) is not None:
                 i += 1
-                assert getattr(update, type) == paramdict[type]
+                assert getattr(update, _type) == paramdict[_type]
         assert i == 1
 
     def test_update_de_json_empty(self, bot):
@@ -118,9 +126,9 @@ class TestUpdate:
 
         assert isinstance(update_dict, dict)
         assert update_dict['update_id'] == update.update_id
-        for type in all_types:
-            if getattr(update, type) is not None:
-                assert update_dict[type] == getattr(update, type).to_dict()
+        for _type in all_types:
+            if getattr(update, _type) is not None:
+                assert update_dict[_type] == getattr(update, _type).to_dict()
 
     def test_effective_chat(self, update):
         # Test that it's sometimes None per docstring

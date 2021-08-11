@@ -47,6 +47,8 @@ class ChatLocation(TelegramObject):
 
     """
 
+    __slots__ = ('location', '_id_attrs', 'address')
+
     def __init__(
         self,
         location: Location,
@@ -60,7 +62,8 @@ class ChatLocation(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['ChatLocation']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None

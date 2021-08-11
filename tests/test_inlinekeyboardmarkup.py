@@ -36,8 +36,16 @@ class TestInlineKeyboardMarkup:
         ]
     ]
 
+    def test_slot_behaviour(self, inline_keyboard_markup, recwarn, mro_slots):
+        inst = inline_keyboard_markup
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+        inst.custom, inst.inline_keyboard = 'should give warning', self.inline_keyboard
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_message_with_inline_keyboard_markup(self, bot, chat_id, inline_keyboard_markup):
         message = bot.send_message(
             chat_id, 'Testing InlineKeyboardMarkup', reply_markup=inline_keyboard_markup
@@ -88,12 +96,12 @@ class TestInlineKeyboardMarkup:
         ):
             if reply_markup is not None:
                 if isinstance(reply_markup, ReplyMarkup):
-                    data['reply_markup'] = reply_markup.to_json()
+                    data['reply_markup'] = reply_markup.to_dict()
                 else:
                     data['reply_markup'] = reply_markup
 
-            assert bool('"switch_inline_query": ""' in data['reply_markup'])
-            assert bool('"switch_inline_query_current_chat": ""' in data['reply_markup'])
+            assert bool("'switch_inline_query': ''" in str(data['reply_markup']))
+            assert bool("'switch_inline_query_current_chat': ''" in str(data['reply_markup']))
 
         inline_keyboard_markup.inline_keyboard[0][0].callback_data = None
         inline_keyboard_markup.inline_keyboard[0][0].switch_inline_query = ''

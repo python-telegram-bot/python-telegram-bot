@@ -26,22 +26,40 @@ from functools import wraps
 from queue import Empty, Queue
 from threading import BoundedSemaphore, Event, Lock, Thread, current_thread
 from time import sleep
-from typing import TYPE_CHECKING, Callable, DefaultDict, Dict, List, Optional, Set, Union
+from typing import (
+    TYPE_CHECKING,
+    Callable,
+    DefaultDict,
+    Dict,
+    List,
+    Optional,
+    Set,
+    Union,
+    Generic,
+    TypeVar,
+    overload,
+    cast,
+)
 from uuid import uuid4
 
 from telegram import TelegramError, Update
-from telegram.ext import BasePersistence
+from telegram.ext import BasePersistence, ContextTypes
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.handler import Handler
-from telegram.utils.deprecate import TelegramDeprecationWarning
+import telegram.ext.extbot
+from telegram.ext.callbackdatacache import CallbackDataCache
+from telegram.utils.deprecate import TelegramDeprecationWarning, set_new_attribute_deprecated
 from telegram.ext.utils.promise import Promise
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
+from telegram.ext.utils.types import CCT, UD, CD, BD
 
 if TYPE_CHECKING:
     from telegram import Bot
     from telegram.ext import JobQueue
 
 DEFAULT_GROUP: int = 0
+
+UT = TypeVar('UT')
 
 
 def run_async(
@@ -98,12 +116,14 @@ class DispatcherHandlerStop(Exception):
         state (:obj:`object`, optional): The next state of the conversation.
     """
 
+    __slots__ = ('state',)
+
     def __init__(self, state: object = None) -> None:
         super().__init__()
         self.state = state
 
 
-class Dispatcher:
+class Dispatcher(Generic[CCT, UD, CD, BD]):
     """This class dispatches all kinds of updates to its registered handlers.
 
     Args:
@@ -118,6 +138,12 @@ class Dispatcher:
         use_context (:obj:`bool`, optional): If set to :obj:`True` uses the context based callback
             API (ignored if `dispatcher` argument is used). Defaults to :obj:`True`.
             **New users**: set this to :obj:`True`.
+        context_types (:class:`telegram.ext.ContextTypes`, optional): Pass an instance
+            of :class:`telegram.ext.ContextTypes` to customize the types used in the
+            ``context`` interface. If not passed, the defaults documented in
+            :class:`telegram.ext.ContextTypes` will be used.
+
+            .. versionadded:: 13.6
 
     Attributes:
         bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
@@ -131,13 +157,69 @@ class Dispatcher:
         bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
             store data that should be persistent over restarts.
+        context_types (:class:`telegram.ext.ContextTypes`): Container for the types used
+            in the ``context`` interface.
+
+            .. versionadded:: 13.6
 
     """
+
+    # Allowing '__weakref__' creation here since we need it for the singleton
+    __slots__ = (
+        'workers',
+        'persistence',
+        'use_context',
+        'update_queue',
+        'job_queue',
+        'user_data',
+        'chat_data',
+        'bot_data',
+        '_update_persistence_lock',
+        'handlers',
+        'groups',
+        'error_handlers',
+        'running',
+        '__stop_event',
+        '__exception_event',
+        '__async_queue',
+        '__async_threads',
+        'bot',
+        '__dict__',
+        '__weakref__',
+        'context_types',
+    )
 
     __singleton_lock = Lock()
     __singleton_semaphore = BoundedSemaphore()
     __singleton = None
     logger = logging.getLogger(__name__)
+
+    @overload
+    def __init__(
+        self: 'Dispatcher[CallbackContext[Dict, Dict, Dict], Dict, Dict, Dict]',
+        bot: 'Bot',
+        update_queue: Queue,
+        workers: int = 4,
+        exception_event: Event = None,
+        job_queue: 'JobQueue' = None,
+        persistence: BasePersistence = None,
+        use_context: bool = True,
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self: 'Dispatcher[CCT, UD, CD, BD]',
+        bot: 'Bot',
+        update_queue: Queue,
+        workers: int = 4,
+        exception_event: Event = None,
+        job_queue: 'JobQueue' = None,
+        persistence: BasePersistence = None,
+        use_context: bool = True,
+        context_types: ContextTypes[CCT, UD, CD, BD] = None,
+    ):
+        ...
 
     def __init__(
         self,
@@ -148,12 +230,14 @@ class Dispatcher:
         job_queue: 'JobQueue' = None,
         persistence: BasePersistence = None,
         use_context: bool = True,
+        context_types: ContextTypes[CCT, UD, CD, BD] = None,
     ):
         self.bot = bot
         self.update_queue = update_queue
         self.job_queue = job_queue
         self.workers = workers
         self.use_context = use_context
+        self.context_types = cast(ContextTypes[CCT, UD, CD, BD], context_types or ContextTypes())
 
         if not use_context:
             warnings.warn(
@@ -162,9 +246,14 @@ class Dispatcher:
                 stacklevel=3,
             )
 
-        self.user_data: DefaultDict[int, Dict[object, object]] = defaultdict(dict)
-        self.chat_data: DefaultDict[int, Dict[object, object]] = defaultdict(dict)
-        self.bot_data = {}
+        if self.workers < 1:
+            warnings.warn(
+                'Asynchronous callbacks can not be processed without at least one worker thread.'
+            )
+
+        self.user_data: DefaultDict[int, UD] = defaultdict(self.context_types.user_data)
+        self.chat_data: DefaultDict[int, CD] = defaultdict(self.context_types.chat_data)
+        self.bot_data = self.context_types.bot_data()
         self.persistence: Optional[BasePersistence] = None
         self._update_persistence_lock = Lock()
         if persistence:
@@ -182,8 +271,21 @@ class Dispatcher:
                     raise ValueError("chat_data must be of type defaultdict")
             if self.persistence.store_bot_data:
                 self.bot_data = self.persistence.get_bot_data()
-                if not isinstance(self.bot_data, dict):
-                    raise ValueError("bot_data must be of type dict")
+                if not isinstance(self.bot_data, self.context_types.bot_data):
+                    raise ValueError(
+                        f"bot_data must be of type {self.context_types.bot_data.__name__}"
+                    )
+            if self.persistence.store_callback_data:
+                self.bot = cast(telegram.ext.extbot.ExtBot, self.bot)
+                persistent_data = self.persistence.get_callback_data()
+                if persistent_data is not None:
+                    if not isinstance(persistent_data, tuple) and len(persistent_data) != 2:
+                        raise ValueError('callback_data must be a 2-tuple')
+                    self.bot.callback_data_cache = CallbackDataCache(
+                        self.bot,
+                        self.bot.callback_data_cache.maxsize,
+                        persistent_data=persistent_data,
+                    )
         else:
             self.persistence = None
 
@@ -205,13 +307,24 @@ class Dispatcher:
         # For backward compatibility, we allow a "singleton" mode for the dispatcher. When there's
         # only one instance of Dispatcher, it will be possible to use the `run_async` decorator.
         with self.__singleton_lock:
-            if self.__singleton_semaphore.acquire(blocking=False):
+            if self.__singleton_semaphore.acquire(blocking=False):  # pylint: disable=R1732
                 self._set_singleton(self)
             else:
                 self._set_singleton(None)
 
+    def __setattr__(self, key: str, value: object) -> None:
+        # Mangled names don't automatically apply in __setattr__ (see
+        # https://docs.python.org/3/tutorial/classes.html#private-variables), so we have to make
+        # it mangled so they don't raise TelegramDeprecationWarning unnecessarily
+        if key.startswith('__'):
+            key = f"_{self.__class__.__name__}{key}"
+        if issubclass(self.__class__, Dispatcher) and self.__class__ is not Dispatcher:
+            object.__setattr__(self, key, value)
+            return
+        set_new_attribute_deprecated(self, key, value)
+
     @property
-    def exception_event(self) -> Event:
+    def exception_event(self) -> Event:  # skipcq: PY-D0003
         return self.__exception_event
 
     def _init_async_threads(self, base_name: str, workers: int) -> None:
@@ -399,7 +512,7 @@ class Dispatcher:
             self.logger.debug('async thread %s/%s has ended', i + 1, total)
 
     @property
-    def has_running_threads(self) -> bool:
+    def has_running_threads(self) -> bool:  # skipcq: PY-D0003
         return self.running or bool(self.__async_threads)
 
     def process_update(self, update: object) -> None:
@@ -417,7 +530,6 @@ class Dispatcher:
                 The update to process.
 
         """
-
         # An error happened while polling
         if isinstance(update, TelegramError):
             try:
@@ -436,7 +548,8 @@ class Dispatcher:
                     check = handler.check_update(update)
                     if check is not None and check is not False:
                         if not context and self.use_context:
-                            context = CallbackContext.from_update(update, self)
+                            context = self.context_types.context.from_update(update, self)
+                            context.refresh_data()
                         handled = True
                         sync_modes.append(handler.run_async)
                         handler.handle_update(update, self, check, context)
@@ -469,7 +582,7 @@ class Dispatcher:
             if not handled_only_async:
                 self.update_persistence(update=update)
 
-    def add_handler(self, handler: Handler, group: int = DEFAULT_GROUP) -> None:
+    def add_handler(self, handler: Handler[UT, CCT], group: int = DEFAULT_GROUP) -> None:
         """Register a handler.
 
         TL;DR: Order and priority counts. 0 or 1 handlers per group will be used. End handling of
@@ -501,14 +614,22 @@ class Dispatcher:
             raise TypeError(f'handler is not an instance of {Handler.__name__}')
         if not isinstance(group, int):
             raise TypeError('group is not int')
-        if isinstance(handler, ConversationHandler) and handler.persistent and handler.name:
+        # For some reason MyPy infers the type of handler is <nothing> here,
+        # so for now we just ignore all the errors
+        if (
+            isinstance(handler, ConversationHandler)
+            and handler.persistent  # type: ignore[attr-defined]
+            and handler.name  # type: ignore[attr-defined]
+        ):
             if not self.persistence:
                 raise ValueError(
-                    f"ConversationHandler {handler.name} can not be persistent if dispatcher has "
-                    f"no persistence"
+                    f"ConversationHandler {handler.name} "  # type: ignore[attr-defined]
+                    f"can not be persistent if dispatcher has no persistence"
                 )
-            handler.persistence = self.persistence
-            handler.conversations = self.persistence.get_conversations(handler.name)
+            handler.persistence = self.persistence  # type: ignore[attr-defined]
+            handler.conversations = (  # type: ignore[attr-defined]
+                self.persistence.get_conversations(handler.name)  # type: ignore[attr-defined]
+            )
 
         if group not in self.handlers:
             self.handlers[group] = []
@@ -536,7 +657,7 @@ class Dispatcher:
 
         Args:
             update (:class:`telegram.Update`, optional): The update to process. If passed, only the
-            corresponding ``user_data`` and ``chat_data`` will be updated.
+                corresponding ``user_data`` and ``chat_data`` will be updated.
         """
         with self._update_persistence_lock:
             self.__update_persistence(update)
@@ -558,6 +679,22 @@ class Dispatcher:
                 else:
                     user_ids = []
 
+            if self.persistence.store_callback_data:
+                self.bot = cast(telegram.ext.extbot.ExtBot, self.bot)
+                try:
+                    self.persistence.update_callback_data(
+                        self.bot.callback_data_cache.persistence_data
+                    )
+                except Exception as exc:
+                    try:
+                        self.dispatch_error(update, exc)
+                    except Exception:
+                        message = (
+                            'Saving callback data raised an error and an '
+                            'uncaught error was raised while handling '
+                            'the error with an error_handler'
+                        )
+                        self.logger.exception(message)
             if self.persistence.store_bot_data:
                 try:
                     self.persistence.update_bot_data(self.bot_data)
@@ -602,7 +739,7 @@ class Dispatcher:
 
     def add_error_handler(
         self,
-        callback: Callable[[object, CallbackContext], None],
+        callback: Callable[[object, CCT], None],
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,  # pylint: disable=W0621
     ) -> None:
         """Registers an error handler in the Dispatcher. This handler will receive every error
@@ -632,13 +769,12 @@ class Dispatcher:
             self.logger.debug('The callback is already registered as an error handler. Ignoring.')
             return
 
-        if run_async is DEFAULT_FALSE and self.bot.defaults:
-            if self.bot.defaults.run_async:
-                run_async = True
+        if run_async is DEFAULT_FALSE and self.bot.defaults and self.bot.defaults.run_async:
+            run_async = True
 
         self.error_handlers[callback] = run_async
 
-    def remove_error_handler(self, callback: Callable[[object, CallbackContext], None]) -> None:
+    def remove_error_handler(self, callback: Callable[[object, CCT], None]) -> None:
         """Removes an error handler.
 
         Args:
@@ -665,7 +801,7 @@ class Dispatcher:
         if self.error_handlers:
             for callback, run_async in self.error_handlers.items():  # pylint: disable=W0621
                 if self.use_context:
-                    context = CallbackContext.from_error(
+                    context = self.context_types.context.from_error(
                         update, error, self, async_args=async_args, async_kwargs=async_kwargs
                     )
                     if run_async:

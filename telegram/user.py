@@ -96,6 +96,20 @@ class User(TelegramObject):
 
     """
 
+    __slots__ = (
+        'is_bot',
+        'can_read_all_group_messages',
+        'username',
+        'first_name',
+        'last_name',
+        'can_join_groups',
+        'supports_inline_queries',
+        'id',
+        'bot',
+        'language_code',
+        '_id_attrs',
+    )
+
     def __init__(
         self,
         id: int,
@@ -128,7 +142,8 @@ class User(TelegramObject):
     @property
     def name(self) -> str:
         """:obj:`str`: Convenience property. If available, returns the user's :attr:`username`
-        prefixed with "@". If :attr:`username` is not available, returns :attr:`full_name`."""
+        prefixed with "@". If :attr:`username` is not available, returns :attr:`full_name`.
+        """
         if self.username:
             return f'@{self.username}'
         return self.full_name
@@ -136,8 +151,8 @@ class User(TelegramObject):
     @property
     def full_name(self) -> str:
         """:obj:`str`: Convenience property. The user's :attr:`first_name`, followed by (if
-        available) :attr:`last_name`."""
-
+        available) :attr:`last_name`.
+        """
         if self.last_name:
             return f'{self.first_name} {self.last_name}'
         return self.first_name
@@ -145,8 +160,8 @@ class User(TelegramObject):
     @property
     def link(self) -> Optional[str]:
         """:obj:`str`: Convenience property. If :attr:`username` is available, returns a t.me link
-        of the user."""
-
+        of the user.
+        """
         if self.username:
             return f"https://t.me/{self.username}"
         return None
@@ -167,7 +182,6 @@ class User(TelegramObject):
         :meth:`telegram.Bot.get_user_profile_photos`.
 
         """
-
         return self.bot.get_user_profile_photos(
             user_id=self.id,
             offset=offset,
@@ -179,7 +193,7 @@ class User(TelegramObject):
     def mention_markdown(self, name: str = None) -> str:
         """
         Note:
-            :attr:`telegram.ParseMode.MARKDOWN` is is a legacy mode, retained by Telegram for
+            :attr:`telegram.ParseMode.MARKDOWN` is a legacy mode, retained by Telegram for
             backward compatibility. You should use :meth:`mention_markdown_v2` instead.
 
         Args:
@@ -348,7 +362,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_message(update.effective_user.id, *args, **kwargs)
+            bot.send_photo(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_photo`.
 
@@ -384,7 +398,7 @@ class User(TelegramObject):
     ) -> List['Message']:
         """Shortcut for::
 
-            bot.send_message(update.effective_user.id, *args, **kwargs)
+            bot.send_media_group(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_media_group`.
 
@@ -422,7 +436,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_message(update.effective_user.id, *args, **kwargs)
+            bot.send_audio(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_audio`.
 
@@ -457,7 +471,7 @@ class User(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            bot.send_message(update.effective_user.id, *args, **kwargs)
+            bot.send_chat_action(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_chat_action`.
 
@@ -491,7 +505,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_message(update.effective_user.id, *args, **kwargs)
+            bot.send_contact(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_contact`.
 
@@ -526,7 +540,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_message(update.effective_user.id, *args, **kwargs)
+            bot.send_dice(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_dice`.
 
@@ -563,7 +577,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_message(update.effective_user.id, *args, **kwargs)
+            bot.send_document(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_document`.
 
@@ -600,7 +614,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_message(update.effective_user.id, *args, **kwargs)
+            bot.send_game(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_game`.
 
@@ -625,9 +639,9 @@ class User(TelegramObject):
         description: str,
         payload: str,
         provider_token: str,
-        start_parameter: str,
         currency: str,
         prices: List['LabeledPrice'],
+        start_parameter: str = None,
         photo_url: str = None,
         photo_size: int = None,
         photo_width: int = None,
@@ -646,12 +660,22 @@ class User(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        max_tip_amount: int = None,
+        suggested_tip_amounts: List[int] = None,
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_message(update.effective_user.id, *args, **kwargs)
+            bot.send_invoice(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_invoice`.
+
+        Warning:
+            As of API 5.2 :attr:`start_parameter` is an optional argument and therefore the order
+            of the arguments had to be changed. Use keyword arguments to make sure that the
+            arguments are passed correctly.
+
+        .. versionchanged:: 13.5
+            As of Bot API 5.2, the parameter :attr:`start_parameter` is optional.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -663,9 +687,9 @@ class User(TelegramObject):
             description=description,
             payload=payload,
             provider_token=provider_token,
-            start_parameter=start_parameter,
             currency=currency,
             prices=prices,
+            start_parameter=start_parameter,
             photo_url=photo_url,
             photo_size=photo_size,
             photo_width=photo_width,
@@ -684,6 +708,8 @@ class User(TelegramObject):
             timeout=timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
+            max_tip_amount=max_tip_amount,
+            suggested_tip_amounts=suggested_tip_amounts,
         )
 
     def send_location(
@@ -704,7 +730,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_message(update.effective_user.id, *args, **kwargs)
+            bot.send_location(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_location`.
 
@@ -749,7 +775,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_message(update.effective_user.id, *args, **kwargs)
+            bot.send_animation(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_animation`.
 
@@ -788,7 +814,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_message(update.effective_user.id, *args, **kwargs)
+            bot.send_sticker(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_sticker`.
 
@@ -828,7 +854,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_message(update.effective_user.id, *args, **kwargs)
+            bot.send_video(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video`.
 
@@ -876,7 +902,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_message(update.effective_user.id, *args, **kwargs)
+            bot.send_venue(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_venue`.
 
@@ -919,7 +945,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_message(update.effective_user.id, *args, **kwargs)
+            bot.send_video_note(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video_note`.
 
@@ -959,7 +985,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_message(update.effective_user.id, *args, **kwargs)
+            bot.send_voice(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_voice`.
 
@@ -1007,7 +1033,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_message(update.effective_user.id, *args, **kwargs)
+            bot.send_poll(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_poll`.
 

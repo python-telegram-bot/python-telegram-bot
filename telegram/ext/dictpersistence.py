@@ -17,9 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the DictPersistence class."""
-from copy import deepcopy
 
-from typing import DefaultDict, Dict, Optional, Tuple
+from typing import DefaultDict, Dict, Optional, Tuple, cast
 from collections import defaultdict
 
 from telegram.utils.helpers import (
@@ -28,7 +27,7 @@ from telegram.utils.helpers import (
     encode_conversations_to_json,
 )
 from telegram.ext import BasePersistence
-from telegram.utils.types import ConversationDict
+from telegram.ext.utils.types import ConversationDict, CDCData
 
 try:
     import ujson as json
@@ -37,7 +36,7 @@ except ImportError:
 
 
 class DictPersistence(BasePersistence):
-    """Using python's dicts and json for making your bot persistent.
+    """Using Python's :obj:`dict` and ``json`` for making your bot persistent.
 
     Note:
         This class does *not* implement a :meth:`flush` method, meaning that data managed by
@@ -57,17 +56,25 @@ class DictPersistence(BasePersistence):
     Args:
         store_user_data (:obj:`bool`, optional): Whether user_data should be saved by this
             persistence class. Default is :obj:`True`.
-        store_chat_data (:obj:`bool`, optional): Whether user_data should be saved by this
+        store_chat_data (:obj:`bool`, optional): Whether chat_data should be saved by this
             persistence class. Default is :obj:`True`.
         store_bot_data (:obj:`bool`, optional): Whether bot_data should be saved by this
-            persistence class. Default is :obj:`True` .
-        user_data_json (:obj:`str`, optional): Json string that will be used to reconstruct
+            persistence class. Default is :obj:`True`.
+        store_callback_data (:obj:`bool`, optional): Whether callback_data should be saved by this
+            persistence class. Default is :obj:`False`.
+
+            .. versionadded:: 13.6
+        user_data_json (:obj:`str`, optional): JSON string that will be used to reconstruct
             user_data on creating this persistence. Default is ``""``.
-        chat_data_json (:obj:`str`, optional): Json string that will be used to reconstruct
+        chat_data_json (:obj:`str`, optional): JSON string that will be used to reconstruct
             chat_data on creating this persistence. Default is ``""``.
-        bot_data_json (:obj:`str`, optional): Json string that will be used to reconstruct
+        bot_data_json (:obj:`str`, optional): JSON string that will be used to reconstruct
             bot_data on creating this persistence. Default is ``""``.
-        conversations_json (:obj:`str`, optional): Json string that will be used to reconstruct
+        callback_data_json (:obj:`str`, optional): Json string that will be used to reconstruct
+            callback_data on creating this persistence. Default is ``""``.
+
+            .. versionadded:: 13.6
+        conversations_json (:obj:`str`, optional): JSON string that will be used to reconstruct
             conversation on creating this persistence. Default is ``""``.
 
     Attributes:
@@ -77,7 +84,24 @@ class DictPersistence(BasePersistence):
             persistence class.
         store_bot_data (:obj:`bool`): Whether bot_data should be saved by this
             persistence class.
+        store_callback_data (:obj:`bool`): Whether callback_data be saved by this
+            persistence class.
+
+            .. versionadded:: 13.6
     """
+
+    __slots__ = (
+        '_user_data',
+        '_chat_data',
+        '_bot_data',
+        '_callback_data',
+        '_conversations',
+        '_user_data_json',
+        '_chat_data_json',
+        '_bot_data_json',
+        '_callback_data_json',
+        '_conversations_json',
+    )
 
     def __init__(
         self,
@@ -88,19 +112,24 @@ class DictPersistence(BasePersistence):
         chat_data_json: str = '',
         bot_data_json: str = '',
         conversations_json: str = '',
+        store_callback_data: bool = False,
+        callback_data_json: str = '',
     ):
         super().__init__(
             store_user_data=store_user_data,
             store_chat_data=store_chat_data,
             store_bot_data=store_bot_data,
+            store_callback_data=store_callback_data,
         )
         self._user_data = None
         self._chat_data = None
         self._bot_data = None
+        self._callback_data = None
         self._conversations = None
         self._user_data_json = None
         self._chat_data_json = None
         self._bot_data_json = None
+        self._callback_data_json = None
         self._conversations_json = None
         if user_data_json:
             try:
@@ -122,6 +151,34 @@ class DictPersistence(BasePersistence):
                 raise TypeError("Unable to deserialize bot_data_json. Not valid JSON") from exc
             if not isinstance(self._bot_data, dict):
                 raise TypeError("bot_data_json must be serialized dict")
+        if callback_data_json:
+            try:
+                data = json.loads(callback_data_json)
+            except (ValueError, AttributeError) as exc:
+                raise TypeError(
+                    "Unable to deserialize callback_data_json. Not valid JSON"
+                ) from exc
+            # We are a bit more thorough with the checking of the format here, because it's
+            # more complicated than for the other things
+            try:
+                if data is None:
+                    self._callback_data = None
+                else:
+                    self._callback_data = cast(
+                        CDCData,
+                        ([(one, float(two), three) for one, two, three in data[0]], data[1]),
+                    )
+                self._callback_data_json = callback_data_json
+            except (ValueError, IndexError) as exc:
+                raise TypeError("callback_data_json is not in the required format") from exc
+            if self._callback_data is not None and (
+                not all(
+                    isinstance(entry[2], dict) and isinstance(entry[0], str)
+                    for entry in self._callback_data[0]
+                )
+                or not isinstance(self._callback_data[1], dict)
+            ):
+                raise TypeError("callback_data_json is not in the required format")
 
         if conversations_json:
             try:
@@ -169,7 +226,25 @@ class DictPersistence(BasePersistence):
         return json.dumps(self.bot_data)
 
     @property
-    def conversations(self) -> Optional[Dict[str, Dict[Tuple, object]]]:
+    def callback_data(self) -> Optional[CDCData]:
+        """:class:`telegram.ext.utils.types.CDCData`: The meta data on the stored callback data.
+
+        .. versionadded:: 13.6
+        """
+        return self._callback_data
+
+    @property
+    def callback_data_json(self) -> str:
+        """:obj:`str`: The meta data on the stored callback data as a JSON-string.
+
+        .. versionadded:: 13.6
+        """
+        if self._callback_data_json:
+            return self._callback_data_json
+        return json.dumps(self.callback_data)
+
+    @property
+    def conversations(self) -> Optional[Dict[str, ConversationDict]]:
         """:obj:`dict`: The conversations as a dict."""
         return self._conversations
 
@@ -187,11 +262,9 @@ class DictPersistence(BasePersistence):
         Returns:
             :obj:`defaultdict`: The restored user data.
         """
-        if self.user_data:
-            pass
-        else:
+        if self.user_data is None:
             self._user_data = defaultdict(dict)
-        return deepcopy(self.user_data)  # type: ignore[arg-type]
+        return self.user_data  # type: ignore[return-value]
 
     def get_chat_data(self) -> DefaultDict[int, Dict[object, object]]:
         """Returns the chat_data created from the ``chat_data_json`` or an empty
@@ -200,11 +273,9 @@ class DictPersistence(BasePersistence):
         Returns:
             :obj:`defaultdict`: The restored chat data.
         """
-        if self.chat_data:
-            pass
-        else:
+        if self.chat_data is None:
             self._chat_data = defaultdict(dict)
-        return deepcopy(self.chat_data)  # type: ignore[arg-type]
+        return self.chat_data  # type: ignore[return-value]
 
     def get_bot_data(self) -> Dict[object, object]:
         """Returns the bot_data created from the ``bot_data_json`` or an empty :obj:`dict`.
@@ -212,11 +283,23 @@ class DictPersistence(BasePersistence):
         Returns:
             :obj:`dict`: The restored bot data.
         """
-        if self.bot_data:
-            pass
-        else:
+        if self.bot_data is None:
             self._bot_data = {}
-        return deepcopy(self.bot_data)  # type: ignore[arg-type]
+        return self.bot_data  # type: ignore[return-value]
+
+    def get_callback_data(self) -> Optional[CDCData]:
+        """Returns the callback_data created from the ``callback_data_json`` or :obj:`None`.
+
+        .. versionadded:: 13.6
+
+        Returns:
+            Optional[:class:`telegram.ext.utils.types.CDCData`]: The restored meta data or
+            :obj:`None`, if no data was stored.
+        """
+        if self.callback_data is None:
+            self._callback_data = None
+            return None
+        return self.callback_data[0], self.callback_data[1].copy()
 
     def get_conversations(self, name: str) -> ConversationDict:
         """Returns the conversations created from the ``conversations_json`` or an empty
@@ -225,9 +308,7 @@ class DictPersistence(BasePersistence):
         Returns:
             :obj:`dict`: The restored conversations data.
         """
-        if self.conversations:
-            pass
-        else:
+        if self.conversations is None:
             self._conversations = {}
         return self.conversations.get(name, {}).copy()  # type: ignore[union-attr]
 
@@ -253,7 +334,7 @@ class DictPersistence(BasePersistence):
 
         Args:
             user_id (:obj:`int`): The user the data might have been changed for.
-            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.user_data` [user_id].
+            data (:obj:`dict`): The :attr:`telegram.ext.Dispatcher.user_data` ``[user_id]``.
         """
         if self._user_data is None:
             self._user_data = defaultdict(dict)
@@ -267,7 +348,7 @@ class DictPersistence(BasePersistence):
 
         Args:
             chat_id (:obj:`int`): The chat the data might have been changed for.
-            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.chat_data` [chat_id].
+            data (:obj:`dict`): The :attr:`telegram.ext.Dispatcher.chat_data` ``[chat_id]``.
         """
         if self._chat_data is None:
             self._chat_data = defaultdict(dict)
@@ -280,9 +361,44 @@ class DictPersistence(BasePersistence):
         """Will update the bot_data (if changed).
 
         Args:
-            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.bot_data`.
+            data (:obj:`dict`): The :attr:`telegram.ext.Dispatcher.bot_data`.
         """
         if self._bot_data == data:
             return
-        self._bot_data = data.copy()
+        self._bot_data = data
         self._bot_data_json = None
+
+    def update_callback_data(self, data: CDCData) -> None:
+        """Will update the callback_data (if changed).
+
+        .. versionadded:: 13.6
+
+        Args:
+            data (:class:`telegram.ext.utils.types.CDCData`): The relevant data to restore
+                :class:`telegram.ext.CallbackDataCache`.
+        """
+        if self._callback_data == data:
+            return
+        self._callback_data = (data[0], data[1].copy())
+        self._callback_data_json = None
+
+    def refresh_user_data(self, user_id: int, user_data: Dict) -> None:
+        """Does nothing.
+
+        .. versionadded:: 13.6
+        .. seealso:: :meth:`telegram.ext.BasePersistence.refresh_user_data`
+        """
+
+    def refresh_chat_data(self, chat_id: int, chat_data: Dict) -> None:
+        """Does nothing.
+
+        .. versionadded:: 13.6
+        .. seealso:: :meth:`telegram.ext.BasePersistence.refresh_chat_data`
+        """
+
+    def refresh_bot_data(self, bot_data: Dict) -> None:
+        """Does nothing.
+
+        .. versionadded:: 13.6
+        .. seealso:: :meth:`telegram.ext.BasePersistence.refresh_bot_data`
+        """

@@ -43,9 +43,11 @@ class InputMedia(TelegramObject):
 
     """
 
+    __slots__ = ()
     caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...], None] = None
 
     def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
         if self.caption_entities:
@@ -111,6 +113,18 @@ class InputMediaAnimation(InputMedia):
         duration (:obj:`int`): Optional. Animation duration.
 
     """
+
+    __slots__ = (
+        'caption_entities',
+        'width',
+        'media',
+        'thumb',
+        'caption',
+        'duration',
+        'parse_mode',
+        'height',
+        'type',
+    )
 
     def __init__(
         self,
@@ -183,6 +197,8 @@ class InputMediaPhoto(InputMedia):
             entities that appear in the caption.
 
     """
+
+    __slots__ = ('caption_entities', 'media', 'caption', 'parse_mode', 'type')
 
     def __init__(
         self,
@@ -263,6 +279,19 @@ class InputMediaVideo(InputMedia):
         thumb (:class:`telegram.InputFile`): Optional. Thumbnail of the file to send.
 
     """
+
+    __slots__ = (
+        'caption_entities',
+        'width',
+        'media',
+        'thumb',
+        'supports_streaming',
+        'caption',
+        'duration',
+        'parse_mode',
+        'height',
+        'type',
+    )
 
     def __init__(
         self,
@@ -363,6 +392,18 @@ class InputMediaAudio(InputMedia):
 
     """
 
+    __slots__ = (
+        'caption_entities',
+        'media',
+        'thumb',
+        'caption',
+        'title',
+        'duration',
+        'type',
+        'parse_mode',
+        'performer',
+    )
+
     def __init__(
         self,
         media: Union[FileInput, Audio],
@@ -450,6 +491,16 @@ class InputMediaDocument(InputMedia):
             the document is sent as part of an album.
 
     """
+
+    __slots__ = (
+        'caption_entities',
+        'media',
+        'thumb',
+        'caption',
+        'parse_mode',
+        'type',
+        'disable_content_type_detection',
+    )
 
     def __init__(
         self,

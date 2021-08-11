@@ -29,7 +29,11 @@ import pytest
 import pytz
 from apscheduler.schedulers import SchedulerNotRunningError
 from flaky import flaky
-from telegram.ext import JobQueue, Updater, Job, CallbackContext
+from telegram.ext import JobQueue, Updater, Job, CallbackContext, Dispatcher, ContextTypes
+
+
+class CustomContext(CallbackContext):
+    pass
 
 
 @pytest.fixture(scope='function')
@@ -50,6 +54,14 @@ class TestJobQueue:
     result = 0
     job_time = 0
     received_error = None
+
+    def test_slot_behaviour(self, job_queue, recwarn, mro_slots, _dp):
+        for attr in job_queue.__slots__:
+            assert getattr(job_queue, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not job_queue.__dict__, f"got missing slot(s): {job_queue.__dict__}"
+        assert len(mro_slots(job_queue)) == len(set(mro_slots(job_queue))), "duplicate slot"
+        job_queue.custom, job_queue._dispatcher = 'should give warning', _dp
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     @pytest.fixture(autouse=True)
     def reset(self):
@@ -511,3 +523,25 @@ class TestJobQueue:
         assert len(caplog.records) == 1
         rec = caplog.records[-1]
         assert 'No error handlers are registered' in rec.getMessage()
+
+    def test_custom_context(self, bot, job_queue):
+        dispatcher = Dispatcher(
+            bot,
+            Queue(),
+            context_types=ContextTypes(
+                context=CustomContext, bot_data=int, user_data=float, chat_data=complex
+            ),
+        )
+        job_queue.set_dispatcher(dispatcher)
+
+        def callback(context):
+            self.result = (
+                type(context),
+                context.user_data,
+                context.chat_data,
+                type(context.bot_data),
+            )
+
+        job_queue.run_once(callback, 0.1)
+        sleep(0.15)
+        assert self.result == (CustomContext, None, None, int)

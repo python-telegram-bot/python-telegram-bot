@@ -19,7 +19,7 @@
 
 import pytest
 
-from telegram import User, Location, InlineQuery, Update, Bot
+from telegram import User, Location, InlineQuery, Update, Bot, Chat
 from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
 
 
@@ -31,6 +31,7 @@ def inline_query(bot):
         TestInlineQuery.query,
         TestInlineQuery.offset,
         location=TestInlineQuery.location,
+        chat_type=TestInlineQuery.chat_type,
         bot=bot,
     )
 
@@ -41,6 +42,15 @@ class TestInlineQuery:
     query = 'query text'
     offset = 'offset'
     location = Location(8.8, 53.1)
+    chat_type = Chat.SENDER
+
+    def test_slot_behaviour(self, inline_query, recwarn, mro_slots):
+        for attr in inline_query.__slots__:
+            assert getattr(inline_query, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not inline_query.__dict__, f"got missing slot(s): {inline_query.__dict__}"
+        assert len(mro_slots(inline_query)) == len(set(mro_slots(inline_query))), "duplicate slot"
+        inline_query.custom, inline_query.id = 'should give warning', self.id_
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_de_json(self, bot):
         json_dict = {
@@ -49,6 +59,7 @@ class TestInlineQuery:
             'query': self.query,
             'offset': self.offset,
             'location': self.location.to_dict(),
+            'chat_type': self.chat_type,
         }
         inline_query_json = InlineQuery.de_json(json_dict, bot)
 
@@ -57,6 +68,7 @@ class TestInlineQuery:
         assert inline_query_json.location == self.location
         assert inline_query_json.query == self.query
         assert inline_query_json.offset == self.offset
+        assert inline_query_json.chat_type == self.chat_type
 
     def test_to_dict(self, inline_query):
         inline_query_dict = inline_query.to_dict()
@@ -67,6 +79,7 @@ class TestInlineQuery:
         assert inline_query_dict['location'] == inline_query.location.to_dict()
         assert inline_query_dict['query'] == inline_query.query
         assert inline_query_dict['offset'] == inline_query.offset
+        assert inline_query_dict['chat_type'] == inline_query.chat_type
 
     def test_answer(self, monkeypatch, inline_query):
         def make_assertion(*_, **kwargs):

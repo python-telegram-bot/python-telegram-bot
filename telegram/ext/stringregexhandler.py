@@ -24,14 +24,15 @@ from typing import TYPE_CHECKING, Callable, Dict, Match, Optional, Pattern, Type
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 from .handler import Handler
+from .utils.types import CCT
 
 if TYPE_CHECKING:
-    from telegram.ext import CallbackContext, Dispatcher
+    from telegram.ext import Dispatcher
 
 RT = TypeVar('RT')
 
 
-class StringRegexHandler(Handler[str]):
+class StringRegexHandler(Handler[str, CCT]):
     """Handler class to handle string updates based on a regex which checks the update content.
 
     Read the documentation of the ``re`` module for more information. The ``re.match`` function is
@@ -91,10 +92,12 @@ class StringRegexHandler(Handler[str]):
 
     """
 
+    __slots__ = ('pass_groups', 'pass_groupdict', 'pattern')
+
     def __init__(
         self,
         pattern: Union[str, Pattern],
-        callback: Callable[[str, 'CallbackContext'], RT],
+        callback: Callable[[str, CCT], RT],
         pass_groups: bool = False,
         pass_groupdict: bool = False,
         pass_update_queue: bool = False,
@@ -137,6 +140,10 @@ class StringRegexHandler(Handler[str]):
         update: str = None,
         check_result: Optional[Match] = None,
     ) -> Dict[str, object]:
+        """Pass the results of ``re.match(pattern, update).{groups(), groupdict()}`` to the
+        callback as a keyword arguments called ``groups`` and ``groupdict``, respectively, if
+        needed.
+        """
         optional_args = super().collect_optional_args(dispatcher, update, check_result)
         if self.pattern:
             if self.pass_groups and check_result:
@@ -147,10 +154,13 @@ class StringRegexHandler(Handler[str]):
 
     def collect_additional_context(
         self,
-        context: 'CallbackContext',
+        context: CCT,
         update: str,
         dispatcher: 'Dispatcher',
         check_result: Optional[Match],
     ) -> None:
+        """Add the result of ``re.match(pattern, update)`` to :attr:`CallbackContext.matches` as
+        list with one element.
+        """
         if self.pattern and check_result:
             context.matches = [check_result]

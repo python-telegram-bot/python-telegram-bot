@@ -49,6 +49,8 @@ class OrderInfo(TelegramObject):
 
     """
 
+    __slots__ = ('email', 'shipping_address', 'phone_number', 'name', '_id_attrs')
+
     def __init__(
         self,
         name: str = None,
@@ -66,7 +68,8 @@ class OrderInfo(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['OrderInfo']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return cls()

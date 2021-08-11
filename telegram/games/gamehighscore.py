@@ -45,6 +45,8 @@ class GameHighScore(TelegramObject):
 
     """
 
+    __slots__ = ('position', 'user', 'score', '_id_attrs')
+
     def __init__(self, position: int, user: User, score: int):
         self.position = position
         self.user = user
@@ -54,7 +56,8 @@ class GameHighScore(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['GameHighScore']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None

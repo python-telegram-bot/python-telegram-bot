@@ -35,26 +35,35 @@ from telegram import Update
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
 from .handler import Handler
+from .utils.types import CCT
 
 if TYPE_CHECKING:
-    from telegram.ext import CallbackContext, Dispatcher
+    from telegram.ext import Dispatcher
 
 RT = TypeVar('RT')
 
 
-class CallbackQueryHandler(Handler[Update]):
+class CallbackQueryHandler(Handler[Update, CCT]):
     """Handler class to handle Telegram callback queries. Optionally based on a regex.
 
     Read the documentation of the ``re`` module for more information.
 
     Note:
-        :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
-        can use to keep any data in will be sent to the :attr:`callback` function. Related to
-        either the user or the chat that the update was sent in. For each update from the same user
-        or in the same chat, it will be the same ``dict``.
+        * :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
+          can use to keep any data in will be sent to the :attr:`callback` function. Related to
+          either the user or the chat that the update was sent in. For each update from the same
+          user or in the same chat, it will be the same ``dict``.
 
-        Note that this is DEPRECATED, and you should use context based callbacks. See
-        https://git.io/fxJuV for more info.
+          Note that this is DEPRECATED, and you should use context based callbacks. See
+          https://git.io/fxJuV for more info.
+        * If your bot allows arbitrary objects as ``callback_data``, it may happen that the
+          original ``callback_data`` for the incoming :class:`telegram.CallbackQuery`` can not be
+          found. This is the case when either a malicious client tempered with the
+          ``callback_data`` or the data was simply dropped from cache or not persisted. In these
+          cases, an instance of :class:`telegram.ext.InvalidCallbackData` will be set as
+          ``callback_data``.
+
+          .. versionadded:: 13.6
 
     Warning:
         When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
@@ -79,9 +88,24 @@ class CallbackQueryHandler(Handler[Update]):
             :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
             which can be used to schedule new jobs. Default is :obj:`False`.
             DEPRECATED: Please switch to context based callbacks.
-        pattern (:obj:`str` | `Pattern`, optional): Regex pattern. If not :obj:`None`, ``re.match``
-            is used on :attr:`telegram.CallbackQuery.data` to determine if an update should be
-            handled by this handler.
+        pattern (:obj:`str` | `Pattern` | :obj:`callable` | :obj:`type`, optional):
+            Pattern to test :attr:`telegram.CallbackQuery.data` against. If a string or a regex
+            pattern is passed, :meth:`re.match` is used on :attr:`telegram.CallbackQuery.data` to
+            determine if an update should be handled by this handler. If your bot allows arbitrary
+            objects as ``callback_data``, non-strings will be accepted. To filter arbitrary
+            objects you may pass
+
+                * a callable, accepting exactly one argument, namely the
+                  :attr:`telegram.CallbackQuery.data`. It must return :obj:`True` or
+                  :obj:`False`/:obj:`None` to indicate, whether the update should be handled.
+                * a :obj:`type`. If :attr:`telegram.CallbackQuery.data` is an instance of that type
+                  (or a subclass), the update will be handled.
+
+            If :attr:`telegram.CallbackQuery.data` is :obj:`None`, the
+            :class:`telegram.CallbackQuery` update will not be handled.
+
+            .. versionchanged:: 13.6
+               Added support for arbitrary callback data.
         pass_groups (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groups()`` as a keyword argument called ``groups``.
             Default is :obj:`False`
@@ -105,8 +129,11 @@ class CallbackQueryHandler(Handler[Update]):
             passed to the callback function.
         pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
             the callback function.
-        pattern (:obj:`str` | `Pattern`): Optional. Regex pattern to test
-            :attr:`telegram.CallbackQuery.data` against.
+        pattern (`Pattern` | :obj:`callable` | :obj:`type`): Optional. Regex pattern, callback or
+            type to test :attr:`telegram.CallbackQuery.data` against.
+
+            .. versionchanged:: 13.6
+               Added support for arbitrary callback data.
         pass_groups (:obj:`bool`): Determines whether ``groups`` will be passed to the
             callback function.
         pass_groupdict (:obj:`bool`): Determines whether ``groupdict``. will be passed to
@@ -119,12 +146,14 @@ class CallbackQueryHandler(Handler[Update]):
 
     """
 
+    __slots__ = ('pattern', 'pass_groups', 'pass_groupdict')
+
     def __init__(
         self,
-        callback: Callable[[Update, 'CallbackContext'], RT],
+        callback: Callable[[Update, CCT], RT],
         pass_update_queue: bool = False,
         pass_job_queue: bool = False,
-        pattern: Union[str, Pattern] = None,
+        pattern: Union[str, Pattern, type, Callable[[object], Optional[bool]]] = None,
         pass_groups: bool = False,
         pass_groupdict: bool = False,
         pass_user_data: bool = False,
@@ -158,11 +187,17 @@ class CallbackQueryHandler(Handler[Update]):
 
         """
         if isinstance(update, Update) and update.callback_query:
+            callback_data = update.callback_query.data
             if self.pattern:
-                if update.callback_query.data:
-                    match = re.match(self.pattern, update.callback_query.data)
-                    if match:
-                        return match
+                if callback_data is None:
+                    return False
+                if isinstance(self.pattern, type):
+                    return isinstance(callback_data, self.pattern)
+                if callable(self.pattern):
+                    return self.pattern(callback_data)
+                match = re.match(self.pattern, callback_data)
+                if match:
+                    return match
             else:
                 return True
         return None
@@ -173,8 +208,12 @@ class CallbackQueryHandler(Handler[Update]):
         update: Update = None,
         check_result: Union[bool, Match] = None,
     ) -> Dict[str, object]:
+        """Pass the results of ``re.match(pattern, data).{groups(), groupdict()}`` to the
+        callback as a keyword arguments called ``groups`` and ``groupdict``, respectively, if
+        needed.
+        """
         optional_args = super().collect_optional_args(dispatcher, update, check_result)
-        if self.pattern:
+        if self.pattern and not callable(self.pattern):
             check_result = cast(Match, check_result)
             if self.pass_groups:
                 optional_args['groups'] = check_result.groups()
@@ -184,11 +223,14 @@ class CallbackQueryHandler(Handler[Update]):
 
     def collect_additional_context(
         self,
-        context: 'CallbackContext',
+        context: CCT,
         update: Update,
         dispatcher: 'Dispatcher',
         check_result: Union[bool, Match],
     ) -> None:
+        """Add the result of ``re.match(pattern, update.callback_query.data)`` to
+        :attr:`CallbackContext.matches` as list with one element.
+        """
         if self.pattern:
             check_result = cast(Match, check_result)
             context.matches = [check_result]

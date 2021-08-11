@@ -52,6 +52,7 @@ from telegram import (
     VoiceChatEnded,
     VoiceChatParticipantsInvited,
     MessageAutoDeleteTimerChanged,
+    VoiceChatScheduled,
 )
 from telegram.ext import Defaults
 from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
@@ -163,7 +164,6 @@ def message(bot):
                 ]
             },
         },
-        {'quote': True},
         {'dice': Dice(4, '🎲')},
         {'via_bot': User(9, 'A_Bot', True)},
         {
@@ -171,6 +171,7 @@ def message(bot):
                 User(1, 'John', False), User(2, 'Doe', False), 42
             )
         },
+        {'voice_chat_scheduled': VoiceChatScheduled(datetime.utcnow())},
         {'voice_chat_started': VoiceChatStarted()},
         {'voice_chat_ended': VoiceChatEnded(100)},
         {
@@ -220,10 +221,10 @@ def message(bot):
         'passport_data',
         'poll',
         'reply_markup',
-        'default_quote',
         'dice',
         'via_bot',
         'proximity_alert_triggered',
+        'voice_chat_scheduled',
         'voice_chat_started',
         'voice_chat_ended',
         'voice_chat_participants_invited',
@@ -305,6 +306,14 @@ class TestMessage:
         caption=test_text_v2,
         caption_entities=[MessageEntity(**e) for e in test_entities_v2],
     )
+
+    def test_slot_behaviour(self, message, recwarn, mro_slots):
+        for attr in message.__slots__:
+            assert getattr(message, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not message.__dict__, f"got missing slot(s): {message.__dict__}"
+        assert len(mro_slots(message)) == len(set(mro_slots(message))), "duplicate slot"
+        message.custom, message.message_id = 'should give warning', self.id_
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_all_possibilities_de_json_and_to_dict(self, bot, message_params):
         new = Message.de_json(message_params.to_dict(), bot)
@@ -603,26 +612,26 @@ class TestMessage:
     def test_chat_id(self, message):
         assert message.chat_id == message.chat.id
 
-    @pytest.mark.parametrize('type', argvalues=[Chat.SUPERGROUP, Chat.CHANNEL])
-    def test_link_with_username(self, message, type):
+    @pytest.mark.parametrize('_type', argvalues=[Chat.SUPERGROUP, Chat.CHANNEL])
+    def test_link_with_username(self, message, _type):
         message.chat.username = 'username'
-        message.chat.type = type
+        message.chat.type = _type
         assert message.link == f'https://t.me/{message.chat.username}/{message.message_id}'
 
     @pytest.mark.parametrize(
-        'type, id', argvalues=[(Chat.CHANNEL, -1003), (Chat.SUPERGROUP, -1003)]
+        '_type, _id', argvalues=[(Chat.CHANNEL, -1003), (Chat.SUPERGROUP, -1003)]
     )
-    def test_link_with_id(self, message, type, id):
+    def test_link_with_id(self, message, _type, _id):
         message.chat.username = None
-        message.chat.id = id
-        message.chat.type = type
+        message.chat.id = _id
+        message.chat.type = _type
         # The leading - for group ids/ -100 for supergroup ids isn't supposed to be in the link
         assert message.link == f'https://t.me/c/{3}/{message.message_id}'
 
-    @pytest.mark.parametrize('id, username', argvalues=[(None, 'username'), (-3, None)])
-    def test_link_private_chats(self, message, id, username):
+    @pytest.mark.parametrize('_id, username', argvalues=[(None, 'username'), (-3, None)])
+    def test_link_private_chats(self, message, _id, username):
         message.chat.type = Chat.PRIVATE
-        message.chat.id = id
+        message.chat.id = _id
         message.chat.username = username
         assert message.link is None
         message.chat.type = Chat.GROUP
@@ -642,7 +651,6 @@ class TestMessage:
             'contact',
             'location',
             'venue',
-            'invoice',
             'invoice',
             'successful_payment',
         ):
@@ -1094,18 +1102,9 @@ class TestMessage:
             description = kwargs['description'] == 'description'
             payload = kwargs['payload'] == 'payload'
             provider_token = kwargs['provider_token'] == 'provider_token'
-            start_parameter = kwargs['start_parameter'] == 'start_parameter'
             currency = kwargs['currency'] == 'currency'
             prices = kwargs['prices'] == 'prices'
-            args = (
-                title
-                and description
-                and payload
-                and provider_token
-                and start_parameter
-                and currency
-                and prices
-            )
+            args = title and description and payload and provider_token and currency and prices
             return kwargs['chat_id'] == message.chat_id and args
 
         assert check_shortcut_signature(
@@ -1120,7 +1119,6 @@ class TestMessage:
             'description',
             'payload',
             'provider_token',
-            'start_parameter',
             'currency',
             'prices',
         )
@@ -1129,7 +1127,6 @@ class TestMessage:
             'description',
             'payload',
             'provider_token',
-            'start_parameter',
             'currency',
             'prices',
             quote=True,

@@ -60,6 +60,17 @@ class Document(TelegramObject):
 
     """
 
+    __slots__ = (
+        'bot',
+        'file_id',
+        'file_size',
+        'file_name',
+        'thumb',
+        'mime_type',
+        'file_unique_id',
+        '_id_attrs',
+    )
+
     _id_keys = ('file_id',)
 
     def __init__(
@@ -87,7 +98,8 @@ class Document(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Document']:
-        data = cls.parse_data(data)
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
 
         if not data:
             return None

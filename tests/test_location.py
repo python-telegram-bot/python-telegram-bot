@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 import pytest
 from flaky import flaky
 
@@ -44,6 +43,14 @@ class TestLocation:
     heading = 90
     proximity_alert_radius = 50
 
+    def test_slot_behaviour(self, location, recwarn, mro_slots):
+        for attr in location.__slots__:
+            assert getattr(location, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert not location.__dict__, f"got missing slot(s): {location.__dict__}"
+        assert len(mro_slots(location)) == len(set(mro_slots(location))), "duplicate slot"
+        location.custom, location.heading = 'should give warning', self.heading
+        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
+
     def test_de_json(self, bot):
         json_dict = {
             'latitude': TestLocation.latitude,
@@ -64,7 +71,6 @@ class TestLocation:
 
     @flaky(3, 1)
     @pytest.mark.xfail
-    @pytest.mark.timeout(10)
     def test_send_live_location(self, bot, chat_id):
         message = bot.send_location(
             chat_id=chat_id,
@@ -144,7 +150,6 @@ class TestLocation:
         assert bot.send_location(location=location, chat_id=chat_id)
 
     @flaky(3, 1)
-    @pytest.mark.timeout(10)
     @pytest.mark.parametrize(
         'default_bot,custom',
         [

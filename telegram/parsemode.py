@@ -21,10 +21,13 @@
 from typing import ClassVar
 
 from telegram import constants
+from telegram.utils.deprecate import set_new_attribute_deprecated
 
 
 class ParseMode:
     """This object represents a Telegram Message Parse Modes."""
+
+    __slots__ = ('__dict__',)
 
     MARKDOWN: ClassVar[str] = constants.PARSEMODE_MARKDOWN
     """:const:`telegram.constants.PARSEMODE_MARKDOWN`\n
@@ -37,3 +40,6 @@ class ParseMode:
     """:const:`telegram.constants.PARSEMODE_MARKDOWN_V2`"""
     HTML: ClassVar[str] = constants.PARSEMODE_HTML
     """:const:`telegram.constants.PARSEMODE_HTML`"""
+
+    def __setattr__(self, key: str, value: object) -> None:
+        set_new_attribute_deprecated(self, key, value)
