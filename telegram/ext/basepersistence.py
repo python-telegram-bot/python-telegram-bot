@@ -447,6 +447,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         .. versionadded:: 13.6
 
         .. versionchanged:: 14.0
+           Changed this method into `@abstractmethod`.
 
         Returns:
             Optional[:class:`telegram.ext.utils.types.CDCData`]: The restored meta data or
@@ -521,6 +522,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         .. versionadded:: 13.6
 
         .. versionchanged:: 14.0
+           Changed this method into `@abstractmethod`.
 
         Args:
             user_id (:obj:`int`): The user ID this :attr:`user_data` is associated with.
@@ -536,6 +538,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         .. versionadded:: 13.6
 
         .. versionchanged:: 14.0
+           Changed this method into `@abstractmethod`.
 
         Args:
             chat_id (:obj:`int`): The chat ID this :attr:`chat_data` is associated with.
@@ -551,6 +554,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         .. versionadded:: 13.6
 
         .. versionchanged:: 14.0
+           Changed this method into `@abstractmethod`.
 
         Args:
             bot_data (:class:`telegram.ext.utils.types.BD`): The ``bot_data``.
@@ -564,6 +568,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         .. versionadded:: 13.6
 
         .. versionchanged:: 14.0
+           Changed this method into `@abstractmethod`.
 
         Args:
             data (:class:`telegram.ext.utils.types.CDCData`): The relevant data to restore
@@ -576,6 +581,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         persistence a chance to finish up saving or close a database connection gracefully.
 
         .. versionchanged:: 14.0
+           Changed this method into `@abstractmethod`.
         """
 
     REPLACED_BOT: ClassVar[str] = 'bot_instance_replaced_by_ptb_persistence'
