@@ -29,18 +29,6 @@ included = {  # These modules/classes intentionally have __dict__.
     'BasePersistence',
     'Dispatcher',
 }
-excluded = {
-    'telegram.error',
-    '_ConversationTimeoutContext',
-    'DispatcherHandlerStop',
-    'Days',
-    'telegram.deprecate',
-    'PassportDecryptionError',
-    'ContextTypes',
-    'CallbackDataCache',
-    'InvalidCallbackData',
-    '_KeyboardData',
-}  # These modules/classes intentionally don't have __dict__.
 
 
 def test_class_has_slots_and_no_dict():
