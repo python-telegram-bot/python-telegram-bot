@@ -159,8 +159,6 @@ def provider_token(bot_info):
 def create_dp(bot):
     # Dispatcher is heavy to init (due to many threads and such) so we have a single session
     # scoped one here, but before each test, reset it (dp fixture below)
-    # class DictDispatcher(Dispatcher):
-    #     pass
     dispatcher = Dispatcher(bot, Queue(), job_queue=JobQueue(), workers=2, use_context=False)
     dispatcher.job_queue.set_dispatcher(dispatcher)
     thr = Thread(target=dispatcher.start)
