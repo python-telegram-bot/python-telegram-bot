@@ -105,7 +105,7 @@ Here's how to make a one-off code change.
 
    - Please ensure that the code you write is well-tested.
 
-        - In addition to that, we provide the `dev` marker for pytest. If you write one or multiple tests and only want to run those, you can decorate them via `@pytest.mark.dev` and then run it with minimal overhead with `pytest ./path/to/test_file.py -m dev`.
+        - In addition to that, we provide the `dev` marker for pytest. If you write one or multiple tests and want to run only those, you can decorate them via `@pytest.mark.dev` and then run it with minimal overhead with `pytest ./path/to/test_file.py -m dev`.
 
    - Don’t break backward compatibility.
 
