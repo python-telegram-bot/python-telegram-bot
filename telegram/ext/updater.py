@@ -93,9 +93,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
             `telegram.utils.request.Request` object (ignored if `bot` or `dispatcher` argument is
             used). The request_kwargs are very useful for the advanced users who would like to
             control the default timeouts and/or control the proxy used for http communication.
-        use_context (:obj:`bool`, optional): If set to :obj:`True` uses the context based callback
-            API (ignored if `dispatcher` argument is used). Defaults to :obj:`True`.
-            **New users**: set this to :obj:`True`.
         persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
             store data that should be persistent over restarts (ignored if `dispatcher` argument is
             used).
@@ -129,7 +126,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
         running (:obj:`bool`): Indicates if the updater is running.
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
             store data that should be persistent over restarts.
-        use_context (:obj:`bool`): Optional. :obj:`True` if using context based callbacks.
 
     """
 
@@ -165,7 +161,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
         request_kwargs: Dict[str, Any] = None,
         persistence: 'BasePersistence' = None,  # pylint: disable=E0601
         defaults: 'Defaults' = None,
-        use_context: bool = True,
         base_file_url: str = None,
         arbitrary_callback_data: Union[DefaultValue, bool, int, None] = DEFAULT_FALSE,
     ):
@@ -184,7 +179,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
         request_kwargs: Dict[str, Any] = None,
         persistence: 'BasePersistence' = None,
         defaults: 'Defaults' = None,
-        use_context: bool = True,
         base_file_url: str = None,
         arbitrary_callback_data: Union[DefaultValue, bool, int, None] = DEFAULT_FALSE,
         context_types: ContextTypes[CCT, UD, CD, BD] = None,

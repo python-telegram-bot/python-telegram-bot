@@ -377,13 +377,8 @@ class TestJobQueue:
         finally:
             _dp.bot = original_bot
 
-    @pytest.mark.parametrize('use_context', [True, False])
-    def test_get_jobs(self, job_queue, use_context):
-        job_queue._dispatcher.use_context = use_context
-        if use_context:
-            callback = self.job_context_based_callback
-        else:
-            callback = self.job_run_once
+    def test_get_jobs(self, job_queue):
+        callback = self.job_context_based_callback
 
         job1 = job_queue.run_once(callback, 10, name='name1')
         job2 = job_queue.run_once(callback, 10, name='name1')
@@ -392,15 +387,6 @@ class TestJobQueue:
         assert job_queue.jobs() == (job1, job2, job3)
         assert job_queue.get_jobs_by_name('name1') == (job1, job2)
         assert job_queue.get_jobs_by_name('name2') == (job3,)
-
-    def test_context_based_callback(self, job_queue):
-        job_queue._dispatcher.use_context = True
-
-        job_queue.run_once(self.job_context_based_callback, 0.01, context=2)
-        sleep(0.03)
-
-        assert self.result == 1
-        job_queue._dispatcher.use_context = False
 
     def test_job_run(self, _dp):
         job_queue = JobQueue()

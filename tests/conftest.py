@@ -185,7 +185,6 @@ def dp(_dp):
     object.__setattr__(_dp, '__async_queue', Queue())
     object.__setattr__(_dp, '__async_threads', set())
     _dp.persistence = None
-    _dp.use_context = False
     if _dp._Dispatcher__singleton_semaphore.acquire(blocking=0):
         Dispatcher._set_singleton(_dp)
     yield _dp
