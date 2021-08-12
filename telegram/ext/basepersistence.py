@@ -76,7 +76,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         store_bot_data (:obj:`bool`, optional): Whether bot_data should be saved by this
             persistence class. Default is :obj:`True`.
         store_callback_data (:obj:`bool`, optional): Whether callback_data should be saved by this
-            persistence class. Default is :obj:`False`.
+            persistence class. Default is :obj:`True`.
 
             .. versionadded:: 13.6
 
@@ -176,7 +176,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         store_user_data: bool = True,
         store_chat_data: bool = True,
         store_bot_data: bool = True,
-        store_callback_data: bool = False,
+        store_callback_data: bool = True,
     ):
         self.store_user_data = store_user_data
         self.store_chat_data = store_chat_data
@@ -439,17 +439,20 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
             :class:`telegram.ext.utils.types.BD`: The restored bot data.
         """
 
+    @abstractmethod
     def get_callback_data(self) -> Optional[CDCData]:
         """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. If callback data was stored, it should be returned.
 
         .. versionadded:: 13.6
 
+        .. versionchanged:: 14.0
+           Changed this method into an ``@abstractmethod``.
+
         Returns:
             Optional[:class:`telegram.ext.utils.types.CDCData`]: The restored meta data or
             :obj:`None`, if no data was stored.
         """
-        raise NotImplementedError
 
     @abstractmethod
     def get_conversations(self, name: str) -> ConversationDict:
@@ -510,6 +513,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
                 :attr:`telegram.ext.Dispatcher.bot_data`.
         """
 
+    @abstractmethod
     def refresh_user_data(self, user_id: int, user_data: UD) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` before passing the
         :attr:`user_data` to a callback. Can be used to update data stored in :attr:`user_data`
@@ -517,11 +521,15 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         .. versionadded:: 13.6
 
+        .. versionchanged:: 14.0
+           Changed this method into an ``@abstractmethod``.
+
         Args:
             user_id (:obj:`int`): The user ID this :attr:`user_data` is associated with.
             user_data (:class:`telegram.ext.utils.types.UD`): The ``user_data`` of a single user.
         """
 
+    @abstractmethod
     def refresh_chat_data(self, chat_id: int, chat_data: CD) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` before passing the
         :attr:`chat_data` to a callback. Can be used to update data stored in :attr:`chat_data`
@@ -529,11 +537,15 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         .. versionadded:: 13.6
 
+        .. versionchanged:: 14.0
+           Changed this method into an ``@abstractmethod``.
+
         Args:
             chat_id (:obj:`int`): The chat ID this :attr:`chat_data` is associated with.
             chat_data (:class:`telegram.ext.utils.types.CD`): The ``chat_data`` of a single chat.
         """
 
+    @abstractmethod
     def refresh_bot_data(self, bot_data: BD) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` before passing the
         :attr:`bot_data` to a callback. Can be used to update data stored in :attr:`bot_data`
@@ -541,25 +553,35 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         .. versionadded:: 13.6
 
+        .. versionchanged:: 14.0
+           Changed this method into an ``@abstractmethod``.
+
         Args:
             bot_data (:class:`telegram.ext.utils.types.BD`): The ``bot_data``.
         """
 
+    @abstractmethod
     def update_callback_data(self, data: CDCData) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
         handled an update.
 
         .. versionadded:: 13.6
 
+        .. versionchanged:: 14.0
+           Changed this method into an ``@abstractmethod``.
+
         Args:
             data (:class:`telegram.ext.utils.types.CDCData`): The relevant data to restore
                 :class:`telegram.ext.CallbackDataCache`.
         """
-        raise NotImplementedError
 
+    @abstractmethod
     def flush(self) -> None:
         """Will be called by :class:`telegram.ext.Updater` upon receiving a stop signal. Gives the
         persistence a chance to finish up saving or close a database connection gracefully.
+
+        .. versionchanged:: 14.0
+           Changed this method into an ``@abstractmethod``.
         """
 
     REPLACED_BOT: ClassVar[str] = 'bot_instance_replaced_by_ptb_persistence'
