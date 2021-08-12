@@ -98,6 +98,24 @@ class OwnPersistence(BasePersistence):
     def update_user_data(self, user_id, data):
         raise NotImplementedError
 
+    def get_callback_data(self):
+        raise NotImplementedError
+
+    def refresh_user_data(self, user_id, user_data):
+        raise NotImplementedError
+
+    def refresh_chat_data(self, chat_id, chat_data):
+        raise NotImplementedError
+
+    def refresh_bot_data(self, bot_data):
+        raise NotImplementedError
+
+    def update_callback_data(self, data):
+        raise NotImplementedError
+
+    def flush(self):
+        raise NotImplementedError
+
 
 @pytest.fixture(scope="function")
 def base_persistence():
@@ -147,6 +165,18 @@ def bot_persistence():
 
         def update_conversation(self, name, key, new_state):
             raise NotImplementedError
+
+        def refresh_user_data(self, user_id, user_data):
+            pass
+
+        def refresh_chat_data(self, chat_id, chat_data):
+            pass
+
+        def refresh_bot_data(self, bot_data):
+            pass
+
+        def flush(self):
+            pass
 
     return BotPersistence()
 
@@ -239,9 +269,11 @@ class TestBasePersistence:
         with pytest.raises(
             TypeError,
             match=(
-                'get_bot_data, get_chat_data, get_conversations, '
-                'get_user_data, update_bot_data, update_chat_data, '
-                'update_conversation, update_user_data'
+                'flush, get_bot_data, get_callback_data, '
+                'get_chat_data, get_conversations, '
+                'get_user_data, refresh_bot_data, refresh_chat_data, '
+                'refresh_user_data, update_bot_data, update_callback_data, '
+                'update_chat_data, update_conversation, update_user_data'
             ),
         ):
             BasePersistence()
