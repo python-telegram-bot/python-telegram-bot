@@ -91,15 +91,16 @@ def bot_info():
     return get_bot()
 
 
-class DictRequest(Request):  # Used for monkey patching attributes
+# Below Dict* classes are used to monkeypatch attributes since parent classes don't have __dict__
+class DictRequest(Request):
     pass
 
 
 class DictExtBot(ExtBot):
-    pass  # Subclass ExtBot to allow monkey patching of attributes & methods by adding a __dict__.
+    pass
 
 
-class DictBot(Bot):  # This is used in a webhook test.
+class DictBot(Bot):
     pass
 
 

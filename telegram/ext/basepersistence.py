@@ -96,7 +96,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         'store_bot_data',
         'store_callback_data',
         'bot',
-        '__dict__',
+        '__dict__',  # __dict__ is included because we replace methods in the __new__
     )
 
     def __new__(
@@ -148,14 +148,14 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
             return update_callback_data((instance.replace_bot(obj_data), queue))
 
         # Adds to __dict__
-        object.__setattr__(instance, 'get_user_data', get_user_data_insert_bot)
-        object.__setattr__(instance, 'get_chat_data', get_chat_data_insert_bot)
-        object.__setattr__(instance, 'get_bot_data', get_bot_data_insert_bot)
-        object.__setattr__(instance, 'get_callback_data', get_callback_data_insert_bot)
-        object.__setattr__(instance, 'update_user_data', update_user_data_replace_bot)
-        object.__setattr__(instance, 'update_chat_data', update_chat_data_replace_bot)
-        object.__setattr__(instance, 'update_bot_data', update_bot_data_replace_bot)
-        object.__setattr__(instance, 'update_callback_data', update_callback_data_replace_bot)
+        setattr(instance, 'get_user_data', get_user_data_insert_bot)
+        setattr(instance, 'get_chat_data', get_chat_data_insert_bot)
+        setattr(instance, 'get_bot_data', get_bot_data_insert_bot)
+        setattr(instance, 'get_callback_data', get_callback_data_insert_bot)
+        setattr(instance, 'update_user_data', update_user_data_replace_bot)
+        setattr(instance, 'update_chat_data', update_chat_data_replace_bot)
+        setattr(instance, 'update_bot_data', update_bot_data_replace_bot)
+        setattr(instance, 'update_callback_data', update_callback_data_replace_bot)
         return instance
 
     def __init__(
