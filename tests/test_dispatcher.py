@@ -619,6 +619,18 @@ class TestDispatcher:
             def update_conversation(self, name, key, new_state):
                 pass
 
+            def refresh_user_data(self, user_id, user_data):
+                pass
+
+            def refresh_chat_data(self, chat_id, chat_data):
+                pass
+
+            def refresh_bot_data(self, bot_data):
+                pass
+
+            def flush(self):
+                pass
+
         def start1(b, u):
             pass
 
@@ -763,6 +775,9 @@ class TestDispatcher:
             def refresh_chat_data(self, chat_id, chat_data):
                 pass
 
+            def flush(self):
+                pass
+
         def callback(update, context):
             pass
 
@@ -830,6 +845,15 @@ class TestDispatcher:
                 pass
 
             def refresh_chat_data(self, chat_id, chat_data):
+                pass
+
+            def get_callback_data(self):
+                pass
+
+            def update_callback_data(self, data):
+                pass
+
+            def flush(self):
                 pass
 
         def callback(update, context):
