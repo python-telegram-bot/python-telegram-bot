@@ -402,3 +402,10 @@ class DictPersistence(BasePersistence):
         .. versionadded:: 13.6
         .. seealso:: :meth:`telegram.ext.BasePersistence.refresh_bot_data`
         """
+
+    def flush(self) -> None:
+        """Does nothing.
+
+        .. versionadded:: 14.0
+        .. seealso:: :meth:`telegram.ext.BasePersistence.flush`
+        """
