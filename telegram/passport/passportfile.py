@@ -65,7 +65,6 @@ class PassportFile(TelegramObject):
         'file_size',
         '_credentials',
         'file_unique_id',
-        '_id_attrs',
     )
 
     def __init__(

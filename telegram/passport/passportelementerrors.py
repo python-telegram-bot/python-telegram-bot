@@ -19,7 +19,7 @@
 # pylint: disable=W0622
 """This module contains the classes that represent Telegram PassportElementError."""
 
-from typing import Any
+from typing import Any, Tuple
 
 from telegram import TelegramObject
 
@@ -46,7 +46,7 @@ class PassportElementError(TelegramObject):
     """
 
     # All subclasses of this class won't have _id_attrs in slots since it's added here.
-    __slots__ = ('message', 'source', 'type', '_id_attrs')
+    __slots__ = ('message', 'source', 'type')
 
     def __init__(self, source: str, type: str, message: str, **_kwargs: Any):
         # Required
@@ -54,7 +54,7 @@ class PassportElementError(TelegramObject):
         self.type = str(type)
         self.message = str(message)
 
-        self._id_attrs = (self.source, self.type)
+        self._id_attrs: Tuple[object, ...] = (self.source, self.type)
 
 
 class PassportElementErrorDataField(PassportElementError):

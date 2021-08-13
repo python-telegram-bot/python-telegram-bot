@@ -23,7 +23,7 @@ except ImportError:
     import json  # type: ignore[no-redef]
 
 import warnings
-from typing import TYPE_CHECKING, List, Optional, Tuple, Type, TypeVar
+from typing import TYPE_CHECKING, List, Optional, Type, TypeVar
 
 from telegram.utils.types import JSONDict
 
@@ -36,11 +36,14 @@ TO = TypeVar('TO', bound='TelegramObject', covariant=True)
 class TelegramObject:
     """Base class for most Telegram objects."""
 
-    _id_attrs: Tuple[object, ...] = ()
-
     # Adding slots reduces memory usage & allows for faster attribute access.
     # Only instance variables should be added to __slots__.
-    __slots__ = ()
+    __slots__ = ('_id_attrs',)
+
+    def __new__(cls, *args: object, **kwargs: object) -> 'TelegramObject':  # pylint: disable=W0613
+        instance = super().__new__(cls)
+        instance._id_attrs = ()  # cannot add type hint since it is not read
+        return instance
 
     def __str__(self) -> str:
         return str(self.to_dict())
@@ -71,7 +74,7 @@ class TelegramObject:
 
         if cls == TelegramObject:
             return cls()
-        return cls(bot=bot, **data)  # type: ignore[call-arg]
+        return cls(bot=bot, **data)
 
     @classmethod
     def de_list(cls: Type[TO], data: Optional[List[JSONDict]], bot: 'Bot') -> List[Optional[TO]]:
@@ -127,21 +130,23 @@ class TelegramObject:
         return data
 
     def __eq__(self, other: object) -> bool:
+        # pylint: disable=no-member
         if isinstance(other, self.__class__):
-            if self._id_attrs == ():
+            if self._id_attrs == ():  # type: ignore[attr-defined]
                 warnings.warn(
                     f"Objects of type {self.__class__.__name__} can not be meaningfully tested for"
                     " equivalence."
                 )
-            if other._id_attrs == ():
+            if other._id_attrs == ():  # type: ignore[attr-defined]
                 warnings.warn(
                     f"Objects of type {other.__class__.__name__} can not be meaningfully tested"
                     " for equivalence."
                 )
-            return self._id_attrs == other._id_attrs
-        return super().__eq__(other)  # pylint: disable=no-member
+            return self._id_attrs == other._id_attrs  # type: ignore[attr-defined]
+        return super().__eq__(other)
 
     def __hash__(self) -> int:
-        if self._id_attrs:
-            return hash((self.__class__, self._id_attrs))  # pylint: disable=no-member
+        # pylint: disable=no-member
+        if self._id_attrs:  # type: ignore[attr-defined]
+            return hash((self.__class__, self._id_attrs))  # type: ignore[attr-defined]
         return super().__hash__()

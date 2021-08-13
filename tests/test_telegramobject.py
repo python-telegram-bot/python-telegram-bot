@@ -107,7 +107,8 @@ class TestTelegramObject:
 
     def test_meaningful_comparison(self, recwarn):
         class TGO(TelegramObject):
-            _id_attrs = (1,)
+            def __init__(self):
+                self._id_attrs = (1,)
 
         a = TGO()
         b = TGO()
