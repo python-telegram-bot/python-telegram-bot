@@ -34,6 +34,7 @@ from telegram.ext import (
     BasePersistence,
     ContextTypes,
 )
+from telegram.ext import PersistenceInput
 from telegram.ext.dispatcher import run_async, Dispatcher, DispatcherHandlerStop
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import DEFAULT_FALSE
@@ -174,10 +175,7 @@ class TestDispatcher:
     def test_construction_with_bad_persistence(self, caplog, bot):
         class my_per:
             def __init__(self):
-                self.store_user_data = False
-                self.store_chat_data = False
-                self.store_bot_data = False
-                self.store_callback_data = False
+                self.store_data = PersistenceInput(False, False, False, False)
 
         with pytest.raises(
             TypeError, match='persistence must be based on telegram.ext.BasePersistence'
@@ -595,13 +593,6 @@ class TestDispatcher:
         increment = []
 
         class OwnPersistence(BasePersistence):
-            def __init__(self):
-                super().__init__()
-                self.store_user_data = True
-                self.store_chat_data = True
-                self.store_bot_data = True
-                self.store_callback_data = True
-
             def get_callback_data(self):
                 return None
 
@@ -739,13 +730,6 @@ class TestDispatcher:
 
     def test_error_while_persisting(self, cdp, monkeypatch):
         class OwnPersistence(BasePersistence):
-            def __init__(self):
-                super().__init__()
-                self.store_user_data = True
-                self.store_chat_data = True
-                self.store_bot_data = True
-                self.store_callback_data = True
-
             def update(self, data):
                 raise Exception('PersistenceError')
 
@@ -820,9 +804,6 @@ class TestDispatcher:
         class OwnPersistence(BasePersistence):
             def __init__(self):
                 super().__init__()
-                self.store_user_data = True
-                self.store_chat_data = True
-                self.store_bot_data = True
                 self.test_flag_bot_data = False
                 self.test_flag_chat_data = False
                 self.test_flag_user_data = False
