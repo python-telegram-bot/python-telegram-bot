@@ -29,7 +29,7 @@ from typing import (
     DefaultDict,
 )
 
-from telegram.ext import BasePersistence
+from telegram.ext import BasePersistence, PersistenceInput
 from .utils.types import UD, CD, BD, ConversationDict, CDCData
 from .contexttypes import ContextTypes
 
@@ -46,19 +46,15 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         :meth:`telegram.ext.BasePersistence.replace_bot` and
         :meth:`telegram.ext.BasePersistence.insert_bot`.
 
+    .. versionchanged:: 14.0
+        The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.
+
     Args:
         filename (:obj:`str`): The filename for storing the pickle files. When :attr:`single_file`
             is :obj:`False` this will be used as a prefix.
-        store_user_data (:obj:`bool`, optional): Whether user_data should be saved by this
-            persistence class. Default is :obj:`True`.
-        store_chat_data (:obj:`bool`, optional): Whether chat_data should be saved by this
-            persistence class. Default is :obj:`True`.
-        store_bot_data (:obj:`bool`, optional): Whether bot_data should be saved by this
-            persistence class. Default is :obj:`True`.
-        store_callback_data (:obj:`bool`, optional): Whether callback_data should be saved by this
-            persistence class. Default is :obj:`False`.
-
-            .. versionadded:: 13.6
+        store_data (:class:`PersistenceInput`, optional): Specifies which kinds of data will be
+            saved by this persistence instance. By default, all available kinds of data will be
+            saved.
         single_file (:obj:`bool`, optional): When :obj:`False` will store 5 separate files of
             `filename_user_data`, `filename_bot_data`, `filename_chat_data`,
             `filename_callback_data` and `filename_conversations`. Default is :obj:`True`.
@@ -76,16 +72,8 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     Attributes:
         filename (:obj:`str`): The filename for storing the pickle files. When :attr:`single_file`
             is :obj:`False` this will be used as a prefix.
-        store_user_data (:obj:`bool`): Optional. Whether user_data should be saved by this
-            persistence class.
-        store_chat_data (:obj:`bool`): Optional. Whether chat_data should be saved by this
-            persistence class.
-        store_bot_data (:obj:`bool`): Optional. Whether bot_data should be saved by this
-            persistence class.
-        store_callback_data (:obj:`bool`): Optional. Whether callback_data be saved by this
-            persistence class.
-
-            .. versionadded:: 13.6
+        store_data (:class:`PersistenceInput`): Specifies which kinds of data will be saved by this
+            persistence instance.
         single_file (:obj:`bool`): Optional. When :obj:`False` will store 5 separate files of
             `filename_user_data`, `filename_bot_data`, `filename_chat_data`,
             `filename_callback_data` and `filename_conversations`. Default is :obj:`True`.
@@ -115,12 +103,9 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     def __init__(
         self: 'PicklePersistence[Dict, Dict, Dict]',
         filename: str,
-        store_user_data: bool = True,
-        store_chat_data: bool = True,
-        store_bot_data: bool = True,
+        store_data: PersistenceInput = None,
         single_file: bool = True,
         on_flush: bool = False,
-        store_callback_data: bool = False,
     ):
         ...
 
@@ -128,12 +113,9 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     def __init__(
         self: 'PicklePersistence[UD, CD, BD]',
         filename: str,
-        store_user_data: bool = True,
-        store_chat_data: bool = True,
-        store_bot_data: bool = True,
+        store_data: PersistenceInput = None,
         single_file: bool = True,
         on_flush: bool = False,
-        store_callback_data: bool = False,
         context_types: ContextTypes[Any, UD, CD, BD] = None,
     ):
         ...
@@ -141,20 +123,12 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     def __init__(
         self,
         filename: str,
-        store_user_data: bool = True,
-        store_chat_data: bool = True,
-        store_bot_data: bool = True,
+        store_data: PersistenceInput = None,
         single_file: bool = True,
         on_flush: bool = False,
-        store_callback_data: bool = False,
         context_types: ContextTypes[Any, UD, CD, BD] = None,
     ):
-        super().__init__(
-            store_user_data=store_user_data,
-            store_chat_data=store_chat_data,
-            store_bot_data=store_bot_data,
-            store_callback_data=store_callback_data,
-        )
+        super().__init__(store_data=store_data)
         self.filename = filename
         self.single_file = single_file
         self.on_flush = on_flush
