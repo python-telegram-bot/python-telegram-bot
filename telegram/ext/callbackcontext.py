@@ -186,11 +186,17 @@ class CallbackContext(Generic[UD, CD, BD]):
         .. versionadded:: 13.6
         """
         if self.dispatcher.persistence:
-            if self.dispatcher.persistence.store_bot_data:
+            if self.dispatcher.persistence.store_data.bot_data:
                 self.dispatcher.persistence.refresh_bot_data(self.bot_data)
-            if self.dispatcher.persistence.store_chat_data and self._chat_id_and_data is not None:
+            if (
+                self.dispatcher.persistence.store_data.chat_data
+                and self._chat_id_and_data is not None
+            ):
                 self.dispatcher.persistence.refresh_chat_data(*self._chat_id_and_data)
-            if self.dispatcher.persistence.store_user_data and self._user_id_and_data is not None:
+            if (
+                self.dispatcher.persistence.store_data.user_data
+                and self._user_id_and_data is not None
+            ):
                 self.dispatcher.persistence.refresh_user_data(*self._user_id_and_data)
 
     def drop_callback_data(self, callback_query: CallbackQuery) -> None:

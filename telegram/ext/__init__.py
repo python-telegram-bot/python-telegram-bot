@@ -20,7 +20,7 @@
 """Extensions over the Telegram Bot API to facilitate bot making"""
 
 from .extbot import ExtBot
-from .basepersistence import BasePersistence
+from .basepersistence import BasePersistence, PersistenceInput
 from .picklepersistence import PicklePersistence
 from .dictpersistence import DictPersistence
 from .handler import Handler
@@ -90,6 +90,7 @@ __all__ = (
     'MessageFilter',
     'MessageHandler',
     'MessageQueue',
+    'PersistenceInput',
     'PicklePersistence',
     'PollAnswerHandler',
     'PollHandler',

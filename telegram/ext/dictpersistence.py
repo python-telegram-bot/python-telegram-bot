@@ -26,7 +26,7 @@ from telegram.utils.helpers import (
     decode_user_chat_data_from_json,
     encode_conversations_to_json,
 )
-from telegram.ext import BasePersistence
+from telegram.ext import BasePersistence, PersistenceInput
 from telegram.ext.utils.types import ConversationDict, CDCData
 
 try:
@@ -53,17 +53,13 @@ class DictPersistence(BasePersistence):
         :meth:`telegram.ext.BasePersistence.replace_bot` and
         :meth:`telegram.ext.BasePersistence.insert_bot`.
 
-    Args:
-        store_user_data (:obj:`bool`, optional): Whether user_data should be saved by this
-            persistence class. Default is :obj:`True`.
-        store_chat_data (:obj:`bool`, optional): Whether chat_data should be saved by this
-            persistence class. Default is :obj:`True`.
-        store_bot_data (:obj:`bool`, optional): Whether bot_data should be saved by this
-            persistence class. Default is :obj:`True`.
-        store_callback_data (:obj:`bool`, optional): Whether callback_data should be saved by this
-            persistence class. Default is :obj:`False`.
+    .. versionchanged:: 14.0
+        The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.
 
-            .. versionadded:: 13.6
+    Args:
+        store_data (:class:`PersistenceInput`, optional): Specifies which kinds of data will be
+            saved by this persistence instance. By default, all available kinds of data will be
+            saved.
         user_data_json (:obj:`str`, optional): JSON string that will be used to reconstruct
             user_data on creating this persistence. Default is ``""``.
         chat_data_json (:obj:`str`, optional): JSON string that will be used to reconstruct
@@ -78,16 +74,8 @@ class DictPersistence(BasePersistence):
             conversation on creating this persistence. Default is ``""``.
 
     Attributes:
-        store_user_data (:obj:`bool`): Whether user_data should be saved by this
-            persistence class.
-        store_chat_data (:obj:`bool`): Whether chat_data should be saved by this
-            persistence class.
-        store_bot_data (:obj:`bool`): Whether bot_data should be saved by this
-            persistence class.
-        store_callback_data (:obj:`bool`): Whether callback_data be saved by this
-            persistence class.
-
-            .. versionadded:: 13.6
+        store_data (:class:`PersistenceInput`): Specifies which kinds of data will be saved by this
+            persistence instance.
     """
 
     __slots__ = (
@@ -105,22 +93,14 @@ class DictPersistence(BasePersistence):
 
     def __init__(
         self,
-        store_user_data: bool = True,
-        store_chat_data: bool = True,
-        store_bot_data: bool = True,
+        store_data: PersistenceInput = None,
         user_data_json: str = '',
         chat_data_json: str = '',
         bot_data_json: str = '',
         conversations_json: str = '',
-        store_callback_data: bool = False,
         callback_data_json: str = '',
     ):
-        super().__init__(
-            store_user_data=store_user_data,
-            store_chat_data=store_chat_data,
-            store_bot_data=store_bot_data,
-            store_callback_data=store_callback_data,
-        )
+        super().__init__(store_data=store_data)
         self._user_data = None
         self._chat_data = None
         self._bot_data = None

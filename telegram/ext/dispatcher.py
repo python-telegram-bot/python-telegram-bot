@@ -261,21 +261,21 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                 raise TypeError("persistence must be based on telegram.ext.BasePersistence")
             self.persistence = persistence
             self.persistence.set_bot(self.bot)
-            if self.persistence.store_user_data:
+            if self.persistence.store_data.user_data:
                 self.user_data = self.persistence.get_user_data()
                 if not isinstance(self.user_data, defaultdict):
                     raise ValueError("user_data must be of type defaultdict")
-            if self.persistence.store_chat_data:
+            if self.persistence.store_data.chat_data:
                 self.chat_data = self.persistence.get_chat_data()
                 if not isinstance(self.chat_data, defaultdict):
                     raise ValueError("chat_data must be of type defaultdict")
-            if self.persistence.store_bot_data:
+            if self.persistence.store_data.bot_data:
                 self.bot_data = self.persistence.get_bot_data()
                 if not isinstance(self.bot_data, self.context_types.bot_data):
                     raise ValueError(
                         f"bot_data must be of type {self.context_types.bot_data.__name__}"
                     )
-            if self.persistence.store_callback_data:
+            if self.persistence.store_data.callback_data:
                 self.bot = cast(telegram.ext.extbot.ExtBot, self.bot)
                 persistent_data = self.persistence.get_callback_data()
                 if persistent_data is not None:
@@ -679,7 +679,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                 else:
                     user_ids = []
 
-            if self.persistence.store_callback_data:
+            if self.persistence.store_data.callback_data:
                 self.bot = cast(telegram.ext.extbot.ExtBot, self.bot)
                 try:
                     self.persistence.update_callback_data(
@@ -695,7 +695,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                             'the error with an error_handler'
                         )
                         self.logger.exception(message)
-            if self.persistence.store_bot_data:
+            if self.persistence.store_data.bot_data:
                 try:
                     self.persistence.update_bot_data(self.bot_data)
                 except Exception as exc:
@@ -708,7 +708,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                             'the error with an error_handler'
                         )
                         self.logger.exception(message)
-            if self.persistence.store_chat_data:
+            if self.persistence.store_data.chat_data:
                 for chat_id in chat_ids:
                     try:
                         self.persistence.update_chat_data(chat_id, self.chat_data[chat_id])
@@ -722,7 +722,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                                 'the error with an error_handler'
                             )
                             self.logger.exception(message)
-            if self.persistence.store_user_data:
+            if self.persistence.store_data.user_data:
                 for user_id in user_ids:
                     try:
                         self.persistence.update_user_data(user_id, self.user_data[user_id])
