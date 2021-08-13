@@ -30,11 +30,12 @@ excluded = {
     'DispatcherHandlerStop',
     'Days',
     'telegram.deprecate',
-    'TelegramDecryptionError',
+    'PassportDecryptionError',
     'ContextTypes',
     'CallbackDataCache',
     'InvalidCallbackData',
     '_KeyboardData',
+    'PersistenceInput',  # This one as a named tuple - no need to worry about slots
 }  # These modules/classes intentionally don't have __dict__.
 
 

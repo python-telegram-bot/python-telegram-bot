@@ -56,7 +56,7 @@ from .replymarkup import ReplyMarkup
 from .replykeyboardmarkup import ReplyKeyboardMarkup
 from .replykeyboardremove import ReplyKeyboardRemove
 from .forcereply import ForceReply
-from .error import TelegramError
+from .error import TelegramError, PassportDecryptionError
 from .files.inputfile import InputFile
 from .files.file import File
 from .parsemode import ParseMode
@@ -159,7 +159,6 @@ from .passport.credentials import (
     SecureData,
     SecureValue,
     FileCredentials,
-    TelegramDecryptionError,
 )
 from .botcommandscope import (
     BotCommandScope,
@@ -308,7 +307,7 @@ __all__ = (  # Keep this alphabetically ordered
     'Sticker',
     'StickerSet',
     'SuccessfulPayment',
-    'TelegramDecryptionError',
+    'PassportDecryptionError',
     'TelegramError',
     'TelegramObject',
     'Update',

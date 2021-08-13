@@ -58,7 +58,7 @@ except ImportError:  # pragma: no cover
         raise
 
 # pylint: disable=C0412
-from telegram import InputFile, InputMedia, TelegramError
+from telegram import InputFile, TelegramError
 from telegram.error import (
     BadRequest,
     ChatMigrated,
@@ -325,13 +325,9 @@ class Request:
                 # Urllib3 doesn't like floats it seems
                 data[key] = str(val)
             elif key == 'media':
-                # One media or multiple
-                if isinstance(val, InputMedia):
-                    # Attach and set val to attached name
-                    data[key] = val.to_json()
-                    if isinstance(val.media, InputFile):  # type: ignore
-                        data[val.media.attach] = val.media.field_tuple  # type: ignore
-                else:
+                files = True
+                # List of media
+                if isinstance(val, list):
                     # Attach and set val to attached name for all
                     media = []
                     for med in val:
@@ -343,7 +339,16 @@ class Request:
                             if "thumb" in media_dict:
                                 data[med.thumb.attach] = med.thumb.field_tuple
                     data[key] = json.dumps(media)
-                files = True
+                # Single media
+                else:
+                    # Attach and set val to attached name
+                    media_dict = val.to_dict()
+                    if isinstance(val.media, InputFile):
+                        data[val.media.attach] = val.media.field_tuple
+                        # if the file has a thumb, we also need to attach it to the data
+                        if "thumb" in media_dict:
+                            data[val.thumb.attach] = val.thumb.field_tuple
+                    data[key] = json.dumps(media_dict)
             elif isinstance(val, list):
                 # In case we're sending files, we need to json-dump lists manually
                 # As we can't know if that's the case, we just json-dump here
