@@ -23,7 +23,7 @@ except ImportError:
     import json  # type: ignore[no-redef]
 
 import warnings
-from typing import TYPE_CHECKING, List, Optional, Type, TypeVar
+from typing import TYPE_CHECKING, List, Optional, Type, TypeVar, Tuple
 
 from telegram.utils.types import JSONDict
 
@@ -36,13 +36,20 @@ TO = TypeVar('TO', bound='TelegramObject', covariant=True)
 class TelegramObject:
     """Base class for most Telegram objects."""
 
+    # type hints in __new__ are not read by mypy (https://github.com/python/mypy/issues/1021). As a
+    # workaround we can type hint instance variables in __new__ using a syntax defined in PEP 526 -
+    # https://www.python.org/dev/peps/pep-0526/#class-and-instance-variable-annotations
+    if TYPE_CHECKING:
+        _id_attrs: Tuple[object, ...]
     # Adding slots reduces memory usage & allows for faster attribute access.
     # Only instance variables should be added to __slots__.
     __slots__ = ('_id_attrs',)
 
     def __new__(cls, *args: object, **kwargs: object) -> 'TelegramObject':  # pylint: disable=W0613
+        # We add _id_attrs in __new__ instead of __init__ since we want to add this to the slots
+        # w/o calling __init__ in all of the subclasses. This is what we also do in BaseFilter.
         instance = super().__new__(cls)
-        instance._id_attrs = ()  # cannot add type hint since it is not read
+        instance._id_attrs = ()
         return instance
 
     def __str__(self) -> str:
@@ -132,21 +139,21 @@ class TelegramObject:
     def __eq__(self, other: object) -> bool:
         # pylint: disable=no-member
         if isinstance(other, self.__class__):
-            if self._id_attrs == ():  # type: ignore[attr-defined]
+            if self._id_attrs == ():
                 warnings.warn(
                     f"Objects of type {self.__class__.__name__} can not be meaningfully tested for"
                     " equivalence."
                 )
-            if other._id_attrs == ():  # type: ignore[attr-defined]
+            if other._id_attrs == ():
                 warnings.warn(
                     f"Objects of type {other.__class__.__name__} can not be meaningfully tested"
                     " for equivalence."
                 )
-            return self._id_attrs == other._id_attrs  # type: ignore[attr-defined]
+            return self._id_attrs == other._id_attrs
         return super().__eq__(other)
 
     def __hash__(self) -> int:
         # pylint: disable=no-member
-        if self._id_attrs:  # type: ignore[attr-defined]
-            return hash((self.__class__, self._id_attrs))  # type: ignore[attr-defined]
+        if self._id_attrs:
+            return hash((self.__class__, self._id_attrs))
         return super().__hash__()

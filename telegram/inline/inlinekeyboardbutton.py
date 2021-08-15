@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardButton."""
 
-from typing import TYPE_CHECKING, Any, Tuple
+from typing import TYPE_CHECKING, Any
 
 from telegram import TelegramObject
 
@@ -132,7 +132,7 @@ class InlineKeyboardButton(TelegramObject):
         self.switch_inline_query_current_chat = switch_inline_query_current_chat
         self.callback_game = callback_game
         self.pay = pay
-        self._id_attrs: Tuple[object, ...] = ()
+        self._id_attrs = ()
         self._set_id_attrs()
 
     def _set_id_attrs(self) -> None:

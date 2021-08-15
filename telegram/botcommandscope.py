@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=W0622
 """This module contains objects representing Telegram bot command scopes."""
-from typing import Any, Union, Optional, TYPE_CHECKING, Dict, Type, Tuple
+from typing import Any, Union, Optional, TYPE_CHECKING, Dict, Type
 
 from telegram import TelegramObject, constants
 from telegram.utils.types import JSONDict
@@ -76,7 +76,7 @@ class BotCommandScope(TelegramObject):
 
     def __init__(self, type: str, **_kwargs: Any):
         self.type = type
-        self._id_attrs: Tuple[object, ...] = (self.type,)
+        self._id_attrs = (self.type,)
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['BotCommandScope']:
