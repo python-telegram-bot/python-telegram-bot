@@ -34,7 +34,7 @@ from typing import (
 
 from telegram import Update, CallbackQuery
 from telegram.ext import ExtBot
-from telegram.ext.utils.types import UD, CD, BD
+from telegram.ext.utils.types import UD, CD, BD, BT, JQ, PT
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -42,7 +42,7 @@ if TYPE_CHECKING:
     from telegram.ext.utils.types import CCT
 
 
-class CallbackContext(Generic[UD, CD, BD]):
+class CallbackContext(Generic[BT, UD, CD, BD]):
     """
     This is a context object passed to the callback called by :class:`telegram.ext.Handler`
     or by the :class:`telegram.ext.Dispatcher` in an error handler added by
@@ -103,7 +103,7 @@ class CallbackContext(Generic[UD, CD, BD]):
         '__dict__',
     )
 
-    def __init__(self: 'CCT', dispatcher: 'Dispatcher[CCT, UD, CD, BD]'):
+    def __init__(self: 'CCT', dispatcher: 'Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]'):
         """
         Args:
             dispatcher (:class:`telegram.ext.Dispatcher`):
@@ -123,7 +123,7 @@ class CallbackContext(Generic[UD, CD, BD]):
         self.async_kwargs: Optional[Dict[str, object]] = None
 
     @property
-    def dispatcher(self) -> 'Dispatcher[CCT, UD, CD, BD]':
+    def dispatcher(self) -> 'Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]':
         """:class:`telegram.ext.Dispatcher`: The dispatcher associated with this context."""
         return self._dispatcher
 
@@ -232,7 +232,7 @@ class CallbackContext(Generic[UD, CD, BD]):
         cls: Type['CCT'],
         update: object,
         error: Exception,
-        dispatcher: 'Dispatcher[CCT, UD, CD, BD]',
+        dispatcher: 'Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]',
         async_args: Union[List, Tuple] = None,
         async_kwargs: Dict[str, object] = None,
     ) -> 'CCT':
@@ -266,7 +266,7 @@ class CallbackContext(Generic[UD, CD, BD]):
 
     @classmethod
     def from_update(
-        cls: Type['CCT'], update: object, dispatcher: 'Dispatcher[CCT, UD, CD, BD]'
+        cls: Type['CCT'], update: object, dispatcher: 'Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]'
     ) -> 'CCT':
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the
@@ -301,7 +301,9 @@ class CallbackContext(Generic[UD, CD, BD]):
         return self
 
     @classmethod
-    def from_job(cls: Type['CCT'], job: 'Job', dispatcher: 'Dispatcher[CCT, UD, CD, BD]') -> 'CCT':
+    def from_job(
+        cls: Type['CCT'], job: 'Job', dispatcher: 'Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]'
+    ) -> 'CCT':
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to a
         job callback.

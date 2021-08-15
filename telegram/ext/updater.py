@@ -36,7 +36,8 @@ from typing import (
     Union,
     no_type_check,
     Generic,
-    overload,
+    TypeVar,
+    cast,
 )
 
 from telegram import Bot, TelegramError
@@ -45,14 +46,16 @@ from telegram.ext import Dispatcher, JobQueue, ContextTypes, ExtBot
 from telegram.utils.deprecate import TelegramDeprecationWarning, set_new_attribute_deprecated
 from telegram.utils.helpers import get_signal_name, DEFAULT_FALSE, DefaultValue
 from telegram.utils.request import Request
-from telegram.ext.utils.types import CCT, UD, CD, BD
+from telegram.ext.utils.types import CCT, UD, CD, BD, BT
 from telegram.ext.utils.webhookhandler import WebhookAppClass, WebhookServer
 
 if TYPE_CHECKING:
-    from telegram.ext import BasePersistence, Defaults, CallbackContext
+    from telegram.ext import BasePersistence, Defaults
+
+DT = TypeVar('DT', bound=Union[None, Dispatcher])
 
 
-class Updater(Generic[CCT, UD, CD, BD]):
+class Updater(Generic[BT, DT]):
     """
     This class, which employs the :class:`telegram.ext.Dispatcher`, provides a frontend to
     :class:`telegram.Bot` to the programmer, so they can focus on coding the bot. Its purpose is to
@@ -64,83 +67,25 @@ class Updater(Generic[CCT, UD, CD, BD]):
     WebhookHandler classes.
 
     Note:
-        * You must supply either a :attr:`bot` or a :attr:`token` argument.
-        * If you supply a :attr:`bot`, you will need to pass :attr:`arbitrary_callback_data`,
-          and :attr:`defaults` to the bot instead of the :class:`telegram.ext.Updater`. In this
-          case, you'll have to use the class :class:`telegram.ext.ExtBot`.
-
-          .. versionchanged:: 13.6
-
-    Args:
-        token (:obj:`str`, optional): The bot's token given by the @BotFather.
-        base_url (:obj:`str`, optional): Base_url for the bot.
-        base_file_url (:obj:`str`, optional): Base_file_url for the bot.
-        workers (:obj:`int`, optional): Amount of threads in the thread pool for functions
-            decorated with ``@run_async`` (ignored if `dispatcher` argument is used).
-        bot (:class:`telegram.Bot`, optional): A pre-initialized bot instance (ignored if
-            `dispatcher` argument is used). If a pre-initialized bot is used, it is the user's
-            responsibility to create it using a `Request` instance with a large enough connection
-            pool.
-        dispatcher (:class:`telegram.ext.Dispatcher`, optional): A pre-initialized dispatcher
-            instance. If a pre-initialized dispatcher is used, it is the user's responsibility to
-            create it with proper arguments.
-        private_key (:obj:`bytes`, optional): Private key for decryption of telegram passport data.
-        private_key_password (:obj:`bytes`, optional): Password for above private key.
-        user_sig_handler (:obj:`function`, optional): Takes ``signum, frame`` as positional
-            arguments. This will be called when a signal is received, defaults are (SIGINT,
-            SIGTERM, SIGABRT) settable with :attr:`idle`.
-        request_kwargs (:obj:`dict`, optional): Keyword args to control the creation of a
-            `telegram.utils.request.Request` object (ignored if `bot` or `dispatcher` argument is
-            used). The request_kwargs are very useful for the advanced users who would like to
-            control the default timeouts and/or control the proxy used for http communication.
-        use_context (:obj:`bool`, optional): If set to :obj:`True` uses the context based callback
-            API (ignored if `dispatcher` argument is used). Defaults to :obj:`True`.
-            **New users**: set this to :obj:`True`.
-        persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
-            store data that should be persistent over restarts (ignored if `dispatcher` argument is
-            used).
-        defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
-            be used if not set explicitly in the bot methods.
-        arbitrary_callback_data (:obj:`bool` | :obj:`int` | :obj:`None`, optional): Whether to
-            allow arbitrary objects as callback data for :class:`telegram.InlineKeyboardButton`.
-            Pass an integer to specify the maximum number of cached objects. For more details,
-            please see our wiki. Defaults to :obj:`False`.
-
-            .. versionadded:: 13.6
-        context_types (:class:`telegram.ext.ContextTypes`, optional): Pass an instance
-            of :class:`telegram.ext.ContextTypes` to customize the types used in the
-            ``context`` interface. If not passed, the defaults documented in
-            :class:`telegram.ext.ContextTypes` will be used.
-
-            .. versionadded:: 13.6
-
-    Raises:
-        ValueError: If both :attr:`token` and :attr:`bot` are passed or none of them.
-
+        Must be initialized via :class:`telegram.ext.DispatcherBuilder`.
 
     Attributes:
         bot (:class:`telegram.Bot`): The bot used with this Updater.
         user_sig_handler (:obj:`function`): Optional. Function to be called when a signal is
             received.
         update_queue (:obj:`Queue`): Queue for the updates.
-        job_queue (:class:`telegram.ext.JobQueue`): Jobqueue for the updater.
-        dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that handles the updates and
-            dispatches them to the handlers.
+        dispatcher (:class:`telegram.ext.Dispatcher`): Optional. Dispatcher that handles the
+            updates and dispatches them to the handlers.
         running (:obj:`bool`): Indicates if the updater is running.
-        persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
-            store data that should be persistent over restarts.
-        use_context (:obj:`bool`): Optional. :obj:`True` if using context based callbacks.
 
     """
 
     __slots__ = (
-        'persistence',
         'dispatcher',
         'user_sig_handler',
         'bot',
         'logger',
         'update_queue',
-        'job_queue',
         '__exception_event',
         'last_update_id',
         'running',
@@ -152,181 +97,34 @@ class Updater(Generic[CCT, UD, CD, BD]):
         '__dict__',
     )
 
-    @overload
-    def __init__(
-        self: 'Updater[CallbackContext, dict, dict, dict]',
-        token: str = None,
-        base_url: str = None,
-        workers: int = 4,
-        bot: Bot = None,
-        private_key: bytes = None,
-        private_key_password: bytes = None,
-        user_sig_handler: Callable = None,
-        request_kwargs: Dict[str, Any] = None,
-        persistence: 'BasePersistence' = None,  # pylint: disable=E0601
-        defaults: 'Defaults' = None,
-        use_context: bool = True,
-        base_file_url: str = None,
-        arbitrary_callback_data: Union[DefaultValue, bool, int, None] = DEFAULT_FALSE,
-    ):
-        ...
-
-    @overload
-    def __init__(
-        self: 'Updater[CCT, UD, CD, BD]',
-        token: str = None,
-        base_url: str = None,
-        workers: int = 4,
-        bot: Bot = None,
-        private_key: bytes = None,
-        private_key_password: bytes = None,
-        user_sig_handler: Callable = None,
-        request_kwargs: Dict[str, Any] = None,
-        persistence: 'BasePersistence' = None,
-        defaults: 'Defaults' = None,
-        use_context: bool = True,
-        base_file_url: str = None,
-        arbitrary_callback_data: Union[DefaultValue, bool, int, None] = DEFAULT_FALSE,
-        context_types: ContextTypes[CCT, UD, CD, BD] = None,
-    ):
-        ...
-
-    @overload
-    def __init__(
-        self: 'Updater[CCT, UD, CD, BD]',
-        user_sig_handler: Callable = None,
-        dispatcher: Dispatcher[CCT, UD, CD, BD] = None,
-    ):
-        ...
-
-    def __init__(  # type: ignore[no-untyped-def,misc]
-        self,
-        token: str = None,
-        base_url: str = None,
-        workers: int = 4,
-        bot: Bot = None,
-        private_key: bytes = None,
-        private_key_password: bytes = None,
-        user_sig_handler: Callable = None,
-        request_kwargs: Dict[str, Any] = None,
-        persistence: 'BasePersistence' = None,
-        defaults: 'Defaults' = None,
-        use_context: bool = True,
-        dispatcher=None,
-        base_file_url: str = None,
-        arbitrary_callback_data: Union[DefaultValue, bool, int, None] = DEFAULT_FALSE,
-        context_types: ContextTypes[CCT, UD, CD, BD] = None,
-    ):
-
-        if defaults and bot:
+    def __init__(self, **kwargs: Any):
+        if not kwargs.pop('builder_flag', False):
             warnings.warn(
-                'Passing defaults to an Updater has no effect when a Bot is passed '
-                'as well. Pass them to the Bot instead.',
-                TelegramDeprecationWarning,
-                stacklevel=2,
-            )
-        if arbitrary_callback_data is not DEFAULT_FALSE and bot:
-            warnings.warn(
-                'Passing arbitrary_callback_data to an Updater has no '
-                'effect when a Bot is passed as well. Pass them to the Bot instead.',
+                '`Dispatcher` instances should be built via the `DispatcherBuilder`.',
+                UserWarning,
                 stacklevel=2,
             )
 
-        if dispatcher is None:
-            if (token is None) and (bot is None):
-                raise ValueError('`token` or `bot` must be passed')
-            if (token is not None) and (bot is not None):
-                raise ValueError('`token` and `bot` are mutually exclusive')
-            if (private_key is not None) and (bot is not None):
-                raise ValueError('`bot` and `private_key` are mutually exclusive')
+        self.user_sig_handler = cast(
+            Optional[Callable[[int, object], Any]], kwargs.pop('user_sig_handler')
+        )
+        self.dispatcher = cast(DT, kwargs.pop('dispatcher'))
+        if self.dispatcher:
+            self.bot = self.dispatcher.bot
+            self.update_queue = self.dispatcher.update_queue
+            self.__exception_event = self.dispatcher.exception_event
         else:
-            if bot is not None:
-                raise ValueError('`dispatcher` and `bot` are mutually exclusive')
-            if persistence is not None:
-                raise ValueError('`dispatcher` and `persistence` are mutually exclusive')
-            if use_context != dispatcher.use_context:
-                raise ValueError('`dispatcher` and `use_context` are mutually exclusive')
-            if context_types is not None:
-                raise ValueError('`dispatcher` and `context_types` are mutually exclusive')
-            if workers is not None:
-                raise ValueError('`dispatcher` and `workers` are mutually exclusive')
+            self.bot = cast(BT, kwargs.pop('bot'))
+            self.update_queue = cast(Queue, kwargs.pop('update_queue'))
+            self.__exception_event = cast(Event, kwargs.pop('exception_event'))
 
-        self.logger = logging.getLogger(__name__)
-        self._request = None
-
-        if dispatcher is None:
-            con_pool_size = workers + 4
-
-            if bot is not None:
-                self.bot = bot
-                if bot.request.con_pool_size < con_pool_size:
-                    self.logger.warning(
-                        'Connection pool of Request object is smaller than optimal value (%s)',
-                        con_pool_size,
-                    )
-            else:
-                # we need a connection pool the size of:
-                # * for each of the workers
-                # * 1 for Dispatcher
-                # * 1 for polling Updater (even if webhook is used, we can spare a connection)
-                # * 1 for JobQueue
-                # * 1 for main thread
-                if request_kwargs is None:
-                    request_kwargs = {}
-                if 'con_pool_size' not in request_kwargs:
-                    request_kwargs['con_pool_size'] = con_pool_size
-                self._request = Request(**request_kwargs)
-                self.bot = ExtBot(
-                    token,  # type: ignore[arg-type]
-                    base_url,
-                    base_file_url=base_file_url,
-                    request=self._request,
-                    private_key=private_key,
-                    private_key_password=private_key_password,
-                    defaults=defaults,
-                    arbitrary_callback_data=(
-                        False  # type: ignore[arg-type]
-                        if arbitrary_callback_data is DEFAULT_FALSE
-                        else arbitrary_callback_data
-                    ),
-                )
-            self.update_queue: Queue = Queue()
-            self.job_queue = JobQueue()
-            self.__exception_event = Event()
-            self.persistence = persistence
-            self.dispatcher = Dispatcher(
-                self.bot,
-                self.update_queue,
-                job_queue=self.job_queue,
-                workers=workers,
-                exception_event=self.__exception_event,
-                persistence=persistence,
-                use_context=use_context,
-                context_types=context_types,
-            )
-            self.job_queue.set_dispatcher(self.dispatcher)
-        else:
-            con_pool_size = dispatcher.workers + 4
-
-            self.bot = dispatcher.bot
-            if self.bot.request.con_pool_size < con_pool_size:
-                self.logger.warning(
-                    'Connection pool of Request object is smaller than optimal value (%s)',
-                    con_pool_size,
-                )
-            self.update_queue = dispatcher.update_queue
-            self.__exception_event = dispatcher.exception_event
-            self.persistence = dispatcher.persistence
-            self.job_queue = dispatcher.job_queue
-            self.dispatcher = dispatcher
-
-        self.user_sig_handler = user_sig_handler
         self.last_update_id = 0
         self.running = False
         self.is_idle = False
         self.httpd = None
         self.__lock = Lock()
         self.__threads: List[Thread] = []
+        self.logger = logging.getLogger(__name__)
 
     def __setattr__(self, key: str, value: object) -> None:
         if key.startswith('__'):
@@ -416,7 +214,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 self.running = True
 
                 # Create & start threads
-                self.job_queue.start()
                 dispatcher_ready = Event()
                 polling_ready = Event()
                 self._init_thread(self.dispatcher.start, "dispatcher", ready=dispatcher_ready)
@@ -540,7 +337,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 # Create & start threads
                 webhook_ready = Event()
                 dispatcher_ready = Event()
-                self.job_queue.start()
                 self._init_thread(self.dispatcher.start, "dispatcher", dispatcher_ready)
                 self._init_thread(
                     self._start_webhook,
@@ -812,7 +608,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
 
     def stop(self) -> None:
         """Stops the polling/webhook thread, the dispatcher and the job queue."""
-        self.job_queue.stop()
         with self.__lock:
             if self.running or self.dispatcher.has_running_threads:
                 self.logger.debug('Stopping Updater and Dispatcher...')
@@ -822,10 +617,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 self._stop_httpd()
                 self._stop_dispatcher()
                 self._join_threads()
-
-                # Stop the Request instance only if it was created by the Updater
-                if self._request:
-                    self._request.stop()
 
     @no_type_check
     def _stop_httpd(self) -> None:

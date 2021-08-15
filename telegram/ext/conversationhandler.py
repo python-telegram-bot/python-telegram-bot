@@ -24,7 +24,7 @@ import warnings
 import functools
 import datetime
 from threading import Lock
-from typing import TYPE_CHECKING, Dict, List, NoReturn, Optional, Union, Tuple, cast, ClassVar
+from typing import TYPE_CHECKING, Dict, List, NoReturn, Optional, Union, Tuple, cast, ClassVar, Any
 
 from telegram import Update
 from telegram.ext import (
@@ -41,7 +41,7 @@ from telegram.ext.utils.types import ConversationDict
 from telegram.ext.utils.types import CCT
 
 if TYPE_CHECKING:
-    from telegram.ext import Dispatcher, Job
+    from telegram.ext import Dispatcher, Job, JobQueue
 CheckUpdateType = Optional[Tuple[Tuple[int, ...], Handler, object]]
 
 
@@ -53,7 +53,7 @@ class _ConversationTimeoutContext:
         self,
         conversation_key: Tuple[int, ...],
         update: Update,
-        dispatcher: 'Dispatcher',
+        dispatcher: 'Dispatcher[Any, CCT, Any, Any, Any, JobQueue, Any]',
         callback_context: Optional[CallbackContext],
     ):
         self.conversation_key = conversation_key
@@ -485,7 +485,7 @@ class ConversationHandler(Handler[Update, CCT]):
     def _schedule_job(
         self,
         new_state: object,
-        dispatcher: 'Dispatcher',
+        dispatcher: 'Dispatcher[Any, CCT, Any, Any, Any, JobQueue, Any]',
         update: Update,
         context: Optional[CallbackContext],
         conversation_key: Tuple[int, ...],
@@ -494,7 +494,7 @@ class ConversationHandler(Handler[Update, CCT]):
             try:
                 # both job_queue & conversation_timeout are checked before calling _schedule_job
                 j_queue = dispatcher.job_queue
-                self.timeout_jobs[conversation_key] = j_queue.run_once(  # type: ignore[union-attr]
+                self.timeout_jobs[conversation_key] = j_queue.run_once(
                     self._trigger_timeout,
                     self.conversation_timeout,  # type: ignore[arg-type]
                     context=_ConversationTimeoutContext(

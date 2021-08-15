@@ -46,12 +46,12 @@ from telegram import TelegramError, Update
 from telegram.ext import BasePersistence, ContextTypes
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.handler import Handler
-import telegram.ext.extbot
+from telegram.ext.extbot import ExtBot
 from telegram.ext.callbackdatacache import CallbackDataCache
 from telegram.utils.deprecate import TelegramDeprecationWarning, set_new_attribute_deprecated
 from telegram.ext.utils.promise import Promise
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
-from telegram.ext.utils.types import CCT, UD, CD, BD
+from telegram.ext.utils.types import CCT, UD, CD, BD, BT, JQ, PT
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -123,27 +123,11 @@ class DispatcherHandlerStop(Exception):
         self.state = state
 
 
-class Dispatcher(Generic[CCT, UD, CD, BD]):
+class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
     """This class dispatches all kinds of updates to its registered handlers.
 
-    Args:
-        bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
-        update_queue (:obj:`Queue`): The synchronized queue that will contain the updates.
-        job_queue (:class:`telegram.ext.JobQueue`, optional): The :class:`telegram.ext.JobQueue`
-                instance to pass onto handler callbacks.
-        workers (:obj:`int`, optional): Number of maximum concurrent worker threads for the
-            ``@run_async`` decorator and :meth:`run_async`. Defaults to 4.
-        persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
-            store data that should be persistent over restarts.
-        use_context (:obj:`bool`, optional): If set to :obj:`True` uses the context based callback
-            API (ignored if `dispatcher` argument is used). Defaults to :obj:`True`.
-            **New users**: set this to :obj:`True`.
-        context_types (:class:`telegram.ext.ContextTypes`, optional): Pass an instance
-            of :class:`telegram.ext.ContextTypes` to customize the types used in the
-            ``context`` interface. If not passed, the defaults documented in
-            :class:`telegram.ext.ContextTypes` will be used.
-
-            .. versionadded:: 13.6
+    Note:
+        Must be initialized via :class:`telegram.ext.DispatcherBuilder`.
 
     Attributes:
         bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
@@ -157,10 +141,6 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
             store data that should be persistent over restarts.
-        context_types (:class:`telegram.ext.ContextTypes`): Container for the types used
-            in the ``context`` interface.
-
-            .. versionadded:: 13.6
 
     """
 
@@ -194,52 +174,24 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
     __singleton = None
     logger = logging.getLogger(__name__)
 
-    @overload
-    def __init__(
-        self: 'Dispatcher[CallbackContext[Dict, Dict, Dict], Dict, Dict, Dict]',
-        bot: 'Bot',
-        update_queue: Queue,
-        workers: int = 4,
-        exception_event: Event = None,
-        job_queue: 'JobQueue' = None,
-        persistence: BasePersistence = None,
-        use_context: bool = True,
-    ):
-        ...
+    def __init__(self, **kwargs: object):
+        if not kwargs.pop('builder_flag', False):
+            warnings.warn(
+                '`Dispatcher` instances should be built via the `DispatcherBuilder`.',
+                UserWarning,
+                stacklevel=2,
+            )
 
-    @overload
-    def __init__(
-        self: 'Dispatcher[CCT, UD, CD, BD]',
-        bot: 'Bot',
-        update_queue: Queue,
-        workers: int = 4,
-        exception_event: Event = None,
-        job_queue: 'JobQueue' = None,
-        persistence: BasePersistence = None,
-        use_context: bool = True,
-        context_types: ContextTypes[CCT, UD, CD, BD] = None,
-    ):
-        ...
+        self.bot = cast(BT, kwargs.pop('bot'))
+        self.update_queue = cast(Queue, kwargs.pop('update_queue'))
+        self.job_queue = cast(JQ, kwargs.pop('job_queue'))
+        self.workers = cast(int, kwargs.pop('workers'))
+        persistence = cast(PT, kwargs.pop('persistence'))
+        self.use_context = True
+        self.context_types = cast(ContextTypes[CCT, UD, CD, BD], kwargs.pop('context_types'))
+        self.__exception_event = cast(Event, kwargs.pop('__exception_event'))
 
-    def __init__(
-        self,
-        bot: 'Bot',
-        update_queue: Queue,
-        workers: int = 4,
-        exception_event: Event = None,
-        job_queue: 'JobQueue' = None,
-        persistence: BasePersistence = None,
-        use_context: bool = True,
-        context_types: ContextTypes[CCT, UD, CD, BD] = None,
-    ):
-        self.bot = bot
-        self.update_queue = update_queue
-        self.job_queue = job_queue
-        self.workers = workers
-        self.use_context = use_context
-        self.context_types = cast(ContextTypes[CCT, UD, CD, BD], context_types or ContextTypes())
-
-        if not use_context:
+        if not self.use_context:
             warnings.warn(
                 'Old Handler API is deprecated - see https://git.io/fxJuV for details',
                 TelegramDeprecationWarning,
@@ -276,15 +228,23 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                         f"bot_data must be of type {self.context_types.bot_data.__name__}"
                     )
             if self.persistence.store_data.callback_data:
-                self.bot = cast(telegram.ext.extbot.ExtBot, self.bot)
-                persistent_data = self.persistence.get_callback_data()
-                if persistent_data is not None:
-                    if not isinstance(persistent_data, tuple) and len(persistent_data) != 2:
-                        raise ValueError('callback_data must be a 2-tuple')
-                    self.bot.callback_data_cache = CallbackDataCache(
-                        self.bot,
-                        self.bot.callback_data_cache.maxsize,
-                        persistent_data=persistent_data,
+                if isinstance(self.bot, ExtBot):
+                    self.bot = cast(ExtBot, self.bot)  # type: ignore[assignment]
+                    persistent_data = self.persistence.get_callback_data()
+                    if persistent_data is not None:
+                        if not isinstance(persistent_data, tuple) and len(persistent_data) != 2:
+                            raise ValueError('callback_data must be a 2-tuple')
+                        self.bot.callback_data_cache = CallbackDataCache(
+                            self.bot,
+                            self.bot.callback_data_cache.maxsize,
+                            persistent_data=persistent_data,
+                        )
+                else:
+                    warnings.warn(
+                        'The persistence has callback_data stored, but the bot instance is not '
+                        'of type telegram.ext.ExtBot. Not applying the data.',
+                        UserWarning,
+                        stacklevel=2,
                     )
         else:
             self.persistence = None
@@ -300,7 +260,6 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         self.running = False
         """:obj:`bool`: Indicates if this dispatcher is running."""
         self.__stop_event = Event()
-        self.__exception_event = exception_event or Event()
         self.__async_queue: Queue = Queue()
         self.__async_threads: Set[Thread] = set()
 
@@ -443,7 +402,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
     def start(self, ready: Event = None) -> None:
         """Thread target of thread 'dispatcher'.
 
-        Runs in background and processes the update queue.
+        Runs in background and processes the update queue. Also starts :attr:`job_queue`, if set.
 
         Args:
             ready (:obj:`threading.Event`, optional): If specified, the event will be set once the
@@ -461,6 +420,8 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
             self.logger.error(msg)
             raise TelegramError(msg)
 
+        if self.job_queue:
+            self.job_queue.start()
         self._init_async_threads(str(uuid4()), self.workers)
         self.running = True
         self.logger.debug('Dispatcher started')
@@ -489,7 +450,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         self.logger.debug('Dispatcher thread stopped')
 
     def stop(self) -> None:
-        """Stops the thread."""
+        """Stops the thread and :attr:`job_queue`, if set. Also calls :meth:`update_persistence`."""
         if self.running:
             self.__stop_event.set()
             while self.running:
@@ -510,6 +471,12 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
             thr.join()
             self.__async_threads.remove(thr)
             self.logger.debug('async thread %s/%s has ended', i + 1, total)
+
+        if self.job_queue:
+            self.job_queue.stop()
+            self.logger.debug('JobQueue was shut down.')
+
+        self.update_persistence()
 
     @property
     def has_running_threads(self) -> bool:  # skipcq: PY-D0003
@@ -549,6 +516,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                     if check is not None and check is not False:
                         if not context and self.use_context:
                             context = self.context_types.context.from_update(update, self)
+                            print('constructed context')
                             context.refresh_data()
                         handled = True
                         sync_modes.append(handler.run_async)
@@ -563,6 +531,8 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
 
             # Dispatch any error.
             except Exception as exc:
+                print('failed to handle update')
+                print(exc)
                 try:
                     self.dispatch_error(update, exc)
                 except DispatcherHandlerStop:
@@ -680,21 +650,29 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                     user_ids = []
 
             if self.persistence.store_data.callback_data:
-                self.bot = cast(telegram.ext.extbot.ExtBot, self.bot)
-                try:
-                    self.persistence.update_callback_data(
-                        self.bot.callback_data_cache.persistence_data
-                    )
-                except Exception as exc:
+                if isinstance(self.bot, ExtBot):
                     try:
-                        self.dispatch_error(update, exc)
-                    except Exception:
-                        message = (
-                            'Saving callback data raised an error and an '
-                            'uncaught error was raised while handling '
-                            'the error with an error_handler'
+                        self.persistence.update_callback_data(
+                            self.bot.callback_data_cache.persistence_data
                         )
-                        self.logger.exception(message)
+                    except Exception as exc:
+                        try:
+                            self.dispatch_error(update, exc)
+                        except Exception:
+                            message = (
+                                'Saving callback data raised an error and an '
+                                'uncaught error was raised while handling '
+                                'the error with an error_handler'
+                            )
+                            self.logger.exception(message)
+                else:
+
+                    warnings.warn(
+                        'The persistence wants to store callback_data, but the bot instance is not'
+                        ' of type telegram.ext.ExtBot. Not storing the data.',
+                        UserWarning,
+                        stacklevel=2,
+                    )
             if self.persistence.store_data.bot_data:
                 try:
                     self.persistence.update_bot_data(self.bot_data)
