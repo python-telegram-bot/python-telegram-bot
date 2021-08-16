@@ -27,7 +27,6 @@ from queue import Empty, Queue
 from threading import BoundedSemaphore, Event, Lock, Thread, current_thread
 from time import sleep
 from typing import (
-    TYPE_CHECKING,
     Callable,
     DefaultDict,
     Dict,
@@ -37,7 +36,6 @@ from typing import (
     Union,
     Generic,
     TypeVar,
-    overload,
     cast,
 )
 from uuid import uuid4
@@ -53,9 +51,6 @@ from telegram.ext.utils.promise import Promise
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 from telegram.ext.utils.types import CCT, UD, CD, BD, BT, JQ, PT
 
-if TYPE_CHECKING:
-    from telegram import Bot
-    from telegram.ext import JobQueue
 
 DEFAULT_GROUP: int = 0
 
@@ -450,7 +445,10 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         self.logger.debug('Dispatcher thread stopped')
 
     def stop(self) -> None:
-        """Stops the thread and :attr:`job_queue`, if set. Also calls :meth:`update_persistence`."""
+        """Stops the thread and :attr:`job_queue`, if set.
+        Also calls :meth:`update_persistence` and :meth:`BasePersistence.flush` on
+        :attr:`persistence`, if set.
+        """
         if self.running:
             self.__stop_event.set()
             while self.running:
@@ -477,6 +475,8 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             self.logger.debug('JobQueue was shut down.')
 
         self.update_persistence()
+        if self.persistence:
+            self.persistence.flush()
 
     @property
     def has_running_threads(self) -> bool:  # skipcq: PY-D0003

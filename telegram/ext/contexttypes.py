@@ -21,7 +21,7 @@
 from typing import Type, Generic, overload, Dict  # pylint: disable=W0611
 
 from telegram.ext.callbackcontext import CallbackContext
-from telegram.ext.extbot import ExtBot
+from telegram.ext.extbot import ExtBot  # pylint: disable=W0611
 from telegram.ext.utils.types import CCT, UD, CD, BD
 
 

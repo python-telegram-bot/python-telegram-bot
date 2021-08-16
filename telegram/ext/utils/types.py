@@ -47,7 +47,7 @@ CCT = TypeVar('CCT', bound='CallbackContext')
 
 .. versionadded:: 13.6
 """
-DefaultContextType = CallbackContext[ExtBot, Dict, Dict, Dict]
+DefaultContextType = CallbackContext['ExtBot', Dict, Dict, Dict]
 """Type annotation for the `context` argument that's correct for the default settings.
 
 .. versionadded: 14.0

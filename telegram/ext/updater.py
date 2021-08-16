@@ -26,10 +26,8 @@ from signal import SIGABRT, SIGINT, SIGTERM, signal
 from threading import Event, Lock, Thread, current_thread
 from time import sleep
 from typing import (
-    TYPE_CHECKING,
     Any,
     Callable,
-    Dict,
     List,
     Optional,
     Tuple,
@@ -40,17 +38,14 @@ from typing import (
     cast,
 )
 
-from telegram import Bot, TelegramError
+from telegram import TelegramError
 from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized
-from telegram.ext import Dispatcher, JobQueue, ContextTypes, ExtBot
+from telegram.ext import Dispatcher
 from telegram.utils.deprecate import TelegramDeprecationWarning, set_new_attribute_deprecated
-from telegram.utils.helpers import get_signal_name, DEFAULT_FALSE, DefaultValue
-from telegram.utils.request import Request
-from telegram.ext.utils.types import CCT, UD, CD, BD, BT
+from telegram.utils.helpers import get_signal_name
+from telegram.ext.utils.types import BT
 from telegram.ext.utils.webhookhandler import WebhookAppClass, WebhookServer
 
-if TYPE_CHECKING:
-    from telegram.ext import BasePersistence, Defaults
 
 DT = TypeVar('DT', bound=Union[None, Dispatcher])
 
@@ -519,18 +514,16 @@ class Updater(Generic[BT, DT]):
             webhook_url = self._gen_webhook_url(listen, port, url_path)
 
         # We pass along the cert to the webhook if present.
-        cert_file = open(cert, 'rb') if cert is not None else None
-        self._bootstrap(
-            max_retries=bootstrap_retries,
-            drop_pending_updates=drop_pending_updates,
-            webhook_url=webhook_url,
-            allowed_updates=allowed_updates,
-            cert=cert_file,
-            ip_address=ip_address,
-            max_connections=max_connections,
-        )
-        if cert_file is not None:
-            cert_file.close()
+        with open(cert, 'rb') if cert is not None else None as cert_file:
+            self._bootstrap(
+                max_retries=bootstrap_retries,
+                drop_pending_updates=drop_pending_updates,
+                webhook_url=webhook_url,
+                allowed_updates=allowed_updates,
+                cert=cert_file,
+                ip_address=ip_address,
+                max_connections=max_connections,
+            )
 
         self.httpd.serve_forever(ready=ready)
 
@@ -649,10 +642,6 @@ class Updater(Generic[BT, DT]):
             self.logger.info(
                 'Received signal %s (%s), stopping...', signum, get_signal_name(signum)
             )
-            if self.persistence:
-                # Update user_data, chat_data and bot_data before flushing
-                self.dispatcher.update_persistence()
-                self.persistence.flush()
             self.stop()
             if self.user_sig_handler:
                 self.user_sig_handler(signum, frame)

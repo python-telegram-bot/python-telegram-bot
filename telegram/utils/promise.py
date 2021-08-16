@@ -21,7 +21,7 @@ compatibility.
 """
 import warnings
 
-import telegram.ext.utils.promise as promise
+from telegram.ext.utils import promise
 from telegram.utils.deprecate import TelegramDeprecationWarning
 
 warnings.warn(
