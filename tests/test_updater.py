@@ -663,7 +663,7 @@ class TestUpdater:
         def user_signal_inc(signum, frame):
             temp_var['a'] = 1
 
-        updater.user_sig_handler = user_signal_inc
+        updater.user_signal_handler = user_signal_inc
         updater.start_polling(0.01)
         Thread(target=partial(self.signal_sender, updater=updater)).start()
         updater.idle()

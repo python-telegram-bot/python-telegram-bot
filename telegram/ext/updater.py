@@ -66,7 +66,7 @@ class Updater(Generic[BT, DT]):
 
     Attributes:
         bot (:class:`telegram.Bot`): The bot used with this Updater.
-        user_sig_handler (:obj:`function`): Optional. Function to be called when a signal is
+        user_signal_handler (:obj:`function`): Optional. Function to be called when a signal is
             received.
         update_queue (:obj:`Queue`): Queue for the updates.
         dispatcher (:class:`telegram.ext.Dispatcher`): Optional. Dispatcher that handles the
@@ -77,7 +77,7 @@ class Updater(Generic[BT, DT]):
 
     __slots__ = (
         'dispatcher',
-        'user_sig_handler',
+        'user_signal_handler',
         'bot',
         'logger',
         'update_queue',
@@ -100,8 +100,8 @@ class Updater(Generic[BT, DT]):
                 stacklevel=2,
             )
 
-        self.user_sig_handler = cast(
-            Optional[Callable[[int, object], Any]], kwargs.pop('user_sig_handler')
+        self.user_signal_handler = cast(
+            Optional[Callable[[int, object], Any]], kwargs.pop('user_signal_handler')
         )
         self.dispatcher = cast(DT, kwargs.pop('dispatcher'))
         if self.dispatcher:
@@ -643,8 +643,8 @@ class Updater(Generic[BT, DT]):
                 'Received signal %s (%s), stopping...', signum, get_signal_name(signum)
             )
             self.stop()
-            if self.user_sig_handler:
-                self.user_sig_handler(signum, frame)
+            if self.user_signal_handler:
+                self.user_signal_handler(signum, frame)
         else:
             self.logger.warning('Exiting immediately!')
             # pylint: disable=C0415,W0212

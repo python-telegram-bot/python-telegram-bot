@@ -53,20 +53,40 @@ if TYPE_CHECKING:
 # leveraging generics and therefore need a number of type variables.
 ODT = TypeVar('ODT', bound=Union[None, Dispatcher])
 DT = TypeVar('DT', bound=Dispatcher)
-InputBT = TypeVar('InputBT', bound=Bot)
-InputJQ = TypeVar('InputJQ', bound=Union[None, JobQueue])
-InputPT = TypeVar('InputPT', bound=Union[None, 'BasePersistence'])
-InputDT = TypeVar('InputDT', bound=Union[None, Dispatcher])
-InputCCT = TypeVar('InputCCT', bound='CallbackContext')
-InputUD = TypeVar('InputUD')
-InputCD = TypeVar('InputCD')
-InputBD = TypeVar('InputBD')
+InBT = TypeVar('InBT', bound=Bot)
+InJQ = TypeVar('InJQ', bound=Union[None, JobQueue])
+InPT = TypeVar('InPT', bound=Union[None, 'BasePersistence'])
+InDT = TypeVar('InDT', bound=Union[None, Dispatcher])
+InCCT = TypeVar('InCCT', bound='CallbackContext')
+InUD = TypeVar('InUD')
+InCD = TypeVar('InCD')
+InBD = TypeVar('InBD')
 DefCCT = DefaultContextType  # type: ignore[misc]
 BuilderType = TypeVar('BuilderType', bound='_BaseBuilder')
 CT = TypeVar('CT', bound=Callable[..., Any])
 
 if TYPE_CHECKING:
     InitBaseBuilder = _BaseBuilder[  # noqa: F821  # pylint: disable=E0601
+        Dispatcher[ExtBot, DefCCT, Dict, Dict, Dict, JobQueue, None],
+        ExtBot,
+        DefCCT,
+        Dict,
+        Dict,
+        Dict,
+        JobQueue,
+        None,
+    ]
+    InitUpdaterBuilder = UpdaterBuilder[  # noqa: F821  # pylint: disable=E0601
+        Dispatcher[ExtBot, DefCCT, Dict, Dict, Dict, JobQueue, None],
+        ExtBot,
+        DefCCT,
+        Dict,
+        Dict,
+        Dict,
+        JobQueue,
+        None,
+    ]
+    InitDispatcherBuilder = DispatcherBuilder[  # noqa: F821  # pylint: disable=E0601
         Dispatcher[ExtBot, DefCCT, Dict, Dict, Dict, JobQueue, None],
         ExtBot,
         DefCCT,
@@ -156,8 +176,8 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         self.__context_types_was_set = False
         self.__dispatcher: Optional['Dispatcher'] = None
         self.__dispatcher_was_set = False
-        self.__user_sig_handler: Optional[Callable[[int, object], Any]] = None
-        self.__user_sig_handler_was_set = False
+        self.__user_signal_handler: Optional[Callable[[int, object], Any]] = None
+        self.__user_signal_handler_was_set = False
 
     def _build_bot(self) -> Bot:
         if self.__token_was_set is False:
@@ -309,8 +329,8 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     def _bot(
         self: '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, '
         'JQ, PT]',
-        bot: InputBT,
-    ) -> '_BaseBuilder[Dispatcher[InputBT, CCT, UD, CD, BD, JQ, PT], InputBT, CCT, UD, CD, BD, JQ, PT]':
+        bot: InBT,
+    ) -> '_BaseBuilder[Dispatcher[InBT, CCT, UD, CD, BD, JQ, PT], InBT, CCT, UD, CD, BD, JQ, PT]':
         for attr, error in _BOT_CHECKS:
             if getattr(self, f'__{attr}'):
                 raise self._exception_builder('bot', error)
@@ -345,8 +365,8 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     @_check_if_already_set
     def _job_queue(
         self: '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
-        job_queue: InputJQ,
-    ) -> '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, InputJQ, PT], BT, CCT, UD, CD, BD, InputJQ, PT]':
+        job_queue: InJQ,
+    ) -> '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, InJQ, PT], BT, CCT, UD, CD, BD, InJQ, PT]':
         if self.__dispatcher:
             raise self._exception_builder('job_queue', 'Dispatcher instance')
         self.__job_queue = job_queue
@@ -356,8 +376,8 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     @_check_if_already_set
     def _persistence(
         self: '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
-        persistence: InputPT,
-    ) -> '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, InputPT], BT, CCT, UD, CD, BD, JQ, InputPT]':
+        persistence: InPT,
+    ) -> '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, InPT], BT, CCT, UD, CD, BD, JQ, InPT]':
         if self.__dispatcher:
             raise self._exception_builder('persistence', 'Dispatcher instance')
         self.__persistence = persistence
@@ -367,8 +387,8 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     @_check_if_already_set
     def _context_types(
         self: '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
-        context_types: 'ContextTypes[InputCCT, InputUD, InputCD, InputBD]',
-    ) -> '_BaseBuilder[Dispatcher[BT, InputCCT, InputUD, InputCD, InputBD, JQ, PT], BT, InputCCT, InputUD, InputCD, InputBD, JQ, PT]':
+        context_types: 'ContextTypes[InCCT, InUD, InCD, InBD]',
+    ) -> '_BaseBuilder[Dispatcher[BT, InCCT, InUD, InCD, InBD, JQ, PT], BT, InCCT, InUD, InCD, InBD, JQ, PT]':
         if self.__dispatcher:
             raise self._exception_builder('context_types', 'Dispatcher instance')
         self.__context_types = context_types
@@ -383,14 +403,14 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
 
     @overload
     def _dispatcher(
-        self: BuilderType, dispatcher: Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]
-    ) -> '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]':
+        self: BuilderType, dispatcher: Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]
+    ) -> '_BaseBuilder[Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT], InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]':
         ...
 
     @_check_if_already_set  # type: ignore[misc]
     def _dispatcher(
-        self: BuilderType, dispatcher: Optional[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]]
-    ) -> '_BaseBuilder[Optional[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]], BT, CCT, UD, CD, BD, JQ, PT]':
+        self: BuilderType, dispatcher: Optional[Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]]
+    ) -> '_BaseBuilder[Optional[Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]], InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]':
         for attr, error in _DISPATCHER_CHECKS:
             if getattr(self, f'__{attr}'):
                 raise self._exception_builder('dispatcher', error)
@@ -399,11 +419,181 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         return self
 
     @_check_if_already_set
-    def _user_sig_handler(
-        self: BuilderType, user_sig_handler: Callable[[int, object], Any]
+    def _user_signal_handler(
+        self: BuilderType, user_signal_handler: Callable[[int, object], Any]
     ) -> BuilderType:
         if self.__dispatcher:
-            raise self._exception_builder('user_sig_handler', 'Dispatcher instance')
-        self.__user_sig_handler = user_sig_handler
-        self.__user_sig_handler_was_set = True
+            raise self._exception_builder('user_signal_handler', 'Dispatcher instance')
+        self.__user_signal_handler = user_signal_handler
+        self.__user_signal_handler_was_set = True
         return self
+
+
+class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
+    # The init is just here for mypy
+    def __init__(self: 'InitDispatcherBuilder'):
+        super().__init__()
+
+    def build(
+        self: 'DispatcherBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]',
+    ) -> Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]:
+        return self._build_dispatcher()
+
+    def token(self: BuilderType, token: str) -> BuilderType:
+        return self._token(token)
+
+    def base_url(self: BuilderType, base_url: str) -> BuilderType:
+        return self._base_url(base_url)
+
+    def base_file_url(self: BuilderType, base_file_url: str) -> BuilderType:
+        return self._base_file_url(base_file_url)
+
+    def request_kwargs(self: BuilderType, request_kwargs: Dict[str, Any]) -> BuilderType:
+        return self._request_kwargs(request_kwargs)
+
+    def request(self: BuilderType, request: Request) -> BuilderType:
+        return self._request(request)
+
+    def private_key(self: BuilderType, private_key: bytes) -> BuilderType:
+        return self._private_key(private_key)
+
+    def private_key_password(self: BuilderType, private_key_password: bytes) -> BuilderType:
+        return self._private_key_password(private_key_password)
+
+    def defaults(self: BuilderType, defaults: 'Defaults') -> BuilderType:
+        return self._defaults(defaults)
+
+    def arbitrary_callback_data(
+        self: BuilderType, arbitrary_callback_data: Union[bool, int]
+    ) -> BuilderType:
+        return self._arbitrary_callback_data(arbitrary_callback_data)
+
+    def bot(
+        self: 'DispatcherBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, '
+        'JQ, PT]',
+        bot: InBT,
+    ) -> 'DispatcherBuilder[Dispatcher[InBT, CCT, UD, CD, BD, JQ, PT], InBT, CCT, UD, CD, BD, JQ, PT]':
+        return self._bot(bot)  # type: ignore[return-value]
+
+    def update_queue(self: BuilderType, update_queue: Queue) -> BuilderType:
+        return self._update_queue(update_queue)
+
+    def workers(self: BuilderType, workers: int) -> BuilderType:
+        return self._workers(workers)
+
+    def exception_event(self: BuilderType, exception_event: Event) -> BuilderType:
+        return self._exception_event(exception_event)
+
+    def job_queue(
+        self: 'DispatcherBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
+        job_queue: InJQ,
+    ) -> 'DispatcherBuilder[Dispatcher[BT, CCT, UD, CD, BD, InJQ, PT], BT, CCT, UD, CD, BD, InJQ, PT]':
+        return self._job_queue(job_queue)  # type: ignore[return-value]
+
+    def persistence(
+        self: 'DispatcherBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
+        persistence: InPT,
+    ) -> 'DispatcherBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, InPT], BT, CCT, UD, CD, BD, JQ, InPT]':
+        return self._persistence(persistence)  # type: ignore[return-value]
+
+    def context_types(
+        self: 'DispatcherBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
+        context_types: 'ContextTypes[InCCT, InUD, InCD, InBD]',
+    ) -> 'DispatcherBuilder[Dispatcher[BT, InCCT, InUD, InCD, InBD, JQ, PT], BT, InCCT, InUD, InCD, InBD, JQ, PT]':
+        return self._context_types(context_types)  # type: ignore[return-value]
+
+
+class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
+    # The init is just here for mypy
+    def __init__(self: 'InitUpdaterBuilder'):
+        super().__init__()
+
+    def build(
+        self: 'UpdaterBuilder[ODT, BT, Any, Any, Any, Any, Any, Any]',
+    ) -> Updater[BT, ODT]:
+        return self._build_updater()
+
+    def token(self: BuilderType, token: str) -> BuilderType:
+        return self._token(token)
+
+    def base_url(self: BuilderType, base_url: str) -> BuilderType:
+        return self._base_url(base_url)
+
+    def base_file_url(self: BuilderType, base_file_url: str) -> BuilderType:
+        return self._base_file_url(base_file_url)
+
+    def request_kwargs(self: BuilderType, request_kwargs: Dict[str, Any]) -> BuilderType:
+        return self._request_kwargs(request_kwargs)
+
+    def request(self: BuilderType, request: Request) -> BuilderType:
+        return self._request(request)
+
+    def private_key(self: BuilderType, private_key: bytes) -> BuilderType:
+        return self._private_key(private_key)
+
+    def private_key_password(self: BuilderType, private_key_password: bytes) -> BuilderType:
+        return self._private_key_password(private_key_password)
+
+    def defaults(self: BuilderType, defaults: 'Defaults') -> BuilderType:
+        return self._defaults(defaults)
+
+    def arbitrary_callback_data(
+        self: BuilderType, arbitrary_callback_data: Union[bool, int]
+    ) -> BuilderType:
+        return self._arbitrary_callback_data(arbitrary_callback_data)
+
+    def bot(
+        self: 'UpdaterBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, '
+        'JQ, PT]',
+        bot: InBT,
+    ) -> 'UpdaterBuilder[Dispatcher[InBT, CCT, UD, CD, BD, JQ, PT], InBT, CCT, UD, CD, BD, JQ, PT]':
+        return self._bot(bot)  # type: ignore[return-value]
+
+    def update_queue(self: BuilderType, update_queue: Queue) -> BuilderType:
+        return self._update_queue(update_queue)
+
+    def workers(self: BuilderType, workers: int) -> BuilderType:
+        return self._workers(workers)
+
+    def exception_event(self: BuilderType, exception_event: Event) -> BuilderType:
+        return self._exception_event(exception_event)
+
+    def job_queue(
+        self: 'UpdaterBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
+        job_queue: InJQ,
+    ) -> 'UpdaterBuilder[Dispatcher[BT, CCT, UD, CD, BD, InJQ, PT], BT, CCT, UD, CD, BD, InJQ, PT]':
+        return self._job_queue(job_queue)  # type: ignore[return-value]
+
+    def persistence(
+        self: 'UpdaterBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
+        persistence: InPT,
+    ) -> 'UpdaterBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, InPT], BT, CCT, UD, CD, BD, JQ, InPT]':
+        return self._persistence(persistence)  # type: ignore[return-value]
+
+    def context_types(
+        self: 'UpdaterBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
+        context_types: 'ContextTypes[InCCT, InUD, InCD, InBD]',
+    ) -> 'UpdaterBuilder[Dispatcher[BT, InCCT, InUD, InCD, InBD, JQ, PT], BT, InCCT, InUD, InCD, InBD, JQ, PT]':
+        return self._context_types(context_types)  # type: ignore[return-value]
+
+    @overload
+    def dispatcher(
+        self: 'UpdaterBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]', dispatcher: None
+    ) -> 'UpdaterBuilder[None, BT, CCT, UD, CD, BD, JQ, PT]':
+        ...
+
+    @overload
+    def dispatcher(
+        self: BuilderType, dispatcher: Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]
+    ) -> 'UpdaterBuilder[Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT], InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]':
+        ...
+
+    def dispatcher(  # type: ignore[misc]
+        self: BuilderType, dispatcher: Optional[Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]]
+    ) -> 'UpdaterBuilder[Optional[Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]], InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]':
+        return self._dispatcher(dispatcher)  # type: ignore[return-value]
+
+    def user_signal_handler(
+        self: BuilderType, user_signal_handler: Callable[[int, object], Any]
+    ) -> BuilderType:
+        return self._user_signal_handler(user_signal_handler)
