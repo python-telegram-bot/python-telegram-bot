@@ -23,8 +23,7 @@
 from typing import TypeVar, TYPE_CHECKING, Tuple, List, Dict, Any, Optional, Union
 
 if TYPE_CHECKING:
-    # noqa: F401
-    from telegram.ext import CallbackContext, JobQueue, BasePersistence, ExtBot
+    from telegram.ext import CallbackContext, JobQueue, BasePersistence, ExtBot  # noqa: F401
     from telegram import Bot
 
 
@@ -47,11 +46,17 @@ CCT = TypeVar('CCT', bound='CallbackContext')
 
 .. versionadded:: 13.6
 """
-DefaultContextType = CallbackContext['ExtBot', Dict, Dict, Dict]
-"""Type annotation for the `context` argument that's correct for the default settings.
+if TYPE_CHECKING:
+    DefaultContextType = CallbackContext[  # type: ignore[misc]  # pylint: disable=E0601
+        'ExtBot', Dict, Dict, Dict
+    ]
+else:
+    # Somewhat silly workaround so that the import doesn't only work while type checking
+    DefaultContextType = "CallbackContext['ExtBot', Dict, Dict, Dict]"  # pylint: disable-all
+    """Type annotation for the `context` argument that's correct for the default settings.
 
-.. versionadded: 14.0
-"""
+    .. versionadded: 14.0
+    """
 BT = TypeVar('BT', bound='Bot')
 """Type of the bot.
 

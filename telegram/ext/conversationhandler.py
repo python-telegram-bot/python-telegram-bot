@@ -24,7 +24,18 @@ import warnings
 import functools
 import datetime
 from threading import Lock
-from typing import TYPE_CHECKING, Dict, List, NoReturn, Optional, Union, Tuple, cast, ClassVar, Any
+from typing import (  # pylint: disable=W0611  # for the "Any" import
+    TYPE_CHECKING,
+    Dict,
+    List,
+    NoReturn,
+    Optional,
+    Union,
+    Tuple,
+    cast,
+    ClassVar,
+    Any,
+)
 
 from telegram import Update
 from telegram.ext import (

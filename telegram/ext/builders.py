@@ -16,6 +16,10 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+#
+# Some of the type hints are just ridiculously long ...
+# flake8: noqa: E501
+# pylint: disable=C0301
 """This module contains the Builder classes for the telegram.ext module."""
 from queue import Queue
 from threading import Event
@@ -57,7 +61,7 @@ InputCCT = TypeVar('InputCCT', bound='CallbackContext')
 InputUD = TypeVar('InputUD')
 InputCD = TypeVar('InputCD')
 InputBD = TypeVar('InputBD')
-DefCCT = DefaultContextType
+DefCCT = DefaultContextType  # type: ignore[misc]
 BuilderType = TypeVar('BuilderType', bound='_BaseBuilder')
 CT = TypeVar('CT', bound=Callable[..., Any])
 
@@ -110,9 +114,12 @@ _DISPATCHER_CHECKS = [
 # Base class for all builders. We do this mainly to reduce code duplication, because e.g.
 # the UpdaterBuilder has all method that the DispatcherBuilder has
 class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
+    # pylint reports false positives here:
+    # pylint: disable=W0238
+
     def __init__(self: 'InitBaseBuilder'):
         # Instead of the *_was_set variables, we could work with e.g. __token = DEFAULT_NONE.
-        # However, this would make type hinting a lot more involved and reasonable type hinting
+        # However, this would make type hinting a *lot* more involved and reasonable type hinting
         # accuracy is valuable for the builder classes.
 
         self.__token: str = ''
@@ -380,7 +387,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     ) -> '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]':
         ...
 
-    @_check_if_already_set
+    @_check_if_already_set  # type: ignore[misc]
     def _dispatcher(
         self: BuilderType, dispatcher: Optional[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]]
     ) -> '_BaseBuilder[Optional[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]], BT, CCT, UD, CD, BD, JQ, PT]':
