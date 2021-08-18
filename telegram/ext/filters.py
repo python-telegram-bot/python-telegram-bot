@@ -36,6 +36,7 @@ from typing import (
     Union,
     cast,
     NoReturn,
+    TYPE_CHECKING,
 )
 
 from telegram import Chat, Message, MessageEntity, Update, User
@@ -115,6 +116,7 @@ class BaseFilter(ABC):
     __slots__ = ('_name', '_data_filter')
 
     def __new__(cls, *args: object, **kwargs: object) -> 'BaseFilter':  # pylint: disable=W0613
+        # We do this here instead of in a __init__ so filter don't have to call __init__ or super()
         instance = super().__new__(cls)
         instance._name = None
         instance._data_filter = False
