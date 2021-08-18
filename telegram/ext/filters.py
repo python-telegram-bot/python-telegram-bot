@@ -36,7 +36,6 @@ from typing import (
     Union,
     cast,
     NoReturn,
-    TYPE_CHECKING,
 )
 
 from telegram import Chat, Message, MessageEntity, Update, User
