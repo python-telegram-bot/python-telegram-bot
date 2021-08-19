@@ -35,7 +35,6 @@ import pickle
 from collections import defaultdict
 from collections.abc import Container
 from time import sleep
-from sys import version_info as py_ver
 
 import pytest
 
@@ -242,16 +241,13 @@ class TestBasePersistence:
     def reset(self):
         self.test_flag = False
 
-    def test_slot_behaviour(self, bot_persistence, mro_slots, recwarn):
+    def test_slot_behaviour(self, bot_persistence, mro_slots):
         inst = bot_persistence
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
         # assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
         # The below test fails if the child class doesn't define __slots__ (not a cause of concern)
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-        inst.store_data, inst.custom = {}, "custom persistence shouldn't warn"
-        assert len(recwarn) == 0, recwarn.list
-        assert '__dict__' not in BasePersistence.__slots__ if py_ver < (3, 7) else True, 'has dict'
 
     def test_creation(self, base_persistence):
         assert base_persistence.store_data.chat_data
@@ -1040,14 +1036,11 @@ class CustomMapping(defaultdict):
 
 
 class TestPicklePersistence:
-    def test_slot_behaviour(self, mro_slots, recwarn, pickle_persistence):
+    def test_slot_behaviour(self, mro_slots, pickle_persistence):
         inst = pickle_persistence
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        # assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-        inst.custom, inst.store_data = 'should give warning', {}
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_pickle_behaviour_with_slots(self, pickle_persistence):
         bot_data = pickle_persistence.get_bot_data()
@@ -1958,10 +1951,7 @@ class TestDictPersistence:
         inst = DictPersistence()
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        # assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-        inst.custom, inst.store_data = 'should give warning', {}
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_no_json_given(self):
         dict_persistence = DictPersistence()

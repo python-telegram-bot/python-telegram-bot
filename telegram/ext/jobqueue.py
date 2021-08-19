@@ -31,7 +31,6 @@ from apscheduler.job import Job as APSJob
 
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.utils.types import JSONDict
-from telegram.utils.deprecate import set_new_attribute_deprecated
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -50,7 +49,7 @@ class JobQueue:
 
     """
 
-    __slots__ = ('_dispatcher', 'logger', 'scheduler', '__dict__')
+    __slots__ = ('_dispatcher', 'logger', 'scheduler')
 
     def __init__(self) -> None:
         self._dispatcher: 'Dispatcher' = None  # type: ignore[assignment]
@@ -66,9 +65,6 @@ class JobQueue:
 
         logging.getLogger('apscheduler.executors.default').addFilter(aps_log_filter)
         self.scheduler.add_listener(self._dispatch_error, EVENT_JOB_ERROR)
-
-    def __setattr__(self, key: str, value: object) -> None:
-        set_new_attribute_deprecated(self, key, value)
 
     def _build_args(self, job: 'Job') -> List[Union[CallbackContext, 'Bot', 'Job']]:
         if self._dispatcher.use_context:
@@ -560,7 +556,6 @@ class Job:
         '_removed',
         '_enabled',
         'job',
-        '__dict__',
     )
 
     def __init__(
@@ -581,9 +576,6 @@ class Job:
         self._enabled = False
 
         self.job = cast(APSJob, job)  # skipcq: PTC-W0052
-
-    def __setattr__(self, key: str, value: object) -> None:
-        set_new_attribute_deprecated(self, key, value)
 
     def run(self, dispatcher: 'Dispatcher') -> None:
         """Executes the callback function independently of the jobs schedule."""

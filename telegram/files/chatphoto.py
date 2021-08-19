@@ -71,7 +71,6 @@ class ChatPhoto(TelegramObject):
         'small_file_id',
         'small_file_unique_id',
         'big_file_id',
-        '_id_attrs',
     )
 
     def __init__(

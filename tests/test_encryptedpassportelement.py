@@ -46,14 +46,11 @@ class TestEncryptedPassportElement:
     reverse_side = PassportFile('file_id', 50, 0)
     selfie = PassportFile('file_id', 50, 0)
 
-    def test_slot_behaviour(self, encrypted_passport_element, recwarn, mro_slots):
+    def test_slot_behaviour(self, encrypted_passport_element, mro_slots):
         inst = encrypted_passport_element
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-        inst.custom, inst.phone_number = 'should give warning', self.phone_number
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_expected_values(self, encrypted_passport_element):
         assert encrypted_passport_element.type == self.type_
