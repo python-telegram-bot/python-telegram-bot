@@ -98,7 +98,7 @@ if TYPE_CHECKING:
     ]
 
 
-def _check_if_already_set(func: CT) -> CT:
+def check_if_already_set(func: CT) -> CT:
     def _decorator(self, arg):  # type: ignore[no-untyped-def]
         arg_name = func.__name__.strip('_')
         if getattr(self, f'__{arg_name}_was_set') is True:
@@ -245,7 +245,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
             return RuntimeError(f'The parameter `{arg_1}` was already set.')
         return RuntimeError(f'The parameter `{arg_1}` can only be set, if the no {arg_2} was set.')
 
-    @_check_if_already_set
+    @check_if_already_set
     def _token(self: BuilderType, token: str) -> BuilderType:
         if self.__bot:
             raise self._exception_builder('token', 'bot instance')
@@ -255,7 +255,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         self.__token_was_set = True
         return self
 
-    @_check_if_already_set
+    @check_if_already_set
     def _base_url(self: BuilderType, base_url: str) -> BuilderType:
         if self.__bot:
             raise self._exception_builder('base_url', 'bot instance')
@@ -263,7 +263,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         self.__base_url_was_set = True
         return self
 
-    @_check_if_already_set
+    @check_if_already_set
     def _base_file_url(self: BuilderType, base_file_url: str) -> BuilderType:
         if self.__bot:
             raise self._exception_builder('_base_file_url', 'bot instance')
@@ -271,7 +271,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         self.__base_file_url_was_set = True
         return self
 
-    @_check_if_already_set
+    @check_if_already_set
     def _request_kwargs(self: BuilderType, request_kwargs: Dict[str, Any]) -> BuilderType:
         if self.__request:
             raise self._exception_builder('request_kwargs', 'Request instance')
@@ -281,7 +281,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         self.__request_kwargs_was_set = True
         return self
 
-    @_check_if_already_set
+    @check_if_already_set
     def _request(self: BuilderType, request: Request) -> BuilderType:
         if self.__request_kwargs:
             raise self._exception_builder('request', 'request_kwargs')
@@ -291,7 +291,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         self.__request_was_set = True
         return self
 
-    @_check_if_already_set
+    @check_if_already_set
     def _private_key(self: BuilderType, private_key: bytes) -> BuilderType:
         if self.__bot:
             raise self._exception_builder('private_key', 'bot instance')
@@ -299,7 +299,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         self.__private_key_was_set = True
         return self
 
-    @_check_if_already_set
+    @check_if_already_set
     def _private_key_password(self: BuilderType, private_key_password: bytes) -> BuilderType:
         if self.__bot:
             raise self._exception_builder('private_key_password', 'bot instance')
@@ -307,7 +307,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         self.__private_key_password_was_set = True
         return self
 
-    @_check_if_already_set
+    @check_if_already_set
     def _defaults(self: BuilderType, defaults: 'Defaults') -> BuilderType:
         if self.__bot:
             raise self._exception_builder('defaults', 'bot instance')
@@ -315,7 +315,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         self.__defaults_was_set = True
         return self
 
-    @_check_if_already_set
+    @check_if_already_set
     def _arbitrary_callback_data(
         self: BuilderType, arbitrary_callback_data: Union[bool, int]
     ) -> BuilderType:
@@ -325,7 +325,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         self.__arbitrary_callback_data_was_set = True
         return self
 
-    @_check_if_already_set
+    @check_if_already_set
     def _bot(
         self: '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, '
         'JQ, PT]',
@@ -338,7 +338,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         self.__bot_was_set = True
         return self  # type: ignore[return-value]
 
-    @_check_if_already_set
+    @check_if_already_set
     def _update_queue(self: BuilderType, update_queue: Queue) -> BuilderType:
         if self.__dispatcher:
             raise self._exception_builder('update_queue', 'Dispatcher instance')
@@ -346,7 +346,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         self.__update_queue_was_set = True
         return self
 
-    @_check_if_already_set
+    @check_if_already_set
     def _workers(self: BuilderType, workers: int) -> BuilderType:
         if self.__dispatcher:
             raise self._exception_builder('workers', 'Dispatcher instance')
@@ -354,7 +354,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         self.__workers_was_set = True
         return self
 
-    @_check_if_already_set
+    @check_if_already_set
     def _exception_event(self: BuilderType, exception_event: Event) -> BuilderType:
         if self.__dispatcher:
             raise self._exception_builder('exception_event', 'Dispatcher instance')
@@ -362,7 +362,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         self.__exception_event_was_set = True
         return self
 
-    @_check_if_already_set
+    @check_if_already_set
     def _job_queue(
         self: '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
         job_queue: InJQ,
@@ -373,7 +373,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         self.__job_queue_was_set = True
         return self  # type: ignore[return-value]
 
-    @_check_if_already_set
+    @check_if_already_set
     def _persistence(
         self: '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
         persistence: InPT,
@@ -384,7 +384,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         self.__persistence_was_set = True
         return self  # type: ignore[return-value]
 
-    @_check_if_already_set
+    @check_if_already_set
     def _context_types(
         self: '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
         context_types: 'ContextTypes[InCCT, InUD, InCD, InBD]',
@@ -407,9 +407,10 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     ) -> '_BaseBuilder[Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT], InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]':
         ...
 
-    @_check_if_already_set  # type: ignore[misc]
+    @check_if_already_set  # type: ignore[misc]
     def _dispatcher(
-        self: BuilderType, dispatcher: Optional[Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]]
+        self: BuilderType,
+        dispatcher: Optional[Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]],
     ) -> '_BaseBuilder[Optional[Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]], InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]':
         for attr, error in _DISPATCHER_CHECKS:
             if getattr(self, f'__{attr}'):
@@ -418,7 +419,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         self.__dispatcher_was_set = True
         return self
 
-    @_check_if_already_set
+    @check_if_already_set
     def _user_signal_handler(
         self: BuilderType, user_signal_handler: Callable[[int, object], Any]
     ) -> BuilderType:
@@ -430,6 +431,33 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
 
 
 class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
+    """This class serves as initializer for :class:`telegram.ext.Dispatcher` via the so called
+    `builder pattern`_. To build a :class:`telegram.ext.Dispatcher`, one first initializes an
+    instance of this class. Arguments for the :class:`telegram.ext.Dispatcher` to build are then
+    added by subsequently calling the methods of the builder. Finally, the
+    :class:`telegram.ext.Dispatcher` is built by calling :meth:`build`. In the simplest case this
+    can look like the following example.
+
+    Example:
+        .. code:: python
+
+            dispatcher = DispatcherBuilder().token('TOKEN').build()
+
+    Please see the description of the individual methods for information on which arguments can be
+    set and what the defaults are when not called. When no default is mentioned, the arguent will
+    not be used by default.
+
+    Note:
+        * Each method can be called at most once, e.g. you can't override arguments that were
+          already set.
+        * Some arguments are mutually exclusive. E.g. after calling :meth:`token`, you can't set
+          a custom bot with :meth:`bot` and vice versa.
+        * Unless a custom :class:`telegram.Bot` instance is set via :meth:`bot`, :meth:`build` will
+          use :class:`telegram.ext.ExtBot` for the bot.
+
+    .. _`builder pattern`: https://en.wikipedia.org/wiki/Builder_pattern.
+    """
+
     # The init is just here for mypy
     def __init__(self: 'InitDispatcherBuilder'):
         super().__init__()
@@ -437,35 +465,148 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     def build(
         self: 'DispatcherBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]',
     ) -> Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]:
+        """Builds a :class:`telegram.ext.Dispatcher` with the provided arguments.
+
+        Returns:
+            :class:`telegram.ext.Dispatcher`
+
+        """
         return self._build_dispatcher()
 
     def token(self: BuilderType, token: str) -> BuilderType:
+        """Sets the token to be used for :attr:`telegram.ext.Dispatcher.bot`.
+
+        Args:
+            token (:obj:`str`): The token.
+
+        Returns:
+            :class:`DispatcherBuilder`: The same builder with the updated argument.
+        """
         return self._token(token)
 
     def base_url(self: BuilderType, base_url: str) -> BuilderType:
+        """Sets the base URL to be used for :attr:`telegram.ext.Dispatcher.bot`. If not called,
+        will default to ``'https://api.telegram.org/bot'``.
+
+        .. seealso:: :attr:`telegram.Bot.base_url`, `Local Bot API Server <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Local-Bot-API-Server>`_
+
+        Args:
+            base_url (:obj:`str`): The URL.
+
+        Returns:
+            :class:`DispatcherBuilder`: The same builder with the updated argument.
+        """
         return self._base_url(base_url)
 
     def base_file_url(self: BuilderType, base_file_url: str) -> BuilderType:
+        """Sets the base file URL to be used for :attr:`telegram.ext.Dispatcher.bot`. If not
+        called, will default to ``'https://api.telegram.org/file/bot'``.
+
+        .. seealso:: :attr:`telegram.Bot.base_file_url`, `Local Bot API Server <https://github.com\
+            /python-telegram-bot/python-telegram-bot/wiki/Local-Bot-API-Server>`_
+
+        Args:
+            base_file_url (:obj:`str`): The URL.
+
+        Returns:
+            :class:`DispatcherBuilder`: The same builder with the updated argument.
+        """
         return self._base_file_url(base_file_url)
 
     def request_kwargs(self: BuilderType, request_kwargs: Dict[str, Any]) -> BuilderType:
+        """Sets keyword arguments that will be passed to the :class:`telegram.utils.Request` object
+        that is created when :attr:`telegram.ext.Dispatcher.bot` is created. If not called, no
+        keyword arguments will be passed.
+
+        Args:
+            request_kwargs (Dict[:obj:`str`, :obj:`object`]): The keyword arguments.
+
+        Returns:
+            :class:`DispatcherBuilder`: The same builder with the updated argument.
+        """
         return self._request_kwargs(request_kwargs)
 
     def request(self: BuilderType, request: Request) -> BuilderType:
+        """Sets a :class:`telegram.utils.Request` object to be used for
+        :attr:`telegram.ext.Dispatcher.bot`.
+
+        Args:
+            request (:class:`telegram.utils.Request`): The request object.
+
+        Returns:
+            :class:`DispatcherBuilder`: The same builder with the updated argument.
+        """
         return self._request(request)
 
     def private_key(self: BuilderType, private_key: bytes) -> BuilderType:
+        """Sets the private key for decryption of telegram passport data to be used for
+        :attr:`telegram.ext.Dispatcher.bot`.
+
+        .. seealso:: `passportbot.py <https://github.com/python-telegram-bot/python-telegram-bot\
+            /tree/master/examples#passportbotpy>`_, `Telegram Passports <https://git.io/fAvYd>`_
+
+        Note:
+            Must be used together with :meth:`private_key_password`.
+
+        Args:
+            private_key (:obj:`bytes`): The private key.
+
+        Returns:
+            :class:`DispatcherBuilder`: The same builder with the updated argument.
+        """
         return self._private_key(private_key)
 
     def private_key_password(self: BuilderType, private_key_password: bytes) -> BuilderType:
+        """Sets the private key password for decryption of telegram passport data to be used for
+        :attr:`telegram.ext.Dispatcher.bot`.
+
+        .. seealso:: `passportbot.py <https://github.com/python-telegram-bot/python-telegram-bot\
+            /tree/master/examples#passportbotpy>`_, `Telegram Passports <https://git.io/fAvYd>`_
+
+        Note:
+            Must be used together with :meth:`private_key`.
+
+        Args:
+            private_key_password (:obj:`bytes`): The private key password.
+
+        Returns:
+            :class:`DispatcherBuilder`: The same builder with the updated argument.
+        """
         return self._private_key_password(private_key_password)
 
     def defaults(self: BuilderType, defaults: 'Defaults') -> BuilderType:
+        """Sets the :class:`telegram.ext.Defaults` object to be used for
+        :attr:`telegram.ext.Dispatcher.bot`.
+
+        .. seealso:: `Adding Defaults <https://git.io/J0FGR>`_
+
+        Args:
+            defaults (:class:`telegram.ext.Defaults`): The defaults.
+
+        Returns:
+            :class:`DispatcherBuilder`: The same builder with the updated argument.
+        """
         return self._defaults(defaults)
 
     def arbitrary_callback_data(
         self: BuilderType, arbitrary_callback_data: Union[bool, int]
     ) -> BuilderType:
+        """Specifies whether the :attr:`telegram.ext.Dispatcher.bot` should use arbitrary callback
+        data or how many keyboards should be stored in memory. If not called, no arbitrary callback
+        data will be used.
+
+        .. seealso:: `Arbitrary callback_data <https://git.io/JGBDI>`_,
+            `arbitrarycallbackdatabot.py <https://git.io/J0FBv>`_
+
+        Args:
+            arbitrary_callback_data (:obj:`bool` | :obj:`int`): If :obj:`True` is passed, the
+                default cache size of 1024 will be used. Pass an integer to specify a different
+                cache size.
+
+        Returns:
+            :class:`DispatcherBuilder`: The same builder with the updated argument.
+        """
         return self._arbitrary_callback_data(arbitrary_callback_data)
 
     def bot(
@@ -473,33 +614,119 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         'JQ, PT]',
         bot: InBT,
     ) -> 'DispatcherBuilder[Dispatcher[InBT, CCT, UD, CD, BD, JQ, PT], InBT, CCT, UD, CD, BD, JQ, PT]':
+        """Sets a :class:`telegram.Bot` instance to be used for
+        :attr:`telegram.ext.Dispatcher.bot`. Instances of subclasses like
+        :class:`telegram.ext.ExtBot` are also valid.
+
+        Args:
+            bot (:class:`telegram.Bot`): The bot.
+
+        Returns:
+            :class:`DispatcherBuilder`: The same builder with the updated argument.
+        """
         return self._bot(bot)  # type: ignore[return-value]
 
     def update_queue(self: BuilderType, update_queue: Queue) -> BuilderType:
+        """Sets a :class:`queue.Queue` instance to be used for
+        :attr:`telegram.ext.Dispatcher.update_queue`, i.e. the queue that the dispatcher will fetch
+        updates from. If not called, a queue will be instantiated.
+
+         .. seealso:: :attr:`telegram.ext.Updater.update_queue`,
+             :meth:`telegram.ext.UpdaterBuilder.update_queue`
+
+        Args:
+            update_queue (:class:`queue.Queue`): The queue.
+
+        Returns:
+            :class:`DispatcherBuilder`: The same builder with the updated argument.
+        """
         return self._update_queue(update_queue)
 
     def workers(self: BuilderType, workers: int) -> BuilderType:
+        """`Dummy text b/c this will be dropped anyway`"""
         return self._workers(workers)
 
     def exception_event(self: BuilderType, exception_event: Event) -> BuilderType:
+        """Sets a :class:`threading.Event` instance to be used for
+        :attr:`telegram.ext.Dispatcher.exception_event`. When this event is set, the dispatcher
+        will stop processing updates. If not called, an event will be instantiated.
+
+         .. seealso:: :attr:`telegram.ext.Updater.exception_event`,
+             :meth:`telegram.ext.UpdaterBuilder.exception_event`
+
+        Args:
+            exception_event (:class:`threading.Event`): The event.
+
+        Returns:
+            :class:`DispatcherBuilder`: The same builder with the updated argument.
+        """
         return self._exception_event(exception_event)
 
     def job_queue(
         self: 'DispatcherBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
         job_queue: InJQ,
     ) -> 'DispatcherBuilder[Dispatcher[BT, CCT, UD, CD, BD, InJQ, PT], BT, CCT, UD, CD, BD, InJQ, PT]':
+        """Sets a :class:`telegram.ext.JobQueue` instance to be used for
+        :attr:`telegram.ext.Dispatcher.job_queue`. If not called, a job queue will be instantiated.
+
+        .. seealso:: `JobQueue <https://git.io/J0FCN>`_, `timerbot.py <https://git.io/J0FWf>`_
+
+        Note:
+            * :meth:`telegram.ext.JobQueue.set_dispatcher` will be called automatically by
+              :meth:`build`.
+            * The job queue will be automatically started by :meth:`telegram.ext.Dispatcher.start`
+              and :meth:`telegram.ext.Dispatcher.stop`, respectively.
+            * When passing :obj:`None`,
+              :attr:`telegram.ext.ConversationHandler.conversation_timeout` can not be used, as
+              this uses :attr:`telegram.ext.Dispatcher.job_queue` internally.
+
+        Args:
+            job_queue (:class:`telegram.ext.JobQueue`, optional): The job queue. Pass :obj:`None`
+                if you don't want to use a job queue.
+
+        Returns:
+            :class:`DispatcherBuilder`: The same builder with the updated argument.
+        """
         return self._job_queue(job_queue)  # type: ignore[return-value]
 
     def persistence(
         self: 'DispatcherBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
         persistence: InPT,
     ) -> 'DispatcherBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, InPT], BT, CCT, UD, CD, BD, JQ, InPT]':
+        """Sets a :class:`telegram.ext.BasePersistence` instance to be used for
+        :attr:`telegram.ext.Dispatcher.persistence`.
+
+        .. seealso:: `Making your bot persistent <https://git.io/J0FWM>`_,
+            `persistentconversationbot.py <https://git.io/J0FW7>`_
+
+        Warning:
+            If a :class:`telegram.ext.ContextTypes` instance is set via :meth:`context_types`,
+            the persistence instance must use the same types!
+
+        Args:
+            persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence
+                instance.
+
+        Returns:
+            :class:`DispatcherBuilder`: The same builder with the updated argument.
+        """
         return self._persistence(persistence)  # type: ignore[return-value]
 
     def context_types(
         self: 'DispatcherBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
         context_types: 'ContextTypes[InCCT, InUD, InCD, InBD]',
     ) -> 'DispatcherBuilder[Dispatcher[BT, InCCT, InUD, InCD, InBD, JQ, PT], BT, InCCT, InUD, InCD, InBD, JQ, PT]':
+        """Sets a :class:`telegram.ext.ContextTypes` instance to be used for
+        :attr:`telegram.ext.Dispatcher.context_types`.
+
+        .. seealso:: `contexttypesbot.py <https://git.io/J0F8d>`_
+
+        Args:
+            context_types (:class:`telegram.ext.ContextTypes`, optional): The context types.
+
+        Returns:
+            :class:`DispatcherBuilder`: The same builder with the updated argument.
+        """
         return self._context_types(context_types)  # type: ignore[return-value]
 
 
@@ -589,7 +816,8 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         ...
 
     def dispatcher(  # type: ignore[misc]
-        self: BuilderType, dispatcher: Optional[Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]]
+        self: BuilderType,
+        dispatcher: Optional[Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]],
     ) -> 'UpdaterBuilder[Optional[Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]], InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]':
         return self._dispatcher(dispatcher)  # type: ignore[return-value]
 
