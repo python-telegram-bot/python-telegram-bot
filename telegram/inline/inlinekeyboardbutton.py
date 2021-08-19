@@ -121,7 +121,6 @@ class InlineKeyboardButton(TelegramObject):
         'pay',
         'switch_inline_query',
         'text',
-        '_id_attrs',
         'login_url',
     )
 

@@ -22,7 +22,7 @@ import pytest
 
 from telegram import Message, User, Chat, MessageEntity, Document, Update, Dice
 from telegram.ext import Filters, BaseFilter, MessageFilter, UpdateFilter
-from sys import version_info as py_ver
+
 import inspect
 import re
 
@@ -61,7 +61,7 @@ def base_class(request):
 
 
 class TestFilters:
-    def test_all_filters_slot_behaviour(self, recwarn, mro_slots):
+    def test_all_filters_slot_behaviour(self, mro_slots):
         """
         Use depth first search to get all nested filters, and instantiate them (which need it) with
         the correct number of arguments, then test each filter separately. Also tests setting
@@ -100,17 +100,10 @@ class TestFilters:
             else:
                 inst = cls() if args < 1 else cls(*['blah'] * args)  # unpack variable no. of args
 
+            assert len(mro_slots(inst)) == len(set(mro_slots(inst))), f"same slot in {name}"
+
             for attr in cls.__slots__:
                 assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}' for {name}"
-                assert not inst.__dict__, f"got missing slot(s): {inst.__dict__} for {name}"
-                assert len(mro_slots(inst)) == len(set(mro_slots(inst))), f"same slot in {name}"
-
-            with pytest.warns(TelegramDeprecationWarning, match='custom attributes') as warn:
-                inst.custom = 'should give warning'
-                if not warn:
-                    pytest.fail(f"Filter {name!r} didn't warn when setting custom attr")
-
-        assert '__dict__' not in BaseFilter.__slots__ if py_ver < (3, 7) else True, 'dict in abc'
 
         class CustomFilter(MessageFilter):
             def filter(self, message: Message):
@@ -118,9 +111,6 @@ class TestFilters:
 
         with pytest.warns(None):
             CustomFilter().custom = 'allowed'  # Test setting custom attr to custom filters
-
-        with pytest.warns(TelegramDeprecationWarning, match='custom attributes'):
-            Filters().custom = 'raise warning'
 
     def test_filters_all(self, update):
         assert Filters.all(update)

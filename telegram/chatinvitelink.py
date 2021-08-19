@@ -92,7 +92,6 @@ class ChatInviteLink(TelegramObject):
         'name',
         'creates_join_request',
         'pending_join_request_count',
-        '_id_attrs',
     )
 
     def __init__(

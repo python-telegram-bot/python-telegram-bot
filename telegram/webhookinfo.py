@@ -71,7 +71,6 @@ class WebhookInfo(TelegramObject):
         'last_error_message',
         'pending_update_count',
         'has_custom_certificate',
-        '_id_attrs',
     )
 
     def __init__(
