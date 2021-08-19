@@ -739,16 +739,11 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
 
         Args:
             callback (:obj:`callable`): The callback function for this error handler. Will be
-                called when an error is raised. Callback signature for context based API:
-
-                ``def callback(update: object, context: CallbackContext)``
+                called when an error is raised.
 
                 The error that happened will be present in context.error.
             run_async (:obj:`bool`, optional): Whether this handlers callback should be run
                 asynchronously using :meth:`run_async`. Defaults to :obj:`False`.
-
-        Note:
-            See https://git.io/fxJuV for more info about switching to context based API.
         """
         if callback in self.error_handlers:
             self.logger.debug('The callback is already registered as an error handler. Ignoring.')

@@ -148,12 +148,7 @@ class JobQueue:
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
-                job. Callback signature for context based API:
-
-                    ``def callback(CallbackContext)``
-
-                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
-                its ``job.context`` or change it to a repeating job.
+                job.
             when (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |                         \
                   :obj:`datetime.datetime` | :obj:`datetime.time`):
                 Time in or at which the job should run. This parameter will be interpreted
@@ -223,12 +218,7 @@ class JobQueue:
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
-                job. Callback signature for context based API:
-
-                    ``def callback(CallbackContext)``
-
-                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
-                its ``job.context`` or change it to a repeating job.
+                job.
             interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta`): The interval in which
                 the job will run. If it is an :obj:`int` or a :obj:`float`, it will be interpreted
                 as seconds.
@@ -315,12 +305,7 @@ class JobQueue:
 
         Args:
             callback (:obj:`callable`):  The callback function that should be executed by the new
-                job. Callback signature for context based API:
-
-                    ``def callback(CallbackContext)``
-
-                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
-                its ``job.context`` or change it to a repeating job.
+                job.
             when (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
                 (``when.tzinfo``) is :obj:`None`, the default timezone of the bot will be used.
             day (:obj:`int`): Defines the day of the month whereby the job would run. It should
@@ -405,12 +390,7 @@ class JobQueue:
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
-                job. Callback signature for context based API:
-
-                    ``def callback(CallbackContext)``
-
-                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
-                its ``job.context`` or change it to a repeating job.
+                job.
             time (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
                 (``time.tzinfo``) is :obj:`None`, the default timezone of the bot will be used.
             days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should
@@ -460,12 +440,7 @@ class JobQueue:
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
-                job. Callback signature for context based API:
-
-                    ``def callback(CallbackContext)``
-
-                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
-                its ``job.context`` or change it to a repeating job.
+                job.
             job_kwargs (:obj:`dict`): Arbitrary keyword arguments. Used as arguments for
                 ``scheduler.add_job``.
             context (:obj:`object`, optional): Additional data needed for the callback function.
@@ -528,12 +503,6 @@ class Job:
 
     Args:
         callback (:obj:`callable`): The callback function that should be executed by the new job.
-            Callback signature for context based API:
-
-                ``def callback(CallbackContext)``
-
-            a ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
-            its ``job.context`` or change it to a repeating job.
         context (:obj:`object`, optional): Additional data needed for the callback function. Can be
             accessed through ``job.context`` in the callback. Defaults to :obj:`None`.
         name (:obj:`str`, optional): The name of the new job. Defaults to ``callback.__name__``.

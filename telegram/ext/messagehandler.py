@@ -50,9 +50,6 @@ class MessageHandler(Handler[Update, CCT]):
             argument.
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature for context based API:
-
-            ``def callback(update: Update, context: CallbackContext)``
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
