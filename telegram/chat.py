@@ -166,7 +166,6 @@ class Chat(TelegramObject):
         'linked_chat_id',
         'all_members_are_administrators',
         'message_auto_delete_time',
-        '_id_attrs',
     )
 
     SENDER: ClassVar[str] = constants.CHAT_SENDER

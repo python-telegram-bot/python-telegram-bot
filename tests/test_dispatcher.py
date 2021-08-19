@@ -58,24 +58,11 @@ class TestDispatcher:
     received = None
     count = 0
 
-    def test_slot_behaviour(self, dp2, recwarn, mro_slots):
+    def test_slot_behaviour(self, dp2, mro_slots):
         for at in dp2.__slots__:
             at = f"_Dispatcher{at}" if at.startswith('__') and not at.endswith('__') else at
             assert getattr(dp2, at, 'err') != 'err', f"got extra slot '{at}'"
-        assert not dp2.__dict__, f"got missing slot(s): {dp2.__dict__}"
         assert len(mro_slots(dp2)) == len(set(mro_slots(dp2))), "duplicate slot"
-        dp2.custom, dp2.running = 'should give warning', dp2.running
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
-
-        class CustomDispatcher(Dispatcher):
-            pass  # Tests that setting custom attrs of Dispatcher subclass doesn't raise warning
-
-        a = CustomDispatcher(None, None)
-        a.my_custom = 'no error!'
-        assert len(recwarn) == 1
-
-        dp2.__setattr__('__test', 'mangled success')
-        assert getattr(dp2, '_Dispatcher__test', 'e') == 'mangled success', "mangling failed"
 
     @pytest.fixture(autouse=True, name='reset')
     def reset_fixture(self):

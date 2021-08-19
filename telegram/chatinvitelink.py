@@ -67,7 +67,6 @@ class ChatInviteLink(TelegramObject):
         'is_revoked',
         'expire_date',
         'member_limit',
-        '_id_attrs',
     )
 
     def __init__(

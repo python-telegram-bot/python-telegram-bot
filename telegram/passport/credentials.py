@@ -137,7 +137,6 @@ class EncryptedCredentials(TelegramObject):
         'secret',
         'bot',
         'data',
-        '_id_attrs',
         '_decrypted_secret',
         '_decrypted_data',
     )

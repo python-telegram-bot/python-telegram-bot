@@ -84,14 +84,11 @@ def inline_query(bot):
 class TestInlineQueryHandler:
     test_flag = False
 
-    def test_slot_behaviour(self, recwarn, mro_slots):
+    def test_slot_behaviour(self, mro_slots):
         handler = InlineQueryHandler(self.callback_context)
         for attr in handler.__slots__:
             assert getattr(handler, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not handler.__dict__, f"got missing slot(s): {handler.__dict__}"
         assert len(mro_slots(handler)) == len(set(mro_slots(handler))), "duplicate slot"
-        handler.custom, handler.callback = 'should give warning', self.callback_basic
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     @pytest.fixture(autouse=True)
     def reset(self):
@@ -270,4 +267,4 @@ class TestInlineQueryHandler:
                 assert self.test_flag == result
 
         finally:
-            inline_query.chat_type = None
+            inline_query.inline_query.chat_type = None

@@ -60,7 +60,7 @@ class ForceReply(ReplyMarkup):
 
     """
 
-    __slots__ = ('selective', 'force_reply', 'input_field_placeholder', '_id_attrs')
+    __slots__ = ('selective', 'force_reply', 'input_field_placeholder')
 
     def __init__(
         self,
