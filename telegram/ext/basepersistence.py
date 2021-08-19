@@ -106,11 +106,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     """
 
     __slots__ = (
-        'store_user_data',
-        'store_chat_data',
-        'store_bot_data',
-        'store_callback_data',
         'bot',
+        'store_data',
         '__dict__',  # __dict__ is included because we replace methods in the __new__
     )
 
