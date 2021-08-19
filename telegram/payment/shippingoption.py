@@ -46,7 +46,7 @@ class ShippingOption(TelegramObject):
 
     """
 
-    __slots__ = ('prices', 'title', 'id', '_id_attrs')
+    __slots__ = ('prices', 'title', 'id')
 
     def __init__(
         self,

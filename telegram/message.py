@@ -412,7 +412,6 @@ class Message(TelegramObject):
         'voice_chat_scheduled',
         'is_automatic_forward',
         'has_protected_content',
-        '_id_attrs',
     )
 
     ATTACHMENT_TYPES: ClassVar[List[str]] = [

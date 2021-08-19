@@ -56,4 +56,4 @@ repos:
     -   id: pyupgrade
         files: ^(telegram|examples|tests)/.*\.py$
         args:
-          - --py36-plus
+          - --py37-plus
