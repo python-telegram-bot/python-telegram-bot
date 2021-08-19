@@ -46,7 +46,6 @@ CheckUpdateType = Optional[Tuple[Tuple[int, ...], Handler, object]]
 
 
 class _ConversationTimeoutContext:
-    # '__dict__' is not included since this a private class
     __slots__ = ('conversation_key', 'update', 'dispatcher', 'callback_context')
 
     def __init__(

@@ -48,7 +48,7 @@ from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.handler import Handler
 import telegram.ext.extbot
 from telegram.ext.callbackdatacache import CallbackDataCache
-from telegram.utils.deprecate import TelegramDeprecationWarning, set_new_attribute_deprecated
+from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.ext.utils.promise import Promise
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 from telegram.ext.utils.types import CCT, UD, CD, BD
@@ -311,17 +311,6 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                 self._set_singleton(self)
             else:
                 self._set_singleton(None)
-
-    def __setattr__(self, key: str, value: object) -> None:
-        # Mangled names don't automatically apply in __setattr__ (see
-        # https://docs.python.org/3/tutorial/classes.html#private-variables), so we have to make
-        # it mangled so they don't raise TelegramDeprecationWarning unnecessarily
-        if key.startswith('__'):
-            key = f"_{self.__class__.__name__}{key}"
-        if issubclass(self.__class__, Dispatcher) and self.__class__ is not Dispatcher:
-            object.__setattr__(self, key, value)
-            return
-        set_new_attribute_deprecated(self, key, value)
 
     @property
     def exception_event(self) -> Event:  # skipcq: PY-D0003

@@ -64,7 +64,7 @@ class VoiceChatEnded(TelegramObject):
 
     """
 
-    __slots__ = ('duration', '_id_attrs')
+    __slots__ = ('duration',)
 
     def __init__(self, duration: int, **_kwargs: Any) -> None:
         self.duration = int(duration) if duration is not None else None
@@ -93,7 +93,7 @@ class VoiceChatParticipantsInvited(TelegramObject):
 
     """
 
-    __slots__ = ('users', '_id_attrs')
+    __slots__ = ('users',)
 
     def __init__(self, users: List[User], **_kwargs: Any) -> None:
         self.users = users
@@ -140,7 +140,7 @@ class VoiceChatScheduled(TelegramObject):
 
     """
 
-    __slots__ = ('start_date', '_id_attrs')
+    __slots__ = ('start_date',)
 
     def __init__(self, start_date: dtm.datetime, **_kwargs: Any) -> None:
         self.start_date = start_date

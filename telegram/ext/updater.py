@@ -42,7 +42,7 @@ from typing import (
 from telegram import Bot, TelegramError
 from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized
 from telegram.ext import Dispatcher, JobQueue, ContextTypes, ExtBot
-from telegram.utils.deprecate import TelegramDeprecationWarning, set_new_attribute_deprecated
+from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import get_signal_name, DEFAULT_FALSE, DefaultValue
 from telegram.utils.request import Request
 from telegram.ext.utils.types import CCT, UD, CD, BD
@@ -149,7 +149,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
         'httpd',
         '__lock',
         '__threads',
-        '__dict__',
     )
 
     @overload
@@ -327,14 +326,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
         self.httpd = None
         self.__lock = Lock()
         self.__threads: List[Thread] = []
-
-    def __setattr__(self, key: str, value: object) -> None:
-        if key.startswith('__'):
-            key = f"_{self.__class__.__name__}{key}"
-        if issubclass(self.__class__, Updater) and self.__class__ is not Updater:
-            object.__setattr__(self, key, value)
-            return
-        set_new_attribute_deprecated(self, key, value)
 
     def _init_thread(self, target: Callable, name: str, *args: object, **kwargs: object) -> None:
         thr = Thread(

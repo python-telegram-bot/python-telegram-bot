@@ -544,7 +544,7 @@ class DefaultValue(Generic[DVType]):
 
     """
 
-    __slots__ = ('value', '__dict__')
+    __slots__ = ('value',)
 
     def __init__(self, value: DVType = None):
         self.value = value

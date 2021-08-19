@@ -74,7 +74,6 @@ class Game(TelegramObject):
         'text_entities',
         'text',
         'animation',
-        '_id_attrs',
     )
 
     def __init__(

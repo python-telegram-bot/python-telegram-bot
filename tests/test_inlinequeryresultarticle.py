@@ -61,10 +61,7 @@ class TestInlineQueryResultArticle:
         inst = inline_query_result_article
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-        inst.custom, inst.id = 'should give warning', self.id_
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_expected_values(self, inline_query_result_article):
         assert inline_query_result_article.type == self.type_

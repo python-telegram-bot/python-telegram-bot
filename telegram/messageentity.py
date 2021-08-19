@@ -60,7 +60,7 @@ class MessageEntity(TelegramObject):
 
     """
 
-    __slots__ = ('length', 'url', 'user', 'type', 'language', 'offset', '_id_attrs')
+    __slots__ = ('length', 'url', 'user', 'type', 'language', 'offset')
 
     def __init__(
         self,

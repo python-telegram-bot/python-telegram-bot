@@ -35,14 +35,11 @@ class TestProximityAlertTriggered:
     watcher = User(2, 'bar', False)
     distance = 42
 
-    def test_slot_behaviour(self, proximity_alert_triggered, mro_slots, recwarn):
+    def test_slot_behaviour(self, proximity_alert_triggered, mro_slots):
         inst = proximity_alert_triggered
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-        inst.custom, inst.traveler = 'should give warning', self.traveler
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_de_json(self, bot):
         json_dict = {

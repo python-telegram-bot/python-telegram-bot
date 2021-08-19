@@ -130,7 +130,6 @@ class EncryptedPassportElement(TelegramObject):
         'reverse_side',
         'front_side',
         'data',
-        '_id_attrs',
     )
 
     def __init__(

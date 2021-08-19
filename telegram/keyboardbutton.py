@@ -58,7 +58,7 @@ class KeyboardButton(TelegramObject):
 
     """
 
-    __slots__ = ('request_location', 'request_contact', 'request_poll', 'text', '_id_attrs')
+    __slots__ = ('request_location', 'request_contact', 'request_poll', 'text')
 
     def __init__(
         self,
