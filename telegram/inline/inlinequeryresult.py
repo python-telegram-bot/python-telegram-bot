@@ -46,7 +46,7 @@ class InlineQueryResult(TelegramObject):
 
     """
 
-    __slots__ = ('type', 'id', '_id_attrs')
+    __slots__ = ('type', 'id')
 
     def __init__(self, type: str, id: str, **_kwargs: Any):
         # Required

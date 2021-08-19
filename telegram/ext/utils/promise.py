@@ -22,7 +22,6 @@ import logging
 from threading import Event
 from typing import Callable, List, Optional, Tuple, TypeVar, Union
 
-from telegram.utils.deprecate import set_new_attribute_deprecated
 from telegram.utils.types import JSONDict
 
 RT = TypeVar('RT')
@@ -65,7 +64,6 @@ class Promise:
         '_done_callback',
         '_result',
         '_exception',
-        '__dict__',
     )
 
     # TODO: Remove error_handling parameter once we drop the @run_async decorator
@@ -86,9 +84,6 @@ class Promise:
         self._done_callback: Optional[Callable] = None
         self._result: Optional[RT] = None
         self._exception: Optional[Exception] = None
-
-    def __setattr__(self, key: str, value: object) -> None:
-        set_new_attribute_deprecated(self, key, value)
 
     def run(self) -> None:
         """Calls the :attr:`pooled_function` callable."""

@@ -31,8 +31,6 @@ class TestContextTypes:
         for attr in instance.__slots__:
             assert getattr(instance, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(instance)) == len(set(mro_slots(instance))), "duplicate slot"
-        with pytest.raises(AttributeError):
-            instance.custom
 
     def test_data_init(self):
         ct = ContextTypes(SubClass, int, float, bool)
