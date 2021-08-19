@@ -101,7 +101,6 @@ class CallbackQuery(TelegramObject):
         'from_user',
         'inline_message_id',
         'data',
-        '_id_attrs',
     )
 
     def __init__(

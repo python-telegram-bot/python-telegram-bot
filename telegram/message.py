@@ -390,7 +390,6 @@ class Message(TelegramObject):
         'voice_chat_participants_invited',
         'voice_chat_started',
         'voice_chat_scheduled',
-        '_id_attrs',
     )
 
     ATTACHMENT_TYPES: ClassVar[List[str]] = [
