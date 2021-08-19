@@ -30,7 +30,6 @@ from typing import (
     Union,
     Generic,
     Type,
-    TypeVar,
 )
 
 from telegram import Update, CallbackQuery
@@ -40,8 +39,7 @@ from telegram.ext.utils.types import UD, CD, BD
 if TYPE_CHECKING:
     from telegram import Bot
     from telegram.ext import Dispatcher, Job, JobQueue
-
-CC = TypeVar('CC', bound='CallbackContext')
+    from telegram.ext.utils.types import CCT
 
 
 class CallbackContext(Generic[UD, CD, BD]):
@@ -105,7 +103,7 @@ class CallbackContext(Generic[UD, CD, BD]):
         '__dict__',
     )
 
-    def __init__(self, dispatcher: 'Dispatcher'):
+    def __init__(self: 'CCT', dispatcher: 'Dispatcher[CCT, UD, CD, BD]'):
         """
         Args:
             dispatcher (:class:`telegram.ext.Dispatcher`):
@@ -121,7 +119,7 @@ class CallbackContext(Generic[UD, CD, BD]):
         self.async_kwargs: Optional[Dict[str, object]] = None
 
     @property
-    def dispatcher(self) -> 'Dispatcher':
+    def dispatcher(self) -> 'Dispatcher[CCT, UD, CD, BD]':
         """:class:`telegram.ext.Dispatcher`: The dispatcher associated with this context."""
         return self._dispatcher
 
@@ -184,11 +182,17 @@ class CallbackContext(Generic[UD, CD, BD]):
         .. versionadded:: 13.6
         """
         if self.dispatcher.persistence:
-            if self.dispatcher.persistence.store_bot_data:
+            if self.dispatcher.persistence.store_data.bot_data:
                 self.dispatcher.persistence.refresh_bot_data(self.bot_data)
-            if self.dispatcher.persistence.store_chat_data and self._chat_id_and_data is not None:
+            if (
+                self.dispatcher.persistence.store_data.chat_data
+                and self._chat_id_and_data is not None
+            ):
                 self.dispatcher.persistence.refresh_chat_data(*self._chat_id_and_data)
-            if self.dispatcher.persistence.store_user_data and self._user_id_and_data is not None:
+            if (
+                self.dispatcher.persistence.store_data.user_data
+                and self._user_id_and_data is not None
+            ):
                 self.dispatcher.persistence.refresh_user_data(*self._user_id_and_data)
 
     def drop_callback_data(self, callback_query: CallbackQuery) -> None:
@@ -221,13 +225,13 @@ class CallbackContext(Generic[UD, CD, BD]):
 
     @classmethod
     def from_error(
-        cls: Type[CC],
+        cls: Type['CCT'],
         update: object,
         error: Exception,
-        dispatcher: 'Dispatcher',
+        dispatcher: 'Dispatcher[CCT, UD, CD, BD]',
         async_args: Union[List, Tuple] = None,
         async_kwargs: Dict[str, object] = None,
-    ) -> CC:
+    ) -> 'CCT':
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the error
         handlers.
@@ -257,7 +261,9 @@ class CallbackContext(Generic[UD, CD, BD]):
         return self
 
     @classmethod
-    def from_update(cls: Type[CC], update: object, dispatcher: 'Dispatcher') -> CC:
+    def from_update(
+        cls: Type['CCT'], update: object, dispatcher: 'Dispatcher[CCT, UD, CD, BD]'
+    ) -> 'CCT':
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the
         handlers.
@@ -272,7 +278,7 @@ class CallbackContext(Generic[UD, CD, BD]):
         Returns:
             :class:`telegram.ext.CallbackContext`
         """
-        self = cls(dispatcher)
+        self = cls(dispatcher)  # type: ignore[arg-type]
 
         if update is not None and isinstance(update, Update):
             chat = update.effective_chat
@@ -291,7 +297,7 @@ class CallbackContext(Generic[UD, CD, BD]):
         return self
 
     @classmethod
-    def from_job(cls: Type[CC], job: 'Job', dispatcher: 'Dispatcher') -> CC:
+    def from_job(cls: Type['CCT'], job: 'Job', dispatcher: 'Dispatcher[CCT, UD, CD, BD]') -> 'CCT':
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to a
         job callback.
@@ -306,7 +312,7 @@ class CallbackContext(Generic[UD, CD, BD]):
         Returns:
             :class:`telegram.ext.CallbackContext`
         """
-        self = cls(dispatcher)
+        self = cls(dispatcher)  # type: ignore[arg-type]
         self.job = job
         return self
 

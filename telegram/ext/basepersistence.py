@@ -21,7 +21,7 @@ import warnings
 from sys import version_info as py_ver
 from abc import ABC, abstractmethod
 from copy import copy
-from typing import Dict, Optional, Tuple, cast, ClassVar, Generic, DefaultDict
+from typing import Dict, Optional, Tuple, cast, ClassVar, Generic, DefaultDict, NamedTuple
 
 from telegram.utils.deprecate import set_new_attribute_deprecated
 
@@ -29,6 +29,33 @@ from telegram import Bot
 import telegram.ext.extbot
 
 from telegram.ext.utils.types import UD, CD, BD, ConversationDict, CDCData
+
+
+class PersistenceInput(NamedTuple):
+    """Convenience wrapper to group boolean input for :class:`BasePersistence`.
+
+    Args:
+        bot_data (:obj:`bool`, optional): Whether the setting should be applied for ``bot_data``.
+            Defaults to :obj:`True`.
+        chat_data (:obj:`bool`, optional): Whether the setting should be applied for ``chat_data``.
+            Defaults to :obj:`True`.
+        user_data (:obj:`bool`, optional): Whether the setting should be applied for ``user_data``.
+            Defaults to :obj:`True`.
+        callback_data (:obj:`bool`, optional): Whether the setting should be applied for
+            ``callback_data``. Defaults to :obj:`True`.
+
+    Attributes:
+        bot_data (:obj:`bool`): Whether the setting should be applied for ``bot_data``.
+        chat_data (:obj:`bool`): Whether the setting should be applied for ``chat_data``.
+        user_data (:obj:`bool`): Whether the setting should be applied for ``user_data``.
+        callback_data (:obj:`bool`): Whether the setting should be applied for ``callback_data``.
+
+    """
+
+    bot_data: bool = True
+    chat_data: bool = True
+    user_data: bool = True
+    callback_data: bool = True
 
 
 class BasePersistence(Generic[UD, CD, BD], ABC):
@@ -53,7 +80,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     * :meth:`flush`
 
     If you don't actually need one of those methods, a simple ``pass`` is enough. For example, if
-    ``store_bot_data=False``, you don't need :meth:`get_bot_data`, :meth:`update_bot_data` or
+    you don't store ``bot_data``, you don't need :meth:`get_bot_data`, :meth:`update_bot_data` or
     :meth:`refresh_bot_data`.
 
     Warning:
@@ -68,46 +95,28 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
          of the :meth:`update/get_*` methods, i.e. you don't need to worry about it while
          implementing a custom persistence subclass.
 
-    Args:
-        store_user_data (:obj:`bool`, optional): Whether user_data should be saved by this
-            persistence class. Default is :obj:`True`.
-        store_chat_data (:obj:`bool`, optional): Whether chat_data should be saved by this
-            persistence class. Default is :obj:`True` .
-        store_bot_data (:obj:`bool`, optional): Whether bot_data should be saved by this
-            persistence class. Default is :obj:`True`.
-        store_callback_data (:obj:`bool`, optional): Whether callback_data should be saved by this
-            persistence class. Default is :obj:`False`.
+    .. versionchanged:: 14.0
+        The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.
 
-            .. versionadded:: 13.6
+    Args:
+        store_data (:class:`PersistenceInput`, optional): Specifies which kinds of data will be
+            saved by this persistence instance. By default, all available kinds of data will be
+            saved.
 
     Attributes:
-        store_user_data (:obj:`bool`): Optional, Whether user_data should be saved by this
-            persistence class.
-        store_chat_data (:obj:`bool`): Optional. Whether chat_data should be saved by this
-            persistence class.
-        store_bot_data (:obj:`bool`): Optional. Whether bot_data should be saved by this
-            persistence class.
-        store_callback_data (:obj:`bool`): Optional. Whether callback_data should be saved by this
-            persistence class.
-
-            .. versionadded:: 13.6
+        store_data (:class:`PersistenceInput`): Specifies which kinds of data will be saved by this
+            persistence instance.
     """
 
     # Apparently Py 3.7 and below have '__dict__' in ABC
     if py_ver < (3, 7):
         __slots__ = (
-            'store_user_data',
-            'store_chat_data',
-            'store_bot_data',
-            'store_callback_data',
+            'store_data',
             'bot',
         )
     else:
         __slots__ = (
-            'store_user_data',  # type: ignore[assignment]
-            'store_chat_data',
-            'store_bot_data',
-            'store_callback_data',
+            'store_data',  # type: ignore[assignment]
             'bot',
             '__dict__',
         )
@@ -173,15 +182,10 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
     def __init__(
         self,
-        store_user_data: bool = True,
-        store_chat_data: bool = True,
-        store_bot_data: bool = True,
-        store_callback_data: bool = False,
+        store_data: PersistenceInput = None,
     ):
-        self.store_user_data = store_user_data
-        self.store_chat_data = store_chat_data
-        self.store_bot_data = store_bot_data
-        self.store_callback_data = store_callback_data
+        self.store_data = store_data or PersistenceInput()
+
         self.bot: Bot = None  # type: ignore[assignment]
 
     def __setattr__(self, key: str, value: object) -> None:
@@ -200,8 +204,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         Args:
             bot (:class:`telegram.Bot`): The bot.
         """
-        if self.store_callback_data and not isinstance(bot, telegram.ext.extbot.ExtBot):
-            raise TypeError('store_callback_data can only be used with telegram.ext.ExtBot.')
+        if self.store_data.callback_data and not isinstance(bot, telegram.ext.extbot.ExtBot):
+            raise TypeError('callback_data can only be stored when using telegram.ext.ExtBot.')
 
         self.bot = bot
 
@@ -439,17 +443,20 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
             :class:`telegram.ext.utils.types.BD`: The restored bot data.
         """
 
+    @abstractmethod
     def get_callback_data(self) -> Optional[CDCData]:
         """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. If callback data was stored, it should be returned.
 
         .. versionadded:: 13.6
 
+        .. versionchanged:: 14.0
+           Changed this method into an ``@abstractmethod``.
+
         Returns:
             Optional[:class:`telegram.ext.utils.types.CDCData`]: The restored meta data or
             :obj:`None`, if no data was stored.
         """
-        raise NotImplementedError
 
     @abstractmethod
     def get_conversations(self, name: str) -> ConversationDict:
@@ -510,6 +517,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
                 :attr:`telegram.ext.Dispatcher.bot_data`.
         """
 
+    @abstractmethod
     def refresh_user_data(self, user_id: int, user_data: UD) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` before passing the
         :attr:`user_data` to a callback. Can be used to update data stored in :attr:`user_data`
@@ -517,11 +525,15 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         .. versionadded:: 13.6
 
+        .. versionchanged:: 14.0
+           Changed this method into an ``@abstractmethod``.
+
         Args:
             user_id (:obj:`int`): The user ID this :attr:`user_data` is associated with.
             user_data (:class:`telegram.ext.utils.types.UD`): The ``user_data`` of a single user.
         """
 
+    @abstractmethod
     def refresh_chat_data(self, chat_id: int, chat_data: CD) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` before passing the
         :attr:`chat_data` to a callback. Can be used to update data stored in :attr:`chat_data`
@@ -529,11 +541,15 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         .. versionadded:: 13.6
 
+        .. versionchanged:: 14.0
+           Changed this method into an ``@abstractmethod``.
+
         Args:
             chat_id (:obj:`int`): The chat ID this :attr:`chat_data` is associated with.
             chat_data (:class:`telegram.ext.utils.types.CD`): The ``chat_data`` of a single chat.
         """
 
+    @abstractmethod
     def refresh_bot_data(self, bot_data: BD) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` before passing the
         :attr:`bot_data` to a callback. Can be used to update data stored in :attr:`bot_data`
@@ -541,25 +557,35 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         .. versionadded:: 13.6
 
+        .. versionchanged:: 14.0
+           Changed this method into an ``@abstractmethod``.
+
         Args:
             bot_data (:class:`telegram.ext.utils.types.BD`): The ``bot_data``.
         """
 
+    @abstractmethod
     def update_callback_data(self, data: CDCData) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
         handled an update.
 
         .. versionadded:: 13.6
 
+        .. versionchanged:: 14.0
+           Changed this method into an ``@abstractmethod``.
+
         Args:
             data (:class:`telegram.ext.utils.types.CDCData`): The relevant data to restore
                 :class:`telegram.ext.CallbackDataCache`.
         """
-        raise NotImplementedError
 
+    @abstractmethod
     def flush(self) -> None:
         """Will be called by :class:`telegram.ext.Updater` upon receiving a stop signal. Gives the
         persistence a chance to finish up saving or close a database connection gracefully.
+
+        .. versionchanged:: 14.0
+           Changed this method into an ``@abstractmethod``.
         """
 
     REPLACED_BOT: ClassVar[str] = 'bot_instance_replaced_by_ptb_persistence'

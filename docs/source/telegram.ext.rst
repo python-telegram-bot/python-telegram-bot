@@ -44,6 +44,7 @@ Persistence
 .. toctree::
 
     telegram.ext.basepersistence
+    telegram.ext.persistenceinput
     telegram.ext.picklepersistence
     telegram.ext.dictpersistence
 
