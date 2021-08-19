@@ -144,7 +144,6 @@ class InputInvoiceMessageContent(InputMessageContent):
         'send_phone_number_to_provider',
         'send_email_to_provider',
         'is_flexible',
-        '_id_attrs',
     )
 
     def __init__(

@@ -51,13 +51,10 @@ class TestChatPhoto:
     chatphoto_big_file_unique_id = 'bigadc3145fd2e84d95b64d68eaa22aa33e'
     chatphoto_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.jpg'
 
-    def test_slot_behaviour(self, chat_photo, recwarn, mro_slots):
+    def test_slot_behaviour(self, chat_photo, mro_slots):
         for attr in chat_photo.__slots__:
             assert getattr(chat_photo, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not chat_photo.__dict__, f"got missing slot(s): {chat_photo.__dict__}"
         assert len(mro_slots(chat_photo)) == len(set(mro_slots(chat_photo))), "duplicate slot"
-        chat_photo.custom, chat_photo.big_file_id = 'gives warning', self.chatphoto_big_file_id
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     @flaky(3, 1)
     def test_send_all_args(self, bot, super_group_id, chatphoto_file, chat_photo, thumb_file):

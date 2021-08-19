@@ -45,7 +45,7 @@ class GameHighScore(TelegramObject):
 
     """
 
-    __slots__ = ('position', 'user', 'score', '_id_attrs')
+    __slots__ = ('position', 'user', 'score')
 
     def __init__(self, position: int, user: User, score: int):
         self.position = position

@@ -90,10 +90,7 @@ class TestSticker:
     def test_slot_behaviour(self, sticker, mro_slots, recwarn):
         for attr in sticker.__slots__:
             assert getattr(sticker, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not sticker.__dict__, f"got missing slot(s): {sticker.__dict__}"
         assert len(mro_slots(sticker)) == len(set(mro_slots(sticker))), "duplicate slot"
-        sticker.custom, sticker.emoji = 'should give warning', self.emoji
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_creation(self, sticker):
         # Make sure file has been uploaded.

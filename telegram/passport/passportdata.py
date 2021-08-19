@@ -51,7 +51,7 @@ class PassportData(TelegramObject):
 
     """
 
-    __slots__ = ('bot', 'credentials', 'data', '_decrypted_data', '_id_attrs')
+    __slots__ = ('bot', 'credentials', 'data', '_decrypted_data')
 
     def __init__(
         self,

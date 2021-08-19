@@ -59,13 +59,10 @@ class TestAudio:
     audio_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
     audio_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
 
-    def test_slot_behaviour(self, audio, recwarn, mro_slots):
+    def test_slot_behaviour(self, audio, mro_slots):
         for attr in audio.__slots__:
             assert getattr(audio, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not audio.__dict__, f"got missing slot(s): {audio.__dict__}"
         assert len(mro_slots(audio)) == len(set(mro_slots(audio))), "duplicate slot"
-        audio.custom, audio.file_name = 'should give warning', self.file_name
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_creation(self, audio):
         # Make sure file has been uploaded.

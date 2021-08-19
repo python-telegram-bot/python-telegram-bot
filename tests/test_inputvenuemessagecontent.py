@@ -45,14 +45,11 @@ class TestInputVenueMessageContent:
     google_place_id = 'google place id'
     google_place_type = 'google place type'
 
-    def test_slot_behaviour(self, input_venue_message_content, recwarn, mro_slots):
+    def test_slot_behaviour(self, input_venue_message_content, mro_slots):
         inst = input_venue_message_content
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-        inst.custom, inst.title = 'should give warning', self.title
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_expected_values(self, input_venue_message_content):
         assert input_venue_message_content.longitude == self.longitude

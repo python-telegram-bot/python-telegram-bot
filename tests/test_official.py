@@ -37,6 +37,7 @@ IGNORED_PARAMETERS = {
     'timeout',
     'bot',
     'api_kwargs',
+    'kwargs',
 }
 
 
@@ -109,8 +110,8 @@ def check_object(h4):
     obj = getattr(telegram, name)
     table = parse_table(h4)
 
-    # Check arguments based on source
-    sig = inspect.signature(obj, follow_wrapped=True)
+    # Check arguments based on source. Makes sure to only check __init__'s signature & nothing else
+    sig = inspect.signature(obj.__init__, follow_wrapped=True)
 
     checked = []
     for parameter in table:

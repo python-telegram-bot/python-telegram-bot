@@ -142,14 +142,11 @@ class BaseTest:
 class TestCommandHandler(BaseTest):
     CMD = '/test'
 
-    def test_slot_behaviour(self, recwarn, mro_slots):
+    def test_slot_behaviour(self, mro_slots):
         handler = self.make_default_handler()
         for attr in handler.__slots__:
             assert getattr(handler, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not handler.__dict__, f"got missing slot(s): {handler.__dict__}"
         assert len(mro_slots(handler)) == len(set(mro_slots(handler))), "duplicate slot"
-        handler.custom, handler.command = 'should give warning', self.CMD
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     @pytest.fixture(scope='class')
     def command(self):
@@ -305,14 +302,11 @@ class TestPrefixHandler(BaseTest):
     COMMANDS = ['help', 'test']
     COMBINATIONS = list(combinations(PREFIXES, COMMANDS))
 
-    def test_slot_behaviour(self, mro_slots, recwarn):
+    def test_slot_behaviour(self, mro_slots):
         handler = self.make_default_handler()
         for attr in handler.__slots__:
             assert getattr(handler, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not handler.__dict__, f"got missing slot(s): {handler.__dict__}"
         assert len(mro_slots(handler)) == len(set(mro_slots(handler))), "duplicate slot"
-        handler.custom, handler.command = 'should give warning', self.COMMANDS
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     @pytest.fixture(scope='class', params=PREFIXES)
     def prefix(self, request):

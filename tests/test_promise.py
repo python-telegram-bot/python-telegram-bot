@@ -30,14 +30,11 @@ class TestPromise:
 
     test_flag = False
 
-    def test_slot_behaviour(self, recwarn, mro_slots):
+    def test_slot_behaviour(self, mro_slots):
         inst = Promise(self.test_call, [], {})
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-        inst.custom, inst.args = 'should give warning', []
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     @pytest.fixture(autouse=True)
     def reset(self):

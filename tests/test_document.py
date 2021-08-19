@@ -53,13 +53,10 @@ class TestDocument:
     document_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
     document_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
 
-    def test_slot_behaviour(self, document, recwarn, mro_slots):
+    def test_slot_behaviour(self, document, mro_slots):
         for attr in document.__slots__:
             assert getattr(document, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not document.__dict__, f"got missing slot(s): {document.__dict__}"
         assert len(mro_slots(document)) == len(set(mro_slots(document))), "duplicate slot"
-        document.custom, document.file_name = 'should give warning', self.file_name
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), f"{recwarn}"
 
     def test_creation(self, document):
         assert isinstance(document, Document)

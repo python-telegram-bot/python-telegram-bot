@@ -287,7 +287,6 @@ class ChatMember(TelegramObject):
         'can_manage_chat',
         'can_manage_voice_chats',
         'until_date',
-        '_id_attrs',
     )
 
     ADMINISTRATOR: ClassVar[str] = constants.CHATMEMBER_ADMINISTRATOR
