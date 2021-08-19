@@ -156,7 +156,6 @@ class Update(TelegramObject):
         'my_chat_member',
         'chat_member',
         'chat_join_request',
-        '_id_attrs',
     )
 
     MESSAGE = constants.UPDATE_MESSAGE

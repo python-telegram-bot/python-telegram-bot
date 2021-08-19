@@ -35,14 +35,11 @@ class TestInputContactMessageContent:
     first_name = 'first name'
     last_name = 'last name'
 
-    def test_slot_behaviour(self, input_contact_message_content, mro_slots, recwarn):
+    def test_slot_behaviour(self, input_contact_message_content, mro_slots):
         inst = input_contact_message_content
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-        inst.custom, inst.first_name = 'should give warning', self.first_name
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_expected_values(self, input_contact_message_content):
         assert input_contact_message_content.first_name == self.first_name

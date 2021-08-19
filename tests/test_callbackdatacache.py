@@ -38,15 +38,13 @@ def callback_data_cache(bot):
 
 
 class TestInvalidCallbackData:
-    def test_slot_behaviour(self, mro_slots, recwarn):
+    def test_slot_behaviour(self, mro_slots):
         invalid_callback_data = InvalidCallbackData()
         for attr in invalid_callback_data.__slots__:
             assert getattr(invalid_callback_data, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(invalid_callback_data)) == len(
             set(mro_slots(invalid_callback_data))
         ), "duplicate slot"
-        with pytest.raises(AttributeError):
-            invalid_callback_data.custom
 
 
 class TestKeyboardData:
@@ -57,8 +55,6 @@ class TestKeyboardData:
         assert len(mro_slots(keyboard_data)) == len(
             set(mro_slots(keyboard_data))
         ), "duplicate slot"
-        with pytest.raises(AttributeError):
-            keyboard_data.custom = 42
 
 
 class TestCallbackDataCache:
@@ -73,8 +69,6 @@ class TestCallbackDataCache:
         assert len(mro_slots(callback_data_cache)) == len(
             set(mro_slots(callback_data_cache))
         ), "duplicate slot"
-        with pytest.raises(AttributeError):
-            callback_data_cache.custom = 42
 
     @pytest.mark.parametrize('maxsize', [1, 5, 2048])
     def test_init_maxsize(self, maxsize, bot):

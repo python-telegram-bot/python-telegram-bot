@@ -69,7 +69,6 @@ class InputVenueMessageContent(InputMessageContent):
         'foursquare_type',
         'google_place_id',
         'latitude',
-        '_id_attrs',
     )
 
     def __init__(

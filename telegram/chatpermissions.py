@@ -82,7 +82,6 @@ class ChatPermissions(TelegramObject):
         'can_send_other_messages',
         'can_invite_users',
         'can_send_polls',
-        '_id_attrs',
         'can_send_messages',
         'can_send_media_messages',
         'can_change_info',

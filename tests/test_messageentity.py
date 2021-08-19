@@ -42,14 +42,11 @@ class TestMessageEntity:
     length = 2
     url = 'url'
 
-    def test_slot_behaviour(self, message_entity, recwarn, mro_slots):
+    def test_slot_behaviour(self, message_entity, mro_slots):
         inst = message_entity
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-        inst.custom, inst.type = 'should give warning', self.type_
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_de_json(self, bot):
         json_dict = {'type': self.type_, 'offset': self.offset, 'length': self.length}

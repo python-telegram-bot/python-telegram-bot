@@ -81,7 +81,6 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         'resize_keyboard',
         'one_time_keyboard',
         'input_field_placeholder',
-        '_id_attrs',
     )
 
     def __init__(

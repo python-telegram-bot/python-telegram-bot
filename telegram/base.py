@@ -23,10 +23,9 @@ except ImportError:
     import json  # type: ignore[no-redef]
 
 import warnings
-from typing import TYPE_CHECKING, List, Optional, Tuple, Type, TypeVar
+from typing import TYPE_CHECKING, List, Optional, Type, TypeVar, Tuple
 
 from telegram.utils.types import JSONDict
-from telegram.utils.deprecate import set_new_attribute_deprecated
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -37,21 +36,27 @@ TO = TypeVar('TO', bound='TelegramObject', covariant=True)
 class TelegramObject:
     """Base class for most Telegram objects."""
 
-    _id_attrs: Tuple[object, ...] = ()
-
+    # type hints in __new__ are not read by mypy (https://github.com/python/mypy/issues/1021). As a
+    # workaround we can type hint instance variables in __new__ using a syntax defined in PEP 526 -
+    # https://www.python.org/dev/peps/pep-0526/#class-and-instance-variable-annotations
+    if TYPE_CHECKING:
+        _id_attrs: Tuple[object, ...]
     # Adding slots reduces memory usage & allows for faster attribute access.
     # Only instance variables should be added to __slots__.
-    # We add __dict__ here for backward compatibility & also to avoid repetition for subclasses.
-    __slots__ = ('__dict__',)
+    __slots__ = ('_id_attrs',)
+
+    def __new__(cls, *args: object, **kwargs: object) -> 'TelegramObject':  # pylint: disable=W0613
+        # We add _id_attrs in __new__ instead of __init__ since we want to add this to the slots
+        # w/o calling __init__ in all of the subclasses. This is what we also do in BaseFilter.
+        instance = super().__new__(cls)
+        instance._id_attrs = ()
+        return instance
 
     def __str__(self) -> str:
         return str(self.to_dict())
 
     def __getitem__(self, item: str) -> object:
         return getattr(self, item, None)
-
-    def __setattr__(self, key: str, value: object) -> None:
-        set_new_attribute_deprecated(self, key, value)
 
     @staticmethod
     def _parse_data(data: Optional[JSONDict]) -> Optional[JSONDict]:
@@ -76,7 +81,7 @@ class TelegramObject:
 
         if cls == TelegramObject:
             return cls()
-        return cls(bot=bot, **data)  # type: ignore[call-arg]
+        return cls(bot=bot, **data)
 
     @classmethod
     def de_list(cls: Type[TO], data: Optional[List[JSONDict]], bot: 'Bot') -> List[Optional[TO]]:
@@ -132,6 +137,7 @@ class TelegramObject:
         return data
 
     def __eq__(self, other: object) -> bool:
+        # pylint: disable=no-member
         if isinstance(other, self.__class__):
             if self._id_attrs == ():
                 warnings.warn(
@@ -144,9 +150,10 @@ class TelegramObject:
                     " for equivalence."
                 )
             return self._id_attrs == other._id_attrs
-        return super().__eq__(other)  # pylint: disable=no-member
+        return super().__eq__(other)
 
     def __hash__(self) -> int:
+        # pylint: disable=no-member
         if self._id_attrs:
-            return hash((self.__class__, self._id_attrs))  # pylint: disable=no-member
+            return hash((self.__class__, self._id_attrs))
         return super().__hash__()

@@ -39,14 +39,11 @@ class TestPassportFile:
     file_size = 50
     file_date = 1532879128
 
-    def test_slot_behaviour(self, passport_file, mro_slots, recwarn):
+    def test_slot_behaviour(self, passport_file, mro_slots):
         inst = passport_file
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-        inst.custom, inst.file_id = 'should give warning', self.file_id
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_expected_values(self, passport_file):
         assert passport_file.file_id == self.file_id

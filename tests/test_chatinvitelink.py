@@ -53,13 +53,10 @@ class TestChatInviteLink:
     name = 'LinkName'
     pending_join_request_count = 42
 
-    def test_slot_behaviour(self, recwarn, mro_slots, invite_link):
+    def test_slot_behaviour(self, mro_slots, invite_link):
         for attr in invite_link.__slots__:
             assert getattr(invite_link, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not invite_link.__dict__, f"got missing slot(s): {invite_link.__dict__}"
         assert len(mro_slots(invite_link)) == len(set(mro_slots(invite_link))), "duplicate slot"
-        invite_link.custom = 'should give warning'
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_de_json_required_args(self, bot, creator):
         json_dict = {

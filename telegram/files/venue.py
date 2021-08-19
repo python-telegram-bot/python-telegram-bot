@@ -68,7 +68,6 @@ class Venue(TelegramObject):
         'foursquare_type',
         'foursquare_id',
         'google_place_id',
-        '_id_attrs',
     )
 
     def __init__(

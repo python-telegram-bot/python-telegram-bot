@@ -74,7 +74,6 @@ class File(TelegramObject):
         'file_unique_id',
         'file_path',
         '_credentials',
-        '_id_attrs',
     )
 
     def __init__(

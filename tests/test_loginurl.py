@@ -37,13 +37,10 @@ class TestLoginUrl:
     bot_username = "botname"
     request_write_access = True
 
-    def test_slot_behaviour(self, login_url, recwarn, mro_slots):
+    def test_slot_behaviour(self, login_url, mro_slots):
         for attr in login_url.__slots__:
             assert getattr(login_url, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not login_url.__dict__, f"got missing slot(s): {login_url.__dict__}"
         assert len(mro_slots(login_url)) == len(set(mro_slots(login_url))), "duplicate slot"
-        login_url.custom, login_url.url = 'should give warning', self.url
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_to_dict(self, login_url):
         login_url_dict = login_url.to_dict()

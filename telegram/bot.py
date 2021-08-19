@@ -224,14 +224,6 @@ class Bot(TelegramObject):
                 private_key, password=private_key_password, backend=default_backend()
             )
 
-    # The ext_bot argument is a little hack to get warnings handled correctly.
-    # It's not very clean, but the warnings will be dropped at some point anyway.
-    def __setattr__(self, key: str, value: object, ext_bot: bool = False) -> None:
-        if issubclass(self.__class__, Bot) and self.__class__ is not Bot and not ext_bot:
-            object.__setattr__(self, key, value)
-            return
-        super().__setattr__(key, value)
-
     def _insert_defaults(
         self, data: Dict[str, object], timeout: ODVInput[float]
     ) -> Optional[float]:

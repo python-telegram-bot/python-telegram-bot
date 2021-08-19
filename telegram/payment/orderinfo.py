@@ -49,7 +49,7 @@ class OrderInfo(TelegramObject):
 
     """
 
-    __slots__ = ('email', 'shipping_address', 'phone_number', 'name', '_id_attrs')
+    __slots__ = ('email', 'shipping_address', 'phone_number', 'name')
 
     def __init__(
         self,

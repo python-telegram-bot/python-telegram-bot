@@ -43,13 +43,10 @@ class TestLocation:
     heading = 90
     proximity_alert_radius = 50
 
-    def test_slot_behaviour(self, location, recwarn, mro_slots):
+    def test_slot_behaviour(self, location, mro_slots):
         for attr in location.__slots__:
             assert getattr(location, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not location.__dict__, f"got missing slot(s): {location.__dict__}"
         assert len(mro_slots(location)) == len(set(mro_slots(location))), "duplicate slot"
-        location.custom, location.heading = 'should give warning', self.heading
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_de_json(self, bot):
         json_dict = {

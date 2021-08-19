@@ -69,7 +69,6 @@ class ChatMemberUpdated(TelegramObject):
         'old_chat_member',
         'new_chat_member',
         'invite_link',
-        '_id_attrs',
     )
 
     def __init__(
