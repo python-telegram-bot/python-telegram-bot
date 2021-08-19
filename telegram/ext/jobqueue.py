@@ -348,7 +348,22 @@ class JobQueue:
         name = name or callback.__name__
         job = Job(callback, context, name, self)
 
-        if day_is_strict:
+        # if day == -1 the run on last day of the month
+        if day == -1:
+            j = self.scheduler.add_job(
+                callback,
+                trigger='cron',
+                args=self._build_args(job),
+                name=name,
+                day='last',
+                hour=when.hour,
+                minute=when.minute,
+                second=when.second,
+                timezone=when.tzinfo or self.scheduler.timezone,
+                **job_kwargs,
+            )
+        # else run on the day as provided
+        else:
             j = self.scheduler.add_job(
                 callback,
                 trigger='cron',
@@ -360,30 +375,6 @@ class JobQueue:
                 second=when.second,
                 timezone=when.tzinfo or self.scheduler.timezone,
                 **job_kwargs,
-            )
-        else:
-            trigger = OrTrigger(
-                [
-                    CronTrigger(
-                        day=day,
-                        hour=when.hour,
-                        minute=when.minute,
-                        second=when.second,
-                        timezone=when.tzinfo,
-                        **job_kwargs,
-                    ),
-                    CronTrigger(
-                        day='last',
-                        hour=when.hour,
-                        minute=when.minute,
-                        second=when.second,
-                        timezone=when.tzinfo or self.scheduler.timezone,
-                        **job_kwargs,
-                    ),
-                ]
-            )
-            j = self.scheduler.add_job(
-                callback, trigger=trigger, args=self._build_args(job), name=name, **job_kwargs
             )
 
         job.job = j
