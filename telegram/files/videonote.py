@@ -69,7 +69,6 @@ class VideoNote(TelegramObject):
         'thumb',
         'duration',
         'file_unique_id',
-        '_id_attrs',
     )
 
     def __init__(

@@ -46,7 +46,7 @@ class PassportElementError(TelegramObject):
     """
 
     # All subclasses of this class won't have _id_attrs in slots since it's added here.
-    __slots__ = ('message', 'source', 'type', '_id_attrs')
+    __slots__ = ('message', 'source', 'type')
 
     def __init__(self, source: str, type: str, message: str, **_kwargs: Any):
         # Required

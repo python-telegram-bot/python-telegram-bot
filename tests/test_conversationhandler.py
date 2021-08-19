@@ -94,16 +94,11 @@ class TestConversationHandler:
     raise_dp_handler_stop = False
     test_flag = False
 
-    def test_slot_behaviour(self, recwarn, mro_slots):
+    def test_slot_behaviour(self, mro_slots):
         handler = ConversationHandler(self.entry_points, self.states, self.fallbacks)
         for attr in handler.__slots__:
             assert getattr(handler, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not handler.__dict__, f"got missing slot(s): {handler.__dict__}"
         assert len(mro_slots(handler)) == len(set(mro_slots(handler))), "duplicate slot"
-        handler.custom, handler._persistence = 'should give warning', handler._persistence
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), [
-            w.message for w in recwarn.list
-        ]
 
     # Test related
     @pytest.fixture(autouse=True)
@@ -833,6 +828,10 @@ class TestConversationHandler:
         def mocked_run_once(*a, **kw):
             raise Exception("job error")
 
+        class DictJB(JobQueue):
+            pass
+
+        dp.job_queue = DictJB()
         monkeypatch.setattr(dp.job_queue, "run_once", mocked_run_once)
         handler = ConversationHandler(
             entry_points=self.entry_points,

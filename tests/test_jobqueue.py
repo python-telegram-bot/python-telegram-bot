@@ -55,13 +55,10 @@ class TestJobQueue:
     job_time = 0
     received_error = None
 
-    def test_slot_behaviour(self, job_queue, recwarn, mro_slots, _dp):
+    def test_slot_behaviour(self, job_queue, mro_slots, _dp):
         for attr in job_queue.__slots__:
             assert getattr(job_queue, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not job_queue.__dict__, f"got missing slot(s): {job_queue.__dict__}"
         assert len(mro_slots(job_queue)) == len(set(mro_slots(job_queue))), "duplicate slot"
-        job_queue.custom, job_queue._dispatcher = 'should give warning', _dp
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     @pytest.fixture(autouse=True)
     def reset(self):
