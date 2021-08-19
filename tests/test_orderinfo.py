@@ -37,13 +37,10 @@ class TestOrderInfo:
     email = 'email'
     shipping_address = ShippingAddress('GB', '', 'London', '12 Grimmauld Place', '', 'WC1')
 
-    def test_slot_behaviour(self, order_info, mro_slots, recwarn):
+    def test_slot_behaviour(self, order_info, mro_slots):
         for attr in order_info.__slots__:
             assert getattr(order_info, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not order_info.__dict__, f"got missing slot(s): {order_info.__dict__}"
         assert len(mro_slots(order_info)) == len(set(mro_slots(order_info))), "duplicate slot"
-        order_info.custom, order_info.name = 'should give warning', self.name
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_de_json(self, bot):
         json_dict = {

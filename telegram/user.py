@@ -107,7 +107,6 @@ class User(TelegramObject):
         'id',
         'bot',
         'language_code',
-        '_id_attrs',
     )
 
     def __init__(

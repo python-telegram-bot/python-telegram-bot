@@ -76,7 +76,6 @@ class PreCheckoutQuery(TelegramObject):
         'total_amount',
         'id',
         'from_user',
-        '_id_attrs',
     )
 
     def __init__(

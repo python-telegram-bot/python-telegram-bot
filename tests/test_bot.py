@@ -145,20 +145,10 @@ class TestBot:
     """
 
     @pytest.mark.parametrize('inst', ['bot', "default_bot"], indirect=True)
-    def test_slot_behaviour(self, inst, recwarn, mro_slots):
+    def test_slot_behaviour(self, inst, mro_slots):
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not inst.__dict__, f"got missing slots: {inst.__dict__}"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-        inst.custom, inst.base_url = 'should give warning', inst.base_url
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
-
-        class CustomBot(Bot):
-            pass  # Tests that setting custom attributes of Bot subclass doesn't raise warning
-
-        a = CustomBot(inst.token)
-        a.my_custom = 'no error!'
-        assert len(recwarn) == 1
 
     @pytest.mark.parametrize(
         'token',

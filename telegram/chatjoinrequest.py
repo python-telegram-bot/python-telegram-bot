@@ -62,7 +62,6 @@ class ChatJoinRequest(TelegramObject):
         'bio',
         'invite_link',
         'bot',
-        '_id_attrs',
     )
 
     def __init__(
