@@ -444,7 +444,7 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
             dispatcher = DispatcherBuilder().token('TOKEN').build()
 
     Please see the description of the individual methods for information on which arguments can be
-    set and what the defaults are when not called. When no default is mentioned, the arguent will
+    set and what the defaults are when not called. When no default is mentioned, the argument will
     not be used by default.
 
     Note:
@@ -454,6 +454,9 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
           a custom bot with :meth:`bot` and vice versa.
         * Unless a custom :class:`telegram.Bot` instance is set via :meth:`bot`, :meth:`build` will
           use :class:`telegram.ext.ExtBot` for the bot.
+
+    .. seealso::
+        :class:`telegram.ext.UpdaterBuilder`
 
     .. _`builder pattern`: https://en.wikipedia.org/wiki/Builder_pattern.
     """
@@ -469,7 +472,6 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
 
         Returns:
             :class:`telegram.ext.Dispatcher`
-
         """
         return self._build_dispatcher()
 
@@ -489,7 +491,8 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         will default to ``'https://api.telegram.org/bot'``.
 
         .. seealso:: :attr:`telegram.Bot.base_url`, `Local Bot API Server <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Local-Bot-API-Server>`_
+            python-telegram-bot/python-telegram-bot/wiki/Local-Bot-API-Server>`_,
+            :meth:`base_url`
 
         Args:
             base_url (:obj:`str`): The URL.
@@ -504,7 +507,8 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         called, will default to ``'https://api.telegram.org/file/bot'``.
 
         .. seealso:: :attr:`telegram.Bot.base_file_url`, `Local Bot API Server <https://github.com\
-            /python-telegram-bot/python-telegram-bot/wiki/Local-Bot-API-Server>`_
+            /python-telegram-bot/python-telegram-bot/wiki/Local-Bot-API-Server>`_,
+            :meth:`base_file_url`
 
         Args:
             base_file_url (:obj:`str`): The URL.
@@ -519,6 +523,8 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         that is created when :attr:`telegram.ext.Dispatcher.bot` is created. If not called, no
         keyword arguments will be passed.
 
+        .. seealso:: :meth:`request`
+
         Args:
             request_kwargs (Dict[:obj:`str`, :obj:`object`]): The keyword arguments.
 
@@ -530,6 +536,8 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     def request(self: BuilderType, request: Request) -> BuilderType:
         """Sets a :class:`telegram.utils.Request` object to be used for
         :attr:`telegram.ext.Dispatcher.bot`.
+
+        .. seealso:: :meth:`request_kwargs`
 
         Args:
             request (:class:`telegram.utils.Request`): The request object.
@@ -592,9 +600,10 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     def arbitrary_callback_data(
         self: BuilderType, arbitrary_callback_data: Union[bool, int]
     ) -> BuilderType:
-        """Specifies whether the :attr:`telegram.ext.Dispatcher.bot` should use arbitrary callback
-        data or how many keyboards should be stored in memory. If not called, no arbitrary callback
-        data will be used.
+        """Specifies whether :attr:`telegram.ext.Dispatcher.bot` should allow arbitrary objects as
+        callback data for :class:`telegram.InlineKeyboardButton` and how many keyboards should be
+        cached in memory. If not called, only strings can be used as callback data and no data will
+        be stored in memory.
 
         .. seealso:: `Arbitrary callback_data <https://git.io/JGBDI>`_,
             `arbitrarycallbackdatabot.py <https://git.io/J0FBv>`_
@@ -674,8 +683,9 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Note:
             * :meth:`telegram.ext.JobQueue.set_dispatcher` will be called automatically by
               :meth:`build`.
-            * The job queue will be automatically started by :meth:`telegram.ext.Dispatcher.start`
-              and :meth:`telegram.ext.Dispatcher.stop`, respectively.
+            * The job queue will be automatically started and stopped by
+              :meth:`telegram.ext.Dispatcher.start` and :meth:`telegram.ext.Dispatcher.stop`,
+              respectively.
             * When passing :obj:`None`,
               :attr:`telegram.ext.ConversationHandler.conversation_timeout` can not be used, as
               this uses :attr:`telegram.ext.Dispatcher.job_queue` internally.
@@ -731,6 +741,36 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
 
 
 class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
+    """This class serves as initializer for :class:`telegram.ext.Updater` via the so called
+    `builder pattern`_. To build an :class:`telegram.ext.Updater`, one first initializes an
+    instance of this class. Arguments for the :class:`telegram.ext.Updater` to build are then
+    added by subsequently calling the methods of the builder. Finally, the
+    :class:`telegram.ext.Updater` is built by calling :meth:`build`. In the simplest case this
+    can look like the following example.
+
+    Example:
+        .. code:: python
+
+            dispatcher = UpdaterBuilder().token('TOKEN').build()
+
+    Please see the description of the individual methods for information on which arguments can be
+    set and what the defaults are when not called. When no default is mentioned, the argument will
+    not be used by default.
+
+    Note:
+        * Each method can be called at most once, e.g. you can't override arguments that were
+          already set.
+        * Some arguments are mutually exclusive. E.g. after calling :meth:`token`, you can't set
+          a custom bot with :meth:`bot` and vice versa.
+        * Unless a custom :class:`telegram.Bot` instance is set via :meth:`bot`, :meth:`build` will
+          use :class:`telegram.ext.ExtBot` for the bot.
+
+    .. seealso::
+        :class:`telegram.ext.DispatcherBuilder`
+
+    .. _`builder pattern`: https://en.wikipedia.org/wiki/Builder_pattern.
+    """
+
     # The init is just here for mypy
     def __init__(self: 'InitUpdaterBuilder'):
         super().__init__()
@@ -738,35 +778,154 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     def build(
         self: 'UpdaterBuilder[ODT, BT, Any, Any, Any, Any, Any, Any]',
     ) -> Updater[BT, ODT]:
+        """Builds a :class:`telegram.ext.Updater` with the provided arguments.
+
+        Returns:
+            :class:`telegram.ext.Updater`
+        """
         return self._build_updater()
 
     def token(self: BuilderType, token: str) -> BuilderType:
+        """Sets the token to be used for :attr:`telegram.ext.Updater.bot`.
+
+        Args:
+            token (:obj:`str`): The token.
+
+        Returns:
+            :class:`UpdaterBuilder`: The same builder with the updated argument.
+        """
         return self._token(token)
 
     def base_url(self: BuilderType, base_url: str) -> BuilderType:
+        """Sets the base URL to be used for :attr:`telegram.ext.Updater.bot`. If not called,
+        will default to ``'https://api.telegram.org/bot'``.
+
+        .. seealso:: :attr:`telegram.Bot.base_url`, `Local Bot API Server <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Local-Bot-API-Server>`_,
+            :meth:`base_url`
+
+        Args:
+            base_url (:obj:`str`): The URL.
+
+        Returns:
+            :class:`UpdaterBuilder`: The same builder with the updated argument.
+        """
         return self._base_url(base_url)
 
     def base_file_url(self: BuilderType, base_file_url: str) -> BuilderType:
+        """Sets the base file URL to be used for :attr:`telegram.ext.Updater.bot`. If not
+        called, will default to ``'https://api.telegram.org/file/bot'``.
+
+        .. seealso:: :attr:`telegram.Bot.base_file_url`, `Local Bot API Server <https://github.com\
+            /python-telegram-bot/python-telegram-bot/wiki/Local-Bot-API-Server>`_,
+            :meth:`base_file_url`
+
+        Args:
+            base_file_url (:obj:`str`): The URL.
+
+        Returns:
+            :class:`UpdaterBuilder`: The same builder with the updated argument.
+        """
         return self._base_file_url(base_file_url)
 
     def request_kwargs(self: BuilderType, request_kwargs: Dict[str, Any]) -> BuilderType:
+        """Sets keyword arguments that will be passed to the :class:`telegram.utils.Request` object
+        that is created when :attr:`telegram.ext.Updater.bot` is created. If not called, no
+        keyword arguments will be passed.
+
+        .. seealso:: :meth:`request`
+
+        Args:
+            request_kwargs (Dict[:obj:`str`, :obj:`object`]): The keyword arguments.
+
+        Returns:
+            :class:`UpdaterBuilder`: The same builder with the updated argument.
+        """
         return self._request_kwargs(request_kwargs)
 
     def request(self: BuilderType, request: Request) -> BuilderType:
+        """Sets a :class:`telegram.utils.Request` object to be used for
+        :attr:`telegram.ext.Updater.bot`.
+
+        .. seealso:: :meth:`request_kwargs`
+
+        Args:
+            request (:class:`telegram.utils.Request`): The request object.
+
+        Returns:
+            :class:`UpdaterBuilder`: The same builder with the updated argument.
+        """
         return self._request(request)
 
     def private_key(self: BuilderType, private_key: bytes) -> BuilderType:
+        """Sets the private key for decryption of telegram passport data to be used for
+        :attr:`telegram.ext.Updater.bot`.
+
+        .. seealso:: `passportbot.py <https://github.com/python-telegram-bot/python-telegram-bot\
+            /tree/master/examples#passportbotpy>`_, `Telegram Passports <https://git.io/fAvYd>`_
+
+        Note:
+            Must be used together with :meth:`private_key_password`.
+
+        Args:
+            private_key (:obj:`bytes`): The private key.
+
+        Returns:
+            :class:`UpdaterBuilder`: The same builder with the updated argument.
+        """
         return self._private_key(private_key)
 
     def private_key_password(self: BuilderType, private_key_password: bytes) -> BuilderType:
+        """Sets the private key password for decryption of telegram passport data to be used for
+        :attr:`telegram.ext.Updater.bot`.
+
+        .. seealso:: `passportbot.py <https://github.com/python-telegram-bot/python-telegram-bot\
+            /tree/master/examples#passportbotpy>`_, `Telegram Passports <https://git.io/fAvYd>`_
+
+        Note:
+            Must be used together with :meth:`private_key`.
+
+        Args:
+            private_key_password (:obj:`bytes`): The private key password.
+
+        Returns:
+            :class:`UpdaterBuilder`: The same builder with the updated argument.
+        """
         return self._private_key_password(private_key_password)
 
     def defaults(self: BuilderType, defaults: 'Defaults') -> BuilderType:
+        """Sets the :class:`telegram.ext.Defaults` object to be used for
+        :attr:`telegram.ext.Updater.bot`.
+
+        .. seealso:: `Adding Defaults <https://git.io/J0FGR>`_
+
+        Args:
+            defaults (:class:`telegram.ext.Defaults`): The defaults.
+
+        Returns:
+            :class:`UpdaterBuilder`: The same builder with the updated argument.
+        """
         return self._defaults(defaults)
 
     def arbitrary_callback_data(
         self: BuilderType, arbitrary_callback_data: Union[bool, int]
     ) -> BuilderType:
+        """Specifies whether :attr:`telegram.ext.Updater.bot` should allow arbitrary objects as
+        callback data for :class:`telegram.InlineKeyboardButton` and how many keyboards should be
+        cached in memory. If not called, only strings can be used as callback data and no data will
+        be stored in memory.
+
+        .. seealso:: `Arbitrary callback_data <https://git.io/JGBDI>`_,
+            `arbitrarycallbackdatabot.py <https://git.io/J0FBv>`_
+
+        Args:
+            arbitrary_callback_data (:obj:`bool` | :obj:`int`): If :obj:`True` is passed, the
+                default cache size of 1024 will be used. Pass an integer to specify a different
+                cache size.
+
+        Returns:
+            :class:`UpdaterBuilder`: The same builder with the updated argument.
+        """
         return self._arbitrary_callback_data(arbitrary_callback_data)
 
     def bot(
@@ -774,33 +933,128 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         'JQ, PT]',
         bot: InBT,
     ) -> 'UpdaterBuilder[Dispatcher[InBT, CCT, UD, CD, BD, JQ, PT], InBT, CCT, UD, CD, BD, JQ, PT]':
+        """Sets a :class:`telegram.Bot` instance to be used for
+        :attr:`telegram.ext.Updater.bot`. Instances of subclasses like
+        :class:`telegram.ext.ExtBot` are also valid.
+
+        Args:
+            bot (:class:`telegram.Bot`): The bot.
+
+        Returns:
+            :class:`UpdaterBuilder`: The same builder with the updated argument.
+        """
         return self._bot(bot)  # type: ignore[return-value]
 
     def update_queue(self: BuilderType, update_queue: Queue) -> BuilderType:
+        """Sets a :class:`queue.Queue` instance to be used for
+        :attr:`telegram.ext.Updater.update_queue`, i.e. the queue that the fetched updates will
+        be queued into. If not called, a queue will be instantiated.
+        If :meth:`dispatcher` is not called, this queue will also be used for
+        :attr:`telegram.ext.Dispatcher.update_queue`.
+
+         .. seealso:: :attr:`telegram.ext.Dispatcher.update_queue`,
+             :meth:`telegram.ext.DispatcherBuilder.update_queue`
+
+        Args:
+            update_queue (:class:`queue.Queue`): The queue.
+
+        Returns:
+            :class:`UpdaterBuilder`: The same builder with the updated argument.
+        """
         return self._update_queue(update_queue)
 
     def workers(self: BuilderType, workers: int) -> BuilderType:
+        """`Dummy text b/c this will be dropped anyway`"""
         return self._workers(workers)
 
     def exception_event(self: BuilderType, exception_event: Event) -> BuilderType:
+        """Sets a :class:`threading.Event` instance to be used by the
+        :class:`telegram.ext.Updater`. When an exception happens while fetching updates, this event
+        will be set and the ``Updater`` will stop fetching for updates. If not called, an event
+        will be instantiated.
+        If :meth:`dispatcher` is not called, this event will also be used for
+        :attr:`telegram.ext.Dispatcher.exception_event`.
+
+         .. seealso:: :attr:`telegram.ext.Dispatcher.exception_event`,
+             :meth:`telegram.ext.DispatcherBuilder.exception_event`
+
+        Args:
+            exception_event (:class:`threading.Event`): The event.
+
+        Returns:
+            :class:`UpdaterBuilder`: The same builder with the updated argument.
+        """
         return self._exception_event(exception_event)
 
     def job_queue(
         self: 'UpdaterBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
         job_queue: InJQ,
     ) -> 'UpdaterBuilder[Dispatcher[BT, CCT, UD, CD, BD, InJQ, PT], BT, CCT, UD, CD, BD, InJQ, PT]':
+        """Sets a :class:`telegram.ext.JobQueue` instance to be used for the
+        :attr:`telegram.ext.Updater.dispatcher`. If not called, a job queue will be instantiated.
+
+        .. seealso:: `JobQueue <https://git.io/J0FCN>`_, `timerbot.py <https://git.io/J0FWf>`_,
+            :attr:`telegram.ext.Dispatcher.job_queue`
+
+        Note:
+            * :meth:`telegram.ext.JobQueue.set_dispatcher` will be called automatically by
+              :meth:`build`.
+            * The job queue will be automatically started/stopped by starting/stopping the
+              ``Updater``, which automatically calls :meth:`telegram.ext.Dispatcher.start`
+              and :meth:`telegram.ext.Dispatcher.stop`, respectively.
+            * When passing :obj:`None`,
+              :attr:`telegram.ext.ConversationHandler.conversation_timeout` can not be used, as
+              this uses :attr:`telegram.ext.Dispatcher.job_queue` internally.
+
+        Args:
+            job_queue (:class:`telegram.ext.JobQueue`, optional): The job queue. Pass :obj:`None`
+                if you don't want to use a job queue.
+
+        Returns:
+            :class:`UpdaterBuilder`: The same builder with the updated argument.
+        """
         return self._job_queue(job_queue)  # type: ignore[return-value]
 
     def persistence(
         self: 'UpdaterBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
         persistence: InPT,
     ) -> 'UpdaterBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, InPT], BT, CCT, UD, CD, BD, JQ, InPT]':
+        """Sets a :class:`telegram.ext.BasePersistence` instance to be used for the
+        :attr:`telegram.ext.Updater.dispatcher`.
+
+        .. seealso:: `Making your bot persistent <https://git.io/J0FWM>`_,
+            `persistentconversationbot.py <https://git.io/J0FW7>`_,
+            :attr:`telegram.ext.Dispatcher.persistence`
+
+        Warning:
+            If a :class:`telegram.ext.ContextTypes` instance is set via :meth:`context_types`,
+            the persistence instance must use the same types!
+
+        Args:
+            persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence
+                instance.
+
+        Returns:
+            :class:`UpdaterBuilder`: The same builder with the updated argument.
+        """
         return self._persistence(persistence)  # type: ignore[return-value]
 
     def context_types(
         self: 'UpdaterBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
         context_types: 'ContextTypes[InCCT, InUD, InCD, InBD]',
     ) -> 'UpdaterBuilder[Dispatcher[BT, InCCT, InUD, InCD, InBD, JQ, PT], BT, InCCT, InUD, InCD, InBD, JQ, PT]':
+        """Sets a :class:`telegram.ext.ContextTypes` instance to be used for the
+        :attr:`telegram.ext.Updater.dispatcher`.
+
+        .. seealso:: `contexttypesbot.py <https://git.io/J0F8d>`_,
+            :attr:`telegram.ext.Dispatcher.context_types`.
+
+        Args:
+            context_types (:class:`telegram.ext.ContextTypes`, optional): The context types.
+
+        Returns:
+            :class:`UpdaterBuilder`: The same builder with the updated argument.
+        """
         return self._context_types(context_types)  # type: ignore[return-value]
 
     @overload
@@ -819,9 +1073,41 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         self: BuilderType,
         dispatcher: Optional[Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]],
     ) -> 'UpdaterBuilder[Optional[Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]], InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]':
+        """Sets a :class:`telegram.ext.Dispatcher` instance to be used for
+        :attr:`telegram.ext.Updater.dispatcher`. If not called, a queue will be instantiated.
+        The dispatchers :attr:`telegram.ext.Dispatcher.bot`,
+        :attr:`telegram.ext.Dispatcher.update_queue` and
+        :attr:`telegram.ext.Dispatcher.exception_event` will be used for the respective arguments
+        of the updater.
+        If not called, a dispatcher will be instantiated.
+
+        Args:
+            dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher.
+
+        Returns:
+            :class:`UpdaterBuilder`: The same builder with the updated argument.
+        """
         return self._dispatcher(dispatcher)  # type: ignore[return-value]
 
     def user_signal_handler(
         self: BuilderType, user_signal_handler: Callable[[int, object], Any]
     ) -> BuilderType:
+        """Sets a callback to be used for :attr:`telegram.ext.Updater.user_signal_handler`.
+        The callback will be called when :meth:`telegram.ext.Updater.idle()` receives a signal.
+        It will be called with the two arguments ``signum, frame`` as for the
+        :meth:`signal.signal` of the standard library.
+
+        Note:
+            Signal handlers are an advanced feature that come with some culprits and are not thread
+            safe. This should therefore only be used for tasks like closing threads or database
+            connections on shutdown. Note that for many tasks a viable alternative is to simply
+            put your code *after* calling :meth:`telegram.ext.Updater.idle`. In this case it will
+            be executed after the updater has shut down.
+
+        Args:
+            user_signal_handler (Callable[signum, frame]): The signal handler.
+
+        Returns:
+            :class:`UpdaterBuilder`: The same builder with the updated argument.
+        """
         return self._user_signal_handler(user_signal_handler)
