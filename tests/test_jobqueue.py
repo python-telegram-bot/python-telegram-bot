@@ -227,7 +227,7 @@ class TestJobQueue:
 
         sleep(0.015)
 
-        assert self.result == 1
+        assert self.result == 0
 
     def test_error(self, job_queue):
         job_queue.run_repeating(self.job_with_exception, 0.01)
@@ -241,7 +241,7 @@ class TestJobQueue:
         try:
             u.job_queue.run_repeating(self.job_run_once, 0.02)
             sleep(0.03)
-            assert self.result == 1
+            assert self.result == 0
             u.stop()
             sleep(1)
             assert self.result == 1
@@ -357,7 +357,7 @@ class TestJobQueue:
         )
         expected_reschedule_time = expected_reschedule_time.timestamp()
 
-        job_queue.run_monthly(self.job_run_once, time_of_day, 31, day_is_strict=False)
+        job_queue.run_monthly(self.job_run_once, time_of_day, -1)
         scheduled_time = job_queue.jobs()[0].next_t.timestamp()
         assert scheduled_time == pytest.approx(expected_reschedule_time)
 

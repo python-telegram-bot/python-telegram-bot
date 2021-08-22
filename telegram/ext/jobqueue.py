@@ -25,8 +25,6 @@ from typing import TYPE_CHECKING, Callable, List, Optional, Tuple, Union, cast, 
 import pytz
 from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED, JobEvent
 from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.combining import OrTrigger
-from apscheduler.triggers.cron import CronTrigger
 from apscheduler.job import Job as APSJob
 
 from telegram.ext.callbackcontext import CallbackContext
@@ -311,7 +309,6 @@ class JobQueue:
         day: int,
         context: object = None,
         name: str = None,
-        day_is_strict: bool = True,
         job_kwargs: JSONDict = None,
     ) -> 'Job':
         """Creates a new ``Job`` that runs on a monthly basis and adds it to the queue.
@@ -349,34 +346,24 @@ class JobQueue:
         job = Job(callback, context, name, self)
 
         # if day == -1 the run on last day of the month
-        if day == -1:
-            j = self.scheduler.add_job(
-                callback,
-                trigger='cron',
-                args=self._build_args(job),
-                name=name,
-                day='last',
-                hour=when.hour,
-                minute=when.minute,
-                second=when.second,
-                timezone=when.tzinfo or self.scheduler.timezone,
-                **job_kwargs,
-            )
         # else run on the day as provided
+        if day == -1:
+            _day = 'last'
         else:
-            j = self.scheduler.add_job(
-                callback,
-                trigger='cron',
-                args=self._build_args(job),
-                name=name,
-                day=day,
-                hour=when.hour,
-                minute=when.minute,
-                second=when.second,
-                timezone=when.tzinfo or self.scheduler.timezone,
-                **job_kwargs,
-            )
+            _day = day
 
+        j = self.scheduler.add_job(
+            callback,
+            trigger='cron',
+            args=self._build_args(job),
+            name=name,
+            day=_day,
+            hour=when.hour,
+            minute=when.minute,
+            second=when.second,
+            timezone=when.tzinfo or self.scheduler.timezone,
+            **job_kwargs,
+        )
         job.job = j
         return job
 
