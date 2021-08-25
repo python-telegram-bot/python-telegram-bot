@@ -347,17 +347,15 @@ class JobQueue:
 
         # if day == -1 the run on last day of the month
         # else run on the day as provided
-        if day == -1:
-            _day = 'last'
-        else:
-            _day = day
+
+        day = 'last' if day == -1 else day
 
         j = self.scheduler.add_job(
             callback,
             trigger='cron',
             args=self._build_args(job),
             name=name,
-            day=_day,
+            day=day,
             hour=when.hour,
             minute=when.minute,
             second=when.second,

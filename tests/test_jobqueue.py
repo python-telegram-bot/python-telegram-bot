@@ -227,7 +227,7 @@ class TestJobQueue:
 
         sleep(0.015)
 
-        assert self.result == 0
+        assert self.result == 1
 
     def test_error(self, job_queue):
         job_queue.run_repeating(self.job_with_exception, 0.01)
@@ -241,7 +241,7 @@ class TestJobQueue:
         try:
             u.job_queue.run_repeating(self.job_run_once, 0.02)
             sleep(0.03)
-            assert self.result == 0
+            assert self.result == 1
             u.stop()
             sleep(1)
             assert self.result == 1
