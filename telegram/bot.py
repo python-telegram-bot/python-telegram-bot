@@ -2673,6 +2673,8 @@ class Bot(TelegramObject):
         ``file_id`` or specify a URL.
 
         Args:
+            media (:class:`telegram.InputMedia`): An object for a new media content
+                of the message.
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
                 specified. Unique identifier for the target chat or username of the target channel
                 (in the format ``@channelusername``).
@@ -2680,8 +2682,6 @@ class Bot(TelegramObject):
                 Identifier of the message to edit.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
                 specified. Identifier of the inline message.
-            media (:class:`telegram.InputMedia`): An object for a new media content
-                of the message.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
                 object for an inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -2691,7 +2691,7 @@ class Bot(TelegramObject):
                 Telegram API.
 
         Returns:
-            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            :class:`telegram.Message`: On success, if edited message is not an inline message, the
             edited Message is returned, otherwise :obj:`True` is returned.
 
         Raises:
