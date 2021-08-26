@@ -25,8 +25,6 @@ from typing import TYPE_CHECKING, Callable, List, Optional, Tuple, Union, cast, 
 import pytz
 from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED, JobEvent
 from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.combining import OrTrigger
-from apscheduler.triggers.cron import CronTrigger
 from apscheduler.job import Job as APSJob
 
 from telegram.ext.callbackcontext import CallbackContext
@@ -307,10 +305,13 @@ class JobQueue:
         day: int,
         context: object = None,
         name: str = None,
-        day_is_strict: bool = True,
         job_kwargs: JSONDict = None,
     ) -> 'Job':
         """Creates a new ``Job`` that runs on a monthly basis and adds it to the queue.
+
+        .. versionchanged:: 14.0
+            The ``day_is_strict`` argument was removed. Instead one can now pass -1 to the ``day``
+            parameter to have the job run on the last day of the month.
 
         Args:
             callback (:obj:`callable`):  The callback function that should be executed by the new
@@ -323,13 +324,13 @@ class JobQueue:
             when (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
                 (``when.tzinfo``) is :obj:`None`, the default timezone of the bot will be used.
             day (:obj:`int`): Defines the day of the month whereby the job would run. It should
-                be within the range of 1 and 31, inclusive.
+                be within the range of 1 and 31, inclusive. If a month has fewer days than this
+                number, the job will not run in this month. Passing -1 leads to the job running on
+                the last day of the month.
             context (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through ``job.context`` in the callback. Defaults to :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
                 ``callback.__name__``.
-            day_is_strict (:obj:`bool`, optional): If :obj:`False` and day > month.days, will pick
-                the last day in the month. Defaults to :obj:`True`.
             job_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to pass to the
                 ``scheduler.add_job()``.
 
@@ -344,44 +345,18 @@ class JobQueue:
         name = name or callback.__name__
         job = Job(callback, context, name, self)
 
-        if day_is_strict:
-            j = self.scheduler.add_job(
-                callback,
-                trigger='cron',
-                args=self._build_args(job),
-                name=name,
-                day=day,
-                hour=when.hour,
-                minute=when.minute,
-                second=when.second,
-                timezone=when.tzinfo or self.scheduler.timezone,
-                **job_kwargs,
-            )
-        else:
-            trigger = OrTrigger(
-                [
-                    CronTrigger(
-                        day=day,
-                        hour=when.hour,
-                        minute=when.minute,
-                        second=when.second,
-                        timezone=when.tzinfo,
-                        **job_kwargs,
-                    ),
-                    CronTrigger(
-                        day='last',
-                        hour=when.hour,
-                        minute=when.minute,
-                        second=when.second,
-                        timezone=when.tzinfo or self.scheduler.timezone,
-                        **job_kwargs,
-                    ),
-                ]
-            )
-            j = self.scheduler.add_job(
-                callback, trigger=trigger, args=self._build_args(job), name=name, **job_kwargs
-            )
-
+        j = self.scheduler.add_job(
+            callback,
+            trigger='cron',
+            args=self._build_args(job),
+            name=name,
+            day='last' if day == -1 else day,
+            hour=when.hour,
+            minute=when.minute,
+            second=when.second,
+            timezone=when.tzinfo or self.scheduler.timezone,
+            **job_kwargs,
+        )
         job.job = j
         return job
 

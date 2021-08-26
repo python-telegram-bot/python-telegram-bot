@@ -354,7 +354,7 @@ class TestJobQueue:
         )
         expected_reschedule_time = expected_reschedule_time.timestamp()
 
-        job_queue.run_monthly(self.job_run_once, time_of_day, 31, day_is_strict=False)
+        job_queue.run_monthly(self.job_run_once, time_of_day, -1)
         scheduled_time = job_queue.jobs()[0].next_t.timestamp()
         assert scheduled_time == pytest.approx(expected_reschedule_time)
 
