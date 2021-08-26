@@ -1753,7 +1753,7 @@ class Bot(TelegramObject):
               :obj:`title` and :obj:`address` and optionally :obj:`foursquare_id` and
               :obj:`foursquare_type` or optionally :obj:`google_place_id` and
               :obj:`google_place_type`.
-            * Foursquare details and Google Pace details are mutually exclusive. However, this
+            * Foursquare details and Google Place details are mutually exclusive. However, this
               behaviour is undocumented and might be changed by Telegram.
 
         Args:
@@ -2868,7 +2868,7 @@ class Bot(TelegramObject):
     @log
     def set_webhook(
         self,
-        url: str = None,
+        url: str,
         certificate: FileInput = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         max_connections: int = 40,
@@ -2939,10 +2939,8 @@ class Bot(TelegramObject):
         .. _`guide to Webhooks`: https://core.telegram.org/bots/webhooks
 
         """
-        data: JSONDict = {}
+        data: JSONDict = {'url': url}
 
-        if url is not None:
-            data['url'] = url
         if certificate:
             data['certificate'] = parse_file_input(certificate)
         if max_connections is not None:
@@ -4231,7 +4229,7 @@ class Bot(TelegramObject):
     def set_chat_description(
         self,
         chat_id: Union[str, int],
-        description: str,
+        description: str = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
@@ -4243,7 +4241,7 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
-            description (:obj:`str`): New chat description, 0-255 characters.
+            description (:obj:`str`, optional): New chat description, 0-255 characters.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -4257,7 +4255,10 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id, 'description': description}
+        data: JSONDict = {'chat_id': chat_id}
+
+        if description is not None:
+            data['description'] = description
 
         result = self._post('setChatDescription', data, timeout=timeout, api_kwargs=api_kwargs)
 

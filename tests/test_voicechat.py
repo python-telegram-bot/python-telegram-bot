@@ -95,7 +95,7 @@ class TestVoiceChatEnded:
 
 
 class TestVoiceChatParticipantsInvited:
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self, mro_slots, user1):
         action = VoiceChatParticipantsInvited([user1])
         for attr in action.__slots__:
             assert getattr(action, attr, 'err') != 'err', f"got extra slot '{attr}'"
@@ -119,25 +119,6 @@ class TestVoiceChatParticipantsInvited:
         assert voice_chat_dict["users"] == [user1.to_dict(), user2.to_dict()]
         assert voice_chat_dict["users"][0]["id"] == user1.id
         assert voice_chat_dict["users"][1]["id"] == user2.id
-
-    def test_equality(self, user1, user2):
-        a = VoiceChatParticipantsInvited([user1])
-        b = VoiceChatParticipantsInvited([user1])
-        c = VoiceChatParticipantsInvited([user1, user2])
-        d = VoiceChatParticipantsInvited([user2])
-        e = VoiceChatStarted()
-
-        assert a == b
-        assert hash(a) == hash(b)
-
-        assert a != c
-        assert hash(a) != hash(c)
-
-        assert a != d
-        assert hash(a) != hash(d)
-
-        assert a != e
-        assert hash(a) != hash(e)
 
 
 class TestVoiceChatScheduled:
