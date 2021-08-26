@@ -324,13 +324,11 @@ class JobQueue:
             when (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
                 (``when.tzinfo``) is :obj:`None`, the default timezone of the bot will be used.
             day (:obj:`int`): Defines the day of the month whereby the job would run. It should
-                be within the range of 1 and 31, inclusive.
+                be within the range of 1 and 31, inclusive or -1 for end of month.
             context (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through ``job.context`` in the callback. Defaults to :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
                 ``callback.__name__``.
-            day_is_strict (:obj:`bool`, optional): If :obj:`False` and day > month.days, will pick
-                the last day in the month. Defaults to :obj:`True`.
             job_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to pass to the
                 ``scheduler.add_job()``.
 
@@ -345,17 +343,12 @@ class JobQueue:
         name = name or callback.__name__
         job = Job(callback, context, name, self)
 
-        # if day == -1 the run on last day of the month
-        # else run on the day as provided
-
-        day = 'last' if day == -1 else day
-
         j = self.scheduler.add_job(
             callback,
             trigger='cron',
             args=self._build_args(job),
             name=name,
-            day=day,
+            day='last' if day == -1 else day,
             hour=when.hour,
             minute=when.minute,
             second=when.second,
