@@ -313,6 +313,10 @@ class JobQueue:
     ) -> 'Job':
         """Creates a new ``Job`` that runs on a monthly basis and adds it to the queue.
 
+        .. versionchanged:: 14.0
+            The ``day_is_strict`` argument was removed. Instead one can now pass -1 to the ``day``
+            parameter to have the job run on the last day of the month.
+
         Args:
             callback (:obj:`callable`):  The callback function that should be executed by the new
                 job. Callback signature for context based API:
@@ -324,7 +328,9 @@ class JobQueue:
             when (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
                 (``when.tzinfo``) is :obj:`None`, the default timezone of the bot will be used.
             day (:obj:`int`): Defines the day of the month whereby the job would run. It should
-                be within the range of 1 and 31, inclusive or -1 for end of month.
+                be within the range of 1 and 31, inclusive. If a month has fewer days than this
+                number, the job will not run in this month. Passing -1 leads to the job running on
+                the last day of the month.
             context (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through ``job.context`` in the callback. Defaults to :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
