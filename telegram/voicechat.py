@@ -99,9 +99,6 @@ class VoiceChatParticipantsInvited(TelegramObject):
         self.users = users
         self._id_attrs = (self.users,)
 
-    def __hash__(self) -> int:
-        return hash(tuple(self.users))
-
     @classmethod
     def de_json(
         cls, data: Optional[JSONDict], bot: 'Bot'
