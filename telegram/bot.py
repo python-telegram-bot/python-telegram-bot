@@ -2657,10 +2657,10 @@ class Bot(TelegramObject):
     @log
     def edit_message_media(
         self,
+        media: 'InputMedia',
         chat_id: Union[str, int] = None,
         message_id: int = None,
         inline_message_id: int = None,
-        media: 'InputMedia' = None,
         reply_markup: InlineKeyboardMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,

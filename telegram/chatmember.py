@@ -417,9 +417,9 @@ class ChatMemberOwner(ChatMember):
     def __init__(
         self,
         user: User,
+        is_anonymous: bool,
         custom_title: str = None,
-        is_anonymous: bool = None,
-        **_kwargs: Any,
+        **_kwargs: object,
     ):
         super().__init__(
             status=ChatMember.CREATOR,
@@ -509,20 +509,20 @@ class ChatMemberAdministrator(ChatMember):
     def __init__(
         self,
         user: User,
-        can_be_edited: bool = None,
-        custom_title: str = None,
-        is_anonymous: bool = None,
-        can_manage_chat: bool = None,
+        can_be_edited: bool,
+        is_anonymous: bool,
+        can_manage_chat: bool,
+        can_delete_messages: bool,
+        can_manage_voice_chats: bool,
+        can_restrict_members: bool,
+        can_promote_members: bool,
+        can_change_info: bool,
+        can_invite_users: bool,
         can_post_messages: bool = None,
         can_edit_messages: bool = None,
-        can_delete_messages: bool = None,
-        can_manage_voice_chats: bool = None,
-        can_restrict_members: bool = None,
-        can_promote_members: bool = None,
-        can_change_info: bool = None,
-        can_invite_users: bool = None,
         can_pin_messages: bool = None,
-        **_kwargs: Any,
+        custom_title: str = None,
+        **_kwargs: object,
     ):
         super().__init__(
             status=ChatMember.ADMINISTRATOR,
@@ -562,7 +562,7 @@ class ChatMemberMember(ChatMember):
 
     __slots__ = ()
 
-    def __init__(self, user: User, **_kwargs: Any):
+    def __init__(self, user: User, **_kwargs: object):
         super().__init__(status=ChatMember.MEMBER, user=user)
 
 
@@ -628,17 +628,17 @@ class ChatMemberRestricted(ChatMember):
     def __init__(
         self,
         user: User,
-        is_member: bool = None,
-        can_change_info: bool = None,
-        can_invite_users: bool = None,
-        can_pin_messages: bool = None,
-        can_send_messages: bool = None,
-        can_send_media_messages: bool = None,
-        can_send_polls: bool = None,
-        can_send_other_messages: bool = None,
-        can_add_web_page_previews: bool = None,
-        until_date: datetime.datetime = None,
-        **_kwargs: Any,
+        is_member: bool,
+        can_change_info: bool,
+        can_invite_users: bool,
+        can_pin_messages: bool,
+        can_send_messages: bool,
+        can_send_media_messages: bool,
+        can_send_polls: bool,
+        can_send_other_messages: bool,
+        can_add_web_page_previews: bool,
+        until_date: datetime.datetime,
+        **_kwargs: object,
     ):
         super().__init__(
             status=ChatMember.RESTRICTED,
@@ -674,7 +674,7 @@ class ChatMemberLeft(ChatMember):
 
     __slots__ = ()
 
-    def __init__(self, user: User, **_kwargs: Any):
+    def __init__(self, user: User, **_kwargs: object):
         super().__init__(status=ChatMember.LEFT, user=user)
 
 
@@ -704,8 +704,8 @@ class ChatMemberBanned(ChatMember):
     def __init__(
         self,
         user: User,
-        until_date: datetime.datetime = None,
-        **_kwargs: Any,
+        until_date: datetime.datetime,
+        **_kwargs: object,
     ):
         super().__init__(
             status=ChatMember.KICKED,
