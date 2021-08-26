@@ -37,7 +37,7 @@ from typing import (
 )
 
 from telegram import Bot
-from telegram.ext import Dispatcher, JobQueue, Updater, ExtBot
+from telegram.ext import Dispatcher, JobQueue, Updater, ExtBot, ContextTypes
 from telegram.ext.utils.types import CCT, UD, CD, BD, BT, DefaultContextType, JQ, PT
 from telegram.utils.request import Request
 
@@ -45,7 +45,6 @@ if TYPE_CHECKING:
     from telegram.ext import (
         Defaults,
         BasePersistence,
-        ContextTypes,
         CallbackContext,
     )
 
@@ -100,8 +99,9 @@ if TYPE_CHECKING:
 
 def check_if_already_set(func: CT) -> CT:
     def _decorator(self, arg):  # type: ignore[no-untyped-def]
-        arg_name = func.__name__.strip('_')
-        if getattr(self, f'__{arg_name}_was_set') is True:
+        # remove the '_set_'
+        arg_name = func.__name__[5:]
+        if getattr(self, f'_{arg_name}_was_set') is True:
             raise self._exception_builder(arg_name)  # pylint: disable=W0212
         return func(self, arg)
 
@@ -122,6 +122,7 @@ _BOT_CHECKS = [
 ]
 
 _DISPATCHER_CHECKS = [
+    ('bot', 'bot instance'),
     ('update_queue', 'update_queue'),
     ('workers', 'workers'),
     ('exception_event', 'exception_event'),
@@ -129,6 +130,7 @@ _DISPATCHER_CHECKS = [
     ('persistence', 'persistence instance'),
     ('context_types', 'ContextTypes instance'),
 ] + _BOT_CHECKS
+_DISPATCHER_CHECKS.remove(('dispatcher', 'Dispatcher instance'))
 
 
 # Base class for all builders. We do this mainly to reduce code duplication, because e.g.
@@ -137,84 +139,112 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     # pylint reports false positives here:
     # pylint: disable=W0238
 
+    __slots__ = (
+        '_token',
+        '_token_was_set',
+        '_base_url',
+        '_base_url_was_set',
+        '_base_file_url',
+        '_base_file_url_was_set',
+        '_request_kwargs',
+        '_request_kwargs_was_set',
+        '_request',
+        '_request_was_set',
+        '_private_key',
+        '_private_key_was_set',
+        '_private_key_password',
+        '_private_key_password_was_set',
+        '_defaults',
+        '_defaults_was_set',
+        '_arbitrary_callback_data',
+        '_arbitrary_callback_data_was_set',
+        '_bot',
+        '_bot_was_set',
+        '_update_queue',
+        '_update_queue_was_set',
+        '_workers',
+        '_workers_was_set',
+        '_exception_event',
+        '_exception_event_was_set',
+        '_job_queue',
+        '_job_queue_was_set',
+        '_persistence',
+        '_persistence_was_set',
+        '_context_types',
+        '_context_types_was_set',
+        '_dispatcher',
+        '_dispatcher_was_set',
+        '_user_signal_handler',
+        '_user_signal_handler_was_set',
+    )
+
     def __init__(self: 'InitBaseBuilder'):
-        # Instead of the *_was_set variables, we could work with e.g. __token = DEFAULT_NONE.
+        # Instead of the *_was_set variables, we could work with e.g. _token = DEFAULT_NONE.
         # However, this would make type hinting a *lot* more involved and reasonable type hinting
         # accuracy is valuable for the builder classes.
 
-        self.__token: str = ''
-        self.__token_was_set = False
-        self.__base_url: str = 'https://api.telegram.org/bot'
-        self.__base_url_was_set = False
-        self.__base_file_url: str = 'https://api.telegram.org/file/bot'
-        self.__base_file_url_was_set = False
-        self.__request_kwargs: Dict[str, Any] = {}
-        self.__request_kwargs_was_set = False
-        self.__request: Optional['Request'] = None
-        self.__request_was_set = False
-        self.__private_key: Optional[bytes] = None
-        self.__private_key_was_set = False
-        self.__private_key_password: Optional[bytes] = None
-        self.__private_key_password_was_set = False
-        self.__defaults: Optional['Defaults'] = None
-        self.__defaults_was_set = False
-        self.__arbitrary_callback_data: Union[bool, int] = False
-        self.__arbitrary_callback_data_was_set = False
-        self.__bot: Bot = None  # type: ignore[assignment]
-        self.__bot_was_set = False
-        self.__update_queue: Queue = Queue()
-        self.__update_queue_was_set = False
-        self.__workers: int = 4
-        self.__workers_was_set = False
-        self.__exception_event: Event = Event()
-        self.__exception_event_was_set = False
-        self.__job_queue: Optional['JobQueue'] = JobQueue()
-        self.__job_queue_was_set = False
-        self.__persistence: Optional['BasePersistence'] = None
-        self.__persistence_was_set = False
-        self.__context_types: Optional['ContextTypes'] = None
-        self.__context_types_was_set = False
-        self.__dispatcher: Optional['Dispatcher'] = None
-        self.__dispatcher_was_set = False
-        self.__user_signal_handler: Optional[Callable[[int, object], Any]] = None
-        self.__user_signal_handler_was_set = False
-
-    def _build_bot(self) -> Bot:
-        if self.__token_was_set is False:
-            raise RuntimeError('No bot token was set.')
-        return Bot(
-            token=self.__token,
-            base_url=self.__base_url,
-            base_file_url=self.__base_file_url,
-            private_key=self.__private_key,
-            private_key_password=self.__private_key_password,
-        )
+        self._token: str = ''
+        self._token_was_set = False
+        self._base_url: str = 'https://api.telegram.org/bot'
+        self._base_url_was_set = False
+        self._base_file_url: str = 'https://api.telegram.org/file/bot'
+        self._base_file_url_was_set = False
+        self._request_kwargs: Dict[str, Any] = {}
+        self._request_kwargs_was_set = False
+        self._request: Optional['Request'] = None
+        self._request_was_set = False
+        self._private_key: Optional[bytes] = None
+        self._private_key_was_set = False
+        self._private_key_password: Optional[bytes] = None
+        self._private_key_password_was_set = False
+        self._defaults: Optional['Defaults'] = None
+        self._defaults_was_set = False
+        self._arbitrary_callback_data: Union[bool, int] = False
+        self._arbitrary_callback_data_was_set = False
+        self._bot: Bot = None  # type: ignore[assignment]
+        self._bot_was_set = False
+        self._update_queue: Queue = Queue()
+        self._update_queue_was_set = False
+        self._workers: int = 4
+        self._workers_was_set = False
+        self._exception_event: Event = Event()
+        self._exception_event_was_set = False
+        self._job_queue: Optional['JobQueue'] = JobQueue()
+        self._job_queue_was_set = False
+        self._persistence: Optional['BasePersistence'] = None
+        self._persistence_was_set = False
+        self._context_types: ContextTypes = ContextTypes()
+        self._context_types_was_set = False
+        self._dispatcher: Optional['Dispatcher'] = None
+        self._dispatcher_was_set = False
+        self._user_signal_handler: Optional[Callable[[int, object], Any]] = None
+        self._user_signal_handler_was_set = False
 
     def _build_ext_bot(self) -> ExtBot:
-        if self.__token_was_set is False:
+        if self._token_was_set is False:
             raise RuntimeError('No bot token was set.')
         return ExtBot(
-            token=self.__token,
-            base_url=self.__base_url,
-            base_file_url=self.__base_file_url,
-            private_key=self.__private_key,
-            private_key_password=self.__private_key_password,
-            defaults=self.__defaults,
-            arbitrary_callback_data=self.__arbitrary_callback_data,
+            token=self._token,
+            base_url=self._base_url,
+            base_file_url=self._base_file_url,
+            private_key=self._private_key,
+            private_key_password=self._private_key_password,
+            defaults=self._defaults,
+            arbitrary_callback_data=self._arbitrary_callback_data,
         )
 
     def _build_dispatcher(
         self: '_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]',
     ) -> Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]:
-        job_queue = JobQueue() if self.__job_queue_was_set is False else self.__job_queue
-
+        job_queue = JobQueue() if self._job_queue_was_set is False else self._job_queue
         dispatcher: Dispatcher[BT, CCT, UD, CD, BD, JQ, PT] = Dispatcher(
-            bot=self.__bot if self.__bot_was_set is False else self._build_ext_bot(),
-            update_queue=self.__update_queue,
-            workers=self.__workers,
-            exception_event=self.__exception_event,
+            bot=self._bot if self._bot_was_set is True else self._build_ext_bot(),
+            update_queue=self._update_queue,
+            workers=self._workers,
+            exception_event=self._exception_event,
             job_queue=job_queue,
-            persistence=self.__persistence,
+            persistence=self._persistence,
+            context_types=self._context_types,
             builder_flag=True,
         )
 
@@ -226,16 +256,20 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     def _build_updater(
         self: '_BaseBuilder[ODT, BT, Any, Any, Any, Any, Any, Any]',
     ) -> Updater[BT, ODT]:
-        if self.__dispatcher_was_set is False:
+        if self._dispatcher_was_set is False:
             dispatcher = self._build_dispatcher()
             return Updater(
                 dispatcher=dispatcher,
+                user_signal_handler=self._user_signal_handler,
+                exception_event=self._exception_event,
                 builder_flag=True,
             )
         return Updater(
-            dispatcher=self.__dispatcher,
-            bot=self.__bot or self._build_ext_bot(),
-            update_queue=self.__update_queue,
+            dispatcher=self._dispatcher,
+            bot=self._dispatcher.bot if self._dispatcher else (self._bot or self._build_ext_bot()),
+            update_queue=self._update_queue,
+            user_signal_handler=self._user_signal_handler,
+            exception_event=self._exception_event,
             builder_flag=True,
         )
 
@@ -245,188 +279,210 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
             return RuntimeError(f'The parameter `{arg_1}` was already set.')
         return RuntimeError(f'The parameter `{arg_1}` can only be set, if the no {arg_2} was set.')
 
+    @property
+    def _dispatcher_check(self) -> bool:
+        return self._dispatcher_was_set and self._dispatcher is not None
+
     @check_if_already_set
-    def _token(self: BuilderType, token: str) -> BuilderType:
-        if self.__bot:
+    def _set_token(self: BuilderType, token: str) -> BuilderType:
+        if self._bot_was_set:
             raise self._exception_builder('token', 'bot instance')
-        if self.__dispatcher:
+        if self._dispatcher_check:
             raise self._exception_builder('token', 'Dispatcher instance')
-        self.__token = token
-        self.__token_was_set = True
+        self._token = token
+        self._token_was_set = True
         return self
 
     @check_if_already_set
-    def _base_url(self: BuilderType, base_url: str) -> BuilderType:
-        if self.__bot:
+    def _set_base_url(self: BuilderType, base_url: str) -> BuilderType:
+        if self._bot_was_set:
             raise self._exception_builder('base_url', 'bot instance')
-        self.__base_url = base_url
-        self.__base_url_was_set = True
+        if self._dispatcher_check:
+            raise self._exception_builder('base_url', 'Dispatcher instance')
+        self._base_url = base_url
+        self._base_url_was_set = True
         return self
 
     @check_if_already_set
-    def _base_file_url(self: BuilderType, base_file_url: str) -> BuilderType:
-        if self.__bot:
-            raise self._exception_builder('_base_file_url', 'bot instance')
-        self.__base_file_url = base_file_url
-        self.__base_file_url_was_set = True
+    def _set_base_file_url(self: BuilderType, base_file_url: str) -> BuilderType:
+        if self._bot_was_set:
+            raise self._exception_builder('base_file_url', 'bot instance')
+        if self._dispatcher_check:
+            raise self._exception_builder('base_file_url', 'Dispatcher instance')
+        self._base_file_url = base_file_url
+        self._base_file_url_was_set = True
         return self
 
     @check_if_already_set
-    def _request_kwargs(self: BuilderType, request_kwargs: Dict[str, Any]) -> BuilderType:
-        if self.__request:
+    def _set_request_kwargs(self: BuilderType, request_kwargs: Dict[str, Any]) -> BuilderType:
+        if self._request_was_set:
             raise self._exception_builder('request_kwargs', 'Request instance')
-        if self.__bot:
+        if self._bot_was_set:
             raise self._exception_builder('request_kwargs', 'bot instance')
-        self.__request_kwargs = request_kwargs
-        self.__request_kwargs_was_set = True
+        if self._dispatcher_check:
+            raise self._exception_builder('request_kwargs', 'Dispatcher instance')
+        self._request_kwargs = request_kwargs
+        self._request_kwargs_was_set = True
         return self
 
     @check_if_already_set
-    def _request(self: BuilderType, request: Request) -> BuilderType:
-        if self.__request_kwargs:
+    def _set_request(self: BuilderType, request: Request) -> BuilderType:
+        if self._request_kwargs_was_set:
             raise self._exception_builder('request', 'request_kwargs')
-        if self.__bot:
+        if self._bot_was_set:
             raise self._exception_builder('request', 'bot instance')
-        self.__request = request
-        self.__request_was_set = True
+        if self._dispatcher_check:
+            raise self._exception_builder('request', 'Dispatcher instance')
+        self._request = request
+        self._request_was_set = True
         return self
 
     @check_if_already_set
-    def _private_key(self: BuilderType, private_key: bytes) -> BuilderType:
-        if self.__bot:
+    def _set_private_key(self: BuilderType, private_key: bytes) -> BuilderType:
+        if self._bot_was_set:
             raise self._exception_builder('private_key', 'bot instance')
-        self.__private_key = private_key
-        self.__private_key_was_set = True
+        if self._dispatcher_check:
+            raise self._exception_builder('private_key', 'Dispatcher instance')
+        self._private_key = private_key
+        self._private_key_was_set = True
         return self
 
     @check_if_already_set
-    def _private_key_password(self: BuilderType, private_key_password: bytes) -> BuilderType:
-        if self.__bot:
+    def _set_private_key_password(self: BuilderType, private_key_password: bytes) -> BuilderType:
+        if self._bot_was_set:
             raise self._exception_builder('private_key_password', 'bot instance')
-        self.__private_key_password = private_key_password
-        self.__private_key_password_was_set = True
+        if self._dispatcher_check:
+            raise self._exception_builder('private_key_password', 'Dispatcher instance')
+        self._private_key_password = private_key_password
+        self._private_key_password_was_set = True
         return self
 
     @check_if_already_set
-    def _defaults(self: BuilderType, defaults: 'Defaults') -> BuilderType:
-        if self.__bot:
+    def _set_defaults(self: BuilderType, defaults: 'Defaults') -> BuilderType:
+        if self._bot_was_set:
             raise self._exception_builder('defaults', 'bot instance')
-        self.__defaults = defaults
-        self.__defaults_was_set = True
+        if self._dispatcher_check:
+            raise self._exception_builder('defaults', 'Dispatcher instance')
+        self._defaults = defaults
+        self._defaults_was_set = True
         return self
 
     @check_if_already_set
-    def _arbitrary_callback_data(
+    def _set_arbitrary_callback_data(
         self: BuilderType, arbitrary_callback_data: Union[bool, int]
     ) -> BuilderType:
-        if self.__bot:
+        if self._bot_was_set:
             raise self._exception_builder('arbitrary_callback_data', 'bot instance')
-        self.__arbitrary_callback_data = arbitrary_callback_data
-        self.__arbitrary_callback_data_was_set = True
+        if self._dispatcher_check:
+            raise self._exception_builder('arbitrary_callback_data', 'Dispatcher instance')
+        self._arbitrary_callback_data = arbitrary_callback_data
+        self._arbitrary_callback_data_was_set = True
         return self
 
     @check_if_already_set
-    def _bot(
+    def _set_bot(
         self: '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, '
         'JQ, PT]',
         bot: InBT,
     ) -> '_BaseBuilder[Dispatcher[InBT, CCT, UD, CD, BD, JQ, PT], InBT, CCT, UD, CD, BD, JQ, PT]':
         for attr, error in _BOT_CHECKS:
-            if getattr(self, f'__{attr}'):
+            if (
+                getattr(self, f'_{attr}_was_set')
+                if attr != 'dispatcher'
+                else self._dispatcher_check
+            ):
                 raise self._exception_builder('bot', error)
-        self.__bot = bot
-        self.__bot_was_set = True
+        self._bot = bot
+        self._bot_was_set = True
         return self  # type: ignore[return-value]
 
     @check_if_already_set
-    def _update_queue(self: BuilderType, update_queue: Queue) -> BuilderType:
-        if self.__dispatcher:
+    def _set_update_queue(self: BuilderType, update_queue: Queue) -> BuilderType:
+        if self._dispatcher_check:
             raise self._exception_builder('update_queue', 'Dispatcher instance')
-        self.__update_queue = update_queue
-        self.__update_queue_was_set = True
+        self._update_queue = update_queue
+        self._update_queue_was_set = True
         return self
 
     @check_if_already_set
-    def _workers(self: BuilderType, workers: int) -> BuilderType:
-        if self.__dispatcher:
+    def _set_workers(self: BuilderType, workers: int) -> BuilderType:
+        if self._dispatcher_check:
             raise self._exception_builder('workers', 'Dispatcher instance')
-        self.__workers = workers
-        self.__workers_was_set = True
+        self._workers = workers
+        self._workers_was_set = True
         return self
 
     @check_if_already_set
-    def _exception_event(self: BuilderType, exception_event: Event) -> BuilderType:
-        if self.__dispatcher:
+    def _set_exception_event(self: BuilderType, exception_event: Event) -> BuilderType:
+        if self._dispatcher_check:
             raise self._exception_builder('exception_event', 'Dispatcher instance')
-        self.__exception_event = exception_event
-        self.__exception_event_was_set = True
+        self._exception_event = exception_event
+        self._exception_event_was_set = True
         return self
 
     @check_if_already_set
-    def _job_queue(
+    def _set_job_queue(
         self: '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
         job_queue: InJQ,
     ) -> '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, InJQ, PT], BT, CCT, UD, CD, BD, InJQ, PT]':
-        if self.__dispatcher:
+        if self._dispatcher_check:
             raise self._exception_builder('job_queue', 'Dispatcher instance')
-        self.__job_queue = job_queue
-        self.__job_queue_was_set = True
+        self._job_queue = job_queue
+        self._job_queue_was_set = True
         return self  # type: ignore[return-value]
 
     @check_if_already_set
-    def _persistence(
+    def _set_persistence(
         self: '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
         persistence: InPT,
     ) -> '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, InPT], BT, CCT, UD, CD, BD, JQ, InPT]':
-        if self.__dispatcher:
+        if self._dispatcher_check:
             raise self._exception_builder('persistence', 'Dispatcher instance')
-        self.__persistence = persistence
-        self.__persistence_was_set = True
+        self._persistence = persistence
+        self._persistence_was_set = True
         return self  # type: ignore[return-value]
 
     @check_if_already_set
-    def _context_types(
+    def _set_context_types(
         self: '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
         context_types: 'ContextTypes[InCCT, InUD, InCD, InBD]',
     ) -> '_BaseBuilder[Dispatcher[BT, InCCT, InUD, InCD, InBD, JQ, PT], BT, InCCT, InUD, InCD, InBD, JQ, PT]':
-        if self.__dispatcher:
+        if self._dispatcher_check:
             raise self._exception_builder('context_types', 'Dispatcher instance')
-        self.__context_types = context_types
-        self.__context_types_was_set = True
+        self._context_types = context_types
+        self._context_types_was_set = True
         return self  # type: ignore[return-value]
 
     @overload
-    def _dispatcher(
+    def _set_dispatcher(
         self: '_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]', dispatcher: None
     ) -> '_BaseBuilder[None, BT, CCT, UD, CD, BD, JQ, PT]':
         ...
 
     @overload
-    def _dispatcher(
+    def _set_dispatcher(
         self: BuilderType, dispatcher: Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]
     ) -> '_BaseBuilder[Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT], InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]':
         ...
 
     @check_if_already_set  # type: ignore[misc]
-    def _dispatcher(
+    def _set_dispatcher(
         self: BuilderType,
         dispatcher: Optional[Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]],
     ) -> '_BaseBuilder[Optional[Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]], InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]':
         for attr, error in _DISPATCHER_CHECKS:
-            if getattr(self, f'__{attr}'):
+            if getattr(self, f'_{attr}_was_set'):
                 raise self._exception_builder('dispatcher', error)
-        self.__dispatcher = dispatcher
-        self.__dispatcher_was_set = True
+        self._dispatcher = dispatcher
+        self._dispatcher_was_set = True
         return self
 
     @check_if_already_set
-    def _user_signal_handler(
+    def _set_user_signal_handler(
         self: BuilderType, user_signal_handler: Callable[[int, object], Any]
     ) -> BuilderType:
-        if self.__dispatcher:
-            raise self._exception_builder('user_signal_handler', 'Dispatcher instance')
-        self.__user_signal_handler = user_signal_handler
-        self.__user_signal_handler_was_set = True
+        self._user_signal_handler = user_signal_handler
+        self._user_signal_handler_was_set = True
         return self
 
 
@@ -462,7 +518,7 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     """
 
     # The init is just here for mypy
-    def __init__(self: 'InitDispatcherBuilder'):
+    def _set_init_(self: 'InitDispatcherBuilder'):
         super().__init__()
 
     def build(
@@ -484,7 +540,7 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`DispatcherBuilder`: The same builder with the updated argument.
         """
-        return self._token(token)
+        return self._set_token(token)
 
     def base_url(self: BuilderType, base_url: str) -> BuilderType:
         """Sets the base URL to be used for :attr:`telegram.ext.Dispatcher.bot`. If not called,
@@ -500,7 +556,7 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`DispatcherBuilder`: The same builder with the updated argument.
         """
-        return self._base_url(base_url)
+        return self._set_base_url(base_url)
 
     def base_file_url(self: BuilderType, base_file_url: str) -> BuilderType:
         """Sets the base file URL to be used for :attr:`telegram.ext.Dispatcher.bot`. If not
@@ -516,7 +572,7 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`DispatcherBuilder`: The same builder with the updated argument.
         """
-        return self._base_file_url(base_file_url)
+        return self._set_base_file_url(base_file_url)
 
     def request_kwargs(self: BuilderType, request_kwargs: Dict[str, Any]) -> BuilderType:
         """Sets keyword arguments that will be passed to the :class:`telegram.utils.Request` object
@@ -531,7 +587,7 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`DispatcherBuilder`: The same builder with the updated argument.
         """
-        return self._request_kwargs(request_kwargs)
+        return self._set_request_kwargs(request_kwargs)
 
     def request(self: BuilderType, request: Request) -> BuilderType:
         """Sets a :class:`telegram.utils.Request` object to be used for
@@ -545,7 +601,7 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`DispatcherBuilder`: The same builder with the updated argument.
         """
-        return self._request(request)
+        return self._set_request(request)
 
     def private_key(self: BuilderType, private_key: bytes) -> BuilderType:
         """Sets the private key for decryption of telegram passport data to be used for
@@ -563,7 +619,7 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`DispatcherBuilder`: The same builder with the updated argument.
         """
-        return self._private_key(private_key)
+        return self._set_private_key(private_key)
 
     def private_key_password(self: BuilderType, private_key_password: bytes) -> BuilderType:
         """Sets the private key password for decryption of telegram passport data to be used for
@@ -581,7 +637,7 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`DispatcherBuilder`: The same builder with the updated argument.
         """
-        return self._private_key_password(private_key_password)
+        return self._set_private_key_password(private_key_password)
 
     def defaults(self: BuilderType, defaults: 'Defaults') -> BuilderType:
         """Sets the :class:`telegram.ext.Defaults` object to be used for
@@ -595,7 +651,7 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`DispatcherBuilder`: The same builder with the updated argument.
         """
-        return self._defaults(defaults)
+        return self._set_defaults(defaults)
 
     def arbitrary_callback_data(
         self: BuilderType, arbitrary_callback_data: Union[bool, int]
@@ -616,7 +672,7 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`DispatcherBuilder`: The same builder with the updated argument.
         """
-        return self._arbitrary_callback_data(arbitrary_callback_data)
+        return self._set_arbitrary_callback_data(arbitrary_callback_data)
 
     def bot(
         self: 'DispatcherBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, '
@@ -633,7 +689,7 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`DispatcherBuilder`: The same builder with the updated argument.
         """
-        return self._bot(bot)  # type: ignore[return-value]
+        return self._set_bot(bot)  # type: ignore[return-value]
 
     def update_queue(self: BuilderType, update_queue: Queue) -> BuilderType:
         """Sets a :class:`queue.Queue` instance to be used for
@@ -649,11 +705,11 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`DispatcherBuilder`: The same builder with the updated argument.
         """
-        return self._update_queue(update_queue)
+        return self._set_update_queue(update_queue)
 
     def workers(self: BuilderType, workers: int) -> BuilderType:
         """`Dummy text b/c this will be dropped anyway`"""
-        return self._workers(workers)
+        return self._set_workers(workers)
 
     def exception_event(self: BuilderType, exception_event: Event) -> BuilderType:
         """Sets a :class:`threading.Event` instance to be used for
@@ -669,7 +725,7 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`DispatcherBuilder`: The same builder with the updated argument.
         """
-        return self._exception_event(exception_event)
+        return self._set_exception_event(exception_event)
 
     def job_queue(
         self: 'DispatcherBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
@@ -697,7 +753,7 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`DispatcherBuilder`: The same builder with the updated argument.
         """
-        return self._job_queue(job_queue)  # type: ignore[return-value]
+        return self._set_job_queue(job_queue)  # type: ignore[return-value]
 
     def persistence(
         self: 'DispatcherBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
@@ -720,7 +776,7 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`DispatcherBuilder`: The same builder with the updated argument.
         """
-        return self._persistence(persistence)  # type: ignore[return-value]
+        return self._set_persistence(persistence)  # type: ignore[return-value]
 
     def context_types(
         self: 'DispatcherBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
@@ -737,7 +793,7 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`DispatcherBuilder`: The same builder with the updated argument.
         """
-        return self._context_types(context_types)  # type: ignore[return-value]
+        return self._set_context_types(context_types)  # type: ignore[return-value]
 
 
 class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
@@ -794,7 +850,7 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`UpdaterBuilder`: The same builder with the updated argument.
         """
-        return self._token(token)
+        return self._set_token(token)
 
     def base_url(self: BuilderType, base_url: str) -> BuilderType:
         """Sets the base URL to be used for :attr:`telegram.ext.Updater.bot`. If not called,
@@ -810,7 +866,7 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`UpdaterBuilder`: The same builder with the updated argument.
         """
-        return self._base_url(base_url)
+        return self._set_base_url(base_url)
 
     def base_file_url(self: BuilderType, base_file_url: str) -> BuilderType:
         """Sets the base file URL to be used for :attr:`telegram.ext.Updater.bot`. If not
@@ -826,7 +882,7 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`UpdaterBuilder`: The same builder with the updated argument.
         """
-        return self._base_file_url(base_file_url)
+        return self._set_base_file_url(base_file_url)
 
     def request_kwargs(self: BuilderType, request_kwargs: Dict[str, Any]) -> BuilderType:
         """Sets keyword arguments that will be passed to the :class:`telegram.utils.Request` object
@@ -841,7 +897,7 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`UpdaterBuilder`: The same builder with the updated argument.
         """
-        return self._request_kwargs(request_kwargs)
+        return self._set_request_kwargs(request_kwargs)
 
     def request(self: BuilderType, request: Request) -> BuilderType:
         """Sets a :class:`telegram.utils.Request` object to be used for
@@ -855,7 +911,7 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`UpdaterBuilder`: The same builder with the updated argument.
         """
-        return self._request(request)
+        return self._set_request(request)
 
     def private_key(self: BuilderType, private_key: bytes) -> BuilderType:
         """Sets the private key for decryption of telegram passport data to be used for
@@ -873,7 +929,7 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`UpdaterBuilder`: The same builder with the updated argument.
         """
-        return self._private_key(private_key)
+        return self._set_private_key(private_key)
 
     def private_key_password(self: BuilderType, private_key_password: bytes) -> BuilderType:
         """Sets the private key password for decryption of telegram passport data to be used for
@@ -891,7 +947,7 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`UpdaterBuilder`: The same builder with the updated argument.
         """
-        return self._private_key_password(private_key_password)
+        return self._set_private_key_password(private_key_password)
 
     def defaults(self: BuilderType, defaults: 'Defaults') -> BuilderType:
         """Sets the :class:`telegram.ext.Defaults` object to be used for
@@ -905,7 +961,7 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`UpdaterBuilder`: The same builder with the updated argument.
         """
-        return self._defaults(defaults)
+        return self._set_defaults(defaults)
 
     def arbitrary_callback_data(
         self: BuilderType, arbitrary_callback_data: Union[bool, int]
@@ -926,7 +982,7 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`UpdaterBuilder`: The same builder with the updated argument.
         """
-        return self._arbitrary_callback_data(arbitrary_callback_data)
+        return self._set_arbitrary_callback_data(arbitrary_callback_data)
 
     def bot(
         self: 'UpdaterBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, '
@@ -943,7 +999,7 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`UpdaterBuilder`: The same builder with the updated argument.
         """
-        return self._bot(bot)  # type: ignore[return-value]
+        return self._set_bot(bot)  # type: ignore[return-value]
 
     def update_queue(self: BuilderType, update_queue: Queue) -> BuilderType:
         """Sets a :class:`queue.Queue` instance to be used for
@@ -961,11 +1017,11 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`UpdaterBuilder`: The same builder with the updated argument.
         """
-        return self._update_queue(update_queue)
+        return self._set_update_queue(update_queue)
 
     def workers(self: BuilderType, workers: int) -> BuilderType:
         """`Dummy text b/c this will be dropped anyway`"""
-        return self._workers(workers)
+        return self._set_workers(workers)
 
     def exception_event(self: BuilderType, exception_event: Event) -> BuilderType:
         """Sets a :class:`threading.Event` instance to be used by the
@@ -984,7 +1040,7 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`UpdaterBuilder`: The same builder with the updated argument.
         """
-        return self._exception_event(exception_event)
+        return self._set_exception_event(exception_event)
 
     def job_queue(
         self: 'UpdaterBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
@@ -1013,7 +1069,7 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`UpdaterBuilder`: The same builder with the updated argument.
         """
-        return self._job_queue(job_queue)  # type: ignore[return-value]
+        return self._set_job_queue(job_queue)  # type: ignore[return-value]
 
     def persistence(
         self: 'UpdaterBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
@@ -1037,7 +1093,7 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`UpdaterBuilder`: The same builder with the updated argument.
         """
-        return self._persistence(persistence)  # type: ignore[return-value]
+        return self._set_persistence(persistence)  # type: ignore[return-value]
 
     def context_types(
         self: 'UpdaterBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
@@ -1055,7 +1111,7 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`UpdaterBuilder`: The same builder with the updated argument.
         """
-        return self._context_types(context_types)  # type: ignore[return-value]
+        return self._set_context_types(context_types)  # type: ignore[return-value]
 
     @overload
     def dispatcher(
@@ -1087,7 +1143,7 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`UpdaterBuilder`: The same builder with the updated argument.
         """
-        return self._dispatcher(dispatcher)  # type: ignore[return-value]
+        return self._set_dispatcher(dispatcher)  # type: ignore[return-value]
 
     def user_signal_handler(
         self: BuilderType, user_signal_handler: Callable[[int, object], Any]
@@ -1110,4 +1166,4 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         Returns:
             :class:`UpdaterBuilder`: The same builder with the updated argument.
         """
-        return self._user_signal_handler(user_signal_handler)
+        return self._set_user_signal_handler(user_signal_handler)

@@ -103,7 +103,7 @@ class Updater(Generic[BT, DT]):
         self.user_signal_handler = cast(
             Optional[Callable[[int, object], Any]], kwargs.pop('user_signal_handler')
         )
-        self.dispatcher = cast(DT, kwargs.pop('dispatcher'))
+        self.dispatcher = cast(Optional[DT], kwargs.pop('dispatcher'))
         if self.dispatcher:
             self.bot = self.dispatcher.bot
             self.update_queue = self.dispatcher.update_queue

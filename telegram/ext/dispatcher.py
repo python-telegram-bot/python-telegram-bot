@@ -184,7 +184,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         persistence = cast(PT, kwargs.pop('persistence'))
         self.use_context = True
         self.context_types = cast(ContextTypes[CCT, UD, CD, BD], kwargs.pop('context_types'))
-        self.__exception_event = cast(Event, kwargs.pop('__exception_event'))
+        self.__exception_event = cast(Event, kwargs.pop('exception_event'))
 
         if not self.use_context:
             warnings.warn(

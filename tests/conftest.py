@@ -53,6 +53,7 @@ from telegram.ext import (
     Defaults,
     UpdateFilter,
     ExtBot,
+    DispatcherBuilder,
 )
 from telegram.error import BadRequest
 from telegram.utils.helpers import DefaultValue, DEFAULT_NONE
@@ -149,8 +150,7 @@ def provider_token(bot_info):
 def create_dp(bot):
     # Dispatcher is heavy to init (due to many threads and such) so we have a single session
     # scoped one here, but before each test, reset it (dp fixture below)
-    dispatcher = Dispatcher(bot, Queue(), job_queue=JobQueue(), workers=2, use_context=False)
-    dispatcher.job_queue.set_dispatcher(dispatcher)
+    dispatcher = DispatcherBuilder().bot(bot).workers(2).build()
     thr = Thread(target=dispatcher.start)
     thr.start()
     sleep(2)
