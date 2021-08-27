@@ -186,8 +186,6 @@ def check_required_param(
             return True
         is_required = False if param_desc[2].split('.', 1)[0] == 'Optional' else True
         is_ours_required = sig.parameters[param_name].default is inspect.Signature.empty
-        if param_name == 'status':
-            print(is_required, is_ours_required, 'found the status')
         return is_required is is_ours_required
 
 
