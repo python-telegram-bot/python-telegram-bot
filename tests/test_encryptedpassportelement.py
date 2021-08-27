@@ -39,7 +39,7 @@ def encrypted_passport_element():
 
 class TestEncryptedPassportElement:
     type_ = 'type'
-    hash = 'we missed this'
+    hash = 'this is a hash'
     data = 'data'
     phone_number = 'phone_number'
     email = 'email'
