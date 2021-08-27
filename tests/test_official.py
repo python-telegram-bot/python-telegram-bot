@@ -41,11 +41,12 @@ IGNORED_PARAMETERS = {
     'kwargs',
 }
 
-ignored_param_requirements = {
+ignored_param_requirements = {  # Ignore these since there's convenience params in them (eg. Venue)
     'send_location': {'latitude', 'longitude'},
     'edit_message_live_location': {'latitude', 'longitude'},
     'send_venue': {'latitude', 'longitude', 'title', 'address'},
     'send_contact': {'phone_number', 'first_name'},
+    'ForceReply': {'force_reply'},  # Telegram docs mention the type as 'True'
 }
 
 
@@ -81,7 +82,8 @@ def check_method(h4):
         param = sig.parameters.get(parameter[0])
         assert param is not None, f"Parameter {parameter[0]} not found in {method.__name__}"
 
-        assert check_required_params(
+        # TODO: Check type via docstring
+        assert check_required_param(
             parameter, param.name, sig, method.__name__
         ), f'Param {param.name!r} of method {method.__name__!r} requirement mismatch!'
         checked.append(parameter[0])
@@ -102,8 +104,6 @@ def check_method(h4):
         ]
     ):
         ignored |= {'filename'}  # Convenience parameter
-    elif name == 'setGameScore':
-        ignored |= {'edit_message'}  # TODO: Now deprecated, so no longer in telegrams docs
     elif name == 'sendContact':
         ignored |= {'contact'}  # Added for ease of use
     elif name in ['sendLocation', 'editMessageLiveLocation']:
@@ -124,7 +124,7 @@ def check_object(h4):
     # Check arguments based on source. Makes sure to only check __init__'s signature & nothing else
     sig = inspect.signature(obj.__init__, follow_wrapped=True)
 
-    checked = []
+    checked = set()
     for parameter in table:
         field = parameter[0]
         if field == 'from':
@@ -135,7 +135,7 @@ def check_object(h4):
             or name.startswith('BotCommandScope')
         ) and field == 'type':
             continue
-        elif (name.startswith('ChatMember')) and field == 'status':
+        elif (name.startswith('ChatMember')) and field == 'status':  # We autofill the status
             continue
         elif (
             name.startswith('PassportElementError') and field == 'source'
@@ -144,10 +144,11 @@ def check_object(h4):
 
         param = sig.parameters.get(field)
         assert param is not None, f"Attribute {field} not found in {obj.__name__}"
-        assert check_required_params(
+        # TODO: Check type via docstring
+        assert check_required_param(
             parameter, field, sig, obj.__name__
         ), f"{obj.__name__!r} parameter {param.name!r} requirement mismatch"
-        checked.append(field)
+        checked.add(field)
 
     ignored = IGNORED_PARAMETERS.copy()
     if name == 'InputFile':
@@ -156,33 +157,8 @@ def check_object(h4):
         ignored |= {'id', 'type'}  # attributes common to all subclasses
     if name == 'ChatMember':
         ignored |= {'user', 'status'}  # attributes common to all subclasses
-    if name == 'ChatMember':
-        ignored |= {
-            'can_add_web_page_previews',  # for backwards compatibility
-            'can_be_edited',
-            'can_change_info',
-            'can_delete_messages',
-            'can_edit_messages',
-            'can_invite_users',
-            'can_manage_chat',
-            'can_manage_voice_chats',
-            'can_pin_messages',
-            'can_post_messages',
-            'can_promote_members',
-            'can_restrict_members',
-            'can_send_media_messages',
-            'can_send_messages',
-            'can_send_other_messages',
-            'can_send_polls',
-            'custom_title',
-            'is_anonymous',
-            'is_member',
-            'until_date',
-        }
     if name == 'BotCommandScope':
         ignored |= {'type'}  # attributes common to all subclasses
-    elif name == 'User':
-        ignored |= {'type'}  # TODO: Deprecation
     elif name in ('PassportFile', 'EncryptedPassportElement'):
         ignored |= {'credentials'}
     elif name == 'PassportElementError':
@@ -193,23 +169,25 @@ def check_object(h4):
     assert (sig.parameters.keys() ^ checked) - ignored == set()
 
 
-def check_required_params(
-    param_desc: List[str], param_name: str, sig: inspect.Signature, method_name: str
+def check_required_param(
+    param_desc: List[str], param_name: str, sig: inspect.Signature, method_or_obj_name: str
 ) -> bool:
     """Checks if the method/class parameter is a required/optional param as per Telegram docs."""
     if len(param_desc) == 4:  # this means that there is a dedicated 'Required' column present.
         # Handle cases where we provide convenience intentionally-
-        if param_name in ignored_param_requirements.get(method_name, {}):
+        if param_name in ignored_param_requirements.get(method_or_obj_name, {}):
             return True
         is_required = True if param_desc[2] in {'Required', 'Yes'} else False
         is_ours_required = sig.parameters[param_name].default is inspect.Signature.empty
         return is_required is is_ours_required
 
     if len(param_desc) == 3:  # The docs mention the requirement in the description for classes...
-        if param_name == 'force_reply':  # edge case
+        if param_name in ignored_param_requirements.get(method_or_obj_name, {}):
             return True
         is_required = False if param_desc[2].split('.', 1)[0] == 'Optional' else True
         is_ours_required = sig.parameters[param_name].default is inspect.Signature.empty
+        if param_name == 'status':
+            print(is_required, is_ours_required, 'found the status')
         return is_required is is_ours_required
 
 
