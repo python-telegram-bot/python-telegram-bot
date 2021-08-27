@@ -68,9 +68,7 @@ class ForceReply(ReplyMarkup):
         input_field_placeholder: str = None,
         **_kwargs: Any,
     ):
-        # Required
         self.force_reply = True
-        # Optionals
         self.selective = bool(selective)
         self.input_field_placeholder = input_field_placeholder
 
