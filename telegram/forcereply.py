@@ -64,13 +64,12 @@ class ForceReply(ReplyMarkup):
 
     def __init__(
         self,
-        force_reply: bool = True,
         selective: bool = False,
         input_field_placeholder: str = None,
         **_kwargs: Any,
     ):
         # Required
-        self.force_reply = bool(force_reply)
+        self.force_reply = True
         # Optionals
         self.selective = bool(selective)
         self.input_field_placeholder = input_field_placeholder

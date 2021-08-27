@@ -42,6 +42,9 @@ class ChatMember(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`user` and :attr:`status` are equal.
 
+    .. versionchanged:: 14.0
+        Previously deprecated arguments and attributes were removed.
+
     Args:
         user (:class:`telegram.User`): Information about the user.
         status (:obj:`str`): The member's status in the chat. Can be

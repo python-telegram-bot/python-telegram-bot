@@ -46,7 +46,6 @@ ignored_param_requirements = {  # Ignore these since there's convenience params 
     'edit_message_live_location': {'latitude', 'longitude'},
     'send_venue': {'latitude', 'longitude', 'title', 'address'},
     'send_contact': {'phone_number', 'first_name'},
-    'ForceReply': {'force_reply'},  # Telegram docs mention the type as 'True'
 }
 
 
@@ -140,6 +139,8 @@ def check_object(h4):
         elif (
             name.startswith('PassportElementError') and field == 'source'
         ) or field == 'remove_keyboard':
+            continue
+        elif name.startswith('ForceReply') and field == 'force_reply':  # this param is always True
             continue
 
         param = sig.parameters.get(field)
