@@ -129,6 +129,10 @@ class Updater(Generic[BT, DT]):
             return
         set_new_attribute_deprecated(self, key, value)
 
+    @property
+    def exception_event(self) -> Event:  # skipcq: PY-D0003
+        return self.__exception_event
+
     def _init_thread(self, target: Callable, name: str, *args: object, **kwargs: object) -> None:
         thr = Thread(
             target=self._thread_wrapper,

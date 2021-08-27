@@ -223,6 +223,10 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     def _build_ext_bot(self) -> ExtBot:
         if self._token_was_set is False:
             raise RuntimeError('No bot token was set.')
+        if self._request_kwargs_was_set:
+            request = Request(**self._request_kwargs)
+        else:
+            request = self._request
         return ExtBot(
             token=self._token,
             base_url=self._base_url,
@@ -231,6 +235,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
             private_key_password=self._private_key_password,
             defaults=self._defaults,
             arbitrary_callback_data=self._arbitrary_callback_data,
+            request=request,
         )
 
     def _build_dispatcher(

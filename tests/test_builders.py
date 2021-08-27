@@ -23,8 +23,11 @@ We mainly test on UpdaterBuilder because it has all methods that DispatcherBuild
 
 import pytest
 
-from telegram.ext import UpdaterBuilder
-from telegram.ext.builders import _BOT_CHECKS, _DISPATCHER_CHECKS
+from telegram.utils.request import Request
+from .conftest import PRIVATE_KEY
+
+from telegram.ext import UpdaterBuilder, Defaults, JobQueue, PicklePersistence, ContextTypes
+from telegram.ext.builders import _BOT_CHECKS, _DISPATCHER_CHECKS, DispatcherBuilder
 
 
 @pytest.fixture(scope='function')
@@ -41,6 +44,12 @@ class TestBuilder:
         getattr(builder, method)(None)
         with pytest.raises(RuntimeError, match=f'`{method}` was already set.'):
             getattr(builder, method)(None)
+
+        dispatcher_builder = DispatcherBuilder()
+        if hasattr(dispatcher_builder, method):
+            getattr(dispatcher_builder, method)(None)
+            with pytest.raises(RuntimeError, match=f'`{method}` was already set.'):
+                getattr(dispatcher_builder, method)(None)
 
     @pytest.mark.parametrize(
         'method, description', _BOT_CHECKS, ids=[entry[0] for entry in _BOT_CHECKS]
@@ -106,13 +115,70 @@ class TestBuilder:
         updater = builder.build()
         assert updater.bot is bot
         assert updater.dispatcher.bot is bot
+        assert updater.dispatcher.job_queue._dispatcher is updater.dispatcher
 
     def test_build_custom_dispatcher(self, builder, cdp):
-        builder.dispatcher(cdp)
-        assert builder.build().dispatcher is cdp
+        updater = builder.dispatcher(cdp).build()
+        assert updater.dispatcher is cdp
+        assert updater.bot is updater.dispatcher.bot
 
     def test_build_no_dispatcher(self, builder, bot):
         builder.dispatcher(None).token(bot.token)
         updater = builder.build()
         assert updater.dispatcher is None
         assert updater.bot.token == bot.token
+
+    def test_all_bot_args_custom(self, builder, bot):
+        defaults = Defaults()
+        request = Request()
+        builder.token(bot.token).base_url('base_url').base_file_url('base_file_url').private_key(
+            PRIVATE_KEY
+        ).defaults(defaults).arbitrary_callback_data(42).request(request)
+        built_bot = builder.build().bot
+
+        assert built_bot.token == bot.token
+        assert built_bot.base_url == 'base_url' + bot.token
+        assert built_bot.base_file_url == 'base_file_url' + bot.token
+        assert built_bot.defaults is defaults
+        assert built_bot.request is request
+        assert built_bot.callback_data_cache.maxsize == 42
+
+        builder = UpdaterBuilder()
+        builder.token(bot.token).request_kwargs({'connect_timeout': 42})
+        built_bot = builder.build().bot
+
+        assert built_bot.token == bot.token
+        assert built_bot.request._connect_timeout == 42
+
+    def test_all_dispatcher_args_custom(self, builder, cdp):
+        job_queue = JobQueue()
+        persistence = PicklePersistence('filename')
+        context_types = ContextTypes()
+        builder.bot(cdp.bot).update_queue(cdp.update_queue).exception_event(
+            cdp.exception_event
+        ).job_queue(job_queue).persistence(persistence).context_types(context_types)
+        dispatcher = builder.build().dispatcher
+
+        assert dispatcher.bot is cdp.bot
+        assert dispatcher.update_queue is cdp.update_queue
+        assert dispatcher.exception_event is cdp.exception_event
+        assert dispatcher.job_queue is job_queue
+        assert dispatcher.job_queue._dispatcher is dispatcher
+        assert dispatcher.persistence is persistence
+        assert dispatcher.context_types is context_types
+
+    def test_all_updater_args_custom(self, builder, cdp):
+        updater = (
+            builder.dispatcher(None)
+            .bot(cdp.bot)
+            .exception_event(cdp.exception_event)
+            .update_queue(cdp.update_queue)
+            .user_signal_handler(42)
+            .build()
+        )
+
+        assert updater.dispatcher is None
+        assert updater.bot is cdp.bot
+        assert updater.exception_event is cdp.exception_event
+        assert updater.update_queue is cdp.update_queue
+        assert updater.user_signal_handler == 42
