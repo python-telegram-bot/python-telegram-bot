@@ -120,6 +120,25 @@ class TestVoiceChatParticipantsInvited:
         assert voice_chat_dict["users"][0]["id"] == user1.id
         assert voice_chat_dict["users"][1]["id"] == user2.id
 
+    def test_equality(self, user1, user2):
+        a = VoiceChatParticipantsInvited([user1])
+        b = VoiceChatParticipantsInvited([user1])
+        c = VoiceChatParticipantsInvited([user1, user2])
+        d = VoiceChatParticipantsInvited(None)
+        e = VoiceChatStarted()
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
 
 class TestVoiceChatScheduled:
     start_date = dtm.datetime.utcnow()

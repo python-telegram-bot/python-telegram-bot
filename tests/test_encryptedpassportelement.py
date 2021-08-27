@@ -26,7 +26,7 @@ from telegram import EncryptedPassportElement, PassportFile, PassportElementErro
 def encrypted_passport_element():
     return EncryptedPassportElement(
         TestEncryptedPassportElement.type_,
-        'we missed this',
+        'this is a hash',
         data=TestEncryptedPassportElement.data,
         phone_number=TestEncryptedPassportElement.phone_number,
         email=TestEncryptedPassportElement.email,
@@ -91,8 +91,8 @@ class TestEncryptedPassportElement:
         )
 
     def test_equality(self):
-        a = EncryptedPassportElement(self.type_, '12313123', data=self.data)
-        b = EncryptedPassportElement(self.type_, '12313123', data=self.data)
+        a = EncryptedPassportElement(self.type_, self.hash, data=self.data)
+        b = EncryptedPassportElement(self.type_, self.hash, data=self.data)
         c = EncryptedPassportElement(self.data, '')
         d = PassportElementError('source', 'type', 'message')
 

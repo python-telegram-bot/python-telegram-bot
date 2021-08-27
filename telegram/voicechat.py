@@ -20,7 +20,7 @@
 """This module contains objects related to Telegram voice chats."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, Any, Optional, List
+from typing import TYPE_CHECKING, Optional, List
 
 from telegram import TelegramObject, User
 from telegram.utils.helpers import from_timestamp, to_timestamp
@@ -119,6 +119,9 @@ class VoiceChatParticipantsInvited(TelegramObject):
         if self.users is not None:
             data["users"] = [u.to_dict() for u in self.users]
         return data
+
+    def __hash__(self) -> int:
+        return hash(None) if self.users is None else hash(tuple(self.users))
 
 
 class VoiceChatScheduled(TelegramObject):
