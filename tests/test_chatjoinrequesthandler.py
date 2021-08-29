@@ -85,6 +85,7 @@ def chat_join_request(time, bot):
         invite_link=ChatInviteLink(
             'https://invite.link',
             User(42, 'creator', False),
+            creates_join_request=False,
             name='InviteLink',
             is_revoked=False,
             is_primary=False,
