@@ -643,9 +643,9 @@ class TestSendMediaGroup:
         message = default_bot.send_photo(chat_id, photo)
 
         message = default_bot.edit_message_media(
+            build_media(parse_mode=ParseMode.HTML, med_type=media_type),
             message.chat_id,
             message.message_id,
-            media=build_media(parse_mode=ParseMode.HTML, med_type=media_type),
         )
         assert message.caption == test_caption
         assert message.caption_entities == test_entities
@@ -654,9 +654,9 @@ class TestSendMediaGroup:
         message.edit_caption()
 
         message = default_bot.edit_message_media(
+            build_media(parse_mode=ParseMode.MARKDOWN_V2, med_type=media_type),
             message.chat_id,
             message.message_id,
-            media=build_media(parse_mode=ParseMode.MARKDOWN_V2, med_type=media_type),
         )
         assert message.caption == test_caption
         assert message.caption_entities == test_entities
@@ -665,9 +665,9 @@ class TestSendMediaGroup:
         message.edit_caption()
 
         message = default_bot.edit_message_media(
+            build_media(parse_mode=None, med_type=media_type),
             message.chat_id,
             message.message_id,
-            media=build_media(parse_mode=None, med_type=media_type),
         )
         assert message.caption == markdown_caption
         assert message.caption_entities == []

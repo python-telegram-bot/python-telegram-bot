@@ -47,9 +47,11 @@ RAW_PASSPORT_DATA = {
         {
             'data': 'QRfzWcCN4WncvRO3lASG+d+c5gzqXtoCinQ1PgtYiZMKXCksx9eB9Ic1bOt8C/un9/XaX220PjJSO7Kuba+nXXC51qTsjqP9rnLKygnEIWjKrfiDdklzgcukpRzFSjiOAvhy86xFJZ1PfPSrFATy/Gp1RydLzbrBd2ZWxZqXrxcMoA0Q2UTTFXDoCYerEAiZoD69i79tB/6nkLBcUUvN5d52gKd/GowvxWqAAmdO6l1N7jlo6aWjdYQNBAK1KHbJdbRZMJLxC1MqMuZXAYrPoYBRKr5xAnxDTmPn/LEZKLc3gwwZyEgR5x7e9jp5heM6IEMmsv3O/6SUeEQs7P0iVuRSPLMJLfDdwns8Tl3fF2M4IxKVovjCaOVW+yHKsADDAYQPzzH2RcrWVD0TP5I64mzpK64BbTOq3qm3Hn51SV9uA/+LvdGbCp7VnzHx4EdUizHsVyilJULOBwvklsrDRvXMiWmh34ZSR6zilh051tMEcRf0I+Oe7pIxVJd/KKfYA2Z/eWVQTCn5gMuAInQNXFSqDIeIqBX+wca6kvOCUOXB7J2uRjTpLaC4DM9s/sNjSBvFixcGAngt+9oap6Y45rQc8ZJaNN/ALqEJAmkphW8=',
             'type': 'personal_details',
+            'hash': 'What to put here?',
         },
         {
             'reverse_side': {
+                'file_size': 32424112,
                 'file_date': 1534074942,
                 'file_id': 'DgADBAADNQQAAtoagFPf4wwmFZdmyQI',
                 'file_unique_id': 'adc3145fd2e84d95b64d68eaa22aa33e',
@@ -82,6 +84,7 @@ RAW_PASSPORT_DATA = {
                 'file_unique_id': 'd4e390cca57b4da5a65322b304762a12',
             },
             'data': 'eJUOFuY53QKmGqmBgVWlLBAQCUQJ79n405SX6M5aGFIIodOPQqnLYvMNqTwTrXGDlW+mVLZcbu+y8luLVO8WsJB/0SB7q5WaXn/IMt1G9lz5G/KMLIZG/x9zlnimsaQLg7u8srG6L4KZzv+xkbbHjZdETrxU8j0N/DoS4HvLMRSJAgeFUrY6v2YW9vSRg+fSxIqQy1jR2VKpzAT8OhOz7A==',
+            'hash': 'We seriously need to improve this mess! took so long to debug!',
         },
         {
             'translation': [
@@ -113,12 +116,14 @@ RAW_PASSPORT_DATA = {
                 },
             ],
             'type': 'utility_bill',
+            'hash': 'Wow over 30 minutes spent debugging passport stuff.',
         },
         {
             'data': 'j9SksVkSj128DBtZA+3aNjSFNirzv+R97guZaMgae4Gi0oDVNAF7twPR7j9VSmPedfJrEwL3O889Ei+a5F1xyLLyEI/qEBljvL70GFIhYGitS0JmNabHPHSZrjOl8b4s/0Z0Px2GpLO5siusTLQonimdUvu4UPjKquYISmlKEKhtmGATy+h+JDjNCYuOkhakeNw0Rk0BHgj0C3fCb7WZNQSyVb+2GTu6caR6eXf/AFwFp0TV3sRz3h0WIVPW8bna',
             'type': 'address',
+            'hash': 'at least I get the pattern now',
         },
-        {'email': 'fb3e3i47zt@dispostable.com', 'type': 'email'},
+        {'email': 'fb3e3i47zt@dispostable.com', 'type': 'email', 'hash': 'this should be it.'},
     ],
 }
 
@@ -126,13 +131,18 @@ RAW_PASSPORT_DATA = {
 @pytest.fixture(scope='function')
 def all_passport_data():
     return [
-        {'type': 'personal_details', 'data': RAW_PASSPORT_DATA['data'][0]['data']},
+        {
+            'type': 'personal_details',
+            'data': RAW_PASSPORT_DATA['data'][0]['data'],
+            'hash': 'what to put here?',
+        },
         {
             'type': 'passport',
             'data': RAW_PASSPORT_DATA['data'][1]['data'],
             'front_side': RAW_PASSPORT_DATA['data'][1]['front_side'],
             'selfie': RAW_PASSPORT_DATA['data'][1]['selfie'],
             'translation': RAW_PASSPORT_DATA['data'][1]['translation'],
+            'hash': 'more data arghh',
         },
         {
             'type': 'internal_passport',
@@ -140,6 +150,7 @@ def all_passport_data():
             'front_side': RAW_PASSPORT_DATA['data'][1]['front_side'],
             'selfie': RAW_PASSPORT_DATA['data'][1]['selfie'],
             'translation': RAW_PASSPORT_DATA['data'][1]['translation'],
+            'hash': 'more data arghh',
         },
         {
             'type': 'driver_license',
@@ -148,6 +159,7 @@ def all_passport_data():
             'reverse_side': RAW_PASSPORT_DATA['data'][1]['reverse_side'],
             'selfie': RAW_PASSPORT_DATA['data'][1]['selfie'],
             'translation': RAW_PASSPORT_DATA['data'][1]['translation'],
+            'hash': 'more data arghh',
         },
         {
             'type': 'identity_card',
@@ -156,35 +168,49 @@ def all_passport_data():
             'reverse_side': RAW_PASSPORT_DATA['data'][1]['reverse_side'],
             'selfie': RAW_PASSPORT_DATA['data'][1]['selfie'],
             'translation': RAW_PASSPORT_DATA['data'][1]['translation'],
+            'hash': 'more data arghh',
         },
         {
             'type': 'utility_bill',
             'files': RAW_PASSPORT_DATA['data'][2]['files'],
             'translation': RAW_PASSPORT_DATA['data'][2]['translation'],
+            'hash': 'more data arghh',
         },
         {
             'type': 'bank_statement',
             'files': RAW_PASSPORT_DATA['data'][2]['files'],
             'translation': RAW_PASSPORT_DATA['data'][2]['translation'],
+            'hash': 'more data arghh',
         },
         {
             'type': 'rental_agreement',
             'files': RAW_PASSPORT_DATA['data'][2]['files'],
             'translation': RAW_PASSPORT_DATA['data'][2]['translation'],
+            'hash': 'more data arghh',
         },
         {
             'type': 'passport_registration',
             'files': RAW_PASSPORT_DATA['data'][2]['files'],
             'translation': RAW_PASSPORT_DATA['data'][2]['translation'],
+            'hash': 'more data arghh',
         },
         {
             'type': 'temporary_registration',
             'files': RAW_PASSPORT_DATA['data'][2]['files'],
             'translation': RAW_PASSPORT_DATA['data'][2]['translation'],
+            'hash': 'more data arghh',
         },
-        {'type': 'address', 'data': RAW_PASSPORT_DATA['data'][3]['data']},
-        {'type': 'email', 'email': 'fb3e3i47zt@dispostable.com'},
-        {'type': 'phone_number', 'phone_number': 'fb3e3i47zt@dispostable.com'},
+        {
+            'type': 'address',
+            'data': RAW_PASSPORT_DATA['data'][3]['data'],
+            'hash': 'more data arghh',
+        },
+        {'type': 'email', 'email': 'fb3e3i47zt@dispostable.com', 'hash': 'more data arghh'},
+        {
+            'type': 'phone_number',
+            'phone_number': 'fb3e3i47zt@dispostable.com',
+            'hash': 'more data arghh',
+        },
     ]
 
 

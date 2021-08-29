@@ -26,7 +26,6 @@ from telegram import ForceReply, ReplyKeyboardRemove
 @pytest.fixture(scope='class')
 def force_reply():
     return ForceReply(
-        TestForceReply.force_reply,
         TestForceReply.selective,
         TestForceReply.input_field_placeholder,
     )
@@ -62,16 +61,16 @@ class TestForceReply:
         assert force_reply_dict['input_field_placeholder'] == force_reply.input_field_placeholder
 
     def test_equality(self):
-        a = ForceReply(True, False)
-        b = ForceReply(False, False)
-        c = ForceReply(True, True)
+        a = ForceReply(True, 'test')
+        b = ForceReply(False, 'pass')
+        c = ForceReply(True)
         d = ReplyKeyboardRemove()
 
-        assert a == b
-        assert hash(a) == hash(b)
+        assert a != b
+        assert hash(a) != hash(b)
 
-        assert a != c
-        assert hash(a) != hash(c)
+        assert a == c
+        assert hash(a) == hash(c)
 
         assert a != d
         assert hash(a) != hash(d)

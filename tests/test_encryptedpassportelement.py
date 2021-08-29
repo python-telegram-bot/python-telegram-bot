@@ -26,6 +26,7 @@ from telegram import EncryptedPassportElement, PassportFile, PassportElementErro
 def encrypted_passport_element():
     return EncryptedPassportElement(
         TestEncryptedPassportElement.type_,
+        'this is a hash',
         data=TestEncryptedPassportElement.data,
         phone_number=TestEncryptedPassportElement.phone_number,
         email=TestEncryptedPassportElement.email,
@@ -38,13 +39,14 @@ def encrypted_passport_element():
 
 class TestEncryptedPassportElement:
     type_ = 'type'
+    hash = 'this is a hash'
     data = 'data'
     phone_number = 'phone_number'
     email = 'email'
-    files = [PassportFile('file_id', 50, 0)]
-    front_side = PassportFile('file_id', 50, 0)
-    reverse_side = PassportFile('file_id', 50, 0)
-    selfie = PassportFile('file_id', 50, 0)
+    files = [PassportFile('file_id', 50, 0, 25)]
+    front_side = PassportFile('file_id', 50, 0, 25)
+    reverse_side = PassportFile('file_id', 50, 0, 25)
+    selfie = PassportFile('file_id', 50, 0, 25)
 
     def test_slot_behaviour(self, encrypted_passport_element, mro_slots):
         inst = encrypted_passport_element
@@ -54,6 +56,7 @@ class TestEncryptedPassportElement:
 
     def test_expected_values(self, encrypted_passport_element):
         assert encrypted_passport_element.type == self.type_
+        assert encrypted_passport_element.hash == self.hash
         assert encrypted_passport_element.data == self.data
         assert encrypted_passport_element.phone_number == self.phone_number
         assert encrypted_passport_element.email == self.email
@@ -88,8 +91,8 @@ class TestEncryptedPassportElement:
         )
 
     def test_equality(self):
-        a = EncryptedPassportElement(self.type_, data=self.data)
-        b = EncryptedPassportElement(self.type_, data=self.data)
+        a = EncryptedPassportElement(self.type_, self.hash, data=self.data)
+        b = EncryptedPassportElement(self.type_, self.hash, data=self.data)
         c = EncryptedPassportElement(self.data, '')
         d = PassportElementError('source', 'type', 'message')
 

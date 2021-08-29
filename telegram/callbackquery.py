@@ -319,7 +319,7 @@ class CallbackQuery(TelegramObject):
 
     def edit_message_media(
         self,
-        media: 'InputMedia' = None,
+        media: 'InputMedia',
         reply_markup: 'InlineKeyboardMarkup' = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
@@ -337,7 +337,7 @@ class CallbackQuery(TelegramObject):
         :meth:`telegram.Bot.edit_message_media` and :meth:`telegram.Message.edit_media`.
 
         Returns:
-            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            :class:`telegram.Message`: On success, if edited message is not an inline message, the
             edited Message is returned, otherwise :obj:`True` is returned.
 
         """

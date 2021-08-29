@@ -2067,7 +2067,7 @@ class Message(TelegramObject):
 
     def edit_media(
         self,
-        media: 'InputMedia' = None,
+        media: 'InputMedia',
         reply_markup: InlineKeyboardMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
@@ -2088,14 +2088,14 @@ class Message(TelegramObject):
             behaviour is undocumented and might be changed by Telegram.
 
         Returns:
-            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            :class:`telegram.Message`: On success, if edited message is not an inline message, the
             edited Message is returned, otherwise ``True`` is returned.
 
         """
         return self.bot.edit_message_media(
+            media=media,
             chat_id=self.chat_id,
             message_id=self.message_id,
-            media=media,
             reply_markup=reply_markup,
             timeout=timeout,
             api_kwargs=api_kwargs,

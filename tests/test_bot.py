@@ -1368,7 +1368,7 @@ class TestBot:
 
         monkeypatch.setattr(bot.request, 'post', assertion)
 
-        assert bot.set_webhook(drop_pending_updates=drop_pending_updates)
+        assert bot.set_webhook('', drop_pending_updates=drop_pending_updates)
         assert bot.delete_webhook(drop_pending_updates=drop_pending_updates)
 
     @flaky(3, 1)
@@ -1916,7 +1916,6 @@ class TestBot:
     def test_set_chat_description(self, bot, channel_id):
         assert bot.set_chat_description(channel_id, 'Time: ' + str(time.time()))
 
-    # TODO: Add bot to group to test there too
     @flaky(3, 1)
     def test_pin_and_unpin_message(self, bot, super_group_id):
         message1 = bot.send_message(super_group_id, text="test_pin_message_1")
