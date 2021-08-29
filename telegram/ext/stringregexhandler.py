@@ -19,7 +19,7 @@
 """This module contains the StringRegexHandler class."""
 
 import re
-from typing import TYPE_CHECKING, Callable, Dict, Match, Optional, Pattern, TypeVar, Union
+from typing import TYPE_CHECKING, Callable, Match, Optional, Pattern, TypeVar, Union
 
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 
@@ -50,64 +50,30 @@ class StringRegexHandler(Handler[str, CCT]):
         pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature for context based API:
-
-            ``def callback(update: Update, context: CallbackContext)``
+            Callback signature: ``def callback(update: Update, context: CallbackContext)``
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
-        pass_groups (:obj:`bool`, optional): If the callback should be passed the result of
-            ``re.match(pattern, data).groups()`` as a keyword argument called ``groups``.
-            Default is :obj:`False`
-            DEPRECATED: Please switch to context based callbacks.
-        pass_groupdict (:obj:`bool`, optional): If the callback should be passed the result of
-            ``re.match(pattern, data).groupdict()`` as a keyword argument called ``groupdict``.
-            Default is :obj:`False`
-            DEPRECATED: Please switch to context based callbacks.
-        pass_update_queue (:obj:`bool`, optional): If set to :obj:`True`, a keyword argument called
-            ``update_queue`` will be passed to the callback function. It will be the ``Queue``
-            instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
-            that contains new updates which can be used to insert updates. Default is :obj:`False`.
-            DEPRECATED: Please switch to context based callbacks.
-        pass_job_queue (:obj:`bool`, optional): If set to :obj:`True`, a keyword argument called
-            ``job_queue`` will be passed to the callback function. It will be a
-            :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
-            which can be used to schedule new jobs. Default is :obj:`False`.
-            DEPRECATED: Please switch to context based callbacks.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
             Defaults to :obj:`False`.
 
     Attributes:
         pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
         callback (:obj:`callable`): The callback function for this handler.
-        pass_groups (:obj:`bool`): Determines whether ``groups`` will be passed to the
-            callback function.
-        pass_groupdict (:obj:`bool`): Determines whether ``groupdict``. will be passed to
-            the callback function.
-        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
-            passed to the callback function.
-        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
-            the callback function.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     """
 
-    __slots__ = ('pass_groups', 'pass_groupdict', 'pattern')
+    __slots__ = ('pattern',)
 
     def __init__(
         self,
         pattern: Union[str, Pattern],
         callback: Callable[[str, CCT], RT],
-        pass_groups: bool = False,
-        pass_groupdict: bool = False,
-        pass_update_queue: bool = False,
-        pass_job_queue: bool = False,
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
         super().__init__(
             callback,
-            pass_update_queue=pass_update_queue,
-            pass_job_queue=pass_job_queue,
             run_async=run_async,
         )
 
@@ -115,8 +81,6 @@ class StringRegexHandler(Handler[str, CCT]):
             pattern = re.compile(pattern)
 
         self.pattern = pattern
-        self.pass_groups = pass_groups
-        self.pass_groupdict = pass_groupdict
 
     def check_update(self, update: object) -> Optional[Match]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
@@ -133,24 +97,6 @@ class StringRegexHandler(Handler[str, CCT]):
             if match:
                 return match
         return None
-
-    def collect_optional_args(
-        self,
-        dispatcher: 'Dispatcher',
-        update: str = None,
-        check_result: Optional[Match] = None,
-    ) -> Dict[str, object]:
-        """Pass the results of ``re.match(pattern, update).{groups(), groupdict()}`` to the
-        callback as a keyword arguments called ``groups`` and ``groupdict``, respectively, if
-        needed.
-        """
-        optional_args = super().collect_optional_args(dispatcher, update, check_result)
-        if self.pattern:
-            if self.pass_groups and check_result:
-                optional_args['groups'] = check_result.groups()
-            if self.pass_groupdict and check_result:
-                optional_args['groupdict'] = check_result.groupdict()
-        return optional_args
 
     def collect_additional_context(
         self,
