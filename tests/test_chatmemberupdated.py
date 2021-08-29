@@ -22,7 +22,14 @@ import inspect
 import pytest
 import pytz
 
-from telegram import User, ChatMember, Chat, ChatMemberUpdated, ChatInviteLink
+from telegram import (
+    User,
+    ChatMember,
+    ChatMemberAdministrator,
+    Chat,
+    ChatMemberUpdated,
+    ChatInviteLink,
+)
 from telegram.utils.helpers import to_timestamp
 
 
@@ -43,7 +50,19 @@ def old_chat_member(user):
 
 @pytest.fixture(scope='class')
 def new_chat_member(user):
-    return ChatMember(user, TestChatMemberUpdated.new_status)
+    return ChatMemberAdministrator(
+        user,
+        TestChatMemberUpdated.new_status,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+    )
 
 
 @pytest.fixture(scope='class')
@@ -53,7 +72,7 @@ def time():
 
 @pytest.fixture(scope='class')
 def invite_link(user):
-    return ChatInviteLink('link', user, True, True)
+    return ChatInviteLink('link', user, False, True, True)
 
 
 @pytest.fixture(scope='class')
