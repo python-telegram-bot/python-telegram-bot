@@ -55,13 +55,10 @@ class TestJobQueue:
     job_time = 0
     received_error = None
 
-    def test_slot_behaviour(self, job_queue, recwarn, mro_slots, _dp):
+    def test_slot_behaviour(self, job_queue, mro_slots, _dp):
         for attr in job_queue.__slots__:
             assert getattr(job_queue, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not job_queue.__dict__, f"got missing slot(s): {job_queue.__dict__}"
         assert len(mro_slots(job_queue)) == len(set(mro_slots(job_queue))), "duplicate slot"
-        job_queue.custom, job_queue._dispatcher = 'should give warning', _dp
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     @pytest.fixture(autouse=True)
     def reset(self):
@@ -354,7 +351,7 @@ class TestJobQueue:
         )
         expected_reschedule_time = expected_reschedule_time.timestamp()
 
-        job_queue.run_monthly(self.job_run_once, time_of_day, 31, day_is_strict=False)
+        job_queue.run_monthly(self.job_run_once, time_of_day, -1)
         scheduled_time = job_queue.jobs()[0].next_t.timestamp()
         assert scheduled_time == pytest.approx(expected_reschedule_time)
 

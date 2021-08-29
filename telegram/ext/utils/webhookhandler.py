@@ -31,7 +31,6 @@ from tornado.ioloop import IOLoop
 
 from telegram import Update
 from telegram.ext import ExtBot
-from telegram.utils.deprecate import set_new_attribute_deprecated
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -53,7 +52,6 @@ class WebhookServer:
         'is_running',
         'server_lock',
         'shutdown_lock',
-        '__dict__',
     )
 
     def __init__(
@@ -67,9 +65,6 @@ class WebhookServer:
         self.is_running = False
         self.server_lock = Lock()
         self.shutdown_lock = Lock()
-
-    def __setattr__(self, key: str, value: object) -> None:
-        set_new_attribute_deprecated(self, key, value)
 
     def serve_forever(self, ready: Event = None) -> None:
         with self.server_lock:

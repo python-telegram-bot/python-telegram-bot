@@ -19,9 +19,6 @@
 """This module contains the base class for handlers as used by the Dispatcher."""
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar, Union, Generic
-from sys import version_info as py_ver
-
-from telegram.utils.deprecate import set_new_attribute_deprecated
 
 from telegram.ext.utils.promise import Promise
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
@@ -60,18 +57,10 @@ class Handler(Generic[UT, CCT], ABC):
 
     """
 
-    # Apparently Py 3.7 and below have '__dict__' in ABC
-    if py_ver < (3, 7):
-        __slots__ = (
-            'callback',
-            'run_async',
-        )
-    else:
-        __slots__ = (
-            'callback',  # type: ignore[assignment]
-            'run_async',
-            '__dict__',
-        )
+    __slots__ = (
+        'callback',
+        'run_async',
+    )
 
     def __init__(
         self,
@@ -80,17 +69,6 @@ class Handler(Generic[UT, CCT], ABC):
     ):
         self.callback = callback
         self.run_async = run_async
-
-    def __setattr__(self, key: str, value: object) -> None:
-        # See comment on BaseFilter to know why this was done.
-        if key.startswith('__'):
-            key = f"_{self.__class__.__name__}{key}"
-        if issubclass(self.__class__, Handler) and not self.__class__.__module__.startswith(
-            'telegram.ext.'
-        ):
-            object.__setattr__(self, key, value)
-            return
-        set_new_attribute_deprecated(self, key, value)
 
     @abstractmethod
     def check_update(self, update: object) -> Optional[Union[bool, object]]:
