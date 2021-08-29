@@ -135,9 +135,6 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
             ``@run_async`` decorator and :meth:`run_async`. Defaults to 4.
         persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
             store data that should be persistent over restarts.
-        use_context (:obj:`bool`, optional): If set to :obj:`True` uses the context based callback
-            API (ignored if `dispatcher` argument is used). Defaults to :obj:`True`.
-            **New users**: set this to :obj:`True`.
         context_types (:class:`telegram.ext.ContextTypes`, optional): Pass an instance
             of :class:`telegram.ext.ContextTypes` to customize the types used in the
             ``context`` interface. If not passed, the defaults documented in
@@ -168,7 +165,6 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
     __slots__ = (
         'workers',
         'persistence',
-        'use_context',
         'update_queue',
         'job_queue',
         'user_data',
@@ -203,7 +199,6 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         exception_event: Event = None,
         job_queue: 'JobQueue' = None,
         persistence: BasePersistence = None,
-        use_context: bool = True,
     ):
         ...
 
@@ -216,7 +211,6 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         exception_event: Event = None,
         job_queue: 'JobQueue' = None,
         persistence: BasePersistence = None,
-        use_context: bool = True,
         context_types: ContextTypes[CCT, UD, CD, BD] = None,
     ):
         ...
@@ -229,22 +223,13 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         exception_event: Event = None,
         job_queue: 'JobQueue' = None,
         persistence: BasePersistence = None,
-        use_context: bool = True,
         context_types: ContextTypes[CCT, UD, CD, BD] = None,
     ):
         self.bot = bot
         self.update_queue = update_queue
         self.job_queue = job_queue
         self.workers = workers
-        self.use_context = use_context
         self.context_types = cast(ContextTypes[CCT, UD, CD, BD], context_types or ContextTypes())
-
-        if not use_context:
-            warnings.warn(
-                'Old Handler API is deprecated - see https://git.io/fxJuV for details',
-                TelegramDeprecationWarning,
-                stacklevel=3,
-            )
 
         if self.workers < 1:
             warnings.warn(
@@ -536,7 +521,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                 for handler in self.handlers[group]:
                     check = handler.check_update(update)
                     if check is not None and check is not False:
-                        if not context and self.use_context:
+                        if not context:
                             context = self.context_types.context.from_update(update, self)
                             context.refresh_data()
                         handled = True
@@ -743,16 +728,12 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
 
         Args:
             callback (:obj:`callable`): The callback function for this error handler. Will be
-                called when an error is raised. Callback signature for context based API:
-
-                ``def callback(update: object, context: CallbackContext)``
+                called when an error is raised.
+            Callback signature: ``def callback(update: Update, context: CallbackContext)``
 
                 The error that happened will be present in context.error.
             run_async (:obj:`bool`, optional): Whether this handlers callback should be run
                 asynchronously using :meth:`run_async`. Defaults to :obj:`False`.
-
-        Note:
-            See https://git.io/fxJuV for more info about switching to context based API.
         """
         if callback in self.error_handlers:
             self.logger.debug('The callback is already registered as an error handler. Ignoring.')
@@ -789,19 +770,13 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
 
         if self.error_handlers:
             for callback, run_async in self.error_handlers.items():  # pylint: disable=W0621
-                if self.use_context:
-                    context = self.context_types.context.from_error(
-                        update, error, self, async_args=async_args, async_kwargs=async_kwargs
-                    )
-                    if run_async:
-                        self.run_async(callback, update, context, update=update)
-                    else:
-                        callback(update, context)
+                context = self.context_types.context.from_error(
+                    update, error, self, async_args=async_args, async_kwargs=async_kwargs
+                )
+                if run_async:
+                    self.run_async(callback, update, context, update=update)
                 else:
-                    if run_async:
-                        self.run_async(callback, self.bot, update, error, update=update)
-                    else:
-                        callback(self.bot, update, error)
+                    callback(update, context)
 
         else:
             self.logger.exception(

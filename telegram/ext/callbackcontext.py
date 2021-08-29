@@ -108,10 +108,6 @@ class CallbackContext(Generic[UD, CD, BD]):
         Args:
             dispatcher (:class:`telegram.ext.Dispatcher`):
         """
-        if not dispatcher.use_context:
-            raise ValueError(
-                'CallbackContext should not be used with a non context aware ' 'dispatcher!'
-            )
         self._dispatcher = dispatcher
         self._chat_id_and_data: Optional[Tuple[int, CD]] = None
         self._user_id_and_data: Optional[Tuple[int, UD]] = None
