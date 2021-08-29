@@ -72,7 +72,7 @@ class PassportFile(TelegramObject):
         file_id: str,
         file_unique_id: str,
         file_date: int,
-        file_size: int = None,
+        file_size: int,
         bot: 'Bot' = None,
         credentials: 'FileCredentials' = None,
         **_kwargs: Any,
