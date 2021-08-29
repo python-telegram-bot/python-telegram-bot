@@ -33,7 +33,7 @@ from telegram import (
     Poll,
     PollOption,
     ChatMemberUpdated,
-    ChatMember,
+    ChatMemberOwner,
 )
 from telegram.poll import PollAnswer
 from telegram.utils.helpers import from_timestamp
@@ -43,8 +43,8 @@ chat_member_updated = ChatMemberUpdated(
     Chat(1, 'chat'),
     User(1, '', False),
     from_timestamp(int(time.time())),
-    ChatMember(User(1, '', False), ChatMember.CREATOR),
-    ChatMember(User(1, '', False), ChatMember.CREATOR),
+    ChatMemberOwner(User(1, '', False), True),
+    ChatMemberOwner(User(1, '', False), True),
 )
 
 params = [
