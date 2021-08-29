@@ -20,7 +20,7 @@
 """This module contains objects related to Telegram voice chats."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, Any, Optional, List
+from typing import TYPE_CHECKING, Optional, List
 
 from telegram import TelegramObject, User
 from telegram.utils.helpers import from_timestamp, to_timestamp
@@ -40,7 +40,7 @@ class VoiceChatStarted(TelegramObject):
 
     __slots__ = ()
 
-    def __init__(self, **_kwargs: Any):  # skipcq: PTC-W0049
+    def __init__(self, **_kwargs: object):  # skipcq: PTC-W0049
         pass
 
 
@@ -66,7 +66,7 @@ class VoiceChatEnded(TelegramObject):
 
     __slots__ = ('duration',)
 
-    def __init__(self, duration: int, **_kwargs: Any) -> None:
+    def __init__(self, duration: int, **_kwargs: object) -> None:
         self.duration = int(duration) if duration is not None else None
         self._id_attrs = (self.duration,)
 
@@ -83,24 +83,21 @@ class VoiceChatParticipantsInvited(TelegramObject):
     .. versionadded:: 13.4
 
     Args:
-        users (List[:class:`telegram.User`]):  New members that
+        users (List[:class:`telegram.User`], optional):  New members that
             were invited to the voice chat.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        users (List[:class:`telegram.User`]):  New members that
+        users (List[:class:`telegram.User`]): Optional. New members that
             were invited to the voice chat.
 
     """
 
     __slots__ = ('users',)
 
-    def __init__(self, users: List[User], **_kwargs: Any) -> None:
+    def __init__(self, users: List[User] = None, **_kwargs: object) -> None:
         self.users = users
         self._id_attrs = (self.users,)
-
-    def __hash__(self) -> int:
-        return hash(tuple(self.users))
 
     @classmethod
     def de_json(
@@ -119,8 +116,12 @@ class VoiceChatParticipantsInvited(TelegramObject):
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
-        data["users"] = [u.to_dict() for u in self.users]
+        if self.users is not None:
+            data["users"] = [u.to_dict() for u in self.users]
         return data
+
+    def __hash__(self) -> int:
+        return hash(None) if self.users is None else hash(tuple(self.users))
 
 
 class VoiceChatScheduled(TelegramObject):
@@ -142,7 +143,7 @@ class VoiceChatScheduled(TelegramObject):
 
     __slots__ = ('start_date',)
 
-    def __init__(self, start_date: dtm.datetime, **_kwargs: Any) -> None:
+    def __init__(self, start_date: dtm.datetime, **_kwargs: object) -> None:
         self.start_date = start_date
 
         self._id_attrs = (self.start_date,)

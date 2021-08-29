@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime
+import inspect
 from copy import deepcopy
 
 import pytest
@@ -34,202 +35,197 @@ from telegram import (
     Dice,
 )
 
-
-@pytest.fixture(scope='class')
-def user():
-    return User(1, 'First name', False)
+ignored = ['self', '_kwargs']
 
 
-@pytest.fixture(
-    scope="class",
-    params=[
-        (ChatMemberOwner, ChatMember.CREATOR),
-        (ChatMemberAdministrator, ChatMember.ADMINISTRATOR),
-        (ChatMemberMember, ChatMember.MEMBER),
-        (ChatMemberRestricted, ChatMember.RESTRICTED),
-        (ChatMemberLeft, ChatMember.LEFT),
-        (ChatMemberBanned, ChatMember.KICKED),
+class CMDefaults:
+    user = User(1, 'First name', False)
+    custom_title: str = 'PTB'
+    is_anonymous: bool = True
+    until_date: datetime.datetime = to_timestamp(datetime.datetime.utcnow())
+    can_be_edited: bool = False
+    can_change_info: bool = True
+    can_post_messages: bool = True
+    can_edit_messages: bool = True
+    can_delete_messages: bool = True
+    can_invite_users: bool = True
+    can_restrict_members: bool = True
+    can_pin_messages: bool = True
+    can_promote_members: bool = True
+    can_send_messages: bool = True
+    can_send_media_messages: bool = True
+    can_send_polls: bool = True
+    can_send_other_messages: bool = True
+    can_add_web_page_previews: bool = True
+    is_member: bool = True
+    can_manage_chat: bool = True
+    can_manage_voice_chats: bool = True
+
+
+def chat_member_owner():
+    return ChatMemberOwner(CMDefaults.user, CMDefaults.is_anonymous, CMDefaults.custom_title)
+
+
+def chat_member_administrator():
+    return ChatMemberAdministrator(
+        CMDefaults.user,
+        CMDefaults.can_be_edited,
+        CMDefaults.is_anonymous,
+        CMDefaults.can_manage_chat,
+        CMDefaults.can_delete_messages,
+        CMDefaults.can_manage_voice_chats,
+        CMDefaults.can_restrict_members,
+        CMDefaults.can_promote_members,
+        CMDefaults.can_change_info,
+        CMDefaults.can_invite_users,
+        CMDefaults.can_post_messages,
+        CMDefaults.can_edit_messages,
+        CMDefaults.can_pin_messages,
+        CMDefaults.custom_title,
+    )
+
+
+def chat_member_member():
+    return ChatMemberMember(CMDefaults.user)
+
+
+def chat_member_restricted():
+    return ChatMemberRestricted(
+        CMDefaults.user,
+        CMDefaults.is_member,
+        CMDefaults.can_change_info,
+        CMDefaults.can_invite_users,
+        CMDefaults.can_pin_messages,
+        CMDefaults.can_send_messages,
+        CMDefaults.can_send_media_messages,
+        CMDefaults.can_send_polls,
+        CMDefaults.can_send_other_messages,
+        CMDefaults.can_add_web_page_previews,
+        CMDefaults.until_date,
+    )
+
+
+def chat_member_left():
+    return ChatMemberLeft(CMDefaults.user)
+
+
+def chat_member_banned():
+    return ChatMemberBanned(CMDefaults.user, CMDefaults.until_date)
+
+
+def make_json_dict(instance: ChatMember, include_optional_args: bool = False) -> dict:
+    """Used to make the json dict which we use for testing de_json. Similar to iter_args()"""
+    json_dict = {'status': instance.status}
+    sig = inspect.signature(instance.__class__.__init__)
+
+    for param in sig.parameters.values():
+        if param.name in ignored:  # ignore irrelevant params
+            continue
+
+        val = getattr(instance, param.name)
+        # Compulsory args-
+        if param.default is inspect.Parameter.empty:
+            if hasattr(val, 'to_dict'):  # convert the user object or any future ones to dict.
+                val = val.to_dict()
+            json_dict[param.name] = val
+
+        # If we want to test all args (for de_json)-
+        elif param.default is not inspect.Parameter.empty and include_optional_args:
+            json_dict[param.name] = val
+    return json_dict
+
+
+def iter_args(instance: ChatMember, de_json_inst: ChatMember, include_optional: bool = False):
+    """
+    We accept both the regular instance and de_json created instance and iterate over them for
+    easy one line testing later one.
+    """
+    yield instance.status, de_json_inst.status  # yield this here cause it's not available in sig.
+
+    sig = inspect.signature(instance.__class__.__init__)
+    for param in sig.parameters.values():
+        if param.name in ignored:
+            continue
+        inst_at, json_at = getattr(instance, param.name), getattr(de_json_inst, param.name)
+        if isinstance(json_at, datetime.datetime):  # Convert datetime to int
+            json_at = to_timestamp(json_at)
+        if param.default is not inspect.Parameter.empty and include_optional:
+            yield inst_at, json_at
+        elif param.default is inspect.Parameter.empty:
+            yield inst_at, json_at
+
+
+@pytest.fixture
+def chat_member_type(request):
+    return request.param()
+
+
+@pytest.mark.parametrize(
+    "chat_member_type",
+    [
+        chat_member_owner,
+        chat_member_administrator,
+        chat_member_member,
+        chat_member_restricted,
+        chat_member_left,
+        chat_member_banned,
     ],
-    ids=[
-        ChatMember.CREATOR,
-        ChatMember.ADMINISTRATOR,
-        ChatMember.MEMBER,
-        ChatMember.RESTRICTED,
-        ChatMember.LEFT,
-        ChatMember.KICKED,
-    ],
+    indirect=True,
 )
-def chat_member_class_and_status(request):
-    return request.param
+class TestChatMemberTypes:
+    def test_slot_behaviour(self, chat_member_type, mro_slots):
+        inst = chat_member_type
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-
-@pytest.fixture(scope='class')
-def chat_member_types(chat_member_class_and_status, user):
-    return chat_member_class_and_status[0](status=chat_member_class_and_status[1], user=user)
-
-
-class TestChatMember:
-    def test_slot_behaviour(self, chat_member_types, mro_slots):
-        for attr in chat_member_types.__slots__:
-            assert getattr(chat_member_types, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert len(mro_slots(chat_member_types)) == len(
-            set(mro_slots(chat_member_types))
-        ), "duplicate slot"
-
-    def test_de_json_required_args(self, bot, chat_member_class_and_status, user):
-        cls = chat_member_class_and_status[0]
-        status = chat_member_class_and_status[1]
-
+    def test_de_json_required_args(self, bot, chat_member_type):
+        cls = chat_member_type.__class__
         assert cls.de_json({}, bot) is None
 
-        json_dict = {'status': status, 'user': user.to_dict()}
-        chat_member_type = ChatMember.de_json(json_dict, bot)
+        json_dict = make_json_dict(chat_member_type)
+        const_chat_member = ChatMember.de_json(json_dict, bot)
 
-        assert isinstance(chat_member_type, ChatMember)
-        assert isinstance(chat_member_type, cls)
-        assert chat_member_type.status == status
-        assert chat_member_type.user == user
+        assert isinstance(const_chat_member, ChatMember)
+        assert isinstance(const_chat_member, cls)
+        for chat_mem_type_at, const_chat_mem_at in iter_args(chat_member_type, const_chat_member):
+            assert chat_mem_type_at == const_chat_mem_at
 
-    def test_de_json_all_args(self, bot, chat_member_class_and_status, user):
-        cls = chat_member_class_and_status[0]
-        status = chat_member_class_and_status[1]
-        time = datetime.datetime.utcnow()
+    def test_de_json_all_args(self, bot, chat_member_type):
+        json_dict = make_json_dict(chat_member_type, include_optional_args=True)
+        const_chat_member = ChatMember.de_json(json_dict, bot)
 
-        json_dict = {
-            'user': user.to_dict(),
-            'status': status,
-            'custom_title': 'PTB',
-            'is_anonymous': True,
-            'until_date': to_timestamp(time),
-            'can_be_edited': False,
-            'can_change_info': True,
-            'can_post_messages': False,
-            'can_edit_messages': True,
-            'can_delete_messages': True,
-            'can_invite_users': False,
-            'can_restrict_members': True,
-            'can_pin_messages': False,
-            'can_promote_members': True,
-            'can_send_messages': False,
-            'can_send_media_messages': True,
-            'can_send_polls': False,
-            'can_send_other_messages': True,
-            'can_add_web_page_previews': False,
-            'can_manage_chat': True,
-            'can_manage_voice_chats': True,
-        }
-        chat_member_type = ChatMember.de_json(json_dict, bot)
+        assert isinstance(const_chat_member, ChatMember)
+        assert isinstance(const_chat_member, chat_member_type.__class__)
+        for c_mem_type_at, const_c_mem_at in iter_args(chat_member_type, const_chat_member, True):
+            assert c_mem_type_at == const_c_mem_at
 
-        assert isinstance(chat_member_type, ChatMember)
-        assert isinstance(chat_member_type, cls)
-        assert chat_member_type.user == user
-        assert chat_member_type.status == status
-        if chat_member_type.custom_title is not None:
-            assert chat_member_type.custom_title == 'PTB'
-            assert type(chat_member_type) in {ChatMemberOwner, ChatMemberAdministrator}
-        if chat_member_type.is_anonymous is not None:
-            assert chat_member_type.is_anonymous is True
-            assert type(chat_member_type) in {ChatMemberOwner, ChatMemberAdministrator}
-        if chat_member_type.until_date is not None:
-            assert type(chat_member_type) in {ChatMemberBanned, ChatMemberRestricted}
-        if chat_member_type.can_be_edited is not None:
-            assert chat_member_type.can_be_edited is False
-            assert type(chat_member_type) == ChatMemberAdministrator
-        if chat_member_type.can_change_info is not None:
-            assert chat_member_type.can_change_info is True
-            assert type(chat_member_type) in {ChatMemberAdministrator, ChatMemberRestricted}
-        if chat_member_type.can_post_messages is not None:
-            assert chat_member_type.can_post_messages is False
-            assert type(chat_member_type) == ChatMemberAdministrator
-        if chat_member_type.can_edit_messages is not None:
-            assert chat_member_type.can_edit_messages is True
-            assert type(chat_member_type) == ChatMemberAdministrator
-        if chat_member_type.can_delete_messages is not None:
-            assert chat_member_type.can_delete_messages is True
-            assert type(chat_member_type) == ChatMemberAdministrator
-        if chat_member_type.can_invite_users is not None:
-            assert chat_member_type.can_invite_users is False
-            assert type(chat_member_type) in {ChatMemberAdministrator, ChatMemberRestricted}
-        if chat_member_type.can_restrict_members is not None:
-            assert chat_member_type.can_restrict_members is True
-            assert type(chat_member_type) == ChatMemberAdministrator
-        if chat_member_type.can_pin_messages is not None:
-            assert chat_member_type.can_pin_messages is False
-            assert type(chat_member_type) in {ChatMemberAdministrator, ChatMemberRestricted}
-        if chat_member_type.can_promote_members is not None:
-            assert chat_member_type.can_promote_members is True
-            assert type(chat_member_type) == ChatMemberAdministrator
-        if chat_member_type.can_send_messages is not None:
-            assert chat_member_type.can_send_messages is False
-            assert type(chat_member_type) == ChatMemberRestricted
-        if chat_member_type.can_send_media_messages is not None:
-            assert chat_member_type.can_send_media_messages is True
-            assert type(chat_member_type) == ChatMemberRestricted
-        if chat_member_type.can_send_polls is not None:
-            assert chat_member_type.can_send_polls is False
-            assert type(chat_member_type) == ChatMemberRestricted
-        if chat_member_type.can_send_other_messages is not None:
-            assert chat_member_type.can_send_other_messages is True
-            assert type(chat_member_type) == ChatMemberRestricted
-        if chat_member_type.can_add_web_page_previews is not None:
-            assert chat_member_type.can_add_web_page_previews is False
-            assert type(chat_member_type) == ChatMemberRestricted
-        if chat_member_type.can_manage_chat is not None:
-            assert chat_member_type.can_manage_chat is True
-            assert type(chat_member_type) == ChatMemberAdministrator
-        if chat_member_type.can_manage_voice_chats is not None:
-            assert chat_member_type.can_manage_voice_chats is True
-            assert type(chat_member_type) == ChatMemberAdministrator
-
-    def test_de_json_invalid_status(self, bot, user):
-        json_dict = {'status': 'invalid', 'user': user.to_dict()}
+    def test_de_json_invalid_status(self, chat_member_type, bot):
+        json_dict = {'status': 'invalid', 'user': CMDefaults.user.to_dict()}
         chat_member_type = ChatMember.de_json(json_dict, bot)
 
         assert type(chat_member_type) is ChatMember
         assert chat_member_type.status == 'invalid'
 
-    def test_de_json_subclass(self, chat_member_class_and_status, bot, chat_id, user):
+    def test_de_json_subclass(self, chat_member_type, bot, chat_id):
         """This makes sure that e.g. ChatMemberAdministrator(data, bot) never returns a
-        ChatMemberKicked instance."""
-        cls = chat_member_class_and_status[0]
-        time = datetime.datetime.utcnow()
-        json_dict = {
-            'user': user.to_dict(),
-            'status': 'status',
-            'custom_title': 'PTB',
-            'is_anonymous': True,
-            'until_date': to_timestamp(time),
-            'can_be_edited': False,
-            'can_change_info': True,
-            'can_post_messages': False,
-            'can_edit_messages': True,
-            'can_delete_messages': True,
-            'can_invite_users': False,
-            'can_restrict_members': True,
-            'can_pin_messages': False,
-            'can_promote_members': True,
-            'can_send_messages': False,
-            'can_send_media_messages': True,
-            'can_send_polls': False,
-            'can_send_other_messages': True,
-            'can_add_web_page_previews': False,
-            'can_manage_chat': True,
-            'can_manage_voice_chats': True,
-        }
+        ChatMemberBanned instance."""
+        cls = chat_member_type.__class__
+        json_dict = make_json_dict(chat_member_type, True)
         assert type(cls.de_json(json_dict, bot)) is cls
 
-    def test_to_dict(self, chat_member_types, user):
-        chat_member_dict = chat_member_types.to_dict()
+    def test_to_dict(self, chat_member_type):
+        chat_member_dict = chat_member_type.to_dict()
 
         assert isinstance(chat_member_dict, dict)
-        assert chat_member_dict['status'] == chat_member_types.status
-        assert chat_member_dict['user'] == user.to_dict()
+        assert chat_member_dict['status'] == chat_member_type.status
+        assert chat_member_dict['user'] == chat_member_type.user.to_dict()
 
-    def test_equality(self, chat_member_types, user):
-        a = ChatMember(status='status', user=user)
-        b = ChatMember(status='status', user=user)
-        c = chat_member_types
-        d = deepcopy(chat_member_types)
+    def test_equality(self, chat_member_type):
+        a = ChatMember(status='status', user=CMDefaults.user)
+        b = ChatMember(status='status', user=CMDefaults.user)
+        c = chat_member_type
+        d = deepcopy(chat_member_type)
         e = Dice(4, 'emoji')
 
         assert a == b
