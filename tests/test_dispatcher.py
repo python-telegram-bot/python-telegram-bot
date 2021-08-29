@@ -242,6 +242,31 @@ class TestDispatcher:
 
         assert name1 != name2
 
+    def test_multiple_run_async_decorator(self, dp, dp2):
+        # Make sure we got two dispatchers and that they are not the same
+        assert isinstance(dp, Dispatcher)
+        assert isinstance(dp2, Dispatcher)
+        assert dp is not dp2
+
+        @run_async
+        def must_raise_runtime_error():
+            pass
+
+        with pytest.raises(RuntimeError):
+            must_raise_runtime_error()
+
+    def test_multiple_run_async_deprecation(self, dp):
+        assert isinstance(dp, Dispatcher)
+
+        @run_async
+        def callback(update, context):
+            pass
+
+        dp.add_handler(MessageHandler(Filters.all, callback))
+
+        with pytest.warns(TelegramDeprecationWarning, match='@run_async decorator'):
+            dp.process_update(self.message_update)
+
     def test_async_raises_dispatcher_handler_stop(self, dp, caplog):
         def callback(update, context):
             raise DispatcherHandlerStop()
