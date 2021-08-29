@@ -53,6 +53,7 @@ from telegram.ext import (
     UpdateFilter,
     ExtBot,
     DispatcherBuilder,
+    UpdaterBuilder,
 )
 from telegram.error import BadRequest
 from telegram.utils.helpers import DefaultValue, DEFAULT_NONE
@@ -200,7 +201,7 @@ def cdp(dp):
 
 @pytest.fixture(scope='function')
 def updater(bot):
-    up = Updater(bot=bot, workers=2, use_context=False)
+    up = UpdaterBuilder().bot(bot).workers(2).build()
     yield up
     if up.running:
         up.stop()

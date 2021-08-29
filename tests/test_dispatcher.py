@@ -33,6 +33,7 @@ from telegram.ext import (
     JobQueue,
     BasePersistence,
     ContextTypes,
+    DispatcherBuilder,
 )
 from telegram.ext import PersistenceInput
 from telegram.ext.dispatcher import run_async, Dispatcher, DispatcherHandlerStop
@@ -70,7 +71,16 @@ class TestDispatcher:
         class CustomDispatcher(Dispatcher):
             pass  # Tests that setting custom attrs of Dispatcher subclass doesn't raise warning
 
-        a = CustomDispatcher(None, None)
+        a = CustomDispatcher(
+            bot=None,
+            update_queue=None,
+            workers=None,
+            exception_event=None,
+            job_queue=None,
+            persistence=None,
+            context_types=None,
+            builder_flag=True,
+        )
         a.my_custom = 'no error!'
         assert len(recwarn) == 1
 
@@ -123,7 +133,7 @@ class TestDispatcher:
             self.received = context.error.message
 
     def test_less_than_one_worker_warning(self, dp, recwarn):
-        Dispatcher(dp.bot, dp.update_queue, job_queue=dp.job_queue, workers=0, use_context=True)
+        DispatcherBuilder().bot(dp.bot).workers(0).build()
         assert len(recwarn) == 1
         assert (
             str(recwarn[0].message)

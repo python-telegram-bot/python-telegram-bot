@@ -95,7 +95,7 @@ class Updater(Generic[BT, DT]):
     def __init__(self, **kwargs: Any):
         if not kwargs.pop('builder_flag', False):
             warnings.warn(
-                '`Dispatcher` instances should be built via the `DispatcherBuilder`.',
+                '`Updater` instances should be built via the `UpdaterBuilder`.',
                 UserWarning,
                 stacklevel=2,
             )
