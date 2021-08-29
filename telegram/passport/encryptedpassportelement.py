@@ -52,6 +52,8 @@ class EncryptedPassportElement(TelegramObject):
             "identity_card", "internal_passport", "address", "utility_bill", "bank_statement",
             "rental_agreement", "passport_registration", "temporary_registration", "phone_number",
             "email".
+        hash (:obj:`str`): Base64-encoded element hash for using in
+            :class:`telegram.PassportElementErrorUnspecified`.
         data (:class:`telegram.PersonalDetails` | :class:`telegram.IdDocument` | \
             :class:`telegram.ResidentialAddress` | :obj:`str`, optional):
             Decrypted or encrypted data, available for "personal_details", "passport",
@@ -77,8 +79,6 @@ class EncryptedPassportElement(TelegramObject):
             requested for "passport", "driver_license", "identity_card", "internal_passport",
             "utility_bill", "bank_statement", "rental_agreement", "passport_registration" and
             "temporary_registration" types.
-        hash (:obj:`str`): Base64-encoded element hash for using in
-            :class:`telegram.PassportElementErrorUnspecified`.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -87,6 +87,8 @@ class EncryptedPassportElement(TelegramObject):
             "identity_card", "internal_passport", "address", "utility_bill", "bank_statement",
             "rental_agreement", "passport_registration", "temporary_registration", "phone_number",
             "email".
+        hash (:obj:`str`): Base64-encoded element hash for using in
+            :class:`telegram.PassportElementErrorUnspecified`.
         data (:class:`telegram.PersonalDetails` | :class:`telegram.IdDocument` | \
             :class:`telegram.ResidentialAddress` | :obj:`str`):
             Optional. Decrypted or encrypted data, available for "personal_details", "passport",
@@ -112,8 +114,6 @@ class EncryptedPassportElement(TelegramObject):
             requested for "passport", "driver_license", "identity_card", "internal_passport",
             "utility_bill", "bank_statement", "rental_agreement", "passport_registration" and
             "temporary_registration" types.
-        hash (:obj:`str`): Base64-encoded element hash for using in
-            :class:`telegram.PassportElementErrorUnspecified`.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     """
@@ -135,6 +135,7 @@ class EncryptedPassportElement(TelegramObject):
     def __init__(
         self,
         type: str,  # pylint: disable=W0622
+        hash: str,  # pylint: disable=W0622
         data: PersonalDetails = None,
         phone_number: str = None,
         email: str = None,
@@ -143,7 +144,6 @@ class EncryptedPassportElement(TelegramObject):
         reverse_side: PassportFile = None,
         selfie: PassportFile = None,
         translation: List[PassportFile] = None,
-        hash: str = None,  # pylint: disable=W0622
         bot: 'Bot' = None,
         credentials: 'Credentials' = None,  # pylint: disable=W0613
         **_kwargs: Any,
