@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=C0413
 """Extensions over the Telegram Bot API to facilitate bot making"""
 
 from .extbot import ExtBot
@@ -28,17 +27,6 @@ from .callbackcontext import CallbackContext
 from .contexttypes import ContextTypes
 from .dispatcher import Dispatcher, DispatcherHandlerStop, run_async
 
-# https://bugs.python.org/issue41451, fixed on 3.7+, doesn't actually remove slots
-# try-except is just  here in case the __init__ is called twice (like in the tests)
-# this block is also the reason for the pylint-ignore at the top of the file
-try:
-    del Dispatcher.__slots__
-except AttributeError as exc:
-    if str(exc) == '__slots__':
-        pass
-    else:
-        raise exc
-
 from .jobqueue import JobQueue, Job
 from .updater import Updater
 from .callbackqueryhandler import CallbackQueryHandler
@@ -47,7 +35,6 @@ from .inlinequeryhandler import InlineQueryHandler
 from .filters import BaseFilter, MessageFilter, UpdateFilter, Filters
 from .messagehandler import MessageHandler
 from .commandhandler import CommandHandler, PrefixHandler
-from .regexhandler import RegexHandler
 from .stringcommandhandler import StringCommandHandler
 from .stringregexhandler import StringRegexHandler
 from .typehandler import TypeHandler
@@ -96,7 +83,6 @@ __all__ = (
     'PollHandler',
     'PreCheckoutQueryHandler',
     'PrefixHandler',
-    'RegexHandler',
     'ShippingQueryHandler',
     'StringCommandHandler',
     'StringRegexHandler',

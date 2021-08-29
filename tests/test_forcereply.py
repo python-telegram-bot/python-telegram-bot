@@ -26,7 +26,6 @@ from telegram import ForceReply, ReplyKeyboardRemove
 @pytest.fixture(scope='class')
 def force_reply():
     return ForceReply(
-        TestForceReply.force_reply,
         TestForceReply.selective,
         TestForceReply.input_field_placeholder,
     )
@@ -37,13 +36,10 @@ class TestForceReply:
     selective = True
     input_field_placeholder = 'force replies can be annoying if not used properly'
 
-    def test_slot_behaviour(self, force_reply, recwarn, mro_slots):
+    def test_slot_behaviour(self, force_reply, mro_slots):
         for attr in force_reply.__slots__:
             assert getattr(force_reply, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not force_reply.__dict__, f"got missing slot(s): {force_reply.__dict__}"
         assert len(mro_slots(force_reply)) == len(set(mro_slots(force_reply))), "duplicate slot"
-        force_reply.custom, force_reply.force_reply = 'should give warning', self.force_reply
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     @flaky(3, 1)
     def test_send_message_with_force_reply(self, bot, chat_id, force_reply):
@@ -65,16 +61,16 @@ class TestForceReply:
         assert force_reply_dict['input_field_placeholder'] == force_reply.input_field_placeholder
 
     def test_equality(self):
-        a = ForceReply(True, False)
-        b = ForceReply(False, False)
-        c = ForceReply(True, True)
+        a = ForceReply(True, 'test')
+        b = ForceReply(False, 'pass')
+        c = ForceReply(True)
         d = ReplyKeyboardRemove()
 
-        assert a == b
-        assert hash(a) == hash(b)
+        assert a != b
+        assert hash(a) != hash(b)
 
-        assert a != c
-        assert hash(a) != hash(c)
+        assert a == c
+        assert hash(a) == hash(c)
 
         assert a != d
         assert hash(a) != hash(d)

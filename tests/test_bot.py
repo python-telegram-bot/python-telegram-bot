@@ -137,20 +137,10 @@ class TestBot:
     """
 
     @pytest.mark.parametrize('inst', ['bot', "default_bot"], indirect=True)
-    def test_slot_behaviour(self, inst, recwarn, mro_slots):
+    def test_slot_behaviour(self, inst, mro_slots):
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not inst.__dict__, f"got missing slots: {inst.__dict__}"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-        inst.custom, inst.base_url = 'should give warning', inst.base_url
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
-
-        class CustomBot(Bot):
-            pass  # Tests that setting custom attributes of Bot subclass doesn't raise warning
-
-        a = CustomBot(inst.token)
-        a.my_custom = 'no error!'
-        assert len(recwarn) == 1
 
     @pytest.mark.parametrize(
         'token',
@@ -1323,7 +1313,7 @@ class TestBot:
 
         monkeypatch.setattr(bot.request, 'post', assertion)
 
-        assert bot.set_webhook(drop_pending_updates=drop_pending_updates)
+        assert bot.set_webhook('', drop_pending_updates=drop_pending_updates)
         assert bot.delete_webhook(drop_pending_updates=drop_pending_updates)
 
     @flaky(3, 1)
@@ -1789,7 +1779,6 @@ class TestBot:
     def test_set_chat_description(self, bot, channel_id):
         assert bot.set_chat_description(channel_id, 'Time: ' + str(time.time()))
 
-    # TODO: Add bot to group to test there too
     @flaky(3, 1)
     def test_pin_and_unpin_message(self, bot, super_group_id):
         message1 = bot.send_message(super_group_id, text="test_pin_message_1")

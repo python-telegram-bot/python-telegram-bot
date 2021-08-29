@@ -41,7 +41,7 @@ from typing import (
 from telegram import TelegramError
 from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized
 from telegram.ext import Dispatcher
-from telegram.utils.deprecate import TelegramDeprecationWarning, set_new_attribute_deprecated
+from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import get_signal_name
 from telegram.ext.utils.types import BT
 from telegram.ext.utils.webhookhandler import WebhookAppClass, WebhookServer
@@ -89,7 +89,6 @@ class Updater(Generic[BT, DT]):
         'httpd',
         '__lock',
         '__threads',
-        '__dict__',
     )
 
     def __init__(self, **kwargs: Any):
@@ -120,14 +119,6 @@ class Updater(Generic[BT, DT]):
         self.__lock = Lock()
         self.__threads: List[Thread] = []
         self.logger = logging.getLogger(__name__)
-
-    def __setattr__(self, key: str, value: object) -> None:
-        if key.startswith('__'):
-            key = f"_{self.__class__.__name__}{key}"
-        if issubclass(self.__class__, Updater) and self.__class__ is not Updater:
-            object.__setattr__(self, key, value)
-            return
-        set_new_attribute_deprecated(self, key, value)
 
     @property
     def exception_event(self) -> Event:  # skipcq: PY-D0003

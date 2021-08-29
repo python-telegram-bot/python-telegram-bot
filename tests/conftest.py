@@ -44,10 +44,10 @@ from telegram import (
     ChosenInlineResult,
     File,
     ChatPermissions,
+    Bot,
 )
 from telegram.ext import (
     Dispatcher,
-    Updater,
     MessageFilter,
     Defaults,
     UpdateFilter,
@@ -57,6 +57,7 @@ from telegram.ext import (
 )
 from telegram.error import BadRequest
 from telegram.utils.helpers import DefaultValue, DEFAULT_NONE
+from telegram.utils.request import Request
 from tests.bots import get_bot
 
 
@@ -90,14 +91,22 @@ def bot_info():
     return get_bot()
 
 
+# Below Dict* classes are used to monkeypatch attributes since parent classes don't have __dict__
+class DictRequest(Request):
+    pass
+
+
+class DictExtBot(ExtBot):
+    pass
+
+
+class DictBot(Bot):
+    pass
+
+
 @pytest.fixture(scope='session')
 def bot(bot_info):
-    class DictExtBot(
-        ExtBot
-    ):  # Subclass Bot to allow monkey patching of attributes and functions, would
-        pass  # come into effect when we __dict__ is dropped from slots
-
-    return DictExtBot(bot_info['token'], private_key=PRIVATE_KEY)
+    return DictExtBot(bot_info['token'], private_key=PRIVATE_KEY, request=DictRequest())
 
 
 DEFAULT_BOTS = {}
@@ -185,18 +194,10 @@ def dp(_dp):
     object.__setattr__(_dp, '__async_queue', Queue())
     object.__setattr__(_dp, '__async_threads', set())
     _dp.persistence = None
-    _dp.use_context = False
     if _dp._Dispatcher__singleton_semaphore.acquire(blocking=0):
         Dispatcher._set_singleton(_dp)
     yield _dp
     Dispatcher._Dispatcher__singleton_semaphore.release()
-
-
-@pytest.fixture(scope='function')
-def cdp(dp):
-    dp.use_context = True
-    yield dp
-    dp.use_context = False
 
 
 @pytest.fixture(scope='function')
@@ -230,7 +231,7 @@ def make_bot(bot_info, **kwargs):
     """
     Tests are executed on tg.ext.ExtBot, as that class only extends the functionality of tg.bot
     """
-    return ExtBot(bot_info['token'], private_key=PRIVATE_KEY, **kwargs)
+    return ExtBot(bot_info['token'], private_key=PRIVATE_KEY, request=DictRequest(), **kwargs)
 
 
 CMD_PATTERN = re.compile(r'/[\da-z_]{1,32}(?:@\w{1,32})?')
@@ -361,9 +362,9 @@ def mro_slots():
         return [
             attr
             for cls in _class.__class__.__mro__[:-1]
-            if hasattr(cls, '__slots__')  # ABC doesn't have slots in py 3.7 and below
+            if hasattr(cls, '__slots__')  # The Exception class doesn't have slots
             for attr in cls.__slots__
-            if attr != '__dict__'
+            if attr != '__dict__'  # left here for classes which still has __dict__
         ]
 
     return _mro_slots

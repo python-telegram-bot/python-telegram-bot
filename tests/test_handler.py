@@ -17,13 +17,11 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-from sys import version_info as py_ver
-
 from telegram.ext import Handler
 
 
 class TestHandler:
-    def test_slot_behaviour(self, recwarn, mro_slots):
+    def test_slot_behaviour(self, mro_slots):
         class SubclassHandler(Handler):
             __slots__ = ()
 
@@ -36,8 +34,4 @@ class TestHandler:
         inst = SubclassHandler()
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-        assert '__dict__' not in Handler.__slots__ if py_ver < (3, 7) else True, 'dict in abc'
-        inst.custom = 'should not give warning'
-        assert len(recwarn) == 0, recwarn.list

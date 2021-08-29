@@ -57,7 +57,6 @@ CheckUpdateType = Optional[Tuple[Tuple[int, ...], Handler, object]]
 
 
 class _ConversationTimeoutContext:
-    # '__dict__' is not included since this a private class
     __slots__ = ('conversation_key', 'update', 'dispatcher', 'callback_context')
 
     def __init__(
@@ -65,7 +64,7 @@ class _ConversationTimeoutContext:
         conversation_key: Tuple[int, ...],
         update: Update,
         dispatcher: 'Dispatcher[Any, CCT, Any, Any, Any, JobQueue, Any]',
-        callback_context: Optional[CallbackContext],
+        callback_context: CallbackContext,
     ):
         self.conversation_key = conversation_key
         self.update = update
@@ -498,7 +497,7 @@ class ConversationHandler(Handler[Update, CCT]):
         new_state: object,
         dispatcher: 'Dispatcher[Any, CCT, Any, Any, Any, JobQueue, Any]',
         update: Update,
-        context: Optional[CallbackContext],
+        context: CallbackContext,
         conversation_key: Tuple[int, ...],
     ) -> None:
         if new_state != self.END:
@@ -610,7 +609,7 @@ class ConversationHandler(Handler[Update, CCT]):
         update: Update,
         dispatcher: 'Dispatcher',
         check_result: CheckUpdateType,
-        context: CallbackContext = None,
+        context: CallbackContext,
     ) -> Optional[object]:
         """Send the update to the callback for the current state and Handler
 
@@ -619,11 +618,10 @@ class ConversationHandler(Handler[Update, CCT]):
                 handler, and the handler's check result.
             update (:class:`telegram.Update`): Incoming telegram update.
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
-            context (:class:`telegram.ext.CallbackContext`, optional): The context as provided by
+            context (:class:`telegram.ext.CallbackContext`): The context as provided by
                 the dispatcher.
 
         """
-        update = cast(Update, update)  # for mypy
         conversation_key, handler, check_result = check_result  # type: ignore[assignment,misc]
         raise_dp_handler_stop = False
 
@@ -702,15 +700,11 @@ class ConversationHandler(Handler[Update, CCT]):
                 if self.persistent and self.persistence and self.name:
                     self.persistence.update_conversation(self.name, key, new_state)
 
-    def _trigger_timeout(self, context: CallbackContext, job: 'Job' = None) -> None:
+    def _trigger_timeout(self, context: CallbackContext) -> None:
         self.logger.debug('conversation timeout was triggered!')
 
-        # Backward compatibility with bots that do not use CallbackContext
-        if isinstance(context, CallbackContext):
-            job = context.job
-            ctxt = cast(_ConversationTimeoutContext, job.context)  # type: ignore[union-attr]
-        else:
-            ctxt = cast(_ConversationTimeoutContext, job.context)
+        job = cast('Job', context.job)
+        ctxt = cast(_ConversationTimeoutContext, job.context)
 
         callback_context = ctxt.callback_context
 

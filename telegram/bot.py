@@ -224,14 +224,6 @@ class Bot(TelegramObject):
                 private_key, password=private_key_password, backend=default_backend()
             )
 
-    # The ext_bot argument is a little hack to get warnings handled correctly.
-    # It's not very clean, but the warnings will be dropped at some point anyway.
-    def __setattr__(self, key: str, value: object, ext_bot: bool = False) -> None:
-        if issubclass(self.__class__, Bot) and self.__class__ is not Bot and not ext_bot:
-            object.__setattr__(self, key, value)
-            return
-        super().__setattr__(key, value)
-
     def _insert_defaults(
         self, data: Dict[str, object], timeout: ODVInput[float]
     ) -> Optional[float]:
@@ -1761,7 +1753,7 @@ class Bot(TelegramObject):
               :obj:`title` and :obj:`address` and optionally :obj:`foursquare_id` and
               :obj:`foursquare_type` or optionally :obj:`google_place_id` and
               :obj:`google_place_type`.
-            * Foursquare details and Google Pace details are mutually exclusive. However, this
+            * Foursquare details and Google Place details are mutually exclusive. However, this
               behaviour is undocumented and might be changed by Telegram.
 
         Args:
@@ -2665,10 +2657,10 @@ class Bot(TelegramObject):
     @log
     def edit_message_media(
         self,
+        media: 'InputMedia',
         chat_id: Union[str, int] = None,
         message_id: int = None,
         inline_message_id: int = None,
-        media: 'InputMedia' = None,
         reply_markup: InlineKeyboardMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
@@ -2681,6 +2673,8 @@ class Bot(TelegramObject):
         ``file_id`` or specify a URL.
 
         Args:
+            media (:class:`telegram.InputMedia`): An object for a new media content
+                of the message.
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
                 specified. Unique identifier for the target chat or username of the target channel
                 (in the format ``@channelusername``).
@@ -2688,8 +2682,6 @@ class Bot(TelegramObject):
                 Identifier of the message to edit.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
                 specified. Identifier of the inline message.
-            media (:class:`telegram.InputMedia`): An object for a new media content
-                of the message.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
                 object for an inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -2699,7 +2691,7 @@ class Bot(TelegramObject):
                 Telegram API.
 
         Returns:
-            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            :class:`telegram.Message`: On success, if edited message is not an inline message, the
             edited Message is returned, otherwise :obj:`True` is returned.
 
         Raises:
@@ -2876,7 +2868,7 @@ class Bot(TelegramObject):
     @log
     def set_webhook(
         self,
-        url: str = None,
+        url: str,
         certificate: FileInput = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         max_connections: int = 40,
@@ -2947,10 +2939,8 @@ class Bot(TelegramObject):
         .. _`guide to Webhooks`: https://core.telegram.org/bots/webhooks
 
         """
-        data: JSONDict = {}
+        data: JSONDict = {'url': url}
 
-        if url is not None:
-            data['url'] = url
         if certificate:
             data['certificate'] = parse_file_input(certificate)
         if max_connections is not None:
@@ -4239,7 +4229,7 @@ class Bot(TelegramObject):
     def set_chat_description(
         self,
         chat_id: Union[str, int],
-        description: str,
+        description: str = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
@@ -4251,7 +4241,7 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
-            description (:obj:`str`): New chat description, 0-255 characters.
+            description (:obj:`str`, optional): New chat description, 0-255 characters.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -4265,7 +4255,10 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id, 'description': description}
+        data: JSONDict = {'chat_id': chat_id}
+
+        if description is not None:
+            data['description'] = description
 
         result = self._post('setChatDescription', data, timeout=timeout, api_kwargs=api_kwargs)
 

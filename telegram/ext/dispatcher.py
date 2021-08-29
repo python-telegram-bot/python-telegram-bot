@@ -46,7 +46,7 @@ from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.handler import Handler
 from telegram.ext.extbot import ExtBot
 from telegram.ext.callbackdatacache import CallbackDataCache
-from telegram.utils.deprecate import TelegramDeprecationWarning, set_new_attribute_deprecated
+from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.ext.utils.promise import Promise
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 from telegram.ext.utils.types import CCT, UD, CD, BD, BT, JQ, PT
@@ -143,7 +143,6 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
     __slots__ = (
         'workers',
         'persistence',
-        'use_context',
         'update_queue',
         'job_queue',
         'user_data',
@@ -182,16 +181,8 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         self.job_queue = cast(JQ, kwargs.pop('job_queue'))
         self.workers = cast(int, kwargs.pop('workers'))
         persistence = cast(PT, kwargs.pop('persistence'))
-        self.use_context = True
         self.context_types = cast(ContextTypes[CCT, UD, CD, BD], kwargs.pop('context_types'))
         self.__exception_event = cast(Event, kwargs.pop('exception_event'))
-
-        if not self.use_context:
-            warnings.warn(
-                'Old Handler API is deprecated - see https://git.io/fxJuV for details',
-                TelegramDeprecationWarning,
-                stacklevel=3,
-            )
 
         if self.workers < 1:
             warnings.warn(
@@ -265,17 +256,6 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
                 self._set_singleton(self)
             else:
                 self._set_singleton(None)
-
-    def __setattr__(self, key: str, value: object) -> None:
-        # Mangled names don't automatically apply in __setattr__ (see
-        # https://docs.python.org/3/tutorial/classes.html#private-variables), so we have to make
-        # it mangled so they don't raise TelegramDeprecationWarning unnecessarily
-        if key.startswith('__'):
-            key = f"_{self.__class__.__name__}{key}"
-        if issubclass(self.__class__, Dispatcher) and self.__class__ is not Dispatcher:
-            object.__setattr__(self, key, value)
-            return
-        set_new_attribute_deprecated(self, key, value)
 
     @property
     def exception_event(self) -> Event:  # skipcq: PY-D0003
@@ -514,7 +494,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
                 for handler in self.handlers[group]:
                     check = handler.check_update(update)
                     if check is not None and check is not False:
-                        if not context and self.use_context:
+                        if not context:
                             context = self.context_types.context.from_update(update, self)
                             print('constructed context')
                             context.refresh_data()
@@ -732,16 +712,15 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
 
         Args:
             callback (:obj:`callable`): The callback function for this error handler. Will be
-                called when an error is raised. Callback signature for context based API:
+                called when an error is raised.
+            Callback signature:
 
-                ``def callback(update: object, context: CallbackContext)``
+
+            ``def callback(update: Update, context: CallbackContext)``
 
                 The error that happened will be present in context.error.
             run_async (:obj:`bool`, optional): Whether this handlers callback should be run
                 asynchronously using :meth:`run_async`. Defaults to :obj:`False`.
-
-        Note:
-            See https://git.io/fxJuV for more info about switching to context based API.
         """
         if callback in self.error_handlers:
             self.logger.debug('The callback is already registered as an error handler. Ignoring.')
@@ -778,19 +757,13 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
 
         if self.error_handlers:
             for callback, run_async in self.error_handlers.items():  # pylint: disable=W0621
-                if self.use_context:
-                    context = self.context_types.context.from_error(
-                        update, error, self, async_args=async_args, async_kwargs=async_kwargs
-                    )
-                    if run_async:
-                        self.run_async(callback, update, context, update=update)
-                    else:
-                        callback(update, context)
+                context = self.context_types.context.from_error(
+                    update, error, self, async_args=async_args, async_kwargs=async_kwargs
+                )
+                if run_async:
+                    self.run_async(callback, update, context, update=update)
                 else:
-                    if run_async:
-                        self.run_async(callback, self.bot, update, error, update=update)
-                    else:
-                        callback(self.bot, update, error)
+                    callback(update, context)
 
         else:
             self.logger.exception(

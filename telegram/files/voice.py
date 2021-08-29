@@ -65,7 +65,6 @@ class Voice(TelegramObject):
         'duration',
         'mime_type',
         'file_unique_id',
-        '_id_attrs',
     )
 
     def __init__(

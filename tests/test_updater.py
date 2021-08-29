@@ -35,6 +35,7 @@ from urllib.request import Request, urlopen
 from urllib.error import HTTPError
 
 import pytest
+from .conftest import DictBot
 
 from telegram import (
     TelegramError,
@@ -49,13 +50,9 @@ from telegram import (
 from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter
 from telegram.ext import (
     Updater,
-    Dispatcher,
-    DictPersistence,
-    Defaults,
     InvalidCallbackData,
     ExtBot,
 )
-from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.ext.utils.webhookhandler import WebhookServer
 
 signalskip = pytest.mark.skipif(
@@ -90,24 +87,11 @@ class TestUpdater:
     offset = 0
     test_flag = False
 
-    def test_slot_behaviour(self, updater, mro_slots, recwarn):
+    def test_slot_behaviour(self, updater, mro_slots):
         for at in updater.__slots__:
             at = f"_Updater{at}" if at.startswith('__') and not at.endswith('__') else at
             assert getattr(updater, at, 'err') != 'err', f"got extra slot '{at}'"
-        assert not updater.__dict__, f"got missing slot(s): {updater.__dict__}"
         assert len(mro_slots(updater)) == len(set(mro_slots(updater))), "duplicate slot"
-        updater.custom, updater.running = 'should give warning', updater.running
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
-
-        class CustomUpdater(Updater):
-            pass  # Tests that setting custom attributes of Updater subclass doesn't raise warning
-
-        a = CustomUpdater(updater.bot.token)
-        a.my_custom = 'no error!'
-        assert len(recwarn) == 1
-
-        updater.__setattr__('__test', 'mangled success')
-        assert getattr(updater, '_Updater__test', 'e') == 'mangled success', "mangling failed"
 
     @pytest.fixture(autouse=True)
     def reset(self):
@@ -118,11 +102,11 @@ class TestUpdater:
         self.cb_handler_called.clear()
         self.test_flag = False
 
-    def error_handler(self, bot, update, error):
-        self.received = error.message
+    def error_handler(self, update, context):
+        self.received = context.error.message
         self.err_handler_called.set()
 
-    def callback(self, bot, update):
+    def callback(self, update, context):
         self.received = update.message.text
         self.cb_handler_called.set()
 
@@ -213,7 +197,7 @@ class TestUpdater:
         if ext_bot and not isinstance(updater.bot, ExtBot):
             updater.bot = ExtBot(updater.bot.token)
         if not ext_bot and not type(updater.bot) is Bot:
-            updater.bot = Bot(updater.bot.token)
+            updater.bot = DictBot(updater.bot.token)
 
         q = Queue()
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
@@ -512,10 +496,9 @@ class TestUpdater:
         except AssertionError:
             pass
 
-        assert len(recwarn) == 3
-        assert str(recwarn[0].message).startswith('Old Handler API')
-        assert str(recwarn[1].message).startswith('The argument `clean` of')
-        assert str(recwarn[2].message).startswith('The argument `force_event_loop` of')
+        assert len(recwarn) == 2
+        assert str(recwarn[0].message).startswith('The argument `clean` of')
+        assert str(recwarn[1].message).startswith('The argument `force_event_loop` of')
 
     def test_clean_deprecation_warning_polling(self, recwarn, updater, monkeypatch):
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
@@ -534,9 +517,8 @@ class TestUpdater:
         except AssertionError:
             pass
 
-        assert len(recwarn) == 2
-        assert str(recwarn[0].message).startswith('Old Handler API')
-        assert str(recwarn[1].message).startswith('The argument `clean` of')
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message).startswith('The argument `clean` of')
 
     def test_clean_drop_pending_mutually_exclusive(self, updater):
         with pytest.raises(TypeError, match='`clean` and `drop_pending_updates` are mutually'):

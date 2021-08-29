@@ -70,7 +70,6 @@ class SuccessfulPayment(TelegramObject):
         'telegram_payment_charge_id',
         'provider_payment_charge_id',
         'total_amount',
-        '_id_attrs',
     )
 
     def __init__(
