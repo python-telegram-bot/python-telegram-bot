@@ -34,7 +34,6 @@ Handlers
     telegram.ext.pollhandler
     telegram.ext.precheckoutqueryhandler
     telegram.ext.prefixhandler
-    telegram.ext.regexhandler
     telegram.ext.shippingqueryhandler
     telegram.ext.stringcommandhandler
     telegram.ext.stringregexhandler

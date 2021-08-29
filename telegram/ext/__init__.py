@@ -35,7 +35,6 @@ from .inlinequeryhandler import InlineQueryHandler
 from .filters import BaseFilter, MessageFilter, UpdateFilter, Filters
 from .messagehandler import MessageHandler
 from .commandhandler import CommandHandler, PrefixHandler
-from .regexhandler import RegexHandler
 from .stringcommandhandler import StringCommandHandler
 from .stringregexhandler import StringRegexHandler
 from .typehandler import TypeHandler
@@ -84,7 +83,6 @@ __all__ = (
     'PollHandler',
     'PreCheckoutQueryHandler',
     'PrefixHandler',
-    'RegexHandler',
     'ShippingQueryHandler',
     'StringCommandHandler',
     'StringRegexHandler',
