@@ -66,12 +66,11 @@ Attributes:
 
 :class:`telegram.ChatAction`:
 
+.. versionchanged::
+    Removed the deprecated constants ``RECORD_AUDIO`` and ``UPLOAD_AUDIO``.
+
 Attributes:
     CHATACTION_FIND_LOCATION (:obj:`str`): ``'find_location'``
-    CHATACTION_RECORD_AUDIO (:obj:`str`): ``'record_audio'``
-
-        .. deprecated:: 13.5
-           Deprecated by Telegram. Use :const:`CHATACTION_RECORD_VOICE` instead.
     CHATACTION_RECORD_VOICE (:obj:`str`): ``'record_voice'``
 
         .. versionadded:: 13.5
@@ -79,9 +78,6 @@ Attributes:
     CHATACTION_RECORD_VIDEO_NOTE (:obj:`str`): ``'record_video_note'``
     CHATACTION_TYPING (:obj:`str`): ``'typing'``
     CHATACTION_UPLOAD_AUDIO (:obj:`str`): ``'upload_audio'``
-
-        .. deprecated:: 13.5
-           Deprecated by Telegram. Use :const:`CHATACTION_UPLOAD_VOICE` instead.
     CHATACTION_UPLOAD_VOICE (:obj:`str`): ``'upload_voice'``
 
         .. versionadded:: 13.5
