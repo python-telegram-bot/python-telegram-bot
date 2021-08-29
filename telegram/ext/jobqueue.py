@@ -31,7 +31,6 @@ from telegram.ext.callbackcontext import CallbackContext
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
-    from telegram import Bot
     from telegram.ext import Dispatcher
     import apscheduler.job  # noqa: F401
 
@@ -64,10 +63,8 @@ class JobQueue:
         logging.getLogger('apscheduler.executors.default').addFilter(aps_log_filter)
         self.scheduler.add_listener(self._dispatch_error, EVENT_JOB_ERROR)
 
-    def _build_args(self, job: 'Job') -> List[Union[CallbackContext, 'Bot', 'Job']]:
-        if self._dispatcher.use_context:
-            return [self._dispatcher.context_types.context.from_job(job, self._dispatcher)]
-        return [self._dispatcher.bot, job]
+    def _build_args(self, job: 'Job') -> List[CallbackContext]:
+        return [self._dispatcher.context_types.context.from_job(job, self._dispatcher)]
 
     def _tz_now(self) -> datetime.datetime:
         return datetime.datetime.now(self.scheduler.timezone)
@@ -145,12 +142,7 @@ class JobQueue:
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
-                job. Callback signature for context based API:
-
-                    ``def callback(CallbackContext)``
-
-                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
-                its ``job.context`` or change it to a repeating job.
+                job. Callback signature: ``def callback(update: Update, context: CallbackContext)``
             when (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |                         \
                   :obj:`datetime.datetime` | :obj:`datetime.time`):
                 Time in or at which the job should run. This parameter will be interpreted
@@ -220,12 +212,7 @@ class JobQueue:
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
-                job. Callback signature for context based API:
-
-                    ``def callback(CallbackContext)``
-
-                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
-                its ``job.context`` or change it to a repeating job.
+                job. Callback signature: ``def callback(update: Update, context: CallbackContext)``
             interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta`): The interval in which
                 the job will run. If it is an :obj:`int` or a :obj:`float`, it will be interpreted
                 as seconds.
@@ -315,12 +302,7 @@ class JobQueue:
 
         Args:
             callback (:obj:`callable`):  The callback function that should be executed by the new
-                job. Callback signature for context based API:
-
-                    ``def callback(CallbackContext)``
-
-                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
-                its ``job.context`` or change it to a repeating job.
+                job. Callback signature: ``def callback(update: Update, context: CallbackContext)``
             when (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
                 (``when.tzinfo``) is :obj:`None`, the default timezone of the bot will be used.
             day (:obj:`int`): Defines the day of the month whereby the job would run. It should
@@ -379,12 +361,7 @@ class JobQueue:
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
-                job. Callback signature for context based API:
-
-                    ``def callback(CallbackContext)``
-
-                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
-                its ``job.context`` or change it to a repeating job.
+                job. Callback signature: ``def callback(update: Update, context: CallbackContext)``
             time (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
                 (``time.tzinfo``) is :obj:`None`, the default timezone of the bot will be used.
             days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should
@@ -434,12 +411,7 @@ class JobQueue:
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
-                job. Callback signature for context based API:
-
-                    ``def callback(CallbackContext)``
-
-                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
-                its ``job.context`` or change it to a repeating job.
+                job. Callback signature: ``def callback(update: Update, context: CallbackContext)``
             job_kwargs (:obj:`dict`): Arbitrary keyword arguments. Used as arguments for
                 ``scheduler.add_job``.
             context (:obj:`object`, optional): Additional data needed for the callback function.
@@ -502,12 +474,7 @@ class Job:
 
     Args:
         callback (:obj:`callable`): The callback function that should be executed by the new job.
-            Callback signature for context based API:
-
-                ``def callback(CallbackContext)``
-
-            a ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
-            its ``job.context`` or change it to a repeating job.
+            Callback signature: ``def callback(update: Update, context: CallbackContext)``
         context (:obj:`object`, optional): Additional data needed for the callback function. Can be
             accessed through ``job.context`` in the callback. Defaults to :obj:`None`.
         name (:obj:`str`, optional): The name of the new job. Defaults to ``callback.__name__``.
@@ -555,10 +522,7 @@ class Job:
     def run(self, dispatcher: 'Dispatcher') -> None:
         """Executes the callback function independently of the jobs schedule."""
         try:
-            if dispatcher.use_context:
-                self.callback(dispatcher.context_types.context.from_job(self, dispatcher))
-            else:
-                self.callback(dispatcher.bot, self)  # type: ignore[arg-type,call-arg]
+            self.callback(dispatcher.context_types.context.from_job(self, dispatcher))
         except Exception as exc:
             try:
                 dispatcher.dispatch_error(None, exc)

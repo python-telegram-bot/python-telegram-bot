@@ -72,7 +72,7 @@ class TestStringCommandHandler:
     test_flag = False
 
     def test_slot_behaviour(self, mro_slots):
-        inst = StringCommandHandler('sleepy', self.callback_basic)
+        inst = StringCommandHandler('sleepy', self.callback_context)
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
@@ -80,23 +80,6 @@ class TestStringCommandHandler:
     @pytest.fixture(autouse=True)
     def reset(self):
         self.test_flag = False
-
-    def callback_basic(self, bot, update):
-        test_bot = isinstance(bot, Bot)
-        test_update = isinstance(update, str)
-        self.test_flag = test_bot and test_update
-
-    def callback_queue_1(self, bot, update, job_queue=None, update_queue=None):
-        self.test_flag = (job_queue is not None) or (update_queue is not None)
-
-    def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
-        self.test_flag = (job_queue is not None) and (update_queue is not None)
-
-    def sch_callback_args(self, bot, update, args):
-        if update == '/test':
-            self.test_flag = len(args) == 0
-        else:
-            self.test_flag = args == ['one', 'two']
 
     def callback_context(self, update, context):
         self.test_flag = (
@@ -113,75 +96,23 @@ class TestStringCommandHandler:
     def callback_context_args(self, update, context):
         self.test_flag = context.args == ['one', 'two']
 
-    def test_basic(self, dp):
-        handler = StringCommandHandler('test', self.callback_basic)
-        dp.add_handler(handler)
-
-        check = handler.check_update('/test')
-        assert check is not None and check is not False
-        dp.process_update('/test')
-        assert self.test_flag
-
-        check = handler.check_update('/nottest')
-        assert check is None or check is False
-        check = handler.check_update('not /test in front')
-        assert check is None or check is False
-        check = handler.check_update('/test followed by text')
-        assert check is not None and check is not False
-
-    def test_pass_args(self, dp):
-        handler = StringCommandHandler('test', self.sch_callback_args, pass_args=True)
-        dp.add_handler(handler)
-
-        dp.process_update('/test')
-        assert self.test_flag
-
-        self.test_flag = False
-        dp.process_update('/test one two')
-        assert self.test_flag
-
-    def test_pass_job_or_update_queue(self, dp):
-        handler = StringCommandHandler('test', self.callback_queue_1, pass_job_queue=True)
-        dp.add_handler(handler)
-
-        dp.process_update('/test')
-        assert self.test_flag
-
-        dp.remove_handler(handler)
-        handler = StringCommandHandler('test', self.callback_queue_1, pass_update_queue=True)
-        dp.add_handler(handler)
-
-        self.test_flag = False
-        dp.process_update('/test')
-        assert self.test_flag
-
-        dp.remove_handler(handler)
-        handler = StringCommandHandler(
-            'test', self.callback_queue_2, pass_job_queue=True, pass_update_queue=True
-        )
-        dp.add_handler(handler)
-
-        self.test_flag = False
-        dp.process_update('/test')
-        assert self.test_flag
-
     def test_other_update_types(self, false_update):
-        handler = StringCommandHandler('test', self.callback_basic)
+        handler = StringCommandHandler('test', self.callback_context)
         assert not handler.check_update(false_update)
 
-    def test_context(self, cdp):
+    def test_context(self, dp):
         handler = StringCommandHandler('test', self.callback_context)
-        cdp.add_handler(handler)
+        dp.add_handler(handler)
 
-        cdp.process_update('/test')
+        dp.process_update('/test')
         assert self.test_flag
 
-    def test_context_args(self, cdp):
+    def test_context_args(self, dp):
         handler = StringCommandHandler('test', self.callback_context_args)
-        cdp.add_handler(handler)
+        dp.add_handler(handler)
 
-        cdp.process_update('/test')
+        dp.process_update('/test')
         assert not self.test_flag
 
-        cdp.process_update('/test one two')
+        dp.process_update('/test one two')
         assert self.test_flag

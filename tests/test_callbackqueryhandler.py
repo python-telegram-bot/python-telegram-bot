@@ -82,8 +82,8 @@ class TestCallbackQueryHandler:
     def reset(self):
         self.test_flag = False
 
-    def callback_basic(self, bot, update):
-        test_bot = isinstance(bot, Bot)
+    def callback_basic(self, update, context):
+        test_bot = isinstance(context.bot, Bot)
         test_update = isinstance(update, Update)
         self.test_flag = test_bot and test_update
 
@@ -123,15 +123,6 @@ class TestCallbackQueryHandler:
             self.test_flag = context.matches[0].groups() == ('t', ' data')
         if context.matches[0].groupdict():
             self.test_flag = context.matches[0].groupdict() == {'begin': 't', 'end': ' data'}
-
-    def test_basic(self, dp, callback_query):
-        handler = CallbackQueryHandler(self.callback_basic)
-        dp.add_handler(handler)
-
-        assert handler.check_update(callback_query)
-
-        dp.process_update(callback_query)
-        assert self.test_flag
 
     def test_with_pattern(self, callback_query):
         handler = CallbackQueryHandler(self.callback_basic, pattern='.*est.*')
@@ -177,103 +168,34 @@ class TestCallbackQueryHandler:
         callback_query.callback_query.data = 'callback_data'
         assert not handler.check_update(callback_query)
 
-    def test_with_passing_group_dict(self, dp, callback_query):
-        handler = CallbackQueryHandler(
-            self.callback_group, pattern='(?P<begin>.*)est(?P<end>.*)', pass_groups=True
-        )
-        dp.add_handler(handler)
-
-        dp.process_update(callback_query)
-        assert self.test_flag
-
-        dp.remove_handler(handler)
-        handler = CallbackQueryHandler(
-            self.callback_group, pattern='(?P<begin>.*)est(?P<end>.*)', pass_groupdict=True
-        )
-        dp.add_handler(handler)
-
-        self.test_flag = False
-        dp.process_update(callback_query)
-        assert self.test_flag
-
-    def test_pass_user_or_chat_data(self, dp, callback_query):
-        handler = CallbackQueryHandler(self.callback_data_1, pass_user_data=True)
-        dp.add_handler(handler)
-
-        dp.process_update(callback_query)
-        assert self.test_flag
-
-        dp.remove_handler(handler)
-        handler = CallbackQueryHandler(self.callback_data_1, pass_chat_data=True)
-        dp.add_handler(handler)
-
-        self.test_flag = False
-        dp.process_update(callback_query)
-        assert self.test_flag
-
-        dp.remove_handler(handler)
-        handler = CallbackQueryHandler(
-            self.callback_data_2, pass_chat_data=True, pass_user_data=True
-        )
-        dp.add_handler(handler)
-
-        self.test_flag = False
-        dp.process_update(callback_query)
-        assert self.test_flag
-
-    def test_pass_job_or_update_queue(self, dp, callback_query):
-        handler = CallbackQueryHandler(self.callback_queue_1, pass_job_queue=True)
-        dp.add_handler(handler)
-
-        dp.process_update(callback_query)
-        assert self.test_flag
-
-        dp.remove_handler(handler)
-        handler = CallbackQueryHandler(self.callback_queue_1, pass_update_queue=True)
-        dp.add_handler(handler)
-
-        self.test_flag = False
-        dp.process_update(callback_query)
-        assert self.test_flag
-
-        dp.remove_handler(handler)
-        handler = CallbackQueryHandler(
-            self.callback_queue_2, pass_job_queue=True, pass_update_queue=True
-        )
-        dp.add_handler(handler)
-
-        self.test_flag = False
-        dp.process_update(callback_query)
-        assert self.test_flag
-
     def test_other_update_types(self, false_update):
         handler = CallbackQueryHandler(self.callback_basic)
         assert not handler.check_update(false_update)
 
-    def test_context(self, cdp, callback_query):
+    def test_context(self, dp, callback_query):
         handler = CallbackQueryHandler(self.callback_context)
-        cdp.add_handler(handler)
+        dp.add_handler(handler)
 
-        cdp.process_update(callback_query)
+        dp.process_update(callback_query)
         assert self.test_flag
 
-    def test_context_pattern(self, cdp, callback_query):
+    def test_context_pattern(self, dp, callback_query):
         handler = CallbackQueryHandler(
             self.callback_context_pattern, pattern=r'(?P<begin>.*)est(?P<end>.*)'
         )
-        cdp.add_handler(handler)
+        dp.add_handler(handler)
 
-        cdp.process_update(callback_query)
+        dp.process_update(callback_query)
         assert self.test_flag
 
-        cdp.remove_handler(handler)
+        dp.remove_handler(handler)
         handler = CallbackQueryHandler(self.callback_context_pattern, pattern=r'(t)est(.*)')
-        cdp.add_handler(handler)
+        dp.add_handler(handler)
 
-        cdp.process_update(callback_query)
+        dp.process_update(callback_query)
         assert self.test_flag
 
-    def test_context_callable_pattern(self, cdp, callback_query):
+    def test_context_callable_pattern(self, dp, callback_query):
         class CallbackData:
             pass
 
@@ -284,6 +206,6 @@ class TestCallbackQueryHandler:
             assert context.matches is None
 
         handler = CallbackQueryHandler(callback, pattern=pattern)
-        cdp.add_handler(handler)
+        dp.add_handler(handler)
 
-        cdp.process_update(callback_query)
+        dp.process_update(callback_query)

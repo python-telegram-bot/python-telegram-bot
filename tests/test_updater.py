@@ -106,11 +106,11 @@ class TestUpdater:
         self.cb_handler_called.clear()
         self.test_flag = False
 
-    def error_handler(self, bot, update, error):
-        self.received = error.message
+    def error_handler(self, update, context):
+        self.received = context.error.message
         self.err_handler_called.set()
 
-    def callback(self, bot, update):
+    def callback(self, update, context):
         self.received = update.message.text
         self.cb_handler_called.set()
 
@@ -500,10 +500,9 @@ class TestUpdater:
         except AssertionError:
             pass
 
-        assert len(recwarn) == 3
-        assert str(recwarn[0].message).startswith('Old Handler API')
-        assert str(recwarn[1].message).startswith('The argument `clean` of')
-        assert str(recwarn[2].message).startswith('The argument `force_event_loop` of')
+        assert len(recwarn) == 2
+        assert str(recwarn[0].message).startswith('The argument `clean` of')
+        assert str(recwarn[1].message).startswith('The argument `force_event_loop` of')
 
     def test_clean_deprecation_warning_polling(self, recwarn, updater, monkeypatch):
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
@@ -522,9 +521,8 @@ class TestUpdater:
         except AssertionError:
             pass
 
-        assert len(recwarn) == 2
-        assert str(recwarn[0].message).startswith('Old Handler API')
-        assert str(recwarn[1].message).startswith('The argument `clean` of')
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message).startswith('The argument `clean` of')
 
     def test_clean_drop_pending_mutually_exclusive(self, updater):
         with pytest.raises(TypeError, match='`clean` and `drop_pending_updates` are mutually'):
@@ -694,12 +692,6 @@ class TestUpdater:
         dispatcher = Dispatcher(bot, None)
         with pytest.raises(ValueError):
             Updater(dispatcher=dispatcher, workers=8)
-
-    def test_mutual_exclude_use_context_dispatcher(self, bot):
-        dispatcher = Dispatcher(bot, None)
-        use_context = not dispatcher.use_context
-        with pytest.raises(ValueError):
-            Updater(dispatcher=dispatcher, use_context=use_context)
 
     def test_mutual_exclude_custom_context_dispatcher(self):
         dispatcher = Dispatcher(None, None)

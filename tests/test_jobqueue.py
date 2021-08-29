@@ -66,20 +66,20 @@ class TestJobQueue:
         self.job_time = 0
         self.received_error = None
 
-    def job_run_once(self, bot, job):
+    def job_run_once(self, context):
         self.result += 1
 
-    def job_with_exception(self, bot, job=None):
+    def job_with_exception(self, context):
         raise Exception('Test Error')
 
-    def job_remove_self(self, bot, job):
+    def job_remove_self(self, context):
         self.result += 1
-        job.schedule_removal()
+        context.job.schedule_removal()
 
-    def job_run_once_with_context(self, bot, job):
-        self.result += job.context
+    def job_run_once_with_context(self, context):
+        self.result += context.job.context
 
-    def job_datetime_tests(self, bot, job):
+    def job_datetime_tests(self, context):
         self.job_time = time.time()
 
     def job_context_based_callback(self, context):
@@ -94,9 +94,6 @@ class TestJobQueue:
             and context.job_queue is not context.job.job_queue
         ):
             self.result += 1
-
-    def error_handler(self, bot, update, error):
-        self.received_error = str(error)
 
     def error_handler_context(self, update, context):
         self.received_error = str(context.error)
@@ -233,7 +230,7 @@ class TestJobQueue:
         assert self.result == 1
 
     def test_in_updater(self, bot):
-        u = Updater(bot=bot, use_context=False)
+        u = Updater(bot=bot)
         u.job_queue.start()
         try:
             u.job_queue.run_repeating(self.job_run_once, 0.02)
@@ -377,13 +374,8 @@ class TestJobQueue:
         finally:
             _dp.bot = original_bot
 
-    @pytest.mark.parametrize('use_context', [True, False])
-    def test_get_jobs(self, job_queue, use_context):
-        job_queue._dispatcher.use_context = use_context
-        if use_context:
-            callback = self.job_context_based_callback
-        else:
-            callback = self.job_run_once
+    def test_get_jobs(self, job_queue):
+        callback = self.job_context_based_callback
 
         job1 = job_queue.run_once(callback, 10, name='name1')
         job2 = job_queue.run_once(callback, 10, name='name1')
@@ -393,24 +385,10 @@ class TestJobQueue:
         assert job_queue.get_jobs_by_name('name1') == (job1, job2)
         assert job_queue.get_jobs_by_name('name2') == (job3,)
 
-    def test_context_based_callback(self, job_queue):
-        job_queue._dispatcher.use_context = True
-
-        job_queue.run_once(self.job_context_based_callback, 0.01, context=2)
-        sleep(0.03)
-
-        assert self.result == 1
-        job_queue._dispatcher.use_context = False
-
-    @pytest.mark.parametrize('use_context', [True, False])
-    def test_job_run(self, _dp, use_context):
-        _dp.use_context = use_context
+    def test_job_run(self, _dp):
         job_queue = JobQueue()
         job_queue.set_dispatcher(_dp)
-        if use_context:
-            job = job_queue.run_repeating(self.job_context_based_callback, 0.02, context=2)
-        else:
-            job = job_queue.run_repeating(self.job_run_once, 0.02, context=2)
+        job = job_queue.run_repeating(self.job_context_based_callback, 0.02, context=2)
         assert self.result == 0
         job.run(_dp)
         assert self.result == 1
@@ -443,8 +421,8 @@ class TestJobQueue:
         assert not job == job_queue
         assert not job < job
 
-    def test_dispatch_error(self, job_queue, dp):
-        dp.add_error_handler(self.error_handler)
+    def test_dispatch_error_context(self, job_queue, dp):
+        dp.add_error_handler(self.error_handler_context)
 
         job = job_queue.run_once(self.job_with_exception, 0.05)
         sleep(0.1)
@@ -454,33 +432,13 @@ class TestJobQueue:
         assert self.received_error == 'Test Error'
 
         # Remove handler
-        dp.remove_error_handler(self.error_handler)
+        dp.remove_error_handler(self.error_handler_context)
         self.received_error = None
 
         job = job_queue.run_once(self.job_with_exception, 0.05)
         sleep(0.1)
         assert self.received_error is None
         job.run(dp)
-        assert self.received_error is None
-
-    def test_dispatch_error_context(self, job_queue, cdp):
-        cdp.add_error_handler(self.error_handler_context)
-
-        job = job_queue.run_once(self.job_with_exception, 0.05)
-        sleep(0.1)
-        assert self.received_error == 'Test Error'
-        self.received_error = None
-        job.run(cdp)
-        assert self.received_error == 'Test Error'
-
-        # Remove handler
-        cdp.remove_error_handler(self.error_handler_context)
-        self.received_error = None
-
-        job = job_queue.run_once(self.job_with_exception, 0.05)
-        sleep(0.1)
-        assert self.received_error is None
-        job.run(cdp)
         assert self.received_error is None
 
     def test_dispatch_error_that_raises_errors(self, job_queue, dp, caplog):
