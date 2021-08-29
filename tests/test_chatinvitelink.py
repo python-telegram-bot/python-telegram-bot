@@ -34,6 +34,7 @@ def invite_link(creator):
     return ChatInviteLink(
         TestChatInviteLink.link,
         creator,
+        TestChatInviteLink.creates_join_request,
         TestChatInviteLink.primary,
         TestChatInviteLink.revoked,
         expire_date=TestChatInviteLink.expire_date,
@@ -46,6 +47,7 @@ def invite_link(creator):
 class TestChatInviteLink:
 
     link = "thisialink"
+    creates_join_request = (False,)
     primary = True
     revoked = False
     expire_date = datetime.datetime.utcnow()
@@ -62,6 +64,7 @@ class TestChatInviteLink:
         json_dict = {
             'invite_link': self.link,
             'creator': creator.to_dict(),
+            'creates_join_request': self.creates_join_request,
             'is_primary': self.primary,
             'is_revoked': self.revoked,
         }
@@ -70,6 +73,7 @@ class TestChatInviteLink:
 
         assert invite_link.invite_link == self.link
         assert invite_link.creator == creator
+        assert invite_link.creates_join_request == self.creates_join_request
         assert invite_link.is_primary == self.primary
         assert invite_link.is_revoked == self.revoked
 
@@ -77,6 +81,7 @@ class TestChatInviteLink:
         json_dict = {
             'invite_link': self.link,
             'creator': creator.to_dict(),
+            'creates_join_request': self.creates_join_request,
             'is_primary': self.primary,
             'is_revoked': self.revoked,
             'expire_date': to_timestamp(self.expire_date),
@@ -89,6 +94,7 @@ class TestChatInviteLink:
 
         assert invite_link.invite_link == self.link
         assert invite_link.creator == creator
+        assert invite_link.creates_join_request == self.creates_join_request
         assert invite_link.is_primary == self.primary
         assert invite_link.is_revoked == self.revoked
         assert pytest.approx(invite_link.expire_date == self.expire_date)
@@ -102,6 +108,7 @@ class TestChatInviteLink:
         assert isinstance(invite_link_dict, dict)
         assert invite_link_dict['creator'] == invite_link.creator.to_dict()
         assert invite_link_dict['invite_link'] == invite_link.invite_link
+        assert invite_link_dict['creates_join_request'] == invite_link.creates_join_request
         assert invite_link_dict['is_primary'] == self.primary
         assert invite_link_dict['is_revoked'] == self.revoked
         assert invite_link_dict['expire_date'] == to_timestamp(self.expire_date)
@@ -110,19 +117,25 @@ class TestChatInviteLink:
         assert invite_link_dict['pending_join_request_count'] == self.pending_join_request_count
 
     def test_equality(self):
-        a = ChatInviteLink("link", User(1, '', False), True, True)
-        b = ChatInviteLink("link", User(1, '', False), True, True)
-        d = ChatInviteLink("link", User(2, '', False), False, True)
-        d2 = ChatInviteLink("notalink", User(1, '', False), False, True)
-        d3 = ChatInviteLink("notalink", User(1, '', False), True, True)
-        e = User(1, '', False)
+        a = ChatInviteLink("link", User(1, '', False), True, True, True)
+        b = ChatInviteLink("link", User(1, '', False), True, True, True)
+        c = ChatInviteLink("link", User(2, '', False), True, True, True)
+        d1 = ChatInviteLink("link", User(1, '', False), False, True, True)
+        d2 = ChatInviteLink("link", User(1, '', False), True, False, True)
+        d3 = ChatInviteLink("link", User(1, '', False), True, True, False)
+        e = ChatInviteLink("notalink", User(1, '', False), True, False, True)
+        f = ChatInviteLink("notalink", User(1, '', False), True, True, True)
+        g = User(1, '', False)
 
         assert a == b
         assert hash(a) == hash(b)
         assert a is not b
 
-        assert a != d
-        assert hash(a) != hash(d)
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d1
+        assert hash(a) != hash(d1)
 
         assert a != d2
         assert hash(a) != hash(d2)
@@ -132,3 +145,9 @@ class TestChatInviteLink:
 
         assert a != e
         assert hash(a) != hash(e)
+
+        assert a != f
+        assert hash(a) != hash(f)
+
+        assert a != g
+        assert hash(a) != hash(g)

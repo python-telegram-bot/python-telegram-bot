@@ -95,7 +95,7 @@ class TestVoiceChatEnded:
 
 
 class TestVoiceChatParticipantsInvited:
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self, mro_slots, user1):
         action = VoiceChatParticipantsInvited([user1])
         for attr in action.__slots__:
             assert getattr(action, attr, 'err') != 'err', f"got extra slot '{attr}'"
@@ -124,7 +124,7 @@ class TestVoiceChatParticipantsInvited:
         a = VoiceChatParticipantsInvited([user1])
         b = VoiceChatParticipantsInvited([user1])
         c = VoiceChatParticipantsInvited([user1, user2])
-        d = VoiceChatParticipantsInvited([user2])
+        d = VoiceChatParticipantsInvited(None)
         e = VoiceChatStarted()
 
         assert a == b
