@@ -32,15 +32,6 @@ class ChatMemberHandler(Handler[Update, CCT]):
 
     .. versionadded:: 13.4
 
-    Note:
-        :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
-        can use to keep any data in will be sent to the :attr:`callback` function. Related to
-        either the user or the chat that the update was sent in. For each update from the same user
-        or in the same chat, it will be the same ``dict``.
-
-        Note that this is DEPRECATED, and you should use context based callbacks. See
-        https://git.io/fxJuV for more info.
-
     Warning:
         When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
@@ -48,9 +39,7 @@ class ChatMemberHandler(Handler[Update, CCT]):
     Args:
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature for context based API:
-
-            ``def callback(update: Update, context: CallbackContext)``
+            Callback signature: ``def callback(update: Update, context: CallbackContext)``
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
@@ -58,22 +47,6 @@ class ChatMemberHandler(Handler[Update, CCT]):
             :attr:`CHAT_MEMBER` or :attr:`ANY_CHAT_MEMBER` to specify if this handler should handle
             only updates with :attr:`telegram.Update.my_chat_member`,
             :attr:`telegram.Update.chat_member` or both. Defaults to :attr:`MY_CHAT_MEMBER`.
-        pass_update_queue (:obj:`bool`, optional): If set to :obj:`True`, a keyword argument called
-            ``update_queue`` will be passed to the callback function. It will be the ``Queue``
-            instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
-            that contains new updates which can be used to insert updates. Default is :obj:`False`.
-            DEPRECATED: Please switch to context based callbacks.
-        pass_job_queue (:obj:`bool`, optional): If set to :obj:`True`, a keyword argument called
-            ``job_queue`` will be passed to the callback function. It will be a
-            :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
-            which can be used to schedule new jobs. Default is :obj:`False`.
-            DEPRECATED: Please switch to context based callbacks.
-        pass_user_data (:obj:`bool`, optional): If set to :obj:`True`, a keyword argument called
-            ``user_data`` will be passed to the callback function. Default is :obj:`False`.
-            DEPRECATED: Please switch to context based callbacks.
-        pass_chat_data (:obj:`bool`, optional): If set to :obj:`True`, a keyword argument called
-            ``chat_data`` will be passed to the callback function. Default is :obj:`False`.
-            DEPRECATED: Please switch to context based callbacks.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
             Defaults to :obj:`False`.
 
@@ -82,14 +55,6 @@ class ChatMemberHandler(Handler[Update, CCT]):
         chat_member_types (:obj:`int`, optional): Specifies if this handler should handle
             only updates with :attr:`telegram.Update.my_chat_member`,
             :attr:`telegram.Update.chat_member` or both.
-        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
-            passed to the callback function.
-        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
-            the callback function.
-        pass_user_data (:obj:`bool`): Determines whether ``user_data`` will be passed to
-            the callback function.
-        pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
-            the callback function.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     """
@@ -107,18 +72,10 @@ class ChatMemberHandler(Handler[Update, CCT]):
         self,
         callback: Callable[[Update, CCT], RT],
         chat_member_types: int = MY_CHAT_MEMBER,
-        pass_update_queue: bool = False,
-        pass_job_queue: bool = False,
-        pass_user_data: bool = False,
-        pass_chat_data: bool = False,
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
         super().__init__(
             callback,
-            pass_update_queue=pass_update_queue,
-            pass_job_queue=pass_job_queue,
-            pass_user_data=pass_user_data,
-            pass_chat_data=pass_chat_data,
             run_async=run_async,
         )
 

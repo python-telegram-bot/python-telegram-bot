@@ -22,7 +22,6 @@ import re
 from typing import (
     TYPE_CHECKING,
     Callable,
-    Dict,
     Match,
     Optional,
     Pattern,
@@ -49,13 +48,6 @@ class CallbackQueryHandler(Handler[Update, CCT]):
     Read the documentation of the ``re`` module for more information.
 
     Note:
-        * :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
-          can use to keep any data in will be sent to the :attr:`callback` function. Related to
-          either the user or the chat that the update was sent in. For each update from the same
-          user or in the same chat, it will be the same ``dict``.
-
-          Note that this is DEPRECATED, and you should use context based callbacks. See
-          https://git.io/fxJuV for more info.
         * If your bot allows arbitrary objects as ``callback_data``, it may happen that the
           original ``callback_data`` for the incoming :class:`telegram.CallbackQuery`` can not be
           found. This is the case when either a malicious client tempered with the
@@ -72,22 +64,10 @@ class CallbackQueryHandler(Handler[Update, CCT]):
     Args:
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature for context based API:
-
-                ``def callback(update: Update, context: CallbackContext)``
+            Callback signature: ``def callback(update: Update, context: CallbackContext)``
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
-        pass_update_queue (:obj:`bool`, optional): If set to :obj:`True`, a keyword argument called
-            ``update_queue`` will be passed to the callback function. It will be the ``Queue``
-            instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
-            that contains new updates which can be used to insert updates. Default is :obj:`False`.
-            DEPRECATED: Please switch to context based callbacks.
-        pass_job_queue (:obj:`bool`, optional): If set to :obj:`True`, a keyword argument called
-            ``job_queue`` will be passed to the callback function. It will be a
-            :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
-            which can be used to schedule new jobs. Default is :obj:`False`.
-            DEPRECATED: Please switch to context based callbacks.
         pattern (:obj:`str` | `Pattern` | :obj:`callable` | :obj:`type`, optional):
             Pattern to test :attr:`telegram.CallbackQuery.data` against. If a string or a regex
             pattern is passed, :meth:`re.match` is used on :attr:`telegram.CallbackQuery.data` to
@@ -106,66 +86,30 @@ class CallbackQueryHandler(Handler[Update, CCT]):
 
             .. versionchanged:: 13.6
                Added support for arbitrary callback data.
-        pass_groups (:obj:`bool`, optional): If the callback should be passed the result of
-            ``re.match(pattern, data).groups()`` as a keyword argument called ``groups``.
-            Default is :obj:`False`
-            DEPRECATED: Please switch to context based callbacks.
-        pass_groupdict (:obj:`bool`, optional): If the callback should be passed the result of
-            ``re.match(pattern, data).groupdict()`` as a keyword argument called ``groupdict``.
-            Default is :obj:`False`
-            DEPRECATED: Please switch to context based callbacks.
-        pass_user_data (:obj:`bool`, optional): If set to :obj:`True`, a keyword argument called
-            ``user_data`` will be passed to the callback function. Default is :obj:`False`.
-            DEPRECATED: Please switch to context based callbacks.
-        pass_chat_data (:obj:`bool`, optional): If set to :obj:`True`, a keyword argument called
-            ``chat_data`` will be passed to the callback function. Default is :obj:`False`.
-            DEPRECATED: Please switch to context based callbacks.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
             Defaults to :obj:`False`.
 
     Attributes:
         callback (:obj:`callable`): The callback function for this handler.
-        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
-            passed to the callback function.
-        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
-            the callback function.
         pattern (`Pattern` | :obj:`callable` | :obj:`type`): Optional. Regex pattern, callback or
             type to test :attr:`telegram.CallbackQuery.data` against.
 
             .. versionchanged:: 13.6
                Added support for arbitrary callback data.
-        pass_groups (:obj:`bool`): Determines whether ``groups`` will be passed to the
-            callback function.
-        pass_groupdict (:obj:`bool`): Determines whether ``groupdict``. will be passed to
-            the callback function.
-        pass_user_data (:obj:`bool`): Determines whether ``user_data`` will be passed to
-            the callback function.
-        pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
-            the callback function.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     """
 
-    __slots__ = ('pattern', 'pass_groups', 'pass_groupdict')
+    __slots__ = ('pattern',)
 
     def __init__(
         self,
         callback: Callable[[Update, CCT], RT],
-        pass_update_queue: bool = False,
-        pass_job_queue: bool = False,
         pattern: Union[str, Pattern, type, Callable[[object], Optional[bool]]] = None,
-        pass_groups: bool = False,
-        pass_groupdict: bool = False,
-        pass_user_data: bool = False,
-        pass_chat_data: bool = False,
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
         super().__init__(
             callback,
-            pass_update_queue=pass_update_queue,
-            pass_job_queue=pass_job_queue,
-            pass_user_data=pass_user_data,
-            pass_chat_data=pass_chat_data,
             run_async=run_async,
         )
 
@@ -173,8 +117,6 @@ class CallbackQueryHandler(Handler[Update, CCT]):
             pattern = re.compile(pattern)
 
         self.pattern = pattern
-        self.pass_groups = pass_groups
-        self.pass_groupdict = pass_groupdict
 
     def check_update(self, update: object) -> Optional[Union[bool, object]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
@@ -201,25 +143,6 @@ class CallbackQueryHandler(Handler[Update, CCT]):
             else:
                 return True
         return None
-
-    def collect_optional_args(
-        self,
-        dispatcher: 'Dispatcher',
-        update: Update = None,
-        check_result: Union[bool, Match] = None,
-    ) -> Dict[str, object]:
-        """Pass the results of ``re.match(pattern, data).{groups(), groupdict()}`` to the
-        callback as a keyword arguments called ``groups`` and ``groupdict``, respectively, if
-        needed.
-        """
-        optional_args = super().collect_optional_args(dispatcher, update, check_result)
-        if self.pattern and not callable(self.pattern):
-            check_result = cast(Match, check_result)
-            if self.pass_groups:
-                optional_args['groups'] = check_result.groups()
-            if self.pass_groupdict:
-                optional_args['groupdict'] = check_result.groupdict()
-        return optional_args
 
     def collect_additional_context(
         self,
