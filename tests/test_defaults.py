@@ -30,7 +30,7 @@ class TestDefault:
             assert getattr(a, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(a)) == len(set(mro_slots(a))), "duplicate slot"
 
-    def test_data_assignment(self, cdp):
+    def test_data_assignment(self, dp):
         defaults = Defaults()
 
         with pytest.raises(AttributeError):
