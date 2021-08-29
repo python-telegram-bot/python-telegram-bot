@@ -33,6 +33,10 @@ class ForceReply(ReplyMarkup):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`selective` is equal.
 
+    .. versionchanged:: 14.0
+        The (undocumented) argument ``force_reply`` was removed and instead :attr:`force_reply`
+        is now always set to :obj:`True` as expected by the Bot API.
+
     Args:
         selective (:obj:`bool`, optional): Use this parameter if you want to force reply from
             specific users only. Targets:
