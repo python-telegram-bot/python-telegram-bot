@@ -45,8 +45,6 @@ class JobQueue:
 
     Attributes:
         scheduler (:class:`apscheduler.schedulers.background.BackgroundScheduler`): The APScheduler
-        bot (:class:`telegram.Bot`): The bot instance that should be passed to the jobs.
-            DEPRECATED: Use :attr:`set_dispatcher` instead.
 
     """
 
