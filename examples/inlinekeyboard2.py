@@ -17,11 +17,11 @@ Press Ctrl-C on the command line to stop the bot.
 import logging
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import (
-    Updater,
     CommandHandler,
     CallbackQueryHandler,
     ConversationHandler,
     CallbackContext,
+    UpdaterBuilder,
 )
 
 # Enable logging
@@ -162,7 +162,7 @@ def end(update: Update, context: CallbackContext) -> int:
 def main() -> None:
     """Run the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater("TOKEN")
+    updater = UpdaterBuilder().token("TOKEN").build()
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher

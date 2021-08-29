@@ -9,7 +9,12 @@ Basic example for a bot that uses inline keyboards. For an in-depth explanation,
 import logging
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, CallbackContext
+from telegram.ext import (
+    CommandHandler,
+    CallbackQueryHandler,
+    CallbackContext,
+    UpdaterBuilder,
+)
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
@@ -51,7 +56,7 @@ def help_command(update: Update, context: CallbackContext) -> None:
 def main() -> None:
     """Run the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater("TOKEN")
+    updater = UpdaterBuilder().token("TOKEN").build()
 
     updater.dispatcher.add_handler(CommandHandler('start', start))
     updater.dispatcher.add_handler(CallbackQueryHandler(button))

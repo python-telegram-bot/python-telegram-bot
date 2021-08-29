@@ -19,13 +19,13 @@ from typing import Dict
 
 from telegram import ReplyKeyboardMarkup, Update, ReplyKeyboardRemove
 from telegram.ext import (
-    Updater,
     CommandHandler,
     MessageHandler,
     Filters,
     ConversationHandler,
     PicklePersistence,
     CallbackContext,
+    UpdaterBuilder,
 )
 
 # Enable logging
@@ -133,7 +133,7 @@ def main() -> None:
     """Run the bot."""
     # Create the Updater and pass it your bot's token.
     persistence = PicklePersistence(filename='conversationbot')
-    updater = Updater("TOKEN", persistence=persistence)
+    updater = UpdaterBuilder().token("TOKEN").persistence(persistence).build()
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher

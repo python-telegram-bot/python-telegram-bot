@@ -19,13 +19,13 @@ from typing import Tuple, Dict, Any
 
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 from telegram.ext import (
-    Updater,
     CommandHandler,
     MessageHandler,
     Filters,
     ConversationHandler,
     CallbackQueryHandler,
     CallbackContext,
+    UpdaterBuilder,
 )
 
 # Enable logging
@@ -303,7 +303,7 @@ def stop_nested(update: Update, context: CallbackContext) -> str:
 def main() -> None:
     """Run the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater("TOKEN")
+    updater = UpdaterBuilder().token("TOKEN").build()
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher

@@ -215,7 +215,9 @@ class Updater(Generic[BT, DT]):
                 # Create & start threads
                 dispatcher_ready = Event()
                 polling_ready = Event()
-                self._init_thread(self.dispatcher.start, "dispatcher", ready=dispatcher_ready)
+
+                if self.dispatcher:
+                    self._init_thread(self.dispatcher.start, "dispatcher", ready=dispatcher_ready)
                 self._init_thread(
                     self._start_polling,
                     "updater",
@@ -228,9 +230,11 @@ class Updater(Generic[BT, DT]):
                     ready=polling_ready,
                 )
 
-                self.logger.debug('Waiting for Dispatcher and polling to start')
-                dispatcher_ready.wait()
+                self.logger.debug('Waiting for polling to start')
                 polling_ready.wait()
+                if self.dispatcher:
+                    self.logger.debug('Waiting for Dispatcher to start')
+                    dispatcher_ready.wait()
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
@@ -336,7 +340,9 @@ class Updater(Generic[BT, DT]):
                 # Create & start threads
                 webhook_ready = Event()
                 dispatcher_ready = Event()
-                self._init_thread(self.dispatcher.start, "dispatcher", dispatcher_ready)
+
+                if self.dispatcher:
+                    self._init_thread(self.dispatcher.start, "dispatcher", dispatcher_ready)
                 self._init_thread(
                     self._start_webhook,
                     "updater",
@@ -354,9 +360,11 @@ class Updater(Generic[BT, DT]):
                     max_connections=max_connections,
                 )
 
-                self.logger.debug('Waiting for Dispatcher and Webhook to start')
+                self.logger.debug('Waiting for webhook to start')
                 webhook_ready.wait()
-                dispatcher_ready.wait()
+                if self.dispatcher:
+                    self.logger.debug('Waiting for Dispatcher to start')
+                    dispatcher_ready.wait()
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
@@ -606,8 +614,11 @@ class Updater(Generic[BT, DT]):
     def stop(self) -> None:
         """Stops the polling/webhook thread, the dispatcher and the job queue."""
         with self.__lock:
-            if self.running or self.dispatcher.has_running_threads:
-                self.logger.debug('Stopping Updater and Dispatcher...')
+            if self.running or (self.dispatcher and self.dispatcher.has_running_threads):
+                if self.dispatcher:
+                    self.logger.debug('Stopping Updater and Dispatcher ...')
+                else:
+                    self.logger.debug('Stopping Updater ...')
 
                 self.running = False
 
@@ -628,8 +639,9 @@ class Updater(Generic[BT, DT]):
 
     @no_type_check
     def _stop_dispatcher(self) -> None:
-        self.logger.debug('Requesting Dispatcher to stop...')
-        self.dispatcher.stop()
+        if self.dispatcher:
+            self.logger.debug('Requesting Dispatcher to stop...')
+            self.dispatcher.stop()
 
     @no_type_check
     def _join_threads(self) -> None:

@@ -19,13 +19,13 @@ from telegram import (
     Update,
 )
 from telegram.ext import (
-    Updater,
     CommandHandler,
     PollAnswerHandler,
     PollHandler,
     MessageHandler,
     Filters,
     CallbackContext,
+    UpdaterBuilder,
 )
 
 logging.basicConfig(
@@ -153,7 +153,7 @@ def help_handler(update: Update, context: CallbackContext) -> None:
 def main() -> None:
     """Run bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater("TOKEN")
+    updater = UpdaterBuilder().token("TOKEN").build()
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(CommandHandler('poll', poll))

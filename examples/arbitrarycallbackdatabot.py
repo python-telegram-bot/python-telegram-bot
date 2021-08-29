@@ -11,12 +11,12 @@ from typing import List, Tuple, cast
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import (
-    Updater,
     CommandHandler,
     CallbackQueryHandler,
     CallbackContext,
     InvalidCallbackData,
     PicklePersistence,
+    UpdaterBuilder,
 )
 
 logging.basicConfig(
@@ -86,7 +86,13 @@ def main() -> None:
     # We use persistence to demonstrate how buttons can still work after the bot was restarted
     persistence = PicklePersistence(filename='arbitrarycallbackdatabot.pickle')
     # Create the Updater and pass it your bot's token.
-    updater = Updater("TOKEN", persistence=persistence, arbitrary_callback_data=True)
+    updater = (
+        UpdaterBuilder()
+        .token("TOKEN")
+        .persistence(persistence)
+        .arbitrary_callback_data(True)
+        .build()
+    )
 
     updater.dispatcher.add_handler(CommandHandler('start', start))
     updater.dispatcher.add_handler(CommandHandler('help', help_command))

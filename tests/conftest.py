@@ -47,7 +47,6 @@ from telegram import (
 )
 from telegram.ext import (
     Dispatcher,
-    JobQueue,
     Updater,
     MessageFilter,
     Defaults,

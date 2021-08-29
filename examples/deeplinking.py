@@ -22,11 +22,11 @@ import logging
 
 from telegram import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton, Update
 from telegram.ext import (
-    Updater,
     CommandHandler,
     CallbackQueryHandler,
     Filters,
     CallbackContext,
+    UpdaterBuilder,
 )
 
 # Enable logging
@@ -106,7 +106,7 @@ def deep_linked_level_4(update: Update, context: CallbackContext) -> None:
 def main() -> None:
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater("TOKEN")
+    updater = UpdaterBuilder().token("TOKEN").build()
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher

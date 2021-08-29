@@ -8,13 +8,13 @@ import logging
 
 from telegram import LabeledPrice, ShippingOption, Update
 from telegram.ext import (
-    Updater,
     CommandHandler,
     MessageHandler,
     Filters,
     PreCheckoutQueryHandler,
     ShippingQueryHandler,
     CallbackContext,
+    UpdaterBuilder,
 )
 
 # Enable logging
@@ -130,7 +130,7 @@ def successful_payment_callback(update: Update, context: CallbackContext) -> Non
 def main() -> None:
     """Run the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater("TOKEN")
+    updater = UpdaterBuilder().token("TOKEN").build()
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
