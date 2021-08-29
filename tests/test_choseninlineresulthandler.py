@@ -87,8 +87,8 @@ class TestChosenInlineResultHandler:
             assert getattr(handler, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(handler)) == len(set(mro_slots(handler))), "duplicate slot"
 
-    def callback_basic(self, bot, update):
-        test_bot = isinstance(bot, Bot)
+    def callback_basic(self, update, context):
+        test_bot = isinstance(context.bot, Bot)
         test_update = isinstance(update, Update)
         self.test_flag = test_bot and test_update
 
@@ -123,73 +123,15 @@ class TestChosenInlineResultHandler:
         if context.matches[0].groupdict():
             self.test_flag = context.matches[0].groupdict() == {'begin': 'res', 'end': '_id'}
 
-    def test_basic(self, dp, chosen_inline_result):
-        handler = ChosenInlineResultHandler(self.callback_basic)
-        dp.add_handler(handler)
-
-        assert handler.check_update(chosen_inline_result)
-        dp.process_update(chosen_inline_result)
-        assert self.test_flag
-
-    def test_pass_user_or_chat_data(self, dp, chosen_inline_result):
-        handler = ChosenInlineResultHandler(self.callback_data_1, pass_user_data=True)
-        dp.add_handler(handler)
-
-        dp.process_update(chosen_inline_result)
-        assert self.test_flag
-
-        dp.remove_handler(handler)
-        handler = ChosenInlineResultHandler(self.callback_data_1, pass_chat_data=True)
-        dp.add_handler(handler)
-
-        self.test_flag = False
-        dp.process_update(chosen_inline_result)
-        assert self.test_flag
-
-        dp.remove_handler(handler)
-        handler = ChosenInlineResultHandler(
-            self.callback_data_2, pass_chat_data=True, pass_user_data=True
-        )
-        dp.add_handler(handler)
-
-        self.test_flag = False
-        dp.process_update(chosen_inline_result)
-        assert self.test_flag
-
-    def test_pass_job_or_update_queue(self, dp, chosen_inline_result):
-        handler = ChosenInlineResultHandler(self.callback_queue_1, pass_job_queue=True)
-        dp.add_handler(handler)
-
-        dp.process_update(chosen_inline_result)
-        assert self.test_flag
-
-        dp.remove_handler(handler)
-        handler = ChosenInlineResultHandler(self.callback_queue_1, pass_update_queue=True)
-        dp.add_handler(handler)
-
-        self.test_flag = False
-        dp.process_update(chosen_inline_result)
-        assert self.test_flag
-
-        dp.remove_handler(handler)
-        handler = ChosenInlineResultHandler(
-            self.callback_queue_2, pass_job_queue=True, pass_update_queue=True
-        )
-        dp.add_handler(handler)
-
-        self.test_flag = False
-        dp.process_update(chosen_inline_result)
-        assert self.test_flag
-
     def test_other_update_types(self, false_update):
         handler = ChosenInlineResultHandler(self.callback_basic)
         assert not handler.check_update(false_update)
 
-    def test_context(self, cdp, chosen_inline_result):
+    def test_context(self, dp, chosen_inline_result):
         handler = ChosenInlineResultHandler(self.callback_context)
-        cdp.add_handler(handler)
+        dp.add_handler(handler)
 
-        cdp.process_update(chosen_inline_result)
+        dp.process_update(chosen_inline_result)
         assert self.test_flag
 
     def test_with_pattern(self, chosen_inline_result):
@@ -201,17 +143,17 @@ class TestChosenInlineResultHandler:
         assert not handler.check_update(chosen_inline_result)
         chosen_inline_result.chosen_inline_result.result_id = 'result_id'
 
-    def test_context_pattern(self, cdp, chosen_inline_result):
+    def test_context_pattern(self, dp, chosen_inline_result):
         handler = ChosenInlineResultHandler(
             self.callback_context_pattern, pattern=r'(?P<begin>.*)ult(?P<end>.*)'
         )
-        cdp.add_handler(handler)
-        cdp.process_update(chosen_inline_result)
+        dp.add_handler(handler)
+        dp.process_update(chosen_inline_result)
         assert self.test_flag
 
-        cdp.remove_handler(handler)
+        dp.remove_handler(handler)
         handler = ChosenInlineResultHandler(self.callback_context_pattern, pattern=r'(res)ult(.*)')
-        cdp.add_handler(handler)
+        dp.add_handler(handler)
 
-        cdp.process_update(chosen_inline_result)
+        dp.process_update(chosen_inline_result)
         assert self.test_flag

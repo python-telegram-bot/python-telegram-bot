@@ -88,7 +88,7 @@ class TestPollHandler:
     test_flag = False
 
     def test_slot_behaviour(self, mro_slots):
-        inst = PollHandler(self.callback_basic)
+        inst = PollHandler(self.callback_context)
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
@@ -96,23 +96,6 @@ class TestPollHandler:
     @pytest.fixture(autouse=True)
     def reset(self):
         self.test_flag = False
-
-    def callback_basic(self, bot, update):
-        test_bot = isinstance(bot, Bot)
-        test_update = isinstance(update, Update)
-        self.test_flag = test_bot and test_update
-
-    def callback_data_1(self, bot, update, user_data=None, chat_data=None):
-        self.test_flag = (user_data is not None) or (chat_data is not None)
-
-    def callback_data_2(self, bot, update, user_data=None, chat_data=None):
-        self.test_flag = (user_data is not None) and (chat_data is not None)
-
-    def callback_queue_1(self, bot, update, job_queue=None, update_queue=None):
-        self.test_flag = (job_queue is not None) or (update_queue is not None)
-
-    def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
-        self.test_flag = (job_queue is not None) and (update_queue is not None)
 
     def callback_context(self, update, context):
         self.test_flag = (
@@ -127,68 +110,13 @@ class TestPollHandler:
             and isinstance(update.poll, Poll)
         )
 
-    def test_basic(self, dp, poll):
-        handler = PollHandler(self.callback_basic)
-        dp.add_handler(handler)
-
-        assert handler.check_update(poll)
-
-        dp.process_update(poll)
-        assert self.test_flag
-
-    def test_pass_user_or_chat_data(self, dp, poll):
-        handler = PollHandler(self.callback_data_1, pass_user_data=True)
-        dp.add_handler(handler)
-
-        dp.process_update(poll)
-        assert self.test_flag
-
-        dp.remove_handler(handler)
-        handler = PollHandler(self.callback_data_1, pass_chat_data=True)
-        dp.add_handler(handler)
-
-        self.test_flag = False
-        dp.process_update(poll)
-        assert self.test_flag
-
-        dp.remove_handler(handler)
-        handler = PollHandler(self.callback_data_2, pass_chat_data=True, pass_user_data=True)
-        dp.add_handler(handler)
-
-        self.test_flag = False
-        dp.process_update(poll)
-        assert self.test_flag
-
-    def test_pass_job_or_update_queue(self, dp, poll):
-        handler = PollHandler(self.callback_queue_1, pass_job_queue=True)
-        dp.add_handler(handler)
-
-        dp.process_update(poll)
-        assert self.test_flag
-
-        dp.remove_handler(handler)
-        handler = PollHandler(self.callback_queue_1, pass_update_queue=True)
-        dp.add_handler(handler)
-
-        self.test_flag = False
-        dp.process_update(poll)
-        assert self.test_flag
-
-        dp.remove_handler(handler)
-        handler = PollHandler(self.callback_queue_2, pass_job_queue=True, pass_update_queue=True)
-        dp.add_handler(handler)
-
-        self.test_flag = False
-        dp.process_update(poll)
-        assert self.test_flag
-
     def test_other_update_types(self, false_update):
-        handler = PollHandler(self.callback_basic)
+        handler = PollHandler(self.callback_context)
         assert not handler.check_update(false_update)
 
-    def test_context(self, cdp, poll):
+    def test_context(self, dp, poll):
         handler = PollHandler(self.callback_context)
-        cdp.add_handler(handler)
+        dp.add_handler(handler)
 
-        cdp.process_update(poll)
+        dp.process_update(poll)
         assert self.test_flag

@@ -20,8 +20,6 @@ import re
 from queue import Queue
 
 import pytest
-import itertools
-from telegram.utils.deprecate import TelegramDeprecationWarning
 
 from telegram import Message, Update, Chat, Bot
 from telegram.ext import CommandHandler, Filters, CallbackContext, JobQueue, PrefixHandler
@@ -56,12 +54,6 @@ class BaseTest:
     def reset(self):
         self.test_flag = False
 
-    PASS_KEYWORDS = ('pass_user_data', 'pass_chat_data', 'pass_job_queue', 'pass_update_queue')
-
-    @pytest.fixture(scope='module', params=itertools.combinations(PASS_KEYWORDS, 2))
-    def pass_combination(self, request):
-        return {key: True for key in request.param}
-
     def response(self, dispatcher, update):
         """
         Utility to send an update to a dispatcher and assert
@@ -72,8 +64,8 @@ class BaseTest:
         dispatcher.process_update(update)
         return self.test_flag
 
-    def callback_basic(self, bot, update):
-        test_bot = isinstance(bot, Bot)
+    def callback_basic(self, update, context):
+        test_bot = isinstance(context.bot, Bot)
         test_update = isinstance(update, Update)
         self.test_flag = test_bot and test_update
 
@@ -112,12 +104,12 @@ class BaseTest:
             num = len(context.matches) == 2
             self.test_flag = types and num
 
-    def _test_context_args_or_regex(self, cdp, handler, text):
-        cdp.add_handler(handler)
+    def _test_context_args_or_regex(self, dp, handler, text):
+        dp.add_handler(handler)
         update = make_command_update(text)
-        assert not self.response(cdp, update)
+        assert not self.response(dp, update)
         update.message.text += ' one two'
-        assert self.response(cdp, update)
+        assert self.response(dp, update)
 
     def _test_edited(self, message, handler_edited, handler_not_edited):
         """
@@ -160,14 +152,6 @@ class TestCommandHandler(BaseTest):
     def command_update(self, command_message):
         return make_command_update(command_message)
 
-    def ch_callback_args(self, bot, update, args):
-        if update.message.text == self.CMD:
-            self.test_flag = len(args) == 0
-        elif update.message.text == f'{self.CMD}@{bot.username}':
-            self.test_flag = len(args) == 0
-        else:
-            self.test_flag = args == ['one', 'two']
-
     def make_default_handler(self, callback=None, **kwargs):
         callback = callback or self.callback_basic
         return CommandHandler(self.CMD[1:], callback, **kwargs)
@@ -199,21 +183,10 @@ class TestCommandHandler(BaseTest):
         assert is_match(handler, make_command_update('/star'))
         assert not is_match(handler, make_command_update('/stop'))
 
-    def test_deprecation_warning(self):
-        """``allow_edited`` deprecated in favor of filters"""
-        with pytest.warns(TelegramDeprecationWarning, match='See https://git.io/fxJuV'):
-            self.make_default_handler(allow_edited=True)
-
     def test_edited(self, command_message):
-        """Test that a CH responds to an edited message iff its filters allow it"""
+        """Test that a CH responds to an edited message if its filters allow it"""
         handler_edited = self.make_default_handler()
         handler_no_edited = self.make_default_handler(filters=~Filters.update.edited_message)
-        self._test_edited(command_message, handler_edited, handler_no_edited)
-
-    def test_edited_deprecated(self, command_message):
-        """Test that a CH responds to an edited message iff ``allow_edited`` is True"""
-        handler_edited = self.make_default_handler(allow_edited=True)
-        handler_no_edited = self.make_default_handler(allow_edited=False)
         self._test_edited(command_message, handler_edited, handler_no_edited)
 
     def test_directed_commands(self, bot, command):
@@ -223,20 +196,10 @@ class TestCommandHandler(BaseTest):
         assert not is_match(handler, make_command_update(command + '@otherbot', bot=bot))
 
     def test_with_filter(self, command):
-        """Test that a CH with a (generic) filter responds iff its filters match"""
+        """Test that a CH with a (generic) filter responds if its filters match"""
         handler = self.make_default_handler(filters=Filters.group)
         assert is_match(handler, make_command_update(command, chat=Chat(-23, Chat.GROUP)))
         assert not is_match(handler, make_command_update(command, chat=Chat(23, Chat.PRIVATE)))
-
-    def test_pass_args(self, dp, bot, command):
-        """Test the passing of arguments alongside a command"""
-        handler = self.make_default_handler(self.ch_callback_args, pass_args=True)
-        dp.add_handler(handler)
-        at_command = f'{command}@{bot.username}'
-        assert self.response(dp, make_command_update(command))
-        assert self.response(dp, make_command_update(command + ' one two'))
-        assert self.response(dp, make_command_update(at_command, bot=bot))
-        assert self.response(dp, make_command_update(at_command + ' one two', bot=bot))
 
     def test_newline(self, dp, command):
         """Assert that newlines don't interfere with a command handler matching a message"""
@@ -245,12 +208,6 @@ class TestCommandHandler(BaseTest):
         update = make_command_update(command + '\nfoobar')
         assert is_match(handler, update)
         assert self.response(dp, update)
-
-    @pytest.mark.parametrize('pass_keyword', BaseTest.PASS_KEYWORDS)
-    def test_pass_data(self, dp, command_update, pass_combination, pass_keyword):
-        handler = CommandHandler('test', self.make_callback_for(pass_keyword), **pass_combination)
-        dp.add_handler(handler)
-        assert self.response(dp, command_update) == pass_combination.get(pass_keyword, False)
 
     def test_other_update_types(self, false_update):
         """Test that a command handler doesn't respond to unrelated updates"""
@@ -263,30 +220,30 @@ class TestCommandHandler(BaseTest):
         assert not is_match(handler, make_command_update('/star'))
         assert not mock_filter.tested
 
-    def test_context(self, cdp, command_update):
+    def test_context(self, dp, command_update):
         """Test correct behaviour of CHs with context-based callbacks"""
         handler = self.make_default_handler(self.callback_context)
-        cdp.add_handler(handler)
-        assert self.response(cdp, command_update)
+        dp.add_handler(handler)
+        assert self.response(dp, command_update)
 
-    def test_context_args(self, cdp, command):
+    def test_context_args(self, dp, command):
         """Test CHs that pass arguments through ``context``"""
         handler = self.make_default_handler(self.callback_context_args)
-        self._test_context_args_or_regex(cdp, handler, command)
+        self._test_context_args_or_regex(dp, handler, command)
 
-    def test_context_regex(self, cdp, command):
+    def test_context_regex(self, dp, command):
         """Test CHs with context-based callbacks and a single filter"""
         handler = self.make_default_handler(
             self.callback_context_regex1, filters=Filters.regex('one two')
         )
-        self._test_context_args_or_regex(cdp, handler, command)
+        self._test_context_args_or_regex(dp, handler, command)
 
-    def test_context_multiple_regex(self, cdp, command):
+    def test_context_multiple_regex(self, dp, command):
         """Test CHs with context-based callbacks and filters combined"""
         handler = self.make_default_handler(
             self.callback_context_regex2, filters=Filters.regex('one') & Filters.regex('two')
         )
-        self._test_context_args_or_regex(cdp, handler, command)
+        self._test_context_args_or_regex(dp, handler, command)
 
 
 # ----------------------------- PrefixHandler -----------------------------
@@ -340,12 +297,6 @@ class TestPrefixHandler(BaseTest):
         callback = callback or self.callback_basic
         return PrefixHandler(self.PREFIXES, self.COMMANDS, callback, **kwargs)
 
-    def ch_callback_args(self, bot, update, args):
-        if update.message.text in TestPrefixHandler.COMBINATIONS:
-            self.test_flag = len(args) == 0
-        else:
-            self.test_flag = args == ['one', 'two']
-
     def test_basic(self, dp, prefix, command):
         """Test the basic expected response from a prefix handler"""
         handler = self.make_default_handler()
@@ -374,25 +325,6 @@ class TestPrefixHandler(BaseTest):
         text = prefix_message_text
         assert is_match(handler, make_message_update(text, chat=Chat(-23, Chat.GROUP)))
         assert not is_match(handler, make_message_update(text, chat=Chat(23, Chat.PRIVATE)))
-
-    def test_pass_args(self, dp, prefix_message):
-        handler = self.make_default_handler(self.ch_callback_args, pass_args=True)
-        dp.add_handler(handler)
-        assert self.response(dp, make_message_update(prefix_message))
-
-        update_with_args = make_message_update(prefix_message.text + ' one two')
-        assert self.response(dp, update_with_args)
-
-    @pytest.mark.parametrize('pass_keyword', BaseTest.PASS_KEYWORDS)
-    def test_pass_data(self, dp, pass_combination, prefix_message_update, pass_keyword):
-        """Assert that callbacks receive data iff its corresponding ``pass_*`` kwarg is enabled"""
-        handler = self.make_default_handler(
-            self.make_callback_for(pass_keyword), **pass_combination
-        )
-        dp.add_handler(handler)
-        assert self.response(dp, prefix_message_update) == pass_combination.get(
-            pass_keyword, False
-        )
 
     def test_other_update_types(self, false_update):
         handler = self.make_default_handler()
@@ -427,23 +359,23 @@ class TestPrefixHandler(BaseTest):
         text = prefix + 'foo'
         assert self.response(dp, make_message_update(text))
 
-    def test_context(self, cdp, prefix_message_update):
+    def test_context(self, dp, prefix_message_update):
         handler = self.make_default_handler(self.callback_context)
-        cdp.add_handler(handler)
-        assert self.response(cdp, prefix_message_update)
+        dp.add_handler(handler)
+        assert self.response(dp, prefix_message_update)
 
-    def test_context_args(self, cdp, prefix_message_text):
+    def test_context_args(self, dp, prefix_message_text):
         handler = self.make_default_handler(self.callback_context_args)
-        self._test_context_args_or_regex(cdp, handler, prefix_message_text)
+        self._test_context_args_or_regex(dp, handler, prefix_message_text)
 
-    def test_context_regex(self, cdp, prefix_message_text):
+    def test_context_regex(self, dp, prefix_message_text):
         handler = self.make_default_handler(
             self.callback_context_regex1, filters=Filters.regex('one two')
         )
-        self._test_context_args_or_regex(cdp, handler, prefix_message_text)
+        self._test_context_args_or_regex(dp, handler, prefix_message_text)
 
-    def test_context_multiple_regex(self, cdp, prefix_message_text):
+    def test_context_multiple_regex(self, dp, prefix_message_text):
         handler = self.make_default_handler(
             self.callback_context_regex2, filters=Filters.regex('one') & Filters.regex('two')
         )
-        self._test_context_args_or_regex(cdp, handler, prefix_message_text)
+        self._test_context_args_or_regex(dp, handler, prefix_message_text)
