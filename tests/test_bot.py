@@ -1917,12 +1917,9 @@ class TestBot:
         assert bot.get_my_commands() == []
         assert bot.set_my_commands(commands)
 
-        for bc in [bot.get_my_commands(), bot.commands]:
-            assert len(bc) == 2
-            assert bc[0].command == 'cmd1'
-            assert bc[0].description == 'descr1'
-            assert bc[1].command == 'cmd2'
-            assert bc[1].description == 'descr2'
+        for i, bc in enumerate(bot.get_my_commands()):
+            assert bc.command == f'cmd{i+1}'
+            assert bc.description == f'descr{i+1}'
 
     @flaky(3, 1)
     def test_get_set_delete_my_commands_with_scope(self, bot, super_group_id, chat_id):
