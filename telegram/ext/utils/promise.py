@@ -33,14 +33,15 @@ logger = logging.getLogger(__name__)
 class Promise:
     """A simple Promise implementation for use with the run_async decorator, DelayQueue etc.
 
+    .. versionchanged:: 14.0
+        Removed the argument and attribute ``error_handler``.
+
     Args:
         pooled_function (:obj:`callable`): The callable that will be called concurrently.
         args (:obj:`list` | :obj:`tuple`): Positional arguments for :attr:`pooled_function`.
         kwargs (:obj:`dict`): Keyword arguments for :attr:`pooled_function`.
         update (:class:`telegram.Update` | :obj:`object`, optional): The update this promise is
             associated with.
-        error_handling (:obj:`bool`, optional): Whether exceptions raised by :attr:`func`
-            may be handled by error handlers. Defaults to :obj:`True`.
 
     Attributes:
         pooled_function (:obj:`callable`): The callable that will be called concurrently.
@@ -49,8 +50,6 @@ class Promise:
         done (:obj:`threading.Event`): Is set when the result is available.
         update (:class:`telegram.Update` | :obj:`object`): Optional. The update this promise is
             associated with.
-        error_handling (:obj:`bool`): Optional. Whether exceptions raised by :attr:`func`
-            may be handled by error handlers. Defaults to :obj:`True`.
 
     """
 
@@ -59,27 +58,23 @@ class Promise:
         'args',
         'kwargs',
         'update',
-        'error_handling',
         'done',
         '_done_callback',
         '_result',
         '_exception',
     )
 
-    # TODO: Remove error_handling parameter once we drop the @run_async decorator
     def __init__(
         self,
         pooled_function: Callable[..., RT],
         args: Union[List, Tuple],
         kwargs: JSONDict,
         update: object = None,
-        error_handling: bool = True,
     ):
         self.pooled_function = pooled_function
         self.args = args
         self.kwargs = kwargs
         self.update = update
-        self.error_handling = error_handling
         self.done = Event()
         self._done_callback: Optional[Callable] = None
         self._result: Optional[RT] = None
