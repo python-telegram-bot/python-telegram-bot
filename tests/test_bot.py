@@ -1895,24 +1895,7 @@ class TestBot:
 
     @flaky(3, 1)
     def test_set_and_get_my_commands(self, bot):
-        commands = [
-            BotCommand('cmd1', 'descr1'),
-            BotCommand('cmd2', 'descr2'),
-        ]
-        bot.set_my_commands([])
-        assert bot.get_my_commands() == []
-        assert bot.set_my_commands(commands)
-
-        for i, bc in enumerate(bot.get_my_commands()):
-            assert bc.command == f'cmd{i+1}'
-            assert bc.description == f'descr{i+1}'
-
-    @flaky(3, 1)
-    def test_set_and_get_my_commands_strings(self, bot):
-        commands = [
-            ['cmd1', 'descr1'],
-            ['cmd2', 'descr2'],
-        ]
+        commands = [BotCommand('cmd1', 'descr1'), ['cmd2', 'descr2']]
         bot.set_my_commands([])
         assert bot.get_my_commands() == []
         assert bot.set_my_commands(commands)

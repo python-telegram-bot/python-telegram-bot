@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 class Promise:
     """A simple Promise implementation for use with the run_async decorator, DelayQueue etc.
 
-    .. versionchange:: 14.0
+    .. versionchanged:: 14.0
         Removed the argument and attribute ``error_handler``.
 
     Args:

@@ -148,7 +148,7 @@ class Bot(TelegramObject):
         incorporated into PTB. However, this is not guaranteed to work, i.e. it will fail for
         passing files.
 
-    .. versionchanged::
+    .. versionchanged:: 14.0
         * Removed the deprecated methods ``kick_chat_member``, ``kickChatMember``,
           ``get_chat_members_count`` and ``getChatMembersCount``.
         * Removed the deprecated property ``commands``.
