@@ -35,7 +35,6 @@ from telegram.ext import (
     CallbackContext,
     ContextTypes,
     DispatcherBuilder,
-    UpdaterBuilder,
 )
 
 

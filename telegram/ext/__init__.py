@@ -25,7 +25,7 @@ from .dictpersistence import DictPersistence
 from .handler import Handler
 from .callbackcontext import CallbackContext
 from .contexttypes import ContextTypes
-from .dispatcher import Dispatcher, DispatcherHandlerStop, run_async
+from .dispatcher import Dispatcher, DispatcherHandlerStop
 
 from .jobqueue import JobQueue, Job
 from .updater import Updater
@@ -41,8 +41,6 @@ from .typehandler import TypeHandler
 from .conversationhandler import ConversationHandler
 from .precheckoutqueryhandler import PreCheckoutQueryHandler
 from .shippingqueryhandler import ShippingQueryHandler
-from .messagequeue import MessageQueue
-from .messagequeue import DelayQueue
 from .pollanswerhandler import PollAnswerHandler
 from .pollhandler import PollHandler
 from .chatmemberhandler import ChatMemberHandler
@@ -62,7 +60,6 @@ __all__ = (
     'ContextTypes',
     'ConversationHandler',
     'Defaults',
-    'DelayQueue',
     'DictPersistence',
     'Dispatcher',
     'DispatcherBuilder',
@@ -76,7 +73,6 @@ __all__ = (
     'JobQueue',
     'MessageFilter',
     'MessageHandler',
-    'MessageQueue',
     'PersistenceInput',
     'PicklePersistence',
     'PollAnswerHandler',
@@ -90,5 +86,4 @@ __all__ = (
     'UpdateFilter',
     'Updater',
     'UpdaterBuilder',
-    'run_async',
 )
