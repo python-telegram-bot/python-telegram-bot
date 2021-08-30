@@ -52,6 +52,7 @@ from telegram.ext import (
     Updater,
     InvalidCallbackData,
     ExtBot,
+    UpdaterBuilder,
 )
 from telegram.ext.utils.webhookhandler import WebhookServer
 
@@ -109,11 +110,6 @@ class TestUpdater:
     def callback(self, update, context):
         self.received = update.message.text
         self.cb_handler_called.set()
-
-    def test_warn_arbitrary_callback_data(self, bot, recwarn):
-        Updater(bot=bot, arbitrary_callback_data=True)
-        assert len(recwarn) == 1
-        assert 'Passing arbitrary_callback_data to an Updater' in str(recwarn[0].message)
 
     @pytest.mark.parametrize(
         ('error',),

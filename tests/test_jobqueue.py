@@ -236,19 +236,19 @@ class TestJobQueue:
         sleep(0.03)
         assert self.result == 1
 
-    def test_in_updater(self, bot):
-        u = UpdaterBuilder().bot(bot).build()
-        u.job_queue.start()
+    def test_in_dispatcher(self, bot):
+        dispatcher = DispatcherBuilder().bot(bot).build()
+        dispatcher.start()
         try:
-            u.job_queue.run_repeating(self.job_run_once, 0.02)
+            dispatcher.job_queue.run_repeating(self.job_run_once, 0.02)
             sleep(0.03)
             assert self.result == 1
-            u.stop()
+            dispatcher.stop()
             sleep(1)
             assert self.result == 1
         finally:
             try:
-                u.stop()
+                dispatcher.stop()
             except SchedulerNotRunningError:
                 pass
 

@@ -117,9 +117,9 @@ class TestBuilder:
         assert updater.dispatcher.bot is bot
         assert updater.dispatcher.job_queue._dispatcher is updater.dispatcher
 
-    def test_build_custom_dispatcher(self, builder, cdp):
-        updater = builder.dispatcher(cdp).build()
-        assert updater.dispatcher is cdp
+    def test_build_custom_dispatcher(self, builder, dp):
+        updater = builder.dispatcher(dp).build()
+        assert updater.dispatcher is dp
         assert updater.bot is updater.dispatcher.bot
 
     def test_build_no_dispatcher(self, builder, bot):
@@ -150,35 +150,35 @@ class TestBuilder:
         assert built_bot.token == bot.token
         assert built_bot.request._connect_timeout == 42
 
-    def test_all_dispatcher_args_custom(self, builder, cdp):
+    def test_all_dispatcher_args_custom(self, builder, dp):
         job_queue = JobQueue()
         persistence = PicklePersistence('filename')
         context_types = ContextTypes()
-        builder.bot(cdp.bot).update_queue(cdp.update_queue).exception_event(
-            cdp.exception_event
+        builder.bot(dp.bot).update_queue(dp.update_queue).exception_event(
+            dp.exception_event
         ).job_queue(job_queue).persistence(persistence).context_types(context_types)
         dispatcher = builder.build().dispatcher
 
-        assert dispatcher.bot is cdp.bot
-        assert dispatcher.update_queue is cdp.update_queue
-        assert dispatcher.exception_event is cdp.exception_event
+        assert dispatcher.bot is dp.bot
+        assert dispatcher.update_queue is dp.update_queue
+        assert dispatcher.exception_event is dp.exception_event
         assert dispatcher.job_queue is job_queue
         assert dispatcher.job_queue._dispatcher is dispatcher
         assert dispatcher.persistence is persistence
         assert dispatcher.context_types is context_types
 
-    def test_all_updater_args_custom(self, builder, cdp):
+    def test_all_updater_args_custom(self, builder, dp):
         updater = (
             builder.dispatcher(None)
-            .bot(cdp.bot)
-            .exception_event(cdp.exception_event)
-            .update_queue(cdp.update_queue)
+            .bot(dp.bot)
+            .exception_event(dp.exception_event)
+            .update_queue(dp.update_queue)
             .user_signal_handler(42)
             .build()
         )
 
         assert updater.dispatcher is None
-        assert updater.bot is cdp.bot
-        assert updater.exception_event is cdp.exception_event
-        assert updater.update_queue is cdp.update_queue
+        assert updater.bot is dp.bot
+        assert updater.exception_event is dp.exception_event
+        assert updater.update_queue is dp.update_queue
         assert updater.user_signal_handler == 42

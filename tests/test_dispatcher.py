@@ -162,7 +162,7 @@ class TestDispatcher:
         with pytest.raises(
             TypeError, match='persistence must be based on telegram.ext.BasePersistence'
         ):
-            Dispatcher(bot, None, persistence=my_per())
+            DispatcherBuilder().bot(bot).persistence(my_per()).build()
 
     def test_error_handler_that_raises_errors(self, dp):
         """
@@ -621,7 +621,7 @@ class TestDispatcher:
             ),
         )
         my_persistence = OwnPersistence()
-        dp = Dispatcher(bot, None, persistence=my_persistence)
+        dp = DispatcherBuilder().bot(bot).persistence(my_persistence).build()
         dp.add_handler(CommandHandler('start', start1))
         dp.add_error_handler(error)
         dp.process_update(update)
@@ -923,7 +923,7 @@ class TestDispatcher:
             bot_data=complex,
         )
 
-        dispatcher = Dispatcher(bot, Queue(), context_types=cc)
+        dispatcher = DispatcherBuilder().bot(bot).context_types(cc).build()
 
         assert isinstance(dispatcher.user_data[1], int)
         assert isinstance(dispatcher.chat_data[1], float)
@@ -938,12 +938,15 @@ class TestDispatcher:
                 type(context.bot_data),
             )
 
-        dispatcher = Dispatcher(
-            bot,
-            Queue(),
-            context_types=ContextTypes(
-                context=CustomContext, bot_data=int, user_data=float, chat_data=complex
-            ),
+        dispatcher = (
+            DispatcherBuilder()
+            .bot(bot)
+            .context_types(
+                ContextTypes(
+                    context=CustomContext, bot_data=int, user_data=float, chat_data=complex
+                )
+            )
+            .build()
         )
         dispatcher.add_error_handler(error_handler)
         dispatcher.add_handler(MessageHandler(Filters.all, self.callback_raise_error))
@@ -961,12 +964,15 @@ class TestDispatcher:
                 type(context.bot_data),
             )
 
-        dispatcher = Dispatcher(
-            bot,
-            Queue(),
-            context_types=ContextTypes(
-                context=CustomContext, bot_data=int, user_data=float, chat_data=complex
-            ),
+        dispatcher = (
+            DispatcherBuilder()
+            .bot(bot)
+            .context_types(
+                ContextTypes(
+                    context=CustomContext, bot_data=int, user_data=float, chat_data=complex
+                )
+            )
+            .build()
         )
         dispatcher.add_handler(MessageHandler(Filters.all, callback))
 
