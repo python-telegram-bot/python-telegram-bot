@@ -197,7 +197,7 @@ class TestCommandHandler(BaseTest):
 
     def test_with_filter(self, command):
         """Test that a CH with a (generic) filter responds if its filters match"""
-        handler = self.make_default_handler(filters=Filters.group)
+        handler = self.make_default_handler(filters=Filters.chat_type.group)
         assert is_match(handler, make_command_update(command, chat=Chat(-23, Chat.GROUP)))
         assert not is_match(handler, make_command_update(command, chat=Chat(23, Chat.PRIVATE)))
 
@@ -321,7 +321,7 @@ class TestPrefixHandler(BaseTest):
         self._test_edited(prefix_message, handler_edited, handler_no_edited)
 
     def test_with_filter(self, prefix_message_text):
-        handler = self.make_default_handler(filters=Filters.group)
+        handler = self.make_default_handler(filters=Filters.chat_type.group)
         text = prefix_message_text
         assert is_match(handler, make_message_update(text, chat=Chat(-23, Chat.GROUP)))
         assert not is_match(handler, make_message_update(text, chat=Chat(23, Chat.PRIVATE)))

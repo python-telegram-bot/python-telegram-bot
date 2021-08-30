@@ -20,7 +20,6 @@
 """This module contains the Filters for use with the MessageHandler class."""
 
 import re
-import warnings
 
 from abc import ABC, abstractmethod
 from threading import Lock
@@ -50,7 +49,6 @@ __all__ = [
     'XORFilter',
 ]
 
-from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.types import SLT
 
 DataDict = Dict[str, list]
@@ -1306,48 +1304,6 @@ officedocument.wordprocessingml.document")``.
         def filter(self, message: Message) -> bool:
             """"""  # remove method from docs
             return any(entity.type == self.entity_type for entity in message.caption_entities)
-
-    class _Private(MessageFilter):
-        __slots__ = ()
-        name = 'Filters.private'
-
-        def filter(self, message: Message) -> bool:
-            warnings.warn(
-                'Filters.private is deprecated. Use Filters.chat_type.private instead.',
-                TelegramDeprecationWarning,
-                stacklevel=2,
-            )
-            return message.chat.type == Chat.PRIVATE
-
-    private = _Private()
-    """
-    Messages sent in a private chat.
-
-    Note:
-        DEPRECATED. Use
-        :attr:`telegram.ext.Filters.chat_type.private` instead.
-    """
-
-    class _Group(MessageFilter):
-        __slots__ = ()
-        name = 'Filters.group'
-
-        def filter(self, message: Message) -> bool:
-            warnings.warn(
-                'Filters.group is deprecated. Use Filters.chat_type.groups instead.',
-                TelegramDeprecationWarning,
-                stacklevel=2,
-            )
-            return message.chat.type in [Chat.GROUP, Chat.SUPERGROUP]
-
-    group = _Group()
-    """
-    Messages sent in a group or a supergroup chat.
-
-    Note:
-        DEPRECATED. Use
-        :attr:`telegram.ext.Filters.chat_type.groups` instead.
-    """
 
     class _ChatType(MessageFilter):
         __slots__ = ()
