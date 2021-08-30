@@ -35,8 +35,7 @@ from telegram.ext import (
     ContextTypes,
 )
 from telegram.ext import PersistenceInput
-from telegram.ext.dispatcher import run_async, Dispatcher, DispatcherHandlerStop
-from telegram.utils.deprecate import TelegramDeprecationWarning
+from telegram.ext.dispatcher import Dispatcher, DispatcherHandlerStop
 from telegram.utils.helpers import DEFAULT_FALSE
 from tests.conftest import create_dp
 from collections import defaultdict
@@ -243,37 +242,11 @@ class TestDispatcher:
 
         assert name1 != name2
 
-    def test_multiple_run_async_decorator(self, dp, dp2):
-        # Make sure we got two dispatchers and that they are not the same
-        assert isinstance(dp, Dispatcher)
-        assert isinstance(dp2, Dispatcher)
-        assert dp is not dp2
-
-        @run_async
-        def must_raise_runtime_error():
-            pass
-
-        with pytest.raises(RuntimeError):
-            must_raise_runtime_error()
-
-    def test_multiple_run_async_deprecation(self, dp):
-        assert isinstance(dp, Dispatcher)
-
-        @run_async
-        def callback(update, context):
-            pass
-
-        dp.add_handler(MessageHandler(Filters.all, callback))
-
-        with pytest.warns(TelegramDeprecationWarning, match='@run_async decorator'):
-            dp.process_update(self.message_update)
-
     def test_async_raises_dispatcher_handler_stop(self, dp, caplog):
-        @run_async
         def callback(update, context):
             raise DispatcherHandlerStop()
 
-        dp.add_handler(MessageHandler(Filters.all, callback))
+        dp.add_handler(MessageHandler(Filters.all, callback, run_async=True))
 
         with caplog.at_level(logging.WARNING):
             dp.update_queue.put(self.message_update)
@@ -282,24 +255,7 @@ class TestDispatcher:
             assert (
                 caplog.records[-1]
                 .getMessage()
-                .startswith('DispatcherHandlerStop is not supported ' 'with async functions')
-            )
-
-    def test_async_raises_exception(self, dp, caplog):
-        @run_async
-        def callback(update, context):
-            raise RuntimeError('async raising exception')
-
-        dp.add_handler(MessageHandler(Filters.all, callback))
-
-        with caplog.at_level(logging.WARNING):
-            dp.update_queue.put(self.message_update)
-            sleep(0.1)
-            assert len(caplog.records) == 1
-            assert (
-                caplog.records[-1]
-                .getMessage()
-                .startswith('A promise with deactivated error handling')
+                .startswith('DispatcherHandlerStop is not supported with async functions')
             )
 
     def test_add_async_handler(self, dp):
