@@ -237,7 +237,7 @@ class TestJobQueue:
 
     def test_in_dispatcher(self, bot):
         dispatcher = DispatcherBuilder().bot(bot).build()
-        dispatcher.start()
+        dispatcher.job_queue.start()
         try:
             dispatcher.job_queue.run_repeating(self.job_run_once, 0.02)
             sleep(0.03)

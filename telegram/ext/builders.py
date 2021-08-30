@@ -21,6 +21,7 @@
 # flake8: noqa: E501
 # pylint: disable=C0301
 """This module contains the Builder classes for the telegram.ext module."""
+import warnings
 from queue import Queue
 from threading import Event
 from typing import (
@@ -223,6 +224,15 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     def _build_ext_bot(self) -> ExtBot:
         if self._token_was_set is False:
             raise RuntimeError('No bot token was set.')
+        if 'con_pool_size' not in self._request_kwargs:
+            # For the standard use case (Updater + Dispatcher + Bot)
+            # we need a connection pool the size of:
+            # * for each of the workers
+            # * 1 for Dispatcher
+            # * 1 for Updater (even if webhook is used, we can spare a connection)
+            # * 1 for JobQueue
+            # * 1 for main thread
+            self._request_kwargs['con_pool_size'] = self._workers + 4
         return ExtBot(
             token=self._token,
             base_url=self._base_url,
@@ -253,6 +263,22 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
 
         if isinstance(job_queue, JobQueue):
             job_queue.set_dispatcher(dispatcher)
+
+        # For the standard use case (Updater + Dispatcher + Bot)
+        # we need a connection pool the size of:
+        # * for each of the workers
+        # * 1 for Dispatcher
+        # * 1 for Updater (even if webhook is used, we can spare a connection)
+        # * 1 for JobQueue
+        # * 1 for main thread
+        con_pool_size = self._workers + 4
+        actual_size = dispatcher.bot.request.con_pool_size
+        if actual_size < con_pool_size:
+            warnings.warn(
+                f'The Connection pool of Request object is smaller ({actual_size}) than the '
+                f'recommended value of {con_pool_size}.',
+                stacklevel=2,
+            )
 
         return dispatcher
 
@@ -519,6 +545,8 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
 
     .. _`builder pattern`: https://en.wikipedia.org/wiki/Builder_pattern.
     """
+
+    __slots__ = ()
 
     # The init is just here for mypy
     def __init__(self: 'InitDispatcherBuilder'):
@@ -829,6 +857,8 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
 
     .. _`builder pattern`: https://en.wikipedia.org/wiki/Builder_pattern.
     """
+
+    __slots__ = ()
 
     # The init is just here for mypy
     def __init__(self: 'InitUpdaterBuilder'):

@@ -127,6 +127,7 @@ class TestBuilder:
         updater = builder.build()
         assert updater.dispatcher is None
         assert updater.bot.token == bot.token
+        assert updater.bot.request.con_pool_size == 8
 
     def test_all_bot_args_custom(self, builder, bot):
         defaults = Defaults()
@@ -156,7 +157,7 @@ class TestBuilder:
         context_types = ContextTypes()
         builder.bot(dp.bot).update_queue(dp.update_queue).exception_event(
             dp.exception_event
-        ).job_queue(job_queue).persistence(persistence).context_types(context_types)
+        ).job_queue(job_queue).persistence(persistence).context_types(context_types).workers(3)
         dispatcher = builder.build().dispatcher
 
         assert dispatcher.bot is dp.bot
@@ -166,6 +167,8 @@ class TestBuilder:
         assert dispatcher.job_queue._dispatcher is dispatcher
         assert dispatcher.persistence is persistence
         assert dispatcher.context_types is context_types
+        assert dispatcher.workers == 3
+        assert dispatcher.bot.request.con_pool_size == 7
 
     def test_all_updater_args_custom(self, builder, dp):
         updater = (
