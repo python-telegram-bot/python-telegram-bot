@@ -120,7 +120,7 @@ class TestMessageHandler:
             self.test_flag = types and num
 
     def test_with_filter(self, message):
-        handler = MessageHandler(Filters.group, self.callback_context)
+        handler = MessageHandler(Filters.chat_type.group, self.callback_context)
 
         message.chat.type = 'group'
         assert handler.check_update(Update(0, message))

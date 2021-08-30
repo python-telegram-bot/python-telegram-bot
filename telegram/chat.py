@@ -18,13 +18,11 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Chat."""
-import warnings
 from datetime import datetime
 from typing import TYPE_CHECKING, List, Optional, ClassVar, Union, Tuple, Any
 
 from telegram import ChatPhoto, TelegramObject, constants
 from telegram.utils.types import JSONDict, FileInput, ODVInput, DVInput
-from telegram.utils.deprecate import TelegramDeprecationWarning
 
 from .chatpermissions import ChatPermissions
 from .chatlocation import ChatLocation
@@ -64,6 +62,9 @@ class Chat(TelegramObject):
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`id` is equal.
+
+    .. versionchanged:: 14.0
+        Removed the deprecated methods ``kick_member`` and ``get_members_count``.
 
     Args:
         id (:obj:`int`): Unique identifier for this chat. This number may be greater than 32 bits
@@ -341,25 +342,6 @@ class Chat(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    def get_members_count(
-        self, timeout: ODVInput[float] = DEFAULT_NONE, api_kwargs: JSONDict = None
-    ) -> int:
-        """
-        Deprecated, use :func:`~telegram.Chat.get_member_count` instead.
-
-        .. deprecated:: 13.7
-        """
-        warnings.warn(
-            '`Chat.get_members_count` is deprecated. Use `Chat.get_member_count` instead.',
-            TelegramDeprecationWarning,
-            stacklevel=2,
-        )
-
-        return self.get_member_count(
-            timeout=timeout,
-            api_kwargs=api_kwargs,
-        )
-
     def get_member_count(
         self, timeout: ODVInput[float] = DEFAULT_NONE, api_kwargs: JSONDict = None
     ) -> int:
@@ -400,33 +382,6 @@ class Chat(TelegramObject):
             user_id=user_id,
             timeout=timeout,
             api_kwargs=api_kwargs,
-        )
-
-    def kick_member(
-        self,
-        user_id: Union[str, int],
-        timeout: ODVInput[float] = DEFAULT_NONE,
-        until_date: Union[int, datetime] = None,
-        api_kwargs: JSONDict = None,
-        revoke_messages: bool = None,
-    ) -> bool:
-        """
-        Deprecated, use :func:`~telegram.Chat.ban_member` instead.
-
-        .. deprecated:: 13.7
-        """
-        warnings.warn(
-            '`Chat.kick_member` is deprecated. Use `Chat.ban_member` instead.',
-            TelegramDeprecationWarning,
-            stacklevel=2,
-        )
-
-        return self.ban_member(
-            user_id=user_id,
-            timeout=timeout,
-            until_date=until_date,
-            api_kwargs=api_kwargs,
-            revoke_messages=revoke_messages,
         )
 
     def ban_member(
