@@ -685,12 +685,10 @@ class TestBot:
         'chat_action',
         [
             ChatAction.FIND_LOCATION,
-            ChatAction.RECORD_AUDIO,
             ChatAction.RECORD_VIDEO,
             ChatAction.RECORD_VIDEO_NOTE,
             ChatAction.RECORD_VOICE,
             ChatAction.TYPING,
-            ChatAction.UPLOAD_AUDIO,
             ChatAction.UPLOAD_DOCUMENT,
             ChatAction.UPLOAD_PHOTO,
             ChatAction.UPLOAD_VIDEO,
