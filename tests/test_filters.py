@@ -26,8 +26,6 @@ from telegram.ext import Filters, BaseFilter, MessageFilter, UpdateFilter
 import inspect
 import re
 
-from telegram.utils.deprecate import TelegramDeprecationWarning
-
 
 @pytest.fixture(scope='function')
 def update():
@@ -971,26 +969,6 @@ class TestFilters:
         assert Filters.caption_entity(message_entity.type)(update)
         assert not Filters.entity(message_entity.type)(update)
 
-    def test_private_filter(self, update):
-        assert Filters.private(update)
-        update.message.chat.type = 'group'
-        assert not Filters.private(update)
-
-    def test_private_filter_deprecation(self, update):
-        with pytest.warns(TelegramDeprecationWarning):
-            Filters.private(update)
-
-    def test_group_filter(self, update):
-        assert not Filters.group(update)
-        update.message.chat.type = 'group'
-        assert Filters.group(update)
-        update.message.chat.type = 'supergroup'
-        assert Filters.group(update)
-
-    def test_group_filter_deprecation(self, update):
-        with pytest.warns(TelegramDeprecationWarning):
-            Filters.group(update)
-
     @pytest.mark.parametrize(
         ('chat_type, results'),
         [
@@ -1832,7 +1810,7 @@ class TestFilters:
 
         update.message.text = 'test'
         update.message.forward_date = datetime.datetime.utcnow()
-        assert (Filters.text & Filters.forwarded & Filters.private)(update)
+        assert (Filters.text & Filters.forwarded & Filters.chat_type.private)(update)
 
     def test_or_filters(self, update):
         update.message.text = 'test'

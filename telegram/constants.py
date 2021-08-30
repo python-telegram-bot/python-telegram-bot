@@ -70,12 +70,11 @@ Attributes:
 
 :class:`telegram.ChatAction`:
 
+.. versionchanged:: 14.0
+    Removed the deprecated constants ``CHATACTION_RECORD_AUDIO`` and ``CHATACTION_UPLOAD_AUDIO``.
+
 Attributes:
     CHATACTION_FIND_LOCATION (:obj:`str`): ``'find_location'``
-    CHATACTION_RECORD_AUDIO (:obj:`str`): ``'record_audio'``
-
-        .. deprecated:: 13.5
-           Deprecated by Telegram. Use :const:`CHATACTION_RECORD_VOICE` instead.
     CHATACTION_RECORD_VOICE (:obj:`str`): ``'record_voice'``
 
         .. versionadded:: 13.5
@@ -83,9 +82,6 @@ Attributes:
     CHATACTION_RECORD_VIDEO_NOTE (:obj:`str`): ``'record_video_note'``
     CHATACTION_TYPING (:obj:`str`): ``'typing'``
     CHATACTION_UPLOAD_AUDIO (:obj:`str`): ``'upload_audio'``
-
-        .. deprecated:: 13.5
-           Deprecated by Telegram. Use :const:`CHATACTION_UPLOAD_VOICE` instead.
     CHATACTION_UPLOAD_VOICE (:obj:`str`): ``'upload_voice'``
 
         .. versionadded:: 13.5
@@ -274,12 +270,10 @@ CHAT_SUPERGROUP: str = 'supergroup'
 CHAT_CHANNEL: str = 'channel'
 
 CHATACTION_FIND_LOCATION: str = 'find_location'
-CHATACTION_RECORD_AUDIO: str = 'record_audio'
 CHATACTION_RECORD_VOICE: str = 'record_voice'
 CHATACTION_RECORD_VIDEO: str = 'record_video'
 CHATACTION_RECORD_VIDEO_NOTE: str = 'record_video_note'
 CHATACTION_TYPING: str = 'typing'
-CHATACTION_UPLOAD_AUDIO: str = 'upload_audio'
 CHATACTION_UPLOAD_VOICE: str = 'upload_voice'
 CHATACTION_UPLOAD_DOCUMENT: str = 'upload_document'
 CHATACTION_CHOOSE_STICKER: str = 'choose_sticker'

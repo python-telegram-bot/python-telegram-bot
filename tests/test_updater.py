@@ -301,7 +301,6 @@ class TestUpdater:
         monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
         # prevent api calls from @info decorator when updater.bot.id is used in thread names
         monkeypatch.setattr(updater.bot, '_bot', User(id=123, first_name='bot', is_bot=True))
-        monkeypatch.setattr(updater.bot, '_commands', [])
 
         ip = '127.0.0.1'
         port = randrange(1024, 49152)  # Select random port
@@ -479,57 +478,6 @@ class TestUpdater:
             bootstrap_interval=0,
         )
         assert self.test_flag is True
-
-    def test_deprecation_warnings_start_webhook(self, recwarn, updater, monkeypatch):
-        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
-        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
-        # prevent api calls from @info decorator when updater.bot.id is used in thread names
-        monkeypatch.setattr(updater.bot, '_bot', User(id=123, first_name='bot', is_bot=True))
-        monkeypatch.setattr(updater.bot, '_commands', [])
-
-        ip = '127.0.0.1'
-        port = randrange(1024, 49152)  # Select random port
-        updater.start_webhook(ip, port, clean=True, force_event_loop=False)
-        updater.stop()
-
-        for warning in recwarn:
-            print(warning)
-
-        try:  # This is for flaky tests (there's an unclosed socket sometimes)
-            recwarn.pop(ResourceWarning)  # internally iterates through recwarn.list and deletes it
-        except AssertionError:
-            pass
-
-        assert len(recwarn) == 2
-        assert str(recwarn[0].message).startswith('The argument `clean` of')
-        assert str(recwarn[1].message).startswith('The argument `force_event_loop` of')
-
-    def test_clean_deprecation_warning_polling(self, recwarn, updater, monkeypatch):
-        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
-        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
-        # prevent api calls from @info decorator when updater.bot.id is used in thread names
-        monkeypatch.setattr(updater.bot, '_bot', User(id=123, first_name='bot', is_bot=True))
-        monkeypatch.setattr(updater.bot, '_commands', [])
-
-        updater.start_polling(clean=True)
-        updater.stop()
-        for msg in recwarn:
-            print(msg)
-
-        try:  # This is for flaky tests (there's an unclosed socket sometimes)
-            recwarn.pop(ResourceWarning)  # internally iterates through recwarn.list and deletes it
-        except AssertionError:
-            pass
-
-        assert len(recwarn) == 1
-        assert str(recwarn[0].message).startswith('The argument `clean` of')
-
-    def test_clean_drop_pending_mutually_exclusive(self, updater):
-        with pytest.raises(TypeError, match='`clean` and `drop_pending_updates` are mutually'):
-            updater.start_polling(clean=True, drop_pending_updates=False)
-
-        with pytest.raises(TypeError, match='`clean` and `drop_pending_updates` are mutually'):
-            updater.start_webhook(clean=True, drop_pending_updates=False)
 
     @flaky(3, 1)
     def test_webhook_invalid_posts(self, updater):

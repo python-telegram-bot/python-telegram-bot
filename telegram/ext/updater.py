@@ -342,13 +342,15 @@ class Updater(Generic[CCT, UD, CD, BD]):
         self,
         poll_interval: float = 0.0,
         timeout: float = 10,
-        clean: bool = None,
         bootstrap_retries: int = -1,
         read_latency: float = 2.0,
         allowed_updates: List[str] = None,
         drop_pending_updates: bool = None,
     ) -> Optional[Queue]:
         """Starts polling updates from Telegram.
+
+        .. versionchanged:: 14.0
+            Removed the ``clean`` argument in favor of ``drop_pending_updates``.
 
         Args:
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
@@ -358,10 +360,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 Telegram servers before actually starting to poll. Default is :obj:`False`.
 
                 .. versionadded :: 13.4
-            clean (:obj:`bool`, optional): Alias for ``drop_pending_updates``.
-
-                .. deprecated:: 13.4
-                    Use ``drop_pending_updates`` instead.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 :class:`telegram.ext.Updater` will retry on failures on the Telegram server.
 
@@ -379,19 +377,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
             :obj:`Queue`: The update queue that can be filled from the main thread.
 
         """
-        if (clean is not None) and (drop_pending_updates is not None):
-            raise TypeError('`clean` and `drop_pending_updates` are mutually exclusive.')
-
-        if clean is not None:
-            warnings.warn(
-                'The argument `clean` of `start_polling` is deprecated. Please use '
-                '`drop_pending_updates` instead.',
-                category=TelegramDeprecationWarning,
-                stacklevel=2,
-            )
-
-        drop_pending_updates = drop_pending_updates if drop_pending_updates is not None else clean
-
         with self.__lock:
             if not self.running:
                 self.running = True
@@ -428,11 +413,9 @@ class Updater(Generic[CCT, UD, CD, BD]):
         url_path: str = '',
         cert: str = None,
         key: str = None,
-        clean: bool = None,
         bootstrap_retries: int = 0,
         webhook_url: str = None,
         allowed_updates: List[str] = None,
-        force_event_loop: bool = None,
         drop_pending_updates: bool = None,
         ip_address: str = None,
         max_connections: int = 40,
@@ -448,6 +431,10 @@ class Updater(Generic[CCT, UD, CD, BD]):
             :meth:`start_webhook` now *always* calls :meth:`telegram.Bot.set_webhook`, so pass
             ``webhook_url`` instead of calling ``updater.bot.set_webhook(webhook_url)`` manually.
 
+        .. versionchanged:: 14.0
+            Removed the ``clean`` argument in favor of ``drop_pending_updates`` and removed the
+            deprecated argument ``force_event_loop``.
+
         Args:
             listen (:obj:`str`, optional): IP-Address to listen on. Default ``127.0.0.1``.
             port (:obj:`int`, optional): Port the bot should be listening on. Default ``80``.
@@ -458,10 +445,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 Telegram servers before actually starting to poll. Default is :obj:`False`.
 
                 .. versionadded :: 13.4
-            clean (:obj:`bool`, optional): Alias for ``drop_pending_updates``.
-
-                .. deprecated:: 13.4
-                    Use ``drop_pending_updates`` instead.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 :class:`telegram.ext.Updater` will retry on failures on the Telegram server.
 
@@ -477,13 +460,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 .. versionadded :: 13.4
             allowed_updates (List[:obj:`str`], optional): Passed to
                 :meth:`telegram.Bot.set_webhook`.
-            force_event_loop (:obj:`bool`, optional): Legacy parameter formerly used for a
-                workaround on Windows + Python 3.8+. No longer has any effect.
-
-                .. deprecated:: 13.6
-                   Since version 13.6, ``tornade>=6.1`` is required, which resolves the former
-                   issue.
-
             max_connections (:obj:`int`, optional): Passed to
                 :meth:`telegram.Bot.set_webhook`.
 
@@ -493,27 +469,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
             :obj:`Queue`: The update queue that can be filled from the main thread.
 
         """
-        if (clean is not None) and (drop_pending_updates is not None):
-            raise TypeError('`clean` and `drop_pending_updates` are mutually exclusive.')
-
-        if clean is not None:
-            warnings.warn(
-                'The argument `clean` of `start_webhook` is deprecated. Please use '
-                '`drop_pending_updates` instead.',
-                category=TelegramDeprecationWarning,
-                stacklevel=2,
-            )
-
-        if force_event_loop is not None:
-            warnings.warn(
-                'The argument `force_event_loop` of `start_webhook` is deprecated and no longer '
-                'has any effect.',
-                category=TelegramDeprecationWarning,
-                stacklevel=2,
-            )
-
-        drop_pending_updates = drop_pending_updates if drop_pending_updates is not None else clean
-
         with self.__lock:
             if not self.running:
                 self.running = True
