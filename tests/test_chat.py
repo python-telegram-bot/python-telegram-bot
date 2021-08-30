@@ -196,15 +196,6 @@ class TestChat:
         monkeypatch.setattr(chat.bot, 'get_chat_member_count', make_assertion)
         assert chat.get_member_count()
 
-    def test_get_members_count_warning(self, chat, monkeypatch, recwarn):
-        def make_assertion(*_, **kwargs):
-            return kwargs['chat_id'] == chat.id
-
-        monkeypatch.setattr(chat.bot, 'get_chat_member_count', make_assertion)
-        assert chat.get_members_count()
-        assert len(recwarn) == 1
-        assert '`Chat.get_members_count` is deprecated' in str(recwarn[0].message)
-
     def test_get_member(self, monkeypatch, chat):
         def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == chat.id
@@ -261,18 +252,6 @@ class TestChat:
 
         monkeypatch.setattr(chat.bot, 'ban_chat_sender_chat', make_assertion)
         assert chat.ban_chat(42)
-
-    def test_kick_member_warning(self, chat, monkeypatch, recwarn):
-        def make_assertion(*_, **kwargs):
-            chat_id = kwargs['chat_id'] == chat.id
-            user_id = kwargs['user_id'] == 42
-            until = kwargs['until_date'] == 43
-            return chat_id and user_id and until
-
-        monkeypatch.setattr(chat.bot, 'ban_chat_member', make_assertion)
-        assert chat.kick_member(user_id=42, until_date=43)
-        assert len(recwarn) == 1
-        assert '`Chat.kick_member` is deprecated' in str(recwarn[0].message)
 
     @pytest.mark.parametrize('only_if_banned', [True, False, None])
     def test_unban_member(self, monkeypatch, chat, only_if_banned):

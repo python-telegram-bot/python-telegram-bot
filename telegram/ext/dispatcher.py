@@ -22,7 +22,6 @@ import logging
 import warnings
 import weakref
 from collections import defaultdict
-from functools import wraps
 from queue import Empty, Queue
 from threading import BoundedSemaphore, Event, Lock, Thread, current_thread
 from time import sleep
@@ -44,11 +43,9 @@ from uuid import uuid4
 
 from telegram import TelegramError, Update
 from telegram.ext import BasePersistence, ContextTypes
-from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.handler import Handler
 import telegram.ext.extbot
 from telegram.ext.callbackdatacache import CallbackDataCache
-from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.ext.utils.promise import Promise
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 from telegram.ext.utils.types import CCT, UD, CD, BD
@@ -56,44 +53,11 @@ from telegram.ext.utils.types import CCT, UD, CD, BD
 if TYPE_CHECKING:
     from telegram import Bot
     from telegram.ext import JobQueue
+    from telegram.ext.callbackcontext import CallbackContext
 
 DEFAULT_GROUP: int = 0
 
 UT = TypeVar('UT')
-
-
-def run_async(
-    func: Callable[[Update, CallbackContext], object]
-) -> Callable[[Update, CallbackContext], object]:
-    """
-    Function decorator that will run the function in a new thread.
-
-    Will run :attr:`telegram.ext.Dispatcher.run_async`.
-
-    Using this decorator is only possible when only a single Dispatcher exist in the system.
-
-    Note:
-        DEPRECATED. Use :attr:`telegram.ext.Dispatcher.run_async` directly instead or the
-        :attr:`Handler.run_async` parameter.
-
-    Warning:
-        If you're using ``@run_async`` you cannot rely on adding custom attributes to
-        :class:`telegram.ext.CallbackContext`. See its docs for more info.
-    """
-
-    @wraps(func)
-    def async_func(*args: object, **kwargs: object) -> object:
-        warnings.warn(
-            'The @run_async decorator is deprecated. Use the `run_async` parameter of '
-            'your Handler or `Dispatcher.run_async` instead.',
-            TelegramDeprecationWarning,
-            stacklevel=2,
-        )
-        return Dispatcher.get_instance()._run_async(  # pylint: disable=W0212
-            func, *args, update=None, error_handling=False, **kwargs
-        )
-
-    return async_func
 
 
 class DispatcherHandlerStop(Exception):
@@ -180,7 +144,6 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         '__async_queue',
         '__async_threads',
         'bot',
-        '__dict__',
         '__weakref__',
         'context_types',
     )
@@ -359,13 +322,6 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                 self.logger.error('An uncaught error was raised while handling the error.')
                 continue
 
-            # Don't perform error handling for a `Promise` with deactivated error handling. This
-            # should happen only via the deprecated `@run_async` decorator or `Promises` created
-            # within error handlers
-            if not promise.error_handling:
-                self.logger.error('A promise with deactivated error handling raised an error.')
-                continue
-
             # If we arrive here, an exception happened in the promise and was neither
             # DispatcherHandlerStop nor raised by an error handler. So we can and must handle it
             try:
@@ -399,18 +355,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
             Promise
 
         """
-        return self._run_async(func, *args, update=update, error_handling=True, **kwargs)
-
-    def _run_async(
-        self,
-        func: Callable[..., object],
-        *args: object,
-        update: object = None,
-        error_handling: bool = True,
-        **kwargs: object,
-    ) -> Promise:
-        # TODO: Remove error_handling parameter once we drop the @run_async decorator
-        promise = Promise(func, args, kwargs, update=update, error_handling=error_handling)
+        promise = Promise(func, args, kwargs, update=update)
         self.__async_queue.put(promise)
         return promise
 
