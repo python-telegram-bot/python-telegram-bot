@@ -99,6 +99,10 @@ if TYPE_CHECKING:
 
 
 def check_if_already_set(func: CT) -> CT:
+    """Builds a decorator that checks if the attribute that `func` wants to set
+    has already been set. If it has been, raises an exception.
+    """
+
     def _decorator(self, arg):  # type: ignore[no-untyped-def]
         # remove the '_set_'
         arg_name = func.__name__[5:]
