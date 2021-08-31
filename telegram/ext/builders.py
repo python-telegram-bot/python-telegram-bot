@@ -224,7 +224,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     def _build_ext_bot(self) -> ExtBot:
         if self._token_was_set is False:
             raise RuntimeError('No bot token was set.')
-        if 'con_pool_size' not in self._request_kwargs:
+        if not self._request_was_set and 'con_pool_size' not in self._request_kwargs:
             # For the standard use case (Updater + Dispatcher + Bot)
             # we need a connection pool the size of:
             # * for each of the workers
@@ -241,9 +241,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
             private_key_password=self._private_key_password,
             defaults=self._defaults,
             arbitrary_callback_data=self._arbitrary_callback_data,
-            request=Request(**self._request_kwargs)
-            if self._request_kwargs_was_set
-            else self._request,
+            request=self._request if self._request_was_set else Request(**self._request_kwargs),
         )
 
     def _build_dispatcher(
@@ -739,7 +737,19 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         return self._set_update_queue(update_queue)
 
     def workers(self: BuilderType, workers: int) -> BuilderType:
-        """`Dummy text b/c this will be dropped anyway`"""
+        """Sets the number of worker threads to be used for
+        :meth:`telegram.ext.Dispatcher.run_async`, i.e. the number of callbacks that can be run
+        asynchronously at the same time.
+
+         .. seealso:: :attr:`telegram.ext.Handler.run_sync`,
+             :attr:`telegram.ext.Defaults.run_async`
+
+        Args:
+            workers (:obj:`int`): The number of worker threads.
+
+        Returns:
+            :class:`DispatcherBuilder`: The same builder with the updated argument.
+        """
         return self._set_workers(workers)
 
     def exception_event(self: BuilderType, exception_event: Event) -> BuilderType:
@@ -1053,7 +1063,19 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         return self._set_update_queue(update_queue)
 
     def workers(self: BuilderType, workers: int) -> BuilderType:
-        """`Dummy text b/c this will be dropped anyway`"""
+        """Sets the number of worker threads to be used for
+        :meth:`telegram.ext.Dispatcher.run_async`, i.e. the number of callbacks that can be run
+        asynchronously at the same time.
+
+         .. seealso:: :attr:`telegram.ext.Handler.run_sync`,
+             :attr:`telegram.ext.Defaults.run_async`
+
+        Args:
+            workers (:obj:`int`): The number of worker threads.
+
+        Returns:
+            :class:`DispatcherBuilder`: The same builder with the updated argument.
+        """
         return self._set_workers(workers)
 
     def exception_event(self: BuilderType, exception_event: Event) -> BuilderType:

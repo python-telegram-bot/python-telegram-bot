@@ -27,7 +27,7 @@ from telegram.utils.request import Request
 from .conftest import PRIVATE_KEY
 
 from telegram.ext import UpdaterBuilder, Defaults, JobQueue, PicklePersistence, ContextTypes
-from telegram.ext.builders import _BOT_CHECKS, _DISPATCHER_CHECKS, DispatcherBuilder
+from telegram.ext.builders import _BOT_CHECKS, _DISPATCHER_CHECKS, DispatcherBuilder, _BaseBuilder
 
 
 @pytest.fixture(scope='function')
@@ -35,7 +35,7 @@ def builder():
     return UpdaterBuilder()
 
 
-UPDATER_METHODS = [slot.lstrip('_') for slot in UpdaterBuilder.__slots__ if 'was_set' not in slot]
+UPDATER_METHODS = [slot.lstrip('_') for slot in _BaseBuilder.__slots__ if 'was_set' not in slot]
 
 
 class TestBuilder:
@@ -131,7 +131,7 @@ class TestBuilder:
 
     def test_all_bot_args_custom(self, builder, bot):
         defaults = Defaults()
-        request = Request()
+        request = Request(8)
         builder.token(bot.token).base_url('base_url').base_file_url('base_file_url').private_key(
             PRIVATE_KEY
         ).defaults(defaults).arbitrary_callback_data(42).request(request)
@@ -168,7 +168,6 @@ class TestBuilder:
         assert dispatcher.persistence is persistence
         assert dispatcher.context_types is context_types
         assert dispatcher.workers == 3
-        assert dispatcher.bot.request.con_pool_size == 7
 
     def test_all_updater_args_custom(self, builder, dp):
         updater = (
@@ -185,3 +184,19 @@ class TestBuilder:
         assert updater.exception_event is dp.exception_event
         assert updater.update_queue is dp.update_queue
         assert updater.user_signal_handler == 42
+
+    def test_connection_pool_size_with_workers(self, bot, builder):
+        dispatcher = builder.token(bot.token).workers(42).build().dispatcher
+        assert dispatcher.workers == 42
+        assert dispatcher.bot.request.con_pool_size == 46
+
+    def test_connection_pool_size_warning(self, bot, builder, recwarn):
+        builder.token(bot.token).workers(42).request_kwargs({'con_pool_size': 1})
+        dispatcher = builder.build().dispatcher
+        assert dispatcher.workers == 42
+        assert dispatcher.bot.request.con_pool_size == 1
+
+        assert len(recwarn) == 1
+        message = str(recwarn[-1].message)
+        assert 'smaller (1)' in message
+        assert 'recommended value of 46.' in message
