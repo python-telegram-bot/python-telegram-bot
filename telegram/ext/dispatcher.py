@@ -97,6 +97,25 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
             store data that should be persistent over restarts.
+        exception_event (:class:`threading.Event`): When this event is set, the dispatcher will
+            stop processing updates. If this dispatcher is used together with an
+            :class:`telegram.ext.Updater`, then this event will be the same object as
+            :attr:`telegram.ext.Updater.exception_event`.
+        handlers (Dict[:obj:`int`, List[:class:`telegram.ext.Handler`]]): A dictionary mapping each
+            handler group to the list of handlers registered to that group.
+
+            .. seealso::
+                :meth:`add_handler`
+        groups (List[:obj:`int`]): A list of all handler groups that have handlers registered.
+
+            .. seealso::
+                :meth:`add_handler`
+        error_handlers (Dict[:obj:`callable`, :obj:`bool`]): A dict, where the keys are error
+            handlers and the values indicate whether they are to be run asynchronously via
+            :meth:`run_async`.
+
+            .. seealso::
+                :meth:`add_error_handler`
 
     """
 
@@ -115,7 +134,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         'error_handlers',
         'running',
         '__stop_event',
-        '__exception_event',
+        'exception_event',
         '__async_queue',
         '__async_threads',
         'bot',
@@ -143,7 +162,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         self.workers = cast(int, kwargs.pop('workers'))
         persistence = cast(PT, kwargs.pop('persistence'))
         self.context_types = cast(ContextTypes[CCT, UD, CD, BD], kwargs.pop('context_types'))
-        self.__exception_event = cast(Event, kwargs.pop('exception_event'))
+        self.exception_event = cast(Event, kwargs.pop('exception_event'))
 
         if self.workers < 1:
             warnings.warn(
@@ -214,10 +233,6 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
                 self._set_singleton(self)
             else:
                 self._set_singleton(None)
-
-    @property
-    def exception_event(self) -> Event:  # skipcq: PY-D0003
-        return self.__exception_event
 
     def _init_async_threads(self, base_name: str, workers: int) -> None:
         base_name = f'{base_name}_' if base_name else ''
@@ -330,7 +345,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
                 ready.set()
             return
 
-        if self.__exception_event.is_set():
+        if self.exception_event.is_set():
             msg = 'reusing dispatcher after exception event is forbidden'
             self.logger.error(msg)
             raise TelegramError(msg)
@@ -352,7 +367,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
                 if self.__stop_event.is_set():
                     self.logger.debug('orderly stopping')
                     break
-                if self.__exception_event.is_set():
+                if self.exception_event.is_set():
                     self.logger.critical('stopping due to exception in another thread')
                     break
                 continue

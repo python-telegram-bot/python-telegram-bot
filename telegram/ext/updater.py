@@ -71,6 +71,9 @@ class Updater(Generic[BT, DT]):
         dispatcher (:class:`telegram.ext.Dispatcher`): Optional. Dispatcher that handles the
             updates and dispatches them to the handlers.
         running (:obj:`bool`): Indicates if the updater is running.
+        exception_event (:class:`threading.Event`): When an unhandled exception happens while
+            fetching updates, this event will be set. If :attr:`dispatcher` is not :obj:`None`, it
+            is the same object as :attr:`telegram.ext.Dispatcher.exception_event`.
 
     """
 
@@ -80,7 +83,7 @@ class Updater(Generic[BT, DT]):
         'bot',
         'logger',
         'update_queue',
-        '__exception_event',
+        'exception_event',
         'last_update_id',
         'running',
         'is_idle',
@@ -104,11 +107,11 @@ class Updater(Generic[BT, DT]):
         if self.dispatcher:
             self.bot = self.dispatcher.bot
             self.update_queue = self.dispatcher.update_queue
-            self.__exception_event = self.dispatcher.exception_event
+            self.exception_event = self.dispatcher.exception_event
         else:
             self.bot = cast(BT, kwargs.pop('bot'))
             self.update_queue = cast(Queue, kwargs.pop('update_queue'))
-            self.__exception_event = cast(Event, kwargs.pop('exception_event'))
+            self.exception_event = cast(Event, kwargs.pop('exception_event'))
 
         self.last_update_id = 0
         self.running = False
@@ -117,10 +120,6 @@ class Updater(Generic[BT, DT]):
         self.__lock = Lock()
         self.__threads: List[Thread] = []
         self.logger = logging.getLogger(__name__)
-
-    @property
-    def exception_event(self) -> Event:  # skipcq: PY-D0003
-        return self.__exception_event
 
     def _init_thread(self, target: Callable, name: str, *args: object, **kwargs: object) -> None:
         thr = Thread(
@@ -138,7 +137,7 @@ class Updater(Generic[BT, DT]):
         try:
             target(*args, **kwargs)
         except Exception:
-            self.__exception_event.set()
+            self.exception_event.set()
             self.logger.exception('unhandled exception in %s', thr_name)
             raise
         self.logger.debug('%s - ended', thr_name)

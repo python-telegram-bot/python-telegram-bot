@@ -20,6 +20,7 @@
 """
 We mainly test on UpdaterBuilder because it has all methods that DispatcherBuilder already has
 """
+from threading import Event
 
 import pytest
 
@@ -116,11 +117,13 @@ class TestBuilder:
         assert updater.bot is bot
         assert updater.dispatcher.bot is bot
         assert updater.dispatcher.job_queue._dispatcher is updater.dispatcher
+        assert updater.exception_event is updater.dispatcher.exception_event
 
     def test_build_custom_dispatcher(self, builder, dp):
         updater = builder.dispatcher(dp).build()
         assert updater.dispatcher is dp
         assert updater.bot is updater.dispatcher.bot
+        assert updater.exception_event is dp.exception_event
 
     def test_build_no_dispatcher(self, builder, bot):
         builder.dispatcher(None).token(bot.token)
@@ -128,6 +131,7 @@ class TestBuilder:
         assert updater.dispatcher is None
         assert updater.bot.token == bot.token
         assert updater.bot.request.con_pool_size == 8
+        assert isinstance(updater.exception_event, Event)
 
     def test_all_bot_args_custom(self, builder, bot):
         defaults = Defaults()

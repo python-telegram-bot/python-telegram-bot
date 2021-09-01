@@ -292,7 +292,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
             return Updater(
                 dispatcher=dispatcher,
                 user_signal_handler=self._user_signal_handler,
-                exception_event=self._exception_event,
+                exception_event=dispatcher.exception_event,
                 builder_flag=True,
             )
         return Updater(
@@ -300,7 +300,9 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
             bot=self._dispatcher.bot if self._dispatcher else (self._bot or self._build_ext_bot()),
             update_queue=self._update_queue,
             user_signal_handler=self._user_signal_handler,
-            exception_event=self._exception_event,
+            exception_event=self._dispatcher.exception_event
+            if self._dispatcher
+            else self._exception_event,
             builder_flag=True,
         )
 
@@ -760,6 +762,8 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         """Sets a :class:`threading.Event` instance to be used for
         :attr:`telegram.ext.Dispatcher.exception_event`. When this event is set, the dispatcher
         will stop processing updates. If not called, an event will be instantiated.
+        If the dispatcher is passed to :meth:`telegram.ext.UpdaterBuilder.dispatcher`, then this
+        event will also be used for :attr:`telegram.ext.Updater.exception_event`.
 
          .. seealso:: :attr:`telegram.ext.Updater.exception_event`,
              :meth:`telegram.ext.UpdaterBuilder.exception_event`
@@ -1084,9 +1088,9 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
 
     def exception_event(self: BuilderType, exception_event: Event) -> BuilderType:
         """Sets a :class:`threading.Event` instance to be used by the
-        :class:`telegram.ext.Updater`. When an exception happens while fetching updates, this event
-        will be set and the ``Updater`` will stop fetching for updates. If not called, an event
-        will be instantiated.
+        :class:`telegram.ext.Updater`. When an unhandled exception happens while fetching updates,
+        this event will be set and the ``Updater`` will stop fetching for updates. If not called,
+        an event will be instantiated.
         If :meth:`dispatcher` is not called, this event will also be used for
         :attr:`telegram.ext.Dispatcher.exception_event`.
 
