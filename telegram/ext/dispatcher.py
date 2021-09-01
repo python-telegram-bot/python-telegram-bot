@@ -42,7 +42,6 @@ from uuid import uuid4
 from telegram import TelegramError, Update
 from telegram.ext import BasePersistence, ContextTypes
 from telegram.ext.handler import Handler
-from telegram.ext.extbot import ExtBot
 from telegram.ext.callbackdatacache import CallbackDataCache
 from telegram.ext.utils.promise import Promise
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
@@ -159,8 +158,12 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         if persistence:
             if not isinstance(persistence, BasePersistence):
                 raise TypeError("persistence must be based on telegram.ext.BasePersistence")
+
             self.persistence = persistence
+            # This raises an exception if persistence.store_data.callback_data is True
+            # but self.bot is not an instance of ExtBot - so no need to check that later on
             self.persistence.set_bot(self.bot)
+
             if self.persistence.store_data.user_data:
                 self.user_data = self.persistence.get_user_data()
                 if not isinstance(self.user_data, defaultdict):
@@ -176,23 +179,16 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
                         f"bot_data must be of type {self.context_types.bot_data.__name__}"
                     )
             if self.persistence.store_data.callback_data:
-                if isinstance(self.bot, ExtBot):
-                    self.bot = cast(ExtBot, self.bot)  # type: ignore[assignment]
-                    persistent_data = self.persistence.get_callback_data()
-                    if persistent_data is not None:
-                        if not isinstance(persistent_data, tuple) and len(persistent_data) != 2:
-                            raise ValueError('callback_data must be a 2-tuple')
-                        self.bot.callback_data_cache = CallbackDataCache(
-                            self.bot,
-                            self.bot.callback_data_cache.maxsize,
-                            persistent_data=persistent_data,
-                        )
-                else:
-                    warnings.warn(
-                        'The persistence has callback_data stored, but the bot instance is not '
-                        'of type telegram.ext.ExtBot. Not applying the data.',
-                        UserWarning,
-                        stacklevel=2,
+                persistent_data = self.persistence.get_callback_data()
+                if persistent_data is not None:
+                    if not isinstance(persistent_data, tuple) and len(persistent_data) != 2:
+                        raise ValueError('callback_data must be a 2-tuple')
+                    # Mypy doesn't know that persistence.set_bot (see above) already checks that
+                    # self.bot is an instance of ExtBot if callback_data should be stored ...
+                    self.bot.callback_data_cache = CallbackDataCache(  # type: ignore[attr-defined]
+                        self.bot,  # type: ignore[arg-type]
+                        self.bot.callback_data_cache.maxsize,  # type: ignore[attr-defined]
+                        persistent_data=persistent_data,
                     )
         else:
             self.persistence = None
@@ -574,29 +570,22 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
                     user_ids = []
 
             if self.persistence.store_data.callback_data:
-                if isinstance(self.bot, ExtBot):
-                    try:
-                        self.persistence.update_callback_data(
-                            self.bot.callback_data_cache.persistence_data
-                        )
-                    except Exception as exc:
-                        try:
-                            self.dispatch_error(update, exc)
-                        except Exception:
-                            message = (
-                                'Saving callback data raised an error and an '
-                                'uncaught error was raised while handling '
-                                'the error with an error_handler'
-                            )
-                            self.logger.exception(message)
-                else:
-
-                    warnings.warn(
-                        'The persistence wants to store callback_data, but the bot instance is not'
-                        ' of type telegram.ext.ExtBot. Not storing the data.',
-                        UserWarning,
-                        stacklevel=2,
+                try:
+                    # Mypy doesn't know that persistence.set_bot (see above) already checks that
+                    # self.bot is an instance of ExtBot if callback_data should be stored ...
+                    self.persistence.update_callback_data(
+                        self.bot.callback_data_cache.persistence_data  # type: ignore[attr-defined]
                     )
+                except Exception as exc:
+                    try:
+                        self.dispatch_error(update, exc)
+                    except Exception:
+                        message = (
+                            'Saving callback data raised an error and an '
+                            'uncaught error was raised while handling '
+                            'the error with an error_handler'
+                        )
+                        self.logger.exception(message)
             if self.persistence.store_data.bot_data:
                 try:
                     self.persistence.update_bot_data(self.bot_data)

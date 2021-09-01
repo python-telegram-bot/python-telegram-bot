@@ -329,8 +329,10 @@ class TestBasePersistence:
         def get_callback_data():
             return callback_data
 
+        base_persistence.bot = None
         base_persistence.get_callback_data = get_callback_data
         u = UpdaterBuilder().bot(bot).persistence(base_persistence).build()
+        assert u.dispatcher.bot is base_persistence.bot
         assert u.dispatcher.bot_data == bot_data
         assert u.dispatcher.chat_data == chat_data
         assert u.dispatcher.user_data == user_data
