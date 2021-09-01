@@ -37,7 +37,6 @@ from telegram.ext import ExtBot
 from telegram.ext.utils.types import UD, CD, BD, BT, JQ, PT  # pylint: disable=W0611
 
 if TYPE_CHECKING:
-    from telegram import Bot
     from telegram.ext import Dispatcher, Job, JobQueue
     from telegram.ext.utils.types import CCT
 
@@ -328,7 +327,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
             setattr(self, key, value)
 
     @property
-    def bot(self) -> 'Bot':
+    def bot(self) -> BT:
         """:class:`telegram.Bot`: The bot associated with this context."""
         return self._dispatcher.bot
 

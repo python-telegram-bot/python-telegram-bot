@@ -12,17 +12,18 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import (
     CommandHandler,
     CallbackQueryHandler,
-    CallbackContext,
     UpdaterBuilder,
 )
+from telegram.ext.utils.types import DefaultContextType
 
+# Enable logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
 
-def start(update: Update, context: CallbackContext) -> None:
+def start(update: Update, context: DefaultContextType) -> None:
     """Sends a message with three inline buttons attached."""
     keyboard = [
         [
@@ -37,7 +38,7 @@ def start(update: Update, context: CallbackContext) -> None:
     update.message.reply_text('Please choose:', reply_markup=reply_markup)
 
 
-def button(update: Update, context: CallbackContext) -> None:
+def button(update: Update, context: DefaultContextType) -> None:
     """Parses the CallbackQuery and updates the message text."""
     query = update.callback_query
 
@@ -48,7 +49,7 @@ def button(update: Update, context: CallbackContext) -> None:
     query.edit_message_text(text=f"Selected option: {query.data}")
 
 
-def help_command(update: Update, context: CallbackContext) -> None:
+def help_command(update: Update, context: DefaultContextType) -> None:
     """Displays info on how to use the bot."""
     update.message.reply_text("Use /start to test this bot.")
 

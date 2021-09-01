@@ -19,32 +19,31 @@ from telegram import InlineQueryResultArticle, ParseMode, InputTextMessageConten
 from telegram.ext import (
     InlineQueryHandler,
     CommandHandler,
-    CallbackContext,
     UpdaterBuilder,
 )
+from telegram.ext.utils.types import DefaultContextType
 from telegram.utils.helpers import escape_markdown
 
 # Enable logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
-
 logger = logging.getLogger(__name__)
 
 
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
-def start(update: Update, context: CallbackContext) -> None:
+def start(update: Update, context: DefaultContextType) -> None:
     """Send a message when the command /start is issued."""
     update.message.reply_text('Hi!')
 
 
-def help_command(update: Update, context: CallbackContext) -> None:
+def help_command(update: Update, context: DefaultContextType) -> None:
     """Send a message when the command /help is issued."""
     update.message.reply_text('Help!')
 
 
-def inlinequery(update: Update, context: CallbackContext) -> None:
+def inlinequery(update: Update, context: DefaultContextType) -> None:
     """Handle the inline query."""
     query = update.inline_query.query
 

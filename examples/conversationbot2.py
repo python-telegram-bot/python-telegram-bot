@@ -23,15 +23,15 @@ from telegram.ext import (
     MessageHandler,
     Filters,
     ConversationHandler,
-    CallbackContext,
     UpdaterBuilder,
 )
+
+from telegram.ext.utils.types import DefaultContextType
 
 # Enable logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
-
 logger = logging.getLogger(__name__)
 
 CHOOSING, TYPING_REPLY, TYPING_CHOICE = range(3)
@@ -50,7 +50,7 @@ def facts_to_str(user_data: Dict[str, str]) -> str:
     return "\n".join(facts).join(['\n', '\n'])
 
 
-def start(update: Update, context: CallbackContext) -> int:
+def start(update: Update, context: DefaultContextType) -> int:
     """Start the conversation and ask user for input."""
     update.message.reply_text(
         "Hi! My name is Doctor Botter. I will hold a more complex conversation with you. "
@@ -61,7 +61,7 @@ def start(update: Update, context: CallbackContext) -> int:
     return CHOOSING
 
 
-def regular_choice(update: Update, context: CallbackContext) -> int:
+def regular_choice(update: Update, context: DefaultContextType) -> int:
     """Ask the user for info about the selected predefined choice."""
     text = update.message.text
     context.user_data['choice'] = text
@@ -70,7 +70,7 @@ def regular_choice(update: Update, context: CallbackContext) -> int:
     return TYPING_REPLY
 
 
-def custom_choice(update: Update, context: CallbackContext) -> int:
+def custom_choice(update: Update, context: DefaultContextType) -> int:
     """Ask the user for a description of a custom category."""
     update.message.reply_text(
         'Alright, please send me the category first, for example "Most impressive skill"'
@@ -79,7 +79,7 @@ def custom_choice(update: Update, context: CallbackContext) -> int:
     return TYPING_CHOICE
 
 
-def received_information(update: Update, context: CallbackContext) -> int:
+def received_information(update: Update, context: DefaultContextType) -> int:
     """Store info provided by user and ask for the next category."""
     user_data = context.user_data
     text = update.message.text
@@ -97,7 +97,7 @@ def received_information(update: Update, context: CallbackContext) -> int:
     return CHOOSING
 
 
-def done(update: Update, context: CallbackContext) -> int:
+def done(update: Update, context: DefaultContextType) -> int:
     """Display the gathered info and end the conversation."""
     user_data = context.user_data
     if 'choice' in user_data:

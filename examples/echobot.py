@@ -22,21 +22,21 @@ from telegram.ext import (
     CommandHandler,
     MessageHandler,
     Filters,
-    CallbackContext,
     UpdaterBuilder,
 )
+
+from telegram.ext.utils.types import DefaultContextType
 
 # Enable logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
-
 logger = logging.getLogger(__name__)
 
 
 # Define a few command handlers. These usually take the two arguments update and
 # context.
-def start(update: Update, context: CallbackContext) -> None:
+def start(update: Update, context: DefaultContextType) -> None:
     """Send a message when the command /start is issued."""
     user = update.effective_user
     update.message.reply_markdown_v2(
@@ -45,12 +45,12 @@ def start(update: Update, context: CallbackContext) -> None:
     )
 
 
-def help_command(update: Update, context: CallbackContext) -> None:
+def help_command(update: Update, context: DefaultContextType) -> None:
     """Send a message when the command /help is issued."""
     update.message.reply_text('Help!')
 
 
-def echo(update: Update, context: CallbackContext) -> None:
+def echo(update: Update, context: DefaultContextType) -> None:
     """Echo the user message."""
     update.message.reply_text(update.message.text)
 
