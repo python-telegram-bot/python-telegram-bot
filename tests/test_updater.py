@@ -51,6 +51,7 @@ from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter
 from telegram.ext import (
     InvalidCallbackData,
     ExtBot,
+    Updater,
 )
 from telegram.ext.utils.webhookhandler import WebhookServer
 
@@ -86,12 +87,6 @@ class TestUpdater:
     offset = 0
     test_flag = False
 
-    def test_slot_behaviour(self, updater, mro_slots):
-        for at in updater.__slots__:
-            at = f"_Updater{at}" if at.startswith('__') and not at.endswith('__') else at
-            assert getattr(updater, at, 'err') != 'err', f"got extra slot '{at}'"
-        assert len(mro_slots(updater)) == len(set(mro_slots(updater))), "duplicate slot"
-
     @pytest.fixture(autouse=True)
     def reset(self):
         self.message_count = 0
@@ -108,6 +103,26 @@ class TestUpdater:
     def callback(self, update, context):
         self.received = update.message.text
         self.cb_handler_called.set()
+
+    def test_slot_behaviour(self, updater, mro_slots):
+        for at in updater.__slots__:
+            at = f"_Updater{at}" if at.startswith('__') and not at.endswith('__') else at
+            assert getattr(updater, at, 'err') != 'err', f"got extra slot '{at}'"
+        assert len(mro_slots(updater)) == len(set(mro_slots(updater))), "duplicate slot"
+
+    def test_manual_init_warning(self, recwarn):
+        Updater(
+            bot=None,
+            dispatcher=None,
+            update_queue=None,
+            exception_event=None,
+            user_signal_handler=None,
+        )
+        assert len(recwarn) == 1
+        assert (
+            str(recwarn[-1].message)
+            == '`Updater` instances should be built via the `UpdaterBuilder`.'
+        )
 
     @pytest.mark.parametrize(
         ('error',),

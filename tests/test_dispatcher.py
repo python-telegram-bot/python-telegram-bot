@@ -36,7 +36,7 @@ from telegram.ext import (
     DispatcherBuilder,
 )
 from telegram.ext import PersistenceInput
-from telegram.ext.dispatcher import DispatcherHandlerStop
+from telegram.ext.dispatcher import DispatcherHandlerStop, Dispatcher
 from telegram.utils.helpers import DEFAULT_FALSE
 from tests.conftest import create_dp
 from collections import defaultdict
@@ -102,6 +102,22 @@ class TestDispatcher:
             and isinstance(context.error, TelegramError)
         ):
             self.received = context.error.message
+
+    def test_manual_init_warning(self, recwarn):
+        Dispatcher(
+            bot=None,
+            update_queue=None,
+            workers=7,
+            exception_event=None,
+            job_queue=None,
+            persistence=None,
+            context_types=ContextTypes(),
+        )
+        assert len(recwarn) == 1
+        assert (
+            str(recwarn[-1].message)
+            == '`Dispatcher` instances should be built via the `DispatcherBuilder`.'
+        )
 
     def test_less_than_one_worker_warning(self, dp, recwarn):
         DispatcherBuilder().bot(dp.bot).workers(0).build()

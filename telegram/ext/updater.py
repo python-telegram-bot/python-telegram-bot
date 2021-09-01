@@ -569,10 +569,9 @@ class Updater(Generic[BT, DT]):
         """Stops the polling/webhook thread, the dispatcher and the job queue."""
         with self.__lock:
             if self.running or (self.dispatcher and self.dispatcher.has_running_threads):
-                if self.dispatcher:
-                    self.logger.debug('Stopping Updater and Dispatcher ...')
-                else:
-                    self.logger.debug('Stopping Updater ...')
+                self.logger.debug(
+                    'Stopping Updater %s...', 'and Dispatcher ' if self.dispatcher else ''
+                )
 
                 self.running = False
 
