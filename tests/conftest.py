@@ -109,6 +109,11 @@ def bot(bot_info):
     return DictExtBot(bot_info['token'], private_key=PRIVATE_KEY, request=DictRequest())
 
 
+@pytest.fixture(scope='session')
+def raw_bot(bot_info):
+    return DictBot(bot_info['token'], private_key=PRIVATE_KEY, request=DictRequest())
+
+
 DEFAULT_BOTS = {}
 
 
@@ -525,6 +530,33 @@ def check_shortcut_call(
     return True
 
 
+# mainly for check_defaults_handling below
+def build_kwargs(signature: inspect.Signature, default_kwargs, dfv: Any = DEFAULT_NONE):
+    kws = {}
+    for name, param in signature.parameters.items():
+        # For required params we need to pass something
+        if param.default == param.empty:
+            # Some special casing
+            if name == 'permissions':
+                kws[name] = ChatPermissions()
+            elif name in ['prices', 'media', 'results', 'commands', 'errors']:
+                kws[name] = []
+            elif name == 'ok':
+                kws['ok'] = False
+                kws['error_message'] = 'error'
+            else:
+                kws[name] = True
+        # pass values for params that can have defaults only if we don't want to use the
+        # standard default
+        elif name in default_kwargs:
+            if dfv != DEFAULT_NONE:
+                kws[name] = dfv
+        # Some special casing for methods that have "exactly one of the optionals" type args
+        elif name in ['location', 'contact', 'venue', 'inline_message_id']:
+            kws[name] = True
+    return kws
+
+
 def check_defaults_handling(
     method: Callable,
     bot: ExtBot,
@@ -540,31 +572,6 @@ def check_defaults_handling(
             None. get_file is automatically handled.
 
     """
-
-    def build_kwargs(signature: inspect.Signature, default_kwargs, dfv: Any = DEFAULT_NONE):
-        kws = {}
-        for name, param in signature.parameters.items():
-            # For required params we need to pass something
-            if param.default == param.empty:
-                # Some special casing
-                if name == 'permissions':
-                    kws[name] = ChatPermissions()
-                elif name in ['prices', 'media', 'results', 'commands', 'errors']:
-                    kws[name] = []
-                elif name == 'ok':
-                    kws['ok'] = False
-                    kws['error_message'] = 'error'
-                else:
-                    kws[name] = True
-            # pass values for params that can have defaults only if we don't want to use the
-            # standard default
-            elif name in default_kwargs:
-                if dfv != DEFAULT_NONE:
-                    kws[name] = dfv
-            # Some special casing for methods that have "exactly one of the optionals" type args
-            elif name in ['location', 'contact', 'venue', 'inline_message_id']:
-                kws[name] = True
-        return kws
 
     shortcut_signature = inspect.signature(method)
     kwargs_need_default = [
@@ -588,7 +595,7 @@ def check_defaults_handling(
     expected_return_values = [None, []] if return_value is None else [return_value]
 
     def make_assertion(_, data, timeout=DEFAULT_NONE, df_value=DEFAULT_NONE):
-        expected_timeout = method_timeout if df_value == DEFAULT_NONE else df_value
+        expected_timeout = method_timeout if df_value is DEFAULT_NONE else df_value
         if timeout != expected_timeout:
             pytest.fail(f'Got value {timeout} for "timeout", expected {expected_timeout}')
 
@@ -623,7 +630,7 @@ def check_defaults_handling(
             (DEFAULT_NONE, defaults_no_custom_defaults),
             ('custom_default', defaults_custom_defaults),
         ]:
-            bot.defaults = defaults
+            bot._defaults = defaults
             # 1: test that we get the correct default value, if we don't specify anything
             kwargs = build_kwargs(
                 shortcut_signature,
@@ -652,6 +659,6 @@ def check_defaults_handling(
         raise exc
     finally:
         setattr(bot.request, 'post', orig_post)
-        bot.defaults = None
+        bot._defaults = None
 
     return True

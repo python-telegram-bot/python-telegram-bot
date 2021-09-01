@@ -61,8 +61,14 @@ from telegram.utils.helpers import (
     from_timestamp,
     escape_markdown,
     to_timestamp,
+    DefaultValue,
 )
-from tests.conftest import expect_bad_request, check_defaults_handling, GITHUB_ACTION
+from tests.conftest import (
+    expect_bad_request,
+    check_defaults_handling,
+    GITHUB_ACTION,
+    build_kwargs,
+)
 from tests.bots import FALLBACKS
 
 
@@ -242,9 +248,16 @@ class TestBot:
             ]
         ],
     )
-    def test_defaults_handling(self, bot_method_name, bot):
+    def test_defaults_handling(self, bot_method_name, bot, raw_bot, monkeypatch):
         """
-        Here we check that the bot methods handle tg.ext.Defaults correctly. As for most defaults,
+        Here we check that the bot methods handle tg.ext.Defaults correctly. This has two parts:
+
+        1. Check that ExtBot actually inserts the defaults values correctly
+        2. Check that tg.Bot just replaces `DefaultValue(obj)` with `obj`, i.e. that it doesn't
+            pass any `DefaultValue` instances to Request. See the docstring of
+            tg.Bot._insert_defaults for details on why we need that
+
+        As for most defaults,
         we can't really check the effect, we just check if we're passing the correct kwargs to
         Request.post. As bot method tests a scattered across the different test files, we do
         this here in one place.
@@ -255,8 +268,27 @@ class TestBot:
         Finally, there are some tests for Defaults.{parse_mode, quote, allow_sending_without_reply}
         at the appropriate places, as those are the only things we can actually check.
         """
+        # Check that ExtBot does the right thing
         bot_method = getattr(bot, bot_method_name)
         assert check_defaults_handling(bot_method, bot)
+
+        # check that tg.Bot does the right thing
+        def make_assertion(_, data, timeout=None):
+            for k, v in data.items():
+                if isinstance(v, DefaultValue):
+                    pytest.fail(f'Parameter {k} was passed as DefaultValue to request')
+            if isinstance(timeout, DefaultValue):
+                pytest.fail('Parameter timeout was passed as DefaultValue to request')
+
+        method = getattr(raw_bot, bot_method_name)
+        signature = inspect.signature(method)
+        kwargs_need_default = [
+            kwarg
+            for kwarg, value in signature.parameters.items()
+            if isinstance(value.default, DefaultValue)
+        ]
+        monkeypatch.setattr(raw_bot.request, 'post', make_assertion)
+        method(**build_kwargs(inspect.signature(method), kwargs_need_default))
 
     def test_ext_bot_signature(self):
         """

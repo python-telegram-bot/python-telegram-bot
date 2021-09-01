@@ -42,9 +42,8 @@ from typing import (
 from uuid import uuid4
 
 from telegram import TelegramError, Update
-from telegram.ext import BasePersistence, ContextTypes
+from telegram.ext import BasePersistence, ContextTypes, ExtBot
 from telegram.ext.handler import Handler
-import telegram.ext.extbot
 from telegram.ext.callbackdatacache import CallbackDataCache
 from telegram.ext.utils.promise import Promise
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
@@ -225,7 +224,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                         f"bot_data must be of type {self.context_types.bot_data.__name__}"
                     )
             if self.persistence.store_data.callback_data:
-                self.bot = cast(telegram.ext.extbot.ExtBot, self.bot)
+                self.bot = cast(ExtBot, self.bot)
                 persistent_data = self.persistence.get_callback_data()
                 if persistent_data is not None:
                     if not isinstance(persistent_data, tuple) and len(persistent_data) != 2:
@@ -496,7 +495,11 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         handled_only_async = all(sync_modes)
         if handled:
             # Respect default settings
-            if all(mode is DEFAULT_FALSE for mode in sync_modes) and self.bot.defaults:
+            if (
+                all(mode is DEFAULT_FALSE for mode in sync_modes)
+                and isinstance(self.bot, ExtBot)
+                and self.bot.defaults
+            ):
                 handled_only_async = self.bot.defaults.run_async
             # If update was only handled by async handlers, we don't need to update here
             if not handled_only_async:
@@ -600,7 +603,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                     user_ids = []
 
             if self.persistence.store_data.callback_data:
-                self.bot = cast(telegram.ext.extbot.ExtBot, self.bot)
+                self.bot = cast(ExtBot, self.bot)
                 try:
                     self.persistence.update_callback_data(
                         self.bot.callback_data_cache.persistence_data
@@ -688,7 +691,12 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
             self.logger.debug('The callback is already registered as an error handler. Ignoring.')
             return
 
-        if run_async is DEFAULT_FALSE and self.bot.defaults and self.bot.defaults.run_async:
+        if (
+            run_async is DEFAULT_FALSE
+            and isinstance(self.bot, ExtBot)
+            and self.bot.defaults
+            and self.bot.defaults.run_async
+        ):
             run_async = True
 
         self.error_handlers[callback] = run_async
