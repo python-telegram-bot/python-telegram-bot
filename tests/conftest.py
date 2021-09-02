@@ -534,6 +534,7 @@ def check_shortcut_call(
 def build_kwargs(signature: inspect.Signature, default_kwargs, dfv: Any = DEFAULT_NONE):
     kws = {}
     for name, param in signature.parameters.items():
+        print(str(param.annotation), type(param.annotation))
         # For required params we need to pass something
         if param.default == param.empty:
             # Some special casing

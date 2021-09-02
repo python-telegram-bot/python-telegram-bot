@@ -52,6 +52,8 @@ from telegram import (
     InlineQueryResultVoice,
     PollOption,
     BotCommandScopeChat,
+    File,
+    InputMedia,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.ext import ExtBot, Defaults
@@ -273,12 +275,40 @@ class TestBot:
         assert check_defaults_handling(bot_method, bot)
 
         # check that tg.Bot does the right thing
+        # make_assertion basically checks everything that happens in
+        # Bot._insert_defaults and Bot._insert_defaults_for_ilq_results
         def make_assertion(_, data, timeout=None):
             for k, v in data.items():
                 if isinstance(v, DefaultValue):
                     pytest.fail(f'Parameter {k} was passed as DefaultValue to request')
+                elif isinstance(v, InputMedia) and isinstance(v.parse_mode, DefaultValue):
+                    pytest.fail(f'Parameter {k} has a DefaultValue parse_mode')
+                elif k == 'media' and isinstance(v, list):
+                    if any(isinstance(med.parse_mode, DefaultValue) for med in v):
+                        pytest.fail(f'One of the media items has a DefaultValue parse_mode')
             if isinstance(timeout, DefaultValue):
                 pytest.fail('Parameter timeout was passed as DefaultValue to request')
+            print(bot_method_name.lower().replace('_', ''), 'answerinlinequery')
+            if bot_method_name.lower().replace('_', '') == 'answerinlinequery':
+                print('in loop', data)
+                for result_dict in data['results']:
+                    print(result_dict)
+                    if isinstance(result_dict.get('parse_mode'), DefaultValue):
+                        pytest.fail('InlineQueryResult has DefaultValue parse_mode')
+                    print(result_dict.get('parse_mode'))
+                    imc = result_dict.get('input_message_content')
+                    if imc and isinstance(imc.get('parse_mode'), DefaultValue):
+                        pytest.fail(
+                            'InlineQueryResult is InputMessageContext with DefaultValue parse_mode'
+                        )
+                    if imc and isinstance(imc.get('disable_web_page_preview'), DefaultValue):
+                        pytest.fail(
+                            'InlineQueryResult is InputMessageContext with DefaultValue disable_web_page_preview'
+                        )
+
+            if bot_method_name in ['get_file', 'getFile']:
+                # The get_file methods try to check if the result is a local file
+                return File(file_id='result', file_unique_id='result').to_dict()
 
         method = getattr(raw_bot, bot_method_name)
         signature = inspect.signature(method)

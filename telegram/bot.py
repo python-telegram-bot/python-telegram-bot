@@ -2037,8 +2037,8 @@ class Bot(TelegramObject):
     ) -> None:
         """The reason why this method exists is similar to the description of _insert_defaults"""
         # pylint: disable=W0212
-        if hasattr(res, 'parse_mode'):
-            res.parse_mode = DefaultValue.get_value(res.parse_mode)
+        # if hasattr(res, 'parse_mode'):
+        #     res.parse_mode = DefaultValue.get_value(res.parse_mode)
         if hasattr(res, 'input_message_content') and res.input_message_content:
             if hasattr(res.input_message_content, 'parse_mode'):
                 res.input_message_content.parse_mode = DefaultValue.get_value(
