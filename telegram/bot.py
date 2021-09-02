@@ -221,6 +221,7 @@ class Bot(TelegramObject):
         `Message.reply_text` and the request to TG. Doing this here in a centralized manner is a
         rather clean and minimally invasive solution, i.e. the link between tg and tg.ext is as
         small as possible.
+        See also _insert_defaults_for_ilq
         ExtBot overrides this method to actually insert default values.
 
         If in the future we come up with a better way of making `Defaults` work, we can cut this
@@ -234,7 +235,7 @@ class Bot(TelegramObject):
             if isinstance(val, DefaultValue):
                 data[key] = val.value
 
-            # 3)
+            # 2)
             elif isinstance(val, InputMedia):
                 val.parse_mode = DefaultValue.get_value(  # type: ignore[attr-defined]
                     val.parse_mode  # type: ignore[attr-defined]
@@ -2035,10 +2036,14 @@ class Bot(TelegramObject):
     def _insert_defaults_for_ilq_results(  # pylint: disable=R0201
         self, res: 'InlineQueryResult'
     ) -> None:
-        """The reason why this method exists is similar to the description of _insert_defaults"""
+        """The reason why this method exists is similar to the description of _insert_defaults
+        The reason why we do this in rather than in _insert_defaults is because converting
+        DEFAULT_NONE to NONE *before* calling to_dict() makes it way easier to drop None entries
+        from the json data.
+        """
         # pylint: disable=W0212
-        # if hasattr(res, 'parse_mode'):
-        #     res.parse_mode = DefaultValue.get_value(res.parse_mode)
+        if hasattr(res, 'parse_mode'):
+            res.parse_mode = DefaultValue.get_value(res.parse_mode)
         if hasattr(res, 'input_message_content') and res.input_message_content:
             if hasattr(res.input_message_content, 'parse_mode'):
                 res.input_message_content.parse_mode = DefaultValue.get_value(

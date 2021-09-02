@@ -288,14 +288,10 @@ class TestBot:
                         pytest.fail(f'One of the media items has a DefaultValue parse_mode')
             if isinstance(timeout, DefaultValue):
                 pytest.fail('Parameter timeout was passed as DefaultValue to request')
-            print(bot_method_name.lower().replace('_', ''), 'answerinlinequery')
             if bot_method_name.lower().replace('_', '') == 'answerinlinequery':
-                print('in loop', data)
                 for result_dict in data['results']:
-                    print(result_dict)
                     if isinstance(result_dict.get('parse_mode'), DefaultValue):
                         pytest.fail('InlineQueryResult has DefaultValue parse_mode')
-                    print(result_dict.get('parse_mode'))
                     imc = result_dict.get('input_message_content')
                     if imc and isinstance(imc.get('parse_mode'), DefaultValue):
                         pytest.fail(
@@ -327,7 +323,9 @@ class TestBot:
         """
         # Some methods of ext.ExtBot
         global_extra_args = set()
-        extra_args_per_method = defaultdict(set, {'__init__': {'arbitrary_callback_data'}})
+        extra_args_per_method = defaultdict(
+            set, {'__init__': {'arbitrary_callback_data', 'defaults'}}
+        )
         different_hints_per_method = defaultdict(set, {'__setattr__': {'ext_bot'}})
 
         for name, method in inspect.getmembers(Bot, predicate=inspect.isfunction):
@@ -2437,15 +2435,3 @@ class TestBot:
             bot.arbitrary_callback_data = False
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
-
-    @pytest.mark.parametrize(
-        'cls,warn', [(Bot, True), (BotSubClass, True), (ExtBot, False), (ExtBotSubClass, False)]
-    )
-    def test_defaults_warning(self, bot, recwarn, cls, warn):
-        defaults = Defaults()
-        cls(bot.token, defaults=defaults)
-        if warn:
-            assert len(recwarn) == 1
-            assert 'Passing Defaults to telegram.Bot is deprecated.' in str(recwarn[-1].message)
-        else:
-            assert len(recwarn) == 0

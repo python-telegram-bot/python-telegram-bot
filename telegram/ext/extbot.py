@@ -159,16 +159,12 @@ class ExtBot(telegram.bot.Bot):
             # 3)
             elif isinstance(val, InputMedia) and val.parse_mode is DEFAULT_NONE:  # type: ignore
                 val.parse_mode = (  # type: ignore[attr-defined]
-                    DefaultValue.get_value(self.defaults.parse_mode) if self.defaults else None
+                    self.defaults.parse_mode if self.defaults else None
                 )
             elif key == 'media' and isinstance(val, list):
                 for media in val:
                     if media.parse_mode is DEFAULT_NONE:
-                        media.parse_mode = (
-                            DefaultValue.get_value(self.defaults.parse_mode)
-                            if self.defaults
-                            else None
-                        )
+                        media.parse_mode = self.defaults.parse_mode if self.defaults else None
 
         effective_timeout = DefaultValue.get_value(timeout)
         if isinstance(timeout, DefaultValue):
@@ -349,16 +345,14 @@ class ExtBot(telegram.bot.Bot):
                 and res.input_message_content.parse_mode is DEFAULT_NONE
             ):
                 res.input_message_content.parse_mode = (
-                    DefaultValue.get_value(self.defaults.parse_mode) if self.defaults else None
+                    self.defaults.parse_mode if self.defaults else None
                 )
             if (
                 hasattr(res.input_message_content, 'disable_web_page_preview')
                 and res.input_message_content.disable_web_page_preview is DEFAULT_NONE
             ):
                 res.input_message_content.disable_web_page_preview = (
-                    DefaultValue.get_value(self.defaults.disable_web_page_preview)
-                    if self.defaults
-                    else None
+                    self.defaults.disable_web_page_preview if self.defaults else None
                 )
 
     def stop_poll(
