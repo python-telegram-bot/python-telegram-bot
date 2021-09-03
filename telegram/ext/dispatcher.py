@@ -451,7 +451,6 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
                     if check is not None and check is not False:
                         if not context:
                             context = self.context_types.context.from_update(update, self)
-                            print('constructed context')
                             context.refresh_data()
                         handled = True
                         sync_modes.append(handler.run_async)
@@ -466,8 +465,6 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
 
             # Dispatch any error.
             except Exception as exc:
-                print('failed to handle update')
-                print(exc)
                 try:
                     self.dispatch_error(update, exc)
                 except DispatcherHandlerStop:
