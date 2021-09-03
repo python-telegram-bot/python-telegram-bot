@@ -658,7 +658,8 @@ def check_defaults_handling(
             # so ILQRPhoto is expected to have parse_mode if df_value is not in [DF_NONE, NONE]
             elif 'photo' in result and result.get('parse_mode') != df_value:
                 pytest.fail(
-                    f'Got value {result.get("parse_mode")} for ILQR.parse_mode instead of {df_value}'
+                    f'Got value {result.get("parse_mode")} for '
+                    f'ILQR.parse_mode instead of {df_value}'
                 )
             imc = result.get('input_message_content')
             if not imc:

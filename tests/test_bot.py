@@ -56,7 +56,7 @@ from telegram import (
     InputMedia,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
-from telegram.ext import ExtBot, Defaults
+from telegram.ext import ExtBot
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
 from telegram.ext.callbackdatacache import InvalidCallbackData
 from telegram.utils.helpers import (
@@ -285,7 +285,7 @@ class TestBot:
                     pytest.fail(f'Parameter {k} has a DefaultValue parse_mode')
                 elif k == 'media' and isinstance(v, list):
                     if any(isinstance(med.parse_mode, DefaultValue) for med in v):
-                        pytest.fail(f'One of the media items has a DefaultValue parse_mode')
+                        pytest.fail('One of the media items has a DefaultValue parse_mode')
             if isinstance(timeout, DefaultValue):
                 pytest.fail('Parameter timeout was passed as DefaultValue to request')
             if bot_method_name.lower().replace('_', '') == 'answerinlinequery':
@@ -299,7 +299,8 @@ class TestBot:
                         )
                     if imc and isinstance(imc.get('disable_web_page_preview'), DefaultValue):
                         pytest.fail(
-                            'InlineQueryResult is InputMessageContext with DefaultValue disable_web_page_preview'
+                            'InlineQueryResult is InputMessageContext with DefaultValue '
+                            'disable_web_page_preview '
                         )
 
             if bot_method_name in ['get_file', 'getFile']:
