@@ -35,6 +35,7 @@ from typing import (
     Optional,
     overload,
     cast,
+    Type,
 )
 
 from telegram import Bot
@@ -103,12 +104,12 @@ def check_if_already_set(func: CT) -> CT:
     has already been set. If it has been, raises an exception.
     """
 
-    def _decorator(self, arg):  # type: ignore[no-untyped-def]
+    def _decorator(self, *args, **kwargs):  # type: ignore[no-untyped-def]
         # remove the '_set_'
         arg_name = func.__name__[5:]
         if getattr(self, f'_{arg_name}_was_set') is True:
             raise self._exception_builder(arg_name)  # pylint: disable=W0212
-        return func(self, arg)
+        return func(self, *args, **kwargs)
 
     return cast(CT, _decorator)
 
@@ -134,6 +135,7 @@ _DISPATCHER_CHECKS = [
     ('job_queue', 'JobQueue instance'),
     ('persistence', 'persistence instance'),
     ('context_types', 'ContextTypes instance'),
+    ('dispatcher_class', 'Dispatcher Class'),
 ] + _BOT_CHECKS
 _DISPATCHER_CHECKS.remove(('dispatcher', 'Dispatcher instance'))
 
@@ -181,6 +183,12 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         '_dispatcher_was_set',
         '_user_signal_handler',
         '_user_signal_handler_was_set',
+        '_dispatcher_class',
+        '_dispatcher_class_was_set',
+        '_dispatcher_kwargs',
+        '_updater_class',
+        '_updater_class_was_set',
+        '_updater_kwargs',
     )
 
     def __init__(self: 'InitBaseBuilder'):
@@ -224,6 +232,12 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         self._dispatcher_was_set = False
         self._user_signal_handler: Optional[Callable[[int, object], Any]] = None
         self._user_signal_handler_was_set = False
+        self._dispatcher_class: Type[Dispatcher] = Dispatcher
+        self._dispatcher_kwargs: Dict[str, object] = {}
+        self._dispatcher_class_was_set = False
+        self._updater_class: Type[Updater] = Updater
+        self._updater_kwargs: Dict[str, object] = {}
+        self._updater_class_was_set = False
 
     def _build_ext_bot(self) -> ExtBot:
         if self._token_was_set is False:
@@ -252,7 +266,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         self: '_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]',
     ) -> Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]:
         job_queue = JobQueue() if self._job_queue_was_set is False else self._job_queue
-        dispatcher: Dispatcher[BT, CCT, UD, CD, BD, JQ, PT] = Dispatcher(
+        dispatcher: Dispatcher[BT, CCT, UD, CD, BD, JQ, PT] = self._dispatcher_class(
             bot=self._bot if self._bot_was_set is True else self._build_ext_bot(),
             update_queue=self._update_queue,
             workers=self._workers,
@@ -261,6 +275,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
             persistence=self._persistence,
             context_types=self._context_types,
             builder_flag=True,
+            **self._dispatcher_kwargs,
         )
 
         if isinstance(job_queue, JobQueue):
@@ -289,13 +304,14 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     ) -> Updater[BT, ODT]:
         if self._dispatcher_was_set is False:
             dispatcher = self._build_dispatcher()
-            return Updater(
+            return self._updater_class(
                 dispatcher=dispatcher,
                 user_signal_handler=self._user_signal_handler,
                 exception_event=dispatcher.exception_event,
                 builder_flag=True,
+                **self._updater_kwargs,
             )
-        return Updater(
+        return self._updater_class(
             dispatcher=self._dispatcher,
             bot=self._dispatcher.bot if self._dispatcher else (self._bot or self._build_ext_bot()),
             update_queue=self._update_queue,
@@ -304,6 +320,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
             if self._dispatcher
             else self._exception_event,
             builder_flag=True,
+            **self._updater_kwargs,
         )
 
     @staticmethod
@@ -315,6 +332,26 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     @property
     def _dispatcher_check(self) -> bool:
         return self._dispatcher_was_set and self._dispatcher is not None
+
+    @check_if_already_set
+    def _set_dispatcher_class(
+        self: BuilderType, dispatcher_class: Type[Dispatcher], kwargs: Dict[str, object] = None
+    ) -> BuilderType:
+        if self._dispatcher_was_set:
+            raise self._exception_builder('dispatcher_class', 'Dispatcher instance')
+        self._dispatcher_class = dispatcher_class
+        self._dispatcher_kwargs = kwargs or {}
+        self._dispatcher_class_was_set = True
+        return self
+
+    @check_if_already_set
+    def _set_updater_class(
+        self: BuilderType, updater_class: Type[Updater], kwargs: Dict[str, object] = None
+    ) -> BuilderType:
+        self._updater_class = updater_class
+        self._updater_kwargs = kwargs or {}
+        self._updater_class_was_set = True
+        return self
 
     @check_if_already_set
     def _set_token(self: BuilderType, token: str) -> BuilderType:
@@ -565,6 +602,29 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
             :class:`telegram.ext.Dispatcher`
         """
         return self._build_dispatcher()
+
+    def dispatcher_class(
+        self: BuilderType, dispatcher_class: Type[Dispatcher], kwargs: Dict[str, object] = None
+    ) -> BuilderType:
+        """Sets a custom subclass to be used instead of :class:`telegram.ext.Dispatcher`. The
+        subclasses ``__init__`` should look like this
+
+        .. code:: python
+
+            def __init__(self, custom_arg_1, custom_arg_2, ..., **kwargs):
+                super().__init__(**kwargs)
+                self.custom_arg_1 = custom_arg_1
+                self.custom_arg_2 = custom_arg_2
+
+        Args:
+            dispatcher_class (:obj:`type`): A subclass of  :class:`telegram.ext.Dispatcher`
+            kwargs (Dict[:obj:`str`, :obj:`object`], optional): Keyword arguments for the
+                initialization. Defaults to an empty dict.
+
+        Returns:
+            :class:`DispatcherBuilder`: The same builder with the updated argument.
+        """
+        return self._set_dispatcher_class(dispatcher_class, kwargs)
 
     def token(self: BuilderType, token: str) -> BuilderType:
         """Sets the token to be used for :attr:`telegram.ext.Dispatcher.bot`.
@@ -891,6 +951,52 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
             :class:`telegram.ext.Updater`
         """
         return self._build_updater()
+
+    def dispatcher_class(
+        self: BuilderType, dispatcher_class: Type[Dispatcher], kwargs: Dict[str, object] = None
+    ) -> BuilderType:
+        """Sets a custom subclass to be used instead of :class:`telegram.ext.Dispatcher`. The
+        subclasses ``__init__`` should look like this
+
+        .. code:: python
+
+            def __init__(self, custom_arg_1, custom_arg_2, ..., **kwargs):
+                super().__init__(**kwargs)
+                self.custom_arg_1 = custom_arg_1
+                self.custom_arg_2 = custom_arg_2
+
+        Args:
+            dispatcher_class (:obj:`type`): A subclass of  :class:`telegram.ext.Dispatcher`
+            kwargs (Dict[:obj:`str`, :obj:`object`], optional): Keyword arguments for the
+                initialization. Defaults to an empty dict.
+
+        Returns:
+            :class:`DispatcherBuilder`: The same builder with the updated argument.
+        """
+        return self._set_dispatcher_class(dispatcher_class, kwargs)
+
+    def updater_class(
+        self: BuilderType, updater_class: Type[Updater], kwargs: Dict[str, object] = None
+    ) -> BuilderType:
+        """Sets a custom subclass to be used instead of :class:`telegram.ext.Updater`. The
+        subclasses ``__init__`` should look like this
+
+        .. code:: python
+
+            def __init__(self, custom_arg_1, custom_arg_2, ..., **kwargs):
+                super().__init__(**kwargs)
+                self.custom_arg_1 = custom_arg_1
+                self.custom_arg_2 = custom_arg_2
+
+        Args:
+            updater_class (:obj:`type`): A subclass of  :class:`telegram.ext.Updater`
+            kwargs (Dict[:obj:`str`, :obj:`object`], optional): Keyword arguments for the
+                initialization. Defaults to an empty dict.
+
+        Returns:
+            :class:`UpdaterBuilder`: The same builder with the updated argument.
+        """
+        return self._set_updater_class(updater_class, kwargs)
 
     def token(self: BuilderType, token: str) -> BuilderType:
         """Sets the token to be used for :attr:`telegram.ext.Updater.bot`.

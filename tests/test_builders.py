@@ -27,7 +27,15 @@ import pytest
 from telegram.utils.request import Request
 from .conftest import PRIVATE_KEY
 
-from telegram.ext import UpdaterBuilder, Defaults, JobQueue, PicklePersistence, ContextTypes
+from telegram.ext import (
+    UpdaterBuilder,
+    Defaults,
+    JobQueue,
+    PicklePersistence,
+    ContextTypes,
+    Dispatcher,
+    Updater,
+)
 from telegram.ext.builders import _BOT_CHECKS, _DISPATCHER_CHECKS, DispatcherBuilder, _BaseBuilder
 
 
@@ -36,7 +44,11 @@ def builder():
     return UpdaterBuilder()
 
 
-UPDATER_METHODS = [slot.lstrip('_') for slot in _BaseBuilder.__slots__ if 'was_set' not in slot]
+UPDATER_METHODS = [
+    slot.lstrip('_')
+    for slot in _BaseBuilder.__slots__
+    if not (slot.endswith('_was_set') or slot.endswith('_kwargs'))
+]
 
 
 class TestBuilder:
@@ -91,7 +103,13 @@ class TestBuilder:
         # Finally test that `bot` *can* be set if `dispatcher` was set to None
         builder = UpdaterBuilder()
         builder.dispatcher(None)
-        getattr(builder, method)(None)
+        if method != 'dispatcher_class':
+            getattr(builder, method)(None)
+        else:
+            with pytest.raises(
+                RuntimeError, match=f'`{method}` can only be set, if the no Dispatcher instance'
+            ):
+                getattr(builder, method)(None)
 
     def test_mutually_exclusive_for_request(self, builder):
         builder.request(None)
@@ -204,3 +222,24 @@ class TestBuilder:
         message = str(recwarn[-1].message)
         assert 'smaller (1)' in message
         assert 'recommended value of 46.' in message
+
+    def test_custom_classes(self, bot, builder):
+        class CustomDispatcher(Dispatcher):
+            def __init__(self, arg, **kwargs):
+                super().__init__(**kwargs)
+                self.arg = arg
+
+        class CustomUpdater(Updater):
+            def __init__(self, arg, **kwargs):
+                super().__init__(**kwargs)
+                self.arg = arg
+
+        builder.updater_class(CustomUpdater, kwargs={'arg': 1}).dispatcher_class(
+            CustomDispatcher, kwargs={'arg': 2}
+        ).token(bot.token)
+        updater = builder.build()
+
+        assert isinstance(updater, CustomUpdater)
+        assert updater.arg == 1
+        assert isinstance(updater.dispatcher, CustomDispatcher)
+        assert updater.dispatcher.arg == 2
