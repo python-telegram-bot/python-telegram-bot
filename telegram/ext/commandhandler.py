@@ -58,10 +58,7 @@ class CommandHandler(Handler[Update, CCT]):
             Limitations are the same as described here https://core.telegram.org/bots#commands
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature:
-
-
-            ``def callback(update: Update, context: CallbackContext)``
+            Callback signature: ``def callback(update: Update, context: CallbackContext)``
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
@@ -215,10 +212,7 @@ class PrefixHandler(CommandHandler):
             The command or list of commands this handler should listen for.
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature:
-
-
-            ``def callback(update: Update, context: CallbackContext)``
+            Callback signature: ``def callback(update: Update, context: CallbackContext)``
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
