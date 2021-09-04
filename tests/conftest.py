@@ -575,6 +575,15 @@ def build_kwargs(signature: inspect.Signature, default_kwargs, dfv: Any = DEFAUL
         # Some special casing for methods that have "exactly one of the optionals" type args
         elif name in ['location', 'contact', 'venue', 'inline_message_id']:
             kws[name] = True
+        elif name == 'until_date':
+            if dfv == 'non-None-value':
+                # Europe/Berlin
+                kws[name] = pytz.timezone('Europe/Berlin').localize(
+                    datetime.datetime(2000, 1, 1, 0)
+                )
+            else:
+                # UTC
+                kws[name] = datetime.datetime(2000, 1, 1, 0)
     return kws
 
 
@@ -604,9 +613,9 @@ def check_defaults_handling(
     method_timeout = shortcut_signature.parameters['timeout'].default.value
 
     defaults_no_custom_defaults = Defaults()
-    defaults_custom_defaults = Defaults(
-        **{kwarg: 'custom_default' for kwarg in inspect.signature(Defaults).parameters.keys()}
-    )
+    kwargs = {kwarg: 'custom_default' for kwarg in inspect.signature(Defaults).parameters.keys()}
+    kwargs['tzinfo'] = pytz.timezone('America/New_York')
+    defaults_custom_defaults = Defaults(**kwargs)
 
     expected_return_values = [None, []] if return_value is None else [return_value]
 
@@ -675,6 +684,19 @@ def check_defaults_handling(
                         f'Got value {imc.get(attr)} for ILQR.i_m_c.{attr} instead of {df_value}'
                     )
 
+        # Check datetime conversion
+        until_date = data.pop('until_date', None)
+        if until_date:
+            if df_value == 'non-None-value':
+                if until_date != 946681200:
+                    pytest.fail('Non-naive until_date was interpreted as Europe/Berlin.')
+            if df_value is DEFAULT_NONE:
+                if until_date != 946684800:
+                    pytest.fail('Naive until_date was not interpreted as UTC')
+            if df_value == 'custom_default':
+                if until_date != 946702800:
+                    pytest.fail('Naive until_date was not interpreted as America/New_York')
+
         if method.__name__ in ['get_file', 'get_small_file', 'get_big_file']:
             # This is here mainly for PassportFile.get_file, which calls .set_credentials on the
             # return value
@@ -695,14 +717,14 @@ def check_defaults_handling(
             ('custom_default', defaults_custom_defaults),
         ]:
             bot._defaults = defaults
-            # # 1: test that we get the correct default value, if we don't specify anything
-            # kwargs = build_kwargs(
-            #     shortcut_signature,
-            #     kwargs_need_default,
-            # )
-            # assertion_callback = functools.partial(make_assertion, df_value=default_value)
-            # setattr(bot.request, 'post', assertion_callback)
-            # assert method(**kwargs) in expected_return_values
+            # 1: test that we get the correct default value, if we don't specify anything
+            kwargs = build_kwargs(
+                shortcut_signature,
+                kwargs_need_default,
+            )
+            assertion_callback = functools.partial(make_assertion, df_value=default_value)
+            setattr(bot.request, 'post', assertion_callback)
+            assert method(**kwargs) in expected_return_values
 
             # 2: test that we get the manually passed non-None value
             kwargs = build_kwargs(shortcut_signature, kwargs_need_default, dfv='non-None-value')

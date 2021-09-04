@@ -278,16 +278,20 @@ class TestBot:
         # make_assertion basically checks everything that happens in
         # Bot._insert_defaults and Bot._insert_defaults_for_ilq_results
         def make_assertion(_, data, timeout=None):
+            # Check regular kwargs
             for k, v in data.items():
                 if isinstance(v, DefaultValue):
                     pytest.fail(f'Parameter {k} was passed as DefaultValue to request')
                 elif isinstance(v, InputMedia) and isinstance(v.parse_mode, DefaultValue):
                     pytest.fail(f'Parameter {k} has a DefaultValue parse_mode')
+                # Check InputMedia
                 elif k == 'media' and isinstance(v, list):
                     if any(isinstance(med.parse_mode, DefaultValue) for med in v):
                         pytest.fail('One of the media items has a DefaultValue parse_mode')
+            # Check timeout
             if isinstance(timeout, DefaultValue):
                 pytest.fail('Parameter timeout was passed as DefaultValue to request')
+            # Check inline query results
             if bot_method_name.lower().replace('_', '') == 'answerinlinequery':
                 for result_dict in data['results']:
                     if isinstance(result_dict.get('parse_mode'), DefaultValue):
@@ -302,6 +306,10 @@ class TestBot:
                             'InlineQueryResult is InputMessageContext with DefaultValue '
                             'disable_web_page_preview '
                         )
+            # Check datetime conversion
+            until_date = data.pop('until_date', None)
+            if until_date and until_date != 946684800:
+                pytest.fail('Naive until_date was not interpreted as UTC')
 
             if bot_method_name in ['get_file', 'getFile']:
                 # The get_file methods try to check if the result is a local file
