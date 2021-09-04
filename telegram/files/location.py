@@ -63,7 +63,6 @@ class Location(TelegramObject):
         'live_period',
         'latitude',
         'heading',
-        '_id_attrs',
     )
 
     def __init__(

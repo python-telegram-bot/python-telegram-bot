@@ -22,7 +22,6 @@ from typing import NoReturn, Optional, Dict, Any
 
 import pytz
 
-from telegram.utils.deprecate import set_new_attribute_deprecated
 from telegram.utils.helpers import DEFAULT_NONE
 from telegram.utils.types import ODVInput
 
@@ -67,7 +66,6 @@ class Defaults:
         '_allow_sending_without_reply',
         '_parse_mode',
         '_api_defaults',
-        '__dict__',
     )
 
     def __init__(
@@ -107,9 +105,6 @@ class Defaults:
         # Special casing, as None is a valid default value
         if self._timeout != DEFAULT_NONE:
             self._api_defaults['timeout'] = self._timeout
-
-    def __setattr__(self, key: str, value: object) -> None:
-        set_new_attribute_deprecated(self, key, value)
 
     @property
     def api_defaults(self) -> Dict[str, Any]:  # skip-cq: PY-D0003

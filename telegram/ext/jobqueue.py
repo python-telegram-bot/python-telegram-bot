@@ -25,16 +25,12 @@ from typing import TYPE_CHECKING, Callable, List, Optional, Tuple, Union, cast, 
 import pytz
 from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED, JobEvent
 from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.combining import OrTrigger
-from apscheduler.triggers.cron import CronTrigger
 from apscheduler.job import Job as APSJob
 
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.utils.types import JSONDict
-from telegram.utils.deprecate import set_new_attribute_deprecated
 
 if TYPE_CHECKING:
-    from telegram import Bot
     from telegram.ext import Dispatcher
     import apscheduler.job  # noqa: F401
 
@@ -48,7 +44,7 @@ class JobQueue:
 
     """
 
-    __slots__ = ('_dispatcher', 'logger', 'scheduler', '__dict__')
+    __slots__ = ('_dispatcher', 'logger', 'scheduler')
 
     def __init__(self) -> None:
         self._dispatcher: 'Dispatcher' = None  # type: ignore[assignment]
@@ -65,13 +61,8 @@ class JobQueue:
         logging.getLogger('apscheduler.executors.default').addFilter(aps_log_filter)
         self.scheduler.add_listener(self._dispatch_error, EVENT_JOB_ERROR)
 
-    def __setattr__(self, key: str, value: object) -> None:
-        set_new_attribute_deprecated(self, key, value)
-
-    def _build_args(self, job: 'Job') -> List[Union[CallbackContext, 'Bot', 'Job']]:
-        if self._dispatcher.use_context:
-            return [self._dispatcher.context_types.context.from_job(job, self._dispatcher)]
-        return [self._dispatcher.bot, job]
+    def _build_args(self, job: 'Job') -> List[CallbackContext]:
+        return [self._dispatcher.context_types.context.from_job(job, self._dispatcher)]
 
     def _tz_now(self) -> datetime.datetime:
         return datetime.datetime.now(self.scheduler.timezone)
@@ -148,12 +139,7 @@ class JobQueue:
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
-                job. Callback signature for context based API:
-
-                    ``def callback(CallbackContext)``
-
-                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
-                its ``job.context`` or change it to a repeating job.
+                job. Callback signature: ``def callback(update: Update, context: CallbackContext)``
             when (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |                         \
                   :obj:`datetime.datetime` | :obj:`datetime.time`):
                 Time in or at which the job should run. This parameter will be interpreted
@@ -223,12 +209,7 @@ class JobQueue:
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
-                job. Callback signature for context based API:
-
-                    ``def callback(CallbackContext)``
-
-                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
-                its ``job.context`` or change it to a repeating job.
+                job. Callback signature: ``def callback(update: Update, context: CallbackContext)``
             interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta`): The interval in which
                 the job will run. If it is an :obj:`int` or a :obj:`float`, it will be interpreted
                 as seconds.
@@ -308,29 +289,27 @@ class JobQueue:
         day: int,
         context: object = None,
         name: str = None,
-        day_is_strict: bool = True,
         job_kwargs: JSONDict = None,
     ) -> 'Job':
         """Creates a new ``Job`` that runs on a monthly basis and adds it to the queue.
 
+        .. versionchanged:: 14.0
+            The ``day_is_strict`` argument was removed. Instead one can now pass -1 to the ``day``
+            parameter to have the job run on the last day of the month.
+
         Args:
             callback (:obj:`callable`):  The callback function that should be executed by the new
-                job. Callback signature for context based API:
-
-                    ``def callback(CallbackContext)``
-
-                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
-                its ``job.context`` or change it to a repeating job.
+                job. Callback signature: ``def callback(update: Update, context: CallbackContext)``
             when (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
                 (``when.tzinfo``) is :obj:`None`, the default timezone of the bot will be used.
             day (:obj:`int`): Defines the day of the month whereby the job would run. It should
-                be within the range of 1 and 31, inclusive.
+                be within the range of 1 and 31, inclusive. If a month has fewer days than this
+                number, the job will not run in this month. Passing -1 leads to the job running on
+                the last day of the month.
             context (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through ``job.context`` in the callback. Defaults to :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
                 ``callback.__name__``.
-            day_is_strict (:obj:`bool`, optional): If :obj:`False` and day > month.days, will pick
-                the last day in the month. Defaults to :obj:`True`.
             job_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to pass to the
                 ``scheduler.add_job()``.
 
@@ -345,44 +324,18 @@ class JobQueue:
         name = name or callback.__name__
         job = Job(callback, context, name, self)
 
-        if day_is_strict:
-            j = self.scheduler.add_job(
-                callback,
-                trigger='cron',
-                args=self._build_args(job),
-                name=name,
-                day=day,
-                hour=when.hour,
-                minute=when.minute,
-                second=when.second,
-                timezone=when.tzinfo or self.scheduler.timezone,
-                **job_kwargs,
-            )
-        else:
-            trigger = OrTrigger(
-                [
-                    CronTrigger(
-                        day=day,
-                        hour=when.hour,
-                        minute=when.minute,
-                        second=when.second,
-                        timezone=when.tzinfo,
-                        **job_kwargs,
-                    ),
-                    CronTrigger(
-                        day='last',
-                        hour=when.hour,
-                        minute=when.minute,
-                        second=when.second,
-                        timezone=when.tzinfo or self.scheduler.timezone,
-                        **job_kwargs,
-                    ),
-                ]
-            )
-            j = self.scheduler.add_job(
-                callback, trigger=trigger, args=self._build_args(job), name=name, **job_kwargs
-            )
-
+        j = self.scheduler.add_job(
+            callback,
+            trigger='cron',
+            args=self._build_args(job),
+            name=name,
+            day='last' if day == -1 else day,
+            hour=when.hour,
+            minute=when.minute,
+            second=when.second,
+            timezone=when.tzinfo or self.scheduler.timezone,
+            **job_kwargs,
+        )
         job.job = j
         return job
 
@@ -405,12 +358,7 @@ class JobQueue:
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
-                job. Callback signature for context based API:
-
-                    ``def callback(CallbackContext)``
-
-                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
-                its ``job.context`` or change it to a repeating job.
+                job. Callback signature: ``def callback(update: Update, context: CallbackContext)``
             time (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
                 (``time.tzinfo``) is :obj:`None`, the default timezone of the bot will be used.
             days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should
@@ -460,12 +408,7 @@ class JobQueue:
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
-                job. Callback signature for context based API:
-
-                    ``def callback(CallbackContext)``
-
-                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
-                its ``job.context`` or change it to a repeating job.
+                job. Callback signature: ``def callback(update: Update, context: CallbackContext)``
             job_kwargs (:obj:`dict`): Arbitrary keyword arguments. Used as arguments for
                 ``scheduler.add_job``.
             context (:obj:`object`, optional): Additional data needed for the callback function.
@@ -528,12 +471,7 @@ class Job:
 
     Args:
         callback (:obj:`callable`): The callback function that should be executed by the new job.
-            Callback signature for context based API:
-
-                ``def callback(CallbackContext)``
-
-            a ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
-            its ``job.context`` or change it to a repeating job.
+            Callback signature: ``def callback(update: Update, context: CallbackContext)``
         context (:obj:`object`, optional): Additional data needed for the callback function. Can be
             accessed through ``job.context`` in the callback. Defaults to :obj:`None`.
         name (:obj:`str`, optional): The name of the new job. Defaults to ``callback.__name__``.
@@ -557,7 +495,6 @@ class Job:
         '_removed',
         '_enabled',
         'job',
-        '__dict__',
     )
 
     def __init__(
@@ -579,16 +516,10 @@ class Job:
 
         self.job = cast(APSJob, job)  # skipcq: PTC-W0052
 
-    def __setattr__(self, key: str, value: object) -> None:
-        set_new_attribute_deprecated(self, key, value)
-
     def run(self, dispatcher: 'Dispatcher') -> None:
         """Executes the callback function independently of the jobs schedule."""
         try:
-            if dispatcher.use_context:
-                self.callback(dispatcher.context_types.context.from_job(self, dispatcher))
-            else:
-                self.callback(dispatcher.bot, self)  # type: ignore[arg-type,call-arg]
+            self.callback(dispatcher.context_types.context.from_job(self, dispatcher))
         except Exception as exc:
             try:
                 dispatcher.dispatch_error(None, exc)

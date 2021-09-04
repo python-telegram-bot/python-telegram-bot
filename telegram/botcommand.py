@@ -41,7 +41,7 @@ class BotCommand(TelegramObject):
 
     """
 
-    __slots__ = ('description', '_id_attrs', 'command')
+    __slots__ = ('description', 'command')
 
     def __init__(self, command: str, description: str, **_kwargs: Any):
         self.command = command

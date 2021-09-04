@@ -137,20 +137,10 @@ class TestBot:
     """
 
     @pytest.mark.parametrize('inst', ['bot', "default_bot"], indirect=True)
-    def test_slot_behaviour(self, inst, recwarn, mro_slots):
+    def test_slot_behaviour(self, inst, mro_slots):
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not inst.__dict__, f"got missing slots: {inst.__dict__}"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-        inst.custom, inst.base_url = 'should give warning', inst.base_url
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
-
-        class CustomBot(Bot):
-            pass  # Tests that setting custom attributes of Bot subclass doesn't raise warning
-
-        a = CustomBot(inst.token)
-        a.my_custom = 'no error!'
-        assert len(recwarn) == 1
 
     @pytest.mark.parametrize(
         'token',
@@ -195,7 +185,6 @@ class TestBot:
     @flaky(3, 1)
     def test_get_me_and_properties(self, bot):
         get_me_bot = bot.get_me()
-        commands = bot.get_my_commands()
 
         assert isinstance(get_me_bot, User)
         assert get_me_bot.id == bot.id
@@ -207,9 +196,6 @@ class TestBot:
         assert get_me_bot.can_read_all_group_messages == bot.can_read_all_group_messages
         assert get_me_bot.supports_inline_queries == bot.supports_inline_queries
         assert f'https://t.me/{get_me_bot.username}' == bot.link
-        assert commands == bot.commands
-        bot._commands = None
-        assert commands == bot.commands
 
     def test_equality(self):
         a = Bot(FALLBACKS[0]["token"])
@@ -699,12 +685,10 @@ class TestBot:
         'chat_action',
         [
             ChatAction.FIND_LOCATION,
-            ChatAction.RECORD_AUDIO,
             ChatAction.RECORD_VIDEO,
             ChatAction.RECORD_VIDEO_NOTE,
             ChatAction.RECORD_VOICE,
             ChatAction.TYPING,
-            ChatAction.UPLOAD_AUDIO,
             ChatAction.UPLOAD_DOCUMENT,
             ChatAction.UPLOAD_PHOTO,
             ChatAction.UPLOAD_VIDEO,
@@ -1002,18 +986,6 @@ class TestBot:
         assert tz_bot.ban_chat_member(2, 32)
         assert tz_bot.ban_chat_member(2, 32, until_date=until)
         assert tz_bot.ban_chat_member(2, 32, until_date=until_timestamp)
-
-    def test_kick_chat_member_warning(self, monkeypatch, bot, recwarn):
-        def test(url, data, *args, **kwargs):
-            chat_id = data['chat_id'] == 2
-            user_id = data['user_id'] == 32
-            return chat_id and user_id
-
-        monkeypatch.setattr(bot.request, 'post', test)
-        bot.kick_chat_member(2, 32)
-        assert len(recwarn) == 1
-        assert '`bot.kick_chat_member` is deprecated' in str(recwarn[0].message)
-        monkeypatch.delattr(bot.request, 'post')
 
     # TODO: Needs improvement.
     @pytest.mark.parametrize('only_if_banned', [True, False, None])
@@ -1323,7 +1295,7 @@ class TestBot:
 
         monkeypatch.setattr(bot.request, 'post', assertion)
 
-        assert bot.set_webhook(drop_pending_updates=drop_pending_updates)
+        assert bot.set_webhook('', drop_pending_updates=drop_pending_updates)
         assert bot.delete_webhook(drop_pending_updates=drop_pending_updates)
 
     @flaky(3, 1)
@@ -1355,16 +1327,6 @@ class TestBot:
         count = bot.get_chat_member_count(channel_id)
         assert isinstance(count, int)
         assert count > 3
-
-    def test_get_chat_members_count_warning(self, bot, channel_id, recwarn):
-        bot.get_chat_members_count(channel_id)
-        assert len(recwarn) == 1
-        assert '`bot.get_chat_members_count` is deprecated' in str(recwarn[0].message)
-
-    def test_bot_command_property_warning(self, bot, recwarn):
-        _ = bot.commands
-        assert len(recwarn) == 1
-        assert 'Bot.commands has been deprecated since there can' in str(recwarn[0].message)
 
     @flaky(3, 1)
     def test_get_chat_member(self, bot, channel_id, chat_id):
@@ -1789,7 +1751,6 @@ class TestBot:
     def test_set_chat_description(self, bot, channel_id):
         assert bot.set_chat_description(channel_id, 'Time: ' + str(time.time()))
 
-    # TODO: Add bot to group to test there too
     @flaky(3, 1)
     def test_pin_and_unpin_message(self, bot, super_group_id):
         message1 = bot.send_message(super_group_id, text="test_pin_message_1")
@@ -1932,39 +1893,14 @@ class TestBot:
 
     @flaky(3, 1)
     def test_set_and_get_my_commands(self, bot):
-        commands = [
-            BotCommand('cmd1', 'descr1'),
-            BotCommand('cmd2', 'descr2'),
-        ]
+        commands = [BotCommand('cmd1', 'descr1'), ['cmd2', 'descr2']]
         bot.set_my_commands([])
         assert bot.get_my_commands() == []
-        assert bot.commands == []
         assert bot.set_my_commands(commands)
 
-        for bc in [bot.get_my_commands(), bot.commands]:
-            assert len(bc) == 2
-            assert bc[0].command == 'cmd1'
-            assert bc[0].description == 'descr1'
-            assert bc[1].command == 'cmd2'
-            assert bc[1].description == 'descr2'
-
-    @flaky(3, 1)
-    def test_set_and_get_my_commands_strings(self, bot):
-        commands = [
-            ['cmd1', 'descr1'],
-            ['cmd2', 'descr2'],
-        ]
-        bot.set_my_commands([])
-        assert bot.get_my_commands() == []
-        assert bot.commands == []
-        assert bot.set_my_commands(commands)
-
-        for bc in [bot.get_my_commands(), bot.commands]:
-            assert len(bc) == 2
-            assert bc[0].command == 'cmd1'
-            assert bc[0].description == 'descr1'
-            assert bc[1].command == 'cmd2'
-            assert bc[1].description == 'descr2'
+        for i, bc in enumerate(bot.get_my_commands()):
+            assert bc.command == f'cmd{i+1}'
+            assert bc.description == f'descr{i+1}'
 
     @flaky(3, 1)
     def test_get_set_delete_my_commands_with_scope(self, bot, super_group_id, chat_id):
@@ -1987,9 +1923,6 @@ class TestBot:
         assert len(gotten_private_cmd) == len(private_cmds)
         assert gotten_private_cmd[0].command == private_cmds[0].command
 
-        assert len(bot.commands) == 2  # set from previous test. Makes sure this hasn't changed.
-        assert bot.commands[0].command == 'cmd1'
-
         # Delete command list from that supergroup and private chat-
         bot.delete_my_commands(private_scope)
         bot.delete_my_commands(group_scope, 'en')
@@ -2002,7 +1935,7 @@ class TestBot:
         assert len(deleted_priv_cmds) == 0 == len(private_cmds) - 1
 
         bot.delete_my_commands()  # Delete commands from default scope
-        assert not bot.commands  # Check if this has been updated to reflect the deletion.
+        assert len(bot.get_my_commands()) == 0
 
     def test_log_out(self, monkeypatch, bot):
         # We don't actually make a request as to not break the test setup

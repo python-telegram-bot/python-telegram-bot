@@ -57,7 +57,7 @@ class BotCommandScope(TelegramObject):
         type (:obj:`str`): Scope type.
     """
 
-    __slots__ = ('type', '_id_attrs')
+    __slots__ = ('type',)
 
     DEFAULT = constants.BOT_COMMAND_SCOPE_DEFAULT
     """:const:`telegram.constants.BOT_COMMAND_SCOPE_DEFAULT`"""

@@ -1,6 +1,6 @@
 [tool.black]
 line-length = 99
-target-version = ['py36']
+target-version = ['py37']
 skip-string-normalization = true
 
 # We need to force-exclude the negated include pattern

@@ -35,6 +35,7 @@ from urllib.request import Request, urlopen
 from urllib.error import HTTPError
 
 import pytest
+from .conftest import DictBot
 
 from telegram import (
     TelegramError,
@@ -90,24 +91,11 @@ class TestUpdater:
     offset = 0
     test_flag = False
 
-    def test_slot_behaviour(self, updater, mro_slots, recwarn):
+    def test_slot_behaviour(self, updater, mro_slots):
         for at in updater.__slots__:
             at = f"_Updater{at}" if at.startswith('__') and not at.endswith('__') else at
             assert getattr(updater, at, 'err') != 'err', f"got extra slot '{at}'"
-        assert not updater.__dict__, f"got missing slot(s): {updater.__dict__}"
         assert len(mro_slots(updater)) == len(set(mro_slots(updater))), "duplicate slot"
-        updater.custom, updater.running = 'should give warning', updater.running
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
-
-        class CustomUpdater(Updater):
-            pass  # Tests that setting custom attributes of Updater subclass doesn't raise warning
-
-        a = CustomUpdater(updater.bot.token)
-        a.my_custom = 'no error!'
-        assert len(recwarn) == 1
-
-        updater.__setattr__('__test', 'mangled success')
-        assert getattr(updater, '_Updater__test', 'e') == 'mangled success', "mangling failed"
 
     @pytest.fixture(autouse=True)
     def reset(self):
@@ -118,11 +106,11 @@ class TestUpdater:
         self.cb_handler_called.clear()
         self.test_flag = False
 
-    def error_handler(self, bot, update, error):
-        self.received = error.message
+    def error_handler(self, update, context):
+        self.received = context.error.message
         self.err_handler_called.set()
 
-    def callback(self, bot, update):
+    def callback(self, update, context):
         self.received = update.message.text
         self.cb_handler_called.set()
 
@@ -213,7 +201,7 @@ class TestUpdater:
         if ext_bot and not isinstance(updater.bot, ExtBot):
             updater.bot = ExtBot(updater.bot.token)
         if not ext_bot and not type(updater.bot) is Bot:
-            updater.bot = Bot(updater.bot.token)
+            updater.bot = DictBot(updater.bot.token)
 
         q = Queue()
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
@@ -313,7 +301,6 @@ class TestUpdater:
         monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
         # prevent api calls from @info decorator when updater.bot.id is used in thread names
         monkeypatch.setattr(updater.bot, '_bot', User(id=123, first_name='bot', is_bot=True))
-        monkeypatch.setattr(updater.bot, '_commands', [])
 
         ip = '127.0.0.1'
         port = randrange(1024, 49152)  # Select random port
@@ -492,59 +479,6 @@ class TestUpdater:
         )
         assert self.test_flag is True
 
-    def test_deprecation_warnings_start_webhook(self, recwarn, updater, monkeypatch):
-        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
-        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
-        # prevent api calls from @info decorator when updater.bot.id is used in thread names
-        monkeypatch.setattr(updater.bot, '_bot', User(id=123, first_name='bot', is_bot=True))
-        monkeypatch.setattr(updater.bot, '_commands', [])
-
-        ip = '127.0.0.1'
-        port = randrange(1024, 49152)  # Select random port
-        updater.start_webhook(ip, port, clean=True, force_event_loop=False)
-        updater.stop()
-
-        for warning in recwarn:
-            print(warning)
-
-        try:  # This is for flaky tests (there's an unclosed socket sometimes)
-            recwarn.pop(ResourceWarning)  # internally iterates through recwarn.list and deletes it
-        except AssertionError:
-            pass
-
-        assert len(recwarn) == 3
-        assert str(recwarn[0].message).startswith('Old Handler API')
-        assert str(recwarn[1].message).startswith('The argument `clean` of')
-        assert str(recwarn[2].message).startswith('The argument `force_event_loop` of')
-
-    def test_clean_deprecation_warning_polling(self, recwarn, updater, monkeypatch):
-        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
-        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
-        # prevent api calls from @info decorator when updater.bot.id is used in thread names
-        monkeypatch.setattr(updater.bot, '_bot', User(id=123, first_name='bot', is_bot=True))
-        monkeypatch.setattr(updater.bot, '_commands', [])
-
-        updater.start_polling(clean=True)
-        updater.stop()
-        for msg in recwarn:
-            print(msg)
-
-        try:  # This is for flaky tests (there's an unclosed socket sometimes)
-            recwarn.pop(ResourceWarning)  # internally iterates through recwarn.list and deletes it
-        except AssertionError:
-            pass
-
-        assert len(recwarn) == 2
-        assert str(recwarn[0].message).startswith('Old Handler API')
-        assert str(recwarn[1].message).startswith('The argument `clean` of')
-
-    def test_clean_drop_pending_mutually_exclusive(self, updater):
-        with pytest.raises(TypeError, match='`clean` and `drop_pending_updates` are mutually'):
-            updater.start_polling(clean=True, drop_pending_updates=False)
-
-        with pytest.raises(TypeError, match='`clean` and `drop_pending_updates` are mutually'):
-            updater.start_webhook(clean=True, drop_pending_updates=False)
-
     @flaky(3, 1)
     def test_webhook_invalid_posts(self, updater):
         ip = '127.0.0.1'
@@ -706,12 +640,6 @@ class TestUpdater:
         dispatcher = Dispatcher(bot, None)
         with pytest.raises(ValueError):
             Updater(dispatcher=dispatcher, workers=8)
-
-    def test_mutual_exclude_use_context_dispatcher(self, bot):
-        dispatcher = Dispatcher(bot, None)
-        use_context = not dispatcher.use_context
-        with pytest.raises(ValueError):
-            Updater(dispatcher=dispatcher, use_context=use_context)
 
     def test_mutual_exclude_custom_context_dispatcher(self):
         dispatcher = Dispatcher(None, None)

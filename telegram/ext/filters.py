@@ -20,10 +20,8 @@
 """This module contains the Filters for use with the MessageHandler class."""
 
 import re
-import warnings
 
 from abc import ABC, abstractmethod
-from sys import version_info as py_ver
 from threading import Lock
 from typing import (
     Dict,
@@ -51,7 +49,6 @@ __all__ = [
     'XORFilter',
 ]
 
-from telegram.utils.deprecate import TelegramDeprecationWarning, set_new_attribute_deprecated
 from telegram.utils.types import SLT
 
 DataDict = Dict[str, list]
@@ -113,12 +110,10 @@ class BaseFilter(ABC):
             (depends on the handler).
     """
 
-    if py_ver < (3, 7):
-        __slots__ = ('_name', '_data_filter')
-    else:
-        __slots__ = ('_name', '_data_filter', '__dict__')  # type: ignore[assignment]
+    __slots__ = ('_name', '_data_filter')
 
     def __new__(cls, *args: object, **kwargs: object) -> 'BaseFilter':  # pylint: disable=W0613
+        # We do this here instead of in a __init__ so filter don't have to call __init__ or super()
         instance = super().__new__(cls)
         instance._name = None
         instance._data_filter = False
@@ -140,18 +135,6 @@ class BaseFilter(ABC):
 
     def __invert__(self) -> 'BaseFilter':
         return InvertedFilter(self)
-
-    def __setattr__(self, key: str, value: object) -> None:
-        # Allow setting custom attributes w/o warning for user defined custom filters.
-        # To differentiate between a custom and a PTB filter, we use this hacky but
-        # simple way of checking the module name where the class is defined from.
-        if (
-            issubclass(self.__class__, (UpdateFilter, MessageFilter))
-            and self.__class__.__module__ != __name__
-        ):  # __name__ is telegram.ext.filters
-            object.__setattr__(self, key, value)
-            return
-        set_new_attribute_deprecated(self, key, value)
 
     @property
     def data_filter(self) -> bool:
@@ -437,10 +420,7 @@ class Filters:
 
     """
 
-    __slots__ = ('__dict__',)
-
-    def __setattr__(self, key: str, value: object) -> None:
-        set_new_attribute_deprecated(self, key, value)
+    __slots__ = ()
 
     class _All(MessageFilter):
         __slots__ = ()
@@ -1324,48 +1304,6 @@ officedocument.wordprocessingml.document")``.
         def filter(self, message: Message) -> bool:
             """"""  # remove method from docs
             return any(entity.type == self.entity_type for entity in message.caption_entities)
-
-    class _Private(MessageFilter):
-        __slots__ = ()
-        name = 'Filters.private'
-
-        def filter(self, message: Message) -> bool:
-            warnings.warn(
-                'Filters.private is deprecated. Use Filters.chat_type.private instead.',
-                TelegramDeprecationWarning,
-                stacklevel=2,
-            )
-            return message.chat.type == Chat.PRIVATE
-
-    private = _Private()
-    """
-    Messages sent in a private chat.
-
-    Note:
-        DEPRECATED. Use
-        :attr:`telegram.ext.Filters.chat_type.private` instead.
-    """
-
-    class _Group(MessageFilter):
-        __slots__ = ()
-        name = 'Filters.group'
-
-        def filter(self, message: Message) -> bool:
-            warnings.warn(
-                'Filters.group is deprecated. Use Filters.chat_type.groups instead.',
-                TelegramDeprecationWarning,
-                stacklevel=2,
-            )
-            return message.chat.type in [Chat.GROUP, Chat.SUPERGROUP]
-
-    group = _Group()
-    """
-    Messages sent in a group or a supergroup chat.
-
-    Note:
-        DEPRECATED. Use
-        :attr:`telegram.ext.Filters.chat_type.groups` instead.
-    """
 
     class _ChatType(MessageFilter):
         __slots__ = ()

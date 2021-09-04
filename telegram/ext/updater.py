@@ -42,7 +42,7 @@ from typing import (
 from telegram import Bot, TelegramError
 from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized
 from telegram.ext import Dispatcher, JobQueue, ContextTypes, ExtBot
-from telegram.utils.deprecate import TelegramDeprecationWarning, set_new_attribute_deprecated
+from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import get_signal_name, DEFAULT_FALSE, DefaultValue
 from telegram.utils.request import Request
 from telegram.ext.utils.types import CCT, UD, CD, BD
@@ -93,9 +93,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
             `telegram.utils.request.Request` object (ignored if `bot` or `dispatcher` argument is
             used). The request_kwargs are very useful for the advanced users who would like to
             control the default timeouts and/or control the proxy used for http communication.
-        use_context (:obj:`bool`, optional): If set to :obj:`True` uses the context based callback
-            API (ignored if `dispatcher` argument is used). Defaults to :obj:`True`.
-            **New users**: set this to :obj:`True`.
         persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
             store data that should be persistent over restarts (ignored if `dispatcher` argument is
             used).
@@ -129,7 +126,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
         running (:obj:`bool`): Indicates if the updater is running.
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
             store data that should be persistent over restarts.
-        use_context (:obj:`bool`): Optional. :obj:`True` if using context based callbacks.
 
     """
 
@@ -149,7 +145,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
         'httpd',
         '__lock',
         '__threads',
-        '__dict__',
     )
 
     @overload
@@ -165,7 +160,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
         request_kwargs: Dict[str, Any] = None,
         persistence: 'BasePersistence' = None,  # pylint: disable=E0601
         defaults: 'Defaults' = None,
-        use_context: bool = True,
         base_file_url: str = None,
         arbitrary_callback_data: Union[DefaultValue, bool, int, None] = DEFAULT_FALSE,
     ):
@@ -184,7 +178,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
         request_kwargs: Dict[str, Any] = None,
         persistence: 'BasePersistence' = None,
         defaults: 'Defaults' = None,
-        use_context: bool = True,
         base_file_url: str = None,
         arbitrary_callback_data: Union[DefaultValue, bool, int, None] = DEFAULT_FALSE,
         context_types: ContextTypes[CCT, UD, CD, BD] = None,
@@ -211,7 +204,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
         request_kwargs: Dict[str, Any] = None,
         persistence: 'BasePersistence' = None,
         defaults: 'Defaults' = None,
-        use_context: bool = True,
         dispatcher=None,
         base_file_url: str = None,
         arbitrary_callback_data: Union[DefaultValue, bool, int, None] = DEFAULT_FALSE,
@@ -244,8 +236,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 raise ValueError('`dispatcher` and `bot` are mutually exclusive')
             if persistence is not None:
                 raise ValueError('`dispatcher` and `persistence` are mutually exclusive')
-            if use_context != dispatcher.use_context:
-                raise ValueError('`dispatcher` and `use_context` are mutually exclusive')
             if context_types is not None:
                 raise ValueError('`dispatcher` and `context_types` are mutually exclusive')
             if workers is not None:
@@ -301,7 +291,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 workers=workers,
                 exception_event=self.__exception_event,
                 persistence=persistence,
-                use_context=use_context,
                 context_types=context_types,
             )
             self.job_queue.set_dispatcher(self.dispatcher)
@@ -328,14 +317,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
         self.__lock = Lock()
         self.__threads: List[Thread] = []
 
-    def __setattr__(self, key: str, value: object) -> None:
-        if key.startswith('__'):
-            key = f"_{self.__class__.__name__}{key}"
-        if issubclass(self.__class__, Updater) and self.__class__ is not Updater:
-            object.__setattr__(self, key, value)
-            return
-        set_new_attribute_deprecated(self, key, value)
-
     def _init_thread(self, target: Callable, name: str, *args: object, **kwargs: object) -> None:
         thr = Thread(
             target=self._thread_wrapper,
@@ -361,13 +342,15 @@ class Updater(Generic[CCT, UD, CD, BD]):
         self,
         poll_interval: float = 0.0,
         timeout: float = 10,
-        clean: bool = None,
         bootstrap_retries: int = -1,
         read_latency: float = 2.0,
         allowed_updates: List[str] = None,
         drop_pending_updates: bool = None,
     ) -> Optional[Queue]:
         """Starts polling updates from Telegram.
+
+        .. versionchanged:: 14.0
+            Removed the ``clean`` argument in favor of ``drop_pending_updates``.
 
         Args:
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
@@ -377,10 +360,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 Telegram servers before actually starting to poll. Default is :obj:`False`.
 
                 .. versionadded :: 13.4
-            clean (:obj:`bool`, optional): Alias for ``drop_pending_updates``.
-
-                .. deprecated:: 13.4
-                    Use ``drop_pending_updates`` instead.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 :class:`telegram.ext.Updater` will retry on failures on the Telegram server.
 
@@ -398,19 +377,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
             :obj:`Queue`: The update queue that can be filled from the main thread.
 
         """
-        if (clean is not None) and (drop_pending_updates is not None):
-            raise TypeError('`clean` and `drop_pending_updates` are mutually exclusive.')
-
-        if clean is not None:
-            warnings.warn(
-                'The argument `clean` of `start_polling` is deprecated. Please use '
-                '`drop_pending_updates` instead.',
-                category=TelegramDeprecationWarning,
-                stacklevel=2,
-            )
-
-        drop_pending_updates = drop_pending_updates if drop_pending_updates is not None else clean
-
         with self.__lock:
             if not self.running:
                 self.running = True
@@ -447,11 +413,9 @@ class Updater(Generic[CCT, UD, CD, BD]):
         url_path: str = '',
         cert: str = None,
         key: str = None,
-        clean: bool = None,
         bootstrap_retries: int = 0,
         webhook_url: str = None,
         allowed_updates: List[str] = None,
-        force_event_loop: bool = None,
         drop_pending_updates: bool = None,
         ip_address: str = None,
         max_connections: int = 40,
@@ -467,6 +431,10 @@ class Updater(Generic[CCT, UD, CD, BD]):
             :meth:`start_webhook` now *always* calls :meth:`telegram.Bot.set_webhook`, so pass
             ``webhook_url`` instead of calling ``updater.bot.set_webhook(webhook_url)`` manually.
 
+        .. versionchanged:: 14.0
+            Removed the ``clean`` argument in favor of ``drop_pending_updates`` and removed the
+            deprecated argument ``force_event_loop``.
+
         Args:
             listen (:obj:`str`, optional): IP-Address to listen on. Default ``127.0.0.1``.
             port (:obj:`int`, optional): Port the bot should be listening on. Default ``80``.
@@ -477,10 +445,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 Telegram servers before actually starting to poll. Default is :obj:`False`.
 
                 .. versionadded :: 13.4
-            clean (:obj:`bool`, optional): Alias for ``drop_pending_updates``.
-
-                .. deprecated:: 13.4
-                    Use ``drop_pending_updates`` instead.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 :class:`telegram.ext.Updater` will retry on failures on the Telegram server.
 
@@ -496,13 +460,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 .. versionadded :: 13.4
             allowed_updates (List[:obj:`str`], optional): Passed to
                 :meth:`telegram.Bot.set_webhook`.
-            force_event_loop (:obj:`bool`, optional): Legacy parameter formerly used for a
-                workaround on Windows + Python 3.8+. No longer has any effect.
-
-                .. deprecated:: 13.6
-                   Since version 13.6, ``tornade>=6.1`` is required, which resolves the former
-                   issue.
-
             max_connections (:obj:`int`, optional): Passed to
                 :meth:`telegram.Bot.set_webhook`.
 
@@ -512,27 +469,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
             :obj:`Queue`: The update queue that can be filled from the main thread.
 
         """
-        if (clean is not None) and (drop_pending_updates is not None):
-            raise TypeError('`clean` and `drop_pending_updates` are mutually exclusive.')
-
-        if clean is not None:
-            warnings.warn(
-                'The argument `clean` of `start_webhook` is deprecated. Please use '
-                '`drop_pending_updates` instead.',
-                category=TelegramDeprecationWarning,
-                stacklevel=2,
-            )
-
-        if force_event_loop is not None:
-            warnings.warn(
-                'The argument `force_event_loop` of `start_webhook` is deprecated and no longer '
-                'has any effect.',
-                category=TelegramDeprecationWarning,
-                stacklevel=2,
-            )
-
-        drop_pending_updates = drop_pending_updates if drop_pending_updates is not None else clean
-
         with self.__lock:
             if not self.running:
                 self.running = True
