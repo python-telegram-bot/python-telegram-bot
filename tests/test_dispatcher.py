@@ -58,12 +58,6 @@ class TestDispatcher:
     received = None
     count = 0
 
-    def test_slot_behaviour(self, dp2, mro_slots):
-        for at in dp2.__slots__:
-            at = f"_Dispatcher{at}" if at.startswith('__') and not at.endswith('__') else at
-            assert getattr(dp2, at, 'err') != 'err', f"got extra slot '{at}'"
-        assert len(mro_slots(dp2)) == len(set(mro_slots(dp2))), "duplicate slot"
-
     @pytest.fixture(autouse=True, name='reset')
     def reset_fixture(self):
         self.reset()
@@ -103,6 +97,12 @@ class TestDispatcher:
         ):
             self.received = context.error.message
 
+    def test_slot_behaviour(self, dp2, mro_slots):
+        for at in dp2.__slots__:
+            at = f"_Dispatcher{at}" if at.startswith('__') and not at.endswith('__') else at
+            assert getattr(dp2, at, 'err') != 'err', f"got extra slot '{at}'"
+        assert len(mro_slots(dp2)) == len(set(mro_slots(dp2))), "duplicate slot"
+
     def test_manual_init_warning(self, recwarn):
         Dispatcher(
             bot=None,
@@ -126,6 +126,15 @@ class TestDispatcher:
             str(recwarn[0].message)
             == 'Asynchronous callbacks can not be processed without at least one worker thread.'
         )
+
+    def test_builder(self, dp):
+        builder_1 = dp.builder()
+        builder_2 = dp.builder()
+        assert isinstance(builder_1, DispatcherBuilder)
+        assert isinstance(builder_2, DispatcherBuilder)
+        assert builder_1 is not builder_2
+        assert not builder_1._token_was_set
+        assert not builder_2._token_was_set
 
     def test_one_context_per_update(self, dp):
         def one(update, context):

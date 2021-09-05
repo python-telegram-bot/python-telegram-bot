@@ -22,7 +22,7 @@ from telegram.ext import (
     TypeHandler,
     Dispatcher,
     ExtBot,
-    UpdaterBuilder,
+    Updater,
 )
 
 
@@ -113,7 +113,7 @@ def track_users(update: Update, context: CustomContext) -> None:
 def main() -> None:
     """Run the bot."""
     context_types = ContextTypes(context=CustomContext, chat_data=ChatData)
-    updater = UpdaterBuilder().token("TOKEN").context_types(context_types).build()
+    updater = Updater.builder().token("TOKEN").context_types(context_types).build()
 
     dispatcher = updater.dispatcher
     # run track_users in its own group to not interfere with the user handlers

@@ -22,7 +22,7 @@ from telegram.ext import (
     CommandHandler,
     MessageHandler,
     Filters,
-    UpdaterBuilder,
+    Updater,
 )
 
 from telegram.ext.utils.types import DefaultContextType
@@ -58,7 +58,7 @@ def echo(update: Update, context: DefaultContextType) -> None:
 def main() -> None:
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = UpdaterBuilder().token("TOKEN").build()
+    updater = Updater.builder().token("TOKEN").build()
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher

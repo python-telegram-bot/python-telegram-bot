@@ -12,7 +12,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import (
     CommandHandler,
     CallbackQueryHandler,
-    UpdaterBuilder,
+    Updater,
 )
 from telegram.ext.utils.types import DefaultContextType
 
@@ -57,7 +57,7 @@ def help_command(update: Update, context: DefaultContextType) -> None:
 def main() -> None:
     """Run the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = UpdaterBuilder().token("TOKEN").build()
+    updater = Updater.builder().token("TOKEN").build()
 
     updater.dispatcher.add_handler(CommandHandler('start', start))
     updater.dispatcher.add_handler(CallbackQueryHandler(button))

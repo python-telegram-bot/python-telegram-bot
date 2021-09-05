@@ -19,7 +19,7 @@ from telegram import InlineQueryResultArticle, ParseMode, InputTextMessageConten
 from telegram.ext import (
     InlineQueryHandler,
     CommandHandler,
-    UpdaterBuilder,
+    Updater,
 )
 from telegram.ext.utils.types import DefaultContextType
 from telegram.utils.helpers import escape_markdown
@@ -78,7 +78,7 @@ def inlinequery(update: Update, context: DefaultContextType) -> None:
 def main() -> None:
     """Run the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = UpdaterBuilder().token("TOKEN").build()
+    updater = Updater.builder().token("TOKEN").build()
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher

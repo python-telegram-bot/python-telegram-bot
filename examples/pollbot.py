@@ -24,7 +24,7 @@ from telegram.ext import (
     PollHandler,
     MessageHandler,
     Filters,
-    UpdaterBuilder,
+    Updater,
 )
 from telegram.ext.utils.types import DefaultContextType
 
@@ -154,7 +154,7 @@ def help_handler(update: Update, context: DefaultContextType) -> None:
 def main() -> None:
     """Run bot."""
     # Create the Updater and pass it your bot's token.
-    updater = UpdaterBuilder().token("TOKEN").build()
+    updater = Updater.builder().token("TOKEN").build()
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(CommandHandler('poll', poll))

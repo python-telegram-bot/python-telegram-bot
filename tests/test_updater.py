@@ -52,6 +52,7 @@ from telegram.ext import (
     InvalidCallbackData,
     ExtBot,
     Updater,
+    UpdaterBuilder,
 )
 from telegram.ext.utils.webhookhandler import WebhookServer
 
@@ -123,6 +124,15 @@ class TestUpdater:
             str(recwarn[-1].message)
             == '`Updater` instances should be built via the `UpdaterBuilder`.'
         )
+
+    def test_builder(self, updater):
+        builder_1 = updater.builder()
+        builder_2 = updater.builder()
+        assert isinstance(builder_1, UpdaterBuilder)
+        assert isinstance(builder_2, UpdaterBuilder)
+        assert builder_1 is not builder_2
+        assert not builder_1._token_was_set
+        assert not builder_2._token_was_set
 
     @pytest.mark.parametrize(
         ('error',),

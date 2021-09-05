@@ -24,7 +24,7 @@ from telegram.ext import (
     Filters,
     ConversationHandler,
     CallbackQueryHandler,
-    UpdaterBuilder,
+    Updater,
 )
 
 from telegram.ext.utils.types import DefaultContextType
@@ -303,7 +303,7 @@ def stop_nested(update: Update, context: DefaultContextType) -> str:
 def main() -> None:
     """Run the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = UpdaterBuilder().token("TOKEN").build()
+    updater = Updater.builder().token("TOKEN").build()
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher

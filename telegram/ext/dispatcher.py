@@ -36,6 +36,7 @@ from typing import (
     Generic,
     TypeVar,
     cast,
+    TYPE_CHECKING,
 )
 from uuid import uuid4
 
@@ -46,6 +47,9 @@ from telegram.ext.callbackdatacache import CallbackDataCache
 from telegram.ext.utils.promise import Promise
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 from telegram.ext.utils.types import CCT, UD, CD, BD, BT, JQ, PT
+
+if TYPE_CHECKING:
+    from .builders import InitDispatcherBuilder
 
 DEFAULT_GROUP: int = 0
 
@@ -81,9 +85,11 @@ class DispatcherHandlerStop(Exception):
 
 class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
     """This class dispatches all kinds of updates to its registered handlers.
-
     Note:
-        Must be initialized via :class:`telegram.ext.DispatcherBuilder`.
+        Must be initialized via :class:`telegram.ext.DispatcherBuilder` - see :meth:`builder`.
+
+    versionchanged:: 14.0
+        Initialization is now done through the :class:`telegram.ext.DispatcherBuilder`.
 
     Attributes:
         bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
@@ -116,6 +122,10 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
 
             .. seealso::
                 :meth:`add_error_handler`
+        running (:obj:`bool`): Indicates if this dispatcher is running.
+
+            .. seealso::
+                :meth:`start`, :meth:`stop`
 
     """
 
@@ -213,15 +223,10 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             self.persistence = None
 
         self.handlers: Dict[int, List[Handler]] = {}
-        """Dict[:obj:`int`, List[:class:`telegram.ext.Handler`]]: Holds the handlers per group."""
         self.groups: List[int] = []
-        """List[:obj:`int`]: A list with all groups."""
         self.error_handlers: Dict[Callable, Union[bool, DefaultValue]] = {}
-        """Dict[:obj:`callable`, :obj:`bool`]: A dict, where the keys are error handlers and the
-        values indicate whether they are to be run asynchronously."""
 
         self.running = False
-        """:obj:`bool`: Indicates if this dispatcher is running."""
         self.__stop_event = Event()
         self.__async_queue: Queue = Queue()
         self.__async_threads: Set[Thread] = set()
@@ -233,6 +238,17 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
                 self._set_singleton(self)
             else:
                 self._set_singleton(None)
+
+    @staticmethod
+    def builder() -> 'InitDispatcherBuilder':
+        """Convenience method. Returns an empty :class:`telegram.ext.DispatcherBuilder`.
+
+        .. versionadded:: 14.0
+        """
+        # Unfortunately this needs to be here due to cyclical imports
+        from telegram.ext import DispatcherBuilder  # pylint: disable=C0415
+
+        return DispatcherBuilder()
 
     def _init_async_threads(self, base_name: str, workers: int) -> None:
         base_name = f'{base_name}_' if base_name else ''

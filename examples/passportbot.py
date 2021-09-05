@@ -13,7 +13,7 @@ See https://git.io/fAvYd for how to use Telegram Passport properly with python-t
 import logging
 
 from telegram import Update
-from telegram.ext import MessageHandler, Filters, UpdaterBuilder
+from telegram.ext import MessageHandler, Filters, Updater
 
 # Enable logging
 from telegram.ext.utils.types import DefaultContextType
@@ -104,7 +104,7 @@ def main() -> None:
     """Start the bot."""
     # Create the Updater and pass it your token and private key
     with open('private.key', 'rb') as private_key:
-        updater = UpdaterBuilder().token("TOKEN").private_key(private_key.read()).build()
+        updater = Updater.builder().token("TOKEN").private_key(private_key.read()).build()
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher

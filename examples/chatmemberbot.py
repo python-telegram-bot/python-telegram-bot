@@ -18,7 +18,7 @@ from telegram import Update, Chat, ChatMember, ParseMode, ChatMemberUpdated
 from telegram.ext import (
     CommandHandler,
     ChatMemberHandler,
-    UpdaterBuilder,
+    Updater,
 )
 
 # Enable logging
@@ -140,7 +140,7 @@ def greet_chat_members(update: Update, context: DefaultContextType) -> None:
 def main() -> None:
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = UpdaterBuilder().token("TOKEN").build()
+    updater = Updater.builder().token("TOKEN").build()
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher

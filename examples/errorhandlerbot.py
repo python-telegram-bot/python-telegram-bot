@@ -9,7 +9,7 @@ import logging
 import traceback
 
 from telegram import Update, ParseMode
-from telegram.ext import CommandHandler, UpdaterBuilder
+from telegram.ext import CommandHandler, Updater
 from telegram.ext.utils.types import DefaultContextType
 
 # Enable logging
@@ -68,7 +68,7 @@ def start(update: Update, context: DefaultContextType) -> None:
 def main() -> None:
     """Run the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = UpdaterBuilder().token(BOT_TOKEN).build()
+    updater = Updater.builder().token(BOT_TOKEN).build()
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher

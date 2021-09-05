@@ -15,7 +15,7 @@ from telegram.ext import (
     CallbackQueryHandler,
     InvalidCallbackData,
     PicklePersistence,
-    UpdaterBuilder,
+    Updater,
 )
 from telegram.ext.utils.types import DefaultContextType
 
@@ -88,7 +88,7 @@ def main() -> None:
     persistence = PicklePersistence(filename='arbitrarycallbackdatabot.pickle')
     # Create the Updater and pass it your bot's token.
     updater = (
-        UpdaterBuilder()
+        Updater.builder()
         .token("TOKEN")
         .persistence(persistence)
         .arbitrary_callback_data(True)

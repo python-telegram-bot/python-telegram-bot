@@ -13,7 +13,7 @@ from telegram.ext import (
     Filters,
     PreCheckoutQueryHandler,
     ShippingQueryHandler,
-    UpdaterBuilder,
+    Updater,
 )
 
 from telegram.ext.utils.types import DefaultContextType
@@ -130,7 +130,7 @@ def successful_payment_callback(update: Update, context: DefaultContextType) -> 
 def main() -> None:
     """Run the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = UpdaterBuilder().token("TOKEN").build()
+    updater = Updater.builder().token("TOKEN").build()
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher

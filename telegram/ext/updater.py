@@ -36,6 +36,7 @@ from typing import (
     Generic,
     TypeVar,
     cast,
+    TYPE_CHECKING,
 )
 
 from telegram import TelegramError
@@ -44,6 +45,9 @@ from telegram.ext import Dispatcher
 from telegram.utils.helpers import get_signal_name
 from telegram.ext.utils.types import BT
 from telegram.ext.utils.webhookhandler import WebhookAppClass, WebhookServer
+
+if TYPE_CHECKING:
+    from .builders import InitUpdaterBuilder
 
 
 DT = TypeVar('DT', bound=Union[None, Dispatcher])
@@ -59,14 +63,28 @@ class Updater(Generic[BT, DT]):
     commands and even arbitrary types. The updater can be started as a polling service or, for
     production, use a webhook to receive updates. This is achieved using the WebhookServer and
     WebhookHandler classes.
+    Note:
+        Must be initialized via :class:`telegram.ext.UpdaterBuilder` - see :meth:`builder`.
+
+    versionchanged:: 14.0
+        * Initialization is now done through the :class:`telegram.ext.UpdaterBuilder`.
 
     Note:
-        Must be initialized via :class:`telegram.ext.DispatcherBuilder`.
+        Must be initialized via :class:`telegram.ext.UpdaterBuilder` - see :meth:`builder`.
+
+    versionchanged:: 14.0
+        * Initialization is now done through the :class:`telegram.ext.UpdaterBuilder`.
+        * Renamed ``user_sig_handler`` to :attr:`user_signal_handler`.
+        * Removed the attributes ``job_queue``, and ``persistence`` - use the corresponding
+          attributes of :attr:`dispatcher` instead.
 
     Attributes:
         bot (:class:`telegram.Bot`): The bot used with this Updater.
         user_signal_handler (:obj:`function`): Optional. Function to be called when a signal is
             received.
+
+            .. versionchanged:: 14.0
+                Renamed ``user_sig_handler`` to ``user_signal_handler``.
         update_queue (:obj:`Queue`): Queue for the updates.
         dispatcher (:class:`telegram.ext.Dispatcher`): Optional. Dispatcher that handles the
             updates and dispatches them to the handlers.
@@ -74,6 +92,8 @@ class Updater(Generic[BT, DT]):
         exception_event (:class:`threading.Event`): When an unhandled exception happens while
             fetching updates, this event will be set. If :attr:`dispatcher` is not :obj:`None`, it
             is the same object as :attr:`telegram.ext.Dispatcher.exception_event`.
+
+            .. versionadded:: 14.0
 
     """
 
@@ -120,6 +140,17 @@ class Updater(Generic[BT, DT]):
         self.__lock = Lock()
         self.__threads: List[Thread] = []
         self.logger = logging.getLogger(__name__)
+
+    @staticmethod
+    def builder() -> 'InitUpdaterBuilder':
+        """Convenience method. Returns an empty :class:`telegram.ext.UpdaterBuilder`.
+
+        .. versionadded:: 14.0
+        """
+        # Unfortunately this needs to be here due to cyclical imports
+        from telegram.ext import UpdaterBuilder  # pylint: disable=C0415
+
+        return UpdaterBuilder()
 
     def _init_thread(self, target: Callable, name: str, *args: object, **kwargs: object) -> None:
         thr = Thread(

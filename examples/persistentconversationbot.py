@@ -24,7 +24,7 @@ from telegram.ext import (
     Filters,
     ConversationHandler,
     PicklePersistence,
-    UpdaterBuilder,
+    Updater,
 )
 
 from telegram.ext.utils.types import DefaultContextType
@@ -133,7 +133,7 @@ def main() -> None:
     """Run the bot."""
     # Create the Updater and pass it your bot's token.
     persistence = PicklePersistence(filename='conversationbot')
-    updater = UpdaterBuilder().token("TOKEN").persistence(persistence).build()
+    updater = Updater.builder().token("TOKEN").persistence(persistence).build()
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
