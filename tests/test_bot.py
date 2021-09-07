@@ -2024,29 +2024,30 @@ class TestBot:
 
     @flaky(3, 1)
     @pytest.mark.parametrize('json_keyboard', [True, False])
-    def test_copy_message(self, monkeypatch, bot, chat_id, media_message, json_keyboard):
+    @pytest.mark.parametrize('caption', ["<b>Test</b>", '', None])
+    def test_copy_message(self, monkeypatch, bot, chat_id, media_message, json_keyboard, caption):
         keyboard = InlineKeyboardMarkup(
             [[InlineKeyboardButton(text="test", callback_data="test2")]]
         )
-
+ 
         def post(url, data, timeout):
             assert data["chat_id"] == chat_id
             assert data["from_chat_id"] == chat_id
             assert data["message_id"] == media_message.message_id
-            assert data["caption"] == "<b>Test</b>"
+            assert data.get("caption") == caption
             assert data["parse_mode"] == ParseMode.HTML
             assert data["reply_to_message_id"] == media_message.message_id
             assert data["reply_markup"] == keyboard.to_json()
             assert data["disable_notification"] is True
             assert data["caption_entities"] == [MessageEntity(MessageEntity.BOLD, 0, 4)]
             return data
-
+ 
         monkeypatch.setattr(bot.request, 'post', post)
         bot.copy_message(
             chat_id,
             from_chat_id=chat_id,
             message_id=media_message.message_id,
-            caption="<b>Test</b>",
+            caption=caption,
             caption_entities=[MessageEntity(MessageEntity.BOLD, 0, 4)],
             parse_mode=ParseMode.HTML,
             reply_to_message_id=media_message.message_id,
