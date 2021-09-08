@@ -2029,7 +2029,7 @@ class TestBot:
         keyboard = InlineKeyboardMarkup(
             [[InlineKeyboardButton(text="test", callback_data="test2")]]
         )
- 
+
         def post(url, data, timeout):
             assert data["chat_id"] == chat_id
             assert data["from_chat_id"] == chat_id
@@ -2041,7 +2041,7 @@ class TestBot:
             assert data["disable_notification"] is True
             assert data["caption_entities"] == [MessageEntity(MessageEntity.BOLD, 0, 4)]
             return data
- 
+
         monkeypatch.setattr(bot.request, 'post', post)
         bot.copy_message(
             chat_id,
