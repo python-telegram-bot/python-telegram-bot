@@ -5296,7 +5296,7 @@ class Bot(TelegramObject):
             'disable_notification': disable_notification,
             'allow_sending_without_reply': allow_sending_without_reply,
         }
-        if caption:
+        if caption is not None:
             data['caption'] = caption
         if caption_entities:
             data['caption_entities'] = caption_entities
