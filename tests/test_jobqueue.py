@@ -61,11 +61,6 @@ class TestJobQueue:
     job_time = 0
     received_error = None
 
-    def test_slot_behaviour(self, job_queue, mro_slots, _dp):
-        for attr in job_queue.__slots__:
-            assert getattr(job_queue, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert len(mro_slots(job_queue)) == len(set(mro_slots(job_queue))), "duplicate slot"
-
     @pytest.fixture(autouse=True)
     def reset(self):
         self.result = 0
@@ -106,6 +101,22 @@ class TestJobQueue:
 
     def error_handler_raise_error(self, *args):
         raise Exception('Failing bigly')
+
+    def test_slot_behaviour(self, job_queue, mro_slots, _dp):
+        for attr in job_queue.__slots__:
+            assert getattr(job_queue, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert len(mro_slots(job_queue)) == len(set(mro_slots(job_queue))), "duplicate slot"
+
+    def test_dispatcher_weakref(self, bot):
+        jq = JobQueue()
+        dispatcher = DispatcherBuilder().bot(bot).job_queue(None).build()
+        with pytest.raises(RuntimeError, match='No dispatcher was set'):
+            jq.dispatcher
+        jq.set_dispatcher(dispatcher)
+        assert jq.dispatcher is dispatcher
+        del dispatcher
+        with pytest.raises(RuntimeError, match='no longer alive'):
+            jq.dispatcher
 
     def test_run_once(self, job_queue):
         job_queue.run_once(self.job_run_once, 0.01)

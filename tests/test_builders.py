@@ -36,12 +36,16 @@ from telegram.ext import (
     Dispatcher,
     Updater,
 )
-from telegram.ext.builders import _BOT_CHECKS, _DISPATCHER_CHECKS
+from telegram.ext.builders import _BOT_CHECKS, _DISPATCHER_CHECKS, DispatcherBuilder
 
 
-@pytest.fixture(scope='function')
-def builder():
-    return UpdaterBuilder()
+@pytest.fixture(
+    scope='function',
+    params=[{'class': UpdaterBuilder}, {'class': DispatcherBuilder}],
+    ids=['UpdaterBuilder', 'DispatcherBuilder'],
+)
+def builder(request):
+    return request.param['class']()
 
 
 class TestBuilder:
@@ -49,13 +53,16 @@ class TestBuilder:
         'method, description', _BOT_CHECKS, ids=[entry[0] for entry in _BOT_CHECKS]
     )
     def test_mutually_exclusive_for_bot(self, builder, method, description):
+        if getattr(builder, method, None) is None:
+            pytest.skip(f'{builder.__class__} has no method called {method}')
+
         # First that e.g. `bot` can't be set if `request` was already set
         getattr(builder, method)(1)
         with pytest.raises(RuntimeError, match=f'`bot` may only be set, if no {description}'):
             builder.bot(None)
 
         # Now test that `request` can't be set if `bot` was already set
-        builder = UpdaterBuilder()
+        builder = builder.__class__()
         builder.bot(None)
         with pytest.raises(RuntimeError, match=f'`{method}` may only be set, if no bot instance'):
             getattr(builder, method)(None)
@@ -64,6 +71,9 @@ class TestBuilder:
         'method, description', _DISPATCHER_CHECKS, ids=[entry[0] for entry in _DISPATCHER_CHECKS]
     )
     def test_mutually_exclusive_for_dispatcher(self, builder, method, description):
+        if None in (getattr(builder, method, None), getattr(builder, 'dispatcher', None)):
+            pytest.skip(f'{builder.__class__} has no method called {method}')
+
         # First that e.g. `dispatcher` can't be set if `bot` was already set
         getattr(builder, method)(None)
         with pytest.raises(
@@ -72,7 +82,7 @@ class TestBuilder:
             builder.dispatcher(None)
 
         # Now test that `bot` can't be set if `dispatcher` was already set
-        builder = UpdaterBuilder()
+        builder = builder.__class__()
         builder.dispatcher(1)
         with pytest.raises(
             RuntimeError, match=f'`{method}` may only be set, if no Dispatcher instance'
@@ -80,7 +90,7 @@ class TestBuilder:
             getattr(builder, method)(None)
 
         # Finally test that `bot` *can* be set if `dispatcher` was set to None
-        builder = UpdaterBuilder()
+        builder = builder.__class__()
         builder.dispatcher(None)
         if method != 'dispatcher_class':
             getattr(builder, method)(None)
@@ -97,7 +107,7 @@ class TestBuilder:
         ):
             builder.request_kwargs(None)
 
-        builder = UpdaterBuilder()
+        builder = builder.__class__()
         builder.request_kwargs(None)
         with pytest.raises(RuntimeError, match='`request` may only be set, if no request_kwargs'):
             builder.request(None)
@@ -108,21 +118,22 @@ class TestBuilder:
 
     def test_build_custom_bot(self, builder, bot):
         builder.bot(bot)
-        updater = builder.build()
-        assert updater.bot is bot
-        assert updater.dispatcher.bot is bot
-        assert updater.dispatcher.job_queue._dispatcher() is updater.dispatcher
-        assert updater.exception_event is updater.dispatcher.exception_event
+        obj = builder.build()
+        assert obj.bot is bot
 
-    def test_build_custom_dispatcher(self, builder, dp):
-        updater = builder.dispatcher(dp).build()
+        if isinstance(obj, Updater):
+            assert obj.dispatcher.bot is bot
+            assert obj.dispatcher.job_queue.dispatcher is obj.dispatcher
+            assert obj.exception_event is obj.dispatcher.exception_event
+
+    def test_build_custom_dispatcher(self, dp):
+        updater = UpdaterBuilder().dispatcher(dp).build()
         assert updater.dispatcher is dp
         assert updater.bot is updater.dispatcher.bot
         assert updater.exception_event is dp.exception_event
 
-    def test_build_no_dispatcher(self, builder, bot):
-        builder.dispatcher(None).token(bot.token)
-        updater = builder.build()
+    def test_build_no_dispatcher(self, bot):
+        updater = UpdaterBuilder().dispatcher(None).token(bot.token).build()
         assert updater.dispatcher is None
         assert updater.bot.token == bot.token
         assert updater.bot.request.con_pool_size == 8
@@ -143,34 +154,37 @@ class TestBuilder:
         assert built_bot.request is request
         assert built_bot.callback_data_cache.maxsize == 42
 
-        builder = UpdaterBuilder()
+        builder = builder.__class__()
         builder.token(bot.token).request_kwargs({'connect_timeout': 42})
         built_bot = builder.build().bot
 
         assert built_bot.token == bot.token
         assert built_bot.request._connect_timeout == 42
 
-    def test_all_dispatcher_args_custom(self, builder, dp):
+    def test_all_dispatcher_args_custom(self, dp):
+        builder = DispatcherBuilder()
+
         job_queue = JobQueue()
         persistence = PicklePersistence('filename')
         context_types = ContextTypes()
         builder.bot(dp.bot).update_queue(dp.update_queue).exception_event(
             dp.exception_event
         ).job_queue(job_queue).persistence(persistence).context_types(context_types).workers(3)
-        dispatcher = builder.build().dispatcher
+        dispatcher = builder.build()
 
         assert dispatcher.bot is dp.bot
         assert dispatcher.update_queue is dp.update_queue
         assert dispatcher.exception_event is dp.exception_event
         assert dispatcher.job_queue is job_queue
-        assert dispatcher.job_queue._dispatcher() is dispatcher
+        assert dispatcher.job_queue.dispatcher is dispatcher
         assert dispatcher.persistence is persistence
         assert dispatcher.context_types is context_types
         assert dispatcher.workers == 3
 
-    def test_all_updater_args_custom(self, builder, dp):
+    def test_all_updater_args_custom(self, dp):
         updater = (
-            builder.dispatcher(None)
+            UpdaterBuilder()
+            .dispatcher(None)
             .bot(dp.bot)
             .exception_event(dp.exception_event)
             .update_queue(dp.update_queue)
@@ -185,13 +199,15 @@ class TestBuilder:
         assert updater.user_signal_handler == 42
 
     def test_connection_pool_size_with_workers(self, bot, builder):
-        dispatcher = builder.token(bot.token).workers(42).build().dispatcher
+        obj = builder.token(bot.token).workers(42).build()
+        dispatcher = obj if isinstance(obj, Dispatcher) else obj.dispatcher
         assert dispatcher.workers == 42
         assert dispatcher.bot.request.con_pool_size == 46
 
     def test_connection_pool_size_warning(self, bot, builder, recwarn):
         builder.token(bot.token).workers(42).request_kwargs({'con_pool_size': 1})
-        dispatcher = builder.build().dispatcher
+        obj = builder.build()
+        dispatcher = obj if isinstance(obj, Dispatcher) else obj.dispatcher
         assert dispatcher.workers == 42
         assert dispatcher.bot.request.con_pool_size == 1
 
@@ -211,12 +227,17 @@ class TestBuilder:
                 super().__init__(**kwargs)
                 self.arg = arg
 
-        builder.updater_class(CustomUpdater, kwargs={'arg': 1}).dispatcher_class(
-            CustomDispatcher, kwargs={'arg': 2}
-        ).token(bot.token)
-        updater = builder.build()
+        builder.dispatcher_class(CustomDispatcher, kwargs={'arg': 2}).token(bot.token)
+        if isinstance(builder, UpdaterBuilder):
+            builder.updater_class(CustomUpdater, kwargs={'arg': 1})
 
-        assert isinstance(updater, CustomUpdater)
-        assert updater.arg == 1
-        assert isinstance(updater.dispatcher, CustomDispatcher)
-        assert updater.dispatcher.arg == 2
+        obj = builder.build()
+
+        if isinstance(builder, UpdaterBuilder):
+            assert isinstance(obj, CustomUpdater)
+            assert obj.arg == 1
+            assert isinstance(obj.dispatcher, CustomDispatcher)
+            assert obj.dispatcher.arg == 2
+        else:
+            assert isinstance(obj, CustomDispatcher)
+            assert obj.arg == 2
