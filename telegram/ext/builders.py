@@ -34,14 +34,15 @@ from typing import (
     Union,
     Optional,
     overload,
-    cast,
     Type,
 )
 
 from telegram import Bot
 from telegram.ext import Dispatcher, JobQueue, Updater, ExtBot, ContextTypes, CallbackContext
 from telegram.ext.utils.types import CCT, UD, CD, BD, BT, JQ, PT
+from telegram.utils.helpers import DEFAULT_NONE, DefaultValue, DEFAULT_FALSE
 from telegram.utils.request import Request
+from telegram.utils.types import ODVInput, DVInput
 
 if TYPE_CHECKING:
     from telegram.ext import (
@@ -98,21 +99,6 @@ if TYPE_CHECKING:
     ]
 
 
-def check_if_already_set(func: CT) -> CT:
-    """Builds a decorator that checks if the attribute that `func` wants to set
-    has already been set. If it has been, raises an exception.
-    """
-
-    def _decorator(self, *args, **kwargs):  # type: ignore[no-untyped-def]
-        # remove the '_set_'
-        arg_name = func.__name__[5:]
-        if getattr(self, f'_{arg_name}_was_set') is True:
-            raise self._exception_builder(arg_name)  # pylint: disable=W0212
-        return func(self, *args, **kwargs)
-
-    return cast(CT, _decorator)
-
-
 _BOT_CHECKS = [
     ('dispatcher', 'Dispatcher instance'),
     ('request', 'Request instance'),
@@ -137,6 +123,8 @@ _DISPATCHER_CHECKS = [
 ] + _BOT_CHECKS
 _DISPATCHER_CHECKS.remove(('dispatcher', 'Dispatcher instance'))
 
+_TWO_ARGS_REQ = "The parameter `{}` may only be set, if no {} was set."
+
 
 # Base class for all builders. We do this mainly to reduce code duplication, because e.g.
 # the UpdaterBuilder has all method that the DispatcherBuilder has
@@ -146,96 +134,52 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
 
     __slots__ = (
         '_token',
-        '_token_was_set',
         '_base_url',
-        '_base_url_was_set',
         '_base_file_url',
-        '_base_file_url_was_set',
         '_request_kwargs',
-        '_request_kwargs_was_set',
         '_request',
-        '_request_was_set',
         '_private_key',
-        '_private_key_was_set',
         '_private_key_password',
-        '_private_key_password_was_set',
         '_defaults',
-        '_defaults_was_set',
         '_arbitrary_callback_data',
-        '_arbitrary_callback_data_was_set',
         '_bot',
-        '_bot_was_set',
         '_update_queue',
-        '_update_queue_was_set',
         '_workers',
-        '_workers_was_set',
         '_exception_event',
-        '_exception_event_was_set',
         '_job_queue',
-        '_job_queue_was_set',
         '_persistence',
-        '_persistence_was_set',
         '_context_types',
-        '_context_types_was_set',
         '_dispatcher',
-        '_dispatcher_was_set',
         '_user_signal_handler',
-        '_user_signal_handler_was_set',
         '_dispatcher_class',
-        '_dispatcher_class_was_set',
         '_dispatcher_kwargs',
         '_updater_class',
-        '_updater_class_was_set',
         '_updater_kwargs',
     )
 
     def __init__(self: 'InitBaseBuilder'):
-        # Instead of the *_was_set variables, we could work with e.g. _token = DEFAULT_NONE.
-        # However, this would make type hinting a *lot* more involved and reasonable type hinting
-        # accuracy is valuable for the builder classes.
-
-        self._token: str = ''
-        self._token_was_set = False
-        self._base_url: str = 'https://api.telegram.org/bot'
-        self._base_url_was_set = False
-        self._base_file_url: str = 'https://api.telegram.org/file/bot'
-        self._base_file_url_was_set = False
-        self._request_kwargs: Dict[str, Any] = {}
-        self._request_kwargs_was_set = False
-        self._request: Optional['Request'] = None
-        self._request_was_set = False
-        self._private_key: Optional[bytes] = None
-        self._private_key_was_set = False
-        self._private_key_password: Optional[bytes] = None
-        self._private_key_password_was_set = False
-        self._defaults: Optional['Defaults'] = None
-        self._defaults_was_set = False
-        self._arbitrary_callback_data: Union[bool, int] = False
-        self._arbitrary_callback_data_was_set = False
-        self._bot: Bot = None  # type: ignore[assignment]
-        self._bot_was_set = False
-        self._update_queue: Queue = Queue()
-        self._update_queue_was_set = False
-        self._workers: int = 4
-        self._workers_was_set = False
-        self._exception_event: Event = Event()
-        self._exception_event_was_set = False
-        self._job_queue: Optional['JobQueue'] = JobQueue()
-        self._job_queue_was_set = False
-        self._persistence: Optional['BasePersistence'] = None
-        self._persistence_was_set = False
-        self._context_types: ContextTypes = ContextTypes()
-        self._context_types_was_set = False
-        self._dispatcher: Optional['Dispatcher'] = None
-        self._dispatcher_was_set = False
+        self._token: DVInput[str] = DefaultValue('')
+        self._base_url: DVInput[str] = DefaultValue('https://api.telegram.org/bot')
+        self._base_file_url: DVInput[str] = DefaultValue('https://api.telegram.org/file/bot')
+        self._request_kwargs: DVInput[Dict[str, Any]] = DefaultValue({})
+        self._request: ODVInput['Request'] = DEFAULT_NONE
+        self._private_key: ODVInput[bytes] = DEFAULT_NONE
+        self._private_key_password: ODVInput[bytes] = DEFAULT_NONE
+        self._defaults: ODVInput['Defaults'] = DEFAULT_NONE
+        self._arbitrary_callback_data: DVInput[Union[bool, int]] = DEFAULT_FALSE
+        self._bot: Bot = DEFAULT_NONE  # type: ignore[assignment]
+        self._update_queue: DVInput[Queue] = DefaultValue(Queue())
+        self._workers: DVInput[int] = DefaultValue(4)
+        self._exception_event: DVInput[Event] = DefaultValue(Event())
+        self._job_queue: ODVInput['JobQueue'] = DefaultValue(JobQueue())
+        self._persistence: ODVInput['BasePersistence'] = DEFAULT_NONE
+        self._context_types: DVInput[ContextTypes] = DefaultValue(ContextTypes())
+        self._dispatcher: ODVInput['Dispatcher'] = DEFAULT_NONE
         self._user_signal_handler: Optional[Callable[[int, object], Any]] = None
-        self._user_signal_handler_was_set = False
-        self._dispatcher_class: Type[Dispatcher] = Dispatcher
+        self._dispatcher_class: DVInput[Type[Dispatcher]] = DefaultValue(Dispatcher)
         self._dispatcher_kwargs: Dict[str, object] = {}
-        self._dispatcher_class_was_set = False
         self._updater_class: Type[Updater] = Updater
         self._updater_kwargs: Dict[str, object] = {}
-        self._updater_class_was_set = False
 
     def _get_connection_pool_size(self) -> int:
         # For the standard use case (Updater + Dispatcher + Bot)
@@ -245,36 +189,48 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         # * 1 for Updater (even if webhook is used, we can spare a connection)
         # * 1 for JobQueue
         # * 1 for main thread
-        return self._workers + 4
+        return DefaultValue.get_value(self._workers) + 4
 
     def _build_ext_bot(self) -> ExtBot:
-        if self._token_was_set is False:
+        if isinstance(self._token, DefaultValue):
             raise RuntimeError('No bot token was set.')
-        if not self._request_was_set and 'con_pool_size' not in self._request_kwargs:
-            self._request_kwargs['con_pool_size'] = self._get_connection_pool_size()
+        request_kwargs = DefaultValue.get_value(self._request_kwargs)
+        if (
+            self._request is DEFAULT_NONE
+            and 'con_pool_size' not in request_kwargs  # pylint: disable=E1135
+        ):
+            request_kwargs[  # pylint: disable=E1137
+                'con_pool_size'
+            ] = self._get_connection_pool_size()
         return ExtBot(
             token=self._token,
-            base_url=self._base_url,
-            base_file_url=self._base_file_url,
-            private_key=self._private_key,
-            private_key_password=self._private_key_password,
-            defaults=self._defaults,
-            arbitrary_callback_data=self._arbitrary_callback_data,
-            request=self._request if self._request_was_set else Request(**self._request_kwargs),
+            base_url=DefaultValue.get_value(self._base_url),
+            base_file_url=DefaultValue.get_value(self._base_file_url),
+            private_key=DefaultValue.get_value(self._private_key),
+            private_key_password=DefaultValue.get_value(self._private_key_password),
+            defaults=DefaultValue.get_value(self._defaults),
+            arbitrary_callback_data=DefaultValue.get_value(self._arbitrary_callback_data),
+            request=self._request  # type: ignore[arg-type]
+            if self._request is not DEFAULT_NONE
+            else Request(**request_kwargs),  # pylint: disable=E1134
         )
 
     def _build_dispatcher(
         self: '_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]',
     ) -> Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]:
-        job_queue = JobQueue() if self._job_queue_was_set is False else self._job_queue
-        dispatcher: Dispatcher[BT, CCT, UD, CD, BD, JQ, PT] = self._dispatcher_class(
-            bot=self._bot if self._bot_was_set is True else self._build_ext_bot(),
-            update_queue=self._update_queue,
-            workers=self._workers,
-            exception_event=self._exception_event,
+        job_queue = DefaultValue.get_value(self._job_queue)
+        dispatcher: Dispatcher[
+            BT, CCT, UD, CD, BD, JQ, PT
+        ] = DefaultValue.get_value(  # pylint: disable=not-callable
+            self._dispatcher_class
+        )(
+            bot=self._bot if self._bot is not DEFAULT_NONE else self._build_ext_bot(),
+            update_queue=DefaultValue.get_value(self._update_queue),
+            workers=DefaultValue.get_value(self._workers),
+            exception_event=DefaultValue.get_value(self._exception_event),
             job_queue=job_queue,
-            persistence=self._persistence,
-            context_types=self._context_types,
+            persistence=DefaultValue.get_value(self._persistence),
+            context_types=DefaultValue.get_value(self._context_types),
             builder_flag=True,
             **self._dispatcher_kwargs,
         )
@@ -296,7 +252,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     def _build_updater(
         self: '_BaseBuilder[ODT, BT, Any, Any, Any, Any, Any, Any]',
     ) -> Updater[BT, ODT]:
-        if self._dispatcher_was_set is False:
+        if isinstance(self._dispatcher, DefaultValue):
             dispatcher = self._build_dispatcher()
             return self._updater_class(
                 dispatcher=dispatcher,
@@ -305,6 +261,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
                 builder_flag=True,
                 **self._updater_kwargs,
             )
+
         return self._updater_class(
             dispatcher=self._dispatcher,
             bot=self._dispatcher.bot if self._dispatcher else (self._bot or self._build_ext_bot()),
@@ -312,131 +269,106 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
             user_signal_handler=self._user_signal_handler,
             exception_event=self._dispatcher.exception_event
             if self._dispatcher
-            else self._exception_event,
+            else DefaultValue.get_value(self._exception_event),
             builder_flag=True,
             **self._updater_kwargs,
         )
 
-    @staticmethod
-    def _exception_builder(arg_1: str, arg_2: str = None) -> RuntimeError:
-        if not arg_2:
-            return RuntimeError(f'The parameter `{arg_1}` was already set.')
-        return RuntimeError(f'The parameter `{arg_1}` can only be set, if the no {arg_2} was set.')
-
     @property
     def _dispatcher_check(self) -> bool:
-        return self._dispatcher_was_set and self._dispatcher is not None
+        return self._dispatcher not in (DEFAULT_NONE, None)
 
-    @check_if_already_set
     def _set_dispatcher_class(
         self: BuilderType, dispatcher_class: Type[Dispatcher], kwargs: Dict[str, object] = None
     ) -> BuilderType:
-        if self._dispatcher_was_set:
-            raise self._exception_builder('dispatcher_class', 'Dispatcher instance')
+        if self._dispatcher is not DEFAULT_NONE:
+            raise RuntimeError(_TWO_ARGS_REQ.format('dispatcher_class', 'Dispatcher instance'))
         self._dispatcher_class = dispatcher_class
         self._dispatcher_kwargs = kwargs or {}
-        self._dispatcher_class_was_set = True
         return self
 
-    @check_if_already_set
     def _set_updater_class(
         self: BuilderType, updater_class: Type[Updater], kwargs: Dict[str, object] = None
     ) -> BuilderType:
         self._updater_class = updater_class
         self._updater_kwargs = kwargs or {}
-        self._updater_class_was_set = True
         return self
 
-    @check_if_already_set
     def _set_token(self: BuilderType, token: str) -> BuilderType:
-        if self._bot_was_set:
-            raise self._exception_builder('token', 'bot instance')
+        if self._bot is not DEFAULT_NONE:
+            raise RuntimeError(_TWO_ARGS_REQ.format('token', 'bot instance'))
         if self._dispatcher_check:
-            raise self._exception_builder('token', 'Dispatcher instance')
+            raise RuntimeError(_TWO_ARGS_REQ.format('token', 'Dispatcher instance'))
         self._token = token
-        self._token_was_set = True
         return self
 
-    @check_if_already_set
     def _set_base_url(self: BuilderType, base_url: str) -> BuilderType:
-        if self._bot_was_set:
-            raise self._exception_builder('base_url', 'bot instance')
+        if self._bot is not DEFAULT_NONE:
+            raise RuntimeError(_TWO_ARGS_REQ.format('base_url', 'bot instance'))
         if self._dispatcher_check:
-            raise self._exception_builder('base_url', 'Dispatcher instance')
+            raise RuntimeError(_TWO_ARGS_REQ.format('base_url', 'Dispatcher instance'))
         self._base_url = base_url
-        self._base_url_was_set = True
         return self
 
-    @check_if_already_set
     def _set_base_file_url(self: BuilderType, base_file_url: str) -> BuilderType:
-        if self._bot_was_set:
-            raise self._exception_builder('base_file_url', 'bot instance')
+        if self._bot is not DEFAULT_NONE:
+            raise RuntimeError(_TWO_ARGS_REQ.format('base_file_url', 'bot instance'))
         if self._dispatcher_check:
-            raise self._exception_builder('base_file_url', 'Dispatcher instance')
+            raise RuntimeError(_TWO_ARGS_REQ.format('base_file_url', 'Dispatcher instance'))
         self._base_file_url = base_file_url
-        self._base_file_url_was_set = True
         return self
 
-    @check_if_already_set
     def _set_request_kwargs(self: BuilderType, request_kwargs: Dict[str, Any]) -> BuilderType:
-        if self._request_was_set:
-            raise self._exception_builder('request_kwargs', 'Request instance')
-        if self._bot_was_set:
-            raise self._exception_builder('request_kwargs', 'bot instance')
+        if self._request is not DEFAULT_NONE:
+            raise RuntimeError(_TWO_ARGS_REQ.format('request_kwargs', 'Request instance'))
+        if self._bot is not DEFAULT_NONE:
+            raise RuntimeError(_TWO_ARGS_REQ.format('request_kwargs', 'bot instance'))
         if self._dispatcher_check:
-            raise self._exception_builder('request_kwargs', 'Dispatcher instance')
+            raise RuntimeError(_TWO_ARGS_REQ.format('request_kwargs', 'Dispatcher instance'))
         self._request_kwargs = request_kwargs
-        self._request_kwargs_was_set = True
         return self
 
-    @check_if_already_set
     def _set_request(self: BuilderType, request: Request) -> BuilderType:
-        if self._request_kwargs_was_set:
-            raise self._exception_builder('request', 'request_kwargs')
-        if self._bot_was_set:
-            raise self._exception_builder('request', 'bot instance')
+        if not isinstance(self._request_kwargs, DefaultValue):
+            raise RuntimeError(_TWO_ARGS_REQ.format('request', 'request_kwargs'))
+        if self._bot is not DEFAULT_NONE:
+            raise RuntimeError(_TWO_ARGS_REQ.format('request', 'bot instance'))
         if self._dispatcher_check:
-            raise self._exception_builder('request', 'Dispatcher instance')
+            raise RuntimeError(_TWO_ARGS_REQ.format('request', 'Dispatcher instance'))
         self._request = request
-        self._request_was_set = True
         return self
 
-    @check_if_already_set
     def _set_private_key(
         self: BuilderType, private_key: bytes, password: bytes = None
     ) -> BuilderType:
-        if self._bot_was_set:
-            raise self._exception_builder('private_key', 'bot instance')
+        if self._bot is not DEFAULT_NONE:
+            raise RuntimeError(_TWO_ARGS_REQ.format('private_key', 'bot instance'))
         if self._dispatcher_check:
-            raise self._exception_builder('private_key', 'Dispatcher instance')
+            raise RuntimeError(_TWO_ARGS_REQ.format('private_key', 'Dispatcher instance'))
         self._private_key = private_key
         self._private_key_password = password
-        self._private_key_was_set = True
         return self
 
-    @check_if_already_set
     def _set_defaults(self: BuilderType, defaults: 'Defaults') -> BuilderType:
-        if self._bot_was_set:
-            raise self._exception_builder('defaults', 'bot instance')
+        if self._bot is not DEFAULT_NONE:
+            raise RuntimeError(_TWO_ARGS_REQ.format('defaults', 'bot instance'))
         if self._dispatcher_check:
-            raise self._exception_builder('defaults', 'Dispatcher instance')
+            raise RuntimeError(_TWO_ARGS_REQ.format('defaults', 'Dispatcher instance'))
         self._defaults = defaults
-        self._defaults_was_set = True
         return self
 
-    @check_if_already_set
     def _set_arbitrary_callback_data(
         self: BuilderType, arbitrary_callback_data: Union[bool, int]
     ) -> BuilderType:
-        if self._bot_was_set:
-            raise self._exception_builder('arbitrary_callback_data', 'bot instance')
+        if self._bot is not DEFAULT_NONE:
+            raise RuntimeError(_TWO_ARGS_REQ.format('arbitrary_callback_data', 'bot instance'))
         if self._dispatcher_check:
-            raise self._exception_builder('arbitrary_callback_data', 'Dispatcher instance')
+            raise RuntimeError(
+                _TWO_ARGS_REQ.format('arbitrary_callback_data', 'Dispatcher instance')
+            )
         self._arbitrary_callback_data = arbitrary_callback_data
-        self._arbitrary_callback_data_was_set = True
         return self
 
-    @check_if_already_set
     def _set_bot(
         self: '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, '
         'JQ, PT]',
@@ -444,70 +376,57 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     ) -> '_BaseBuilder[Dispatcher[InBT, CCT, UD, CD, BD, JQ, PT], InBT, CCT, UD, CD, BD, JQ, PT]':
         for attr, error in _BOT_CHECKS:
             if (
-                getattr(self, f'_{attr}_was_set')
+                not isinstance(getattr(self, f'_{attr}'), DefaultValue)
                 if attr != 'dispatcher'
                 else self._dispatcher_check
             ):
-                raise self._exception_builder('bot', error)
+                raise RuntimeError(_TWO_ARGS_REQ.format('bot', error))
         self._bot = bot
-        self._bot_was_set = True
         return self  # type: ignore[return-value]
 
-    @check_if_already_set
     def _set_update_queue(self: BuilderType, update_queue: Queue) -> BuilderType:
         if self._dispatcher_check:
-            raise self._exception_builder('update_queue', 'Dispatcher instance')
+            raise RuntimeError(_TWO_ARGS_REQ.format('update_queue', 'Dispatcher instance'))
         self._update_queue = update_queue
-        self._update_queue_was_set = True
         return self
 
-    @check_if_already_set
     def _set_workers(self: BuilderType, workers: int) -> BuilderType:
         if self._dispatcher_check:
-            raise self._exception_builder('workers', 'Dispatcher instance')
+            raise RuntimeError(_TWO_ARGS_REQ.format('workers', 'Dispatcher instance'))
         self._workers = workers
-        self._workers_was_set = True
         return self
 
-    @check_if_already_set
     def _set_exception_event(self: BuilderType, exception_event: Event) -> BuilderType:
         if self._dispatcher_check:
-            raise self._exception_builder('exception_event', 'Dispatcher instance')
+            raise RuntimeError(_TWO_ARGS_REQ.format('exception_event', 'Dispatcher instance'))
         self._exception_event = exception_event
-        self._exception_event_was_set = True
         return self
 
-    @check_if_already_set
     def _set_job_queue(
         self: '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
         job_queue: InJQ,
     ) -> '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, InJQ, PT], BT, CCT, UD, CD, BD, InJQ, PT]':
         if self._dispatcher_check:
-            raise self._exception_builder('job_queue', 'Dispatcher instance')
+            raise RuntimeError(_TWO_ARGS_REQ.format('job_queue', 'Dispatcher instance'))
         self._job_queue = job_queue
-        self._job_queue_was_set = True
         return self  # type: ignore[return-value]
 
-    @check_if_already_set
     def _set_persistence(
         self: '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
         persistence: InPT,
     ) -> '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, InPT], BT, CCT, UD, CD, BD, JQ, InPT]':
         if self._dispatcher_check:
-            raise self._exception_builder('persistence', 'Dispatcher instance')
+            raise RuntimeError(_TWO_ARGS_REQ.format('persistence', 'Dispatcher instance'))
         self._persistence = persistence
-        self._persistence_was_set = True
         return self  # type: ignore[return-value]
 
-    @check_if_already_set
     def _set_context_types(
         self: '_BaseBuilder[Dispatcher[BT, CCT, UD, CD, BD, JQ, PT], BT, CCT, UD, CD, BD, JQ, PT]',
         context_types: 'ContextTypes[InCCT, InUD, InCD, InBD]',
     ) -> '_BaseBuilder[Dispatcher[BT, InCCT, InUD, InCD, InBD, JQ, PT], BT, InCCT, InUD, InCD, InBD, JQ, PT]':
         if self._dispatcher_check:
-            raise self._exception_builder('context_types', 'Dispatcher instance')
+            raise RuntimeError(_TWO_ARGS_REQ.format('context_types', 'Dispatcher instance'))
         self._context_types = context_types
-        self._context_types_was_set = True
         return self  # type: ignore[return-value]
 
     @overload
@@ -522,24 +441,20 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     ) -> '_BaseBuilder[Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT], InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]':
         ...
 
-    @check_if_already_set  # type: ignore[misc]
-    def _set_dispatcher(
+    def _set_dispatcher(  # type: ignore[misc]
         self: BuilderType,
         dispatcher: Optional[Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]],
     ) -> '_BaseBuilder[Optional[Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]], InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]':
         for attr, error in _DISPATCHER_CHECKS:
-            if getattr(self, f'_{attr}_was_set'):
-                raise self._exception_builder('dispatcher', error)
+            if not isinstance(getattr(self, f'_{attr}'), DefaultValue):
+                raise RuntimeError(_TWO_ARGS_REQ.format('dispatcher', error))
         self._dispatcher = dispatcher
-        self._dispatcher_was_set = True
         return self
 
-    @check_if_already_set
     def _set_user_signal_handler(
         self: BuilderType, user_signal_handler: Callable[[int, object], Any]
     ) -> BuilderType:
         self._user_signal_handler = user_signal_handler
-        self._user_signal_handler_was_set = True
         return self
 
 
@@ -561,8 +476,6 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     not be used by default.
 
     Note:
-        * Each method can be called at most once, e.g. you can't override arguments that were
-          already set.
         * Some arguments are mutually exclusive. E.g. after calling :meth:`token`, you can't set
           a custom bot with :meth:`bot` and vice versa.
         * Unless a custom :class:`telegram.Bot` instance is set via :meth:`bot`, :meth:`build` will
@@ -890,8 +803,6 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     not be used by default.
 
     Note:
-        * Each method can be called at most once, e.g. you can't override arguments that were
-          already set.
         * Some arguments are mutually exclusive. E.g. after calling :meth:`token`, you can't set
           a custom bot with :meth:`bot` and vice versa.
         * Unless a custom :class:`telegram.Bot` instance is set via :meth:`bot`, :meth:`build` will

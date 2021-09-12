@@ -51,15 +51,13 @@ class TestBuilder:
     def test_mutually_exclusive_for_bot(self, builder, method, description):
         # First that e.g. `bot` can't be set if `request` was already set
         getattr(builder, method)(1)
-        with pytest.raises(RuntimeError, match=f'`bot` can only be set, if the no {description}'):
+        with pytest.raises(RuntimeError, match=f'`bot` may only be set, if no {description}'):
             builder.bot(None)
 
         # Now test that `request` can't be set if `bot` was already set
         builder = UpdaterBuilder()
         builder.bot(None)
-        with pytest.raises(
-            RuntimeError, match=f'`{method}` can only be set, if the no bot instance'
-        ):
+        with pytest.raises(RuntimeError, match=f'`{method}` may only be set, if no bot instance'):
             getattr(builder, method)(None)
 
     @pytest.mark.parametrize(
@@ -69,7 +67,7 @@ class TestBuilder:
         # First that e.g. `dispatcher` can't be set if `bot` was already set
         getattr(builder, method)(None)
         with pytest.raises(
-            RuntimeError, match=f'`dispatcher` can only be set, if the no {description}'
+            RuntimeError, match=f'`dispatcher` may only be set, if no {description}'
         ):
             builder.dispatcher(None)
 
@@ -77,7 +75,7 @@ class TestBuilder:
         builder = UpdaterBuilder()
         builder.dispatcher(1)
         with pytest.raises(
-            RuntimeError, match=f'`{method}` can only be set, if the no Dispatcher instance'
+            RuntimeError, match=f'`{method}` may only be set, if no Dispatcher instance'
         ):
             getattr(builder, method)(None)
 
@@ -88,22 +86,20 @@ class TestBuilder:
             getattr(builder, method)(None)
         else:
             with pytest.raises(
-                RuntimeError, match=f'`{method}` can only be set, if the no Dispatcher instance'
+                RuntimeError, match=f'`{method}` may only be set, if no Dispatcher instance'
             ):
                 getattr(builder, method)(None)
 
     def test_mutually_exclusive_for_request(self, builder):
         builder.request(None)
         with pytest.raises(
-            RuntimeError, match='`request_kwargs` can only be set, if the no Request instance'
+            RuntimeError, match='`request_kwargs` may only be set, if no Request instance'
         ):
             builder.request_kwargs(None)
 
         builder = UpdaterBuilder()
         builder.request_kwargs(None)
-        with pytest.raises(
-            RuntimeError, match='`request` can only be set, if the no request_kwargs'
-        ):
+        with pytest.raises(RuntimeError, match='`request` may only be set, if no request_kwargs'):
             builder.request(None)
 
     def test_build_without_token(self, builder):
