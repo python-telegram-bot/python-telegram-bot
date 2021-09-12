@@ -21,9 +21,9 @@ from telegram.ext import (
     CallbackQueryHandler,
     ConversationHandler,
     Updater,
+    CallbackContext,
 )
 
-from telegram.ext.utils.types import DefaultContextType
 
 # Enable logging
 logging.basicConfig(
@@ -37,7 +37,7 @@ FIRST, SECOND = range(2)
 ONE, TWO, THREE, FOUR = range(4)
 
 
-def start(update: Update, context: DefaultContextType) -> int:
+def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Send message on `/start`."""
     # Get user that sent /start and log his name
     user = update.message.from_user
@@ -59,7 +59,7 @@ def start(update: Update, context: DefaultContextType) -> int:
     return FIRST
 
 
-def start_over(update: Update, context: DefaultContextType) -> int:
+def start_over(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Prompt same text & keyboard as `start` does but not as new message"""
     # Get CallbackQuery from Update
     query = update.callback_query
@@ -80,7 +80,7 @@ def start_over(update: Update, context: DefaultContextType) -> int:
     return FIRST
 
 
-def one(update: Update, context: DefaultContextType) -> int:
+def one(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Show new choice of buttons"""
     query = update.callback_query
     query.answer()
@@ -97,7 +97,7 @@ def one(update: Update, context: DefaultContextType) -> int:
     return FIRST
 
 
-def two(update: Update, context: DefaultContextType) -> int:
+def two(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Show new choice of buttons"""
     query = update.callback_query
     query.answer()
@@ -114,7 +114,7 @@ def two(update: Update, context: DefaultContextType) -> int:
     return FIRST
 
 
-def three(update: Update, context: DefaultContextType) -> int:
+def three(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Show new choice of buttons"""
     query = update.callback_query
     query.answer()
@@ -132,7 +132,7 @@ def three(update: Update, context: DefaultContextType) -> int:
     return SECOND
 
 
-def four(update: Update, context: DefaultContextType) -> int:
+def four(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Show new choice of buttons"""
     query = update.callback_query
     query.answer()
@@ -149,7 +149,7 @@ def four(update: Update, context: DefaultContextType) -> int:
     return FIRST
 
 
-def end(update: Update, context: DefaultContextType) -> int:
+def end(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Returns `ConversationHandler.END`, which tells the
     ConversationHandler that the conversation is over.
     """

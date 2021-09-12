@@ -89,6 +89,26 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
     """
 
+    if TYPE_CHECKING:
+        DEFAULT_TYPE = CallbackContext[  # type: ignore[misc]  # noqa: F821
+            ExtBot, Dict, Dict, Dict
+        ]
+    else:
+        # Somewhat silly workaround so that accessing the attribute
+        # doesn't only work while type checking
+        DEFAULT_TYPE = 'CallbackContext[ExtBot, Dict, Dict, Dict]'  # pylint: disable-all
+        """Shortcut for the type annotation for the `context` argument that's correct for the
+        default settings, i.e. if :class:`telegram.ext.ContextTypes` is not used.
+
+        Example:
+            .. code:: python
+
+                def callback(update: Update, context: CallbackContext.DEFAULT_TYPE):
+                    ...
+
+        .. versionadded: 14.0
+        """
+
     __slots__ = (
         '_dispatcher',
         '_chat_id_and_data',

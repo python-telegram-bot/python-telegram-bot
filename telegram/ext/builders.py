@@ -19,7 +19,7 @@
 #
 # Some of the type hints are just ridiculously long ...
 # flake8: noqa: E501
-# pylint: disable=C0301
+# pylint: disable=line-too-long
 """This module contains the Builder classes for the telegram.ext module."""
 import warnings
 from queue import Queue
@@ -39,15 +39,14 @@ from typing import (
 )
 
 from telegram import Bot
-from telegram.ext import Dispatcher, JobQueue, Updater, ExtBot, ContextTypes
-from telegram.ext.utils.types import CCT, UD, CD, BD, BT, DefaultContextType, JQ, PT
+from telegram.ext import Dispatcher, JobQueue, Updater, ExtBot, ContextTypes, CallbackContext
+from telegram.ext.utils.types import CCT, UD, CD, BD, BT, JQ, PT
 from telegram.utils.request import Request
 
 if TYPE_CHECKING:
     from telegram.ext import (
         Defaults,
         BasePersistence,
-        CallbackContext,
     )
 
 # Type hinting is a bit complicated here because we try to get to a sane level of
@@ -62,15 +61,15 @@ InCCT = TypeVar('InCCT', bound='CallbackContext')
 InUD = TypeVar('InUD')
 InCD = TypeVar('InCD')
 InBD = TypeVar('InBD')
-DefCCT = DefaultContextType  # type: ignore[misc]
 BuilderType = TypeVar('BuilderType', bound='_BaseBuilder')
 CT = TypeVar('CT', bound=Callable[..., Any])
 
 if TYPE_CHECKING:
+    DEF_CCT = CallbackContext.DEFAULT_TYPE  # type: ignore[misc]
     InitBaseBuilder = _BaseBuilder[  # noqa: F821  # pylint: disable=E0601
-        Dispatcher[ExtBot, DefCCT, Dict, Dict, Dict, JobQueue, None],
+        Dispatcher[ExtBot, DEF_CCT, Dict, Dict, Dict, JobQueue, None],
         ExtBot,
-        DefCCT,
+        DEF_CCT,
         Dict,
         Dict,
         Dict,
@@ -78,9 +77,9 @@ if TYPE_CHECKING:
         None,
     ]
     InitUpdaterBuilder = UpdaterBuilder[  # noqa: F821  # pylint: disable=E0601
-        Dispatcher[ExtBot, DefCCT, Dict, Dict, Dict, JobQueue, None],
+        Dispatcher[ExtBot, DEF_CCT, Dict, Dict, Dict, JobQueue, None],
         ExtBot,
-        DefCCT,
+        DEF_CCT,
         Dict,
         Dict,
         Dict,
@@ -88,9 +87,9 @@ if TYPE_CHECKING:
         None,
     ]
     InitDispatcherBuilder = DispatcherBuilder[  # noqa: F821  # pylint: disable=E0601
-        Dispatcher[ExtBot, DefCCT, Dict, Dict, Dict, JobQueue, None],
+        Dispatcher[ExtBot, DEF_CCT, Dict, Dict, Dict, JobQueue, None],
         ExtBot,
-        DefCCT,
+        DEF_CCT,
         Dict,
         Dict,
         Dict,
@@ -124,7 +123,6 @@ _BOT_CHECKS = [
     ('defaults', 'Defaults instance'),
     ('arbitrary_callback_data', 'arbitrary_callback_data'),
     ('private_key', 'private_key'),
-    ('private_key_password', 'private_key_password'),
 ]
 
 _DISPATCHER_CHECKS = [
@@ -239,18 +237,21 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         self._updater_kwargs: Dict[str, object] = {}
         self._updater_class_was_set = False
 
+    def _get_connection_pool_size(self) -> int:
+        # For the standard use case (Updater + Dispatcher + Bot)
+        # we need a connection pool the size of:
+        # * for each of the workers
+        # * 1 for Dispatcher
+        # * 1 for Updater (even if webhook is used, we can spare a connection)
+        # * 1 for JobQueue
+        # * 1 for main thread
+        return self._workers + 4
+
     def _build_ext_bot(self) -> ExtBot:
         if self._token_was_set is False:
             raise RuntimeError('No bot token was set.')
         if not self._request_was_set and 'con_pool_size' not in self._request_kwargs:
-            # For the standard use case (Updater + Dispatcher + Bot)
-            # we need a connection pool the size of:
-            # * for each of the workers
-            # * 1 for Dispatcher
-            # * 1 for Updater (even if webhook is used, we can spare a connection)
-            # * 1 for JobQueue
-            # * 1 for main thread
-            self._request_kwargs['con_pool_size'] = self._workers + 4
+            self._request_kwargs['con_pool_size'] = self._get_connection_pool_size()
         return ExtBot(
             token=self._token,
             base_url=self._base_url,
@@ -278,17 +279,10 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
             **self._dispatcher_kwargs,
         )
 
-        if isinstance(job_queue, JobQueue):
+        if job_queue is not None:
             job_queue.set_dispatcher(dispatcher)
 
-        # For the standard use case (Updater + Dispatcher + Bot)
-        # we need a connection pool the size of:
-        # * for each of the workers
-        # * 1 for Dispatcher
-        # * 1 for Updater (even if webhook is used, we can spare a connection)
-        # * 1 for JobQueue
-        # * 1 for main thread
-        con_pool_size = self._workers + 4
+        con_pool_size = self._get_connection_pool_size()
         actual_size = dispatcher.bot.request.con_pool_size
         if actual_size < con_pool_size:
             warnings.warn(
@@ -408,23 +402,16 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         return self
 
     @check_if_already_set
-    def _set_private_key(self: BuilderType, private_key: bytes) -> BuilderType:
+    def _set_private_key(
+        self: BuilderType, private_key: bytes, password: bytes = None
+    ) -> BuilderType:
         if self._bot_was_set:
             raise self._exception_builder('private_key', 'bot instance')
         if self._dispatcher_check:
             raise self._exception_builder('private_key', 'Dispatcher instance')
         self._private_key = private_key
+        self._private_key_password = password
         self._private_key_was_set = True
-        return self
-
-    @check_if_already_set
-    def _set_private_key_password(self: BuilderType, private_key_password: bytes) -> BuilderType:
-        if self._bot_was_set:
-            raise self._exception_builder('private_key_password', 'bot instance')
-        if self._dispatcher_check:
-            raise self._exception_builder('private_key_password', 'Dispatcher instance')
-        self._private_key_password = private_key_password
-        self._private_key_password_was_set = True
         return self
 
     @check_if_already_set
@@ -698,41 +685,21 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         """
         return self._set_request(request)
 
-    def private_key(self: BuilderType, private_key: bytes) -> BuilderType:
-        """Sets the private key for decryption of telegram passport data to be used for
-        :attr:`telegram.ext.Dispatcher.bot`.
+    def private_key(self: BuilderType, private_key: bytes, password: bytes = None) -> BuilderType:
+        """Sets the private key and corresponding password for decryption of telegram passport data
+        to be used for :attr:`telegram.ext.Dispatcher.bot`.
 
         .. seealso:: `passportbot.py <https://github.com/python-telegram-bot/python-telegram-bot\
             /tree/master/examples#passportbotpy>`_, `Telegram Passports <https://git.io/fAvYd>`_
-
-        Note:
-            Must be used together with :meth:`private_key_password`.
 
         Args:
             private_key (:obj:`bytes`): The private key.
+            password (:obj:`bytes`): Optional. The corresponding password.
 
         Returns:
             :class:`DispatcherBuilder`: The same builder with the updated argument.
         """
-        return self._set_private_key(private_key)
-
-    def private_key_password(self: BuilderType, private_key_password: bytes) -> BuilderType:
-        """Sets the private key password for decryption of telegram passport data to be used for
-        :attr:`telegram.ext.Dispatcher.bot`.
-
-        .. seealso:: `passportbot.py <https://github.com/python-telegram-bot/python-telegram-bot\
-            /tree/master/examples#passportbotpy>`_, `Telegram Passports <https://git.io/fAvYd>`_
-
-        Note:
-            Must be used together with :meth:`private_key`.
-
-        Args:
-            private_key_password (:obj:`bytes`): The private key password.
-
-        Returns:
-            :class:`DispatcherBuilder`: The same builder with the updated argument.
-        """
-        return self._set_private_key_password(private_key_password)
+        return self._set_private_key(private_key=private_key, password=password)
 
     def defaults(self: BuilderType, defaults: 'Defaults') -> BuilderType:
         """Sets the :class:`telegram.ext.Defaults` object to be used for
@@ -1070,41 +1037,21 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         """
         return self._set_request(request)
 
-    def private_key(self: BuilderType, private_key: bytes) -> BuilderType:
-        """Sets the private key for decryption of telegram passport data to be used for
-        :attr:`telegram.ext.Updater.bot`.
+    def private_key(self: BuilderType, private_key: bytes, password: bytes = None) -> BuilderType:
+        """Sets the private key and corresponding password for decryption of telegram passport data
+        to be used for :attr:`telegram.ext.Updater.bot`.
 
         .. seealso:: `passportbot.py <https://github.com/python-telegram-bot/python-telegram-bot\
             /tree/master/examples#passportbotpy>`_, `Telegram Passports <https://git.io/fAvYd>`_
-
-        Note:
-            Must be used together with :meth:`private_key_password`.
 
         Args:
             private_key (:obj:`bytes`): The private key.
+            password (:obj:`bytes`): Optional. The corresponding password.
 
         Returns:
             :class:`UpdaterBuilder`: The same builder with the updated argument.
         """
-        return self._set_private_key(private_key)
-
-    def private_key_password(self: BuilderType, private_key_password: bytes) -> BuilderType:
-        """Sets the private key password for decryption of telegram passport data to be used for
-        :attr:`telegram.ext.Updater.bot`.
-
-        .. seealso:: `passportbot.py <https://github.com/python-telegram-bot/python-telegram-bot\
-            /tree/master/examples#passportbotpy>`_, `Telegram Passports <https://git.io/fAvYd>`_
-
-        Note:
-            Must be used together with :meth:`private_key`.
-
-        Args:
-            private_key_password (:obj:`bytes`): The private key password.
-
-        Returns:
-            :class:`UpdaterBuilder`: The same builder with the updated argument.
-        """
-        return self._set_private_key_password(private_key_password)
+        return self._set_private_key(private_key=private_key, password=password)
 
     def defaults(self: BuilderType, defaults: 'Defaults') -> BuilderType:
         """Sets the :class:`telegram.ext.Defaults` object to be used for

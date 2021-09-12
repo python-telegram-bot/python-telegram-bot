@@ -20,6 +20,7 @@
 
 import datetime
 import logging
+import weakref
 from typing import TYPE_CHECKING, Callable, List, Optional, Tuple, Union, cast, overload
 
 import pytz
@@ -49,7 +50,7 @@ class JobQueue:
     __slots__ = ('_dispatcher', 'logger', 'scheduler')
 
     def __init__(self) -> None:
-        self._dispatcher: 'Dispatcher' = None  # type: ignore[assignment]
+        self._dispatcher: 'Optional[weakref.ReferenceType[Dispatcher]]' = None
         self.logger = logging.getLogger(self.__class__.__name__)
         self.scheduler = BackgroundScheduler(timezone=pytz.utc)
         self.scheduler.add_listener(
@@ -64,17 +65,17 @@ class JobQueue:
         self.scheduler.add_listener(self._dispatch_error, EVENT_JOB_ERROR)
 
     def _build_args(self, job: 'Job') -> List[CallbackContext]:
-        return [self._dispatcher.context_types.context.from_job(job, self._dispatcher)]
+        return [self.dispatcher.context_types.context.from_job(job, self.dispatcher)]
 
     def _tz_now(self) -> datetime.datetime:
         return datetime.datetime.now(self.scheduler.timezone)
 
     def _update_persistence(self, _: JobEvent) -> None:
-        self._dispatcher.update_persistence()
+        self.dispatcher.update_persistence()
 
     def _dispatch_error(self, event: JobEvent) -> None:
         try:
-            self._dispatcher.dispatch_error(None, event.exception)
+            self.dispatcher.dispatch_error(None, event.exception)
         # Errors should not stop the thread.
         except Exception:
             self.logger.exception(
@@ -119,16 +120,25 @@ class JobQueue:
         return time
 
     def set_dispatcher(self, dispatcher: 'Dispatcher') -> None:
-        """Set the dispatcher to be used by this JobQueue. Use this instead of passing a
-        :class:`telegram.Bot` to the JobQueue, which is deprecated.
+        """Set the dispatcher to be used by this JobQueue.
 
         Args:
             dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher.
 
         """
-        self._dispatcher = dispatcher
+        self._dispatcher = weakref.ref(dispatcher)
         if dispatcher.bot.defaults:
             self.scheduler.configure(timezone=dispatcher.bot.defaults.tzinfo or pytz.utc)
+
+    @property
+    def dispatcher(self) -> 'Dispatcher':
+        """The dispatcher this JobQueue is associated with."""
+        if self._dispatcher is None:
+            raise RuntimeError('No dispatcher was set for this JobQueue.')
+        dispatcher = self._dispatcher()
+        if dispatcher is not None:
+            return dispatcher
+        raise RuntimeError('The dispatcher instance is no longer alive.')
 
     def run_once(
         self,

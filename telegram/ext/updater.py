@@ -63,16 +63,12 @@ class Updater(Generic[BT, DT]):
     commands and even arbitrary types. The updater can be started as a polling service or, for
     production, use a webhook to receive updates. This is achieved using the WebhookServer and
     WebhookHandler classes.
-    Note:
-        Must be initialized via :class:`telegram.ext.UpdaterBuilder` - see :meth:`builder`.
-
-    versionchanged:: 14.0
-        * Initialization is now done through the :class:`telegram.ext.UpdaterBuilder`.
 
     Note:
-        Must be initialized via :class:`telegram.ext.UpdaterBuilder` - see :meth:`builder`.
+         This class may not be initialized directly. Use :class:`telegram.ext.UpdaterBuilder` or
+         :meth:`builder` (for convenience).
 
-    versionchanged:: 14.0
+    .. versionchanged:: 14.0
         * Initialization is now done through the :class:`telegram.ext.UpdaterBuilder`.
         * Renamed ``user_sig_handler`` to :attr:`user_signal_handler`.
         * Removed the attributes ``job_queue``, and ``persistence`` - use the corresponding
@@ -143,7 +139,7 @@ class Updater(Generic[BT, DT]):
 
     @staticmethod
     def builder() -> 'InitUpdaterBuilder':
-        """Convenience method. Returns an empty :class:`telegram.ext.UpdaterBuilder`.
+        """Convenience method. Returns a new :class:`telegram.ext.UpdaterBuilder`.
 
         .. versionadded:: 14.0
         """

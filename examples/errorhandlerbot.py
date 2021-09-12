@@ -9,8 +9,7 @@ import logging
 import traceback
 
 from telegram import Update, ParseMode
-from telegram.ext import CommandHandler, Updater
-from telegram.ext.utils.types import DefaultContextType
+from telegram.ext import CommandHandler, Updater, CallbackContext
 
 # Enable logging
 logging.basicConfig(
@@ -26,7 +25,7 @@ BOT_TOKEN = "TOKEN"
 DEVELOPER_CHAT_ID = 123456789
 
 
-def error_handler(update: object, context: DefaultContextType) -> None:
+def error_handler(update: object, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Log the error and send a telegram message to notify the developer."""
     # Log the error before we do anything else, so we can see it even if something breaks.
     logger.error(msg="Exception while handling an update:", exc_info=context.error)
@@ -52,12 +51,12 @@ def error_handler(update: object, context: DefaultContextType) -> None:
     context.bot.send_message(chat_id=DEVELOPER_CHAT_ID, text=message, parse_mode=ParseMode.HTML)
 
 
-def bad_command(update: Update, context: DefaultContextType) -> None:
+def bad_command(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Raise an error to trigger the error handler."""
     context.bot.wrong_method_name()  # type: ignore[attr-defined]
 
 
-def start(update: Update, context: DefaultContextType) -> None:
+def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Displays info on how to trigger an error."""
     update.effective_message.reply_html(
         'Use /bad_command to cause an error.\n'

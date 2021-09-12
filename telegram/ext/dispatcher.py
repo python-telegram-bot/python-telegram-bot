@@ -85,10 +85,12 @@ class DispatcherHandlerStop(Exception):
 
 class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
     """This class dispatches all kinds of updates to its registered handlers.
-    Note:
-        Must be initialized via :class:`telegram.ext.DispatcherBuilder` - see :meth:`builder`.
 
-    versionchanged:: 14.0
+    Note:
+         This class may not be initialized directly. Use :class:`telegram.ext.DispatcherBuilder` or
+         :meth:`builder` (for convenience).
+
+    .. versionchanged:: 14.0
         Initialization is now done through the :class:`telegram.ext.DispatcherBuilder`.
 
     Attributes:
@@ -241,7 +243,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
 
     @staticmethod
     def builder() -> 'InitDispatcherBuilder':
-        """Convenience method. Returns an empty :class:`telegram.ext.DispatcherBuilder`.
+        """Convenience method. Returns a new :class:`telegram.ext.DispatcherBuilder`.
 
         .. versionadded:: 14.0
         """
@@ -673,11 +675,8 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
 
         Args:
             callback (:obj:`callable`): The callback function for this error handler. Will be
-                called when an error is raised.
-            Callback signature:
-
-
-            ``def callback(update: Update, context: CallbackContext)``
+                called when an error is raised. Callback signature:
+                ``def callback(update: Update, context: CallbackContext)``
 
                 The error that happened will be present in context.error.
             run_async (:obj:`bool`, optional): Whether this handlers callback should be run

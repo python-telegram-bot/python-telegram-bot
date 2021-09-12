@@ -16,8 +16,9 @@ from telegram.ext import (
     InvalidCallbackData,
     PicklePersistence,
     Updater,
+    CallbackContext,
 )
-from telegram.ext.utils.types import DefaultContextType
+
 
 # Enable logging
 logging.basicConfig(
@@ -26,13 +27,13 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def start(update: Update, context: DefaultContextType) -> None:
+def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Sends a message with 5 inline buttons attached."""
     number_list: List[int] = []
     update.message.reply_text('Please choose:', reply_markup=build_keyboard(number_list))
 
 
-def help_command(update: Update, context: DefaultContextType) -> None:
+def help_command(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Displays info on how to use the bot."""
     update.message.reply_text(
         "Use /start to test this bot. Use /clear to clear the stored data so that you can see "
@@ -40,7 +41,7 @@ def help_command(update: Update, context: DefaultContextType) -> None:
     )
 
 
-def clear(update: Update, context: DefaultContextType) -> None:
+def clear(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Clears the callback data cache"""
     context.bot.callback_data_cache.clear_callback_data()
     context.bot.callback_data_cache.clear_callback_queries()
@@ -54,7 +55,7 @@ def build_keyboard(current_list: List[int]) -> InlineKeyboardMarkup:
     )
 
 
-def list_button(update: Update, context: DefaultContextType) -> None:
+def list_button(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Parses the CallbackQuery and updates the message text."""
     query = update.callback_query
     query.answer()
@@ -74,7 +75,7 @@ def list_button(update: Update, context: DefaultContextType) -> None:
     context.drop_callback_data(query)
 
 
-def handle_invalid_button(update: Update, context: DefaultContextType) -> None:
+def handle_invalid_button(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Informs the user that the button is no longer available."""
     update.callback_query.answer()
     update.effective_message.edit_text(

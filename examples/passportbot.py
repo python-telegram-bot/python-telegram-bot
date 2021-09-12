@@ -13,10 +13,9 @@ See https://git.io/fAvYd for how to use Telegram Passport properly with python-t
 import logging
 
 from telegram import Update
-from telegram.ext import MessageHandler, Filters, Updater
+from telegram.ext import MessageHandler, Filters, Updater, CallbackContext
 
 # Enable logging
-from telegram.ext.utils.types import DefaultContextType
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
@@ -25,7 +24,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def msg(update: Update, context: DefaultContextType) -> None:
+def msg(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Downloads and prints the received passport data."""
     # Retrieve passport data
     passport_data = update.message.passport_data

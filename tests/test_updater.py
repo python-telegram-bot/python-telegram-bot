@@ -131,8 +131,11 @@ class TestUpdater:
         assert isinstance(builder_1, UpdaterBuilder)
         assert isinstance(builder_2, UpdaterBuilder)
         assert builder_1 is not builder_2
-        assert not builder_1._token_was_set
-        assert not builder_2._token_was_set
+
+        # Make sure that setting a token doesn't raise an exception
+        # i.e. check that the builders are "empty"/new
+        builder_1.token(updater.bot.token)
+        builder_2.token(updater.bot.token)
 
     @pytest.mark.parametrize(
         ('error',),

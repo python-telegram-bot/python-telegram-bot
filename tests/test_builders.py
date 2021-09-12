@@ -36,7 +36,7 @@ from telegram.ext import (
     Dispatcher,
     Updater,
 )
-from telegram.ext.builders import _BOT_CHECKS, _DISPATCHER_CHECKS, DispatcherBuilder, _BaseBuilder
+from telegram.ext.builders import _BOT_CHECKS, _DISPATCHER_CHECKS
 
 
 @pytest.fixture(scope='function')
@@ -44,26 +44,7 @@ def builder():
     return UpdaterBuilder()
 
 
-UPDATER_METHODS = [
-    slot.lstrip('_')
-    for slot in _BaseBuilder.__slots__
-    if not (slot.endswith('_was_set') or slot.endswith('_kwargs'))
-]
-
-
 class TestBuilder:
-    @pytest.mark.parametrize('method', UPDATER_METHODS)
-    def test_call_method_twice_for_updater_builder(self, builder, method):
-        getattr(builder, method)(None)
-        with pytest.raises(RuntimeError, match=f'`{method}` was already set.'):
-            getattr(builder, method)(None)
-
-        dispatcher_builder = DispatcherBuilder()
-        if hasattr(dispatcher_builder, method):
-            getattr(dispatcher_builder, method)(None)
-            with pytest.raises(RuntimeError, match=f'`{method}` was already set.'):
-                getattr(dispatcher_builder, method)(None)
-
     @pytest.mark.parametrize(
         'method, description', _BOT_CHECKS, ids=[entry[0] for entry in _BOT_CHECKS]
     )
@@ -134,7 +115,7 @@ class TestBuilder:
         updater = builder.build()
         assert updater.bot is bot
         assert updater.dispatcher.bot is bot
-        assert updater.dispatcher.job_queue._dispatcher is updater.dispatcher
+        assert updater.dispatcher.job_queue._dispatcher() is updater.dispatcher
         assert updater.exception_event is updater.dispatcher.exception_event
 
     def test_build_custom_dispatcher(self, builder, dp):
@@ -186,7 +167,7 @@ class TestBuilder:
         assert dispatcher.update_queue is dp.update_queue
         assert dispatcher.exception_event is dp.exception_event
         assert dispatcher.job_queue is job_queue
-        assert dispatcher.job_queue._dispatcher is dispatcher
+        assert dispatcher.job_queue._dispatcher() is dispatcher
         assert dispatcher.persistence is persistence
         assert dispatcher.context_types is context_types
         assert dispatcher.workers == 3

@@ -19,10 +19,10 @@ from telegram.ext import (
     CommandHandler,
     ChatMemberHandler,
     Updater,
+    CallbackContext,
 )
 
 # Enable logging
-from telegram.ext.utils.types import DefaultContextType
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -67,7 +67,7 @@ def extract_status_change(
     return was_member, is_member
 
 
-def track_chats(update: Update, context: DefaultContextType) -> None:
+def track_chats(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Tracks the chats the bot is in."""
     result = extract_status_change(update.my_chat_member)
     if result is None:
@@ -102,7 +102,7 @@ def track_chats(update: Update, context: DefaultContextType) -> None:
             context.bot_data.setdefault("channel_ids", set()).discard(chat.id)
 
 
-def show_chats(update: Update, context: DefaultContextType) -> None:
+def show_chats(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Shows which chats the bot is in"""
     user_ids = ", ".join(str(uid) for uid in context.bot_data.setdefault("user_ids", set()))
     group_ids = ", ".join(str(gid) for gid in context.bot_data.setdefault("group_ids", set()))
@@ -115,7 +115,7 @@ def show_chats(update: Update, context: DefaultContextType) -> None:
     update.effective_message.reply_text(text)
 
 
-def greet_chat_members(update: Update, context: DefaultContextType) -> None:
+def greet_chat_members(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Greets new users in chats and announces when someone leaves"""
     result = extract_status_change(update.chat_member)
     if result is None:

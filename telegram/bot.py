@@ -185,8 +185,8 @@ class Bot(TelegramObject):
     def __init__(
         self,
         token: str,
-        base_url: str = None,
-        base_file_url: str = None,
+        base_url: str = 'https://api.telegram.org/bot',
+        base_file_url: str = 'https://api.telegram.org/file/bot',
         request: 'Request' = None,
         private_key: bytes = None,
         private_key_password: bytes = None,
@@ -203,12 +203,6 @@ class Bot(TelegramObject):
                 TelegramDeprecationWarning,
                 stacklevel=3,
             )
-
-        if base_url is None:
-            base_url = 'https://api.telegram.org/bot'
-
-        if base_file_url is None:
-            base_file_url = 'https://api.telegram.org/file/bot'
 
         self.base_url = base_url + self.token
         self.base_file_url = base_file_url + self.token
