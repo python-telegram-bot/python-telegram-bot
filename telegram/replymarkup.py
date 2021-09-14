@@ -41,7 +41,6 @@ class ReplyMarkup(TelegramObject):
         keyboard: Sequence[Sequence[Union['KeyboardButton', 'str', 'InlineKeyboardButton']]]
     ) -> bool:
         """Checks if the keyboard provided is of the correct type - A list of lists."""
-
         for row in keyboard:
             if not isinstance(row, list):
                 return False
