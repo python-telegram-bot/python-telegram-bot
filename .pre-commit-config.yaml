@@ -20,6 +20,7 @@ repos:
         files: ^(telegram|examples)/.*\.py$
         args:
           - --rcfile=setup.cfg
+          - --jobs=0
         additional_dependencies:
           - certifi
           - tornado>=6.1
