@@ -92,13 +92,13 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         input_field_placeholder: str = None,
         **_kwargs: Any,
     ):
-        # Required
         if not self._check_keyboard_type(keyboard):
             raise ValueError(
                 "The parameter `keyboard` should be a list of list of "
                 "strings or KeyboardButtons"
             )
 
+        # Required
         self.keyboard = []
         for row in keyboard:
             button_row = []
