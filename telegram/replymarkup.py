@@ -17,12 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram ReplyMarkup Objects."""
-from typing import Union, TYPE_CHECKING, Sequence
-
 from telegram import TelegramObject
-
-if TYPE_CHECKING:
-    from telegram import KeyboardButton, InlineKeyboardButton
 
 
 class ReplyMarkup(TelegramObject):
@@ -37,11 +32,9 @@ class ReplyMarkup(TelegramObject):
     __slots__ = ()
 
     @staticmethod
-    def _check_keyboard_type(
-        keyboard: Sequence[Sequence[Union['KeyboardButton', 'str', 'InlineKeyboardButton']]]
-    ) -> bool:
+    def _check_keyboard_type(keyboard: object) -> bool:
         """Checks if the keyboard provided is of the correct type - A list of lists."""
-        for row in keyboard:
+        for row in keyboard:  # type: ignore[attr-defined]
             if not isinstance(row, list):
                 return False
         return True
