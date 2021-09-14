@@ -53,6 +53,12 @@ class InlineKeyboardMarkup(ReplyMarkup):
 
         self._id_attrs = (self.inline_keyboard,)
 
+        if not self._check_keyboard_type(inline_keyboard):
+            raise ValueError(
+                "The parameter `inline_keyboard` should be a list of "
+                "list of InlineKeyboardButtons"
+            )
+
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
