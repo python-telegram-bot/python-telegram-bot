@@ -66,6 +66,14 @@ from tests.conftest import expect_bad_request, check_defaults_handling, GITHUB_A
 from tests.bots import FALLBACKS
 
 
+def to_camel_case(snake_str):
+    """https://stackoverflow.com/a/19053800"""
+    components = snake_str.split('_')
+    # We capitalize the first letter of each component except the first one
+    # with the 'title' method and join them together.
+    return components[0] + ''.join(x.title() for x in components[1:])
+
+
 class ExtBotSubClass(ExtBot):
     # used for test_defaults_warning below
     pass
@@ -2455,3 +2463,25 @@ class TestBot:
             assert 'Passing Defaults to telegram.Bot is deprecated.' in str(recwarn[-1].message)
         else:
             assert len(recwarn) == 0
+
+    def test_camel_case_redefinition_extbot(self):
+        invalid_camel_case_functions = []
+        for function_name, function in ExtBot.__dict__.items():
+            camel_case_function = getattr(ExtBot, to_camel_case(function_name), False)
+            if callable(function) and camel_case_function and camel_case_function is not function:
+                invalid_camel_case_functions.append(function_name)
+        assert invalid_camel_case_functions == []
+
+    def test_camel_case_bot(self):
+        not_available_camelcase_functions = []
+        for function_name, function in Bot.__dict__.items():
+            if (
+                function_name.startswith("_")
+                or not callable(function)
+                or function_name == "to_dict"
+            ):
+                continue
+            camel_case_function = getattr(Bot, to_camel_case(function_name), False)
+            if not camel_case_function:
+                not_available_camelcase_functions.append(function_name)
+        assert not_available_camelcase_functions == []
