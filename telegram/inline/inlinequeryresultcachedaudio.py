@@ -69,12 +69,12 @@ class InlineQueryResultCachedAudio(InlineQueryResult):
     """
 
     __slots__ = (
-        'reply_markup',
-        'caption_entities',
-        'caption',
-        'parse_mode',
-        'audio_file_id',
-        'input_message_content',
+        "reply_markup",
+        "caption_entities",
+        "caption",
+        "parse_mode",
+        "audio_file_id",
+        "input_message_content",
     )
 
     def __init__(
@@ -82,14 +82,14 @@ class InlineQueryResultCachedAudio(InlineQueryResult):
         id: str,  # pylint: disable=W0622
         audio_file_id: str,
         caption: str = None,
-        reply_markup: 'ReplyMarkup' = None,
-        input_message_content: 'InputMessageContent' = None,
+        reply_markup: "ReplyMarkup" = None,
+        input_message_content: "InputMessageContent" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
         **_kwargs: Any,
     ):
         # Required
-        super().__init__('audio', id)
+        super().__init__("audio", id)
         self.audio_file_id = audio_file_id
 
         # Optionals

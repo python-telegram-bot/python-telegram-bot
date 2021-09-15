@@ -48,14 +48,14 @@ from telegram.ext import (
 )
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def user1():
-    return User(first_name='Misses Test', id=123, is_bot=False)
+    return User(first_name="Misses Test", id=123, is_bot=False)
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def user2():
-    return User(first_name='Mister Test', id=124, is_bot=False)
+    return User(first_name="Mister Test", id=124, is_bot=False)
 
 
 @pytest.fixture(autouse=True)
@@ -85,7 +85,7 @@ class TestConversationHandler:
 
     # Drinking state definitions (nested)
     # At first we're holding the cup.  Then we sip coffee, and last we swallow it
-    HOLDING, SIPPING, SWALLOWING, REPLENISHING, STOPPING = map(chr, range(ord('a'), ord('f')))
+    HOLDING, SIPPING, SWALLOWING, REPLENISHING, STOPPING = map(chr, range(ord("a"), ord("f")))
 
     current_state, entry_points, states, fallbacks = None, None, None, None
     group = Chat(0, Chat.GROUP)
@@ -97,7 +97,7 @@ class TestConversationHandler:
     def test_slot_behaviour(self, mro_slots):
         handler = ConversationHandler(self.entry_points, self.states, self.fallbacks)
         for attr in handler.__slots__:
-            assert getattr(handler, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(handler, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(handler)) == len(set(mro_slots(handler))), "duplicate slot"
 
     # Test related
@@ -106,46 +106,46 @@ class TestConversationHandler:
         self.raise_dp_handler_stop = False
         self.test_flag = False
         self.current_state = {}
-        self.entry_points = [CommandHandler('start', self.start)]
+        self.entry_points = [CommandHandler("start", self.start)]
         self.states = {
-            self.THIRSTY: [CommandHandler('brew', self.brew), CommandHandler('wait', self.start)],
-            self.BREWING: [CommandHandler('pourCoffee', self.drink)],
+            self.THIRSTY: [CommandHandler("brew", self.brew), CommandHandler("wait", self.start)],
+            self.BREWING: [CommandHandler("pourCoffee", self.drink)],
             self.DRINKING: [
-                CommandHandler('startCoding', self.code),
-                CommandHandler('drinkMore', self.drink),
-                CommandHandler('end', self.end),
+                CommandHandler("startCoding", self.code),
+                CommandHandler("drinkMore", self.drink),
+                CommandHandler("end", self.end),
             ],
             self.CODING: [
-                CommandHandler('keepCoding', self.code),
-                CommandHandler('gettingThirsty', self.start),
-                CommandHandler('drinkMore', self.drink),
+                CommandHandler("keepCoding", self.code),
+                CommandHandler("gettingThirsty", self.start),
+                CommandHandler("drinkMore", self.drink),
             ],
         }
-        self.fallbacks = [CommandHandler('eat', self.start)]
+        self.fallbacks = [CommandHandler("eat", self.start)]
         self.is_timeout = False
 
         # for nesting tests
         self.nested_states = {
-            self.THIRSTY: [CommandHandler('brew', self.brew), CommandHandler('wait', self.start)],
-            self.BREWING: [CommandHandler('pourCoffee', self.drink)],
+            self.THIRSTY: [CommandHandler("brew", self.brew), CommandHandler("wait", self.start)],
+            self.BREWING: [CommandHandler("pourCoffee", self.drink)],
             self.CODING: [
-                CommandHandler('keepCoding', self.code),
-                CommandHandler('gettingThirsty', self.start),
-                CommandHandler('drinkMore', self.drink),
+                CommandHandler("keepCoding", self.code),
+                CommandHandler("gettingThirsty", self.start),
+                CommandHandler("drinkMore", self.drink),
             ],
         }
-        self.drinking_entry_points = [CommandHandler('hold', self.hold)]
+        self.drinking_entry_points = [CommandHandler("hold", self.hold)]
         self.drinking_states = {
-            self.HOLDING: [CommandHandler('sip', self.sip)],
-            self.SIPPING: [CommandHandler('swallow', self.swallow)],
-            self.SWALLOWING: [CommandHandler('hold', self.hold)],
+            self.HOLDING: [CommandHandler("sip", self.sip)],
+            self.SIPPING: [CommandHandler("swallow", self.swallow)],
+            self.SWALLOWING: [CommandHandler("hold", self.hold)],
         }
         self.drinking_fallbacks = [
-            CommandHandler('replenish', self.replenish),
-            CommandHandler('stop', self.stop),
-            CommandHandler('end', self.end),
-            CommandHandler('startCoding', self.code),
-            CommandHandler('drinkMore', self.drink),
+            CommandHandler("replenish", self.replenish),
+            CommandHandler("stop", self.stop),
+            CommandHandler("end", self.end),
+            CommandHandler("startCoding", self.code),
+            CommandHandler("drinkMore", self.drink),
         ]
         self.drinking_entry_points.extend(self.drinking_fallbacks)
 
@@ -203,7 +203,7 @@ class TestConversationHandler:
 
     @raise_dphs
     def passout(self, update, context):
-        assert update.message.text == '/brew'
+        assert update.message.text == "/brew"
         assert isinstance(update, Update)
         self.is_timeout = True
 
@@ -214,7 +214,7 @@ class TestConversationHandler:
 
     @raise_dphs
     def passout_context(self, update, context):
-        assert update.message.text == '/brew'
+        assert update.message.text == "/brew"
         assert isinstance(context, CallbackContext)
         self.is_timeout = True
 
@@ -247,32 +247,32 @@ class TestConversationHandler:
 
     # Tests
     @pytest.mark.parametrize(
-        'attr',
+        "attr",
         [
-            'entry_points',
-            'states',
-            'fallbacks',
-            'per_chat',
-            'name',
-            'per_user',
-            'allow_reentry',
-            'conversation_timeout',
-            'map_to_parent',
+            "entry_points",
+            "states",
+            "fallbacks",
+            "per_chat",
+            "name",
+            "per_user",
+            "allow_reentry",
+            "conversation_timeout",
+            "map_to_parent",
         ],
         indirect=False,
     )
     def test_immutable(self, attr):
         ch = ConversationHandler(
-            'entry_points',
-            {'states': ['states']},
-            'fallbacks',
-            per_chat='per_chat',
-            per_user='per_user',
+            "entry_points",
+            {"states": ["states"]},
+            "fallbacks",
+            per_chat="per_chat",
+            per_user="per_user",
             per_message=False,
-            allow_reentry='allow_reentry',
-            conversation_timeout='conversation_timeout',
-            name='name',
-            map_to_parent='map_to_parent',
+            allow_reentry="allow_reentry",
+            conversation_timeout="conversation_timeout",
+            name="name",
+            map_to_parent="map_to_parent",
         )
 
         value = getattr(ch, attr)
@@ -282,24 +282,24 @@ class TestConversationHandler:
             assert list(value.keys())[0] == attr
         else:
             assert getattr(ch, attr) == attr
-        with pytest.raises(ValueError, match=f'You can not assign a new value to {attr}'):
+        with pytest.raises(ValueError, match=f"You can not assign a new value to {attr}"):
             setattr(ch, attr, True)
 
     def test_immutable_per_message(self):
         ch = ConversationHandler(
-            'entry_points',
-            {'states': ['states']},
-            'fallbacks',
-            per_chat='per_chat',
-            per_user='per_user',
+            "entry_points",
+            {"states": ["states"]},
+            "fallbacks",
+            per_chat="per_chat",
+            per_user="per_user",
             per_message=False,
-            allow_reentry='allow_reentry',
-            conversation_timeout='conversation_timeout',
-            name='name',
-            map_to_parent='map_to_parent',
+            allow_reentry="allow_reentry",
+            conversation_timeout="conversation_timeout",
+            name="name",
+            map_to_parent="map_to_parent",
         )
         assert ch.per_message is False
-        with pytest.raises(ValueError, match='You can not assign a new value to per_message'):
+        with pytest.raises(ValueError, match="You can not assign a new value to per_message"):
             ch.per_message = True
 
     def test_per_all_false(self):
@@ -331,9 +331,9 @@ class TestConversationHandler:
             None,
             self.group,
             from_user=user1,
-            text='/start',
+            text="/start",
             entities=[
-                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
             bot=bot,
         )
@@ -341,20 +341,20 @@ class TestConversationHandler:
         assert self.current_state[user1.id] == self.THIRSTY
 
         # The user is thirsty and wants to brew coffee.
-        message.text = '/brew'
-        message.entities[0].length = len('/brew')
+        message.text = "/brew"
+        message.entities[0].length = len("/brew")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.BREWING
 
         # Lets see if an invalid command makes sure, no state is changed.
-        message.text = '/nothing'
-        message.entities[0].length = len('/nothing')
+        message.text = "/nothing"
+        message.entities[0].length = len("/nothing")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.BREWING
 
         # Lets see if the state machine still works by pouring coffee.
-        message.text = '/pourCoffee'
-        message.entities[0].length = len('/pourCoffee')
+        message.text = "/pourCoffee"
+        message.entities[0].length = len("/pourCoffee")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.DRINKING
 
@@ -376,21 +376,21 @@ class TestConversationHandler:
             None,
             self.group,
             from_user=user1,
-            text='/start',
+            text="/start",
             entities=[
-                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
             bot=bot,
         )
         dp.process_update(Update(update_id=0, message=message))
-        message.text = '/brew'
-        message.entities[0].length = len('/brew')
+        message.text = "/brew"
+        message.entities[0].length = len("/brew")
         dp.process_update(Update(update_id=0, message=message))
-        message.text = '/pourCoffee'
-        message.entities[0].length = len('/pourCoffee')
+        message.text = "/pourCoffee"
+        message.entities[0].length = len("/pourCoffee")
         dp.process_update(Update(update_id=0, message=message))
-        message.text = '/end'
-        message.entities[0].length = len('/end')
+        message.text = "/end"
+        message.entities[0].length = len("/end")
         caplog.clear()
         with caplog.at_level(logging.ERROR):
             dp.process_update(Update(update_id=0, message=message))
@@ -411,8 +411,8 @@ class TestConversationHandler:
             None,
             self.group,
             from_user=user1,
-            text='/eat',
-            entities=[MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/eat'))],
+            text="/eat",
+            entities=[MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/eat"))],
             bot=bot,
         )
         dp.process_update(Update(update_id=0, message=message))
@@ -420,20 +420,20 @@ class TestConversationHandler:
             self.current_state[user1.id]
 
         # User starts the state machine.
-        message.text = '/start'
-        message.entities[0].length = len('/start')
+        message.text = "/start"
+        message.entities[0].length = len("/start")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.THIRSTY
 
         # The user is thirsty and wants to brew coffee.
-        message.text = '/brew'
-        message.entities[0].length = len('/brew')
+        message.text = "/brew"
+        message.entities[0].length = len("/brew")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.BREWING
 
         # Now a fallback command is issued
-        message.text = '/eat'
-        message.entities[0].length = len('/eat')
+        message.text = "/eat"
+        message.entities[0].length = len("/eat")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.THIRSTY
 
@@ -453,9 +453,9 @@ class TestConversationHandler:
             None,
             self.group,
             from_user=user1,
-            text='/start',
+            text="/start",
             entities=[
-                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
             bot=bot,
         )
@@ -483,24 +483,24 @@ class TestConversationHandler:
             None,
             self.group,
             from_user=user1,
-            text='/start',
+            text="/start",
             entities=[
-                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
             bot=bot,
         )
         dp.process_update(Update(update_id=0, message=message))
 
         # The user is thirsty and wants to brew coffee.
-        message.text = '/brew'
-        message.entities[0].length = len('/brew')
+        message.text = "/brew"
+        message.entities[0].length = len("/brew")
         dp.process_update(Update(update_id=0, message=message))
 
         # Let's now verify that for another user, who did not start yet,
         # the state will be changed because they are in the same group.
         message.from_user = user2
-        message.text = '/pourCoffee'
-        message.entities[0].length = len('/pourCoffee')
+        message.text = "/pourCoffee"
+        message.entities[0].length = len("/pourCoffee")
         dp.process_update(Update(update_id=0, message=message))
 
         assert handler.conversations[(self.group.id,)] == self.DRINKING
@@ -520,24 +520,24 @@ class TestConversationHandler:
             None,
             self.group,
             from_user=user1,
-            text='/start',
+            text="/start",
             entities=[
-                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
             bot=bot,
         )
         dp.process_update(Update(update_id=0, message=message))
 
         # The user is thirsty and wants to brew coffee.
-        message.text = '/brew'
-        message.entities[0].length = len('/brew')
+        message.text = "/brew"
+        message.entities[0].length = len("/brew")
         dp.process_update(Update(update_id=0, message=message))
 
         # Let's now verify that for the same user in a different group, the state will still be
         # updated
         message.chat = self.second_group
-        message.text = '/pourCoffee'
-        message.entities[0].length = len('/pourCoffee')
+        message.text = "/pourCoffee"
+        message.entities[0].length = len("/pourCoffee")
         dp.process_update(Update(update_id=0, message=message))
 
         assert handler.conversations[(user1.id,)] == self.DRINKING
@@ -562,10 +562,10 @@ class TestConversationHandler:
 
         # User one, starts the state machine.
         message = Message(
-            0, None, self.group, from_user=user1, text='msg w/ inlinekeyboard', bot=bot
+            0, None, self.group, from_user=user1, text="msg w/ inlinekeyboard", bot=bot
         )
 
-        cbq = CallbackQuery(0, user1, None, message=message, data='data', bot=bot)
+        cbq = CallbackQuery(0, user1, None, message=message, data="data", bot=bot)
         dp.process_update(Update(update_id=0, callback_query=cbq))
 
         assert handler.conversations[(self.group.id, user1.id, message.message_id)] == 1
@@ -583,7 +583,7 @@ class TestConversationHandler:
 
     def test_end_on_first_message(self, dp, bot, user1):
         handler = ConversationHandler(
-            entry_points=[CommandHandler('start', self.start_end)], states={}, fallbacks=[]
+            entry_points=[CommandHandler("start", self.start_end)], states={}, fallbacks=[]
         )
         dp.add_handler(handler)
 
@@ -593,9 +593,9 @@ class TestConversationHandler:
             None,
             self.group,
             from_user=user1,
-            text='/start',
+            text="/start",
             entities=[
-                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
             bot=bot,
         )
@@ -606,7 +606,7 @@ class TestConversationHandler:
         handler = ConversationHandler(
             entry_points=[
                 CommandHandler(
-                    'start', lambda update, context: dp.run_async(self.start_end, update, context)
+                    "start", lambda update, context: dp.run_async(self.start_end, update, context)
                 )
             ],
             states={},
@@ -621,9 +621,9 @@ class TestConversationHandler:
             None,
             self.group,
             from_user=user1,
-            text='/start',
+            text="/start",
             entities=[
-                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
             bot=bot,
         )
@@ -632,8 +632,8 @@ class TestConversationHandler:
         # Assert that the Promise has been accepted as the new state
         assert len(handler.conversations) == 1
 
-        message.text = 'resolve promise pls'
-        message.entities[0].length = len('resolve promise pls')
+        message.text = "resolve promise pls"
+        message.entities[0].length = len("resolve promise pls")
         dp.update_queue.put(Update(update_id=0, message=message))
         sleep(0.1)
         # Assert that the Promise has been resolved and the conversation ended.
@@ -641,7 +641,7 @@ class TestConversationHandler:
 
     def test_end_on_first_message_async_handler(self, dp, bot, user1):
         handler = ConversationHandler(
-            entry_points=[CommandHandler('start', self.start_end, run_async=True)],
+            entry_points=[CommandHandler("start", self.start_end, run_async=True)],
             states={},
             fallbacks=[],
         )
@@ -653,10 +653,10 @@ class TestConversationHandler:
             0,
             None,
             self.group,
-            text='/start',
+            text="/start",
             from_user=user1,
             entities=[
-                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
             bot=bot,
         )
@@ -665,8 +665,8 @@ class TestConversationHandler:
         # Assert that the Promise has been accepted as the new state
         assert len(handler.conversations) == 1
 
-        message.text = 'resolve promise pls'
-        message.entities[0].length = len('resolve promise pls')
+        message.text = "resolve promise pls"
+        message.entities[0].length = len("resolve promise pls")
         dp.update_queue.put(Update(update_id=0, message=message))
         sleep(0.1)
         # Assert that the Promise has been resolved and the conversation ended.
@@ -674,12 +674,12 @@ class TestConversationHandler:
 
     def test_none_on_first_message(self, dp, bot, user1):
         handler = ConversationHandler(
-            entry_points=[CommandHandler('start', self.start_none)], states={}, fallbacks=[]
+            entry_points=[CommandHandler("start", self.start_none)], states={}, fallbacks=[]
         )
         dp.add_handler(handler)
 
         # User starts the state machine and a callback function returns None
-        message = Message(0, None, self.group, from_user=user1, text='/start', bot=bot)
+        message = Message(0, None, self.group, from_user=user1, text="/start", bot=bot)
         dp.process_update(Update(update_id=0, message=message))
         assert len(handler.conversations) == 0
 
@@ -687,7 +687,7 @@ class TestConversationHandler:
         handler = ConversationHandler(
             entry_points=[
                 CommandHandler(
-                    'start', lambda update, context: dp.run_async(self.start_none, update, context)
+                    "start", lambda update, context: dp.run_async(self.start_none, update, context)
                 )
             ],
             states={},
@@ -702,9 +702,9 @@ class TestConversationHandler:
             None,
             self.group,
             from_user=user1,
-            text='/start',
+            text="/start",
             entities=[
-                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
             bot=bot,
         )
@@ -713,7 +713,7 @@ class TestConversationHandler:
         # Assert that the Promise has been accepted as the new state
         assert len(handler.conversations) == 1
 
-        message.text = 'resolve promise pls'
+        message.text = "resolve promise pls"
         dp.update_queue.put(Update(update_id=0, message=message))
         sleep(0.1)
         # Assert that the Promise has been resolved and the conversation ended.
@@ -721,7 +721,7 @@ class TestConversationHandler:
 
     def test_none_on_first_message_async_handler(self, dp, bot, user1):
         handler = ConversationHandler(
-            entry_points=[CommandHandler('start', self.start_none, run_async=True)],
+            entry_points=[CommandHandler("start", self.start_none, run_async=True)],
             states={},
             fallbacks=[],
         )
@@ -733,10 +733,10 @@ class TestConversationHandler:
             0,
             None,
             self.group,
-            text='/start',
+            text="/start",
             from_user=user1,
             entities=[
-                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
             bot=bot,
         )
@@ -745,7 +745,7 @@ class TestConversationHandler:
         # Assert that the Promise has been accepted as the new state
         assert len(handler.conversations) == 1
 
-        message.text = 'resolve promise pls'
+        message.text = "resolve promise pls"
         dp.update_queue.put(Update(update_id=0, message=message))
         sleep(0.1)
         # Assert that the Promise has been resolved and the conversation ended.
@@ -753,7 +753,7 @@ class TestConversationHandler:
 
     def test_per_chat_message_without_chat(self, bot, user1):
         handler = ConversationHandler(
-            entry_points=[CommandHandler('start', self.start_end)], states={}, fallbacks=[]
+            entry_points=[CommandHandler("start", self.start_end)], states={}, fallbacks=[]
         )
         cbq = CallbackQuery(0, user1, None, None, bot=bot)
         update = Update(0, callback_query=cbq)
@@ -763,7 +763,7 @@ class TestConversationHandler:
         handler = ConversationHandler(
             entry_points=[MessageHandler(Filters.all, self.start_end)], states={}, fallbacks=[]
         )
-        message = Message(0, date=None, chat=Chat(0, Chat.CHANNEL, 'Misses Test'), bot=bot)
+        message = Message(0, date=None, chat=Chat(0, Chat.CHANNEL, "Misses Test"), bot=bot)
 
         update = Update(0, channel_post=message)
         assert not handler.check_update(update)
@@ -773,13 +773,13 @@ class TestConversationHandler:
 
     def test_all_update_types(self, dp, bot, user1):
         handler = ConversationHandler(
-            entry_points=[CommandHandler('start', self.start_end)], states={}, fallbacks=[]
+            entry_points=[CommandHandler("start", self.start_end)], states={}, fallbacks=[]
         )
-        message = Message(0, None, self.group, from_user=user1, text='ignore', bot=bot)
-        callback_query = CallbackQuery(0, user1, None, message=message, data='data', bot=bot)
-        chosen_inline_result = ChosenInlineResult(0, user1, 'query', bot=bot)
-        inline_query = InlineQuery(0, user1, 'query', 0, bot=bot)
-        pre_checkout_query = PreCheckoutQuery(0, user1, 'USD', 100, [], bot=bot)
+        message = Message(0, None, self.group, from_user=user1, text="ignore", bot=bot)
+        callback_query = CallbackQuery(0, user1, None, message=message, data="data", bot=bot)
+        chosen_inline_result = ChosenInlineResult(0, user1, "query", bot=bot)
+        inline_query = InlineQuery(0, user1, "query", 0, bot=bot)
+        pre_checkout_query = PreCheckoutQuery(0, user1, "USD", 100, [], bot=bot)
         shipping_query = ShippingQuery(0, user1, [], None, bot=bot)
         assert not handler.check_update(Update(0, callback_query=callback_query))
         assert not handler.check_update(Update(0, chosen_inline_result=chosen_inline_result))
@@ -806,9 +806,9 @@ class TestConversationHandler:
             None,
             self.group,
             from_user=user1,
-            text='/start',
+            text="/start",
             entities=[
-                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
             bot=bot,
         )
@@ -846,9 +846,9 @@ class TestConversationHandler:
             None,
             self.group,
             from_user=user1,
-            text='/start',
+            text="/start",
             entities=[
-                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
             bot=bot,
         )
@@ -888,9 +888,9 @@ class TestConversationHandler:
             None,
             self.group,
             from_user=user1,
-            text='/start',
+            text="/start",
             entities=[
-                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
             bot=bot,
         )
@@ -926,9 +926,9 @@ class TestConversationHandler:
             None,
             self.group,
             from_user=user1,
-            text='/start',
+            text="/start",
             entities=[
-                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
             bot=bot,
         )
@@ -940,8 +940,8 @@ class TestConversationHandler:
         # Start state machine, do something, then reach timeout
         dp.process_update(Update(update_id=1, message=message))
         assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
-        message.text = '/brew'
-        message.entities[0].length = len('/brew')
+        message.text = "/brew"
+        message.entities[0].length = len("/brew")
         dp.process_update(Update(update_id=2, message=message))
         assert handler.conversations.get((self.group.id, user1.id)) == self.BREWING
         sleep(0.7)
@@ -966,25 +966,25 @@ class TestConversationHandler:
             None,
             self.group,
             from_user=user1,
-            text='/start',
+            text="/start",
             entities=[
-                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
             bot=bot,
         )
         # start the conversation
         dp.process_update(Update(update_id=0, message=message))
         sleep(0.1)
-        message.text = '/brew'
-        message.entities[0].length = len('/brew')
+        message.text = "/brew"
+        message.entities[0].length = len("/brew")
         dp.process_update(Update(update_id=1, message=message))
         sleep(0.1)
-        message.text = '/pourCoffee'
-        message.entities[0].length = len('/pourCoffee')
+        message.text = "/pourCoffee"
+        message.entities[0].length = len("/pourCoffee")
         dp.process_update(Update(update_id=2, message=message))
         sleep(0.1)
-        message.text = '/end'
-        message.entities[0].length = len('/end')
+        message.text = "/end"
+        message.entities[0].length = len("/end")
         dp.process_update(Update(update_id=3, message=message))
         sleep(1)
         # assert timeout handler didn't got called
@@ -1009,10 +1009,10 @@ class TestConversationHandler:
             0,
             None,
             self.group,
-            text='/start',
+            text="/start",
             from_user=user1,
             entities=[
-                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
             bot=bot,
         )
@@ -1024,7 +1024,7 @@ class TestConversationHandler:
             assert handler.conversations.get((self.group.id, user1.id)) is None
         assert len(caplog.records) == 1
         rec = caplog.records[-1]
-        assert rec.getMessage().startswith('DispatcherHandlerStop in TIMEOUT')
+        assert rec.getMessage().startswith("DispatcherHandlerStop in TIMEOUT")
 
     def test_conversation_handler_timeout_update_and_context(self, dp, bot, user1):
         context = None
@@ -1035,10 +1035,10 @@ class TestConversationHandler:
             return self.start(u, c)
 
         states = self.states
-        timeout_handler = CommandHandler('start', None)
+        timeout_handler = CommandHandler("start", None)
         states.update({ConversationHandler.TIMEOUT: [timeout_handler]})
         handler = ConversationHandler(
-            entry_points=[CommandHandler('start', start_callback)],
+            entry_points=[CommandHandler("start", start_callback)],
             states=states,
             fallbacks=self.fallbacks,
             conversation_timeout=0.5,
@@ -1051,9 +1051,9 @@ class TestConversationHandler:
             None,
             self.group,
             from_user=user1,
-            text='/start',
+            text="/start",
             entities=[
-                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
             bot=bot,
         )
@@ -1094,9 +1094,9 @@ class TestConversationHandler:
             None,
             self.group,
             from_user=user1,
-            text='/start',
+            text="/start",
             entities=[
-                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
             bot=bot,
         )
@@ -1104,14 +1104,14 @@ class TestConversationHandler:
         assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
         sleep(0.35)  # t=.35
         assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
-        message.text = '/brew'
-        message.entities[0].length = len('/brew')
+        message.text = "/brew"
+        message.entities[0].length = len("/brew")
         dp.process_update(Update(update_id=0, message=message))
         assert handler.conversations.get((self.group.id, user1.id)) == self.BREWING
         sleep(0.25)  # t=.6
         assert handler.conversations.get((self.group.id, user1.id)) == self.BREWING
-        message.text = '/pourCoffee'
-        message.entities[0].length = len('/pourCoffee')
+        message.text = "/pourCoffee"
+        message.entities[0].length = len("/pourCoffee")
         dp.process_update(Update(update_id=0, message=message))
         assert handler.conversations.get((self.group.id, user1.id)) == self.DRINKING
         sleep(0.4)  # t=1.0
@@ -1134,22 +1134,22 @@ class TestConversationHandler:
             None,
             self.group,
             from_user=user1,
-            text='/start',
+            text="/start",
             entities=[
-                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
             bot=bot,
         )
         dp.process_update(Update(update_id=0, message=message))
         assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
-        message.text = '/brew'
-        message.entities[0].length = len('/brew')
-        message.entities[0].length = len('/brew')
+        message.text = "/brew"
+        message.entities[0].length = len("/brew")
+        message.entities[0].length = len("/brew")
         message.from_user = user2
         dp.process_update(Update(update_id=0, message=message))
         assert handler.conversations.get((self.group.id, user2.id)) is None
-        message.text = '/start'
-        message.entities[0].length = len('/start')
+        message.text = "/start"
+        message.entities[0].length = len("/start")
         dp.process_update(Update(update_id=0, message=message))
         assert handler.conversations.get((self.group.id, user2.id)) == self.THIRSTY
         sleep(0.7)
@@ -1161,8 +1161,8 @@ class TestConversationHandler:
         states.update(
             {
                 ConversationHandler.TIMEOUT: [
-                    CommandHandler('brew', self.passout),
-                    MessageHandler(~Filters.regex('oding'), self.passout2),
+                    CommandHandler("brew", self.passout),
+                    MessageHandler(~Filters.regex("oding"), self.passout2),
                 ]
             }
         )
@@ -1180,15 +1180,15 @@ class TestConversationHandler:
             None,
             self.group,
             from_user=user1,
-            text='/start',
+            text="/start",
             entities=[
-                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
             bot=bot,
         )
         dp.process_update(Update(update_id=0, message=message))
-        message.text = '/brew'
-        message.entities[0].length = len('/brew')
+        message.text = "/brew"
+        message.entities[0].length = len("/brew")
         dp.process_update(Update(update_id=0, message=message))
         sleep(0.7)
         assert handler.conversations.get((self.group.id, user1.id)) is None
@@ -1196,8 +1196,8 @@ class TestConversationHandler:
 
         # MessageHandler timeout
         self.is_timeout = False
-        message.text = '/start'
-        message.entities[0].length = len('/start')
+        message.text = "/start"
+        message.entities[0].length = len("/start")
         dp.process_update(Update(update_id=1, message=message))
         sleep(0.7)
         assert handler.conversations.get((self.group.id, user1.id)) is None
@@ -1206,11 +1206,11 @@ class TestConversationHandler:
         # Timeout but no valid handler
         self.is_timeout = False
         dp.process_update(Update(update_id=0, message=message))
-        message.text = '/brew'
-        message.entities[0].length = len('/brew')
+        message.text = "/brew"
+        message.entities[0].length = len("/brew")
         dp.process_update(Update(update_id=0, message=message))
-        message.text = '/startCoding'
-        message.entities[0].length = len('/startCoding')
+        message.text = "/startCoding"
+        message.entities[0].length = len("/startCoding")
         dp.process_update(Update(update_id=0, message=message))
         sleep(0.7)
         assert handler.conversations.get((self.group.id, user1.id)) is None
@@ -1221,8 +1221,8 @@ class TestConversationHandler:
         states.update(
             {
                 ConversationHandler.TIMEOUT: [
-                    CommandHandler('brew', self.passout_context),
-                    MessageHandler(~Filters.regex('oding'), self.passout2_context),
+                    CommandHandler("brew", self.passout_context),
+                    MessageHandler(~Filters.regex("oding"), self.passout2_context),
                 ]
             }
         )
@@ -1240,15 +1240,15 @@ class TestConversationHandler:
             None,
             self.group,
             from_user=user1,
-            text='/start',
+            text="/start",
             entities=[
-                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
             bot=bot,
         )
         dp.process_update(Update(update_id=0, message=message))
-        message.text = '/brew'
-        message.entities[0].length = len('/brew')
+        message.text = "/brew"
+        message.entities[0].length = len("/brew")
         dp.process_update(Update(update_id=0, message=message))
         sleep(0.7)
         assert handler.conversations.get((self.group.id, user1.id)) is None
@@ -1256,8 +1256,8 @@ class TestConversationHandler:
 
         # MessageHandler timeout
         self.is_timeout = False
-        message.text = '/start'
-        message.entities[0].length = len('/start')
+        message.text = "/start"
+        message.entities[0].length = len("/start")
         dp.process_update(Update(update_id=1, message=message))
         sleep(0.7)
         assert handler.conversations.get((self.group.id, user1.id)) is None
@@ -1266,11 +1266,11 @@ class TestConversationHandler:
         # Timeout but no valid handler
         self.is_timeout = False
         dp.process_update(Update(update_id=0, message=message))
-        message.text = '/brew'
-        message.entities[0].length = len('/brew')
+        message.text = "/brew"
+        message.entities[0].length = len("/brew")
         dp.process_update(Update(update_id=0, message=message))
-        message.text = '/startCoding'
-        message.entities[0].length = len('/startCoding')
+        message.text = "/startCoding"
+        message.entities[0].length = len("/startCoding")
         dp.process_update(Update(update_id=0, message=message))
         sleep(0.7)
         assert handler.conversations.get((self.group.id, user1.id)) is None
@@ -1293,7 +1293,7 @@ class TestConversationHandler:
             # we can see if the timeout has been executed
 
         states = self.states
-        states[self.THIRSTY].append(CommandHandler('slowbrew', slowbrew))
+        states[self.THIRSTY].append(CommandHandler("slowbrew", slowbrew))
         states.update({ConversationHandler.TIMEOUT: [MessageHandler(None, self.passout2)]})
 
         handler = ConversationHandler(
@@ -1310,16 +1310,16 @@ class TestConversationHandler:
             None,
             self.group,
             from_user=user1,
-            text='/start',
+            text="/start",
             entities=[
-                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
             bot=bot,
         )
         dp.process_update(Update(update_id=0, message=message))
         sleep(0.25)
-        message.text = '/slowbrew'
-        message.entities[0].length = len('/slowbrew')
+        message.text = "/slowbrew"
+        message.entities[0].length = len("/slowbrew")
         dp.process_update(Update(update_id=0, message=message))
         assert handler.conversations.get((self.group.id, user1.id)) is not None
         assert not self.is_timeout
@@ -1336,7 +1336,7 @@ class TestConversationHandler:
                     ConversationHandler(
                         entry_points=self.entry_points,
                         states={
-                            self.BREWING: [CommandHandler('pourCoffee', self.drink)],
+                            self.BREWING: [CommandHandler("pourCoffee", self.drink)],
                         },
                         fallbacks=self.fallbacks,
                     )
@@ -1345,7 +1345,7 @@ class TestConversationHandler:
                     ConversationHandler(
                         entry_points=self.entry_points,
                         states={
-                            self.CODING: [CommandHandler('startCoding', self.code)],
+                            self.CODING: [CommandHandler("startCoding", self.code)],
                         },
                         fallbacks=self.fallbacks,
                     )
@@ -1365,8 +1365,8 @@ class TestConversationHandler:
         ConversationHandler(
             entry_points=self.entry_points,
             states={
-                self.THIRSTY: [CommandHandler('pourCoffee', self.drink)],
-                self.BREWING: [CommandHandler('startCoding', self.code)],
+                self.THIRSTY: [CommandHandler("pourCoffee", self.drink)],
+                self.BREWING: [CommandHandler("startCoding", self.code)],
             },
             fallbacks=self.fallbacks,
             per_message=True,
@@ -1436,98 +1436,98 @@ class TestConversationHandler:
             None,
             self.group,
             from_user=user1,
-            text='/start',
+            text="/start",
             bot=bot,
             entities=[
-                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
         )
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.THIRSTY
 
         # The user is thirsty and wants to brew coffee.
-        message.text = '/brew'
-        message.entities[0].length = len('/brew')
+        message.text = "/brew"
+        message.entities[0].length = len("/brew")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.BREWING
 
         # Lets pour some coffee.
-        message.text = '/pourCoffee'
-        message.entities[0].length = len('/pourCoffee')
+        message.text = "/pourCoffee"
+        message.entities[0].length = len("/pourCoffee")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.DRINKING
 
         # The user is holding the cup
-        message.text = '/hold'
-        message.entities[0].length = len('/hold')
+        message.text = "/hold"
+        message.entities[0].length = len("/hold")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.HOLDING
 
         # The user is sipping coffee
-        message.text = '/sip'
-        message.entities[0].length = len('/sip')
+        message.text = "/sip"
+        message.entities[0].length = len("/sip")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.SIPPING
 
         # The user is swallowing
-        message.text = '/swallow'
-        message.entities[0].length = len('/swallow')
+        message.text = "/swallow"
+        message.entities[0].length = len("/swallow")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.SWALLOWING
 
         # The user is holding the cup again
-        message.text = '/hold'
-        message.entities[0].length = len('/hold')
+        message.text = "/hold"
+        message.entities[0].length = len("/hold")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.HOLDING
 
         # The user wants to replenish the coffee supply
-        message.text = '/replenish'
-        message.entities[0].length = len('/replenish')
+        message.text = "/replenish"
+        message.entities[0].length = len("/replenish")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.REPLENISHING
         assert handler.conversations[(0, user1.id)] == self.BREWING
 
         # The user wants to drink their coffee again
-        message.text = '/pourCoffee'
-        message.entities[0].length = len('/pourCoffee')
+        message.text = "/pourCoffee"
+        message.entities[0].length = len("/pourCoffee")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.DRINKING
 
         # The user is now ready to start coding
-        message.text = '/startCoding'
-        message.entities[0].length = len('/startCoding')
+        message.text = "/startCoding"
+        message.entities[0].length = len("/startCoding")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.CODING
 
         # The user decides it's time to drink again
-        message.text = '/drinkMore'
-        message.entities[0].length = len('/drinkMore')
+        message.text = "/drinkMore"
+        message.entities[0].length = len("/drinkMore")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.DRINKING
 
         # The user is holding their cup
-        message.text = '/hold'
-        message.entities[0].length = len('/hold')
+        message.text = "/hold"
+        message.entities[0].length = len("/hold")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.HOLDING
 
         # The user wants to end with the drinking and go back to coding
-        message.text = '/end'
-        message.entities[0].length = len('/end')
+        message.text = "/end"
+        message.entities[0].length = len("/end")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.END
         assert handler.conversations[(0, user1.id)] == self.CODING
 
         # The user wants to drink once more
-        message.text = '/drinkMore'
-        message.entities[0].length = len('/drinkMore')
+        message.text = "/drinkMore"
+        message.entities[0].length = len("/drinkMore")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.DRINKING
 
         # The user wants to stop altogether
-        message.text = '/stop'
-        message.entities[0].length = len('/stop')
+        message.text = "/stop"
+        message.entities[0].length = len("/stop")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.STOPPING
         assert handler.conversations.get((0, user1.id)) is None
@@ -1557,11 +1557,11 @@ class TestConversationHandler:
             0,
             None,
             self.group,
-            text='/start',
+            text="/start",
             bot=bot,
             from_user=user1,
             entities=[
-                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
         )
         dp.process_update(Update(update_id=0, message=message))
@@ -1569,101 +1569,101 @@ class TestConversationHandler:
         assert not self.test_flag
 
         # The user is thirsty and wants to brew coffee.
-        message.text = '/brew'
-        message.entities[0].length = len('/brew')
+        message.text = "/brew"
+        message.entities[0].length = len("/brew")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.BREWING
         assert not self.test_flag
 
         # Lets pour some coffee.
-        message.text = '/pourCoffee'
-        message.entities[0].length = len('/pourCoffee')
+        message.text = "/pourCoffee"
+        message.entities[0].length = len("/pourCoffee")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.DRINKING
         assert not self.test_flag
 
         # The user is holding the cup
-        message.text = '/hold'
-        message.entities[0].length = len('/hold')
+        message.text = "/hold"
+        message.entities[0].length = len("/hold")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.HOLDING
         assert not self.test_flag
 
         # The user is sipping coffee
-        message.text = '/sip'
-        message.entities[0].length = len('/sip')
+        message.text = "/sip"
+        message.entities[0].length = len("/sip")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.SIPPING
         assert not self.test_flag
 
         # The user is swallowing
-        message.text = '/swallow'
-        message.entities[0].length = len('/swallow')
+        message.text = "/swallow"
+        message.entities[0].length = len("/swallow")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.SWALLOWING
         assert not self.test_flag
 
         # The user is holding the cup again
-        message.text = '/hold'
-        message.entities[0].length = len('/hold')
+        message.text = "/hold"
+        message.entities[0].length = len("/hold")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.HOLDING
         assert not self.test_flag
 
         # The user wants to replenish the coffee supply
-        message.text = '/replenish'
-        message.entities[0].length = len('/replenish')
+        message.text = "/replenish"
+        message.entities[0].length = len("/replenish")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.REPLENISHING
         assert handler.conversations[(0, user1.id)] == self.BREWING
         assert not self.test_flag
 
         # The user wants to drink their coffee again
-        message.text = '/pourCoffee'
-        message.entities[0].length = len('/pourCoffee')
+        message.text = "/pourCoffee"
+        message.entities[0].length = len("/pourCoffee")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.DRINKING
         assert not self.test_flag
 
         # The user is now ready to start coding
-        message.text = '/startCoding'
-        message.entities[0].length = len('/startCoding')
+        message.text = "/startCoding"
+        message.entities[0].length = len("/startCoding")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.CODING
         assert not self.test_flag
 
         # The user decides it's time to drink again
-        message.text = '/drinkMore'
-        message.entities[0].length = len('/drinkMore')
+        message.text = "/drinkMore"
+        message.entities[0].length = len("/drinkMore")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.DRINKING
         assert not self.test_flag
 
         # The user is holding their cup
-        message.text = '/hold'
-        message.entities[0].length = len('/hold')
+        message.text = "/hold"
+        message.entities[0].length = len("/hold")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.HOLDING
         assert not self.test_flag
 
         # The user wants to end with the drinking and go back to coding
-        message.text = '/end'
-        message.entities[0].length = len('/end')
+        message.text = "/end"
+        message.entities[0].length = len("/end")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.END
         assert handler.conversations[(0, user1.id)] == self.CODING
         assert not self.test_flag
 
         # The user wants to drink once more
-        message.text = '/drinkMore'
-        message.entities[0].length = len('/drinkMore')
+        message.text = "/drinkMore"
+        message.entities[0].length = len("/drinkMore")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.DRINKING
         assert not self.test_flag
 
         # The user wants to stop altogether
-        message.text = '/stop'
-        message.entities[0].length = len('/stop')
+        message.text = "/stop"
+        message.entities[0].length = len("/stop")
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.STOPPING
         assert handler.conversations.get((0, user1.id)) is None
@@ -1686,7 +1686,7 @@ class TestConversationHandler:
 
     def test_conversation_handler_run_async_false(self, dp):
         conv_handler = ConversationHandler(
-            entry_points=[CommandHandler('start', self.start_end, run_async=True)],
+            entry_points=[CommandHandler("start", self.start_end, run_async=True)],
             states=self.states,
             fallbacks=self.fallbacks,
             run_async=False,

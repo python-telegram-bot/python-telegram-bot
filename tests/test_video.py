@@ -28,16 +28,16 @@ from telegram.utils.helpers import escape_markdown
 from tests.conftest import check_shortcut_call, check_shortcut_signature, check_defaults_handling
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def video_file():
-    f = open('tests/data/telegram.mp4', 'rb')
+    f = open("tests/data/telegram.mp4", "rb")
     yield f
     f.close()
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def video(bot, chat_id):
-    with open('tests/data/telegram.mp4', 'rb') as f:
+    with open("tests/data/telegram.mp4", "rb") as f:
         return bot.send_video(chat_id, video=f, timeout=50).video
 
 
@@ -46,23 +46,23 @@ class TestVideo:
     height = 640
     duration = 5
     file_size = 326534
-    mime_type = 'video/mp4'
+    mime_type = "video/mp4"
     supports_streaming = True
-    file_name = 'telegram.mp4'
+    file_name = "telegram.mp4"
 
     thumb_width = 180
     thumb_height = 320
     thumb_file_size = 1767
 
-    caption = '<b>VideoTest</b> - *Caption*'
-    video_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.mp4'
+    caption = "<b>VideoTest</b> - *Caption*"
+    video_file_url = "https://python-telegram-bot.org/static/testfiles/telegram.mp4"
 
-    video_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
-    video_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
+    video_file_id = "5a3128a4d2a04750b5b58397f3b5e812"
+    video_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
     def test_slot_behaviour(self, video, mro_slots):
         for attr in video.__slots__:
-            assert getattr(video, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(video, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(video)) == len(set(mro_slots(video))), "duplicate slot"
 
     def test_creation(self, video):
@@ -70,14 +70,14 @@ class TestVideo:
         assert isinstance(video, Video)
         assert isinstance(video.file_id, str)
         assert isinstance(video.file_unique_id, str)
-        assert video.file_id != ''
-        assert video.file_unique_id != ''
+        assert video.file_id != ""
+        assert video.file_unique_id != ""
 
         assert isinstance(video.thumb, PhotoSize)
         assert isinstance(video.thumb.file_id, str)
         assert isinstance(video.thumb.file_unique_id, str)
-        assert video.thumb.file_id != ''
-        assert video.thumb.file_unique_id != ''
+        assert video.thumb.file_id != ""
+        assert video.thumb.file_unique_id != ""
 
     def test_expected_values(self, video):
         assert video.width == self.width
@@ -97,21 +97,21 @@ class TestVideo:
             disable_notification=False,
             width=video.width,
             height=video.height,
-            parse_mode='Markdown',
+            parse_mode="Markdown",
             thumb=thumb_file,
         )
 
         assert isinstance(message.video, Video)
         assert isinstance(message.video.file_id, str)
         assert isinstance(message.video.file_unique_id, str)
-        assert message.video.file_id != ''
-        assert message.video.file_unique_id != ''
+        assert message.video.file_id != ""
+        assert message.video.file_unique_id != ""
         assert message.video.width == video.width
         assert message.video.height == video.height
         assert message.video.duration == video.duration
         assert message.video.file_size == video.file_size
 
-        assert message.caption == self.caption.replace('*', '')
+        assert message.caption == self.caption.replace("*", "")
 
         assert message.video.thumb.file_size == self.thumb_file_size
         assert message.video.thumb.width == self.thumb_width
@@ -122,11 +122,11 @@ class TestVideo:
     @flaky(3, 1)
     def test_send_video_custom_filename(self, bot, chat_id, video_file, monkeypatch):
         def make_assertion(url, data, **kwargs):
-            return data['video'].filename == 'custom_filename'
+            return data["video"].filename == "custom_filename"
 
-        monkeypatch.setattr(bot.request, 'post', make_assertion)
+        monkeypatch.setattr(bot.request, "post", make_assertion)
 
-        assert bot.send_video(chat_id, video_file, filename='custom_filename')
+        assert bot.send_video(chat_id, video_file, filename="custom_filename")
 
     @flaky(3, 1)
     def test_get_and_download(self, bot, video):
@@ -135,11 +135,11 @@ class TestVideo:
         assert new_file.file_size == self.file_size
         assert new_file.file_id == video.file_id
         assert new_file.file_unique_id == video.file_unique_id
-        assert new_file.file_path.startswith('https://')
+        assert new_file.file_path.startswith("https://")
 
-        new_file.download('telegram.mp4')
+        new_file.download("telegram.mp4")
 
-        assert os.path.isfile('telegram.mp4')
+        assert os.path.isfile("telegram.mp4")
 
     @flaky(3, 1)
     def test_send_mp4_file_url(self, bot, chat_id, video):
@@ -148,8 +148,8 @@ class TestVideo:
         assert isinstance(message.video, Video)
         assert isinstance(message.video.file_id, str)
         assert isinstance(message.video.file_unique_id, str)
-        assert message.video.file_id != ''
-        assert message.video.file_unique_id != ''
+        assert message.video.file_id != ""
+        assert message.video.file_unique_id != ""
         assert message.video.width == video.width
         assert message.video.height == video.height
         assert message.video.duration == video.duration
@@ -158,8 +158,8 @@ class TestVideo:
         assert isinstance(message.video.thumb, PhotoSize)
         assert isinstance(message.video.thumb.file_id, str)
         assert isinstance(message.video.thumb.file_unique_id, str)
-        assert message.video.thumb.file_id != ''
-        assert message.video.thumb.file_unique_id != ''
+        assert message.video.thumb.file_id != ""
+        assert message.video.thumb.file_unique_id != ""
         assert message.video.thumb.width == 51  # This seems odd that it's not self.thumb_width
         assert message.video.thumb.height == 90  # Ditto
         assert message.video.thumb.file_size == 645  # same
@@ -168,7 +168,7 @@ class TestVideo:
 
     @flaky(3, 1)
     def test_send_video_caption_entities(self, bot, chat_id, video):
-        test_string = 'Italic Bold Code'
+        test_string = "Italic Bold Code"
         entities = [
             MessageEntity(MessageEntity.ITALIC, 0, 6),
             MessageEntity(MessageEntity.ITALIC, 7, 4),
@@ -187,26 +187,26 @@ class TestVideo:
 
     def test_send_with_video(self, monkeypatch, bot, chat_id, video):
         def test(url, data, **kwargs):
-            return data['video'] == video.file_id
+            return data["video"] == video.file_id
 
-        monkeypatch.setattr(bot.request, 'post', test)
+        monkeypatch.setattr(bot.request, "post", test)
         message = bot.send_video(chat_id, video=video)
         assert message
 
     @flaky(3, 1)
-    @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
+    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     def test_send_video_default_parse_mode_1(self, default_bot, chat_id, video):
-        test_string = 'Italic Bold Code'
-        test_markdown_string = '_Italic_ *Bold* `Code`'
+        test_string = "Italic Bold Code"
+        test_markdown_string = "_Italic_ *Bold* `Code`"
 
         message = default_bot.send_video(chat_id, video, caption=test_markdown_string)
         assert message.caption_markdown == test_markdown_string
         assert message.caption == test_string
 
     @flaky(3, 1)
-    @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
+    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     def test_send_video_default_parse_mode_2(self, default_bot, chat_id, video):
-        test_markdown_string = '_Italic_ *Bold* `Code`'
+        test_markdown_string = "_Italic_ *Bold* `Code`"
 
         message = default_bot.send_video(
             chat_id, video, caption=test_markdown_string, parse_mode=None
@@ -215,12 +215,12 @@ class TestVideo:
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
     @flaky(3, 1)
-    @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
+    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     def test_send_video_default_parse_mode_3(self, default_bot, chat_id, video):
-        test_markdown_string = '_Italic_ *Bold* `Code`'
+        test_markdown_string = "_Italic_ *Bold* `Code`"
 
         message = default_bot.send_video(
-            chat_id, video, caption=test_markdown_string, parse_mode='HTML'
+            chat_id, video, caption=test_markdown_string, parse_mode="HTML"
         )
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
@@ -228,32 +228,32 @@ class TestVideo:
     def test_send_video_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
-        expected = (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
-        file = 'tests/data/telegram.jpg'
+        expected = (Path.cwd() / "tests/data/telegram.jpg/").as_uri()
+        file = "tests/data/telegram.jpg"
 
         def make_assertion(_, data, *args, **kwargs):
             nonlocal test_flag
-            test_flag = data.get('video') == expected and data.get('thumb') == expected
+            test_flag = data.get("video") == expected and data.get("thumb") == expected
 
-        monkeypatch.setattr(bot, '_post', make_assertion)
+        monkeypatch.setattr(bot, "_post", make_assertion)
         bot.send_video(chat_id, file, thumb=file)
         assert test_flag
-        monkeypatch.delattr(bot, '_post')
+        monkeypatch.delattr(bot, "_post")
 
     @flaky(3, 1)
     @pytest.mark.parametrize(
-        'default_bot,custom',
+        "default_bot,custom",
         [
-            ({'allow_sending_without_reply': True}, None),
-            ({'allow_sending_without_reply': False}, None),
-            ({'allow_sending_without_reply': False}, True),
+            ({"allow_sending_without_reply": True}, None),
+            ({"allow_sending_without_reply": False}, None),
+            ({"allow_sending_without_reply": False}, True),
         ],
-        indirect=['default_bot'],
+        indirect=["default_bot"],
     )
     def test_send_video_default_allow_sending_without_reply(
         self, default_bot, chat_id, video, custom
     ):
-        reply_to_message = default_bot.send_message(chat_id, 'test')
+        reply_to_message = default_bot.send_message(chat_id, "test")
         reply_to_message.delete()
         if custom is not None:
             message = default_bot.send_video(
@@ -269,21 +269,21 @@ class TestVideo:
             )
             assert message.reply_to_message is None
         else:
-            with pytest.raises(BadRequest, match='message not found'):
+            with pytest.raises(BadRequest, match="message not found"):
                 default_bot.send_video(
                     chat_id, video, reply_to_message_id=reply_to_message.message_id
                 )
 
     def test_de_json(self, bot):
         json_dict = {
-            'file_id': self.video_file_id,
-            'file_unique_id': self.video_file_unique_id,
-            'width': self.width,
-            'height': self.height,
-            'duration': self.duration,
-            'mime_type': self.mime_type,
-            'file_size': self.file_size,
-            'file_name': self.file_name,
+            "file_id": self.video_file_id,
+            "file_unique_id": self.video_file_unique_id,
+            "width": self.width,
+            "height": self.height,
+            "duration": self.duration,
+            "mime_type": self.mime_type,
+            "file_size": self.file_size,
+            "file_name": self.file_name,
         }
         json_video = Video.de_json(json_dict, bot)
 
@@ -300,24 +300,24 @@ class TestVideo:
         video_dict = video.to_dict()
 
         assert isinstance(video_dict, dict)
-        assert video_dict['file_id'] == video.file_id
-        assert video_dict['file_unique_id'] == video.file_unique_id
-        assert video_dict['width'] == video.width
-        assert video_dict['height'] == video.height
-        assert video_dict['duration'] == video.duration
-        assert video_dict['mime_type'] == video.mime_type
-        assert video_dict['file_size'] == video.file_size
-        assert video_dict['file_name'] == video.file_name
+        assert video_dict["file_id"] == video.file_id
+        assert video_dict["file_unique_id"] == video.file_unique_id
+        assert video_dict["width"] == video.width
+        assert video_dict["height"] == video.height
+        assert video_dict["duration"] == video.duration
+        assert video_dict["mime_type"] == video.mime_type
+        assert video_dict["file_size"] == video.file_size
+        assert video_dict["file_name"] == video.file_name
 
     @flaky(3, 1)
     def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
-            bot.send_video(chat_id, open(os.devnull, 'rb'))
+            bot.send_video(chat_id, open(os.devnull, "rb"))
 
     @flaky(3, 1)
     def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
-            bot.send_video(chat_id, '')
+            bot.send_video(chat_id, "")
 
     def test_error_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
@@ -325,20 +325,20 @@ class TestVideo:
 
     def test_get_file_instance_method(self, monkeypatch, video):
         def make_assertion(*_, **kwargs):
-            return kwargs['file_id'] == video.file_id
+            return kwargs["file_id"] == video.file_id
 
-        assert check_shortcut_signature(Video.get_file, Bot.get_file, ['file_id'], [])
-        assert check_shortcut_call(video.get_file, video.bot, 'get_file')
+        assert check_shortcut_signature(Video.get_file, Bot.get_file, ["file_id"], [])
+        assert check_shortcut_call(video.get_file, video.bot, "get_file")
         assert check_defaults_handling(video.get_file, video.bot)
 
-        monkeypatch.setattr(video.bot, 'get_file', make_assertion)
+        monkeypatch.setattr(video.bot, "get_file", make_assertion)
         assert video.get_file()
 
     def test_equality(self, video):
         a = Video(video.file_id, video.file_unique_id, self.width, self.height, self.duration)
-        b = Video('', video.file_unique_id, self.width, self.height, self.duration)
+        b = Video("", video.file_unique_id, self.width, self.height, self.duration)
         c = Video(video.file_id, video.file_unique_id, 0, 0, 0)
-        d = Video('', '', self.width, self.height, self.duration)
+        d = Video("", "", self.width, self.height, self.duration)
         e = Voice(video.file_id, video.file_unique_id, self.duration)
 
         assert a == b

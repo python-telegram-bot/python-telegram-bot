@@ -28,7 +28,7 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def inline_query_result_cached_mpeg4_gif():
     return InlineQueryResultCachedMpeg4Gif(
         TestInlineQueryResultCachedMpeg4Gif.id_,
@@ -43,20 +43,20 @@ def inline_query_result_cached_mpeg4_gif():
 
 
 class TestInlineQueryResultCachedMpeg4Gif:
-    id_ = 'id'
-    type_ = 'mpeg4_gif'
-    mpeg4_file_id = 'mpeg4 file id'
-    title = 'title'
-    caption = 'caption'
-    parse_mode = 'Markdown'
+    id_ = "id"
+    type_ = "mpeg4_gif"
+    mpeg4_file_id = "mpeg4 file id"
+    title = "title"
+    caption = "caption"
+    parse_mode = "Markdown"
     caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
-    input_message_content = InputTextMessageContent('input_message_content')
-    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
+    input_message_content = InputTextMessageContent("input_message_content")
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
     def test_slot_behaviour(self, inline_query_result_cached_mpeg4_gif, mro_slots):
         inst = inline_query_result_cached_mpeg4_gif
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, inline_query_result_cached_mpeg4_gif):
@@ -81,47 +81,47 @@ class TestInlineQueryResultCachedMpeg4Gif:
 
         assert isinstance(inline_query_result_cached_mpeg4_gif_dict, dict)
         assert (
-            inline_query_result_cached_mpeg4_gif_dict['type']
+            inline_query_result_cached_mpeg4_gif_dict["type"]
             == inline_query_result_cached_mpeg4_gif.type
         )
         assert (
-            inline_query_result_cached_mpeg4_gif_dict['id']
+            inline_query_result_cached_mpeg4_gif_dict["id"]
             == inline_query_result_cached_mpeg4_gif.id
         )
         assert (
-            inline_query_result_cached_mpeg4_gif_dict['mpeg4_file_id']
+            inline_query_result_cached_mpeg4_gif_dict["mpeg4_file_id"]
             == inline_query_result_cached_mpeg4_gif.mpeg4_file_id
         )
         assert (
-            inline_query_result_cached_mpeg4_gif_dict['title']
+            inline_query_result_cached_mpeg4_gif_dict["title"]
             == inline_query_result_cached_mpeg4_gif.title
         )
         assert (
-            inline_query_result_cached_mpeg4_gif_dict['caption']
+            inline_query_result_cached_mpeg4_gif_dict["caption"]
             == inline_query_result_cached_mpeg4_gif.caption
         )
         assert (
-            inline_query_result_cached_mpeg4_gif_dict['parse_mode']
+            inline_query_result_cached_mpeg4_gif_dict["parse_mode"]
             == inline_query_result_cached_mpeg4_gif.parse_mode
         )
-        assert inline_query_result_cached_mpeg4_gif_dict['caption_entities'] == [
+        assert inline_query_result_cached_mpeg4_gif_dict["caption_entities"] == [
             ce.to_dict() for ce in inline_query_result_cached_mpeg4_gif.caption_entities
         ]
         assert (
-            inline_query_result_cached_mpeg4_gif_dict['input_message_content']
+            inline_query_result_cached_mpeg4_gif_dict["input_message_content"]
             == inline_query_result_cached_mpeg4_gif.input_message_content.to_dict()
         )
         assert (
-            inline_query_result_cached_mpeg4_gif_dict['reply_markup']
+            inline_query_result_cached_mpeg4_gif_dict["reply_markup"]
             == inline_query_result_cached_mpeg4_gif.reply_markup.to_dict()
         )
 
     def test_equality(self):
         a = InlineQueryResultCachedMpeg4Gif(self.id_, self.mpeg4_file_id)
         b = InlineQueryResultCachedMpeg4Gif(self.id_, self.mpeg4_file_id)
-        c = InlineQueryResultCachedMpeg4Gif(self.id_, '')
-        d = InlineQueryResultCachedMpeg4Gif('', self.mpeg4_file_id)
-        e = InlineQueryResultCachedVoice(self.id_, '', '')
+        c = InlineQueryResultCachedMpeg4Gif(self.id_, "")
+        d = InlineQueryResultCachedMpeg4Gif("", self.mpeg4_file_id)
+        e = InlineQueryResultCachedVoice(self.id_, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

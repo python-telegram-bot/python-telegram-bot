@@ -22,7 +22,7 @@ import time
 from telegram import WebhookInfo, LoginUrl
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def webhook_info():
     return WebhookInfo(
         url=TestWebhookInfo.url,
@@ -39,26 +39,26 @@ class TestWebhookInfo:
     url = "http://www.google.com"
     has_custom_certificate = False
     pending_update_count = 5
-    ip_address = '127.0.0.1'
+    ip_address = "127.0.0.1"
     last_error_date = time.time()
     max_connections = 42
-    allowed_updates = ['type1', 'type2']
+    allowed_updates = ["type1", "type2"]
 
     def test_slot_behaviour(self, webhook_info, mro_slots):
         for attr in webhook_info.__slots__:
-            assert getattr(webhook_info, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(webhook_info, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(webhook_info)) == len(set(mro_slots(webhook_info))), "duplicate slot"
 
     def test_to_dict(self, webhook_info):
         webhook_info_dict = webhook_info.to_dict()
 
         assert isinstance(webhook_info_dict, dict)
-        assert webhook_info_dict['url'] == self.url
-        assert webhook_info_dict['pending_update_count'] == self.pending_update_count
-        assert webhook_info_dict['last_error_date'] == self.last_error_date
-        assert webhook_info_dict['max_connections'] == self.max_connections
-        assert webhook_info_dict['allowed_updates'] == self.allowed_updates
-        assert webhook_info_dict['ip_address'] == self.ip_address
+        assert webhook_info_dict["url"] == self.url
+        assert webhook_info_dict["pending_update_count"] == self.pending_update_count
+        assert webhook_info_dict["last_error_date"] == self.last_error_date
+        assert webhook_info_dict["max_connections"] == self.max_connections
+        assert webhook_info_dict["allowed_updates"] == self.allowed_updates
+        assert webhook_info_dict["ip_address"] == self.ip_address
 
     def test_equality(self):
         a = WebhookInfo(

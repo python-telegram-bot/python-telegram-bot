@@ -76,11 +76,11 @@ class ReplyKeyboardMarkup(ReplyMarkup):
     """
 
     __slots__ = (
-        'selective',
-        'keyboard',
-        'resize_keyboard',
-        'one_time_keyboard',
-        'input_field_placeholder',
+        "selective",
+        "keyboard",
+        "resize_keyboard",
+        "one_time_keyboard",
+        "input_field_placeholder",
     )
 
     def __init__(
@@ -115,9 +115,9 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
-        data['keyboard'] = []
+        data["keyboard"] = []
         for row in self.keyboard:
-            data['keyboard'].append([button.to_dict() for button in row])
+            data["keyboard"].append([button.to_dict() for button in row])
         return data
 
     @classmethod
@@ -129,7 +129,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         selective: bool = False,
         input_field_placeholder: str = None,
         **kwargs: object,
-    ) -> 'ReplyKeyboardMarkup':
+    ) -> "ReplyKeyboardMarkup":
         """Shortcut for::
 
             ReplyKeyboardMarkup([[button]], **kwargs)
@@ -181,7 +181,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         selective: bool = False,
         input_field_placeholder: str = None,
         **kwargs: object,
-    ) -> 'ReplyKeyboardMarkup':
+    ) -> "ReplyKeyboardMarkup":
         """Shortcut for::
 
             ReplyKeyboardMarkup([button_row], **kwargs)
@@ -234,7 +234,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         selective: bool = False,
         input_field_placeholder: str = None,
         **kwargs: object,
-    ) -> 'ReplyKeyboardMarkup':
+    ) -> "ReplyKeyboardMarkup":
         """Shortcut for::
 
             ReplyKeyboardMarkup([[button] for button in button_column], **kwargs)

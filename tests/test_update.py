@@ -38,49 +38,49 @@ from telegram import (
 from telegram.poll import PollAnswer
 from telegram.utils.helpers import from_timestamp
 
-message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
+message = Message(1, None, Chat(1, ""), from_user=User(1, "", False), text="Text")
 chat_member_updated = ChatMemberUpdated(
-    Chat(1, 'chat'),
-    User(1, '', False),
+    Chat(1, "chat"),
+    User(1, "", False),
     from_timestamp(int(time.time())),
-    ChatMemberOwner(User(1, '', False), True),
-    ChatMemberOwner(User(1, '', False), True),
+    ChatMemberOwner(User(1, "", False), True),
+    ChatMemberOwner(User(1, "", False), True),
 )
 
 params = [
-    {'message': message},
-    {'edited_message': message},
-    {'callback_query': CallbackQuery(1, User(1, '', False), 'chat', message=message)},
-    {'channel_post': message},
-    {'edited_channel_post': message},
-    {'inline_query': InlineQuery(1, User(1, '', False), '', '')},
-    {'chosen_inline_result': ChosenInlineResult('id', User(1, '', False), '')},
-    {'shipping_query': ShippingQuery('id', User(1, '', False), '', None)},
-    {'pre_checkout_query': PreCheckoutQuery('id', User(1, '', False), '', 0, '')},
-    {'callback_query': CallbackQuery(1, User(1, '', False), 'chat')},
-    {'poll': Poll('id', '?', [PollOption('.', 1)], False, False, False, Poll.REGULAR, True)},
-    {'poll_answer': PollAnswer("id", User(1, '', False), [1])},
-    {'my_chat_member': chat_member_updated},
-    {'chat_member': chat_member_updated},
+    {"message": message},
+    {"edited_message": message},
+    {"callback_query": CallbackQuery(1, User(1, "", False), "chat", message=message)},
+    {"channel_post": message},
+    {"edited_channel_post": message},
+    {"inline_query": InlineQuery(1, User(1, "", False), "", "")},
+    {"chosen_inline_result": ChosenInlineResult("id", User(1, "", False), "")},
+    {"shipping_query": ShippingQuery("id", User(1, "", False), "", None)},
+    {"pre_checkout_query": PreCheckoutQuery("id", User(1, "", False), "", 0, "")},
+    {"callback_query": CallbackQuery(1, User(1, "", False), "chat")},
+    {"poll": Poll("id", "?", [PollOption(".", 1)], False, False, False, Poll.REGULAR, True)},
+    {"poll_answer": PollAnswer("id", User(1, "", False), [1])},
+    {"my_chat_member": chat_member_updated},
+    {"chat_member": chat_member_updated},
 ]
 
 all_types = (
-    'message',
-    'edited_message',
-    'callback_query',
-    'channel_post',
-    'edited_channel_post',
-    'inline_query',
-    'chosen_inline_result',
-    'shipping_query',
-    'pre_checkout_query',
-    'poll',
-    'poll_answer',
-    'my_chat_member',
-    'chat_member',
+    "message",
+    "edited_message",
+    "callback_query",
+    "channel_post",
+    "edited_channel_post",
+    "inline_query",
+    "chosen_inline_result",
+    "shipping_query",
+    "pre_checkout_query",
+    "poll",
+    "poll_answer",
+    "my_chat_member",
+    "chat_member",
 )
 
-ids = all_types + ('callback_query_without_message',)
+ids = all_types + ("callback_query_without_message",)
 
 
 @pytest.fixture(params=params, ids=ids)
@@ -93,12 +93,12 @@ class TestUpdate:
 
     def test_slot_behaviour(self, update, mro_slots):
         for attr in update.__slots__:
-            assert getattr(update, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(update, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(update)) == len(set(mro_slots(update))), "duplicate slot"
 
-    @pytest.mark.parametrize('paramdict', argvalues=params, ids=ids)
+    @pytest.mark.parametrize("paramdict", argvalues=params, ids=ids)
     def test_de_json(self, bot, paramdict):
-        json_dict = {'update_id': TestUpdate.update_id}
+        json_dict = {"update_id": TestUpdate.update_id}
         # Convert the single update 'item' to a dict of that item and apply it to the json_dict
         json_dict.update({k: v.to_dict() for k, v in paramdict.items()})
         update = Update.de_json(json_dict, bot)
@@ -122,7 +122,7 @@ class TestUpdate:
         update_dict = update.to_dict()
 
         assert isinstance(update_dict, dict)
-        assert update_dict['update_id'] == update.update_id
+        assert update_dict["update_id"] == update.update_id
         for _type in all_types:
             if getattr(update, _type) is not None:
                 assert update_dict[_type] == getattr(update, _type).to_dict()
@@ -178,7 +178,7 @@ class TestUpdate:
         b = Update(self.update_id, message=message)
         c = Update(self.update_id)
         d = Update(0, message=message)
-        e = User(self.update_id, '', False)
+        e = User(self.update_id, "", False)
 
         assert a == b
         assert hash(a) == hash(b)

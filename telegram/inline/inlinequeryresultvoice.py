@@ -74,14 +74,14 @@ class InlineQueryResultVoice(InlineQueryResult):
     """
 
     __slots__ = (
-        'reply_markup',
-        'caption_entities',
-        'voice_duration',
-        'caption',
-        'title',
-        'voice_url',
-        'parse_mode',
-        'input_message_content',
+        "reply_markup",
+        "caption_entities",
+        "voice_duration",
+        "caption",
+        "title",
+        "voice_url",
+        "parse_mode",
+        "input_message_content",
     )
 
     def __init__(
@@ -91,15 +91,15 @@ class InlineQueryResultVoice(InlineQueryResult):
         title: str,
         voice_duration: int = None,
         caption: str = None,
-        reply_markup: 'ReplyMarkup' = None,
-        input_message_content: 'InputMessageContent' = None,
+        reply_markup: "ReplyMarkup" = None,
+        input_message_content: "InputMessageContent" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
         **_kwargs: Any,
     ):
 
         # Required
-        super().__init__('voice', id)
+        super().__init__("voice", id)
         self.voice_url = voice_url
         self.title = title
 

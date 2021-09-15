@@ -26,7 +26,7 @@ from flaky import flaky
 from telegram import File, TelegramError, Voice
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def file(bot):
     return File(
         TestFile.file_id,
@@ -37,37 +37,37 @@ def file(bot):
     )
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def local_file(bot):
     return File(
         TestFile.file_id,
         TestFile.file_unique_id,
-        file_path=str(Path.cwd() / 'tests' / 'data' / 'local_file.txt'),
+        file_path=str(Path.cwd() / "tests" / "data" / "local_file.txt"),
         file_size=TestFile.file_size,
         bot=bot,
     )
 
 
 class TestFile:
-    file_id = 'NOTVALIDDOESNOTMATTER'
-    file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
+    file_id = "NOTVALIDDOESNOTMATTER"
+    file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
     file_path = (
-        'https://api.org/file/bot133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0/document/file_3'
+        "https://api.org/file/bot133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0/document/file_3"
     )
     file_size = 28232
-    file_content = 'Saint-Saëns'.encode()  # Intentionally contains unicode chars.
+    file_content = "Saint-Saëns".encode()  # Intentionally contains unicode chars.
 
     def test_slot_behaviour(self, file, mro_slots):
         for attr in file.__slots__:
-            assert getattr(file, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(file, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(file)) == len(set(mro_slots(file))), "duplicate slot"
 
     def test_de_json(self, bot):
         json_dict = {
-            'file_id': self.file_id,
-            'file_unique_id': self.file_unique_id,
-            'file_path': self.file_path,
-            'file_size': self.file_size,
+            "file_id": self.file_id,
+            "file_unique_id": self.file_unique_id,
+            "file_path": self.file_path,
+            "file_size": self.file_size,
         }
         new_file = File.de_json(json_dict, bot)
 
@@ -80,29 +80,29 @@ class TestFile:
         file_dict = file.to_dict()
 
         assert isinstance(file_dict, dict)
-        assert file_dict['file_id'] == file.file_id
-        assert file_dict['file_unique_id'] == file.file_unique_id
-        assert file_dict['file_path'] == file.file_path
-        assert file_dict['file_size'] == file.file_size
+        assert file_dict["file_id"] == file.file_id
+        assert file_dict["file_unique_id"] == file.file_unique_id
+        assert file_dict["file_path"] == file.file_path
+        assert file_dict["file_size"] == file.file_size
 
     @flaky(3, 1)
     def test_error_get_empty_file_id(self, bot):
         with pytest.raises(TelegramError):
-            bot.get_file(file_id='')
+            bot.get_file(file_id="")
 
     def test_download_mutuall_exclusive(self, file):
-        with pytest.raises(ValueError, match='custom_path and out are mutually exclusive'):
-            file.download('custom_path', 'out')
+        with pytest.raises(ValueError, match="custom_path and out are mutually exclusive"):
+            file.download("custom_path", "out")
 
     def test_download(self, monkeypatch, file):
         def test(*args, **kwargs):
             return self.file_content
 
-        monkeypatch.setattr('telegram.utils.request.Request.retrieve', test)
+        monkeypatch.setattr("telegram.utils.request.Request.retrieve", test)
         out_file = file.download()
 
         try:
-            with open(out_file, 'rb') as fobj:
+            with open(out_file, "rb") as fobj:
                 assert fobj.read() == self.file_content
         finally:
             os.unlink(out_file)
@@ -114,13 +114,13 @@ class TestFile:
         def test(*args, **kwargs):
             return self.file_content
 
-        monkeypatch.setattr('telegram.utils.request.Request.retrieve', test)
+        monkeypatch.setattr("telegram.utils.request.Request.retrieve", test)
         file_handle, custom_path = mkstemp()
         try:
             out_file = file.download(custom_path)
             assert out_file == custom_path
 
-            with open(out_file, 'rb') as fobj:
+            with open(out_file, "rb") as fobj:
                 assert fobj.read() == self.file_content
         finally:
             os.close(file_handle)
@@ -132,7 +132,7 @@ class TestFile:
             out_file = local_file.download(custom_path)
             assert out_file == custom_path
 
-            with open(out_file, 'rb') as fobj:
+            with open(out_file, "rb") as fobj:
                 assert fobj.read() == self.file_content
         finally:
             os.close(file_handle)
@@ -144,12 +144,12 @@ class TestFile:
 
         file.file_path = None
 
-        monkeypatch.setattr('telegram.utils.request.Request.retrieve', test)
+        monkeypatch.setattr("telegram.utils.request.Request.retrieve", test)
         out_file = file.download()
 
         assert out_file[-len(file.file_id) :] == file.file_id
         try:
-            with open(out_file, 'rb') as fobj:
+            with open(out_file, "rb") as fobj:
                 assert fobj.read() == self.file_content
         finally:
             os.unlink(out_file)
@@ -158,7 +158,7 @@ class TestFile:
         def test(*args, **kwargs):
             return self.file_content
 
-        monkeypatch.setattr('telegram.utils.request.Request.retrieve', test)
+        monkeypatch.setattr("telegram.utils.request.Request.retrieve", test)
         with TemporaryFile() as custom_fobj:
             out_fobj = file.download(out=custom_fobj)
             assert out_fobj is custom_fobj
@@ -178,7 +178,7 @@ class TestFile:
         def test(*args, **kwargs):
             return self.file_content
 
-        monkeypatch.setattr('telegram.utils.request.Request.retrieve', test)
+        monkeypatch.setattr("telegram.utils.request.Request.retrieve", test)
 
         # Check that a download to a newly allocated bytearray works.
         buf = file.download_as_bytearray()
@@ -205,9 +205,9 @@ class TestFile:
 
     def test_equality(self, bot):
         a = File(self.file_id, self.file_unique_id, bot)
-        b = File('', self.file_unique_id, bot)
+        b = File("", self.file_unique_id, bot)
         c = File(self.file_id, self.file_unique_id, None)
-        d = File('', '', bot)
+        d = File("", "", bot)
         e = Voice(self.file_id, self.file_unique_id, 0)
 
         assert a == b

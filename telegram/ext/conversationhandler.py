@@ -46,13 +46,13 @@ CheckUpdateType = Optional[Tuple[Tuple[int, ...], Handler, object]]
 
 
 class _ConversationTimeoutContext:
-    __slots__ = ('conversation_key', 'update', 'dispatcher', 'callback_context')
+    __slots__ = ("conversation_key", "update", "dispatcher", "callback_context")
 
     def __init__(
         self,
         conversation_key: Tuple[int, ...],
         update: Update,
-        dispatcher: 'Dispatcher',
+        dispatcher: "Dispatcher",
         callback_context: CallbackContext,
     ):
         self.conversation_key = conversation_key
@@ -186,23 +186,23 @@ class ConversationHandler(Handler[Update, CCT]):
     """
 
     __slots__ = (
-        '_entry_points',
-        '_states',
-        '_fallbacks',
-        '_allow_reentry',
-        '_per_user',
-        '_per_chat',
-        '_per_message',
-        '_conversation_timeout',
-        '_name',
-        'persistent',
-        '_persistence',
-        '_map_to_parent',
-        'timeout_jobs',
-        '_timeout_jobs_lock',
-        '_conversations',
-        '_conversations_lock',
-        'logger',
+        "_entry_points",
+        "_states",
+        "_fallbacks",
+        "_allow_reentry",
+        "_per_user",
+        "_per_chat",
+        "_per_message",
+        "_conversation_timeout",
+        "_name",
+        "persistent",
+        "_persistence",
+        "_map_to_parent",
+        "timeout_jobs",
+        "_timeout_jobs_lock",
+        "_conversations",
+        "_conversations_lock",
+        "logger",
     )
 
     END: ClassVar[int] = -1
@@ -248,7 +248,7 @@ class ConversationHandler(Handler[Update, CCT]):
         Set by dispatcher"""
         self._map_to_parent = map_to_parent
 
-        self.timeout_jobs: Dict[Tuple[int, ...], 'Job'] = {}
+        self.timeout_jobs: Dict[Tuple[int, ...], "Job"] = {}
         self._timeout_jobs_lock = Lock()
         self._conversations: ConversationDict = {}
         self._conversations_lock = Lock()
@@ -321,7 +321,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
     @entry_points.setter
     def entry_points(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to entry_points after initialization.')
+        raise ValueError("You can not assign a new value to entry_points after initialization.")
 
     @property
     def states(self) -> Dict[object, List[Handler]]:
@@ -333,7 +333,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
     @states.setter
     def states(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to states after initialization.')
+        raise ValueError("You can not assign a new value to states after initialization.")
 
     @property
     def fallbacks(self) -> List[Handler]:
@@ -345,7 +345,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
     @fallbacks.setter
     def fallbacks(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to fallbacks after initialization.')
+        raise ValueError("You can not assign a new value to fallbacks after initialization.")
 
     @property
     def allow_reentry(self) -> bool:
@@ -354,7 +354,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
     @allow_reentry.setter
     def allow_reentry(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to allow_reentry after initialization.')
+        raise ValueError("You can not assign a new value to allow_reentry after initialization.")
 
     @property
     def per_user(self) -> bool:
@@ -363,7 +363,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
     @per_user.setter
     def per_user(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to per_user after initialization.')
+        raise ValueError("You can not assign a new value to per_user after initialization.")
 
     @property
     def per_chat(self) -> bool:
@@ -372,7 +372,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
     @per_chat.setter
     def per_chat(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to per_chat after initialization.')
+        raise ValueError("You can not assign a new value to per_chat after initialization.")
 
     @property
     def per_message(self) -> bool:
@@ -381,7 +381,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
     @per_message.setter
     def per_message(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to per_message after initialization.')
+        raise ValueError("You can not assign a new value to per_message after initialization.")
 
     @property
     def conversation_timeout(
@@ -396,7 +396,7 @@ class ConversationHandler(Handler[Update, CCT]):
     @conversation_timeout.setter
     def conversation_timeout(self, value: object) -> NoReturn:
         raise ValueError(
-            'You can not assign a new value to conversation_timeout after initialization.'
+            "You can not assign a new value to conversation_timeout after initialization."
         )
 
     @property
@@ -406,7 +406,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
     @name.setter
     def name(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to name after initialization.')
+        raise ValueError("You can not assign a new value to name after initialization.")
 
     @property
     def map_to_parent(self) -> Optional[Dict[object, object]]:
@@ -418,7 +418,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
     @map_to_parent.setter
     def map_to_parent(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to map_to_parent after initialization.')
+        raise ValueError("You can not assign a new value to map_to_parent after initialization.")
 
     @property
     def persistence(self) -> Optional[BasePersistence]:
@@ -484,7 +484,7 @@ class ConversationHandler(Handler[Update, CCT]):
     def _schedule_job(
         self,
         new_state: object,
-        dispatcher: 'Dispatcher',
+        dispatcher: "Dispatcher",
         update: Update,
         context: CallbackContext,
         conversation_key: Tuple[int, ...],
@@ -536,7 +536,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
         # Resolve promises
         if isinstance(state, tuple) and len(state) == 2 and isinstance(state[1], Promise):
-            self.logger.debug('waiting for promise...')
+            self.logger.debug("waiting for promise...")
 
             # check if promise is finished or not
             if state[1].done.wait(0):
@@ -554,7 +554,7 @@ class ConversationHandler(Handler[Update, CCT]):
                         return key, hdlr, check
                 return None
 
-        self.logger.debug('selecting conversation %s with state %s', str(key), str(state))
+        self.logger.debug("selecting conversation %s with state %s", str(key), str(state))
 
         handler = None
 
@@ -596,7 +596,7 @@ class ConversationHandler(Handler[Update, CCT]):
     def handle_update(  # type: ignore[override]
         self,
         update: Update,
-        dispatcher: 'Dispatcher',
+        dispatcher: "Dispatcher",
         check_result: CheckUpdateType,
         context: CallbackContext,
     ) -> Optional[object]:
@@ -690,9 +690,9 @@ class ConversationHandler(Handler[Update, CCT]):
                     self.persistence.update_conversation(self.name, key, new_state)
 
     def _trigger_timeout(self, context: CallbackContext) -> None:
-        self.logger.debug('conversation timeout was triggered!')
+        self.logger.debug("conversation timeout was triggered!")
 
-        job = cast('Job', context.job)
+        job = cast("Job", context.job)
         ctxt = cast(_ConversationTimeoutContext, job.context)
 
         callback_context = ctxt.callback_context
@@ -712,8 +712,8 @@ class ConversationHandler(Handler[Update, CCT]):
                     handler.handle_update(ctxt.update, ctxt.dispatcher, check, callback_context)
                 except DispatcherHandlerStop:
                     self.logger.warning(
-                        'DispatcherHandlerStop in TIMEOUT state of '
-                        'ConversationHandler has no effect. Ignoring.'
+                        "DispatcherHandlerStop in TIMEOUT state of "
+                        "ConversationHandler has no effect. Ignoring."
                     )
 
         self._update_state(self.END, ctxt.conversation_key)

@@ -77,14 +77,14 @@ class InlineQueryResultCachedPhoto(InlineQueryResult):
     """
 
     __slots__ = (
-        'reply_markup',
-        'caption_entities',
-        'caption',
-        'title',
-        'description',
-        'parse_mode',
-        'photo_file_id',
-        'input_message_content',
+        "reply_markup",
+        "caption_entities",
+        "caption",
+        "title",
+        "description",
+        "parse_mode",
+        "photo_file_id",
+        "input_message_content",
     )
 
     def __init__(
@@ -94,14 +94,14 @@ class InlineQueryResultCachedPhoto(InlineQueryResult):
         title: str = None,
         description: str = None,
         caption: str = None,
-        reply_markup: 'ReplyMarkup' = None,
-        input_message_content: 'InputMessageContent' = None,
+        reply_markup: "ReplyMarkup" = None,
+        input_message_content: "InputMessageContent" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
         **_kwargs: Any,
     ):
         # Required
-        super().__init__('photo', id)
+        super().__init__("photo", id)
         self.photo_file_id = photo_file_id
 
         # Optionals

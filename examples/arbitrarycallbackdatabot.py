@@ -20,7 +20,7 @@ from telegram.ext import (
 )
 
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 def start(update: Update, context: CallbackContext) -> None:
     """Sends a message with 5 inline buttons attached."""
     number_list: List[int] = []
-    update.message.reply_text('Please choose:', reply_markup=build_keyboard(number_list))
+    update.message.reply_text("Please choose:", reply_markup=build_keyboard(number_list))
 
 
 def help_command(update: Update, context: CallbackContext) -> None:
@@ -43,7 +43,7 @@ def clear(update: Update, context: CallbackContext) -> None:
     """Clears the callback data cache"""
     context.bot.callback_data_cache.clear_callback_data()  # type: ignore[attr-defined]
     context.bot.callback_data_cache.clear_callback_queries()  # type: ignore[attr-defined]
-    update.effective_message.reply_text('All clear!')
+    update.effective_message.reply_text("All clear!")
 
 
 def build_keyboard(current_list: List[int]) -> InlineKeyboardMarkup:
@@ -77,20 +77,20 @@ def handle_invalid_button(update: Update, context: CallbackContext) -> None:
     """Informs the user that the button is no longer available."""
     update.callback_query.answer()
     update.effective_message.edit_text(
-        'Sorry, I could not process this button click 😕 Please send /start to get a new keyboard.'
+        "Sorry, I could not process this button click 😕 Please send /start to get a new keyboard."
     )
 
 
 def main() -> None:
     """Run the bot."""
     # We use persistence to demonstrate how buttons can still work after the bot was restarted
-    persistence = PicklePersistence(filename='arbitrarycallbackdatabot.pickle')
+    persistence = PicklePersistence(filename="arbitrarycallbackdatabot.pickle")
     # Create the Updater and pass it your bot's token.
     updater = Updater("TOKEN", persistence=persistence, arbitrary_callback_data=True)
 
-    updater.dispatcher.add_handler(CommandHandler('start', start))
-    updater.dispatcher.add_handler(CommandHandler('help', help_command))
-    updater.dispatcher.add_handler(CommandHandler('clear', clear))
+    updater.dispatcher.add_handler(CommandHandler("start", start))
+    updater.dispatcher.add_handler(CommandHandler("help", help_command))
+    updater.dispatcher.add_handler(CommandHandler("clear", clear))
     updater.dispatcher.add_handler(
         CallbackQueryHandler(handle_invalid_button, pattern=InvalidCallbackData)
     )
@@ -104,5 +104,5 @@ def main() -> None:
     updater.idle()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

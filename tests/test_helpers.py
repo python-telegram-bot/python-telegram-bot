@@ -63,17 +63,17 @@ import to raise the expected exception.
 Note that a fixture that just does this for every test that needs it is a nice idea, but for some
 reason makes test_updater.py hang indefinitely on GitHub Actions (at least when Hinrich tried that)
 """
-TEST_NO_PYTZ = env_var_2_bool(os.getenv('TEST_NO_PYTZ', False))
+TEST_NO_PYTZ = env_var_2_bool(os.getenv("TEST_NO_PYTZ", False))
 
 if TEST_NO_PYTZ:
     orig_import = __import__
 
     def import_mock(module_name, *args, **kwargs):
-        if module_name == 'pytz':
-            raise ModuleNotFoundError('We are testing without pytz here')
+        if module_name == "pytz":
+            raise ModuleNotFoundError("We are testing without pytz here")
         return orig_import(module_name, *args, **kwargs)
 
-    with mock.patch('builtins.__import__', side_effect=import_mock):
+    with mock.patch("builtins.__import__", side_effect=import_mock):
         reload(helpers)
 
 
@@ -86,21 +86,21 @@ class TestHelpers:
             assert helpers.UTC is not helpers.DTM_UTC
 
     def test_escape_markdown(self):
-        test_str = '*bold*, _italic_, `code`, [text_link](http://github.com/)'
-        expected_str = r'\*bold\*, \_italic\_, \`code\`, \[text\_link](http://github.com/)'
+        test_str = "*bold*, _italic_, `code`, [text_link](http://github.com/)"
+        expected_str = r"\*bold\*, \_italic\_, \`code\`, \[text\_link](http://github.com/)"
 
         assert expected_str == helpers.escape_markdown(test_str)
 
     def test_escape_markdown_v2(self):
-        test_str = 'a_b*c[d]e (fg) h~I`>JK#L+MN -O=|p{qr}s.t! u'
-        expected_str = r'a\_b\*c\[d\]e \(fg\) h\~I\`\>JK\#L\+MN \-O\=\|p\{qr\}s\.t\! u'
+        test_str = "a_b*c[d]e (fg) h~I`>JK#L+MN -O=|p{qr}s.t! u"
+        expected_str = r"a\_b\*c\[d\]e \(fg\) h\~I\`\>JK\#L\+MN \-O\=\|p\{qr\}s\.t\! u"
 
         assert expected_str == helpers.escape_markdown(test_str, version=2)
 
     def test_escape_markdown_v2_monospaced(self):
 
-        test_str = r'mono/pre: `abc` \int (`\some \`stuff)'
-        expected_str = 'mono/pre: \\`abc\\` \\\\int (\\`\\\\some \\\\\\`stuff)'
+        test_str = r"mono/pre: `abc` \int (`\some \`stuff)"
+        expected_str = "mono/pre: \\`abc\\` \\\\int (\\`\\\\some \\\\\\`stuff)"
 
         assert expected_str == helpers.escape_markdown(
             test_str, version=2, entity_type=MessageEntity.PRE
@@ -111,8 +111,8 @@ class TestHelpers:
 
     def test_escape_markdown_v2_text_link(self):
 
-        test_str = 'https://url.containing/funny)cha)\\ra\\)cter\\s'
-        expected_str = 'https://url.containing/funny\\)cha\\)\\\\ra\\\\\\)cter\\\\s'
+        test_str = "https://url.containing/funny)cha)\\ra\\)cter\\s"
+        expected_str = "https://url.containing/funny\\)cha\\)\\\\ra\\\\\\)cter\\\\s"
 
         assert expected_str == helpers.escape_markdown(
             test_str, version=2, entity_type=MessageEntity.TEXT_LINK
@@ -120,7 +120,7 @@ class TestHelpers:
 
     def test_markdown_invalid_version(self):
         with pytest.raises(ValueError):
-            helpers.escape_markdown('abc', version=-1)
+            helpers.escape_markdown("abc", version=-1)
 
     def test_to_float_timestamp_absolute_naive(self):
         """Conversion from timezone-naive datetime to timestamp.
@@ -133,7 +133,7 @@ class TestHelpers:
         """Conversion from timezone-naive datetime to timestamp.
         Naive datetimes should be assumed to be in UTC.
         """
-        monkeypatch.setattr(helpers, 'UTC', helpers.DTM_UTC)
+        monkeypatch.setattr(helpers, "UTC", helpers.DTM_UTC)
         datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5)
         assert helpers.to_float_timestamp(datetime) == 1573431976.1
 
@@ -153,11 +153,11 @@ class TestHelpers:
         with pytest.raises(ValueError):
             helpers.to_float_timestamp(dtm.datetime(2019, 11, 11), reference_timestamp=123)
 
-    @pytest.mark.parametrize('time_spec', DELTA_TIME_SPECS, ids=str)
+    @pytest.mark.parametrize("time_spec", DELTA_TIME_SPECS, ids=str)
     def test_to_float_timestamp_delta(self, time_spec):
         """Conversion from a 'delta' time specification to timestamp"""
         reference_t = 0
-        delta = time_spec.total_seconds() if hasattr(time_spec, 'total_seconds') else time_spec
+        delta = time_spec.total_seconds() if hasattr(time_spec, "total_seconds") else time_spec
         assert helpers.to_float_timestamp(time_spec, reference_t) == reference_t + delta
 
     def test_to_float_timestamp_time_of_day(self):
@@ -186,7 +186,7 @@ class TestHelpers:
             ref_t + (-utc_offset.total_seconds() % (24 * 60 * 60))
         )
 
-    @pytest.mark.parametrize('time_spec', RELATIVE_TIME_SPECS, ids=str)
+    @pytest.mark.parametrize("time_spec", RELATIVE_TIME_SPECS, ids=str)
     def test_to_float_timestamp_default_reference(self, time_spec):
         """The reference timestamp for relative time specifications should default to now"""
         now = time.time()
@@ -195,10 +195,10 @@ class TestHelpers:
         )
 
     def test_to_float_timestamp_error(self):
-        with pytest.raises(TypeError, match='Defaults'):
+        with pytest.raises(TypeError, match="Defaults"):
             helpers.to_float_timestamp(Defaults())
 
-    @pytest.mark.parametrize('time_spec', TIME_SPECS, ids=str)
+    @pytest.mark.parametrize("time_spec", TIME_SPECS, ids=str)
     def test_to_timestamp(self, time_spec):
         # delegate tests to `to_float_timestamp`
         assert helpers.to_timestamp(time_spec) == int(helpers.to_float_timestamp(time_spec))
@@ -227,7 +227,7 @@ class TestHelpers:
         )
 
     def test_create_deep_linked_url(self):
-        username = 'JamesTheMock'
+        username = "JamesTheMock"
 
         payload = "hello"
         expected = f"https://t.me/{username}?start={payload}"
@@ -246,10 +246,10 @@ class TestHelpers:
         assert expected == helpers.create_deep_linked_url(username, payload)
 
         with pytest.raises(ValueError):
-            helpers.create_deep_linked_url(username, 'text with spaces')
+            helpers.create_deep_linked_url(username, "text with spaces")
 
         with pytest.raises(ValueError):
-            helpers.create_deep_linked_url(username, '0' * 65)
+            helpers.create_deep_linked_url(username, "0" * 65)
 
         with pytest.raises(ValueError):
             helpers.create_deep_linked_url(None, None)
@@ -267,26 +267,26 @@ class TestHelpers:
             config.update(**kwargs)
             return Message(**config)
 
-        test_message = build_test_message(text='Test')
-        assert helpers.effective_message_type(test_message) == 'text'
+        test_message = build_test_message(text="Test")
+        assert helpers.effective_message_type(test_message) == "text"
         test_message.text = None
 
         test_message = build_test_message(
-            sticker=Sticker('sticker_id', 'unique_id', 50, 50, False)
+            sticker=Sticker("sticker_id", "unique_id", 50, 50, False)
         )
-        assert helpers.effective_message_type(test_message) == 'sticker'
+        assert helpers.effective_message_type(test_message) == "sticker"
         test_message.sticker = None
 
-        test_message = build_test_message(new_chat_members=[User(55, 'new_user', False)])
-        assert helpers.effective_message_type(test_message) == 'new_chat_members'
+        test_message = build_test_message(new_chat_members=[User(55, "new_user", False)])
+        assert helpers.effective_message_type(test_message) == "new_chat_members"
 
-        test_message = build_test_message(left_chat_member=[User(55, 'new_user', False)])
-        assert helpers.effective_message_type(test_message) == 'left_chat_member'
+        test_message = build_test_message(left_chat_member=[User(55, "new_user", False)])
+        assert helpers.effective_message_type(test_message) == "left_chat_member"
 
         test_update = Update(1)
-        test_message = build_test_message(text='Test')
+        test_message = build_test_message(text="Test")
         test_update.message = test_message
-        assert helpers.effective_message_type(test_update) == 'text'
+        assert helpers.effective_message_type(test_update) == "text"
 
         empty_update = Update(2)
         assert helpers.effective_message_type(empty_update) is None
@@ -294,28 +294,28 @@ class TestHelpers:
     def test_mention_html(self):
         expected = '<a href="tg://user?id=1">the name</a>'
 
-        assert expected == helpers.mention_html(1, 'the name')
+        assert expected == helpers.mention_html(1, "the name")
 
     def test_mention_markdown(self):
-        expected = '[the name](tg://user?id=1)'
+        expected = "[the name](tg://user?id=1)"
 
-        assert expected == helpers.mention_markdown(1, 'the name')
+        assert expected == helpers.mention_markdown(1, "the name")
 
     def test_mention_markdown_2(self):
-        expected = r'[the\_name](tg://user?id=1)'
+        expected = r"[the\_name](tg://user?id=1)"
 
-        assert expected == helpers.mention_markdown(1, 'the_name')
+        assert expected == helpers.mention_markdown(1, "the_name")
 
     @pytest.mark.parametrize(
-        'string,expected',
+        "string,expected",
         [
-            ('tests/data/game.gif', True),
-            ('tests/data', False),
-            (str(Path.cwd() / 'tests' / 'data' / 'game.gif'), True),
-            (str(Path.cwd() / 'tests' / 'data'), False),
-            (Path.cwd() / 'tests' / 'data' / 'game.gif', True),
-            (Path.cwd() / 'tests' / 'data', False),
-            ('https:/api.org/file/botTOKEN/document/file_3', False),
+            ("tests/data/game.gif", True),
+            ("tests/data", False),
+            (str(Path.cwd() / "tests" / "data" / "game.gif"), True),
+            (str(Path.cwd() / "tests" / "data"), False),
+            (Path.cwd() / "tests" / "data" / "game.gif", True),
+            (Path.cwd() / "tests" / "data", False),
+            ("https:/api.org/file/botTOKEN/document/file_3", False),
             (None, False),
         ],
     )
@@ -323,24 +323,24 @@ class TestHelpers:
         assert helpers.is_local_file(string) == expected
 
     @pytest.mark.parametrize(
-        'string,expected',
+        "string,expected",
         [
-            ('tests/data/game.gif', (Path.cwd() / 'tests' / 'data' / 'game.gif').as_uri()),
-            ('tests/data', 'tests/data'),
-            ('file://foobar', 'file://foobar'),
+            ("tests/data/game.gif", (Path.cwd() / "tests" / "data" / "game.gif").as_uri()),
+            ("tests/data", "tests/data"),
+            ("file://foobar", "file://foobar"),
             (
-                str(Path.cwd() / 'tests' / 'data' / 'game.gif'),
-                (Path.cwd() / 'tests' / 'data' / 'game.gif').as_uri(),
+                str(Path.cwd() / "tests" / "data" / "game.gif"),
+                (Path.cwd() / "tests" / "data" / "game.gif").as_uri(),
             ),
-            (str(Path.cwd() / 'tests' / 'data'), str(Path.cwd() / 'tests' / 'data')),
+            (str(Path.cwd() / "tests" / "data"), str(Path.cwd() / "tests" / "data")),
             (
-                Path.cwd() / 'tests' / 'data' / 'game.gif',
-                (Path.cwd() / 'tests' / 'data' / 'game.gif').as_uri(),
+                Path.cwd() / "tests" / "data" / "game.gif",
+                (Path.cwd() / "tests" / "data" / "game.gif").as_uri(),
             ),
-            (Path.cwd() / 'tests' / 'data', Path.cwd() / 'tests' / 'data'),
+            (Path.cwd() / "tests" / "data", Path.cwd() / "tests" / "data"),
             (
-                'https:/api.org/file/botTOKEN/document/file_3',
-                'https:/api.org/file/botTOKEN/document/file_3',
+                "https:/api.org/file/botTOKEN/document/file_3",
+                "https:/api.org/file/botTOKEN/document/file_3",
             ),
         ],
     )
@@ -348,40 +348,40 @@ class TestHelpers:
         assert helpers.parse_file_input(string) == expected
 
     def test_parse_file_input_file_like(self):
-        with open('tests/data/game.gif', 'rb') as file:
+        with open("tests/data/game.gif", "rb") as file:
             parsed = helpers.parse_file_input(file)
 
         assert isinstance(parsed, InputFile)
         assert not parsed.attach
-        assert parsed.filename == 'game.gif'
+        assert parsed.filename == "game.gif"
 
-        with open('tests/data/game.gif', 'rb') as file:
-            parsed = helpers.parse_file_input(file, attach=True, filename='test_file')
+        with open("tests/data/game.gif", "rb") as file:
+            parsed = helpers.parse_file_input(file, attach=True, filename="test_file")
 
         assert isinstance(parsed, InputFile)
         assert parsed.attach
-        assert parsed.filename == 'test_file'
+        assert parsed.filename == "test_file"
 
     def test_parse_file_input_bytes(self):
-        with open('tests/data/text_file.txt', 'rb') as file:
+        with open("tests/data/text_file.txt", "rb") as file:
             parsed = helpers.parse_file_input(file.read())
 
         assert isinstance(parsed, InputFile)
         assert not parsed.attach
-        assert parsed.filename == 'application.octet-stream'
+        assert parsed.filename == "application.octet-stream"
 
-        with open('tests/data/text_file.txt', 'rb') as file:
-            parsed = helpers.parse_file_input(file.read(), attach=True, filename='test_file')
+        with open("tests/data/text_file.txt", "rb") as file:
+            parsed = helpers.parse_file_input(file.read(), attach=True, filename="test_file")
 
         assert isinstance(parsed, InputFile)
         assert parsed.attach
-        assert parsed.filename == 'test_file'
+        assert parsed.filename == "test_file"
 
     def test_parse_file_input_tg_object(self):
-        animation = Animation('file_id', 'unique_id', 1, 1, 1)
-        assert helpers.parse_file_input(animation, Animation) == 'file_id'
+        animation = Animation("file_id", "unique_id", 1, 1, 1)
+        assert helpers.parse_file_input(animation, Animation) == "file_id"
         assert helpers.parse_file_input(animation, MessageEntity) is animation
 
-    @pytest.mark.parametrize('obj', [{1: 2}, [1, 2], (1, 2)])
+    @pytest.mark.parametrize("obj", [{1: 2}, [1, 2], (1, 2)])
     def test_parse_file_input_other(self, obj):
         assert helpers.parse_file_input(obj) is obj

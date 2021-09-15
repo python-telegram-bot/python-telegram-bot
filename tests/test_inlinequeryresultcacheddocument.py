@@ -29,7 +29,7 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def inline_query_result_cached_document():
     return InlineQueryResultCachedDocument(
         TestInlineQueryResultCachedDocument.id_,
@@ -45,21 +45,21 @@ def inline_query_result_cached_document():
 
 
 class TestInlineQueryResultCachedDocument:
-    id_ = 'id'
-    type_ = 'document'
-    document_file_id = 'document file id'
-    title = 'title'
-    caption = 'caption'
-    parse_mode = 'Markdown'
+    id_ = "id"
+    type_ = "document"
+    document_file_id = "document file id"
+    title = "title"
+    caption = "caption"
+    parse_mode = "Markdown"
     caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
-    description = 'description'
-    input_message_content = InputTextMessageContent('input_message_content')
-    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
+    description = "description"
+    input_message_content = InputTextMessageContent("input_message_content")
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
     def test_slot_behaviour(self, inline_query_result_cached_document, mro_slots):
         inst = inline_query_result_cached_document
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, inline_query_result_cached_document):
@@ -85,51 +85,51 @@ class TestInlineQueryResultCachedDocument:
 
         assert isinstance(inline_query_result_cached_document_dict, dict)
         assert (
-            inline_query_result_cached_document_dict['id']
+            inline_query_result_cached_document_dict["id"]
             == inline_query_result_cached_document.id
         )
         assert (
-            inline_query_result_cached_document_dict['type']
+            inline_query_result_cached_document_dict["type"]
             == inline_query_result_cached_document.type
         )
         assert (
-            inline_query_result_cached_document_dict['document_file_id']
+            inline_query_result_cached_document_dict["document_file_id"]
             == inline_query_result_cached_document.document_file_id
         )
         assert (
-            inline_query_result_cached_document_dict['title']
+            inline_query_result_cached_document_dict["title"]
             == inline_query_result_cached_document.title
         )
         assert (
-            inline_query_result_cached_document_dict['caption']
+            inline_query_result_cached_document_dict["caption"]
             == inline_query_result_cached_document.caption
         )
         assert (
-            inline_query_result_cached_document_dict['parse_mode']
+            inline_query_result_cached_document_dict["parse_mode"]
             == inline_query_result_cached_document.parse_mode
         )
-        assert inline_query_result_cached_document_dict['caption_entities'] == [
+        assert inline_query_result_cached_document_dict["caption_entities"] == [
             ce.to_dict() for ce in inline_query_result_cached_document.caption_entities
         ]
         assert (
-            inline_query_result_cached_document_dict['description']
+            inline_query_result_cached_document_dict["description"]
             == inline_query_result_cached_document.description
         )
         assert (
-            inline_query_result_cached_document_dict['input_message_content']
+            inline_query_result_cached_document_dict["input_message_content"]
             == inline_query_result_cached_document.input_message_content.to_dict()
         )
         assert (
-            inline_query_result_cached_document_dict['reply_markup']
+            inline_query_result_cached_document_dict["reply_markup"]
             == inline_query_result_cached_document.reply_markup.to_dict()
         )
 
     def test_equality(self):
         a = InlineQueryResultCachedDocument(self.id_, self.title, self.document_file_id)
         b = InlineQueryResultCachedDocument(self.id_, self.title, self.document_file_id)
-        c = InlineQueryResultCachedDocument(self.id_, self.title, '')
-        d = InlineQueryResultCachedDocument('', self.title, self.document_file_id)
-        e = InlineQueryResultCachedVoice(self.id_, '', '')
+        c = InlineQueryResultCachedDocument(self.id_, self.title, "")
+        d = InlineQueryResultCachedDocument("", self.title, self.document_file_id)
+        e = InlineQueryResultCachedVoice(self.id_, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

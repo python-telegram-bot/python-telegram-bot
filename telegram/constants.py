@@ -229,7 +229,7 @@ Attributes:
 """
 from typing import List
 
-BOT_API_VERSION: str = '5.3'
+BOT_API_VERSION: str = "5.3"
 MAX_MESSAGE_LENGTH: int = 4096
 MAX_CAPTION_LENGTH: int = 1024
 ANONYMOUS_ADMIN_ID: int = 1087968824
@@ -248,36 +248,36 @@ MAX_MESSAGE_ENTITIES: int = 100
 MAX_INLINE_QUERY_RESULTS: int = 50
 MAX_ANSWER_CALLBACK_QUERY_TEXT_LENGTH: int = 200
 
-CHAT_SENDER: str = 'sender'
-CHAT_PRIVATE: str = 'private'
-CHAT_GROUP: str = 'group'
-CHAT_SUPERGROUP: str = 'supergroup'
-CHAT_CHANNEL: str = 'channel'
+CHAT_SENDER: str = "sender"
+CHAT_PRIVATE: str = "private"
+CHAT_GROUP: str = "group"
+CHAT_SUPERGROUP: str = "supergroup"
+CHAT_CHANNEL: str = "channel"
 
-CHATACTION_FIND_LOCATION: str = 'find_location'
-CHATACTION_RECORD_VOICE: str = 'record_voice'
-CHATACTION_RECORD_VIDEO: str = 'record_video'
-CHATACTION_RECORD_VIDEO_NOTE: str = 'record_video_note'
-CHATACTION_TYPING: str = 'typing'
-CHATACTION_UPLOAD_VOICE: str = 'upload_voice'
-CHATACTION_UPLOAD_DOCUMENT: str = 'upload_document'
-CHATACTION_UPLOAD_PHOTO: str = 'upload_photo'
-CHATACTION_UPLOAD_VIDEO: str = 'upload_video'
-CHATACTION_UPLOAD_VIDEO_NOTE: str = 'upload_video_note'
+CHATACTION_FIND_LOCATION: str = "find_location"
+CHATACTION_RECORD_VOICE: str = "record_voice"
+CHATACTION_RECORD_VIDEO: str = "record_video"
+CHATACTION_RECORD_VIDEO_NOTE: str = "record_video_note"
+CHATACTION_TYPING: str = "typing"
+CHATACTION_UPLOAD_VOICE: str = "upload_voice"
+CHATACTION_UPLOAD_DOCUMENT: str = "upload_document"
+CHATACTION_UPLOAD_PHOTO: str = "upload_photo"
+CHATACTION_UPLOAD_VIDEO: str = "upload_video"
+CHATACTION_UPLOAD_VIDEO_NOTE: str = "upload_video_note"
 
-CHATMEMBER_ADMINISTRATOR: str = 'administrator'
-CHATMEMBER_CREATOR: str = 'creator'
-CHATMEMBER_KICKED: str = 'kicked'
-CHATMEMBER_LEFT: str = 'left'
-CHATMEMBER_MEMBER: str = 'member'
-CHATMEMBER_RESTRICTED: str = 'restricted'
+CHATMEMBER_ADMINISTRATOR: str = "administrator"
+CHATMEMBER_CREATOR: str = "creator"
+CHATMEMBER_KICKED: str = "kicked"
+CHATMEMBER_LEFT: str = "left"
+CHATMEMBER_MEMBER: str = "member"
+CHATMEMBER_RESTRICTED: str = "restricted"
 
-DICE_DICE: str = '🎲'
-DICE_DARTS: str = '🎯'
-DICE_BASKETBALL: str = '🏀'
-DICE_FOOTBALL: str = '⚽'
-DICE_SLOT_MACHINE: str = '🎰'
-DICE_BOWLING: str = '🎳'
+DICE_DICE: str = "🎲"
+DICE_DARTS: str = "🎯"
+DICE_BASKETBALL: str = "🏀"
+DICE_FOOTBALL: str = "⚽"
+DICE_SLOT_MACHINE: str = "🎰"
+DICE_BOWLING: str = "🎳"
 DICE_ALL_EMOJI: List[str] = [
     DICE_DICE,
     DICE_DARTS,
@@ -287,21 +287,21 @@ DICE_ALL_EMOJI: List[str] = [
     DICE_BOWLING,
 ]
 
-MESSAGEENTITY_MENTION: str = 'mention'
-MESSAGEENTITY_HASHTAG: str = 'hashtag'
-MESSAGEENTITY_CASHTAG: str = 'cashtag'
-MESSAGEENTITY_PHONE_NUMBER: str = 'phone_number'
-MESSAGEENTITY_BOT_COMMAND: str = 'bot_command'
-MESSAGEENTITY_URL: str = 'url'
-MESSAGEENTITY_EMAIL: str = 'email'
-MESSAGEENTITY_BOLD: str = 'bold'
-MESSAGEENTITY_ITALIC: str = 'italic'
-MESSAGEENTITY_CODE: str = 'code'
-MESSAGEENTITY_PRE: str = 'pre'
-MESSAGEENTITY_TEXT_LINK: str = 'text_link'
-MESSAGEENTITY_TEXT_MENTION: str = 'text_mention'
-MESSAGEENTITY_UNDERLINE: str = 'underline'
-MESSAGEENTITY_STRIKETHROUGH: str = 'strikethrough'
+MESSAGEENTITY_MENTION: str = "mention"
+MESSAGEENTITY_HASHTAG: str = "hashtag"
+MESSAGEENTITY_CASHTAG: str = "cashtag"
+MESSAGEENTITY_PHONE_NUMBER: str = "phone_number"
+MESSAGEENTITY_BOT_COMMAND: str = "bot_command"
+MESSAGEENTITY_URL: str = "url"
+MESSAGEENTITY_EMAIL: str = "email"
+MESSAGEENTITY_BOLD: str = "bold"
+MESSAGEENTITY_ITALIC: str = "italic"
+MESSAGEENTITY_CODE: str = "code"
+MESSAGEENTITY_PRE: str = "pre"
+MESSAGEENTITY_TEXT_LINK: str = "text_link"
+MESSAGEENTITY_TEXT_MENTION: str = "text_mention"
+MESSAGEENTITY_UNDERLINE: str = "underline"
+MESSAGEENTITY_STRIKETHROUGH: str = "strikethrough"
 MESSAGEENTITY_ALL_TYPES: List[str] = [
     MESSAGEENTITY_MENTION,
     MESSAGEENTITY_HASHTAG,
@@ -320,33 +320,33 @@ MESSAGEENTITY_ALL_TYPES: List[str] = [
     MESSAGEENTITY_STRIKETHROUGH,
 ]
 
-PARSEMODE_MARKDOWN: str = 'Markdown'
-PARSEMODE_MARKDOWN_V2: str = 'MarkdownV2'
-PARSEMODE_HTML: str = 'HTML'
+PARSEMODE_MARKDOWN: str = "Markdown"
+PARSEMODE_MARKDOWN_V2: str = "MarkdownV2"
+PARSEMODE_HTML: str = "HTML"
 
-POLL_REGULAR: str = 'regular'
-POLL_QUIZ: str = 'quiz'
+POLL_REGULAR: str = "regular"
+POLL_QUIZ: str = "quiz"
 MAX_POLL_QUESTION_LENGTH: int = 300
 MAX_POLL_OPTION_LENGTH: int = 100
 
-STICKER_FOREHEAD: str = 'forehead'
-STICKER_EYES: str = 'eyes'
-STICKER_MOUTH: str = 'mouth'
-STICKER_CHIN: str = 'chin'
+STICKER_FOREHEAD: str = "forehead"
+STICKER_EYES: str = "eyes"
+STICKER_MOUTH: str = "mouth"
+STICKER_CHIN: str = "chin"
 
-UPDATE_MESSAGE = 'message'
-UPDATE_EDITED_MESSAGE = 'edited_message'
-UPDATE_CHANNEL_POST = 'channel_post'
-UPDATE_EDITED_CHANNEL_POST = 'edited_channel_post'
-UPDATE_INLINE_QUERY = 'inline_query'
-UPDATE_CHOSEN_INLINE_RESULT = 'chosen_inline_result'
-UPDATE_CALLBACK_QUERY = 'callback_query'
-UPDATE_SHIPPING_QUERY = 'shipping_query'
-UPDATE_PRE_CHECKOUT_QUERY = 'pre_checkout_query'
-UPDATE_POLL = 'poll'
-UPDATE_POLL_ANSWER = 'poll_answer'
-UPDATE_MY_CHAT_MEMBER = 'my_chat_member'
-UPDATE_CHAT_MEMBER = 'chat_member'
+UPDATE_MESSAGE = "message"
+UPDATE_EDITED_MESSAGE = "edited_message"
+UPDATE_CHANNEL_POST = "channel_post"
+UPDATE_EDITED_CHANNEL_POST = "edited_channel_post"
+UPDATE_INLINE_QUERY = "inline_query"
+UPDATE_CHOSEN_INLINE_RESULT = "chosen_inline_result"
+UPDATE_CALLBACK_QUERY = "callback_query"
+UPDATE_SHIPPING_QUERY = "shipping_query"
+UPDATE_PRE_CHECKOUT_QUERY = "pre_checkout_query"
+UPDATE_POLL = "poll"
+UPDATE_POLL_ANSWER = "poll_answer"
+UPDATE_MY_CHAT_MEMBER = "my_chat_member"
+UPDATE_CHAT_MEMBER = "chat_member"
 UPDATE_ALL_TYPES = [
     UPDATE_MESSAGE,
     UPDATE_EDITED_MESSAGE,
@@ -363,10 +363,10 @@ UPDATE_ALL_TYPES = [
     UPDATE_CHAT_MEMBER,
 ]
 
-BOT_COMMAND_SCOPE_DEFAULT = 'default'
-BOT_COMMAND_SCOPE_ALL_PRIVATE_CHATS = 'all_private_chats'
-BOT_COMMAND_SCOPE_ALL_GROUP_CHATS = 'all_group_chats'
-BOT_COMMAND_SCOPE_ALL_CHAT_ADMINISTRATORS = 'all_chat_administrators'
-BOT_COMMAND_SCOPE_CHAT = 'chat'
-BOT_COMMAND_SCOPE_CHAT_ADMINISTRATORS = 'chat_administrators'
-BOT_COMMAND_SCOPE_CHAT_MEMBER = 'chat_member'
+BOT_COMMAND_SCOPE_DEFAULT = "default"
+BOT_COMMAND_SCOPE_ALL_PRIVATE_CHATS = "all_private_chats"
+BOT_COMMAND_SCOPE_ALL_GROUP_CHATS = "all_group_chats"
+BOT_COMMAND_SCOPE_ALL_CHAT_ADMINISTRATORS = "all_chat_administrators"
+BOT_COMMAND_SCOPE_CHAT = "chat"
+BOT_COMMAND_SCOPE_CHAT_ADMINISTRATORS = "chat_administrators"
+BOT_COMMAND_SCOPE_CHAT_MEMBER = "chat_member"

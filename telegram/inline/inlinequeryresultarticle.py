@@ -64,23 +64,23 @@ class InlineQueryResultArticle(InlineQueryResult):
     """
 
     __slots__ = (
-        'reply_markup',
-        'thumb_width',
-        'thumb_height',
-        'hide_url',
-        'url',
-        'title',
-        'description',
-        'input_message_content',
-        'thumb_url',
+        "reply_markup",
+        "thumb_width",
+        "thumb_height",
+        "hide_url",
+        "url",
+        "title",
+        "description",
+        "input_message_content",
+        "thumb_url",
     )
 
     def __init__(
         self,
         id: str,  # pylint: disable=W0622
         title: str,
-        input_message_content: 'InputMessageContent',
-        reply_markup: 'ReplyMarkup' = None,
+        input_message_content: "InputMessageContent",
+        reply_markup: "ReplyMarkup" = None,
         url: str = None,
         hide_url: bool = None,
         description: str = None,
@@ -91,7 +91,7 @@ class InlineQueryResultArticle(InlineQueryResult):
     ):
 
         # Required
-        super().__init__('article', id)
+        super().__init__("article", id)
         self.title = title
         self.input_message_content = input_message_content
 

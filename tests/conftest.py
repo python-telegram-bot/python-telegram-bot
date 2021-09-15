@@ -64,14 +64,14 @@ from tests.bots import get_bot
 # This is here instead of in setup.cfg due to https://github.com/pytest-dev/pytest/issues/8343
 def pytest_runtestloop(session):
     session.add_marker(
-        pytest.mark.filterwarnings('ignore::telegram.utils.deprecate.TelegramDeprecationWarning')
+        pytest.mark.filterwarnings("ignore::telegram.utils.deprecate.TelegramDeprecationWarning")
     )
 
 
-GITHUB_ACTION = os.getenv('GITHUB_ACTION', False)
+GITHUB_ACTION = os.getenv("GITHUB_ACTION", False)
 
 if GITHUB_ACTION:
-    pytest_plugins = ['tests.plugin_github_group']
+    pytest_plugins = ["tests.plugin_github_group"]
 
 # THIS KEY IS OBVIOUSLY COMPROMISED
 # DO NOT USE IN PRODUCTION!
@@ -83,10 +83,10 @@ def env_var_2_bool(env_var: object) -> bool:
         return env_var
     if not isinstance(env_var, str):
         return False
-    return env_var.lower().strip() == 'true'
+    return env_var.lower().strip() == "true"
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def bot_info():
     return get_bot()
 
@@ -104,56 +104,56 @@ class DictBot(Bot):
     pass
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def bot(bot_info):
-    return DictExtBot(bot_info['token'], private_key=PRIVATE_KEY, request=DictRequest())
+    return DictExtBot(bot_info["token"], private_key=PRIVATE_KEY, request=DictRequest())
 
 
 DEFAULT_BOTS = {}
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def default_bot(request, bot_info):
-    param = request.param if hasattr(request, 'param') else {}
+    param = request.param if hasattr(request, "param") else {}
 
     defaults = Defaults(**param)
     default_bot = DEFAULT_BOTS.get(defaults)
     if default_bot:
         return default_bot
-    default_bot = make_bot(bot_info, **{'defaults': defaults})
+    default_bot = make_bot(bot_info, **{"defaults": defaults})
     DEFAULT_BOTS[defaults] = default_bot
     return default_bot
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def tz_bot(timezone, bot_info):
     defaults = Defaults(tzinfo=timezone)
     default_bot = DEFAULT_BOTS.get(defaults)
     if default_bot:
         return default_bot
-    default_bot = make_bot(bot_info, **{'defaults': defaults})
+    default_bot = make_bot(bot_info, **{"defaults": defaults})
     DEFAULT_BOTS[defaults] = default_bot
     return default_bot
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def chat_id(bot_info):
-    return bot_info['chat_id']
+    return bot_info["chat_id"]
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def super_group_id(bot_info):
-    return bot_info['super_group_id']
+    return bot_info["super_group_id"]
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def channel_id(bot_info):
-    return bot_info['channel_id']
+    return bot_info["channel_id"]
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def provider_token(bot_info):
-    return bot_info['payment_provider_token']
+    return bot_info["payment_provider_token"]
 
 
 def create_dp(bot):
@@ -171,12 +171,12 @@ def create_dp(bot):
     thr.join()
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def _dp(bot):
     yield from create_dp(bot)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def dp(_dp):
     # Reset the dispatcher first
     while not _dp.update_queue.empty():
@@ -190,10 +190,10 @@ def dp(_dp):
     _dp.error_handlers = {}
     # For some reason if we setattr with the name mangled, then some tests(like async) run forever,
     # due to threads not acquiring, (blocking). This adds these attributes to the __dict__.
-    object.__setattr__(_dp, '__stop_event', Event())
-    object.__setattr__(_dp, '__exception_event', Event())
-    object.__setattr__(_dp, '__async_queue', Queue())
-    object.__setattr__(_dp, '__async_threads', set())
+    object.__setattr__(_dp, "__stop_event", Event())
+    object.__setattr__(_dp, "__exception_event", Event())
+    object.__setattr__(_dp, "__async_queue", Queue())
+    object.__setattr__(_dp, "__async_threads", set())
     _dp.persistence = None
     if _dp._Dispatcher__singleton_semaphore.acquire(blocking=0):
         Dispatcher._set_singleton(_dp)
@@ -201,7 +201,7 @@ def dp(_dp):
     Dispatcher._Dispatcher__singleton_semaphore.release()
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def updater(bot):
     up = Updater(bot=bot, workers=2)
     yield up
@@ -209,22 +209,22 @@ def updater(bot):
         up.stop()
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def thumb_file():
-    f = open('tests/data/thumb.jpg', 'rb')
+    f = open("tests/data/thumb.jpg", "rb")
     yield f
     f.close()
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def class_thumb_file():
-    f = open('tests/data/thumb.jpg', 'rb')
+    f = open("tests/data/thumb.jpg", "rb")
     yield f
     f.close()
 
 
 def pytest_configure(config):
-    config.addinivalue_line('filterwarnings', 'ignore::ResourceWarning')
+    config.addinivalue_line("filterwarnings", "ignore::ResourceWarning")
     # TODO: Write so good code that we don't need to ignore ResourceWarnings anymore
 
 
@@ -232,10 +232,10 @@ def make_bot(bot_info, **kwargs):
     """
     Tests are executed on tg.ext.ExtBot, as that class only extends the functionality of tg.bot
     """
-    return ExtBot(bot_info['token'], private_key=PRIVATE_KEY, request=DictRequest(), **kwargs)
+    return ExtBot(bot_info["token"], private_key=PRIVATE_KEY, request=DictRequest(), **kwargs)
 
 
-CMD_PATTERN = re.compile(r'/[\da-z_]{1,32}(?:@\w{1,32})?')
+CMD_PATTERN = re.compile(r"/[\da-z_]{1,32}(?:@\w{1,32})?")
 DATE = datetime.datetime.now()
 
 
@@ -248,11 +248,11 @@ def make_message(text, **kwargs):
     """
     return Message(
         message_id=1,
-        from_user=kwargs.pop('user', User(id=1, first_name='', is_bot=False)),
-        date=kwargs.pop('date', DATE),
-        chat=kwargs.pop('chat', Chat(id=1, type='')),
+        from_user=kwargs.pop("user", User(id=1, first_name="", is_bot=False)),
+        date=kwargs.pop("date", DATE),
+        chat=kwargs.pop("chat", Chat(id=1, type="")),
         text=text,
-        bot=kwargs.pop('bot', make_bot(get_bot())),
+        bot=kwargs.pop("bot", make_bot(get_bot())),
         **kwargs,
     )
 
@@ -295,7 +295,7 @@ def make_message_update(message, message_factory=make_message, edited=False, **k
     """
     if not isinstance(message, Message):
         message = message_factory(message, **kwargs)
-    update_kwargs = {'message' if not edited else 'edited_message': message}
+    update_kwargs = {"message" if not edited else "edited_message": message}
     return Update(0, **update_kwargs)
 
 
@@ -311,12 +311,12 @@ def make_command_update(message, edited=False, **kwargs):
 
 
 @pytest.fixture(
-    scope='class',
-    params=[{'class': MessageFilter}, {'class': UpdateFilter}],
-    ids=['MessageFilter', 'UpdateFilter'],
+    scope="class",
+    params=[{"class": MessageFilter}, {"class": UpdateFilter}],
+    ids=["MessageFilter", "UpdateFilter"],
 )
 def mock_filter(request):
-    class MockFilter(request.param['class']):
+    class MockFilter(request.param["class"]):
         def __init__(self):
             self.tested = False
 
@@ -327,27 +327,27 @@ def mock_filter(request):
 
 
 def get_false_update_fixture_decorator_params():
-    message = Message(1, DATE, Chat(1, ''), from_user=User(1, '', False), text='test')
+    message = Message(1, DATE, Chat(1, ""), from_user=User(1, "", False), text="test")
     params = [
-        {'callback_query': CallbackQuery(1, User(1, '', False), 'chat', message=message)},
-        {'channel_post': message},
-        {'edited_channel_post': message},
-        {'inline_query': InlineQuery(1, User(1, '', False), '', '')},
-        {'chosen_inline_result': ChosenInlineResult('id', User(1, '', False), '')},
-        {'shipping_query': ShippingQuery('id', User(1, '', False), '', None)},
-        {'pre_checkout_query': PreCheckoutQuery('id', User(1, '', False), '', 0, '')},
-        {'callback_query': CallbackQuery(1, User(1, '', False), 'chat')},
+        {"callback_query": CallbackQuery(1, User(1, "", False), "chat", message=message)},
+        {"channel_post": message},
+        {"edited_channel_post": message},
+        {"inline_query": InlineQuery(1, User(1, "", False), "", "")},
+        {"chosen_inline_result": ChosenInlineResult("id", User(1, "", False), "")},
+        {"shipping_query": ShippingQuery("id", User(1, "", False), "", None)},
+        {"pre_checkout_query": PreCheckoutQuery("id", User(1, "", False), "", 0, "")},
+        {"callback_query": CallbackQuery(1, User(1, "", False), "chat")},
     ]
     ids = tuple(key for kwargs in params for key in kwargs)
-    return {'params': params, 'ids': ids}
+    return {"params": params, "ids": ids}
 
 
-@pytest.fixture(scope='function', **get_false_update_fixture_decorator_params())
+@pytest.fixture(scope="function", **get_false_update_fixture_decorator_params())
 def false_update(request):
     return Update(update_id=1, **request.param)
 
 
-@pytest.fixture(params=['Europe/Berlin', 'Asia/Singapore', 'UTC'])
+@pytest.fixture(params=["Europe/Berlin", "Asia/Singapore", "UTC"])
 def tzinfo(request):
     return pytz.timezone(request.param)
 
@@ -363,9 +363,9 @@ def mro_slots():
         return [
             attr
             for cls in _class.__class__.__mro__[:-1]
-            if hasattr(cls, '__slots__')  # The Exception class doesn't have slots
+            if hasattr(cls, "__slots__")  # The Exception class doesn't have slots
             for attr in cls.__slots__
-            if attr != '__dict__'  # left here for classes which still has __dict__
+            if attr != "__dict__"  # left here for classes which still has __dict__
         ]
 
     return _mro_slots
@@ -389,7 +389,7 @@ def expect_bad_request(func, message, reason):
         return func()
     except BadRequest as e:
         if message in str(e):
-            pytest.xfail(f'{reason}. {e}')
+            pytest.xfail(f"{reason}. {e}")
         else:
             raise e
 
@@ -415,15 +415,15 @@ def check_shortcut_signature(
     """
     shortcut_sig = inspect.signature(shortcut)
     effective_shortcut_args = set(shortcut_sig.parameters.keys()).difference(additional_kwargs)
-    effective_shortcut_args.discard('self')
+    effective_shortcut_args.discard("self")
 
     bot_sig = inspect.signature(bot_method)
     expected_args = set(bot_sig.parameters.keys()).difference(shortcut_kwargs)
-    expected_args.discard('self')
+    expected_args.discard("self")
 
     args_check = expected_args == effective_shortcut_args
     if not args_check:
-        raise Exception(f'Expected arguments {expected_args}, got {effective_shortcut_args}')
+        raise Exception(f"Expected arguments {expected_args}, got {effective_shortcut_args}")
 
     # TODO: Also check annotation of return type. Would currently be a hassle b/c typing doesn't
     # resolve `ForwardRef('Type')` to `Type`. For now we rely on MyPy, which probably allows the
@@ -436,13 +436,13 @@ def check_shortcut_signature(
                     shortcut_sig.parameters[kwarg].annotation
                 ):
                     raise Exception(
-                        f'For argument {kwarg} I expected {bot_sig.parameters[kwarg].annotation}, '
-                        f'but got {shortcut_sig.parameters[kwarg].annotation}'
+                        f"For argument {kwarg} I expected {bot_sig.parameters[kwarg].annotation}, "
+                        f"but got {shortcut_sig.parameters[kwarg].annotation}"
                     )
             else:
                 raise Exception(
-                    f'For argument {kwarg} I expected {bot_sig.parameters[kwarg].annotation}, but '
-                    f'got {shortcut_sig.parameters[kwarg].annotation}'
+                    f"For argument {kwarg} I expected {bot_sig.parameters[kwarg].annotation}, but "
+                    f"got {shortcut_sig.parameters[kwarg].annotation}"
                 )
 
     bot_method_sig = inspect.signature(bot_method)
@@ -450,7 +450,7 @@ def check_shortcut_signature(
     for arg in expected_args:
         if not shortcut_sig.parameters[arg].default == bot_method_sig.parameters[arg].default:
             raise Exception(
-                f'Default for argument {arg} does not match the default of the Bot method.'
+                f"Default for argument {arg} does not match the default of the Bot method."
             )
 
     return True
@@ -485,7 +485,7 @@ def check_shortcut_call(
 
     orig_bot_method = getattr(bot, bot_method_name)
     bot_signature = inspect.signature(orig_bot_method)
-    expected_args = set(bot_signature.parameters.keys()) - {'self'} - set(skip_params)
+    expected_args = set(bot_signature.parameters.keys()) - {"self"} - set(skip_params)
     positional_args = {
         name for name, param in bot_signature.parameters.items() if param.default == param.empty
     }
@@ -493,7 +493,7 @@ def check_shortcut_call(
 
     shortcut_signature = inspect.signature(shortcut_method)
     # auto_pagination: Special casing for InlineQuery.answer
-    kwargs = {name: name for name in shortcut_signature.parameters if name != 'auto_pagination'}
+    kwargs = {name: name for name in shortcut_signature.parameters if name != "auto_pagination"}
 
     def make_assertion(**kw):
         # name == value makes sure that
@@ -504,14 +504,14 @@ def check_shortcut_call(
         }
         if not received_kwargs == expected_args:
             raise Exception(
-                f'{orig_bot_method.__name__} did not receive correct value for the parameters '
-                f'{expected_args - received_kwargs}'
+                f"{orig_bot_method.__name__} did not receive correct value for the parameters "
+                f"{expected_args - received_kwargs}"
             )
 
-        if bot_method_name == 'get_file':
+        if bot_method_name == "get_file":
             # This is here mainly for PassportFile.get_file, which calls .set_credentials on the
             # return value
-            return File(file_id='result', file_unique_id='result')
+            return File(file_id="result", file_unique_id="result")
         return True
 
     setattr(bot, bot_method_name, make_assertion)
@@ -547,13 +547,13 @@ def check_defaults_handling(
             # For required params we need to pass something
             if param.default == param.empty:
                 # Some special casing
-                if name == 'permissions':
+                if name == "permissions":
                     kws[name] = ChatPermissions()
-                elif name in ['prices', 'media', 'results', 'commands', 'errors']:
+                elif name in ["prices", "media", "results", "commands", "errors"]:
                     kws[name] = []
-                elif name == 'ok':
-                    kws['ok'] = False
-                    kws['error_message'] = 'error'
+                elif name == "ok":
+                    kws["ok"] = False
+                    kws["error_message"] = "error"
                 else:
                     kws[name] = True
             # pass values for params that can have defaults only if we don't want to use the
@@ -562,7 +562,7 @@ def check_defaults_handling(
                 if dfv != DEFAULT_NONE:
                     kws[name] = dfv
             # Some special casing for methods that have "exactly one of the optionals" type args
-            elif name in ['location', 'contact', 'venue', 'inline_message_id']:
+            elif name in ["location", "contact", "venue", "inline_message_id"]:
                 kws[name] = True
         return kws
 
@@ -573,16 +573,16 @@ def check_defaults_handling(
         if isinstance(value.default, DefaultValue)
     ]
     # shortcut_signature.parameters['timeout'] is of type DefaultValue
-    method_timeout = shortcut_signature.parameters['timeout'].default.value
+    method_timeout = shortcut_signature.parameters["timeout"].default.value
 
     default_kwarg_names = kwargs_need_default
     # special case explanation_parse_mode of Bot.send_poll:
-    if 'explanation_parse_mode' in default_kwarg_names:
-        default_kwarg_names.remove('explanation_parse_mode')
+    if "explanation_parse_mode" in default_kwarg_names:
+        default_kwarg_names.remove("explanation_parse_mode")
 
     defaults_no_custom_defaults = Defaults()
     defaults_custom_defaults = Defaults(
-        **{kwarg: 'custom_default' for kwarg in default_kwarg_names}
+        **{kwarg: "custom_default" for kwarg in default_kwarg_names}
     )
 
     expected_return_values = [None, []] if return_value is None else [return_value]
@@ -592,22 +592,22 @@ def check_defaults_handling(
         if timeout != expected_timeout:
             pytest.fail(f'Got value {timeout} for "timeout", expected {expected_timeout}')
 
-        for arg in (dkw for dkw in kwargs_need_default if dkw != 'timeout'):
+        for arg in (dkw for dkw in kwargs_need_default if dkw != "timeout"):
             # 'None' should not be passed along to Telegram
             if df_value in [None, DEFAULT_NONE]:
                 if arg in data:
                     pytest.fail(
-                        f'Got value {data[arg]} for argument {arg}, expected it to be absent'
+                        f"Got value {data[arg]} for argument {arg}, expected it to be absent"
                     )
             else:
-                value = data.get(arg, '`not passed at all`')
+                value = data.get(arg, "`not passed at all`")
                 if value != df_value:
-                    pytest.fail(f'Got value {value} for argument {arg} instead of {df_value}')
+                    pytest.fail(f"Got value {value} for argument {arg} instead of {df_value}")
 
-        if method.__name__ in ['get_file', 'get_small_file', 'get_big_file']:
+        if method.__name__ in ["get_file", "get_small_file", "get_big_file"]:
             # This is here mainly for PassportFile.get_file, which calls .set_credentials on the
             # return value
-            out = File(file_id='result', file_unique_id='result')
+            out = File(file_id="result", file_unique_id="result")
             nonlocal expected_return_values
             expected_return_values = [out]
             return out.to_dict()
@@ -621,7 +621,7 @@ def check_defaults_handling(
     try:
         for default_value, defaults in [
             (DEFAULT_NONE, defaults_no_custom_defaults),
-            ('custom_default', defaults_custom_defaults),
+            ("custom_default", defaults_custom_defaults),
         ]:
             bot.defaults = defaults
             # 1: test that we get the correct default value, if we don't specify anything
@@ -630,13 +630,13 @@ def check_defaults_handling(
                 kwargs_need_default,
             )
             assertion_callback = functools.partial(make_assertion, df_value=default_value)
-            setattr(bot.request, 'post', assertion_callback)
+            setattr(bot.request, "post", assertion_callback)
             assert method(**kwargs) in expected_return_values
 
             # 2: test that we get the manually passed non-None value
-            kwargs = build_kwargs(shortcut_signature, kwargs_need_default, dfv='non-None-value')
-            assertion_callback = functools.partial(make_assertion, df_value='non-None-value')
-            setattr(bot.request, 'post', assertion_callback)
+            kwargs = build_kwargs(shortcut_signature, kwargs_need_default, dfv="non-None-value")
+            assertion_callback = functools.partial(make_assertion, df_value="non-None-value")
+            setattr(bot.request, "post", assertion_callback)
             assert method(**kwargs) in expected_return_values
 
             # 3: test that we get the manually passed None value
@@ -646,12 +646,12 @@ def check_defaults_handling(
                 dfv=None,
             )
             assertion_callback = functools.partial(make_assertion, df_value=None)
-            setattr(bot.request, 'post', assertion_callback)
+            setattr(bot.request, "post", assertion_callback)
             assert method(**kwargs) in expected_return_values
     except Exception as exc:
         raise exc
     finally:
-        setattr(bot.request, 'post', orig_post)
+        setattr(bot.request, "post", orig_post)
         bot.defaults = None
 
     return True

@@ -51,7 +51,7 @@ class InputMedia(TelegramObject):
         data = super().to_dict()
 
         if self.caption_entities:
-            data['caption_entities'] = [
+            data["caption_entities"] = [
                 ce.to_dict() for ce in self.caption_entities  # pylint: disable=E1133
             ]
 
@@ -115,15 +115,15 @@ class InputMediaAnimation(InputMedia):
     """
 
     __slots__ = (
-        'caption_entities',
-        'width',
-        'media',
-        'thumb',
-        'caption',
-        'duration',
-        'parse_mode',
-        'height',
-        'type',
+        "caption_entities",
+        "width",
+        "media",
+        "thumb",
+        "caption",
+        "duration",
+        "parse_mode",
+        "height",
+        "type",
     )
 
     def __init__(
@@ -138,7 +138,7 @@ class InputMediaAnimation(InputMedia):
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
     ):
-        self.type = 'animation'
+        self.type = "animation"
 
         if isinstance(media, Animation):
             self.media: Union[str, InputFile] = media.file_id
@@ -198,7 +198,7 @@ class InputMediaPhoto(InputMedia):
 
     """
 
-    __slots__ = ('caption_entities', 'media', 'caption', 'parse_mode', 'type')
+    __slots__ = ("caption_entities", "media", "caption", "parse_mode", "type")
 
     def __init__(
         self,
@@ -208,7 +208,7 @@ class InputMediaPhoto(InputMedia):
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
     ):
-        self.type = 'photo'
+        self.type = "photo"
         self.media = parse_file_input(media, PhotoSize, attach=True, filename=filename)
 
         if caption:
@@ -281,16 +281,16 @@ class InputMediaVideo(InputMedia):
     """
 
     __slots__ = (
-        'caption_entities',
-        'width',
-        'media',
-        'thumb',
-        'supports_streaming',
-        'caption',
-        'duration',
-        'parse_mode',
-        'height',
-        'type',
+        "caption_entities",
+        "width",
+        "media",
+        "thumb",
+        "supports_streaming",
+        "caption",
+        "duration",
+        "parse_mode",
+        "height",
+        "type",
     )
 
     def __init__(
@@ -306,7 +306,7 @@ class InputMediaVideo(InputMedia):
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
     ):
-        self.type = 'video'
+        self.type = "video"
 
         if isinstance(media, Video):
             self.media: Union[str, InputFile] = media.file_id
@@ -393,15 +393,15 @@ class InputMediaAudio(InputMedia):
     """
 
     __slots__ = (
-        'caption_entities',
-        'media',
-        'thumb',
-        'caption',
-        'title',
-        'duration',
-        'type',
-        'parse_mode',
-        'performer',
+        "caption_entities",
+        "media",
+        "thumb",
+        "caption",
+        "title",
+        "duration",
+        "type",
+        "parse_mode",
+        "performer",
     )
 
     def __init__(
@@ -416,7 +416,7 @@ class InputMediaAudio(InputMedia):
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
     ):
-        self.type = 'audio'
+        self.type = "audio"
 
         if isinstance(media, Audio):
             self.media: Union[str, InputFile] = media.file_id
@@ -493,13 +493,13 @@ class InputMediaDocument(InputMedia):
     """
 
     __slots__ = (
-        'caption_entities',
-        'media',
-        'thumb',
-        'caption',
-        'parse_mode',
-        'type',
-        'disable_content_type_detection',
+        "caption_entities",
+        "media",
+        "thumb",
+        "caption",
+        "parse_mode",
+        "type",
+        "disable_content_type_detection",
     )
 
     def __init__(
@@ -512,7 +512,7 @@ class InputMediaDocument(InputMedia):
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
     ):
-        self.type = 'document'
+        self.type = "document"
         self.media = parse_file_input(media, Document, attach=True, filename=filename)
 
         if thumb:

@@ -33,10 +33,10 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class", params=['str', 'int'])
+@pytest.fixture(scope="class", params=["str", "int"])
 def chat_id(request):
-    if request.param == 'str':
-        return '@supergroupusername'
+    if request.param == "str":
+        return "@supergroupusername"
     return 43
 
 
@@ -106,7 +106,7 @@ def scope_class_and_type(request):
     return request.param
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def bot_command_scope(scope_class_and_type, chat_id):
     return scope_class_and_type[0](type=scope_class_and_type[1], chat_id=chat_id, user_id=42)
 
@@ -115,7 +115,7 @@ def bot_command_scope(scope_class_and_type, chat_id):
 class TestBotCommandScope:
     def test_slot_behaviour(self, bot_command_scope, mro_slots):
         for attr in bot_command_scope.__slots__:
-            assert getattr(bot_command_scope, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(bot_command_scope, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(bot_command_scope)) == len(
             set(mro_slots(bot_command_scope))
         ), "duplicate slot"
@@ -126,46 +126,46 @@ class TestBotCommandScope:
 
         assert cls.de_json({}, bot) is None
 
-        json_dict = {'type': type_, 'chat_id': chat_id, 'user_id': 42}
+        json_dict = {"type": type_, "chat_id": chat_id, "user_id": 42}
         bot_command_scope = BotCommandScope.de_json(json_dict, bot)
 
         assert isinstance(bot_command_scope, BotCommandScope)
         assert isinstance(bot_command_scope, cls)
         assert bot_command_scope.type == type_
-        if 'chat_id' in cls.__slots__:
+        if "chat_id" in cls.__slots__:
             assert bot_command_scope.chat_id == chat_id
-        if 'user_id' in cls.__slots__:
+        if "user_id" in cls.__slots__:
             assert bot_command_scope.user_id == 42
 
     def test_de_json_invalid_type(self, bot):
-        json_dict = {'type': 'invalid', 'chat_id': chat_id, 'user_id': 42}
+        json_dict = {"type": "invalid", "chat_id": chat_id, "user_id": 42}
         bot_command_scope = BotCommandScope.de_json(json_dict, bot)
 
         assert type(bot_command_scope) is BotCommandScope
-        assert bot_command_scope.type == 'invalid'
+        assert bot_command_scope.type == "invalid"
 
     def test_de_json_subclass(self, scope_class, bot, chat_id):
         """This makes sure that e.g. BotCommandScopeDefault(data) never returns a
         BotCommandScopeChat instance."""
-        json_dict = {'type': 'invalid', 'chat_id': chat_id, 'user_id': 42}
+        json_dict = {"type": "invalid", "chat_id": chat_id, "user_id": 42}
         assert type(scope_class.de_json(json_dict, bot)) is scope_class
 
     def test_to_dict(self, bot_command_scope):
         bot_command_scope_dict = bot_command_scope.to_dict()
 
         assert isinstance(bot_command_scope_dict, dict)
-        assert bot_command_scope['type'] == bot_command_scope.type
-        if hasattr(bot_command_scope, 'chat_id'):
-            assert bot_command_scope['chat_id'] == bot_command_scope.chat_id
-        if hasattr(bot_command_scope, 'user_id'):
-            assert bot_command_scope['user_id'] == bot_command_scope.user_id
+        assert bot_command_scope["type"] == bot_command_scope.type
+        if hasattr(bot_command_scope, "chat_id"):
+            assert bot_command_scope["chat_id"] == bot_command_scope.chat_id
+        if hasattr(bot_command_scope, "user_id"):
+            assert bot_command_scope["user_id"] == bot_command_scope.user_id
 
     def test_equality(self, bot_command_scope, bot):
-        a = BotCommandScope('base_type')
-        b = BotCommandScope('base_type')
+        a = BotCommandScope("base_type")
+        b = BotCommandScope("base_type")
         c = bot_command_scope
         d = deepcopy(bot_command_scope)
-        e = Dice(4, 'emoji')
+        e = Dice(4, "emoji")
 
         assert a == b
         assert hash(a) == hash(b)
@@ -185,17 +185,17 @@ class TestBotCommandScope:
         assert c != e
         assert hash(c) != hash(e)
 
-        if hasattr(c, 'chat_id'):
+        if hasattr(c, "chat_id"):
             json_dict = c.to_dict()
-            json_dict['chat_id'] = 0
+            json_dict["chat_id"] = 0
             f = c.__class__.de_json(json_dict, bot)
 
             assert c != f
             assert hash(c) != hash(f)
 
-        if hasattr(c, 'user_id'):
+        if hasattr(c, "user_id"):
             json_dict = c.to_dict()
-            json_dict['user_id'] = 0
+            json_dict["user_id"] = 0
             g = c.__class__.de_json(json_dict, bot)
 
             assert c != g

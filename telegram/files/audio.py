@@ -70,16 +70,16 @@ class Audio(TelegramObject):
     """
 
     __slots__ = (
-        'file_id',
-        'bot',
-        'file_size',
-        'file_name',
-        'thumb',
-        'title',
-        'duration',
-        'performer',
-        'mime_type',
-        'file_unique_id',
+        "file_id",
+        "bot",
+        "file_size",
+        "file_name",
+        "thumb",
+        "title",
+        "duration",
+        "performer",
+        "mime_type",
+        "file_unique_id",
     )
 
     def __init__(
@@ -92,7 +92,7 @@ class Audio(TelegramObject):
         mime_type: str = None,
         file_size: int = None,
         thumb: PhotoSize = None,
-        bot: 'Bot' = None,
+        bot: "Bot" = None,
         file_name: str = None,
         **_kwargs: Any,
     ):
@@ -112,20 +112,20 @@ class Audio(TelegramObject):
         self._id_attrs = (self.file_unique_id,)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Audio']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["Audio"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
+        data["thumb"] = PhotoSize.de_json(data.get("thumb"), bot)
 
         return cls(bot=bot, **data)
 
     def get_file(
         self, timeout: ODVInput[float] = DEFAULT_NONE, api_kwargs: JSONDict = None
-    ) -> 'File':
+    ) -> "File":
         """Convenience wrapper over :attr:`telegram.Bot.get_file`
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.get_file`.

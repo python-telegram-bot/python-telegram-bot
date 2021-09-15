@@ -31,7 +31,7 @@ class TestTypeHandler:
     def test_slot_behaviour(self, mro_slots):
         inst = TypeHandler(dict, self.callback_context)
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     @pytest.fixture(autouse=True)
@@ -54,20 +54,20 @@ class TestTypeHandler:
         handler = TypeHandler(dict, self.callback_context)
         dp.add_handler(handler)
 
-        assert handler.check_update({'a': 1, 'b': 2})
-        assert not handler.check_update('not a dict')
-        dp.process_update({'a': 1, 'b': 2})
+        assert handler.check_update({"a": 1, "b": 2})
+        assert not handler.check_update("not a dict")
+        dp.process_update({"a": 1, "b": 2})
         assert self.test_flag
 
     def test_strict(self):
         handler = TypeHandler(dict, self.callback_context, strict=True)
-        o = OrderedDict({'a': 1, 'b': 2})
-        assert handler.check_update({'a': 1, 'b': 2})
+        o = OrderedDict({"a": 1, "b": 2})
+        assert handler.check_update({"a": 1, "b": 2})
         assert not handler.check_update(o)
 
     def test_context(self, dp):
         handler = TypeHandler(dict, self.callback_context)
         dp.add_handler(handler)
 
-        dp.process_update({'a': 1, 'b': 2})
+        dp.process_update({"a": 1, "b": 2})
         assert self.test_flag

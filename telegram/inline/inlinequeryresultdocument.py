@@ -86,18 +86,18 @@ class InlineQueryResultDocument(InlineQueryResult):
     """
 
     __slots__ = (
-        'reply_markup',
-        'caption_entities',
-        'document_url',
-        'thumb_width',
-        'thumb_height',
-        'caption',
-        'title',
-        'description',
-        'parse_mode',
-        'mime_type',
-        'thumb_url',
-        'input_message_content',
+        "reply_markup",
+        "caption_entities",
+        "document_url",
+        "thumb_width",
+        "thumb_height",
+        "caption",
+        "title",
+        "description",
+        "parse_mode",
+        "mime_type",
+        "thumb_url",
+        "input_message_content",
     )
 
     def __init__(
@@ -108,8 +108,8 @@ class InlineQueryResultDocument(InlineQueryResult):
         mime_type: str,
         caption: str = None,
         description: str = None,
-        reply_markup: 'ReplyMarkup' = None,
-        input_message_content: 'InputMessageContent' = None,
+        reply_markup: "ReplyMarkup" = None,
+        input_message_content: "InputMessageContent" = None,
         thumb_url: str = None,
         thumb_width: int = None,
         thumb_height: int = None,
@@ -118,7 +118,7 @@ class InlineQueryResultDocument(InlineQueryResult):
         **_kwargs: Any,
     ):
         # Required
-        super().__init__('document', id)
+        super().__init__("document", id)
         self.document_url = document_url
         self.title = title
         self.mime_type = mime_type

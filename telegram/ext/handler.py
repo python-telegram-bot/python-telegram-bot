@@ -27,8 +27,8 @@ from telegram.ext.utils.types import CCT
 if TYPE_CHECKING:
     from telegram.ext import Dispatcher
 
-RT = TypeVar('RT')
-UT = TypeVar('UT')
+RT = TypeVar("RT")
+UT = TypeVar("UT")
 
 
 class Handler(Generic[UT, CCT], ABC):
@@ -55,8 +55,8 @@ class Handler(Generic[UT, CCT], ABC):
     """
 
     __slots__ = (
-        'callback',
-        'run_async',
+        "callback",
+        "run_async",
     )
 
     def __init__(
@@ -90,7 +90,7 @@ class Handler(Generic[UT, CCT], ABC):
     def handle_update(
         self,
         update: UT,
-        dispatcher: 'Dispatcher',
+        dispatcher: "Dispatcher",
         check_result: object,
         context: CCT,
     ) -> Union[RT, Promise]:
@@ -126,7 +126,7 @@ class Handler(Generic[UT, CCT], ABC):
         self,
         context: CCT,
         update: UT,
-        dispatcher: 'Dispatcher',
+        dispatcher: "Dispatcher",
         check_result: Any,
     ) -> None:
         """Prepares additional arguments for the context. Override if needed.

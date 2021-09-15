@@ -21,7 +21,7 @@ import pytest
 from telegram import LoginUrl
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def login_url():
     return LoginUrl(
         url=TestLoginUrl.url,
@@ -39,17 +39,17 @@ class TestLoginUrl:
 
     def test_slot_behaviour(self, login_url, mro_slots):
         for attr in login_url.__slots__:
-            assert getattr(login_url, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(login_url, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(login_url)) == len(set(mro_slots(login_url))), "duplicate slot"
 
     def test_to_dict(self, login_url):
         login_url_dict = login_url.to_dict()
 
         assert isinstance(login_url_dict, dict)
-        assert login_url_dict['url'] == self.url
-        assert login_url_dict['forward_text'] == self.forward_text
-        assert login_url_dict['bot_username'] == self.bot_username
-        assert login_url_dict['request_write_access'] == self.request_write_access
+        assert login_url_dict["url"] == self.url
+        assert login_url_dict["forward_text"] == self.forward_text
+        assert login_url_dict["bot_username"] == self.bot_username
+        assert login_url_dict["request_write_access"] == self.request_write_access
 
     def test_equality(self):
         a = LoginUrl(self.url, self.forward_text, self.bot_username, self.request_write_access)

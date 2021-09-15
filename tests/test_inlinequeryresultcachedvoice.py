@@ -28,7 +28,7 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def inline_query_result_cached_voice():
     return InlineQueryResultCachedVoice(
         TestInlineQueryResultCachedVoice.id_,
@@ -43,20 +43,20 @@ def inline_query_result_cached_voice():
 
 
 class TestInlineQueryResultCachedVoice:
-    id_ = 'id'
-    type_ = 'voice'
-    voice_file_id = 'voice file id'
-    title = 'title'
-    caption = 'caption'
-    parse_mode = 'HTML'
+    id_ = "id"
+    type_ = "voice"
+    voice_file_id = "voice file id"
+    title = "title"
+    caption = "caption"
+    parse_mode = "HTML"
     caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
-    input_message_content = InputTextMessageContent('input_message_content')
-    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
+    input_message_content = InputTextMessageContent("input_message_content")
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
     def test_slot_behaviour(self, inline_query_result_cached_voice, mro_slots):
         inst = inline_query_result_cached_voice
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, inline_query_result_cached_voice):
@@ -80,43 +80,43 @@ class TestInlineQueryResultCachedVoice:
 
         assert isinstance(inline_query_result_cached_voice_dict, dict)
         assert (
-            inline_query_result_cached_voice_dict['type'] == inline_query_result_cached_voice.type
+            inline_query_result_cached_voice_dict["type"] == inline_query_result_cached_voice.type
         )
-        assert inline_query_result_cached_voice_dict['id'] == inline_query_result_cached_voice.id
+        assert inline_query_result_cached_voice_dict["id"] == inline_query_result_cached_voice.id
         assert (
-            inline_query_result_cached_voice_dict['voice_file_id']
+            inline_query_result_cached_voice_dict["voice_file_id"]
             == inline_query_result_cached_voice.voice_file_id
         )
         assert (
-            inline_query_result_cached_voice_dict['title']
+            inline_query_result_cached_voice_dict["title"]
             == inline_query_result_cached_voice.title
         )
         assert (
-            inline_query_result_cached_voice_dict['caption']
+            inline_query_result_cached_voice_dict["caption"]
             == inline_query_result_cached_voice.caption
         )
         assert (
-            inline_query_result_cached_voice_dict['parse_mode']
+            inline_query_result_cached_voice_dict["parse_mode"]
             == inline_query_result_cached_voice.parse_mode
         )
-        assert inline_query_result_cached_voice_dict['caption_entities'] == [
+        assert inline_query_result_cached_voice_dict["caption_entities"] == [
             ce.to_dict() for ce in inline_query_result_cached_voice.caption_entities
         ]
         assert (
-            inline_query_result_cached_voice_dict['input_message_content']
+            inline_query_result_cached_voice_dict["input_message_content"]
             == inline_query_result_cached_voice.input_message_content.to_dict()
         )
         assert (
-            inline_query_result_cached_voice_dict['reply_markup']
+            inline_query_result_cached_voice_dict["reply_markup"]
             == inline_query_result_cached_voice.reply_markup.to_dict()
         )
 
     def test_equality(self):
         a = InlineQueryResultCachedVoice(self.id_, self.voice_file_id, self.title)
         b = InlineQueryResultCachedVoice(self.id_, self.voice_file_id, self.title)
-        c = InlineQueryResultCachedVoice(self.id_, '', self.title)
-        d = InlineQueryResultCachedVoice('', self.voice_file_id, self.title)
-        e = InlineQueryResultCachedAudio(self.id_, '', '')
+        c = InlineQueryResultCachedVoice(self.id_, "", self.title)
+        d = InlineQueryResultCachedVoice("", self.voice_file_id, self.title)
+        e = InlineQueryResultCachedAudio(self.id_, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

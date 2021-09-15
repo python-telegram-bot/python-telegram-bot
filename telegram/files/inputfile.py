@@ -26,7 +26,7 @@ import os
 from typing import IO, Optional, Tuple, Union
 from uuid import uuid4
 
-DEFAULT_MIME_TYPE = 'application/octet-stream'
+DEFAULT_MIME_TYPE = "application/octet-stream"
 logger = logging.getLogger(__name__)
 
 
@@ -50,7 +50,7 @@ class InputFile:
 
     """
 
-    __slots__ = ('filename', 'attach', 'input_file_content', 'mimetype')
+    __slots__ = ("filename", "attach", "input_file_content", "mimetype")
 
     def __init__(self, obj: Union[IO, bytes], filename: str = None, attach: bool = None):
         self.filename = None
@@ -58,11 +58,11 @@ class InputFile:
             self.input_file_content = obj
         else:
             self.input_file_content = obj.read()
-        self.attach = 'attached' + uuid4().hex if attach else None
+        self.attach = "attached" + uuid4().hex if attach else None
 
         if filename:
             self.filename = filename
-        elif hasattr(obj, 'name') and not isinstance(obj.name, int):  # type: ignore[union-attr]
+        elif hasattr(obj, "name") and not isinstance(obj.name, int):  # type: ignore[union-attr]
             self.filename = os.path.basename(obj.name)  # type: ignore[union-attr]
 
         image_mime_type = self.is_image(self.input_file_content)
@@ -74,7 +74,7 @@ class InputFile:
             self.mimetype = DEFAULT_MIME_TYPE
 
         if not self.filename:
-            self.filename = self.mimetype.replace('/', '.')
+            self.filename = self.mimetype.replace("/", ".")
 
     @property
     def field_tuple(self) -> Tuple[str, bytes, str]:  # skipcq: PY-D0003
@@ -95,7 +95,7 @@ class InputFile:
         try:
             image = imghdr.what(None, stream)
             if image:
-                return f'image/{image}'
+                return f"image/{image}"
             return None
         except Exception:
             logger.debug(
@@ -105,10 +105,10 @@ class InputFile:
 
     @staticmethod
     def is_file(obj: object) -> bool:  # skipcq: PY-D0003
-        return hasattr(obj, 'read')
+        return hasattr(obj, "read")
 
     def to_dict(self) -> Optional[str]:
         """See :meth:`telegram.TelegramObject.to_dict`."""
         if self.attach:
-            return 'attach://' + self.attach
+            return "attach://" + self.attach
         return None

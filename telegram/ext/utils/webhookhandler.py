@@ -44,18 +44,18 @@ except ImportError:
 
 class WebhookServer:
     __slots__ = (
-        'http_server',
-        'listen',
-        'port',
-        'loop',
-        'logger',
-        'is_running',
-        'server_lock',
-        'shutdown_lock',
+        "http_server",
+        "listen",
+        "port",
+        "loop",
+        "logger",
+        "is_running",
+        "server_lock",
+        "shutdown_lock",
     )
 
     def __init__(
-        self, listen: str, port: int, webhook_app: 'WebhookAppClass', ssl_ctx: SSLContext
+        self, listen: str, port: int, webhook_app: "WebhookAppClass", ssl_ctx: SSLContext
     ):
         self.http_server = HTTPServer(webhook_app, ssl_options=ssl_ctx)
         self.listen = listen
@@ -70,7 +70,7 @@ class WebhookServer:
         with self.server_lock:
             IOLoop().make_current()
             self.is_running = True
-            self.logger.debug('Webhook Server started.')
+            self.logger.debug("Webhook Server started.")
             self.loop = IOLoop.current()
             self.http_server.listen(self.port, address=self.listen)
 
@@ -78,27 +78,27 @@ class WebhookServer:
                 ready.set()
 
             self.loop.start()
-            self.logger.debug('Webhook Server stopped.')
+            self.logger.debug("Webhook Server stopped.")
             self.is_running = False
 
     def shutdown(self) -> None:
         with self.shutdown_lock:
             if not self.is_running:
-                self.logger.warning('Webhook Server already stopped.')
+                self.logger.warning("Webhook Server already stopped.")
                 return
             self.loop.add_callback(self.loop.stop)  # type: ignore
 
     def handle_error(self, request: object, client_address: str) -> None:  # pylint: disable=W0613
         """Handle an error gracefully."""
         self.logger.debug(
-            'Exception happened during processing of request from %s',
+            "Exception happened during processing of request from %s",
             client_address,
             exc_info=True,
         )
 
 
 class WebhookAppClass(tornado.web.Application):
-    def __init__(self, webhook_path: str, bot: 'Bot', update_queue: Queue):
+    def __init__(self, webhook_path: str, bot: "Bot", update_queue: Queue):
         self.shared_objects = {"bot": bot, "update_queue": update_queue}
         handlers = [(rf"{webhook_path}/?", WebhookHandler, self.shared_objects)]  # noqa
         tornado.web.Application.__init__(self, handlers)  # type: ignore
@@ -121,7 +121,7 @@ class WebhookHandler(tornado.web.RequestHandler):
         super().__init__(application, request, **kwargs)
         self.logger = logging.getLogger(__name__)
 
-    def initialize(self, bot: 'Bot', update_queue: Queue) -> None:
+    def initialize(self, bot: "Bot", update_queue: Queue) -> None:
         # pylint: disable=W0201
         self.bot = bot
         self.update_queue = update_queue
@@ -130,15 +130,15 @@ class WebhookHandler(tornado.web.RequestHandler):
         self.set_header("Content-Type", 'application/json; charset="utf-8"')
 
     def post(self) -> None:
-        self.logger.debug('Webhook triggered')
+        self.logger.debug("Webhook triggered")
         self._validate_post()
         json_string = self.request.body.decode()
         data = json.loads(json_string)
         self.set_status(200)
-        self.logger.debug('Webhook received data: %s', json_string)
+        self.logger.debug("Webhook received data: %s", json_string)
         update = Update.de_json(data, self.bot)
         if update:
-            self.logger.debug('Received Update with ID %d on Webhook', update.update_id)
+            self.logger.debug("Received Update with ID %d on Webhook", update.update_id)
             # handle arbitrary callback data, if necessary
             if isinstance(self.bot, ExtBot):
                 self.bot.insert_callback_data(update)
@@ -146,7 +146,7 @@ class WebhookHandler(tornado.web.RequestHandler):
 
     def _validate_post(self) -> None:
         ct_header = self.request.headers.get("Content-Type", None)
-        if ct_header != 'application/json':
+        if ct_header != "application/json":
             raise tornado.web.HTTPError(403)
 
     def write_error(self, status_code: int, **kwargs: Any) -> None:
@@ -168,5 +168,5 @@ class WebhookHandler(tornado.web.RequestHandler):
             "%s - - %s",
             self.request.remote_ip,
             "Exception in WebhookHandler",
-            exc_info=kwargs['exc_info'],
+            exc_info=kwargs["exc_info"],
         )

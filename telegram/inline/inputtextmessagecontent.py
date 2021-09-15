@@ -59,7 +59,7 @@ class InputTextMessageContent(InputMessageContent):
 
     """
 
-    __slots__ = ('disable_web_page_preview', 'parse_mode', 'entities', 'message_text')
+    __slots__ = ("disable_web_page_preview", "parse_mode", "entities", "message_text")
 
     def __init__(
         self,
@@ -83,6 +83,6 @@ class InputTextMessageContent(InputMessageContent):
         data = super().to_dict()
 
         if self.entities:
-            data['entities'] = [ce.to_dict() for ce in self.entities]
+            data["entities"] = [ce.to_dict() for ce in self.entities]
 
         return data

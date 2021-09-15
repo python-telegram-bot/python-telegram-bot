@@ -61,12 +61,12 @@ class ChatInviteLink(TelegramObject):
     """
 
     __slots__ = (
-        'invite_link',
-        'creator',
-        'is_primary',
-        'is_revoked',
-        'expire_date',
-        'member_limit',
+        "invite_link",
+        "creator",
+        "is_primary",
+        "is_revoked",
+        "expire_date",
+        "member_limit",
     )
 
     def __init__(
@@ -92,15 +92,15 @@ class ChatInviteLink(TelegramObject):
         self._id_attrs = (self.invite_link, self.creator, self.is_primary, self.is_revoked)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['ChatInviteLink']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ChatInviteLink"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['creator'] = User.de_json(data.get('creator'), bot)
-        data['expire_date'] = from_timestamp(data.get('expire_date', None))
+        data["creator"] = User.de_json(data.get("creator"), bot)
+        data["expire_date"] = from_timestamp(data.get("expire_date", None))
 
         return cls(**data)
 
@@ -108,6 +108,6 @@ class ChatInviteLink(TelegramObject):
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
-        data['expire_date'] = to_timestamp(self.expire_date)
+        data["expire_date"] = to_timestamp(self.expire_date)
 
         return data

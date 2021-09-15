@@ -42,7 +42,7 @@ if TYPE_CHECKING:
     from telegram.utils.request import Request
     from .defaults import Defaults
 
-HandledTypes = TypeVar('HandledTypes', bound=Union[Message, CallbackQuery, Chat])
+HandledTypes = TypeVar("HandledTypes", bound=Union[Message, CallbackQuery, Chat])
 
 
 class ExtBot(telegram.bot.Bot):
@@ -73,17 +73,17 @@ class ExtBot(telegram.bot.Bot):
 
     """
 
-    __slots__ = ('arbitrary_callback_data', 'callback_data_cache')
+    __slots__ = ("arbitrary_callback_data", "callback_data_cache")
 
     def __init__(
         self,
         token: str,
         base_url: str = None,
         base_file_url: str = None,
-        request: 'Request' = None,
+        request: "Request" = None,
         private_key: bytes = None,
         private_key_password: bytes = None,
-        defaults: 'Defaults' = None,
+        defaults: "Defaults" = None,
         arbitrary_callback_data: Union[bool, int] = False,
     ):
         super().__init__(
@@ -228,11 +228,11 @@ class ExtBot(telegram.bot.Bot):
     def _effective_inline_results(  # pylint: disable=R0201
         self,
         results: Union[
-            Sequence['InlineQueryResult'], Callable[[int], Optional[Sequence['InlineQueryResult']]]
+            Sequence["InlineQueryResult"], Callable[[int], Optional[Sequence["InlineQueryResult"]]]
         ],
         next_offset: str = None,
         current_offset: str = None,
-    ) -> Tuple[Sequence['InlineQueryResult'], Optional[str]]:
+    ) -> Tuple[Sequence["InlineQueryResult"], Optional[str]]:
         """
         This method is called by Bot.answer_inline_query to build the actual results list.
         Overriding this to call self._replace_keyboard suffices
@@ -248,7 +248,7 @@ class ExtBot(telegram.bot.Bot):
         for result in effective_results:
             # All currently existingInlineQueryResults have a reply_markup, but future ones
             # might not have. Better be save than sorry
-            if not hasattr(result, 'reply_markup'):
+            if not hasattr(result, "reply_markup"):
                 results.append(result)
             else:
                 # We build a new result in case the user wants to use the same object in
@@ -284,7 +284,7 @@ class ExtBot(telegram.bot.Bot):
         message_id: int,
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[Tuple['MessageEntity', ...], List['MessageEntity']] = None,
+        caption_entities: Union[Tuple["MessageEntity", ...], List["MessageEntity"]] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,

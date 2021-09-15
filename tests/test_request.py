@@ -25,7 +25,7 @@ from telegram.utils.request import Request
 def test_slot_behaviour(mro_slots):
     inst = Request()
     for attr in inst.__slots__:
-        assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
     assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
 
@@ -36,7 +36,7 @@ def test_replaced_unprintable_char():
     """
     server_response = b'{"invalid utf-8": "\x80", "result": "KUKU"}'
 
-    assert Request._parse(server_response) == 'KUKU'
+    assert Request._parse(server_response) == "KUKU"
 
 
 def test_parse_illegal_json():
@@ -46,5 +46,5 @@ def test_parse_illegal_json():
     """
     server_response = b'{"invalid utf-8": "\x80", result: "KUKU"}'
 
-    with pytest.raises(TelegramError, match='Invalid server response'):
+    with pytest.raises(TelegramError, match="Invalid server response"):
         Request._parse(server_response)

@@ -61,13 +61,13 @@ class Venue(TelegramObject):
     """
 
     __slots__ = (
-        'google_place_type',
-        'location',
-        'title',
-        'address',
-        'foursquare_type',
-        'foursquare_id',
-        'google_place_id',
+        "google_place_type",
+        "location",
+        "title",
+        "address",
+        "foursquare_type",
+        "foursquare_id",
+        "google_place_id",
     )
 
     def __init__(
@@ -94,13 +94,13 @@ class Venue(TelegramObject):
         self._id_attrs = (self.location, self.title)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Venue']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["Venue"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['location'] = Location.de_json(data.get('location'), bot)
+        data["location"] = Location.de_json(data.get("location"), bot)
 
         return cls(**data)

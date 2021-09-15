@@ -39,7 +39,7 @@ from .utils.types import CCT
 if TYPE_CHECKING:
     from telegram.ext import Dispatcher
 
-RT = TypeVar('RT')
+RT = TypeVar("RT")
 
 
 class CallbackQueryHandler(Handler[Update, CCT]):
@@ -100,7 +100,7 @@ class CallbackQueryHandler(Handler[Update, CCT]):
 
     """
 
-    __slots__ = ('pattern',)
+    __slots__ = ("pattern",)
 
     def __init__(
         self,
@@ -148,7 +148,7 @@ class CallbackQueryHandler(Handler[Update, CCT]):
         self,
         context: CCT,
         update: Update,
-        dispatcher: 'Dispatcher',
+        dispatcher: "Dispatcher",
         check_result: Union[bool, Match],
     ) -> None:
         """Add the result of ``re.match(pattern, update.callback_query.data)`` to

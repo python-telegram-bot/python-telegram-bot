@@ -97,8 +97,8 @@ class TestErrors:
             raise RetryAfter(12)
 
     def test_conflict(self):
-        with pytest.raises(Conflict, match='Something something.'):
-            raise Conflict('Something something.')
+        with pytest.raises(Conflict, match="Something something."):
+            raise Conflict("Something something.")
 
     @pytest.mark.parametrize(
         "exception, attributes",
@@ -113,7 +113,7 @@ class TestErrors:
             (RetryAfter(12), ["message", "retry_after"]),
             (Conflict("test message"), ["message"]),
             (PassportDecryptionError("test message"), ["message"]),
-            (InvalidCallbackData('test data'), ['callback_data']),
+            (InvalidCallbackData("test data"), ["callback_data"]),
         ],
     )
     def test_errors_pickling(self, exception, attributes):

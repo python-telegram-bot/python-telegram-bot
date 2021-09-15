@@ -22,7 +22,7 @@ import pytest
 from telegram import EncryptedCredentials, PassportElementError
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def encrypted_credentials():
     return EncryptedCredentials(
         TestEncryptedCredentials.data,
@@ -32,14 +32,14 @@ def encrypted_credentials():
 
 
 class TestEncryptedCredentials:
-    data = 'data'
-    hash = 'hash'
-    secret = 'secret'
+    data = "data"
+    hash = "hash"
+    secret = "secret"
 
     def test_slot_behaviour(self, encrypted_credentials, mro_slots):
         inst = encrypted_credentials
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, encrypted_credentials):
@@ -51,17 +51,17 @@ class TestEncryptedCredentials:
         encrypted_credentials_dict = encrypted_credentials.to_dict()
 
         assert isinstance(encrypted_credentials_dict, dict)
-        assert encrypted_credentials_dict['data'] == encrypted_credentials.data
-        assert encrypted_credentials_dict['hash'] == encrypted_credentials.hash
-        assert encrypted_credentials_dict['secret'] == encrypted_credentials.secret
+        assert encrypted_credentials_dict["data"] == encrypted_credentials.data
+        assert encrypted_credentials_dict["hash"] == encrypted_credentials.hash
+        assert encrypted_credentials_dict["secret"] == encrypted_credentials.secret
 
     def test_equality(self):
         a = EncryptedCredentials(self.data, self.hash, self.secret)
         b = EncryptedCredentials(self.data, self.hash, self.secret)
-        c = EncryptedCredentials(self.data, '', '')
-        d = EncryptedCredentials('', self.hash, '')
-        e = EncryptedCredentials('', '', self.secret)
-        f = PassportElementError('source', 'type', 'message')
+        c = EncryptedCredentials(self.data, "", "")
+        d = EncryptedCredentials("", self.hash, "")
+        e = EncryptedCredentials("", "", self.secret)
+        f = PassportElementError("source", "type", "message")
 
         assert a == b
         assert hash(a) == hash(b)

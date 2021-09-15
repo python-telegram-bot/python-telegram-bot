@@ -74,13 +74,13 @@ class InlineQueryResultCachedGif(InlineQueryResult):
     """
 
     __slots__ = (
-        'reply_markup',
-        'caption_entities',
-        'caption',
-        'title',
-        'input_message_content',
-        'parse_mode',
-        'gif_file_id',
+        "reply_markup",
+        "caption_entities",
+        "caption",
+        "title",
+        "input_message_content",
+        "parse_mode",
+        "gif_file_id",
     )
 
     def __init__(
@@ -89,14 +89,14 @@ class InlineQueryResultCachedGif(InlineQueryResult):
         gif_file_id: str,
         title: str = None,
         caption: str = None,
-        reply_markup: 'ReplyMarkup' = None,
-        input_message_content: 'InputMessageContent' = None,
+        reply_markup: "ReplyMarkup" = None,
+        input_message_content: "InputMessageContent" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
         **_kwargs: Any,
     ):
         # Required
-        super().__init__('gif', id)
+        super().__init__("gif", id)
         self.gif_file_id = gif_file_id
 
         # Optionals

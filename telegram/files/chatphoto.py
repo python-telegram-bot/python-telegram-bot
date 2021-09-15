@@ -66,11 +66,11 @@ class ChatPhoto(TelegramObject):
     """
 
     __slots__ = (
-        'big_file_unique_id',
-        'bot',
-        'small_file_id',
-        'small_file_unique_id',
-        'big_file_id',
+        "big_file_unique_id",
+        "bot",
+        "small_file_id",
+        "small_file_unique_id",
+        "big_file_id",
     )
 
     def __init__(
@@ -79,7 +79,7 @@ class ChatPhoto(TelegramObject):
         small_file_unique_id: str,
         big_file_id: str,
         big_file_unique_id: str,
-        bot: 'Bot' = None,
+        bot: "Bot" = None,
         **_kwargs: Any,
     ):
         self.small_file_id = small_file_id
@@ -96,7 +96,7 @@ class ChatPhoto(TelegramObject):
 
     def get_small_file(
         self, timeout: ODVInput[float] = DEFAULT_NONE, api_kwargs: JSONDict = None
-    ) -> 'File':
+    ) -> "File":
         """Convenience wrapper over :attr:`telegram.Bot.get_file` for getting the
         small (160x160) chat photo
 
@@ -115,7 +115,7 @@ class ChatPhoto(TelegramObject):
 
     def get_big_file(
         self, timeout: ODVInput[float] = DEFAULT_NONE, api_kwargs: JSONDict = None
-    ) -> 'File':
+    ) -> "File":
         """Convenience wrapper over :attr:`telegram.Bot.get_file` for getting the
         big (640x640) chat photo
 

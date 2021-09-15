@@ -87,18 +87,18 @@ class InlineQueryResultGif(InlineQueryResult):
     """
 
     __slots__ = (
-        'reply_markup',
-        'gif_height',
-        'thumb_mime_type',
-        'caption_entities',
-        'gif_width',
-        'title',
-        'caption',
-        'parse_mode',
-        'gif_duration',
-        'input_message_content',
-        'gif_url',
-        'thumb_url',
+        "reply_markup",
+        "gif_height",
+        "thumb_mime_type",
+        "caption_entities",
+        "gif_width",
+        "title",
+        "caption",
+        "parse_mode",
+        "gif_duration",
+        "input_message_content",
+        "gif_url",
+        "thumb_url",
     )
 
     def __init__(
@@ -110,8 +110,8 @@ class InlineQueryResultGif(InlineQueryResult):
         gif_height: int = None,
         title: str = None,
         caption: str = None,
-        reply_markup: 'ReplyMarkup' = None,
-        input_message_content: 'InputMessageContent' = None,
+        reply_markup: "ReplyMarkup" = None,
+        input_message_content: "InputMessageContent" = None,
         gif_duration: int = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         thumb_mime_type: str = None,
@@ -120,7 +120,7 @@ class InlineQueryResultGif(InlineQueryResult):
     ):
 
         # Required
-        super().__init__('gif', id)
+        super().__init__("gif", id)
         self.gif_url = gif_url
         self.thumb_url = thumb_url
 

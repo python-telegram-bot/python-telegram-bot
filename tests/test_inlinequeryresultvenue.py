@@ -27,7 +27,7 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def inline_query_result_venue():
     return InlineQueryResultVenue(
         TestInlineQueryResultVenue.id_,
@@ -48,26 +48,26 @@ def inline_query_result_venue():
 
 
 class TestInlineQueryResultVenue:
-    id_ = 'id'
-    type_ = 'venue'
-    latitude = 'latitude'
-    longitude = 'longitude'
-    title = 'title'
-    address = 'address'
-    foursquare_id = 'foursquare id'
-    foursquare_type = 'foursquare type'
-    google_place_id = 'google place id'
-    google_place_type = 'google place type'
-    thumb_url = 'thumb url'
+    id_ = "id"
+    type_ = "venue"
+    latitude = "latitude"
+    longitude = "longitude"
+    title = "title"
+    address = "address"
+    foursquare_id = "foursquare id"
+    foursquare_type = "foursquare type"
+    google_place_id = "google place id"
+    google_place_type = "google place type"
+    thumb_url = "thumb url"
     thumb_width = 10
     thumb_height = 15
-    input_message_content = InputTextMessageContent('input_message_content')
-    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
+    input_message_content = InputTextMessageContent("input_message_content")
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
     def test_slot_behaviour(self, inline_query_result_venue, mro_slots):
         inst = inline_query_result_venue
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, inline_query_result_venue):
@@ -94,42 +94,42 @@ class TestInlineQueryResultVenue:
         inline_query_result_venue_dict = inline_query_result_venue.to_dict()
 
         assert isinstance(inline_query_result_venue_dict, dict)
-        assert inline_query_result_venue_dict['id'] == inline_query_result_venue.id
-        assert inline_query_result_venue_dict['type'] == inline_query_result_venue.type
-        assert inline_query_result_venue_dict['latitude'] == inline_query_result_venue.latitude
-        assert inline_query_result_venue_dict['longitude'] == inline_query_result_venue.longitude
-        assert inline_query_result_venue_dict['title'] == inline_query_result_venue.title
-        assert inline_query_result_venue_dict['address'] == inline_query_result_venue.address
+        assert inline_query_result_venue_dict["id"] == inline_query_result_venue.id
+        assert inline_query_result_venue_dict["type"] == inline_query_result_venue.type
+        assert inline_query_result_venue_dict["latitude"] == inline_query_result_venue.latitude
+        assert inline_query_result_venue_dict["longitude"] == inline_query_result_venue.longitude
+        assert inline_query_result_venue_dict["title"] == inline_query_result_venue.title
+        assert inline_query_result_venue_dict["address"] == inline_query_result_venue.address
         assert (
-            inline_query_result_venue_dict['foursquare_id']
+            inline_query_result_venue_dict["foursquare_id"]
             == inline_query_result_venue.foursquare_id
         )
         assert (
-            inline_query_result_venue_dict['foursquare_type']
+            inline_query_result_venue_dict["foursquare_type"]
             == inline_query_result_venue.foursquare_type
         )
         assert (
-            inline_query_result_venue_dict['google_place_id']
+            inline_query_result_venue_dict["google_place_id"]
             == inline_query_result_venue.google_place_id
         )
         assert (
-            inline_query_result_venue_dict['google_place_type']
+            inline_query_result_venue_dict["google_place_type"]
             == inline_query_result_venue.google_place_type
         )
-        assert inline_query_result_venue_dict['thumb_url'] == inline_query_result_venue.thumb_url
+        assert inline_query_result_venue_dict["thumb_url"] == inline_query_result_venue.thumb_url
         assert (
-            inline_query_result_venue_dict['thumb_width'] == inline_query_result_venue.thumb_width
+            inline_query_result_venue_dict["thumb_width"] == inline_query_result_venue.thumb_width
         )
         assert (
-            inline_query_result_venue_dict['thumb_height']
+            inline_query_result_venue_dict["thumb_height"]
             == inline_query_result_venue.thumb_height
         )
         assert (
-            inline_query_result_venue_dict['input_message_content']
+            inline_query_result_venue_dict["input_message_content"]
             == inline_query_result_venue.input_message_content.to_dict()
         )
         assert (
-            inline_query_result_venue_dict['reply_markup']
+            inline_query_result_venue_dict["reply_markup"]
             == inline_query_result_venue.reply_markup.to_dict()
         )
 
@@ -140,9 +140,9 @@ class TestInlineQueryResultVenue:
         b = InlineQueryResultVenue(
             self.id_, self.longitude, self.latitude, self.title, self.address
         )
-        c = InlineQueryResultVenue(self.id_, '', self.latitude, self.title, self.address)
-        d = InlineQueryResultVenue('', self.longitude, self.latitude, self.title, self.address)
-        e = InlineQueryResultVoice(self.id_, '', '')
+        c = InlineQueryResultVenue(self.id_, "", self.latitude, self.title, self.address)
+        d = InlineQueryResultVenue("", self.longitude, self.latitude, self.title, self.address)
+        e = InlineQueryResultVoice(self.id_, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

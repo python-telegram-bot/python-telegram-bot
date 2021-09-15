@@ -93,14 +93,14 @@ class CallbackQuery(TelegramObject):
     """
 
     __slots__ = (
-        'bot',
-        'game_short_name',
-        'message',
-        'chat_instance',
-        'id',
-        'from_user',
-        'inline_message_id',
-        'data',
+        "bot",
+        "game_short_name",
+        "message",
+        "chat_instance",
+        "id",
+        "from_user",
+        "inline_message_id",
+        "data",
     )
 
     def __init__(
@@ -112,7 +112,7 @@ class CallbackQuery(TelegramObject):
         data: str = None,
         inline_message_id: str = None,
         game_short_name: str = None,
-        bot: 'Bot' = None,
+        bot: "Bot" = None,
         **_kwargs: Any,
     ):
         # Required
@@ -130,15 +130,15 @@ class CallbackQuery(TelegramObject):
         self._id_attrs = (self.id,)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['CallbackQuery']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["CallbackQuery"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['from_user'] = User.de_json(data.get('from'), bot)
-        data['message'] = Message.de_json(data.get('message'), bot)
+        data["from_user"] = User.de_json(data.get("from"), bot)
+        data["message"] = Message.de_json(data.get("message"), bot)
 
         return cls(bot=bot, **data)
 
@@ -177,10 +177,10 @@ class CallbackQuery(TelegramObject):
         text: str,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: 'InlineKeyboardMarkup' = None,
+        reply_markup: "InlineKeyboardMarkup" = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
     ) -> Union[Message, bool]:
         """Shortcut for either::
 
@@ -225,11 +225,11 @@ class CallbackQuery(TelegramObject):
     def edit_message_caption(
         self,
         caption: str = None,
-        reply_markup: 'InlineKeyboardMarkup' = None,
+        reply_markup: "InlineKeyboardMarkup" = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
     ) -> Union[Message, bool]:
         """Shortcut for either::
 
@@ -272,7 +272,7 @@ class CallbackQuery(TelegramObject):
 
     def edit_message_reply_markup(
         self,
-        reply_markup: Optional['InlineKeyboardMarkup'] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> Union[Message, bool]:
@@ -319,8 +319,8 @@ class CallbackQuery(TelegramObject):
 
     def edit_message_media(
         self,
-        media: 'InputMedia',
-        reply_markup: 'InlineKeyboardMarkup' = None,
+        media: "InputMedia",
+        reply_markup: "InlineKeyboardMarkup" = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> Union[Message, bool]:
@@ -363,7 +363,7 @@ class CallbackQuery(TelegramObject):
         latitude: float = None,
         longitude: float = None,
         location: Location = None,
-        reply_markup: 'InlineKeyboardMarkup' = None,
+        reply_markup: "InlineKeyboardMarkup" = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         horizontal_accuracy: float = None,
@@ -419,7 +419,7 @@ class CallbackQuery(TelegramObject):
 
     def stop_message_live_location(
         self,
-        reply_markup: 'InlineKeyboardMarkup' = None,
+        reply_markup: "InlineKeyboardMarkup" = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> Union[Message, bool]:
@@ -510,7 +510,7 @@ class CallbackQuery(TelegramObject):
         user_id: Union[int, str],
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> List['GameHighScore']:
+    ) -> List["GameHighScore"]:
         """Shortcut for either::
 
             update.callback_query.message.get_game_high_score(*args, **kwargs)
@@ -612,14 +612,14 @@ class CallbackQuery(TelegramObject):
         chat_id: Union[int, str],
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[Tuple['MessageEntity', ...], List['MessageEntity']] = None,
+        caption_entities: Union[Tuple["MessageEntity", ...], List["MessageEntity"]] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
         reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> 'MessageId':
+    ) -> "MessageId":
         """Shortcut for::
 
             update.callback_query.message.copy(

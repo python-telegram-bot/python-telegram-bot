@@ -26,7 +26,7 @@ from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 from .handler import Handler
 from .utils.types import CCT
 
-RT = TypeVar('RT')
+RT = TypeVar("RT")
 
 if TYPE_CHECKING:
     from telegram.ext import CallbackContext, Dispatcher
@@ -65,11 +65,11 @@ class ChosenInlineResultHandler(Handler[Update, CCT]):
 
     """
 
-    __slots__ = ('pattern',)
+    __slots__ = ("pattern",)
 
     def __init__(
         self,
-        callback: Callable[[Update, 'CallbackContext'], RT],
+        callback: Callable[[Update, "CallbackContext"], RT],
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
         pattern: Union[str, Pattern] = None,
     ):
@@ -104,9 +104,9 @@ class ChosenInlineResultHandler(Handler[Update, CCT]):
 
     def collect_additional_context(
         self,
-        context: 'CallbackContext',
+        context: "CallbackContext",
         update: Update,
-        dispatcher: 'Dispatcher',
+        dispatcher: "Dispatcher",
         check_result: Union[bool, Match],
     ) -> None:
         """This function adds the matched regex pattern result to

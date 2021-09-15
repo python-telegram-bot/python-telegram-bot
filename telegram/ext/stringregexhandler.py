@@ -29,7 +29,7 @@ from .utils.types import CCT
 if TYPE_CHECKING:
     from telegram.ext import Dispatcher
 
-RT = TypeVar('RT')
+RT = TypeVar("RT")
 
 
 class StringRegexHandler(Handler[str, CCT]):
@@ -64,7 +64,7 @@ class StringRegexHandler(Handler[str, CCT]):
 
     """
 
-    __slots__ = ('pattern',)
+    __slots__ = ("pattern",)
 
     def __init__(
         self,
@@ -102,7 +102,7 @@ class StringRegexHandler(Handler[str, CCT]):
         self,
         context: CCT,
         update: str,
-        dispatcher: 'Dispatcher',
+        dispatcher: "Dispatcher",
         check_result: Optional[Match],
     ) -> None:
         """Add the result of ``re.match(pattern, update)`` to :attr:`CallbackContext.matches` as

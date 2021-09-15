@@ -79,26 +79,26 @@ class DictPersistence(BasePersistence):
     """
 
     __slots__ = (
-        '_user_data',
-        '_chat_data',
-        '_bot_data',
-        '_callback_data',
-        '_conversations',
-        '_user_data_json',
-        '_chat_data_json',
-        '_bot_data_json',
-        '_callback_data_json',
-        '_conversations_json',
+        "_user_data",
+        "_chat_data",
+        "_bot_data",
+        "_callback_data",
+        "_conversations",
+        "_user_data_json",
+        "_chat_data_json",
+        "_bot_data_json",
+        "_callback_data_json",
+        "_conversations_json",
     )
 
     def __init__(
         self,
         store_data: PersistenceInput = None,
-        user_data_json: str = '',
-        chat_data_json: str = '',
-        bot_data_json: str = '',
-        conversations_json: str = '',
-        callback_data_json: str = '',
+        user_data_json: str = "",
+        chat_data_json: str = "",
+        bot_data_json: str = "",
+        conversations_json: str = "",
+        callback_data_json: str = "",
     ):
         super().__init__(store_data=store_data)
         self._user_data = None

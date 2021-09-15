@@ -29,7 +29,7 @@ from telegram.ext import (
 )
 
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
@@ -37,8 +37,8 @@ logger = logging.getLogger(__name__)
 def start(update: Update, context: CallbackContext) -> None:
     """Inform user about what this bot can do"""
     update.message.reply_text(
-        'Please select /poll to get a Poll, /quiz to get a Quiz or /preview'
-        ' to generate a preview for your poll'
+        "Please select /poll to get a Poll, /quiz to get a Quiz or /preview"
+        " to generate a preview for your poll"
     )
 
 
@@ -155,14 +155,14 @@ def main() -> None:
     # Create the Updater and pass it your bot's token.
     updater = Updater("TOKEN")
     dispatcher = updater.dispatcher
-    dispatcher.add_handler(CommandHandler('start', start))
-    dispatcher.add_handler(CommandHandler('poll', poll))
+    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(CommandHandler("poll", poll))
     dispatcher.add_handler(PollAnswerHandler(receive_poll_answer))
-    dispatcher.add_handler(CommandHandler('quiz', quiz))
+    dispatcher.add_handler(CommandHandler("quiz", quiz))
     dispatcher.add_handler(PollHandler(receive_quiz_answer))
-    dispatcher.add_handler(CommandHandler('preview', preview))
+    dispatcher.add_handler(CommandHandler("preview", preview))
     dispatcher.add_handler(MessageHandler(Filters.poll, receive_poll))
-    dispatcher.add_handler(CommandHandler('help', help_handler))
+    dispatcher.add_handler(CommandHandler("help", help_handler))
 
     # Start the Bot
     updater.start_polling()
@@ -172,5 +172,5 @@ def main() -> None:
     updater.idle()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -50,12 +50,12 @@ class ShippingAddress(TelegramObject):
     """
 
     __slots__ = (
-        'post_code',
-        'city',
-        'country_code',
-        'street_line2',
-        'street_line1',
-        'state',
+        "post_code",
+        "city",
+        "country_code",
+        "street_line2",
+        "street_line1",
+        "state",
     )
 
     def __init__(

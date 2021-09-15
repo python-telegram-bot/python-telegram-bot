@@ -22,5 +22,5 @@ from telegram import ChatAction
 def test_slot_behaviour(mro_slots):
     action = ChatAction()
     for attr in action.__slots__:
-        assert getattr(action, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
     assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"

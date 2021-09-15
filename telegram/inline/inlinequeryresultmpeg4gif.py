@@ -86,18 +86,18 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
     """
 
     __slots__ = (
-        'reply_markup',
-        'thumb_mime_type',
-        'caption_entities',
-        'mpeg4_duration',
-        'mpeg4_width',
-        'title',
-        'caption',
-        'parse_mode',
-        'input_message_content',
-        'mpeg4_url',
-        'mpeg4_height',
-        'thumb_url',
+        "reply_markup",
+        "thumb_mime_type",
+        "caption_entities",
+        "mpeg4_duration",
+        "mpeg4_width",
+        "title",
+        "caption",
+        "parse_mode",
+        "input_message_content",
+        "mpeg4_url",
+        "mpeg4_height",
+        "thumb_url",
     )
 
     def __init__(
@@ -109,8 +109,8 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         mpeg4_height: int = None,
         title: str = None,
         caption: str = None,
-        reply_markup: 'ReplyMarkup' = None,
-        input_message_content: 'InputMessageContent' = None,
+        reply_markup: "ReplyMarkup" = None,
+        input_message_content: "InputMessageContent" = None,
         mpeg4_duration: int = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         thumb_mime_type: str = None,
@@ -119,7 +119,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
     ):
 
         # Required
-        super().__init__('mpeg4_gif', id)
+        super().__init__("mpeg4_gif", id)
         self.mpeg4_url = mpeg4_url
         self.thumb_url = thumb_url
 

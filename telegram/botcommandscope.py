@@ -57,7 +57,7 @@ class BotCommandScope(TelegramObject):
         type (:obj:`str`): Scope type.
     """
 
-    __slots__ = ('type',)
+    __slots__ = ("type",)
 
     DEFAULT = constants.BOT_COMMAND_SCOPE_DEFAULT
     """:const:`telegram.constants.BOT_COMMAND_SCOPE_DEFAULT`"""
@@ -79,7 +79,7 @@ class BotCommandScope(TelegramObject):
         self._id_attrs = (self.type,)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['BotCommandScope']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["BotCommandScope"]:
         """Converts JSON data to the appropriate :class:`BotCommandScope` object, i.e. takes
         care of selecting the correct subclass.
 
@@ -96,7 +96,7 @@ class BotCommandScope(TelegramObject):
         if not data:
             return None
 
-        _class_mapping: Dict[str, Type['BotCommandScope']] = {
+        _class_mapping: Dict[str, Type["BotCommandScope"]] = {
             cls.DEFAULT: BotCommandScopeDefault,
             cls.ALL_PRIVATE_CHATS: BotCommandScopeAllPrivateChats,
             cls.ALL_GROUP_CHATS: BotCommandScopeAllGroupChats,
@@ -107,7 +107,7 @@ class BotCommandScope(TelegramObject):
         }
 
         if cls is BotCommandScope:
-            return _class_mapping.get(data['type'], cls)(**data, bot=bot)
+            return _class_mapping.get(data["type"], cls)(**data, bot=bot)
         return cls(**data)
 
 
@@ -192,12 +192,12 @@ class BotCommandScopeChat(BotCommandScope):
             target supergroup (in the format ``@supergroupusername``)
     """
 
-    __slots__ = ('chat_id',)
+    __slots__ = ("chat_id",)
 
     def __init__(self, chat_id: Union[str, int], **_kwargs: Any):
         super().__init__(type=BotCommandScope.CHAT)
         self.chat_id = (
-            chat_id if isinstance(chat_id, str) and chat_id.startswith('@') else int(chat_id)
+            chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)
         )
         self._id_attrs = (self.type, self.chat_id)
 
@@ -221,12 +221,12 @@ class BotCommandScopeChatAdministrators(BotCommandScope):
             target supergroup (in the format ``@supergroupusername``)
     """
 
-    __slots__ = ('chat_id',)
+    __slots__ = ("chat_id",)
 
     def __init__(self, chat_id: Union[str, int], **_kwargs: Any):
         super().__init__(type=BotCommandScope.CHAT_ADMINISTRATORS)
         self.chat_id = (
-            chat_id if isinstance(chat_id, str) and chat_id.startswith('@') else int(chat_id)
+            chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)
         )
         self._id_attrs = (self.type, self.chat_id)
 
@@ -252,12 +252,12 @@ class BotCommandScopeChatMember(BotCommandScope):
         user_id (:obj:`int`): Unique identifier of the target user.
     """
 
-    __slots__ = ('chat_id', 'user_id')
+    __slots__ = ("chat_id", "user_id")
 
     def __init__(self, chat_id: Union[str, int], user_id: int, **_kwargs: Any):
         super().__init__(type=BotCommandScope.CHAT_MEMBER)
         self.chat_id = (
-            chat_id if isinstance(chat_id, str) and chat_id.startswith('@') else int(chat_id)
+            chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)
         )
         self.user_id = int(user_id)
         self._id_attrs = (self.type, self.chat_id, self.user_id)

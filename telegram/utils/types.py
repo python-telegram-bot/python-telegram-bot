@@ -34,7 +34,7 @@ if TYPE_CHECKING:
     from telegram import InputFile  # noqa: F401
     from telegram.utils.helpers import DefaultValue  # noqa: F401
 
-FileLike = Union[IO, 'InputFile']
+FileLike = Union[IO, "InputFile"]
 """Either an open file handler or a :class:`telegram.InputFile`."""
 
 FileInput = Union[str, bytes, FileLike, Path]
@@ -44,11 +44,11 @@ a local file path as string, :class:`pathlib.Path` or the file contents as :obj:
 JSONDict = Dict[str, Any]
 """Dictionary containing response from Telegram or data to send to the API."""
 
-DVType = TypeVar('DVType')
-ODVInput = Optional[Union['DefaultValue[DVType]', DVType]]
+DVType = TypeVar("DVType")
+ODVInput = Optional[Union["DefaultValue[DVType]", DVType]]
 """Generic type for bot method parameters which can have defaults. ``ODVInput[type]`` is the same
 as ``Optional[Union[DefaultValue, type]]``."""
-DVInput = Union['DefaultValue[DVType]', DVType]
+DVInput = Union["DefaultValue[DVType]", DVType]
 """Generic type for bot method parameters which can have defaults. ``DVInput[type]`` is the same
 as ``Union[DefaultValue, type]``."""
 

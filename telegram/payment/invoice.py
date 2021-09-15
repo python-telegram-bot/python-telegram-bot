@@ -54,11 +54,11 @@ class Invoice(TelegramObject):
     """
 
     __slots__ = (
-        'currency',
-        'start_parameter',
-        'title',
-        'description',
-        'total_amount',
+        "currency",
+        "start_parameter",
+        "title",
+        "description",
+        "total_amount",
     )
 
     def __init__(

@@ -61,14 +61,14 @@ class InputVenueMessageContent(InputMessageContent):
     """
 
     __slots__ = (
-        'longitude',
-        'google_place_type',
-        'title',
-        'address',
-        'foursquare_id',
-        'foursquare_type',
-        'google_place_id',
-        'latitude',
+        "longitude",
+        "google_place_type",
+        "title",
+        "address",
+        "foursquare_id",
+        "foursquare_type",
+        "google_place_id",
+        "latitude",
     )
 
     def __init__(

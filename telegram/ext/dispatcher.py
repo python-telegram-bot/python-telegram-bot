@@ -57,7 +57,7 @@ if TYPE_CHECKING:
 
 DEFAULT_GROUP: int = 0
 
-UT = TypeVar('UT')
+UT = TypeVar("UT")
 
 
 class DispatcherHandlerStop(Exception):
@@ -80,7 +80,7 @@ class DispatcherHandlerStop(Exception):
         state (:obj:`object`, optional): The next state of the conversation.
     """
 
-    __slots__ = ('state',)
+    __slots__ = ("state",)
 
     def __init__(self, state: object = None) -> None:
         super().__init__()
@@ -127,26 +127,26 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
 
     # Allowing '__weakref__' creation here since we need it for the singleton
     __slots__ = (
-        'workers',
-        'persistence',
-        'update_queue',
-        'job_queue',
-        'user_data',
-        'chat_data',
-        'bot_data',
-        '_update_persistence_lock',
-        'handlers',
-        'groups',
-        'error_handlers',
-        'running',
-        '__stop_event',
-        '__exception_event',
-        '__async_queue',
-        '__async_threads',
-        'bot',
-        '__dict__',
-        '__weakref__',
-        'context_types',
+        "workers",
+        "persistence",
+        "update_queue",
+        "job_queue",
+        "user_data",
+        "chat_data",
+        "bot_data",
+        "_update_persistence_lock",
+        "handlers",
+        "groups",
+        "error_handlers",
+        "running",
+        "__stop_event",
+        "__exception_event",
+        "__async_queue",
+        "__async_threads",
+        "bot",
+        "__dict__",
+        "__weakref__",
+        "context_types",
     )
 
     __singleton_lock = Lock()
@@ -156,24 +156,24 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
 
     @overload
     def __init__(
-        self: 'Dispatcher[CallbackContext[Dict, Dict, Dict], Dict, Dict, Dict]',
-        bot: 'Bot',
+        self: "Dispatcher[CallbackContext[Dict, Dict, Dict], Dict, Dict, Dict]",
+        bot: "Bot",
         update_queue: Queue,
         workers: int = 4,
         exception_event: Event = None,
-        job_queue: 'JobQueue' = None,
+        job_queue: "JobQueue" = None,
         persistence: BasePersistence = None,
     ):
         ...
 
     @overload
     def __init__(
-        self: 'Dispatcher[CCT, UD, CD, BD]',
-        bot: 'Bot',
+        self: "Dispatcher[CCT, UD, CD, BD]",
+        bot: "Bot",
         update_queue: Queue,
         workers: int = 4,
         exception_event: Event = None,
-        job_queue: 'JobQueue' = None,
+        job_queue: "JobQueue" = None,
         persistence: BasePersistence = None,
         context_types: ContextTypes[CCT, UD, CD, BD] = None,
     ):
@@ -181,11 +181,11 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
 
     def __init__(
         self,
-        bot: 'Bot',
+        bot: "Bot",
         update_queue: Queue,
         workers: int = 4,
         exception_event: Event = None,
-        job_queue: 'JobQueue' = None,
+        job_queue: "JobQueue" = None,
         persistence: BasePersistence = None,
         context_types: ContextTypes[CCT, UD, CD, BD] = None,
     ):
@@ -197,7 +197,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
 
         if self.workers < 1:
             warnings.warn(
-                'Asynchronous callbacks can not be processed without at least one worker thread.'
+                "Asynchronous callbacks can not be processed without at least one worker thread."
             )
 
         self.user_data: DefaultDict[int, UD] = defaultdict(self.context_types.user_data)
@@ -229,7 +229,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                 persistent_data = self.persistence.get_callback_data()
                 if persistent_data is not None:
                     if not isinstance(persistent_data, tuple) and len(persistent_data) != 2:
-                        raise ValueError('callback_data must be a 2-tuple')
+                        raise ValueError("callback_data must be a 2-tuple")
                     self.bot.callback_data_cache = CallbackDataCache(
                         self.bot,
                         self.bot.callback_data_cache.maxsize,
@@ -266,20 +266,20 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         return self.__exception_event
 
     def _init_async_threads(self, base_name: str, workers: int) -> None:
-        base_name = f'{base_name}_' if base_name else ''
+        base_name = f"{base_name}_" if base_name else ""
 
         for i in range(workers):
-            thread = Thread(target=self._pooled, name=f'Bot:{self.bot.id}:worker:{base_name}{i}')
+            thread = Thread(target=self._pooled, name=f"Bot:{self.bot.id}:worker:{base_name}{i}")
             self.__async_threads.add(thread)
             thread.start()
 
     @classmethod
-    def _set_singleton(cls, val: Optional['Dispatcher']) -> None:
-        cls.logger.debug('Setting singleton dispatcher as %s', val)
+    def _set_singleton(cls, val: Optional["Dispatcher"]) -> None:
+        cls.logger.debug("Setting singleton dispatcher as %s", val)
         cls.__singleton = weakref.ref(val) if val else None
 
     @classmethod
-    def get_instance(cls) -> 'Dispatcher':
+    def get_instance(cls) -> "Dispatcher":
         """Get the singleton instance of this class.
 
         Returns:
@@ -291,7 +291,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         """
         if cls.__singleton is not None:
             return cls.__singleton()  # type: ignore[return-value] # pylint: disable=not-callable
-        raise RuntimeError(f'{cls.__name__} not initialized or multiple instances exist')
+        raise RuntimeError(f"{cls.__name__} not initialized or multiple instances exist")
 
     def _pooled(self) -> None:
         thr_name = current_thread().getName()
@@ -313,14 +313,14 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
 
             if isinstance(promise.exception, DispatcherHandlerStop):
                 self.logger.warning(
-                    'DispatcherHandlerStop is not supported with async functions; func: %s',
+                    "DispatcherHandlerStop is not supported with async functions; func: %s",
                     promise.pooled_function.__name__,
                 )
                 continue
 
             # Avoid infinite recursion of error handlers.
             if promise.pooled_function in self.error_handlers:
-                self.logger.error('An uncaught error was raised while handling the error.')
+                self.logger.error("An uncaught error was raised while handling the error.")
                 continue
 
             # If we arrive here, an exception happened in the promise and was neither
@@ -328,7 +328,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
             try:
                 self.dispatch_error(promise.update, promise.exception, promise=promise)
             except Exception:
-                self.logger.exception('An uncaught error was raised while handling the error.')
+                self.logger.exception("An uncaught error was raised while handling the error.")
 
     def run_async(
         self, func: Callable[..., object], *args: object, update: object = None, **kwargs: object
@@ -371,19 +371,19 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
 
         """
         if self.running:
-            self.logger.warning('already running')
+            self.logger.warning("already running")
             if ready is not None:
                 ready.set()
             return
 
         if self.__exception_event.is_set():
-            msg = 'reusing dispatcher after exception event is forbidden'
+            msg = "reusing dispatcher after exception event is forbidden"
             self.logger.error(msg)
             raise TelegramError(msg)
 
         self._init_async_threads(str(uuid4()), self.workers)
         self.running = True
-        self.logger.debug('Dispatcher started')
+        self.logger.debug("Dispatcher started")
 
         if ready is not None:
             ready.set()
@@ -394,19 +394,19 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                 update = self.update_queue.get(True, 1)
             except Empty:
                 if self.__stop_event.is_set():
-                    self.logger.debug('orderly stopping')
+                    self.logger.debug("orderly stopping")
                     break
                 if self.__exception_event.is_set():
-                    self.logger.critical('stopping due to exception in another thread')
+                    self.logger.critical("stopping due to exception in another thread")
                     break
                 continue
 
-            self.logger.debug('Processing Update: %s', update)
+            self.logger.debug("Processing Update: %s", update)
             self.process_update(update)
             self.update_queue.task_done()
 
         self.running = False
-        self.logger.debug('Dispatcher thread stopped')
+        self.logger.debug("Dispatcher thread stopped")
 
     def stop(self) -> None:
         """Stops the thread."""
@@ -426,10 +426,10 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
             self.__async_queue.put(None)
 
         for i, thr in enumerate(threads):
-            self.logger.debug('Waiting for async thread %s/%s to end', i + 1, total)
+            self.logger.debug("Waiting for async thread %s/%s to end", i + 1, total)
             thr.join()
             self.__async_threads.remove(thr)
-            self.logger.debug('async thread %s/%s has ended', i + 1, total)
+            self.logger.debug("async thread %s/%s has ended", i + 1, total)
 
     @property
     def has_running_threads(self) -> bool:  # skipcq: PY-D0003
@@ -455,7 +455,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
             try:
                 self.dispatch_error(None, update)
             except Exception:
-                self.logger.exception('An uncaught error was raised while handling the error.')
+                self.logger.exception("An uncaught error was raised while handling the error.")
             return
 
         context = None
@@ -477,7 +477,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
 
             # Stop processing with any other handler.
             except DispatcherHandlerStop:
-                self.logger.debug('Stopping further handlers due to DispatcherHandlerStop')
+                self.logger.debug("Stopping further handlers due to DispatcherHandlerStop")
                 self.update_persistence(update=update)
                 break
 
@@ -486,11 +486,11 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                 try:
                     self.dispatch_error(update, exc)
                 except DispatcherHandlerStop:
-                    self.logger.debug('Error handler stopped further handlers')
+                    self.logger.debug("Error handler stopped further handlers")
                     break
                 # Errors should not stop the thread.
                 except Exception:
-                    self.logger.exception('An uncaught error was raised while handling the error.')
+                    self.logger.exception("An uncaught error was raised while handling the error.")
 
         # Update persistence, if handled
         handled_only_async = all(sync_modes)
@@ -531,9 +531,9 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         from .conversationhandler import ConversationHandler  # pylint: disable=C0415
 
         if not isinstance(handler, Handler):
-            raise TypeError(f'handler is not an instance of {Handler.__name__}')
+            raise TypeError(f"handler is not an instance of {Handler.__name__}")
         if not isinstance(group, int):
-            raise TypeError('group is not int')
+            raise TypeError("group is not int")
         # For some reason MyPy infers the type of handler is <nothing> here,
         # so for now we just ignore all the errors
         if (
@@ -610,9 +610,9 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                         self.dispatch_error(update, exc)
                     except Exception:
                         message = (
-                            'Saving callback data raised an error and an '
-                            'uncaught error was raised while handling '
-                            'the error with an error_handler'
+                            "Saving callback data raised an error and an "
+                            "uncaught error was raised while handling "
+                            "the error with an error_handler"
                         )
                         self.logger.exception(message)
             if self.persistence.store_data.bot_data:
@@ -623,9 +623,9 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                         self.dispatch_error(update, exc)
                     except Exception:
                         message = (
-                            'Saving bot data raised an error and an '
-                            'uncaught error was raised while handling '
-                            'the error with an error_handler'
+                            "Saving bot data raised an error and an "
+                            "uncaught error was raised while handling "
+                            "the error with an error_handler"
                         )
                         self.logger.exception(message)
             if self.persistence.store_data.chat_data:
@@ -637,9 +637,9 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                             self.dispatch_error(update, exc)
                         except Exception:
                             message = (
-                                'Saving chat data raised an error and an '
-                                'uncaught error was raised while handling '
-                                'the error with an error_handler'
+                                "Saving chat data raised an error and an "
+                                "uncaught error was raised while handling "
+                                "the error with an error_handler"
                             )
                             self.logger.exception(message)
             if self.persistence.store_data.user_data:
@@ -651,9 +651,9 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                             self.dispatch_error(update, exc)
                         except Exception:
                             message = (
-                                'Saving user data raised an error and an '
-                                'uncaught error was raised while handling '
-                                'the error with an error_handler'
+                                "Saving user data raised an error and an "
+                                "uncaught error was raised while handling "
+                                "the error with an error_handler"
                             )
                             self.logger.exception(message)
 
@@ -682,7 +682,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                 asynchronously using :meth:`run_async`. Defaults to :obj:`False`.
         """
         if callback in self.error_handlers:
-            self.logger.debug('The callback is already registered as an error handler. Ignoring.')
+            self.logger.debug("The callback is already registered as an error handler. Ignoring.")
             return
 
         if run_async is DEFAULT_FALSE and self.bot.defaults and self.bot.defaults.run_async:
@@ -726,5 +726,5 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
 
         else:
             self.logger.exception(
-                'No error handlers are registered, logging exception.', exc_info=error
+                "No error handlers are registered, logging exception.", exc_info=error
             )

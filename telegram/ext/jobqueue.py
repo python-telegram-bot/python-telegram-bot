@@ -46,10 +46,10 @@ class JobQueue:
 
     """
 
-    __slots__ = ('_dispatcher', 'logger', 'scheduler')
+    __slots__ = ("_dispatcher", "logger", "scheduler")
 
     def __init__(self) -> None:
-        self._dispatcher: 'Dispatcher' = None  # type: ignore[assignment]
+        self._dispatcher: "Dispatcher" = None  # type: ignore[assignment]
         self.logger = logging.getLogger(self.__class__.__name__)
         self.scheduler = BackgroundScheduler(timezone=pytz.utc)
         self.scheduler.add_listener(
@@ -58,12 +58,12 @@ class JobQueue:
 
         # Dispatch errors and don't log them in the APS logger
         def aps_log_filter(record):  # type: ignore
-            return 'raised an exception' not in record.msg
+            return "raised an exception" not in record.msg
 
-        logging.getLogger('apscheduler.executors.default').addFilter(aps_log_filter)
+        logging.getLogger("apscheduler.executors.default").addFilter(aps_log_filter)
         self.scheduler.add_listener(self._dispatch_error, EVENT_JOB_ERROR)
 
-    def _build_args(self, job: 'Job') -> List[CallbackContext]:
+    def _build_args(self, job: "Job") -> List[CallbackContext]:
         return [self._dispatcher.context_types.context.from_job(job, self._dispatcher)]
 
     def _tz_now(self) -> datetime.datetime:
@@ -78,9 +78,9 @@ class JobQueue:
         # Errors should not stop the thread.
         except Exception:
             self.logger.exception(
-                'An error was raised while processing the job and an '
-                'uncaught error was raised while handling the error '
-                'with an error_handler.'
+                "An error was raised while processing the job and an "
+                "uncaught error was raised while handling the error "
+                "with an error_handler."
             )
 
     @overload
@@ -118,7 +118,7 @@ class JobQueue:
         # isinstance(time, datetime.datetime):
         return time
 
-    def set_dispatcher(self, dispatcher: 'Dispatcher') -> None:
+    def set_dispatcher(self, dispatcher: "Dispatcher") -> None:
         """Set the dispatcher to be used by this JobQueue. Use this instead of passing a
         :class:`telegram.Bot` to the JobQueue, which is deprecated.
 
@@ -132,12 +132,12 @@ class JobQueue:
 
     def run_once(
         self,
-        callback: Callable[['CallbackContext'], None],
+        callback: Callable[["CallbackContext"], None],
         when: Union[float, datetime.timedelta, datetime.datetime, datetime.time],
         context: object = None,
         name: str = None,
         job_kwargs: JSONDict = None,
-    ) -> 'Job':
+    ) -> "Job":
         """Creates a new ``Job`` that runs once and adds it to the queue.
 
         Args:
@@ -182,7 +182,7 @@ class JobQueue:
         j = self.scheduler.add_job(
             callback,
             name=name,
-            trigger='date',
+            trigger="date",
             run_date=date_time,
             args=self._build_args(job),
             timezone=date_time.tzinfo or self.scheduler.timezone,
@@ -194,14 +194,14 @@ class JobQueue:
 
     def run_repeating(
         self,
-        callback: Callable[['CallbackContext'], None],
+        callback: Callable[["CallbackContext"], None],
         interval: Union[float, datetime.timedelta],
         first: Union[float, datetime.timedelta, datetime.datetime, datetime.time] = None,
         last: Union[float, datetime.timedelta, datetime.datetime, datetime.time] = None,
         context: object = None,
         name: str = None,
         job_kwargs: JSONDict = None,
-    ) -> 'Job':
+    ) -> "Job":
         """Creates a new ``Job`` that runs at specified intervals and adds it to the queue.
 
         Note:
@@ -273,7 +273,7 @@ class JobQueue:
 
         j = self.scheduler.add_job(
             callback,
-            trigger='interval',
+            trigger="interval",
             args=self._build_args(job),
             start_date=dt_first,
             end_date=dt_last,
@@ -287,13 +287,13 @@ class JobQueue:
 
     def run_monthly(
         self,
-        callback: Callable[['CallbackContext'], None],
+        callback: Callable[["CallbackContext"], None],
         when: datetime.time,
         day: int,
         context: object = None,
         name: str = None,
         job_kwargs: JSONDict = None,
-    ) -> 'Job':
+    ) -> "Job":
         """Creates a new ``Job`` that runs on a monthly basis and adds it to the queue.
 
         .. versionchanged:: 14.0
@@ -329,10 +329,10 @@ class JobQueue:
 
         j = self.scheduler.add_job(
             callback,
-            trigger='cron',
+            trigger="cron",
             args=self._build_args(job),
             name=name,
-            day='last' if day == -1 else day,
+            day="last" if day == -1 else day,
             hour=when.hour,
             minute=when.minute,
             second=when.second,
@@ -344,13 +344,13 @@ class JobQueue:
 
     def run_daily(
         self,
-        callback: Callable[['CallbackContext'], None],
+        callback: Callable[["CallbackContext"], None],
         time: datetime.time,
         days: Tuple[int, ...] = tuple(range(7)),
         context: object = None,
         name: str = None,
         job_kwargs: JSONDict = None,
-    ) -> 'Job':
+    ) -> "Job":
         """Creates a new ``Job`` that runs on a daily basis and adds it to the queue.
 
         Note:
@@ -388,8 +388,8 @@ class JobQueue:
             callback,
             name=name,
             args=self._build_args(job),
-            trigger='cron',
-            day_of_week=','.join([str(d) for d in days]),
+            trigger="cron",
+            day_of_week=",".join([str(d) for d in days]),
             hour=time.hour,
             minute=time.minute,
             second=time.second,
@@ -402,11 +402,11 @@ class JobQueue:
 
     def run_custom(
         self,
-        callback: Callable[['CallbackContext'], None],
+        callback: Callable[["CallbackContext"], None],
         job_kwargs: JSONDict,
         context: object = None,
         name: str = None,
-    ) -> 'Job':
+    ) -> "Job":
         """Creates a new customly defined ``Job``.
 
         Args:
@@ -442,14 +442,14 @@ class JobQueue:
         if self.scheduler.running:
             self.scheduler.shutdown()
 
-    def jobs(self) -> Tuple['Job', ...]:
+    def jobs(self) -> Tuple["Job", ...]:
         """Returns a tuple of all *scheduled* jobs that are currently in the ``JobQueue``."""
         return tuple(
             Job._from_aps_job(job, self)  # pylint: disable=W0212
             for job in self.scheduler.get_jobs()
         )
 
-    def get_jobs_by_name(self, name: str) -> Tuple['Job', ...]:
+    def get_jobs_by_name(self, name: str) -> Tuple["Job", ...]:
         """Returns a tuple of all *pending/scheduled* jobs with the given name that are currently
         in the ``JobQueue``.
         """
@@ -491,18 +491,18 @@ class Job:
     """
 
     __slots__ = (
-        'callback',
-        'context',
-        'name',
-        'job_queue',
-        '_removed',
-        '_enabled',
-        'job',
+        "callback",
+        "context",
+        "name",
+        "job_queue",
+        "_removed",
+        "_enabled",
+        "job",
     )
 
     def __init__(
         self,
-        callback: Callable[['CallbackContext'], None],
+        callback: Callable[["CallbackContext"], None],
         context: object = None,
         name: str = None,
         job_queue: JobQueue = None,
@@ -519,7 +519,7 @@ class Job:
 
         self.job = cast(APSJob, job)  # skipcq: PTC-W0052
 
-    def run(self, dispatcher: 'Dispatcher') -> None:
+    def run(self, dispatcher: "Dispatcher") -> None:
         """Executes the callback function independently of the jobs schedule."""
         try:
             self.callback(dispatcher.context_types.context.from_job(self, dispatcher))
@@ -529,9 +529,9 @@ class Job:
             # Errors should not stop the thread.
             except Exception:
                 dispatcher.logger.exception(
-                    'An error was raised while processing the job and an '
-                    'uncaught error was raised while handling the error '
-                    'with an error_handler.'
+                    "An error was raised while processing the job and an "
+                    "uncaught error was raised while handling the error "
+                    "with an error_handler."
                 )
 
     def schedule_removal(self) -> None:
@@ -570,7 +570,7 @@ class Job:
         return self.job.next_run_time
 
     @classmethod
-    def _from_aps_job(cls, job: APSJob, job_queue: JobQueue) -> 'Job':
+    def _from_aps_job(cls, job: APSJob, job_queue: JobQueue) -> "Job":
         # context based callbacks
         if len(job.args) == 1:
             context = job.args[0].job.context

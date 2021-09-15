@@ -26,7 +26,7 @@ from telegram.ext import (
 
 # Enable logging
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 
 logger = logging.getLogger(__name__)
@@ -174,20 +174,20 @@ def main() -> None:
     # $ means "end of line/string"
     # So ^ABC$ will only allow 'ABC'
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', start)],
+        entry_points=[CommandHandler("start", start)],
         states={
             FIRST: [
-                CallbackQueryHandler(one, pattern='^' + str(ONE) + '$'),
-                CallbackQueryHandler(two, pattern='^' + str(TWO) + '$'),
-                CallbackQueryHandler(three, pattern='^' + str(THREE) + '$'),
-                CallbackQueryHandler(four, pattern='^' + str(FOUR) + '$'),
+                CallbackQueryHandler(one, pattern="^" + str(ONE) + "$"),
+                CallbackQueryHandler(two, pattern="^" + str(TWO) + "$"),
+                CallbackQueryHandler(three, pattern="^" + str(THREE) + "$"),
+                CallbackQueryHandler(four, pattern="^" + str(FOUR) + "$"),
             ],
             SECOND: [
-                CallbackQueryHandler(start_over, pattern='^' + str(ONE) + '$'),
-                CallbackQueryHandler(end, pattern='^' + str(TWO) + '$'),
+                CallbackQueryHandler(start_over, pattern="^" + str(ONE) + "$"),
+                CallbackQueryHandler(end, pattern="^" + str(TWO) + "$"),
             ],
         },
-        fallbacks=[CommandHandler('start', start)],
+        fallbacks=[CommandHandler("start", start)],
     )
 
     # Add ConversationHandler to dispatcher that will be used for handling updates
@@ -202,5 +202,5 @@ def main() -> None:
     updater.idle()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

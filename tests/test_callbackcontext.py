@@ -41,7 +41,7 @@ class TestCallbackContext:
     def test_slot_behaviour(self, dp, mro_slots, recwarn):
         c = CallbackContext(dp)
         for attr in c.__slots__:
-            assert getattr(c, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(c, attr, "err") != "err", f"got extra slot '{attr}'"
         assert not c.__dict__, f"got missing slot(s): {c.__dict__}"
         assert len(mro_slots(c)) == len(set(mro_slots(c))), "duplicate slot"
         c.args = c.args
@@ -62,7 +62,7 @@ class TestCallbackContext:
 
     def test_from_update(self, dp):
         update = Update(
-            0, message=Message(0, None, Chat(1, 'chat'), from_user=User(1, 'user', False))
+            0, message=Message(0, None, Chat(1, "chat"), from_user=User(1, "user", False))
         )
 
         callback_context = CallbackContext.from_update(update, dp)
@@ -76,16 +76,16 @@ class TestCallbackContext:
 
         callback_context_same_user_chat = CallbackContext.from_update(update, dp)
 
-        callback_context.bot_data['test'] = 'bot'
-        callback_context.chat_data['test'] = 'chat'
-        callback_context.user_data['test'] = 'user'
+        callback_context.bot_data["test"] = "bot"
+        callback_context.chat_data["test"] = "chat"
+        callback_context.user_data["test"] = "user"
 
         assert callback_context_same_user_chat.bot_data is callback_context.bot_data
         assert callback_context_same_user_chat.chat_data is callback_context.chat_data
         assert callback_context_same_user_chat.user_data is callback_context.user_data
 
         update_other_user_chat = Update(
-            0, message=Message(0, None, Chat(2, 'chat'), from_user=User(2, 'user', False))
+            0, message=Message(0, None, Chat(2, "chat"), from_user=User(2, "user", False))
         )
 
         callback_context_other_user_chat = CallbackContext.from_update(update_other_user_chat, dp)
@@ -104,7 +104,7 @@ class TestCallbackContext:
         assert callback_context.job_queue is dp.job_queue
         assert callback_context.update_queue is dp.update_queue
 
-        callback_context = CallbackContext.from_update('', dp)
+        callback_context = CallbackContext.from_update("", dp)
 
         assert callback_context.chat_data is None
         assert callback_context.user_data is None
@@ -114,10 +114,10 @@ class TestCallbackContext:
         assert callback_context.update_queue is dp.update_queue
 
     def test_from_error(self, dp):
-        error = TelegramError('test')
+        error = TelegramError("test")
 
         update = Update(
-            0, message=Message(0, None, Chat(1, 'chat'), from_user=User(1, 'user', False))
+            0, message=Message(0, None, Chat(1, "chat"), from_user=User(1, "user", False))
         )
 
         callback_context = CallbackContext.from_error(update, error, dp)
@@ -133,10 +133,10 @@ class TestCallbackContext:
         assert callback_context.async_kwargs is None
 
     def test_from_error_async_params(self, dp):
-        error = TelegramError('test')
+        error = TelegramError("test")
 
-        args = [1, '2']
-        kwargs = {'one': 1, 2: 'two'}
+        args = [1, "2"]
+        kwargs = {"one": 1, 2: "two"}
 
         callback_context = CallbackContext.from_error(
             None, error, dp, async_args=args, async_kwargs=kwargs
@@ -151,13 +151,13 @@ class TestCallbackContext:
 
         assert callback_context.match is None
 
-        callback_context.matches = ['test', 'blah']
+        callback_context.matches = ["test", "blah"]
 
-        assert callback_context.match == 'test'
+        assert callback_context.match == "test"
 
     def test_data_assignment(self, dp):
         update = Update(
-            0, message=Message(0, None, Chat(1, 'chat'), from_user=User(1, 'user', False))
+            0, message=Message(0, None, Chat(1, "chat"), from_user=User(1, "user", False))
         )
 
         callback_context = CallbackContext.from_update(update, dp)
@@ -176,41 +176,41 @@ class TestCallbackContext:
     def test_drop_callback_data_exception(self, bot, dp):
         non_ext_bot = Bot(bot.token)
         update = Update(
-            0, message=Message(0, None, Chat(1, 'chat'), from_user=User(1, 'user', False))
+            0, message=Message(0, None, Chat(1, "chat"), from_user=User(1, "user", False))
         )
 
         callback_context = CallbackContext.from_update(update, dp)
 
-        with pytest.raises(RuntimeError, match='This telegram.ext.ExtBot instance does not'):
+        with pytest.raises(RuntimeError, match="This telegram.ext.ExtBot instance does not"):
             callback_context.drop_callback_data(None)
 
         try:
             dp.bot = non_ext_bot
-            with pytest.raises(RuntimeError, match='telegram.Bot does not allow for'):
+            with pytest.raises(RuntimeError, match="telegram.Bot does not allow for"):
                 callback_context.drop_callback_data(None)
         finally:
             dp.bot = bot
 
     def test_drop_callback_data(self, dp, monkeypatch, chat_id):
-        monkeypatch.setattr(dp.bot, 'arbitrary_callback_data', True)
+        monkeypatch.setattr(dp.bot, "arbitrary_callback_data", True)
 
         update = Update(
-            0, message=Message(0, None, Chat(1, 'chat'), from_user=User(1, 'user', False))
+            0, message=Message(0, None, Chat(1, "chat"), from_user=User(1, "user", False))
         )
 
         callback_context = CallbackContext.from_update(update, dp)
         dp.bot.send_message(
             chat_id=chat_id,
-            text='test',
+            text="test",
             reply_markup=InlineKeyboardMarkup.from_button(
-                InlineKeyboardButton('test', callback_data='callback_data')
+                InlineKeyboardButton("test", callback_data="callback_data")
             ),
         )
         keyboard_uuid = dp.bot.callback_data_cache.persistence_data[0][0][0]
         button_uuid = list(dp.bot.callback_data_cache.persistence_data[0][0][2])[0]
         callback_data = keyboard_uuid + button_uuid
         callback_query = CallbackQuery(
-            id='1',
+            id="1",
             from_user=None,
             chat_instance=None,
             data=callback_data,
@@ -219,7 +219,7 @@ class TestCallbackContext:
 
         try:
             assert len(dp.bot.callback_data_cache.persistence_data[0]) == 1
-            assert list(dp.bot.callback_data_cache.persistence_data[1]) == ['1']
+            assert list(dp.bot.callback_data_cache.persistence_data[1]) == ["1"]
 
             callback_context.drop_callback_data(callback_query)
             assert dp.bot.callback_data_cache.persistence_data == ([], {})

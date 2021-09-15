@@ -24,8 +24,8 @@ from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 from .handler import Handler
 from .utils.types import CCT
 
-RT = TypeVar('RT')
-UT = TypeVar('UT')
+RT = TypeVar("RT")
+UT = TypeVar("UT")
 
 
 class TypeHandler(Handler[UT, CCT]):
@@ -57,7 +57,7 @@ class TypeHandler(Handler[UT, CCT]):
 
     """
 
-    __slots__ = ('type', 'strict')
+    __slots__ = ("type", "strict")
 
     def __init__(
         self,

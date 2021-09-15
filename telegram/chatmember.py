@@ -61,7 +61,7 @@ class ChatMember(TelegramObject):
 
     """
 
-    __slots__ = ('user', 'status')
+    __slots__ = ("user", "status")
 
     ADMINISTRATOR: ClassVar[str] = constants.CHATMEMBER_ADMINISTRATOR
     """:const:`telegram.constants.CHATMEMBER_ADMINISTRATOR`"""
@@ -84,17 +84,17 @@ class ChatMember(TelegramObject):
         self._id_attrs = (self.user, self.status)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['ChatMember']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ChatMember"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['user'] = User.de_json(data.get('user'), bot)
-        data['until_date'] = from_timestamp(data.get('until_date', None))
+        data["user"] = User.de_json(data.get("user"), bot)
+        data["until_date"] = from_timestamp(data.get("until_date", None))
 
-        _class_mapping: Dict[str, Type['ChatMember']] = {
+        _class_mapping: Dict[str, Type["ChatMember"]] = {
             cls.CREATOR: ChatMemberOwner,
             cls.ADMINISTRATOR: ChatMemberAdministrator,
             cls.MEMBER: ChatMemberMember,
@@ -104,15 +104,15 @@ class ChatMember(TelegramObject):
         }
 
         if cls is ChatMember:
-            return _class_mapping.get(data['status'], cls)(**data, bot=bot)
+            return _class_mapping.get(data["status"], cls)(**data, bot=bot)
         return cls(**data)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
-        if data.get('until_date', False):
-            data['until_date'] = to_timestamp(data['until_date'])
+        if data.get("until_date", False):
+            data["until_date"] = to_timestamp(data["until_date"])
 
         return data
 
@@ -140,7 +140,7 @@ class ChatMemberOwner(ChatMember):
             this user.
     """
 
-    __slots__ = ('is_anonymous', 'custom_title')
+    __slots__ = ("is_anonymous", "custom_title")
 
     def __init__(
         self,
@@ -230,19 +230,19 @@ class ChatMemberAdministrator(ChatMember):
     """
 
     __slots__ = (
-        'can_be_edited',
-        'is_anonymous',
-        'can_manage_chat',
-        'can_delete_messages',
-        'can_manage_voice_chats',
-        'can_restrict_members',
-        'can_promote_members',
-        'can_change_info',
-        'can_invite_users',
-        'can_post_messages',
-        'can_edit_messages',
-        'can_pin_messages',
-        'custom_title',
+        "can_be_edited",
+        "is_anonymous",
+        "can_manage_chat",
+        "can_delete_messages",
+        "can_manage_voice_chats",
+        "can_restrict_members",
+        "can_promote_members",
+        "can_change_info",
+        "can_invite_users",
+        "can_post_messages",
+        "can_edit_messages",
+        "can_pin_messages",
+        "custom_title",
     )
 
     def __init__(
@@ -360,16 +360,16 @@ class ChatMemberRestricted(ChatMember):
     """
 
     __slots__ = (
-        'is_member',
-        'can_change_info',
-        'can_invite_users',
-        'can_pin_messages',
-        'can_send_messages',
-        'can_send_media_messages',
-        'can_send_polls',
-        'can_send_other_messages',
-        'can_add_web_page_previews',
-        'until_date',
+        "is_member",
+        "can_change_info",
+        "can_invite_users",
+        "can_pin_messages",
+        "can_send_messages",
+        "can_send_media_messages",
+        "can_send_polls",
+        "can_send_other_messages",
+        "can_add_web_page_previews",
+        "until_date",
     )
 
     def __init__(
@@ -443,7 +443,7 @@ class ChatMemberBanned(ChatMember):
 
     """
 
-    __slots__ = ('until_date',)
+    __slots__ = ("until_date",)
 
     def __init__(self, user: User, until_date: datetime.datetime, **_kwargs: object):
         super().__init__(status=ChatMember.KICKED, user=user)

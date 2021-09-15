@@ -19,7 +19,7 @@ from telegram.ext import (
 
 # Enable logging
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 
 logger = logging.getLogger(__name__)
@@ -95,16 +95,16 @@ def shipping_callback(update: Update, context: CallbackContext) -> None:
     """Answers the ShippingQuery with ShippingOptions"""
     query = update.shipping_query
     # check the payload, is this from your bot?
-    if query.invoice_payload != 'Custom-Payload':
+    if query.invoice_payload != "Custom-Payload":
         # answer False pre_checkout_query
         query.answer(ok=False, error_message="Something went wrong...")
         return
 
     # First option has a single LabeledPrice
-    options = [ShippingOption('1', 'Shipping Option A', [LabeledPrice('A', 100)])]
+    options = [ShippingOption("1", "Shipping Option A", [LabeledPrice("A", 100)])]
     # second option has an array of LabeledPrice objects
-    price_list = [LabeledPrice('B1', 150), LabeledPrice('B2', 200)]
-    options.append(ShippingOption('2', 'Shipping Option B', price_list))
+    price_list = [LabeledPrice("B1", 150), LabeledPrice("B2", 200)]
+    options.append(ShippingOption("2", "Shipping Option B", price_list))
     query.answer(ok=True, shipping_options=options)
 
 
@@ -113,7 +113,7 @@ def precheckout_callback(update: Update, context: CallbackContext) -> None:
     """Answers the PreQecheckoutQuery"""
     query = update.pre_checkout_query
     # check the payload, is this from your bot?
-    if query.invoice_payload != 'Custom-Payload':
+    if query.invoice_payload != "Custom-Payload":
         # answer False pre_checkout_query
         query.answer(ok=False, error_message="Something went wrong...")
     else:
@@ -160,5 +160,5 @@ def main() -> None:
     updater.idle()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

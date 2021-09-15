@@ -88,20 +88,20 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     """
 
     __slots__ = (
-        'filename',
-        'single_file',
-        'on_flush',
-        'user_data',
-        'chat_data',
-        'bot_data',
-        'callback_data',
-        'conversations',
-        'context_types',
+        "filename",
+        "single_file",
+        "on_flush",
+        "user_data",
+        "chat_data",
+        "bot_data",
+        "callback_data",
+        "conversations",
+        "context_types",
     )
 
     @overload
     def __init__(
-        self: 'PicklePersistence[Dict, Dict, Dict]',
+        self: "PicklePersistence[Dict, Dict, Dict]",
         filename: str,
         store_data: PersistenceInput = None,
         single_file: bool = True,
@@ -111,7 +111,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
 
     @overload
     def __init__(
-        self: 'PicklePersistence[UD, CD, BD]',
+        self: "PicklePersistence[UD, CD, BD]",
         filename: str,
         store_data: PersistenceInput = None,
         single_file: bool = True,
@@ -144,12 +144,12 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             filename = self.filename
             with open(self.filename, "rb") as file:
                 data = pickle.load(file)
-                self.user_data = defaultdict(self.context_types.user_data, data['user_data'])
-                self.chat_data = defaultdict(self.context_types.chat_data, data['chat_data'])
+                self.user_data = defaultdict(self.context_types.user_data, data["user_data"])
+                self.chat_data = defaultdict(self.context_types.chat_data, data["chat_data"])
                 # For backwards compatibility with files not containing bot data
-                self.bot_data = data.get('bot_data', self.context_types.bot_data())
-                self.callback_data = data.get('callback_data', {})
-                self.conversations = data['conversations']
+                self.bot_data = data.get("bot_data", self.context_types.bot_data())
+                self.callback_data = data.get("callback_data", {})
+                self.conversations = data["conversations"]
         except OSError:
             self.conversations = {}
             self.user_data = defaultdict(self.context_types.user_data)
@@ -176,11 +176,11 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     def _dump_singlefile(self) -> None:
         with open(self.filename, "wb") as file:
             data = {
-                'conversations': self.conversations,
-                'user_data': self.user_data,
-                'chat_data': self.chat_data,
-                'bot_data': self.bot_data,
-                'callback_data': self.callback_data,
+                "conversations": self.conversations,
+                "user_data": self.user_data,
+                "chat_data": self.chat_data,
+                "bot_data": self.bot_data,
+                "callback_data": self.callback_data,
             }
             pickle.dump(data, file)
 

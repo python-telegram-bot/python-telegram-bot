@@ -116,7 +116,7 @@ if TYPE_CHECKING:
         MessageEntity,
     )
 
-RT = TypeVar('RT')
+RT = TypeVar("RT")
 
 
 def log(  # skipcq: PY-D0003
@@ -126,10 +126,10 @@ def log(  # skipcq: PY-D0003
 
     @functools.wraps(func)
     def decorator(*args: object, **kwargs: object) -> RT:  # pylint: disable=W0613
-        logger.debug('Entering: %s', func.__name__)
+        logger.debug("Entering: %s", func.__name__)
         result = func(*args, **kwargs)
         logger.debug(result)
-        logger.debug('Exiting: %s', func.__name__)
+        logger.debug("Exiting: %s", func.__name__)
         return result
 
     return decorator
@@ -172,14 +172,14 @@ class Bot(TelegramObject):
     """
 
     __slots__ = (
-        'token',
-        'base_url',
-        'base_file_url',
-        'private_key',
-        'defaults',
-        '_bot',
-        '_request',
-        'logger',
+        "token",
+        "base_url",
+        "base_file_url",
+        "private_key",
+        "defaults",
+        "_bot",
+        "_request",
+        "logger",
     )
 
     def __init__(
@@ -187,10 +187,10 @@ class Bot(TelegramObject):
         token: str,
         base_url: str = None,
         base_file_url: str = None,
-        request: 'Request' = None,
+        request: "Request" = None,
         private_key: bytes = None,
         private_key_password: bytes = None,
-        defaults: 'Defaults' = None,
+        defaults: "Defaults" = None,
     ):
         self.token = self._validate_token(token)
 
@@ -199,16 +199,16 @@ class Bot(TelegramObject):
 
         if self.defaults:
             warnings.warn(
-                'Passing Defaults to telegram.Bot is deprecated. Use telegram.ext.ExtBot instead.',
+                "Passing Defaults to telegram.Bot is deprecated. Use telegram.ext.ExtBot instead.",
                 TelegramDeprecationWarning,
                 stacklevel=3,
             )
 
         if base_url is None:
-            base_url = 'https://api.telegram.org/bot'
+            base_url = "https://api.telegram.org/bot"
 
         if base_file_url is None:
-            base_file_url = 'https://api.telegram.org/file/bot'
+            base_file_url = "https://api.telegram.org/file/bot"
 
         self.base_url = str(base_url) + str(self.token)
         self.base_file_url = str(base_file_url) + str(self.token)
@@ -220,8 +220,8 @@ class Bot(TelegramObject):
         if private_key:
             if not CRYPTO_INSTALLED:
                 raise RuntimeError(
-                    'To use Telegram Passports, PTB must be installed via `pip install '
-                    'python-telegram-bot[passport]`.'
+                    "To use Telegram Passports, PTB must be installed via `pip install "
+                    "python-telegram-bot[passport]`."
                 )
             self.private_key = serialization.load_pem_private_key(
                 private_key, password=private_key_password, backend=default_backend()
@@ -280,7 +280,7 @@ class Bot(TelegramObject):
                 data = api_kwargs
 
         # Insert is in-place, so no return value for data
-        if endpoint != 'getUpdates':
+        if endpoint != "getUpdates":
             effective_timeout = self._insert_defaults(data, timeout)
         else:
             effective_timeout = cast(float, timeout)
@@ -288,7 +288,7 @@ class Bot(TelegramObject):
         data = {key: value for key, value in data.items() if value is not None}
 
         return self.request.post(
-            f'{self.base_url}/{endpoint}', data=data, timeout=effective_timeout
+            f"{self.base_url}/{endpoint}", data=data, timeout=effective_timeout
         )
 
     def _message(
@@ -303,26 +303,26 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
     ) -> Union[bool, Message]:
         if reply_to_message_id is not None:
-            data['reply_to_message_id'] = reply_to_message_id
+            data["reply_to_message_id"] = reply_to_message_id
 
         # We don't check if (DEFAULT_)None here, so that _put is able to insert the defaults
         # correctly, if necessary
-        data['disable_notification'] = disable_notification
-        data['allow_sending_without_reply'] = allow_sending_without_reply
+        data["disable_notification"] = disable_notification
+        data["allow_sending_without_reply"] = allow_sending_without_reply
 
         if reply_markup is not None:
             if isinstance(reply_markup, ReplyMarkup):
                 # We need to_json() instead of to_dict() here, because reply_markups may be
                 # attached to media messages, which aren't json dumped by utils.request
-                data['reply_markup'] = reply_markup.to_json()
+                data["reply_markup"] = reply_markup.to_json()
             else:
-                data['reply_markup'] = reply_markup
+                data["reply_markup"] = reply_markup
 
-        if data.get('media') and (data['media'].parse_mode == DEFAULT_NONE):
+        if data.get("media") and (data["media"].parse_mode == DEFAULT_NONE):
             if self.defaults:
-                data['media'].parse_mode = DefaultValue.get_value(self.defaults.parse_mode)
+                data["media"].parse_mode = DefaultValue.get_value(self.defaults.parse_mode)
             else:
-                data['media'].parse_mode = None
+                data["media"].parse_mode = None
 
         result = self._post(endpoint, data, timeout=timeout, api_kwargs=api_kwargs)
 
@@ -341,7 +341,7 @@ class Bot(TelegramObject):
         if any(x.isspace() for x in token):
             raise InvalidToken()
 
-        left, sep, _right = token.partition(':')
+        left, sep, _right = token.partition(":")
         if (not sep) or (not left.isdigit()) or (len(left) < 3):
             raise InvalidToken()
 
@@ -397,7 +397,7 @@ class Bot(TelegramObject):
     @property
     def name(self) -> str:
         """:obj:`str`: Bot's @username."""
-        return f'@{self.username}'
+        return f"@{self.username}"
 
     @log
     def get_me(self, timeout: ODVInput[float] = DEFAULT_NONE, api_kwargs: JSONDict = None) -> User:
@@ -418,7 +418,7 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        result = self._post('getMe', timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("getMe", timeout=timeout, api_kwargs=api_kwargs)
 
         self._bot = User.de_json(result, self)  # type: ignore[return-value, arg-type]
 
@@ -437,7 +437,7 @@ class Bot(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
     ) -> Message:
         """Use this method to send text messages.
 
@@ -476,17 +476,17 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {
-            'chat_id': chat_id,
-            'text': text,
-            'parse_mode': parse_mode,
-            'disable_web_page_preview': disable_web_page_preview,
+            "chat_id": chat_id,
+            "text": text,
+            "parse_mode": parse_mode,
+            "disable_web_page_preview": disable_web_page_preview,
         }
 
         if entities:
-            data['entities'] = [me.to_dict() for me in entities]
+            data["entities"] = [me.to_dict() for me in entities]
 
         return self._message(  # type: ignore[return-value]
-            'sendMessage',
+            "sendMessage",
             data,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
@@ -536,9 +536,9 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id, 'message_id': message_id}
+        data: JSONDict = {"chat_id": chat_id, "message_id": message_id}
 
-        result = self._post('deleteMessage', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("deleteMessage", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -578,14 +578,14 @@ class Bot(TelegramObject):
         data: JSONDict = {}
 
         if chat_id:
-            data['chat_id'] = chat_id
+            data["chat_id"] = chat_id
         if from_chat_id:
-            data['from_chat_id'] = from_chat_id
+            data["from_chat_id"] = from_chat_id
         if message_id:
-            data['message_id'] = message_id
+            data["message_id"] = message_id
 
         return self._message(  # type: ignore[return-value]
-            'forwardMessage',
+            "forwardMessage",
             data,
             disable_notification=disable_notification,
             timeout=timeout,
@@ -596,7 +596,7 @@ class Bot(TelegramObject):
     def send_photo(
         self,
         chat_id: Union[int, str],
-        photo: Union[FileInput, 'PhotoSize'],
+        photo: Union[FileInput, "PhotoSize"],
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
@@ -605,7 +605,7 @@ class Bot(TelegramObject):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         filename: str = None,
     ) -> Message:
         """Use this method to send photos.
@@ -660,19 +660,19 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {
-            'chat_id': chat_id,
-            'photo': parse_file_input(photo, PhotoSize, filename=filename),
-            'parse_mode': parse_mode,
+            "chat_id": chat_id,
+            "photo": parse_file_input(photo, PhotoSize, filename=filename),
+            "parse_mode": parse_mode,
         }
 
         if caption:
-            data['caption'] = caption
+            data["caption"] = caption
 
         if caption_entities:
-            data['caption_entities'] = [me.to_dict() for me in caption_entities]
+            data["caption_entities"] = [me.to_dict() for me in caption_entities]
 
         return self._message(  # type: ignore[return-value]
-            'sendPhoto',
+            "sendPhoto",
             data,
             timeout=timeout,
             disable_notification=disable_notification,
@@ -686,7 +686,7 @@ class Bot(TelegramObject):
     def send_audio(
         self,
         chat_id: Union[int, str],
-        audio: Union[FileInput, 'Audio'],
+        audio: Union[FileInput, "Audio"],
         duration: int = None,
         performer: str = None,
         title: str = None,
@@ -699,7 +699,7 @@ class Bot(TelegramObject):
         thumb: FileInput = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         filename: str = None,
     ) -> Message:
         """
@@ -773,27 +773,27 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {
-            'chat_id': chat_id,
-            'audio': parse_file_input(audio, Audio, filename=filename),
-            'parse_mode': parse_mode,
+            "chat_id": chat_id,
+            "audio": parse_file_input(audio, Audio, filename=filename),
+            "parse_mode": parse_mode,
         }
 
         if duration:
-            data['duration'] = duration
+            data["duration"] = duration
         if performer:
-            data['performer'] = performer
+            data["performer"] = performer
         if title:
-            data['title'] = title
+            data["title"] = title
         if caption:
-            data['caption'] = caption
+            data["caption"] = caption
 
         if caption_entities:
-            data['caption_entities'] = [me.to_dict() for me in caption_entities]
+            data["caption_entities"] = [me.to_dict() for me in caption_entities]
         if thumb:
-            data['thumb'] = parse_file_input(thumb, attach=True)
+            data["thumb"] = parse_file_input(thumb, attach=True)
 
         return self._message(  # type: ignore[return-value]
-            'sendAudio',
+            "sendAudio",
             data,
             timeout=timeout,
             disable_notification=disable_notification,
@@ -807,7 +807,7 @@ class Bot(TelegramObject):
     def send_document(
         self,
         chat_id: Union[int, str],
-        document: Union[FileInput, 'Document'],
+        document: Union[FileInput, "Document"],
         filename: str = None,
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
@@ -819,7 +819,7 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
         disable_content_type_detection: bool = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
     ) -> Message:
         """
         Use this method to send general files.
@@ -886,23 +886,23 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {
-            'chat_id': chat_id,
-            'document': parse_file_input(document, Document, filename=filename),
-            'parse_mode': parse_mode,
+            "chat_id": chat_id,
+            "document": parse_file_input(document, Document, filename=filename),
+            "parse_mode": parse_mode,
         }
 
         if caption:
-            data['caption'] = caption
+            data["caption"] = caption
 
         if caption_entities:
-            data['caption_entities'] = [me.to_dict() for me in caption_entities]
+            data["caption_entities"] = [me.to_dict() for me in caption_entities]
         if disable_content_type_detection is not None:
-            data['disable_content_type_detection'] = disable_content_type_detection
+            data["disable_content_type_detection"] = disable_content_type_detection
         if thumb:
-            data['thumb'] = parse_file_input(thumb, attach=True)
+            data["thumb"] = parse_file_input(thumb, attach=True)
 
         return self._message(  # type: ignore[return-value]
-            'sendDocument',
+            "sendDocument",
             data,
             timeout=timeout,
             disable_notification=disable_notification,
@@ -916,7 +916,7 @@ class Bot(TelegramObject):
     def send_sticker(
         self,
         chat_id: Union[int, str],
-        sticker: Union[FileInput, 'Sticker'],
+        sticker: Union[FileInput, "Sticker"],
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
@@ -963,10 +963,10 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id, 'sticker': parse_file_input(sticker, Sticker)}
+        data: JSONDict = {"chat_id": chat_id, "sticker": parse_file_input(sticker, Sticker)}
 
         return self._message(  # type: ignore[return-value]
-            'sendSticker',
+            "sendSticker",
             data,
             timeout=timeout,
             disable_notification=disable_notification,
@@ -980,7 +980,7 @@ class Bot(TelegramObject):
     def send_video(
         self,
         chat_id: Union[int, str],
-        video: Union[FileInput, 'Video'],
+        video: Union[FileInput, "Video"],
         duration: int = None,
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
@@ -994,7 +994,7 @@ class Bot(TelegramObject):
         thumb: FileInput = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         filename: str = None,
     ) -> Message:
         """
@@ -1071,28 +1071,28 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {
-            'chat_id': chat_id,
-            'video': parse_file_input(video, Video, filename=filename),
-            'parse_mode': parse_mode,
+            "chat_id": chat_id,
+            "video": parse_file_input(video, Video, filename=filename),
+            "parse_mode": parse_mode,
         }
 
         if duration:
-            data['duration'] = duration
+            data["duration"] = duration
         if caption:
-            data['caption'] = caption
+            data["caption"] = caption
         if caption_entities:
-            data['caption_entities'] = [me.to_dict() for me in caption_entities]
+            data["caption_entities"] = [me.to_dict() for me in caption_entities]
         if supports_streaming:
-            data['supports_streaming'] = supports_streaming
+            data["supports_streaming"] = supports_streaming
         if width:
-            data['width'] = width
+            data["width"] = width
         if height:
-            data['height'] = height
+            data["height"] = height
         if thumb:
-            data['thumb'] = parse_file_input(thumb, attach=True)
+            data["thumb"] = parse_file_input(thumb, attach=True)
 
         return self._message(  # type: ignore[return-value]
-            'sendVideo',
+            "sendVideo",
             data,
             timeout=timeout,
             disable_notification=disable_notification,
@@ -1106,7 +1106,7 @@ class Bot(TelegramObject):
     def send_video_note(
         self,
         chat_id: Union[int, str],
-        video_note: Union[FileInput, 'VideoNote'],
+        video_note: Union[FileInput, "VideoNote"],
         duration: int = None,
         length: int = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
@@ -1179,19 +1179,19 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {
-            'chat_id': chat_id,
-            'video_note': parse_file_input(video_note, VideoNote, filename=filename),
+            "chat_id": chat_id,
+            "video_note": parse_file_input(video_note, VideoNote, filename=filename),
         }
 
         if duration is not None:
-            data['duration'] = duration
+            data["duration"] = duration
         if length is not None:
-            data['length'] = length
+            data["length"] = length
         if thumb:
-            data['thumb'] = parse_file_input(thumb, attach=True)
+            data["thumb"] = parse_file_input(thumb, attach=True)
 
         return self._message(  # type: ignore[return-value]
-            'sendVideoNote',
+            "sendVideoNote",
             data,
             timeout=timeout,
             disable_notification=disable_notification,
@@ -1205,7 +1205,7 @@ class Bot(TelegramObject):
     def send_animation(
         self,
         chat_id: Union[int, str],
-        animation: Union[FileInput, 'Animation'],
+        animation: Union[FileInput, "Animation"],
         duration: int = None,
         width: int = None,
         height: int = None,
@@ -1218,7 +1218,7 @@ class Bot(TelegramObject):
         timeout: DVInput[float] = DEFAULT_20,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         filename: str = None,
     ) -> Message:
         """
@@ -1289,26 +1289,26 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {
-            'chat_id': chat_id,
-            'animation': parse_file_input(animation, Animation, filename=filename),
-            'parse_mode': parse_mode,
+            "chat_id": chat_id,
+            "animation": parse_file_input(animation, Animation, filename=filename),
+            "parse_mode": parse_mode,
         }
 
         if duration:
-            data['duration'] = duration
+            data["duration"] = duration
         if width:
-            data['width'] = width
+            data["width"] = width
         if height:
-            data['height'] = height
+            data["height"] = height
         if thumb:
-            data['thumb'] = parse_file_input(thumb, attach=True)
+            data["thumb"] = parse_file_input(thumb, attach=True)
         if caption:
-            data['caption'] = caption
+            data["caption"] = caption
         if caption_entities:
-            data['caption_entities'] = [me.to_dict() for me in caption_entities]
+            data["caption_entities"] = [me.to_dict() for me in caption_entities]
 
         return self._message(  # type: ignore[return-value]
-            'sendAnimation',
+            "sendAnimation",
             data,
             timeout=timeout,
             disable_notification=disable_notification,
@@ -1322,7 +1322,7 @@ class Bot(TelegramObject):
     def send_voice(
         self,
         chat_id: Union[int, str],
-        voice: Union[FileInput, 'Voice'],
+        voice: Union[FileInput, "Voice"],
         duration: int = None,
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
@@ -1332,7 +1332,7 @@ class Bot(TelegramObject):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         filename: str = None,
     ) -> Message:
         """
@@ -1392,21 +1392,21 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {
-            'chat_id': chat_id,
-            'voice': parse_file_input(voice, Voice, filename=filename),
-            'parse_mode': parse_mode,
+            "chat_id": chat_id,
+            "voice": parse_file_input(voice, Voice, filename=filename),
+            "parse_mode": parse_mode,
         }
 
         if duration:
-            data['duration'] = duration
+            data["duration"] = duration
         if caption:
-            data['caption'] = caption
+            data["caption"] = caption
 
         if caption_entities:
-            data['caption_entities'] = [me.to_dict() for me in caption_entities]
+            data["caption_entities"] = [me.to_dict() for me in caption_entities]
 
         return self._message(  # type: ignore[return-value]
-            'sendVoice',
+            "sendVoice",
             data,
             timeout=timeout,
             disable_notification=disable_notification,
@@ -1421,7 +1421,7 @@ class Bot(TelegramObject):
         self,
         chat_id: Union[int, str],
         media: List[
-            Union['InputMediaAudio', 'InputMediaDocument', 'InputMediaPhoto', 'InputMediaVideo']
+            Union["InputMediaAudio", "InputMediaDocument", "InputMediaPhoto", "InputMediaVideo"]
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
@@ -1454,13 +1454,13 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
-            'chat_id': chat_id,
-            'media': media,
-            'disable_notification': disable_notification,
-            'allow_sending_without_reply': allow_sending_without_reply,
+            "chat_id": chat_id,
+            "media": media,
+            "disable_notification": disable_notification,
+            "allow_sending_without_reply": allow_sending_without_reply,
         }
 
-        for med in data['media']:
+        for med in data["media"]:
             if med.parse_mode == DEFAULT_NONE:
                 if self.defaults:
                     med.parse_mode = DefaultValue.get_value(self.defaults.parse_mode)
@@ -1468,9 +1468,9 @@ class Bot(TelegramObject):
                     med.parse_mode = None
 
         if reply_to_message_id:
-            data['reply_to_message_id'] = reply_to_message_id
+            data["reply_to_message_id"] = reply_to_message_id
 
-        result = self._post('sendMediaGroup', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("sendMediaGroup", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return Message.de_list(result, self)  # type: ignore
 
@@ -1548,19 +1548,19 @@ class Bot(TelegramObject):
             latitude = location.latitude
             longitude = location.longitude
 
-        data: JSONDict = {'chat_id': chat_id, 'latitude': latitude, 'longitude': longitude}
+        data: JSONDict = {"chat_id": chat_id, "latitude": latitude, "longitude": longitude}
 
         if live_period:
-            data['live_period'] = live_period
+            data["live_period"] = live_period
         if horizontal_accuracy:
-            data['horizontal_accuracy'] = horizontal_accuracy
+            data["horizontal_accuracy"] = horizontal_accuracy
         if heading:
-            data['heading'] = heading
+            data["heading"] = heading
         if proximity_alert_radius:
-            data['proximity_alert_radius'] = proximity_alert_radius
+            data["proximity_alert_radius"] = proximity_alert_radius
 
         return self._message(  # type: ignore[return-value]
-            'sendLocation',
+            "sendLocation",
             data,
             timeout=timeout,
             disable_notification=disable_notification,
@@ -1636,23 +1636,23 @@ class Bot(TelegramObject):
             latitude = location.latitude
             longitude = location.longitude
 
-        data: JSONDict = {'latitude': latitude, 'longitude': longitude}
+        data: JSONDict = {"latitude": latitude, "longitude": longitude}
 
         if chat_id:
-            data['chat_id'] = chat_id
+            data["chat_id"] = chat_id
         if message_id:
-            data['message_id'] = message_id
+            data["message_id"] = message_id
         if inline_message_id:
-            data['inline_message_id'] = inline_message_id
+            data["inline_message_id"] = inline_message_id
         if horizontal_accuracy:
-            data['horizontal_accuracy'] = horizontal_accuracy
+            data["horizontal_accuracy"] = horizontal_accuracy
         if heading:
-            data['heading'] = heading
+            data["heading"] = heading
         if proximity_alert_radius:
-            data['proximity_alert_radius'] = proximity_alert_radius
+            data["proximity_alert_radius"] = proximity_alert_radius
 
         return self._message(
-            'editMessageLiveLocation',
+            "editMessageLiveLocation",
             data,
             timeout=timeout,
             reply_markup=reply_markup,
@@ -1695,14 +1695,14 @@ class Bot(TelegramObject):
         data: JSONDict = {}
 
         if chat_id:
-            data['chat_id'] = chat_id
+            data["chat_id"] = chat_id
         if message_id:
-            data['message_id'] = message_id
+            data["message_id"] = message_id
         if inline_message_id:
-            data['inline_message_id'] = inline_message_id
+            data["inline_message_id"] = inline_message_id
 
         return self._message(
-            'stopMessageLiveLocation',
+            "stopMessageLiveLocation",
             data,
             timeout=timeout,
             reply_markup=reply_markup,
@@ -1794,24 +1794,24 @@ class Bot(TelegramObject):
             google_place_type = venue.google_place_type
 
         data: JSONDict = {
-            'chat_id': chat_id,
-            'latitude': latitude,
-            'longitude': longitude,
-            'address': address,
-            'title': title,
+            "chat_id": chat_id,
+            "latitude": latitude,
+            "longitude": longitude,
+            "address": address,
+            "title": title,
         }
 
         if foursquare_id:
-            data['foursquare_id'] = foursquare_id
+            data["foursquare_id"] = foursquare_id
         if foursquare_type:
-            data['foursquare_type'] = foursquare_type
+            data["foursquare_type"] = foursquare_type
         if google_place_id:
-            data['google_place_id'] = google_place_id
+            data["google_place_id"] = google_place_id
         if google_place_type:
-            data['google_place_type'] = google_place_type
+            data["google_place_type"] = google_place_type
 
         return self._message(  # type: ignore[return-value]
-            'sendVenue',
+            "sendVenue",
             data,
             timeout=timeout,
             disable_notification=disable_notification,
@@ -1886,18 +1886,18 @@ class Bot(TelegramObject):
             vcard = contact.vcard
 
         data: JSONDict = {
-            'chat_id': chat_id,
-            'phone_number': phone_number,
-            'first_name': first_name,
+            "chat_id": chat_id,
+            "phone_number": phone_number,
+            "first_name": first_name,
         }
 
         if last_name:
-            data['last_name'] = last_name
+            data["last_name"] = last_name
         if vcard:
-            data['vcard'] = vcard
+            data["vcard"] = vcard
 
         return self._message(  # type: ignore[return-value]
-            'sendContact',
+            "sendContact",
             data,
             timeout=timeout,
             disable_notification=disable_notification,
@@ -1947,10 +1947,10 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id, 'game_short_name': game_short_name}
+        data: JSONDict = {"chat_id": chat_id, "game_short_name": game_short_name}
 
         return self._message(  # type: ignore[return-value]
-            'sendGame',
+            "sendGame",
             data,
             timeout=timeout,
             disable_notification=disable_notification,
@@ -1993,20 +1993,20 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id, 'action': action}
+        data: JSONDict = {"chat_id": chat_id, "action": action}
 
-        result = self._post('sendChatAction', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("sendChatAction", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
     def _effective_inline_results(  # pylint: disable=R0201
         self,
         results: Union[
-            Sequence['InlineQueryResult'], Callable[[int], Optional[Sequence['InlineQueryResult']]]
+            Sequence["InlineQueryResult"], Callable[[int], Optional[Sequence["InlineQueryResult"]]]
         ],
         next_offset: str = None,
         current_offset: str = None,
-    ) -> Tuple[Sequence['InlineQueryResult'], Optional[str]]:
+    ) -> Tuple[Sequence["InlineQueryResult"], Optional[str]]:
         """
         Builds the effective results from the results input.
         We make this a stand-alone method so tg.ext.ExtBot can wrap it.
@@ -2016,23 +2016,23 @@ class Bot(TelegramObject):
 
         """
         if current_offset is not None and next_offset is not None:
-            raise ValueError('`current_offset` and `next_offset` are mutually exclusive!')
+            raise ValueError("`current_offset` and `next_offset` are mutually exclusive!")
 
         if current_offset is not None:
             # Convert the string input to integer
-            if current_offset == '':
+            if current_offset == "":
                 current_offset_int = 0
             else:
                 current_offset_int = int(current_offset)
 
             # for now set to empty string, stating that there are no more results
             # might change later
-            next_offset = ''
+            next_offset = ""
 
             if callable(results):
                 callable_output = results(current_offset_int)
                 if not callable_output:
-                    effective_results: Sequence['InlineQueryResult'] = []
+                    effective_results: Sequence["InlineQueryResult"] = []
                 else:
                     effective_results = callable_output
                     # the callback *might* return more results on the next call, so we increment
@@ -2060,7 +2060,7 @@ class Bot(TelegramObject):
         self,
         inline_query_id: str,
         results: Union[
-            Sequence['InlineQueryResult'], Callable[[int], Optional[Sequence['InlineQueryResult']]]
+            Sequence["InlineQueryResult"], Callable[[int], Optional[Sequence["InlineQueryResult"]]]
         ],
         cache_time: int = 300,
         is_personal: bool = None,
@@ -2132,14 +2132,14 @@ class Bot(TelegramObject):
         @no_type_check
         def _set_defaults(res):
             # pylint: disable=W0212
-            if hasattr(res, 'parse_mode') and res.parse_mode == DEFAULT_NONE:
+            if hasattr(res, "parse_mode") and res.parse_mode == DEFAULT_NONE:
                 if self.defaults:
                     res.parse_mode = self.defaults.parse_mode
                 else:
                     res.parse_mode = None
-            if hasattr(res, 'input_message_content') and res.input_message_content:
+            if hasattr(res, "input_message_content") and res.input_message_content:
                 if (
-                    hasattr(res.input_message_content, 'parse_mode')
+                    hasattr(res.input_message_content, "parse_mode")
                     and res.input_message_content.parse_mode == DEFAULT_NONE
                 ):
                     if self.defaults:
@@ -2149,7 +2149,7 @@ class Bot(TelegramObject):
                     else:
                         res.input_message_content.parse_mode = None
                 if (
-                    hasattr(res.input_message_content, 'disable_web_page_preview')
+                    hasattr(res.input_message_content, "disable_web_page_preview")
                     and res.input_message_content.disable_web_page_preview == DEFAULT_NONE
                 ):
                     if self.defaults:
@@ -2169,21 +2169,21 @@ class Bot(TelegramObject):
 
         results_dicts = [res.to_dict() for res in effective_results]
 
-        data: JSONDict = {'inline_query_id': inline_query_id, 'results': results_dicts}
+        data: JSONDict = {"inline_query_id": inline_query_id, "results": results_dicts}
 
         if cache_time or cache_time == 0:
-            data['cache_time'] = cache_time
+            data["cache_time"] = cache_time
         if is_personal:
-            data['is_personal'] = is_personal
+            data["is_personal"] = is_personal
         if next_offset is not None:
-            data['next_offset'] = next_offset
+            data["next_offset"] = next_offset
         if switch_pm_text:
-            data['switch_pm_text'] = switch_pm_text
+            data["switch_pm_text"] = switch_pm_text
         if switch_pm_parameter:
-            data['switch_pm_parameter'] = switch_pm_parameter
+            data["switch_pm_parameter"] = switch_pm_parameter
 
         return self._post(  # type: ignore[return-value]
-            'answerInlineQuery',
+            "answerInlineQuery",
             data,
             timeout=timeout,
             api_kwargs=api_kwargs,
@@ -2219,14 +2219,14 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'user_id': user_id}
+        data: JSONDict = {"user_id": user_id}
 
         if offset is not None:
-            data['offset'] = offset
+            data["offset"] = offset
         if limit:
-            data['limit'] = limit
+            data["limit"] = limit
 
-        result = self._post('getUserProfilePhotos', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("getUserProfilePhotos", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return UserProfilePhotos.de_json(result, self)  # type: ignore[return-value, arg-type]
 
@@ -2277,15 +2277,15 @@ class Bot(TelegramObject):
         except AttributeError:
             pass
 
-        data: JSONDict = {'file_id': file_id}
+        data: JSONDict = {"file_id": file_id}
 
-        result = self._post('getFile', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("getFile", data, timeout=timeout, api_kwargs=api_kwargs)
 
-        if result.get('file_path') and not is_local_file(  # type: ignore[union-attr]
-            result['file_path']  # type: ignore[index]
+        if result.get("file_path") and not is_local_file(  # type: ignore[union-attr]
+            result["file_path"]  # type: ignore[index]
         ):
-            result['file_path'] = '{}/{}'.format(  # type: ignore[index]
-                self.base_file_url, result['file_path']  # type: ignore[index]
+            result["file_path"] = "{}/{}".format(  # type: ignore[index]
+                self.base_file_url, result["file_path"]  # type: ignore[index]
             )
 
         return File.de_json(result, self)  # type: ignore[return-value, arg-type]
@@ -2337,19 +2337,19 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id, 'user_id': user_id}
+        data: JSONDict = {"chat_id": chat_id, "user_id": user_id}
 
         if until_date is not None:
             if isinstance(until_date, datetime):
                 until_date = to_timestamp(
                     until_date, tzinfo=self.defaults.tzinfo if self.defaults else None
                 )
-            data['until_date'] = until_date
+            data["until_date"] = until_date
 
         if revoke_messages is not None:
-            data['revoke_messages'] = revoke_messages
+            data["revoke_messages"] = revoke_messages
 
-        result = self._post('banChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("banChatMember", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -2388,12 +2388,12 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id, 'user_id': user_id}
+        data: JSONDict = {"chat_id": chat_id, "user_id": user_id}
 
         if only_if_banned is not None:
-            data['only_if_banned'] = only_if_banned
+            data["only_if_banned"] = only_if_banned
 
-        result = self._post('unbanChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("unbanChatMember", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -2445,18 +2445,18 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'callback_query_id': callback_query_id}
+        data: JSONDict = {"callback_query_id": callback_query_id}
 
         if text:
-            data['text'] = text
+            data["text"] = text
         if show_alert:
-            data['show_alert'] = show_alert
+            data["show_alert"] = show_alert
         if url:
-            data['url'] = url
+            data["url"] = url
         if cache_time is not None:
-            data['cache_time'] = cache_time
+            data["cache_time"] = cache_time
 
-        result = self._post('answerCallbackQuery', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("answerCallbackQuery", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -2472,7 +2472,7 @@ class Bot(TelegramObject):
         reply_markup: InlineKeyboardMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
     ) -> Union[Message, bool]:
         """
         Use this method to edit text and game messages.
@@ -2510,22 +2510,22 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {
-            'text': text,
-            'parse_mode': parse_mode,
-            'disable_web_page_preview': disable_web_page_preview,
+            "text": text,
+            "parse_mode": parse_mode,
+            "disable_web_page_preview": disable_web_page_preview,
         }
 
         if chat_id:
-            data['chat_id'] = chat_id
+            data["chat_id"] = chat_id
         if message_id:
-            data['message_id'] = message_id
+            data["message_id"] = message_id
         if inline_message_id:
-            data['inline_message_id'] = inline_message_id
+            data["inline_message_id"] = inline_message_id
         if entities:
-            data['entities'] = [me.to_dict() for me in entities]
+            data["entities"] = [me.to_dict() for me in entities]
 
         return self._message(
-            'editMessageText',
+            "editMessageText",
             data,
             timeout=timeout,
             reply_markup=reply_markup,
@@ -2543,7 +2543,7 @@ class Bot(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
     ) -> Union[Message, bool]:
         """
         Use this method to edit captions of messages.
@@ -2582,25 +2582,25 @@ class Bot(TelegramObject):
         """
         if inline_message_id is None and (chat_id is None or message_id is None):
             raise ValueError(
-                'edit_message_caption: Both chat_id and message_id are required when '
-                'inline_message_id is not specified'
+                "edit_message_caption: Both chat_id and message_id are required when "
+                "inline_message_id is not specified"
             )
 
-        data: JSONDict = {'parse_mode': parse_mode}
+        data: JSONDict = {"parse_mode": parse_mode}
 
         if caption:
-            data['caption'] = caption
+            data["caption"] = caption
         if caption_entities:
-            data['caption_entities'] = [me.to_dict() for me in caption_entities]
+            data["caption_entities"] = [me.to_dict() for me in caption_entities]
         if chat_id:
-            data['chat_id'] = chat_id
+            data["chat_id"] = chat_id
         if message_id:
-            data['message_id'] = message_id
+            data["message_id"] = message_id
         if inline_message_id:
-            data['inline_message_id'] = inline_message_id
+            data["inline_message_id"] = inline_message_id
 
         return self._message(
-            'editMessageCaption',
+            "editMessageCaption",
             data,
             timeout=timeout,
             reply_markup=reply_markup,
@@ -2610,7 +2610,7 @@ class Bot(TelegramObject):
     @log
     def edit_message_media(
         self,
-        media: 'InputMedia',
+        media: "InputMedia",
         chat_id: Union[str, int] = None,
         message_id: int = None,
         inline_message_id: int = None,
@@ -2652,21 +2652,21 @@ class Bot(TelegramObject):
         """
         if inline_message_id is None and (chat_id is None or message_id is None):
             raise ValueError(
-                'edit_message_media: Both chat_id and message_id are required when '
-                'inline_message_id is not specified'
+                "edit_message_media: Both chat_id and message_id are required when "
+                "inline_message_id is not specified"
             )
 
-        data: JSONDict = {'media': media}
+        data: JSONDict = {"media": media}
 
         if chat_id:
-            data['chat_id'] = chat_id
+            data["chat_id"] = chat_id
         if message_id:
-            data['message_id'] = message_id
+            data["message_id"] = message_id
         if inline_message_id:
-            data['inline_message_id'] = inline_message_id
+            data["inline_message_id"] = inline_message_id
 
         return self._message(
-            'editMessageMedia',
+            "editMessageMedia",
             data,
             timeout=timeout,
             reply_markup=reply_markup,
@@ -2679,7 +2679,7 @@ class Bot(TelegramObject):
         chat_id: Union[str, int] = None,
         message_id: int = None,
         inline_message_id: int = None,
-        reply_markup: Optional['InlineKeyboardMarkup'] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> Union[Message, bool]:
@@ -2713,21 +2713,21 @@ class Bot(TelegramObject):
         """
         if inline_message_id is None and (chat_id is None or message_id is None):
             raise ValueError(
-                'edit_message_reply_markup: Both chat_id and message_id are required when '
-                'inline_message_id is not specified'
+                "edit_message_reply_markup: Both chat_id and message_id are required when "
+                "inline_message_id is not specified"
             )
 
         data: JSONDict = {}
 
         if chat_id:
-            data['chat_id'] = chat_id
+            data["chat_id"] = chat_id
         if message_id:
-            data['message_id'] = message_id
+            data["message_id"] = message_id
         if inline_message_id:
-            data['inline_message_id'] = inline_message_id
+            data["inline_message_id"] = inline_message_id
 
         return self._message(
-            'editMessageReplyMarkup',
+            "editMessageReplyMarkup",
             data,
             timeout=timeout,
             reply_markup=reply_markup,
@@ -2787,14 +2787,14 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'timeout': timeout}
+        data: JSONDict = {"timeout": timeout}
 
         if offset:
-            data['offset'] = offset
+            data["offset"] = offset
         if limit:
-            data['limit'] = limit
+            data["limit"] = limit
         if allowed_updates is not None:
-            data['allowed_updates'] = allowed_updates
+            data["allowed_updates"] = allowed_updates
 
         # Ideally we'd use an aggressive read timeout for the polling. However,
         # * Short polling should return within 2 seconds.
@@ -2804,7 +2804,7 @@ class Bot(TelegramObject):
         result = cast(
             List[JSONDict],
             self._post(
-                'getUpdates',
+                "getUpdates",
                 data,
                 timeout=float(read_latency) + float(timeout),
                 api_kwargs=api_kwargs,
@@ -2812,9 +2812,9 @@ class Bot(TelegramObject):
         )
 
         if result:
-            self.logger.debug('Getting updates: %s', [u['update_id'] for u in result])
+            self.logger.debug("Getting updates: %s", [u["update_id"] for u in result])
         else:
-            self.logger.debug('No new updates found.')
+            self.logger.debug("No new updates found.")
 
         return Update.de_list(result, self)  # type: ignore[return-value]
 
@@ -2892,20 +2892,20 @@ class Bot(TelegramObject):
         .. _`guide to Webhooks`: https://core.telegram.org/bots/webhooks
 
         """
-        data: JSONDict = {'url': url}
+        data: JSONDict = {"url": url}
 
         if certificate:
-            data['certificate'] = parse_file_input(certificate)
+            data["certificate"] = parse_file_input(certificate)
         if max_connections is not None:
-            data['max_connections'] = max_connections
+            data["max_connections"] = max_connections
         if allowed_updates is not None:
-            data['allowed_updates'] = allowed_updates
+            data["allowed_updates"] = allowed_updates
         if ip_address:
-            data['ip_address'] = ip_address
+            data["ip_address"] = ip_address
         if drop_pending_updates:
-            data['drop_pending_updates'] = drop_pending_updates
+            data["drop_pending_updates"] = drop_pending_updates
 
-        result = self._post('setWebhook', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("setWebhook", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -2939,9 +2939,9 @@ class Bot(TelegramObject):
         data = {}
 
         if drop_pending_updates:
-            data['drop_pending_updates'] = drop_pending_updates
+            data["drop_pending_updates"] = drop_pending_updates
 
-        result = self._post('deleteWebhook', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("deleteWebhook", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -2970,9 +2970,9 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id}
+        data: JSONDict = {"chat_id": chat_id}
 
-        result = self._post('leaveChat', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("leaveChat", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -3003,9 +3003,9 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id}
+        data: JSONDict = {"chat_id": chat_id}
 
-        result = self._post('getChat', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("getChat", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return Chat.de_json(result, self)  # type: ignore[return-value, arg-type]
 
@@ -3038,9 +3038,9 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id}
+        data: JSONDict = {"chat_id": chat_id}
 
-        result = self._post('getChatAdministrators', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("getChatAdministrators", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return ChatMember.de_list(result, self)  # type: ignore
 
@@ -3071,9 +3071,9 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id}
+        data: JSONDict = {"chat_id": chat_id}
 
-        result = self._post('getChatMemberCount', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("getChatMemberCount", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -3104,9 +3104,9 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id, 'user_id': user_id}
+        data: JSONDict = {"chat_id": chat_id, "user_id": user_id}
 
-        result = self._post('getChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("getChatMember", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return ChatMember.de_json(result, self)  # type: ignore[return-value, arg-type]
 
@@ -3137,9 +3137,9 @@ class Bot(TelegramObject):
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
         """
-        data: JSONDict = {'chat_id': chat_id, 'sticker_set_name': sticker_set_name}
+        data: JSONDict = {"chat_id": chat_id, "sticker_set_name": sticker_set_name}
 
-        result = self._post('setChatStickerSet', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("setChatStickerSet", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -3167,9 +3167,9 @@ class Bot(TelegramObject):
         Returns:
              :obj:`bool`: On success, :obj:`True` is returned.
         """
-        data: JSONDict = {'chat_id': chat_id}
+        data: JSONDict = {"chat_id": chat_id}
 
-        result = self._post('deleteChatStickerSet', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("deleteChatStickerSet", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -3192,7 +3192,7 @@ class Bot(TelegramObject):
             :class:`telegram.WebhookInfo`
 
         """
-        result = self._post('getWebhookInfo', None, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("getWebhookInfo", None, timeout=timeout, api_kwargs=api_kwargs)
 
         return WebhookInfo.de_json(result, self)  # type: ignore[return-value, arg-type]
 
@@ -3240,21 +3240,21 @@ class Bot(TelegramObject):
                 current score in the chat and force is :obj:`False`.
 
         """
-        data: JSONDict = {'user_id': user_id, 'score': score}
+        data: JSONDict = {"user_id": user_id, "score": score}
 
         if chat_id:
-            data['chat_id'] = chat_id
+            data["chat_id"] = chat_id
         if message_id:
-            data['message_id'] = message_id
+            data["message_id"] = message_id
         if inline_message_id:
-            data['inline_message_id'] = inline_message_id
+            data["inline_message_id"] = inline_message_id
         if force is not None:
-            data['force'] = force
+            data["force"] = force
         if disable_edit_message is not None:
-            data['disable_edit_message'] = disable_edit_message
+            data["disable_edit_message"] = disable_edit_message
 
         return self._message(
-            'setGameScore',
+            "setGameScore",
             data,
             timeout=timeout,
             api_kwargs=api_kwargs,
@@ -3300,16 +3300,16 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'user_id': user_id}
+        data: JSONDict = {"user_id": user_id}
 
         if chat_id:
-            data['chat_id'] = chat_id
+            data["chat_id"] = chat_id
         if message_id:
-            data['message_id'] = message_id
+            data["message_id"] = message_id
         if inline_message_id:
-            data['inline_message_id'] = inline_message_id
+            data["inline_message_id"] = inline_message_id
 
-        result = self._post('getGameHighScores', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("getGameHighScores", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return GameHighScore.de_list(result, self)  # type: ignore
 
@@ -3322,7 +3322,7 @@ class Bot(TelegramObject):
         payload: str,
         provider_token: str,
         currency: str,
-        prices: List['LabeledPrice'],
+        prices: List["LabeledPrice"],
         start_parameter: str = None,
         photo_url: str = None,
         photo_size: int = None,
@@ -3439,50 +3439,50 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {
-            'chat_id': chat_id,
-            'title': title,
-            'description': description,
-            'payload': payload,
-            'provider_token': provider_token,
-            'currency': currency,
-            'prices': [p.to_dict() for p in prices],
+            "chat_id": chat_id,
+            "title": title,
+            "description": description,
+            "payload": payload,
+            "provider_token": provider_token,
+            "currency": currency,
+            "prices": [p.to_dict() for p in prices],
         }
         if max_tip_amount is not None:
-            data['max_tip_amount'] = max_tip_amount
+            data["max_tip_amount"] = max_tip_amount
         if suggested_tip_amounts is not None:
-            data['suggested_tip_amounts'] = suggested_tip_amounts
+            data["suggested_tip_amounts"] = suggested_tip_amounts
         if start_parameter is not None:
-            data['start_parameter'] = start_parameter
+            data["start_parameter"] = start_parameter
         if provider_data is not None:
             if isinstance(provider_data, str):
-                data['provider_data'] = provider_data
+                data["provider_data"] = provider_data
             else:
-                data['provider_data'] = json.dumps(provider_data)
+                data["provider_data"] = json.dumps(provider_data)
         if photo_url is not None:
-            data['photo_url'] = photo_url
+            data["photo_url"] = photo_url
         if photo_size is not None:
-            data['photo_size'] = photo_size
+            data["photo_size"] = photo_size
         if photo_width is not None:
-            data['photo_width'] = photo_width
+            data["photo_width"] = photo_width
         if photo_height is not None:
-            data['photo_height'] = photo_height
+            data["photo_height"] = photo_height
         if need_name is not None:
-            data['need_name'] = need_name
+            data["need_name"] = need_name
         if need_phone_number is not None:
-            data['need_phone_number'] = need_phone_number
+            data["need_phone_number"] = need_phone_number
         if need_email is not None:
-            data['need_email'] = need_email
+            data["need_email"] = need_email
         if need_shipping_address is not None:
-            data['need_shipping_address'] = need_shipping_address
+            data["need_shipping_address"] = need_shipping_address
         if is_flexible is not None:
-            data['is_flexible'] = is_flexible
+            data["is_flexible"] = is_flexible
         if send_phone_number_to_provider is not None:
-            data['send_phone_number_to_provider'] = send_phone_number_to_provider
+            data["send_phone_number_to_provider"] = send_phone_number_to_provider
         if send_email_to_provider is not None:
-            data['send_email_to_provider'] = send_email_to_provider
+            data["send_email_to_provider"] = send_email_to_provider
 
         return self._message(  # type: ignore[return-value]
-            'sendInvoice',
+            "sendInvoice",
             data,
             timeout=timeout,
             disable_notification=disable_notification,
@@ -3536,28 +3536,28 @@ class Bot(TelegramObject):
 
         if ok and (shipping_options is None or error_message is not None):
             raise TelegramError(
-                'answerShippingQuery: If ok is True, shipping_options '
-                'should not be empty and there should not be error_message'
+                "answerShippingQuery: If ok is True, shipping_options "
+                "should not be empty and there should not be error_message"
             )
 
         if not ok and (shipping_options is not None or error_message is None):
             raise TelegramError(
-                'answerShippingQuery: If ok is False, error_message '
-                'should not be empty and there should not be shipping_options'
+                "answerShippingQuery: If ok is False, error_message "
+                "should not be empty and there should not be shipping_options"
             )
 
-        data: JSONDict = {'shipping_query_id': shipping_query_id, 'ok': ok}
+        data: JSONDict = {"shipping_query_id": shipping_query_id, "ok": ok}
 
         if ok:
             if not shipping_options:
                 # not using an assert statement directly here since they are removed in
                 # the optimized bytecode
                 raise AssertionError
-            data['shipping_options'] = [option.to_dict() for option in shipping_options]
+            data["shipping_options"] = [option.to_dict() for option in shipping_options]
         if error_message is not None:
-            data['error_message'] = error_message
+            data["error_message"] = error_message
 
-        result = self._post('answerShippingQuery', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("answerShippingQuery", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -3606,17 +3606,17 @@ class Bot(TelegramObject):
 
         if not (ok ^ (error_message is not None)):  # pylint: disable=C0325
             raise TelegramError(
-                'answerPreCheckoutQuery: If ok is True, there should '
-                'not be error_message; if ok is False, error_message '
-                'should not be empty'
+                "answerPreCheckoutQuery: If ok is True, there should "
+                "not be error_message; if ok is False, error_message "
+                "should not be empty"
             )
 
-        data: JSONDict = {'pre_checkout_query_id': pre_checkout_query_id, 'ok': ok}
+        data: JSONDict = {"pre_checkout_query_id": pre_checkout_query_id, "ok": ok}
 
         if error_message is not None:
-            data['error_message'] = error_message
+            data["error_message"] = error_message
 
-        result = self._post('answerPreCheckoutQuery', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("answerPreCheckoutQuery", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -3665,9 +3665,9 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
-            'chat_id': chat_id,
-            'user_id': user_id,
-            'permissions': permissions.to_dict(),
+            "chat_id": chat_id,
+            "user_id": user_id,
+            "permissions": permissions.to_dict(),
         }
 
         if until_date is not None:
@@ -3675,9 +3675,9 @@ class Bot(TelegramObject):
                 until_date = to_timestamp(
                     until_date, tzinfo=self.defaults.tzinfo if self.defaults else None
                 )
-            data['until_date'] = until_date
+            data["until_date"] = until_date
 
-        result = self._post('restrictChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("restrictChatMember", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -3754,32 +3754,32 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id, 'user_id': user_id}
+        data: JSONDict = {"chat_id": chat_id, "user_id": user_id}
 
         if is_anonymous is not None:
-            data['is_anonymous'] = is_anonymous
+            data["is_anonymous"] = is_anonymous
         if can_change_info is not None:
-            data['can_change_info'] = can_change_info
+            data["can_change_info"] = can_change_info
         if can_post_messages is not None:
-            data['can_post_messages'] = can_post_messages
+            data["can_post_messages"] = can_post_messages
         if can_edit_messages is not None:
-            data['can_edit_messages'] = can_edit_messages
+            data["can_edit_messages"] = can_edit_messages
         if can_delete_messages is not None:
-            data['can_delete_messages'] = can_delete_messages
+            data["can_delete_messages"] = can_delete_messages
         if can_invite_users is not None:
-            data['can_invite_users'] = can_invite_users
+            data["can_invite_users"] = can_invite_users
         if can_restrict_members is not None:
-            data['can_restrict_members'] = can_restrict_members
+            data["can_restrict_members"] = can_restrict_members
         if can_pin_messages is not None:
-            data['can_pin_messages'] = can_pin_messages
+            data["can_pin_messages"] = can_pin_messages
         if can_promote_members is not None:
-            data['can_promote_members'] = can_promote_members
+            data["can_promote_members"] = can_promote_members
         if can_manage_chat is not None:
-            data['can_manage_chat'] = can_manage_chat
+            data["can_manage_chat"] = can_manage_chat
         if can_manage_voice_chats is not None:
-            data['can_manage_voice_chats'] = can_manage_voice_chats
+            data["can_manage_voice_chats"] = can_manage_voice_chats
 
-        result = self._post('promoteChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("promoteChatMember", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -3813,9 +3813,9 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id, 'permissions': permissions.to_dict()}
+        data: JSONDict = {"chat_id": chat_id, "permissions": permissions.to_dict()}
 
-        result = self._post('setChatPermissions', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("setChatPermissions", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -3851,10 +3851,10 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id, 'user_id': user_id, 'custom_title': custom_title}
+        data: JSONDict = {"chat_id": chat_id, "user_id": user_id, "custom_title": custom_title}
 
         result = self._post(
-            'setChatAdministratorCustomTitle', data, timeout=timeout, api_kwargs=api_kwargs
+            "setChatAdministratorCustomTitle", data, timeout=timeout, api_kwargs=api_kwargs
         )
 
         return result  # type: ignore[return-value]
@@ -3894,9 +3894,9 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id}
+        data: JSONDict = {"chat_id": chat_id}
 
-        result = self._post('exportChatInviteLink', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("exportChatInviteLink", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -3939,7 +3939,7 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {
-            'chat_id': chat_id,
+            "chat_id": chat_id,
         }
 
         if expire_date is not None:
@@ -3947,12 +3947,12 @@ class Bot(TelegramObject):
                 expire_date = to_timestamp(
                     expire_date, tzinfo=self.defaults.tzinfo if self.defaults else None
                 )
-            data['expire_date'] = expire_date
+            data["expire_date"] = expire_date
 
         if member_limit is not None:
-            data['member_limit'] = member_limit
+            data["member_limit"] = member_limit
 
-        result = self._post('createChatInviteLink', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("createChatInviteLink", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return ChatInviteLink.de_json(result, self)  # type: ignore[return-value, arg-type]
 
@@ -3995,19 +3995,19 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id, 'invite_link': invite_link}
+        data: JSONDict = {"chat_id": chat_id, "invite_link": invite_link}
 
         if expire_date is not None:
             if isinstance(expire_date, datetime):
                 expire_date = to_timestamp(
                     expire_date, tzinfo=self.defaults.tzinfo if self.defaults else None
                 )
-            data['expire_date'] = expire_date
+            data["expire_date"] = expire_date
 
         if member_limit is not None:
-            data['member_limit'] = member_limit
+            data["member_limit"] = member_limit
 
-        result = self._post('editChatInviteLink', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("editChatInviteLink", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return ChatInviteLink.de_json(result, self)  # type: ignore[return-value, arg-type]
 
@@ -4043,9 +4043,9 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id, 'invite_link': invite_link}
+        data: JSONDict = {"chat_id": chat_id, "invite_link": invite_link}
 
-        result = self._post('revokeChatInviteLink', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("revokeChatInviteLink", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return ChatInviteLink.de_json(result, self)  # type: ignore[return-value, arg-type]
 
@@ -4082,9 +4082,9 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id, 'photo': parse_file_input(photo)}
+        data: JSONDict = {"chat_id": chat_id, "photo": parse_file_input(photo)}
 
-        result = self._post('setChatPhoto', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("setChatPhoto", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -4116,9 +4116,9 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id}
+        data: JSONDict = {"chat_id": chat_id}
 
-        result = self._post('deleteChatPhoto', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("deleteChatPhoto", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -4152,9 +4152,9 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id, 'title': title}
+        data: JSONDict = {"chat_id": chat_id, "title": title}
 
-        result = self._post('setChatTitle', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("setChatTitle", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -4188,12 +4188,12 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id}
+        data: JSONDict = {"chat_id": chat_id}
 
         if description is not None:
-            data['description'] = description
+            data["description"] = description
 
-        result = self._post('setChatDescription', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("setChatDescription", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -4233,13 +4233,13 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {
-            'chat_id': chat_id,
-            'message_id': message_id,
-            'disable_notification': disable_notification,
+            "chat_id": chat_id,
+            "message_id": message_id,
+            "disable_notification": disable_notification,
         }
 
         return self._post(  # type: ignore[return-value]
-            'pinChatMessage', data, timeout=timeout, api_kwargs=api_kwargs
+            "pinChatMessage", data, timeout=timeout, api_kwargs=api_kwargs
         )
 
     @log
@@ -4274,13 +4274,13 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id}
+        data: JSONDict = {"chat_id": chat_id}
 
         if message_id is not None:
-            data['message_id'] = message_id
+            data["message_id"] = message_id
 
         return self._post(  # type: ignore[return-value]
-            'unpinChatMessage', data, timeout=timeout, api_kwargs=api_kwargs
+            "unpinChatMessage", data, timeout=timeout, api_kwargs=api_kwargs
         )
 
     @log
@@ -4312,10 +4312,10 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id}
+        data: JSONDict = {"chat_id": chat_id}
 
         return self._post(  # type: ignore[return-value]
-            'unpinAllChatMessages', data, timeout=timeout, api_kwargs=api_kwargs
+            "unpinAllChatMessages", data, timeout=timeout, api_kwargs=api_kwargs
         )
 
     @log
@@ -4342,9 +4342,9 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'name': name}
+        data: JSONDict = {"name": name}
 
-        result = self._post('getStickerSet', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("getStickerSet", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return StickerSet.de_json(result, self)  # type: ignore[return-value, arg-type]
 
@@ -4387,9 +4387,9 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'user_id': user_id, 'png_sticker': parse_file_input(png_sticker)}
+        data: JSONDict = {"user_id": user_id, "png_sticker": parse_file_input(png_sticker)}
 
-        result = self._post('uploadStickerFile', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("uploadStickerFile", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return File.de_json(result, self)  # type: ignore[return-value, arg-type]
 
@@ -4465,20 +4465,20 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'user_id': user_id, 'name': name, 'title': title, 'emojis': emojis}
+        data: JSONDict = {"user_id": user_id, "name": name, "title": title, "emojis": emojis}
 
         if png_sticker is not None:
-            data['png_sticker'] = parse_file_input(png_sticker)
+            data["png_sticker"] = parse_file_input(png_sticker)
         if tgs_sticker is not None:
-            data['tgs_sticker'] = parse_file_input(tgs_sticker)
+            data["tgs_sticker"] = parse_file_input(tgs_sticker)
         if contains_masks is not None:
-            data['contains_masks'] = contains_masks
+            data["contains_masks"] = contains_masks
         if mask_position is not None:
             # We need to_json() instead of to_dict() here, because we're sending a media
             # message here, which isn't json dumped by utils.request
-            data['mask_position'] = mask_position.to_json()
+            data["mask_position"] = mask_position.to_json()
 
-        result = self._post('createNewStickerSet', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("createNewStickerSet", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -4547,18 +4547,18 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'user_id': user_id, 'name': name, 'emojis': emojis}
+        data: JSONDict = {"user_id": user_id, "name": name, "emojis": emojis}
 
         if png_sticker is not None:
-            data['png_sticker'] = parse_file_input(png_sticker)
+            data["png_sticker"] = parse_file_input(png_sticker)
         if tgs_sticker is not None:
-            data['tgs_sticker'] = parse_file_input(tgs_sticker)
+            data["tgs_sticker"] = parse_file_input(tgs_sticker)
         if mask_position is not None:
             # We need to_json() instead of to_dict() here, because we're sending a media
             # message here, which isn't json dumped by utils.request
-            data['mask_position'] = mask_position.to_json()
+            data["mask_position"] = mask_position.to_json()
 
-        result = self._post('addStickerToSet', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("addStickerToSet", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -4588,10 +4588,10 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'sticker': sticker, 'position': position}
+        data: JSONDict = {"sticker": sticker, "position": position}
 
         result = self._post(
-            'setStickerPositionInSet', data, timeout=timeout, api_kwargs=api_kwargs
+            "setStickerPositionInSet", data, timeout=timeout, api_kwargs=api_kwargs
         )
 
         return result  # type: ignore[return-value]
@@ -4620,9 +4620,9 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'sticker': sticker}
+        data: JSONDict = {"sticker": sticker}
 
-        result = self._post('deleteStickerFromSet', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("deleteStickerFromSet", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -4669,12 +4669,12 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'name': name, 'user_id': user_id}
+        data: JSONDict = {"name": name, "user_id": user_id}
 
         if thumb is not None:
-            data['thumb'] = parse_file_input(thumb)
+            data["thumb"] = parse_file_input(thumb)
 
-        result = self._post('setStickerSetThumb', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("setStickerSetThumb", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -4713,9 +4713,9 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'user_id': user_id, 'errors': [error.to_dict() for error in errors]}
+        data: JSONDict = {"user_id": user_id, "errors": [error.to_dict() for error in errors]}
 
-        result = self._post('setPassportDataErrors', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("setPassportDataErrors", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -4740,7 +4740,7 @@ class Bot(TelegramObject):
         close_date: Union[int, datetime] = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        explanation_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        explanation_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
     ) -> Message:
         """
         Use this method to send a native poll.
@@ -4800,37 +4800,37 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {
-            'chat_id': chat_id,
-            'question': question,
-            'options': options,
-            'explanation_parse_mode': explanation_parse_mode,
+            "chat_id": chat_id,
+            "question": question,
+            "options": options,
+            "explanation_parse_mode": explanation_parse_mode,
         }
 
         if not is_anonymous:
-            data['is_anonymous'] = is_anonymous
+            data["is_anonymous"] = is_anonymous
         if type:
-            data['type'] = type
+            data["type"] = type
         if allows_multiple_answers:
-            data['allows_multiple_answers'] = allows_multiple_answers
+            data["allows_multiple_answers"] = allows_multiple_answers
         if correct_option_id is not None:
-            data['correct_option_id'] = correct_option_id
+            data["correct_option_id"] = correct_option_id
         if is_closed:
-            data['is_closed'] = is_closed
+            data["is_closed"] = is_closed
         if explanation:
-            data['explanation'] = explanation
+            data["explanation"] = explanation
         if explanation_entities:
-            data['explanation_entities'] = [me.to_dict() for me in explanation_entities]
+            data["explanation_entities"] = [me.to_dict() for me in explanation_entities]
         if open_period:
-            data['open_period'] = open_period
+            data["open_period"] = open_period
         if close_date:
             if isinstance(close_date, datetime):
                 close_date = to_timestamp(
                     close_date, tzinfo=self.defaults.tzinfo if self.defaults else None
                 )
-            data['close_date'] = close_date
+            data["close_date"] = close_date
 
         return self._message(  # type: ignore[return-value]
-            'sendPoll',
+            "sendPoll",
             data,
             timeout=timeout,
             disable_notification=disable_notification,
@@ -4872,17 +4872,17 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id, 'message_id': message_id}
+        data: JSONDict = {"chat_id": chat_id, "message_id": message_id}
 
         if reply_markup:
             if isinstance(reply_markup, ReplyMarkup):
                 # We need to_json() instead of to_dict() here, because reply_markups may be
                 # attached to media messages, which aren't json dumped by utils.request
-                data['reply_markup'] = reply_markup.to_json()
+                data["reply_markup"] = reply_markup.to_json()
             else:
-                data['reply_markup'] = reply_markup
+                data["reply_markup"] = reply_markup
 
-        result = self._post('stopPoll', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("stopPoll", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return Poll.de_json(result, self)  # type: ignore[return-value, arg-type]
 
@@ -4934,14 +4934,14 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {
-            'chat_id': chat_id,
+            "chat_id": chat_id,
         }
 
         if emoji:
-            data['emoji'] = emoji
+            data["emoji"] = emoji
 
         return self._message(  # type: ignore[return-value]
-            'sendDice',
+            "sendDice",
             data,
             timeout=timeout,
             disable_notification=disable_notification,
@@ -4990,12 +4990,12 @@ class Bot(TelegramObject):
         data: JSONDict = {}
 
         if scope:
-            data['scope'] = scope.to_dict()
+            data["scope"] = scope.to_dict()
 
         if language_code:
-            data['language_code'] = language_code
+            data["language_code"] = language_code
 
-        result = self._post('getMyCommands', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("getMyCommands", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return BotCommand.de_list(result, self)  # type: ignore[return-value,arg-type]
 
@@ -5043,15 +5043,15 @@ class Bot(TelegramObject):
         """
         cmds = [c if isinstance(c, BotCommand) else BotCommand(c[0], c[1]) for c in commands]
 
-        data: JSONDict = {'commands': [c.to_dict() for c in cmds]}
+        data: JSONDict = {"commands": [c.to_dict() for c in cmds]}
 
         if scope:
-            data['scope'] = scope.to_dict()
+            data["scope"] = scope.to_dict()
 
         if language_code:
-            data['language_code'] = language_code
+            data["language_code"] = language_code
 
-        result = self._post('setMyCommands', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("setMyCommands", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -5093,12 +5093,12 @@ class Bot(TelegramObject):
         data: JSONDict = {}
 
         if scope:
-            data['scope'] = scope.to_dict()
+            data["scope"] = scope.to_dict()
 
         if language_code:
-            data['language_code'] = language_code
+            data["language_code"] = language_code
 
-        result = self._post('deleteMyCommands', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("deleteMyCommands", data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -5123,7 +5123,7 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        return self._post('logOut', timeout=timeout)  # type: ignore[return-value]
+        return self._post("logOut", timeout=timeout)  # type: ignore[return-value]
 
     @log
     def close(self, timeout: ODVInput[float] = DEFAULT_NONE) -> bool:
@@ -5145,7 +5145,7 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        return self._post('close', timeout=timeout)  # type: ignore[return-value]
+        return self._post("close", timeout=timeout)  # type: ignore[return-value]
 
     @log
     def copy_message(
@@ -5155,7 +5155,7 @@ class Bot(TelegramObject):
         message_id: int,
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[Tuple['MessageEntity', ...], List['MessageEntity']] = None,
+        caption_entities: Union[Tuple["MessageEntity", ...], List["MessageEntity"]] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
@@ -5203,36 +5203,36 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
-            'chat_id': chat_id,
-            'from_chat_id': from_chat_id,
-            'message_id': message_id,
-            'parse_mode': parse_mode,
-            'disable_notification': disable_notification,
-            'allow_sending_without_reply': allow_sending_without_reply,
+            "chat_id": chat_id,
+            "from_chat_id": from_chat_id,
+            "message_id": message_id,
+            "parse_mode": parse_mode,
+            "disable_notification": disable_notification,
+            "allow_sending_without_reply": allow_sending_without_reply,
         }
         if caption is not None:
-            data['caption'] = caption
+            data["caption"] = caption
         if caption_entities:
-            data['caption_entities'] = caption_entities
+            data["caption_entities"] = caption_entities
         if reply_to_message_id:
-            data['reply_to_message_id'] = reply_to_message_id
+            data["reply_to_message_id"] = reply_to_message_id
         if reply_markup:
             if isinstance(reply_markup, ReplyMarkup):
                 # We need to_json() instead of to_dict() here, because reply_markups may be
                 # attached to media messages, which aren't json dumped by utils.request
-                data['reply_markup'] = reply_markup.to_json()
+                data["reply_markup"] = reply_markup.to_json()
             else:
-                data['reply_markup'] = reply_markup
+                data["reply_markup"] = reply_markup
 
-        result = self._post('copyMessage', data, timeout=timeout, api_kwargs=api_kwargs)
+        result = self._post("copyMessage", data, timeout=timeout, api_kwargs=api_kwargs)
         return MessageId.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data: JSONDict = {'id': self.id, 'username': self.username, 'first_name': self.first_name}
+        data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
 
         if self.last_name:
-            data['last_name'] = self.last_name
+            data["last_name"] = self.last_name
 
         return data
 

@@ -67,15 +67,15 @@ class InlineQueryResultContact(InlineQueryResult):
     """
 
     __slots__ = (
-        'reply_markup',
-        'thumb_width',
-        'thumb_height',
-        'vcard',
-        'first_name',
-        'last_name',
-        'phone_number',
-        'input_message_content',
-        'thumb_url',
+        "reply_markup",
+        "thumb_width",
+        "thumb_height",
+        "vcard",
+        "first_name",
+        "last_name",
+        "phone_number",
+        "input_message_content",
+        "thumb_url",
     )
 
     def __init__(
@@ -84,8 +84,8 @@ class InlineQueryResultContact(InlineQueryResult):
         phone_number: str,
         first_name: str,
         last_name: str = None,
-        reply_markup: 'ReplyMarkup' = None,
-        input_message_content: 'InputMessageContent' = None,
+        reply_markup: "ReplyMarkup" = None,
+        input_message_content: "InputMessageContent" = None,
         thumb_url: str = None,
         thumb_width: int = None,
         thumb_height: int = None,
@@ -93,7 +93,7 @@ class InlineQueryResultContact(InlineQueryResult):
         **_kwargs: Any,
     ):
         # Required
-        super().__init__('contact', id)
+        super().__init__("contact", id)
         self.phone_number = phone_number
         self.first_name = first_name
 

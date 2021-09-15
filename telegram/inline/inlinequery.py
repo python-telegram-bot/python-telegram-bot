@@ -71,7 +71,7 @@ class InlineQuery(TelegramObject):
 
     """
 
-    __slots__ = ('bot', 'location', 'chat_type', 'id', 'offset', 'from_user', 'query')
+    __slots__ = ("bot", "location", "chat_type", "id", "offset", "from_user", "query")
 
     def __init__(
         self,
@@ -80,7 +80,7 @@ class InlineQuery(TelegramObject):
         query: str,
         offset: str,
         location: Location = None,
-        bot: 'Bot' = None,
+        bot: "Bot" = None,
         chat_type: str = None,
         **_kwargs: Any,
     ):
@@ -98,22 +98,22 @@ class InlineQuery(TelegramObject):
         self._id_attrs = (self.id,)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['InlineQuery']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["InlineQuery"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['from_user'] = User.de_json(data.get('from'), bot)
-        data['location'] = Location.de_json(data.get('location'), bot)
+        data["from_user"] = User.de_json(data.get("from"), bot)
+        data["location"] = Location.de_json(data.get("location"), bot)
 
         return cls(bot=bot, **data)
 
     def answer(
         self,
         results: Union[
-            Sequence['InlineQueryResult'], Callable[[int], Optional[Sequence['InlineQueryResult']]]
+            Sequence["InlineQueryResult"], Callable[[int], Optional[Sequence["InlineQueryResult"]]]
         ],
         cache_time: int = 300,
         is_personal: bool = None,
@@ -146,7 +146,7 @@ class InlineQuery(TelegramObject):
         if current_offset and auto_pagination:
             # We raise TypeError instead of ValueError for backwards compatibility with versions
             # which didn't check this here but let Python do the checking
-            raise TypeError('current_offset and auto_pagination are mutually exclusive!')
+            raise TypeError("current_offset and auto_pagination are mutually exclusive!")
         return self.bot.answer_inline_query(
             inline_query_id=self.id,
             current_offset=self.offset if auto_pagination else current_offset,

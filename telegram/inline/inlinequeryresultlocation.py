@@ -80,18 +80,18 @@ class InlineQueryResultLocation(InlineQueryResult):
     """
 
     __slots__ = (
-        'longitude',
-        'reply_markup',
-        'thumb_width',
-        'thumb_height',
-        'heading',
-        'title',
-        'live_period',
-        'proximity_alert_radius',
-        'input_message_content',
-        'latitude',
-        'horizontal_accuracy',
-        'thumb_url',
+        "longitude",
+        "reply_markup",
+        "thumb_width",
+        "thumb_height",
+        "heading",
+        "title",
+        "live_period",
+        "proximity_alert_radius",
+        "input_message_content",
+        "latitude",
+        "horizontal_accuracy",
+        "thumb_url",
     )
 
     def __init__(
@@ -101,8 +101,8 @@ class InlineQueryResultLocation(InlineQueryResult):
         longitude: float,
         title: str,
         live_period: int = None,
-        reply_markup: 'ReplyMarkup' = None,
-        input_message_content: 'InputMessageContent' = None,
+        reply_markup: "ReplyMarkup" = None,
+        input_message_content: "InputMessageContent" = None,
         thumb_url: str = None,
         thumb_width: int = None,
         thumb_height: int = None,
@@ -112,7 +112,7 @@ class InlineQueryResultLocation(InlineQueryResult):
         **_kwargs: Any,
     ):
         # Required
-        super().__init__('location', id)
+        super().__init__("location", id)
         self.latitude = float(latitude)
         self.longitude = float(longitude)
         self.title = title

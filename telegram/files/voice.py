@@ -59,12 +59,12 @@ class Voice(TelegramObject):
     """
 
     __slots__ = (
-        'bot',
-        'file_id',
-        'file_size',
-        'duration',
-        'mime_type',
-        'file_unique_id',
+        "bot",
+        "file_id",
+        "file_size",
+        "duration",
+        "mime_type",
+        "file_unique_id",
     )
 
     def __init__(
@@ -74,7 +74,7 @@ class Voice(TelegramObject):
         duration: int,
         mime_type: str = None,
         file_size: int = None,
-        bot: 'Bot' = None,
+        bot: "Bot" = None,
         **_kwargs: Any,
     ):
         # Required
@@ -90,7 +90,7 @@ class Voice(TelegramObject):
 
     def get_file(
         self, timeout: ODVInput[float] = DEFAULT_NONE, api_kwargs: JSONDict = None
-    ) -> 'File':
+    ) -> "File":
         """Convenience wrapper over :attr:`telegram.Bot.get_file`
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.get_file`.

@@ -93,19 +93,19 @@ class InlineQueryResultVideo(InlineQueryResult):
     """
 
     __slots__ = (
-        'video_url',
-        'reply_markup',
-        'caption_entities',
-        'caption',
-        'title',
-        'description',
-        'video_duration',
-        'parse_mode',
-        'mime_type',
-        'input_message_content',
-        'video_height',
-        'video_width',
-        'thumb_url',
+        "video_url",
+        "reply_markup",
+        "caption_entities",
+        "caption",
+        "title",
+        "description",
+        "video_duration",
+        "parse_mode",
+        "mime_type",
+        "input_message_content",
+        "video_height",
+        "video_width",
+        "thumb_url",
     )
 
     def __init__(
@@ -120,15 +120,15 @@ class InlineQueryResultVideo(InlineQueryResult):
         video_height: int = None,
         video_duration: int = None,
         description: str = None,
-        reply_markup: 'ReplyMarkup' = None,
-        input_message_content: 'InputMessageContent' = None,
+        reply_markup: "ReplyMarkup" = None,
+        input_message_content: "InputMessageContent" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
         **_kwargs: Any,
     ):
 
         # Required
-        super().__init__('video', id)
+        super().__init__("video", id)
         self.video_url = video_url
         self.mime_type = mime_type
         self.thumb_url = thumb_url

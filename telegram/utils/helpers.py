@@ -67,7 +67,7 @@ except ImportError:
 _signames = {
     v: k
     for k, v in reversed(sorted(vars(signal).items()))
-    if k.startswith('SIG') and not k.startswith('SIG_')
+    if k.startswith("SIG") and not k.startswith("SIG_")
 }
 
 
@@ -94,11 +94,11 @@ def is_local_file(obj: Optional[Union[str, Path]]) -> bool:
 
 
 def parse_file_input(
-    file_input: Union[FileInput, 'TelegramObject'],
-    tg_type: Type['TelegramObject'] = None,
+    file_input: Union[FileInput, "TelegramObject"],
+    tg_type: Type["TelegramObject"] = None,
     attach: bool = None,
     filename: str = None,
-) -> Union[str, 'InputFile', Any]:
+) -> Union[str, "InputFile", Any]:
     """
     Parses input for sending files:
 
@@ -128,7 +128,7 @@ def parse_file_input(
     # Importing on file-level yields cyclic Import Errors
     from telegram import InputFile  # pylint: disable=C0415
 
-    if isinstance(file_input, str) and file_input.startswith('file://'):
+    if isinstance(file_input, str) and file_input.startswith("file://"):
         return file_input
     if isinstance(file_input, (str, Path)):
         if is_local_file(file_input):
@@ -160,18 +160,18 @@ def escape_markdown(text: str, version: int = 1, entity_type: str = None) -> str
             ``version=2``, will be ignored else.
     """
     if int(version) == 1:
-        escape_chars = r'_*`['
+        escape_chars = r"_*`["
     elif int(version) == 2:
-        if entity_type in ['pre', 'code']:
-            escape_chars = r'\`'
-        elif entity_type == 'text_link':
-            escape_chars = r'\)'
+        if entity_type in ["pre", "code"]:
+            escape_chars = r"\`"
+        elif entity_type == "text_link":
+            escape_chars = r"\)"
         else:
-            escape_chars = r'_*[]()~`>#+-=|{}.!'
+            escape_chars = r"_*[]()~`>#+-=|{}.!"
     else:
-        raise ValueError('Markdown version must be either 1 or 2!')
+        raise ValueError("Markdown version must be either 1 or 2!")
 
-    return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
+    return re.sub(f"([{re.escape(escape_chars)}])", r"\\\1", text)
 
 
 # -------- date/time related helpers --------
@@ -251,7 +251,7 @@ def to_float_timestamp(
     if reference_timestamp is None:
         reference_timestamp = time.time()
     elif isinstance(time_object, dtm.datetime):
-        raise ValueError('t is an (absolute) datetime while reference_timestamp is not None')
+        raise ValueError("t is an (absolute) datetime while reference_timestamp is not None")
 
     if isinstance(time_object, dtm.timedelta):
         return reference_timestamp + time_object.total_seconds()
@@ -281,7 +281,7 @@ def to_float_timestamp(
             time_object = _localize(time_object, tzinfo)
         return _datetime_to_float_timestamp(time_object)
 
-    raise TypeError(f'Unable to convert {type(time_object).__name__} object to timestamp')
+    raise TypeError(f"Unable to convert {type(time_object).__name__} object to timestamp")
 
 
 def to_timestamp(
@@ -350,10 +350,10 @@ def mention_markdown(user_id: Union[int, str], name: str, version: int = 1) -> s
     Returns:
         :obj:`str`: The inline mention for the user as Markdown.
     """
-    return f'[{escape_markdown(name, version=version)}](tg://user?id={user_id})'
+    return f"[{escape_markdown(name, version=version)}](tg://user?id={user_id})"
 
 
-def effective_message_type(entity: Union['Message', 'Update']) -> Optional[str]:
+def effective_message_type(entity: Union["Message", "Update"]) -> Optional[str]:
     """
     Extracts the type of message as a string identifier from a :class:`telegram.Message` or a
     :class:`telegram.Update`.
@@ -410,25 +410,25 @@ def create_deep_linked_url(bot_username: str, payload: str = None, group: bool =
     if bot_username is None or len(bot_username) <= 3:
         raise ValueError("You must provide a valid bot_username.")
 
-    base_url = f'https://t.me/{bot_username}'
+    base_url = f"https://t.me/{bot_username}"
     if not payload:
         return base_url
 
     if len(payload) > 64:
         raise ValueError("The deep-linking payload must not exceed 64 characters.")
 
-    if not re.match(r'^[A-Za-z0-9_-]+$', payload):
+    if not re.match(r"^[A-Za-z0-9_-]+$", payload):
         raise ValueError(
             "Only the following characters are allowed for deep-linked "
             "URLs: A-Z, a-z, 0-9, _ and -"
         )
 
     if group:
-        key = 'startgroup'
+        key = "startgroup"
     else:
-        key = 'start'
+        key = "start"
 
-    return f'{base_url}?{key}={payload}'
+    return f"{base_url}?{key}={payload}"
 
 
 def encode_conversations_to_json(conversations: Dict[str, Dict[Tuple, object]]) -> str:
@@ -492,8 +492,8 @@ def decode_user_chat_data_from_json(data: str) -> DefaultDict[int, Dict[object, 
     return tmp
 
 
-DVType = TypeVar('DVType', bound=object)
-OT = TypeVar('OT', bound=object)
+DVType = TypeVar("DVType", bound=object)
+OT = TypeVar("OT", bound=object)
 
 
 class DefaultValue(Generic[DVType]):
@@ -544,7 +544,7 @@ class DefaultValue(Generic[DVType]):
 
     """
 
-    __slots__ = ('value',)
+    __slots__ = ("value",)
 
     def __init__(self, value: DVType = None):
         self.value = value
@@ -554,7 +554,7 @@ class DefaultValue(Generic[DVType]):
 
     @overload
     @staticmethod
-    def get_value(obj: 'DefaultValue[OT]') -> OT:
+    def get_value(obj: "DefaultValue[OT]") -> OT:
         ...
 
     @overload
@@ -563,7 +563,7 @@ class DefaultValue(Generic[DVType]):
         ...
 
     @staticmethod
-    def get_value(obj: Union[OT, 'DefaultValue[OT]']) -> OT:
+    def get_value(obj: Union[OT, "DefaultValue[OT]"]) -> OT:
         """
         Shortcut for::
 
@@ -579,7 +579,7 @@ class DefaultValue(Generic[DVType]):
 
     # This is mostly here for readability during debugging
     def __str__(self) -> str:
-        return f'DefaultValue({self.value})'
+        return f"DefaultValue({self.value})"
 
     # This is here to have the default instances nicely rendered in the docs
     def __repr__(self) -> str:

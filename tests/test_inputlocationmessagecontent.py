@@ -21,7 +21,7 @@ import pytest
 from telegram import InputLocationMessageContent, Location
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def input_location_message_content():
     return InputLocationMessageContent(
         TestInputLocationMessageContent.latitude,
@@ -44,7 +44,7 @@ class TestInputLocationMessageContent:
     def test_slot_behaviour(self, input_location_message_content, mro_slots):
         inst = input_location_message_content
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, input_location_message_content):
@@ -60,27 +60,27 @@ class TestInputLocationMessageContent:
 
         assert isinstance(input_location_message_content_dict, dict)
         assert (
-            input_location_message_content_dict['latitude']
+            input_location_message_content_dict["latitude"]
             == input_location_message_content.latitude
         )
         assert (
-            input_location_message_content_dict['longitude']
+            input_location_message_content_dict["longitude"]
             == input_location_message_content.longitude
         )
         assert (
-            input_location_message_content_dict['live_period']
+            input_location_message_content_dict["live_period"]
             == input_location_message_content.live_period
         )
         assert (
-            input_location_message_content_dict['horizontal_accuracy']
+            input_location_message_content_dict["horizontal_accuracy"]
             == input_location_message_content.horizontal_accuracy
         )
         assert (
-            input_location_message_content_dict['heading']
+            input_location_message_content_dict["heading"]
             == input_location_message_content.heading
         )
         assert (
-            input_location_message_content_dict['proximity_alert_radius']
+            input_location_message_content_dict["proximity_alert_radius"]
             == input_location_message_content.proximity_alert_radius
         )
 

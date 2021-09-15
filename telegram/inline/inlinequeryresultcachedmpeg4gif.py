@@ -74,13 +74,13 @@ class InlineQueryResultCachedMpeg4Gif(InlineQueryResult):
     """
 
     __slots__ = (
-        'reply_markup',
-        'caption_entities',
-        'mpeg4_file_id',
-        'caption',
-        'title',
-        'parse_mode',
-        'input_message_content',
+        "reply_markup",
+        "caption_entities",
+        "mpeg4_file_id",
+        "caption",
+        "title",
+        "parse_mode",
+        "input_message_content",
     )
 
     def __init__(
@@ -89,14 +89,14 @@ class InlineQueryResultCachedMpeg4Gif(InlineQueryResult):
         mpeg4_file_id: str,
         title: str = None,
         caption: str = None,
-        reply_markup: 'ReplyMarkup' = None,
-        input_message_content: 'InputMessageContent' = None,
+        reply_markup: "ReplyMarkup" = None,
+        input_message_content: "InputMessageContent" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
         **_kwargs: Any,
     ):
         # Required
-        super().__init__('mpeg4_gif', id)
+        super().__init__("mpeg4_gif", id)
         self.mpeg4_file_id = mpeg4_file_id
 
         # Optionals

@@ -21,7 +21,7 @@ import pytest
 from telegram import LabeledPrice, ShippingOption, Voice
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def shipping_option():
     return ShippingOption(
         TestShippingOption.id_, TestShippingOption.title, TestShippingOption.prices
@@ -29,14 +29,14 @@ def shipping_option():
 
 
 class TestShippingOption:
-    id_ = 'id'
-    title = 'title'
-    prices = [LabeledPrice('Fish Container', 100), LabeledPrice('Premium Fish Container', 1000)]
+    id_ = "id"
+    title = "title"
+    prices = [LabeledPrice("Fish Container", 100), LabeledPrice("Premium Fish Container", 1000)]
 
     def test_slot_behaviour(self, shipping_option, mro_slots):
         inst = shipping_option
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, shipping_option):
@@ -48,17 +48,17 @@ class TestShippingOption:
         shipping_option_dict = shipping_option.to_dict()
 
         assert isinstance(shipping_option_dict, dict)
-        assert shipping_option_dict['id'] == shipping_option.id
-        assert shipping_option_dict['title'] == shipping_option.title
-        assert shipping_option_dict['prices'][0] == shipping_option.prices[0].to_dict()
-        assert shipping_option_dict['prices'][1] == shipping_option.prices[1].to_dict()
+        assert shipping_option_dict["id"] == shipping_option.id
+        assert shipping_option_dict["title"] == shipping_option.title
+        assert shipping_option_dict["prices"][0] == shipping_option.prices[0].to_dict()
+        assert shipping_option_dict["prices"][1] == shipping_option.prices[1].to_dict()
 
     def test_equality(self):
         a = ShippingOption(self.id_, self.title, self.prices)
         b = ShippingOption(self.id_, self.title, self.prices)
-        c = ShippingOption(self.id_, '', [])
+        c = ShippingOption(self.id_, "", [])
         d = ShippingOption(0, self.title, self.prices)
-        e = Voice(self.id_, 'someid', 0)
+        e = Voice(self.id_, "someid", 0)
 
         assert a == b
         assert hash(a) == hash(b)

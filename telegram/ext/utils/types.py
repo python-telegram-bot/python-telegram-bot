@@ -40,22 +40,22 @@ CDCData = Tuple[List[Tuple[str, float, Dict[str, Any]]], Dict[str, str]]
     .. versionadded:: 13.6
 """
 
-CCT = TypeVar('CCT', bound='CallbackContext')
+CCT = TypeVar("CCT", bound="CallbackContext")
 """An instance of :class:`telegram.ext.CallbackContext` or a custom subclass.
 
 .. versionadded:: 13.6
 """
-UD = TypeVar('UD')
+UD = TypeVar("UD")
 """Type of the user data for a single user.
 
 .. versionadded:: 13.6
 """
-CD = TypeVar('CD')
+CD = TypeVar("CD")
 """Type of the chat data for a single user.
 
 .. versionadded:: 13.6
 """
-BD = TypeVar('BD')
+BD = TypeVar("BD")
 """Type of the bot data.
 
 .. versionadded:: 13.6

@@ -26,7 +26,7 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def inline_query_result_game():
     return InlineQueryResultGame(
         TestInlineQueryResultGame.id_,
@@ -36,15 +36,15 @@ def inline_query_result_game():
 
 
 class TestInlineQueryResultGame:
-    id_ = 'id'
-    type_ = 'game'
-    game_short_name = 'game short name'
-    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
+    id_ = "id"
+    type_ = "game"
+    game_short_name = "game short name"
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
     def test_slot_behaviour(self, inline_query_result_game, mro_slots):
         inst = inline_query_result_game
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, inline_query_result_game):
@@ -57,23 +57,23 @@ class TestInlineQueryResultGame:
         inline_query_result_game_dict = inline_query_result_game.to_dict()
 
         assert isinstance(inline_query_result_game_dict, dict)
-        assert inline_query_result_game_dict['type'] == inline_query_result_game.type
-        assert inline_query_result_game_dict['id'] == inline_query_result_game.id
+        assert inline_query_result_game_dict["type"] == inline_query_result_game.type
+        assert inline_query_result_game_dict["id"] == inline_query_result_game.id
         assert (
-            inline_query_result_game_dict['game_short_name']
+            inline_query_result_game_dict["game_short_name"]
             == inline_query_result_game.game_short_name
         )
         assert (
-            inline_query_result_game_dict['reply_markup']
+            inline_query_result_game_dict["reply_markup"]
             == inline_query_result_game.reply_markup.to_dict()
         )
 
     def test_equality(self):
         a = InlineQueryResultGame(self.id_, self.game_short_name)
         b = InlineQueryResultGame(self.id_, self.game_short_name)
-        c = InlineQueryResultGame(self.id_, '')
-        d = InlineQueryResultGame('', self.game_short_name)
-        e = InlineQueryResultVoice(self.id_, '', '')
+        c = InlineQueryResultGame(self.id_, "")
+        d = InlineQueryResultGame("", self.game_short_name)
+        e = InlineQueryResultVoice(self.id_, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

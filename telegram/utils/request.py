@@ -47,8 +47,8 @@ except ImportError:  # pragma: no cover
         from urllib3.util.timeout import Timeout  # type: ignore[no-redef]
 
         warnings.warn(
-            'python-telegram-bot is using upstream urllib3. This is allowed but not '
-            'supported by python-telegram-bot maintainers.'
+            "python-telegram-bot is using upstream urllib3. This is allowed but not "
+            "supported by python-telegram-bot maintainers."
         )
     except ImportError:
         warnings.warn(
@@ -78,16 +78,16 @@ def _render_part(self: RequestField, name: str, value: str) -> str:  # pylint: d
     Content-Disposition headers since telegram servers don't understand it. Instead just escape
     \\ and " and replace any \n and \r with a space.
     """
-    value = value.replace('\\', '\\\\').replace('"', '\\"')
-    value = value.replace('\r', ' ').replace('\n', ' ')
+    value = value.replace("\\", "\\\\").replace('"', '\\"')
+    value = value.replace("\r", " ").replace("\n", " ")
     return f'{name}="{value}"'
 
 
 RequestField._render_part = _render_part  # type: ignore  # pylint: disable=W0212
 
-logging.getLogger('telegram.vendor.ptb_urllib3.urllib3').setLevel(logging.WARNING)
+logging.getLogger("telegram.vendor.ptb_urllib3.urllib3").setLevel(logging.WARNING)
 
-USER_AGENT = 'Python Telegram Bot (https://github.com/python-telegram-bot/python-telegram-bot)'
+USER_AGENT = "Python Telegram Bot (https://github.com/python-telegram-bot/python-telegram-bot)"
 
 
 class Request:
@@ -111,7 +111,7 @@ class Request:
 
     """
 
-    __slots__ = ('_connect_timeout', '_con_pool_size', '_con_pool')
+    __slots__ = ("_connect_timeout", "_con_pool_size", "_con_pool")
 
     def __init__(
         self,
@@ -131,7 +131,7 @@ class Request:
         ]
 
         # TODO: Support other platforms like mac and windows.
-        if 'linux' in sys.platform:
+        if "linux" in sys.platform:
             sockopts.append(
                 (socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 120)  # pylint: disable=no-member
             )
@@ -146,7 +146,7 @@ class Request:
 
         kwargs = dict(
             maxsize=con_pool_size,
-            cert_reqs='CERT_REQUIRED',
+            cert_reqs="CERT_REQUIRED",
             ca_certs=certifi.where(),
             socket_options=sockopts,
             timeout=urllib3.Timeout(connect=self._connect_timeout, read=read_timeout, total=None),
@@ -159,12 +159,12 @@ class Request:
         # * None (if no proxy is configured)
 
         if not proxy_url:
-            proxy_url = os.environ.get('HTTPS_PROXY') or os.environ.get('https_proxy')
+            proxy_url = os.environ.get("HTTPS_PROXY") or os.environ.get("https_proxy")
 
         self._con_pool: Union[
             urllib3.PoolManager,
             appengine.AppEngineManager,
-            'SOCKSProxyManager',  # noqa: F821
+            "SOCKSProxyManager",  # noqa: F821
             urllib3.ProxyManager,
         ] = None  # type: ignore
         if not proxy_url:
@@ -175,12 +175,12 @@ class Request:
                 self._con_pool = urllib3.PoolManager(**kwargs)
         else:
             kwargs.update(urllib3_proxy_kwargs)
-            if proxy_url.startswith('socks'):
+            if proxy_url.startswith("socks"):
                 try:
                     # pylint: disable=C0415
                     from telegram.vendor.ptb_urllib3.urllib3.contrib.socks import SOCKSProxyManager
                 except ImportError as exc:
-                    raise RuntimeError('PySocks is missing') from exc
+                    raise RuntimeError("PySocks is missing") from exc
                 self._con_pool = SOCKSProxyManager(proxy_url, **kwargs)
             else:
                 mgr = urllib3.proxy_from_url(proxy_url, **kwargs)
@@ -208,26 +208,26 @@ class Request:
             dict: A JSON parsed as Python dict with results - on error this dict will be empty.
 
         """
-        decoded_s = json_data.decode('utf-8', 'replace')
+        decoded_s = json_data.decode("utf-8", "replace")
         try:
             data = json.loads(decoded_s)
         except ValueError as exc:
-            raise TelegramError('Invalid server response') from exc
+            raise TelegramError("Invalid server response") from exc
 
-        if not data.get('ok'):  # pragma: no cover
-            description = data.get('description')
-            parameters = data.get('parameters')
+        if not data.get("ok"):  # pragma: no cover
+            description = data.get("description")
+            parameters = data.get("parameters")
             if parameters:
-                migrate_to_chat_id = parameters.get('migrate_to_chat_id')
+                migrate_to_chat_id = parameters.get("migrate_to_chat_id")
                 if migrate_to_chat_id:
                     raise ChatMigrated(migrate_to_chat_id)
-                retry_after = parameters.get('retry_after')
+                retry_after = parameters.get("retry_after")
                 if retry_after:
                     raise RetryAfter(retry_after)
             if description:
                 return description
 
-        return data['result']
+        return data["result"]
 
     def _request_wrapper(self, *args: object, **kwargs: Any) -> bytes:
         """Wraps urllib3 request for handling known exceptions.
@@ -245,11 +245,11 @@ class Request:
         """
         # Make sure to hint Telegram servers that we reuse connections by sending
         # "Connection: keep-alive" in the HTTP headers.
-        if 'headers' not in kwargs:
-            kwargs['headers'] = {}
-        kwargs['headers']['connection'] = 'keep-alive'
+        if "headers" not in kwargs:
+            kwargs["headers"] = {}
+        kwargs["headers"]["connection"] = "keep-alive"
         # Also set our user agent
-        kwargs['headers']['user-agent'] = USER_AGENT
+        kwargs["headers"]["user-agent"] = USER_AGENT
 
         try:
             resp = self._con_pool.request(*args, **kwargs)
@@ -258,7 +258,7 @@ class Request:
         except urllib3.exceptions.HTTPError as error:
             # HTTPError must come last as its the base urllib3 exception class
             # TODO: do something smart here; for now just raise NetworkError
-            raise NetworkError(f'urllib3 HTTPError {error}') from error
+            raise NetworkError(f"urllib3 HTTPError {error}") from error
 
         if 200 <= resp.status <= 299:
             # 200-299 range are HTTP success statuses
@@ -267,7 +267,7 @@ class Request:
         try:
             message = str(self._parse(resp.data))
         except ValueError:
-            message = 'Unknown HTTPError'
+            message = "Unknown HTTPError"
 
         if resp.status in (401, 403):
             raise Unauthorized(message)
@@ -279,12 +279,12 @@ class Request:
             raise Conflict(message)
         if resp.status == 413:
             raise NetworkError(
-                'File too large. Check telegram api limits '
-                'https://core.telegram.org/bots/api#senddocument'
+                "File too large. Check telegram api limits "
+                "https://core.telegram.org/bots/api#senddocument"
             )
         if resp.status == 502:
-            raise NetworkError('Bad Gateway')
-        raise NetworkError(f'{message} ({resp.status})')
+            raise NetworkError("Bad Gateway")
+        raise NetworkError(f"{message} ({resp.status})")
 
     def post(self, url: str, data: JSONDict, timeout: float = None) -> Union[JSONDict, bool]:
         """Request an URL.
@@ -303,7 +303,7 @@ class Request:
         urlopen_kwargs = {}
 
         if timeout is not None:
-            urlopen_kwargs['timeout'] = Timeout(read=timeout, connect=self._connect_timeout)
+            urlopen_kwargs["timeout"] = Timeout(read=timeout, connect=self._connect_timeout)
 
         if data is None:
             data = {}
@@ -320,7 +320,7 @@ class Request:
             elif isinstance(val, (float, int)):
                 # Urllib3 doesn't like floats it seems
                 data[key] = str(val)
-            elif key == 'media':
+            elif key == "media":
                 files = True
                 # List of media
                 if isinstance(val, list):
@@ -352,13 +352,13 @@ class Request:
 
         # Use multipart upload if we're uploading files, otherwise use JSON
         if files:
-            result = self._request_wrapper('POST', url, fields=data, **urlopen_kwargs)
+            result = self._request_wrapper("POST", url, fields=data, **urlopen_kwargs)
         else:
             result = self._request_wrapper(
-                'POST',
+                "POST",
                 url,
-                body=json.dumps(data).encode('utf-8'),
-                headers={'Content-Type': 'application/json'},
+                body=json.dumps(data).encode("utf-8"),
+                headers={"Content-Type": "application/json"},
                 **urlopen_kwargs,
             )
 
@@ -376,9 +376,9 @@ class Request:
         """
         urlopen_kwargs = {}
         if timeout is not None:
-            urlopen_kwargs['timeout'] = Timeout(read=timeout, connect=self._connect_timeout)
+            urlopen_kwargs["timeout"] = Timeout(read=timeout, connect=self._connect_timeout)
 
-        return self._request_wrapper('GET', url, **urlopen_kwargs)
+        return self._request_wrapper("GET", url, **urlopen_kwargs)
 
     def download(self, url: str, filename: str, timeout: float = None) -> None:
         """Download a file by its URL.
@@ -392,5 +392,5 @@ class Request:
 
         """
         buf = self.retrieve(url, timeout=timeout)
-        with open(filename, 'wb') as fobj:
+        with open(filename, "wb") as fobj:
             fobj.write(buf)

@@ -24,7 +24,7 @@ from typing import Callable, List, Optional, Tuple, TypeVar, Union
 
 from telegram.utils.types import JSONDict
 
-RT = TypeVar('RT')
+RT = TypeVar("RT")
 
 
 logger = logging.getLogger(__name__)
@@ -54,14 +54,14 @@ class Promise:
     """
 
     __slots__ = (
-        'pooled_function',
-        'args',
-        'kwargs',
-        'update',
-        'done',
-        '_done_callback',
-        '_result',
-        '_exception',
+        "pooled_function",
+        "args",
+        "kwargs",
+        "update",
+        "done",
+        "_done_callback",
+        "_result",
+        "_exception",
     )
 
     def __init__(

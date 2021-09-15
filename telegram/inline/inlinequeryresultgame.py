@@ -45,17 +45,17 @@ class InlineQueryResultGame(InlineQueryResult):
 
     """
 
-    __slots__ = ('reply_markup', 'game_short_name')
+    __slots__ = ("reply_markup", "game_short_name")
 
     def __init__(
         self,
         id: str,  # pylint: disable=W0622
         game_short_name: str,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: "ReplyMarkup" = None,
         **_kwargs: Any,
     ):
         # Required
-        super().__init__('game', id)
+        super().__init__("game", id)
         self.id = id  # pylint: disable=W0622
         self.game_short_name = game_short_name
 

@@ -28,7 +28,7 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def inline_query_result_video():
     return InlineQueryResultVideo(
         TestInlineQueryResultVideo.id_,
@@ -49,26 +49,26 @@ def inline_query_result_video():
 
 
 class TestInlineQueryResultVideo:
-    id_ = 'id'
-    type_ = 'video'
-    video_url = 'video url'
-    mime_type = 'mime type'
+    id_ = "id"
+    type_ = "video"
+    video_url = "video url"
+    mime_type = "mime type"
     video_width = 10
     video_height = 15
     video_duration = 15
-    thumb_url = 'thumb url'
-    title = 'title'
-    caption = 'caption'
-    parse_mode = 'Markdown'
+    thumb_url = "thumb url"
+    title = "title"
+    caption = "caption"
+    parse_mode = "Markdown"
     caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
-    description = 'description'
-    input_message_content = InputTextMessageContent('input_message_content')
-    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
+    description = "description"
+    input_message_content = InputTextMessageContent("input_message_content")
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
     def test_slot_behaviour(self, inline_query_result_video, mro_slots):
         inst = inline_query_result_video
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, inline_query_result_video):
@@ -95,37 +95,37 @@ class TestInlineQueryResultVideo:
         inline_query_result_video_dict = inline_query_result_video.to_dict()
 
         assert isinstance(inline_query_result_video_dict, dict)
-        assert inline_query_result_video_dict['type'] == inline_query_result_video.type
-        assert inline_query_result_video_dict['id'] == inline_query_result_video.id
-        assert inline_query_result_video_dict['video_url'] == inline_query_result_video.video_url
-        assert inline_query_result_video_dict['mime_type'] == inline_query_result_video.mime_type
+        assert inline_query_result_video_dict["type"] == inline_query_result_video.type
+        assert inline_query_result_video_dict["id"] == inline_query_result_video.id
+        assert inline_query_result_video_dict["video_url"] == inline_query_result_video.video_url
+        assert inline_query_result_video_dict["mime_type"] == inline_query_result_video.mime_type
         assert (
-            inline_query_result_video_dict['video_width'] == inline_query_result_video.video_width
+            inline_query_result_video_dict["video_width"] == inline_query_result_video.video_width
         )
         assert (
-            inline_query_result_video_dict['video_height']
+            inline_query_result_video_dict["video_height"]
             == inline_query_result_video.video_height
         )
         assert (
-            inline_query_result_video_dict['video_duration']
+            inline_query_result_video_dict["video_duration"]
             == inline_query_result_video.video_duration
         )
-        assert inline_query_result_video_dict['thumb_url'] == inline_query_result_video.thumb_url
-        assert inline_query_result_video_dict['title'] == inline_query_result_video.title
+        assert inline_query_result_video_dict["thumb_url"] == inline_query_result_video.thumb_url
+        assert inline_query_result_video_dict["title"] == inline_query_result_video.title
         assert (
-            inline_query_result_video_dict['description'] == inline_query_result_video.description
+            inline_query_result_video_dict["description"] == inline_query_result_video.description
         )
-        assert inline_query_result_video_dict['caption'] == inline_query_result_video.caption
-        assert inline_query_result_video_dict['parse_mode'] == inline_query_result_video.parse_mode
-        assert inline_query_result_video_dict['caption_entities'] == [
+        assert inline_query_result_video_dict["caption"] == inline_query_result_video.caption
+        assert inline_query_result_video_dict["parse_mode"] == inline_query_result_video.parse_mode
+        assert inline_query_result_video_dict["caption_entities"] == [
             ce.to_dict() for ce in inline_query_result_video.caption_entities
         ]
         assert (
-            inline_query_result_video_dict['input_message_content']
+            inline_query_result_video_dict["input_message_content"]
             == inline_query_result_video.input_message_content.to_dict()
         )
         assert (
-            inline_query_result_video_dict['reply_markup']
+            inline_query_result_video_dict["reply_markup"]
             == inline_query_result_video.reply_markup.to_dict()
         )
 
@@ -136,9 +136,9 @@ class TestInlineQueryResultVideo:
         b = InlineQueryResultVideo(
             self.id_, self.video_url, self.mime_type, self.thumb_url, self.title
         )
-        c = InlineQueryResultVideo(self.id_, '', self.mime_type, self.thumb_url, self.title)
-        d = InlineQueryResultVideo('', self.video_url, self.mime_type, self.thumb_url, self.title)
-        e = InlineQueryResultVoice(self.id_, '', '')
+        c = InlineQueryResultVideo(self.id_, "", self.mime_type, self.thumb_url, self.title)
+        d = InlineQueryResultVideo("", self.video_url, self.mime_type, self.thumb_url, self.title)
+        e = InlineQueryResultVoice(self.id_, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

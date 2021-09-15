@@ -147,26 +147,26 @@ class Chat(TelegramObject):
     """
 
     __slots__ = (
-        'bio',
-        'id',
-        'type',
-        'last_name',
-        'bot',
-        'sticker_set_name',
-        'slow_mode_delay',
-        'location',
-        'first_name',
-        'permissions',
-        'invite_link',
-        'pinned_message',
-        'description',
-        'can_set_sticker_set',
-        'username',
-        'title',
-        'photo',
-        'linked_chat_id',
-        'all_members_are_administrators',
-        'message_auto_delete_time',
+        "bio",
+        "id",
+        "type",
+        "last_name",
+        "bot",
+        "sticker_set_name",
+        "slow_mode_delay",
+        "location",
+        "first_name",
+        "permissions",
+        "invite_link",
+        "pinned_message",
+        "description",
+        "can_set_sticker_set",
+        "username",
+        "title",
+        "photo",
+        "linked_chat_id",
+        "all_members_are_administrators",
+        "message_auto_delete_time",
     )
 
     SENDER: ClassVar[str] = constants.CHAT_SENDER
@@ -191,11 +191,11 @@ class Chat(TelegramObject):
         username: str = None,
         first_name: str = None,
         last_name: str = None,
-        bot: 'Bot' = None,
+        bot: "Bot" = None,
         photo: ChatPhoto = None,
         description: str = None,
         invite_link: str = None,
-        pinned_message: 'Message' = None,
+        pinned_message: "Message" = None,
         permissions: ChatPermissions = None,
         sticker_set_name: str = None,
         can_set_sticker_set: bool = None,
@@ -215,7 +215,7 @@ class Chat(TelegramObject):
         self.first_name = first_name
         self.last_name = last_name
         # TODO: Remove (also from tests), when Telegram drops this completely
-        self.all_members_are_administrators = _kwargs.get('all_members_are_administrators')
+        self.all_members_are_administrators = _kwargs.get("all_members_are_administrators")
         self.photo = photo
         self.bio = bio
         self.description = description
@@ -249,7 +249,7 @@ class Chat(TelegramObject):
         if not self.first_name:
             return None
         if self.last_name:
-            return f'{self.first_name} {self.last_name}'
+            return f"{self.first_name} {self.last_name}"
         return self.first_name
 
     @property
@@ -262,19 +262,19 @@ class Chat(TelegramObject):
         return None
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Chat']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["Chat"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['photo'] = ChatPhoto.de_json(data.get('photo'), bot)
+        data["photo"] = ChatPhoto.de_json(data.get("photo"), bot)
         from telegram import Message  # pylint: disable=C0415
 
-        data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
-        data['permissions'] = ChatPermissions.de_json(data.get('permissions'), bot)
-        data['location'] = ChatLocation.de_json(data.get('location'), bot)
+        data["pinned_message"] = Message.de_json(data.get("pinned_message"), bot)
+        data["permissions"] = ChatPermissions.de_json(data.get("permissions"), bot)
+        data["location"] = ChatLocation.de_json(data.get("location"), bot)
 
         return cls(bot=bot, **data)
 
@@ -297,7 +297,7 @@ class Chat(TelegramObject):
 
     def get_administrators(
         self, timeout: ODVInput[float] = DEFAULT_NONE, api_kwargs: JSONDict = None
-    ) -> List['ChatMember']:
+    ) -> List["ChatMember"]:
         """Shortcut for::
 
             bot.get_chat_administrators(update.effective_chat.id, *args, **kwargs)
@@ -342,7 +342,7 @@ class Chat(TelegramObject):
         user_id: Union[str, int],
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> 'ChatMember':
+    ) -> "ChatMember":
         """Shortcut for::
 
             bot.get_chat_member(update.effective_chat.id, *args, **kwargs)
@@ -625,12 +625,12 @@ class Chat(TelegramObject):
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: "ReplyMarkup" = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
-    ) -> 'Message':
+        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+    ) -> "Message":
         """Shortcut for::
 
             bot.send_message(update.effective_chat.id, *args, **kwargs)
@@ -658,14 +658,14 @@ class Chat(TelegramObject):
     def send_media_group(
         self,
         media: List[
-            Union['InputMediaAudio', 'InputMediaDocument', 'InputMediaPhoto', 'InputMediaVideo']
+            Union["InputMediaAudio", "InputMediaDocument", "InputMediaPhoto", "InputMediaVideo"]
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         timeout: DVInput[float] = DEFAULT_20,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-    ) -> List['Message']:
+    ) -> List["Message"]:
         """Shortcut for::
 
             bot.send_media_group(update.effective_chat.id, *args, **kwargs)
@@ -714,18 +714,18 @@ class Chat(TelegramObject):
 
     def send_photo(
         self,
-        photo: Union[FileInput, 'PhotoSize'],
+        photo: Union[FileInput, "PhotoSize"],
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: "ReplyMarkup" = None,
         timeout: DVInput[float] = DEFAULT_20,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         filename: str = None,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
             bot.send_photo(update.effective_chat.id, *args, **kwargs)
@@ -758,13 +758,13 @@ class Chat(TelegramObject):
         last_name: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: "ReplyMarkup" = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
-        contact: 'Contact' = None,
+        contact: "Contact" = None,
         vcard: str = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
             bot.send_contact(update.effective_chat.id, *args, **kwargs)
@@ -792,22 +792,22 @@ class Chat(TelegramObject):
 
     def send_audio(
         self,
-        audio: Union[FileInput, 'Audio'],
+        audio: Union[FileInput, "Audio"],
         duration: int = None,
         performer: str = None,
         title: str = None,
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: "ReplyMarkup" = None,
         timeout: DVInput[float] = DEFAULT_20,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         thumb: FileInput = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         filename: str = None,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
             bot.send_audio(update.effective_chat.id, *args, **kwargs)
@@ -839,20 +839,20 @@ class Chat(TelegramObject):
 
     def send_document(
         self,
-        document: Union[FileInput, 'Document'],
+        document: Union[FileInput, "Document"],
         filename: str = None,
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: "ReplyMarkup" = None,
         timeout: DVInput[float] = DEFAULT_20,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         thumb: FileInput = None,
         api_kwargs: JSONDict = None,
         disable_content_type_detection: bool = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
-    ) -> 'Message':
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+    ) -> "Message":
         """Shortcut for::
 
             bot.send_document(update.effective_chat.id, *args, **kwargs)
@@ -884,12 +884,12 @@ class Chat(TelegramObject):
         self,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: "ReplyMarkup" = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         emoji: str = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
             bot.send_dice(update.effective_chat.id, *args, **kwargs)
@@ -916,11 +916,11 @@ class Chat(TelegramObject):
         game_short_name: str,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'InlineKeyboardMarkup' = None,
+        reply_markup: "InlineKeyboardMarkup" = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
             bot.send_game(update.effective_chat.id, *args, **kwargs)
@@ -949,7 +949,7 @@ class Chat(TelegramObject):
         payload: str,
         provider_token: str,
         currency: str,
-        prices: List['LabeledPrice'],
+        prices: List["LabeledPrice"],
         start_parameter: str = None,
         photo_url: str = None,
         photo_size: int = None,
@@ -962,7 +962,7 @@ class Chat(TelegramObject):
         is_flexible: bool = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'InlineKeyboardMarkup' = None,
+        reply_markup: "InlineKeyboardMarkup" = None,
         provider_data: Union[str, object] = None,
         send_phone_number_to_provider: bool = None,
         send_email_to_provider: bool = None,
@@ -971,7 +971,7 @@ class Chat(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         max_tip_amount: int = None,
         suggested_tip_amounts: List[int] = None,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
             bot.send_invoice(update.effective_chat.id, *args, **kwargs)
@@ -1027,16 +1027,16 @@ class Chat(TelegramObject):
         longitude: float = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: "ReplyMarkup" = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
-        location: 'Location' = None,
+        location: "Location" = None,
         live_period: int = None,
         api_kwargs: JSONDict = None,
         horizontal_accuracy: float = None,
         heading: int = None,
         proximity_alert_radius: int = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
             bot.send_location(update.effective_chat.id, *args, **kwargs)
@@ -1066,7 +1066,7 @@ class Chat(TelegramObject):
 
     def send_animation(
         self,
-        animation: Union[FileInput, 'Animation'],
+        animation: Union[FileInput, "Animation"],
         duration: int = None,
         width: int = None,
         height: int = None,
@@ -1075,13 +1075,13 @@ class Chat(TelegramObject):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: "ReplyMarkup" = None,
         timeout: DVInput[float] = DEFAULT_20,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         filename: str = None,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
             bot.send_animation(update.effective_chat.id, *args, **kwargs)
@@ -1113,14 +1113,14 @@ class Chat(TelegramObject):
 
     def send_sticker(
         self,
-        sticker: Union[FileInput, 'Sticker'],
+        sticker: Union[FileInput, "Sticker"],
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: "ReplyMarkup" = None,
         timeout: DVInput[float] = DEFAULT_20,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
             bot.send_sticker(update.effective_chat.id, *args, **kwargs)
@@ -1151,15 +1151,15 @@ class Chat(TelegramObject):
         foursquare_id: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: "ReplyMarkup" = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
-        venue: 'Venue' = None,
+        venue: "Venue" = None,
         foursquare_type: str = None,
         api_kwargs: JSONDict = None,
         google_place_id: str = None,
         google_place_type: str = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
             bot.send_venue(update.effective_chat.id, *args, **kwargs)
@@ -1191,12 +1191,12 @@ class Chat(TelegramObject):
 
     def send_video(
         self,
-        video: Union[FileInput, 'Video'],
+        video: Union[FileInput, "Video"],
         duration: int = None,
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: "ReplyMarkup" = None,
         timeout: DVInput[float] = DEFAULT_20,
         width: int = None,
         height: int = None,
@@ -1205,9 +1205,9 @@ class Chat(TelegramObject):
         thumb: FileInput = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         filename: str = None,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
             bot.send_video(update.effective_chat.id, *args, **kwargs)
@@ -1240,18 +1240,18 @@ class Chat(TelegramObject):
 
     def send_video_note(
         self,
-        video_note: Union[FileInput, 'VideoNote'],
+        video_note: Union[FileInput, "VideoNote"],
         duration: int = None,
         length: int = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: "ReplyMarkup" = None,
         timeout: DVInput[float] = DEFAULT_20,
         thumb: FileInput = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         filename: str = None,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
             bot.send_video_note(update.effective_chat.id, *args, **kwargs)
@@ -1279,19 +1279,19 @@ class Chat(TelegramObject):
 
     def send_voice(
         self,
-        voice: Union[FileInput, 'Voice'],
+        voice: Union[FileInput, "Voice"],
         duration: int = None,
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: "ReplyMarkup" = None,
         timeout: DVInput[float] = DEFAULT_20,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         filename: str = None,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
             bot.send_voice(update.effective_chat.id, *args, **kwargs)
@@ -1330,7 +1330,7 @@ class Chat(TelegramObject):
         is_closed: bool = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: "ReplyMarkup" = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         explanation: str = None,
         explanation_parse_mode: ODVInput[str] = DEFAULT_NONE,
@@ -1338,8 +1338,8 @@ class Chat(TelegramObject):
         close_date: Union[int, datetime] = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        explanation_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
-    ) -> 'Message':
+        explanation_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+    ) -> "Message":
         """Shortcut for::
 
             bot.send_poll(update.effective_chat.id, *args, **kwargs)
@@ -1378,14 +1378,14 @@ class Chat(TelegramObject):
         message_id: int,
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[Tuple['MessageEntity', ...], List['MessageEntity']] = None,
+        caption_entities: Union[Tuple["MessageEntity", ...], List["MessageEntity"]] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: "ReplyMarkup" = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> 'MessageId':
+    ) -> "MessageId":
         """Shortcut for::
 
             bot.copy_message(chat_id=update.effective_chat.id, *args, **kwargs)
@@ -1417,14 +1417,14 @@ class Chat(TelegramObject):
         message_id: int,
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[Tuple['MessageEntity', ...], List['MessageEntity']] = None,
+        caption_entities: Union[Tuple["MessageEntity", ...], List["MessageEntity"]] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: "ReplyMarkup" = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> 'MessageId':
+    ) -> "MessageId":
         """Shortcut for::
 
             bot.copy_message(from_chat_id=update.effective_chat.id, *args, **kwargs)
@@ -1478,7 +1478,7 @@ class Chat(TelegramObject):
         member_limit: int = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> 'ChatInviteLink':
+    ) -> "ChatInviteLink":
         """Shortcut for::
 
             bot.create_chat_invite_link(chat_id=update.effective_chat.id, *args, **kwargs)
@@ -1507,7 +1507,7 @@ class Chat(TelegramObject):
         member_limit: int = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> 'ChatInviteLink':
+    ) -> "ChatInviteLink":
         """Shortcut for::
 
             bot.edit_chat_invite_link(chat_id=update.effective_chat.id, *args, **kwargs)
@@ -1535,7 +1535,7 @@ class Chat(TelegramObject):
         invite_link: str,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> 'ChatInviteLink':
+    ) -> "ChatInviteLink":
         """Shortcut for::
 
             bot.revoke_chat_invite_link(chat_id=update.effective_chat.id, *args, **kwargs)

@@ -57,15 +57,15 @@ class Defaults:
     """
 
     __slots__ = (
-        '_timeout',
-        '_tzinfo',
-        '_disable_web_page_preview',
-        '_run_async',
-        '_quote',
-        '_disable_notification',
-        '_allow_sending_without_reply',
-        '_parse_mode',
-        '_api_defaults',
+        "_timeout",
+        "_tzinfo",
+        "_disable_web_page_preview",
+        "_run_async",
+        "_quote",
+        "_disable_notification",
+        "_allow_sending_without_reply",
+        "_parse_mode",
+        "_api_defaults",
     )
 
     def __init__(
@@ -93,18 +93,18 @@ class Defaults:
         # Gather all defaults that actually have a default value
         self._api_defaults = {}
         for kwarg in (
-            'parse_mode',
-            'explanation_parse_mode',
-            'disable_notification',
-            'disable_web_page_preview',
-            'allow_sending_without_reply',
+            "parse_mode",
+            "explanation_parse_mode",
+            "disable_notification",
+            "disable_web_page_preview",
+            "allow_sending_without_reply",
         ):
             value = getattr(self, kwarg)
             if value not in [None, DEFAULT_NONE]:
                 self._api_defaults[kwarg] = value
         # Special casing, as None is a valid default value
         if self._timeout != DEFAULT_NONE:
-            self._api_defaults['timeout'] = self._timeout
+            self._api_defaults["timeout"] = self._timeout
 
     @property
     def api_defaults(self) -> Dict[str, Any]:  # skip-cq: PY-D0003

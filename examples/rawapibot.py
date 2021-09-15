@@ -21,7 +21,7 @@ def main() -> NoReturn:
     """Run the bot."""
     global UPDATE_ID
     # Telegram Bot Authorization Token
-    bot = telegram.Bot('TOKEN')
+    bot = telegram.Bot("TOKEN")
 
     # get the first pending update_id, this is so we can skip over it in case
     # we get an "Unauthorized" exception.
@@ -30,7 +30,7 @@ def main() -> NoReturn:
     except IndexError:
         UPDATE_ID = None
 
-    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
     while True:
         try:
@@ -56,5 +56,5 @@ def echo(bot: telegram.Bot) -> None:
             update.message.reply_text(update.message.text)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

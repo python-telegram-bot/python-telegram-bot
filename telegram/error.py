@@ -41,21 +41,21 @@ def _lstrip_str(in_s: str, lstr: str) -> str:
 class TelegramError(Exception):
     """Base class for Telegram errors."""
 
-    __slots__ = ('message',)
+    __slots__ = ("message",)
 
     def __init__(self, message: str):
         super().__init__()
 
-        msg = _lstrip_str(message, 'Error: ')
-        msg = _lstrip_str(msg, '[Error]: ')
-        msg = _lstrip_str(msg, 'Bad Request: ')
+        msg = _lstrip_str(message, "Error: ")
+        msg = _lstrip_str(msg, "[Error]: ")
+        msg = _lstrip_str(msg, "Bad Request: ")
         if msg != message:
             # api_error - capitalize the msg...
             msg = msg.capitalize()
         self.message = msg
 
     def __str__(self) -> str:
-        return '%s' % self.message
+        return "%s" % self.message
 
     def __reduce__(self) -> Tuple[type, Tuple[str]]:
         return self.__class__, (self.message,)
@@ -73,7 +73,7 @@ class InvalidToken(TelegramError):
     __slots__ = ()
 
     def __init__(self) -> None:
-        super().__init__('Invalid token')
+        super().__init__("Invalid token")
 
     def __reduce__(self) -> Tuple[type, Tuple]:  # type: ignore[override]
         return self.__class__, ()
@@ -97,7 +97,7 @@ class TimedOut(NetworkError):
     __slots__ = ()
 
     def __init__(self) -> None:
-        super().__init__('Timed out')
+        super().__init__("Timed out")
 
     def __reduce__(self) -> Tuple[type, Tuple]:  # type: ignore[override]
         return self.__class__, ()
@@ -112,10 +112,10 @@ class ChatMigrated(TelegramError):
 
     """
 
-    __slots__ = ('new_chat_id',)
+    __slots__ = ("new_chat_id",)
 
     def __init__(self, new_chat_id: int):
-        super().__init__(f'Group migrated to supergroup. New chat id: {new_chat_id}')
+        super().__init__(f"Group migrated to supergroup. New chat id: {new_chat_id}")
         self.new_chat_id = new_chat_id
 
     def __reduce__(self) -> Tuple[type, Tuple[int]]:  # type: ignore[override]
@@ -131,10 +131,10 @@ class RetryAfter(TelegramError):
 
     """
 
-    __slots__ = ('retry_after',)
+    __slots__ = ("retry_after",)
 
     def __init__(self, retry_after: int):
-        super().__init__(f'Flood control exceeded. Retry in {float(retry_after)} seconds')
+        super().__init__(f"Flood control exceeded. Retry in {float(retry_after)} seconds")
         self.retry_after = float(retry_after)
 
     def __reduce__(self) -> Tuple[type, Tuple[float]]:  # type: ignore[override]
@@ -153,7 +153,7 @@ class Conflict(TelegramError):
 class PassportDecryptionError(TelegramError):
     """Something went wrong with decryption."""
 
-    __slots__ = ('_msg',)
+    __slots__ = ("_msg",)
 
     def __init__(self, message: Union[str, Exception]):
         super().__init__(f"PassportDecryptionError: {message}")
