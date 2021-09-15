@@ -102,6 +102,12 @@ class TestReplyKeyboardMarkup:
         assert reply_keyboard_markup.selective == self.selective
         assert reply_keyboard_markup.input_field_placeholder == self.input_field_placeholder
 
+    def test_wrong_keyboard_inputs(self):
+        with pytest.raises(ValueError):
+            ReplyKeyboardMarkup([[KeyboardButton('b1')], 'b2'])
+        with pytest.raises(ValueError):
+            ReplyKeyboardMarkup(KeyboardButton('b1'))
+
     def test_to_dict(self, reply_keyboard_markup):
         reply_keyboard_markup_dict = reply_keyboard_markup.to_dict()
 
