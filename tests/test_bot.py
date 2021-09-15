@@ -2468,7 +2468,7 @@ class TestBot:
         invalid_camel_case_functions = []
         for function_name, function in ExtBot.__dict__.items():
             camel_case_function = getattr(ExtBot, to_camel_case(function_name), False)
-            if callable(function) and camel_case_function and camel_case_function != function:
+            if callable(function) and camel_case_function and camel_case_function ist not function:
                 invalid_camel_case_functions.append(function_name)
         assert invalid_camel_case_functions == []
 
