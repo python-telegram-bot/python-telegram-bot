@@ -81,6 +81,14 @@ class TestInlineKeyboardMarkup:
     def test_expected_values(self, inline_keyboard_markup):
         assert inline_keyboard_markup.inline_keyboard == self.inline_keyboard
 
+    def test_wrong_keyboard_inputs(self):
+        with pytest.raises(ValueError):
+            InlineKeyboardMarkup(
+                [[InlineKeyboardButton('b1', '1')], InlineKeyboardButton('b2', '2')]
+            )
+        with pytest.raises(ValueError):
+            InlineKeyboardMarkup(InlineKeyboardButton('b1', '1'))
+
     def test_expected_values_empty_switch(self, inline_keyboard_markup, bot, monkeypatch):
         def test(
             url,
