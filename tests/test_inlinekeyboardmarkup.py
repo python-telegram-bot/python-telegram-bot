@@ -86,6 +86,8 @@ class TestInlineKeyboardMarkup:
             InlineKeyboardMarkup(
                 [[InlineKeyboardButton('b1', '1')], InlineKeyboardButton('b2', '2')]
             )
+        with pytest.raises(ValueError):
+            InlineKeyboardMarkup(InlineKeyboardButton('b1', '1'))
 
     def test_expected_values_empty_switch(self, inline_keyboard_markup, bot, monkeypatch):
         def test(
