@@ -325,3 +325,13 @@ class ExtBot(telegram.bot.Bot):
         # We override this method to call self._insert_callback_data
         result = super().get_chat(chat_id=chat_id, timeout=timeout, api_kwargs=api_kwargs)
         return self._insert_callback_data(result)
+
+    # updated camelCase aliases
+    getChat = get_chat
+    """Alias for :meth:`get_chat`"""
+    copyMessage = copy_message
+    """Alias for :meth:`copy_message`"""
+    getUpdates = get_updates
+    """Alias for :meth:`get_updates`"""
+    stopPoll = stop_poll
+    """Alias for :meth:`stop_poll`"""
