@@ -13,10 +13,7 @@ class TestCamelCase:
     def test_camel_case(self):
         invalid_camel_case_functions = []
         for function_name, function in ExtBot.__dict__.items():
-            if (
-                callable(function)
-                and (camel_case_function := getattr(ExtBot, to_camel_case(function_name), False))
-                and camel_case_function != function
-            ):
+            camel_case_function = getattr(ExtBot, to_camel_case(function_name), False)
+            if callable(function) and camel_case_function and camel_case_function != function:
                 invalid_camel_case_functions.append(function_name)
         assert invalid_camel_case_functions == []
