@@ -19,10 +19,15 @@
 """This module contains a class which is used for deprecation warnings."""
 
 
-# We use our own DeprecationWarning since they are muted by default and "UserWarning" makes it
-# seem like it's the user that issued the warning
-# We name it something else so that you don't get confused when you attempt to suppress it
-class TelegramDeprecationWarning(Warning):
+class TelegramUserWarning(UserWarning):
+    """Custom user warning class used for warnings in this library."""
+
+    __slots__ = ()
+
+
+# https://www.python.org/dev/peps/pep-0565/ recommends to use a custom warning class derived from
+# DeprecationWarning. We also subclass from TGUserWarning so users can easily 'switch off' warnings
+class TelegramDeprecationWarning(TelegramUserWarning, DeprecationWarning):
     """Custom warning class for deprecations in this library."""
 
     __slots__ = ()
