@@ -119,6 +119,16 @@ class TestUpdater:
         assert len(recwarn) == 1
         assert 'Passing arbitrary_callback_data to an Updater' in str(recwarn[0].message)
 
+    def test_warn_con_pool(self, bot, recwarn, dp):
+        dp = Dispatcher(bot, Queue(), workers=5)
+        Updater(bot=bot, workers=8)
+        Updater(dispatcher=dp, workers=None)
+        assert len(recwarn) == 2
+        for idx, value in enumerate((12, 9)):
+            warning = f'Connection pool of Request object is smaller than optimal value {value}'
+            assert str(recwarn[idx].message) == warning
+            assert recwarn[idx].filename == __file__, "wrong stacklevel!"
+
     @pytest.mark.parametrize(
         ('error',),
         argvalues=[(TelegramError('Test Error 2'),), (Unauthorized('Test Unauthorized'),)],
