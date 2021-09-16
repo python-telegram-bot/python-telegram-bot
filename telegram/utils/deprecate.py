@@ -20,7 +20,11 @@
 
 
 class TelegramUserWarning(UserWarning):
-    """Custom user warning class used for warnings in this library."""
+    """
+    Custom user warning class used for warnings in this library.
+
+    .. versionadded:: 14.0
+    """
 
     __slots__ = ()
 
