@@ -42,7 +42,7 @@ from typing import (
 from telegram import Bot, TelegramError
 from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized
 from telegram.ext import Dispatcher, JobQueue, ContextTypes, ExtBot
-from telegram.utils.deprecate import TelegramDeprecationWarning
+from telegram.utils.deprecate import TelegramDeprecationWarning, TelegramUserWarning
 from telegram.utils.helpers import get_signal_name, DEFAULT_FALSE, DefaultValue
 from telegram.utils.request import Request
 from telegram.ext.utils.types import CCT, UD, CD, BD
@@ -250,9 +250,11 @@ class Updater(Generic[CCT, UD, CD, BD]):
             if bot is not None:
                 self.bot = bot
                 if bot.request.con_pool_size < con_pool_size:
-                    self.logger.warning(
-                        'Connection pool of Request object is smaller than optimal value (%s)',
-                        con_pool_size,
+                    warnings.warn(
+                        f'Connection pool of Request object is smaller than optimal value '
+                        f'{con_pool_size}',
+                        category=TelegramUserWarning,
+                        stacklevel=2,
                     )
             else:
                 # we need a connection pool the size of:
@@ -299,9 +301,11 @@ class Updater(Generic[CCT, UD, CD, BD]):
 
             self.bot = dispatcher.bot
             if self.bot.request.con_pool_size < con_pool_size:
-                self.logger.warning(
-                    'Connection pool of Request object is smaller than optimal value (%s)',
-                    con_pool_size,
+                warnings.warn(
+                    f'Connection pool of Request object is smaller than optimal value '
+                    f'{con_pool_size}',
+                    category=TelegramUserWarning,
+                    stacklevel=2,
                 )
             self.update_queue = dispatcher.update_queue
             self.__exception_event = dispatcher.exception_event

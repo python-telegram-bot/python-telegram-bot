@@ -47,6 +47,7 @@ from telegram.ext.handler import Handler
 import telegram.ext.extbot
 from telegram.ext.callbackdatacache import CallbackDataCache
 from telegram.ext.utils.promise import Promise
+from telegram.utils.deprecate import TelegramUserWarning
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 from telegram.ext.utils.types import CCT, UD, CD, BD
 
@@ -197,7 +198,9 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
 
         if self.workers < 1:
             warnings.warn(
-                'Asynchronous callbacks can not be processed without at least one worker thread.'
+                'Asynchronous callbacks can not be processed without at least one worker thread.',
+                category=TelegramUserWarning,
+                stacklevel=2,
             )
 
         self.user_data: DefaultDict[int, UD] = defaultdict(self.context_types.user_data)
@@ -312,9 +315,10 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                 continue
 
             if isinstance(promise.exception, DispatcherHandlerStop):
-                self.logger.warning(
-                    'DispatcherHandlerStop is not supported with async functions; func: %s',
-                    promise.pooled_function.__name__,
+                warnings.warn(
+                    'DispatcherHandlerStop is not supported with async functions; '
+                    f'func: {promise.pooled_function.__name__}',
+                    category=TelegramUserWarning,
                 )
                 continue
 

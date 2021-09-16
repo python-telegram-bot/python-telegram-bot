@@ -26,6 +26,7 @@ import warnings
 from typing import TYPE_CHECKING, List, Optional, Type, TypeVar, Tuple
 
 from telegram.utils.types import JSONDict
+from telegram.utils.deprecate import TelegramUserWarning
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -142,12 +143,16 @@ class TelegramObject:
             if self._id_attrs == ():
                 warnings.warn(
                     f"Objects of type {self.__class__.__name__} can not be meaningfully tested for"
-                    " equivalence."
+                    " equivalence.",
+                    category=TelegramUserWarning,
+                    stacklevel=2,
                 )
             if other._id_attrs == ():
                 warnings.warn(
                     f"Objects of type {other.__class__.__name__} can not be meaningfully tested"
-                    " for equivalence."
+                    " for equivalence.",
+                    category=TelegramUserWarning,
+                    stacklevel=2,
                 )
             return self._id_attrs == other._id_attrs
         return super().__eq__(other)

@@ -39,6 +39,7 @@ from telegram.ext import (
 from telegram.ext.utils.promise import Promise
 from telegram.ext.utils.types import ConversationDict
 from telegram.ext.utils.types import CCT
+from telegram.utils.deprecate import TelegramUserWarning
 
 if TYPE_CHECKING:
     from telegram.ext import Dispatcher, Job
@@ -261,7 +262,9 @@ class ConversationHandler(Handler[Update, CCT]):
         if self.per_message and not self.per_chat:
             warnings.warn(
                 "If 'per_message=True' is used, 'per_chat=True' should also be used, "
-                "since message IDs are not globally unique."
+                "since message IDs are not globally unique.",
+                category=TelegramUserWarning,
+                stacklevel=2,
             )
 
         all_handlers: List[Handler] = []
@@ -277,7 +280,9 @@ class ConversationHandler(Handler[Update, CCT]):
                     warnings.warn(
                         "If 'per_message=True', all entry points and state handlers"
                         " must be 'CallbackQueryHandler', since no other handlers "
-                        "have a message context."
+                        "have a message context.",
+                        category=TelegramUserWarning,
+                        stacklevel=2,
                     )
                     break
         else:
@@ -285,7 +290,9 @@ class ConversationHandler(Handler[Update, CCT]):
                 if isinstance(handler, CallbackQueryHandler):
                     warnings.warn(
                         "If 'per_message=False', 'CallbackQueryHandler' will not be "
-                        "tracked for every message."
+                        "tracked for every message.",
+                        category=TelegramUserWarning,
+                        stacklevel=2,
                     )
                     break
 
@@ -294,7 +301,9 @@ class ConversationHandler(Handler[Update, CCT]):
                 if isinstance(handler, (InlineQueryHandler, ChosenInlineResultHandler)):
                     warnings.warn(
                         "If 'per_chat=True', 'InlineQueryHandler' can not be used, "
-                        "since inline queries have no chat context."
+                        "since inline queries have no chat context.",
+                        category=TelegramUserWarning,
+                        stacklevel=2,
                     )
                     break
 
@@ -304,7 +313,9 @@ class ConversationHandler(Handler[Update, CCT]):
                     warnings.warn(
                         "Using `conversation_timeout` with nested conversations is currently not "
                         "supported. You can still try to use it, but it will likely behave "
-                        "differently from what you expect."
+                        "differently from what you expect.",
+                        category=TelegramUserWarning,
+                        stacklevel=2,
                     )
                     break
 
@@ -644,8 +655,9 @@ class ConversationHandler(Handler[Update, CCT]):
                             new_state, dispatcher, update, context, conversation_key
                         )
                 else:
-                    self.logger.warning(
-                        "Ignoring `conversation_timeout` because the Dispatcher has no JobQueue."
+                    warnings.warn(
+                        "Ignoring `conversation_timeout` because the Dispatcher has no JobQueue.",
+                        category=TelegramUserWarning,
                     )
 
         if isinstance(self.map_to_parent, dict) and new_state in self.map_to_parent:
@@ -682,7 +694,8 @@ class ConversationHandler(Handler[Update, CCT]):
             if new_state not in self.states:
                 warnings.warn(
                     f"Handler returned state {new_state} which is unknown to the "
-                    f"ConversationHandler{' ' + self.name if self.name is not None else ''}."
+                    f"ConversationHandler{' ' + self.name if self.name is not None else ''}.",
+                    category=TelegramUserWarning,
                 )
             with self._conversations_lock:
                 self.conversations[key] = new_state
@@ -711,9 +724,10 @@ class ConversationHandler(Handler[Update, CCT]):
                 try:
                     handler.handle_update(ctxt.update, ctxt.dispatcher, check, callback_context)
                 except DispatcherHandlerStop:
-                    self.logger.warning(
+                    warnings.warn(
                         'DispatcherHandlerStop in TIMEOUT state of '
-                        'ConversationHandler has no effect. Ignoring.'
+                        'ConversationHandler has no effect. Ignoring.',
+                        category=TelegramUserWarning,
                     )
 
         self._update_state(self.END, ctxt.conversation_key)
