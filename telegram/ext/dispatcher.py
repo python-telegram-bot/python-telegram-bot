@@ -47,7 +47,7 @@ from telegram.ext.handler import Handler
 import telegram.ext.extbot
 from telegram.ext.callbackdatacache import CallbackDataCache
 from telegram.ext.utils.promise import Promise
-from telegram.utils.warnings import TelegramUserWarning
+from telegram.utils.warnings import PTBUserWarning
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 from telegram.ext.utils.types import CCT, UD, CD, BD
 
@@ -199,7 +199,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         if self.workers < 1:
             warnings.warn(
                 'Asynchronous callbacks can not be processed without at least one worker thread.',
-                category=TelegramUserWarning,
+                category=PTBUserWarning,
                 stacklevel=2,
             )
 
@@ -318,7 +318,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                 warnings.warn(
                     'DispatcherHandlerStop is not supported with async functions; '
                     f'func: {promise.pooled_function.__name__}',
-                    category=TelegramUserWarning,
+                    category=PTBUserWarning,
                 )
                 continue
 

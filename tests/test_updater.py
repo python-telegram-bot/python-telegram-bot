@@ -56,7 +56,7 @@ from telegram.ext import (
     InvalidCallbackData,
     ExtBot,
 )
-from telegram.utils.warnings import TelegramDeprecationWarning
+from telegram.utils.warnings import PTBDeprecationWarning
 from telegram.ext.utils.webhookhandler import WebhookServer
 
 signalskip = pytest.mark.skipif(
@@ -657,5 +657,5 @@ class TestUpdater:
             Updater(dispatcher=dispatcher, context_types=True)
 
     def test_defaults_warning(self, bot):
-        with pytest.warns(TelegramDeprecationWarning, match='no effect when a Bot is passed'):
+        with pytest.warns(PTBDeprecationWarning, match='no effect when a Bot is passed'):
             Updater(bot=bot, defaults=Defaults())

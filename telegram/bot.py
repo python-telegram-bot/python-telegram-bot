@@ -91,7 +91,7 @@ from telegram import (
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import InvalidToken, TelegramError
-from telegram.utils.warnings import TelegramDeprecationWarning
+from telegram.utils.warnings import PTBDeprecationWarning
 from telegram.utils.helpers import (
     DEFAULT_NONE,
     DefaultValue,
@@ -200,7 +200,7 @@ class Bot(TelegramObject):
         if self.defaults:
             warnings.warn(
                 'Passing Defaults to telegram.Bot is deprecated. Use telegram.ext.ExtBot instead.',
-                TelegramDeprecationWarning,
+                PTBDeprecationWarning,
                 stacklevel=3,
             )
 

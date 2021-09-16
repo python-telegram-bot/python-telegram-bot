@@ -19,7 +19,7 @@
 """This module contains a class which is used for deprecation warnings."""
 
 
-class TelegramUserWarning(UserWarning):
+class PTBUserWarning(UserWarning):
     """
     Custom user warning class used for warnings in this library.
 
@@ -31,7 +31,7 @@ class TelegramUserWarning(UserWarning):
 
 # https://www.python.org/dev/peps/pep-0565/ recommends to use a custom warning class derived from
 # DeprecationWarning. We also subclass from TGUserWarning so users can easily 'switch off' warnings
-class TelegramDeprecationWarning(TelegramUserWarning, DeprecationWarning):
+class PTBDeprecationWarning(PTBUserWarning, DeprecationWarning):
     """Custom warning class for deprecations in this library."""
 
     __slots__ = ()

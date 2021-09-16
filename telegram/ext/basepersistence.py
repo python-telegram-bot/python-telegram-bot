@@ -26,7 +26,7 @@ from telegram import Bot
 import telegram.ext.extbot
 
 from telegram.ext.utils.types import UD, CD, BD, ConversationDict, CDCData
-from telegram.utils.warnings import TelegramUserWarning
+from telegram.utils.warnings import PTBUserWarning
 
 
 class PersistenceInput(NamedTuple):
@@ -234,7 +234,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
             warnings.warn(
                 f'BasePersistence.replace_bot does not handle classes such as {obj.__name__!r}. '
                 'See the docs of BasePersistence.replace_bot for more information.',
-                category=TelegramUserWarning,
+                category=PTBUserWarning,
             )
             return obj
 
@@ -245,7 +245,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
             warnings.warn(
                 'BasePersistence.replace_bot does not handle objects that can not be copied. See '
                 'the docs of BasePersistence.replace_bot for more information.',
-                TelegramUserWarning,
+                PTBUserWarning,
             )
             memo[obj_id] = obj
             return obj
@@ -286,7 +286,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
             warnings.warn(
                 f'Parsing of an object failed with the following exception: {exception}. '
                 f'See the docs of BasePersistence.replace_bot for more information.',
-                category=TelegramUserWarning,
+                category=PTBUserWarning,
             )
 
         memo[obj_id] = obj
@@ -337,7 +337,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
             warnings.warn(
                 f'BasePersistence.insert_bot does not handle classes such as {obj.__name__!r}. '
                 'See the docs of BasePersistence.insert_bot for more information.',
-                category=TelegramUserWarning,
+                category=PTBUserWarning,
             )
             return obj
 
@@ -347,7 +347,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
             warnings.warn(
                 'BasePersistence.insert_bot does not handle objects that can not be copied. See '
                 'the docs of BasePersistence.insert_bot for more information.',
-                TelegramUserWarning,
+                PTBUserWarning,
             )
             memo[obj_id] = obj
             return obj
@@ -388,7 +388,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
             warnings.warn(
                 f'Parsing of an object failed with the following exception: {exception}. '
                 f'See the docs of BasePersistence.insert_bot for more information.',
-                category=TelegramUserWarning,
+                category=PTBUserWarning,
             )
 
         memo[obj_id] = obj

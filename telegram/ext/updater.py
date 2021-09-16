@@ -42,7 +42,7 @@ from typing import (
 from telegram import Bot, TelegramError
 from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized
 from telegram.ext import Dispatcher, JobQueue, ContextTypes, ExtBot
-from telegram.utils.warnings import TelegramDeprecationWarning, TelegramUserWarning
+from telegram.utils.warnings import PTBDeprecationWarning, PTBUserWarning
 from telegram.utils.helpers import get_signal_name, DEFAULT_FALSE, DefaultValue
 from telegram.utils.request import Request
 from telegram.ext.utils.types import CCT, UD, CD, BD
@@ -214,7 +214,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
             warnings.warn(
                 'Passing defaults to an Updater has no effect when a Bot is passed '
                 'as well. Pass them to the Bot instead.',
-                TelegramDeprecationWarning,
+                PTBDeprecationWarning,
                 stacklevel=2,
             )
         if arbitrary_callback_data is not DEFAULT_FALSE and bot:
@@ -253,7 +253,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
                     warnings.warn(
                         f'Connection pool of Request object is smaller than optimal value '
                         f'{con_pool_size}',
-                        category=TelegramUserWarning,
+                        category=PTBUserWarning,
                         stacklevel=2,
                     )
             else:
@@ -304,7 +304,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 warnings.warn(
                     f'Connection pool of Request object is smaller than optimal value '
                     f'{con_pool_size}',
-                    category=TelegramUserWarning,
+                    category=PTBUserWarning,
                     stacklevel=2,
                 )
             self.update_queue = dispatcher.update_queue
