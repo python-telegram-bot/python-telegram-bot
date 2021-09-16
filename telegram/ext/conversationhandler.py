@@ -39,7 +39,7 @@ from telegram.ext import (
 from telegram.ext.utils.promise import Promise
 from telegram.ext.utils.types import ConversationDict
 from telegram.ext.utils.types import CCT
-from telegram.utils.deprecate import TelegramUserWarning
+from telegram.utils.warnings import TelegramUserWarning
 
 if TYPE_CHECKING:
     from telegram.ext import Dispatcher, Job

@@ -181,4 +181,4 @@ utils
     telegram.utils.promise
     telegram.utils.request
     telegram.utils.types
-    telegram.utils.deprecate
+    telegram.utils.warnings

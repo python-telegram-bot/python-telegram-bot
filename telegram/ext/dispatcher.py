@@ -47,7 +47,7 @@ from telegram.ext.handler import Handler
 import telegram.ext.extbot
 from telegram.ext.callbackdatacache import CallbackDataCache
 from telegram.ext.utils.promise import Promise
-from telegram.utils.deprecate import TelegramUserWarning
+from telegram.utils.warnings import TelegramUserWarning
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 from telegram.ext.utils.types import CCT, UD, CD, BD
 

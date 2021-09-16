@@ -56,7 +56,7 @@ from telegram.ext import (
     InvalidCallbackData,
     ExtBot,
 )
-from telegram.utils.deprecate import TelegramDeprecationWarning
+from telegram.utils.warnings import TelegramDeprecationWarning
 from telegram.ext.utils.webhookhandler import WebhookServer
 
 signalskip = pytest.mark.skipif(

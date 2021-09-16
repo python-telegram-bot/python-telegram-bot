@@ -26,7 +26,7 @@ import warnings
 from typing import TYPE_CHECKING, List, Optional, Type, TypeVar, Tuple
 
 from telegram.utils.types import JSONDict
-from telegram.utils.deprecate import TelegramUserWarning
+from telegram.utils.warnings import TelegramUserWarning
 
 if TYPE_CHECKING:
     from telegram import Bot

@@ -1,8 +1,8 @@
-:github_url: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/telegram/utils/deprecate.py
+:github_url: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/telegram/utils/warnings.py
 
-telegram.utils.deprecate Module
+telegram.utils.warnings Module
 ===============================
 
-.. automodule::  telegram.utils.deprecate
+.. automodule::  telegram.utils.warnings
     :members:
     :show-inheritance:

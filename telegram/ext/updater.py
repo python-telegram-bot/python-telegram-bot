@@ -42,7 +42,7 @@ from typing import (
 from telegram import Bot, TelegramError
 from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized
 from telegram.ext import Dispatcher, JobQueue, ContextTypes, ExtBot
-from telegram.utils.deprecate import TelegramDeprecationWarning, TelegramUserWarning
+from telegram.utils.warnings import TelegramDeprecationWarning, TelegramUserWarning
 from telegram.utils.helpers import get_signal_name, DEFAULT_FALSE, DefaultValue
 from telegram.utils.request import Request
 from telegram.ext.utils.types import CCT, UD, CD, BD

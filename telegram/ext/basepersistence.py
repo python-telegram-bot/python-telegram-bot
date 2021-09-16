@@ -26,7 +26,7 @@ from telegram import Bot
 import telegram.ext.extbot
 
 from telegram.ext.utils.types import UD, CD, BD, ConversationDict, CDCData
-from telegram.utils.deprecate import TelegramUserWarning
+from telegram.utils.warnings import TelegramUserWarning
 
 
 class PersistenceInput(NamedTuple):
