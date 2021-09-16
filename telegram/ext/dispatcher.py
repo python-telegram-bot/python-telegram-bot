@@ -670,8 +670,8 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         """Dispatches an error by passing it to all error handlers registered with
          :meth:`add_error_handler`. If one of the error handlers raises
         :class:`telegram.ext.DispatcherHandlerStop`, the update will not be handled by other error
-        handler or handlers (even in other groups). All other exceptions raised by an error handler
-        will be logged.
+        handlers or handlers (even in other groups). All other exceptions raised by an error
+        handler will just be logged.
 
         .. versionchanged:: 14.0
             * Exceptions raised by error handlers are now properly logged.
@@ -690,7 +690,6 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         """
         async_args = None if not promise else promise.args
         async_kwargs = None if not promise else promise.kwargs
-        dispatcher_handler_stop = False
 
         if self.error_handlers:
             for callback, run_async in self.error_handlers.items():  # pylint: disable=W0621
@@ -703,15 +702,14 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                     try:
                         callback(update, context)
                     except DispatcherHandlerStop:
-                        dispatcher_handler_stop = True
-                        break
+                        return True
                     except Exception as exc:
                         self.logger.exception(
                             'An error was raised and an uncaught error was raised while '
                             'handling the error with an error_handler.',
                             exc_info=exc,
                         )
-            return dispatcher_handler_stop
+            return False
 
         self.logger.exception(
             'No error handlers are registered, logging exception.', exc_info=error
