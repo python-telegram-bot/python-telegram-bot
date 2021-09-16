@@ -106,7 +106,7 @@ class DictBot(Bot):
 
 @pytest.fixture(scope='session')
 def bot(bot_info):
-    return DictExtBot(bot_info['token'], private_key=PRIVATE_KEY, request=DictRequest())
+    return DictExtBot(bot_info['token'], private_key=PRIVATE_KEY, request=DictRequest(8))
 
 
 DEFAULT_BOTS = {}

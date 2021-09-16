@@ -26,7 +26,7 @@ try:
 except ImportError:
     ujson = None
 
-from telegram import TelegramObject
+from telegram import TelegramObject, VoiceChatStarted
 
 
 class TestTelegramObject:
@@ -101,9 +101,9 @@ class TestTelegramObject:
         a = TGO()
         b = TGO()
         assert a == b
-        assert len(recwarn) == 2
+        assert len(recwarn) == 1
         assert str(recwarn[0].message) == expected_warning
-        assert str(recwarn[1].message) == expected_warning
+        assert recwarn[0].filename == __file__, "wrong stacklevel"
 
     def test_meaningful_comparison(self, recwarn):
         class TGO(TelegramObject):
