@@ -26,7 +26,7 @@ try:
 except ImportError:
     ujson = None
 
-from telegram import TelegramObject, VoiceChatStarted
+from telegram import TelegramObject
 
 
 class TestTelegramObject:
