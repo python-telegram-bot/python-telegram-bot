@@ -62,7 +62,7 @@ UT = TypeVar('UT')
 
 class DispatcherHandlerStop(Exception):
     """
-    Raise this in handler or error handler to prevent execution of any other handler (even in
+    Raise this in a handler or an error handler to prevent execution of any other handler (even in
     different group).
 
     In order to use this exception in a :class:`telegram.ext.ConversationHandler`, pass the
