@@ -20,6 +20,7 @@
 """
 We mainly test on UpdaterBuilder because it has all methods that DispatcherBuilder already has
 """
+from random import randint
 from threading import Event
 
 import pytest
@@ -36,7 +37,7 @@ from telegram.ext import (
     Dispatcher,
     Updater,
 )
-from telegram.ext.builders import _BOT_CHECKS, _DISPATCHER_CHECKS, DispatcherBuilder
+from telegram.ext.builders import _BOT_CHECKS, _DISPATCHER_CHECKS, DispatcherBuilder, _BaseBuilder
 
 
 @pytest.fixture(
@@ -49,6 +50,10 @@ def builder(request):
 
 
 class TestBuilder:
+    @pytest.mark.parametrize('workers', [randint(1, 100) for _ in range(10)])
+    def test_get_connection_pool_size(self, workers):
+        assert _BaseBuilder._get_connection_pool_size(workers) == workers + 4
+
     @pytest.mark.parametrize(
         'method, description', _BOT_CHECKS, ids=[entry[0] for entry in _BOT_CHECKS]
     )

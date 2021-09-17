@@ -181,7 +181,8 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         self._updater_class: Type[Updater] = Updater
         self._updater_kwargs: Dict[str, object] = {}
 
-    def _get_connection_pool_size(self) -> int:
+    @staticmethod
+    def _get_connection_pool_size(workers: DVInput[int]) -> int:
         # For the standard use case (Updater + Dispatcher + Bot)
         # we need a connection pool the size of:
         # * for each of the workers
@@ -189,19 +190,22 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         # * 1 for Updater (even if webhook is used, we can spare a connection)
         # * 1 for JobQueue
         # * 1 for main thread
-        return DefaultValue.get_value(self._workers) + 4
+        return DefaultValue.get_value(workers) + 4
 
     def _build_ext_bot(self) -> ExtBot:
         if isinstance(self._token, DefaultValue):
             raise RuntimeError('No bot token was set.')
-        request_kwargs = DefaultValue.get_value(self._request_kwargs)
-        if (
-            self._request is DEFAULT_NONE
-            and 'con_pool_size' not in request_kwargs  # pylint: disable=E1135
-        ):
-            request_kwargs[  # pylint: disable=E1137
-                'con_pool_size'
-            ] = self._get_connection_pool_size()
+
+        if not isinstance(self._request, DefaultValue):
+            request = self._request
+        else:
+            request_kwargs = DefaultValue.get_value(self._request_kwargs)
+            if 'con_pool_size' not in request_kwargs:  # pylint: disable=E1135
+                request_kwargs[  # pylint: disable=E1137
+                    'con_pool_size'
+                ] = self._get_connection_pool_size(self._workers)
+            request = Request(**request_kwargs)  # pylint: disable=E1134
+
         return ExtBot(
             token=self._token,
             base_url=DefaultValue.get_value(self._base_url),
@@ -210,9 +214,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
             private_key_password=DefaultValue.get_value(self._private_key_password),
             defaults=DefaultValue.get_value(self._defaults),
             arbitrary_callback_data=DefaultValue.get_value(self._arbitrary_callback_data),
-            request=self._request  # type: ignore[arg-type]
-            if self._request is not DEFAULT_NONE
-            else Request(**request_kwargs),  # pylint: disable=E1134
+            request=request,
         )
 
     def _build_dispatcher(
@@ -238,7 +240,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         if job_queue is not None:
             job_queue.set_dispatcher(dispatcher)
 
-        con_pool_size = self._get_connection_pool_size()
+        con_pool_size = self._get_connection_pool_size(self._workers)
         actual_size = dispatcher.bot.request.con_pool_size
         if actual_size < con_pool_size:
             warnings.warn(
@@ -262,14 +264,19 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
                 **self._updater_kwargs,
             )
 
+        if self._dispatcher:
+            exception_event = self._dispatcher.exception_event
+            bot = self._dispatcher.bot
+        else:
+            exception_event = DefaultValue.get_value(self._exception_event)
+            bot = self._bot or self._build_ext_bot()
+
         return self._updater_class(
             dispatcher=self._dispatcher,
-            bot=self._dispatcher.bot if self._dispatcher else (self._bot or self._build_ext_bot()),
+            bot=bot,
             update_queue=self._update_queue,
             user_signal_handler=self._user_signal_handler,
-            exception_event=self._dispatcher.exception_event
-            if self._dispatcher
-            else DefaultValue.get_value(self._exception_event),
+            exception_event=exception_event,
             builder_flag=True,
             **self._updater_kwargs,
         )
