@@ -73,15 +73,7 @@ class JobQueue:
         self._dispatcher.update_persistence()
 
     def _dispatch_error(self, event: JobEvent) -> None:
-        try:
-            self._dispatcher.dispatch_error(None, event.exception)
-        # Errors should not stop the thread.
-        except Exception:
-            self.logger.exception(
-                'An error was raised while processing the job and an '
-                'uncaught error was raised while handling the error '
-                'with an error_handler.'
-            )
+        self._dispatcher.dispatch_error(None, event.exception)
 
     @overload
     def _parse_time_input(self, time: None, shift_day: bool = False) -> None:
@@ -521,15 +513,7 @@ class Job:
         try:
             self.callback(dispatcher.context_types.context.from_job(self, dispatcher))
         except Exception as exc:
-            try:
-                dispatcher.dispatch_error(None, exc)
-            # Errors should not stop the thread.
-            except Exception:
-                dispatcher.logger.exception(
-                    'An error was raised while processing the job and an '
-                    'uncaught error was raised while handling the error '
-                    'with an error_handler.'
-                )
+            dispatcher.dispatch_error(None, exc)
 
     def schedule_removal(self) -> None:
         """

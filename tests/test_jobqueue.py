@@ -448,15 +448,13 @@ class TestJobQueue:
         sleep(0.1)
         assert len(caplog.records) == 1
         rec = caplog.records[-1]
-        assert 'processing the job' in rec.getMessage()
-        assert 'uncaught error was raised while handling' in rec.getMessage()
+        assert 'An error was raised and an uncaught' in rec.getMessage()
         caplog.clear()
 
         with caplog.at_level(logging.ERROR):
             job.run(dp)
         assert len(caplog.records) == 1
         rec = caplog.records[-1]
-        assert 'processing the job' in rec.getMessage()
         assert 'uncaught error was raised while handling' in rec.getMessage()
         caplog.clear()
 
