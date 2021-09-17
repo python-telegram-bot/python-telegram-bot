@@ -62,7 +62,8 @@ UT = TypeVar('UT')
 
 class DispatcherHandlerStop(Exception):
     """
-    Raise this in handler to prevent execution of any other handler (even in different group).
+    Raise this in a handler or an error handler to prevent execution of any other handler (even in
+    different group).
 
     In order to use this exception in a :class:`telegram.ext.ConversationHandler`, pass the
     optional ``state`` parameter instead of returning the next state:
@@ -72,6 +73,9 @@ class DispatcherHandlerStop(Exception):
         def callback(update, context):
             ...
             raise DispatcherHandlerStop(next_state)
+
+    Note:
+        Has no effect, if the handler or error handler is run asynchronously.
 
     Attributes:
         state (:obj:`object`): Optional. The next state of the conversation.
@@ -319,15 +323,16 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
 
             # Avoid infinite recursion of error handlers.
             if promise.pooled_function in self.error_handlers:
-                self.logger.error('An uncaught error was raised while handling the error.')
+                self.logger.exception(
+                    'An error was raised and an uncaught error was raised while '
+                    'handling the error with an error_handler.',
+                    exc_info=promise.exception,
+                )
                 continue
 
             # If we arrive here, an exception happened in the promise and was neither
             # DispatcherHandlerStop nor raised by an error handler. So we can and must handle it
-            try:
-                self.dispatch_error(promise.update, promise.exception, promise=promise)
-            except Exception:
-                self.logger.exception('An uncaught error was raised while handling the error.')
+            self.dispatch_error(promise.update, promise.exception, promise=promise)
 
     def run_async(
         self, func: Callable[..., object], *args: object, update: object = None, **kwargs: object
@@ -451,10 +456,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         """
         # An error happened while polling
         if isinstance(update, TelegramError):
-            try:
-                self.dispatch_error(None, update)
-            except Exception:
-                self.logger.exception('An uncaught error was raised while handling the error.')
+            self.dispatch_error(None, update)
             return
 
         context = None
@@ -482,14 +484,9 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
 
             # Dispatch any error.
             except Exception as exc:
-                try:
-                    self.dispatch_error(update, exc)
-                except DispatcherHandlerStop:
-                    self.logger.debug('Error handler stopped further handlers')
+                if self.dispatch_error(update, exc):
+                    self.logger.debug('Error handler stopped further handlers.')
                     break
-                # Errors should not stop the thread.
-                except Exception:
-                    self.logger.exception('An uncaught error was raised while handling the error.')
 
         # Update persistence, if handled
         handled_only_async = all(sync_modes)
@@ -605,56 +602,24 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                         self.bot.callback_data_cache.persistence_data
                     )
                 except Exception as exc:
-                    try:
-                        self.dispatch_error(update, exc)
-                    except Exception:
-                        message = (
-                            'Saving callback data raised an error and an '
-                            'uncaught error was raised while handling '
-                            'the error with an error_handler'
-                        )
-                        self.logger.exception(message)
+                    self.dispatch_error(update, exc)
             if self.persistence.store_data.bot_data:
                 try:
                     self.persistence.update_bot_data(self.bot_data)
                 except Exception as exc:
-                    try:
-                        self.dispatch_error(update, exc)
-                    except Exception:
-                        message = (
-                            'Saving bot data raised an error and an '
-                            'uncaught error was raised while handling '
-                            'the error with an error_handler'
-                        )
-                        self.logger.exception(message)
+                    self.dispatch_error(update, exc)
             if self.persistence.store_data.chat_data:
                 for chat_id in chat_ids:
                     try:
                         self.persistence.update_chat_data(chat_id, self.chat_data[chat_id])
                     except Exception as exc:
-                        try:
-                            self.dispatch_error(update, exc)
-                        except Exception:
-                            message = (
-                                'Saving chat data raised an error and an '
-                                'uncaught error was raised while handling '
-                                'the error with an error_handler'
-                            )
-                            self.logger.exception(message)
+                        self.dispatch_error(update, exc)
             if self.persistence.store_data.user_data:
                 for user_id in user_ids:
                     try:
                         self.persistence.update_user_data(user_id, self.user_data[user_id])
                     except Exception as exc:
-                        try:
-                            self.dispatch_error(update, exc)
-                        except Exception:
-                            message = (
-                                'Saving user data raised an error and an '
-                                'uncaught error was raised while handling '
-                                'the error with an error_handler'
-                            )
-                            self.logger.exception(message)
+                        self.dispatch_error(update, exc)
 
     def add_error_handler(
         self,
@@ -662,14 +627,11 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,  # pylint: disable=W0621
     ) -> None:
         """Registers an error handler in the Dispatcher. This handler will receive every error
-        which happens in your bot.
+        which happens in your bot. See the docs of :meth:`dispatch_error` for more details on how
+        errors are handled.
 
         Note:
             Attempts to add the same callback multiple times will be ignored.
-
-        Warning:
-            The errors handled within these handlers won't show up in the logger, so you
-            need to make sure that you reraise the error.
 
         Args:
             callback (:obj:`callable`): The callback function for this error handler. Will be
@@ -699,9 +661,21 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         self.error_handlers.pop(callback, None)
 
     def dispatch_error(
-        self, update: Optional[object], error: Exception, promise: Promise = None
-    ) -> None:
-        """Dispatches an error.
+        self,
+        update: Optional[object],
+        error: Exception,
+        promise: Promise = None,
+    ) -> bool:
+        """Dispatches an error by passing it to all error handlers registered with
+         :meth:`add_error_handler`. If one of the error handlers raises
+        :class:`telegram.ext.DispatcherHandlerStop`, the update will not be handled by other error
+        handlers or handlers (even in other groups). All other exceptions raised by an error
+        handler will just be logged.
+
+        .. versionchanged:: 14.0
+            * Exceptions raised by error handlers are now properly logged.
+            * :class:`telegram.ext.DispatcherHandlerStop` is no longer reraised but converted into
+                the return value.
 
         Args:
             update (:obj:`object` | :class:`telegram.Update`): The update that caused the error.
@@ -709,6 +683,9 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
             promise (:class:`telegram.utils.Promise`, optional): The promise whose pooled function
                 raised the error.
 
+        Returns:
+            :obj:`bool`: :obj:`True` if one of the error handlers raised
+                :class:`telegram.ext.DispatcherHandlerStop`. :obj:`False`, otherwise.
         """
         async_args = None if not promise else promise.args
         async_kwargs = None if not promise else promise.kwargs
@@ -721,9 +698,19 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                 if run_async:
                     self.run_async(callback, update, context, update=update)
                 else:
-                    callback(update, context)
+                    try:
+                        callback(update, context)
+                    except DispatcherHandlerStop:
+                        return True
+                    except Exception as exc:
+                        self.logger.exception(
+                            'An error was raised and an uncaught error was raised while '
+                            'handling the error with an error_handler.',
+                            exc_info=exc,
+                        )
+            return False
 
-        else:
-            self.logger.exception(
-                'No error handlers are registered, logging exception.', exc_info=error
-            )
+        self.logger.exception(
+            'No error handlers are registered, logging exception.', exc_info=error
+        )
+        return False
