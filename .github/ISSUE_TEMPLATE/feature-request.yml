@@ -1,0 +1,33 @@
+name: Feature Request
+description: Suggest an idea for this project
+title: "[FEATURE]"
+labels: ["enhancement"]
+
+body:
+  - type: textarea
+    id: related-problem
+    attributes:
+      label: "Is your feature request related to a problem? Please describe."
+      description: "A clear and concise description of what the problem is."
+      placeholder: "Ex. *I want to do X, but there is no way to do it.*"
+      
+  - type: textarea
+    id: solution
+    attributes:
+      label: "Describe the solution you'd like"
+      description: "A clear and concise description of what you want to happen."
+      placeholder: "Ex. *I think it would be nice if you would add feature Y so it will make it easier.*"
+        
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: "Describe alternatives you've considered"
+      description: "A clear and concise description of any alternative solutions or features you've considered."
+      placeholder: "Ex. *I considered Z, but that didn't work because...*"
+      
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: "Additional context"
+      description: "Add any other context or screenshots about the feature request here."
+      placeholder: "Ex. *Here's a photo of my cat!*"
