@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a class which is used for deprecation warnings."""
+"""This module contains classes used for warnings."""
 import warnings
 from typing import Type
 
