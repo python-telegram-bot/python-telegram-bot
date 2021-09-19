@@ -25,12 +25,8 @@ from unittest import mock
 
 import pytest
 
-from telegram import Sticker, InputFile, Animation
-from telegram import Update
-from telegram import User
-from telegram import MessageEntity
+from telegram import InputFile, Animation, MessageEntity
 from telegram.ext import Defaults
-from telegram.message import Message
 from telegram.utils import helpers
 from telegram.utils.helpers import _datetime_to_float_timestamp
 
@@ -77,50 +73,13 @@ if TEST_NO_PYTZ:
         reload(helpers)
 
 
-class TestHelpers:
+class TestUtilsHelpers:
     def test_helpers_utc(self):
         # Here we just test, that we got the correct UTC variant
         if TEST_NO_PYTZ:
             assert helpers.UTC is helpers.DTM_UTC
         else:
             assert helpers.UTC is not helpers.DTM_UTC
-
-    def test_escape_markdown(self):
-        test_str = '*bold*, _italic_, `code`, [text_link](http://github.com/)'
-        expected_str = r'\*bold\*, \_italic\_, \`code\`, \[text\_link](http://github.com/)'
-
-        assert expected_str == helpers.escape_markdown(test_str)
-
-    def test_escape_markdown_v2(self):
-        test_str = 'a_b*c[d]e (fg) h~I`>JK#L+MN -O=|p{qr}s.t! u'
-        expected_str = r'a\_b\*c\[d\]e \(fg\) h\~I\`\>JK\#L\+MN \-O\=\|p\{qr\}s\.t\! u'
-
-        assert expected_str == helpers.escape_markdown(test_str, version=2)
-
-    def test_escape_markdown_v2_monospaced(self):
-
-        test_str = r'mono/pre: `abc` \int (`\some \`stuff)'
-        expected_str = 'mono/pre: \\`abc\\` \\\\int (\\`\\\\some \\\\\\`stuff)'
-
-        assert expected_str == helpers.escape_markdown(
-            test_str, version=2, entity_type=MessageEntity.PRE
-        )
-        assert expected_str == helpers.escape_markdown(
-            test_str, version=2, entity_type=MessageEntity.CODE
-        )
-
-    def test_escape_markdown_v2_text_link(self):
-
-        test_str = 'https://url.containing/funny)cha)\\ra\\)cter\\s'
-        expected_str = 'https://url.containing/funny\\)cha\\)\\\\ra\\\\\\)cter\\\\s'
-
-        assert expected_str == helpers.escape_markdown(
-            test_str, version=2, entity_type=MessageEntity.TEXT_LINK
-        )
-
-    def test_markdown_invalid_version(self):
-        with pytest.raises(ValueError):
-            helpers.escape_markdown('abc', version=-1)
 
     def test_to_float_timestamp_absolute_naive(self):
         """Conversion from timezone-naive datetime to timestamp.
@@ -225,86 +184,6 @@ class TestHelpers:
             )
             == datetime
         )
-
-    def test_create_deep_linked_url(self):
-        username = 'JamesTheMock'
-
-        payload = "hello"
-        expected = f"https://t.me/{username}?start={payload}"
-        actual = helpers.create_deep_linked_url(username, payload)
-        assert expected == actual
-
-        expected = f"https://t.me/{username}?startgroup={payload}"
-        actual = helpers.create_deep_linked_url(username, payload, group=True)
-        assert expected == actual
-
-        payload = ""
-        expected = f"https://t.me/{username}"
-        assert expected == helpers.create_deep_linked_url(username)
-        assert expected == helpers.create_deep_linked_url(username, payload)
-        payload = None
-        assert expected == helpers.create_deep_linked_url(username, payload)
-
-        with pytest.raises(ValueError):
-            helpers.create_deep_linked_url(username, 'text with spaces')
-
-        with pytest.raises(ValueError):
-            helpers.create_deep_linked_url(username, '0' * 65)
-
-        with pytest.raises(ValueError):
-            helpers.create_deep_linked_url(None, None)
-        with pytest.raises(ValueError):  # too short username (4 is minimum)
-            helpers.create_deep_linked_url("abc", None)
-
-    def test_effective_message_type(self):
-        def build_test_message(**kwargs):
-            config = dict(
-                message_id=1,
-                from_user=None,
-                date=None,
-                chat=None,
-            )
-            config.update(**kwargs)
-            return Message(**config)
-
-        test_message = build_test_message(text='Test')
-        assert helpers.effective_message_type(test_message) == 'text'
-        test_message.text = None
-
-        test_message = build_test_message(
-            sticker=Sticker('sticker_id', 'unique_id', 50, 50, False)
-        )
-        assert helpers.effective_message_type(test_message) == 'sticker'
-        test_message.sticker = None
-
-        test_message = build_test_message(new_chat_members=[User(55, 'new_user', False)])
-        assert helpers.effective_message_type(test_message) == 'new_chat_members'
-
-        test_message = build_test_message(left_chat_member=[User(55, 'new_user', False)])
-        assert helpers.effective_message_type(test_message) == 'left_chat_member'
-
-        test_update = Update(1)
-        test_message = build_test_message(text='Test')
-        test_update.message = test_message
-        assert helpers.effective_message_type(test_update) == 'text'
-
-        empty_update = Update(2)
-        assert helpers.effective_message_type(empty_update) is None
-
-    def test_mention_html(self):
-        expected = '<a href="tg://user?id=1">the name</a>'
-
-        assert expected == helpers.mention_html(1, 'the name')
-
-    def test_mention_markdown(self):
-        expected = '[the name](tg://user?id=1)'
-
-        assert expected == helpers.mention_markdown(1, 'the name')
-
-    def test_mention_markdown_2(self):
-        expected = r'[the\_name](tg://user?id=1)'
-
-        assert expected == helpers.mention_markdown(1, 'the_name')
 
     @pytest.mark.parametrize(
         'string,expected',
