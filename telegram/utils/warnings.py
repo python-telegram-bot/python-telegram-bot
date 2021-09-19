@@ -34,6 +34,8 @@ class PTBUserWarning(UserWarning):
 class PTBRuntimeWarning(PTBUserWarning, RuntimeWarning):
     """
     Custom runtime warning class used for warnings in this library.
+
+    .. versionadded:: 14.0
     """
 
     __slots__ = ()
@@ -42,11 +44,20 @@ class PTBRuntimeWarning(PTBUserWarning, RuntimeWarning):
 # https://www.python.org/dev/peps/pep-0565/ recommends to use a custom warning class derived from
 # DeprecationWarning. We also subclass from TGUserWarning so users can easily 'switch off' warnings
 class PTBDeprecationWarning(PTBUserWarning, DeprecationWarning):
-    """Custom warning class for deprecations in this library."""
+    """
+    Custom warning class for deprecations in this library.
+
+    .. versionchanged:: 14.0
+       Rename TelegramDeprecationWarning to PTBDeprecationWarning.
+    """
 
     __slots__ = ()
 
 
 def warn(message: str, category: Type[Warning] = PTBUserWarning, stacklevel: int = 1) -> None:
-    """Helper function used as a shortcut for warning with default values."""
+    """
+    Helper function used as a shortcut for warning with default values.
+
+    .. versionadded:: 14.0
+    """
     warnings.warn(message, category=category, stacklevel=stacklevel)
