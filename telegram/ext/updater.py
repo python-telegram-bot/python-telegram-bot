@@ -20,7 +20,6 @@
 
 import logging
 import ssl
-import warnings
 from queue import Queue
 from signal import SIGABRT, SIGINT, SIGTERM, signal
 from threading import Event, Lock, Thread, current_thread
@@ -42,7 +41,7 @@ from typing import (
 from telegram import Bot, TelegramError
 from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized
 from telegram.ext import Dispatcher, JobQueue, ContextTypes, ExtBot
-from telegram.utils.warnings import PTBDeprecationWarning, PTBUserWarning
+from telegram.utils.warnings import PTBDeprecationWarning, warn
 from telegram.utils.helpers import get_signal_name, DEFAULT_FALSE, DefaultValue
 from telegram.utils.request import Request
 from telegram.ext.utils.types import CCT, UD, CD, BD
@@ -211,17 +210,17 @@ class Updater(Generic[CCT, UD, CD, BD]):
     ):
 
         if defaults and bot:
-            warnings.warn(
+            warn(
                 'Passing defaults to an Updater has no effect when a Bot is passed '
                 'as well. Pass them to the Bot instead.',
                 PTBDeprecationWarning,
-                stacklevel=2,
+                stacklevel=3,
             )
         if arbitrary_callback_data is not DEFAULT_FALSE and bot:
-            warnings.warn(
+            warn(
                 'Passing arbitrary_callback_data to an Updater has no '
                 'effect when a Bot is passed as well. Pass them to the Bot instead.',
-                stacklevel=2,
+                stacklevel=3,
             )
 
         if dispatcher is None:
@@ -250,11 +249,10 @@ class Updater(Generic[CCT, UD, CD, BD]):
             if bot is not None:
                 self.bot = bot
                 if bot.request.con_pool_size < con_pool_size:
-                    warnings.warn(
+                    warn(
                         f'Connection pool of Request object is smaller than optimal value '
                         f'{con_pool_size}',
-                        category=PTBUserWarning,
-                        stacklevel=2,
+                        stacklevel=3,
                     )
             else:
                 # we need a connection pool the size of:
@@ -301,11 +299,10 @@ class Updater(Generic[CCT, UD, CD, BD]):
 
             self.bot = dispatcher.bot
             if self.bot.request.con_pool_size < con_pool_size:
-                warnings.warn(
+                warn(
                     f'Connection pool of Request object is smaller than optimal value '
                     f'{con_pool_size}',
-                    category=PTBUserWarning,
-                    stacklevel=2,
+                    stacklevel=3,
                 )
             self.update_queue = dispatcher.update_queue
             self.__exception_event = dispatcher.exception_event

@@ -19,7 +19,6 @@
 """This module contains the Dispatcher class."""
 
 import logging
-import warnings
 import weakref
 from collections import defaultdict
 from queue import Empty, Queue
@@ -47,7 +46,7 @@ from telegram.ext.handler import Handler
 import telegram.ext.extbot
 from telegram.ext.callbackdatacache import CallbackDataCache
 from telegram.ext.utils.promise import Promise
-from telegram.utils.warnings import PTBUserWarning
+from telegram.utils.warnings import warn
 from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 from telegram.ext.utils.types import CCT, UD, CD, BD
 
@@ -197,10 +196,9 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         self.context_types = cast(ContextTypes[CCT, UD, CD, BD], context_types or ContextTypes())
 
         if self.workers < 1:
-            warnings.warn(
+            warn(
                 'Asynchronous callbacks can not be processed without at least one worker thread.',
-                category=PTBUserWarning,
-                stacklevel=2,
+                stacklevel=3,
             )
 
         self.user_data: DefaultDict[int, UD] = defaultdict(self.context_types.user_data)
@@ -315,10 +313,9 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                 continue
 
             if isinstance(promise.exception, DispatcherHandlerStop):
-                warnings.warn(
+                warn(
                     'DispatcherHandlerStop is not supported with async functions; '
                     f'func: {promise.pooled_function.__name__}',
-                    category=PTBUserWarning,
                 )
                 continue
 

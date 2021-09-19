@@ -64,7 +64,7 @@ from tests.bots import get_bot
 # This is here instead of in setup.cfg due to https://github.com/pytest-dev/pytest/issues/8343
 def pytest_runtestloop(session):
     session.add_marker(
-        pytest.mark.filterwarnings('ignore::telegram.utils.deprecate.PTBDeprecationWarning')
+        pytest.mark.filterwarnings('ignore::telegram.utils.warnings.PTBDeprecationWarning')
     )
 
 

@@ -22,11 +22,10 @@ try:
 except ImportError:
     import json  # type: ignore[no-redef]
 
-import warnings
 from typing import TYPE_CHECKING, List, Optional, Type, TypeVar, Tuple
 
 from telegram.utils.types import JSONDict
-from telegram.utils.warnings import PTBUserWarning
+from telegram.utils.warnings import warn
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -141,18 +140,16 @@ class TelegramObject:
         # pylint: disable=no-member
         if isinstance(other, self.__class__):
             if self._id_attrs == ():
-                warnings.warn(
+                warn(
                     f"Objects of type {self.__class__.__name__} can not be meaningfully tested for"
                     " equivalence.",
-                    category=PTBUserWarning,
-                    stacklevel=2,
+                    stacklevel=3,
                 )
             if other._id_attrs == ():
-                warnings.warn(
+                warn(
                     f"Objects of type {other.__class__.__name__} can not be meaningfully tested"
                     " for equivalence.",
-                    category=PTBUserWarning,
-                    stacklevel=2,
+                    stacklevel=3,
                 )
             return self._id_attrs == other._id_attrs
         return super().__eq__(other)
