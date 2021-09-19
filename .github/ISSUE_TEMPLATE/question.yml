@@ -26,14 +26,12 @@ body:
     attributes:
       label: "Traceback to the issue"
       description: "If you are facing a specific error message, please paste the traceback here. This will be automatically formatted into code (shell), so no need for backticks."
-      placeholder: 
-        ```python
+      placeholder: |
         Traceback (most recent call last):
           File "/home/bot.py", line 1, in main
             foo = bar()
           ...
         telegram.error.BadRequest: Traceback not found
-        ```
       render: python
         
   - type: textarea
