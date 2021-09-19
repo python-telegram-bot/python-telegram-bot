@@ -1371,9 +1371,26 @@ class TestConversationHandler:
         )
         assert len(recwarn) == 1
         assert str(recwarn[0].message) == (
-            "If 'per_message=True', all entry points and state handlers"
+            "If 'per_message=True', all entry points, state handlers, and fallbacks"
             " must be 'CallbackQueryHandler', since no other handlers"
             " have a message context."
+        )
+        assert recwarn[0].filename == __file__, "incorrect stacklevel!"
+
+    def test_per_message_but_not_per_chat_warning(self, recwarn):
+        ConversationHandler(
+            entry_points=[CallbackQueryHandler(self.code, "code")],
+            states={
+                self.BREWING: [CallbackQueryHandler(self.code, "code")],
+            },
+            fallbacks=[CallbackQueryHandler(self.code, "code")],
+            per_message=True,
+            per_chat=False,
+        )
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message) == (
+            "If 'per_message=True' is used, 'per_chat=True' should also be used, "
+            "since message IDs are not globally unique."
         )
         assert recwarn[0].filename == __file__, "incorrect stacklevel!"
 
