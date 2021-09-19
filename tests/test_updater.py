@@ -38,7 +38,6 @@ import pytest
 from .conftest import DictBot
 
 from telegram import (
-    TelegramError,
     Message,
     User,
     Chat,
@@ -47,7 +46,7 @@ from telegram import (
     InlineKeyboardMarkup,
     InlineKeyboardButton,
 )
-from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter
+from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter, TelegramError
 from telegram.ext import (
     Updater,
     Dispatcher,

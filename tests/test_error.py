@@ -21,7 +21,6 @@ from collections import defaultdict
 
 import pytest
 
-from telegram import TelegramError, PassportDecryptionError
 from telegram.error import (
     Unauthorized,
     InvalidToken,
@@ -31,6 +30,8 @@ from telegram.error import (
     ChatMigrated,
     RetryAfter,
     Conflict,
+    TelegramError,
+    PassportDecryptionError,
 )
 from telegram.ext.callbackdatacache import InvalidCallbackData
 

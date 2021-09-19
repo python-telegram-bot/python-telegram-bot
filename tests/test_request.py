@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import TelegramError
+from telegram.error import TelegramError
 from telegram.request import Request
 
 

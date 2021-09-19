@@ -23,7 +23,8 @@ from tempfile import TemporaryFile, mkstemp
 import pytest
 from flaky import flaky
 
-from telegram import File, TelegramError, Voice
+from telegram import File, Voice
+from telegram.error import TelegramError
 
 
 @pytest.fixture(scope='class')

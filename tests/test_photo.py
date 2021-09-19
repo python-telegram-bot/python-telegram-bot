@@ -22,8 +22,8 @@ from pathlib import Path
 import pytest
 from flaky import flaky
 
-from telegram import Sticker, TelegramError, PhotoSize, InputFile, MessageEntity, Bot
-from telegram.error import BadRequest
+from telegram import Sticker, PhotoSize, InputFile, MessageEntity, Bot
+from telegram.error import BadRequest, TelegramError
 from telegram.helpers import escape_markdown
 from tests.conftest import (
     expect_bad_request,

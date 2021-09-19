@@ -31,7 +31,6 @@ from telegram import (
     Bot,
     Update,
     ChatAction,
-    TelegramError,
     User,
     InlineKeyboardMarkup,
     InlineKeyboardButton,
@@ -55,7 +54,7 @@ from telegram import (
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.ext import ExtBot, Defaults
-from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
+from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter, TelegramError
 from telegram.ext.callbackdatacache import InvalidCallbackData
 from telegram.utils.helpers import (
     from_timestamp,
