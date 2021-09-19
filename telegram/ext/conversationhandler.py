@@ -276,7 +276,7 @@ class ConversationHandler(Handler[Update, CCT]):
             for handler in all_handlers:
                 if not isinstance(handler, CallbackQueryHandler):
                     warn(
-                        "If 'per_message=True', all entry points and state handlers"
+                        "If 'per_message=True', all entry points, state handlers, and fallbacks"
                         " must be 'CallbackQueryHandler', since no other handlers "
                         "have a message context.",
                         stacklevel=2,
