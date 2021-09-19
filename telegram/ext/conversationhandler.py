@@ -262,7 +262,7 @@ class ConversationHandler(Handler[Update, CCT]):
             warn(
                 "If 'per_message=True' is used, 'per_chat=True' should also be used, "
                 "since message IDs are not globally unique.",
-                stacklevel=3,
+                stacklevel=2,
             )
 
         all_handlers: List[Handler] = []
@@ -279,7 +279,7 @@ class ConversationHandler(Handler[Update, CCT]):
                         "If 'per_message=True', all entry points and state handlers"
                         " must be 'CallbackQueryHandler', since no other handlers "
                         "have a message context.",
-                        stacklevel=3,
+                        stacklevel=2,
                     )
                     break
         else:
@@ -288,7 +288,7 @@ class ConversationHandler(Handler[Update, CCT]):
                     warn(
                         "If 'per_message=False', 'CallbackQueryHandler' will not be "
                         "tracked for every message.",
-                        stacklevel=3,
+                        stacklevel=2,
                     )
                     break
 
@@ -298,7 +298,7 @@ class ConversationHandler(Handler[Update, CCT]):
                     warn(
                         "If 'per_chat=True', 'InlineQueryHandler' can not be used, "
                         "since inline queries have no chat context.",
-                        stacklevel=3,
+                        stacklevel=2,
                     )
                     break
 
@@ -309,7 +309,7 @@ class ConversationHandler(Handler[Update, CCT]):
                         "Using `conversation_timeout` with nested conversations is currently not "
                         "supported. You can still try to use it, but it will likely behave "
                         "differently from what you expect.",
-                        stacklevel=3,
+                        stacklevel=2,
                     )
                     break
 

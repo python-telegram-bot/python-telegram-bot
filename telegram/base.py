@@ -143,13 +143,13 @@ class TelegramObject:
                 warn(
                     f"Objects of type {self.__class__.__name__} can not be meaningfully tested for"
                     " equivalence.",
-                    stacklevel=3,
+                    stacklevel=2,
                 )
             if other._id_attrs == ():
                 warn(
                     f"Objects of type {other.__class__.__name__} can not be meaningfully tested"
                     " for equivalence.",
-                    stacklevel=3,
+                    stacklevel=2,
                 )
             return self._id_attrs == other._id_attrs
         return super().__eq__(other)

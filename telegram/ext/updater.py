@@ -214,13 +214,13 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 'Passing defaults to an Updater has no effect when a Bot is passed '
                 'as well. Pass them to the Bot instead.',
                 PTBDeprecationWarning,
-                stacklevel=3,
+                stacklevel=2,
             )
         if arbitrary_callback_data is not DEFAULT_FALSE and bot:
             warn(
                 'Passing arbitrary_callback_data to an Updater has no '
                 'effect when a Bot is passed as well. Pass them to the Bot instead.',
-                stacklevel=3,
+                stacklevel=2,
             )
 
         if dispatcher is None:
@@ -252,7 +252,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
                     warn(
                         f'Connection pool of Request object is smaller than optimal value '
                         f'{con_pool_size}',
-                        stacklevel=3,
+                        stacklevel=2,
                     )
             else:
                 # we need a connection pool the size of:
@@ -302,7 +302,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 warn(
                     f'Connection pool of Request object is smaller than optimal value '
                     f'{con_pool_size}',
-                    stacklevel=3,
+                    stacklevel=2,
                 )
             self.update_queue = dispatcher.update_queue
             self.__exception_event = dispatcher.exception_event

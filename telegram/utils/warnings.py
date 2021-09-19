@@ -48,16 +48,21 @@ class PTBDeprecationWarning(PTBUserWarning, DeprecationWarning):
     Custom warning class for deprecations in this library.
 
     .. versionchanged:: 14.0
-       Rename TelegramDeprecationWarning to PTBDeprecationWarning.
+       Renamed TelegramDeprecationWarning to PTBDeprecationWarning.
     """
 
     __slots__ = ()
 
 
-def warn(message: str, category: Type[Warning] = PTBUserWarning, stacklevel: int = 1) -> None:
+def warn(message: str, category: Type[Warning] = PTBUserWarning, stacklevel: int = 0) -> None:
     """
     Helper function used as a shortcut for warning with default values.
 
     .. versionadded:: 14.0
+
+    Args:
+        category (:obj:`Type[Warning]`): Specify the Warning class to pass to ``warnings.warn()``.
+        stacklevel (:obj:`int`): Specify the stacklevel to pass to ``warnings.warn()``. Pass the
+            same value as you'd pass directly to ``warnings.warn()``.
     """
-    warnings.warn(message, category=category, stacklevel=stacklevel)
+    warnings.warn(message, category=category, stacklevel=stacklevel + 1)
