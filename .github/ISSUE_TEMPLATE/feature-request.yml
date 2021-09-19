@@ -7,9 +7,11 @@ body:
   - type: textarea
     id: related-problem
     attributes:
-      label: "Is your feature request related to a problem? Please describe."
+      label: "What kind of feature are you missing? Where do you notice a shortcoming of PTB?"
       description: "A clear and concise description of what the problem is."
       placeholder: "Example: I want to do X, but there is no way to do it."
+    validations:
+      required: true
       
   - type: textarea
     id: solution
@@ -17,6 +19,8 @@ body:
       label: "Describe the solution you'd like"
       description: "A clear and concise description of what you want to happen."
       placeholder: "Example: I think it would be nice if you would add feature Y so it will make it easier."
+    validations:
+      required: true
         
   - type: textarea
     id: alternatives

@@ -21,10 +21,10 @@ body:
       label: Steps to Reproduce
       value: |
         1. 
-
         2.
-
         3.
+    validations:
+      required: true
         
   - type: textarea
     id: expected-behaviour
@@ -32,7 +32,7 @@ body:
       label: Expected behaviour
       description: Tell us what should happen
     validations:
-      required: false
+      required: true
       
   - type: textarea
     id: actual-behaviour
@@ -40,7 +40,7 @@ body:
       label: Actual behaviour
       description: Tell us what happens instead
     validations:
-      required: false
+      required: true
       
   - type: markdown
     attributes:
@@ -51,20 +51,26 @@ body:
     attributes:
       label: Operating System
     validations: 
-      required: false
+      required: true
 
   - type: textarea
     id: versions
     attributes:
       label: Version of Python, python-telegram-bot & dependencies
-      description: This will be automatically formatted into code, so no need for backticks.
+      description: Paste the output of `$ python -m telegram` here. This will be automatically formatted into code, so no need for backticks.
       render: shell
     validations: 
-      required: false
+      required: true
       
   - type: textarea
     id: logs
     attributes:
       label: Relevant log output
       description: Insert logs here (if necessary). This will be automatically formatted into code, so no need for backticks.
-      render: shell
+      render: python
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: You may provide any other additional context to the bug here.
