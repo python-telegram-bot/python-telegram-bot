@@ -22,7 +22,7 @@ import base64
 import os
 import random
 import pytest
-from telegram.utils.request import Request
+from telegram.request import Request
 from telegram.error import RetryAfter, TimedOut
 
 # Provide some public fallbacks so it's easy for contributors to run tests on their local machine

@@ -19,7 +19,7 @@
 import pytest
 
 from telegram import TelegramError
-from telegram.utils.request import Request
+from telegram.request import Request
 
 
 def test_slot_behaviour(mro_slots):

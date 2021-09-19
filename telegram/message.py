@@ -55,8 +55,8 @@ from telegram import (
     MessageAutoDeleteTimerChanged,
     VoiceChatScheduled,
 )
+from telegram.helpers import escape_markdown
 from telegram.utils.helpers import (
-    escape_markdown,
     from_timestamp,
     to_timestamp,
     DEFAULT_NONE,

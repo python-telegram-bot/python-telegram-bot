@@ -16,7 +16,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains custom typing aliases."""
+"""This module contains custom typing aliases for internal use within the library.
+
+Warning:
+    Contents of this module are intended to be used internally by the library and *not* by the
+    user. Changes to this module are not considered breaking changes and may not be documented in
+    the changelog.
+"""
 from pathlib import Path
 from typing import (
     IO,

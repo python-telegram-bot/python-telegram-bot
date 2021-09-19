@@ -59,9 +59,9 @@ from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
 from telegram.ext.callbackdatacache import InvalidCallbackData
 from telegram.utils.helpers import (
     from_timestamp,
-    escape_markdown,
     to_timestamp,
 )
+from telegram.helpers import escape_markdown
 from tests.conftest import expect_bad_request, check_defaults_handling, GITHUB_ACTION
 from tests.bots import FALLBACKS
 
@@ -1807,7 +1807,7 @@ class TestBot:
 
             return b'{"ok": true, "result": []}'
 
-        monkeypatch.setattr('telegram.utils.request.Request._request_wrapper', request_wrapper)
+        monkeypatch.setattr('telegram.request.Request._request_wrapper', request_wrapper)
 
         # Test file uploading
         with pytest.raises(OkException):
@@ -1831,7 +1831,7 @@ class TestBot:
 
             return b'{"ok": true, "result": []}'
 
-        monkeypatch.setattr('telegram.utils.request.Request._request_wrapper', request_wrapper)
+        monkeypatch.setattr('telegram.request.Request._request_wrapper', request_wrapper)
 
         # Test file uploading
         with pytest.raises(OkException):

@@ -28,10 +28,9 @@ import pytest
 from telegram import Sticker, InputFile, Animation
 from telegram import Update
 from telegram import User
-from telegram import MessageEntity
+from telegram import MessageEntity, helpers
 from telegram.ext import Defaults
 from telegram.message import Message
-from telegram.utils import helpers
 from telegram.utils.helpers import _datetime_to_float_timestamp
 
 

@@ -53,7 +53,7 @@ class CommandHandler(Handler[Update, CCT]):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        command (:class:`telegram.utils.types.SLT[str]`):
+        command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
             The command or list of commands this handler should listen for.
             Limitations are the same as described here https://core.telegram.org/bots#commands
         callback (:obj:`callable`): The callback function for this handler. Will be called when
@@ -73,7 +73,7 @@ class CommandHandler(Handler[Update, CCT]):
         ValueError: when command is too long or has illegal chars.
 
     Attributes:
-        command (:class:`telegram.utils.types.SLT[str]`):
+        command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
             The command or list of commands this handler should listen for.
             Limitations are the same as described here https://core.telegram.org/bots#commands
         callback (:obj:`callable`): The callback function for this handler.
@@ -206,9 +206,9 @@ class PrefixHandler(CommandHandler):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        prefix (:class:`telegram.utils.types.SLT[str]`):
+        prefix (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
             The prefix(es) that will precede :attr:`command`.
-        command (:class:`telegram.utils.types.SLT[str]`):
+        command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
             The command or list of commands this handler should listen for.
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.

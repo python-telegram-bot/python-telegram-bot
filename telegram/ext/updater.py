@@ -39,12 +39,12 @@ from typing import (
     overload,
 )
 
-from telegram import Bot, TelegramError
-from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized
+from telegram import Bot
+from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized, TelegramError
 from telegram.ext import Dispatcher, JobQueue, ContextTypes, ExtBot
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import get_signal_name, DEFAULT_FALSE, DefaultValue
-from telegram.utils.request import Request
+from telegram.request import Request
 from telegram.ext.utils.types import CCT, UD, CD, BD
 from telegram.ext.utils.webhookhandler import WebhookAppClass, WebhookServer
 
@@ -90,7 +90,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
             arguments. This will be called when a signal is received, defaults are (SIGINT,
             SIGTERM, SIGABRT) settable with :attr:`idle`.
         request_kwargs (:obj:`dict`, optional): Keyword args to control the creation of a
-            `telegram.utils.request.Request` object (ignored if `bot` or `dispatcher` argument is
+            `telegram.request.Request` object (ignored if `bot` or `dispatcher` argument is
             used). The request_kwargs are very useful for the advanced users who would like to
             control the default timeouts and/or control the proxy used for http communication.
         persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to

@@ -57,7 +57,7 @@ from telegram.ext import (
 )
 from telegram.error import BadRequest
 from telegram.utils.helpers import DefaultValue, DEFAULT_NONE
-from telegram.utils.request import Request
+from telegram.request import Request
 from tests.bots import get_bot
 
 

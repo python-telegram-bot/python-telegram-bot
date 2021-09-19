@@ -41,7 +41,8 @@ from typing import (
 )
 from uuid import uuid4
 
-from telegram import TelegramError, Update
+from telegram import Update
+from telegram.error import TelegramError
 from telegram.ext import BasePersistence, ContextTypes
 from telegram.ext.handler import Handler
 import telegram.ext.extbot
@@ -668,15 +669,16 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         promise: Promise = None,
     ) -> bool:
         """Dispatches an error by passing it to all error handlers registered with
-         :meth:`add_error_handler`. If one of the error handlers raises
+        :meth:`add_error_handler`. If one of the error handlers raises
         :class:`telegram.ext.DispatcherHandlerStop`, the update will not be handled by other error
         handlers or handlers (even in other groups). All other exceptions raised by an error
         handler will just be logged.
 
         .. versionchanged:: 14.0
+
             * Exceptions raised by error handlers are now properly logged.
             * :class:`telegram.ext.DispatcherHandlerStop` is no longer reraised but converted into
-                the return value.
+              the return value.
 
         Args:
             update (:obj:`object` | :class:`telegram.Update`): The update that caused the error.

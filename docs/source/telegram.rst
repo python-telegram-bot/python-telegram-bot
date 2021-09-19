@@ -30,11 +30,9 @@ telegram package
     telegram.chatmemberupdated
     telegram.chatpermissions
     telegram.chatphoto
-    telegram.constants
     telegram.contact
     telegram.dice
     telegram.document
-    telegram.error
     telegram.file
     telegram.forcereply
     telegram.inlinekeyboardbutton
@@ -172,12 +170,20 @@ Passport
     telegram.encryptedpassportelement
     telegram.encryptedcredentials
 
+Auxiliary modules
+-----------------
+
+.. toctree::
+
+    telegram.constants
+    telegram.error
+    telegram.helpers
+    telegram.request
+
 utils
 -----
 
 .. toctree::
 
     telegram.utils.helpers
-    telegram.utils.promise
-    telegram.utils.request
     telegram.utils.types

@@ -19,6 +19,11 @@
 """This module contains custom typing aliases.
 
 .. versionadded:: 13.6
+
+Warning:
+    Contents of this module are intended to be used internally by the library and *not* by the
+    user. Changes to this module are not considered breaking changes and may not be documented in
+    the changelog.
 """
 from typing import TypeVar, TYPE_CHECKING, Tuple, List, Dict, Any, Optional
 
