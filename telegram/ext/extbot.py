@@ -35,7 +35,7 @@ from telegram import (
 
 from telegram.ext.callbackdatacache import CallbackDataCache
 from telegram.utils.types import JSONDict, ODVInput, DVInput
-from ..utils.helpers import DEFAULT_NONE
+from telegram.utils.defaultvalue import DEFAULT_NONE
 
 if TYPE_CHECKING:
     from telegram import InlineQueryResult, MessageEntity

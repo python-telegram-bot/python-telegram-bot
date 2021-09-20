@@ -16,7 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains convenience helper functions."""
+"""This module contains convenience helper functions.
+
+.. versionchanged:: 14.0
+   Previously, the contents of this module where available through the (no longer existing)
+   module ``telegram.utils.helpers``.
+"""
 
 import re
 

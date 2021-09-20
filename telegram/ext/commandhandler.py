@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, Callable, Dict, List, Optional, Tuple, TypeVar
 from telegram import MessageEntity, Update
 from telegram.ext import BaseFilter, Filters
 from telegram.utils.types import SLT
-from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
+from telegram.utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 
 from .utils.types import CCT
 from .handler import Handler

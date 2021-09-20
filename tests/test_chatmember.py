@@ -22,7 +22,7 @@ from copy import deepcopy
 
 import pytest
 
-from telegram.utils.helpers import to_timestamp
+from telegram.utils.aux import to_timestamp
 from telegram import (
     User,
     ChatMember,

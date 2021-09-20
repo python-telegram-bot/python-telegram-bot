@@ -16,7 +16,10 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the Promise class."""
+"""This module contains the Promise class.
+
+
+"""
 
 import logging
 from threading import Event

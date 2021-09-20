@@ -179,12 +179,15 @@ Auxiliary modules
     telegram.error
     telegram.helpers
     telegram.request
+    telegram.warnings
 
 utils
 -----
 
 .. toctree::
 
-    telegram.utils.helpers
+    telegram.utils.datetime
+    telegram.utils.defaultvalue
+    telegram.utils.files
     telegram.utils.types
     telegram.utils.warnings

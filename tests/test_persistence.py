@@ -23,7 +23,7 @@ from threading import Lock
 
 from telegram.ext import PersistenceInput
 from telegram.ext.callbackdatacache import CallbackDataCache
-from telegram.utils.helpers import encode_conversations_to_json
+from telegram.utils.aux import encode_conversations_to_json
 
 try:
     import ujson as json

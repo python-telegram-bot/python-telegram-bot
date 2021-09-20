@@ -90,15 +90,11 @@ from telegram import (
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import InvalidToken, TelegramError
-from telegram.utils.warnings import PTBDeprecationWarning, warn
-from telegram.utils.helpers import (
-    DEFAULT_NONE,
-    DefaultValue,
-    to_timestamp,
-    is_local_file,
-    parse_file_input,
-    DEFAULT_20,
-)
+from telegram.warnings import PTBDeprecationWarning
+from telegram.utils.warnings import warn
+from telegram.utils.defaultvalue import DEFAULT_NONE, DefaultValue, DEFAULT_20
+from telegram.utils.datetime import to_timestamp
+from telegram.utils.files import is_local_file, parse_file_input
 from telegram.request import Request
 from telegram.utils.types import FileInput, JSONDict, ODVInput, DVInput
 

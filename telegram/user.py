@@ -26,10 +26,7 @@ from telegram.helpers import (
     mention_markdown as helpers_mention_markdown,
     mention_html as helpers_mention_html,
 )
-from telegram.utils.helpers import (
-    DEFAULT_NONE,
-    DEFAULT_20,
-)
+from telegram.utils.defaultvalue import DEFAULT_NONE, DEFAULT_20
 from telegram.utils.types import JSONDict, FileInput, ODVInput, DVInput
 
 if TYPE_CHECKING:

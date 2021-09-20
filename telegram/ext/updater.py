@@ -41,14 +41,23 @@ from typing import (
 from telegram import Bot
 from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized, TelegramError
 from telegram.ext import Dispatcher, JobQueue, ContextTypes, ExtBot
-from telegram.utils.warnings import PTBDeprecationWarning, warn
-from telegram.utils.helpers import get_signal_name, DEFAULT_FALSE, DefaultValue
+from telegram.warnings import PTBDeprecationWarning
 from telegram.request import Request
+from telegram.utils.defaultvalue import DEFAULT_FALSE, DefaultValue
+from telegram.utils.warnings import warn
 from telegram.ext.utils.types import CCT, UD, CD, BD
 from telegram.ext.utils.webhookhandler import WebhookAppClass, WebhookServer
 
 if TYPE_CHECKING:
     from telegram.ext import BasePersistence, Defaults, CallbackContext
+
+
+# From https://stackoverflow.com/questions/2549939/get-signal-names-from-numbers-in-python
+_SIGNAL_NAMES = {
+    v: k
+    for k, v in reversed(sorted(vars(signal).items()))
+    if k.startswith('SIG') and not k.startswith('SIG_')
+}
 
 
 class Updater(Generic[CCT, UD, CD, BD]):
@@ -792,9 +801,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
     def _signal_handler(self, signum, frame) -> None:
         self.is_idle = False
         if self.running:
-            self.logger.info(
-                'Received signal %s (%s), stopping...', signum, get_signal_name(signum)
-            )
+            self.logger.info('Received signal %s (%s), stopping...', signum, _SIGNAL_NAMES[signum])
             if self.persistence:
                 # Update user_data, chat_data and bot_data before flushing
                 self.dispatcher.update_persistence()
