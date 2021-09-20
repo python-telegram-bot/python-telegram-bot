@@ -788,7 +788,7 @@ class TestConversationHandler:
         assert not handler.check_update(Update(0, pre_checkout_query=pre_checkout_query))
         assert not handler.check_update(Update(0, shipping_query=shipping_query))
 
-    def test_no_jobqueue_warning(self, dp, bot, user1, caplog):
+    def test_no_jobqueue_warning(self, dp, bot, user1, recwarn):
         handler = ConversationHandler(
             entry_points=self.entry_points,
             states=self.states,
@@ -813,12 +813,11 @@ class TestConversationHandler:
             bot=bot,
         )
 
-        with caplog.at_level(logging.WARNING):
-            dp.process_update(Update(update_id=0, message=message))
-            sleep(0.5)
-        assert len(caplog.records) == 1
+        dp.process_update(Update(update_id=0, message=message))
+        sleep(0.5)
+        assert len(recwarn) == 1
         assert (
-            caplog.records[0].message
+            str(recwarn[0].message)
             == "Ignoring `conversation_timeout` because the Dispatcher has no JobQueue."
         )
         # now set dp.job_queue back to it's original value
@@ -990,7 +989,7 @@ class TestConversationHandler:
         # assert timeout handler didn't got called
         assert self.test_flag is False
 
-    def test_conversation_timeout_dispatcher_handler_stop(self, dp, bot, user1, caplog):
+    def test_conversation_timeout_dispatcher_handler_stop(self, dp, bot, user1, recwarn):
         handler = ConversationHandler(
             entry_points=self.entry_points,
             states=self.states,
@@ -1017,14 +1016,12 @@ class TestConversationHandler:
             bot=bot,
         )
 
-        with caplog.at_level(logging.WARNING):
-            dp.process_update(Update(update_id=0, message=message))
-            assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
-            sleep(0.9)
-            assert handler.conversations.get((self.group.id, user1.id)) is None
-        assert len(caplog.records) == 1
-        rec = caplog.records[-1]
-        assert rec.getMessage().startswith('DispatcherHandlerStop in TIMEOUT')
+        dp.process_update(Update(update_id=0, message=message))
+        assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
+        sleep(0.9)
+        assert handler.conversations.get((self.group.id, user1.id)) is None
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message).startswith('DispatcherHandlerStop in TIMEOUT')
 
     def test_conversation_handler_timeout_update_and_context(self, dp, bot, user1):
         context = None
@@ -1360,6 +1357,7 @@ class TestConversationHandler:
             "supported. You can still try to use it, but it will likely behave "
             "differently from what you expect."
         )
+        assert recwarn[0].filename == __file__, "incorrect stacklevel!"
 
     def test_per_message_warning_is_only_shown_once(self, recwarn):
         ConversationHandler(
@@ -1373,10 +1371,28 @@ class TestConversationHandler:
         )
         assert len(recwarn) == 1
         assert str(recwarn[0].message) == (
-            "If 'per_message=True', all entry points and state handlers"
+            "If 'per_message=True', all entry points, state handlers, and fallbacks"
             " must be 'CallbackQueryHandler', since no other handlers"
             " have a message context."
         )
+        assert recwarn[0].filename == __file__, "incorrect stacklevel!"
+
+    def test_per_message_but_not_per_chat_warning(self, recwarn):
+        ConversationHandler(
+            entry_points=[CallbackQueryHandler(self.code, "code")],
+            states={
+                self.BREWING: [CallbackQueryHandler(self.code, "code")],
+            },
+            fallbacks=[CallbackQueryHandler(self.code, "code")],
+            per_message=True,
+            per_chat=False,
+        )
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message) == (
+            "If 'per_message=True' is used, 'per_chat=True' should also be used, "
+            "since message IDs are not globally unique."
+        )
+        assert recwarn[0].filename == __file__, "incorrect stacklevel!"
 
     def test_per_message_false_warning_is_only_shown_once(self, recwarn):
         ConversationHandler(
@@ -1393,6 +1409,7 @@ class TestConversationHandler:
             "If 'per_message=False', 'CallbackQueryHandler' will not be "
             "tracked for every message."
         )
+        assert recwarn[0].filename == __file__, "incorrect stacklevel!"
 
     def test_warnings_per_chat_is_only_shown_once(self, recwarn):
         def hello(update, context):
@@ -1415,6 +1432,7 @@ class TestConversationHandler:
             "If 'per_chat=True', 'InlineQueryHandler' can not be used,"
             " since inline queries have no chat context."
         )
+        assert recwarn[0].filename == __file__, "incorrect stacklevel!"
 
     def test_nested_conversation_handler(self, dp, bot, user1, user2):
         self.nested_states[self.DRINKING] = [
