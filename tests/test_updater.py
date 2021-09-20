@@ -56,7 +56,7 @@ from telegram.ext import (
     InvalidCallbackData,
     ExtBot,
 )
-from telegram.utils.deprecate import TelegramDeprecationWarning
+from telegram.utils.warnings import PTBDeprecationWarning
 from telegram.ext.utils.webhookhandler import WebhookServer
 
 signalskip = pytest.mark.skipif(
@@ -118,6 +118,16 @@ class TestUpdater:
         Updater(bot=bot, arbitrary_callback_data=True)
         assert len(recwarn) == 1
         assert 'Passing arbitrary_callback_data to an Updater' in str(recwarn[0].message)
+
+    def test_warn_con_pool(self, bot, recwarn, dp):
+        dp = Dispatcher(bot, Queue(), workers=5)
+        Updater(bot=bot, workers=8)
+        Updater(dispatcher=dp, workers=None)
+        assert len(recwarn) == 2
+        for idx, value in enumerate((12, 9)):
+            warning = f'Connection pool of Request object is smaller than optimal value {value}'
+            assert str(recwarn[idx].message) == warning
+            assert recwarn[idx].filename == __file__, "wrong stacklevel!"
 
     @pytest.mark.parametrize(
         ('error',),
@@ -647,5 +657,5 @@ class TestUpdater:
             Updater(dispatcher=dispatcher, context_types=True)
 
     def test_defaults_warning(self, bot):
-        with pytest.warns(TelegramDeprecationWarning, match='no effect when a Bot is passed'):
+        with pytest.warns(PTBDeprecationWarning, match='no effect when a Bot is passed'):
             Updater(bot=bot, defaults=Defaults())
