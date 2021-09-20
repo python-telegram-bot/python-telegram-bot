@@ -774,10 +774,10 @@ class TestBasePersistence:
 
         assert len(recwarn) == 2
         assert str(recwarn[0].message).startswith(
-            "BasePersistence.replace_bot does not handle classes."
+            "BasePersistence.replace_bot does not handle classes such as 'CustomClass'"
         )
         assert str(recwarn[1].message).startswith(
-            "BasePersistence.insert_bot does not handle classes."
+            "BasePersistence.insert_bot does not handle classes such as 'CustomClass'"
         )
 
     def test_bot_replace_insert_bot_objects_with_faulty_equality(self, bot, bot_persistence):

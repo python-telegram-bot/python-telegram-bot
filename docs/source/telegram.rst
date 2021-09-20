@@ -187,3 +187,4 @@ utils
 
     telegram.utils.helpers
     telegram.utils.types
+    telegram.utils.warnings

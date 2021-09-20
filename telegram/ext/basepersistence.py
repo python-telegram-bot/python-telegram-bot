@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the BasePersistence class."""
-import warnings
 from abc import ABC, abstractmethod
 from copy import copy
 from typing import Dict, Optional, Tuple, cast, ClassVar, Generic, DefaultDict, NamedTuple
@@ -26,6 +25,7 @@ from telegram import Bot
 import telegram.ext.extbot
 
 from telegram.ext.utils.types import UD, CD, BD, ConversationDict, CDCData
+from telegram.utils.warnings import warn, PTBRuntimeWarning
 
 
 class PersistenceInput(NamedTuple):
@@ -230,10 +230,10 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
             return new_immutable
         if isinstance(obj, type):
             # classes usually do have a __dict__, but it's not writable
-            warnings.warn(
-                'BasePersistence.replace_bot does not handle classes. See '
-                'the docs of BasePersistence.replace_bot for more information.',
-                RuntimeWarning,
+            warn(
+                f'BasePersistence.replace_bot does not handle classes such as {obj.__name__!r}. '
+                'See the docs of BasePersistence.replace_bot for more information.',
+                PTBRuntimeWarning,
             )
             return obj
 
@@ -241,10 +241,10 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
             new_obj = copy(obj)
             memo[obj_id] = new_obj
         except Exception:
-            warnings.warn(
+            warn(
                 'BasePersistence.replace_bot does not handle objects that can not be copied. See '
                 'the docs of BasePersistence.replace_bot for more information.',
-                RuntimeWarning,
+                PTBRuntimeWarning,
             )
             memo[obj_id] = obj
             return obj
@@ -282,10 +282,10 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
                 memo[obj_id] = new_obj
                 return new_obj
         except Exception as exception:
-            warnings.warn(
+            warn(
                 f'Parsing of an object failed with the following exception: {exception}. '
                 f'See the docs of BasePersistence.replace_bot for more information.',
-                RuntimeWarning,
+                PTBRuntimeWarning,
             )
 
         memo[obj_id] = obj
@@ -333,20 +333,20 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
             return new_immutable
         if isinstance(obj, type):
             # classes usually do have a __dict__, but it's not writable
-            warnings.warn(
-                'BasePersistence.insert_bot does not handle classes. See '
-                'the docs of BasePersistence.insert_bot for more information.',
-                RuntimeWarning,
+            warn(
+                f'BasePersistence.insert_bot does not handle classes such as {obj.__name__!r}. '
+                'See the docs of BasePersistence.insert_bot for more information.',
+                PTBRuntimeWarning,
             )
             return obj
 
         try:
             new_obj = copy(obj)
         except Exception:
-            warnings.warn(
+            warn(
                 'BasePersistence.insert_bot does not handle objects that can not be copied. See '
                 'the docs of BasePersistence.insert_bot for more information.',
-                RuntimeWarning,
+                PTBRuntimeWarning,
             )
             memo[obj_id] = obj
             return obj
@@ -384,10 +384,10 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
                 memo[obj_id] = new_obj
                 return new_obj
         except Exception as exception:
-            warnings.warn(
+            warn(
                 f'Parsing of an object failed with the following exception: {exception}. '
                 f'See the docs of BasePersistence.insert_bot for more information.',
-                RuntimeWarning,
+                PTBRuntimeWarning,
             )
 
         memo[obj_id] = obj
