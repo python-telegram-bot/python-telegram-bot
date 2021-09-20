@@ -21,7 +21,6 @@
 
 import functools
 import logging
-import warnings
 from datetime import datetime
 
 from typing import (
@@ -91,7 +90,7 @@ from telegram import (
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import InvalidToken, TelegramError
-from telegram.utils.deprecate import TelegramDeprecationWarning
+from telegram.utils.warnings import PTBDeprecationWarning, warn
 from telegram.utils.helpers import (
     DEFAULT_NONE,
     DefaultValue,
@@ -198,10 +197,10 @@ class Bot(TelegramObject):
         self.defaults = defaults
 
         if self.defaults:
-            warnings.warn(
+            warn(
                 'Passing Defaults to telegram.Bot is deprecated. Use telegram.ext.ExtBot instead.',
-                TelegramDeprecationWarning,
-                stacklevel=3,
+                PTBDeprecationWarning,
+                stacklevel=4,
             )
 
         if base_url is None:
