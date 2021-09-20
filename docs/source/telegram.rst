@@ -182,3 +182,4 @@ utils
     telegram.utils.promise
     telegram.utils.request
     telegram.utils.types
+    telegram.utils.warnings
