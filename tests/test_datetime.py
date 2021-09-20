@@ -20,17 +20,12 @@ import os
 import time
 import datetime as dtm
 from importlib import reload
-from pathlib import Path
 from unittest import mock
 
 import pytest
 
-import telegram.utils.datetime
-import telegram.utils.files
-from telegram import InputFile, Animation, MessageEntity
+from telegram.utils import datetime as tg_dtm
 from telegram.ext import Defaults
-from telegram.utils import aux
-from telegram.utils.aux import _datetime_to_float_timestamp
 
 
 # sample time specification values categorised into absolute / delta / time-of-day
@@ -72,31 +67,31 @@ if TEST_NO_PYTZ:
         return orig_import(module_name, *args, **kwargs)
 
     with mock.patch('builtins.__import__', side_effect=import_mock):
-        reload(aux)
+        reload(tg_dtm)
 
 
-class TestUtilsHelpers:
+class TestDatetime:
     def test_helpers_utc(self):
         # Here we just test, that we got the correct UTC variant
         if TEST_NO_PYTZ:
-            assert telegram.utils.datetime.UTC is telegram.utils.datetime.DTM_UTC
+            assert tg_dtm.UTC is tg_dtm.DTM_UTC
         else:
-            assert telegram.utils.datetime.UTC is not telegram.utils.datetime.DTM_UTC
+            assert tg_dtm.UTC is not tg_dtm.DTM_UTC
 
     def test_to_float_timestamp_absolute_naive(self):
         """Conversion from timezone-naive datetime to timestamp.
         Naive datetimes should be assumed to be in UTC.
         """
         datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5)
-        assert telegram.utils.datetime.to_float_timestamp(datetime) == 1573431976.1
+        assert tg_dtm.to_float_timestamp(datetime) == 1573431976.1
 
     def test_to_float_timestamp_absolute_naive_no_pytz(self, monkeypatch):
         """Conversion from timezone-naive datetime to timestamp.
         Naive datetimes should be assumed to be in UTC.
         """
-        monkeypatch.setattr(aux, 'UTC', telegram.utils.datetime.DTM_UTC)
+        monkeypatch.setattr(tg_dtm, 'UTC', tg_dtm.DTM_UTC)
         datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5)
-        assert telegram.utils.datetime.to_float_timestamp(datetime) == 1573431976.1
+        assert tg_dtm.to_float_timestamp(datetime) == 1573431976.1
 
     def test_to_float_timestamp_absolute_aware(self, timezone):
         """Conversion from timezone-aware datetime to timestamp"""
@@ -105,41 +100,31 @@ class TestUtilsHelpers:
         test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5)
         datetime = timezone.localize(test_datetime)
         assert (
-            telegram.utils.datetime.to_float_timestamp(datetime)
+            tg_dtm.to_float_timestamp(datetime)
             == 1573431976.1 - timezone.utcoffset(test_datetime).total_seconds()
         )
 
     def test_to_float_timestamp_absolute_no_reference(self):
         """A reference timestamp is only relevant for relative time specifications"""
         with pytest.raises(ValueError):
-            telegram.utils.datetime.to_float_timestamp(
-                dtm.datetime(2019, 11, 11), reference_timestamp=123
-            )
+            tg_dtm.to_float_timestamp(dtm.datetime(2019, 11, 11), reference_timestamp=123)
 
     @pytest.mark.parametrize('time_spec', DELTA_TIME_SPECS, ids=str)
     def test_to_float_timestamp_delta(self, time_spec):
         """Conversion from a 'delta' time specification to timestamp"""
         reference_t = 0
         delta = time_spec.total_seconds() if hasattr(time_spec, 'total_seconds') else time_spec
-        assert (
-            telegram.utils.datetime.to_float_timestamp(time_spec, reference_t)
-            == reference_t + delta
-        )
+        assert tg_dtm.to_float_timestamp(time_spec, reference_t) == reference_t + delta
 
     def test_to_float_timestamp_time_of_day(self):
         """Conversion from time-of-day specification to timestamp"""
         hour, hour_delta = 12, 1
-        ref_t = _datetime_to_float_timestamp(dtm.datetime(1970, 1, 1, hour=hour))
+        ref_t = tg_dtm._datetime_to_float_timestamp(dtm.datetime(1970, 1, 1, hour=hour))
 
         # test for a time of day that is still to come, and one in the past
         time_future, time_past = dtm.time(hour + hour_delta), dtm.time(hour - hour_delta)
-        assert (
-            telegram.utils.datetime.to_float_timestamp(time_future, ref_t)
-            == ref_t + 60 * 60 * hour_delta
-        )
-        assert telegram.utils.datetime.to_float_timestamp(time_past, ref_t) == ref_t + 60 * 60 * (
-            24 - hour_delta
-        )
+        assert tg_dtm.to_float_timestamp(time_future, ref_t) == ref_t + 60 * 60 * hour_delta
+        assert tg_dtm.to_float_timestamp(time_past, ref_t) == ref_t + 60 * 60 * (24 - hour_delta)
 
     def test_to_float_timestamp_time_of_day_timezone(self, timezone):
         """Conversion from timezone-aware time-of-day specification to timestamp"""
@@ -147,47 +132,43 @@ class TestUtilsHelpers:
         # of an xpass when the test is run in a timezone with the same UTC offset
         ref_datetime = dtm.datetime(1970, 1, 1, 12)
         utc_offset = timezone.utcoffset(ref_datetime)
-        ref_t, time_of_day = _datetime_to_float_timestamp(ref_datetime), ref_datetime.time()
+        ref_t, time_of_day = tg_dtm._datetime_to_float_timestamp(ref_datetime), ref_datetime.time()
         aware_time_of_day = timezone.localize(ref_datetime).timetz()
 
         # first test that naive time is assumed to be utc:
-        assert telegram.utils.datetime.to_float_timestamp(time_of_day, ref_t) == pytest.approx(
-            ref_t
-        )
+        assert tg_dtm.to_float_timestamp(time_of_day, ref_t) == pytest.approx(ref_t)
         # test that by setting the timezone the timestamp changes accordingly:
-        assert telegram.utils.datetime.to_float_timestamp(
-            aware_time_of_day, ref_t
-        ) == pytest.approx(ref_t + (-utc_offset.total_seconds() % (24 * 60 * 60)))
+        assert tg_dtm.to_float_timestamp(aware_time_of_day, ref_t) == pytest.approx(
+            ref_t + (-utc_offset.total_seconds() % (24 * 60 * 60))
+        )
 
     @pytest.mark.parametrize('time_spec', RELATIVE_TIME_SPECS, ids=str)
     def test_to_float_timestamp_default_reference(self, time_spec):
         """The reference timestamp for relative time specifications should default to now"""
         now = time.time()
-        assert telegram.utils.datetime.to_float_timestamp(time_spec) == pytest.approx(
-            telegram.utils.datetime.to_float_timestamp(time_spec, reference_timestamp=now)
+        assert tg_dtm.to_float_timestamp(time_spec) == pytest.approx(
+            tg_dtm.to_float_timestamp(time_spec, reference_timestamp=now)
         )
 
     def test_to_float_timestamp_error(self):
         with pytest.raises(TypeError, match='Defaults'):
-            telegram.utils.datetime.to_float_timestamp(Defaults())
+            tg_dtm.to_float_timestamp(Defaults())
 
     @pytest.mark.parametrize('time_spec', TIME_SPECS, ids=str)
     def test_to_timestamp(self, time_spec):
         # delegate tests to `to_float_timestamp`
-        assert telegram.utils.datetime.to_timestamp(time_spec) == int(
-            telegram.utils.datetime.to_float_timestamp(time_spec)
-        )
+        assert tg_dtm.to_timestamp(time_spec) == int(tg_dtm.to_float_timestamp(time_spec))
 
     def test_to_timestamp_none(self):
         # this 'convenience' behaviour has been left left for backwards compatibility
-        assert telegram.utils.datetime.to_timestamp(None) is None
+        assert tg_dtm.to_timestamp(None) is None
 
     def test_from_timestamp_none(self):
-        assert telegram.utils.datetime.from_timestamp(None) is None
+        assert tg_dtm.from_timestamp(None) is None
 
     def test_from_timestamp_naive(self):
         datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, tzinfo=None)
-        assert telegram.utils.datetime.from_timestamp(1573431976, tzinfo=None) == datetime
+        assert tg_dtm.from_timestamp(1573431976, tzinfo=None) == datetime
 
     def test_from_timestamp_aware(self, timezone):
         # we're parametrizing this with two different UTC offsets to exclude the possibility
@@ -195,90 +176,6 @@ class TestUtilsHelpers:
         test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5)
         datetime = timezone.localize(test_datetime)
         assert (
-            telegram.utils.datetime.from_timestamp(
-                1573431976.1 - timezone.utcoffset(test_datetime).total_seconds()
-            )
+            tg_dtm.from_timestamp(1573431976.1 - timezone.utcoffset(test_datetime).total_seconds())
             == datetime
         )
-
-    @pytest.mark.parametrize(
-        'string,expected',
-        [
-            ('tests/data/game.gif', True),
-            ('tests/data', False),
-            (str(Path.cwd() / 'tests' / 'data' / 'game.gif'), True),
-            (str(Path.cwd() / 'tests' / 'data'), False),
-            (Path.cwd() / 'tests' / 'data' / 'game.gif', True),
-            (Path.cwd() / 'tests' / 'data', False),
-            ('https:/api.org/file/botTOKEN/document/file_3', False),
-            (None, False),
-        ],
-    )
-    def test_is_local_file(self, string, expected):
-        assert telegram.utils.files.is_local_file(string) == expected
-
-    @pytest.mark.parametrize(
-        'string,expected',
-        [
-            ('tests/data/game.gif', (Path.cwd() / 'tests' / 'data' / 'game.gif').as_uri()),
-            ('tests/data', 'tests/data'),
-            ('file://foobar', 'file://foobar'),
-            (
-                str(Path.cwd() / 'tests' / 'data' / 'game.gif'),
-                (Path.cwd() / 'tests' / 'data' / 'game.gif').as_uri(),
-            ),
-            (str(Path.cwd() / 'tests' / 'data'), str(Path.cwd() / 'tests' / 'data')),
-            (
-                Path.cwd() / 'tests' / 'data' / 'game.gif',
-                (Path.cwd() / 'tests' / 'data' / 'game.gif').as_uri(),
-            ),
-            (Path.cwd() / 'tests' / 'data', Path.cwd() / 'tests' / 'data'),
-            (
-                'https:/api.org/file/botTOKEN/document/file_3',
-                'https:/api.org/file/botTOKEN/document/file_3',
-            ),
-        ],
-    )
-    def test_parse_file_input_string(self, string, expected):
-        assert telegram.utils.files.parse_file_input(string) == expected
-
-    def test_parse_file_input_file_like(self):
-        with open('tests/data/game.gif', 'rb') as file:
-            parsed = telegram.utils.files.parse_file_input(file)
-
-        assert isinstance(parsed, InputFile)
-        assert not parsed.attach
-        assert parsed.filename == 'game.gif'
-
-        with open('tests/data/game.gif', 'rb') as file:
-            parsed = telegram.utils.files.parse_file_input(file, attach=True, filename='test_file')
-
-        assert isinstance(parsed, InputFile)
-        assert parsed.attach
-        assert parsed.filename == 'test_file'
-
-    def test_parse_file_input_bytes(self):
-        with open('tests/data/text_file.txt', 'rb') as file:
-            parsed = telegram.utils.files.parse_file_input(file.read())
-
-        assert isinstance(parsed, InputFile)
-        assert not parsed.attach
-        assert parsed.filename == 'application.octet-stream'
-
-        with open('tests/data/text_file.txt', 'rb') as file:
-            parsed = telegram.utils.files.parse_file_input(
-                file.read(), attach=True, filename='test_file'
-            )
-
-        assert isinstance(parsed, InputFile)
-        assert parsed.attach
-        assert parsed.filename == 'test_file'
-
-    def test_parse_file_input_tg_object(self):
-        animation = Animation('file_id', 'unique_id', 1, 1, 1)
-        assert telegram.utils.files.parse_file_input(animation, Animation) == 'file_id'
-        assert telegram.utils.files.parse_file_input(animation, MessageEntity) is animation
-
-    @pytest.mark.parametrize('obj', [{1: 2}, [1, 2], (1, 2)])
-    def test_parse_file_input_other(self, obj):
-        assert telegram.utils.files.parse_file_input(obj) is obj

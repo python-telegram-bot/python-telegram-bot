@@ -126,11 +126,33 @@ class TestErrors:
         for attribute in attributes:
             assert getattr(unpickled, attribute) == getattr(exception, attribute)
 
-    def test_pickling_test_coverage(self):
+    @pytest.mark.parametrize(
+        "inst",
+        [
+            (TelegramError("test message")),
+            (Unauthorized("test message")),
+            (InvalidToken()),
+            (NetworkError("test message")),
+            (BadRequest("test message")),
+            (TimedOut()),
+            (ChatMigrated(1234)),
+            (RetryAfter(12)),
+            (Conflict("test message")),
+            (PassportDecryptionError("test message")),
+            (InvalidCallbackData('test data')),
+        ],
+    )
+    def test_slots_behavior(self, inst, mro_slots):
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_test_coverage(self):
         """
-        This test is only here to make sure that new errors will override __reduce__ properly.
+        This test is only here to make sure that new errors will override __reduce__ and set
+        __slots__ properly.
         Add the new error class to the below covered_subclasses dict, if it's covered in the above
-        test_errors_pickling test.
+        test_errors_pickling and test_slots_behavior tests.
         """
 
         def make_assertion(cls):

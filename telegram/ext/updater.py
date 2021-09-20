@@ -20,8 +20,8 @@
 
 import logging
 import ssl
+import signal
 from queue import Queue
-from signal import SIGABRT, SIGINT, SIGTERM, signal
 from threading import Event, Lock, Thread, current_thread
 from time import sleep
 from typing import (
@@ -53,6 +53,7 @@ if TYPE_CHECKING:
 
 
 # From https://stackoverflow.com/questions/2549939/get-signal-names-from-numbers-in-python
+# TODO: Once we drop py3.7 replace this with signal.strsignal, which is new in py3.8
 _SIGNAL_NAMES = {
     v: k
     for k, v in reversed(sorted(vars(signal).items()))
@@ -816,7 +817,9 @@ class Updater(Generic[CCT, UD, CD, BD]):
 
             os._exit(1)
 
-    def idle(self, stop_signals: Union[List, Tuple] = (SIGINT, SIGTERM, SIGABRT)) -> None:
+    def idle(
+        self, stop_signals: Union[List, Tuple] = (signal.SIGINT, signal.SIGTERM, signal.SIGABRT)
+    ) -> None:
         """Blocks until one of the signals are received and stops the updater.
 
         Args:
@@ -826,7 +829,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
 
         """
         for sig in stop_signals:
-            signal(sig, self._signal_handler)
+            signal.signal(sig, self._signal_handler)
 
         self.is_idle = True
 

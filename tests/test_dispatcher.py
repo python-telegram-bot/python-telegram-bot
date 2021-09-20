@@ -36,7 +36,7 @@ from telegram.ext import (
 )
 from telegram.ext import PersistenceInput
 from telegram.ext.dispatcher import Dispatcher, DispatcherHandlerStop
-from telegram.utils.aux import DEFAULT_FALSE
+from telegram.utils.defaultvalue import DEFAULT_FALSE
 from telegram.error import TelegramError
 from tests.conftest import create_dp
 from collections import defaultdict

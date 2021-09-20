@@ -21,7 +21,7 @@ import datetime
 import pytest
 
 from telegram import User, ChatInviteLink
-from telegram.utils.aux import to_timestamp
+from telegram.utils.datetime import to_timestamp
 
 
 @pytest.fixture(scope='class')

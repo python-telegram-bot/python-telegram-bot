@@ -37,9 +37,9 @@ class DefaultValue(Generic[DVType]):
     """Wrapper for immutable default arguments that allows to check, if the default value was set
     explicitly. Usage::
 
-        DefaultOne = DefaultValue(1)
-        def f(arg=DefaultOne):
-            if arg is DefaultOne:
+        default_one = DefaultValue(1)
+        def f(arg=default_one):
+            if arg is default_one:
                 print('`arg` is the default')
                 arg = arg.value
             else:
