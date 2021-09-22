@@ -17,13 +17,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a Telegram Message.
-
-Warning:
-    Contents of this module are intended to be used internally by the library and *not* by the
-    user. Changes to this module are not considered breaking changes and may not be documented in
-    the changelog.
-"""
+"""This module contains an object that represents a Telegram Message."""
 import datetime
 import sys
 from html import escape

@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import re
+
 import pytest
 
 from telegram import Sticker, Update, User, MessageEntity, Message
@@ -124,6 +126,13 @@ class TestHelpers:
 
         empty_update = Update(2)
         assert helpers.effective_message_type(empty_update) is None
+
+    def test_effective_message_type_wrong_type(self):
+        entity = dict()
+        with pytest.raises(
+            TypeError, match=re.escape(f'not Message or Update (got: {type(entity)})')
+        ):
+            helpers.effective_message_type(entity)
 
     def test_mention_html(self):
         expected = '<a href="tg://user?id=1">the name</a>'

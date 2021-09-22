@@ -19,7 +19,7 @@
 """This module contains the DefaultValue class.
 
 .. versionchanged:: 14.0
-   Previously, the contents of this module where available through the (no longer existing)
+   Previously, the contents of this module were available through the (no longer existing)
    module ``telegram.utils.helpers``.
 
 Warning:

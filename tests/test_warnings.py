@@ -42,8 +42,8 @@ class TestWarnings:
     def test_test_coverage(self):
         """This test is only here to make sure that new warning classes will set __slots__
         properly.
-        Add the new error class to the below covered_subclasses dict, if it's covered in the above
-        test_slots_behavior tests.
+        Add the new warning class to the below covered_subclasses dict, if it's covered in the
+        above test_slots_behavior tests.
         """
 
         def make_assertion(cls):
@@ -80,9 +80,9 @@ class TestWarnings:
         assert str(recwarn[1].message) == 'test message 2'
         assert pathlib.Path(recwarn[1].filename) == expected_file, "incorrect stacklevel!"
 
-        warn('test message 3', stacklevel=1)
+        warn('test message 3', stacklevel=1, category=PTBDeprecationWarning)
         expected_file = pathlib.Path(__file__)
         assert len(recwarn) == 3
-        assert recwarn[2].category is PTBUserWarning
+        assert recwarn[2].category is PTBDeprecationWarning
         assert str(recwarn[2].message) == 'test message 3'
         assert pathlib.Path(recwarn[2].filename) == expected_file, "incorrect stacklevel!"

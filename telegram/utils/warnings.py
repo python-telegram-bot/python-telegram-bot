@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the helper function related to warnings issued by the library.
+"""This module contains helper functions related to warnings issued by the library.
 
 .. versionadded:: 14.0
 
@@ -39,8 +39,9 @@ def warn(message: str, category: Type[Warning] = PTBUserWarning, stacklevel: int
 
     Args:
         message (:obj:`str`): Specify the warnings message to pass to ``warnings.warn()``.
-        category (:obj:`Type[Warning]`): Specify the Warning class to pass to ``warnings.warn()``.
-        stacklevel (:obj:`int`): Specify the stacklevel to pass to ``warnings.warn()``. Pass the
-            same value as you'd pass directly to ``warnings.warn()``.
+        category (:obj:`Type[Warning]`, optional): Specify the Warning class to pass to
+            ``warnings.warn()``. Defaults to :class:`telegram.warnings.PTBUserWarning``
+        stacklevel (:obj:`int`, optional): Specify the stacklevel to pass to ``warnings.warn()``.
+            Pass the same value as you'd pass directly to ``warnings.warn()``. Defaults to ``0``.
     """
     warnings.warn(message, category=category, stacklevel=stacklevel + 1)

@@ -52,15 +52,6 @@ if TYPE_CHECKING:
     from telegram.ext import BasePersistence, Defaults, CallbackContext
 
 
-# From https://stackoverflow.com/questions/2549939/get-signal-names-from-numbers-in-python
-# TODO: Once we drop py3.7 replace this with signal.strsignal, which is new in py3.8
-_SIGNAL_NAMES = {
-    v: k
-    for k, v in reversed(sorted(vars(signal).items()))
-    if k.startswith('SIG') and not k.startswith('SIG_')
-}
-
-
 class Updater(Generic[CCT, UD, CD, BD]):
     """
     This class, which employs the :class:`telegram.ext.Dispatcher`, provides a frontend to
@@ -802,7 +793,14 @@ class Updater(Generic[CCT, UD, CD, BD]):
     def _signal_handler(self, signum, frame) -> None:
         self.is_idle = False
         if self.running:
-            self.logger.info('Received signal %s (%s), stopping...', signum, _SIGNAL_NAMES[signum])
+            self.logger.info(
+                'Received signal %s (%s), stopping...',
+                signum,
+                # signal.Signals is undocumented for some reason see
+                # https://github.com/python/typeshed/pull/555#issuecomment-247874222
+                # https://bugs.python.org/issue28206
+                signal.Signals(signum),  # pylint: disable=no-member
+            )
             if self.persistence:
                 # Update user_data, chat_data and bot_data before flushing
                 self.dispatcher.update_persistence()
