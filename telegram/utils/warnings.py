@@ -40,7 +40,7 @@ def warn(message: str, category: Type[Warning] = PTBUserWarning, stacklevel: int
     Args:
         message (:obj:`str`): Specify the warnings message to pass to ``warnings.warn()``.
         category (:obj:`Type[Warning]`, optional): Specify the Warning class to pass to
-            ``warnings.warn()``. Defaults to :class:`telegram.warnings.PTBUserWarning``
+            ``warnings.warn()``. Defaults to :class:`telegram.warnings.PTBUserWarning`.
         stacklevel (:obj:`int`, optional): Specify the stacklevel to pass to ``warnings.warn()``.
             Pass the same value as you'd pass directly to ``warnings.warn()``. Defaults to ``0``.
     """
