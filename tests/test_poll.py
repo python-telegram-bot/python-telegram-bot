@@ -21,7 +21,7 @@ from datetime import datetime
 
 
 from telegram import Poll, PollOption, PollAnswer, User, MessageEntity
-from telegram.utils.helpers import to_timestamp
+from telegram.utils.datetime import to_timestamp
 
 
 @pytest.fixture(scope="class")

@@ -22,8 +22,8 @@ from pathlib import Path
 import pytest
 from flaky import flaky
 
-from telegram import VideoNote, TelegramError, Voice, PhotoSize, Bot
-from telegram.error import BadRequest
+from telegram import VideoNote, Voice, PhotoSize, Bot
+from telegram.error import BadRequest, TelegramError
 from tests.conftest import check_shortcut_call, check_shortcut_signature, check_defaults_handling
 
 

@@ -31,7 +31,7 @@ from typing import (
 )
 
 from telegram import Update
-from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
+from telegram.utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 
 from .handler import Handler
 from .utils.types import CCT
