@@ -22,9 +22,9 @@ from pathlib import Path
 import pytest
 from flaky import flaky
 
-from telegram import Audio, Voice, TelegramError, MessageEntity, Bot
-from telegram.error import BadRequest
-from telegram.utils.helpers import escape_markdown
+from telegram import Audio, Voice, MessageEntity, Bot
+from telegram.error import BadRequest, TelegramError
+from telegram.helpers import escape_markdown
 from tests.conftest import check_shortcut_call, check_shortcut_signature, check_defaults_handling
 
 

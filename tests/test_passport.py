@@ -28,8 +28,8 @@ from telegram import (
     PassportElementErrorSelfie,
     PassportElementErrorDataField,
     Credentials,
-    PassportDecryptionError,
 )
+from telegram.error import PassportDecryptionError
 
 
 # Note: All classes in telegram.credentials (except EncryptedCredentials) aren't directly tested
