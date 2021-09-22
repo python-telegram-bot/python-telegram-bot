@@ -183,7 +183,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         if self.workers < 1:
             warn(
                 'Asynchronous callbacks can not be processed without at least one worker thread.',
-                stacklevel=2,
+                stacklevel=4,
             )
 
         self.user_data: DefaultDict[int, UD] = defaultdict(self.context_types.user_data)

@@ -34,6 +34,7 @@ from telegram.ext import (
     BasePersistence,
     ContextTypes,
     DispatcherBuilder,
+    UpdaterBuilder,
 )
 from telegram.ext import PersistenceInput
 from telegram.ext.dispatcher import DispatcherHandlerStop, Dispatcher
@@ -120,8 +121,16 @@ class TestDispatcher:
             == '`Dispatcher` instances should be built via the `DispatcherBuilder`.'
         )
 
-    def test_less_than_one_worker_warning(self, dp, recwarn):
-        DispatcherBuilder().bot(dp.bot).workers(0).build()
+    @pytest.mark.parametrize(
+        'builder',
+        (DispatcherBuilder(), UpdaterBuilder()),
+        ids=('DispatcherBuilder', 'UpdaterBuilder'),
+    )
+    def test_less_than_one_worker_warning(self, dp, recwarn, builder):
+        if isinstance(builder, UpdaterBuilder):
+            pytest.xfail('How we handle this depends on the last review')
+
+        builder.bot(dp.bot).workers(0).build()
         assert len(recwarn) == 1
         assert (
             str(recwarn[0].message)
