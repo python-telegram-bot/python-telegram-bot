@@ -38,7 +38,6 @@ import pytest
 from .conftest import DictBot
 
 from telegram import (
-    TelegramError,
     Message,
     User,
     Chat,
@@ -47,7 +46,7 @@ from telegram import (
     InlineKeyboardMarkup,
     InlineKeyboardButton,
 )
-from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter
+from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter, TelegramError
 from telegram.ext import (
     Updater,
     Dispatcher,
@@ -56,7 +55,7 @@ from telegram.ext import (
     InvalidCallbackData,
     ExtBot,
 )
-from telegram.utils.warnings import PTBDeprecationWarning
+from telegram.warnings import PTBDeprecationWarning
 from telegram.ext.utils.webhookhandler import WebhookServer
 
 signalskip = pytest.mark.skipif(

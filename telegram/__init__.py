@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """A library that provides a Python interface to the Telegram Bot API"""
 
-from .base import TelegramObject
+from .telegramobject import TelegramObject
 from .botcommand import BotCommand
 from .user import User
 from .files.chatphoto import ChatPhoto
@@ -57,7 +57,6 @@ from .replymarkup import ReplyMarkup
 from .replykeyboardmarkup import ReplyKeyboardMarkup
 from .replykeyboardremove import ReplyKeyboardRemove
 from .forcereply import ForceReply
-from .error import TelegramError, PassportDecryptionError
 from .files.inputfile import InputFile
 from .files.file import File
 from .parsemode import ParseMode
@@ -131,16 +130,6 @@ from .files.inputmedia import (
     InputMediaAnimation,
     InputMediaAudio,
     InputMediaDocument,
-)
-from .constants import (
-    MAX_MESSAGE_LENGTH,
-    MAX_CAPTION_LENGTH,
-    SUPPORTED_WEBHOOK_PORTS,
-    MAX_FILESIZE_DOWNLOAD,
-    MAX_FILESIZE_UPLOAD,
-    MAX_MESSAGES_PER_SECOND_PER_CHAT,
-    MAX_MESSAGES_PER_SECOND,
-    MAX_MESSAGES_PER_MINUTE_PER_GROUP,
 )
 from .passport.passportelementerrors import (
     PassportElementError,
@@ -263,13 +252,6 @@ __all__ = (  # Keep this alphabetically ordered
     'LabeledPrice',
     'Location',
     'LoginUrl',
-    'MAX_CAPTION_LENGTH',
-    'MAX_FILESIZE_DOWNLOAD',
-    'MAX_FILESIZE_UPLOAD',
-    'MAX_MESSAGES_PER_MINUTE_PER_GROUP',
-    'MAX_MESSAGES_PER_SECOND',
-    'MAX_MESSAGES_PER_SECOND_PER_CHAT',
-    'MAX_MESSAGE_LENGTH',
     'MaskPosition',
     'Message',
     'MessageAutoDeleteTimerChanged',
@@ -300,7 +282,6 @@ __all__ = (  # Keep this alphabetically ordered
     'ReplyKeyboardRemove',
     'ReplyMarkup',
     'ResidentialAddress',
-    'SUPPORTED_WEBHOOK_PORTS',
     'SecureData',
     'SecureValue',
     'ShippingAddress',
@@ -309,8 +290,6 @@ __all__ = (  # Keep this alphabetically ordered
     'Sticker',
     'StickerSet',
     'SuccessfulPayment',
-    'PassportDecryptionError',
-    'TelegramError',
     'TelegramObject',
     'Update',
     'User',

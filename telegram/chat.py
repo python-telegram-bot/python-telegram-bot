@@ -26,7 +26,7 @@ from telegram.utils.types import JSONDict, FileInput, ODVInput, DVInput
 
 from .chatpermissions import ChatPermissions
 from .chatlocation import ChatLocation
-from .utils.helpers import DEFAULT_NONE, DEFAULT_20
+from .utils.defaultvalue import DEFAULT_NONE, DEFAULT_20
 
 if TYPE_CHECKING:
     from telegram import (

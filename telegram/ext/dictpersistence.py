@@ -21,13 +21,9 @@
 from typing import DefaultDict, Dict, Optional, Tuple, cast
 from collections import defaultdict
 
-from telegram.utils.helpers import (
-    decode_conversations_from_json,
-    decode_user_chat_data_from_json,
-    encode_conversations_to_json,
-)
 from telegram.ext import BasePersistence, PersistenceInput
 from telegram.ext.utils.types import ConversationDict, CDCData
+from telegram.utils.types import JSONDict
 
 try:
     import ujson as json
@@ -113,13 +109,13 @@ class DictPersistence(BasePersistence):
         self._conversations_json = None
         if user_data_json:
             try:
-                self._user_data = decode_user_chat_data_from_json(user_data_json)
+                self._user_data = self._decode_user_chat_data_from_json(user_data_json)
                 self._user_data_json = user_data_json
             except (ValueError, AttributeError) as exc:
                 raise TypeError("Unable to deserialize user_data_json. Not valid JSON") from exc
         if chat_data_json:
             try:
-                self._chat_data = decode_user_chat_data_from_json(chat_data_json)
+                self._chat_data = self._decode_user_chat_data_from_json(chat_data_json)
                 self._chat_data_json = chat_data_json
             except (ValueError, AttributeError) as exc:
                 raise TypeError("Unable to deserialize chat_data_json. Not valid JSON") from exc
@@ -162,7 +158,7 @@ class DictPersistence(BasePersistence):
 
         if conversations_json:
             try:
-                self._conversations = decode_conversations_from_json(conversations_json)
+                self._conversations = self._decode_conversations_from_json(conversations_json)
                 self._conversations_json = conversations_json
             except (ValueError, AttributeError) as exc:
                 raise TypeError(
@@ -233,7 +229,7 @@ class DictPersistence(BasePersistence):
         """:obj:`str`: The conversations serialized as a JSON-string."""
         if self._conversations_json:
             return self._conversations_json
-        return encode_conversations_to_json(self.conversations)  # type: ignore[arg-type]
+        return self._encode_conversations_to_json(self.conversations)  # type: ignore[arg-type]
 
     def get_user_data(self) -> DefaultDict[int, Dict[object, object]]:
         """Returns the user_data created from the ``user_data_json`` or an empty
@@ -389,3 +385,64 @@ class DictPersistence(BasePersistence):
         .. versionadded:: 14.0
         .. seealso:: :meth:`telegram.ext.BasePersistence.flush`
         """
+
+    @staticmethod
+    def _encode_conversations_to_json(conversations: Dict[str, Dict[Tuple, object]]) -> str:
+        """Helper method to encode a conversations dict (that uses tuples as keys) to a
+        JSON-serializable way. Use :meth:`self._decode_conversations_from_json` to decode.
+
+        Args:
+            conversations (:obj:`dict`): The conversations dict to transform to JSON.
+
+        Returns:
+            :obj:`str`: The JSON-serialized conversations dict
+        """
+        tmp: Dict[str, JSONDict] = {}
+        for handler, states in conversations.items():
+            tmp[handler] = {}
+            for key, state in states.items():
+                tmp[handler][json.dumps(key)] = state
+        return json.dumps(tmp)
+
+    @staticmethod
+    def _decode_conversations_from_json(json_string: str) -> Dict[str, Dict[Tuple, object]]:
+        """Helper method to decode a conversations dict (that uses tuples as keys) from a
+        JSON-string created with :meth:`self._encode_conversations_to_json`.
+
+        Args:
+            json_string (:obj:`str`): The conversations dict as JSON string.
+
+        Returns:
+            :obj:`dict`: The conversations dict after decoding
+        """
+        tmp = json.loads(json_string)
+        conversations: Dict[str, Dict[Tuple, object]] = {}
+        for handler, states in tmp.items():
+            conversations[handler] = {}
+            for key, state in states.items():
+                conversations[handler][tuple(json.loads(key))] = state
+        return conversations
+
+    @staticmethod
+    def _decode_user_chat_data_from_json(data: str) -> DefaultDict[int, Dict[object, object]]:
+        """Helper method to decode chat or user data (that uses ints as keys) from a
+        JSON-string.
+
+        Args:
+            data (:obj:`str`): The user/chat_data dict as JSON string.
+
+        Returns:
+            :obj:`dict`: The user/chat_data defaultdict after decoding
+        """
+        tmp: DefaultDict[int, Dict[object, object]] = defaultdict(dict)
+        decoded_data = json.loads(data)
+        for user, user_data in decoded_data.items():
+            user = int(user)
+            tmp[user] = {}
+            for key, value in user_data.items():
+                try:
+                    key = int(key)
+                except ValueError:
+                    pass
+                tmp[user][key] = value
+        return tmp

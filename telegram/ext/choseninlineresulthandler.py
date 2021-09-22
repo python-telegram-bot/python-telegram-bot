@@ -22,7 +22,7 @@ from typing import Optional, TypeVar, Union, Callable, TYPE_CHECKING, Pattern, M
 
 from telegram import Update
 
-from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
+from telegram.utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 from .handler import Handler
 from .utils.types import CCT
 

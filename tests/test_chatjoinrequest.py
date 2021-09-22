@@ -22,7 +22,7 @@ import pytest
 import pytz
 
 from telegram import ChatJoinRequest, User, Chat, ChatInviteLink, Bot
-from telegram.utils.helpers import to_timestamp
+from telegram.utils.datetime import to_timestamp
 from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
 
 

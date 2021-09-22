@@ -56,15 +56,15 @@ from telegram.ext import (
     ExtBot,
 )
 from telegram.error import BadRequest
-from telegram.utils.helpers import DefaultValue, DEFAULT_NONE
-from telegram.utils.request import Request
+from telegram.utils.defaultvalue import DefaultValue, DEFAULT_NONE
+from telegram.request import Request
 from tests.bots import get_bot
 
 
 # This is here instead of in setup.cfg due to https://github.com/pytest-dev/pytest/issues/8343
 def pytest_runtestloop(session):
     session.add_marker(
-        pytest.mark.filterwarnings('ignore::telegram.utils.warnings.PTBDeprecationWarning')
+        pytest.mark.filterwarnings('ignore::telegram.warnings.PTBDeprecationWarning')
     )
 
 

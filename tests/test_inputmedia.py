@@ -500,7 +500,7 @@ class TestSendMediaGroup:
             result = video_check and thumb_check
             raise Exception(f"Test was {'successful' if result else 'failing'}")
 
-        monkeypatch.setattr('telegram.utils.request.Request._request_wrapper', test)
+        monkeypatch.setattr('telegram.request.Request._request_wrapper', test)
         input_video = InputMediaVideo(video_file, thumb=photo_file)
         with pytest.raises(Exception, match='Test was successful'):
             bot.send_media_group(chat_id, [input_video, input_video])
@@ -591,7 +591,7 @@ class TestSendMediaGroup:
             result = video_check and thumb_check
             raise Exception(f"Test was {'successful' if result else 'failing'}")
 
-        monkeypatch.setattr('telegram.utils.request.Request._request_wrapper', test)
+        monkeypatch.setattr('telegram.request.Request._request_wrapper', test)
         input_video = InputMediaVideo(video_file, thumb=photo_file)
         with pytest.raises(Exception, match='Test was successful'):
             bot.edit_message_media(chat_id=chat_id, message_id=123, media=input_video)
