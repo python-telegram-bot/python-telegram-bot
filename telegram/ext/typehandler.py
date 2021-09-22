@@ -19,7 +19,7 @@
 """This module contains the TypeHandler class."""
 
 from typing import Callable, Type, TypeVar, Union
-from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
+from telegram.utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 
 from .handler import Handler
 from .utils.types import CCT

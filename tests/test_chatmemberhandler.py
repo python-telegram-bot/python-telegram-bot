@@ -35,7 +35,7 @@ from telegram import (
     ChatMember,
 )
 from telegram.ext import CallbackContext, JobQueue, ChatMemberHandler
-from telegram.utils.helpers import from_timestamp
+from telegram.utils.datetime import from_timestamp
 
 message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
 

@@ -19,7 +19,7 @@
 import pytest
 
 from telegram import Update, User, Bot, InlineKeyboardButton
-from telegram.utils.helpers import escape_markdown
+from telegram.helpers import escape_markdown
 from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
 
 

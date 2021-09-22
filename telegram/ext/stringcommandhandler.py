@@ -20,7 +20,7 @@
 
 from typing import TYPE_CHECKING, Callable, List, Optional, TypeVar, Union
 
-from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
+from telegram.utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 
 from .handler import Handler
 from .utils.types import CCT

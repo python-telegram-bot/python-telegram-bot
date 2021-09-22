@@ -23,7 +23,7 @@ from time import sleep
 
 import pytest
 
-from telegram import TelegramError, Message, User, Chat, Update, Bot, MessageEntity
+from telegram import Message, User, Chat, Update, Bot, MessageEntity
 from telegram.ext import (
     MessageHandler,
     Filters,
@@ -36,7 +36,8 @@ from telegram.ext import (
 )
 from telegram.ext import PersistenceInput
 from telegram.ext.dispatcher import Dispatcher, DispatcherHandlerStop
-from telegram.utils.helpers import DEFAULT_FALSE
+from telegram.utils.defaultvalue import DEFAULT_FALSE
+from telegram.error import TelegramError
 from tests.conftest import create_dp
 from collections import defaultdict
 

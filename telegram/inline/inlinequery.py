@@ -22,7 +22,7 @@
 from typing import TYPE_CHECKING, Any, Optional, Union, Callable, ClassVar, Sequence
 
 from telegram import Location, TelegramObject, User, constants
-from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.defaultvalue import DEFAULT_NONE
 from telegram.utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:

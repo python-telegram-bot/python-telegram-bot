@@ -1539,9 +1539,9 @@ officedocument.wordprocessingml.document")``.
             of allowed users.
 
         Args:
-            user_id(:class:`telegram.utils.types.SLT[int]`, optional):
+            user_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
                 Which user ID(s) to allow through.
-            username(:class:`telegram.utils.types.SLT[str]`, optional):
+            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
                 Which username(s) to allow through. Leading ``'@'`` s in usernames will be
                 discarded.
             allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
@@ -1586,7 +1586,7 @@ officedocument.wordprocessingml.document")``.
             Add one or more users to the allowed usernames.
 
             Args:
-                username(:class:`telegram.utils.types.SLT[str]`, optional):
+                username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
                     Which username(s) to allow through.
                     Leading ``'@'`` s in usernames will be discarded.
             """
@@ -1597,7 +1597,7 @@ officedocument.wordprocessingml.document")``.
             Add one or more users to the allowed user ids.
 
             Args:
-                user_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                user_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
                     Which user ID(s) to allow through.
             """
             return super().add_chat_ids(user_id)
@@ -1607,7 +1607,7 @@ officedocument.wordprocessingml.document")``.
             Remove one or more users from allowed usernames.
 
             Args:
-                username(:class:`telegram.utils.types.SLT[str]`, optional):
+                username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
                     Which username(s) to disallow through.
                     Leading ``'@'`` s in usernames will be discarded.
             """
@@ -1618,7 +1618,7 @@ officedocument.wordprocessingml.document")``.
             Remove one or more users from allowed user ids.
 
             Args:
-                user_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                user_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
                     Which user ID(s) to disallow through.
             """
             return super().remove_chat_ids(user_id)
@@ -1640,9 +1640,9 @@ officedocument.wordprocessingml.document")``.
             of allowed bots.
 
         Args:
-            bot_id(:class:`telegram.utils.types.SLT[int]`, optional):
+            bot_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
                 Which bot ID(s) to allow through.
-            username(:class:`telegram.utils.types.SLT[str]`, optional):
+            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
                 Which username(s) to allow through. Leading ``'@'`` s in usernames will be
                 discarded.
             allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
@@ -1687,7 +1687,7 @@ officedocument.wordprocessingml.document")``.
             Add one or more users to the allowed usernames.
 
             Args:
-                username(:class:`telegram.utils.types.SLT[str]`, optional):
+                username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
                     Which username(s) to allow through.
                     Leading ``'@'`` s in usernames will be discarded.
             """
@@ -1699,7 +1699,7 @@ officedocument.wordprocessingml.document")``.
             Add one or more users to the allowed user ids.
 
             Args:
-                bot_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                bot_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
                     Which bot ID(s) to allow through.
             """
             return super().add_chat_ids(bot_id)
@@ -1709,7 +1709,7 @@ officedocument.wordprocessingml.document")``.
             Remove one or more users from allowed usernames.
 
             Args:
-                username(:class:`telegram.utils.types.SLT[str]`, optional):
+                username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
                     Which username(s) to disallow through.
                     Leading ``'@'`` s in usernames will be discarded.
             """
@@ -1720,7 +1720,7 @@ officedocument.wordprocessingml.document")``.
             Remove one or more users from allowed user ids.
 
             Args:
-                bot_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                bot_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
                     Which bot ID(s) to disallow through.
             """
             return super().remove_chat_ids(bot_id)
@@ -1741,9 +1741,9 @@ officedocument.wordprocessingml.document")``.
             of allowed chats.
 
         Args:
-            chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
+            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
                 Which chat ID(s) to allow through.
-            username(:class:`telegram.utils.types.SLT[str]`, optional):
+            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
                 Which username(s) to allow through.
                 Leading ``'@'`` s in usernames will be discarded.
             allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
@@ -1771,7 +1771,7 @@ officedocument.wordprocessingml.document")``.
             Add one or more chats to the allowed usernames.
 
             Args:
-                username(:class:`telegram.utils.types.SLT[str]`, optional):
+                username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
                     Which username(s) to allow through.
                     Leading ``'@'`` s in usernames will be discarded.
             """
@@ -1782,7 +1782,7 @@ officedocument.wordprocessingml.document")``.
             Add one or more chats to the allowed chat ids.
 
             Args:
-                chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
                     Which chat ID(s) to allow through.
             """
             return super().add_chat_ids(chat_id)
@@ -1792,7 +1792,7 @@ officedocument.wordprocessingml.document")``.
             Remove one or more chats from allowed usernames.
 
             Args:
-                username(:class:`telegram.utils.types.SLT[str]`, optional):
+                username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
                     Which username(s) to disallow through.
                     Leading ``'@'`` s in usernames will be discarded.
             """
@@ -1803,7 +1803,7 @@ officedocument.wordprocessingml.document")``.
             Remove one or more chats from allowed chat ids.
 
             Args:
-                chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
                     Which chat ID(s) to disallow through.
             """
             return super().remove_chat_ids(chat_id)
@@ -1835,9 +1835,9 @@ officedocument.wordprocessingml.document")``.
             of allowed chats.
 
         Args:
-            chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
+            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
                 Which chat/user ID(s) to allow through.
-            username(:class:`telegram.utils.types.SLT[str]`, optional):
+            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
                 Which username(s) to allow through. Leading ``'@'`` s in usernames will be
                 discarded.
             allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
@@ -1864,7 +1864,7 @@ officedocument.wordprocessingml.document")``.
             Add one or more chats to the allowed usernames.
 
             Args:
-                username(:class:`telegram.utils.types.SLT[str]`, optional):
+                username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
                     Which username(s) to allow through.
                     Leading ``'@'`` s in usernames will be discarded.
             """
@@ -1875,7 +1875,7 @@ officedocument.wordprocessingml.document")``.
             Add one or more chats to the allowed chat ids.
 
             Args:
-                chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
                     Which chat/user ID(s) to allow through.
             """
             return super().add_chat_ids(chat_id)
@@ -1885,7 +1885,7 @@ officedocument.wordprocessingml.document")``.
             Remove one or more chats from allowed usernames.
 
             Args:
-                username(:class:`telegram.utils.types.SLT[str]`, optional):
+                username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
                     Which username(s) to disallow through.
                     Leading ``'@'`` s in usernames will be discarded.
             """
@@ -1896,7 +1896,7 @@ officedocument.wordprocessingml.document")``.
             Remove one or more chats from allowed chat ids.
 
             Args:
-                chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
                     Which chat/user ID(s) to disallow through.
             """
             return super().remove_chat_ids(chat_id)
@@ -1935,9 +1935,9 @@ officedocument.wordprocessingml.document")``.
             of allowed chats.
 
         Args:
-            chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
+            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
                 Which sender chat chat ID(s) to allow through.
-            username(:class:`telegram.utils.types.SLT[str]`, optional):
+            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
                 Which sender chat username(s) to allow through.
                 Leading ``'@'`` s in usernames will be discarded.
             allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no sender
@@ -1974,7 +1974,7 @@ officedocument.wordprocessingml.document")``.
             Add one or more sender chats to the allowed usernames.
 
             Args:
-                username(:class:`telegram.utils.types.SLT[str]`, optional):
+                username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
                     Which sender chat username(s) to allow through.
                     Leading ``'@'`` s in usernames will be discarded.
             """
@@ -1985,7 +1985,7 @@ officedocument.wordprocessingml.document")``.
             Add one or more sender chats to the allowed chat ids.
 
             Args:
-                chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
                     Which sender chat ID(s) to allow through.
             """
             return super().add_chat_ids(chat_id)
@@ -1995,7 +1995,7 @@ officedocument.wordprocessingml.document")``.
             Remove one or more sender chats from allowed usernames.
 
             Args:
-                username(:class:`telegram.utils.types.SLT[str]`, optional):
+                username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
                     Which sender chat username(s) to disallow through.
                     Leading ``'@'`` s in usernames will be discarded.
             """
@@ -2006,7 +2006,7 @@ officedocument.wordprocessingml.document")``.
             Remove one or more sender chats from allowed chat ids.
 
             Args:
-                chat_id(:class:`telegram.utils.types.SLT[int]`, optional):
+                chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
                     Which sender chat ID(s) to disallow through.
             """
             return super().remove_chat_ids(chat_id)
@@ -2127,7 +2127,7 @@ officedocument.wordprocessingml.document")``.
         ``Filters.text | Filters.dice``.
 
     Args:
-        update (:class:`telegram.utils.types.SLT[int]`, optional):
+        update (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
             Which values to allow. If not specified, will allow any dice message.
 
     Attributes:
@@ -2159,7 +2159,7 @@ officedocument.wordprocessingml.document")``.
             ``MessageHandler(Filters.language("en"), callback_method)``
 
         Args:
-            lang (:class:`telegram.utils.types.SLT[str]`):
+            lang (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
                 Which language code(s) to allow through.
                 This will be matched using ``.startswith`` meaning that
                 'en' will match both 'en_US' and 'en_GB'.

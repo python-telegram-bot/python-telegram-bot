@@ -23,8 +23,8 @@ from time import sleep
 import pytest
 from flaky import flaky
 
-from telegram import Sticker, PhotoSize, TelegramError, StickerSet, Audio, MaskPosition, Bot
-from telegram.error import BadRequest
+from telegram import Sticker, PhotoSize, StickerSet, Audio, MaskPosition, Bot
+from telegram.error import BadRequest, TelegramError
 from tests.conftest import check_shortcut_call, check_shortcut_signature, check_defaults_handling
 
 
