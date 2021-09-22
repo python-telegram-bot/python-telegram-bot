@@ -23,7 +23,7 @@ from time import sleep
 
 import pytest
 
-from telegram import TelegramError, Message, User, Chat, Update, Bot, MessageEntity
+from telegram import Message, User, Chat, Update, Bot, MessageEntity
 from telegram.ext import (
     MessageHandler,
     Filters,
@@ -37,7 +37,8 @@ from telegram.ext import (
 )
 from telegram.ext import PersistenceInput
 from telegram.ext.dispatcher import DispatcherHandlerStop, Dispatcher
-from telegram.utils.helpers import DEFAULT_FALSE
+from telegram.utils.defaultvalue import DEFAULT_FALSE
+from telegram.error import TelegramError
 from tests.conftest import create_dp
 from collections import defaultdict
 
@@ -126,6 +127,7 @@ class TestDispatcher:
             str(recwarn[0].message)
             == 'Asynchronous callbacks can not be processed without at least one worker thread.'
         )
+        assert recwarn[0].filename == __file__, "stacklevel is incorrect!"
 
     def test_builder(self, dp):
         builder_1 = dp.builder()
@@ -271,21 +273,18 @@ class TestDispatcher:
 
         assert name1 != name2
 
-    def test_async_raises_dispatcher_handler_stop(self, dp, caplog):
+    def test_async_raises_dispatcher_handler_stop(self, dp, recwarn):
         def callback(update, context):
             raise DispatcherHandlerStop()
 
         dp.add_handler(MessageHandler(Filters.all, callback, run_async=True))
 
-        with caplog.at_level(logging.WARNING):
-            dp.update_queue.put(self.message_update)
-            sleep(0.1)
-            assert len(caplog.records) == 1
-            assert (
-                caplog.records[-1]
-                .getMessage()
-                .startswith('DispatcherHandlerStop is not supported with async functions')
-            )
+        dp.update_queue.put(self.message_update)
+        sleep(0.1)
+        assert len(recwarn) == 1
+        assert str(recwarn[-1].message).startswith(
+            'DispatcherHandlerStop is not supported with async functions'
+        )
 
     def test_add_async_handler(self, dp):
         dp.add_handler(

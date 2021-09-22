@@ -19,7 +19,6 @@
 """This module contains the Dispatcher class."""
 
 import logging
-import warnings
 import weakref
 from collections import defaultdict
 from queue import Empty, Queue
@@ -40,12 +39,14 @@ from typing import (
 )
 from uuid import uuid4
 
-from telegram import TelegramError, Update
+from telegram import Update
+from telegram.error import TelegramError
 from telegram.ext import BasePersistence, ContextTypes
 from telegram.ext.handler import Handler
 from telegram.ext.callbackdatacache import CallbackDataCache
+from telegram.utils.defaultvalue import DefaultValue, DEFAULT_FALSE
+from telegram.utils.warnings import warn
 from telegram.ext.utils.promise import Promise
-from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
 from telegram.ext.utils.types import CCT, UD, CD, BD, BT, JQ, PT
 
 if TYPE_CHECKING:
@@ -166,9 +167,8 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
 
     def __init__(self, **kwargs: object):
         if not kwargs.pop('builder_flag', False):
-            warnings.warn(
+            warn(
                 '`Dispatcher` instances should be built via the `DispatcherBuilder`.',
-                UserWarning,
                 stacklevel=2,
             )
 
@@ -181,8 +181,9 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         self.exception_event = cast(Event, kwargs.pop('exception_event'))
 
         if self.workers < 1:
-            warnings.warn(
-                'Asynchronous callbacks can not be processed without at least one worker thread.'
+            warn(
+                'Asynchronous callbacks can not be processed without at least one worker thread.',
+                stacklevel=2,
             )
 
         self.user_data: DefaultDict[int, UD] = defaultdict(self.context_types.user_data)
@@ -303,9 +304,9 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
                 continue
 
             if isinstance(promise.exception, DispatcherHandlerStop):
-                self.logger.warning(
-                    'DispatcherHandlerStop is not supported with async functions; func: %s',
-                    promise.pooled_function.__name__,
+                warn(
+                    'DispatcherHandlerStop is not supported with async functions; '
+                    f'func: {promise.pooled_function.__name__}',
                 )
                 continue
 
@@ -669,15 +670,16 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         promise: Promise = None,
     ) -> bool:
         """Dispatches an error by passing it to all error handlers registered with
-         :meth:`add_error_handler`. If one of the error handlers raises
+        :meth:`add_error_handler`. If one of the error handlers raises
         :class:`telegram.ext.DispatcherHandlerStop`, the update will not be handled by other error
         handlers or handlers (even in other groups). All other exceptions raised by an error
         handler will just be logged.
 
         .. versionchanged:: 14.0
+
             * Exceptions raised by error handlers are now properly logged.
             * :class:`telegram.ext.DispatcherHandlerStop` is no longer reraised but converted into
-                the return value.
+              the return value.
 
         Args:
             update (:obj:`object` | :class:`telegram.Update`): The update that caused the error.

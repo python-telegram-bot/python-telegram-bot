@@ -25,7 +25,7 @@ from threading import Event
 
 import pytest
 
-from telegram.utils.request import Request
+from telegram.request import Request
 from .conftest import PRIVATE_KEY
 
 from telegram.ext import (
@@ -220,6 +220,7 @@ class TestBuilder:
         message = str(recwarn[-1].message)
         assert 'smaller (1)' in message
         assert 'recommended value of 46.' in message
+        assert recwarn[-1].filename == __file__, "wrong stacklevel"
 
     def test_custom_classes(self, bot, builder):
         class CustomDispatcher(Dispatcher):

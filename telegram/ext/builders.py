@@ -40,8 +40,8 @@ from typing import (
 from telegram import Bot
 from telegram.ext import Dispatcher, JobQueue, Updater, ExtBot, ContextTypes, CallbackContext
 from telegram.ext.utils.types import CCT, UD, CD, BD, BT, JQ, PT
-from telegram.utils.helpers import DEFAULT_NONE, DefaultValue, DEFAULT_FALSE
-from telegram.utils.request import Request
+from telegram.utils.defaultvalue import DEFAULT_NONE, DefaultValue, DEFAULT_FALSE
+from telegram.request import Request
 from telegram.utils.types import ODVInput, DVInput
 
 if TYPE_CHECKING:
@@ -218,7 +218,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         )
 
     def _build_dispatcher(
-        self: '_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]',
+        self: '_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]', stack_level: int = 3
     ) -> Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]:
         job_queue = DefaultValue.get_value(self._job_queue)
         dispatcher: Dispatcher[
@@ -246,7 +246,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
             warnings.warn(
                 f'The Connection pool of Request object is smaller ({actual_size}) than the '
                 f'recommended value of {con_pool_size}.',
-                stacklevel=2,
+                stacklevel=stack_level,
             )
 
         return dispatcher
@@ -255,7 +255,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         self: '_BaseBuilder[ODT, BT, Any, Any, Any, Any, Any, Any]',
     ) -> Updater[BT, ODT]:
         if isinstance(self._dispatcher, DefaultValue):
-            dispatcher = self._build_dispatcher()
+            dispatcher = self._build_dispatcher(stack_level=4)
             return self._updater_class(
                 dispatcher=dispatcher,
                 user_signal_handler=self._user_signal_handler,

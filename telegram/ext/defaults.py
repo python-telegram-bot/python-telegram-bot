@@ -22,7 +22,7 @@ from typing import NoReturn, Optional, Dict, Any
 
 import pytz
 
-from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.defaultvalue import DEFAULT_NONE
 from telegram.utils.types import ODVInput
 
 

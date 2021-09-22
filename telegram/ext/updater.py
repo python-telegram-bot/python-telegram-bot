@@ -20,9 +20,8 @@
 
 import logging
 import ssl
-import warnings
+import signal
 from queue import Queue
-from signal import SIGABRT, SIGINT, SIGTERM, signal
 from threading import Event, Lock, Thread, current_thread
 from time import sleep
 from typing import (
@@ -39,12 +38,11 @@ from typing import (
     TYPE_CHECKING,
 )
 
-from telegram import TelegramError
-from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized
+from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized, TelegramError
 from telegram.ext import Dispatcher
-from telegram.utils.helpers import get_signal_name
 from telegram.ext.utils.types import BT
 from telegram.ext.utils.webhookhandler import WebhookAppClass, WebhookServer
+from ..utils.warnings import warn
 
 if TYPE_CHECKING:
     from .builders import InitUpdaterBuilder
@@ -110,9 +108,8 @@ class Updater(Generic[BT, DT]):
 
     def __init__(self, **kwargs: Any):
         if not kwargs.pop('builder_flag', False):
-            warnings.warn(
+            warn(
                 '`Updater` instances should be built via the `UpdaterBuilder`.',
-                UserWarning,
                 stacklevel=2,
             )
 
@@ -635,7 +632,12 @@ class Updater(Generic[BT, DT]):
         self.is_idle = False
         if self.running:
             self.logger.info(
-                'Received signal %s (%s), stopping...', signum, get_signal_name(signum)
+                'Received signal %s (%s), stopping...',
+                signum,
+                # signal.Signals is undocumented for some reason see
+                # https://github.com/python/typeshed/pull/555#issuecomment-247874222
+                # https://bugs.python.org/issue28206
+                signal.Signals(signum),  # pylint: disable=no-member
             )
             self.stop()
             if self.user_signal_handler:
@@ -647,7 +649,9 @@ class Updater(Generic[BT, DT]):
 
             os._exit(1)
 
-    def idle(self, stop_signals: Union[List, Tuple] = (SIGINT, SIGTERM, SIGABRT)) -> None:
+    def idle(
+        self, stop_signals: Union[List, Tuple] = (signal.SIGINT, signal.SIGTERM, signal.SIGABRT)
+    ) -> None:
         """Blocks until one of the signals are received and stops the updater.
 
         Args:
@@ -657,7 +661,7 @@ class Updater(Generic[BT, DT]):
 
         """
         for sig in stop_signals:
-            signal(sig, self._signal_handler)
+            signal.signal(sig, self._signal_handler)
 
         self.is_idle = True
 
