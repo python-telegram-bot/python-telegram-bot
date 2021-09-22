@@ -24,13 +24,13 @@ from telegram import (
     Message,
     Chat,
     User,
-    TelegramError,
     Bot,
     InlineKeyboardMarkup,
     InlineKeyboardButton,
     CallbackQuery,
 )
 from telegram.ext import CallbackContext
+from telegram.error import TelegramError
 
 """
 CallbackContext.refresh_data is tested in TestBasePersistence

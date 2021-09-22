@@ -35,11 +35,11 @@ from telegram import (
 
 from telegram.ext.callbackdatacache import CallbackDataCache
 from telegram.utils.types import JSONDict, ODVInput, DVInput
-from ..utils.helpers import DEFAULT_NONE
+from telegram.utils.defaultvalue import DEFAULT_NONE
 
 if TYPE_CHECKING:
     from telegram import InlineQueryResult, MessageEntity
-    from telegram.utils.request import Request
+    from telegram.request import Request
     from .defaults import Defaults
 
 HandledTypes = TypeVar('HandledTypes', bound=Union[Message, CallbackQuery, Chat])

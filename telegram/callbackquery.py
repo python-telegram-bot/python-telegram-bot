@@ -21,7 +21,7 @@
 from typing import TYPE_CHECKING, Any, List, Optional, Union, Tuple, ClassVar
 
 from telegram import Message, TelegramObject, User, Location, ReplyMarkup, constants
-from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.defaultvalue import DEFAULT_NONE
 from telegram.utils.types import JSONDict, ODVInput, DVInput
 
 if TYPE_CHECKING:

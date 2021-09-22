@@ -37,7 +37,7 @@ from telegram import (
     ChatJoinRequest,
 )
 from telegram.poll import PollAnswer
-from telegram.utils.helpers import from_timestamp
+from telegram.utils.datetime import from_timestamp
 
 message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
 chat_member_updated = ChatMemberUpdated(

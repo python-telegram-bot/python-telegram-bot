@@ -16,42 +16,19 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains classes used for warnings."""
+"""This module contains helper functions related to warnings issued by the library.
+
+.. versionadded:: 14.0
+
+Warning:
+    Contents of this module are intended to be used internally by the library and *not* by the
+    user. Changes to this module are not considered breaking changes and may not be documented in
+    the changelog.
+"""
 import warnings
 from typing import Type
 
-
-class PTBUserWarning(UserWarning):
-    """
-    Custom user warning class used for warnings in this library.
-
-    .. versionadded:: 14.0
-    """
-
-    __slots__ = ()
-
-
-class PTBRuntimeWarning(PTBUserWarning, RuntimeWarning):
-    """
-    Custom runtime warning class used for warnings in this library.
-
-    .. versionadded:: 14.0
-    """
-
-    __slots__ = ()
-
-
-# https://www.python.org/dev/peps/pep-0565/ recommends to use a custom warning class derived from
-# DeprecationWarning. We also subclass from TGUserWarning so users can easily 'switch off' warnings
-class PTBDeprecationWarning(PTBUserWarning, DeprecationWarning):
-    """
-    Custom warning class for deprecations in this library.
-
-    .. versionchanged:: 14.0
-       Renamed TelegramDeprecationWarning to PTBDeprecationWarning.
-    """
-
-    __slots__ = ()
+from telegram.warnings import PTBUserWarning
 
 
 def warn(message: str, category: Type[Warning] = PTBUserWarning, stacklevel: int = 0) -> None:
@@ -61,8 +38,10 @@ def warn(message: str, category: Type[Warning] = PTBUserWarning, stacklevel: int
     .. versionadded:: 14.0
 
     Args:
-        category (:obj:`Type[Warning]`): Specify the Warning class to pass to ``warnings.warn()``.
-        stacklevel (:obj:`int`): Specify the stacklevel to pass to ``warnings.warn()``. Pass the
-            same value as you'd pass directly to ``warnings.warn()``.
+        message (:obj:`str`): Specify the warnings message to pass to ``warnings.warn()``.
+        category (:obj:`Type[Warning]`, optional): Specify the Warning class to pass to
+            ``warnings.warn()``. Defaults to :class:`telegram.warnings.PTBUserWarning`.
+        stacklevel (:obj:`int`, optional): Specify the stacklevel to pass to ``warnings.warn()``.
+            Pass the same value as you'd pass directly to ``warnings.warn()``. Defaults to ``0``.
     """
     warnings.warn(message, category=category, stacklevel=stacklevel + 1)

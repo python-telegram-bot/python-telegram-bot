@@ -20,7 +20,8 @@ import os
 import pytest
 from flaky import flaky
 
-from telegram import ChatPhoto, Voice, TelegramError, Bot
+from telegram import ChatPhoto, Voice, Bot
+from telegram.error import TelegramError
 from tests.conftest import (
     expect_bad_request,
     check_shortcut_call,

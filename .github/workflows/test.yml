@@ -34,7 +34,7 @@ jobs:
 
       - name: Test with pytest
         # We run 3 different suites here
-        # 1. Test just utils.helpers.py without pytz being installed
+        # 1. Test just utils.datetime.py without pytz being installed
         # 2. Test just test_no_passport.py without passport dependencies being installed
         # 3. Test everything else
         # The first & second one are achieved by mocking the corresponding import

@@ -16,7 +16,9 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains methods to make POST and GET requests."""
+"""This module contains the Request class which handles the communication with the Telegram
+servers.
+"""
 import logging
 import os
 import socket
@@ -58,8 +60,9 @@ except ImportError:  # pragma: no cover
         raise
 
 # pylint: disable=C0412
-from telegram import InputFile, TelegramError
+from telegram import InputFile
 from telegram.error import (
+    TelegramError,
     BadRequest,
     ChatMigrated,
     Conflict,
@@ -91,8 +94,7 @@ USER_AGENT = 'Python Telegram Bot (https://github.com/python-telegram-bot/python
 
 
 class Request:
-    """
-    Helper class for python-telegram-bot which provides methods to perform POST & GET towards
+    """Helper class for python-telegram-bot which provides methods to perform POST & GET towards
     Telegram servers.
 
     Args:

@@ -90,16 +90,12 @@ from telegram import (
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import InvalidToken, TelegramError
-from telegram.utils.warnings import PTBDeprecationWarning, warn
-from telegram.utils.helpers import (
-    DEFAULT_NONE,
-    DefaultValue,
-    to_timestamp,
-    is_local_file,
-    parse_file_input,
-    DEFAULT_20,
-)
-from telegram.utils.request import Request
+from telegram.warnings import PTBDeprecationWarning
+from telegram.utils.warnings import warn
+from telegram.utils.defaultvalue import DEFAULT_NONE, DefaultValue, DEFAULT_20
+from telegram.utils.datetime import to_timestamp
+from telegram.utils.files import is_local_file, parse_file_input
+from telegram.request import Request
 from telegram.utils.types import FileInput, JSONDict, ODVInput, DVInput
 
 if TYPE_CHECKING:
@@ -156,8 +152,8 @@ class Bot(TelegramObject):
         token (:obj:`str`): Bot's unique authentication.
         base_url (:obj:`str`, optional): Telegram Bot API service URL.
         base_file_url (:obj:`str`, optional): Telegram Bot API file URL.
-        request (:obj:`telegram.utils.request.Request`, optional): Pre initialized
-            :obj:`telegram.utils.request.Request`.
+        request (:obj:`telegram.request.Request`, optional): Pre initialized
+            :obj:`telegram.request.Request`.
         private_key (:obj:`bytes`, optional): Private key for decryption of telegram passport data.
         private_key_password (:obj:`bytes`, optional): Password for above private key.
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
@@ -316,7 +312,7 @@ class Bot(TelegramObject):
         if reply_markup is not None:
             if isinstance(reply_markup, ReplyMarkup):
                 # We need to_json() instead of to_dict() here, because reply_markups may be
-                # attached to media messages, which aren't json dumped by utils.request
+                # attached to media messages, which aren't json dumped by telegram.request
                 data['reply_markup'] = reply_markup.to_json()
             else:
                 data['reply_markup'] = reply_markup
@@ -4805,7 +4801,7 @@ class Bot(TelegramObject):
             data['contains_masks'] = contains_masks
         if mask_position is not None:
             # We need to_json() instead of to_dict() here, because we're sending a media
-            # message here, which isn't json dumped by utils.request
+            # message here, which isn't json dumped by telegram.request
             data['mask_position'] = mask_position.to_json()
 
         result = self._post('createNewStickerSet', data, timeout=timeout, api_kwargs=api_kwargs)
@@ -4894,7 +4890,7 @@ class Bot(TelegramObject):
             data['webm_sticker'] = parse_file_input(webm_sticker)
         if mask_position is not None:
             # We need to_json() instead of to_dict() here, because we're sending a media
-            # message here, which isn't json dumped by utils.request
+            # message here, which isn't json dumped by telegram.request
             data['mask_position'] = mask_position.to_json()
 
         result = self._post('addStickerToSet', data, timeout=timeout, api_kwargs=api_kwargs)
@@ -5227,7 +5223,7 @@ class Bot(TelegramObject):
         if reply_markup:
             if isinstance(reply_markup, ReplyMarkup):
                 # We need to_json() instead of to_dict() here, because reply_markups may be
-                # attached to media messages, which aren't json dumped by utils.request
+                # attached to media messages, which aren't json dumped by telegram.request
                 data['reply_markup'] = reply_markup.to_json()
             else:
                 data['reply_markup'] = reply_markup
@@ -5534,9 +5530,9 @@ class Bot(TelegramObject):
                 entities parsing. If not specified, the original caption is kept.
             parse_mode (:obj:`str`, optional): Mode for parsing entities in the new caption. See
                 the constants in :class:`telegram.ParseMode` for the available modes.
-            caption_entities (:class:`telegram.utils.types.SLT[MessageEntity]`): List of special
-                entities that appear in the new caption, which can be specified instead of
-                parse_mode
+            caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
+                entities that appear in the new caption, which can be specified instead
+                of parse_mode.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
@@ -5582,7 +5578,7 @@ class Bot(TelegramObject):
         if reply_markup:
             if isinstance(reply_markup, ReplyMarkup):
                 # We need to_json() instead of to_dict() here, because reply_markups may be
-                # attached to media messages, which aren't json dumped by utils.request
+                # attached to media messages, which aren't json dumped by telegram.request
                 data['reply_markup'] = reply_markup.to_json()
             else:
                 data['reply_markup'] = reply_markup

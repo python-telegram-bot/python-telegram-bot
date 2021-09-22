@@ -29,12 +29,12 @@ from cachetools import LRUCache  # pylint: disable=E0401
 from telegram import (
     InlineKeyboardMarkup,
     InlineKeyboardButton,
-    TelegramError,
     CallbackQuery,
     Message,
     User,
 )
-from telegram.utils.helpers import to_float_timestamp
+from telegram.error import TelegramError
+from telegram.utils.datetime import to_float_timestamp
 from telegram.ext.utils.types import CDCData
 
 if TYPE_CHECKING:

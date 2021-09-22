@@ -23,7 +23,7 @@ import datetime as dtm
 from typing import TYPE_CHECKING, Optional, List
 
 from telegram import TelegramObject, User
-from telegram.utils.helpers import from_timestamp, to_timestamp
+from telegram.utils.datetime import from_timestamp, to_timestamp
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:

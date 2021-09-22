@@ -21,7 +21,8 @@ import datetime
 from typing import TYPE_CHECKING, Any, Optional
 
 from telegram import TelegramObject, User, Chat, ChatInviteLink
-from telegram.utils.helpers import from_timestamp, to_timestamp, DEFAULT_NONE
+from telegram.utils.datetime import from_timestamp, to_timestamp
+from telegram.utils.defaultvalue import DEFAULT_NONE
 from telegram.utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
