@@ -55,13 +55,9 @@ from telegram import (
     MessageAutoDeleteTimerChanged,
     VoiceChatScheduled,
 )
-from telegram.utils.helpers import (
-    escape_markdown,
-    from_timestamp,
-    to_timestamp,
-    DEFAULT_NONE,
-    DEFAULT_20,
-)
+from telegram.helpers import escape_markdown
+from telegram.utils.datetime import from_timestamp, to_timestamp
+from telegram.utils.defaultvalue import DEFAULT_NONE, DEFAULT_20
 from telegram.utils.types import JSONDict, FileInput, ODVInput, DVInput
 
 if TYPE_CHECKING:
