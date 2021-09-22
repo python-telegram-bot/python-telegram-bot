@@ -26,7 +26,7 @@ from telegram import (
     User,
     VoiceChatScheduled,
 )
-from telegram.utils.helpers import to_timestamp
+from telegram.utils.datetime import to_timestamp
 
 
 @pytest.fixture(scope='class')
