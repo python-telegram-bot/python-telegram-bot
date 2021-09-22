@@ -20,8 +20,8 @@
 
 import logging
 import ssl
+import signal
 from queue import Queue
-from signal import SIGABRT, SIGINT, SIGTERM, signal
 from threading import Event, Lock, Thread, current_thread
 from time import sleep
 from typing import (
@@ -38,12 +38,13 @@ from typing import (
     overload,
 )
 
-from telegram import Bot, TelegramError
-from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized
+from telegram import Bot
+from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized, TelegramError
 from telegram.ext import Dispatcher, JobQueue, ContextTypes, ExtBot
-from telegram.utils.warnings import PTBDeprecationWarning, warn
-from telegram.utils.helpers import get_signal_name, DEFAULT_FALSE, DefaultValue
-from telegram.utils.request import Request
+from telegram.warnings import PTBDeprecationWarning
+from telegram.request import Request
+from telegram.utils.defaultvalue import DEFAULT_FALSE, DefaultValue
+from telegram.utils.warnings import warn
 from telegram.ext.utils.types import CCT, UD, CD, BD
 from telegram.ext.utils.webhookhandler import WebhookAppClass, WebhookServer
 
@@ -89,7 +90,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
             arguments. This will be called when a signal is received, defaults are (SIGINT,
             SIGTERM, SIGABRT) settable with :attr:`idle`.
         request_kwargs (:obj:`dict`, optional): Keyword args to control the creation of a
-            `telegram.utils.request.Request` object (ignored if `bot` or `dispatcher` argument is
+            `telegram.request.Request` object (ignored if `bot` or `dispatcher` argument is
             used). The request_kwargs are very useful for the advanced users who would like to
             control the default timeouts and/or control the proxy used for http communication.
         persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
@@ -793,7 +794,12 @@ class Updater(Generic[CCT, UD, CD, BD]):
         self.is_idle = False
         if self.running:
             self.logger.info(
-                'Received signal %s (%s), stopping...', signum, get_signal_name(signum)
+                'Received signal %s (%s), stopping...',
+                signum,
+                # signal.Signals is undocumented for some reason see
+                # https://github.com/python/typeshed/pull/555#issuecomment-247874222
+                # https://bugs.python.org/issue28206
+                signal.Signals(signum),  # pylint: disable=no-member
             )
             if self.persistence:
                 # Update user_data, chat_data and bot_data before flushing
@@ -809,7 +815,9 @@ class Updater(Generic[CCT, UD, CD, BD]):
 
             os._exit(1)
 
-    def idle(self, stop_signals: Union[List, Tuple] = (SIGINT, SIGTERM, SIGABRT)) -> None:
+    def idle(
+        self, stop_signals: Union[List, Tuple] = (signal.SIGINT, signal.SIGTERM, signal.SIGABRT)
+    ) -> None:
         """Blocks until one of the signals are received and stops the updater.
 
         Args:
@@ -819,7 +827,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
 
         """
         for sig in stop_signals:
-            signal(sig, self._signal_handler)
+            signal.signal(sig, self._signal_handler)
 
         self.is_idle = True
 
