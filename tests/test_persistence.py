@@ -23,7 +23,6 @@ from threading import Lock
 
 from telegram.ext import PersistenceInput
 from telegram.ext.callbackdatacache import CallbackDataCache
-from telegram.utils.helpers import encode_conversations_to_json
 
 try:
     import ujson as json
@@ -774,10 +773,10 @@ class TestBasePersistence:
 
         assert len(recwarn) == 2
         assert str(recwarn[0].message).startswith(
-            "BasePersistence.replace_bot does not handle classes."
+            "BasePersistence.replace_bot does not handle classes such as 'CustomClass'"
         )
         assert str(recwarn[1].message).startswith(
-            "BasePersistence.insert_bot does not handle classes."
+            "BasePersistence.insert_bot does not handle classes such as 'CustomClass'"
         )
 
     def test_bot_replace_insert_bot_objects_with_faulty_equality(self, bot, bot_persistence):
@@ -2163,15 +2162,19 @@ class TestDictPersistence:
         dict_persistence.update_conversation('name1', (123, 123), 5)
         assert dict_persistence.conversations['name1'] == conversation1
         conversations['name1'][(123, 123)] = 5
-        assert dict_persistence.conversations_json == encode_conversations_to_json(conversations)
+        assert (
+            dict_persistence.conversations_json
+            == DictPersistence._encode_conversations_to_json(conversations)
+        )
         assert dict_persistence.get_conversations('name1') == conversation1
 
         dict_persistence._conversations = None
         dict_persistence.update_conversation('name1', (123, 123), 5)
         assert dict_persistence.conversations['name1'] == {(123, 123): 5}
         assert dict_persistence.get_conversations('name1') == {(123, 123): 5}
-        assert dict_persistence.conversations_json == encode_conversations_to_json(
-            {"name1": {(123, 123): 5}}
+        assert (
+            dict_persistence.conversations_json
+            == DictPersistence._encode_conversations_to_json({"name1": {(123, 123): 5}})
         )
 
     def test_with_handler(self, bot, update):

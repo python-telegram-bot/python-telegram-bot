@@ -21,7 +21,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar, Union, Generic
 
 from telegram.ext.utils.promise import Promise
-from telegram.utils.helpers import DefaultValue, DEFAULT_FALSE
+from telegram.utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 from telegram.ext.utils.types import CCT
 
 if TYPE_CHECKING:

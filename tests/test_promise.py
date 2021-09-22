@@ -19,7 +19,7 @@
 import logging
 import pytest
 
-from telegram import TelegramError
+from telegram.error import TelegramError
 from telegram.ext.utils.promise import Promise
 
 

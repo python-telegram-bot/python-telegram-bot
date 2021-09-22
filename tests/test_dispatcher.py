@@ -23,7 +23,7 @@ from time import sleep
 
 import pytest
 
-from telegram import TelegramError, Message, User, Chat, Update, Bot, MessageEntity
+from telegram import Message, User, Chat, Update, Bot, MessageEntity
 from telegram.ext import (
     MessageHandler,
     Filters,
@@ -36,7 +36,8 @@ from telegram.ext import (
 )
 from telegram.ext import PersistenceInput
 from telegram.ext.dispatcher import Dispatcher, DispatcherHandlerStop
-from telegram.utils.helpers import DEFAULT_FALSE
+from telegram.utils.defaultvalue import DEFAULT_FALSE
+from telegram.error import TelegramError
 from tests.conftest import create_dp
 from collections import defaultdict
 
@@ -109,6 +110,7 @@ class TestDispatcher:
             str(recwarn[0].message)
             == 'Asynchronous callbacks can not be processed without at least one worker thread.'
         )
+        assert recwarn[0].filename == __file__, "stacklevel is incorrect!"
 
     def test_one_context_per_update(self, dp):
         def one(update, context):
@@ -242,21 +244,18 @@ class TestDispatcher:
 
         assert name1 != name2
 
-    def test_async_raises_dispatcher_handler_stop(self, dp, caplog):
+    def test_async_raises_dispatcher_handler_stop(self, dp, recwarn):
         def callback(update, context):
             raise DispatcherHandlerStop()
 
         dp.add_handler(MessageHandler(Filters.all, callback, run_async=True))
 
-        with caplog.at_level(logging.WARNING):
-            dp.update_queue.put(self.message_update)
-            sleep(0.1)
-            assert len(caplog.records) == 1
-            assert (
-                caplog.records[-1]
-                .getMessage()
-                .startswith('DispatcherHandlerStop is not supported with async functions')
-            )
+        dp.update_queue.put(self.message_update)
+        sleep(0.1)
+        assert len(recwarn) == 1
+        assert str(recwarn[-1].message).startswith(
+            'DispatcherHandlerStop is not supported with async functions'
+        )
 
     def test_add_async_handler(self, dp):
         dp.add_handler(
@@ -298,7 +297,9 @@ class TestDispatcher:
             dp.update_queue.put(self.message_update)
             sleep(0.1)
             assert len(caplog.records) == 1
-            assert caplog.records[-1].getMessage().startswith('An uncaught error was raised')
+            assert (
+                caplog.records[-1].getMessage().startswith('An error was raised and an uncaught')
+            )
 
         # Make sure that the main loop still runs
         dp.remove_handler(handler)
@@ -316,7 +317,9 @@ class TestDispatcher:
             dp.update_queue.put(self.message_update)
             sleep(0.1)
             assert len(caplog.records) == 1
-            assert caplog.records[-1].getMessage().startswith('An uncaught error was raised')
+            assert (
+                caplog.records[-1].getMessage().startswith('An error was raised and an uncaught')
+            )
 
         # Make sure that the main loop still runs
         dp.remove_handler(handler)
@@ -631,7 +634,7 @@ class TestDispatcher:
         for thread_name in thread_names:
             assert thread_name.startswith(f"Bot:{dp2.bot.id}:worker:")
 
-    def test_error_while_persisting(self, dp, monkeypatch):
+    def test_error_while_persisting(self, dp, caplog):
         class OwnPersistence(BasePersistence):
             def update(self, data):
                 raise Exception('PersistenceError')
@@ -681,15 +684,12 @@ class TestDispatcher:
         def callback(update, context):
             pass
 
-        test_flag = False
+        test_flag = []
 
         def error(update, context):
             nonlocal test_flag
-            test_flag = str(context.error) == 'PersistenceError'
+            test_flag.append(str(context.error) == 'PersistenceError')
             raise Exception('ErrorHandlingError')
-
-        def logger(message):
-            assert 'uncaught error was raised while handling' in message
 
         update = Update(
             1, message=Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
@@ -697,11 +697,17 @@ class TestDispatcher:
         handler = MessageHandler(Filters.all, callback)
         dp.add_handler(handler)
         dp.add_error_handler(error)
-        monkeypatch.setattr(dp.logger, 'exception', logger)
 
         dp.persistence = OwnPersistence()
-        dp.process_update(update)
-        assert test_flag
+
+        with caplog.at_level(logging.ERROR):
+            dp.process_update(update)
+
+        assert test_flag == [True, True, True, True]
+        assert len(caplog.records) == 4
+        for record in caplog.records:
+            message = record.getMessage()
+            assert message.startswith('An error was raised and an uncaught')
 
     def test_persisting_no_user_no_chat(self, dp):
         class OwnPersistence(BasePersistence):

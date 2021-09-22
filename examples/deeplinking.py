@@ -20,7 +20,7 @@ bot.
 
 import logging
 
-from telegram import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton, Update
+from telegram import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton, Update, helpers
 from telegram.ext import (
     Updater,
     CommandHandler,
@@ -30,8 +30,6 @@ from telegram.ext import (
 )
 
 # Enable logging
-from telegram.utils import helpers
-
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
