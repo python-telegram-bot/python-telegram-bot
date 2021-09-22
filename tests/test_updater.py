@@ -313,9 +313,21 @@ class TestUpdater:
             updater.bot.callback_data_cache.clear_callback_data()
             updater.bot.callback_data_cache.clear_callback_queries()
 
-    def test_start_webhook_no_warning_or_error_logs(self, caplog, updater, monkeypatch):
+    @pytest.mark.parametrize('use_dispatcher', (True, False))
+    def test_start_webhook_no_warning_or_error_logs(
+        self, caplog, updater, monkeypatch, use_dispatcher
+    ):
+        if not use_dispatcher:
+            updater.dispatcher = None
+
+        self.test_flag = 0
+
+        def set_flag():
+            self.test_flag += 1
+
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
         monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot._request, 'stop', lambda *args, **kwargs: set_flag())
         # prevent api calls from @info decorator when updater.bot.id is used in thread names
         monkeypatch.setattr(updater.bot, '_bot', User(id=123, first_name='bot', is_bot=True))
 
@@ -325,6 +337,8 @@ class TestUpdater:
             updater.start_webhook(ip, port)
             updater.stop()
         assert not caplog.records
+        # Make sure that bot.request.stop() has been called exactly once
+        assert self.test_flag == 1
 
     def test_webhook_ssl(self, monkeypatch, updater):
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)

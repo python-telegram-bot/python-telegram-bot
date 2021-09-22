@@ -437,6 +437,9 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         if self.persistence:
             self.persistence.flush()
 
+        # Clear the connection pool
+        self.bot.request.stop()
+
     @property
     def has_running_threads(self) -> bool:  # skipcq: PY-D0003
         return self.running or bool(self.__async_threads)

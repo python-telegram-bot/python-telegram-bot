@@ -602,6 +602,11 @@ class Updater(Generic[BT, DT]):
                 self._stop_dispatcher()
                 self._join_threads()
 
+                # Clear the connection pool only if the bot is managed by the Updater
+                # Otherwise `dispatcher.stop()` already does that
+                if not self.dispatcher:
+                    self.bot.request.stop()
+
     @no_type_check
     def _stop_httpd(self) -> None:
         if self.httpd:
