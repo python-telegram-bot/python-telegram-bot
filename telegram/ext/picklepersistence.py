@@ -19,6 +19,7 @@
 """This module contains the PicklePersistence class."""
 import pickle
 from collections import defaultdict
+from pathlib import Path
 from typing import (
     Any,
     Dict,
@@ -27,6 +28,7 @@ from typing import (
     overload,
     cast,
     DefaultDict,
+    Union,
 )
 
 from telegram.ext import BasePersistence, PersistenceInput
@@ -50,8 +52,8 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.
 
     Args:
-        filename (:obj:`str`): The filename for storing the pickle files. When :attr:`single_file`
-            is :obj:`False` this will be used as a prefix.
+        filename (:obj:`str` | :obj: 'Path'): The filename for storing the pickle files.
+            When :attr:`single_file` is :obj:`False` this will be used as a prefix.
         store_data (:class:`PersistenceInput`, optional): Specifies which kinds of data will be
             saved by this persistence instance. By default, all available kinds of data will be
             saved.
@@ -70,8 +72,8 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             .. versionadded:: 13.6
 
     Attributes:
-        filename (:obj:`str`): The filename for storing the pickle files. When :attr:`single_file`
-            is :obj:`False` this will be used as a prefix.
+        filename (:obj:`str` | :obj: 'Path'): The filename for storing the pickle files.
+            When :attr:`single_file` is :obj:`False` this will be used as a prefix.
         store_data (:class:`PersistenceInput`): Specifies which kinds of data will be saved by this
             persistence instance.
         single_file (:obj:`bool`): Optional. When :obj:`False` will store 5 separate files of
@@ -88,7 +90,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     """
 
     __slots__ = (
-        'filename',
+        'filepath',
         'single_file',
         'on_flush',
         'user_data',
@@ -102,7 +104,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     @overload
     def __init__(
         self: 'PicklePersistence[Dict, Dict, Dict]',
-        filename: str,
+        filename: Union[Path, str],
         store_data: PersistenceInput = None,
         single_file: bool = True,
         on_flush: bool = False,
@@ -112,7 +114,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     @overload
     def __init__(
         self: 'PicklePersistence[UD, CD, BD]',
-        filename: str,
+        filename: Union[Path, str],
         store_data: PersistenceInput = None,
         single_file: bool = True,
         on_flush: bool = False,
@@ -122,14 +124,14 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
 
     def __init__(
         self,
-        filename: str,
+        filename: Union[Path, str],
         store_data: PersistenceInput = None,
         single_file: bool = True,
         on_flush: bool = False,
         context_types: ContextTypes[Any, UD, CD, BD] = None,
     ):
         super().__init__(store_data=store_data)
-        self.filename = filename
+        self.filepath: Path = Path(filename)
         self.single_file = single_file
         self.on_flush = on_flush
         self.user_data: Optional[DefaultDict[int, UD]] = None
@@ -141,8 +143,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
 
     def _load_singlefile(self) -> None:
         try:
-            filename = self.filename
-            with open(self.filename, "rb") as file:
+            with self.filepath.open("rb") as file:
                 data = pickle.load(file)
                 self.user_data = defaultdict(self.context_types.user_data, data['user_data'])
                 self.chat_data = defaultdict(self.context_types.chat_data, data['chat_data'])
@@ -157,24 +158,24 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             self.bot_data = self.context_types.bot_data()
             self.callback_data = None
         except pickle.UnpicklingError as exc:
-            raise TypeError(f"File {filename} does not contain valid pickle data") from exc
+            raise TypeError(f"File {self.filepath} does not contain valid pickle data") from exc
         except Exception as exc:
-            raise TypeError(f"Something went wrong unpickling {filename}") from exc
+            raise TypeError(f"Something went wrong unpickling {self.filepath}") from exc
 
     @staticmethod
-    def _load_file(filename: str) -> Any:
+    def _load_file(filepath: Path) -> Any:
         try:
-            with open(filename, "rb") as file:
+            with filepath.open("rb") as file:
                 return pickle.load(file)
         except OSError:
             return None
         except pickle.UnpicklingError as exc:
-            raise TypeError(f"File {filename} does not contain valid pickle data") from exc
+            raise TypeError(f"File {filepath} does not contain valid pickle data") from exc
         except Exception as exc:
-            raise TypeError(f"Something went wrong unpickling {filename}") from exc
+            raise TypeError(f"Something went wrong unpickling {filepath}") from exc
 
     def _dump_singlefile(self) -> None:
-        with open(self.filename, "wb") as file:
+        with self.filepath.open("wb") as file:
             data = {
                 'conversations': self.conversations,
                 'user_data': self.user_data,
@@ -185,8 +186,8 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             pickle.dump(data, file)
 
     @staticmethod
-    def _dump_file(filename: str, data: object) -> None:
-        with open(filename, "wb") as file:
+    def _dump_file(filepath: Path, data: object) -> None:
+        with filepath.open("wb") as file:
             pickle.dump(data, file)
 
     def get_user_data(self) -> DefaultDict[int, UD]:
@@ -198,8 +199,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         if self.user_data:
             pass
         elif not self.single_file:
-            filename = f"{self.filename}_user_data"
-            data = self._load_file(filename)
+            data = self._load_file(Path(f"{self.filepath}_user_data"))
             if not data:
                 data = defaultdict(self.context_types.user_data)
             else:
@@ -218,8 +218,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         if self.chat_data:
             pass
         elif not self.single_file:
-            filename = f"{self.filename}_chat_data"
-            data = self._load_file(filename)
+            data = self._load_file(Path(f"{self.filepath}_chat_data"))
             if not data:
                 data = defaultdict(self.context_types.chat_data)
             else:
@@ -239,8 +238,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         if self.bot_data:
             pass
         elif not self.single_file:
-            filename = f"{self.filename}_bot_data"
-            data = self._load_file(filename)
+            data = self._load_file(Path(f"{self.filepath}_bot_data"))
             if not data:
                 data = self.context_types.bot_data()
             self.bot_data = data
@@ -260,8 +258,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         if self.callback_data:
             pass
         elif not self.single_file:
-            filename = f"{self.filename}_callback_data"
-            data = self._load_file(filename)
+            data = self._load_file(Path(f"{self.filepath}_callback_data"))
             if not data:
                 data = None
             self.callback_data = data
@@ -283,8 +280,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         if self.conversations:
             pass
         elif not self.single_file:
-            filename = f"{self.filename}_conversations"
-            data = self._load_file(filename)
+            data = self._load_file(Path(f"{self.filepath}_conversations"))
             if not data:
                 data = {name: {}}
             self.conversations = data
@@ -310,8 +306,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         self.conversations[name][key] = new_state
         if not self.on_flush:
             if not self.single_file:
-                filename = f"{self.filename}_conversations"
-                self._dump_file(filename, self.conversations)
+                self._dump_file(Path(f"{self.filepath}_conversations"), self.conversations)
             else:
                 self._dump_singlefile()
 
@@ -330,8 +325,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         self.user_data[user_id] = data
         if not self.on_flush:
             if not self.single_file:
-                filename = f"{self.filename}_user_data"
-                self._dump_file(filename, self.user_data)
+                self._dump_file(Path(f"{self.filepath}_user_data"), self.user_data)
             else:
                 self._dump_singlefile()
 
@@ -350,8 +344,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         self.chat_data[chat_id] = data
         if not self.on_flush:
             if not self.single_file:
-                filename = f"{self.filename}_chat_data"
-                self._dump_file(filename, self.chat_data)
+                self._dump_file(Path(f"{self.filepath}_chat_data"), self.chat_data)
             else:
                 self._dump_singlefile()
 
@@ -367,8 +360,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         self.bot_data = data
         if not self.on_flush:
             if not self.single_file:
-                filename = f"{self.filename}_bot_data"
-                self._dump_file(filename, self.bot_data)
+                self._dump_file(Path(f"{self.filepath}_bot_data"), self.bot_data)
             else:
                 self._dump_singlefile()
 
@@ -387,8 +379,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         self.callback_data = (data[0], data[1].copy())
         if not self.on_flush:
             if not self.single_file:
-                filename = f"{self.filename}_callback_data"
-                self._dump_file(filename, self.callback_data)
+                self._dump_file(Path(f"{self.filepath}_callback_data"), self.callback_data)
             else:
                 self._dump_singlefile()
 
@@ -426,12 +417,12 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
                 self._dump_singlefile()
         else:
             if self.user_data:
-                self._dump_file(f"{self.filename}_user_data", self.user_data)
+                self._dump_file(Path(f"{self.filepath}_user_data"), self.user_data)
             if self.chat_data:
-                self._dump_file(f"{self.filename}_chat_data", self.chat_data)
+                self._dump_file(Path(f"{self.filepath}_chat_data"), self.chat_data)
             if self.bot_data:
-                self._dump_file(f"{self.filename}_bot_data", self.bot_data)
+                self._dump_file(Path(f"{self.filepath}_bot_data"), self.bot_data)
             if self.callback_data:
-                self._dump_file(f"{self.filename}_callback_data", self.callback_data)
+                self._dump_file(Path(f"{self.filepath}_callback_data"), self.callback_data)
             if self.conversations:
-                self._dump_file(f"{self.filename}_conversations", self.conversations)
+                self._dump_file(Path(f"{self.filepath}_conversations"), self.conversations)
