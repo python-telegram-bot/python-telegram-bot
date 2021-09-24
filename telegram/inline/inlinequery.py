@@ -127,13 +127,18 @@ class InlineQuery(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            bot.answer_inline_query(update.inline_query.id,
-                                    *args,
-                                    current_offset=self.offset if auto_pagination else None,
-                                    **kwargs)
+            bot.answer_inline_query(
+                update.inline_query.id,
+                *args,
+                current_offset=self.offset if auto_pagination else None,
+                **kwargs
+            )
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.answer_inline_query`.
+
+        .. versionchanged:: 14.0
+            Raises :class:`ValueError` instead of :class:`TypeError`.
 
         Args:
             auto_pagination (:obj:`bool`, optional): If set to :obj:`True`, :attr:`offset` will be
@@ -141,12 +146,10 @@ class InlineQuery(TelegramObject):
                 Defaults to :obj:`False`.
 
         Raises:
-            TypeError: If both :attr:`current_offset` and :attr:`auto_pagination` are supplied.
+            ValueError: If both :attr:`current_offset` and :attr:`auto_pagination` are supplied.
         """
         if current_offset and auto_pagination:
-            # We raise TypeError instead of ValueError for backwards compatibility with versions
-            # which didn't check this here but let Python do the checking
-            raise TypeError('current_offset and auto_pagination are mutually exclusive!')
+            raise ValueError('current_offset and auto_pagination are mutually exclusive!')
         return self.bot.answer_inline_query(
             inline_query_id=self.id,
             current_offset=self.offset if auto_pagination else current_offset,
