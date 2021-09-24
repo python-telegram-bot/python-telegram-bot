@@ -92,7 +92,7 @@ class TestInlineQuery:
         assert inline_query.answer(results=[])
 
     def test_answer_error(self, inline_query):
-        with pytest.raises(TypeError, match='mutually exclusive'):
+        with pytest.raises(ValueError, match='mutually exclusive'):
             inline_query.answer(results=[], auto_pagination=True, current_offset='foobar')
 
     def test_answer_auto_pagination(self, monkeypatch, inline_query):
