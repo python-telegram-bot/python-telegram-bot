@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """The setup and build script for the python-telegram-bot library."""
-import os
 import subprocess
 import sys
+from pathlib import Path
 
 from setuptools import setup, find_packages
 
@@ -13,7 +13,7 @@ def get_requirements(raw=False):
     """Build the requirements list for this project"""
     requirements_list = []
 
-    with open('requirements.txt') as reqs:
+    with Path('requirements.txt').open() as reqs:
         for install in reqs:
             if install.startswith('# only telegram.ext:'):
                 if raw:
@@ -47,16 +47,14 @@ def get_setup_kwargs(raw=False):
     packages, requirements = get_packages_requirements(raw=raw)
 
     raw_ext = "-raw" if raw else ""
-    readme = f'README{"_RAW" if raw else ""}.rst'
+    readme: Path = Path(f'README{"_RAW" if raw else ""}.rst')
 
-    fn = os.path.join('telegram', 'version.py')
-    with open(fn) as fh:
+    with Path('telegram/version.py').open() as fh:
         for line in fh.readlines():
             if line.startswith('__version__'):
                 exec(line)
 
-    with open(readme, 'r', encoding='utf-8') as fd:
-
+    with readme.open('r', encoding='utf-8') as fd:
         kwargs = dict(
             script_name=f'setup{raw_ext}.py',
             name=f'python-telegram-bot{raw_ext}',

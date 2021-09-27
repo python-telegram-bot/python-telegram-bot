@@ -17,16 +17,16 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import logging
-import os
 import subprocess
 import sys
 from io import BytesIO
+from pathlib import Path
 
 from telegram import InputFile
 
 
 class TestInputFile:
-    png = os.path.join('tests', 'data', 'game.png')
+    png: Path = Path('tests/data/game.png')
 
     def test_slot_behaviour(self, mro_slots):
         inst = InputFile(BytesIO(b'blah'), filename='tg.jpg')
@@ -43,7 +43,7 @@ class TestInputFile:
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=(sys.platform == 'win32'))
         in_file = InputFile(proc.stdout)
 
-        assert in_file.input_file_content == open(self.png, 'rb').read()
+        assert in_file.input_file_content == self.png.read_bytes()
         assert in_file.mimetype == 'image/png'
         assert in_file.filename == 'image.png'
 
@@ -124,7 +124,7 @@ class TestInputFile:
     def test_send_bytes(self, bot, chat_id):
         # We test this here and not at the respective test modules because it's not worth
         # duplicating the test for the different methods
-        with open('tests/data/text_file.txt', 'rb') as file:
+        with Path('tests/data/text_file.txt').open('rb') as file:
             message = bot.send_document(chat_id, file.read())
 
         out = BytesIO()

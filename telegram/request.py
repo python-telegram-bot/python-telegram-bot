@@ -24,6 +24,7 @@ import os
 import socket
 import sys
 import warnings
+from pathlib import Path
 
 try:
     import ujson as json
@@ -382,7 +383,7 @@ class Request:
 
         return self._request_wrapper('GET', url, **urlopen_kwargs)
 
-    def download(self, url: str, filename: str, timeout: float = None) -> None:
+    def download(self, url: str, filepath: Path, timeout: float = None) -> None:
         """Download a file by its URL.
 
         Args:
@@ -390,9 +391,7 @@ class Request:
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            filename (:obj:`str`): The filename within the path to download the file.
+            filename (:obj:`Path`): The filename within the path to download the file.
 
         """
-        buf = self.retrieve(url, timeout=timeout)
-        with open(filename, 'wb') as fobj:
-            fobj.write(buf)
+        filepath.write_bytes(self.retrieve(url, timeout))

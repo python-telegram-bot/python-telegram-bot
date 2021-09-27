@@ -100,16 +100,15 @@ class TestFile:
             return self.file_content
 
         monkeypatch.setattr('telegram.request.Request.retrieve', test)
-        out_file = file.download()
+        out_file: Path = file.download()
 
         try:
-            with open(out_file, 'rb') as fobj:
-                assert fobj.read() == self.file_content
+            assert out_file.read_bytes() == self.file_content
         finally:
-            os.unlink(out_file)
+            out_file.unlink()
 
     def test_download_local_file(self, local_file):
-        assert local_file.download() == local_file.file_path
+        assert local_file.download() == Path(local_file.file_path)
 
     def test_download_custom_path(self, monkeypatch, file):
         def test(*args, **kwargs):
@@ -117,27 +116,25 @@ class TestFile:
 
         monkeypatch.setattr('telegram.request.Request.retrieve', test)
         file_handle, custom_path = mkstemp()
+        custom_path = Path(custom_path)
         try:
-            out_file = file.download(custom_path)
+            out_file: Path = file.download(custom_path)
             assert out_file == custom_path
-
-            with open(out_file, 'rb') as fobj:
-                assert fobj.read() == self.file_content
+            assert out_file.read_bytes() == self.file_content
         finally:
             os.close(file_handle)
-            os.unlink(custom_path)
+            custom_path.unlink()
 
     def test_download_custom_path_local_file(self, local_file):
         file_handle, custom_path = mkstemp()
+        custom_path = Path(custom_path)
         try:
             out_file = local_file.download(custom_path)
             assert out_file == custom_path
-
-            with open(out_file, 'rb') as fobj:
-                assert fobj.read() == self.file_content
+            assert out_file.read_bytes() == self.file_content
         finally:
             os.close(file_handle)
-            os.unlink(custom_path)
+            custom_path.unlink()
 
     def test_download_no_filename(self, monkeypatch, file):
         def test(*args, **kwargs):
@@ -146,14 +143,13 @@ class TestFile:
         file.file_path = None
 
         monkeypatch.setattr('telegram.request.Request.retrieve', test)
-        out_file = file.download()
+        out_file: Path = file.download()
 
-        assert out_file[-len(file.file_id) :] == file.file_id
+        assert str(out_file)[-len(file.file_id) :] == file.file_id
         try:
-            with open(out_file, 'rb') as fobj:
-                assert fobj.read() == self.file_content
+            assert out_file.read_bytes() == self.file_content
         finally:
-            os.unlink(out_file)
+            out_file.unlink()
 
     def test_download_file_obj(self, monkeypatch, file):
         def test(*args, **kwargs):
