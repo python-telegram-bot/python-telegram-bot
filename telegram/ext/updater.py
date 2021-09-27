@@ -17,10 +17,11 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class Updater, which tries to make creating Telegram bots intuitive."""
-
+import inspect
 import logging
 import ssl
 import signal
+from pathlib import Path
 from queue import Queue
 from threading import Event, Lock, Thread, current_thread
 from time import sleep
@@ -34,7 +35,6 @@ from typing import (
     no_type_check,
     Generic,
     TypeVar,
-    cast,
     TYPE_CHECKING,
 )
 
@@ -42,6 +42,7 @@ from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized, Tel
 from telegram.ext import Dispatcher
 from telegram.ext.utils.types import BT
 from telegram.ext.utils.webhookhandler import WebhookAppClass, WebhookServer
+from .utils.stack import was_called_by
 from ..utils.warnings import warn
 
 if TYPE_CHECKING:
@@ -106,25 +107,33 @@ class Updater(Generic[BT, DT]):
         '__threads',
     )
 
-    def __init__(self, **kwargs: Any):
-        if not kwargs.pop('builder_flag', False):
+    def __init__(
+        self: 'Updater[BT, DT]',
+        *,
+        user_signal_handler: Callable[[int, object], Any] = None,
+        dispatcher: DT = None,
+        bot: BT = None,
+        update_queue: Queue = None,
+        exception_event: Event = None,
+    ):
+        if not was_called_by(
+            inspect.currentframe(), Path(__file__).parent.resolve() / 'builders.py'
+        ):
             warn(
                 '`Updater` instances should be built via the `UpdaterBuilder`.',
                 stacklevel=2,
             )
 
-        self.user_signal_handler = cast(
-            Optional[Callable[[int, object], Any]], kwargs.pop('user_signal_handler')
-        )
-        self.dispatcher = cast(Optional[DT], kwargs.pop('dispatcher'))
+        self.user_signal_handler = user_signal_handler
+        self.dispatcher = dispatcher
         if self.dispatcher:
             self.bot = self.dispatcher.bot
             self.update_queue = self.dispatcher.update_queue
             self.exception_event = self.dispatcher.exception_event
         else:
-            self.bot = cast(BT, kwargs.pop('bot'))
-            self.update_queue = cast(Queue, kwargs.pop('update_queue'))
-            self.exception_event = cast(Event, kwargs.pop('exception_event'))
+            self.bot = bot
+            self.update_queue = update_queue
+            self.exception_event = exception_event
 
         self.last_update_id = 0
         self.running = False

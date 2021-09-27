@@ -123,6 +123,7 @@ class TestUpdater:
             str(recwarn[-1].message)
             == '`Updater` instances should be built via the `UpdaterBuilder`.'
         )
+        assert recwarn[0].filename == __file__, "stacklevel is incorrect!"
 
     def test_builder(self, updater):
         builder_1 = updater.builder()

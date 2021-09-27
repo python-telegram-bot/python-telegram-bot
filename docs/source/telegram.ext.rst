@@ -62,4 +62,5 @@ utils
 .. toctree::
 
     telegram.ext.utils.promise
+    telegram.ext.utils.stack
     telegram.ext.utils.types

@@ -76,7 +76,10 @@ class TestBuilder:
         'method, description', _DISPATCHER_CHECKS, ids=[entry[0] for entry in _DISPATCHER_CHECKS]
     )
     def test_mutually_exclusive_for_dispatcher(self, builder, method, description):
-        if None in (getattr(builder, method, None), getattr(builder, 'dispatcher', None)):
+        if isinstance(builder, DispatcherBuilder):
+            pytest.skip('This test is only relevant for UpdaterBuilder')
+
+        if getattr(builder, method, None) is None:
             pytest.skip(f'{builder.__class__} has no method called {method}')
 
         # First that e.g. `dispatcher` can't be set if `bot` was already set

@@ -17,10 +17,11 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the Dispatcher class."""
-
+import inspect
 import logging
 import weakref
 from collections import defaultdict
+from pathlib import Path
 from queue import Empty, Queue
 from threading import BoundedSemaphore, Event, Lock, Thread, current_thread
 from time import sleep
@@ -34,7 +35,6 @@ from typing import (
     Union,
     Generic,
     TypeVar,
-    cast,
     TYPE_CHECKING,
 )
 from uuid import uuid4
@@ -48,6 +48,7 @@ from telegram.utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 from telegram.utils.warnings import warn
 from telegram.ext.utils.promise import Promise
 from telegram.ext.utils.types import CCT, UD, CD, BD, BT, JQ, PT
+from .utils.stack import was_called_by
 
 if TYPE_CHECKING:
     from .builders import InitDispatcherBuilder
@@ -165,25 +166,37 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
     __singleton = None
     logger = logging.getLogger(__name__)
 
-    def __init__(self, **kwargs: object):
-        if not kwargs.pop('builder_flag', False):
+    def __init__(
+        self: 'Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]',
+        *,
+        bot: BT,
+        update_queue: Queue,
+        job_queue: JQ,
+        workers: int,
+        persistence: PT,
+        context_types: ContextTypes[CCT, UD, CD, BD],
+        exception_event: Event,
+        stack_level: int = 4,
+    ):
+        if not was_called_by(
+            inspect.currentframe(), Path(__file__).parent.resolve() / 'builders.py'
+        ):
             warn(
                 '`Dispatcher` instances should be built via the `DispatcherBuilder`.',
                 stacklevel=2,
             )
 
-        self.bot = cast(BT, kwargs.pop('bot'))
-        self.update_queue = cast(Queue, kwargs.pop('update_queue'))
-        self.job_queue = cast(JQ, kwargs.pop('job_queue'))
-        self.workers = cast(int, kwargs.pop('workers'))
-        persistence = cast(PT, kwargs.pop('persistence'))
-        self.context_types = cast(ContextTypes[CCT, UD, CD, BD], kwargs.pop('context_types'))
-        self.exception_event = cast(Event, kwargs.pop('exception_event'))
+        self.bot = bot
+        self.update_queue = update_queue
+        self.job_queue = job_queue
+        self.workers = workers
+        self.context_types = context_types
+        self.exception_event = exception_event
 
         if self.workers < 1:
             warn(
                 'Asynchronous callbacks can not be processed without at least one worker thread.',
-                stacklevel=4,
+                stacklevel=stack_level,
             )
 
         self.user_data: DefaultDict[int, UD] = defaultdict(self.context_types.user_data)

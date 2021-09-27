@@ -120,6 +120,7 @@ class TestDispatcher:
             str(recwarn[-1].message)
             == '`Dispatcher` instances should be built via the `DispatcherBuilder`.'
         )
+        assert recwarn[0].filename == __file__, "stacklevel is incorrect!"
 
     @pytest.mark.parametrize(
         'builder',
@@ -127,9 +128,6 @@ class TestDispatcher:
         ids=('DispatcherBuilder', 'UpdaterBuilder'),
     )
     def test_less_than_one_worker_warning(self, dp, recwarn, builder):
-        if isinstance(builder, UpdaterBuilder):
-            pytest.xfail('How we handle this depends on the last review')
-
         builder.bot(dp.bot).workers(0).build()
         assert len(recwarn) == 1
         assert (
