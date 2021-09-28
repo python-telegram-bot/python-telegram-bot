@@ -32,6 +32,10 @@ class ForceReply(ReplyMarkup):
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`selective` is equal.
+    
+    Note:
+        Attempting to edit a message with ``ForceReply`` specified as :attr:`~telegram.Message.reply_markup`
+            will raise the :attr:`~telegram.error.BadRequest` exception.
 
     Args:
         selective (:obj:`bool`, optional): Use this parameter if you want to force reply from
