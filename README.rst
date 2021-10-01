@@ -93,7 +93,7 @@ Introduction
 
 This library provides a pure Python interface for the
 `Telegram Bot API <https://core.telegram.org/bots/api>`_.
-It's compatible with Python versions 3.6.8+. PTB might also work on `PyPy <http://pypy.org/>`_, though there have been a lot of issues before. Hence, PyPy is not officially supported.
+It's compatible with Python versions 3.6.8+. python-telegram-bot might also work on `PyPy <http://pypy.org/>`_, though there have been a lot of issues before. Hence, PyPy is not officially supported.
 
 In addition to the pure API implementation, this library features a number of high-level classes to
 make the development of bots easy and straightforward. These classes are contained in the
@@ -131,7 +131,7 @@ Or you can install from source with:
     $ cd python-telegram-bot
     $ python setup.py install
     
-In case you have a previously cloned local repository already, you should initialize the added urllib3 submodule before installing with:
+In case you already have a previously cloned local repository, you should initialize the added urllib3 submodule before installing with:
 
 .. code:: shell
 
@@ -141,7 +141,7 @@ In case you have a previously cloned local repository already, you should initia
 Optional Dependencies
 ---------------------
 
-PTB can be installed with optional dependencies:
+python-telegram-bot can be installed with optional dependencies:
 
 * ``pip install python-telegram-bot[passport]`` installs the `cryptography <https://cryptography.io>`_ library. Use this, if you want to use Telegram Passport related functionality.
 * ``pip install python-telegram-bot[ujson]`` installs the `ujson <https://pypi.org/project/ujson/>`_ library. It will then be used for JSON de- & encoding, which can bring speed up compared to the standard `json <https://docs.python.org/3/library/json.html>`_ library.
@@ -165,7 +165,7 @@ Other references:
 Learning by example
 -------------------
 
-We believe that the best way to learn this package is by example. Here
+We believe that the best way to lean this package is by example. Here
 are some examples for you to review. Even if it is not your approach for learning, please take a
 look at ``echobot.py``, it is the de facto base for most of the bots out there. Best of all,
 the code for these examples are released to the public domain, so you can start by grabbing the
@@ -231,7 +231,7 @@ Contributions of all sizes are welcome. Please review our `contribution guidelin
 ========
 Donating
 ========
-Occasionally we are asked if we accept donations to support the development. While we appreciate the thought, maintaining PTB is our hobby and we have almost no running costs for it. We therefore have nothing set up to accept donations. If you still want to donate, we kindly ask you to donate to another open source project/initiative of your choice instead.
+Occasionally we are asked if we accept donations to support the development. While we appreciate the thought, maintaining python-telegram-bot is our hobby and we have almost no running costs for it. We therefore have nothing set up to accept donations. If you still want to donate, we kindly ask you to donate to another open source project/initiative of your choice instead.
 
 =======
 License
