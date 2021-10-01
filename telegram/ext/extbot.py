@@ -34,8 +34,9 @@ from typing import (
     no_type_check,
 )
 
-import telegram.bot
+# import telegram.bot
 from telegram import (
+    Bot,
     ReplyMarkup,
     Message,
     InlineKeyboardMarkup,
@@ -60,7 +61,7 @@ if TYPE_CHECKING:
 HandledTypes = TypeVar('HandledTypes', bound=Union[Message, CallbackQuery, Chat])
 
 
-class ExtBot(telegram.bot.Bot):
+class ExtBot(Bot):
     """This object represents a Telegram Bot with convenience extensions.
 
     Warning:

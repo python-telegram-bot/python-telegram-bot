@@ -31,11 +31,12 @@ from telegram import (
     ShippingQuery,
     PreCheckoutQuery,
     Poll,
+    PollAnswer,
     PollOption,
     ChatMemberUpdated,
     ChatMemberOwner,
 )
-from telegram.poll import PollAnswer
+
 from telegram.utils.datetime import from_timestamp
 
 message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
