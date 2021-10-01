@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram InputMedia Objects."""
 
-from typing import Union, List, Tuple
+from typing import Union, List, Tuple, Optional
 
 from telegram import (
     Animation,
@@ -30,22 +30,64 @@ from telegram import (
     Video,
     MessageEntity,
 )
+from telegram.files.mediaattrmixins import (
+    _DurationMixin,
+    _ThumbFiMixin,
+    _WidthHeightMixin,
+    _TitleMixin,
+)
 from telegram.utils.defaultvalue import DEFAULT_NONE
 from telegram.utils.files import parse_file_input
 from telegram.utils.types import FileInput, JSONDict, ODVInput
 
 
 class InputMedia(TelegramObject):
-    """Base class for Telegram InputMedia Objects.
+    """
+    Base class for Telegram InputMedia Objects.
 
-    See :class:`telegram.InputMediaAnimation`, :class:`telegram.InputMediaAudio`,
-    :class:`telegram.InputMediaDocument`, :class:`telegram.InputMediaPhoto` and
-    :class:`telegram.InputMediaVideo` for detailed use.
+    Args:
+        media (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
+            :class:`telegram.Animation` |  :class:`telegram.Audio` | \
+            :class:`telegram.Document` | :class:`telegram.PhotoSize` | \
+            :class:`telegram.Video`):
+            File to send. Pass a file_id to send a file that exists on the Telegram servers
+            (recommended), pass an HTTP URL for Telegram to get a file from the Internet.
+            Lastly you can pass an existing telegram media object of the corresponding type
+            to send.
+        caption (:obj:`str`, optional): Caption of the media to be sent, 0-1024 characters
+            after entities parsing.
+        caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
+            entities that appear in the caption, which can be specified instead of parse_mode.
+        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
+            in :class:`telegram.ParseMode` for the available modes.
 
+    Attributes:
+        type (:obj:`str`): Type of the input media.
+        media (:obj:`str` | :class:`telegram.InputFile`): Media to send.
+        caption (:obj:`str`): Optional. Caption of the media to be sent.
+        parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
+        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
+            entities that appear in the caption.
     """
 
-    __slots__ = ()
-    caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...], None] = None
+    __slots__ = ('caption', 'caption_entities', 'media', 'parse_mode', 'type')
+
+    def __init__(
+        self,
+        media_type: str,
+        media: Union[str, InputFile],
+        caption: str = None,
+        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+    ):
+        self.type: str = media_type
+        self.media: Union[str, InputFile] = media
+        self.caption: Optional[str] = caption
+        self.caption_entities: Optional[
+            Union[List[MessageEntity], Tuple[MessageEntity, ...]]
+        ] = caption_entities
+        self.parse_mode: ODVInput[str] = parse_mode
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
@@ -59,7 +101,7 @@ class InputMedia(TelegramObject):
         return data
 
 
-class InputMediaAnimation(InputMedia):
+class InputMediaAnimation(InputMedia, _DurationMixin, _ThumbFiMixin, _WidthHeightMixin):
     """Represents an animation file (GIF or H.264/MPEG-4 AVC video without sound) to be sent.
 
     Note:
@@ -115,17 +157,7 @@ class InputMediaAnimation(InputMedia):
 
     """
 
-    __slots__ = (
-        'caption_entities',
-        'width',
-        'media',
-        'thumb',
-        'caption',
-        'duration',
-        'parse_mode',
-        'height',
-        'type',
-    )
+    __slots__ = ('duration', 'height', 'thumb', 'width')
 
     def __init__(
         self,
@@ -139,29 +171,18 @@ class InputMediaAnimation(InputMedia):
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
     ):
-        self.type = 'animation'
-
         if isinstance(media, Animation):
-            self.media: Union[str, InputFile] = media.file_id
-            self.width = media.width
-            self.height = media.height
-            self.duration = media.duration
+            width = media.width if width is None else width
+            height = media.height if height is None else height
+            duration = media.duration if duration is None else duration
+            media: str = media.file_id  # type: ignore[no-redef]
         else:
-            self.media = parse_file_input(media, attach=True, filename=filename)
+            media = parse_file_input(media, attach=True, filename=filename)
 
-        if thumb:
-            self.thumb = parse_file_input(thumb, attach=True)
-
-        if caption:
-            self.caption = caption
-        self.parse_mode = parse_mode
-        self.caption_entities = caption_entities
-        if width:
-            self.width = width
-        if height:
-            self.height = height
-        if duration:
-            self.duration = duration
+        super().__init__('animation', media, caption, caption_entities, parse_mode)
+        _DurationMixin.__init__(self, duration)
+        _ThumbFiMixin.__init__(self, thumb)
+        _WidthHeightMixin.__init__(self, width, height)
 
 
 class InputMediaPhoto(InputMedia):
@@ -199,7 +220,7 @@ class InputMediaPhoto(InputMedia):
 
     """
 
-    __slots__ = ('caption_entities', 'media', 'caption', 'parse_mode', 'type')
+    __slots__ = ()
 
     def __init__(
         self,
@@ -209,16 +230,11 @@ class InputMediaPhoto(InputMedia):
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
     ):
-        self.type = 'photo'
-        self.media = parse_file_input(media, PhotoSize, attach=True, filename=filename)
-
-        if caption:
-            self.caption = caption
-        self.parse_mode = parse_mode
-        self.caption_entities = caption_entities
+        media = parse_file_input(media, PhotoSize, attach=True, filename=filename)
+        super().__init__('photo', media, caption, caption_entities, parse_mode)
 
 
-class InputMediaVideo(InputMedia):
+class InputMediaVideo(InputMedia, _DurationMixin, _ThumbFiMixin, _WidthHeightMixin):
     """Represents a video to be sent.
 
     Note:
@@ -226,7 +242,7 @@ class InputMediaVideo(InputMedia):
            width, height and duration from that video, unless otherwise specified with the optional
            arguments.
         *  ``thumb`` will be ignored for small video files, for which Telegram can easily
-           generate thumb nails. However, this behaviour is undocumented and might be changed
+           generate thumbnails. However, this behaviour is undocumented and might be changed
            by Telegram.
 
     Args:
@@ -281,18 +297,7 @@ class InputMediaVideo(InputMedia):
 
     """
 
-    __slots__ = (
-        'caption_entities',
-        'width',
-        'media',
-        'thumb',
-        'supports_streaming',
-        'caption',
-        'duration',
-        'parse_mode',
-        'height',
-        'type',
-    )
+    __slots__ = ('duration', 'height', 'thumb', 'supports_streaming', 'width')
 
     def __init__(
         self,
@@ -307,34 +312,22 @@ class InputMediaVideo(InputMedia):
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
     ):
-        self.type = 'video'
 
         if isinstance(media, Video):
-            self.media: Union[str, InputFile] = media.file_id
-            self.width = media.width
-            self.height = media.height
-            self.duration = media.duration
+            width = width if width is not None else media.width
+            height = height if height is not None else media.height
+            duration = duration if duration is not None else media.duration
+            media: str = media.file_id  # type: ignore[no-redef]
         else:
-            self.media = parse_file_input(media, attach=True, filename=filename)
-
-        if thumb:
-            self.thumb = parse_file_input(thumb, attach=True)
-
-        if caption:
-            self.caption = caption
-        self.parse_mode = parse_mode
-        self.caption_entities = caption_entities
-        if width:
-            self.width = width
-        if height:
-            self.height = height
-        if duration:
-            self.duration = duration
-        if supports_streaming:
-            self.supports_streaming = supports_streaming
+            media = parse_file_input(media, attach=True, filename=filename)
+        super().__init__('video', media, caption, caption_entities, parse_mode)
+        _DurationMixin.__init__(self, duration)
+        _ThumbFiMixin.__init__(self, thumb)
+        _WidthHeightMixin.__init__(self, width, height)
+        self.supports_streaming: bool = False if supports_streaming is None else supports_streaming
 
 
-class InputMediaAudio(InputMedia):
+class InputMediaAudio(InputMedia, _DurationMixin, _ThumbFiMixin, _TitleMixin):
     """Represents an audio file to be treated as music to be sent.
 
     Note:
@@ -393,17 +386,7 @@ class InputMediaAudio(InputMedia):
 
     """
 
-    __slots__ = (
-        'caption_entities',
-        'media',
-        'thumb',
-        'caption',
-        'title',
-        'duration',
-        'type',
-        'parse_mode',
-        'performer',
-    )
+    __slots__ = ('duration', 'performer', 'thumb', 'title')
 
     def __init__(
         self,
@@ -417,32 +400,23 @@ class InputMediaAudio(InputMedia):
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
     ):
-        self.type = 'audio'
-
         if isinstance(media, Audio):
-            self.media: Union[str, InputFile] = media.file_id
-            self.duration = media.duration
-            self.performer = media.performer
-            self.title = media.title
+            duration = media.duration if duration is None else duration
+            performer = media.performer if performer is None else performer
+            title = media.title if title is None else title
+            media = media.title
         else:
-            self.media = parse_file_input(media, attach=True, filename=filename)
+            media = parse_file_input(media, attach=True, filename=filename)
 
-        if thumb:
-            self.thumb = parse_file_input(thumb, attach=True)
-
-        if caption:
-            self.caption = caption
-        self.parse_mode = parse_mode
-        self.caption_entities = caption_entities
-        if duration:
-            self.duration = duration
-        if performer:
-            self.performer = performer
-        if title:
-            self.title = title
+        cap_ent = caption_entities
+        super().__init__('audio', media, caption, cap_ent, parse_mode)  # type: ignore[arg-type]
+        _DurationMixin.__init__(self, duration)
+        _ThumbFiMixin.__init__(self, thumb)
+        _TitleMixin.__init__(self, title)
+        self.performer: Optional[str] = performer
 
 
-class InputMediaDocument(InputMedia):
+class InputMediaDocument(InputMedia, _ThumbFiMixin):
     """Represents a general file to be sent.
 
     Args:
@@ -493,15 +467,7 @@ class InputMediaDocument(InputMedia):
 
     """
 
-    __slots__ = (
-        'caption_entities',
-        'media',
-        'thumb',
-        'caption',
-        'parse_mode',
-        'type',
-        'disable_content_type_detection',
-    )
+    __slots__ = ('disable_content_type_detection', 'thumb')
 
     def __init__(
         self,
@@ -513,14 +479,7 @@ class InputMediaDocument(InputMedia):
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
     ):
-        self.type = 'document'
-        self.media = parse_file_input(media, Document, attach=True, filename=filename)
-
-        if thumb:
-            self.thumb = parse_file_input(thumb, attach=True)
-
-        if caption:
-            self.caption = caption
-        self.parse_mode = parse_mode
-        self.caption_entities = caption_entities
-        self.disable_content_type_detection = disable_content_type_detection
+        media = parse_file_input(media, Document, attach=True, filename=filename)
+        super().__init__('document', media, caption, caption_entities, parse_mode)
+        _ThumbFiMixin.__init__(self, thumb)
+        self.disable_content_type_detection: Optional[bool] = disable_content_type_detection

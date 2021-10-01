@@ -17,17 +17,33 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Animation."""
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
-from telegram import PhotoSize, TelegramObject
-from telegram.utils.defaultvalue import DEFAULT_NONE
-from telegram.utils.types import JSONDict, ODVInput
+from telegram import PhotoSize
+from telegram.files.basemedium import _BaseMedium
+from telegram.files.mediaattrmixins import (
+    _DurationMixin,
+    _FileNameMixin,
+    _MimeTypeMixin,
+    _ThumbPsMixin,
+    _WidthHeightMixin,
+)
+
 
 if TYPE_CHECKING:
-    from telegram import Bot, File
+    from telegram import Bot
+
+Ancestors = (
+    _BaseMedium,
+    _DurationMixin,
+    _FileNameMixin,
+    _MimeTypeMixin,
+    _ThumbPsMixin,
+    _WidthHeightMixin,
+)
 
 
-class Animation(TelegramObject):
+class Animation(*Ancestors):  # type: ignore[too-many-ancestors, misc]
     """This object represents an animation file (GIF or H.264/MPEG-4 AVC video without sound).
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -65,18 +81,7 @@ class Animation(TelegramObject):
 
     """
 
-    __slots__ = (
-        'bot',
-        'width',
-        'file_id',
-        'file_size',
-        'file_name',
-        'thumb',
-        'duration',
-        'mime_type',
-        'height',
-        'file_unique_id',
-    )
+    __slots__ = ('duration', 'height', 'file_name', 'mime_type', 'thumb', 'width')
 
     def __init__(
         self,
@@ -92,45 +97,9 @@ class Animation(TelegramObject):
         bot: 'Bot' = None,
         **_kwargs: Any,
     ):
-        # Required
-        self.file_id = str(file_id)
-        self.file_unique_id = str(file_unique_id)
-        self.width = int(width)
-        self.height = int(height)
-        self.duration = duration
-        # Optionals
-        self.thumb = thumb
-        self.file_name = file_name
-        self.mime_type = mime_type
-        self.file_size = file_size
-        self.bot = bot
-
-        self._id_attrs = (self.file_unique_id,)
-
-    @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Animation']:
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        if not data:
-            return None
-
-        data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
-
-        return cls(bot=bot, **data)
-
-    def get_file(
-        self, timeout: ODVInput[float] = DEFAULT_NONE, api_kwargs: JSONDict = None
-    ) -> 'File':
-        """Convenience wrapper over :attr:`telegram.Bot.get_file`
-
-        For the documentation of the arguments, please see :meth:`telegram.Bot.get_file`.
-
-        Returns:
-            :class:`telegram.File`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
-        """
-        return self.bot.get_file(file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs)
+        super().__init__(file_id, file_unique_id, file_size, bot)
+        _DurationMixin.__init__(self, duration)
+        _FileNameMixin.__init__(self, file_name)
+        _MimeTypeMixin.__init__(self, mime_type)
+        _ThumbPsMixin.__init__(self, thumb)
+        _WidthHeightMixin.__init__(self, width, height)

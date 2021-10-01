@@ -20,15 +20,23 @@
 
 from typing import TYPE_CHECKING, Any, Optional
 
-from telegram import PhotoSize, TelegramObject
-from telegram.utils.defaultvalue import DEFAULT_NONE
-from telegram.utils.types import JSONDict, ODVInput
+from telegram import PhotoSize
+from telegram.files.basemedium import _BaseMedium
+from telegram.files.mediaattrmixins import (
+    _DurationMixin,
+    _FileNameMixin,
+    _MimeTypeMixin,
+    _TitleMixin,
+    _ThumbPsMixin,
+)
 
 if TYPE_CHECKING:
-    from telegram import Bot, File
+    from telegram import Bot
+
+Ancestors = _BaseMedium, _DurationMixin, _FileNameMixin, _MimeTypeMixin, _ThumbPsMixin, _TitleMixin
 
 
-class Audio(TelegramObject):
+class Audio(*Ancestors):  # type: ignore[too-many-ancestors, misc]
     """This object represents an audio file to be treated as music by the Telegram clients.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -69,18 +77,7 @@ class Audio(TelegramObject):
 
     """
 
-    __slots__ = (
-        'file_id',
-        'bot',
-        'file_size',
-        'file_name',
-        'thumb',
-        'title',
-        'duration',
-        'performer',
-        'mime_type',
-        'file_unique_id',
-    )
+    __slots__ = ('duration', 'file_name', 'mime_type', 'performer', 'thumb', 'title')
 
     def __init__(
         self,
@@ -96,45 +93,10 @@ class Audio(TelegramObject):
         file_name: str = None,
         **_kwargs: Any,
     ):
-        # Required
-        self.file_id = str(file_id)
-        self.file_unique_id = str(file_unique_id)
-        self.duration = int(duration)
-        # Optionals
-        self.performer = performer
-        self.title = title
-        self.file_name = file_name
-        self.mime_type = mime_type
-        self.file_size = file_size
-        self.thumb = thumb
-        self.bot = bot
-
-        self._id_attrs = (self.file_unique_id,)
-
-    @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Audio']:
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        if not data:
-            return None
-
-        data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
-
-        return cls(bot=bot, **data)
-
-    def get_file(
-        self, timeout: ODVInput[float] = DEFAULT_NONE, api_kwargs: JSONDict = None
-    ) -> 'File':
-        """Convenience wrapper over :attr:`telegram.Bot.get_file`
-
-        For the documentation of the arguments, please see :meth:`telegram.Bot.get_file`.
-
-        Returns:
-            :class:`telegram.File`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
-        """
-        return self.bot.get_file(file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs)
+        super().__init__(file_id, file_unique_id, file_size, bot)
+        _DurationMixin.__init__(self, duration)
+        _FileNameMixin.__init__(self, file_name)
+        _MimeTypeMixin.__init__(self, mime_type)
+        _ThumbPsMixin.__init__(self, thumb)
+        _TitleMixin.__init__(self, title)
+        self.performer: Optional[str] = performer
