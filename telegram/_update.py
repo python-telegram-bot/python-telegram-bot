@@ -26,13 +26,14 @@ from telegram import (
     InlineQuery,
     Message,
     Poll,
+    PollAnswer,
     PreCheckoutQuery,
     ShippingQuery,
     TelegramObject,
     ChatMemberUpdated,
     constants,
 )
-from telegram.poll import PollAnswer
+
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:

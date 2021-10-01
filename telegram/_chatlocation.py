@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, Any, Optional
 from telegram import TelegramObject
 from telegram.utils.types import JSONDict
 
-from .files.location import Location
+from .files._location import Location
 
 if TYPE_CHECKING:
     from telegram import Bot

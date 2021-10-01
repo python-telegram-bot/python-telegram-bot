@@ -24,8 +24,8 @@ from typing import TYPE_CHECKING, List, Optional, ClassVar, Union, Tuple, Any
 from telegram import ChatPhoto, TelegramObject, constants
 from telegram.utils.types import JSONDict, FileInput, ODVInput, DVInput
 
-from .chatpermissions import ChatPermissions
-from .chatlocation import ChatLocation
+from ._chatpermissions import ChatPermissions
+from ._chatlocation import ChatLocation
 from .utils.defaultvalue import DEFAULT_NONE, DEFAULT_20
 
 if TYPE_CHECKING:
