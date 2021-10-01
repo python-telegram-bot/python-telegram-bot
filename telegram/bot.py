@@ -35,6 +35,7 @@ from typing import (
     Dict,
     cast,
     Sequence,
+    Any,
 )
 
 try:
@@ -112,22 +113,6 @@ if TYPE_CHECKING:
     )
 
 RT = TypeVar('RT')
-
-
-def log(  # skipcq: PY-D0003
-    func: Callable[..., RT], *args: object, **kwargs: object  # pylint: disable=W0613
-) -> Callable[..., RT]:
-    logger = logging.getLogger(func.__module__)
-
-    @functools.wraps(func)
-    def decorator(*args: object, **kwargs: object) -> RT:  # pylint: disable=W0613
-        logger.debug('Entering: %s', func.__name__)
-        result = func(*args, **kwargs)
-        logger.debug(result)
-        logger.debug('Exiting: %s', func.__name__)
-        return result
-
-    return decorator
 
 
 class Bot(TelegramObject):
@@ -221,6 +206,23 @@ class Bot(TelegramObject):
             self.private_key = serialization.load_pem_private_key(
                 private_key, password=private_key_password, backend=default_backend()
             )
+
+    # TODO: After https://youtrack.jetbrains.com/issue/PY-50952 is fixed, we can revisit this and
+    # consider adding Paramspec from typing_extensions to properly fix this. Currently a workaround
+    def log(  # type: ignore[no-untyped-def] # skipcq: PY-D0003
+        func: Any, *args, **kwargs  # pylint: disable=W0613
+    ):
+        logger = logging.getLogger(func.__module__)
+
+        @functools.wraps(func)
+        def decorator(*args, **kwargs):  # type: ignore[no-untyped-def] # pylint: disable=W0613
+            logger.debug('Entering: %s', func.__name__)
+            result = func(*args, **kwargs)
+            logger.debug(result)
+            logger.debug('Exiting: %s', func.__name__)
+            return result
+
+        return decorator
 
     def _insert_defaults(
         self, data: Dict[str, object], timeout: ODVInput[float]

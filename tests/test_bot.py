@@ -240,6 +240,7 @@ class TestBot:
                 'de_list',
                 'to_dict',
                 'to_json',
+                'log',
                 'parse_data',
                 'get_updates',
                 'getUpdates',
