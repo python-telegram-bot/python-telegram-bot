@@ -38,7 +38,7 @@ from unittest import mock
 import pytest
 
 from telegram import _bot as bot
-from telegram.passport import credentials
+from telegram.passport import _credentials as credentials
 from tests.conftest import env_var_2_bool
 
 TEST_NO_PASSPORT = env_var_2_bool(os.getenv('TEST_NO_PASSPORT', False))

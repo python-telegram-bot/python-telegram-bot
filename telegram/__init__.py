@@ -20,9 +20,9 @@
 
 from ._telegramobject import TelegramObject
 from ._botcommand import BotCommand
-from .user import User
+from ._user import User
 from .files._chatphoto import ChatPhoto
-from .chat import Chat
+from ._chat import Chat
 from ._chatlocation import ChatLocation
 from ._chatinvitelink import ChatInviteLink
 from ._chatmember import (
@@ -76,19 +76,19 @@ from .payment._shippingaddress import ShippingAddress
 from .payment._orderinfo import OrderInfo
 from .payment._successfulpayment import SuccessfulPayment
 from .payment._invoice import Invoice
-from .passport.credentials import EncryptedCredentials
-from .passport.passportfile import PassportFile
+from .passport._credentials import EncryptedCredentials
+from .passport._passportfile import PassportFile
 from .passport._data import IdDocumentData, PersonalDetails, ResidentialAddress
 from .passport._encryptedpassportelement import EncryptedPassportElement
-from .passport.passportdata import PassportData
+from .passport._passportdata import PassportData
 from .inline._inlinekeyboardbutton import InlineKeyboardButton
 from .inline._inlinekeyboardmarkup import InlineKeyboardMarkup
 from ._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
-from .message import Message
-from .callbackquery import CallbackQuery
+from ._message import Message
+from ._callbackquery import CallbackQuery
 from ._choseninlineresult import ChosenInlineResult
 from .inline._inputmessagecontent import InputMessageContent
-from .inline.inlinequery import InlineQuery
+from .inline._inlinequery import InlineQuery
 from .inline._inlinequeryresult import InlineQueryResult
 from .inline._inlinequeryresultarticle import InlineQueryResultArticle
 from .inline._inlinequeryresultaudio import InlineQueryResultAudio
@@ -117,8 +117,8 @@ from .payment._labeledprice import LabeledPrice
 from .inline._inputinvoicemessagecontent import InputInvoiceMessageContent
 from .inline._inputcontactmessagecontent import InputContactMessageContent
 from .payment._shippingoption import ShippingOption
-from .payment.precheckoutquery import PreCheckoutQuery
-from .payment.shippingquery import ShippingQuery
+from .payment._precheckoutquery import PreCheckoutQuery
+from .payment._shippingquery import ShippingQuery
 from ._webhookinfo import WebhookInfo
 from .games._gamehighscore import GameHighScore
 from ._update import Update
@@ -142,7 +142,7 @@ from .passport._passportelementerrors import (
     PassportElementErrorTranslationFiles,
     PassportElementErrorUnspecified,
 )
-from .passport.credentials import (
+from .passport._credentials import (
     Credentials,
     DataCredentials,
     SecureData,

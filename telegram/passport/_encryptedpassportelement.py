@@ -27,7 +27,7 @@ from telegram import (
     ResidentialAddress,
     TelegramObject,
 )
-from telegram.passport.credentials import decrypt_json
+from telegram.passport._credentials import decrypt_json
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
