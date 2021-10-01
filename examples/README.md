@@ -25,7 +25,7 @@ A even more complex example of a bot that uses the nested `ConversationHandler`s
 A basic example of a bot store conversation state and user_data over multiple restarts.
 
 ### [`inlinekeyboard.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/inlinekeyboard.py)
-This example sheds some light on inline keyboards, callback queries and message editing. A wikipedia site explaining this examples lives at https://git.io/JOmFw.
+This example sheds some light on inline keyboards, callback queries and message editing. A wiki site explaining this examples lives at https://git.io/JOmFw.
 
 ### [`inlinekeyboard2.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/inlinekeyboard2.py)
 A more complex example about inline keyboards, callback queries and message editing. This example showcases how an interactive menu could be build using inline keyboards.
