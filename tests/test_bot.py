@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import inspect
+import logging
 import time
 import datetime as dtm
 from collections import defaultdict
@@ -161,6 +162,13 @@ class TestBot:
     def test_invalid_token(self, token):
         with pytest.raises(InvalidToken, match='Invalid token'):
             Bot(token)
+
+    def test_log_decorator(self, bot, caplog):
+        with caplog.at_level(logging.DEBUG):
+            bot.get_me()
+            assert len(caplog.records) == 3
+            assert caplog.records[0].getMessage().startswith('Entering: get_me')
+            assert caplog.records[-1].getMessage().startswith('Exiting: get_me')
 
     @pytest.mark.parametrize(
         'acd_in,maxsize,acd',
