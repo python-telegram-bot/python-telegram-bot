@@ -42,8 +42,7 @@ from uuid import uuid4
 
 from telegram import Update
 from telegram.error import TelegramError
-from telegram.ext import BasePersistence, ContextTypes, ExtBot
-from telegram.ext.handler import Handler
+from telegram.ext import BasePersistence, ContextTypes, ExtBot, Handler
 from telegram.ext.callbackdatacache import CallbackDataCache
 from telegram.utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 from telegram.utils.warnings import warn
@@ -529,7 +528,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
 
         """
         # Unfortunately due to circular imports this has to be here
-        from .conversationhandler import ConversationHandler  # pylint: disable=C0415
+        from ._conversationhandler import ConversationHandler  # pylint: disable=C0415
 
         if not isinstance(handler, Handler):
             raise TypeError(f'handler is not an instance of {Handler.__name__}')

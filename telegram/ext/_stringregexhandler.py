@@ -16,13 +16,14 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the StringCommandHandler class."""
+"""This module contains the StringRegexHandler class."""
 
-from typing import TYPE_CHECKING, Callable, List, Optional, TypeVar, Union
+import re
+from typing import TYPE_CHECKING, Callable, Match, Optional, Pattern, TypeVar, Union
 
 from telegram.utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 
-from .handler import Handler
+from telegram.ext import Handler
 from .utils.types import CCT
 
 if TYPE_CHECKING:
@@ -31,11 +32,11 @@ if TYPE_CHECKING:
 RT = TypeVar('RT')
 
 
-class StringCommandHandler(Handler[str, CCT]):
-    """Handler class to handle string commands. Commands are string updates that start with ``/``.
-    The handler will add a ``list`` to the
-    :class:`CallbackContext` named :attr:`CallbackContext.args`. It will contain a list of strings,
-    which is the text following the command split on single whitespace characters.
+class StringRegexHandler(Handler[str, CCT]):
+    """Handler class to handle string updates based on a regex which checks the update content.
+
+    Read the documentation of the ``re`` module for more information. The ``re.match`` function is
+    used to determine if an update should be handled by this handler.
 
     Note:
         This handler is not used to handle Telegram :attr:`telegram.Update`, but strings manually
@@ -46,7 +47,7 @@ class StringCommandHandler(Handler[str, CCT]):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        command (:obj:`str`): The command this handler should listen for.
+        pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
             Callback signature: ``def callback(update: Update, context: CallbackContext)``
@@ -57,17 +58,17 @@ class StringCommandHandler(Handler[str, CCT]):
             Defaults to :obj:`False`.
 
     Attributes:
-        command (:obj:`str`): The command this handler should listen for.
+        pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
         callback (:obj:`callable`): The callback function for this handler.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     """
 
-    __slots__ = ('command',)
+    __slots__ = ('pattern',)
 
     def __init__(
         self,
-        command: str,
+        pattern: Union[str, Pattern],
         callback: Callable[[str, CCT], RT],
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
@@ -75,9 +76,13 @@ class StringCommandHandler(Handler[str, CCT]):
             callback,
             run_async=run_async,
         )
-        self.command = command
 
-    def check_update(self, update: object) -> Optional[List[str]]:
+        if isinstance(pattern, str):
+            pattern = re.compile(pattern)
+
+        self.pattern = pattern
+
+    def check_update(self, update: object) -> Optional[Match]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
@@ -87,10 +92,10 @@ class StringCommandHandler(Handler[str, CCT]):
             :obj:`bool`
 
         """
-        if isinstance(update, str) and update.startswith('/'):
-            args = update[1:].split(' ')
-            if args[0] == self.command:
-                return args[1:]
+        if isinstance(update, str):
+            match = re.match(self.pattern, update)
+            if match:
+                return match
         return None
 
     def collect_additional_context(
@@ -98,9 +103,10 @@ class StringCommandHandler(Handler[str, CCT]):
         context: CCT,
         update: str,
         dispatcher: 'Dispatcher',
-        check_result: Optional[List[str]],
+        check_result: Optional[Match],
     ) -> None:
-        """Add text after the command to :attr:`CallbackContext.args` as list, split on single
-        whitespaces.
+        """Add the result of ``re.match(pattern, update)`` to :attr:`CallbackContext.matches` as
+        list with one element.
         """
-        context.args = check_result
+        if self.pattern and check_result:
+            context.matches = [check_result]

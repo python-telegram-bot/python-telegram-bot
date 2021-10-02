@@ -34,7 +34,6 @@ from typing import (
     no_type_check,
 )
 
-# import telegram.bot
 from telegram import (
     Bot,
     ReplyMarkup,
@@ -48,7 +47,7 @@ from telegram import (
     InputMedia,
 )
 
-from telegram.ext.callbackdatacache import CallbackDataCache
+from telegram.ext._callbackdatacache import CallbackDataCache
 from telegram.utils.types import JSONDict, ODVInput, DVInput
 from telegram.utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram.utils.datetime import to_timestamp
@@ -56,7 +55,7 @@ from telegram.utils.datetime import to_timestamp
 if TYPE_CHECKING:
     from telegram import InlineQueryResult, MessageEntity
     from telegram.request import Request
-    from .defaults import Defaults
+    from telegram.ext import Defaults
 
 HandledTypes = TypeVar('HandledTypes', bound=Union[Message, CallbackQuery, Chat])
 

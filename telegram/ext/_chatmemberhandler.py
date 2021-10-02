@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2021
+# Copyright (C) 2019-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,77 +16,72 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the MessageHandler class."""
-from typing import TYPE_CHECKING, Callable, Dict, Optional, TypeVar, Union
+"""This module contains the ChatMemberHandler classes."""
+from typing import ClassVar, TypeVar, Union, Callable
 
 from telegram import Update
-from telegram.ext import BaseFilter, Filters
 from telegram.utils.defaultvalue import DefaultValue, DEFAULT_FALSE
-
-from .handler import Handler
+from telegram.ext import Handler
 from .utils.types import CCT
-
-if TYPE_CHECKING:
-    from telegram.ext import Dispatcher
 
 RT = TypeVar('RT')
 
 
-class MessageHandler(Handler[Update, CCT]):
-    """Handler class to handle telegram messages. They might contain text, media or status updates.
+class ChatMemberHandler(Handler[Update, CCT]):
+    """Handler class to handle Telegram updates that contain a chat member update.
+
+    .. versionadded:: 13.4
 
     Warning:
         When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        filters (:class:`telegram.ext.BaseFilter`, optional): A filter inheriting from
-            :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
-            :class:`telegram.ext.filters.Filters`. Filters can be combined using bitwise
-            operators (& for and, | for or, ~ for not). Default is
-            :attr:`telegram.ext.filters.Filters.update`. This defaults to all message_type updates
-            being: ``message``, ``edited_message``, ``channel_post`` and ``edited_channel_post``.
-            If you don't want or need any of those pass ``~Filters.update.*`` in the filter
-            argument.
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
             Callback signature: ``def callback(update: Update, context: CallbackContext)``
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
+        chat_member_types (:obj:`int`, optional): Pass one of :attr:`MY_CHAT_MEMBER`,
+            :attr:`CHAT_MEMBER` or :attr:`ANY_CHAT_MEMBER` to specify if this handler should handle
+            only updates with :attr:`telegram.Update.my_chat_member`,
+            :attr:`telegram.Update.chat_member` or both. Defaults to :attr:`MY_CHAT_MEMBER`.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
             Defaults to :obj:`False`.
 
-    Raises:
-        ValueError
-
     Attributes:
-        filters (:obj:`Filter`): Only allow updates with these Filters. See
-            :mod:`telegram.ext.filters` for a full list of all available filters.
         callback (:obj:`callable`): The callback function for this handler.
+        chat_member_types (:obj:`int`, optional): Specifies if this handler should handle
+            only updates with :attr:`telegram.Update.my_chat_member`,
+            :attr:`telegram.Update.chat_member` or both.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     """
 
-    __slots__ = ('filters',)
+    __slots__ = ('chat_member_types',)
+    MY_CHAT_MEMBER: ClassVar[int] = -1
+    """:obj:`int`: Used as a constant to handle only :attr:`telegram.Update.my_chat_member`."""
+    CHAT_MEMBER: ClassVar[int] = 0
+    """:obj:`int`: Used as a constant to handle only :attr:`telegram.Update.chat_member`."""
+    ANY_CHAT_MEMBER: ClassVar[int] = 1
+    """:obj:`int`: Used as a constant to handle bot :attr:`telegram.Update.my_chat_member`
+    and :attr:`telegram.Update.chat_member`."""
 
     def __init__(
         self,
-        filters: BaseFilter,
         callback: Callable[[Update, CCT], RT],
+        chat_member_types: int = MY_CHAT_MEMBER,
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
-
         super().__init__(
             callback,
             run_async=run_async,
         )
-        if filters is not None:
-            self.filters = Filters.update & filters
-        else:
-            self.filters = Filters.update
 
-    def check_update(self, update: object) -> Optional[Union[bool, Dict[str, list]]]:
+        self.chat_member_types = chat_member_types
+
+    def check_update(self, update: object) -> bool:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
@@ -97,16 +92,11 @@ class MessageHandler(Handler[Update, CCT]):
 
         """
         if isinstance(update, Update):
-            return self.filters(update)
-        return None
-
-    def collect_additional_context(
-        self,
-        context: CCT,
-        update: Update,
-        dispatcher: 'Dispatcher',
-        check_result: Optional[Union[bool, Dict[str, object]]],
-    ) -> None:
-        """Adds possible output of data filters to the :class:`CallbackContext`."""
-        if isinstance(check_result, dict):
-            context.update(check_result)
+            if not (update.my_chat_member or update.chat_member):
+                return False
+            if self.chat_member_types == self.ANY_CHAT_MEMBER:
+                return True
+            if self.chat_member_types == self.CHAT_MEMBER:
+                return bool(update.chat_member)
+            return bool(update.my_chat_member)
+        return False

@@ -56,9 +56,8 @@ from telegram import (
     InputMedia,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
-from telegram.ext import ExtBot
+from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter, TelegramError
-from telegram.ext.callbackdatacache import InvalidCallbackData
 from telegram.utils.datetime import from_timestamp, to_timestamp
 from telegram.helpers import escape_markdown
 from telegram.utils.defaultvalue import DefaultValue

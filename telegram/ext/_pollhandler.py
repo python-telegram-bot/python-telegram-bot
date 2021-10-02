@@ -16,17 +16,17 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the PollAnswerHandler class."""
+"""This module contains the PollHandler classes."""
 
 
 from telegram import Update
 
-from .handler import Handler
+from telegram.ext import Handler
 from .utils.types import CCT
 
 
-class PollAnswerHandler(Handler[Update, CCT]):
-    """Handler class to handle Telegram updates that contain a poll answer.
+class PollHandler(Handler[Update, CCT]):
+    """Handler class to handle Telegram updates that contain a poll.
 
     Warning:
         When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
@@ -60,4 +60,4 @@ class PollAnswerHandler(Handler[Update, CCT]):
             :obj:`bool`
 
         """
-        return isinstance(update, Update) and bool(update.poll_answer)
+        return isinstance(update, Update) and bool(update.poll)

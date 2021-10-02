@@ -25,17 +25,19 @@ import pytest
 
 from telegram import Message, User, Chat, Update, Bot, MessageEntity
 from telegram.ext import (
+    CommandHandler,
     MessageHandler,
+    JobQueue,
     Filters,
     Defaults,
-    CommandHandler,
     CallbackContext,
-    JobQueue,
-    BasePersistence,
     ContextTypes,
+    BasePersistence,
+    PersistenceInput,
+    Dispatcher,
+    DispatcherHandlerStop,
 )
-from telegram.ext import PersistenceInput
-from telegram.ext.dispatcher import Dispatcher, DispatcherHandlerStop
+
 from telegram.utils.defaultvalue import DEFAULT_FALSE
 from telegram.error import TelegramError
 from tests.conftest import create_dp

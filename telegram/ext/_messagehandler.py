@@ -16,14 +16,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the StringRegexHandler class."""
+"""This module contains the MessageHandler class."""
+from typing import TYPE_CHECKING, Callable, Dict, Optional, TypeVar, Union
 
-import re
-from typing import TYPE_CHECKING, Callable, Match, Optional, Pattern, TypeVar, Union
-
+from telegram import Update
+from telegram.ext import BaseFilter, Filters, Handler
 from telegram.utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 
-from .handler import Handler
 from .utils.types import CCT
 
 if TYPE_CHECKING:
@@ -32,22 +31,22 @@ if TYPE_CHECKING:
 RT = TypeVar('RT')
 
 
-class StringRegexHandler(Handler[str, CCT]):
-    """Handler class to handle string updates based on a regex which checks the update content.
-
-    Read the documentation of the ``re`` module for more information. The ``re.match`` function is
-    used to determine if an update should be handled by this handler.
-
-    Note:
-        This handler is not used to handle Telegram :attr:`telegram.Update`, but strings manually
-        put in the queue. For example to send messages with the bot using command line or API.
+class MessageHandler(Handler[Update, CCT]):
+    """Handler class to handle telegram messages. They might contain text, media or status updates.
 
     Warning:
         When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
+        filters (:class:`telegram.ext.BaseFilter`, optional): A filter inheriting from
+            :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
+            :class:`telegram.ext.filters.Filters`. Filters can be combined using bitwise
+            operators (& for and, | for or, ~ for not). Default is
+            :attr:`telegram.ext.filters.Filters.update`. This defaults to all message_type updates
+            being: ``message``, ``edited_message``, ``channel_post`` and ``edited_channel_post``.
+            If you don't want or need any of those pass ``~Filters.update.*`` in the filter
+            argument.
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
             Callback signature: ``def callback(update: Update, context: CallbackContext)``
@@ -57,56 +56,56 @@ class StringRegexHandler(Handler[str, CCT]):
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
             Defaults to :obj:`False`.
 
+    Raises:
+        ValueError
+
     Attributes:
-        pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
+        filters (:obj:`Filter`): Only allow updates with these Filters. See
+            :mod:`telegram.ext.filters` for a full list of all available filters.
         callback (:obj:`callable`): The callback function for this handler.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     """
 
-    __slots__ = ('pattern',)
+    __slots__ = ('filters',)
 
     def __init__(
         self,
-        pattern: Union[str, Pattern],
-        callback: Callable[[str, CCT], RT],
+        filters: BaseFilter,
+        callback: Callable[[Update, CCT], RT],
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
+
         super().__init__(
             callback,
             run_async=run_async,
         )
+        if filters is not None:
+            self.filters = Filters.update & filters
+        else:
+            self.filters = Filters.update
 
-        if isinstance(pattern, str):
-            pattern = re.compile(pattern)
-
-        self.pattern = pattern
-
-    def check_update(self, update: object) -> Optional[Match]:
+    def check_update(self, update: object) -> Optional[Union[bool, Dict[str, list]]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
-            update (:obj:`object`): The incoming update.
+            update (:class:`telegram.Update` | :obj:`object`): Incoming update.
 
         Returns:
             :obj:`bool`
 
         """
-        if isinstance(update, str):
-            match = re.match(self.pattern, update)
-            if match:
-                return match
+        if isinstance(update, Update):
+            return self.filters(update)
         return None
 
     def collect_additional_context(
         self,
         context: CCT,
-        update: str,
+        update: Update,
         dispatcher: 'Dispatcher',
-        check_result: Optional[Match],
+        check_result: Optional[Union[bool, Dict[str, object]]],
     ) -> None:
-        """Add the result of ``re.match(pattern, update)`` to :attr:`CallbackContext.matches` as
-        list with one element.
-        """
-        if self.pattern and check_result:
-            context.matches = [check_result]
+        """Adds possible output of data filters to the :class:`CallbackContext`."""
+        if isinstance(check_result, dict):
+            context.update(check_result)

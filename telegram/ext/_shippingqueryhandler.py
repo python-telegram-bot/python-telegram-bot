@@ -20,7 +20,7 @@
 
 
 from telegram import Update
-from .handler import Handler
+from telegram.ext import Handler
 from .utils.types import CCT
 
 
