@@ -42,10 +42,8 @@ from uuid import uuid4
 
 from telegram import Update
 from telegram.error import TelegramError
-from telegram.ext import BasePersistence, ContextTypes
-from telegram.ext.handler import Handler
-import telegram.ext.extbot
-from telegram.ext.callbackdatacache import CallbackDataCache
+from telegram.ext import BasePersistence, ContextTypes, ExtBot, Handler
+from telegram.ext._callbackdatacache import CallbackDataCache
 from telegram.utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 from telegram.utils.warnings import warn
 from telegram.ext.utils.promise import Promise
@@ -53,8 +51,7 @@ from telegram.ext.utils.types import CCT, UD, CD, BD
 
 if TYPE_CHECKING:
     from telegram import Bot
-    from telegram.ext import JobQueue
-    from telegram.ext.callbackcontext import CallbackContext
+    from telegram.ext import JobQueue, CallbackContext
 
 DEFAULT_GROUP: int = 0
 
@@ -231,7 +228,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                         f"bot_data must be of type {self.context_types.bot_data.__name__}"
                     )
             if self.persistence.store_data.callback_data:
-                self.bot = cast(telegram.ext.extbot.ExtBot, self.bot)
+                self.bot = cast(ExtBot, self.bot)
                 persistent_data = self.persistence.get_callback_data()
                 if persistent_data is not None:
                     if not isinstance(persistent_data, tuple) and len(persistent_data) != 2:
@@ -527,7 +524,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
 
         """
         # Unfortunately due to circular imports this has to be here
-        from .conversationhandler import ConversationHandler  # pylint: disable=C0415
+        from ._conversationhandler import ConversationHandler  # pylint: disable=C0415
 
         if not isinstance(handler, Handler):
             raise TypeError(f'handler is not an instance of {Handler.__name__}')
@@ -599,7 +596,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                     user_ids = []
 
             if self.persistence.store_data.callback_data:
-                self.bot = cast(telegram.ext.extbot.ExtBot, self.bot)
+                self.bot = cast(ExtBot, self.bot)
                 try:
                     self.persistence.update_callback_data(
                         self.bot.callback_data_cache.persistence_data

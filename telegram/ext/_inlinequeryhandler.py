@@ -33,7 +33,7 @@ from typing import (
 from telegram import Update
 from telegram.utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 
-from .handler import Handler
+from telegram.ext import Handler
 from .utils.types import CCT
 
 if TYPE_CHECKING:

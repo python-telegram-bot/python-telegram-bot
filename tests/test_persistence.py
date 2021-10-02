@@ -21,8 +21,7 @@ import signal
 import uuid
 from threading import Lock
 
-from telegram.ext import PersistenceInput
-from telegram.ext.callbackdatacache import CallbackDataCache
+from telegram.ext import CallbackDataCache, PersistenceInput
 
 try:
     import ujson as json

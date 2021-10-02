@@ -33,7 +33,7 @@ from telegram.error import (
     TelegramError,
     PassportDecryptionError,
 )
-from telegram.ext.callbackdatacache import InvalidCallbackData
+from telegram.ext import InvalidCallbackData
 
 
 class TestErrors:

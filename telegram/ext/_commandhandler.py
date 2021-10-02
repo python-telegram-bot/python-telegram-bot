@@ -21,12 +21,11 @@ import re
 from typing import TYPE_CHECKING, Callable, Dict, List, Optional, Tuple, TypeVar, Union
 
 from telegram import MessageEntity, Update
-from telegram.ext import BaseFilter, Filters
+from telegram.ext import BaseFilter, Filters, Handler
 from telegram.utils.types import SLT
 from telegram.utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 
 from .utils.types import CCT
-from .handler import Handler
 
 if TYPE_CHECKING:
     from telegram.ext import Dispatcher

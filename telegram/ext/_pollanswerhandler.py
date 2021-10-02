@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2021
+# Copyright (C) 2019-2021
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,17 +16,17 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the PreCheckoutQueryHandler class."""
+"""This module contains the PollAnswerHandler class."""
 
 
 from telegram import Update
 
-from .handler import Handler
+from telegram.ext import Handler
 from .utils.types import CCT
 
 
-class PreCheckoutQueryHandler(Handler[Update, CCT]):
-    """Handler class to handle Telegram PreCheckout callback queries.
+class PollAnswerHandler(Handler[Update, CCT]):
+    """Handler class to handle Telegram updates that contain a poll answer.
 
     Warning:
         When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
@@ -60,4 +60,4 @@ class PreCheckoutQueryHandler(Handler[Update, CCT]):
             :obj:`bool`
 
         """
-        return isinstance(update, Update) and bool(update.pre_checkout_query)
+        return isinstance(update, Update) and bool(update.poll_answer)

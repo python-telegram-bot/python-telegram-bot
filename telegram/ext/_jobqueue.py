@@ -27,7 +27,7 @@ from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED, JobEvent
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.job import Job as APSJob
 
-from telegram.ext.callbackcontext import CallbackContext
+from telegram.ext import CallbackContext
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:

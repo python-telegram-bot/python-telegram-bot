@@ -22,7 +22,7 @@ from copy import copy
 from typing import Dict, Optional, Tuple, cast, ClassVar, Generic, DefaultDict, NamedTuple
 
 from telegram import Bot
-import telegram.ext.extbot
+from telegram.ext import ExtBot
 
 from telegram.ext.utils.types import UD, CD, BD, ConversationDict, CDCData
 from telegram.warnings import PTBRuntimeWarning
@@ -185,7 +185,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         Args:
             bot (:class:`telegram.Bot`): The bot.
         """
-        if self.store_data.callback_data and not isinstance(bot, telegram.ext.extbot.ExtBot):
+        if self.store_data.callback_data and not isinstance(bot, ExtBot):
             raise TypeError('callback_data can only be stored when using telegram.ext.ExtBot.')
 
         self.bot = bot
