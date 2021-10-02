@@ -25,7 +25,7 @@ body:
     id: traceback
     attributes:
       label: "Traceback to the issue"
-      description: "If you are facing a specific error message, please paste the traceback here. This will be automatically formatted into code (shell), so no need for backticks."
+      description: "If you are facing a specific error message, please paste the traceback here. This will be automatically formatted into python code, so no need for backticks."
       placeholder: |
         Traceback (most recent call last):
           File "/home/bot.py", line 1, in main
@@ -42,6 +42,17 @@ body:
       placeholder: "put it here"
       render: python
 
+  - type: markdown
+    attributes:
+      value: "### Configuration"
+
+  - type: input
+    id: operating-system
+    attributes:
+      label: Operating System
+    validations: 
+      required: true
+      
   - type: textarea
     id: versions
     attributes:
