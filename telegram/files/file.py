@@ -52,7 +52,7 @@ class File(TelegramObject):
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
         file_size (:obj:`int`, optional): Optional. File size, if known.
-        file_path (:obj:`Path`, optional): File path. Use :attr:`download` to get the file.
+        file_path (:obj:`str`, optional): File path. Use :attr:`download` to get the file.
         bot (:obj:`telegram.Bot`, optional): Bot to use with shortcut method.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -62,7 +62,7 @@ class File(TelegramObject):
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
         file_size (:obj:`str`): Optional. File size.
-        file_path (:obj:`Path`): Optional. File path. Use :attr:`download` to get the file.
+        file_path (:obj:`str`): Optional. File path. Use :attr:`download` to get the file.
 
     """
 

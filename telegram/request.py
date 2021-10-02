@@ -383,15 +383,18 @@ class Request:
 
         return self._request_wrapper('GET', url, **urlopen_kwargs)
 
-    def download(self, url: str, filepath: Path, timeout: float = None) -> None:
+    def download(self, url: str, filepath: Union[Path, str], timeout: float = None) -> None:
         """Download a file by its URL.
 
         Args:
             url (:obj:`str`): The web location we want to retrieve.
+            filepath (:obj:`Path` | :obj: `str`): The filepath to download the file to.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            filename (:obj:`Path`): The filename within the path to download the file.
+
+        .. versionchanged:: 14.0
+            The
 
         """
-        filepath.write_bytes(self.retrieve(url, timeout))
+        Path(filepath).write_bytes(self.retrieve(url, timeout))

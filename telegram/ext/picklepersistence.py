@@ -52,7 +52,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.
 
     Args:
-        filename (:obj:`str` | :obj: 'Path'): The filename for storing the pickle files.
+        filepath (:obj:`str` | :obj: 'Path'): The filename for storing the pickle files.
             When :attr:`single_file` is :obj:`False` this will be used as a prefix.
         store_data (:class:`PersistenceInput`, optional): Specifies which kinds of data will be
             saved by this persistence instance. By default, all available kinds of data will be
@@ -145,12 +145,12 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         try:
             with self.filepath.open("rb") as file:
                 data = pickle.load(file)
-                self.user_data = defaultdict(self.context_types.user_data, data['user_data'])
-                self.chat_data = defaultdict(self.context_types.chat_data, data['chat_data'])
-                # For backwards compatibility with files not containing bot data
-                self.bot_data = data.get('bot_data', self.context_types.bot_data())
-                self.callback_data = data.get('callback_data', {})
-                self.conversations = data['conversations']
+            self.user_data = defaultdict(self.context_types.user_data, data['user_data'])
+            self.chat_data = defaultdict(self.context_types.chat_data, data['chat_data'])
+            # For backwards compatibility with files not containing bot data
+            self.bot_data = data.get('bot_data', self.context_types.bot_data())
+            self.callback_data = data.get('callback_data', {})
+            self.conversations = data['conversations']
         except OSError:
             self.conversations = {}
             self.user_data = defaultdict(self.context_types.user_data)
@@ -175,14 +175,14 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             raise TypeError(f"Something went wrong unpickling {filepath}") from exc
 
     def _dump_singlefile(self) -> None:
+        data = {
+            'conversations': self.conversations,
+            'user_data': self.user_data,
+            'chat_data': self.chat_data,
+            'bot_data': self.bot_data,
+            'callback_data': self.callback_data,
+        }
         with self.filepath.open("wb") as file:
-            data = {
-                'conversations': self.conversations,
-                'user_data': self.user_data,
-                'chat_data': self.chat_data,
-                'bot_data': self.bot_data,
-                'callback_data': self.callback_data,
-            }
             pickle.dump(data, file)
 
     @staticmethod

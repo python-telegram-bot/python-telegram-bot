@@ -102,8 +102,7 @@ def msg(update: Update, context: CallbackContext) -> None:
 def main() -> None:
     """Start the bot."""
     # Create the Updater and pass it your token and private key
-    with Path('private.key').open('rb') as private_key:
-        updater = Updater("TOKEN", private_key=private_key.read())
+    updater = Updater("TOKEN", private_key=Path('private.key').read_bytes())
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher

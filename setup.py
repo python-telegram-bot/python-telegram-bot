@@ -54,54 +54,53 @@ def get_setup_kwargs(raw=False):
             if line.startswith('__version__'):
                 exec(line)
 
-    with readme.open('r', encoding='utf-8') as fd:
-        kwargs = dict(
-            script_name=f'setup{raw_ext}.py',
-            name=f'python-telegram-bot{raw_ext}',
-            version=locals()['__version__'],
-            author='Leandro Toledo',
-            author_email='devs@python-telegram-bot.org',
-            license='LGPLv3',
-            url='https://python-telegram-bot.org/',
-            # Keywords supported by PyPI can be found at https://git.io/JtLIZ
-            project_urls={
-                "Documentation": "https://python-telegram-bot.readthedocs.io",
-                "Bug Tracker": "https://github.com/python-telegram-bot/python-telegram-bot/issues",
-                "Source Code": "https://github.com/python-telegram-bot/python-telegram-bot",
-                "News": "https://t.me/pythontelegrambotchannel",
-                "Changelog": "https://python-telegram-bot.readthedocs.io/en/stable/changelog.html",
-            },
-            download_url=f'https://pypi.org/project/python-telegram-bot{raw_ext}/',
-            keywords='python telegram bot api wrapper',
-            description="We have made you a wrapper you can't refuse",
-            long_description=fd.read(),
-            long_description_content_type='text/x-rst',
-            packages=packages,
+    kwargs = dict(
+        script_name=f'setup{raw_ext}.py',
+        name=f'python-telegram-bot{raw_ext}',
+        version=locals()['__version__'],
+        author='Leandro Toledo',
+        author_email='devs@python-telegram-bot.org',
+        license='LGPLv3',
+        url='https://python-telegram-bot.org/',
+        # Keywords supported by PyPI can be found at https://git.io/JtLIZ
+        project_urls={
+            "Documentation": "https://python-telegram-bot.readthedocs.io",
+            "Bug Tracker": "https://github.com/python-telegram-bot/python-telegram-bot/issues",
+            "Source Code": "https://github.com/python-telegram-bot/python-telegram-bot",
+            "News": "https://t.me/pythontelegrambotchannel",
+            "Changelog": "https://python-telegram-bot.readthedocs.io/en/stable/changelog.html",
+        },
+        download_url=f'https://pypi.org/project/python-telegram-bot{raw_ext}/',
+        keywords='python telegram bot api wrapper',
+        description="We have made you a wrapper you can't refuse",
+        long_description=readme.read_text(),
+        long_description_content_type='text/x-rst',
+        packages=packages,
 
-            install_requires=requirements,
-            extras_require={
-                'json': 'ujson',
-                'socks': 'PySocks',
-                # 3.4-3.4.3 contained some cyclical import bugs
-                'passport': 'cryptography!=3.4,!=3.4.1,!=3.4.2,!=3.4.3',
-            },
-            include_package_data=True,
-            classifiers=[
-                'Development Status :: 5 - Production/Stable',
-                'Intended Audience :: Developers',
-                'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)',
-                'Operating System :: OS Independent',
-                'Topic :: Software Development :: Libraries :: Python Modules',
-                'Topic :: Communications :: Chat',
-                'Topic :: Internet',
-                'Programming Language :: Python',
-                'Programming Language :: Python :: 3',
-                'Programming Language :: Python :: 3.7',
-                'Programming Language :: Python :: 3.8',
-                'Programming Language :: Python :: 3.9',
-            ],
-            python_requires='>=3.7'
-        )
+        install_requires=requirements,
+        extras_require={
+            'json': 'ujson',
+            'socks': 'PySocks',
+            # 3.4-3.4.3 contained some cyclical import bugs
+            'passport': 'cryptography!=3.4,!=3.4.1,!=3.4.2,!=3.4.3',
+        },
+        include_package_data=True,
+        classifiers=[
+            'Development Status :: 5 - Production/Stable',
+            'Intended Audience :: Developers',
+            'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)',
+            'Operating System :: OS Independent',
+            'Topic :: Software Development :: Libraries :: Python Modules',
+            'Topic :: Communications :: Chat',
+            'Topic :: Internet',
+            'Programming Language :: Python',
+            'Programming Language :: Python :: 3',
+            'Programming Language :: Python :: 3.7',
+            'Programming Language :: Python :: 3.8',
+            'Programming Language :: Python :: 3.9',
+        ],
+        python_requires='>=3.7'
+    )
 
     return kwargs
 
