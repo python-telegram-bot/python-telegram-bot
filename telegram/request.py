@@ -394,7 +394,7 @@ class Request:
                 the connection pool).
 
         .. versionchanged:: 14.0
-            The
+            :param:`filepath` now also accepts `pathlib.Path` objects as argument.
 
         """
         Path(filepath).write_bytes(self.retrieve(url, timeout))

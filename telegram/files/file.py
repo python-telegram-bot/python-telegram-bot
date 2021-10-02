@@ -89,7 +89,7 @@ class File(TelegramObject):
         self.file_unique_id = str(file_unique_id)
         # Optionals
         self.file_size = file_size
-        self.file_path: Optional[str] = file_path  # Can be either path or url, so must remain str.
+        self.file_path = file_path  # Can be either path or url, so must remain str.
         self.bot = bot
         self._credentials: Optional['FileCredentials'] = None
 
@@ -97,7 +97,7 @@ class File(TelegramObject):
 
     def download(
         self, custom_path: Optional[Union[Path, str]] = None, out: IO = None, timeout: int = None
-    ) -> Union[Path, str, IO]:
+    ) -> Union[Path, IO]:
         """
         Download this file. By default, the file is saved in the current working directory with its
         original filename as reported by Telegram. If the file has no filename, it the file ID will
@@ -111,8 +111,12 @@ class File(TelegramObject):
               the path of a local file (which is the case when a Bot API Server is running in
               local mode), this method will just return the path.
 
+        .. versionchanged:: 14.0
+            * :param:`custom_path` now also accepts pathlib.Path objects as argument.
+            * Returns `pathlib.Path` object in cases where previously returned `str` object.
+
         Args:
-            custom_path (:obj: 'Path' | :obj:`str`, optional): Custom path.
+            custom_path (:obj: 'pathlib.Path' | :obj:`str`, optional): Custom path.
             out (:obj:`io.BufferedWriter`, optional): A file-like object. Must be opened for
                 writing in binary mode, if applicable.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -120,7 +124,8 @@ class File(TelegramObject):
                 the connection pool).
 
         Returns:
-            :obj:`str` | :obj:`io.BufferedWriter`: The same object as :attr:`out` if specified.
+            :obj:`pathlib.Path` | :obj:`io.BufferedWriter`: The same object as :attr:`out` if
+                specified.
             Otherwise, returns the filename downloaded to or the file path of the local file.
 
         Raises:
@@ -128,16 +133,17 @@ class File(TelegramObject):
 
         """
         if custom_path is not None and out is not None:
-            raise ValueError('custom_path and out are mutually exclusive')
+            raise ValueError('`custom_path` and `out` are mutually exclusive')
 
         local_file: bool = is_local_file(self.file_path)
-        url: Union[Path, str] = Path(self.file_path) if local_file else self._get_encoded_url()
+        url: Optional[str] = None if local_file else self._get_encoded_url()
+        path: Optional[Path] = Path(self.file_path) if local_file else None
 
         if out:
             if local_file:
-                buf = url.read_bytes()  # type: ignore[union-attr]
+                buf = path.read_bytes()
             else:
-                buf = self.bot.request.retrieve(url)  # type: ignore[arg-type]
+                buf = self.bot.request.retrieve(url)
                 if self._credentials:
                     buf = decrypt(
                         b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
@@ -158,7 +164,7 @@ class File(TelegramObject):
         else:
             filename = Path.cwd() / self.file_id
 
-        buf = self.bot.request.retrieve(url, timeout=timeout)  # type: ignore[arg-type]
+        buf = self.bot.request.retrieve(url, timeout=timeout)
         if self._credentials:
             buf = decrypt(
                 b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf

@@ -872,7 +872,7 @@ class TestBasePersistence:
 @pytest.fixture(scope='function')
 def pickle_persistence():
     return PicklePersistence(
-        filename='pickletest',
+        filepath='pickletest',
         single_file=False,
         on_flush=False,
     )
@@ -881,7 +881,7 @@ def pickle_persistence():
 @pytest.fixture(scope='function')
 def pickle_persistence_only_bot():
     return PicklePersistence(
-        filename='pickletest',
+        filepath='pickletest',
         store_data=PersistenceInput(callback_data=False, user_data=False, chat_data=False),
         single_file=False,
         on_flush=False,
@@ -891,7 +891,7 @@ def pickle_persistence_only_bot():
 @pytest.fixture(scope='function')
 def pickle_persistence_only_chat():
     return PicklePersistence(
-        filename='pickletest',
+        filepath='pickletest',
         store_data=PersistenceInput(callback_data=False, user_data=False, bot_data=False),
         single_file=False,
         on_flush=False,
@@ -901,7 +901,7 @@ def pickle_persistence_only_chat():
 @pytest.fixture(scope='function')
 def pickle_persistence_only_user():
     return PicklePersistence(
-        filename='pickletest',
+        filepath='pickletest',
         store_data=PersistenceInput(callback_data=False, chat_data=False, bot_data=False),
         single_file=False,
         on_flush=False,
@@ -911,7 +911,7 @@ def pickle_persistence_only_user():
 @pytest.fixture(scope='function')
 def pickle_persistence_only_callback():
     return PicklePersistence(
-        filename='pickletest',
+        filepath='pickletest',
         store_data=PersistenceInput(user_data=False, chat_data=False, bot_data=False),
         single_file=False,
         on_flush=False,
@@ -1656,7 +1656,7 @@ class TestPicklePersistence:
         dp.add_handler(h1)
         dp.process_update(update)
         pickle_persistence_2 = PicklePersistence(
-            filename='pickletest',
+            filepath='pickletest',
             single_file=False,
             on_flush=False,
         )
@@ -1675,7 +1675,7 @@ class TestPicklePersistence:
         dp.bot.callback_data_cache._callback_queries['test'] = 'Working4!'
         u._signal_handler(signal.SIGINT, None)
         pickle_persistence_2 = PicklePersistence(
-            filename='pickletest',
+            filepath='pickletest',
             single_file=False,
             on_flush=False,
         )
@@ -1695,7 +1695,7 @@ class TestPicklePersistence:
         dp.bot.callback_data_cache._callback_queries['test'] = 'Working4!'
         u._signal_handler(signal.SIGINT, None)
         pickle_persistence_2 = PicklePersistence(
-            filename='pickletest',
+            filepath='pickletest',
             store_data=PersistenceInput(callback_data=False, chat_data=False, user_data=False),
             single_file=False,
             on_flush=False,
@@ -1715,7 +1715,7 @@ class TestPicklePersistence:
         dp.bot.callback_data_cache._callback_queries['test'] = 'Working4!'
         u._signal_handler(signal.SIGINT, None)
         pickle_persistence_2 = PicklePersistence(
-            filename='pickletest',
+            filepath='pickletest',
             store_data=PersistenceInput(callback_data=False, user_data=False, bot_data=False),
             single_file=False,
             on_flush=False,
@@ -1735,7 +1735,7 @@ class TestPicklePersistence:
         dp.bot.callback_data_cache._callback_queries['test'] = 'Working4!'
         u._signal_handler(signal.SIGINT, None)
         pickle_persistence_2 = PicklePersistence(
-            filename='pickletest',
+            filepath='pickletest',
             store_data=PersistenceInput(callback_data=False, chat_data=False, bot_data=False),
             single_file=False,
             on_flush=False,
@@ -1758,7 +1758,7 @@ class TestPicklePersistence:
         del u
         del pickle_persistence_only_callback
         pickle_persistence_2 = PicklePersistence(
-            filename='pickletest',
+            filepath='pickletest',
             store_data=PersistenceInput(user_data=False, chat_data=False, bot_data=False),
             single_file=False,
             on_flush=False,

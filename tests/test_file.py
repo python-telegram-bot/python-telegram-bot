@@ -92,7 +92,7 @@ class TestFile:
             bot.get_file(file_id='')
 
     def test_download_mutuall_exclusive(self, file):
-        with pytest.raises(ValueError, match='custom_path and out are mutually exclusive'):
+        with pytest.raises(ValueError, match='`custom_path` and `out` are mutually exclusive'):
             file.download('custom_path', 'out')
 
     def test_download(self, monkeypatch, file):
@@ -100,7 +100,7 @@ class TestFile:
             return self.file_content
 
         monkeypatch.setattr('telegram.request.Request.retrieve', test)
-        out_file: Path = file.download()
+        out_file = file.download()
 
         try:
             assert out_file.read_bytes() == self.file_content
@@ -118,7 +118,7 @@ class TestFile:
         file_handle, custom_path = mkstemp()
         custom_path = Path(custom_path)
         try:
-            out_file: Path = file.download(custom_path)
+            out_file = file.download(custom_path)
             assert out_file == custom_path
             assert out_file.read_bytes() == self.file_content
         finally:
@@ -143,7 +143,7 @@ class TestFile:
         file.file_path = None
 
         monkeypatch.setattr('telegram.request.Request.retrieve', test)
-        out_file: Path = file.download()
+        out_file = file.download()
 
         assert str(out_file)[-len(file.file_id) :] == file.file_id
         try:

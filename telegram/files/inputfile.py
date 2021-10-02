@@ -64,7 +64,7 @@ class InputFile:
         if filename:
             self.filename = filename
         elif hasattr(obj, 'name') and not isinstance(obj.name, int):  # type: ignore[union-attr]
-            self.filename = str(Path(obj.name).name)  # type: ignore[union-attr]
+            self.filename = Path(obj.name).name  # type: ignore[union-attr]
 
         image_mime_type = self.is_image(self.input_file_content)
         if image_mime_type:

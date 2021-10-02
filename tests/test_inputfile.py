@@ -26,7 +26,7 @@ from telegram import InputFile
 
 
 class TestInputFile:
-    png: Path = Path('tests/data/game.png')
+    png = Path('tests/data/game.png')
 
     def test_slot_behaviour(self, mro_slots):
         inst = InputFile(BytesIO(b'blah'), filename='tg.jpg')
@@ -35,11 +35,8 @@ class TestInputFile:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_subprocess_pipe(self):
-        if sys.platform == 'win32':
-            cmd = ['type', self.png]
-        else:
-            cmd = ['cat', self.png]
-
+        cmd_str = 'type' if sys.platform == 'win32' else 'cat'
+        cmd = [cmd_str, str(self.png)]
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=(sys.platform == 'win32'))
         in_file = InputFile(proc.stdout)
 

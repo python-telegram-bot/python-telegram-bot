@@ -50,9 +50,10 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
 
     .. versionchanged:: 14.0
         The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.
+        The parameter and attribute ``filename`` were replaced by :attr:`filepath.
 
     Args:
-        filepath (:obj:`str` | :obj: 'Path'): The filename for storing the pickle files.
+        filepath (:obj:`str` | :obj: 'pathlib.Path'): The filename for storing the pickle files.
             When :attr:`single_file` is :obj:`False` this will be used as a prefix.
         store_data (:class:`PersistenceInput`, optional): Specifies which kinds of data will be
             saved by this persistence instance. By default, all available kinds of data will be
@@ -72,7 +73,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             .. versionadded:: 13.6
 
     Attributes:
-        filename (:obj:`str` | :obj: 'Path'): The filename for storing the pickle files.
+        filepath (:obj: 'pathlib.Path'): The filepath for storing the pickle files.
             When :attr:`single_file` is :obj:`False` this will be used as a prefix.
         store_data (:class:`PersistenceInput`): Specifies which kinds of data will be saved by this
             persistence instance.
@@ -104,7 +105,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     @overload
     def __init__(
         self: 'PicklePersistence[Dict, Dict, Dict]',
-        filename: Union[Path, str],
+        filepath: Union[Path, str],
         store_data: PersistenceInput = None,
         single_file: bool = True,
         on_flush: bool = False,
@@ -114,7 +115,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     @overload
     def __init__(
         self: 'PicklePersistence[UD, CD, BD]',
-        filename: Union[Path, str],
+        filepath: Union[Path, str],
         store_data: PersistenceInput = None,
         single_file: bool = True,
         on_flush: bool = False,
@@ -124,14 +125,14 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
 
     def __init__(
         self,
-        filename: Union[Path, str],
+        filepath: Union[Path, str],
         store_data: PersistenceInput = None,
         single_file: bool = True,
         on_flush: bool = False,
         context_types: ContextTypes[Any, UD, CD, BD] = None,
     ):
         super().__init__(store_data=store_data)
-        self.filepath: Path = Path(filename)
+        self.filepath: Path = Path(filepath)
         self.single_file = single_file
         self.on_flush = on_flush
         self.user_data: Optional[DefaultDict[int, UD]] = None
