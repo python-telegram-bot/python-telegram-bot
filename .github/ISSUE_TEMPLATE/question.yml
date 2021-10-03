@@ -39,7 +39,12 @@ body:
     attributes:
       label: "Related part of your code"
       description: "This will be automatically formatted into code (python), so no need for backticks."
-      placeholder: "put it here"
+      placeholder: |
+        logging.basicConfig(
+            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
+        )
+
+        logger = logging.getLogger(__name__)
       render: python
 
   - type: markdown
