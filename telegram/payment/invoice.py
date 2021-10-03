@@ -59,7 +59,6 @@ class Invoice(TelegramObject):
         'title',
         'description',
         'total_amount',
-        '_id_attrs',
     )
 
     def __init__(

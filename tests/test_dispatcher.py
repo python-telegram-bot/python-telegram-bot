@@ -23,7 +23,7 @@ from time import sleep
 
 import pytest
 
-from telegram import TelegramError, Message, User, Chat, Update, Bot, MessageEntity
+from telegram import Message, User, Chat, Update, Bot, MessageEntity
 from telegram.ext import (
     MessageHandler,
     Filters,
@@ -34,9 +34,10 @@ from telegram.ext import (
     BasePersistence,
     ContextTypes,
 )
-from telegram.ext.dispatcher import run_async, Dispatcher, DispatcherHandlerStop
-from telegram.utils.deprecate import TelegramDeprecationWarning
-from telegram.utils.helpers import DEFAULT_FALSE
+from telegram.ext import PersistenceInput
+from telegram.ext.dispatcher import Dispatcher, DispatcherHandlerStop
+from telegram.utils.defaultvalue import DEFAULT_FALSE
+from telegram.error import TelegramError
 from tests.conftest import create_dp
 from collections import defaultdict
 
@@ -57,24 +58,11 @@ class TestDispatcher:
     received = None
     count = 0
 
-    def test_slot_behaviour(self, dp2, recwarn, mro_slots):
+    def test_slot_behaviour(self, dp2, mro_slots):
         for at in dp2.__slots__:
             at = f"_Dispatcher{at}" if at.startswith('__') and not at.endswith('__') else at
             assert getattr(dp2, at, 'err') != 'err', f"got extra slot '{at}'"
-        assert not dp2.__dict__, f"got missing slot(s): {dp2.__dict__}"
         assert len(mro_slots(dp2)) == len(set(mro_slots(dp2))), "duplicate slot"
-        dp2.custom, dp2.running = 'should give warning', dp2.running
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
-
-        class CustomDispatcher(Dispatcher):
-            pass  # Tests that setting custom attrs of Dispatcher subclass doesn't raise warning
-
-        a = CustomDispatcher(None, None)
-        a.my_custom = 'no error!'
-        assert len(recwarn) == 1
-
-        dp2.__setattr__('__test', 'mangled success')
-        assert getattr(dp2, '_Dispatcher__test', 'e') == 'mangled success', "mangling failed"
 
     @pytest.fixture(autouse=True, name='reset')
     def reset_fixture(self):
@@ -84,16 +72,13 @@ class TestDispatcher:
         self.received = None
         self.count = 0
 
-    def error_handler(self, bot, update, error):
-        self.received = error.message
-
     def error_handler_context(self, update, context):
         self.received = context.error.message
 
-    def error_handler_raise_error(self, bot, update, error):
+    def error_handler_raise_error(self, update, context):
         raise Exception('Failing bigly')
 
-    def callback_increase_count(self, bot, update):
+    def callback_increase_count(self, update, context):
         self.count += 1
 
     def callback_set_count(self, count):
@@ -102,14 +87,11 @@ class TestDispatcher:
 
         return callback
 
-    def callback_raise_error(self, bot, update):
-        if isinstance(bot, Bot):
-            raise TelegramError(update.message.text)
-        raise TelegramError(bot.message.text)
+    def callback_raise_error(self, update, context):
+        raise TelegramError(update.message.text)
 
-    def callback_if_not_update_queue(self, bot, update, update_queue=None):
-        if update_queue is not None:
-            self.received = update.message
+    def callback_received(self, update, context):
+        self.received = update.message
 
     def callback_context(self, update, context):
         if (
@@ -122,14 +104,15 @@ class TestDispatcher:
             self.received = context.error.message
 
     def test_less_than_one_worker_warning(self, dp, recwarn):
-        Dispatcher(dp.bot, dp.update_queue, job_queue=dp.job_queue, workers=0, use_context=True)
+        Dispatcher(dp.bot, dp.update_queue, job_queue=dp.job_queue, workers=0)
         assert len(recwarn) == 1
         assert (
             str(recwarn[0].message)
             == 'Asynchronous callbacks can not be processed without at least one worker thread.'
         )
+        assert recwarn[0].filename == __file__, "stacklevel is incorrect!"
 
-    def test_one_context_per_update(self, cdp):
+    def test_one_context_per_update(self, dp):
         def one(update, context):
             if update.message.text == 'test':
                 context.my_flag = True
@@ -142,22 +125,22 @@ class TestDispatcher:
                 if hasattr(context, 'my_flag'):
                     pytest.fail()
 
-        cdp.add_handler(MessageHandler(Filters.regex('test'), one), group=1)
-        cdp.add_handler(MessageHandler(None, two), group=2)
+        dp.add_handler(MessageHandler(Filters.regex('test'), one), group=1)
+        dp.add_handler(MessageHandler(None, two), group=2)
         u = Update(1, Message(1, None, None, None, text='test'))
-        cdp.process_update(u)
+        dp.process_update(u)
         u.message.text = 'something'
-        cdp.process_update(u)
+        dp.process_update(u)
 
     def test_error_handler(self, dp):
-        dp.add_error_handler(self.error_handler)
+        dp.add_error_handler(self.error_handler_context)
         error = TelegramError('Unauthorized.')
         dp.update_queue.put(error)
         sleep(0.1)
         assert self.received == 'Unauthorized.'
 
         # Remove handler
-        dp.remove_error_handler(self.error_handler)
+        dp.remove_error_handler(self.error_handler_context)
         self.reset()
 
         dp.update_queue.put(error)
@@ -165,19 +148,16 @@ class TestDispatcher:
         assert self.received is None
 
     def test_double_add_error_handler(self, dp, caplog):
-        dp.add_error_handler(self.error_handler)
+        dp.add_error_handler(self.error_handler_context)
         with caplog.at_level(logging.DEBUG):
-            dp.add_error_handler(self.error_handler)
+            dp.add_error_handler(self.error_handler_context)
             assert len(caplog.records) == 1
             assert caplog.records[-1].getMessage().startswith('The callback is already registered')
 
     def test_construction_with_bad_persistence(self, caplog, bot):
         class my_per:
             def __init__(self):
-                self.store_user_data = False
-                self.store_chat_data = False
-                self.store_bot_data = False
-                self.store_callback_data = False
+                self.store_data = PersistenceInput(False, False, False, False)
 
         with pytest.raises(
             TypeError, match='persistence must be based on telegram.ext.BasePersistence'
@@ -217,7 +197,7 @@ class TestDispatcher:
         dp.bot.defaults = Defaults(run_async=run_async)
         try:
             dp.add_handler(MessageHandler(Filters.all, self.callback_raise_error))
-            dp.add_error_handler(self.error_handler)
+            dp.add_error_handler(self.error_handler_context)
 
             monkeypatch.setattr(dp, 'run_async', mock_async_err_handler)
             dp.process_update(self.message_update)
@@ -264,82 +244,24 @@ class TestDispatcher:
 
         assert name1 != name2
 
-    def test_multiple_run_async_decorator(self, dp, dp2):
-        # Make sure we got two dispatchers and that they are not the same
-        assert isinstance(dp, Dispatcher)
-        assert isinstance(dp2, Dispatcher)
-        assert dp is not dp2
-
-        @run_async
-        def must_raise_runtime_error():
-            pass
-
-        with pytest.raises(RuntimeError):
-            must_raise_runtime_error()
-
-    def test_run_async_with_args(self, dp):
-        dp.add_handler(
-            MessageHandler(
-                Filters.all, run_async(self.callback_if_not_update_queue), pass_update_queue=True
-            )
-        )
-
-        dp.update_queue.put(self.message_update)
-        sleep(0.1)
-        assert self.received == self.message_update.message
-
-    def test_multiple_run_async_deprecation(self, dp):
-        assert isinstance(dp, Dispatcher)
-
-        @run_async
-        def callback(update, context):
-            pass
-
-        dp.add_handler(MessageHandler(Filters.all, callback))
-
-        with pytest.warns(TelegramDeprecationWarning, match='@run_async decorator'):
-            dp.process_update(self.message_update)
-
-    def test_async_raises_dispatcher_handler_stop(self, dp, caplog):
-        @run_async
+    def test_async_raises_dispatcher_handler_stop(self, dp, recwarn):
         def callback(update, context):
             raise DispatcherHandlerStop()
 
-        dp.add_handler(MessageHandler(Filters.all, callback))
+        dp.add_handler(MessageHandler(Filters.all, callback, run_async=True))
 
-        with caplog.at_level(logging.WARNING):
-            dp.update_queue.put(self.message_update)
-            sleep(0.1)
-            assert len(caplog.records) == 1
-            assert (
-                caplog.records[-1]
-                .getMessage()
-                .startswith('DispatcherHandlerStop is not supported ' 'with async functions')
-            )
-
-    def test_async_raises_exception(self, dp, caplog):
-        @run_async
-        def callback(update, context):
-            raise RuntimeError('async raising exception')
-
-        dp.add_handler(MessageHandler(Filters.all, callback))
-
-        with caplog.at_level(logging.WARNING):
-            dp.update_queue.put(self.message_update)
-            sleep(0.1)
-            assert len(caplog.records) == 1
-            assert (
-                caplog.records[-1]
-                .getMessage()
-                .startswith('A promise with deactivated error handling')
-            )
+        dp.update_queue.put(self.message_update)
+        sleep(0.1)
+        assert len(recwarn) == 1
+        assert str(recwarn[-1].message).startswith(
+            'DispatcherHandlerStop is not supported with async functions'
+        )
 
     def test_add_async_handler(self, dp):
         dp.add_handler(
             MessageHandler(
                 Filters.all,
-                self.callback_if_not_update_queue,
-                pass_update_queue=True,
+                self.callback_received,
                 run_async=True,
             )
         )
@@ -358,19 +280,11 @@ class TestDispatcher:
             assert len(caplog.records) == 1
             assert caplog.records[-1].getMessage().startswith('No error handlers are registered')
 
-    def test_async_handler_error_handler(self, dp):
+    def test_async_handler_async_error_handler_context(self, dp):
         dp.add_handler(MessageHandler(Filters.all, self.callback_raise_error, run_async=True))
-        dp.add_error_handler(self.error_handler)
+        dp.add_error_handler(self.error_handler_context, run_async=True)
 
         dp.update_queue.put(self.message_update)
-        sleep(0.1)
-        assert self.received == self.message_update.message.text
-
-    def test_async_handler_async_error_handler_context(self, cdp):
-        cdp.add_handler(MessageHandler(Filters.all, self.callback_raise_error, run_async=True))
-        cdp.add_error_handler(self.error_handler_context, run_async=True)
-
-        cdp.update_queue.put(self.message_update)
         sleep(2)
         assert self.received == self.message_update.message.text
 
@@ -383,7 +297,9 @@ class TestDispatcher:
             dp.update_queue.put(self.message_update)
             sleep(0.1)
             assert len(caplog.records) == 1
-            assert caplog.records[-1].getMessage().startswith('An uncaught error was raised')
+            assert (
+                caplog.records[-1].getMessage().startswith('An error was raised and an uncaught')
+            )
 
         # Make sure that the main loop still runs
         dp.remove_handler(handler)
@@ -401,7 +317,9 @@ class TestDispatcher:
             dp.update_queue.put(self.message_update)
             sleep(0.1)
             assert len(caplog.records) == 1
-            assert caplog.records[-1].getMessage().startswith('An uncaught error was raised')
+            assert (
+                caplog.records[-1].getMessage().startswith('An error was raised and an uncaught')
+            )
 
         # Make sure that the main loop still runs
         dp.remove_handler(handler)
@@ -412,7 +330,7 @@ class TestDispatcher:
 
     def test_error_in_handler(self, dp):
         dp.add_handler(MessageHandler(Filters.all, self.callback_raise_error))
-        dp.add_error_handler(self.error_handler)
+        dp.add_error_handler(self.error_handler_context)
 
         dp.update_queue.put(self.message_update)
         sleep(0.1)
@@ -509,19 +427,19 @@ class TestDispatcher:
         passed = []
         err = Exception('General exception')
 
-        def start1(b, u):
+        def start1(u, c):
             passed.append('start1')
             raise err
 
-        def start2(b, u):
+        def start2(u, c):
             passed.append('start2')
 
-        def start3(b, u):
+        def start3(u, c):
             passed.append('start3')
 
-        def error(b, u, e):
+        def error(u, c):
             passed.append('error')
-            passed.append(e)
+            passed.append(c.error)
 
         update = Update(
             1,
@@ -552,19 +470,19 @@ class TestDispatcher:
         passed = []
         err = TelegramError('Telegram error')
 
-        def start1(b, u):
+        def start1(u, c):
             passed.append('start1')
             raise err
 
-        def start2(b, u):
+        def start2(u, c):
             passed.append('start2')
 
-        def start3(b, u):
+        def start3(u, c):
             passed.append('start3')
 
-        def error(b, u, e):
+        def error(u, c):
             passed.append('error')
-            passed.append(e)
+            passed.append(c.error)
 
         update = Update(
             1,
@@ -595,13 +513,6 @@ class TestDispatcher:
         increment = []
 
         class OwnPersistence(BasePersistence):
-            def __init__(self):
-                super().__init__()
-                self.store_user_data = True
-                self.store_chat_data = True
-                self.store_bot_data = True
-                self.store_callback_data = True
-
             def get_callback_data(self):
                 return None
 
@@ -632,10 +543,22 @@ class TestDispatcher:
             def update_conversation(self, name, key, new_state):
                 pass
 
-        def start1(b, u):
+            def refresh_user_data(self, user_id, user_data):
+                pass
+
+            def refresh_chat_data(self, chat_id, chat_data):
+                pass
+
+            def refresh_bot_data(self, bot_data):
+                pass
+
+            def flush(self):
+                pass
+
+        def start1(u, c):
             pass
 
-        def error(b, u, e):
+        def error(u, c):
             increment.append("error")
 
         # If updating a user_data or chat_data from a persistence object throws an error,
@@ -656,7 +579,7 @@ class TestDispatcher:
             ),
         )
         my_persistence = OwnPersistence()
-        dp = Dispatcher(bot, None, persistence=my_persistence, use_context=False)
+        dp = Dispatcher(bot, None, persistence=my_persistence)
         dp.add_handler(CommandHandler('start', start1))
         dp.add_error_handler(error)
         dp.process_update(update)
@@ -666,19 +589,19 @@ class TestDispatcher:
         passed = []
         err = TelegramError('Telegram error')
 
-        def start1(b, u):
+        def start1(u, c):
             passed.append('start1')
             raise err
 
-        def start2(b, u):
+        def start2(u, c):
             passed.append('start2')
 
-        def start3(b, u):
+        def start3(u, c):
             passed.append('start3')
 
-        def error(b, u, e):
+        def error(u, c):
             passed.append('error')
-            passed.append(e)
+            passed.append(c.error)
             raise DispatcherHandlerStop
 
         update = Update(
@@ -706,34 +629,13 @@ class TestDispatcher:
         assert passed == ['start1', 'error', err]
         assert passed[2] is err
 
-    def test_error_handler_context(self, cdp):
-        cdp.add_error_handler(self.callback_context)
-
-        error = TelegramError('Unauthorized.')
-        cdp.update_queue.put(error)
-        sleep(0.1)
-        assert self.received == 'Unauthorized.'
-
     def test_sensible_worker_thread_names(self, dp2):
         thread_names = [thread.name for thread in dp2._Dispatcher__async_threads]
         for thread_name in thread_names:
             assert thread_name.startswith(f"Bot:{dp2.bot.id}:worker:")
 
-    def test_non_context_deprecation(self, dp):
-        with pytest.warns(TelegramDeprecationWarning):
-            Dispatcher(
-                dp.bot, dp.update_queue, job_queue=dp.job_queue, workers=0, use_context=False
-            )
-
-    def test_error_while_persisting(self, cdp, monkeypatch):
+    def test_error_while_persisting(self, dp, caplog):
         class OwnPersistence(BasePersistence):
-            def __init__(self):
-                super().__init__()
-                self.store_user_data = True
-                self.store_chat_data = True
-                self.store_bot_data = True
-                self.store_callback_data = True
-
             def update(self, data):
                 raise Exception('PersistenceError')
 
@@ -776,38 +678,41 @@ class TestDispatcher:
             def refresh_chat_data(self, chat_id, chat_data):
                 pass
 
+            def flush(self):
+                pass
+
         def callback(update, context):
             pass
 
-        test_flag = False
+        test_flag = []
 
         def error(update, context):
             nonlocal test_flag
-            test_flag = str(context.error) == 'PersistenceError'
+            test_flag.append(str(context.error) == 'PersistenceError')
             raise Exception('ErrorHandlingError')
-
-        def logger(message):
-            assert 'uncaught error was raised while handling' in message
 
         update = Update(
             1, message=Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
         )
         handler = MessageHandler(Filters.all, callback)
-        cdp.add_handler(handler)
-        cdp.add_error_handler(error)
-        monkeypatch.setattr(cdp.logger, 'exception', logger)
+        dp.add_handler(handler)
+        dp.add_error_handler(error)
 
-        cdp.persistence = OwnPersistence()
-        cdp.process_update(update)
-        assert test_flag
+        dp.persistence = OwnPersistence()
 
-    def test_persisting_no_user_no_chat(self, cdp):
+        with caplog.at_level(logging.ERROR):
+            dp.process_update(update)
+
+        assert test_flag == [True, True, True, True]
+        assert len(caplog.records) == 4
+        for record in caplog.records:
+            message = record.getMessage()
+            assert message.startswith('An error was raised and an uncaught')
+
+    def test_persisting_no_user_no_chat(self, dp):
         class OwnPersistence(BasePersistence):
             def __init__(self):
                 super().__init__()
-                self.store_user_data = True
-                self.store_chat_data = True
-                self.store_bot_data = True
                 self.test_flag_bot_data = False
                 self.test_flag_chat_data = False
                 self.test_flag_user_data = False
@@ -845,29 +750,38 @@ class TestDispatcher:
             def refresh_chat_data(self, chat_id, chat_data):
                 pass
 
+            def get_callback_data(self):
+                pass
+
+            def update_callback_data(self, data):
+                pass
+
+            def flush(self):
+                pass
+
         def callback(update, context):
             pass
 
         handler = MessageHandler(Filters.all, callback)
-        cdp.add_handler(handler)
-        cdp.persistence = OwnPersistence()
+        dp.add_handler(handler)
+        dp.persistence = OwnPersistence()
 
         update = Update(
             1, message=Message(1, None, None, from_user=User(1, '', False), text='Text')
         )
-        cdp.process_update(update)
-        assert cdp.persistence.test_flag_bot_data
-        assert cdp.persistence.test_flag_user_data
-        assert not cdp.persistence.test_flag_chat_data
+        dp.process_update(update)
+        assert dp.persistence.test_flag_bot_data
+        assert dp.persistence.test_flag_user_data
+        assert not dp.persistence.test_flag_chat_data
 
-        cdp.persistence.test_flag_bot_data = False
-        cdp.persistence.test_flag_user_data = False
-        cdp.persistence.test_flag_chat_data = False
+        dp.persistence.test_flag_bot_data = False
+        dp.persistence.test_flag_user_data = False
+        dp.persistence.test_flag_chat_data = False
         update = Update(1, message=Message(1, None, Chat(1, ''), from_user=None, text='Text'))
-        cdp.process_update(update)
-        assert cdp.persistence.test_flag_bot_data
-        assert not cdp.persistence.test_flag_user_data
-        assert cdp.persistence.test_flag_chat_data
+        dp.process_update(update)
+        assert dp.persistence.test_flag_bot_data
+        assert not dp.persistence.test_flag_user_data
+        assert dp.persistence.test_flag_chat_data
 
     def test_update_persistence_once_per_update(self, monkeypatch, dp):
         def update_persistence(*args, **kwargs):

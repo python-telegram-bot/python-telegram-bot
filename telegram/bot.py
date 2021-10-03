@@ -21,7 +21,6 @@
 
 import functools
 import logging
-import warnings
 from datetime import datetime
 
 from typing import (
@@ -91,16 +90,12 @@ from telegram import (
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import InvalidToken, TelegramError
-from telegram.utils.deprecate import TelegramDeprecationWarning
-from telegram.utils.helpers import (
-    DEFAULT_NONE,
-    DefaultValue,
-    to_timestamp,
-    is_local_file,
-    parse_file_input,
-    DEFAULT_20,
-)
-from telegram.utils.request import Request
+from telegram.warnings import PTBDeprecationWarning
+from telegram.utils.warnings import warn
+from telegram.utils.defaultvalue import DEFAULT_NONE, DefaultValue, DEFAULT_20
+from telegram.utils.datetime import to_timestamp
+from telegram.utils.files import is_local_file, parse_file_input
+from telegram.request import Request
 from telegram.utils.types import FileInput, JSONDict, ODVInput, DVInput
 
 if TYPE_CHECKING:
@@ -148,12 +143,17 @@ class Bot(TelegramObject):
         incorporated into PTB. However, this is not guaranteed to work, i.e. it will fail for
         passing files.
 
+    .. versionchanged:: 14.0
+        * Removed the deprecated methods ``kick_chat_member``, ``kickChatMember``,
+          ``get_chat_members_count`` and ``getChatMembersCount``.
+        * Removed the deprecated property ``commands``.
+
     Args:
         token (:obj:`str`): Bot's unique authentication.
         base_url (:obj:`str`, optional): Telegram Bot API service URL.
         base_file_url (:obj:`str`, optional): Telegram Bot API file URL.
-        request (:obj:`telegram.utils.request.Request`, optional): Pre initialized
-            :obj:`telegram.utils.request.Request`.
+        request (:obj:`telegram.request.Request`, optional): Pre initialized
+            :obj:`telegram.request.Request`.
         private_key (:obj:`bytes`, optional): Private key for decryption of telegram passport data.
         private_key_password (:obj:`bytes`, optional): Password for above private key.
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
@@ -173,7 +173,6 @@ class Bot(TelegramObject):
         'private_key',
         'defaults',
         '_bot',
-        '_commands',
         '_request',
         'logger',
     )
@@ -194,10 +193,10 @@ class Bot(TelegramObject):
         self.defaults = defaults
 
         if self.defaults:
-            warnings.warn(
+            warn(
                 'Passing Defaults to telegram.Bot is deprecated. Use telegram.ext.ExtBot instead.',
-                TelegramDeprecationWarning,
-                stacklevel=3,
+                PTBDeprecationWarning,
+                stacklevel=4,
             )
 
         if base_url is None:
@@ -209,7 +208,6 @@ class Bot(TelegramObject):
         self.base_url = str(base_url) + str(self.token)
         self.base_file_url = str(base_file_url) + str(self.token)
         self._bot: Optional[User] = None
-        self._commands: Optional[List[BotCommand]] = None
         self._request = request or Request()
         self.private_key = None
         self.logger = logging.getLogger(__name__)
@@ -223,14 +221,6 @@ class Bot(TelegramObject):
             self.private_key = serialization.load_pem_private_key(
                 private_key, password=private_key_password, backend=default_backend()
             )
-
-    # The ext_bot argument is a little hack to get warnings handled correctly.
-    # It's not very clean, but the warnings will be dropped at some point anyway.
-    def __setattr__(self, key: str, value: object, ext_bot: bool = False) -> None:
-        if issubclass(self.__class__, Bot) and self.__class__ is not Bot and not ext_bot:
-            object.__setattr__(self, key, value)
-            return
-        super().__setattr__(key, value)
 
     def _insert_defaults(
         self, data: Dict[str, object], timeout: ODVInput[float]
@@ -318,7 +308,7 @@ class Bot(TelegramObject):
         if reply_markup is not None:
             if isinstance(reply_markup, ReplyMarkup):
                 # We need to_json() instead of to_dict() here, because reply_markups may be
-                # attached to media messages, which aren't json dumped by utils.request
+                # attached to media messages, which aren't json dumped by telegram.request
                 data['reply_markup'] = reply_markup.to_json()
             else:
                 data['reply_markup'] = reply_markup
@@ -398,26 +388,6 @@ class Bot(TelegramObject):
     def supports_inline_queries(self) -> bool:
         """:obj:`bool`: Bot's :attr:`telegram.User.supports_inline_queries` attribute."""
         return self.bot.supports_inline_queries  # type: ignore
-
-    @property
-    def commands(self) -> List[BotCommand]:
-        """
-        List[:class:`BotCommand`]: Bot's commands as available in the default scope.
-
-        .. deprecated:: 13.7
-            This property has been deprecated since there can be different commands available for
-            different scopes.
-        """
-        warnings.warn(
-            "Bot.commands has been deprecated since there can be different command "
-            "lists for different scopes.",
-            TelegramDeprecationWarning,
-            stacklevel=2,
-        )
-
-        if self._commands is None:
-            self._commands = self.get_my_commands()
-        return self._commands
 
     @property
     def name(self) -> str:
@@ -1714,8 +1684,8 @@ class Bot(TelegramObject):
                 Telegram API.
 
         Returns:
-            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            sent Message is returned, otherwise :obj:`True` is returned.
+            :class:`telegram.Message`: On success, if edited message is not an inline message, the
+            edited message is returned, otherwise :obj:`True` is returned.
         """
         data: JSONDict = {}
 
@@ -1761,7 +1731,7 @@ class Bot(TelegramObject):
               :obj:`title` and :obj:`address` and optionally :obj:`foursquare_id` and
               :obj:`foursquare_type` or optionally :obj:`google_place_id` and
               :obj:`google_place_type`.
-            * Foursquare details and Google Pace details are mutually exclusive. However, this
+            * Foursquare details and Google Place details are mutually exclusive. However, this
               behaviour is undocumented and might be changed by Telegram.
 
         Args:
@@ -2316,36 +2286,6 @@ class Bot(TelegramObject):
         return File.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @log
-    def kick_chat_member(
-        self,
-        chat_id: Union[str, int],
-        user_id: Union[str, int],
-        timeout: ODVInput[float] = DEFAULT_NONE,
-        until_date: Union[int, datetime] = None,
-        api_kwargs: JSONDict = None,
-        revoke_messages: bool = None,
-    ) -> bool:
-        """
-        Deprecated, use :func:`~telegram.Bot.ban_chat_member` instead.
-
-        .. deprecated:: 13.7
-
-        """
-        warnings.warn(
-            '`bot.kick_chat_member` is deprecated. Use `bot.ban_chat_member` instead.',
-            TelegramDeprecationWarning,
-            stacklevel=2,
-        )
-        return self.ban_chat_member(
-            chat_id=chat_id,
-            user_id=user_id,
-            timeout=timeout,
-            until_date=until_date,
-            api_kwargs=api_kwargs,
-            revoke_messages=revoke_messages,
-        )
-
-    @log
     def ban_chat_member(
         self,
         chat_id: Union[str, int],
@@ -2665,10 +2605,10 @@ class Bot(TelegramObject):
     @log
     def edit_message_media(
         self,
+        media: 'InputMedia',
         chat_id: Union[str, int] = None,
         message_id: int = None,
         inline_message_id: int = None,
-        media: 'InputMedia' = None,
         reply_markup: InlineKeyboardMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
@@ -2677,10 +2617,12 @@ class Bot(TelegramObject):
         Use this method to edit animation, audio, document, photo, or video messages. If a message
         is part of a message album, then it can be edited only to an audio for audio albums, only
         to a document for document albums and to a photo or a video otherwise. When an inline
-        message is edited, a new file can't be uploaded. Use a previously uploaded file via its
+        message is edited, a new file can't be uploaded; use a previously uploaded file via its
         ``file_id`` or specify a URL.
 
         Args:
+            media (:class:`telegram.InputMedia`): An object for a new media content
+                of the message.
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
                 specified. Unique identifier for the target chat or username of the target channel
                 (in the format ``@channelusername``).
@@ -2688,8 +2630,6 @@ class Bot(TelegramObject):
                 Identifier of the message to edit.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
                 specified. Identifier of the inline message.
-            media (:class:`telegram.InputMedia`): An object for a new media content
-                of the message.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
                 object for an inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -2699,8 +2639,8 @@ class Bot(TelegramObject):
                 Telegram API.
 
         Returns:
-            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise :obj:`True` is returned.
+            :class:`telegram.Message`: On success, if the edited message is not an inline message
+            , the edited Message is returned, otherwise :obj:`True` is returned.
 
         Raises:
             :class:`telegram.error.TelegramError`
@@ -2876,7 +2816,7 @@ class Bot(TelegramObject):
     @log
     def set_webhook(
         self,
-        url: str = None,
+        url: str,
         certificate: FileInput = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         max_connections: int = 40,
@@ -2947,10 +2887,8 @@ class Bot(TelegramObject):
         .. _`guide to Webhooks`: https://core.telegram.org/bots/webhooks
 
         """
-        data: JSONDict = {}
+        data: JSONDict = {'url': url}
 
-        if url is not None:
-            data['url'] = url
         if certificate:
             data['certificate'] = parse_file_input(certificate)
         if max_connections is not None:
@@ -3100,26 +3038,6 @@ class Bot(TelegramObject):
         result = self._post('getChatAdministrators', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return ChatMember.de_list(result, self)  # type: ignore
-
-    @log
-    def get_chat_members_count(
-        self,
-        chat_id: Union[str, int],
-        timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-    ) -> int:
-        """
-        Deprecated, use :func:`~telegram.Bot.get_chat_member_count` instead.
-
-        .. deprecated:: 13.7
-        """
-        warnings.warn(
-            '`bot.get_chat_members_count` is deprecated. '
-            'Use `bot.get_chat_member_count` instead.',
-            TelegramDeprecationWarning,
-            stacklevel=2,
-        )
-        return self.get_chat_member_count(chat_id=chat_id, timeout=timeout, api_kwargs=api_kwargs)
 
     @log
     def get_chat_member_count(
@@ -3287,7 +3205,7 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
     ) -> Union[Message, bool]:
         """
-        Use this method to set the score of the specified user in a game.
+        Use this method to set the score of the specified user in a game message.
 
         Args:
             user_id (:obj:`int`): User identifier.
@@ -3309,7 +3227,7 @@ class Bot(TelegramObject):
                 Telegram API.
 
         Returns:
-            :class:`telegram.Message`: The edited message, or if the message wasn't sent by the bot
+            :class:`telegram.Message`: The edited message. If the message is not an inline message
             , :obj:`True`.
 
         Raises:
@@ -4239,7 +4157,7 @@ class Bot(TelegramObject):
     def set_chat_description(
         self,
         chat_id: Union[str, int],
-        description: str,
+        description: str = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
@@ -4251,7 +4169,7 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
-            description (:obj:`str`): New chat description, 0-255 characters.
+            description (:obj:`str`, optional): New chat description, 0-255 characters.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -4265,7 +4183,10 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id, 'description': description}
+        data: JSONDict = {'chat_id': chat_id}
+
+        if description is not None:
+            data['description'] = description
 
         result = self._post('setChatDescription', data, timeout=timeout, api_kwargs=api_kwargs)
 
@@ -4549,7 +4470,7 @@ class Bot(TelegramObject):
             data['contains_masks'] = contains_masks
         if mask_position is not None:
             # We need to_json() instead of to_dict() here, because we're sending a media
-            # message here, which isn't json dumped by utils.request
+            # message here, which isn't json dumped by telegram.request
             data['mask_position'] = mask_position.to_json()
 
         result = self._post('createNewStickerSet', data, timeout=timeout, api_kwargs=api_kwargs)
@@ -4629,7 +4550,7 @@ class Bot(TelegramObject):
             data['tgs_sticker'] = parse_file_input(tgs_sticker)
         if mask_position is not None:
             # We need to_json() instead of to_dict() here, because we're sending a media
-            # message here, which isn't json dumped by utils.request
+            # message here, which isn't json dumped by telegram.request
             data['mask_position'] = mask_position.to_json()
 
         result = self._post('addStickerToSet', data, timeout=timeout, api_kwargs=api_kwargs)
@@ -4939,8 +4860,7 @@ class Bot(TelegramObject):
                 Telegram API.
 
         Returns:
-            :class:`telegram.Poll`: On success, the stopped Poll with the final results is
-            returned.
+            :class:`telegram.Poll`: On success, the stopped Poll is returned.
 
         Raises:
             :class:`telegram.error.TelegramError`
@@ -4951,7 +4871,7 @@ class Bot(TelegramObject):
         if reply_markup:
             if isinstance(reply_markup, ReplyMarkup):
                 # We need to_json() instead of to_dict() here, because reply_markups may be
-                # attached to media messages, which aren't json dumped by utils.request
+                # attached to media messages, which aren't json dumped by telegram.request
                 data['reply_markup'] = reply_markup.to_json()
             else:
                 data['reply_markup'] = reply_markup
@@ -5071,10 +4991,6 @@ class Bot(TelegramObject):
 
         result = self._post('getMyCommands', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        if (scope is None or scope.type == scope.DEFAULT) and language_code is None:
-            self._commands = BotCommand.de_list(result, self)  # type: ignore[assignment,arg-type]
-            return self._commands  # type: ignore[return-value]
-
         return BotCommand.de_list(result, self)  # type: ignore[return-value,arg-type]
 
     @log
@@ -5131,11 +5047,6 @@ class Bot(TelegramObject):
 
         result = self._post('setMyCommands', data, timeout=timeout, api_kwargs=api_kwargs)
 
-        # Set commands only for default scope. No need to check for outcome.
-        # If request failed, we won't come this far
-        if (scope is None or scope.type == scope.DEFAULT) and language_code is None:
-            self._commands = cmds
-
         return result  # type: ignore[return-value]
 
     @log
@@ -5182,9 +5093,6 @@ class Bot(TelegramObject):
             data['language_code'] = language_code
 
         result = self._post('deleteMyCommands', data, timeout=timeout, api_kwargs=api_kwargs)
-
-        if (scope is None or scope.type == scope.DEFAULT) and language_code is None:
-            self._commands = []
 
         return result  # type: ignore[return-value]
 
@@ -5264,9 +5172,9 @@ class Bot(TelegramObject):
                 entities parsing. If not specified, the original caption is kept.
             parse_mode (:obj:`str`, optional): Mode for parsing entities in the new caption. See
                 the constants in :class:`telegram.ParseMode` for the available modes.
-            caption_entities (:class:`telegram.utils.types.SLT[MessageEntity]`): List of special
-                entities that appear in the new caption, which can be specified instead of
-                parse_mode
+            caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
+                entities that appear in the new caption, which can be specified instead
+                of parse_mode.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
@@ -5305,7 +5213,7 @@ class Bot(TelegramObject):
         if reply_markup:
             if isinstance(reply_markup, ReplyMarkup):
                 # We need to_json() instead of to_dict() here, because reply_markups may be
-                # attached to media messages, which aren't json dumped by utils.request
+                # attached to media messages, which aren't json dumped by telegram.request
                 data['reply_markup'] = reply_markup.to_json()
             else:
                 data['reply_markup'] = reply_markup
@@ -5377,8 +5285,6 @@ class Bot(TelegramObject):
     """Alias for :meth:`get_file`"""
     banChatMember = ban_chat_member
     """Alias for :meth:`ban_chat_member`"""
-    kickChatMember = kick_chat_member
-    """Alias for :meth:`kick_chat_member`"""
     unbanChatMember = unban_chat_member
     """Alias for :meth:`unban_chat_member`"""
     answerCallbackQuery = answer_callback_query
@@ -5411,8 +5317,6 @@ class Bot(TelegramObject):
     """Alias for :meth:`delete_chat_sticker_set`"""
     getChatMemberCount = get_chat_member_count
     """Alias for :meth:`get_chat_member_count`"""
-    getChatMembersCount = get_chat_members_count
-    """Alias for :meth:`get_chat_members_count`"""
     getWebhookInfo = get_webhook_info
     """Alias for :meth:`get_webhook_info`"""
     setGameScore = set_game_score

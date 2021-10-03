@@ -22,9 +22,9 @@ from pathlib import Path
 import pytest
 from flaky import flaky
 
-from telegram import Document, PhotoSize, TelegramError, Voice, MessageEntity, Bot
-from telegram.error import BadRequest
-from telegram.utils.helpers import escape_markdown
+from telegram import Document, PhotoSize, Voice, MessageEntity, Bot
+from telegram.error import BadRequest, TelegramError
+from telegram.helpers import escape_markdown
 from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
 
 
@@ -53,13 +53,10 @@ class TestDocument:
     document_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
     document_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
 
-    def test_slot_behaviour(self, document, recwarn, mro_slots):
+    def test_slot_behaviour(self, document, mro_slots):
         for attr in document.__slots__:
             assert getattr(document, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not document.__dict__, f"got missing slot(s): {document.__dict__}"
         assert len(mro_slots(document)) == len(set(mro_slots(document))), "duplicate slot"
-        document.custom, document.file_name = 'should give warning', self.file_name
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), f"{recwarn}"
 
     def test_creation(self, document):
         assert isinstance(document, Document)

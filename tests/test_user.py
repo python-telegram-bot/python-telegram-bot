@@ -19,7 +19,7 @@
 import pytest
 
 from telegram import Update, User, Bot
-from telegram.utils.helpers import escape_markdown
+from telegram.helpers import escape_markdown
 from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
 
 
@@ -65,13 +65,10 @@ class TestUser:
     can_read_all_group_messages = True
     supports_inline_queries = False
 
-    def test_slot_behaviour(self, user, mro_slots, recwarn):
+    def test_slot_behaviour(self, user, mro_slots):
         for attr in user.__slots__:
             assert getattr(user, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not user.__dict__, f"got missing slot(s): {user.__dict__}"
         assert len(mro_slots(user)) == len(set(mro_slots(user))), "duplicate slot"
-        user.custom, user.id = 'should give warning', self.id_
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_de_json(self, json_dict, bot):
         user = User.de_json(json_dict, bot)

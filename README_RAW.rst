@@ -91,7 +91,7 @@ Introduction
 
 This library provides a pure Python, lightweight interface for the
 `Telegram Bot API <https://core.telegram.org/bots/api>`_.
-It's compatible with Python versions 3.6.8+. PTB-Raw might also work on `PyPy <http://pypy.org/>`_, though there have been a lot of issues before. Hence, PyPy is not officially supported.
+It's compatible with Python versions **3.7+**. PTB-Raw might also work on `PyPy <http://pypy.org/>`_, though there have been a lot of issues before. Hence, PyPy is not officially supported.
 
 ``python-telegram-bot-raw`` is part of the `python-telegram-bot <https://python-telegram-bot.org>`_ ecosystem and provides the pure API functionality extracted from PTB. It therefore does *not* have independent release schedules, changelogs or documentation. Please consult the PTB resources.
 
@@ -144,7 +144,7 @@ Optional Dependencies
 PTB can be installed with optional dependencies:
 
 * ``pip install python-telegram-bot-raw[passport]`` installs the `cryptography <https://cryptography.io>`_ library. Use this, if you want to use Telegram Passport related functionality.
-* ``pip install python-telegram-bot-raw[ujson]`` installs the `ujson <https://pypi.org/project/ujson/>`_ library. It will then be used for JSON de- & encoding, which can bring speed up compared to the standard `json <https://docs.python.org/3/library/json.html>`_ library.
+* ``pip install python-telegram-bot-raw[json]`` installs the `ujson <https://pypi.org/project/ujson/>`_ library. It will then be used for JSON de- & encoding, which can bring speed up compared to the standard `json <https://docs.python.org/3/library/json.html>`_ library.
 
 ===============
 Getting started

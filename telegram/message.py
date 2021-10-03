@@ -55,13 +55,9 @@ from telegram import (
     MessageAutoDeleteTimerChanged,
     VoiceChatScheduled,
 )
-from telegram.utils.helpers import (
-    escape_markdown,
-    from_timestamp,
-    to_timestamp,
-    DEFAULT_NONE,
-    DEFAULT_20,
-)
+from telegram.helpers import escape_markdown
+from telegram.utils.datetime import from_timestamp, to_timestamp
+from telegram.utils.defaultvalue import DEFAULT_NONE, DEFAULT_20
 from telegram.utils.types import JSONDict, FileInput, ODVInput, DVInput
 
 if TYPE_CHECKING:
@@ -390,7 +386,6 @@ class Message(TelegramObject):
         'voice_chat_participants_invited',
         'voice_chat_started',
         'voice_chat_scheduled',
-        '_id_attrs',
     )
 
     ATTACHMENT_TYPES: ClassVar[List[str]] = [
@@ -1988,7 +1983,7 @@ class Message(TelegramObject):
 
     def edit_media(
         self,
-        media: 'InputMedia' = None,
+        media: 'InputMedia',
         reply_markup: InlineKeyboardMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
@@ -2009,14 +2004,14 @@ class Message(TelegramObject):
             behaviour is undocumented and might be changed by Telegram.
 
         Returns:
-            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            :class:`telegram.Message`: On success, if edited message is not an inline message, the
             edited Message is returned, otherwise ``True`` is returned.
 
         """
         return self.bot.edit_message_media(
+            media=media,
             chat_id=self.chat_id,
             message_id=self.message_id,
-            media=media,
             reply_markup=reply_markup,
             timeout=timeout,
             api_kwargs=api_kwargs,

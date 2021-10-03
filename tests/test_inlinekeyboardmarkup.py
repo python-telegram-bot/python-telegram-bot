@@ -36,14 +36,11 @@ class TestInlineKeyboardMarkup:
         ]
     ]
 
-    def test_slot_behaviour(self, inline_keyboard_markup, recwarn, mro_slots):
+    def test_slot_behaviour(self, inline_keyboard_markup, mro_slots):
         inst = inline_keyboard_markup
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-        inst.custom, inst.inline_keyboard = 'should give warning', self.inline_keyboard
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     @flaky(3, 1)
     def test_send_message_with_inline_keyboard_markup(self, bot, chat_id, inline_keyboard_markup):
@@ -83,6 +80,14 @@ class TestInlineKeyboardMarkup:
 
     def test_expected_values(self, inline_keyboard_markup):
         assert inline_keyboard_markup.inline_keyboard == self.inline_keyboard
+
+    def test_wrong_keyboard_inputs(self):
+        with pytest.raises(ValueError):
+            InlineKeyboardMarkup(
+                [[InlineKeyboardButton('b1', '1')], InlineKeyboardButton('b2', '2')]
+            )
+        with pytest.raises(ValueError):
+            InlineKeyboardMarkup(InlineKeyboardButton('b1', '1'))
 
     def test_expected_values_empty_switch(self, inline_keyboard_markup, bot, monkeypatch):
         def test(

@@ -21,7 +21,7 @@
 from typing import TYPE_CHECKING, Any
 
 from telegram import TelegramObject
-from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.defaultvalue import DEFAULT_NONE
 from telegram.utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
@@ -58,7 +58,7 @@ class PhotoSize(TelegramObject):
 
     """
 
-    __slots__ = ('bot', 'width', 'file_id', 'file_size', 'height', 'file_unique_id', '_id_attrs')
+    __slots__ = ('bot', 'width', 'file_id', 'file_size', 'height', 'file_unique_id')
 
     def __init__(
         self,

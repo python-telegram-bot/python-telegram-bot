@@ -23,7 +23,8 @@ from tempfile import TemporaryFile, mkstemp
 import pytest
 from flaky import flaky
 
-from telegram import File, TelegramError, Voice
+from telegram import File, Voice
+from telegram.error import TelegramError
 
 
 @pytest.fixture(scope='class')
@@ -57,13 +58,10 @@ class TestFile:
     file_size = 28232
     file_content = 'Saint-Saëns'.encode()  # Intentionally contains unicode chars.
 
-    def test_slot_behaviour(self, file, recwarn, mro_slots):
+    def test_slot_behaviour(self, file, mro_slots):
         for attr in file.__slots__:
             assert getattr(file, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not file.__dict__, f"got missing slot(s): {file.__dict__}"
         assert len(mro_slots(file)) == len(set(mro_slots(file))), "duplicate slot"
-        file.custom, file.file_id = 'should give warning', self.file_id
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_de_json(self, bot):
         json_dict = {
@@ -101,7 +99,7 @@ class TestFile:
         def test(*args, **kwargs):
             return self.file_content
 
-        monkeypatch.setattr('telegram.utils.request.Request.retrieve', test)
+        monkeypatch.setattr('telegram.request.Request.retrieve', test)
         out_file = file.download()
 
         try:
@@ -117,7 +115,7 @@ class TestFile:
         def test(*args, **kwargs):
             return self.file_content
 
-        monkeypatch.setattr('telegram.utils.request.Request.retrieve', test)
+        monkeypatch.setattr('telegram.request.Request.retrieve', test)
         file_handle, custom_path = mkstemp()
         try:
             out_file = file.download(custom_path)
@@ -147,7 +145,7 @@ class TestFile:
 
         file.file_path = None
 
-        monkeypatch.setattr('telegram.utils.request.Request.retrieve', test)
+        monkeypatch.setattr('telegram.request.Request.retrieve', test)
         out_file = file.download()
 
         assert out_file[-len(file.file_id) :] == file.file_id
@@ -161,7 +159,7 @@ class TestFile:
         def test(*args, **kwargs):
             return self.file_content
 
-        monkeypatch.setattr('telegram.utils.request.Request.retrieve', test)
+        monkeypatch.setattr('telegram.request.Request.retrieve', test)
         with TemporaryFile() as custom_fobj:
             out_fobj = file.download(out=custom_fobj)
             assert out_fobj is custom_fobj
@@ -181,7 +179,7 @@ class TestFile:
         def test(*args, **kwargs):
             return self.file_content
 
-        monkeypatch.setattr('telegram.utils.request.Request.retrieve', test)
+        monkeypatch.setattr('telegram.request.Request.retrieve', test)
 
         # Check that a download to a newly allocated bytearray works.
         buf = file.download_as_bytearray()

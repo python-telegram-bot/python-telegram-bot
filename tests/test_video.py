@@ -22,9 +22,9 @@ from pathlib import Path
 import pytest
 from flaky import flaky
 
-from telegram import Video, TelegramError, Voice, PhotoSize, MessageEntity, Bot
-from telegram.error import BadRequest
-from telegram.utils.helpers import escape_markdown
+from telegram import Video, Voice, PhotoSize, MessageEntity, Bot
+from telegram.error import BadRequest, TelegramError
+from telegram.helpers import escape_markdown
 from tests.conftest import check_shortcut_call, check_shortcut_signature, check_defaults_handling
 
 
@@ -60,13 +60,10 @@ class TestVideo:
     video_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
     video_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
 
-    def test_slot_behaviour(self, video, mro_slots, recwarn):
+    def test_slot_behaviour(self, video, mro_slots):
         for attr in video.__slots__:
             assert getattr(video, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not video.__dict__, f"got missing slot(s): {video.__dict__}"
         assert len(mro_slots(video)) == len(set(mro_slots(video))), "duplicate slot"
-        video.custom, video.width = 'should give warning', self.width
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_creation(self, video):
         # Make sure file has been uploaded.

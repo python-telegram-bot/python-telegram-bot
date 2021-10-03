@@ -21,7 +21,7 @@
 from typing import TYPE_CHECKING, Any, List, Optional, ClassVar
 
 from telegram import PhotoSize, TelegramObject, constants
-from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.defaultvalue import DEFAULT_NONE
 from telegram.utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
@@ -85,7 +85,6 @@ class Sticker(TelegramObject):
         'height',
         'file_unique_id',
         'emoji',
-        '_id_attrs',
     )
 
     def __init__(
@@ -182,7 +181,6 @@ class StickerSet(TelegramObject):
         'title',
         'stickers',
         'name',
-        '_id_attrs',
     )
 
     def __init__(
@@ -258,7 +256,7 @@ class MaskPosition(TelegramObject):
 
     """
 
-    __slots__ = ('point', 'scale', 'x_shift', 'y_shift', '_id_attrs')
+    __slots__ = ('point', 'scale', 'x_shift', 'y_shift')
 
     FOREHEAD: ClassVar[str] = constants.STICKER_FOREHEAD
     """:const:`telegram.constants.STICKER_FOREHEAD`"""

@@ -22,12 +22,11 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any, List, Optional, Union, Tuple
 
 from telegram import TelegramObject, constants
-from telegram.utils.helpers import (
-    mention_html as util_mention_html,
-    DEFAULT_NONE,
-    DEFAULT_20,
+from telegram.helpers import (
+    mention_markdown as helpers_mention_markdown,
+    mention_html as helpers_mention_html,
 )
-from telegram.utils.helpers import mention_markdown as util_mention_markdown
+from telegram.utils.defaultvalue import DEFAULT_NONE, DEFAULT_20
 from telegram.utils.types import JSONDict, FileInput, ODVInput, DVInput
 
 if TYPE_CHECKING:
@@ -107,7 +106,6 @@ class User(TelegramObject):
         'id',
         'bot',
         'language_code',
-        '_id_attrs',
     )
 
     def __init__(
@@ -204,8 +202,8 @@ class User(TelegramObject):
 
         """
         if name:
-            return util_mention_markdown(self.id, name)
-        return util_mention_markdown(self.id, self.full_name)
+            return helpers_mention_markdown(self.id, name)
+        return helpers_mention_markdown(self.id, self.full_name)
 
     def mention_markdown_v2(self, name: str = None) -> str:
         """
@@ -217,8 +215,8 @@ class User(TelegramObject):
 
         """
         if name:
-            return util_mention_markdown(self.id, name, version=2)
-        return util_mention_markdown(self.id, self.full_name, version=2)
+            return helpers_mention_markdown(self.id, name, version=2)
+        return helpers_mention_markdown(self.id, self.full_name, version=2)
 
     def mention_html(self, name: str = None) -> str:
         """
@@ -230,8 +228,8 @@ class User(TelegramObject):
 
         """
         if name:
-            return util_mention_html(self.id, name)
-        return util_mention_html(self.id, self.full_name)
+            return helpers_mention_html(self.id, name)
+        return helpers_mention_html(self.id, self.full_name)
 
     def pin_message(
         self,

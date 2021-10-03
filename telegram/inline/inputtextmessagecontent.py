@@ -21,7 +21,7 @@
 from typing import Any, Union, Tuple, List
 
 from telegram import InputMessageContent, MessageEntity
-from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.defaultvalue import DEFAULT_NONE
 from telegram.utils.types import JSONDict, ODVInput
 
 
@@ -59,7 +59,7 @@ class InputTextMessageContent(InputMessageContent):
 
     """
 
-    __slots__ = ('disable_web_page_preview', 'parse_mode', 'entities', 'message_text', '_id_attrs')
+    __slots__ = ('disable_web_page_preview', 'parse_mode', 'entities', 'message_text')
 
     def __init__(
         self,

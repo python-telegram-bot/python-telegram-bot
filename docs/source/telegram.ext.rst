@@ -10,8 +10,6 @@ telegram.ext package
     telegram.ext.callbackcontext
     telegram.ext.job
     telegram.ext.jobqueue
-    telegram.ext.messagequeue
-    telegram.ext.delayqueue
     telegram.ext.contexttypes
     telegram.ext.defaults
 
@@ -33,7 +31,6 @@ Handlers
     telegram.ext.pollhandler
     telegram.ext.precheckoutqueryhandler
     telegram.ext.prefixhandler
-    telegram.ext.regexhandler
     telegram.ext.shippingqueryhandler
     telegram.ext.stringcommandhandler
     telegram.ext.stringregexhandler
@@ -45,6 +42,7 @@ Persistence
 .. toctree::
 
     telegram.ext.basepersistence
+    telegram.ext.persistenceinput
     telegram.ext.picklepersistence
     telegram.ext.dictpersistence
 

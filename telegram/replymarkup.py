@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram ReplyMarkup Objects."""
-
 from telegram import TelegramObject
 
 
@@ -31,3 +30,13 @@ class ReplyMarkup(TelegramObject):
     """
 
     __slots__ = ()
+
+    @staticmethod
+    def _check_keyboard_type(keyboard: object) -> bool:
+        """Checks if the keyboard provided is of the correct type - A list of lists."""
+        if not isinstance(keyboard, list):
+            return False
+        for row in keyboard:
+            if not isinstance(row, list):
+                return False
+        return True

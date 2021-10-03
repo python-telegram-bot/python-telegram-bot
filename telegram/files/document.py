@@ -21,7 +21,7 @@
 from typing import TYPE_CHECKING, Any, Optional
 
 from telegram import PhotoSize, TelegramObject
-from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.defaultvalue import DEFAULT_NONE
 from telegram.utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
@@ -68,10 +68,7 @@ class Document(TelegramObject):
         'thumb',
         'mime_type',
         'file_unique_id',
-        '_id_attrs',
     )
-
-    _id_keys = ('file_id',)
 
     def __init__(
         self,

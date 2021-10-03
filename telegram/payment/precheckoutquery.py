@@ -21,7 +21,7 @@
 from typing import TYPE_CHECKING, Any, Optional
 
 from telegram import OrderInfo, TelegramObject, User
-from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.defaultvalue import DEFAULT_NONE
 from telegram.utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
@@ -76,7 +76,6 @@ class PreCheckoutQuery(TelegramObject):
         'total_amount',
         'id',
         'from_user',
-        '_id_attrs',
     )
 
     def __init__(

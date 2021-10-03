@@ -16,28 +16,16 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=C0413
 """Extensions over the Telegram Bot API to facilitate bot making"""
 
 from .extbot import ExtBot
-from .basepersistence import BasePersistence
+from .basepersistence import BasePersistence, PersistenceInput
 from .picklepersistence import PicklePersistence
 from .dictpersistence import DictPersistence
 from .handler import Handler
 from .callbackcontext import CallbackContext
 from .contexttypes import ContextTypes
-from .dispatcher import Dispatcher, DispatcherHandlerStop, run_async
-
-# https://bugs.python.org/issue41451, fixed on 3.7+, doesn't actually remove slots
-# try-except is just  here in case the __init__ is called twice (like in the tests)
-# this block is also the reason for the pylint-ignore at the top of the file
-try:
-    del Dispatcher.__slots__
-except AttributeError as exc:
-    if str(exc) == '__slots__':
-        pass
-    else:
-        raise exc
+from .dispatcher import Dispatcher, DispatcherHandlerStop
 
 from .jobqueue import JobQueue, Job
 from .updater import Updater
@@ -47,15 +35,12 @@ from .inlinequeryhandler import InlineQueryHandler
 from .filters import BaseFilter, MessageFilter, UpdateFilter, Filters
 from .messagehandler import MessageHandler
 from .commandhandler import CommandHandler, PrefixHandler
-from .regexhandler import RegexHandler
 from .stringcommandhandler import StringCommandHandler
 from .stringregexhandler import StringRegexHandler
 from .typehandler import TypeHandler
 from .conversationhandler import ConversationHandler
 from .precheckoutqueryhandler import PreCheckoutQueryHandler
 from .shippingqueryhandler import ShippingQueryHandler
-from .messagequeue import MessageQueue
-from .messagequeue import DelayQueue
 from .pollanswerhandler import PollAnswerHandler
 from .pollhandler import PollHandler
 from .chatmemberhandler import ChatMemberHandler
@@ -74,7 +59,6 @@ __all__ = (
     'ContextTypes',
     'ConversationHandler',
     'Defaults',
-    'DelayQueue',
     'DictPersistence',
     'Dispatcher',
     'DispatcherHandlerStop',
@@ -87,18 +71,16 @@ __all__ = (
     'JobQueue',
     'MessageFilter',
     'MessageHandler',
-    'MessageQueue',
+    'PersistenceInput',
     'PicklePersistence',
     'PollAnswerHandler',
     'PollHandler',
     'PreCheckoutQueryHandler',
     'PrefixHandler',
-    'RegexHandler',
     'ShippingQueryHandler',
     'StringCommandHandler',
     'StringRegexHandler',
     'TypeHandler',
     'UpdateFilter',
     'Updater',
-    'run_async',
 )

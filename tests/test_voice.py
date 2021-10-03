@@ -22,9 +22,9 @@ from pathlib import Path
 import pytest
 from flaky import flaky
 
-from telegram import Audio, Voice, TelegramError, MessageEntity, Bot
-from telegram.error import BadRequest
-from telegram.utils.helpers import escape_markdown
+from telegram import Audio, Voice, MessageEntity, Bot
+from telegram.error import BadRequest, TelegramError
+from telegram.helpers import escape_markdown
 from tests.conftest import check_shortcut_call, check_shortcut_signature, check_defaults_handling
 
 
@@ -52,13 +52,10 @@ class TestVoice:
     voice_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
     voice_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
 
-    def test_slot_behaviour(self, voice, recwarn, mro_slots):
+    def test_slot_behaviour(self, voice, mro_slots):
         for attr in voice.__slots__:
             assert getattr(voice, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not voice.__dict__, f"got missing slot(s): {voice.__dict__}"
         assert len(mro_slots(voice)) == len(set(mro_slots(voice))), "duplicate slot"
-        voice.custom, voice.duration = 'should give warning', self.duration
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_creation(self, voice):
         # Make sure file has been uploaded.

@@ -63,13 +63,10 @@ class TestChat:
     linked_chat_id = 11880
     location = ChatLocation(Location(123, 456), 'Barbie World')
 
-    def test_slot_behaviour(self, chat, recwarn, mro_slots):
+    def test_slot_behaviour(self, chat, mro_slots):
         for attr in chat.__slots__:
             assert getattr(chat, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not chat.__dict__, f"got missing slot(s): {chat.__dict__}"
         assert len(mro_slots(chat)) == len(set(mro_slots(chat))), "duplicate slot"
-        chat.custom, chat.id = 'should give warning', self.id_
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_de_json(self, bot):
         json_dict = {
@@ -189,15 +186,6 @@ class TestChat:
         monkeypatch.setattr(chat.bot, 'get_chat_member_count', make_assertion)
         assert chat.get_member_count()
 
-    def test_get_members_count_warning(self, chat, monkeypatch, recwarn):
-        def make_assertion(*_, **kwargs):
-            return kwargs['chat_id'] == chat.id
-
-        monkeypatch.setattr(chat.bot, 'get_chat_member_count', make_assertion)
-        assert chat.get_members_count()
-        assert len(recwarn) == 1
-        assert '`Chat.get_members_count` is deprecated' in str(recwarn[0].message)
-
     def test_get_member(self, monkeypatch, chat):
         def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == chat.id
@@ -224,18 +212,6 @@ class TestChat:
 
         monkeypatch.setattr(chat.bot, 'ban_chat_member', make_assertion)
         assert chat.ban_member(user_id=42, until_date=43)
-
-    def test_kick_member_warning(self, chat, monkeypatch, recwarn):
-        def make_assertion(*_, **kwargs):
-            chat_id = kwargs['chat_id'] == chat.id
-            user_id = kwargs['user_id'] == 42
-            until = kwargs['until_date'] == 43
-            return chat_id and user_id and until
-
-        monkeypatch.setattr(chat.bot, 'ban_chat_member', make_assertion)
-        assert chat.kick_member(user_id=42, until_date=43)
-        assert len(recwarn) == 1
-        assert '`Chat.kick_member` is deprecated' in str(recwarn[0].message)
 
     @pytest.mark.parametrize('only_if_banned', [True, False, None])
     def test_unban_member(self, monkeypatch, chat, only_if_banned):

@@ -16,7 +16,9 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains methods to make POST and GET requests."""
+"""This module contains the Request class which handles the communication with the Telegram
+servers.
+"""
 import logging
 import os
 import socket
@@ -58,8 +60,9 @@ except ImportError:  # pragma: no cover
         raise
 
 # pylint: disable=C0412
-from telegram import InputFile, TelegramError
+from telegram import InputFile
 from telegram.error import (
+    TelegramError,
     BadRequest,
     ChatMigrated,
     Conflict,
@@ -70,7 +73,6 @@ from telegram.error import (
     Unauthorized,
 )
 from telegram.utils.types import JSONDict
-from telegram.utils.deprecate import set_new_attribute_deprecated
 
 
 def _render_part(self: RequestField, name: str, value: str) -> str:  # pylint: disable=W0613
@@ -92,8 +94,7 @@ USER_AGENT = 'Python Telegram Bot (https://github.com/python-telegram-bot/python
 
 
 class Request:
-    """
-    Helper class for python-telegram-bot which provides methods to perform POST & GET towards
+    """Helper class for python-telegram-bot which provides methods to perform POST & GET towards
     Telegram servers.
 
     Args:
@@ -112,7 +113,7 @@ class Request:
 
     """
 
-    __slots__ = ('_connect_timeout', '_con_pool_size', '_con_pool', '__dict__')
+    __slots__ = ('_connect_timeout', '_con_pool_size', '_con_pool')
 
     def __init__(
         self,
@@ -191,9 +192,6 @@ class Request:
                     mgr.proxy_headers.update(auth_hdrs)
 
                 self._con_pool = mgr
-
-    def __setattr__(self, key: str, value: object) -> None:
-        set_new_attribute_deprecated(self, key, value)
 
     @property
     def con_pool_size(self) -> int:

@@ -20,7 +20,6 @@
 """This module contains the ConversationHandler."""
 
 import logging
-import warnings
 import functools
 import datetime
 from threading import Lock
@@ -39,6 +38,7 @@ from telegram.ext import (
 from telegram.ext.utils.promise import Promise
 from telegram.ext.utils.types import ConversationDict
 from telegram.ext.utils.types import CCT
+from telegram.utils.warnings import warn
 
 if TYPE_CHECKING:
     from telegram.ext import Dispatcher, Job
@@ -46,7 +46,6 @@ CheckUpdateType = Optional[Tuple[Tuple[int, ...], Handler, object]]
 
 
 class _ConversationTimeoutContext:
-    # '__dict__' is not included since this a private class
     __slots__ = ('conversation_key', 'update', 'dispatcher', 'callback_context')
 
     def __init__(
@@ -54,7 +53,7 @@ class _ConversationTimeoutContext:
         conversation_key: Tuple[int, ...],
         update: Update,
         dispatcher: 'Dispatcher',
-        callback_context: Optional[CallbackContext],
+        callback_context: CallbackContext,
     ):
         self.conversation_key = conversation_key
         self.update = update
@@ -260,9 +259,10 @@ class ConversationHandler(Handler[Update, CCT]):
             raise ValueError("'per_user', 'per_chat' and 'per_message' can't all be 'False'")
 
         if self.per_message and not self.per_chat:
-            warnings.warn(
+            warn(
                 "If 'per_message=True' is used, 'per_chat=True' should also be used, "
-                "since message IDs are not globally unique."
+                "since message IDs are not globally unique.",
+                stacklevel=2,
             )
 
         all_handlers: List[Handler] = []
@@ -275,37 +275,41 @@ class ConversationHandler(Handler[Update, CCT]):
         if self.per_message:
             for handler in all_handlers:
                 if not isinstance(handler, CallbackQueryHandler):
-                    warnings.warn(
-                        "If 'per_message=True', all entry points and state handlers"
+                    warn(
+                        "If 'per_message=True', all entry points, state handlers, and fallbacks"
                         " must be 'CallbackQueryHandler', since no other handlers "
-                        "have a message context."
+                        "have a message context.",
+                        stacklevel=2,
                     )
                     break
         else:
             for handler in all_handlers:
                 if isinstance(handler, CallbackQueryHandler):
-                    warnings.warn(
+                    warn(
                         "If 'per_message=False', 'CallbackQueryHandler' will not be "
-                        "tracked for every message."
+                        "tracked for every message.",
+                        stacklevel=2,
                     )
                     break
 
         if self.per_chat:
             for handler in all_handlers:
                 if isinstance(handler, (InlineQueryHandler, ChosenInlineResultHandler)):
-                    warnings.warn(
+                    warn(
                         "If 'per_chat=True', 'InlineQueryHandler' can not be used, "
-                        "since inline queries have no chat context."
+                        "since inline queries have no chat context.",
+                        stacklevel=2,
                     )
                     break
 
         if self.conversation_timeout:
             for handler in all_handlers:
                 if isinstance(handler, self.__class__):
-                    warnings.warn(
+                    warn(
                         "Using `conversation_timeout` with nested conversations is currently not "
                         "supported. You can still try to use it, but it will likely behave "
-                        "differently from what you expect."
+                        "differently from what you expect.",
+                        stacklevel=2,
                     )
                     break
 
@@ -487,7 +491,7 @@ class ConversationHandler(Handler[Update, CCT]):
         new_state: object,
         dispatcher: 'Dispatcher',
         update: Update,
-        context: Optional[CallbackContext],
+        context: CallbackContext,
         conversation_key: Tuple[int, ...],
     ) -> None:
         if new_state != self.END:
@@ -599,7 +603,7 @@ class ConversationHandler(Handler[Update, CCT]):
         update: Update,
         dispatcher: 'Dispatcher',
         check_result: CheckUpdateType,
-        context: CallbackContext = None,
+        context: CallbackContext,
     ) -> Optional[object]:
         """Send the update to the callback for the current state and Handler
 
@@ -608,11 +612,10 @@ class ConversationHandler(Handler[Update, CCT]):
                 handler, and the handler's check result.
             update (:class:`telegram.Update`): Incoming telegram update.
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
-            context (:class:`telegram.ext.CallbackContext`, optional): The context as provided by
+            context (:class:`telegram.ext.CallbackContext`): The context as provided by
                 the dispatcher.
 
         """
-        update = cast(Update, update)  # for mypy
         conversation_key, handler, check_result = check_result  # type: ignore[assignment,misc]
         raise_dp_handler_stop = False
 
@@ -646,8 +649,8 @@ class ConversationHandler(Handler[Update, CCT]):
                             new_state, dispatcher, update, context, conversation_key
                         )
                 else:
-                    self.logger.warning(
-                        "Ignoring `conversation_timeout` because the Dispatcher has no JobQueue."
+                    warn(
+                        "Ignoring `conversation_timeout` because the Dispatcher has no JobQueue.",
                     )
 
         if isinstance(self.map_to_parent, dict) and new_state in self.map_to_parent:
@@ -682,24 +685,20 @@ class ConversationHandler(Handler[Update, CCT]):
 
         elif new_state is not None:
             if new_state not in self.states:
-                warnings.warn(
+                warn(
                     f"Handler returned state {new_state} which is unknown to the "
-                    f"ConversationHandler{' ' + self.name if self.name is not None else ''}."
+                    f"ConversationHandler{' ' + self.name if self.name is not None else ''}.",
                 )
             with self._conversations_lock:
                 self.conversations[key] = new_state
                 if self.persistent and self.persistence and self.name:
                     self.persistence.update_conversation(self.name, key, new_state)
 
-    def _trigger_timeout(self, context: CallbackContext, job: 'Job' = None) -> None:
+    def _trigger_timeout(self, context: CallbackContext) -> None:
         self.logger.debug('conversation timeout was triggered!')
 
-        # Backward compatibility with bots that do not use CallbackContext
-        if isinstance(context, CallbackContext):
-            job = context.job
-            ctxt = cast(_ConversationTimeoutContext, job.context)  # type: ignore[union-attr]
-        else:
-            ctxt = cast(_ConversationTimeoutContext, job.context)
+        job = cast('Job', context.job)
+        ctxt = cast(_ConversationTimeoutContext, job.context)
 
         callback_context = ctxt.callback_context
 
@@ -717,9 +716,9 @@ class ConversationHandler(Handler[Update, CCT]):
                 try:
                     handler.handle_update(ctxt.update, ctxt.dispatcher, check, callback_context)
                 except DispatcherHandlerStop:
-                    self.logger.warning(
+                    warn(
                         'DispatcherHandlerStop in TIMEOUT state of '
-                        'ConversationHandler has no effect. Ignoring.'
+                        'ConversationHandler has no effect. Ignoring.',
                     )
 
         self._update_state(self.END, ctxt.conversation_key)

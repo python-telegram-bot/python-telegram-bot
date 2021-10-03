@@ -23,8 +23,8 @@ from time import sleep
 import pytest
 from flaky import flaky
 
-from telegram import Sticker, PhotoSize, TelegramError, StickerSet, Audio, MaskPosition, Bot
-from telegram.error import BadRequest
+from telegram import Sticker, PhotoSize, StickerSet, Audio, MaskPosition, Bot
+from telegram.error import BadRequest, TelegramError
 from tests.conftest import check_shortcut_call, check_shortcut_signature, check_defaults_handling
 
 
@@ -77,10 +77,7 @@ class TestSticker:
     def test_slot_behaviour(self, sticker, mro_slots, recwarn):
         for attr in sticker.__slots__:
             assert getattr(sticker, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not sticker.__dict__, f"got missing slot(s): {sticker.__dict__}"
         assert len(mro_slots(sticker)) == len(set(mro_slots(sticker))), "duplicate slot"
-        sticker.custom, sticker.emoji = 'should give warning', self.emoji
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_creation(self, sticker):
         # Make sure file has been uploaded.

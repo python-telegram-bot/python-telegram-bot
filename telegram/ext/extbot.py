@@ -35,11 +35,11 @@ from telegram import (
 
 from telegram.ext.callbackdatacache import CallbackDataCache
 from telegram.utils.types import JSONDict, ODVInput, DVInput
-from ..utils.helpers import DEFAULT_NONE
+from telegram.utils.defaultvalue import DEFAULT_NONE
 
 if TYPE_CHECKING:
     from telegram import InlineQueryResult, MessageEntity
-    from telegram.utils.request import Request
+    from telegram.request import Request
     from .defaults import Defaults
 
 HandledTypes = TypeVar('HandledTypes', bound=Union[Message, CallbackQuery, Chat])
@@ -74,14 +74,6 @@ class ExtBot(telegram.bot.Bot):
     """
 
     __slots__ = ('arbitrary_callback_data', 'callback_data_cache')
-
-    # The ext_bot argument is a little hack to get warnings handled correctly.
-    # It's not very clean, but the warnings will be dropped at some point anyway.
-    def __setattr__(self, key: str, value: object, ext_bot: bool = True) -> None:
-        if issubclass(self.__class__, ExtBot) and self.__class__ is not ExtBot:
-            object.__setattr__(self, key, value)
-            return
-        super().__setattr__(key, value, ext_bot=ext_bot)  # type: ignore[call-arg]
 
     def __init__(
         self,
@@ -263,7 +255,7 @@ class ExtBot(telegram.bot.Bot):
                 # different places
                 new_result = copy(result)
                 markup = self._replace_keyboard(result.reply_markup)  # type: ignore[attr-defined]
-                new_result.reply_markup = markup
+                new_result.reply_markup = markup  # type: ignore[attr-defined]
                 results.append(new_result)
 
         return results, next_offset

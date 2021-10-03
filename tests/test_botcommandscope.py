@@ -113,15 +113,12 @@ def bot_command_scope(scope_class_and_type, chat_id):
 
 # All the scope types are very similar, so we test everything via parametrization
 class TestBotCommandScope:
-    def test_slot_behaviour(self, bot_command_scope, mro_slots, recwarn):
+    def test_slot_behaviour(self, bot_command_scope, mro_slots):
         for attr in bot_command_scope.__slots__:
             assert getattr(bot_command_scope, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not bot_command_scope.__dict__, f"got missing slot(s): {bot_command_scope.__dict__}"
         assert len(mro_slots(bot_command_scope)) == len(
             set(mro_slots(bot_command_scope))
         ), "duplicate slot"
-        bot_command_scope.custom, bot_command_scope.type = 'warning!', bot_command_scope.type
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_de_json(self, bot, scope_class_and_type, chat_id):
         cls = scope_class_and_type[0]

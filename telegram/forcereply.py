@@ -33,6 +33,10 @@ class ForceReply(ReplyMarkup):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`selective` is equal.
 
+    .. versionchanged:: 14.0
+        The (undocumented) argument ``force_reply`` was removed and instead :attr:`force_reply`
+        is now always set to :obj:`True` as expected by the Bot API.
+
     Args:
         selective (:obj:`bool`, optional): Use this parameter if you want to force reply from
             specific users only. Targets:
@@ -60,18 +64,15 @@ class ForceReply(ReplyMarkup):
 
     """
 
-    __slots__ = ('selective', 'force_reply', 'input_field_placeholder', '_id_attrs')
+    __slots__ = ('selective', 'force_reply', 'input_field_placeholder')
 
     def __init__(
         self,
-        force_reply: bool = True,
         selective: bool = False,
         input_field_placeholder: str = None,
         **_kwargs: Any,
     ):
-        # Required
-        self.force_reply = bool(force_reply)
-        # Optionals
+        self.force_reply = True
         self.selective = bool(selective)
         self.input_field_placeholder = input_field_placeholder
 

@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=C0115
-"""This module contains an object that represents Telegram errors."""
-from typing import Tuple
+"""This module contains an classes that represent Telegram errors."""
+from typing import Tuple, Union
 
 
 def _lstrip_str(in_s: str, lstr: str) -> str:
@@ -41,7 +41,6 @@ def _lstrip_str(in_s: str, lstr: str) -> str:
 class TelegramError(Exception):
     """Base class for Telegram errors."""
 
-    # Apparently the base class Exception already has __dict__ in it, so its not included here
     __slots__ = ('message',)
 
     def __init__(self, message: str):
@@ -149,3 +148,16 @@ class Conflict(TelegramError):
 
     def __reduce__(self) -> Tuple[type, Tuple[str]]:
         return self.__class__, (self.message,)
+
+
+class PassportDecryptionError(TelegramError):
+    """Something went wrong with decryption."""
+
+    __slots__ = ('_msg',)
+
+    def __init__(self, message: Union[str, Exception]):
+        super().__init__(f"PassportDecryptionError: {message}")
+        self._msg = str(message)
+
+    def __reduce__(self) -> Tuple[type, Tuple[str]]:
+        return self.__class__, (self._msg,)

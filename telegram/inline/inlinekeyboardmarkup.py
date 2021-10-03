@@ -45,9 +45,14 @@ class InlineKeyboardMarkup(ReplyMarkup):
 
     """
 
-    __slots__ = ('inline_keyboard', '_id_attrs')
+    __slots__ = ('inline_keyboard',)
 
     def __init__(self, inline_keyboard: List[List[InlineKeyboardButton]], **_kwargs: Any):
+        if not self._check_keyboard_type(inline_keyboard):
+            raise ValueError(
+                "The parameter `inline_keyboard` should be a list of "
+                "list of InlineKeyboardButtons"
+            )
         # Required
         self.inline_keyboard = inline_keyboard
 

@@ -24,7 +24,7 @@ import sys
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, ClassVar
 
 from telegram import MessageEntity, TelegramObject, User, constants
-from telegram.utils.helpers import from_timestamp, to_timestamp
+from telegram.utils.datetime import from_timestamp, to_timestamp
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -48,7 +48,7 @@ class PollOption(TelegramObject):
 
     """
 
-    __slots__ = ('voter_count', 'text', '_id_attrs')
+    __slots__ = ('voter_count', 'text')
 
     def __init__(self, text: str, voter_count: int, **_kwargs: Any):
         self.text = text
@@ -80,7 +80,7 @@ class PollAnswer(TelegramObject):
 
     """
 
-    __slots__ = ('option_ids', 'user', 'poll_id', '_id_attrs')
+    __slots__ = ('option_ids', 'user', 'poll_id')
 
     def __init__(self, poll_id: str, user: User, option_ids: List[int], **_kwargs: Any):
         self.poll_id = poll_id
@@ -164,7 +164,6 @@ class Poll(TelegramObject):
         'explanation',
         'question',
         'correct_option_id',
-        '_id_attrs',
     )
 
     def __init__(

@@ -28,8 +28,8 @@ from telegram import (
     PassportElementErrorSelfie,
     PassportElementErrorDataField,
     Credentials,
-    TelegramDecryptionError,
 )
+from telegram.error import PassportDecryptionError
 
 
 # Note: All classes in telegram.credentials (except EncryptedCredentials) aren't directly tested
@@ -47,9 +47,11 @@ RAW_PASSPORT_DATA = {
         {
             'data': 'QRfzWcCN4WncvRO3lASG+d+c5gzqXtoCinQ1PgtYiZMKXCksx9eB9Ic1bOt8C/un9/XaX220PjJSO7Kuba+nXXC51qTsjqP9rnLKygnEIWjKrfiDdklzgcukpRzFSjiOAvhy86xFJZ1PfPSrFATy/Gp1RydLzbrBd2ZWxZqXrxcMoA0Q2UTTFXDoCYerEAiZoD69i79tB/6nkLBcUUvN5d52gKd/GowvxWqAAmdO6l1N7jlo6aWjdYQNBAK1KHbJdbRZMJLxC1MqMuZXAYrPoYBRKr5xAnxDTmPn/LEZKLc3gwwZyEgR5x7e9jp5heM6IEMmsv3O/6SUeEQs7P0iVuRSPLMJLfDdwns8Tl3fF2M4IxKVovjCaOVW+yHKsADDAYQPzzH2RcrWVD0TP5I64mzpK64BbTOq3qm3Hn51SV9uA/+LvdGbCp7VnzHx4EdUizHsVyilJULOBwvklsrDRvXMiWmh34ZSR6zilh051tMEcRf0I+Oe7pIxVJd/KKfYA2Z/eWVQTCn5gMuAInQNXFSqDIeIqBX+wca6kvOCUOXB7J2uRjTpLaC4DM9s/sNjSBvFixcGAngt+9oap6Y45rQc8ZJaNN/ALqEJAmkphW8=',
             'type': 'personal_details',
+            'hash': 'What to put here?',
         },
         {
             'reverse_side': {
+                'file_size': 32424112,
                 'file_date': 1534074942,
                 'file_id': 'DgADBAADNQQAAtoagFPf4wwmFZdmyQI',
                 'file_unique_id': 'adc3145fd2e84d95b64d68eaa22aa33e',
@@ -82,6 +84,7 @@ RAW_PASSPORT_DATA = {
                 'file_unique_id': 'd4e390cca57b4da5a65322b304762a12',
             },
             'data': 'eJUOFuY53QKmGqmBgVWlLBAQCUQJ79n405SX6M5aGFIIodOPQqnLYvMNqTwTrXGDlW+mVLZcbu+y8luLVO8WsJB/0SB7q5WaXn/IMt1G9lz5G/KMLIZG/x9zlnimsaQLg7u8srG6L4KZzv+xkbbHjZdETrxU8j0N/DoS4HvLMRSJAgeFUrY6v2YW9vSRg+fSxIqQy1jR2VKpzAT8OhOz7A==',
+            'hash': 'We seriously need to improve this mess! took so long to debug!',
         },
         {
             'translation': [
@@ -113,12 +116,14 @@ RAW_PASSPORT_DATA = {
                 },
             ],
             'type': 'utility_bill',
+            'hash': 'Wow over 30 minutes spent debugging passport stuff.',
         },
         {
             'data': 'j9SksVkSj128DBtZA+3aNjSFNirzv+R97guZaMgae4Gi0oDVNAF7twPR7j9VSmPedfJrEwL3O889Ei+a5F1xyLLyEI/qEBljvL70GFIhYGitS0JmNabHPHSZrjOl8b4s/0Z0Px2GpLO5siusTLQonimdUvu4UPjKquYISmlKEKhtmGATy+h+JDjNCYuOkhakeNw0Rk0BHgj0C3fCb7WZNQSyVb+2GTu6caR6eXf/AFwFp0TV3sRz3h0WIVPW8bna',
             'type': 'address',
+            'hash': 'at least I get the pattern now',
         },
-        {'email': 'fb3e3i47zt@dispostable.com', 'type': 'email'},
+        {'email': 'fb3e3i47zt@dispostable.com', 'type': 'email', 'hash': 'this should be it.'},
     ],
 }
 
@@ -126,13 +131,18 @@ RAW_PASSPORT_DATA = {
 @pytest.fixture(scope='function')
 def all_passport_data():
     return [
-        {'type': 'personal_details', 'data': RAW_PASSPORT_DATA['data'][0]['data']},
+        {
+            'type': 'personal_details',
+            'data': RAW_PASSPORT_DATA['data'][0]['data'],
+            'hash': 'what to put here?',
+        },
         {
             'type': 'passport',
             'data': RAW_PASSPORT_DATA['data'][1]['data'],
             'front_side': RAW_PASSPORT_DATA['data'][1]['front_side'],
             'selfie': RAW_PASSPORT_DATA['data'][1]['selfie'],
             'translation': RAW_PASSPORT_DATA['data'][1]['translation'],
+            'hash': 'more data arghh',
         },
         {
             'type': 'internal_passport',
@@ -140,6 +150,7 @@ def all_passport_data():
             'front_side': RAW_PASSPORT_DATA['data'][1]['front_side'],
             'selfie': RAW_PASSPORT_DATA['data'][1]['selfie'],
             'translation': RAW_PASSPORT_DATA['data'][1]['translation'],
+            'hash': 'more data arghh',
         },
         {
             'type': 'driver_license',
@@ -148,6 +159,7 @@ def all_passport_data():
             'reverse_side': RAW_PASSPORT_DATA['data'][1]['reverse_side'],
             'selfie': RAW_PASSPORT_DATA['data'][1]['selfie'],
             'translation': RAW_PASSPORT_DATA['data'][1]['translation'],
+            'hash': 'more data arghh',
         },
         {
             'type': 'identity_card',
@@ -156,35 +168,49 @@ def all_passport_data():
             'reverse_side': RAW_PASSPORT_DATA['data'][1]['reverse_side'],
             'selfie': RAW_PASSPORT_DATA['data'][1]['selfie'],
             'translation': RAW_PASSPORT_DATA['data'][1]['translation'],
+            'hash': 'more data arghh',
         },
         {
             'type': 'utility_bill',
             'files': RAW_PASSPORT_DATA['data'][2]['files'],
             'translation': RAW_PASSPORT_DATA['data'][2]['translation'],
+            'hash': 'more data arghh',
         },
         {
             'type': 'bank_statement',
             'files': RAW_PASSPORT_DATA['data'][2]['files'],
             'translation': RAW_PASSPORT_DATA['data'][2]['translation'],
+            'hash': 'more data arghh',
         },
         {
             'type': 'rental_agreement',
             'files': RAW_PASSPORT_DATA['data'][2]['files'],
             'translation': RAW_PASSPORT_DATA['data'][2]['translation'],
+            'hash': 'more data arghh',
         },
         {
             'type': 'passport_registration',
             'files': RAW_PASSPORT_DATA['data'][2]['files'],
             'translation': RAW_PASSPORT_DATA['data'][2]['translation'],
+            'hash': 'more data arghh',
         },
         {
             'type': 'temporary_registration',
             'files': RAW_PASSPORT_DATA['data'][2]['files'],
             'translation': RAW_PASSPORT_DATA['data'][2]['translation'],
+            'hash': 'more data arghh',
         },
-        {'type': 'address', 'data': RAW_PASSPORT_DATA['data'][3]['data']},
-        {'type': 'email', 'email': 'fb3e3i47zt@dispostable.com'},
-        {'type': 'phone_number', 'phone_number': 'fb3e3i47zt@dispostable.com'},
+        {
+            'type': 'address',
+            'data': RAW_PASSPORT_DATA['data'][3]['data'],
+            'hash': 'more data arghh',
+        },
+        {'type': 'email', 'email': 'fb3e3i47zt@dispostable.com', 'hash': 'more data arghh'},
+        {
+            'type': 'phone_number',
+            'phone_number': 'fb3e3i47zt@dispostable.com',
+            'hash': 'more data arghh',
+        },
     ]
 
 
@@ -215,14 +241,11 @@ class TestPassport:
     driver_license_selfie_credentials_file_hash = 'Cila/qLXSBH7DpZFbb5bRZIRxeFW2uv/ulL0u0JNsYI='
     driver_license_selfie_credentials_secret = 'tivdId6RNYNsvXYPppdzrbxOBuBOr9wXRPDcCvnXU7E='
 
-    def test_slot_behaviour(self, passport_data, mro_slots, recwarn):
+    def test_slot_behaviour(self, passport_data, mro_slots):
         inst = passport_data
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-        inst.custom, inst.data = 'should give warning', passport_data.data
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_creation(self, passport_data):
         assert isinstance(passport_data, PassportData)
@@ -412,20 +435,20 @@ class TestPassport:
         data = deepcopy(RAW_PASSPORT_DATA)
         data['credentials']['hash'] = 'bm90Y29ycmVjdGhhc2g='  # Not correct hash
         passport_data = PassportData.de_json(data, bot=bot)
-        with pytest.raises(TelegramDecryptionError):
+        with pytest.raises(PassportDecryptionError):
             assert passport_data.decrypted_data
 
     def test_wrong_key(self, bot):
         short_key = b"-----BEGIN RSA PRIVATE KEY-----\r\nMIIBOQIBAAJBAKU+OZ2jJm7sCA/ec4gngNZhXYPu+DZ/TAwSMl0W7vAPXAsLplBk\r\nO8l6IBHx8N0ZC4Bc65mO3b2G8YAzqndyqH8CAwEAAQJAWOx3jQFzeVXDsOaBPdAk\r\nYTncXVeIc6tlfUl9mOLyinSbRNCy1XicOiOZFgH1rRKOGIC1235QmqxFvdecySoY\r\nwQIhAOFeGgeX9CrEPuSsd9+kqUcA2avCwqdQgSdy2qggRFyJAiEAu7QHT8JQSkHU\r\nDELfzrzc24AhjyG0z1DpGZArM8COascCIDK42SboXj3Z2UXiQ0CEcMzYNiVgOisq\r\nBUd5pBi+2mPxAiAM5Z7G/Sv1HjbKrOGh29o0/sXPhtpckEuj5QMC6E0gywIgFY6S\r\nNjwrAA+cMmsgY0O2fAzEKkDc5YiFsiXaGaSS4eA=\r\n-----END RSA PRIVATE KEY-----"
         b = Bot(bot.token, private_key=short_key)
         passport_data = PassportData.de_json(RAW_PASSPORT_DATA, bot=b)
-        with pytest.raises(TelegramDecryptionError):
+        with pytest.raises(PassportDecryptionError):
             assert passport_data.decrypted_data
 
         wrong_key = b"-----BEGIN RSA PRIVATE KEY-----\r\nMIIEogIBAAKCAQB4qCFltuvHakZze86TUweU7E/SB3VLGEHAe7GJlBmrou9SSWsL\r\nH7E++157X6UqWFl54LOE9MeHZnoW7rZ+DxLKhk6NwAHTxXPnvw4CZlvUPC3OFxg3\r\nhEmNen6ojSM4sl4kYUIa7F+Q5uMEYaboxoBen9mbj4zzMGsG4aY/xBOb2ewrXQyL\r\nRh//tk1Px4ago+lUPisAvQVecz7/6KU4Xj4Lpv2z20f3cHlZX6bb7HlE1vixCMOf\r\nxvfC5SkWEGZMR/ZoWQUsoDkrDSITF/S3GtLfg083TgtCKaOF3mCT27sJ1og77npP\r\n0cH/qdlbdoFtdrRj3PvBpaj/TtXRhmdGcJBxAgMBAAECggEAYSq1Sp6XHo8dkV8B\r\nK2/QSURNu8y5zvIH8aUrgqo8Shb7OH9bryekrB3vJtgNwR5JYHdu2wHttcL3S4SO\r\nftJQxbyHgmxAjHUVNGqOM6yPA0o7cR70J7FnMoKVgdO3q68pVY7ll50IET9/T0X9\r\nDrTdKFb+/eILFsXFS1NpeSzExdsKq3zM0sP/vlJHHYVTmZDGaGEvny/eLAS+KAfG\r\nrKP96DeO4C/peXEJzALZ/mG1ReBB05Qp9Dx1xEC20yreRk5MnnBA5oiHVG5ZLOl9\r\nEEHINidqN+TMNSkxv67xMfQ6utNu5IpbklKv/4wqQOJOO50HZ+qBtSurTN573dky\r\nzslbCQKBgQDHDUBYyKN/v69VLmvNVcxTgrOcrdbqAfefJXb9C3dVXhS8/oRkCRU/\r\ndzxYWNT7hmQyWUKor/izh68rZ/M+bsTnlaa7IdAgyChzTfcZL/2pxG9pq05GF1Q4\r\nBSJ896ZEe3jEhbpJXRlWYvz7455svlxR0H8FooCTddTmkU3nsQSx0wKBgQCbLSa4\r\nyZs2QVstQQerNjxAtLi0IvV8cJkuvFoNC2Q21oqQc7BYU7NJL7uwriprZr5nwkCQ\r\nOFQXi4N3uqimNxuSng31ETfjFZPp+pjb8jf7Sce7cqU66xxR+anUzVZqBG1CJShx\r\nVxN7cWN33UZvIH34gA2Ax6AXNnJG42B5Gn1GKwKBgQCZ/oh/p4nGNXfiAK3qB6yy\r\nFvX6CwuvsqHt/8AUeKBz7PtCU+38roI/vXF0MBVmGky+HwxREQLpcdl1TVCERpIT\r\nUFXThI9OLUwOGI1IcTZf9tby+1LtKvM++8n4wGdjp9qAv6ylQV9u09pAzZItMwCd\r\nUx5SL6wlaQ2y60tIKk0lfQKBgBJS+56YmA6JGzY11qz+I5FUhfcnpauDNGOTdGLT\r\n9IqRPR2fu7RCdgpva4+KkZHLOTLReoRNUojRPb4WubGfEk93AJju5pWXR7c6k3Bt\r\novS2mrJk8GQLvXVksQxjDxBH44sLDkKMEM3j7uYJqDaZNKbyoCWT7TCwikAau5qx\r\naRevAoGAAKZV705dvrpJuyoHFZ66luANlrAwG/vNf6Q4mBEXB7guqMkokCsSkjqR\r\nhsD79E6q06zA0QzkLCavbCn5kMmDS/AbA80+B7El92iIN6d3jRdiNZiewkhlWhEG\r\nm4N0gQRfIu+rUjsS/4xk8UuQUT/Ossjn/hExi7ejpKdCc7N++bc=\r\n-----END RSA PRIVATE KEY-----"
         b = Bot(bot.token, private_key=wrong_key)
         passport_data = PassportData.de_json(RAW_PASSPORT_DATA, bot=b)
-        with pytest.raises(TelegramDecryptionError):
+        with pytest.raises(PassportDecryptionError):
             assert passport_data.decrypted_data
 
     def test_mocked_download_passport_file(self, passport_data, monkeypatch):

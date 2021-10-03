@@ -21,7 +21,7 @@ import datetime
 from typing import TYPE_CHECKING, Any, Optional
 
 from telegram import TelegramObject, User
-from telegram.utils.helpers import from_timestamp, to_timestamp
+from telegram.utils.datetime import from_timestamp, to_timestamp
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -67,7 +67,6 @@ class ChatInviteLink(TelegramObject):
         'is_revoked',
         'expire_date',
         'member_limit',
-        '_id_attrs',
     )
 
     def __init__(

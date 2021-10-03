@@ -22,8 +22,15 @@ import inspect
 import pytest
 import pytz
 
-from telegram import User, ChatMember, Chat, ChatMemberUpdated, ChatInviteLink
-from telegram.utils.helpers import to_timestamp
+from telegram import (
+    User,
+    ChatMember,
+    ChatMemberAdministrator,
+    Chat,
+    ChatMemberUpdated,
+    ChatInviteLink,
+)
+from telegram.utils.datetime import to_timestamp
 
 
 @pytest.fixture(scope='class')
@@ -43,7 +50,19 @@ def old_chat_member(user):
 
 @pytest.fixture(scope='class')
 def new_chat_member(user):
-    return ChatMember(user, TestChatMemberUpdated.new_status)
+    return ChatMemberAdministrator(
+        user,
+        TestChatMemberUpdated.new_status,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+    )
 
 
 @pytest.fixture(scope='class')
@@ -65,14 +84,11 @@ class TestChatMemberUpdated:
     old_status = ChatMember.MEMBER
     new_status = ChatMember.ADMINISTRATOR
 
-    def test_slot_behaviour(self, recwarn, mro_slots, chat_member_updated):
+    def test_slot_behaviour(self, mro_slots, chat_member_updated):
         action = chat_member_updated
         for attr in action.__slots__:
             assert getattr(action, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not action.__dict__, f"got missing slot(s): {action.__dict__}"
         assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
-        action.custom = 'should give warning'
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     def test_de_json_required_args(self, bot, user, chat, old_chat_member, new_chat_member, time):
         json_dict = {

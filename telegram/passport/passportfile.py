@@ -21,7 +21,7 @@
 from typing import TYPE_CHECKING, Any, List, Optional
 
 from telegram import TelegramObject
-from telegram.utils.helpers import DEFAULT_NONE
+from telegram.utils.defaultvalue import DEFAULT_NONE
 from telegram.utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
@@ -65,7 +65,6 @@ class PassportFile(TelegramObject):
         'file_size',
         '_credentials',
         'file_unique_id',
-        '_id_attrs',
     )
 
     def __init__(
@@ -73,7 +72,7 @@ class PassportFile(TelegramObject):
         file_id: str,
         file_unique_id: str,
         file_date: int,
-        file_size: int = None,
+        file_size: int,
         bot: 'Bot' = None,
         credentials: 'FileCredentials' = None,
         **_kwargs: Any,

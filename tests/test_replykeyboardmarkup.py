@@ -40,14 +40,11 @@ class TestReplyKeyboardMarkup:
     selective = True
     input_field_placeholder = 'lol a keyboard'
 
-    def test_slot_behaviour(self, reply_keyboard_markup, mro_slots, recwarn):
+    def test_slot_behaviour(self, reply_keyboard_markup, mro_slots):
         inst = reply_keyboard_markup
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-        inst.custom, inst.selective = 'should give warning', self.selective
-        assert len(recwarn) == 1 and 'custom' in str(recwarn[0].message), recwarn.list
 
     @flaky(3, 1)
     def test_send_message_with_reply_keyboard_markup(self, bot, chat_id, reply_keyboard_markup):
@@ -104,6 +101,12 @@ class TestReplyKeyboardMarkup:
         assert reply_keyboard_markup.one_time_keyboard == self.one_time_keyboard
         assert reply_keyboard_markup.selective == self.selective
         assert reply_keyboard_markup.input_field_placeholder == self.input_field_placeholder
+
+    def test_wrong_keyboard_inputs(self):
+        with pytest.raises(ValueError):
+            ReplyKeyboardMarkup([[KeyboardButton('b1')], 'b2'])
+        with pytest.raises(ValueError):
+            ReplyKeyboardMarkup(KeyboardButton('b1'))
 
     def test_to_dict(self, reply_keyboard_markup):
         reply_keyboard_markup_dict = reply_keyboard_markup.to_dict()
