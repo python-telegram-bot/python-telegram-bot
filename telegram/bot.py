@@ -65,6 +65,7 @@ from telegram import (
     Document,
     File,
     GameHighScore,
+    InputMedia,
     Location,
     MaskPosition,
     Message,
@@ -90,8 +91,6 @@ from telegram import (
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import InvalidToken, TelegramError
-from telegram.warnings import PTBDeprecationWarning
-from telegram.utils.warnings import warn
 from telegram.utils.defaultvalue import DEFAULT_NONE, DefaultValue, DEFAULT_20
 from telegram.utils.datetime import to_timestamp
 from telegram.utils.files import is_local_file, parse_file_input
@@ -99,13 +98,11 @@ from telegram.request import Request
 from telegram.utils.types import FileInput, JSONDict, ODVInput, DVInput
 
 if TYPE_CHECKING:
-    from telegram.ext import Defaults
     from telegram import (
         InputMediaAudio,
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
-        InputMedia,
         InlineQueryResult,
         LabeledPrice,
         MessageEntity,
@@ -147,6 +144,9 @@ class Bot(TelegramObject):
         * Removed the deprecated methods ``kick_chat_member``, ``kickChatMember``,
           ``get_chat_members_count`` and ``getChatMembersCount``.
         * Removed the deprecated property ``commands``.
+        * Removed the deprecated ``defaults`` parameter. If you want to use
+            :class:`telegram.ext.Defaults`, please use the subclass :class:`telegram.ext.ExtBot`
+            instead.
 
     Args:
         token (:obj:`str`): Bot's unique authentication.
@@ -156,13 +156,6 @@ class Bot(TelegramObject):
             :obj:`telegram.request.Request`.
         private_key (:obj:`bytes`, optional): Private key for decryption of telegram passport data.
         private_key_password (:obj:`bytes`, optional): Password for above private key.
-        defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
-            be used if not set explicitly in the bot methods.
-
-            .. deprecated:: 13.6
-               Passing :class:`telegram.ext.Defaults` to :class:`telegram.Bot` is deprecated. If
-               you want to use :class:`telegram.ext.Defaults`, please use
-               :class:`telegram.ext.ExtBot` instead.
 
     """
 
@@ -171,7 +164,6 @@ class Bot(TelegramObject):
         'base_url',
         'base_file_url',
         'private_key',
-        'defaults',
         '_bot',
         '_request',
         'logger',
@@ -185,19 +177,8 @@ class Bot(TelegramObject):
         request: 'Request' = None,
         private_key: bytes = None,
         private_key_password: bytes = None,
-        defaults: 'Defaults' = None,
     ):
         self.token = self._validate_token(token)
-
-        # Gather default
-        self.defaults = defaults
-
-        if self.defaults:
-            warn(
-                'Passing Defaults to telegram.Bot is deprecated. Use telegram.ext.ExtBot instead.',
-                PTBDeprecationWarning,
-                stacklevel=4,
-            )
 
         if base_url is None:
             base_url = 'https://api.telegram.org/bot'
@@ -222,41 +203,42 @@ class Bot(TelegramObject):
                 private_key, password=private_key_password, backend=default_backend()
             )
 
-    def _insert_defaults(
+    def _insert_defaults(  # pylint: disable=no-self-use
         self, data: Dict[str, object], timeout: ODVInput[float]
     ) -> Optional[float]:
+        """This method is here to make ext.Defaults work. Because we need to be able to tell
+        e.g. `send_message(chat_id, text)` from `send_message(chat_id, text, parse_mode=None)`, the
+        default values for `parse_mode` etc are not `None` but `DEFAULT_NONE`. While this *could*
+        be done in ExtBot instead of Bot, shortcuts like `Message.reply_text` need to work for both
+        Bot and ExtBot, so they also have the `DEFAULT_NONE` default values.
+
+        This makes it necessary to convert `DefaultValue(obj)` to `obj` at some point between
+        `Message.reply_text` and the request to TG. Doing this here in a centralized manner is a
+        rather clean and minimally invasive solution, i.e. the link between tg and tg.ext is as
+        small as possible.
+        See also _insert_defaults_for_ilq
+        ExtBot overrides this method to actually insert default values.
+
+        If in the future we come up with a better way of making `Defaults` work, we can cut this
+        link as well.
         """
-        Inserts the defaults values for optional kwargs for which tg.ext.Defaults provides
-        convenience functionality, i.e. the kwargs with a tg.utils.helpers.DefaultValue default
-
-        data is edited in-place. As timeout is not passed via the kwargs, it needs to be passed
-        separately and gets returned.
-
-        This can only work, if all kwargs that may have defaults are passed in data!
-        """
-        effective_timeout = DefaultValue.get_value(timeout)
-
-        # If we have no Defaults, we just need to replace DefaultValue instances
-        # with the actual value
-        if not self.defaults:
-            data.update((key, DefaultValue.get_value(value)) for key, value in data.items())
-            return effective_timeout
-
-        # if we have Defaults, we replace all DefaultValue instances with the relevant
-        # Defaults value. If there is none, we fall back to the default value of the bot method
+        # We
+        # 1) set the correct parse_mode for all InputMedia objects
+        # 2) replace all DefaultValue instances with the corresponding normal value.
         for key, val in data.items():
-            if isinstance(val, DefaultValue):
-                data[key] = self.defaults.api_defaults.get(key, val.value)
+            # 1)
+            if isinstance(val, InputMedia):
+                val.parse_mode = DefaultValue.get_value(  # type: ignore[attr-defined]
+                    val.parse_mode  # type: ignore[attr-defined]
+                )
+            elif key == 'media' and isinstance(val, list):
+                for media in val:
+                    media.parse_mode = DefaultValue.get_value(media.parse_mode)
+            # 2)
+            else:
+                data[key] = DefaultValue.get_value(val)
 
-        if isinstance(timeout, DefaultValue):
-            # If we get here, we use Defaults.timeout, unless that's not set, which is the
-            # case if isinstance(self.defaults.timeout, DefaultValue)
-            return (
-                self.defaults.timeout
-                if not isinstance(self.defaults.timeout, DefaultValue)
-                else effective_timeout
-            )
-        return effective_timeout
+        return DefaultValue.get_value(timeout)
 
     def _post(
         self,
@@ -279,8 +261,15 @@ class Bot(TelegramObject):
             effective_timeout = self._insert_defaults(data, timeout)
         else:
             effective_timeout = cast(float, timeout)
+
         # Drop any None values because Telegram doesn't handle them well
         data = {key: value for key, value in data.items() if value is not None}
+
+        # We do this here so that _insert_defaults (see above) has a chance to convert
+        # to the default timezone in case this is called by ExtBot
+        for key, value in data.items():
+            if isinstance(value, datetime):
+                data[key] = to_timestamp(value)
 
         return self.request.post(
             f'{self.base_url}/{endpoint}', data=data, timeout=effective_timeout
@@ -304,7 +293,7 @@ class Bot(TelegramObject):
         if protect_content:
             data['protect_content'] = protect_content
 
-        # We don't check if (DEFAULT_)None here, so that _put is able to insert the defaults
+        # We don't check if (DEFAULT_)None here, so that _post is able to insert the defaults
         # correctly, if necessary
         data['disable_notification'] = disable_notification
         data['allow_sending_without_reply'] = allow_sending_without_reply
@@ -316,12 +305,6 @@ class Bot(TelegramObject):
                 data['reply_markup'] = reply_markup.to_json()
             else:
                 data['reply_markup'] = reply_markup
-
-        if data.get('media') and (data['media'].parse_mode == DEFAULT_NONE):
-            if self.defaults:
-                data['media'].parse_mode = DefaultValue.get_value(self.defaults.parse_mode)
-            else:
-                data['media'].parse_mode = None
 
         result = self._post(endpoint, data, timeout=timeout, api_kwargs=api_kwargs)
 
@@ -1541,13 +1524,6 @@ class Bot(TelegramObject):
             'allow_sending_without_reply': allow_sending_without_reply,
         }
 
-        for med in data['media']:
-            if med.parse_mode == DEFAULT_NONE:
-                if self.defaults:
-                    med.parse_mode = DefaultValue.get_value(self.defaults.parse_mode)
-                else:
-                    med.parse_mode = None
-
         if reply_to_message_id:
             data['reply_to_message_id'] = reply_to_message_id
 
@@ -2167,6 +2143,28 @@ class Bot(TelegramObject):
 
         return effective_results, next_offset
 
+    @no_type_check  # mypy doesn't play too well with hasattr
+    def _insert_defaults_for_ilq_results(  # pylint: disable=R0201
+        self, res: 'InlineQueryResult'
+    ) -> None:
+        """The reason why this method exists is similar to the description of _insert_defaults
+        The reason why we do this in rather than in _insert_defaults is because converting
+        DEFAULT_NONE to NONE *before* calling to_dict() makes it way easier to drop None entries
+        from the json data.
+        """
+        # pylint: disable=W0212
+        if hasattr(res, 'parse_mode'):
+            res.parse_mode = DefaultValue.get_value(res.parse_mode)
+        if hasattr(res, 'input_message_content') and res.input_message_content:
+            if hasattr(res.input_message_content, 'parse_mode'):
+                res.input_message_content.parse_mode = DefaultValue.get_value(
+                    res.input_message_content.parse_mode
+                )
+            if hasattr(res.input_message_content, 'disable_web_page_preview'):
+                res.input_message_content.disable_web_page_preview = DefaultValue.get_value(
+                    res.input_message_content.disable_web_page_preview
+                )
+
     @log
     def answer_inline_query(
         self,
@@ -2240,44 +2238,13 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-
-        @no_type_check
-        def _set_defaults(res):
-            # pylint: disable=W0212
-            if hasattr(res, 'parse_mode') and res.parse_mode == DEFAULT_NONE:
-                if self.defaults:
-                    res.parse_mode = self.defaults.parse_mode
-                else:
-                    res.parse_mode = None
-            if hasattr(res, 'input_message_content') and res.input_message_content:
-                if (
-                    hasattr(res.input_message_content, 'parse_mode')
-                    and res.input_message_content.parse_mode == DEFAULT_NONE
-                ):
-                    if self.defaults:
-                        res.input_message_content.parse_mode = DefaultValue.get_value(
-                            self.defaults.parse_mode
-                        )
-                    else:
-                        res.input_message_content.parse_mode = None
-                if (
-                    hasattr(res.input_message_content, 'disable_web_page_preview')
-                    and res.input_message_content.disable_web_page_preview == DEFAULT_NONE
-                ):
-                    if self.defaults:
-                        res.input_message_content.disable_web_page_preview = (
-                            DefaultValue.get_value(self.defaults.disable_web_page_preview)
-                        )
-                    else:
-                        res.input_message_content.disable_web_page_preview = None
-
         effective_results, next_offset = self._effective_inline_results(
             results=results, next_offset=next_offset, current_offset=current_offset
         )
 
         # Apply defaults
         for result in effective_results:
-            _set_defaults(result)
+            self._insert_defaults_for_ilq_results(result)
 
         results_dicts = [res.to_dict() for res in effective_results]
 
@@ -2452,10 +2419,6 @@ class Bot(TelegramObject):
         data: JSONDict = {'chat_id': chat_id, 'user_id': user_id}
 
         if until_date is not None:
-            if isinstance(until_date, datetime):
-                until_date = to_timestamp(
-                    until_date, tzinfo=self.defaults.tzinfo if self.defaults else None
-                )
             data['until_date'] = until_date
 
         if revoke_messages is not None:
@@ -3866,10 +3829,6 @@ class Bot(TelegramObject):
         }
 
         if until_date is not None:
-            if isinstance(until_date, datetime):
-                until_date = to_timestamp(
-                    until_date, tzinfo=self.defaults.tzinfo if self.defaults else None
-                )
             data['until_date'] = until_date
 
         result = self._post('restrictChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
@@ -4153,10 +4112,6 @@ class Bot(TelegramObject):
         }
 
         if expire_date is not None:
-            if isinstance(expire_date, datetime):
-                expire_date = to_timestamp(
-                    expire_date, tzinfo=self.defaults.tzinfo if self.defaults else None
-                )
             data['expire_date'] = expire_date
 
         if member_limit is not None:
@@ -4235,10 +4190,6 @@ class Bot(TelegramObject):
         data: JSONDict = {'chat_id': chat_id, 'invite_link': invite_link}
 
         if expire_date is not None:
-            if isinstance(expire_date, datetime):
-                expire_date = to_timestamp(
-                    expire_date, tzinfo=self.defaults.tzinfo if self.defaults else None
-                )
             data['expire_date'] = expire_date
 
         if member_limit is not None:
@@ -5168,10 +5119,6 @@ class Bot(TelegramObject):
         if open_period:
             data['open_period'] = open_period
         if close_date:
-            if isinstance(close_date, datetime):
-                close_date = to_timestamp(
-                    close_date, tzinfo=self.defaults.tzinfo if self.defaults else None
-                )
             data['close_date'] = close_date
 
         return self._message(  # type: ignore[return-value]

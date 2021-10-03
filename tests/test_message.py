@@ -1534,7 +1534,7 @@ class TestMessage:
         assert message.unpin()
 
     def test_default_quote(self, message):
-        message.bot.defaults = Defaults()
+        message.bot._defaults = Defaults()
 
         try:
             message.bot.defaults._quote = False
@@ -1550,7 +1550,7 @@ class TestMessage:
             message.chat.type = Chat.GROUP
             assert message._quote(None, None)
         finally:
-            message.bot.defaults = None
+            message.bot._defaults = None
 
     def test_equality(self):
         id_ = 1

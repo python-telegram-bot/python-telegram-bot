@@ -19,7 +19,20 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Bot with convenience extensions."""
 from copy import copy
-from typing import Union, cast, List, Callable, Optional, Tuple, TypeVar, TYPE_CHECKING, Sequence
+from datetime import datetime
+from typing import (
+    Union,
+    cast,
+    List,
+    Callable,
+    Optional,
+    Tuple,
+    TypeVar,
+    TYPE_CHECKING,
+    Sequence,
+    Dict,
+    no_type_check,
+)
 
 import telegram.bot
 from telegram import (
@@ -31,11 +44,13 @@ from telegram import (
     Update,
     Chat,
     CallbackQuery,
+    InputMedia,
 )
 
 from telegram.ext.callbackdatacache import CallbackDataCache
 from telegram.utils.types import JSONDict, ODVInput, DVInput
-from telegram.utils.defaultvalue import DEFAULT_NONE
+from telegram.utils.defaultvalue import DEFAULT_NONE, DefaultValue
+from telegram.utils.datetime import to_timestamp
 
 if TYPE_CHECKING:
     from telegram import InlineQueryResult, MessageEntity
@@ -73,7 +88,7 @@ class ExtBot(telegram.bot.Bot):
 
     """
 
-    __slots__ = ('arbitrary_callback_data', 'callback_data_cache')
+    __slots__ = ('arbitrary_callback_data', 'callback_data_cache', '_defaults')
 
     def __init__(
         self,
@@ -94,8 +109,7 @@ class ExtBot(telegram.bot.Bot):
             private_key=private_key,
             private_key_password=private_key_password,
         )
-        # We don't pass this to super().__init__ to avoid the deprecation warning
-        self.defaults = defaults
+        self._defaults = defaults
 
         # set up callback_data
         if not isinstance(arbitrary_callback_data, bool):
@@ -105,6 +119,64 @@ class ExtBot(telegram.bot.Bot):
             maxsize = 1024
             self.arbitrary_callback_data = arbitrary_callback_data
         self.callback_data_cache: CallbackDataCache = CallbackDataCache(bot=self, maxsize=maxsize)
+
+    @property
+    def defaults(self) -> Optional['Defaults']:
+        """The :class:`telegram.ext.Defaults` used by this bot, if any."""
+        # This is a property because defaults shouldn't be changed at runtime
+        return self._defaults
+
+    def _insert_defaults(
+        self, data: Dict[str, object], timeout: ODVInput[float]
+    ) -> Optional[float]:
+        """Inserts the defaults values for optional kwargs for which tg.ext.Defaults provides
+        convenience functionality, i.e. the kwargs with a tg.utils.helpers.DefaultValue default
+
+        data is edited in-place. As timeout is not passed via the kwargs, it needs to be passed
+        separately and gets returned.
+
+        This can only work, if all kwargs that may have defaults are passed in data!
+        """
+        # if we have Defaults, we
+        # 1) replace all DefaultValue instances with the relevant Defaults value. If there is none,
+        #    we fall back to the default value of the bot method
+        # 2) convert all datetime.datetime objects to timestamps wrt the correct default timezone
+        # 3) set the correct parse_mode for all InputMedia objects
+        for key, val in data.items():
+            # 1)
+            if isinstance(val, DefaultValue):
+                data[key] = (
+                    self.defaults.api_defaults.get(key, val.value)
+                    if self.defaults
+                    else DefaultValue.get_value(val)
+                )
+
+            # 2)
+            elif isinstance(val, datetime):
+                data[key] = to_timestamp(
+                    val, tzinfo=self.defaults.tzinfo if self.defaults else None
+                )
+
+            # 3)
+            elif isinstance(val, InputMedia) and val.parse_mode is DEFAULT_NONE:  # type: ignore
+                val.parse_mode = (  # type: ignore[attr-defined]
+                    self.defaults.parse_mode if self.defaults else None
+                )
+            elif key == 'media' and isinstance(val, list):
+                for media in val:
+                    if media.parse_mode is DEFAULT_NONE:
+                        media.parse_mode = self.defaults.parse_mode if self.defaults else None
+
+        effective_timeout = DefaultValue.get_value(timeout)
+        if isinstance(timeout, DefaultValue):
+            # If we get here, we use Defaults.timeout, unless that's not set, which is the
+            # case if isinstance(self.defaults.timeout, DefaultValue)
+            return (
+                self.defaults.timeout
+                if self.defaults and not isinstance(self.defaults.timeout, DefaultValue)
+                else effective_timeout
+            )
+        return effective_timeout
 
     def _replace_keyboard(self, reply_markup: Optional[ReplyMarkup]) -> Optional[ReplyMarkup]:
         # If the reply_markup is an inline keyboard and we allow arbitrary callback data, let the
@@ -235,8 +307,7 @@ class ExtBot(telegram.bot.Bot):
         next_offset: str = None,
         current_offset: str = None,
     ) -> Tuple[Sequence['InlineQueryResult'], Optional[str]]:
-        """
-        This method is called by Bot.answer_inline_query to build the actual results list.
+        """This method is called by Bot.answer_inline_query to build the actual results list.
         Overriding this to call self._replace_keyboard suffices
         """
         effective_results, next_offset = super()._effective_inline_results(
@@ -261,6 +332,30 @@ class ExtBot(telegram.bot.Bot):
                 results.append(new_result)
 
         return results, next_offset
+
+    @no_type_check  # mypy doesn't play too well with hasattr
+    def _insert_defaults_for_ilq_results(self, res: 'InlineQueryResult') -> None:
+        """This method is called by Bot.answer_inline_query to replace `DefaultValue(obj)` with
+        `obj`.
+        Overriding this to call insert the actual desired default values.
+        """
+        if hasattr(res, 'parse_mode') and res.parse_mode is DEFAULT_NONE:
+            res.parse_mode = self.defaults.parse_mode if self.defaults else None
+        if hasattr(res, 'input_message_content') and res.input_message_content:
+            if (
+                hasattr(res.input_message_content, 'parse_mode')
+                and res.input_message_content.parse_mode is DEFAULT_NONE
+            ):
+                res.input_message_content.parse_mode = (
+                    self.defaults.parse_mode if self.defaults else None
+                )
+            if (
+                hasattr(res.input_message_content, 'disable_web_page_preview')
+                and res.input_message_content.disable_web_page_preview is DEFAULT_NONE
+            ):
+                res.input_message_content.disable_web_page_preview = (
+                    self.defaults.disable_web_page_preview if self.defaults else None
+                )
 
     def stop_poll(
         self,
