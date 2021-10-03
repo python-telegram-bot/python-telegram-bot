@@ -1,4 +1,4 @@
-sphinx==3.5.4
+sphinx==4.2.0
 sphinx-pypi-upload
 # When bumping this, make sure to rebuild the dark-mode CSS
 # More instructions at source/_static/dark.css
