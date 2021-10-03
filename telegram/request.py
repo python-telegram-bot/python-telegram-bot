@@ -388,7 +388,7 @@ class Request:
 
         Args:
             url (:obj:`str`): The web location we want to retrieve.
-            filepath (:obj:`Path` | :obj: `str`): The filepath to download the file to.
+            filepath (:obj:`pathlib.Path` | :obj: `str`): The filepath to download the file to.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).

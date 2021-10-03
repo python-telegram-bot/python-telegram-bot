@@ -47,7 +47,7 @@ def get_setup_kwargs(raw=False):
     packages, requirements = get_packages_requirements(raw=raw)
 
     raw_ext = "-raw" if raw else ""
-    readme: Path = Path(f'README{"_RAW" if raw else ""}.rst')
+    readme = Path(f'README{"_RAW" if raw else ""}.rst')
 
     with Path('telegram/version.py').open() as fh:
         for line in fh.readlines():

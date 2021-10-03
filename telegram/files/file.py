@@ -89,14 +89,14 @@ class File(TelegramObject):
         self.file_unique_id = str(file_unique_id)
         # Optionals
         self.file_size = file_size
-        self.file_path = file_path  # Can be either path or url, so must remain str.
+        self.file_path = file_path
         self.bot = bot
         self._credentials: Optional['FileCredentials'] = None
 
         self._id_attrs = (self.file_unique_id,)
 
     def download(
-        self, custom_path: Optional[Union[Path, str]] = None, out: IO = None, timeout: int = None
+        self, custom_path: Union[Path, str] = None, out: IO = None, timeout: int = None
     ) -> Union[Path, IO]:
         """
         Download this file. By default, the file is saved in the current working directory with its
@@ -112,11 +112,11 @@ class File(TelegramObject):
               local mode), this method will just return the path.
 
         .. versionchanged:: 14.0
-            * :param:`custom_path` now also accepts pathlib.Path objects as argument.
-            * Returns `pathlib.Path` object in cases where previously returned `str` object.
+            * ``custom_path`` now also accepts pathlib.Path objects as argument.
+            * Returns :obj:`pathlib.Path` object in cases where previously returned `str` object.
 
         Args:
-            custom_path (:obj: 'pathlib.Path' | :obj:`str`, optional): Custom path.
+            custom_path (:obj: `pathlib.Path` | :obj:`str`, optional): Custom path.
             out (:obj:`io.BufferedWriter`, optional): A file-like object. Must be opened for
                 writing in binary mode, if applicable.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -135,9 +135,9 @@ class File(TelegramObject):
         if custom_path is not None and out is not None:
             raise ValueError('`custom_path` and `out` are mutually exclusive')
 
-        local_file: bool = is_local_file(self.file_path)
-        url: Optional[str] = None if local_file else self._get_encoded_url()
-        path: Optional[Path] = Path(self.file_path) if local_file else None
+        local_file = is_local_file(self.file_path)
+        url = None if local_file else self._get_encoded_url()
+        path = Path(self.file_path) if local_file else None
 
         if out:
             if local_file:

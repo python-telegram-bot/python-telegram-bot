@@ -50,10 +50,10 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
 
     .. versionchanged:: 14.0
         The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.
-        The parameter and attribute ``filename`` were replaced by :attr:`filepath.
+        The parameter and attribute ``filename`` were replaced by :attr:`filepath`.
 
     Args:
-        filepath (:obj:`str` | :obj: 'pathlib.Path'): The filename for storing the pickle files.
+        filepath (:obj:`str` | :obj: `pathlib.Path`): The filepath for storing the pickle files.
             When :attr:`single_file` is :obj:`False` this will be used as a prefix.
         store_data (:class:`PersistenceInput`, optional): Specifies which kinds of data will be
             saved by this persistence instance. By default, all available kinds of data will be
@@ -73,7 +73,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             .. versionadded:: 13.6
 
     Attributes:
-        filepath (:obj:`str` | :obj: 'pathlib.Path'): The filepath for storing the pickle files.
+        filepath (:obj:`str` | :obj: `pathlib.Path`): The filepath for storing the pickle files.
             When :attr:`single_file` is :obj:`False` this will be used as a prefix.
         store_data (:class:`PersistenceInput`): Specifies which kinds of data will be saved by this
             persistence instance.
@@ -124,7 +124,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         ...
 
     def __init__(
-        self: 'PicklePersistence[UD, CD, BD]',
+        self,
         filepath: Union[Path, str],
         store_data: PersistenceInput = None,
         single_file: bool = True,
@@ -132,7 +132,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         context_types: ContextTypes[Any, UD, CD, BD] = None,
     ):
         super().__init__(store_data=store_data)
-        self.filepath: Path = Path(filepath)
+        self.filepath = Path(filepath)
         self.single_file = single_file
         self.on_flush = on_flush
         self.user_data: Optional[DefaultDict[int, UD]] = None
@@ -159,7 +159,8 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             self.bot_data = self.context_types.bot_data()
             self.callback_data = None
         except pickle.UnpicklingError as exc:
-            raise TypeError(f"File {self.filepath} does not contain valid pickle data") from exc
+            filename = self.filepath.name
+            raise TypeError(f"File {filename} does not contain valid pickle data") from exc
         except Exception as exc:
             raise TypeError(f"Something went wrong unpickling {self.filepath}") from exc
 
