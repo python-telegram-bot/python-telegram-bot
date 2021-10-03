@@ -43,17 +43,20 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         :class:`PicklePersistence` will try to replace :class:`telegram.Bot` instances by
         :attr:`REPLACED_BOT` and insert the bot set with
         :meth:`telegram.ext.BasePersistence.set_bot` upon loading of the data. This is to ensure
-        that changes to the bot apply to the saved objects, too. If you change the bots token, this
-        may lead to e.g. ``Chat not found`` errors. For the limitations on replacing bots see
-        :meth:`telegram.ext.BasePersistence.replace_bot` and
-        :meth:`telegram.ext.BasePersistence.insert_bot`.
+            that changes to the bot apply to the saved objects, too. If you change the bot's
+            token, this may lead to e.g. ``Chat not found`` errors.
+            For the limitations on replacing bots see:
+                * :meth:`telegram.ext.BasePersistence.replace_bot`
+                * :meth:`telegram.ext.BasePersistence.insert_bot`.
 
     .. versionchanged:: 14.0
-        The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.
-        The parameter and attribute ``filename`` were replaced by :attr:`filepath`.
+        * The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.
+        * The parameter and attribute ``filename`` were replaced by :attr:`filepath`.
+        * :attr:`filepath` now also accepts :obj:`pathlib.Path` as argument.
+
 
     Args:
-        filepath (:obj:`str` | :obj: `pathlib.Path`): The filepath for storing the pickle files.
+        filepath (:obj:`str` | :obj:`pathlib.Path`): The filepath for storing the pickle files.
             When :attr:`single_file` is :obj:`False` this will be used as a prefix.
         store_data (:class:`PersistenceInput`, optional): Specifies which kinds of data will be
             saved by this persistence instance. By default, all available kinds of data will be
@@ -73,7 +76,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             .. versionadded:: 13.6
 
     Attributes:
-        filepath (:obj:`str` | :obj: `pathlib.Path`): The filepath for storing the pickle files.
+        filepath (:obj:`str` | :obj:`pathlib.Path`): The filepath for storing the pickle files.
             When :attr:`single_file` is :obj:`False` this will be used as a prefix.
         store_data (:class:`PersistenceInput`): Specifies which kinds of data will be saved by this
             persistence instance.

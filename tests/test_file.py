@@ -110,7 +110,10 @@ class TestFile:
     def test_download_local_file(self, local_file):
         assert local_file.download() == Path(local_file.file_path)
 
-    def test_download_custom_path(self, monkeypatch, file):
+    @pytest.mark.parametrize(
+        'custom_path_type', [str, Path], ids=['str custom_path', 'pathlib.Path custom_path']
+    )
+    def test_download_custom_path(self, monkeypatch, file, custom_path_type):
         def test(*args, **kwargs):
             return self.file_content
 
@@ -118,18 +121,21 @@ class TestFile:
         file_handle, custom_path = mkstemp()
         custom_path = Path(custom_path)
         try:
-            out_file = file.download(custom_path)
+            out_file = file.download(custom_path_type(custom_path))
             assert out_file == custom_path
             assert out_file.read_bytes() == self.file_content
         finally:
             os.close(file_handle)
             custom_path.unlink()
 
-    def test_download_custom_path_local_file(self, local_file):
+    @pytest.mark.parametrize(
+        'custom_path_type', [str, Path], ids=['str custom_path', 'pathlib.Path custom_path']
+    )
+    def test_download_custom_path_local_file(self, local_file, custom_path_type):
         file_handle, custom_path = mkstemp()
         custom_path = Path(custom_path)
         try:
-            out_file = local_file.download(custom_path)
+            out_file = local_file.download(custom_path_type(custom_path))
             assert out_file == custom_path
             assert out_file.read_bytes() == self.file_content
         finally:

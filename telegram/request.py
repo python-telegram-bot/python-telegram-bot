@@ -81,6 +81,7 @@ def _render_part(self: RequestField, name: str, value: str) -> str:  # pylint: d
     Monkey patch urllib3.urllib3.fields.RequestField to make it *not* support RFC2231 compliant
     Content-Disposition headers since telegram servers don't understand it. Instead just escape
     \\ and " and replace any \n and \r with a space.
+
     """
     value = value.replace('\\', '\\\\').replace('"', '\\"')
     value = value.replace('\r', ' ').replace('\n', ' ')
@@ -388,13 +389,13 @@ class Request:
 
         Args:
             url (:obj:`str`): The web location we want to retrieve.
-            filepath (:obj:`pathlib.Path` | :obj: `str`): The filepath to download the file to.
+            filepath (:obj:`pathlib.Path` | :obj:`str`): The filepath to download the file to.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
 
         .. versionchanged:: 14.0
-            :param:`filepath` now also accepts `pathlib.Path` objects as argument.
+            The ``filepath`` parameter now also accepts :obj:`pathlib.Path` objects as argument.
 
         """
         Path(filepath).write_bytes(self.retrieve(url, timeout))

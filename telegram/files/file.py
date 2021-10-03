@@ -112,7 +112,7 @@ class File(TelegramObject):
               local mode), this method will just return the path.
 
         .. versionchanged:: 14.0
-            * ``custom_path`` now also accepts pathlib.Path objects as argument.
+            * ``custom_path`` parameter now also accepts :obj:`pathlib.Path` as argument.
             * Returns :obj:`pathlib.Path` object in cases where previously returned `str` object.
 
         Args:
