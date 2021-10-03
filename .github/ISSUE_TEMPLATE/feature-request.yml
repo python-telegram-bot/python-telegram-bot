@@ -27,7 +27,7 @@ body:
     attributes:
       label: "Describe alternatives you've considered"
       description: "A clear and concise description of any alternative solutions or features you've considered."
-      placeholder: "Example: I considered Z, but that didn't work because..."
+      placeholder: "Example: I considered Z to be able to do X, but that didn't work because..."
       
   - type: textarea
     id: additional-context
