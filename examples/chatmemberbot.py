@@ -6,7 +6,7 @@
 Simple Bot to handle '(my_)chat_member' updates.
 Greets new users & keeps track of which chats the bot is in.
 
-Usage:
+Usage:dweq
 Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
