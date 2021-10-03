@@ -203,12 +203,12 @@ class Bot(TelegramObject):
                 private_key, password=private_key_password, backend=default_backend()
             )
 
-    def _insert_defaults(  # pylint: disable=R0201
+    def _insert_defaults(  # pylint: disable=no-self-use
         self, data: Dict[str, object], timeout: ODVInput[float]
     ) -> Optional[float]:
-        """This function is here to make ext.Defaults work. Because we need to be able to tell
-        e.g. send_message(chat_id, text) from send_message(chat_id, text, parse_mode=None), the
-        default values for `parse_mode` etc are not `None` bot `DEFAULT_NONE`. While this *could*
+        """This method is here to make ext.Defaults work. Because we need to be able to tell
+        e.g. `send_message(chat_id, text)` from `send_message(chat_id, text, parse_mode=None)`, the
+        default values for `parse_mode` etc are not `None` but `DEFAULT_NONE`. While this *could*
         be done in ExtBot instead of Bot, shortcuts like `Message.reply_text` need to work for both
         Bot and ExtBot, so they also have the `DEFAULT_NONE` default values.
 
@@ -223,21 +223,20 @@ class Bot(TelegramObject):
         link as well.
         """
         # We
-        # 1) replace all DefaultValue instances with the corresponding normal value.
-        # 2) set the correct parse_mode for all InputMedia objects
+        # 1) set the correct parse_mode for all InputMedia objects
+        # 2) replace all DefaultValue instances with the corresponding normal value.
         for key, val in data.items():
             # 1)
-            if isinstance(val, DefaultValue):
-                data[key] = val.value
-
-            # 2)
-            elif isinstance(val, InputMedia):
+            if isinstance(val, InputMedia):
                 val.parse_mode = DefaultValue.get_value(  # type: ignore[attr-defined]
                     val.parse_mode  # type: ignore[attr-defined]
                 )
             elif key == 'media' and isinstance(val, list):
                 for media in val:
                     media.parse_mode = DefaultValue.get_value(media.parse_mode)
+            # 2)
+            else:
+                data[key] = DefaultValue.get_value(val)
 
         return DefaultValue.get_value(timeout)
 

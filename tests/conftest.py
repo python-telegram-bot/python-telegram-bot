@@ -540,7 +540,7 @@ def build_kwargs(signature: inspect.Signature, default_kwargs, dfv: Any = DEFAUL
     kws = {}
     for name, param in signature.parameters.items():
         # For required params we need to pass something
-        if param.default == param.empty:
+        if param.default is inspect.Parameter.empty:
             # Some special casing
             if name == 'permissions':
                 kws[name] = ChatPermissions()

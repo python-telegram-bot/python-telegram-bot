@@ -337,7 +337,6 @@ class ExtBot(telegram.bot.Bot):
         `obj`.
         Overriding this to call insert the actual desired default values.
         """
-        # pylint: disable=W0212
         if hasattr(res, 'parse_mode') and res.parse_mode is DEFAULT_NONE:
             res.parse_mode = self.defaults.parse_mode if self.defaults else None
         if hasattr(res, 'input_message_content') and res.input_message_content:
