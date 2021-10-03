@@ -487,7 +487,10 @@ class Job:
 
     def run(self, dispatcher: 'Dispatcher') -> None:
         """Executes the callback function independently of the jobs schedule. Also calls
-        :meth:`telegram.ext.Dispatcher.update_persistence`
+        :meth:`telegram.ext.Dispatcher.update_persistence`.
+
+        .. versionchaged:: 14.0
+            Calls :meth:`telegram.ext.Dispatcher.update_persistence`.
 
         Args:
             dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher this job is associated
@@ -508,6 +511,8 @@ class Job:
         Warning:
             The fact that jobs are callable should be considered an implementation detail and not
             as part of PTBs public API.
+
+        .. versionadded:: 14.0
 
         Args:
             dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher this job is associated
