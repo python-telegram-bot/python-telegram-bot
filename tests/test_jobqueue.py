@@ -95,7 +95,7 @@ class TestJobQueue:
             self.result += 1
 
     def error_handler_context(self, update, context):
-        self.received_error = str(context.error)
+        self.received_error = (str(context.error), context.job)
 
     def error_handler_raise_error(self, *args):
         raise Exception('Failing bigly')
@@ -425,10 +425,12 @@ class TestJobQueue:
 
         job = job_queue.run_once(self.job_with_exception, 0.05)
         sleep(0.1)
-        assert self.received_error == 'Test Error'
+        assert self.received_error[0] == 'Test Error'
+        assert self.received_error[1] is job
         self.received_error = None
         job.run(dp)
-        assert self.received_error == 'Test Error'
+        assert self.received_error[0] == 'Test Error'
+        assert self.received_error[1] is job
 
         # Remove handler
         dp.remove_error_handler(self.error_handler_context)
