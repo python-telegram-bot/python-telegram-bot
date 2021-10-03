@@ -52,8 +52,7 @@ from telegram.ext.utils.types import CCT, UD, CD, BD
 
 if TYPE_CHECKING:
     from telegram import Bot
-    from telegram.ext import JobQueue
-    from telegram.ext.callbackcontext import CallbackContext
+    from telegram.ext import JobQueue, Job, CallbackContext
 
 DEFAULT_GROUP: int = 0
 
@@ -678,6 +677,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         update: Optional[object],
         error: Exception,
         promise: Promise = None,
+        job: 'Job' = None,
     ) -> bool:
         """Dispatches an error by passing it to all error handlers registered with
         :meth:`add_error_handler`. If one of the error handlers raises
@@ -696,6 +696,9 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
             error (:obj:`Exception`): The error that was raised.
             promise (:class:`telegram.utils.Promise`, optional): The promise whose pooled function
                 raised the error.
+            job (:class:`telegram.ext.Job`, optional): The job that caused the error.
+
+                .. versionadded:: 14.0
 
         Returns:
             :obj:`bool`: :obj:`True` if one of the error handlers raised
@@ -707,7 +710,12 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         if self.error_handlers:
             for callback, run_async in self.error_handlers.items():  # pylint: disable=W0621
                 context = self.context_types.context.from_error(
-                    update, error, self, async_args=async_args, async_kwargs=async_kwargs
+                    update=update,
+                    error=error,
+                    dispatcher=self,
+                    async_args=async_args,
+                    async_kwargs=async_kwargs,
+                    job=job,
                 )
                 if run_async:
                     self.run_async(callback, update, context, update=update)
