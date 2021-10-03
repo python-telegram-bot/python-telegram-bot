@@ -2026,7 +2026,6 @@ class Bot(TelegramObject):
 
         return effective_results, next_offset
 
-    @_log
     @no_type_check  # mypy doesn't play too well with hasattr
     def _insert_defaults_for_ilq_results(  # pylint: disable=R0201
         self, res: 'InlineQueryResult'
