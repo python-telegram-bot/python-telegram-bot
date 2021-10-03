@@ -73,7 +73,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             .. versionadded:: 13.6
 
     Attributes:
-        filepath (:obj: 'pathlib.Path'): The filepath for storing the pickle files.
+        filepath (:obj:`str` | :obj: 'pathlib.Path'): The filepath for storing the pickle files.
             When :attr:`single_file` is :obj:`False` this will be used as a prefix.
         store_data (:class:`PersistenceInput`): Specifies which kinds of data will be saved by this
             persistence instance.
@@ -124,7 +124,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         ...
 
     def __init__(
-        self,
+        self: 'PicklePersistence[UD, CD, BD]',
         filepath: Union[Path, str],
         store_data: PersistenceInput = None,
         single_file: bool = True,
