@@ -51,14 +51,17 @@ from telegram import (
     InlineQueryResultVoice,
     PollOption,
     BotCommandScopeChat,
+    File,
+    InputMedia,
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
-from telegram.ext import ExtBot, Defaults
+from telegram.ext import ExtBot
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter, TelegramError
 from telegram.ext.callbackdatacache import InvalidCallbackData
 from telegram.utils.datetime import from_timestamp, to_timestamp
 from telegram.helpers import escape_markdown
-from tests.conftest import expect_bad_request, check_defaults_handling, GITHUB_ACTION
+from telegram.utils.defaultvalue import DefaultValue
+from tests.conftest import expect_bad_request, check_defaults_handling, GITHUB_ACTION, build_kwargs
 from tests.bots import FALLBACKS
 
 
@@ -246,9 +249,16 @@ class TestBot:
             ]
         ],
     )
-    def test_defaults_handling(self, bot_method_name, bot):
+    def test_defaults_handling(self, bot_method_name, bot, raw_bot, monkeypatch):
         """
-        Here we check that the bot methods handle tg.ext.Defaults correctly. As for most defaults,
+        Here we check that the bot methods handle tg.ext.Defaults correctly. This has two parts:
+
+        1. Check that ExtBot actually inserts the defaults values correctly
+        2. Check that tg.Bot just replaces `DefaultValue(obj)` with `obj`, i.e. that it doesn't
+            pass any `DefaultValue` instances to Request. See the docstring of
+            tg.Bot._insert_defaults for details on why we need that
+
+        As for most defaults,
         we can't really check the effect, we just check if we're passing the correct kwargs to
         Request.post. As bot method tests a scattered across the different test files, we do
         this here in one place.
@@ -259,8 +269,60 @@ class TestBot:
         Finally, there are some tests for Defaults.{parse_mode, quote, allow_sending_without_reply}
         at the appropriate places, as those are the only things we can actually check.
         """
+        # Check that ExtBot does the right thing
         bot_method = getattr(bot, bot_method_name)
         assert check_defaults_handling(bot_method, bot)
+
+        # check that tg.Bot does the right thing
+        # make_assertion basically checks everything that happens in
+        # Bot._insert_defaults and Bot._insert_defaults_for_ilq_results
+        def make_assertion(_, data, timeout=None):
+            # Check regular kwargs
+            for k, v in data.items():
+                if isinstance(v, DefaultValue):
+                    pytest.fail(f'Parameter {k} was passed as DefaultValue to request')
+                elif isinstance(v, InputMedia) and isinstance(v.parse_mode, DefaultValue):
+                    pytest.fail(f'Parameter {k} has a DefaultValue parse_mode')
+                # Check InputMedia
+                elif k == 'media' and isinstance(v, list):
+                    if any(isinstance(med.parse_mode, DefaultValue) for med in v):
+                        pytest.fail('One of the media items has a DefaultValue parse_mode')
+            # Check timeout
+            if isinstance(timeout, DefaultValue):
+                pytest.fail('Parameter timeout was passed as DefaultValue to request')
+            # Check inline query results
+            if bot_method_name.lower().replace('_', '') == 'answerinlinequery':
+                for result_dict in data['results']:
+                    if isinstance(result_dict.get('parse_mode'), DefaultValue):
+                        pytest.fail('InlineQueryResult has DefaultValue parse_mode')
+                    imc = result_dict.get('input_message_content')
+                    if imc and isinstance(imc.get('parse_mode'), DefaultValue):
+                        pytest.fail(
+                            'InlineQueryResult is InputMessageContext with DefaultValue parse_mode'
+                        )
+                    if imc and isinstance(imc.get('disable_web_page_preview'), DefaultValue):
+                        pytest.fail(
+                            'InlineQueryResult is InputMessageContext with DefaultValue '
+                            'disable_web_page_preview '
+                        )
+            # Check datetime conversion
+            until_date = data.pop('until_date', None)
+            if until_date and until_date != 946684800:
+                pytest.fail('Naive until_date was not interpreted as UTC')
+
+            if bot_method_name in ['get_file', 'getFile']:
+                # The get_file methods try to check if the result is a local file
+                return File(file_id='result', file_unique_id='result').to_dict()
+
+        method = getattr(raw_bot, bot_method_name)
+        signature = inspect.signature(method)
+        kwargs_need_default = [
+            kwarg
+            for kwarg, value in signature.parameters.items()
+            if isinstance(value.default, DefaultValue)
+        ]
+        monkeypatch.setattr(raw_bot.request, 'post', make_assertion)
+        method(**build_kwargs(inspect.signature(method), kwargs_need_default))
 
     def test_ext_bot_signature(self):
         """
@@ -269,7 +331,9 @@ class TestBot:
         """
         # Some methods of ext.ExtBot
         global_extra_args = set()
-        extra_args_per_method = defaultdict(set, {'__init__': {'arbitrary_callback_data'}})
+        extra_args_per_method = defaultdict(
+            set, {'__init__': {'arbitrary_callback_data', 'defaults'}}
+        )
         different_hints_per_method = defaultdict(set, {'__setattr__': {'ext_bot'}})
 
         for name, method in inspect.getmembers(Bot, predicate=inspect.isfunction):
@@ -2512,18 +2576,6 @@ class TestBot:
             bot.arbitrary_callback_data = False
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
-
-    @pytest.mark.parametrize(
-        'cls,warn', [(Bot, True), (BotSubClass, True), (ExtBot, False), (ExtBotSubClass, False)]
-    )
-    def test_defaults_warning(self, bot, recwarn, cls, warn):
-        defaults = Defaults()
-        cls(bot.token, defaults=defaults)
-        if warn:
-            assert len(recwarn) == 1
-            assert 'Passing Defaults to telegram.Bot is deprecated.' in str(recwarn[-1].message)
-        else:
-            assert len(recwarn) == 0
 
     def test_camel_case_redefinition_extbot(self):
         invalid_camel_case_functions = []
