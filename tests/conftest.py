@@ -45,6 +45,11 @@ from telegram import (
     File,
     ChatPermissions,
     Bot,
+    InlineQueryResultArticle,
+    InputTextMessageContent,
+    InlineQueryResultCachedPhoto,
+    InputMediaPhoto,
+    InputMedia,
 )
 from telegram.ext import (
     Dispatcher,
@@ -111,6 +116,11 @@ class DictDispatcher(Dispatcher):
 @pytest.fixture(scope='session')
 def bot(bot_info):
     return DictExtBot(bot_info['token'], private_key=PRIVATE_KEY, request=DictRequest(8))
+
+
+@pytest.fixture(scope='session')
+def raw_bot(bot_info):
+    return DictBot(bot_info['token'], private_key=PRIVATE_KEY, request=DictRequest())
 
 
 DEFAULT_BOTS = {}
@@ -524,6 +534,58 @@ def check_shortcut_call(
     return True
 
 
+# mainly for check_defaults_handling below
+def build_kwargs(signature: inspect.Signature, default_kwargs, dfv: Any = DEFAULT_NONE):
+    kws = {}
+    for name, param in signature.parameters.items():
+        # For required params we need to pass something
+        if param.default is inspect.Parameter.empty:
+            # Some special casing
+            if name == 'permissions':
+                kws[name] = ChatPermissions()
+            elif name in ['prices', 'commands', 'errors']:
+                kws[name] = []
+            elif name == 'media':
+                media = InputMediaPhoto('media', parse_mode=dfv)
+                if 'list' in str(param.annotation).lower():
+                    kws[name] = [media]
+                else:
+                    kws[name] = media
+            elif name == 'results':
+                itmc = InputTextMessageContent(
+                    'text', parse_mode=dfv, disable_web_page_preview=dfv
+                )
+                kws[name] = [
+                    InlineQueryResultArticle('id', 'title', input_message_content=itmc),
+                    InlineQueryResultCachedPhoto(
+                        'id', 'photo_file_id', parse_mode=dfv, input_message_content=itmc
+                    ),
+                ]
+            elif name == 'ok':
+                kws['ok'] = False
+                kws['error_message'] = 'error'
+            else:
+                kws[name] = True
+        # pass values for params that can have defaults only if we don't want to use the
+        # standard default
+        elif name in default_kwargs:
+            if dfv != DEFAULT_NONE:
+                kws[name] = dfv
+        # Some special casing for methods that have "exactly one of the optionals" type args
+        elif name in ['location', 'contact', 'venue', 'inline_message_id']:
+            kws[name] = True
+        elif name == 'until_date':
+            if dfv == 'non-None-value':
+                # Europe/Berlin
+                kws[name] = pytz.timezone('Europe/Berlin').localize(
+                    datetime.datetime(2000, 1, 1, 0)
+                )
+            else:
+                # UTC
+                kws[name] = datetime.datetime(2000, 1, 1, 0)
+    return kws
+
+
 def check_defaults_handling(
     method: Callable,
     bot: ExtBot,
@@ -540,31 +602,6 @@ def check_defaults_handling(
 
     """
 
-    def build_kwargs(signature: inspect.Signature, default_kwargs, dfv: Any = DEFAULT_NONE):
-        kws = {}
-        for name, param in signature.parameters.items():
-            # For required params we need to pass something
-            if param.default == param.empty:
-                # Some special casing
-                if name == 'permissions':
-                    kws[name] = ChatPermissions()
-                elif name in ['prices', 'media', 'results', 'commands', 'errors']:
-                    kws[name] = []
-                elif name == 'ok':
-                    kws['ok'] = False
-                    kws['error_message'] = 'error'
-                else:
-                    kws[name] = True
-            # pass values for params that can have defaults only if we don't want to use the
-            # standard default
-            elif name in default_kwargs:
-                if dfv != DEFAULT_NONE:
-                    kws[name] = dfv
-            # Some special casing for methods that have "exactly one of the optionals" type args
-            elif name in ['location', 'contact', 'venue', 'inline_message_id']:
-                kws[name] = True
-        return kws
-
     shortcut_signature = inspect.signature(method)
     kwargs_need_default = [
         kwarg
@@ -574,23 +611,20 @@ def check_defaults_handling(
     # shortcut_signature.parameters['timeout'] is of type DefaultValue
     method_timeout = shortcut_signature.parameters['timeout'].default.value
 
-    default_kwarg_names = kwargs_need_default
-    # special case explanation_parse_mode of Bot.send_poll:
-    if 'explanation_parse_mode' in default_kwarg_names:
-        default_kwarg_names.remove('explanation_parse_mode')
-
     defaults_no_custom_defaults = Defaults()
-    defaults_custom_defaults = Defaults(
-        **{kwarg: 'custom_default' for kwarg in default_kwarg_names}
-    )
+    kwargs = {kwarg: 'custom_default' for kwarg in inspect.signature(Defaults).parameters.keys()}
+    kwargs['tzinfo'] = pytz.timezone('America/New_York')
+    defaults_custom_defaults = Defaults(**kwargs)
 
     expected_return_values = [None, []] if return_value is None else [return_value]
 
     def make_assertion(_, data, timeout=DEFAULT_NONE, df_value=DEFAULT_NONE):
-        expected_timeout = method_timeout if df_value == DEFAULT_NONE else df_value
+        # Check timeout first
+        expected_timeout = method_timeout if df_value is DEFAULT_NONE else df_value
         if timeout != expected_timeout:
             pytest.fail(f'Got value {timeout} for "timeout", expected {expected_timeout}')
 
+        # Check regular arguments that need defaults
         for arg in (dkw for dkw in kwargs_need_default if dkw != 'timeout'):
             # 'None' should not be passed along to Telegram
             if df_value in [None, DEFAULT_NONE]:
@@ -602,6 +636,65 @@ def check_defaults_handling(
                 value = data.get(arg, '`not passed at all`')
                 if value != df_value:
                     pytest.fail(f'Got value {value} for argument {arg} instead of {df_value}')
+
+        # Check InputMedia (parse_mode can have a default)
+        def check_input_media(m: InputMedia):
+            parse_mode = m.parse_mode
+            if df_value is DEFAULT_NONE:
+                if parse_mode is not None:
+                    pytest.fail('InputMedia has non-None parse_mode')
+            elif parse_mode != df_value:
+                pytest.fail(
+                    f'Got value {parse_mode} for InputMedia.parse_mode instead of {df_value}'
+                )
+
+        media = data.pop('media', None)
+        if media:
+            if isinstance(media, InputMedia):
+                check_input_media(media)
+            else:
+                for m in media:
+                    check_input_media(m)
+
+        # Check InlineQueryResults
+        results = data.pop('results', [])
+        for result in results:
+            if df_value in [DEFAULT_NONE, None]:
+                if 'parse_mode' in result:
+                    pytest.fail('ILQR has a parse mode, expected it to be absent')
+            # Here we explicitly use that we only pass ILQRPhoto and ILQRArticle for testing
+            # so ILQRPhoto is expected to have parse_mode if df_value is not in [DF_NONE, NONE]
+            elif 'photo' in result and result.get('parse_mode') != df_value:
+                pytest.fail(
+                    f'Got value {result.get("parse_mode")} for '
+                    f'ILQR.parse_mode instead of {df_value}'
+                )
+            imc = result.get('input_message_content')
+            if not imc:
+                continue
+            for attr in ['parse_mode', 'disable_web_page_preview']:
+                if df_value in [DEFAULT_NONE, None]:
+                    if attr in imc:
+                        pytest.fail(f'ILQR.i_m_c has a {attr}, expected it to be absent')
+                # Here we explicitly use that we only pass InputTextMessageContent for testing
+                # which has both attributes
+                elif imc.get(attr) != df_value:
+                    pytest.fail(
+                        f'Got value {imc.get(attr)} for ILQR.i_m_c.{attr} instead of {df_value}'
+                    )
+
+        # Check datetime conversion
+        until_date = data.pop('until_date', None)
+        if until_date:
+            if df_value == 'non-None-value':
+                if until_date != 946681200:
+                    pytest.fail('Non-naive until_date was interpreted as Europe/Berlin.')
+            if df_value is DEFAULT_NONE:
+                if until_date != 946684800:
+                    pytest.fail('Naive until_date was not interpreted as UTC')
+            if df_value == 'custom_default':
+                if until_date != 946702800:
+                    pytest.fail('Naive until_date was not interpreted as America/New_York')
 
         if method.__name__ in ['get_file', 'get_small_file', 'get_big_file']:
             # This is here mainly for PassportFile.get_file, which calls .set_credentials on the
@@ -622,7 +715,7 @@ def check_defaults_handling(
             (DEFAULT_NONE, defaults_no_custom_defaults),
             ('custom_default', defaults_custom_defaults),
         ]:
-            bot.defaults = defaults
+            bot._defaults = defaults
             # 1: test that we get the correct default value, if we don't specify anything
             kwargs = build_kwargs(
                 shortcut_signature,
@@ -651,6 +744,6 @@ def check_defaults_handling(
         raise exc
     finally:
         setattr(bot.request, 'post', orig_post)
-        bot.defaults = None
+        bot._defaults = None
 
     return True
