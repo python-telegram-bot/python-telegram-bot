@@ -1,6 +1,6 @@
 name: Warning maintainers
 on:
-  pull_request:
+  pull_request_target:
     paths:
       - requirements.txt
       - requirements-dev.txt
